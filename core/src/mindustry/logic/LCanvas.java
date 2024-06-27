@@ -13,6 +13,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.pooling.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -278,8 +279,10 @@ public class LCanvas extends Table{
             });
             processedJumps.sort((a,b) -> a.jumpUIBegin - b.jumpUIBegin);
 
-            Seq<JumpCurve> occupiers = new Seq<JumpCurve>();
-            Bits occupied = new Bits();
+            Seq<JumpCurve> occupiers = Pools.obtain(Seq.class, Seq<JumpCurve>::new);
+            Bits occupied = Pools.obtain(Bits.class, Bits::new);
+            occupiers.clear();
+            occupied.clear();
             for(int i = 0; i < processedJumps.size; i++){
                 JumpCurve cur = processedJumps.get(i);
                 occupiers.retainAll(e -> {
@@ -291,15 +294,21 @@ public class LCanvas extends Table{
                 occupiers.add(cur);
                 occupied.set(h);
             }
+
+            occupied.clear();
+            occupiers.clear();
+            Pools.free(occupied);
+            Pools.free(occupiers);
         }
 
         private int getJumpHeight(int index, Seq<JumpCurve> occupiers, Bits occupied){
             JumpCurve jmp = processedJumps.get(index);
             if(jmp.markedDone) return jmp.predHeight;
 
-            // TODO: optimize for LESS cloning
-            Seq<JumpCurve> tmpOccupiers = new Seq<JumpCurve>(occupiers);
-            Bits tmpOccupied = new Bits();
+            Seq<JumpCurve> tmpOccupiers = Pools.obtain(Seq.class, Seq<JumpCurve>::new).clear();
+            Bits tmpOccupied = Pools.obtain(Bits.class, Bits::new);
+            tmpOccupiers.set(occupiers);
+            tmpOccupied.clear();
             tmpOccupied.set(occupied);
 
             int max = -1;
@@ -319,6 +328,11 @@ public class LCanvas extends Table{
 
             jmp.predHeight = occupied.nextClearBit(max + 1);
             jmp.markedDone = true;
+
+            tmpOccupied.clear();
+            tmpOccupiers.clear();
+            Pools.free(tmpOccupied);
+            Pools.free(tmpOccupiers);
 
             return jmp.predHeight;
         }
