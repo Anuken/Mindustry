@@ -33,9 +33,18 @@ public class PayloadBlock extends Block{
     public void load(){
         super.load();
 
-        topRegion = Core.atlas.find(name + "-top", "factory-top-" + size + regionSuffix);
-        outRegion = Core.atlas.find(name + "-out", "factory-out-" + size + regionSuffix);
-        inRegion = Core.atlas.find(name + "-in", "factory-in-" + size + regionSuffix);
+        topRegion = loadPayloadRegion("-top");
+        outRegion = loadPayloadRegion("-out");
+        inRegion = loadPayloadRegion("-in");
+    }
+
+    protected TextureRegion loadPayloadRegion(String suffix){
+        TextureRegion region = Core.atlas.find(name + suffix);
+
+        if(!region.found() && minfo.mod != null) region = Core.atlas.find(minfo.mod.name + "-factory" + suffix + "-" + size + regionSuffix);
+        if(!region.found()) region = Core.atlas.find("factory" + suffix + "-" + size + regionSuffix);
+
+        return region;
     }
 
     public static boolean blends(Building build, int direction){
