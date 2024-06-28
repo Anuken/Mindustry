@@ -353,7 +353,7 @@ public class ConstructBlock extends Block{
 
             if(progress <= current.deconstructThreshold || state.rules.infiniteResources){
                 //add any leftover items that weren't obtained due to rounding errors
-                if(core != null){
+                if(core != null && !state.rules.infiniteResources){
                     for(int i = 0; i < itemsLeft.length; i++){
                         int target = Mathf.round(requirements[i].amount * state.rules.buildCostMultiplier * state.rules.deconstructRefundMultiplier);
                         int remaining = target - itemsLeft[i];

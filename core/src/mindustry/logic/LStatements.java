@@ -281,8 +281,8 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new DrawI((byte)type.ordinal(), 0, builder.var(x), builder.var(y),
-                type == GraphicsType.print ? nameToAlign.get(p1, Align.bottomLeft) : builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+            return new DrawI((byte)type.ordinal(), builder.var(x), builder.var(y),
+                type == GraphicsType.print ? new LVar(p1, nameToAlign.get(p1, Align.bottomLeft), true) : builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
 
         @Override
@@ -1045,7 +1045,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new RadarI(target1, target2, target3, sort, LExecutor.varUnit, builder.var(sortOrder), builder.var(output));
+            return new RadarI(target1, target2, target3, sort, builder.var("@unit"), builder.var(sortOrder), builder.var(output));
         }
 
         @Override
@@ -1903,6 +1903,42 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SyncI(builder.var(variable));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("clientdata")
+    public static class ClientDataStatement extends LStatement{
+        public String channel = "\"frog\"", value = "\"bar\"", reliable = "0";
+
+        @Override
+        public void build(Table table){
+            table.add("send ");
+            fields(table, value, str -> value = str);
+            table.add(" on ");
+            fields(table, channel, str -> channel = str);
+            table.add(", reliable ");
+            fields(table, reliable, str -> reliable = str);
+        }
+
+        @Override
+        public boolean hidden(){
+            return true;
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            if(!state.rules.allowLogicData) return null;
+            return new ClientDataI(builder.var(channel), builder.var(value), builder.var(reliable));
         }
 
         @Override

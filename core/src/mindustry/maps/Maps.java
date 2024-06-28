@@ -33,7 +33,7 @@ public class Maps{
     NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
     RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
     BlendFilter::new, MirrorFilter::new, ClearFilter::new, CoreSpawnFilter::new,
-    EnemySpawnFilter::new, SpawnPathFilter::new
+    EnemySpawnFilter::new, SpawnPathFilter::new, LogicFilter::new
     };
 
     /** List of all built-in maps. Filenames only. */

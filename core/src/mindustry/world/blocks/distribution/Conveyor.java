@@ -253,7 +253,7 @@ public class Conveyor extends Block implements Autotiler{
             mid = 0;
 
             //skip updates if possible
-            if(len == 0){
+            if(len == 0 && Mathf.equal(timeScale, 1f)){
                 clogHeat = 0f;
                 sleep();
                 return;

@@ -45,7 +45,7 @@ public class DatabaseDialog extends BaseDialog{
 
     void rebuild(){
         all.clear();
-        var text = search.getText();
+        var text = search.getText().toLowerCase();
 
         Seq<Content>[] allContent = Vars.content.getContentMap();
 
@@ -54,7 +54,7 @@ public class DatabaseDialog extends BaseDialog{
 
             Seq<UnlockableContent> array = allContent[j]
                 .select(c -> c instanceof UnlockableContent u && !u.isHidden()  &&
-                    (text.isEmpty() || u.localizedName.toLowerCase().contains(text.toLowerCase()))).as();
+                    (text.isEmpty() || u.localizedName.toLowerCase().contains(text))).as();
             if(array.size == 0) continue;
 
             all.add("@content." + type.name() + ".name").growX().left().color(Pal.accent);

@@ -99,7 +99,7 @@ public class StatusEffect extends UnlockableContent{
         boolean reacts = false;
 
         for(var e : opposites.toSeq().sort()){
-            stats.add(Stat.opposites, e.emoji() + "" + e);
+            stats.add(Stat.opposites, e.emoji() + e);
         }
 
         if(reactive){
@@ -140,6 +140,11 @@ public class StatusEffect extends UnlockableContent{
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
+    }
+
+    /** Called when status effect is removed. */
+    public void onRemoved(Unit unit){
+
     }
 
     protected void trans(StatusEffect effect, TransitionHandler handler){

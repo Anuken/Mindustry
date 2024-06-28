@@ -40,7 +40,7 @@ abstract class BlockUnitComp implements Unitc{
     @Replace
     @Override
     public TextureRegion icon(){
-        return tile.block.fullIcon;
+        return tile.block.uiIcon;
     }
 
     @Override

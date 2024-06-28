@@ -25,7 +25,6 @@ public class Damage{
     private static final Rect rect = new Rect();
     private static final Rect hitrect = new Rect();
     private static final Vec2 vec = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
-    private static final Seq<Unit> units = new Seq<>();
     private static final IntSet collidedBlocks = new IntSet();
     private static final IntFloatMap damages = new IntFloatMap();
     private static final Seq<Collided> collided = new Seq<>();
@@ -41,6 +40,7 @@ public class Damage{
     public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source){
         applySuppression(team, x, y, range, reload, maxDelay, applyParticleChance, source, Pal.sapBullet);
     }
+
     public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source, Color effectColor){
         builds.clear();
         indexer.eachBlock(null, x, y, range, build -> build.team != team, build -> {
@@ -175,21 +175,23 @@ public class Damage{
 
         distances.clear();
 
-        World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
-            //add distance to list so it can be processed
-            var build = world.build(x, y);
+        if(b.type.collidesGround && b.type.collidesTiles){
+            World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
+                //add distance to list so it can be processed
+                var build = world.build(x, y);
 
-            if(build != null && build.team != b.team && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
-                distances.add(b.dst(build));
+                if(build != null && build.team != b.team && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
+                    distances.add(b.dst(build));
 
-                if(laser && build.absorbLasers()){
-                    maxDst = Math.min(maxDst, b.dst(build));
-                    return true;
+                    if(laser && build.absorbLasers()){
+                        maxDst = Math.min(maxDst, b.dst(build));
+                        return true;
+                    }
                 }
-            }
 
-            return false;
-        });
+                return false;
+            });
+        }
 
         Units.nearbyEnemies(b.team, rect, u -> {
             u.hitbox(hitrect);
@@ -247,7 +249,7 @@ public class Damage{
         collidedBlocks.clear();
         vec.trnsExact(angle, length);
 
-        if(hitter.type.collidesGround){
+        if(hitter.type.collidesGround && hitter.type.collidesTiles){
             seg1.set(x, y);
             seg2.set(seg1).add(vec);
             World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {

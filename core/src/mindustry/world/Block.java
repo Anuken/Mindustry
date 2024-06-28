@@ -409,7 +409,7 @@ public class Block extends UnlockableContent implements Senseable{
         Draw.rect(
             variants == 0 ? customShadowRegion :
             variantShadowRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantShadowRegions.length - 1))],
-        tile.drawx(), tile.drawy(), tile.build == null ? 0f : tile.build.drawrot());
+        tile.drawx(), tile.drawy());
         Draw.color();
     }
 
@@ -517,6 +517,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public boolean rotatedOutput(int x, int y){
         return rotate;
+    }
+
+    public boolean rotatedOutput(int fromX, int fromY, Tile destination){
+        return rotatedOutput(fromX, fromY);
     }
 
     public boolean synthetic(){
@@ -1403,6 +1407,7 @@ public class Block extends UnlockableContent implements Senseable{
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
+            case solid -> solid ? 1 : 0;
             case size -> size;
             case itemCapacity -> itemCapacity;
             case liquidCapacity -> liquidCapacity;
