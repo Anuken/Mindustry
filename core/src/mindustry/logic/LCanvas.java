@@ -206,10 +206,45 @@ public class LCanvas extends Table{
         public Group jumps = new WidgetGroup();
         private Seq<JumpCurve> processedJumps = new Seq<JumpCurve>();
         public boolean updateJumpHeights = true;
-        private Rand rand = new Rand();
+        private Color[] jumpColors = new Color[LExecutor.maxInstructions];
 
         {
             setTransform(true);
+
+            Time.mark();
+
+            //set seed so that colors are consistent between game launches
+            Rand rand = new Rand(0L);
+
+            int checkAmount = 5; //to how many previous hues to compare
+            float minDistance = 360f / checkAmount / 2f; //by at least how much should each hue be different from the checkAmount previous and next ones
+
+            Seq<Float> previousHues = new Seq<>();
+
+            for(int i = 0; i < LExecutor.maxInstructions; i++){
+                float hue = 0f;
+
+                boolean goodEnough = false;
+                while(!goodEnough){
+                    goodEnough = true;
+                    hue = Mathf.random(360f);
+                    for(float previousHue : previousHues){
+                        if(Math.abs(previousHue - hue) < minDistance) {
+                            goodEnough = false;
+                            break;
+                        }
+                    }
+                }
+
+                jumpColors[i] = Color.HSVtoRGB(hue, rand.random(80f, 100f), 100f);
+
+                previousHues.add(hue);
+                if(previousHues.size == checkAmount){
+                    previousHues.remove(0);
+                }
+            }
+
+            Log.debug("Processed logic jump colors in @ms", Time.elapsed()); //2.2ms on my (Ilya246) machine
         }
 
         @Override
@@ -272,8 +307,7 @@ public class LCanvas extends Table{
                     if(!(e instanceof JumpCurve e2) || e2.button.to.get() == null) return;
                     int idx = e2.button.to.get().index;
                     if(dragging != null && idx >= dragging.index) idx += 1;
-                    rand.setSeed((long) idx);
-                    Color.HSVtoRGB(rand.random(0.0f, 360.0f), rand.random(80.0f, 90.0f), 100.0f, e2.button.defaultColor);
+                    e2.button.defaultColor.set(jumpColors[idx]);
                 });
             }
 
