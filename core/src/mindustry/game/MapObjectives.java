@@ -64,7 +64,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             TextMarker::new,
             LineMarker::new,
             TextureMarker::new,
-            QuadMarker::new
+            QuadMarker::new,
+            LightMarker::new
         );
 
         registerLegacyMarker("Minimap", PointMarker::new);
@@ -1248,6 +1249,48 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
         }
 
+    }
+
+    /** Displays a single point light. */
+    public static class LightMarker extends PosMarker{
+        public float radius = 5f;
+        public Color color = Color.valueOf("ffd37f");
+
+        public LightMarker(int x, int y){
+            this.pos.set(x, y);
+        }
+
+        public LightMarker(int x, int y, Color color){
+            this.pos.set(x, y);
+            this.color = color;
+        }
+
+        public LightMarker(int x, int y, float radius, Color color){
+            this.pos.set(x, y);
+            this.radius = radius;
+            this.color = color;
+        }
+
+        public LightMarker(){}
+
+        @Override
+        public void drawLight(float scaleFactor){
+            float rad = radius * tilesize * scaleFactor;
+
+            renderer.lights.add(pos.x, pos.y, radius, color, color.a);
+        }
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            super.control(type, p1, p2, p3);
+
+            if(!Double.isNaN(p1)){
+                switch(type){
+                    case radius -> radius = (float)p1;
+                    case color -> color.fromDouble(p1);
+                }
+            }
+        }
     }
 
     private static void lookupRegion(String name, TextureRegion out){
