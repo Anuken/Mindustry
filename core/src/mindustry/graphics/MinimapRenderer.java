@@ -260,19 +260,7 @@ public class MinimapRenderer{
         Draw.reset();
 
         //TODO autoscale markers
-        state.rules.objectives.eachRunning(obj -> {
-            for(var marker : obj.markers){
-                if(marker.minimap){
-                    marker.draw(1);
-                }
-            }
-        });
-
-        for(var marker : state.markers){
-            if(marker.minimap){
-                marker.draw(1);
-            }
-        }
+        renderer.drawMarkers(1, marker -> marker.minimap);
 
         Draw.trans(Tmp.m2);
     }

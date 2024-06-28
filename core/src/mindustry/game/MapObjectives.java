@@ -64,7 +64,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             TextMarker::new,
             LineMarker::new,
             TextureMarker::new,
-            QuadMarker::new
+            QuadMarker::new,
+            LightMarker::new
         );
 
         registerLegacyMarker("Minimap", PointMarker::new);
@@ -618,12 +619,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public boolean world = true;
         /** Whether to display marker on minimap. */
         public boolean minimap = false;
+        /** Whether the marker should act as a light source. */
+        public boolean light = false;
         /** Whether to scale marker corresponding to player's zoom level. */
         public boolean autoscale = false;
         /** On which z-sorting layer is marker drawn. */
         protected float drawLayer = Layer.overlayUI;
 
         public void draw(float scaleFactor){}
+
+        public void drawLight(float scaleFactor){
+            draw(scaleFactor);
+        }
 
         /** Control marker with world processor code. Ignores NaN (null) values. */
         public void control(LMarkerControl type, double p1, double p2, double p3){
@@ -632,6 +639,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             switch(type){
                 case world -> world = !Mathf.equal((float)p1, 0f);
                 case minimap -> minimap = !Mathf.equal((float)p1, 0f);
+                case light -> light = !Mathf.equal((float)p1, 0f);
                 case autoscale -> autoscale = !Mathf.equal((float)p1, 0f);
                 case drawLayer -> drawLayer = (float)p1;
             }
@@ -831,8 +839,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             Draw.z(drawLayer);
             Lines.stroke(Scl.scl((1f - fin) * stroke + 0.1f), color);
             Lines.circle(pos.x, pos.y, rad * fin);
+        }
 
-            Draw.reset();
+        @Override
+        public void drawLight(float scaleFactor){
+            float rad = radius * tilesize * scaleFactor;
+
+            renderer.lights.add(pos.x, pos.y, radius, color, color.a);
         }
 
         @Override
@@ -890,8 +903,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     Fill.arc(pos.x, pos.y, radius * scaleFactor, (startAngle - endAngle) / 360f, rotation + endAngle, sides);
                 }
             }
-
-            Draw.reset();
         }
 
         @Override
@@ -1030,6 +1041,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             Lines.stroke(stroke * scaleFactor, Color.white);
             Lines.line(pos.x, pos.y, color1, endPos.x, endPos.y, color2);
+        }
+
+        @Override
+        public void drawLight(float scaleFactor){
+            renderer.lights.line(pos.x, pos.y, endPos.x, endPos.y, stroke, color1, color1.a);
         }
 
         @Override
@@ -1233,6 +1249,48 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
         }
 
+    }
+
+    /** Displays a single point light. */
+    public static class LightMarker extends PosMarker{
+        public float radius = 5f;
+        public Color color = Color.valueOf("ffd37f");
+
+        public LightMarker(int x, int y){
+            this.pos.set(x, y);
+        }
+
+        public LightMarker(int x, int y, Color color){
+            this.pos.set(x, y);
+            this.color = color;
+        }
+
+        public LightMarker(int x, int y, float radius, Color color){
+            this.pos.set(x, y);
+            this.radius = radius;
+            this.color = color;
+        }
+
+        public LightMarker(){}
+
+        @Override
+        public void drawLight(float scaleFactor){
+            float rad = radius * tilesize * scaleFactor;
+
+            renderer.lights.add(pos.x, pos.y, radius, color, color.a);
+        }
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            super.control(type, p1, p2, p3);
+
+            if(!Double.isNaN(p1)){
+                switch(type){
+                    case radius -> radius = (float)p1;
+                    case color -> color.fromDouble(p1);
+                }
+            }
+        }
     }
 
     private static void lookupRegion(String name, TextureRegion out){
