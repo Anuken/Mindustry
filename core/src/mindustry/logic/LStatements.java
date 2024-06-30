@@ -856,6 +856,7 @@ public class LStatements{
         private static Color last = new Color();
 
         public transient StatementElem dest;
+        public transient JumpButton jumpButton;
 
         public int destIndex;
 
@@ -870,7 +871,7 @@ public class LStatements{
             table.table(this::rebuild);
 
             table.add().growX();
-            table.add(new JumpButton(() -> dest, s -> dest = s)).size(30).right().padLeft(-8);
+            table.add(jumpButton = new JumpButton(() -> dest, s -> dest = s)).size(30).right().padLeft(-8);
 
             String name = name();
 

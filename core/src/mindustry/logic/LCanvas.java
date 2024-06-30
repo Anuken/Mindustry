@@ -19,6 +19,8 @@ import mindustry.graphics.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 
+import java.util.*;
+
 public class LCanvas extends Table{
     public static final int maxJumpsDrawn = 100;
     //ew static variables
@@ -257,11 +259,51 @@ public class LCanvas extends Table{
                 }
             }
 
+            Seq<StatementElem> allJumps = new Seq<>();
+            children.each(e -> e instanceof StatementElem s && s.st instanceof JumpStatement, e -> allJumps.add((StatementElem)e));
+            Seq<StatementElem> backJumps = new Seq<>();
+            Seq<StatementElem> forwardJumps = new Seq<>();
+            allJumps.each(j -> j.jumpCurve.dist = 20f);
+            children.each(c -> {
+                if(c instanceof StatementElem s){
+                    //Add to dist at bottom end of a jump
+                    if(forwardJumps.contains(j -> fwdJumpDestCheck(j, s))){ //The dest of a previous jump is this
+                        for(int i = forwardJumps.size - 1; i >= 0; i--){ //Start from end so it'll remove shorter jumps first.
+                            if(fwdJumpDestCheck(forwardJumps.get(i), s)){
+                                forwardJumps.remove(i);
+                            }
+
+                            backJumps.each(j -> j.jumpCurve.dist += 20f);
+                            forwardJumps.each(j -> j.jumpCurve.dist += 20f);
+                        }
+                    }
+                    if(backJumps.contains(s)){ //This is the origin of a jump going backwards
+                        backJumps.remove(s);
+
+                        backJumps.each(j -> j.jumpCurve.dist += 20f);
+                        forwardJumps.each(j -> j.jumpCurve.dist += 20f);
+                    }
+
+                    backJumps.add(allJumps.select(j -> backJumpDestCheck(j, s)));
+                    if(s.st instanceof JumpStatement j && j.dest != null && j.dest.index > s.index) forwardJumps.add(s);
+                }
+            });
+
             invalidateHierarchy();
 
             if(parent != null && parent instanceof Table){
                 setCullingArea(parent.getCullingArea());
             }
+        }
+
+        private boolean fwdJumpDestCheck(StatementElem jump, StatementElem jumpDest){
+            StatementElem dest = ((JumpStatement)jump.st).dest;
+            return dest != null && dest.index > jump.index && dest.equals(jumpDest);
+        }
+
+        private boolean backJumpDestCheck(StatementElem jump, StatementElem jumpDest){
+            StatementElem dest = ((JumpStatement)jump.st).dest;
+            return dest != null && dest.index < jump.index && dest.equals(jumpDest);
         }
 
         @Override
@@ -329,6 +371,7 @@ public class LCanvas extends Table{
         public LStatement st;
         public int index;
         Label addressLabel;
+        JumpCurve jumpCurve;
 
         public StatementElem(LStatement st){
             this.st = st;
@@ -405,6 +448,8 @@ public class LCanvas extends Table{
                 t.marginLeft(4);
                 t.setColor(color);
                 st.build(t);
+
+                if(st instanceof JumpStatement) jumpCurve = ((JumpStatement)st).jumpButton.curve;;
             }).pad(4).padTop(2).left().grow();
 
             marginBottom(7);
@@ -523,6 +568,7 @@ public class LCanvas extends Table{
 
     public static class JumpCurve extends Element{
         public JumpButton button;
+        public float dist = 20f;
 
         public JumpCurve(JumpButton button){
             this.button = button;
@@ -581,8 +627,6 @@ public class LCanvas extends Table{
             Lines.stroke(4f, button.color);
             Draw.alpha(parentAlpha);
 
-            float dist = 100f;
-
             //square jumps
             if(false){
                 float len = Scl.scl(Mathf.randomSeed(hashCode(), 10, 50));
@@ -599,11 +643,12 @@ public class LCanvas extends Table{
             }
 
             Lines.curve(
-            x, y,
-            x + dist, y,
-            x2 + dist, y2,
-            x2, y2,
-            Math.max(18, (int)(Mathf.dst(x, y, x2, y2) / 6)));
+                x, y,
+                x + dist, y,
+                x2 + dist, y2,
+                x2, y2,
+                Math.max(18, (int)(Mathf.dst(x, y, x2, y2) / 6))
+            );
         }
     }
 }
