@@ -505,6 +505,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         graphics.checkPref("dynamicjumpheights", true);
         graphics.checkPref("coloredjumps", true);
+        graphics.checkPref("trapezoidaljumps", true);
     }
 
     public void exportData(Fi file) throws IOException{
