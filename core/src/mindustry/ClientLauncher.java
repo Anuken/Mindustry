@@ -216,6 +216,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         if(!finished){
             if(loader != null){
                 loader.draw();
+                Events.fire(Trigger.loaderDraw);
             }
             if(assets.update(1000 / loadingFPS)){
                 loader.dispose();
