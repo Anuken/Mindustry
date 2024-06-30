@@ -83,6 +83,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean overrideLineRotation;
     public int rotation;
     public boolean droppingItem;
+    public float itemDepositCooldown;
     public Group uiGroup;
     public boolean isBuilding = true, buildWasAutoPaused = false, wasShooting = false;
     public @Nullable UnitType controlledType;
@@ -142,6 +143,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Events.on(ResetEvent.class, e -> {
             logicCutscene = false;
+            itemDepositCooldown = 0f;
             Arrays.fill(controlGroups, null);
         });
     }
@@ -423,6 +425,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player == null || build == null || !player.within(build, itemTransferRange) || build.items == null || player.dead() || (state.rules.onlyDepositCore && !(build instanceof CoreBuild))) return;
 
         if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, build) ||
+        //to avoid rejecting deposit packets that happen to overlap due to packet speed differences, the actual cap is double the cooldown with 2 deposits.
+        (!player.isLocal() && !player.itemDepositRate.allow((long)(state.rules.itemDepositCooldown * 1000 * 2), 2)) ||
+
         !netServer.admins.allowAction(player, ActionType.depositItem, build.tile, action -> {
             action.itemAmount = player.unit().stack.amount;
             action.item = player.unit().item();
@@ -795,6 +800,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }else{
             logicCutsceneZoom = -1f;
         }
+
+        itemDepositCooldown -= Time.delta / 60f;
 
         commandBuildings.removeAll(b -> !b.isValid());
 
@@ -1859,8 +1866,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(build != null && build.acceptStack(stack.item, stack.amount, player.unit()) > 0 && build.interactable(player.team()) &&
                 build.block.hasItems && player.unit().stack().amount > 0 && build.interactable(player.team())){
-            if(!(state.rules.onlyDepositCore && !(build instanceof CoreBuild))){
+
+            if(!(state.rules.onlyDepositCore && !(build instanceof CoreBuild)) && itemDepositCooldown <= 0f){
                 Call.transferInventory(player, build);
+                itemDepositCooldown = state.rules.itemDepositCooldown;
             }
         }else{
             Call.dropItem(player.angleTo(x, y));

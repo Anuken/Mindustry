@@ -47,6 +47,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient float deathTimer;
     transient String lastText = "";
     transient float textFadeTime;
+    transient Ratekeeper itemDepositRate = new Ratekeeper();
 
     transient private Unit lastReadUnit = Nulls.unit;
     transient private int wrongReadUnits;
