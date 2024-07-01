@@ -117,11 +117,13 @@ public class BeamDrill extends Block{
 
         if(optionalBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
             stats.remove(Stat.booster);
-            stats.add(Stat.booster,
-                StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
+            stats.add(Stat.booster, StatValues.speedBoosters(
+                "{0}" + StatUnit.timesSpeed.localized(),
                 consBase.amount, optionalBoostIntensity, false,
-                l -> (consumesLiquid(l) && (findConsumer(f -> f instanceof ConsumeLiquid).booster || ((ConsumeLiquid)findConsumer(f -> f instanceof ConsumeLiquid)).liquid != l)))
-            );
+                l -> (consumesLiquid(l) && 
+                    findConsumer(f -> f instanceof ConsumeLiquid cl && cl.liquid == l && cl.booster) != null
+                )
+            ));
         }
     }
 
