@@ -319,5 +319,9 @@
   {
     "name": "Vndustry",
     "address": ["vndustry.ddns.net"]
+  },
+  {
+    "name": "ChillOut",
+    "address": ["87.228.8.133"]
   }
 ]
