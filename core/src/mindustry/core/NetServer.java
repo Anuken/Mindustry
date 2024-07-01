@@ -59,7 +59,7 @@ public class NetServer implements ApplicationListener{
                         count++;
                     }
                 }
-                return count;
+                return (float)count + Mathf.random(-0.1f, 0.1f); //if several have the same playercount pick random
             });
             return re == null ? null : re.team;
         }
