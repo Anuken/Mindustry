@@ -319,5 +319,9 @@
   {
     "name": "Vndustry",
     "address": ["vndustry.ddns.net"]
+  },
+  {
+    "name": "VNM",
+    "address": ["server.mindustry-tool.app"]
   }
 ]
