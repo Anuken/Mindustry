@@ -47,6 +47,8 @@ public class BuilderAI extends AIController{
 
         if(target != null && shouldShoot()){
             unit.lookAt(target);
+        }else if(!unit.type.flying){
+            unit.lookAt(unit.prefRotation());
         }
 
         unit.updateBuilding = true;
@@ -54,6 +56,8 @@ public class BuilderAI extends AIController{
         if(assistFollowing != null && assistFollowing.activelyBuilding()){
             following = assistFollowing;
         }
+
+        boolean moving = false;
 
         if(following != null){
             retreatTimer = 0f;
@@ -83,6 +87,7 @@ public class BuilderAI extends AIController{
                     var core = unit.closestCore();
                     if(core != null && !unit.within(core, retreatDst)){
                         moveTo(core, retreatDst);
+                        moving = true;
                     }
                 }
             }
@@ -114,7 +119,8 @@ public class BuilderAI extends AIController{
 
             if(valid){
                 //move toward the plan
-                moveTo(req.tile(), unit.type.buildRange - 20f);
+                moveTo(req.tile(), unit.type.buildRange - 20f, 20f);
+                moving = !unit.within(req.tile(), unit.type.buildRange - 10f);
             }else{
                 //discard invalid plan
                 unit.plans.removeFirst();
@@ -124,6 +130,7 @@ public class BuilderAI extends AIController{
 
             if(assistFollowing != null){
                 moveTo(assistFollowing, assistFollowing.type.hitSize + unit.type.hitSize/2f + 60f);
+                moving = !unit.within(assistFollowing, assistFollowing.type.hitSize + unit.type.hitSize/2f + 65f);
             }
 
             //follow someone and help them build
@@ -185,6 +192,10 @@ public class BuilderAI extends AIController{
                     blocks.addLast(blocks.removeFirst());
                 }
             }
+        }
+
+        if(!unit.type.flying){
+            unit.updateBoosting(moving || unit.floorOn().isDuct || unit.floorOn().damageTaken > 0f);
         }
     }
 

@@ -31,7 +31,7 @@ public class ShieldArcAbility extends Ability{
             if(paramField.data <= b.damage()){
                 paramField.data -= paramField.cooldown * paramField.regen;
 
-                Fx.arcShieldBreak.at(paramPos.x, paramPos.y, 0, paramUnit.team.color, paramUnit);
+                Fx.arcShieldBreak.at(paramPos.x, paramPos.y, 0, paramField.color == null ? paramUnit.type.shieldColor(paramUnit) : paramField.color, paramUnit);
             }
 
             paramField.data -= b.damage();
@@ -60,6 +60,8 @@ public class ShieldArcAbility extends Ability{
     public boolean drawArc = true;
     /** If not null, will be drawn on top. */
     public @Nullable String region;
+    /** Color override of the shield. Uses unit shield colour by default. */ 
+    public @Nullable Color color;
     /** If true, sprite position will be influenced by x/y. */
     public boolean offsetRegion = false;
 
@@ -109,7 +111,7 @@ public class ShieldArcAbility extends Ability{
         if(widthScale > 0.001f){
             Draw.z(Layer.shields);
 
-            Draw.color(unit.team.color, Color.white, Mathf.clamp(alpha));
+            Draw.color(color == null ? unit.type.shieldColor(unit) : color, Color.white, Mathf.clamp(alpha));
             var pos = paramPos.set(x, y).rotate(unit.rotation - 90f).add(unit);
 
             if(!Vars.renderer.animateShields){

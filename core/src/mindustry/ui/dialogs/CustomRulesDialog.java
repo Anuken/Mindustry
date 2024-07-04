@@ -30,15 +30,23 @@ public class CustomRulesDialog extends BaseDialog{
     private Table main;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
+
+    public boolean showRuleEditRule;
     public Seq<Table> categories;
     public Table current;
     public Seq<String> categoryNames;
-    public String currentName;
+    public String currentName = "";
     public String ruleSearch = "";
     public Seq<Runnable> additionalSetup; // for modding to easily add new rules
 
     public CustomRulesDialog(){
+        this(false);
+    }
+
+    public CustomRulesDialog(boolean showRuleEditRule){
         super("@mode.custom");
+
+        this.showRuleEditRule = showRuleEditRule;
 
         loadoutDialog = new LoadoutDialog();
 
@@ -49,8 +57,6 @@ public class CustomRulesDialog extends BaseDialog{
         additionalSetup = new Seq<>();
         categories = new Seq<>();
         categoryNames = new Seq<>();
-        currentName = "";
-        ruleSearch = "";
 
         buttons.button("@edit", Icon.pencil, () -> {
             BaseDialog dialog = new BaseDialog("@waves.edit");
@@ -209,7 +215,6 @@ public class CustomRulesDialog extends BaseDialog{
         main.left().defaults().fillX().left();
         main.row();
 
-
         category("waves");
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
         check("@rules.wavesending", b -> rules.waveSending = b, () -> rules.waveSending, () -> rules.waves);
@@ -352,6 +357,10 @@ public class CustomRulesDialog extends BaseDialog{
 
 
         category("teams");
+        //not sure where else to put this
+        if(showRuleEditRule){
+            check("@rules.allowedit", b -> rules.allowEditRules = b, () -> rules.allowEditRules);
+        }
         team("@rules.playerteam", t -> rules.defaultTeam = t, () -> rules.defaultTeam);
         team("@rules.enemyteam", t -> rules.waveTeam = t, () -> rules.waveTeam);
 
