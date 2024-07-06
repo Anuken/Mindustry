@@ -1923,7 +1923,7 @@ public class LStatements{
             table.add(" on ");
             fields(table, channel, str -> channel = str);
             table.add(", reliable ");
-            fields(table, channel, str -> channel = str);
+            fields(table, reliable, str -> reliable = str);
         }
 
         @Override

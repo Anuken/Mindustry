@@ -33,7 +33,7 @@
   },
   {
     "name": "DontVin",
-    "address": ["45.84.59.49:1342","45.137.205.185:1068","45.137.205.185:1190","45.137.205.185:1191","be.phoenix-network.dev:4200","be.phoenix-network.dev:6942","134.255.218.3:1142","45.137.205.185:1192","45.137.205.185:1193","45.137.205.185:1221"]
+    "address": ["45.84.59.49:1342","45.137.205.185:1068","45.137.205.185:1190","45.137.205.185:1191","134.255.218.3:1142","45.137.205.185:1192","45.137.205.185:1193","45.137.205.185:1221","be.phoenix-network.dev","be.phoenix-network.dev:1111","be.phoenix-network.dev:2222","be.phoenix-network.dev:3333","be.phoenix-network.dev:4444","be.phoenix-network.dev:5555","be.phoenix-network.dev:6666","be.phoenix-network.dev:7777","be.phoenix-network.dev:8888","be.phoenix-network.dev:9999"]
   },
   {
     "name": "Crux's Citadel",
@@ -84,8 +84,8 @@
     "address": ["0nera.ru:7777"]
   },
   {
-    "name": "Untitled Mindustry Servers",
-    "address": ["45.144.66.250:6567", "45.144.66.250:6601", "45.144.66.250:6611"]
+    "name": "Voiddustry Servers",
+    "address": ["45.144.66.250:6567", "185.189.14.201:6567"]
   },
   {
     "name": "thedimas",
@@ -238,11 +238,11 @@
   },
   {
     "name": "MeowIsland",
-    "address": ["nexus.minecraft.rent:25598", "nexus.minecraft.rent:25596", "jupiter.minecraft.rent:25651", "pandora.minecraft.rent:25620"]
+    "address": ["jupiter.minerent.net:25651", "nexus.minerent.net:25596", "nexus.minerent.net:25598", "pandora.minerent.net:25620"]
   },
   {
     "name": "3MIDustry",
-    "address": ["play.3midustry.xyz:6001", "play.3midustry.xyz:6002", "play.3midustry.xyz:6003", "play.3midustry.xyz:6004", "play.3midustry.xyz:6005", "play.3midustry.xyz:6006", "play.3midustry.xyz:6007", "play.3midustry.xyz:6008", "play.3midustry.xyz:6009", "play.3midustry.xyz:6010"]
+    "address": ["play.3midustry.octane.lol:6001", "play.3midustry.octane.lol:6002", "play.3midustry.octane.lol:6003", "play.3midustry.octane.lol:6004", "play.3midustry.octane.lol:6005", "play.3midustry.octane.lol:6006", "play.3midustry.octane.lol:6007", "play.3midustry.octane.lol:6008", "play.3midustry.octane.lol:6009", "play.3midustry.octane.lol:6010"]
   },
   {
     "name": "abcxyz remaster",

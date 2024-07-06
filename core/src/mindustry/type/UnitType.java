@@ -259,6 +259,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public Color healColor = Pal.heal;
     /** Color of light that this unit produces when lighting is enabled in the map. */
     public Color lightColor = Pal.powerLight;
+    /** override for unit shield colour. */
+    public @Nullable Color shieldColor;
     /** sound played when this unit explodes (*not* when it is shot down) */
     public Sound deathSound = Sounds.bang;
     /** sound played on loop when this unit is around. */
@@ -826,6 +828,10 @@ public class UnitType extends UnlockableContent implements Senseable{
 
             if(canBoost){
                 cmds.add(UnitCommand.boostCommand);
+
+                if(buildSpeed > 0f){
+                    cmds.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
+                }
             }
 
             //healing, mining and building is only supported for flying units; pathfinding to ambiguously reachable locations is hard.
@@ -1305,6 +1311,12 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         Draw.reset();
     }
+        
+    //...where do I put this
+    public Color shieldColor(Unit unit){
+        return shieldColor == null ? unit.team.color : shieldColor;
+    }
+    
 
     public void drawMining(Unit unit){
         if(!unit.mining()) return;
@@ -1345,7 +1357,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         float radius = unit.hitSize() * 1.3f;
         Fill.light(unit.x, unit.y, Lines.circleVertices(radius), radius,
             Color.clear,
-            Tmp.c2.set(unit.team.color).lerp(Color.white, Mathf.clamp(unit.hitTime() / 2f)).a(0.7f * alpha)
+            Tmp.c2.set(unit.type.shieldColor(unit)).lerp(Color.white, Mathf.clamp(unit.hitTime() / 2f)).a(0.7f * alpha)
         );
     }
 
