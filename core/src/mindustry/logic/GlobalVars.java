@@ -92,11 +92,13 @@ public class GlobalVars{
         put("@ctrlCommand", ctrlCommand);
         
         //sounds
-        for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
-            if(sound != Sounds.none && sound != Sounds.swish){
-                String name = sound.file.nameWithoutExtension();
-                soundNames.add(name);
-                put("@sfx-" + name, Sounds.getSoundId(sound));
+        if(Core.assets != null){
+            for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
+                if(sound != Sounds.none && sound != Sounds.swish){
+                    String name = sound.file.nameWithoutExtension();
+                    soundNames.add(name);
+                    put("@sfx-" + name, Sounds.getSoundId(sound));
+                }
             }
         }
 
