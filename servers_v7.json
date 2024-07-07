@@ -321,6 +321,10 @@
     "address": ["vndustry.ddns.net"]
   },
   {
+    "name": "ChillOut",
+    "address": ["87.228.8.133"]
+  },
+  {
     "name": "VNM",
     "address": ["server.mindustry-tool.app"]
   }
