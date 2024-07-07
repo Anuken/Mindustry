@@ -259,7 +259,8 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void updateTile(){
-            float eff = enabled ? (efficiency + baseEfficiency) : 0f;
+            //the item still needs to be "reeled" in when disabled
+            float eff = enabled ? (efficiency + baseEfficiency) : 1f;
 
             //reel in crater
             if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * eff * delta(), 0f, recharge);

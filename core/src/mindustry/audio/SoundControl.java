@@ -164,8 +164,11 @@ public class SoundControl{
             //this just fades out the last track to make way for ingame music
             silence();
 
-            //play music at intervals
-            if(Time.timeSinceMillis(lastPlayed) > 1000 * musicInterval / 60f){
+            if(Core.settings.getBool("alwaysmusic")){
+                if(current == null){
+                    playRandom();
+                }
+            }else if(Time.timeSinceMillis(lastPlayed) > 1000 * musicInterval / 60f){
                 //chance to play it per interval
                 if(Mathf.chance(musicChance)){
                     lastPlayed = Time.millis();
