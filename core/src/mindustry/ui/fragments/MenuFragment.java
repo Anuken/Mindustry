@@ -28,11 +28,11 @@ public class MenuFragment{
     private Button currentMenu;
     private MenuRenderer renderer;
     private Seq<MenuButton> customButtons = new Seq<>();
-    public MenuButton[] desktopButtons;
+    public Seq<MenuButton> desktopButtons = new Seq();
 
     public MenuFragment(){
         if(!mobile){
-            desktopButtons = new MenuButton[]{
+            desktopButtons = Seq.with(
                 new MenuButton("@play", Icon.play,
                     new MenuButton("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
                     new MenuButton("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
@@ -47,9 +47,7 @@ public class MenuFragment{
                 new MenuButton("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new MenuButton("@workshop", Icon.steam, platform::openWorkshop) : null,
                 new MenuButton("@mods", Icon.book, ui.mods::show),
                 new MenuButton("@settings", Icon.settings, ui.settings::show)
-            };
-        }else{
-            desktopButtons = null;
+            );
         }
     }
 
@@ -211,7 +209,7 @@ public class MenuFragment{
             t.defaults().width(width).height(70f);
             t.name = "buttons";
 
-            buttons(t, desktopButtons);
+            buttons(t, desktopButtons.toArray(MenuButton.class));
             buttons(t, customButtons.toArray(MenuButton.class));
             buttons(t, new MenuButton("@quit", Icon.exit, Core.app::exit));
         }).width(width).growY();
