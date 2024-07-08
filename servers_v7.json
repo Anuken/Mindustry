@@ -242,7 +242,7 @@
   },
   {
     "name": "Exdustry",
-    "address": ["uk1.noxia.cloud:6001", "uk1.noxia.cloud:6002", "uk1.noxia.cloud:6003", "uk1.noxia.cloud:6004", "uk1.noxia.cloud:6005", "uk1.noxia.cloud:6006", "uk1.noxia.cloud:6007", "uk1.noxia.cloud:6008", "uk1.noxia.cloud:6009", "uk1.noxia.cloud:6010"]
+    "address": ["exd.noxia.cloud:6001", "exd.noxia.cloud:6002", "exd.noxia.cloud:6003", "exd.noxia.cloud:6004", "exd.noxia.cloud:6005", "exd.noxia.cloud:6006", "exd.noxia.cloud:6007", "exd.noxia.cloud:6008", "exd.noxia.cloud:6009", "exd.noxia.cloud:6010"]
   },
   {
     "name": "abcxyz remaster",
