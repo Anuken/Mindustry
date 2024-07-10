@@ -1242,7 +1242,7 @@ public class LExecutor{
                         result.setobj(units == null || i < 0 || i >= units.size ? null : units.get(i));
                     }
                 }
-                case player -> result.setobj(i < 0 || i >= data.players.size || data.players.get(i).unit().isNull() ? null : data.players.get(i).unit());
+                case player -> result.setobj(i < 0 || i >= data.players.size ? null : data.players.get(i).unit());
                 case core -> result.setobj(i < 0 || i >= data.cores.size ? null : data.cores.get(i));
                 case build -> {
                     Block block = extra.obj() instanceof Block b ? b : null;

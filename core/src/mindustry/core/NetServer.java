@@ -98,7 +98,7 @@ public class NetServer implements ApplicationListener{
     private boolean closing = false, pvpAutoPaused = true;
     private Interval timer = new Interval(10);
     private IntSet buildHealthChanged = new IntSet();
-    
+
     /** Current kick session. */
     public @Nullable VoteSession currentlyKicking = null;
     /** Duration of a kick in seconds. */
@@ -548,10 +548,10 @@ public class NetServer implements ApplicationListener{
     @Remote(targets = Loc.client, variants = Variant.one)
     public static void requestDebugStatus(Player player){
         int flags =
-            (player.con.hasDisconnected ? 1 : 0) |
-            (player.con.hasConnected ? 2 : 0) |
-            (player.isAdded() ? 4 : 0) |
-            (player.con.hasBegunConnecting ? 8 : 0);
+        (player.con.hasDisconnected ? 1 : 0) |
+        (player.con.hasConnected ? 2 : 0) |
+        (player.isAdded() ? 4 : 0) |
+        (player.con.hasBegunConnecting ? 8 : 0);
 
         Call.debugStatusClient(player.con, flags, player.con.lastReceivedClientSnapshot, player.con.snapshotsSent);
         Call.debugStatusClientUnreliable(player.con, flags, player.con.lastReceivedClientSnapshot, player.con.snapshotsSent);
@@ -610,18 +610,18 @@ public class NetServer implements ApplicationListener{
 
     @Remote(targets = Loc.client, unreliable = true)
     public static void clientSnapshot(
-        Player player,
-        int snapshotID,
-        int unitID,
-        boolean dead,
-        float x, float y,
-        float pointerX, float pointerY,
-        float rotation, float baseRotation,
-        float xVelocity, float yVelocity,
-        Tile mining,
-        boolean boosting, boolean shooting, boolean chatting, boolean building,
-        @Nullable Queue<BuildPlan> plans,
-        float viewX, float viewY, float viewWidth, float viewHeight
+    Player player,
+    int snapshotID,
+    int unitID,
+    boolean dead,
+    float x, float y,
+    float pointerX, float pointerY,
+    float rotation, float baseRotation,
+    float xVelocity, float yVelocity,
+    Tile mining,
+    boolean boosting, boolean shooting, boolean chatting, boolean building,
+    @Nullable Queue<BuildPlan> plans,
+    float viewX, float viewY, float viewWidth, float viewHeight
     ){
         NetConnection con = player.con;
         if(con == null || snapshotID < con.lastReceivedClientSnapshot) return;
@@ -660,12 +660,11 @@ public class NetServer implements ApplicationListener{
         player.shooting = shooting;
         player.boosting = boosting;
 
-        player.unit().controlWeapons(shooting, shooting);
-        player.unit().aim(pointerX, pointerY);
+        @Nullable var unit = player.unit();
 
         if(player.isBuilder()){
-            player.unit().clearBuilding();
-            player.unit().updateBuilding(building);
+            unit.clearBuilding();
+            unit.updateBuilding(building);
 
             if(plans != null){
                 for(BuildPlan req : plans){
@@ -694,12 +693,12 @@ public class NetServer implements ApplicationListener{
             }
         }
 
-        player.unit().mineTile = mining;
-
         con.rejectedRequests.clear();
 
         if(!player.dead()){
-            Unit unit = player.unit();
+            unit.controlWeapons(shooting, shooting);
+            unit.aim(pointerX, pointerY);
+            unit.mineTile = mining;
 
             long elapsed = Math.min(Time.timeSinceMillis(con.lastReceivedClientTime), 1500);
             float maxSpeed = unit.speed();
@@ -1125,7 +1124,7 @@ public class NetServer implements ApplicationListener{
             voted.put(admins.getInfo(player.uuid()).lastIP, d);
 
             Call.sendMessage(Strings.format("[lightgray]@[lightgray] has voted on kicking[orange] @[lightgray].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
-                player.name, target.name, votes, votesRequired()));
+            player.name, target.name, votes, votesRequired()));
 
             checkPass();
         }
