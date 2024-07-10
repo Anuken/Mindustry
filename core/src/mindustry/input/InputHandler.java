@@ -489,6 +489,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.server, called = Loc.server)
     public static void pickedUnitPayload(Unit unit, Unit target){
+        if(target == Nulls.unit) return;
+
         if(target != null && unit instanceof Payloadc pay){
             pay.pickup(target);
         }else if(target != null){
