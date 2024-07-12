@@ -57,7 +57,7 @@ public class DesktopInput extends InputHandler{
     public long lastCtrlGroupSelectMillis;
 
     boolean showHint(){
-        return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() &&
+        return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() && !player.dead() &&
             (!isBuilding && !Core.settings.getBool("buildautopause") || player.unit().isBuilding() || !player.dead() && !player.unit().spawnedByCore());
     }
 
