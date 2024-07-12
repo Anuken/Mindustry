@@ -490,8 +490,9 @@ public class Vars implements Loadable{
             //router
             if(locale.toString().equals("router")){
                 I18NBundle defBundle = I18NBundle.createBundle(Core.files.internal("bundles/bundle"));
+                String router = Character.toString(Iconc.blockRouter);
                 for(String s : bundle.getKeys()){
-                    bundle.getProperties().put(s, Strings.stripColors(defBundle.get(s)).replaceAll("\\S", Character.toString(Iconc.blockRouter)));
+                    bundle.getProperties().put(s, Strings.stripColors(defBundle.get(s)).replaceAll("\\S", router));
                 }
             }
         }
