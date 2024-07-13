@@ -601,6 +601,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void afterDestroyed(){
+            super.afterDestroyed();
             if(state.rules.coreCapture){
                 if(!net.client()){
                     tile.setBlock(block, lastDamage);
