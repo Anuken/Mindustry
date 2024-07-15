@@ -280,7 +280,7 @@ public class StackConveyor extends Block implements Autotiler{
             if(!enabled) return;
 
             if(state == stateUnload){ //unload
-                while(lastItem != null && (!outputRouter ? moveForward(lastItem) : dump(lastItem))){
+                while(lastItem != null && items.has(lastItem) && !outputRouter ? moveForward(lastItem) : dump(lastItem)){
                     if(!outputRouter){
                         items.remove(lastItem, 1);
                     }
