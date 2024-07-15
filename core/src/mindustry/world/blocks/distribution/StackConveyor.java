@@ -394,6 +394,7 @@ public class StackConveyor extends Block implements Autotiler{
 
             link = read.i();
             cooldown = read.f();
+            lastItem = items.first();
         }
     }
 }
