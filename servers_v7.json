@@ -238,7 +238,7 @@
   },
   {
     "name": "MeowIsland",
-    "address": ["jupiter.minerent.net:25651", "nexus.minerent.net:25596", "nexus.minerent.net:25598", "pandora.minerent.net:25620", "vega.minerent.net:25635"]
+    "address": ["meowisland.ru:5000", "meowisland.ru:5001", "meowisland.ru:5002", "meowisland.ru:5003", "meowisland.ru:5004"]
   },
   {
     "name": "Exdustry",
@@ -246,7 +246,7 @@
   },
   {
     "name": "abcxyz remaster",
-    "address": ["144.76.57.59:30302", "srv24.godlike.club:27272"]
+    "address": ["144.76.57.59:30302", "23.88.73.88:16895"]
   },
   {
     "name": "CroCraft Network",
@@ -310,7 +310,7 @@
   },
   {
     "name": "ArmyOFUkraine",
-    "address": ["194.247.42.131:27715", "194.247.42.131:26639"]
+    "address": ["194.247.42.131:27715", "194.247.42.131:27512"]
   },
   {
     "name": "SandBox",
