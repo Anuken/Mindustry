@@ -261,6 +261,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         read(read, revision);
     }
 
+    public void writeSync(Writes write){
+        writeAll(write);
+    }
+
+    public void readSync(Reads read, byte revision){
+        readAll(read, revision);
+    }
+
     @CallSuper
     public void write(Writes write){
         //overriden by subclasses!

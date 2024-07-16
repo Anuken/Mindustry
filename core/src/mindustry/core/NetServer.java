@@ -913,7 +913,7 @@ public class NetServer implements ApplicationListener{
 
             dataStream.writeInt(entity.pos());
             dataStream.writeShort(entity.block.id);
-            entity.writeAll(Writes.get(dataStream));
+            entity.writeSync(Writes.get(dataStream));
 
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();
