@@ -913,7 +913,7 @@ public class HudFragment{
 
         table.table().update(t -> {
             t.left();
-            Bits applied = player.unit() == null ? null : player.unit().statusBits();
+            Bits applied = player.dead() ? null : player.unit().statusBits();
             if(!statuses.equals(applied)){
                 t.clear();
 
