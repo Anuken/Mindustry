@@ -59,6 +59,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     
     @Import float x, y, health, maxHealth;
     @Import Team team;
+    @Import boolean dead;
 
     transient Tile tile;
     transient Block block;
@@ -2081,6 +2082,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public void killed(){
+        dead = true;
         Events.fire(new BlockDestroyEvent(tile));
         block.destroySound.at(tile);
         onDestroyed();
