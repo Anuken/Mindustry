@@ -15,7 +15,7 @@ public class RegionPart extends DrawPart{
     public String suffix = "";
     /** Overrides suffix if set. */
     public @Nullable String name;
-    public TextureRegion heat;
+    public TextureRegion heat, light;
     public TextureRegion[] regions = {};
     public TextureRegion[] outlines = {};
 
@@ -27,8 +27,6 @@ public class RegionPart extends DrawPart{
     public boolean drawRegion = true;
     /** If true, the heat region produces light. */
     public boolean heatLight = false;
-    /** If true, the heat region will only produce light and not draw itself. Assumes heatLight is true. */
-    public boolean lightOnly = false;
     /** Progress function for determining position/rotation. */
     public PartProgress progress = PartProgress.warmup;
     /** Progress function for scaling. */
@@ -134,8 +132,8 @@ public class RegionPart extends DrawPart{
             if(heat.found()){
                 float hprog = heatProgress.getClamp(params);
                 heatColor.write(Tmp.c1).a(hprog * heatColor.a);
-                if(!lightOnly) Drawf.additive(heat, Tmp.c1, rx, ry, rot, turretShading ? turretHeatLayer : Draw.z() + heatLayerOffset);
-                if(heatLight) Drawf.light(rx, ry, heat, rot, Tmp.c1, heatLightOpacity * hprog);
+                Drawf.additive(heat, Tmp.c1, rx, ry, rot, turretShading ? turretHeatLayer : Draw.z() + heatLayerOffset);
+                if(heatLight) Drawf.light(rx, ry, light.found() ? light : heat, rot, Tmp.c1, heatLightOpacity * hprog);
             }
 
             Draw.xscl *= sign;
@@ -189,6 +187,7 @@ public class RegionPart extends DrawPart{
         }
 
         heat = Core.atlas.find(realName + "-heat");
+        light = Core.atlas.find(realName + "-light");
         for(var child : children){
             child.turretShading = turretShading;
             child.load(name);
