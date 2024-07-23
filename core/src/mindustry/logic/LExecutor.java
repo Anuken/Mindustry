@@ -1612,6 +1612,11 @@ public class LExecutor{
             ){
                 //set outSuccess=false to let user retry.
                 outSuccess.setnum(0);
+                //back compatibility 
+                if(exec.var(outSuccess).name.equals("@wait")){
+                    exec.var(varCounter).numval--;
+                    exec.yield = true;
+                }
                 return;
             }
 
