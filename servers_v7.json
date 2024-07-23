@@ -327,5 +327,9 @@
   {
     "name": "VNM",
     "address": ["server.mindustry-tool.app"]
+  },
+  {
+    "name": "LibreDUSTRY",
+    "address": ["46.4.114.111"]
   }
 ]
