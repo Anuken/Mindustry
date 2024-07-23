@@ -297,7 +297,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         font.getData().setScale(0.25f / Scl.scl(1f));
         layout.setText(font, name);
 
-        if(!isLocal()){
+        if(!isLocal() && unit != null){
             Draw.color(0f, 0f, 0f, 0.3f);
             Fill.rect(unit.x, unit.y + nameHeight - layout.height / 2, layout.width + 2, layout.height + 3);
             Draw.color();
@@ -313,7 +313,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             }
         }
 
-        if(Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || typing)){
+        if(unit != null && Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || typing)){
             String text = textFadeTime <= 0 || lastText == null ? "[lightgray]" + Strings.animated(Time.time, 4, 15f, ".") : lastText;
             float width = 100f;
             float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime, 0.9f);
