@@ -3099,7 +3099,8 @@ public class Blocks{
             health = 250;
             inaccuracy = 2.5f;
             rotateSpeed = 10f;
-            coolant = consumeCoolant(0.1f);
+            coolant = consumeCoolant(2/60f);
+            coolantMultiplier = 30f;
             researchCostMultiplier = 0.05f;
 
             limitRange();
