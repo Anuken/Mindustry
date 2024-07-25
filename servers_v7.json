@@ -266,7 +266,7 @@
   },
   {
     "name": "XuwenHost",
-    "address": ["mdt.xuwenblock.cn:6567","rack1.rainplay.cn:59196"]
+    "address": ["mdt.xuwenblock.cn:6567","mdt.nekopark.cloud:6567"]
   },
   {
     "name": "Atomic",
