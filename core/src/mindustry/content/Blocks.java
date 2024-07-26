@@ -3053,7 +3053,10 @@ public class Blocks{
                     height = 9f;
                     backColor = hitColor = Pal.lightishGray;
                     frontColor = Color.white;
+                    trailColor = backColor;
                     homingPower = 0.1f;
+                    trailLength = 14;
+                    trailWidth = 1.5f;
                     reloadMultiplier = 1.5f;
                     ammoMultiplier = 5;
                     lifetime = 90f;
@@ -3070,7 +3073,7 @@ public class Blocks{
                      backColor = hitColor = Pal.lighterOrange ;
                      frontColor = Color.white;
                      rangeChange = -32;
-                     statusDuration = 60f * 5;
+                     statusDuration = 60f * 8;
                      status = StatusEffects.burning;
                 }}
             );
