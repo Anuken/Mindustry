@@ -30,9 +30,11 @@ import static mindustry.Vars.*;
  * This class should <i>not</i> call any outside methods to change state of modules, but instead fire events.
  */
 public class Logic implements ApplicationListener{
-
+    private long time = Time.nanos();
+    private long totalElapsedTime = 0;
+    private int frameCount = 0;
+    private boolean debug = false;
     public Logic(){
-
         Events.on(BlockDestroyEvent.class, event -> {
             //skip if rule is off
             if(!state.rules.ghostBlocks) return;
@@ -497,6 +499,21 @@ public class Logic implements ApplicationListener{
         }else if(netServer.isWaitingForPlayers() && runStateCheck){
             checkGameState();
         }
+        
+        long elapsedTime = Time.nanos() - time;
+        totalElapsedTime += elapsedTime;
+        if((elapsedTime >= 1000000000) && debug)
+        {
+            time = Time.nanos();
+            totalElapsedTime /= Time.nanosPerMilli;
+            if(frameCount > 0)
+                totalElapsedTime /= frameCount;
+            Log.log(Log.LogLevel.warn, "Average time elapsed per frame last second: " + totalElapsedTime);
+            totalElapsedTime = 0;
+            frameCount = 0;
+        }
+
+        frameCount += 1;
     }
 
     /** @return whether the wave timer is paused due to enemies */
