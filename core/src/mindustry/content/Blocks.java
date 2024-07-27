@@ -3036,7 +3036,6 @@ public class Blocks{
                     ammoMultiplier = 2;
                     backColor = hitColor = Pal.lightishOrange;
                     frontColor = Color.white;
-                    rangeChange = -20;
                 }},
                 Items.graphite, new BasicBulletType(3.5f, 14){{
                     width = 9f;
@@ -3067,7 +3066,6 @@ public class Blocks{
                      lifetime = 60f;
                      ammoMultiplier = 5;
                      reloadMultiplier = 0.9f;
-                     makeFire = true;
                      splashDamageRadius = 10;
                      splashDamage = 4;
                      backColor = hitColor = Pal.lighterOrange ;
