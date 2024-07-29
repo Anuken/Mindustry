@@ -6,6 +6,11 @@ import mindustry.*;
 
 public abstract class Mod{
 
+    /** @return the folder where configuration files for this mod should go.*/
+    public Fi getConfigFolder(){
+        return Vars.mods.getConfigFolder(this);
+    }
+
     /** @return the config file for this plugin, as the file 'mods/[plugin-name]/config.json'.*/
     public Fi getConfig(){
         return Vars.mods.getConfig(this);
@@ -26,7 +31,7 @@ public abstract class Mod{
 
     }
 
-    /** Register any commands to be used on the client side, e.g. sent from an in-game player.. */
+    /** Register any commands to be used on the client side, e.g. sent from an in-game player. */
     public void registerClientCommands(CommandHandler handler){
 
     }

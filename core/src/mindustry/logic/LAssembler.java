@@ -14,16 +14,15 @@ public class LAssembler{
 
     private static final int invalidNum = Integer.MIN_VALUE;
 
-    private int lastVar;
     private boolean privileged;
-    /** Maps names to variable IDs. */
-    public ObjectMap<String, BVar> vars = new ObjectMap<>();
+    /** Maps names to variable. */
+    public OrderedMap<String, LVar> vars = new OrderedMap<>();
     /** All instructions to be executed. */
     public LInstruction[] instructions;
 
     public LAssembler(){
         //instruction counter
-        putVar("@counter").value = 0;
+        putVar("@counter");
         //currently controlled unit
         putConst("@unit", null);
         //reference to self
@@ -57,20 +56,17 @@ public class LAssembler{
         return new LParser(text, privileged).parse();
     }
 
-    /** @return a variable ID by name.
+    /** @return a variable by name.
      * This may be a constant variable referring to a number or object. */
-    public int var(String symbol){
-        int constId = Vars.logicVars.get(symbol);
-        if(constId > 0){
-            //global constants are *negated* and stored separately
-            return -constId;
-        }
+    public LVar var(String symbol){
+        LVar constVar = Vars.logicVars.get(symbol);
+        if(constVar != null) return constVar;
 
         symbol = symbol.trim();
 
         //string case
         if(!symbol.isEmpty() && symbol.charAt(0) == '\"' && symbol.charAt(symbol.length() - 1) == '\"'){
-            return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n")).id;
+            return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n"));
         }
 
         //remove spaces for non-strings
@@ -79,10 +75,10 @@ public class LAssembler{
         double value = parseDouble(symbol);
 
         if(value == invalidNum){
-            return putVar(symbol).id;
+            return putVar(symbol);
         }else{
             //this creates a hidden const variable with the specified value
-            return putConst("___" + value, value).id;
+            return putConst("___" + value, value);
         }
     }
 
@@ -106,48 +102,34 @@ public class LAssembler{
     }
 
     /** Adds a constant value by name. */
-    public BVar putConst(String name, Object value){
-        BVar var = putVar(name);
+    public LVar putConst(String name, Object value){
+        LVar var = putVar(name);
+        if(value instanceof Number number){
+            var.isobj = false;
+            var.numval = number.doubleValue();
+            var.objval = null;
+        }else{
+            var.isobj = true;
+            var.objval = value;
+        }
         var.constant = true;
-        var.value = value;
         return var;
     }
 
     /** Registers a variable name mapping. */
-    public BVar putVar(String name){
+    public LVar putVar(String name){
         if(vars.containsKey(name)){
             return vars.get(name);
         }else{
-            BVar var = new BVar(lastVar++);
+            LVar var = new LVar(name);
             vars.put(name, var);
             return var;
         }
     }
 
     @Nullable
-    public BVar getVar(String name){
+    public LVar getVar(String name){
         return vars.get(name);
     }
 
-    /** A variable "builder". */
-    public static class BVar{
-        public int id;
-        public boolean constant;
-        public Object value;
-
-        public BVar(int id){
-            this.id = id;
-        }
-
-        BVar(){}
-
-        @Override
-        public String toString(){
-            return "BVar{" +
-            "id=" + id +
-            ", constant=" + constant +
-            ", value=" + value +
-            '}';
-        }
-    }
 }

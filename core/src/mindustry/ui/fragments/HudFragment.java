@@ -27,6 +27,8 @@ import mindustry.input.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 import static mindustry.gen.Tex.*;
@@ -584,6 +586,8 @@ public class HudFragment{
         }
     }
 
+    /** @deprecated see {@link CoreBuild#beginLaunch(CoreBlock)} */
+    @Deprecated
     public void showLaunch(){
         float margin = 30f;
 
@@ -602,6 +606,8 @@ public class HudFragment{
         Core.scene.add(image);
     }
 
+    /** @deprecated see {@link CoreBuild#beginLaunch(CoreBlock)} */
+    @Deprecated
     public void showLand(){
         Image image = new Image();
         image.color.a = 1f;
@@ -761,7 +767,7 @@ public class HudFragment{
                 }
             });
 
-            t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
+            t.add(new SideBar(() -> player.dead() ? 0f : player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
                 b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color() : Pal.health);
@@ -907,7 +913,7 @@ public class HudFragment{
 
         table.table().update(t -> {
             t.left();
-            Bits applied = player.unit().statusBits();
+            Bits applied = player.dead() ? null : player.unit().statusBits();
             if(!statuses.equals(applied)){
                 t.clear();
 

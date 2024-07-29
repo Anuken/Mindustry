@@ -137,7 +137,7 @@ public class UnitFactory extends UnitBlock{
                                 }
 
                                 ItemStack stack = plan.requirements[i];
-                                req.add(new ItemDisplay(stack.item, stack.amount, false)).pad(5);
+                                req.add(new ItemDisplay(stack.item, stack.amount, plan.time, true)).pad(5);
                             }
                         }).right().grow().pad(10f);
                     }else{

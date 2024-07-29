@@ -39,6 +39,12 @@ public class ContinuousTurret extends Turret{
         public float lastLength = size * 4f;
 
         @Override
+        public float estimateDps(){
+            if(!hasAmmo()) return 0f;
+            return shootType.damage * 60f / (shootType instanceof ContinuousBulletType c ? c.damageInterval : 5f);
+        }
+
+        @Override
         protected void updateCooling(){
             //TODO how does coolant work here, if at all?
         }

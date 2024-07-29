@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
-import mindustry.world.consumers.*;
 
 public class PowerGraph{
     private static final Queue<Building> queue = new Queue<>();
@@ -109,7 +108,7 @@ public class PowerGraph{
         for(int i = 0; i < consumers.size; i++){
             var consumer = items[i];
             var consumePower = consumer.block.consPower;
-            if(otherConsumersAreValid(consumer, consumePower)){
+            if(consumer.shouldConsumePower){
                 powerNeeded += consumePower.requestedPower(consumer) * consumer.delta();
             }
         }
@@ -201,7 +200,7 @@ public class PowerGraph{
                 }
             }else{
                 //valid consumers get power as usual
-                if(otherConsumersAreValid(consumer, cons)){
+                if(consumer.shouldConsumePower){
                     consumer.power.status = coverage;
                 }else{ //invalid consumers get an estimate, if they were to activate
                     consumer.power.status = Math.min(1, produced / (needed + cons.usage * consumer.delta()));
@@ -379,24 +378,6 @@ public class PowerGraph{
 
     public int getId(){
         return graphID;
-    }
-
-    @Deprecated
-    private boolean otherConsumersAreValid(Building build, Consume consumePower){
-        if(!build.enabled) return false;
-
-        float f = build.efficiency;
-        //hack so liquids output positive efficiency values
-        build.efficiency = 1f;
-        for(Consume cons : build.block.nonOptionalConsumers){
-            //TODO fix this properly
-            if(cons != consumePower && cons.efficiency(build) <= 0.0000001f){
-                build.efficiency = f;
-                return false;
-            }
-        }
-        build.efficiency = f;
-        return true;
     }
 
     @Override

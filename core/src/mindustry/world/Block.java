@@ -409,7 +409,7 @@ public class Block extends UnlockableContent implements Senseable{
         Draw.rect(
             variants == 0 ? customShadowRegion :
             variantShadowRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantShadowRegions.length - 1))],
-        tile.drawx(), tile.drawy(), tile.build == null ? 0f : tile.build.drawrot());
+        tile.drawx(), tile.drawy());
         Draw.color();
     }
 
@@ -517,6 +517,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public boolean rotatedOutput(int x, int y){
         return rotate;
+    }
+
+    public boolean rotatedOutput(int fromX, int fromY, Tile destination){
+        return rotatedOutput(fromX, fromY);
     }
 
     public boolean synthetic(){
@@ -993,6 +997,11 @@ public class Block extends UnlockableContent implements Senseable{
         return consume(new ConsumePowerDynamic((Floatf<Building>)usage));
     }
 
+    /** Creates a consumer that consumes a dynamic amount of power. */
+    public <T extends Building> ConsumePower consumePowerDynamic(float displayed, Floatf<T> usage){
+        return consume(new ConsumePowerDynamic(displayed, (Floatf<Building>)usage));
+    }
+
     /**
      * Creates a consumer which stores power.
      * @param powerCapacity The maximum capacity in power units.
@@ -1398,6 +1407,7 @@ public class Block extends UnlockableContent implements Senseable{
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
+            case solid -> solid ? 1 : 0;
             case size -> size;
             case itemCapacity -> itemCapacity;
             case liquidCapacity -> liquidCapacity;

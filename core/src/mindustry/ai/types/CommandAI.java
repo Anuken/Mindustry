@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.ai.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -35,7 +34,6 @@ public class CommandAI extends AIController{
 
     protected boolean stopAtTarget, stopWhenInRange;
     protected Vec2 lastTargetPos;
-    protected int pathId = -1;
     protected boolean blockingUnit;
     protected float timeSpentBlocked;
 
@@ -148,10 +146,6 @@ public class CommandAI extends AIController{
             }
         }
 
-        if(group != null){
-            group.updateMinSpeed();
-        }
-
         if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.buildOn() != null && (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
             var build = unit.buildOn();
             tmpPayload.unit = unit;
@@ -209,6 +203,11 @@ public class CommandAI extends AIController{
             }
         }
 
+        boolean alwaysArrive = false;
+
+        float engageRange = unit.type.range - 10f;
+        boolean withinAttackRange = attackTarget != null && unit.within(attackTarget, engageRange) && stance != UnitStance.ram;
+
         if(targetPos != null){
             boolean move = true, isFinalPoint = commandQueue.size == 0;
             vecOut.set(targetPos);
@@ -225,6 +224,7 @@ public class CommandAI extends AIController{
             }
 
             if(unit.isGrounded() && stance != UnitStance.ram){
+                //TODO: blocking enable or disable?
                 if(timer.get(timerTarget3, avoidInterval)){
                     Vec2 dstPos = Tmp.v1.trns(unit.rotation, unit.hitSize/2f);
                     float max = unit.hitSize/2f;
@@ -252,8 +252,18 @@ public class CommandAI extends AIController{
                     timeSpentBlocked = 0f;
                 }
 
-                //if you've spent 3 seconds stuck, something is wrong, move regardless
-                move = Vars.controlPath.getPathPosition(unit, pathId, vecMovePos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                //if the unit is next to the target, stop asking the pathfinder how to get there, it's a waste of CPU
+                //TODO maybe stop moving too?
+                if(withinAttackRange){
+                    move = true;
+                    noFound[0] = false;
+                    vecOut.set(vecMovePos);
+                }else{
+                    move = controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                }
+
+                //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
+                alwaysArrive = vecOut.epsilonEquals(unit.tileX() * tilesize, unit.tileY() * tilesize);
                 //we've reached the final point if the returned coordinate is equal to the supplied input
                 isFinalPoint &= vecMovePos.epsilonEquals(vecOut, 4.1f);
 
@@ -270,18 +280,16 @@ public class CommandAI extends AIController{
                 vecOut.set(vecMovePos);
             }
 
-            float engageRange = unit.type.range - 10f;
-
             if(move){
                 if(unit.type.circleTarget && attackTarget != null){
                     target = attackTarget;
                     circleAttack(80f);
                 }else{
                     moveTo(vecOut,
-                    attackTarget != null && unit.within(attackTarget, engageRange) && stance != UnitStance.ram ? engageRange :
+                    withinAttackRange ? engageRange :
                     unit.isGrounded() ? 0f :
-                    attackTarget != null && stance != UnitStance.ram ? engageRange :
-                    0f, unit.isFlying() ? 40f : 100f, false, null, isFinalPoint);
+                    attackTarget != null && stance != UnitStance.ram ? engageRange : 0f,
+                    unit.isFlying() ? 40f : 100f, false, null, isFinalPoint || alwaysArrive);
                 }
             }
 
@@ -364,11 +372,6 @@ public class CommandAI extends AIController{
     }
 
     @Override
-    public float prefSpeed(){
-        return group == null ? super.prefSpeed() : Math.min(group.minSpeed, unit.speed());
-    }
-
-    @Override
     public boolean shouldFire(){
         return stance != UnitStance.holdFire;
     }
@@ -426,7 +429,6 @@ public class CommandAI extends AIController{
         //this is an allocation, but it's relatively rarely called anyway, and outside mutations must be prevented
         targetPos = lastTargetPos = pos.cpy();
         attackTarget = null;
-        pathId = Vars.controlPath.nextTargetId();
         this.stopWhenInRange = stopWhenInRange;
     }
 
@@ -441,7 +443,6 @@ public class CommandAI extends AIController{
     public void commandTarget(Teamc moveTo, boolean stopAtTarget){
         attackTarget = moveTo;
         this.stopAtTarget = stopAtTarget;
-        pathId = Vars.controlPath.nextTargetId();
     }
 
     /*
