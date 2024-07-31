@@ -323,5 +323,9 @@
   {
     "name": "VNM",
     "address": ["server.mindustry-tool.app"]
+  },
+  {
+    "name": "distributor",
+    "address": ["185.186.143.131:25731"]
   }
 ]
