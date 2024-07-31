@@ -12,30 +12,12 @@ import mindustry.async.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.gen.*;
-import mindustry.world.blocks.environment.*;
 
 public class UnitGroup{
     public Seq<Unit> units = new Seq<>();
     public int collisionLayer;
     public volatile float[] positions, originalPositions;
     public volatile boolean valid;
-    public long lastSpeedUpdate = -1;
-    public float minSpeed = 999999f;
-
-    public void updateMinSpeed(){
-        if(lastSpeedUpdate == Vars.state.updateId) return;
-
-        lastSpeedUpdate = Vars.state.updateId;
-        minSpeed = 999999f;
-
-        for(Unit unit : units){
-            //don't factor in the floor speed multiplier
-            Floor on = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
-            minSpeed = Math.min(unit.speed() / on.speedMultiplier, minSpeed);
-        }
-
-        if(Float.isInfinite(minSpeed) || Float.isNaN(minSpeed)) minSpeed = 999999f;
-    }
     
     public void calculateFormation(Vec2 dest, int collisionLayer){
         this.collisionLayer = collisionLayer;
@@ -57,8 +39,6 @@ public class UnitGroup{
             positions[i * 2 + 1] = unit.y - cy;
             unit.command().groupIndex = i;
         }
-
-        updateMinSpeed();
 
         //run on new thread to prevent stutter
         Vars.mainExecutor.submit(() -> {
@@ -188,9 +168,9 @@ public class UnitGroup{
             Unit unit = units.get(index);
 
             PathCost cost = unit.type.pathCost;
-            int res = ControlPathfinder.raycastFast(unit.team.id, cost, World.toTile(dest.x), World.toTile(dest.y), World.toTile(x), World.toTile(y));
+            int res = ControlPathfinder.raycastFastAvoid(unit.team.id, cost, World.toTile(dest.x), World.toTile(dest.y), World.toTile(x), World.toTile(y));
 
-            //collision found, make th destination the point right before the collision
+            //collision found, make the destination the point right before the collision
             if(res != 0){
                 v1.set(Point2.x(res) * Vars.tilesize - dest.x, Point2.y(res) * Vars.tilesize - dest.y);
                 v1.setLength(Math.max(v1.len() - Vars.tilesize - 4f, 0));

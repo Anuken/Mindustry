@@ -228,6 +228,7 @@ public class Weapon implements Cloneable{
                 var part = parts.get(i);
                 DrawPart.params.setRecoil(part.recoilIndex >= 0 && mount.recoils != null ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(part.under){
+                    unit.type.applyColor(unit);
                     part.draw(DrawPart.params);
                 }
             }
@@ -262,6 +263,7 @@ public class Weapon implements Cloneable{
                 var part = parts.get(i);
                 DrawPart.params.setRecoil(part.recoilIndex >= 0 && mount.recoils != null ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(!part.under){
+                    unit.type.applyColor(unit);
                     part.draw(DrawPart.params);
                 }
             }
@@ -297,31 +299,9 @@ public class Weapon implements Cloneable{
             mount.warmup = Mathf.lerpDelta(mount.warmup, warmupTarget, shootWarmupSpeed);
         }
 
-        //rotate if applicable
-        if(rotate && (mount.rotate || mount.shoot) && can){
-            float axisX = unit.x + Angles.trnsx(unit.rotation - 90,  x, y),
-            axisY = unit.y + Angles.trnsy(unit.rotation - 90,  x, y);
-
-            mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
-            mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
-            if(rotationLimit < 360){
-                float dst = Angles.angleDist(mount.rotation, baseRotation);
-                if(dst > rotationLimit/2f){
-                    mount.rotation = Angles.moveToward(mount.rotation, baseRotation, dst - rotationLimit/2f);
-                }
-            }
-        }else if(!rotate){
-            mount.rotation = baseRotation;
-            mount.targetRotation = unit.angleTo(mount.aimX, mount.aimY);
-        }
-
         float
-        weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
         mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
-        mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
-        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
-        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY),
-        shootAngle = bulletRotation(unit, mount, bulletX, bulletY);
+        mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y);
 
         //find a new target
         if(!controllable && autoTarget){
@@ -354,6 +334,30 @@ public class Weapon implements Cloneable{
             //note that shooting state is not affected, as these cannot be controlled
             //logic will return shooting as false even if these return true, which is fine
         }
+
+        //rotate if applicable
+        if(rotate && (mount.rotate || mount.shoot) && can){
+            float axisX = unit.x + Angles.trnsx(unit.rotation - 90,  x, y),
+            axisY = unit.y + Angles.trnsy(unit.rotation - 90,  x, y);
+
+            mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
+            mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
+            if(rotationLimit < 360){
+                float dst = Angles.angleDist(mount.rotation, baseRotation);
+                if(dst > rotationLimit/2f){
+                    mount.rotation = Angles.moveToward(mount.rotation, baseRotation, dst - rotationLimit/2f);
+                }
+            }
+        }else if(!rotate){
+            mount.rotation = baseRotation;
+            mount.targetRotation = unit.angleTo(mount.aimX, mount.aimY);
+        }
+
+        float
+        weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
+        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
+        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY),
+        shootAngle = bulletRotation(unit, mount, bulletX, bulletY);
 
         if(alwaysShooting) mount.shoot = true;
 

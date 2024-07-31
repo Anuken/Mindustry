@@ -59,6 +59,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc, Syncc{
 
         amount -= Time.delta * (1f - liquid.viscosity) / (5f + addSpeed);
         amount += accepting;
+        amount = Math.min(amount, maxLiquid);
         accepting = 0f;
 
         if(amount >= maxLiquid / 1.5f){

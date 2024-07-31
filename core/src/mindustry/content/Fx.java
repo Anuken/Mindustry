@@ -2434,12 +2434,9 @@ public class Fx{
     shieldBreak = new Effect(40, e -> {
         color(e.color);
         stroke(3f * e.fout());
-        if(e.data instanceof Unit u){
-            var ab = (ForceFieldAbility)Structs.find(u.abilities, a -> a instanceof ForceFieldAbility);
-            if(ab != null){
-                Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.rotation);
-                return;
-            }
+        if(e.data instanceof ForceFieldAbility ab){
+            Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.rotation);
+            return;
         }
 
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
@@ -2584,7 +2581,7 @@ public class Fx{
        if(!(e.data instanceof Vec2[] vec)) return;
 
        Draw.color(e.color);
-       Lines.stroke(1f);
+       Lines.stroke(2f);
 
        if(vec.length == 2){
            Lines.line(vec[0].x, vec[0].y, vec[1].x, vec[1].y);
@@ -2596,5 +2593,15 @@ public class Fx{
        }
 
        Draw.reset();
+    }),
+    debugRect = new Effect(90f, 1000000000000f, e -> {
+        if(!(e.data instanceof Rect rect)) return;
+
+        Draw.color(e.color);
+        Lines.stroke(2f);
+
+        Lines.rect(rect);
+
+        Draw.reset();
     });
 }

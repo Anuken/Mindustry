@@ -3,9 +3,11 @@ package mindustry.ui;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
+import arc.math.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
@@ -20,6 +22,22 @@ public class Minimap extends Table{
         add(new Element(){
             {
                 setSize(Scl.scl(140f));
+
+                addListener(new ClickListener(KeyCode.mouseRight){
+                    @Override
+                    public void clicked(InputEvent event, float cx, float cy){
+                        var region = renderer.minimap.getRegion();
+                        if(region == null) return;
+
+                        float
+                        sx = (cx - x) / width,
+                        sy = (cy - y) / height,
+                        scaledX = Mathf.lerp(region.u, region.u2, sx) * world.width() * tilesize,
+                        scaledY = Mathf.lerp(1f - region.v2, 1f - region.v, sy) * world.height() * tilesize;
+
+                        control.input.panCamera(Tmp.v1.set(scaledX, scaledY));
+                    }
+                });
             }
 
             @Override

@@ -4,13 +4,6 @@ if(JavaVersion.current().ordinal() < JavaVersion.VERSION_16.ordinal()){
 
 include 'desktop', 'core', 'server', 'ios', 'annotations', 'tools', 'tests'
 
-def use = { ... names ->
-    for(String name : names){
-        include(name)
-        project(name).projectDir = new File(settingsDir, "../${name.substring(1).replace(":", "/")}")
-    }
-}
-
 def hasSdk = System.getenv("ANDROID_HOME") != null
 
 if(new File(settingsDir, 'local.properties').exists()){
@@ -26,9 +19,7 @@ if(hasSdk){
     //why? because IntelliJ chokes on the new version of the Android plugin
 
     //UPDATE: it no longer chokes on AGP with the latest version, but instead gives a completely different error. brilliant.
-    if(!System.getProperty("jna.tmpdir")?.contains("JetBrains")){
-        include 'android'
-    }
+    include 'android'
 }else{
     println("No Android SDK found. Skipping Android module.")
 }
