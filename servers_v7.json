@@ -331,5 +331,9 @@
   {
     "name": "LibreDUSTRY",
     "address": ["46.4.114.111"]
+  },
+  {
+    "name": "distributor",
+    "address": ["185.186.143.131:25731"]
   }
 ]
