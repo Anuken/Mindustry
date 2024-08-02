@@ -1,14 +1,17 @@
 package mindustry.world.blocks.power;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
@@ -20,6 +23,9 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class BeamNode extends PowerBlock{
+    //maximum expected range of any beam node; used for previews
+    private static final int maxRange = 30;
+
     public int range = 5;
 
     public @Load(value = "@-beam", fallback = "power-beam") TextureRegion laser;
@@ -105,11 +111,98 @@ public class BeamNode extends PowerBlock{
         }
     }
 
+    /** Iterates through linked nodes of a block at a tile. All returned buildings are beam nodes. */
+    public static void getNodeLinks(Tile tile, Block block, Team team, Cons<Building> others){
+        var tree = team.data().buildingTree;
+
+        if(tree == null) return;
+
+        float cx = tile.worldx() + block.offset, cy = tile.worldy() + block.offset, s = block.size * tilesize/2f, r = maxRange * tilesize;
+
+        for(int i = 0; i < 4; i++){
+            int dx = Geometry.d4[i].x, dy = Geometry.d4[i].y;
+            for(int length = 1; length < maxRange; length++){
+                Tile other = tile.nearby(dx * i, dy * i);
+                if(other == null || other.build == null || other.build.isInsulated()) break;
+
+                Building build = other.build;
+
+                if(build.team == team && build.block.hasPower && build.block.connectedPower){
+                    if(build instanceof BeamNodeBuild){
+                        if(build.tileX() == tile.x || build.tileY() == tile.y){
+                            others.get(build);
+                            break;
+                        }
+                    }else{ //it's a power structure that is blocking the way to any potential beam node.
+                        break;
+                    }
+                }
+            }
+
+            switch(i){
+                case 0 -> Tmp.r1.set(cx - s, cy - s, r, s * 2f);
+                case 1 -> Tmp.r1.set(cx - s, cy - s, s * 2f, r);
+                case 2 -> Tmp.r1.set(cx + s, cy - s, -r, s * 2f).normalize();
+                case 3 -> Tmp.r1.set(cx - s, cy + s, s * 2f, -r).normalize();
+            }
+
+            tempBuilds.clear();
+            tree.intersect(Tmp.r1, tempBuilds);
+            int fi = i;
+            Building closest = tempBuilds.min(b -> b instanceof BeamNodeBuild node && node.couldConnect((fi + 2) % 4, block, tile.x, tile.y), b -> b.dst2(cx, cy));
+            if(closest != null){
+                others.get(closest);
+            }
+        }
+    }
+
+    /** Note that x1 and y1 are expected to be coordinates of the node to draw the beam from. */
+    public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2){
+        float w = laserWidth;
+        float dst = Math.max(Math.abs(x1 - x2),  Math.abs(y2 - y1)) / tilesize;
+        float sizeOff = dst * tilesize - (size1 + size2) * tilesize/2f;
+
+        //don't draw lasers for adjacent blocks
+        if(dst > 1 + size/2){
+            var point = Geometry.d4(Tile.relativeTo(x1, y1, x2, y2));
+            float poff = tilesize/2f;
+            Drawf.laser(laser, laserEnd, x1 + poff*size*point.x, y1 + poff*size*point.y, x1 + (poff*size + sizeOff) * point.x, y1 + (poff*size + sizeOff) * point.y, w);
+        }
+    }
+
     public class BeamNodeBuild extends Building{
         //current links in cardinal directions
         public Building[] links = new Building[4];
         public Tile[] dests = new Tile[4];
         public int lastChange = -2;
+
+        /** @return whether a beam could theoretically connect with the specified block at a position */
+        public boolean couldConnect(int direction, Block target, int targetX, int targetY){
+            int offset = -(target.size - 1) / 2;
+            int minX = targetX + offset, minY = targetY + offset, maxX = targetX + offset + target.size - 1, maxY = targetY + offset + target.size - 1;
+            var dir = Geometry.d4[direction];
+
+            int rangeOffset = size/2;
+
+            //find first block with power in range
+            for(int j = 1 + rangeOffset; j <= range + rangeOffset; j++){
+                var other = world.tile(tile.x + j * dir.x, tile.y + j * dir.y);
+
+                if(other == null) return false;
+
+                //hit insulated wall
+                if((other.build != null && other.build.isInsulated()) || (other.block().hasPower && other.block().connectedPower && other.team() == team)){
+                    return false;
+                }
+
+                //within target rectangle
+                if(other.x >= minX && other.y >= minY && other.x <= maxX && other.y <= maxY){
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         @Override
         public void updateTile(){
