@@ -27,7 +27,7 @@ public class GlobalVars{
     public static final Rand rand = new Rand();
 
     //non-constants that depend on state
-    private static LVar varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varServer, varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile;
+    private static LVar varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varWait, varServer, varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile;
 
     private ObjectMap<String, LVar> vars = new ObjectMap<>();
     private Seq<VarEntry> varEntries = new Seq<>();
@@ -73,6 +73,7 @@ public class GlobalVars{
 
         varMapW = putEntry("@mapw", 0);
         varMapH = putEntry("@maph", 0);
+        varWait = putEntry("@wait", null);
 
         putEntryOnly("sectionNetwork");
 
@@ -207,6 +208,10 @@ public class GlobalVars{
             varClientTeam.numval = player.team().id;
             varClientMobile.numval = mobile ? 1 : 0;
         }
+    }
+
+    public LVar waitVar(){
+        return varWait;
     }
 
     public Seq<VarEntry> getEntries(){

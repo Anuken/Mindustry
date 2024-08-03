@@ -42,7 +42,6 @@ public class LExecutor{
     maxDisplayBuffer = 1024,
     maxTextBuffer = 400;
 
-
     public LInstruction[] instructions = {};
     /** Non-constant variables used for network sync */
     public LVar[] vars = {};
@@ -1601,7 +1600,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             //set default to success
             outSuccess.setnum(1);
-            if(headless && type != MessageType.mission) {
+            if(headless && type != MessageType.mission){
                 exec.textBuffer.setLength(0);
                 return;
             }
@@ -1611,8 +1610,14 @@ public class LExecutor{
                 type == MessageType.notify && ui.hudfrag.hasToast() ||
                 type == MessageType.toast && ui.hasAnnouncement()
             ){
-                //set outSuccess=false to let user retry.
-                outSuccess.setnum(0);
+                //backwards compatibility; if it is @wait, block execution
+                if(outSuccess == logicVars.waitVar()){
+                    exec.counter.numval--;
+                    exec.yield = true;
+                }else{
+                    //set outSuccess=false to let user retry.
+                    outSuccess.setnum(0);
+                }
                 return;
             }
 

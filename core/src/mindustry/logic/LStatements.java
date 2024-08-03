@@ -1594,7 +1594,7 @@ public class LStatements{
     @RegisterStatement("message")
     public static class FlushMessageStatement extends LStatement{
         public MessageType type = MessageType.announce;
-        public String duration = "3", outSuccess = "success";
+        public String duration = "3", outSuccess = "@wait";
 
         @Override
         public void build(Table table){
@@ -1616,9 +1616,11 @@ public class LStatements{
                 case announce, toast  -> {
                     table.add(" for ");
                     fields(table, duration, str -> duration = str);
-                    table.add(" secs ");
+                    table.add(" sec ");
                 }
             }
+            row(table);
+
             table.add(" success ");
             fields(table, outSuccess, str -> outSuccess = str);
         }
