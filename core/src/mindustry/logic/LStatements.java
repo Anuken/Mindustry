@@ -1,7 +1,6 @@
 package mindustry.logic;
 
 import arc.*;
-import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.style.*;
@@ -2128,8 +2127,6 @@ public class LStatements{
         public boolean positional;
         public String id = "@sfx-pew", volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy";
         
-        private transient TextField tfield;
-        
         @Override
         public void build(Table table){
             rebuild(table);
@@ -2145,15 +2142,13 @@ public class LStatements{
             
             row(table);
             
-            table.add(" play ");
-            
-            tfield = field(table, id, str -> id = str).padRight(0f).get();
+            field(table, id, str -> id = str).padRight(0f).get();
             
             table.button(b -> {
                 b.image(Icon.pencilSmall);
                 
                 b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), id.substring(4), t -> {
-                    sid("@sfx-" + t);
+                    id = "@sfx-" + t;
                     rebuild(table);
                 }, 2, cell -> cell.size(160, 50)));
             }, Styles.logict, () -> {}).size(40).color(table.color).left().padLeft(-1);
@@ -2166,21 +2161,12 @@ public class LStatements{
             table.row();
             
             if(positional){
-                table.add("at ");
+                fieldst(table, "x", x, str -> x = str);
                 
-                fields(table, x, str -> x = str);
-                
-                table.add(", ");
-                
-                fields(table, y, str -> y = str);
+                fieldst(table, "y", y, str -> y = str);
             }else{
                 fieldst(table, "pan", pan, str -> pan = str);
             }
-        }
-        
-        private void sid(String text){
-            tfield.setText(text);
-            id = text;
         }
         
         @Override
