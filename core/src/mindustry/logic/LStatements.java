@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.style.*;
@@ -2116,6 +2117,82 @@ public class LStatements{
             return new SetPropI(builder.var(type), builder.var(of), builder.var(value));
         }
 
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+    
+    @RegisterStatement("playsound")
+    public static class PlaySoundStatement extends LStatement{
+        public boolean positional;
+        public String id = "@sfx-pew", volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy";
+        
+        private transient TextField tfield;
+        
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+        
+        void rebuild(Table table){
+            table.clearChildren();
+            
+            table.button(positional ? "positional" : "global", Styles.logict, () -> {
+                positional = !positional;
+                rebuild(table);
+            }).size(160f, 40f).pad(4f).color(table.color);
+            
+            row(table);
+            
+            table.add(" play ");
+            
+            tfield = field(table, id, str -> id = str).padRight(0f).get();
+            
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+                
+                b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), id.substring(4), t -> {
+                    sid("@sfx-" + t);
+                    rebuild(table);
+                }, 2, cell -> cell.size(160, 50)));
+            }, Styles.logict, () -> {}).size(40).color(table.color).left().padLeft(-1);
+            
+            row(table);
+            
+            fieldst(table, "volume", volume, str -> volume = str);
+            fieldst(table, "pitch", pitch, str -> pitch = str);
+            
+            table.row();
+            
+            if(positional){
+                table.add("at ");
+                
+                fields(table, x, str -> x = str);
+                
+                table.add(", ");
+                
+                fields(table, y, str -> y = str);
+            }else{
+                fieldst(table, "pan", pan, str -> pan = str);
+            }
+        }
+        
+        private void sid(String text){
+            tfield.setText(text);
+            id = text;
+        }
+        
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+        
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PlaySoundI(positional, builder.var(id), builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y));
+        }
+        
         @Override
         public LCategory category(){
             return LCategory.world;

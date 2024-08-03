@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -1907,6 +1908,36 @@ public class LExecutor{
                 }else if(key instanceof UnlockableContent content){
                     sp.setProp(content, value.num());
                 }
+            }
+        }
+    }
+
+    public static class PlaySoundI implements LInstruction{
+        public boolean positional;
+        public LVar id, volume, pitch, pan, x, y;
+
+        public PlaySoundI(){
+        }
+
+        public PlaySoundI(boolean positional, LVar id, LVar volume, LVar pitch, LVar pan, LVar x, LVar y){
+            this.positional = positional;
+            this.id = id;
+            this.volume = volume;
+            this.pitch = pitch;
+            this.pan = pan;
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Sound sound = Sounds.getSound(id.numi());
+            if(sound == null || sound == Sounds.swish) sound = Sounds.none; //no.
+            
+            if(positional){
+                sound.at(World.unconv(x.numf()), World.unconv(y.numf()), pitch.numf(), Math.min(volume.numf(), 2f));
+            }else{
+                sound.play(Math.min(volume.numf() * (Core.settings.getInt("sfxvol") / 100f), 2f), pitch.numf(), pan.numf());
             }
         }
     }
