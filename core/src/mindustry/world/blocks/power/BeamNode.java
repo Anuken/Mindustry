@@ -120,25 +120,6 @@ public class BeamNode extends PowerBlock{
         float cx = tile.worldx() + block.offset, cy = tile.worldy() + block.offset, s = block.size * tilesize/2f, r = maxRange * tilesize;
 
         for(int i = 0; i < 4; i++){
-            int dx = Geometry.d4[i].x, dy = Geometry.d4[i].y;
-            for(int length = 1; length < maxRange; length++){
-                Tile other = tile.nearby(dx * i, dy * i);
-                if(other == null || other.build == null || other.build.isInsulated()) break;
-
-                Building build = other.build;
-
-                if(build.team == team && build.block.hasPower && build.block.connectedPower){
-                    if(build instanceof BeamNodeBuild){
-                        if(build.tileX() == tile.x || build.tileY() == tile.y){
-                            others.get(build);
-                            break;
-                        }
-                    }else{ //it's a power structure that is blocking the way to any potential beam node.
-                        break;
-                    }
-                }
-            }
-
             switch(i){
                 case 0 -> Tmp.r1.set(cx - s, cy - s, r, s * 2f);
                 case 1 -> Tmp.r1.set(cx - s, cy - s, s * 2f, r);
@@ -150,6 +131,7 @@ public class BeamNode extends PowerBlock{
             tree.intersect(Tmp.r1, tempBuilds);
             int fi = i;
             Building closest = tempBuilds.min(b -> b instanceof BeamNodeBuild node && node.couldConnect((fi + 2) % 4, block, tile.x, tile.y), b -> b.dst2(cx, cy));
+            tempBuilds.clear();
             if(closest != null){
                 others.get(closest);
             }
