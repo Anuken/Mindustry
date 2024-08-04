@@ -29,7 +29,7 @@
   },
   {
     "name": "meiqiuMDT",
-    "address": ["cn1.meiqiumdt.top","cn1.meiqiumdt.top:7000","cn1.meiqiumdt.top:8000","cn1.meiqiumdt.top:7013","cn1.meiqiumdt.top:9000"]
+    "address": ["cn.meiqiumdt.top","ai.meiqiumdt.top","cn2.meiqiumdt.top"]
   },
   {
     "name": "DontVin",
@@ -254,11 +254,11 @@
   },
   {
     "name": "Extra Utilities",
-    "address": ["p1.i9mr.com:44922", "p1.i9mr.com:44834", "p1.i9mr.com:43189"]
+    "address": ["p1.i9mr.com:44922", "p1.i9mr.com:44834", "p1.i9mr.com:43189", "203.135.99.189:15142", "203.135.99.189:15143", "203.135.99.190:15142", "203.135.99.190:15143"]
   },
   {
     "name": "Alex Multiverse",
-    "address": ["alexmindustryv7.servegame.com:25588", "172.234.80.96:6768", "139.162.41.78:6767", "172.245.187.143:6868", "172.245.187.143:6869", "92.119.127.171:6888", "45.84.59.51:1025", "45.84.59.51:1027"]
+    "address": ["alexmindustryv7.servegame.com:25588", "172.234.80.96:6768", "139.162.41.78:6767", "172.245.187.143:6868", "172.245.187.143:6869", "92.119.127.171:6888", "181.215.58.13:1025", "181.215.58.13:1027"]
   },
   {
     "name": "Open PVP",
@@ -266,7 +266,7 @@
   },
   {
     "name": "XuwenHost",
-    "address": ["mdt.xuwenblock.cn:6567","rack1.rainplay.cn:59196"]
+    "address": ["mdt.xuwenblock.cn:6567","mdt.nekopark.cloud:6567"]
   },
   {
     "name": "Atomic",
@@ -286,7 +286,7 @@
   },
   {
     "name": "Erepulo",
-    "address": ["95.84.198.97:5401", "95.84.198.97:5402", "95.84.198.97:5403", "95.84.198.97:2357"]
+    "address": ["95.84.198.97:5401", "95.84.198.97:5402", "95.84.198.97:5403", "95.84.198.97:5404", "95.84.198.97:2357", "95.84.198.97:5500"]
   },
   {
     "name": "MineCore",
@@ -313,8 +313,8 @@
     "address": ["194.247.42.131:27715", "194.247.42.131:27512"]
   },
   {
-    "name": "SandBox",
-    "address": ["185.9.145.8:25993"]
+    "name": "Erbium",
+    "address": ["hp5.nexcord.com:12066", "hp5.nexcord.com:11999", "hp5.nexcord.com:12067"]
   },
   {
     "name": "Vndustry",
@@ -322,10 +322,14 @@
   },
   {
     "name": "ChillOut",
-    "address": ["87.228.8.133"]
+    "address": ["87.228.8.133", "87.228.8.133:6568"]
   },
   {
     "name": "VNM",
     "address": ["server.mindustry-tool.app"]
+  },
+  {
+    "name": "LibreDUSTRY",
+    "address": ["46.4.114.111"]
   }
 ]

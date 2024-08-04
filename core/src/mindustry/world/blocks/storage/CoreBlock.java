@@ -292,7 +292,7 @@ public class CoreBlock extends StorageBlock{
 
     protected void drawLandingThrusters(float x, float y, float rotation, float frame){
         float length = thrusterLength * (frame - 1f) - 1f/4f;
-        float alpha = Draw.getColor().a;
+        float alpha = Draw.getColorAlpha();
 
         //two passes for consistent lighting
         for(int j = 0; j < 2; j++){
@@ -601,6 +601,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void afterDestroyed(){
+            super.afterDestroyed();
             if(state.rules.coreCapture){
                 if(!net.client()){
                     tile.setBlock(block, lastDamage);

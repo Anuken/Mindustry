@@ -70,7 +70,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         });
 
         UI.loadColors();
-        batch = new SortedSpriteBatch();
+        batch = new SpriteBatch();
         assets = new AssetManager();
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
 

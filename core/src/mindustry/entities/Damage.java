@@ -245,6 +245,7 @@ public class Damage{
      */
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
         length = findLength(hitter, length, laser, pierceCap);
+        hitter.fdata = length;
 
         collidedBlocks.clear();
         vec.trnsExact(angle, length);

@@ -572,7 +572,7 @@ public class DesktopInput extends InputHandler{
             player.unit().mineTile = null;
         }
 
-        if(Core.input.keyTap(Binding.clear_building)){
+        if(Core.input.keyTap(Binding.clear_building) && !player.dead()){
             player.unit().clearBuilding();
         }
 

@@ -205,7 +205,7 @@ public class NetServer implements ApplicationListener{
                 info.id = packet.uuid;
                 admins.save();
                 Call.infoMessage(con, "You are not whitelisted here.");
-                info("&lcDo &lywhitelist-add @&lc to whitelist the player &lb'@'", packet.uuid, packet.name);
+                info("&lcDo &lywhitelist add @&lc to whitelist the player &lb'@'", packet.uuid, packet.name);
                 con.kick(KickReason.whitelist);
                 return;
             }
@@ -913,7 +913,7 @@ public class NetServer implements ApplicationListener{
 
             dataStream.writeInt(entity.pos());
             dataStream.writeShort(entity.block.id);
-            entity.writeAll(Writes.get(dataStream));
+            entity.writeSync(Writes.get(dataStream));
 
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();
