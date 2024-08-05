@@ -694,7 +694,7 @@ public class ContentParser{
             TeamEntry entry;
             Team team;
             if(value.has("team")){
-                team = classParsers.get(Team.class).parse(Team.class, value.get("team"));
+                team = (Team)classParsers.get(Team.class).parse(Team.class, value.get("team"));
             }else{
                 throw new RuntimeException("Team field missing.");
             }
