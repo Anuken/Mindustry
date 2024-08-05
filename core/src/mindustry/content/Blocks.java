@@ -3366,18 +3366,18 @@ public class Blocks{
         }};
 
         parallax = new TractorBeamTurret("parallax"){{
-            requirements(Category.turret, with(Items.silicon, 120, Items.titanium, 90, Items.graphite, 30));
+            requirements(Category.turret, with(Items.silicon, 160, Items.titanium, 110, Items.graphite, 50));
 
             hasPower = true;
             size = 2;
-            force = 12f;
-            scaledForce = 6f;
-            range = 240f;
-            damage = 0.3f;
+            force = 16f;
+            scaledForce = 9f;
+            range = 300f;
+            damage = 0.5f;
             scaledHealth = 160;
-            rotateSpeed = 10;
+            rotateSpeed = 12;
 
-            consumePower(3f);
+            consumePower(3.3f);
         }};
 
         swarmer = new ItemTurret("swarmer"){{
