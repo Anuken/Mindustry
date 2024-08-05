@@ -701,7 +701,7 @@ public class ContentParser{
             value.remove("team");
             
             if(locate(ContentType.team, name) != null){
-                entry = (T)locate(ContentType.team, name);
+                entry = locate(ContentType.team, name);
                 readBundle(ContentType.team, name, value);
             }else{
                 readBundle(ContentType.team, name, value);
