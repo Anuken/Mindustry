@@ -327,6 +327,21 @@ public class ContentParser{
             readFields(consume, data);
             return consume;
         });
+        put(Team.class, (type, data) -> {
+            if(data.isString()){
+                Seq<Team> teams = new Seq<>(Team.baseTeams);
+                Team out = teams.find(t -> t.name.equals(data.asString()));
+                if(out == null) throw new IllegalArgumentException("Unknown team: " + data.asString());
+                return out;
+            }else if(data.isNumber()){
+                Seq<Team> teams = new Seq<>(Team.all);
+                Team out = teams.find(t -> t.id == data.asInt());
+                if(out == null) throw new IllegalArgumentException("Unknown team: " + data.asString());
+                return out;
+            }else{
+                throw new IllegalArgumentException("Unknown team: " + data.asString() + ". Team must either be a string or a number.");
+            }
+        });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accommodate binding of content names first.*/
@@ -674,6 +689,28 @@ public class ContentParser{
             currentContent = planet;
             read(() -> readFields(planet, value));
             return planet;
+        },
+        ContentType.team, (TypeParser<TeamEntry>)(mod, name, value) -> {
+            TeamEntry entry;
+            /* 'team' field isn't necessary as of now so...
+            Team team;
+            if(value.has("team")){
+                team = classParsers.get(Team.class).parse(Team.class, value.get("team"));
+            }else{
+                throw new RuntimeException("Team field missing.");
+            }
+            value.remove("team"); */
+            
+            if(locate(ContentType.team, name) != null){
+                entry = (T)locate(ContentType.team, name);
+                readBundle(ContentType.team, name, value);
+            }else{
+                readBundle(ContentType.team, name, value);
+                entry = new TeamEntry(mod + "-" + name);
+            }
+            currentContent = entry;
+            read(() -> readFields(entry, value));
+            return entry;
         }
     );
 
