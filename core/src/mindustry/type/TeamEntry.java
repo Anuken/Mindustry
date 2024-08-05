@@ -14,6 +14,10 @@ public class TeamEntry extends UnlockableContent{
         this.team = team;
     }
 
+    public TeamEntry(String name){
+        super(name);
+    }
+
     @Override
     public void displayExtra(Table table){
         table.add("@team." + name + ".log").pad(6).padTop(20).width(400f).wrap().fillX();
