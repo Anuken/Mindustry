@@ -692,21 +692,20 @@ public class ContentParser{
         },
         ContentType.team, (TypeParser<TeamEntry>)(mod, name, value) -> {
             TeamEntry entry;
-            /* 'team' field isn't necessary as of now so...
             Team team;
             if(value.has("team")){
                 team = classParsers.get(Team.class).parse(Team.class, value.get("team"));
             }else{
                 throw new RuntimeException("Team field missing.");
             }
-            value.remove("team"); */
+            value.remove("team");
             
             if(locate(ContentType.team, name) != null){
                 entry = (T)locate(ContentType.team, name);
                 readBundle(ContentType.team, name, value);
             }else{
                 readBundle(ContentType.team, name, value);
-                entry = new TeamEntry(mod + "-" + name);
+                entry = new TeamEntry(mod + "-" + name, team);
             }
             currentContent = entry;
             read(() -> readFields(entry, value));
