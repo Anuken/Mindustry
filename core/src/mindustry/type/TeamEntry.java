@@ -15,7 +15,7 @@ public class TeamEntry extends UnlockableContent{
     }
 
     public TeamEntry(Team team){
-        this(team, team.name);
+        this(team.name, team);
     }
 
     @Override
