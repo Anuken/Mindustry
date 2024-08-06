@@ -329,15 +329,14 @@ public class ContentParser{
         });
         put(Team.class, (type, data) -> {
             if(data.isString()){
-                Seq<Team> teams = new Seq<>(Team.baseTeams);
-                Team out = teams.find(t -> t.name.equals(data.asString()));
+                Team out = Structs.find(Team.baseTeams, t -> t.name.equals(data.asString()));
                 if(out == null) throw new IllegalArgumentException("Unknown team: " + data.asString());
                 return out;
             }else if(data.isNumber()){
-                Seq<Team> teams = new Seq<>(Team.all);
-                Team out = teams.find(t -> t.id == data.asInt());
-                if(out == null) throw new IllegalArgumentException("Unknown team: " + data.asString());
-                return out;
+                if(data.asInt() >= Team.all.length || data.asInt() < 0){
+                    throw new IllegalArgumentException("Unknown team: " + data.asString());
+                }
+                return Team.get(data.asInt());
             }else{
                 throw new IllegalArgumentException("Unknown team: " + data.asString() + ". Team must either be a string or a number.");
             }
