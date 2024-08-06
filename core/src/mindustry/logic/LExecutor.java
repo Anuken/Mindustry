@@ -1919,12 +1919,12 @@ public class LExecutor{
 
     public static class PlaySoundI implements LInstruction{
         public boolean positional;
-        public LVar id, volume, pitch, pan, x, y;
+        public LVar id, volume, pitch, pan, x, y, limit;
 
         public PlaySoundI(){
         }
 
-        public PlaySoundI(boolean positional, LVar id, LVar volume, LVar pitch, LVar pan, LVar x, LVar y){
+        public PlaySoundI(boolean positional, LVar id, LVar volume, LVar pitch, LVar pan, LVar x, LVar y, LVar limit){
             this.positional = positional;
             this.id = id;
             this.volume = volume;
@@ -1932,6 +1932,7 @@ public class LExecutor{
             this.pan = pan;
             this.x = x;
             this.y = y;
+            this.limit = limit;
         }
 
         @Override
@@ -1940,9 +1941,9 @@ public class LExecutor{
             if(sound == null || sound == Sounds.swish) sound = Sounds.none; //no.
             
             if(positional){
-                sound.at(World.unconv(x.numf()), World.unconv(y.numf()), pitch.numf(), Math.min(volume.numf(), 2f));
+                sound.at(World.unconv(x.numf()), World.unconv(y.numf()), pitch.numf(), Math.min(volume.numf(), 2f), limit.bool());
             }else{
-                sound.play(Math.min(volume.numf() * (Core.settings.getInt("sfxvol") / 100f), 2f), pitch.numf(), pan.numf());
+                sound.play(Math.min(volume.numf() * (Core.settings.getInt("sfxvol") / 100f), 2f), pitch.numf(), pan.numf(), false, limit.bool());
             }
         }
     }
