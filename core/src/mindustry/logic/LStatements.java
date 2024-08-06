@@ -2127,7 +2127,7 @@ public class LStatements{
     @RegisterStatement("playsound")
     public static class PlaySoundStatement extends LStatement{
         public boolean positional;
-        public String id = "@sfx-pew", volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy";
+        public String id = "@sfx-pew", volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy", checkFrame = "true";
         
         @Override
         public void build(Table table){
@@ -2169,6 +2169,10 @@ public class LStatements{
             }else{
                 fieldst(table, "pan", pan, str -> pan = str);
             }
+            
+            table.row();
+            
+            fieldst(table, "check frame", checkFrame, str -> checkFrame = str);
         }
         
         @Override
@@ -2178,7 +2182,7 @@ public class LStatements{
         
         @Override
         public LInstruction build(LAssembler builder){
-            return new PlaySoundI(positional, builder.var(id), builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y));
+            return new PlaySoundI(positional, builder.var(id), builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y), builder.var(checkFrame));
         }
         
         @Override
