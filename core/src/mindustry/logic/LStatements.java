@@ -2149,7 +2149,8 @@ public class LStatements{
             table.button(b -> {
                 b.image(Icon.pencilSmall);
                 
-                b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), id.substring(4), t -> {
+                String soundName = id.startsWith("@sfx-") ? id.substring(5) : id;
+                b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), soundName, t -> {
                     id = "@sfx-" + t;
                     rebuild(table);
                 }, 2, cell -> cell.size(160, 50)));
