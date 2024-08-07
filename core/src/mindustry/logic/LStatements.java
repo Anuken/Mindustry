@@ -2127,7 +2127,7 @@ public class LStatements{
     @RegisterStatement("playsound")
     public static class PlaySoundStatement extends LStatement{
         public boolean positional;
-        public String id = "@sfx-pew", volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy";
+        public String id = "@sfx-pew", volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy", limit = "true";
         
         @Override
         public void build(Table table){
@@ -2149,7 +2149,8 @@ public class LStatements{
             table.button(b -> {
                 b.image(Icon.pencilSmall);
                 
-                b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), id.substring(4), t -> {
+                String soundName = id.startsWith("@sfx-") ? id.substring(5) : id;
+                b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), soundName, t -> {
                     id = "@sfx-" + t;
                     rebuild(table);
                 }, 2, cell -> cell.size(160, 50)));
@@ -2169,6 +2170,10 @@ public class LStatements{
             }else{
                 fieldst(table, "pan", pan, str -> pan = str);
             }
+            
+            table.row();
+            
+            fieldst(table, "limit", limit, str -> limit = str);
         }
         
         @Override
@@ -2178,7 +2183,7 @@ public class LStatements{
         
         @Override
         public LInstruction build(LAssembler builder){
-            return new PlaySoundI(positional, builder.var(id), builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y));
+            return new PlaySoundI(positional, builder.var(id), builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y), builder.var(limit));
         }
         
         @Override
