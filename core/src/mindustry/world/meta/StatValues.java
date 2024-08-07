@@ -66,7 +66,7 @@ public class StatValues{
     }
 
     public static StatValue liquid(Liquid liquid, float amount, boolean perSecond){
-        return table -> table.add(new LiquidDisplay(liquid, amount, perSecond));
+        return table -> table.add(new LiquidDisplay(liquid, amount, perSecond)).left();
     }
 
     public static StatValue liquids(Boolf<Liquid> filter, float amount, boolean perSecond){
@@ -289,6 +289,37 @@ public class StatValues{
                 }
             }).growX().colspan(table.getColumns());
             table.row();
+        };
+    }
+
+    public static StatValue itemEffMultiplier(Floatf<Item> efficiency, float timePeriod, Boolf<Item> filter){
+        return table -> {
+            table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
+            table.row();
+            table.table(c -> {
+                for(Item item : content.items().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden())){
+                    c.table(Styles.grayPanel, b -> {
+                        b.image(item.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        b.add(item.localizedName + (timePeriod > 0 ? "\n[lightgray]" + Strings.autoFixed(1f / (timePeriod / 60f), 2) + StatUnit.perSecond.localized() : "")).left().grow();
+                        b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(item) * 100f))).right().pad(10f).padRight(15f);
+                    }).growX().pad(5).row();
+                }
+            }).growX().colspan(table.getColumns()).row();
+        };
+    }
+
+    public static StatValue liquidEffMultiplier(Floatf<Liquid> efficiency, float amount, Boolf<Liquid> filter){
+        return table -> {
+            table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
+            table.row();
+            table.table(c -> {
+                for(Liquid liquid : content.liquids().select(l -> filter.get(l) && l.unlockedNow() && !l.isHidden())){
+                    c.table(Styles.grayPanel, b -> {
+                        b.add(new LiquidDisplay(liquid, 40f, amount, true)).pad(10f).left().grow();
+                        b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(liquid) * 100f))).right().pad(10f).padRight(15f);
+                    }).growX().pad(5).row();
+                }
+            }).growX().colspan(table.getColumns()).row();
         };
     }
 

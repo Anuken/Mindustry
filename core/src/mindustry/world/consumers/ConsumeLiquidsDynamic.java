@@ -1,12 +1,12 @@
 package mindustry.world.consumers;
 
-import arc.func.Func;
-import arc.scene.ui.layout.Table;
-import mindustry.Vars;
-import mindustry.gen.Building;
-import mindustry.type.LiquidStack;
-import mindustry.ui.ReqImage;
-import mindustry.world.Block;
+import arc.func.*;
+import arc.scene.ui.layout.*;
+import mindustry.*;
+import mindustry.gen.*;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.*;
 
 public class ConsumeLiquidsDynamic extends Consume{
     public final Func<Building, LiquidStack[]> liquids;
