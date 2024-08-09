@@ -3034,21 +3034,45 @@ public class Blocks{
                     height = 9f;
                     lifetime = 60f;
                     ammoMultiplier = 2;
+                    backColor = hitColor = Pal.lightishOrange;
+                    frontColor = Color.white;
                 }},
-                Items.graphite, new BasicBulletType(3.5f, 18){{
+                Items.graphite, new BasicBulletType(3.5f, 14){{
                     width = 9f;
                     height = 12f;
                     reloadMultiplier = 0.6f;
+                    backColor = hitColor = Pal.techBlue;
+                    frontColor = Color.white;
                     ammoMultiplier = 4;
-                    lifetime = 60f;
+                    rangeChange = 8;
+                    lifetime = 90f;
                 }},
                 Items.silicon, new BasicBulletType(3f, 12){{
                     width = 7f;
                     height = 9f;
+                    backColor = hitColor = Pal.lightishGray;
+                    frontColor = Color.white;
+                    trailColor = backColor;
                     homingPower = 0.1f;
+                    trailLength = 14;
+                    trailWidth = 1.5f;
                     reloadMultiplier = 1.5f;
                     ammoMultiplier = 5;
-                    lifetime = 60f;
+                    lifetime = 90f;
+                }},
+                Items.pyratite,  new BasicBulletType(3f, 16){{
+                     width = 7f;
+                     height = 9f;
+                     lifetime = 60f;
+                     ammoMultiplier = 5;
+                     reloadMultiplier = 0.9f;
+                     splashDamageRadius = 10;
+                     splashDamage = 4;
+                     backColor = hitColor = Pal.lighterOrange ;
+                     frontColor = Color.white;
+                     rangeChange = -32;
+                     statusDuration = 60f * 8;
+                     status = StatusEffects.burning;
                 }}
             );
 
@@ -3070,13 +3094,14 @@ public class Blocks{
             recoil = 0.5f;
             shootY = 3f;
             reload = 20f;
-            range = 110;
+            range = 140;
             shootCone = 15f;
             ammoUseEffect = Fx.casing1;
             health = 250;
-            inaccuracy = 2f;
+            inaccuracy = 2.5f;
             rotateSpeed = 10f;
-            coolant = consumeCoolant(0.1f);
+            coolant = consumeCoolant(2/60f);
+            coolantMultiplier = 30f;
             researchCostMultiplier = 0.05f;
 
             limitRange();
