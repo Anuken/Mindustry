@@ -4,6 +4,10 @@
     "address": ["min7.include-once.org:8000", "min7.include-once.org:8001"]
   },
   {
+    "name": "AzurLine",
+    "address": ["23.88.73.88:11203"]
+  },
+  {
     "name": "TSR Network",
     "address": ["de-prem-01.hosts.optikservers.com:35526", "de-prem-01.hosts.optikservers.com:35915", "de-prem-01.hosts.optikservers.com:35250", "de-prem-01.hosts.optikservers.com:27526", "de-prem-01.hosts.optikservers.com:35376", "de-prem-01.hosts.optikservers.com:35895"]
   },
