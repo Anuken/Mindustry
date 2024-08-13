@@ -62,7 +62,10 @@ public enum LAccess{
     shoot("x", "y", "shoot"),
     shootp(true, "unit", "shoot"),
     config(true, "to"),
-    color("to");
+    color("to"),
+
+    accept(true,"result","content"),
+    consume(true,"result","content");
 
     public final String[] params;
     public final boolean isObj;

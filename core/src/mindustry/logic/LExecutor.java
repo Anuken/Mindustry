@@ -501,7 +501,14 @@ public class LExecutor{
         public void run(LExecutor exec){
             Object obj = target.obj();
             if(obj instanceof Building b && (exec.privileged || (b.team == exec.team && exec.linkIds.contains(b.id)))){
-
+                if(type.params.length > 0 && type.params[0] == "result"){
+                    if(type.isObj && p2.isobj){
+                        b.control(type, p1, p2.obj(), p3.num(), p4.num());
+                    }else{
+                        b.control(type, p1, p2.num(), p3.num(), p4.num());
+                    }
+                    return;
+                }
                 if(type == LAccess.enabled && !p1.bool()){
                     b.lastDisabler = exec.build;
                 }

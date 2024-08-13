@@ -1998,6 +1998,21 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
+    public void control(LAccess type, LVar p1, double p2, double p3, double p4){
+        
+    }
+    @Override
+    public void control(LAccess type, LVar p1, Object p2, double p3, double p4){
+       if(type == LAccess.accept) {
+           p1.setnum(p2 instanceof Item item ? (acceptItem(self(),item) ? 1.0d : 0.0d) :p2 instanceof Liquid liquid ? (acceptLiquid(self(),liquid) ? 1.0d : 0.0d) : Float.NaN);
+           return;
+       }
+       if(type == LAccess.consume) {
+           p1.setnum(p2 instanceof Item item ? (block.consumesItem(item) ? 1.0d : 0.0d) :p2 instanceof Liquid liquid ? (block.consumesLiquid(liquid) ? 1.0d : 0.0d) : Float.NaN);
+           return;
+       }
+    }
+    @Override
     public void setProp(LAccess prop, double value){
         switch(prop){
             case health -> {
