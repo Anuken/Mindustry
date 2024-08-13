@@ -99,7 +99,7 @@ public abstract class DrawPart{
             return getClamp(p, true);
         }
         
-        default float getClamp(PartProgress p, boolean clamp){
+        default float getClamp(PartParams p, boolean clamp){
             return clamp ? Mathf.clamp(get(p)) : get(p);
         }
         
