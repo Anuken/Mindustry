@@ -29,7 +29,7 @@
   },
   {
     "name": "meiqiuMDT",
-    "address": ["cn1.meiqiumdt.top","cn1.meiqiumdt.top:7000","cn1.meiqiumdt.top:8000","cn1.meiqiumdt.top:7013","cn1.meiqiumdt.top:9000"]
+    "address": ["cn.meiqiumdt.top","ai.meiqiumdt.top","cn2.meiqiumdt.top"]
   },
   {
     "name": "DontVin",
@@ -246,7 +246,7 @@
   },
   {
     "name": "abcxyz remaster",
-    "address": ["144.76.57.59:30302", "23.88.73.88:16895"]
+    "address": ["144.76.57.59:35150"]
   },
   {
     "name": "CroCraft Network",
@@ -254,11 +254,11 @@
   },
   {
     "name": "Extra Utilities",
-    "address": ["p1.i9mr.com:44922", "p1.i9mr.com:44834", "p1.i9mr.com:43189", "203.135.99.189:15142", "203.135.99.189:15143"]
+    "address": ["p1.i9mr.com:44922", "p1.i9mr.com:44834", "p1.i9mr.com:43189", "203.135.99.189:15142", "203.135.99.189:15143", "203.135.99.190:15142", "203.135.99.190:15143"]
   },
   {
     "name": "Alex Multiverse",
-    "address": ["alexmindustryv7.servegame.com:25588", "172.234.80.96:6768", "139.162.41.78:6767", "172.245.187.143:6868", "172.245.187.143:6869", "92.119.127.171:6888", "45.84.59.51:1025", "45.84.59.51:1027"]
+    "address": ["alexmindustryv7.servegame.com:25588", "172.234.80.96:6768", "139.162.41.78:6767", "172.245.187.143:6868", "172.245.187.143:6869", "92.119.127.171:6888", "181.215.58.8:1025", "181.215.58.8:1027", "181.215.58.7:1820"]
   },
   {
     "name": "Open PVP",
@@ -266,7 +266,7 @@
   },
   {
     "name": "XuwenHost",
-    "address": ["mdt.xuwenblock.cn:6567","rack1.rainplay.cn:59196"]
+    "address": ["mdt.xuwenblock.cn:6567","mdt.nekopark.cloud:6567"]
   },
   {
     "name": "Atomic",
@@ -282,7 +282,7 @@
   },
   {
     "name": "AZDustry",
-    "address": ["8.245.23.28:25874"]
+    "address": ["148.251.77.197:2012"]
   },
   {
     "name": "Erepulo",
@@ -327,5 +327,9 @@
   {
     "name": "VNM",
     "address": ["server.mindustry-tool.app"]
+  },
+  {
+    "name": "LibreDUSTRY",
+    "address": ["46.4.114.111"]
   }
 ]

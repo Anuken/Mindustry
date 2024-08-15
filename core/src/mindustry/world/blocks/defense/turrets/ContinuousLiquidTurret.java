@@ -73,9 +73,9 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         @Override
         public void updateTile(){
-            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
-
             super.updateTile();
+
+            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
         }
 
         @Override

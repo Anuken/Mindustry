@@ -1017,6 +1017,12 @@ public class ControlPathfinder implements Runnable{
 
         var nodePath = clusterAstar(request, costId, node, dest);
 
+        //no result found, bail out.
+        if(nodePath == null){
+            request.notFound = true;
+            return;
+        }
+
         FieldCache cache = fields.get(Pack.longInt(goalPos, costId));
         //if true, extra values are added on the sides of existing field cells that face new cells.
         boolean addingFrontier = true;

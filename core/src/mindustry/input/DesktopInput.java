@@ -108,6 +108,10 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void drawTop(){
+        if(cursorType != SystemCursor.arrow && scene.hasMouse()){
+           graphics.cursor(cursorType = SystemCursor.arrow);
+        }
+
         Lines.stroke(1f);
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());
@@ -446,6 +450,8 @@ public class DesktopInput extends InputHandler{
 
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
+        cursorType = SystemCursor.arrow;
+
         if(cursor != null){
             if(cursor.build != null && cursor.build.interactable(player.team())){
                 cursorType = cursor.build.getCursor();
@@ -498,9 +504,9 @@ public class DesktopInput extends InputHandler{
 
         if(!Core.scene.hasMouse()){
             Core.graphics.cursor(cursorType);
+        }else{
+            cursorType = SystemCursor.arrow;
         }
-
-        cursorType = SystemCursor.arrow;
     }
 
     @Override
@@ -668,7 +674,7 @@ public class DesktopInput extends InputHandler{
                 lastLineY = cursorY;
                 mode = placing;
                 updateLine(selectX, selectY);
-            }else if(plan != null && !plan.breaking && mode == none && !plan.initialized){
+            }else if(plan != null && !plan.breaking && mode == none && !plan.initialized && plan.progress <= 0f){
                 splan = plan;
             }else if(plan != null && plan.breaking){
                 deleting = true;

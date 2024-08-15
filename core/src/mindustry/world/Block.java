@@ -441,6 +441,14 @@ public class Block extends UnlockableContent implements Senseable{
 
                     Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
                 });
+
+                BeamNode.getNodeLinks(tile, this, player.team(), other -> {
+                    BeamNode node = (BeamNode)other.block;
+                    Draw.color(node.laserColor1, Renderer.laserOpacity * 0.5f);
+                    node.drawLaser(other.x, other.y, x * tilesize + offset, y * tilesize + offset, size, other.block.size);
+
+                    Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
+                });
             }
         }
     }
