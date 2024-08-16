@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.*;
+import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.math.*;
@@ -8,6 +9,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
+import mindustry.gen.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -25,14 +27,16 @@ public class GlobalVars{
     public static final Rand rand = new Rand();
 
     //non-constants that depend on state
-    private static LVar varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varServer, varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile;
+    private static LVar varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varWait, varServer, varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile;
 
     private ObjectMap<String, LVar> vars = new ObjectMap<>();
     private Seq<VarEntry> varEntries = new Seq<>();
     private ObjectSet<String> privilegedNames = new ObjectSet<>();
     private UnlockableContent[][] logicIdToContent;
     private int[][] contentIdToLogicId;
-
+    
+    public static final Seq<String> soundNames = new Seq<>();
+    
     public void init(){
         putEntryOnly("sectionProcessor");
 
@@ -69,6 +73,7 @@ public class GlobalVars{
 
         varMapW = putEntry("@mapw", 0);
         varMapH = putEntry("@maph", 0);
+        varWait = putEntry("@wait", null);
 
         putEntryOnly("sectionNetwork");
 
@@ -86,6 +91,17 @@ public class GlobalVars{
         put("@ctrlProcessor", ctrlProcessor);
         put("@ctrlPlayer", ctrlPlayer);
         put("@ctrlCommand", ctrlCommand);
+        
+        //sounds
+        if(Core.assets != null){
+            for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
+                if(sound != Sounds.none && sound != Sounds.swish && sound.file != null){
+                    String name = sound.file.nameWithoutExtension();
+                    soundNames.add(name);
+                    put("@sfx-" + name, Sounds.getSoundId(sound));
+                }
+            }
+        }
 
         //store base content
 
@@ -192,6 +208,10 @@ public class GlobalVars{
             varClientTeam.numval = player.team().id;
             varClientMobile.numval = mobile ? 1 : 0;
         }
+    }
+
+    public LVar waitVar(){
+        return varWait;
     }
 
     public Seq<VarEntry> getEntries(){

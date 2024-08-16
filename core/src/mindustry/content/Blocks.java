@@ -4468,6 +4468,7 @@ public class Blocks{
                 trailInterval = 3f;
                 trailParam = 4f;
                 pierceCap = 2;
+                buildingDamageMultiplier = 0.5f;
                 fragOnHit = false;
                 speed = 5f;
                 damage = 180f;

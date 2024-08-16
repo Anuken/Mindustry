@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -40,7 +41,6 @@ public class LExecutor{
     maxGraphicsBuffer = 256,
     maxDisplayBuffer = 1024,
     maxTextBuffer = 400;
-
 
     public LInstruction[] instructions = {};
     /** Non-constant variables used for network sync */
@@ -1600,7 +1600,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             //set default to success
             outSuccess.setnum(1);
-            if(headless && type != MessageType.mission) {
+            if(headless && type != MessageType.mission){
                 exec.textBuffer.setLength(0);
                 return;
             }
@@ -1610,8 +1610,14 @@ public class LExecutor{
                 type == MessageType.notify && ui.hudfrag.hasToast() ||
                 type == MessageType.toast && ui.hasAnnouncement()
             ){
-                //set outSuccess=false to let user retry.
-                outSuccess.setnum(0);
+                //backwards compatibility; if it is @wait, block execution
+                if(outSuccess == logicVars.waitVar()){
+                    exec.counter.numval--;
+                    exec.yield = true;
+                }else{
+                    //set outSuccess=false to let user retry.
+                    outSuccess.setnum(0);
+                }
                 return;
             }
 
@@ -1907,6 +1913,37 @@ public class LExecutor{
                 }else if(key instanceof UnlockableContent content){
                     sp.setProp(content, value.num());
                 }
+            }
+        }
+    }
+
+    public static class PlaySoundI implements LInstruction{
+        public boolean positional;
+        public LVar id, volume, pitch, pan, x, y, limit;
+
+        public PlaySoundI(){
+        }
+
+        public PlaySoundI(boolean positional, LVar id, LVar volume, LVar pitch, LVar pan, LVar x, LVar y, LVar limit){
+            this.positional = positional;
+            this.id = id;
+            this.volume = volume;
+            this.pitch = pitch;
+            this.pan = pan;
+            this.x = x;
+            this.y = y;
+            this.limit = limit;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Sound sound = Sounds.getSound(id.numi());
+            if(sound == null || sound == Sounds.swish) sound = Sounds.none; //no.
+            
+            if(positional){
+                sound.at(World.unconv(x.numf()), World.unconv(y.numf()), pitch.numf(), Math.min(volume.numf(), 2f), limit.bool());
+            }else{
+                sound.play(Math.min(volume.numf() * (Core.settings.getInt("sfxvol") / 100f), 2f), pitch.numf(), pan.numf(), false, limit.bool());
             }
         }
     }

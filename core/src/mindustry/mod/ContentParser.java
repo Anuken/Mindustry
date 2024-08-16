@@ -327,6 +327,20 @@ public class ContentParser{
             readFields(consume, data);
             return consume;
         });
+        put(Team.class, (type, data) -> {
+            if(data.isString()){
+                Team out = Structs.find(Team.baseTeams, t -> t.name.equals(data.asString()));
+                if(out == null) throw new IllegalArgumentException("Unknown team: " + data.asString());
+                return out;
+            }else if(data.isNumber()){
+                if(data.asInt() >= Team.all.length || data.asInt() < 0){
+                    throw new IllegalArgumentException("Unknown team: " + data.asString());
+                }
+                return Team.get(data.asInt());
+            }else{
+                throw new IllegalArgumentException("Unknown team: " + data.asString() + ". Team must either be a string or a number.");
+            }
+        });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accommodate binding of content names first.*/
@@ -674,6 +688,27 @@ public class ContentParser{
             currentContent = planet;
             read(() -> readFields(planet, value));
             return planet;
+        },
+        ContentType.team, (TypeParser<TeamEntry>)(mod, name, value) -> {
+            TeamEntry entry;
+            Team team;
+            if(value.has("team")){
+                team = (Team)classParsers.get(Team.class).parse(Team.class, value.get("team"));
+            }else{
+                throw new RuntimeException("Team field missing.");
+            }
+            value.remove("team");
+            
+            if(locate(ContentType.team, name) != null){
+                entry = locate(ContentType.team, name);
+                readBundle(ContentType.team, name, value);
+            }else{
+                readBundle(ContentType.team, name, value);
+                entry = new TeamEntry(mod + "-" + name, team);
+            }
+            currentContent = entry;
+            read(() -> readFields(entry, value));
+            return entry;
         }
     );
 

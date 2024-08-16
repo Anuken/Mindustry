@@ -64,7 +64,7 @@ public abstract class UnlockableContent extends MappableContent{
     @Override
     public void loadIcon(){
         fullIcon =
-            Core.atlas.find(fullOverride,
+            Core.atlas.find(fullOverride == null ? "" : fullOverride,
             Core.atlas.find(getContentType().name() + "-" + name + "-full",
             Core.atlas.find(name + "-full",
             Core.atlas.find(name,

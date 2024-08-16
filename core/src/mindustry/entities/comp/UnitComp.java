@@ -792,6 +792,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     @Replace
     public String toString(){
-        return "Unit#" + id() + ":" + type;
+        return "Unit#" + id() + ":" + type + " (" + x + ", " + y + ")";
     }
 }

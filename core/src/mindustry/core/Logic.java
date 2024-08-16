@@ -261,6 +261,7 @@ public class Logic implements ApplicationListener{
         Groups.clear();
         Time.clear();
         Events.fire(new ResetEvent());
+        world.tiles = new Tiles(0, 0);
 
         //save settings on reset
         Core.settings.manualSave();
