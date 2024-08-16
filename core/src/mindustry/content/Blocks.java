@@ -3037,7 +3037,7 @@ public class Blocks{
                     backColor = hitColor = Pal.lightishOrange;
                     frontColor = Color.white;
                 }},
-                Items.graphite, new BasicBulletType(3.5f, 12){{
+                Items.graphite, new BasicBulletType(3.5f, 14){{
                     width = 9f;
                     height = 12f;
                     reloadMultiplier = 0.6f;
@@ -3244,7 +3244,7 @@ public class Blocks{
                     width = height = 11f;
                     collidesTiles = false;
                     splashDamageRadius = 25f * 0.75f;
-                    splashDamage = 20f;
+                    splashDamage = 25f;
                     shootEffect = Fx.shootSmall;
                     backColor = hitColor = trailColor = Pal.techBlue;
                     frontColor = Color.white;
@@ -3255,12 +3255,12 @@ public class Blocks{
                     width = height = 11f;
                     collidesTiles = false;
                     splashDamageRadius = 25f * 0.75f;
-                    splashDamage = 25f;
+                    splashDamage = 20f;
                     reloadMultiplier = 1.2f;
-                    ammoMultiplier = 1f;
+                    ammoMultiplier = 2f;
                     homingPower = 0.12f;
                     homingRange = 50f;
-                    trailLength = 6;
+                    trailLength = 9;
                     shootEffect = Fx.shootSmall;
                     trailColor = backColor = Pal.gray;
                     frontColor = Color.white;
@@ -3271,14 +3271,14 @@ public class Blocks{
                     lifetime = 80f;
                     width = height = 13f;
                     collidesTiles = false;
-                    splashDamageRadius = 25f * 0.75f;
-                    splashDamage = 35f;
+                    splashDamageRadius = 30f * 0.75f;
+                    splashDamage = 30f;
                     status = StatusEffects.burning;
                     statusDuration = 60f * 12f;
                     makeFire = true;
                     trailEffect = Fx.incendTrail;
                     shootEffect = Fx.shootSmall;
-                    ammoMultiplier = 2f;
+                    ammoMultiplier = 3f;
                     trailColor = backColor = Pal.lightishOrange;
                     frontColor = Color.white;
                 }}
