@@ -1998,8 +1998,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
-    public void control(LAccess type, LVar p1, double p2, double p3, double p4){
-        
+    public void control(LAccess type, LVar p1, double p2, double p3, double p4){   
+       if(type == LAccess.isPartOf) {
+           p1.setnum(world.build((int)p2, (int)p3)==null?0.0d:((world.build((int)p2,(int)p3).tile == this.tile)?1.0d:0.0d));
+       }
     }
     @Override
     public void control(LAccess type, LVar p1, Object p2, double p3, double p4){

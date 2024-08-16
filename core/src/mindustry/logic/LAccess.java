@@ -65,7 +65,8 @@ public enum LAccess{
     color("to"),
 
     accept(true,"result","content"),
-    consume(true,"result","content");
+    consume(true,"result","content"),
+    isPartOf("result","x","y");
 
     public final String[] params;
     public final boolean isObj;
