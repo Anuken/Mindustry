@@ -33,8 +33,9 @@ public class LAssembler{
 
         Seq<LStatement> st = read(data, privileged);
 
-        asm.instructions = st.map(l -> l.build(asm)).retainAll(l -> l != null).toArray(LInstruction.class);
         asm.privileged = privileged;
+        
+        asm.instructions = st.map(l -> l.build(asm)).retainAll(l -> l != null).toArray(LInstruction.class);
         return asm;
     }
 
