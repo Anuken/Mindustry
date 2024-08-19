@@ -615,7 +615,7 @@ public class PlacementFragment{
                         blocksSelect.margin(4).marginTop(0);
                         blockPane = blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
                             if(pane.hasScroll()){
-                                Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                                Element result = Core.scene.getHoverElement();
                                 if(result == null || !result.isDescendantOf(pane)){
                                     Core.scene.setScrollFocus(null);
                                 }

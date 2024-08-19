@@ -164,8 +164,14 @@ public class LCanvas extends Table{
         this.statements.layout();
     }
 
+    public void clearStatements(){
+        jumps.clear();
+        statements.clearChildren();
+        statements.layout();
+    }
+
     StatementElem checkHovered(){
-        Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+        Element e = Core.scene.getHoverElement();
         if(e != null){
             while(e != null && !(e instanceof StatementElem)){
                 e = e.parent;
@@ -251,7 +257,7 @@ public class LCanvas extends Table{
                 }
             }
 
-            invalidateHierarchy();
+            if(parent != null) parent.invalidateHierarchy();//don't invalid self
 
             if(parent != null && parent instanceof Table){
                 setCullingArea(parent.getCullingArea());

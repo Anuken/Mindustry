@@ -32,6 +32,7 @@ public class ForceFieldAbility extends Ability{
 
     /** State. */
     protected float radiusScale, alpha;
+    protected boolean wasBroken = true;
 
     private static float realRad;
     private static Unit paramUnit;
@@ -40,13 +41,6 @@ public class ForceFieldAbility extends Ability{
         if(trait.team != paramUnit.team && trait.type.absorbable && Intersector.isInRegularPolygon(paramField.sides, paramUnit.x, paramUnit.y, realRad, paramField.rotation, trait.x(), trait.y()) && paramUnit.shield > 0){
             trait.absorb();
             Fx.absorb.at(trait);
-
-            //break shield
-            if(paramUnit.shield <= trait.damage()){
-                paramUnit.shield -= paramField.cooldown * paramField.regen;
-
-                Fx.shieldBreak.at(paramUnit.x, paramUnit.y, paramField.radius, paramUnit.team.color, paramUnit);
-            }
 
             paramUnit.shield -= trait.damage();
             paramField.alpha = 1f;
@@ -85,6 +79,14 @@ public class ForceFieldAbility extends Ability{
 
     @Override
     public void update(Unit unit){
+        if(unit.shield <= 0f && !wasBroken){
+            unit.shield -= cooldown * regen;
+
+            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), this);
+        }
+
+        wasBroken = unit.shield <= 0f;
+
         if(unit.shield < max){
             unit.shield += Time.delta * regen;
         }
@@ -108,7 +110,7 @@ public class ForceFieldAbility extends Ability{
         checkRadius(unit);
 
         if(unit.shield > 0){
-            Draw.color(unit.team.color, Color.white, Mathf.clamp(alpha));
+            Draw.color(unit.type.shieldColor(unit), Color.white, Mathf.clamp(alpha));
 
             if(Vars.renderer.animateShields){
                 Draw.z(Layer.shields + 0.001f * alpha);

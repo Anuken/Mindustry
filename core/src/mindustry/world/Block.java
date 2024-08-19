@@ -409,7 +409,7 @@ public class Block extends UnlockableContent implements Senseable{
         Draw.rect(
             variants == 0 ? customShadowRegion :
             variantShadowRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantShadowRegions.length - 1))],
-        tile.drawx(), tile.drawy(), tile.build == null ? 0f : tile.build.drawrot());
+        tile.drawx(), tile.drawy());
         Draw.color();
     }
 
@@ -438,6 +438,14 @@ public class Block extends UnlockableContent implements Senseable{
                     PowerNode node = (PowerNode)other.block;
                     Draw.color(node.laserColor1, Renderer.laserOpacity * 0.5f);
                     node.drawLaser(x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
+
+                    Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
+                });
+
+                BeamNode.getNodeLinks(tile, this, player.team(), other -> {
+                    BeamNode node = (BeamNode)other.block;
+                    Draw.color(node.laserColor1, Renderer.laserOpacity * 0.5f);
+                    node.drawLaser(other.x, other.y, x * tilesize + offset, y * tilesize + offset, size, other.block.size);
 
                     Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
                 });
@@ -517,6 +525,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public boolean rotatedOutput(int x, int y){
         return rotate;
+    }
+
+    public boolean rotatedOutput(int fromX, int fromY, Tile destination){
+        return rotatedOutput(fromX, fromY);
     }
 
     public boolean synthetic(){
@@ -1403,6 +1415,7 @@ public class Block extends UnlockableContent implements Senseable{
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
+            case solid -> solid ? 1 : 0;
             case size -> size;
             case itemCapacity -> itemCapacity;
             case liquidCapacity -> liquidCapacity;

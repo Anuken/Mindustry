@@ -234,6 +234,7 @@ project(":desktop"){
     dependencies{
         implementation project(":core")
         implementation arcModule("extensions:discord")
+        implementation arcModule("natives:natives-filedialogs")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
 
@@ -320,6 +321,7 @@ project(":core"){
         api arcModule("extensions:g3d")
         api arcModule("extensions:fx")
         api arcModule("extensions:arcnet")
+        implementation arcModule("extensions:filedialogs")
         api "com.github.Anuken:rhino:$rhinoVersion"
         if(localArc && debugged()) api arcModule("extensions:recorder")
         if(localArc) api arcModule(":extensions:packer")

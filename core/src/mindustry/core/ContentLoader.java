@@ -171,6 +171,13 @@ public class ContentLoader{
 
     public void handleMappableContent(MappableContent content){
         if(contentNameMap[content.getContentType().ordinal()].containsKey(content.name)){
+            var list = contentMap[content.getContentType().ordinal()];
+
+            //this method is only called when registering content, and after handleContent.
+            //If this is the last registered content, and it is invalid, make sure to remove it from the list to prevent invalid stuff from being registered
+            if(list.size > 0 && list.peek() == content){
+                list.pop();
+            }
             throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + content.name + "')");
         }
         if(currentMod != null){

@@ -51,6 +51,7 @@ public class CoreBlock extends StorageBlock{
     public UnitType unitType = UnitTypes.alpha;
     public float landDuration = 160f;
     public Music landMusic = Musics.land;
+    public Music launchMusic = Musics.coreLaunch;
     public Effect launchEffect = Fx.launch;
 
     public Interp landZoomInterp = Interp.pow3;
@@ -291,7 +292,7 @@ public class CoreBlock extends StorageBlock{
 
     protected void drawLandingThrusters(float x, float y, float rotation, float frame){
         float length = thrusterLength * (frame - 1f) - 1f/4f;
-        float alpha = Draw.getColor().a;
+        float alpha = Draw.getColorAlpha();
 
         //two passes for consistent lighting
         for(int j = 0; j < 2; j++){
@@ -331,6 +332,10 @@ public class CoreBlock extends StorageBlock{
 
         public Music landMusic(){
             return landMusic;
+        }
+
+        public Music launchMusic(){
+            return launchMusic;
         }
 
         @Override
@@ -596,6 +601,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void afterDestroyed(){
+            super.afterDestroyed();
             if(state.rules.coreCapture){
                 if(!net.client()){
                     tile.setBlock(block, lastDamage);

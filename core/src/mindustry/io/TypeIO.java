@@ -279,7 +279,7 @@ public class TypeIO{
     }
 
     public static void writeUnit(Writes write, Unit unit){
-        write.b(unit == null || unit.isNull() ? 0 : unit instanceof BlockUnitc ? 1 : 2);
+        write.b(unit == null ? 0 : unit instanceof BlockUnitc ? 1 : 2);
 
         //block units are special
         if(unit instanceof BlockUnitc){
@@ -295,15 +295,14 @@ public class TypeIO{
         byte type = read.b();
         int id = read.i();
         //nothing
-        if(type == 0) return Nulls.unit;
+        if(type == 0) return null;
         if(type == 2){ //standard unit
-            Unit unit = Groups.unit.getByID(id);
-            return unit == null ? Nulls.unit : unit;
+            return Groups.unit.getByID(id);
         }else if(type == 1){ //block
             Building tile = world.build(id);
-            return tile instanceof ControlBlock cont ? cont.unit() : Nulls.unit;
+            return tile instanceof ControlBlock cont ? cont.unit() : null;
         }
-        return Nulls.unit;
+        return null;
     }
 
     public static void writeCommand(Writes write, @Nullable UnitCommand command){
@@ -628,7 +627,7 @@ public class TypeIO{
     }
 
     public static KickReason readKick(Reads read){
-        return KickReason.values()[read.b()];
+        return KickReason.all[read.b()];
     }
 
     public static void writeMarkerControl(Writes write, LMarkerControl reason){
@@ -786,7 +785,7 @@ public class TypeIO{
     }
 
     public static AdminAction readAction(Reads read){
-        return AdminAction.values()[read.b()];
+        return AdminAction.all[read.b()];
     }
 
     public static void writeUnitType(Writes write, UnitType effect){
@@ -1038,14 +1037,19 @@ public class TypeIO{
         }
     }
 
+    public interface Boxed<T> {
+        T unbox();
+    }
+
     /** Represents a building that has not been resolved yet. */
-    public static class BuildingBox{
+    public static class BuildingBox implements Boxed<Building>{
         public int pos;
 
         public BuildingBox(int pos){
             this.pos = pos;
         }
 
+        @Override
         public Building unbox(){
             return world.build(pos);
         }
@@ -1059,13 +1063,14 @@ public class TypeIO{
     }
 
     /** Represents a unit that has not been resolved yet. TODO unimplemented / unused*/
-    public static class UnitBox{
+    public static class UnitBox implements Boxed<Unit>{
         public int id;
 
         public UnitBox(int id){
             this.id = id;
         }
 
+        @Override
         public Unit unbox(){
             return Groups.unit.getByID(id);
         }

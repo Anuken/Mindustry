@@ -478,7 +478,7 @@ public class NetClient implements ApplicationListener{
                     Log.warn("Block ID mismatch at @: @ != @. Skipping block snapshot.", tile, tile.build.block.id, block);
                     break;
                 }
-                tile.build.readAll(Reads.get(input), tile.build.version());
+                tile.build.readSync(Reads.get(input), tile.build.version());
             }
         }catch(Exception e){
             Log.err(e);
@@ -622,21 +622,22 @@ public class NetClient implements ApplicationListener{
 
     void sync(){
         if(timer.get(0, playerSyncTime)){
-            Unit unit = player.dead() ? Nulls.unit : player.unit();
-            int uid = player.dead() ? -1 : unit.id;
+            boolean dead = player.dead();
+            Unit unit = dead ? null : player.unit();
+            int uid = dead || unit == null ? -1 : unit.id;
 
             Call.clientSnapshot(
             lastSent++,
             uid,
-            player.dead(),
-            player.dead() ? player.x : unit.x, player.dead() ? player.y : unit.y,
-            player.unit().aimX(), player.unit().aimY(),
-            unit.rotation,
+            dead,
+            dead ? player.x : unit.x, dead ? player.y : unit.y,
+            dead ? 0f : unit.aimX(), dead ? 0f : unit.aimY(),
+            unit == null ? 0f : unit.rotation,
             unit instanceof Mechc m ? m.baseRotation() : 0,
-            unit.vel.x, unit.vel.y,
-            player.unit().mineTile,
+            unit == null ? 0f : unit.vel.x, unit == null ? 0f : unit.vel.y,
+            dead ? null : unit.mineTile,
             player.boosting, player.shooting, ui.chatfrag.shown(), control.input.isBuilding,
-            player.isBuilder() ? player.unit().plans : null,
+            player.isBuilder() && unit != null ? unit.plans : null,
             Core.camera.position.x, Core.camera.position.y,
             Core.camera.width, Core.camera.height
             );
