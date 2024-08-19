@@ -332,4 +332,8 @@
     "name": "LibreDUSTRY",
     "address": ["46.4.114.111"]
   }
+  {
+    "name": "Pushkin",
+    "address": ["23.88.73.88:13123"]
+  }
 ]
