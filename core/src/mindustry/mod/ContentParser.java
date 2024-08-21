@@ -1102,9 +1102,9 @@ public class ContentParser{
                     Object fieldObj = field.get(object);
 
                     if(fieldObj instanceof ObjectSet set){
-                        set.addAll((ObjectSet)fieldObj);
+                        set.addAll((ObjectSet)readField);
                     }else if(fieldObj instanceof Seq seq){
-                        seq.addAll((Seq)fieldObj);
+                        seq.addAll((Seq)readField);
                     }else{
                         throw new SerializationException("This should be impossible");
                     }
