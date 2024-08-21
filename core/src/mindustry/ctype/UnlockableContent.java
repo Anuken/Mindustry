@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
@@ -45,14 +46,25 @@ public abstract class UnlockableContent extends MappableContent{
     public String fullOverride = "";
     /** If true, this content will appear in all database tabs. */
     public boolean allDatabaseTabs = false;
-    /** Content - usually a planet - that dictates which database tab(s) this content will appear in. If nothing is defined, Serpulo is considered to be the "default" tab. */
+    /**
+     * Planets that this content is made for. If empty, it is shown on all planets.
+     * Currently, this is only meaningful for blocks.
+     * */
+    public ObjectSet<Planet> shownPlanets = new ObjectSet<>();
+    /**
+     * Content - usually a planet - that dictates which database tab(s) this content will appear in.
+     * If nothing is defined, it will use the values in shownPlanets.
+     * If shownPlanets is also empty, it will use Serpulo as the "default" tab.
+     * Note: When reading, use {@link #getDatabaseTabs} instead.
+     * */
     public ObjectSet<UnlockableContent> databaseTabs = new ObjectSet<>();
     /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
     public @Nullable TechNode techNode;
     /** Tech nodes for all trees that this content is part of. */
     public Seq<TechNode> techNodes = new Seq<>();
-    /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
+    /** Unlock state. Loaded from settings. Do not modify outside the constructor. */
     protected boolean unlocked;
+    private boolean initializedDatabaseTabs;
 
     public UnlockableContent(String name){
         super(name);
@@ -61,6 +73,20 @@ public abstract class UnlockableContent extends MappableContent{
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
         this.details = Core.bundle.getOrNull(getContentType() + "." + this.name + ".details");
         this.unlocked = Core.settings != null && Core.settings.getBool(this.name + "-unlocked", false);
+    }
+
+    public ObjectSet<UnlockableContent> getDatabaseTabs(){
+        //the problem here is that the planet hasn't initialized yet in init(), which means it hasn't assigned the shownPlanets yet.
+        //initialization has to be deferred to a getter
+        if(!initializedDatabaseTabs){
+            initializedDatabaseTabs = true;
+
+            databaseTabs.addAll(shownPlanets);
+            if(databaseTabs.isEmpty()){
+                databaseTabs.add(Planets.serpulo);
+            }
+        }
+        return databaseTabs;
     }
 
     @Override

@@ -900,7 +900,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean isVisibleOn(Planet planet){
-        return !Structs.contains(requirements, i -> planet.hiddenItems.contains(i.item));
+        return !Structs.contains(requirements, i -> planet.hiddenItems.contains(i.item)) && (shownPlanets.isEmpty() || shownPlanets.contains(planet));
     }
 
     public boolean isPlaceable(){
@@ -948,7 +948,9 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean environmentBuildable(){
-        return (state.rules.hiddenBuildItems.isEmpty() || !Structs.contains(requirements, i -> state.rules.hiddenBuildItems.contains(i.item)));
+        return
+            (state.rules.hiddenBuildItems.isEmpty() || !Structs.contains(requirements, i -> state.rules.hiddenBuildItems.contains(i.item))) &&
+            (state.getPlanet() == null || shownPlanets.isEmpty() || shownPlanets.contains(state.getPlanet()));
     }
 
     public boolean isStatic(){

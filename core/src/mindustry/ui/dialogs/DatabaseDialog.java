@@ -66,7 +66,7 @@ public class DatabaseDialog extends BaseDialog{
             for(var contents : allContent){
                 for(var content : contents){
                     if(content instanceof UnlockableContent u){
-                        all.addAll(u.databaseTabs);
+                        all.addAll(u.getDatabaseTabs());
                     }
                 }
             }
@@ -101,7 +101,7 @@ public class DatabaseDialog extends BaseDialog{
             ContentType type = ContentType.all[j];
 
             Seq<UnlockableContent> array = allContent[j]
-                .select(c -> c instanceof UnlockableContent u && !u.isHidden() && (tab == Planets.sun || u.allDatabaseTabs || (u.databaseTabs.isEmpty() && tab == Planets.serpulo) || u.databaseTabs.contains(tab)) &&
+                .select(c -> c instanceof UnlockableContent u && !u.isHidden() && (tab == Planets.sun || u.allDatabaseTabs || u.getDatabaseTabs().contains(tab)) &&
                     (text.isEmpty() || u.localizedName.toLowerCase().contains(text))).as();
 
             if(array.size == 0) continue;

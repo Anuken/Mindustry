@@ -150,6 +150,8 @@ public class Planet extends UnlockableContent{
     public Seq<Item> hiddenItems = new Seq<>();
     /** The only items available on this planet, if defined. */
     public Seq<Item> itemWhitelist = new Seq<>();
+    /** If true, all content in this planet's tech tree will be assigned this planet in their shownPlanets. */
+    public boolean autoAssignPlanet = true;
     /** Content (usually planet-specific) that is unlocked upon landing here. */
     public Seq<UnlockableContent> unlockedOnLand = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
@@ -340,6 +342,10 @@ public class Planet extends UnlockableContent{
 
         if(techTree != null){
             techTree.addDatabaseTab(this);
+
+            if(autoAssignPlanet){
+                techTree.addPlanet(this);
+            }
         }
 
         for(Sector sector : sectors){
