@@ -206,7 +206,6 @@ public class Planet extends UnlockableContent{
         rules.attributes.add(defaultAttributes);
         rules.env = defaultEnv;
         rules.planet = this;
-        rules.hiddenBuildItems.clear();
     }
 
     public @Nullable Sector getLastSector(){

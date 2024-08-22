@@ -140,9 +140,6 @@ public class Logic implements ApplicationListener{
                         core.items.set(item, core.block.itemCapacity);
                     }
                 }
-
-                //set up hidden items
-                state.rules.hiddenBuildItems.clear();
             }
 
             //save settings

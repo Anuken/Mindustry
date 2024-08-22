@@ -944,9 +944,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean environmentBuildable(){
-        return
-            (state.rules.hiddenBuildItems.isEmpty() || !Structs.contains(requirements, i -> state.rules.hiddenBuildItems.contains(i.item))) &&
-            (state.getPlanet() == null || shownPlanets.isEmpty() || shownPlanets.contains(state.getPlanet()));
+        return isOnPlanet(state.getPlanet());
     }
 
     public boolean isStatic(){
