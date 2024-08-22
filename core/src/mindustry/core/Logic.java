@@ -143,7 +143,6 @@ public class Logic implements ApplicationListener{
 
                 //set up hidden items
                 state.rules.hiddenBuildItems.clear();
-                state.rules.hiddenBuildItems.addAll(state.rules.sector.planet.hiddenItems);
             }
 
             //save settings

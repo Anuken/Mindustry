@@ -229,19 +229,8 @@ public class CustomRulesDialog extends BaseDialog{
         }
         number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> rules.waves);
 
-
         category("resourcesbuilding");
-        check("@rules.infiniteresources", b -> {
-            rules.infiniteResources = b;
-
-            //reset to serpulo if any env was enabled
-            if(!b && rules.hiddenBuildItems.isEmpty()){
-                rules.env = Planets.serpulo.defaultEnv;
-                rules.hiddenBuildItems.clear();
-                rules.hiddenBuildItems.addAll(Planets.serpulo.hiddenItems);
-                setup();
-            }
-        }, () -> rules.infiniteResources);
+        check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
         check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore);
         check("@rules.derelictrepair", b -> rules.derelictRepair = b, () -> rules.derelictRepair);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);

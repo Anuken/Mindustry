@@ -102,6 +102,10 @@ public abstract class UnlockableContent extends MappableContent{
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
     }
 
+    public boolean isOnPlanet(@Nullable Planet planet){
+        return planet == null || shownPlanets.isEmpty() || shownPlanets.contains(planet);
+    }
+
     public int getLogicId(){
         return logicVars.lookupLogicId(this);
     }
