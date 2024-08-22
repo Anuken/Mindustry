@@ -1295,7 +1295,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            Tile tile = world.tile(x.numi(), y.numi());
+            Tile tile = world.tile(Mathf.round(x.numf()), Mathf.round(y.numf()));
             if(tile == null){
                 dest.setobj(null);
             }else{
