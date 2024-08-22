@@ -154,6 +154,11 @@ public class Planet extends UnlockableContent{
     /** Loads the planet grid outline mesh. Clientside only. */
     public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineRad * radius);
 
+    /** @deprecated no-op, do not use. */
+    @Deprecated
+    public Seq<Item> itemWhitelist = new Seq<>(), hiddenItems = new Seq<>();
+
+
     public Planet(String name, Planet parent, float radius){
         super(name);
 
