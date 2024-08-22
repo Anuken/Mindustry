@@ -172,7 +172,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 Cons<Schematic> handler = s -> {
                     if(s.tiles.contains(tile -> !tile.block.supportsEnv(sector.planet.defaultEnv) ||
                     //make sure block can be built here.
-                    tile.block.isOnPlanet(sector.planet))){
+                    !tile.block.isOnPlanet(sector.planet))){
                         return;
                     }
 

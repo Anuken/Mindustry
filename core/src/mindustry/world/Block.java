@@ -1160,6 +1160,22 @@ public class Block extends UnlockableContent implements Senseable{
         return buildVisibility != BuildVisibility.hidden;
     }
 
+    @Override
+    public void postInit(){
+        //usually, an empty set of planets is a configuration error. auto-assign based on requirements
+        if(requirements.length > 0 && shownPlanets.isEmpty()){
+            for(Planet planet : content.planets()){
+                if(planet.isLandable()){
+                    if(!Structs.contains(requirements, s -> !s.item.isOnPlanet(planet))){
+                        shownPlanets.add(planet);
+                    }
+                }
+            }
+        }
+
+        super.postInit();
+    }
+
     /** Called after all blocks are created. */
     @Override
     @CallSuper
