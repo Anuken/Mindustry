@@ -555,7 +555,7 @@ public class LExecutor{
             int address = position.numi();
             Building from = target.building();
 
-            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team)){
+            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
                 output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
             }
         }
@@ -662,7 +662,7 @@ public class LExecutor{
             LogicAI ai = null;
 
             if(base instanceof Ranged r && (exec.privileged || r.team() == exec.team) &&
-                (base instanceof Building || (ai = UnitControlI.checkLogicAI(exec, base)) != null)){ //must be a building or a controllable unit
+                ((base instanceof Building b && (!b.block.privileged || exec.privileged)) || (ai = UnitControlI.checkLogicAI(exec, base)) != null)){ //must be a building or a controllable unit
                 float range = r.range();
 
                 Healthc targeted;
@@ -1050,7 +1050,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(target.building() instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
+            if(target.building() instanceof MessageBuild d && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
@@ -1295,7 +1295,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            Tile tile = world.tile(x.numi(), y.numi());
+            Tile tile = world.tile(Mathf.round(x.numf()), Mathf.round(y.numf()));
             if(tile == null){
                 dest.setobj(null);
             }else{

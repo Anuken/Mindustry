@@ -587,7 +587,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             @Override
             public void act(float delta){
-                if(scene.getDialog() == PlanetDialog.this && !scene.hit(input.mouseX(), input.mouseY(), true).isDescendantOf(e -> e instanceof ScrollPane)){
+                if(scene.getDialog() == PlanetDialog.this && (scene.getHoverElement() == null || !scene.getHoverElement().isDescendantOf(e -> e instanceof ScrollPane))){
                     scene.setScrollFocus(PlanetDialog.this);
                 }
 

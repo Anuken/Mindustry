@@ -33,8 +33,9 @@ public class LAssembler{
 
         Seq<LStatement> st = read(data, privileged);
 
-        asm.instructions = st.map(l -> l.build(asm)).retainAll(l -> l != null).toArray(LInstruction.class);
         asm.privileged = privileged;
+        
+        asm.instructions = st.map(l -> l.build(asm)).retainAll(l -> l != null).toArray(LInstruction.class);
         return asm;
     }
 
@@ -58,7 +59,7 @@ public class LAssembler{
     /** @return a variable by name.
      * This may be a constant variable referring to a number or object. */
     public LVar var(String symbol){
-        LVar constVar = Vars.logicVars.get(symbol);
+        LVar constVar = Vars.logicVars.get(symbol, privileged);
         if(constVar != null) return constVar;
 
         symbol = symbol.trim();

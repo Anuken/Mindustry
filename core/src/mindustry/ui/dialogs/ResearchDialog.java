@@ -472,7 +472,7 @@ public class ResearchDialog extends BaseDialog{
 
             if(mobile){
                 tapped(() -> {
-                    Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                    Element e = Core.scene.getHoverElement();
                     if(e == this){
                         hoverNode = null;
                         rebuild();

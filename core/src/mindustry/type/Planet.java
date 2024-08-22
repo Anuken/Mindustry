@@ -15,7 +15,6 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
-import mindustry.game.EventType.ContentInitEvent;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
@@ -146,10 +145,8 @@ public class Planet extends UnlockableContent{
     public @Nullable TechNode techTree;
     /** TODO remove? Planets that can be launched to from this one. Made mutual in init(). */
     public Seq<Planet> launchCandidates = new Seq<>();
-    /** Items not available on this planet. Left out for backwards compatibility. */
-    public Seq<Item> hiddenItems = new Seq<>();
-    /** The only items available on this planet, if defined. */
-    public Seq<Item> itemWhitelist = new Seq<>();
+    /** If true, all content in this planet's tech tree will be assigned this planet in their shownPlanets. */
+    public boolean autoAssignPlanet = true;
     /** Content (usually planet-specific) that is unlocked upon landing here. */
     public Seq<UnlockableContent> unlockedOnLand = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
@@ -178,13 +175,6 @@ public class Planet extends UnlockableContent{
             parent.children.add(this);
             parent.updateTotalRadius();
         }
-
-        //if an item whitelist exists, add everything else not in that whitelist to hidden items
-        Events.on(ContentInitEvent.class, e -> {
-            if(itemWhitelist.size > 0){
-                hiddenItems.addAll(content.items().select(i -> !itemWhitelist.contains(i)));
-            }
-        });
 
         //calculate solar system
         for(solarSystem = this; solarSystem.parent != null; solarSystem = solarSystem.parent);
@@ -216,8 +206,6 @@ public class Planet extends UnlockableContent{
         rules.attributes.add(defaultAttributes);
         rules.env = defaultEnv;
         rules.planet = this;
-        rules.hiddenBuildItems.clear();
-        rules.hiddenBuildItems.addAll(hiddenItems);
     }
 
     public @Nullable Sector getLastSector(){
@@ -336,6 +324,11 @@ public class Planet extends UnlockableContent{
     public void init(){
         if(techTree == null){
             techTree = TechTree.roots.find(n -> n.planet == this);
+        }
+
+        if(techTree != null && autoAssignPlanet){
+            techTree.addDatabaseTab(this);
+            techTree.addPlanet(this);
         }
 
         for(Sector sector : sectors){

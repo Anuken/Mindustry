@@ -73,7 +73,7 @@
   },
   {
     "name": "SMoke of Anarchy",
-    "address": ["86.102.97.27"]
+    "address": ["mindustry.smokeofanarchy.ru", "mindustry.smokeofanarchy.ru:6568", "mindustry.smokeofanarchy.ru:6569", "mindustry.smokeofanarchy.ru:6570", "mindustry.smokeofanarchy.ru:6571", "mindustry.smokeofanarchy.ru:6572", "mindustry.smokeofanarchy.ru:6573", "mindustry.smokeofanarchy.ru:6574", "mindustry.smokeofanarchy.ru:6575", "mindustry.smokeofanarchy.ru:6576"]
   },
   {
     "name": "Mindustry.pl",
@@ -246,7 +246,7 @@
   },
   {
     "name": "abcxyz remaster",
-    "address": ["144.76.57.59:30302", "23.88.73.88:16895"]
+    "address": ["144.76.57.59:35150", "23.88.73.88:11066", "23.88.73.88:9171", "23.88.73.88:10911"]
   },
   {
     "name": "CroCraft Network",
@@ -282,11 +282,11 @@
   },
   {
     "name": "AZDustry",
-    "address": ["8.245.23.28:25874"]
+    "address": ["148.251.77.197:2012"]
   },
   {
     "name": "Erepulo",
-    "address": ["95.84.198.97:5401", "95.84.198.97:5402", "95.84.198.97:5403", "95.84.198.97:5404", "95.84.198.97:2357", "95.84.198.97:5500"]
+    "address": ["95.84.198.97:5401", "95.84.198.97:5402", "95.84.198.97:5403", "95.84.198.97:5404", "95.84.198.97:2357", "95.84.198.97:5500", "199.83.103.251"]
   },
   {
     "name": "MineCore",

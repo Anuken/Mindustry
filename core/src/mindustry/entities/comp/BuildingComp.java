@@ -1370,6 +1370,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called when the block is destroyed. The tile is still intact at this stage. */
     public void onDestroyed(){
+        if(sound != null){
+            sound.stop();
+        }
+
         float explosiveness = block.baseExplosiveness;
         float flammability = 0f;
         float power = 0f;

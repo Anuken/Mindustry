@@ -171,7 +171,7 @@ public class LCanvas extends Table{
     }
 
     StatementElem checkHovered(){
-        Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+        Element e = Core.scene.getHoverElement();
         if(e != null){
             while(e != null && !(e instanceof StatementElem)){
                 e = e.parent;
