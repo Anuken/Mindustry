@@ -1,5 +1,9 @@
 [
   {
+    "name": "EscoCorp",
+    "address": ["81.30.105.171:6567"]
+  },
+  {
     "name": "Redundancy Dept",
     "address": ["min7.include-once.org:8000", "min7.include-once.org:8001"]
   },
