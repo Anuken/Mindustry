@@ -128,6 +128,8 @@ public class LCanvas extends Table{
         if(toLoad != null){
             load(toLoad);
         }
+
+        Core.app.post(() -> statements.invalidateHierarchy());
     }
 
     @Override
@@ -257,7 +259,7 @@ public class LCanvas extends Table{
                 }
             }
 
-            invalidateHierarchy();
+            if(parent != null) parent.invalidateHierarchy();
 
             if(parent != null && parent instanceof Table){
                 setCullingArea(parent.getCullingArea());
