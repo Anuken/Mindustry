@@ -21,7 +21,7 @@ public class LAssembler{
 
     public LAssembler(){
         //instruction counter
-        putVar("@counter");
+        putVar("@counter").isobj = false;
         //currently controlled unit
         putConst("@unit", null);
         //reference to self
