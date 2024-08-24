@@ -270,7 +270,7 @@
   },
   {
     "name": "XuwenHost",
-    "address": ["mdt.xuwenblock.cn:6567","mdt.nekopark.cloud:6567"]
+    "address": ["mdt.xuwenblock.cn:6567","mdt.nekopark.cloud:6567","mdtsf.nekopark.cloud:6567"]
   },
   {
     "name": "Atomic",
