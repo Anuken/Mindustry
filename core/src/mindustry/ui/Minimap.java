@@ -111,7 +111,7 @@ public class Minimap extends Table{
 
         update(() -> {
 
-            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+            Element e = Core.scene.getHoverElement();
             if(e != null && e.isDescendantOf(this)){
                 requestScroll();
             }else if(hasScroll()){
