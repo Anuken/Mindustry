@@ -121,7 +121,9 @@ public class LAssembler{
         if(vars.containsKey(name)){
             return vars.get(name);
         }else{
+            //variables are null objects by default
             LVar var = new LVar(name);
+            var.isobj = true;
             vars.put(name, var);
             return var;
         }
