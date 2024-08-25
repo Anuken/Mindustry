@@ -116,20 +116,11 @@ public class LCanvas extends Table{
             jumps.cullable = false;
         }).grow().get();
         pane.setFlickScroll(false);
-
         pane.setScrollYForce(s);
-        pane.updateVisualScroll();
-        //load old scroll percent
-        Core.app.post(() -> {
-            pane.setScrollYForce(s);
-            pane.updateVisualScroll();
-        });
 
         if(toLoad != null){
             load(toLoad);
         }
-
-        Core.app.post(() -> statements.invalidateHierarchy());
     }
 
     @Override
