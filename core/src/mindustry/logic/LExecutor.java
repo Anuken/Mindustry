@@ -978,7 +978,6 @@ public class LExecutor{
             return
                 obj == null ? "null" :
                 obj instanceof String s ? s :
-                obj == Blocks.stoneWall ? "solid" : //special alias
                 obj instanceof MappableContent content ? content.name :
                 obj instanceof Content ? "[content]" :
                 obj instanceof Building build ? build.block.name :
