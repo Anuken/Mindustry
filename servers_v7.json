@@ -1,5 +1,9 @@
 [
   {
+    "name": "EscoCorp",
+    "address": ["81.30.105.171:6567"]
+  },
+  {
     "name": "Redundancy Dept",
     "address": ["min7.include-once.org:8000", "min7.include-once.org:8001"]
   },
@@ -254,7 +258,7 @@
   },
   {
     "name": "Extra Utilities",
-    "address": ["p1.i9mr.com:44922", "p1.i9mr.com:44834", "p1.i9mr.com:43189", "203.135.99.189:15142", "203.135.99.189:15143", "203.135.99.190:15142", "203.135.99.190:15143"]
+    "address": ["p1.i9mr.com:44922", "p1.i9mr.com:44834", "p1.i9mr.com:43189", "203.135.99.65:15142", "203.135.99.65:15143", "203.135.99.71:15142", "203.135.99.71:15143"]
   },
   {
     "name": "Alex Multiverse",
