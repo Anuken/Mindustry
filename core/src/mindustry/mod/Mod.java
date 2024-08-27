@@ -26,6 +26,11 @@ public abstract class Mod{
 
     }
 
+    /** Called on clientside mods after loadContent(). Load content here. */
+    public void afterLoadContent(){
+
+    }
+
     /** Register any commands to be used on the server side, e.g. from the console. */
     public void registerServerCommands(CommandHandler handler){
 
