@@ -36,6 +36,8 @@ public class PlanetRenderer implements Disposable{
     //seed: 8kmfuix03fw
     public final CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
 
+    public @Nullable PlanetParams mainParams;
+
     public PlanetRenderer(){
         projector.setScaling(1f / 150f);
         cam.fov = 60f;
@@ -44,6 +46,7 @@ public class PlanetRenderer implements Disposable{
 
     /** Render the entire planet scene to the screen. */
     public void render(PlanetParams params){
+        mainParams = params;
         Draw.flush();
         Gl.clear(Gl.depthBufferBit);
         Gl.enable(Gl.depthTest);
