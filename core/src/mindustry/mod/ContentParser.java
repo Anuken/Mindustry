@@ -327,6 +327,20 @@ public class ContentParser{
             readFields(consume, data);
             return consume;
         });
+        put(Team.class, (type, data) -> {
+            if(data.isString()){
+                Team out = Structs.find(Team.baseTeams, t -> t.name.equals(data.asString()));
+                if(out == null) throw new IllegalArgumentException("Unknown team: " + data.asString());
+                return out;
+            }else if(data.isNumber()){
+                if(data.asInt() >= Team.all.length || data.asInt() < 0){
+                    throw new IllegalArgumentException("Unknown team: " + data.asString());
+                }
+                return Team.get(data.asInt());
+            }else{
+                throw new IllegalArgumentException("Unknown team: " + data.asString() + ". Team must either be a string or a number.");
+            }
+        });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accommodate binding of content names first.*/
@@ -467,6 +481,7 @@ public class ContentParser{
                             case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
                             case "itemRadioactive" -> block.consume((Consume)parser.readValue(ConsumeItemRadioactive.class, child));
                             case "itemExplosive" -> block.consume((Consume)parser.readValue(ConsumeItemExplosive.class, child));
+                            case "itemList" -> block.consume((Consume)parser.readValue(ConsumeItemList.class, child));
                             case "itemExplode" -> block.consume((Consume)parser.readValue(ConsumeItemExplode.class, child));
                             case "items" -> block.consume(child.isArray() ?
                                     new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
@@ -673,6 +688,27 @@ public class ContentParser{
             currentContent = planet;
             read(() -> readFields(planet, value));
             return planet;
+        },
+        ContentType.team, (TypeParser<TeamEntry>)(mod, name, value) -> {
+            TeamEntry entry;
+            Team team;
+            if(value.has("team")){
+                team = (Team)classParsers.get(Team.class).parse(Team.class, value.get("team"));
+            }else{
+                throw new RuntimeException("Team field missing.");
+            }
+            value.remove("team");
+            
+            if(locate(ContentType.team, name) != null){
+                entry = locate(ContentType.team, name);
+                readBundle(ContentType.team, name, value);
+            }else{
+                readBundle(ContentType.team, name, value);
+                entry = new TeamEntry(mod + "-" + name, team);
+            }
+            currentContent = entry;
+            read(() -> readFields(entry, value));
+            return entry;
         }
     );
 
@@ -1061,21 +1097,41 @@ public class ContentParser{
             }
             Field field = metadata.field;
             try{
-                boolean mergeMap = ObjectMap.class.isAssignableFrom(field.getType()) && child.has("add") && child.get("add").isBoolean() && child.getBoolean("add", false);
+                if(child.isObject() && child.has("add") && (Seq.class.isAssignableFrom(field.getType()) || ObjectSet.class.isAssignableFrom(field.getType()))){
+                    Object readField = parser.readValue(field.getType(), metadata.elementType, child.get("add"), metadata.keyType);
+                    Object fieldObj = field.get(object);
 
-                if(mergeMap){
-                    child.remove("add");
-                }
-
-                Object readField = parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType);
-
-                //if a map has add: true, add its contents to the map instead
-                if(mergeMap && field.get(object) instanceof ObjectMap<?,?> baseMap){
-                    baseMap.putAll((ObjectMap)readField);
+                    if(fieldObj instanceof ObjectSet set){
+                        set.addAll((ObjectSet)readField);
+                    }else if(fieldObj instanceof Seq seq){
+                        seq.addAll((Seq)readField);
+                    }else{
+                        throw new SerializationException("This should be impossible");
+                    }
                 }else{
-                    field.set(object, readField);
-                }
+                    boolean isMap = ObjectMap.class.isAssignableFrom(field.getType()) || ObjectIntMap.class.isAssignableFrom(field.getType()) || ObjectFloatMap.class.isAssignableFrom(field.getType());
+                    boolean mergeMap = isMap && child.has("add") && child.get("add").isBoolean() && child.getBoolean("add", false);
 
+                    if(mergeMap){
+                        child.remove("add");
+                    }
+
+                    Object readField = parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType);
+                    Object fieldObj = field.get(object);
+
+                    //if a map has add: true, add its contents to the map instead
+                    if(mergeMap && (fieldObj instanceof ObjectMap<?,?> || fieldObj instanceof ObjectIntMap<?> || fieldObj instanceof ObjectFloatMap<?>)){
+                        if(field.get(object) instanceof ObjectMap<?,?> baseMap){
+                            baseMap.putAll((ObjectMap)readField);
+                        }else if(field.get(object) instanceof ObjectIntMap<?> baseMap){
+                            baseMap.putAll((ObjectIntMap)readField);
+                        }else if(field.get(object) instanceof ObjectFloatMap<?> baseMap){
+                            baseMap.putAll((ObjectFloatMap)readField);
+                        }
+                    }else{
+                        field.set(object, readField);
+                    }
+                }
             }catch(IllegalAccessException ex){
                 throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
             }catch(SerializationException ex){

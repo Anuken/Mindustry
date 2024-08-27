@@ -78,7 +78,7 @@ public class GameState{
     }
 
     public @Nullable Planet getPlanet(){
-        return rules.sector != null ? rules.sector.planet : null;
+        return rules.sector != null ? rules.sector.planet : rules.planet;
     }
 
     public boolean isEditor(){

@@ -140,6 +140,7 @@ public class Turret extends ReloadTurret{
         quickRotate = false;
         outlinedIcon = 1;
         drawLiquidLight = false;
+        sync = true;
     }
 
     @Override
@@ -663,6 +664,17 @@ public class Turret extends ReloadTurret{
         @Override
         public byte version(){
             return 1;
+        }
+
+        @Override
+        public void readSync(Reads read, byte revision){
+            //maintain rotation and reload when syncing so clients don't see turrets snapping around
+            float oldRot = rotation, oldReload = reloadCounter;
+
+            readAll(read, revision);
+
+            rotation = oldRot;
+            reloadCounter = oldReload;
         }
     }
 

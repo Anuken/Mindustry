@@ -68,10 +68,12 @@ public class StatusEffect extends UnlockableContent{
 
     public StatusEffect(String name){
         super(name);
+        allDatabaseTabs = true;
     }
 
     @Override
     public void init(){
+        super.init();
         if(initblock != null){
             initblock.run();
         }
@@ -99,7 +101,7 @@ public class StatusEffect extends UnlockableContent{
         boolean reacts = false;
 
         for(var e : opposites.toSeq().sort()){
-            stats.add(Stat.opposites, e.emoji() + "" + e);
+            stats.add(Stat.opposites, e.emoji() + e);
         }
 
         if(reactive){

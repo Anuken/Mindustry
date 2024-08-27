@@ -48,13 +48,13 @@ public class ShieldRegenFieldAbility extends Ability{
                 if(other.shield < max){
                     other.shield = Math.min(other.shield + amount, max);
                     other.shieldAlpha = 1f; //TODO may not be necessary
-                    applyEffect.at(unit.x, unit.y, 0f, unit.team.color, parentizeEffects ? other : null);
+                    applyEffect.at(other.x, other.y, 0f, other.type.shieldColor(other), parentizeEffects ? other : null);
                     applied = true;
                 }
             });
 
             if(applied){
-                activeEffect.at(unit.x, unit.y, unit.team.color);
+                activeEffect.at(unit.x, unit.y, unit.type.shieldColor(unit));
             }
 
             timer = 0f;

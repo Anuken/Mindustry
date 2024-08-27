@@ -19,6 +19,8 @@ import mindustry.world.blocks.*;
  * Does not store game state, just configuration.
  */
 public class Rules{
+    /** Allows editing the rules in-game. Essentially a cheat mode toggle. */
+    public boolean allowEditRules = false;
     /** Sandbox mode: Enables infinite resources, build range and build speed. */
     public boolean infiniteResources;
     /** Team-specific rules. */
@@ -29,6 +31,8 @@ public class Rules{
     public boolean waveSending = true;
     /** Whether waves are spawnable at all. */
     public boolean waves;
+    /** Whether air units spawn at spawns instead of the edge of the map */
+    public boolean airUseSpawns = false;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
     public boolean pvp;
     /** Whether is waiting for players enabled in PvP. */
@@ -103,6 +107,8 @@ public class Rules{
     public boolean cleanupDeadTeams = true;
     /** If true, items can only be deposited in the core. */
     public boolean onlyDepositCore = false;
+    /** Cooldown, in seconds, of item depositing for players. */
+    public float itemDepositCooldown = 0.5f;
     /** If true, every enemy block in the radius of the (enemy) core is destroyed upon death. Used for campaign maps. */
     public boolean coreDestroyClear = false;
     /** If true, banned blocks are hidden from the build menu. */
@@ -147,8 +153,6 @@ public class Rules{
     public ObjectSet<Block> revealedBlocks = new ObjectSet<>();
     /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */
     public ObjectSet<String> researched = new ObjectSet<>();
-    /** Block containing these items as requirements are hidden. */
-    public ObjectSet<Item> hiddenBuildItems = Items.erekirOnlyItems.asSet();
     /** In-map objective executor. */
     public MapObjectives objectives = new MapObjectives();
     /** Flags set by objectives. Used in world processors. */
@@ -201,6 +205,8 @@ public class Rules{
     public @Nullable PlanetParams planetBackground;
     /** Rules from this planet are applied. If it's {@code sun}, mixed tech is enabled. */
     public Planet planet = Planets.serpulo;
+    /** If the `data` instruction is allowed for world processors */
+    public boolean allowLogicData = false;
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){

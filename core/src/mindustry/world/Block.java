@@ -441,6 +441,14 @@ public class Block extends UnlockableContent implements Senseable{
 
                     Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
                 });
+
+                BeamNode.getNodeLinks(tile, this, player.team(), other -> {
+                    BeamNode node = (BeamNode)other.block;
+                    Draw.color(node.laserColor1, Renderer.laserOpacity * 0.5f);
+                    node.drawLaser(other.x, other.y, x * tilesize + offset, y * tilesize + offset, size, other.block.size);
+
+                    Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
+                });
             }
         }
     }
@@ -517,6 +525,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public boolean rotatedOutput(int x, int y){
         return rotate;
+    }
+
+    public boolean rotatedOutput(int fromX, int fromY, Tile destination){
+        return rotatedOutput(fromX, fromY);
     }
 
     public boolean synthetic(){
@@ -887,10 +899,6 @@ public class Block extends UnlockableContent implements Senseable{
         return !isHidden() && (state.rules.editor || (!state.rules.hideBannedBlocks || !state.rules.isBanned(this)));
     }
 
-    public boolean isVisibleOn(Planet planet){
-        return !Structs.contains(requirements, i -> planet.hiddenItems.contains(i.item));
-    }
-
     public boolean isPlaceable(){
         return isVisible() && (!state.rules.isBanned(this) || state.rules.editor) && supportsEnv(state.rules.env);
     }
@@ -936,7 +944,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean environmentBuildable(){
-        return (state.rules.hiddenBuildItems.isEmpty() || !Structs.contains(requirements, i -> state.rules.hiddenBuildItems.contains(i.item)));
+        return isOnPlanet(state.getPlanet());
     }
 
     public boolean isStatic(){
@@ -1152,10 +1160,28 @@ public class Block extends UnlockableContent implements Senseable{
         return buildVisibility != BuildVisibility.hidden;
     }
 
+    @Override
+    public void postInit(){
+        //usually, an empty set of planets is a configuration error. auto-assign based on requirements
+        if(requirements.length > 0 && shownPlanets.isEmpty()){
+            for(Planet planet : content.planets()){
+                if(planet.isLandable()){
+                    if(!Structs.contains(requirements, s -> !s.item.isOnPlanet(planet))){
+                        shownPlanets.add(planet);
+                    }
+                }
+            }
+        }
+
+        super.postInit();
+    }
+
     /** Called after all blocks are created. */
     @Override
     @CallSuper
     public void init(){
+        super.init();
+
         //disable standard shadow
         if(customShadow){
             hasShadow = false;
@@ -1403,6 +1429,7 @@ public class Block extends UnlockableContent implements Senseable{
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
+            case solid -> solid ? 1 : 0;
             case size -> size;
             case itemCapacity -> itemCapacity;
             case liquidCapacity -> liquidCapacity;
