@@ -93,8 +93,6 @@ platforms.each{ platform ->
     task "packr${platform.toString()}"{
         dependsOn dist
 
-        println "JDK dir: " + new File("${JDK_DIR}").getAbsolutePath()
-
         doLast{
             copy{
                 into "build/packr/"
