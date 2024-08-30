@@ -68,7 +68,6 @@ if(!project.ext.hasSprites() && System.getenv("JITPACK") != "true"){
 //this is only for local testing
 //add -Prelease -PversionModifier=steam as build properties
 task steamtest(dependsOn: dist){
-    println new File("../JDKs").absolutePath
     doLast{
         copy{
             from "build/libs/Mindustry.jar"
@@ -93,6 +92,8 @@ task steamtest(dependsOn: dist){
 platforms.each{ platform ->
     task "packr${platform.toString()}"{
         dependsOn dist
+
+        println "JDK dir: " + new File("${JDK_DIR}").getAbsolutePath()
 
         doLast{
             copy{
@@ -119,20 +120,20 @@ platforms.each{ platform ->
                 }
             }else{
                 def jarPath = JDK_DIR + "packr.jar"
-                def args = ["java", "-jar", jarPath] as String[]
+                def args = new String[]{"java", "-jar", jarPath}
 
-                args += [
-                    "--platform", platform == "MacOS" ? "Mac" : platform.toString(),
-                    "--jdk", JDK_DIR + "jre-${platform.toString().toLowerCase()}",
-                    "--executable", appName,
-                    "--classpath", "$rootDir/desktop/build/packr/desktop.jar".toString(),
-                    "--mainclass", project.ext.mainClassName,
-                    "--verbose",
-                    "--bundle", getPackage() + ".mac",
-                    "--icon", ICON_DIR,
-                    "--output", "$rootDir/desktop/build/packr/output".toString(),
-                    "--removelibs", "$rootDir/desktop/build/packr/desktop.jar".toString()
-                ]
+                args += new String[]{
+                        "--platform", platform == "MacOS" ? "Mac" : platform.toString(),
+                        "--jdk", JDK_DIR + "jre-${platform.toString().toLowerCase()}",
+                        "--executable", appName,
+                        "--classpath", "$rootDir/desktop/build/packr/desktop.jar".toString(),
+                        "--mainclass", project.ext.mainClassName,
+                        "--verbose",
+                        "--bundle", getPackage() + ".mac",
+                        "--icon", ICON_DIR,
+                        "--output", "$rootDir/desktop/build/packr/output".toString(),
+                        "--removelibs", "$rootDir/desktop/build/packr/desktop.jar".toString()
+                }
 
                 args += "--vmargs"
 
