@@ -68,6 +68,7 @@ if(!project.ext.hasSprites() && System.getenv("JITPACK") != "true"){
 //this is only for local testing
 //add -Prelease -PversionModifier=steam as build properties
 task steamtest(dependsOn: dist){
+    println new File("../JDKs").absolutePath
     doLast{
         copy{
             from "build/libs/Mindustry.jar"
