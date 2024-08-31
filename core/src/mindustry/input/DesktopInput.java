@@ -457,7 +457,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = cursor.build.getCursor();
             }
 
-            if(cursor.build != null && player.team() != Team.derelict && cursor.build.team == Team.derelict && Build.validPlace(cursor.block(), player.team(), cursor.build.tileX(), cursor.build.tileY(), cursor.build.rotation)){
+            if(cursor.build != null && player.team() != Team.derelict && cursor.build.team == Team.derelict && cursor.build.block.unlockedNow() && Build.validPlace(cursor.block(), player.team(), cursor.build.tileX(), cursor.build.tileY(), cursor.build.rotation)){
                 cursorType = ui.repairCursor;
             }
 

@@ -171,7 +171,7 @@ public class GameService{
                 }
             }
 
-            if(campaign() && player.unit().type.canBoost && player.unit().elevation >= 0.25f){
+            if(campaign() && !player.dead() && player.unit().type.canBoost && player.unit().elevation >= 0.25f){
                 boostUnit.complete();
             }
         });
