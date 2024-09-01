@@ -399,7 +399,7 @@ public class SerpuloTechTree{
                         });
                     });
 
-                    node(navalFactory, Seq.with(new SectorComplete(ruinousShores)), () -> {
+                    node(navalFactory, Seq.with(new OnSector(windsweptIslands)), () -> {
                         node(risso, () -> {
                             node(minke, () -> {
                                 node(bryde, () -> {
