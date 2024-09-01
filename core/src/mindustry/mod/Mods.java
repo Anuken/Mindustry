@@ -706,6 +706,8 @@ public class Mods implements Loadable{
 
         content.setCurrentMod(null);
 
+        Events.fire(new ModContentLoadEvent());
+
         class LoadRun implements Comparable<LoadRun>{
             final ContentType type;
             final Fi file;
