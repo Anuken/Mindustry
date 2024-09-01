@@ -2,6 +2,7 @@ package mindustry.content;
 
 import arc.struct.*;
 import mindustry.game.Objectives.*;
+import mindustry.type.*;
 
 import static mindustry.content.Blocks.*;
 import static mindustry.content.SectorPresets.craters;
@@ -359,7 +360,8 @@ public class SerpuloTechTree{
                         });
                     });
 
-                    node(crawler, () -> {
+                    //override research requirements to have graphite, not coal
+                    node(crawler, ItemStack.with(Items.silicon, 400, Items.graphite, 400), () -> {
                         node(atrax, () -> {
                             node(spiroct, () -> {
                                 node(arkyid, () -> {
