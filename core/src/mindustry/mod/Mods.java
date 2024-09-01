@@ -704,14 +704,6 @@ public class Mods implements Loadable{
             }
         }
 
-        for(LoadedMod mod : orderedMods()){
-            //hidden mods can't load content
-            if(mod.main != null && !mod.meta.hidden){
-                content.setCurrentMod(mod);
-                mod.main.afterLoadContent();
-            }
-        }
-
         content.setCurrentMod(null);
 
         class LoadRun implements Comparable<LoadRun>{
