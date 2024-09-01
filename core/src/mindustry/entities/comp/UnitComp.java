@@ -214,6 +214,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case ammoCapacity -> type.ammoCapacity;
             case x -> World.conv(x);
             case y -> World.conv(y);
+            case velocityX -> vel.x * 60f / tilesize;
+            case velocityY -> vel.y * 60f / tilesize;
             case dead -> dead || !isAdded() ? 1 : 0;
             case team -> team.id;
             case shooting -> isShooting() ? 1 : 0;
@@ -282,6 +284,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 y = World.unconv((float)value);
                 if(!isLocal()) snapInterpolation();
             }
+            case velocityX -> vel.x = (float)(value * tilesize / 60d);
+            case velocityY -> vel.y = (float)(value * tilesize / 60d);
             case rotation -> rotation = (float)value;
             case team -> {
                 if(!net.client()){
@@ -788,6 +792,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     @Replace
     public String toString(){
-        return "Unit#" + id() + ":" + type;
+        return "Unit#" + id() + ":" + type + " (" + x + ", " + y + ")";
     }
 }

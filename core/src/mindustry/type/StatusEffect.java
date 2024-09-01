@@ -68,10 +68,12 @@ public class StatusEffect extends UnlockableContent{
 
     public StatusEffect(String name){
         super(name);
+        allDatabaseTabs = true;
     }
 
     @Override
     public void init(){
+        super.init();
         if(initblock != null){
             initblock.run();
         }

@@ -34,7 +34,7 @@ public class BaseGenerator{
         Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.isVanilla() && b.size == size
             && !b.insulated && b.buildVisibility == BuildVisibility.shown
             && !(b instanceof Door)
-            && !(Structs.contains(b.requirements, i -> state.rules.hiddenBuildItems.contains(i.item))));
+            && b.isOnPlanet(state.getPlanet()));
         wallsSmall.sort(b -> b.buildCost);
         return wallsSmall.getFrac(difficulty * 0.91f);
     }

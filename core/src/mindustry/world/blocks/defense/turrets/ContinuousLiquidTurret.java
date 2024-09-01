@@ -4,6 +4,7 @@ import arc.struct.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -72,9 +73,17 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         @Override
         public void updateTile(){
-            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
-
             super.updateTile();
+
+            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            return switch(sensor){
+                case currentAmmoType -> liquids.current();
+                default -> super.senseObject(sensor);
+            };
         }
 
         @Override

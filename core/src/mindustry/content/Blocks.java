@@ -1513,27 +1513,23 @@ public class Blocks{
             requirements(Category.defense, with(Items.copper, 6));
             health = 80 * wallHealthMultiplier;
             researchCostMultiplier = 0.1f;
-            envDisabled |= Env.scorching;
         }};
 
         copperWallLarge = new Wall("copper-wall-large"){{
             requirements(Category.defense, ItemStack.mult(copperWall.requirements, 4));
             health = 80 * 4 * wallHealthMultiplier;
             size = 2;
-            envDisabled |= Env.scorching;
         }};
 
         titaniumWall = new Wall("titanium-wall"){{
             requirements(Category.defense, with(Items.titanium, 6));
             health = 110 * wallHealthMultiplier;
-            envDisabled |= Env.scorching;
         }};
 
         titaniumWallLarge = new Wall("titanium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(titaniumWall.requirements, 4));
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
-            envDisabled |= Env.scorching;
         }};
 
         plastaniumWall = new Wall("plastanium-wall"){{
@@ -1542,7 +1538,6 @@ public class Blocks{
             insulated = true;
             absorbLasers = true;
             schematicPriority = 10;
-            envDisabled |= Env.scorching;
         }};
 
         plastaniumWallLarge = new Wall("plastanium-wall-large"){{
@@ -1552,20 +1547,17 @@ public class Blocks{
             insulated = true;
             absorbLasers = true;
             schematicPriority = 10;
-            envDisabled |= Env.scorching;
         }};
 
         thoriumWall = new Wall("thorium-wall"){{
             requirements(Category.defense, with(Items.thorium, 6));
             health = 200 * wallHealthMultiplier;
-            envDisabled |= Env.scorching;
         }};
 
         thoriumWallLarge = new Wall("thorium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(thoriumWall.requirements, 4));
             health = 200 * wallHealthMultiplier * 4;
             size = 2;
-            envDisabled |= Env.scorching;
         }};
 
         phaseWall = new Wall("phase-wall"){{
@@ -1573,7 +1565,6 @@ public class Blocks{
             health = 150 * wallHealthMultiplier;
             chanceDeflect = 10f;
             flashHit = true;
-            envDisabled |= Env.scorching;
         }};
 
         phaseWallLarge = new Wall("phase-wall-large"){{
@@ -1582,14 +1573,12 @@ public class Blocks{
             size = 2;
             chanceDeflect = 10f;
             flashHit = true;
-            envDisabled |= Env.scorching;
         }};
 
         surgeWall = new Wall("surge-wall"){{
             requirements(Category.defense, with(Items.surgeAlloy, 6));
             health = 230 * wallHealthMultiplier;
             lightningChance = 0.05f;
-            envDisabled |= Env.scorching;
         }};
 
         surgeWallLarge = new Wall("surge-wall-large"){{
@@ -1597,13 +1586,11 @@ public class Blocks{
             health = 230 * 4 * wallHealthMultiplier;
             size = 2;
             lightningChance = 0.05f;
-            envDisabled |= Env.scorching;
         }};
 
         door = new Door("door"){{
             requirements(Category.defense, with(Items.titanium, 6, Items.silicon, 4));
             health = 100 * wallHealthMultiplier;
-            envDisabled |= Env.scorching;
         }};
 
         doorLarge = new Door("door-large"){{
@@ -1612,14 +1599,12 @@ public class Blocks{
             closefx = Fx.doorcloselarge;
             health = 100 * 4 * wallHealthMultiplier;
             size = 2;
-            envDisabled |= Env.scorching;
         }};
 
         scrapWall = new Wall("scrap-wall"){{
             requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 6));
             health = 60 * wallHealthMultiplier;
             variants = 5;
-            envDisabled |= Env.scorching;
         }};
 
         scrapWallLarge = new Wall("scrap-wall-large"){{
@@ -1627,7 +1612,6 @@ public class Blocks{
             health = 60 * 4 * wallHealthMultiplier;
             size = 2;
             variants = 4;
-            envDisabled |= Env.scorching;
         }};
 
         scrapWallHuge = new Wall("scrap-wall-huge"){{
@@ -1635,21 +1619,18 @@ public class Blocks{
             health = 60 * 9 * wallHealthMultiplier;
             size = 3;
             variants = 3;
-            envDisabled |= Env.scorching;
         }};
 
         scrapWallGigantic = new Wall("scrap-wall-gigantic"){{
             requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 16));
             health = 60 * 16 * wallHealthMultiplier;
             size = 4;
-            envDisabled |= Env.scorching;
         }};
 
         thruster = new Thruster("thruster"){{
             requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 96));
             health = 55 * 16 * wallHealthMultiplier;
             size = 4;
-            envDisabled |= Env.scorching;
         }};
 
         berylliumWall = new Wall("beryllium-wall"){{
@@ -2556,8 +2537,8 @@ public class Blocks{
 
         fluxReactor = new VariableReactor("flux-reactor"){{
             requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
-            powerProduction = 120f;
-            maxHeat = 140f;
+            powerProduction = 240f;
+            maxHeat = 150f;
 
             consumeLiquid(Liquids.cyanogen, 9f / 60f);
             liquidCapacity = 30f;
@@ -4382,6 +4363,7 @@ public class Blocks{
                 trailInterval = 3f;
                 trailParam = 4f;
                 pierceCap = 2;
+                buildingDamageMultiplier = 0.5f;
                 fragOnHit = false;
                 speed = 5f;
                 damage = 180f;
@@ -5934,7 +5916,7 @@ public class Blocks{
         }};
 
         worldProcessor = new LogicBlock("world-processor"){{
-            requirements(Category.logic, BuildVisibility.editorOnly, with());
+            requirements(Category.logic, BuildVisibility.worldProcessorOnly, with());
 
             canOverdrive = false;
             targetable = false;
@@ -5947,7 +5929,7 @@ public class Blocks{
         }};
 
         worldCell = new MemoryBlock("world-cell"){{
-            requirements(Category.logic, BuildVisibility.editorOnly, with());
+            requirements(Category.logic, BuildVisibility.worldProcessorOnly, with());
             
             targetable = false;
             privileged = true;
@@ -5956,14 +5938,14 @@ public class Blocks{
         }};
 
         worldMessage = new MessageBlock("world-message"){{
-            requirements(Category.logic, BuildVisibility.editorOnly, with());
+            requirements(Category.logic, BuildVisibility.worldProcessorOnly, with());
             
             targetable = false;
             privileged = true;
         }};
 
         worldSwitch = new SwitchBlock("world-switch"){{
-            requirements(Category.logic, BuildVisibility.editorOnly, with());
+            requirements(Category.logic, BuildVisibility.worldProcessorOnly, with());
 
             targetable = false;
             privileged = true;
