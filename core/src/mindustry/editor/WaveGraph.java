@@ -1,8 +1,10 @@
 package mindustry.editor;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -26,12 +28,16 @@ public class WaveGraph extends Table{
     private float maxHealth;
     private Table colors;
     private ObjectSet<UnitType> hidden = new ObjectSet<>();
+    private StringBuilder countStr = new StringBuilder();
 
     public WaveGraph(){
         background(Tex.pane);
 
         rect((x, y, width, height) -> {
             Lines.stroke(Scl.scl(3f));
+            countStr.setLength(0);
+
+            Vec2 mouse = stageToLocalCoordinates(Core.input.mouse());
 
             GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
             Font font = Fonts.outline;
@@ -49,6 +55,8 @@ public class WaveGraph extends Table{
 
             float graphX = x + offsetX, graphY = y + offsetY, graphW = width - offsetX, graphH = height - offsetY;
             float spacing = graphW / (values.length - 1);
+
+            int selcol = Rect.contains(x, y, width, height, mouse.x, mouse.y) ? Mathf.round((mouse.x - graphX) / spacing) : -1;
 
             if(mode == Mode.counts){
                 for(UnitType type : used.orderedItems()){
@@ -97,6 +105,23 @@ public class WaveGraph extends Table{
                 Lines.endLine();
             }
 
+
+            if(selcol >= 0 && selcol < values.length){
+                Draw.color(1f, 0f, 0f, 0.2f);
+                Fill.crect(selcol * spacing + graphX - spacing/2f, graphY, spacing, graphH);
+                Draw.color();
+                font.getData().setScale(1.5f);
+                for(UnitType type : used.orderedItems()){
+                    int amount = values[Mathf.clamp(selcol, 0, values.length - 1)][type.id];
+                    if(amount > 0){
+                        countStr.append(type.emoji()).append(" ").append(amount).append("\n");
+                    }
+                }
+                float pad = Scl.scl(5f);
+                font.draw(countStr, selcol * spacing + graphX - spacing/2f + pad, graphY + graphH - pad);
+                font.getData().setScale(1f);
+            }
+
             //how many numbers can fit here
             float totalMarks = Mathf.clamp(maxY, 1, 10);
 
@@ -123,7 +148,7 @@ public class WaveGraph extends Table{
                 float cy = y + fh, cx = graphX + graphW / (values.length - 1) * i;
 
                 Lines.line(cx, cy, cx, cy + len);
-                if(i == values.length / 2){
+                if(i == selcol){
                     font.draw("" + (i + from + 1), cx, cy - Scl.scl(2f), Align.center);
                 }
             }
