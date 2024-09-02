@@ -24,8 +24,16 @@ public class ServerGroup{
         return Core.settings.getBool(key() + "-hidden", false);
     }
 
+    public boolean favorite(){
+        return Core.settings.getBool(key() + "-favorite", false);
+    }
+
     public void setHidden(boolean hidden){
         Core.settings.put(key() + "-hidden", hidden);
+    }
+
+    public void setFavorite(boolean favorite){
+        Core.settings.put(key() + "-favorite", favorite);
     }
 
     String key(){
