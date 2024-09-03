@@ -301,6 +301,11 @@ public class MapObjectivesDialog extends BaseDialog{
             }).growX().fillY();
         });
 
+
+        setInterpreter(IndexBool.class, int.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            getInterpreter(Boolean.class).build(cont, name, type, field, remover, indexer, () -> get.get() != -1, v -> set.get(v ? +1 : -1));
+        });
+
         // Special data structure interpreters.
         // Instantiate default `Seq`s with a reflectively allocated array.
         setProvider(Seq.class, (type, cons) -> cons.get(new Seq<>(type.element.raw)));

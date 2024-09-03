@@ -4,7 +4,6 @@ import arc.*;
 import arc.assets.loaders.TextureLoader.*;
 import arc.audio.*;
 import arc.files.*;
-import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
@@ -16,7 +15,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
-import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
@@ -327,20 +325,30 @@ public class Renderer implements ApplicationListener{
 
         //draw objective markers
         float scaleFactor = 4f / renderer.getDisplayScale();
-        drawMarkers(scaleFactor, marker -> marker.world);
+        state.rules.objectives.eachRunning(obj -> {
+            for(var marker : obj.markers){
+                if(marker.world != -1){
+                    marker.draw(marker.autoscale ? scaleFactor : 1);
+                }
+            }
+        });
+
+        for(var marker : state.markers.worldMarkers){
+            marker.draw(marker.autoscale ? scaleFactor : 1);
+        }
+        Draw.reset();
+
         lights.add(() -> {
             state.rules.objectives.eachRunning(obj -> {
                 for(var marker : obj.markers){
-                    if(marker.light){
+                    if(marker.light != -1){
                         marker.drawLight(marker.autoscale ? scaleFactor : 1);
                     }
                 }
             });
 
-            for(var marker : state.markers){
-                if(marker.light){
-                    marker.drawLight(marker.autoscale ? scaleFactor : 1);
-                }
+            for(var marker : state.markers.lightMarkers){
+                marker.drawLight(marker.autoscale ? scaleFactor : 1);
             }
 
             Draw.reset();
@@ -472,24 +480,6 @@ public class Renderer implements ApplicationListener{
         if(state.rules.customBackgroundCallback != null && customBackgrounds.containsKey(state.rules.customBackgroundCallback)){
             customBackgrounds.get(state.rules.customBackgroundCallback).run();
         }
-    }
-
-    public void drawMarkers(float scaleFactor, Boolf<ObjectiveMarker> filter) {
-        state.rules.objectives.eachRunning(obj -> {
-            for(var marker : obj.markers){
-                if(filter.get(marker)){
-                    marker.draw(marker.autoscale ? scaleFactor : 1);
-                }
-            }
-        });
-
-        for(var marker : state.markers){
-            if(filter.get(marker)){
-                marker.draw(marker.autoscale ? scaleFactor : 1);
-            }
-        }
-
-        Draw.reset();
     }
 
     public void scaleCamera(float amount){

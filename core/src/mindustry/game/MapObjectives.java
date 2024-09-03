@@ -612,15 +612,12 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay.  */
     public static abstract class ObjectiveMarker{
-        /** Internal use only! Do not access. */
-        public transient int arrayIndex;
-
-        /** Whether to display marker in the world. */
-        public boolean world = true;
-        /** Whether to display marker on minimap. */
-        public boolean minimap = false;
-        /** Whether the marker should act as a light source. */
-        public boolean light = false;
+        /** Whether to display marker in the world. Do not modify directly if added, use control() instead. */
+        public @IndexBool int world = 1;
+        /** Whether to display marker on the minimap. Do not modify directly if added, use control() instead. */
+        public @IndexBool int minimap = -1;
+        /** Whether to use the marker as light. Do not modify directly if added, use control() instead. */
+        public @IndexBool int light = -1;
         /** Whether to scale marker corresponding to player's zoom level. */
         public boolean autoscale = false;
         /** On which z-sorting layer is marker drawn. */
@@ -637,9 +634,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(Double.isNaN(p1)) return;
 
             switch(type){
-                case world -> world = !Mathf.equal((float)p1, 0f);
-                case minimap -> minimap = !Mathf.equal((float)p1, 0f);
-                case light -> light = !Mathf.equal((float)p1, 0f);
+                case world -> state.markers.updateMarker(state.markers.worldMarkers, this, !Mathf.equal((float)p1, 0f), m -> m.world, (m, i) -> m.world = i);
+                case minimap -> state.markers.updateMarker(state.markers.mapMarkers, this, !Mathf.equal((float)p1, 0f), m -> m.minimap, (m, i) -> m.minimap = i);
+                case light -> state.markers.updateMarker(state.markers.lightMarkers, this, !Mathf.equal((float)p1, 0f), m -> m.light, (m, i) -> m.light = i);
                 case autoscale -> autoscale = !Mathf.equal((float)p1, 0f);
                 case drawLayer -> drawLayer = (float)p1;
             }
@@ -1320,6 +1317,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     @Target(FIELD)
     @Retention(RUNTIME)
     public @interface Vertices{}
+
+    /** For {@code int}; treats it as a boolean with -1 for false and any other value for true (defaulting to 1) */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface IndexBool{}
 
     /** For {@code byte}; treats it as a world label flag. */
     @Target(FIELD)
