@@ -52,7 +52,7 @@ public class SectorPresets{
             difficulty = 3;
         }};
 
-        facility32m = new SectorPreset("facility32m", serpulo, 170){{
+        facility32m = new SectorPreset("facility32m", serpulo, 64){{
             captureWave = 25;
             difficulty = 4;
         }};
