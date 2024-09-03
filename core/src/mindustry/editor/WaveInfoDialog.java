@@ -72,7 +72,7 @@ public class WaveInfoDialog extends BaseDialog{
                         groups = maps.readWaves(Core.app.getClipboardText());
                         buildGroups();
                     }catch(Exception e){
-                        e.printStackTrace();
+                        Log.err(e);
                         ui.showErrorMessage("@waves.invalid");
                     }
                     dialog.hide();

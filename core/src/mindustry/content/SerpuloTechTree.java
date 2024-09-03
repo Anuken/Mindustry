@@ -502,15 +502,19 @@ public class SerpuloTechTree{
                                     });
                                 });
 
-                                node(extractionOutpost, Seq.with(
-                                new SectorComplete(stainedMountains),
-                                new SectorComplete(windsweptIslands),
-                                new Research(groundFactory),
-                                new Research(nova),
-                                new Research(airFactory),
-                                new Research(mono)
+                                node(facility32m, Seq.with(
+                                new Research(pneumaticDrill)
                                 ), () -> {
+                                    node(extractionOutpost, Seq.with(
+                                    new SectorComplete(stainedMountains),
+                                    new SectorComplete(windsweptIslands),
+                                    new Research(groundFactory),
+                                    new Research(nova),
+                                    new Research(airFactory),
+                                    new Research(mono)
+                                    ), () -> {
 
+                                    });
                                 });
 
                                 node(saltFlats, Seq.with(
