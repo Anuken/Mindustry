@@ -1912,7 +1912,7 @@ public class UnitTypes{
                     trailWidth = 3f;
                     trailLength = 8;
 
-                    splashDamage = 33f;
+                    splashDamage = 36f;
                     splashDamageRadius = 32f;
                 }};
             }});

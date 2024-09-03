@@ -1349,7 +1349,7 @@ public class LExecutor{
                             if(t == null) t = Team.derelict;
 
                             if(tile.block() != b || tile.team() != t){
-                                tile.setBlock(b, t, Mathf.clamp(rotation.numi(), 0, 3));
+                                tile.setNet(b, t, Mathf.clamp(rotation.numi(), 0, 3));
                             }
                         }
                     }

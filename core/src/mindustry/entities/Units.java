@@ -83,6 +83,7 @@ public class Units{
 
     @Remote(called = Loc.server)
     public static void unitDespawn(Unit unit){
+        if(unit == null) return;
         Fx.unitDespawn.at(unit.x, unit.y, 0, unit);
         unit.remove();
     }

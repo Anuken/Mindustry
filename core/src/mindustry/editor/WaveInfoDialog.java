@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
@@ -71,7 +72,7 @@ public class WaveInfoDialog extends BaseDialog{
                         groups = maps.readWaves(Core.app.getClipboardText());
                         buildGroups();
                     }catch(Exception e){
-                        e.printStackTrace();
+                        Log.err(e);
                         ui.showErrorMessage("@waves.invalid");
                     }
                     dialog.hide();
@@ -200,6 +201,19 @@ public class WaveInfoDialog extends BaseDialog{
         }}).width(390f).growY();
 
         cont.add(graph = new WaveGraph()).grow();
+
+        graph.scrolled((scroll) -> {
+            view(Mathf.sign(scroll));
+        });
+
+        graph.touchable = Touchable.enabled;
+        graph.addListener(new InputListener(){
+
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Element fromActor){
+                graph.requestScroll();
+            }
+        });
 
         buildGroups();
     }
