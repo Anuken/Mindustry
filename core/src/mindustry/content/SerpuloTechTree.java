@@ -566,6 +566,13 @@ public class SerpuloTechTree{
                     new Research(scatter),
                     new Research(graphitePress)
                     ), () -> {
+                        node(taintedWoods, Seq.with(
+                        new SectorComplete(biomassFacility),
+                        new Research(Items.sporePod)
+                        ), () -> {
+
+                        });
+
                         node(stainedMountains, Seq.with(
                         new SectorComplete(biomassFacility),
                         new Research(pneumaticDrill),

@@ -7,7 +7,7 @@ import static mindustry.content.Planets.*;
 public class SectorPresets{
     public static SectorPreset
     groundZero,
-    craters, biomassFacility, frozenForest, ruinousShores, facility32m, windsweptIslands, stainedMountains, tarFields,
+    craters, biomassFacility, taintedWoods, frozenForest, ruinousShores, facility32m, windsweptIslands, stainedMountains, tarFields,
     fungalPass, extractionOutpost, saltFlats, overgrowth,
     impact0078, desolateRift, nuclearComplex, planetaryTerminal,
     coastline, navalFortress,
@@ -40,6 +40,11 @@ public class SectorPresets{
         biomassFacility = new SectorPreset("biomassFacility", serpulo, 81){{
             captureWave = 20;
             difficulty = 3;
+        }};
+
+        taintedWoods = new SectorPreset("taintedWoods", serpulo, 221){{
+            captureWave = 32;
+            difficulty = 4;
         }};
 
         craters = new SectorPreset("craters", serpulo, 18){{
