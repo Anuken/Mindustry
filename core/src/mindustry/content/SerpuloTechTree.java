@@ -568,7 +568,8 @@ public class SerpuloTechTree{
                     ), () -> {
                         node(taintedWoods, Seq.with(
                         new SectorComplete(biomassFacility),
-                        new Research(Items.sporePod)
+                        new Research(Items.sporePod),
+                        new Research(wave)
                         ), () -> {
 
                         });
