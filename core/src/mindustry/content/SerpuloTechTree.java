@@ -123,7 +123,7 @@ public class SerpuloTechTree{
                     });
 
                     node(pyratiteMixer, () -> {
-                        node(blastMixer, () -> {
+                        node(blastMixer, Seq.with(new SectorComplete(facility32m)), () -> {
 
                         });
                     });
@@ -503,11 +503,12 @@ public class SerpuloTechTree{
                                 });
 
                                 node(facility32m, Seq.with(
-                                new Research(pneumaticDrill)
+                                new Research(pneumaticDrill),
+                                new SectorComplete(stainedMountains)
                                 ), () -> {
                                     node(extractionOutpost, Seq.with(
-                                    new SectorComplete(stainedMountains),
                                     new SectorComplete(windsweptIslands),
+                                    new SectorComplete(facility32m),
                                     new Research(groundFactory),
                                     new Research(nova),
                                     new Research(airFactory),
@@ -565,6 +566,13 @@ public class SerpuloTechTree{
                     new Research(scatter),
                     new Research(graphitePress)
                     ), () -> {
+                        node(taintedWoods, Seq.with(
+                        new SectorComplete(biomassFacility),
+                        new Research(Items.sporePod)
+                        ), () -> {
+
+                        });
+
                         node(stainedMountains, Seq.with(
                         new SectorComplete(biomassFacility),
                         new Research(pneumaticDrill),
