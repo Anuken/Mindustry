@@ -129,10 +129,10 @@ public class Placement{
     }
 
     public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge){
-        calculateBridges(plans, bridge, t -> false);
+        calculateBridges(plans, bridge, false, t -> false);
     }
 
-    public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge, Boolf<Block> avoid){
+    public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge, boolean hasJunction, Boolf<Block> avoid){
         if(isSidePlace(plans) || plans.size == 0) return;
 
         //check for orthogonal placement + unlocked state
@@ -170,7 +170,7 @@ public class Placement{
                         continue outer;
                     }else if(placeable.get(other)){
 
-                        if(wereSame){
+                        if(wereSame && hasJunction){
                             //the gap is fake, it's just conveyors that can be replaced with junctions
                             i ++;
                             continue outer;
