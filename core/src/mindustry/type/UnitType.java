@@ -892,7 +892,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             //suicide enemy
             if(weapons.contains(w -> w.bullet.killShooter)){
                 //scale down DPS to be insignificant
-                dpsEstimate /= 25f;
+                dpsEstimate /= 15f;
             }
         }
 
@@ -1313,12 +1313,12 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         Draw.reset();
     }
-        
+
     //...where do I put this
     public Color shieldColor(Unit unit){
         return shieldColor == null ? unit.team.color : shieldColor;
     }
-    
+
 
     public void drawMining(Unit unit){
         if(!unit.mining()) return;

@@ -346,7 +346,7 @@ public class BulletType extends Content implements Cloneable{
             return spawnUnit.estimateDps();
         }
 
-        float sum = damage * (pierce ? pierceCap == -1 ? 2 : Mathf.clamp(pierceCap, 1, 2) : 1f) * splashDamage*0.75f;
+        float sum = (damage + splashDamage*0.75f) * (pierce ? pierceCap == -1 ? 2 : Mathf.clamp(pierceCap, 1, 2) : 1f);
         if(fragBullet != null && fragBullet != this){
             sum += fragBullet.estimateDPS() * fragBullets / 2f;
         }
@@ -549,7 +549,7 @@ public class BulletType extends Content implements Cloneable{
         if(!fragOnHit){
             createFrags(b, b.x, b.y);
         }
-        
+
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         despawnSound.at(b);
 
@@ -675,7 +675,7 @@ public class BulletType extends Content implements Cloneable{
             }
         }
     }
-    
+
     public void updateTrail(Bullet b){
         if(!headless && trailLength > 0){
             if(b.trail == null){
@@ -716,7 +716,7 @@ public class BulletType extends Content implements Cloneable{
         if(lightRadius <= -1){
             lightRadius = Math.max(18, hitSize * 5f);
         }
-        
+
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
         range = calculateRange();
     }
