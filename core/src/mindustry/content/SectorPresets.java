@@ -44,7 +44,7 @@ public class SectorPresets{
 
         taintedWoods = new SectorPreset("taintedWoods", serpulo, 221){{
             captureWave = 32;
-            difficulty = 4;
+            difficulty = 5;
         }};
 
         craters = new SectorPreset("craters", serpulo, 18){{

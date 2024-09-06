@@ -139,7 +139,7 @@ public class SerpuloTechTree{
                                 });
                             });
 
-                            node(plastaniumCompressor, Seq.with(new SectorComplete(windsweptIslands)), () -> {
+                            node(plastaniumCompressor, Seq.with(new SectorComplete(windsweptIslands), new OnSector(tarFields)), () -> {
                                 node(phaseWeaver, Seq.with(new SectorComplete(tarFields)), () -> {
 
                                 });
