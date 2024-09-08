@@ -51,7 +51,7 @@ Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platfo
 [h2]Közösség és moddolás[/h2]
 
 [list]
-[*] Használd a Steam műhelyt a közösség által készített pályák és vázlatok böngészéséhez.
+[*] Használd a Steam Műhelyt a közösség által készített pályák és vázlatok böngészéséhez.
 [*] Csatlakozz nyilvános és közösségi kiszolgálókhoz, hogy másokkal játszhass platformokon keresztül
 [*] Játssz vállvetve, PvP-ben, vagy homokozóban a barátaiddal
 [*] A közösségi kiszolgálók támogatják az egyéni pályák és játékmódok bővítményeit
