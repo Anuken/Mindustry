@@ -1,6 +1,6 @@
 A Mindustry egy gyárépítő játék Toronyvédő és RTS elemekkel. Készíts bonyolult ellátási láncokat, hogy lőszert juttass a lövegtornyokba, termelj az építkezéshez használható nyersanyagokat, és állíts elő egységeket. Irányítsd az egységeket, hogy elfoglald az ellenséges bázisokat, és bővítsd a termelésedet. Védd meg a támaszpontodat a hullámokban támadó ellenségektől.
 
-Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platformokon átívelő többjátékos módban, vagy hívd ki őket csapat alapú PvP meccsekre
+Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platformokon átívelő többjátékos módban, vagy hívd ki őket csapat alapú PvP mérkőzésekre
 
 [img]{STEAM_APP_IMAGE}/extras/factory.gif[/img]
 
@@ -10,7 +10,7 @@ Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platfo
 [*] Hozz létre bonyolult szállítószalagokból álló ellátási láncokat, hogy lőszert juttass a lövegtornyokba és termelj nyersanyagokat az építkezésekhez
 [*] Használd a gyártó-blokkokat a legkülönfélébb fejlett nyersanyagok létrehozásához
 [*] Oszd szét a folyadékokat, és küzdj meg az állandó kihívásokkal, mint például a tűzkitörések, vagy az ellenséges repülőgépek rajtaütéseivel
-[*] Hozd ki a legtöbbet a termelésből az opcionális hűtőanyag-ellátással
+[*] Hozd ki a legtöbbet a termelésből az opcionális hűtőfolyadék-ellátással
 [*] Egységek széles skáláját állíthatod elő a bázisod automatikus irányításához, és az ellenséges bázisok megtámadásához
 [/list]
 
@@ -51,7 +51,7 @@ Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platfo
 [h2]Közösség és moddolás[/h2]
 
 [list]
-[*] Használd a Steam Műhelyt a közösség által készített pályák és vázlatok böngészéséhez.
+[*] Használd a Steam műhelyt a közösség által készített pályák és vázlatok böngészéséhez.
 [*] Csatlakozz nyilvános és közösségi kiszolgálókhoz, hogy másokkal játszhass platformokon keresztül
 [*] Játssz vállvetve, PvP-ben, vagy homokozóban a barátaiddal
 [*] A közösségi kiszolgálók támogatják az egyéni pályák és játékmódok bővítményeit
