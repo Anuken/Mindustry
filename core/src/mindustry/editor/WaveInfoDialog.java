@@ -6,7 +6,6 @@ import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
@@ -28,7 +27,6 @@ import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
-    private int start = 0, displayed = 20;
     Seq<SpawnGroup> groups = new Seq<>();
     private @Nullable SpawnGroup expandedGroup;
 
@@ -37,7 +35,6 @@ public class WaveInfoDialog extends BaseDialog{
     private @Nullable UnitType filterType;
     private Sort sort = Sort.begin;
     private boolean reverseSort = false;
-    private float updateTimer, updatePeriod = 1f;
     private boolean checkedSpawns;
     private WaveGraph graph = new WaveGraph();
 
@@ -94,56 +91,12 @@ public class WaveInfoDialog extends BaseDialog{
             dialog.show();
         }).size(250f, 64f);
 
-        buttons.defaults().width(60f);
-
-        buttons.button("<", () -> {}).update(t -> {
-            if(t.getClickListener().isPressed()){
-                shift(-1);
-            }
-        });
-        buttons.button(">", () -> {}).update(t -> {
-            if(t.getClickListener().isPressed()){
-                shift(1);
-            }
-        });
-
-        buttons.button("-", () -> {}).update(t -> {
-            if(t.getClickListener().isPressed()){
-                view(-1);
-            }
-        });
-        buttons.button("+", () -> {}).update(t -> {
-            if(t.getClickListener().isPressed()){
-                view(1);
-            }
-        });
-
         if(experimental){
             buttons.button(Core.bundle.get("waves.random"), Icon.refresh, () -> {
                 groups.clear();
                 groups = Waves.generate(1f / 10f);
                 buildGroups();
             }).width(200f);
-        }
-    }
-
-    void view(int amount){
-        updateTimer += Time.delta;
-        if(updateTimer >= updatePeriod){
-            displayed += amount;
-            if(displayed < 5) displayed = 5;
-            updateTimer = 0f;
-            updateWaves();
-        }
-    }
-
-    void shift(int amount){
-        updateTimer += Time.delta;
-        if(updateTimer >= updatePeriod){
-            start += amount;
-            if(start < 0) start = 0;
-            updateTimer = 0f;
-            updateWaves();
         }
     }
 
@@ -157,7 +110,6 @@ public class WaveInfoDialog extends BaseDialog{
                 s.image(Icon.zoom).padRight(8);
                 s.field(search < 0 ? "" : (search + 1) + "", TextFieldFilter.digitsOnly, text -> {
                     search = groups.any() ? Strings.parseInt(text, 0) - 1 : -1;
-                    start = Math.max(search - (displayed / 2) - (displayed % 2), 0);
                     buildGroups();
                 }).growX().maxTextLength(8).get().setMessageText("@waves.search");
                 s.button(Icon.units, Styles.emptyi, () -> showUnits(type -> filterType = type, true)).size(46f).tooltip("@waves.filter")
@@ -201,19 +153,6 @@ public class WaveInfoDialog extends BaseDialog{
         }}).width(390f).growY();
 
         cont.add(graph = new WaveGraph()).grow();
-
-        graph.scrolled((scroll) -> {
-            view(Mathf.sign(scroll));
-        });
-
-        graph.touchable = Touchable.enabled;
-        graph.addListener(new InputListener(){
-
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Element fromActor){
-                graph.requestScroll();
-            }
-        });
 
         buildGroups();
     }
@@ -507,8 +446,6 @@ public class WaveInfoDialog extends BaseDialog{
 
     void updateWaves(){
         graph.groups = groups;
-        graph.from = start;
-        graph.to = start + displayed;
         graph.rebuild();
     }
 }
