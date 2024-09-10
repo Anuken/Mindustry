@@ -20,9 +20,9 @@ public class ShieldArcAbility extends Ability{
     private static Vec2 paramPos = new Vec2();
     private static final Cons<Bullet> shieldConsumer = b -> {
         if(b.team != paramUnit.team && b.type.absorbable && paramField.data > 0 &&
-            !b.within(paramPos, paramField.radius - paramField.width/2f) &&
-            Tmp.v1.set(b).add(b.vel).within(paramPos, paramField.radius + paramField.width/2f) &&
-            Angles.within(paramPos.angleTo(b), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f)){
+            !(b.within(paramPos, paramField.radius - paramField.width/2f) && paramPos.within(b.x - b.deltaX, b.y - b.deltaY, paramField.radius - paramField.width/2f)) &&
+            (Tmp.v1.set(b).add(b.deltaX, b.deltaY).within(paramPos, paramField.radius + paramField.width/2f) || b.within(paramPos, paramField.radius + paramField.width/2f)) &&
+            (Angles.within(paramPos.angleTo(b), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(b.x + b.deltaX, b.y + b.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
 
             b.absorb();
             Fx.absorb.at(b);
@@ -60,7 +60,7 @@ public class ShieldArcAbility extends Ability{
     public boolean drawArc = true;
     /** If not null, will be drawn on top. */
     public @Nullable String region;
-    /** Color override of the shield. Uses unit shield colour by default. */ 
+    /** Color override of the shield. Uses unit shield colour by default. */
     public @Nullable Color color;
     /** If true, sprite position will be influenced by x/y. */
     public boolean offsetRegion = false;
@@ -80,7 +80,7 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void update(Unit unit){
-        
+
         if(data < max){
             data += Time.delta * regen;
         }
