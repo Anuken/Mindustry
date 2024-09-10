@@ -291,6 +291,8 @@ public class WaveGraph extends Table{
             maxHealth = Math.max(maxHealth, healthsum);
         }
 
+        used.orderedItems().sort();
+
         ObjectSet<UnitType> usedCopy = new ObjectSet<>(used);
 
         colors.clear();
