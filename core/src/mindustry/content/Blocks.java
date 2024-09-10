@@ -1338,7 +1338,7 @@ public class Blocks{
         slagIncinerator = new ItemIncinerator("slag-incinerator"){{
             requirements(Category.crafting, with(Items.tungsten, 15));
             size = 1;
-            consumeLiquid(Liquids.slag, 2f / 60f);
+            consumeLiquid(Liquids.slag, 0f);
         }};
 
         carbideCrucible = new HeatCrafter("carbide-crucible"){{
