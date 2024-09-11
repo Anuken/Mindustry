@@ -584,6 +584,16 @@ public class SerpuloTechTree{
                             new Research(groundFactory),
                             new Research(door)
                             ), () -> {
+                                node(infestedCanyons, Seq.with(
+                                new SectorComplete(fungalPass),
+                                new Research(navalFactory),
+                                new Research(risso),
+                                new Research(minke),
+                                new Research(additiveReconstructor)
+                                ), () -> {
+
+                                });
+
                                 node(nuclearComplex, Seq.with(
                                 new SectorComplete(fungalPass),
                                 new Research(thermalGenerator),
