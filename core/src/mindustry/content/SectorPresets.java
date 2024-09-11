@@ -90,7 +90,7 @@ public class SectorPresets{
         }};
 
         infestedCanyons = new SectorPreset("infestedCanyons", serpulo, 210){{
-            difficulty = 5;
+            difficulty = 4;
         }};
 
         overgrowth = new SectorPreset("overgrowth", serpulo, 134){{
