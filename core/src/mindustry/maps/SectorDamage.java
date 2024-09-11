@@ -21,7 +21,7 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class SectorDamage{
-    public static final int maxRetWave = 50, maxWavesSimulated = 60;
+    public static final int maxRetWave = 110, maxWavesSimulated = 111;
 
     //direct damage is for testing only
     private static final boolean rubble = true;

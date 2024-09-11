@@ -139,7 +139,7 @@ public class SerpuloTechTree{
                                 });
                             });
 
-                            node(plastaniumCompressor, Seq.with(new SectorComplete(windsweptIslands)), () -> {
+                            node(plastaniumCompressor, Seq.with(new SectorComplete(windsweptIslands), new OnSector(tarFields)), () -> {
                                 node(phaseWeaver, Seq.with(new SectorComplete(tarFields)), () -> {
 
                                 });
@@ -568,7 +568,8 @@ public class SerpuloTechTree{
                     ), () -> {
                         node(taintedWoods, Seq.with(
                         new SectorComplete(biomassFacility),
-                        new Research(Items.sporePod)
+                        new Research(Items.sporePod),
+                        new Research(wave)
                         ), () -> {
 
                         });
@@ -583,6 +584,16 @@ public class SerpuloTechTree{
                             new Research(groundFactory),
                             new Research(door)
                             ), () -> {
+                                node(infestedCanyons, Seq.with(
+                                new SectorComplete(fungalPass),
+                                new Research(navalFactory),
+                                new Research(risso),
+                                new Research(minke),
+                                new Research(additiveReconstructor)
+                                ), () -> {
+
+                                });
+
                                 node(nuclearComplex, Seq.with(
                                 new SectorComplete(fungalPass),
                                 new Research(thermalGenerator),
