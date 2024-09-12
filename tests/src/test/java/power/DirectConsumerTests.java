@@ -16,9 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DirectConsumerTests extends PowerTestFixture{
 
 
-    /**
-     * CsvSource parameterized tests, testing outliers
-     */
+    /** CsvSource parameterized tests, testing outliers */
     @ParameterizedTest
     @CsvSource({"0, 0, 0.08f, 0.08f, 1f", "0, 0, 0.08f, 0.08f, 1f", "0, 0, 0.08f, 0.08f, 1f"})
     public void noPowerRequestedWithNoItemsParameterized(int siliconAmount, int leadAmount, float producedPower, float requestedPower, float expectedSatisfaction){
