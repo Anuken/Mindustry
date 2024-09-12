@@ -1,5 +1,4 @@
 import arc.*;
-import arc.assets.AssetManager;
 import arc.backend.headless.*;
 import arc.files.*;
 import arc.math.geom.*;
@@ -13,12 +12,10 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
-import mindustry.entities.bullet.BulletType;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.g3d.PlanetGrid;
-import mindustry.input.InputHandler;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.maps.*;
@@ -31,8 +28,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
-import mindustry.world.blocks.defense.turrets.*;  // Added by WS
-import mindustry.world.blocks.environment.Floor; // Added by WS
+import mindustry.world.blocks.defense.turrets.*;
+import mindustry.world.blocks.environment.Floor;
 import mindustry.world.blocks.storage.CoreBlock.CoreBuild;
 import org.json.*;
 import org.junit.jupiter.api.*;
@@ -43,9 +40,7 @@ import org.mockito.Mockito;
 import java.io.*;
 import java.nio.*;
 
-import static arc.Core.assets;
 import static mindustry.Vars.*;
-import static mindustry.content.Planets.erekir;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.DynamicTest.*;
 import static org.mockito.Mockito.*;
@@ -99,9 +94,6 @@ public class ApplicationTests{
                     add(logic = new Logic());
                     add(netServer = new NetServer());
 
-                    //remove me if fail
-                    //add(control = new Control());
-
                     content.init();
 
                     mods.eachClass(Mod::init);
@@ -122,7 +114,7 @@ public class ApplicationTests{
                 public void init(){
                     super.init();
                     begins[0] = true;
-                    testMap = maps.loadInternalMap("groundZero"); //was groundZero
+                    testMap = maps.loadInternalMap("groundZero");
                     Thread.currentThread().interrupt();
                 }
             };
@@ -302,19 +294,9 @@ public class ApplicationTests{
                 int after_boss = 0;
                 while (after_boss < 3)
                 {
-                    //state.rules.winWave = 1;
-                    //state.rules.attackMode = true;
                     if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
                             (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
                         Call.sectorCapture();
-                        /*if(state.rules.sector.preset != null && state.rules.sector.preset.attackAfterWaves && !state.rules.attackMode){
-                            //activate attack mode to destroy cores after waves are done.
-                            state.rules.attackMode = true;
-                            state.rules.waves = false;
-                            Call.setRules(state.rules);
-                        }else{
-                            Call.sectorCapture();
-                        }*/
                     }
                     Groups.unit.update();
                     after_boss++;
@@ -326,11 +308,6 @@ public class ApplicationTests{
         }
         Call.sectorCapture();
         assertFalse(state.rules.waves); //state.rules.waves now being false means sector has been captured and game is over
-        System.out.println("gg");
-        //no more waves = no more enemies = gg
-        //force trigger delayed spawns
-        //Time.setDeltaProvider(() -> 1000f);
-        //assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
     }
     
     /**
@@ -343,20 +320,17 @@ public class ApplicationTests{
         int wave_count = 0;
         testMap = maps.loadInternalMap("nuclearComplex");
         world.loadMap(testMap);
-        //assertTrue(spawner.countSpawns() > 0, "No spawns present.");
         while (true)
         {
             logic.runWave();
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
             if (boss)
             {
-                //System.out.println("BOSS ROUND REACHED"); //nuclear complex round 50 eclipse boss spawns.
+                //nuclear complex round 50 eclipse boss spawns.
                 assertTrue(boss, "boss wave assertion");
-                //System.out.println("RUNNING BOSS ROUND");
                 Groups.unit.update();
                 break;
             }
-            //System.out.println("BOSS ROUND IS " + boss);
             Groups.unit.update();
             wave_count++;
         }
@@ -386,7 +360,6 @@ public class ApplicationTests{
     void WaveCountdownStateTest()
     {
         world.loadMap(testMap);
-        //assertTrue(spawner.countSpawns() > 0, "No spawns present.");
         logic.runWave();
         //force trigger delayed spawns
         Time.setDeltaProvider(() -> 1000f);
@@ -406,7 +379,6 @@ public class ApplicationTests{
     void GameOverStateTest()
     {
         world.loadMap(testMap);
-
         //to make this a campaign map we need a sector - make a dummy sector
         state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
         state.rules.winWave = 50;
@@ -423,7 +395,6 @@ public class ApplicationTests{
         //need to set state to is playing to see if we are in fact dead, otherwise we are inside a menu
         state.set(State.playing);
         logic.update();
-
 
         //if we die or loose, state.gameOver = true
         //enemies present and spawned. No longer in prep phase. Wave has started.
@@ -445,17 +416,11 @@ public class ApplicationTests{
         state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
         state.rules.winWave = 50;
         boolean boss = false;
-        //assertTrue(spawner.countSpawns() > 0, "No spawns present.");
         while (!boss)
         {
             logic.runWave();
             boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
-            if (boss)
-            {
-               // System.out.println("BOSS ROUND");
-                //nuclear complex round 50 eclipse boss spawns.
-            }
-            //System.out.println("BOSS ROUND IS " + boss);
+
             Groups.unit.update();
             wave_count++;
         }
@@ -494,10 +459,10 @@ public class ApplicationTests{
         logic.update();
         assertTrue(state.rules.fog, "Fog of war active");
     }
-    
 
-    //make building, damage building and compare health to see it went through
-    //Test
+    /**
+     * Make building, damage building and compare health to see it went through
+     */
     @Test
     void BuildingDamageTest()
     {
@@ -511,9 +476,7 @@ public class ApplicationTests{
         d1.update();
         Time.setDeltaProvider(() -> 1f);
 
-
         assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
-
         Time.setDeltaProvider(() -> 9999f);
 
         //prevents range issues
@@ -527,6 +490,7 @@ public class ApplicationTests{
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
     }
+
     @Test
     void verifyWorldCreation(){
         Tiles tiles = world.resize(8, 8);
@@ -538,6 +502,7 @@ public class ApplicationTests{
             assertEquals(tile.data, 0);
         }
     }
+
     @Test
     void createMap(){
         Tiles tiles = world.resize(8, 8);
@@ -579,7 +544,6 @@ public class ApplicationTests{
         multiblock();
         //grab tile of our world at coordinate 4,4
         Tile tile = world.tile(4, 4);
-
         tile.build.items.add(Items.coal, 5);
         tile.build.items.add(Items.titanium, 50);
         assertEquals(tile.build.items.total(), 55);
@@ -590,9 +554,7 @@ public class ApplicationTests{
 
     /**
      * Gives/Removes a specific tile resources and verify the resources were properly assigned
-     *
      * Test other remove methods and add methods
-     *
      * Adding contents of one tile to another (our total)
      */
     @Test
@@ -606,8 +568,8 @@ public class ApplicationTests{
         world.tile(0, 0).setBlock(Blocks.coreShard, Team.sharded, 0);
         tile2.build.items.add(Items.titanium, 50);
 
-        //sanity check to ensure we havent created the same tile twice
-        assertEquals(tile == tile2, false);
+        //sanity check to ensure we have not created the same tile twice
+        assertNotSame(tile, tile2);
 
         tile.build.items.add(Items.coal, 5);
         //add our tile2 items to tile1
@@ -618,7 +580,6 @@ public class ApplicationTests{
 
     /**
      * Add an item and test its ID to ensure proper assignment
-     *
      * Check if coal ID is properly read
      */
     @Test
@@ -629,13 +590,11 @@ public class ApplicationTests{
         world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
         tile.build.items.add(Items.coal, 5);
 
-        //tile.build.items.has();
         assertTrue(tile.build.items.has(5), "Coal ID was found on tile");
     }
 
     /**
      * Add an item and test if the item lookup returns true to ensure proper assignment
-     *
      * Check if coal item is properly read
      */
     @Test
@@ -646,13 +605,11 @@ public class ApplicationTests{
         world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
         tile.build.items.add(Items.coal, 5);
 
-        //tile.build.items.has();
         assertTrue(tile.build.items.has(Items.coal), "Coal Item was found on tile");
     }
 
     /**
      * Add an item and use different method of removing
-     *
      * Remove items by itemstack (passing this as a parameter in remove)
      */
     @Test
@@ -980,27 +937,6 @@ public class ApplicationTests{
     //===========================================
 
     /**
-     * As of right now the game does not make the base Block.java class easy to test because it
-     * is implemented by so many other classes and not directly used.
-     * In order to better test this Block.java class
-     * We created a BlockStub.java to directly test methods inside Block.java. percentSolid is
-     * a function that was previously uncovered in our test suite. However, due to our BlockStub
-     * class, we are now able to access it directly and get the result for a tile made on 1,1 on
-     * the game map.
-     *
-     * No LONGER IN USE
-     */
-
-    //@Test
-    void BlockStubTest()
-    {
-        BlockStub stub = new BlockStub("coal");
-        Tile tile = new Tile(1,1);
-        assertEquals(stub.percentSolid(1,1), 0);
-    }
-
-
-    /**
      * Now using dummy method to always get optimal flow with pipping
      */
     @Test
@@ -1021,8 +957,6 @@ public class ApplicationTests{
 
         tank.setBlock(Blocks.liquidTank, Team.sharded);
 
-        //updateBlocks(10);  // Original tile updates
-
         // New tile updates
         for(Tile tile : world.tiles){
             if(tile.build != null && tile.isCenter()){
@@ -1042,13 +976,12 @@ public class ApplicationTests{
             }
         }
 
-        // System.out.println(tank.build.liquids.currentAmount());  // Print amount of water in the tank
         assertTrue(tank.build.liquids.currentAmount() >= 1, "Liquid not moved through junction");
         assertTrue(tank.build.liquids.current() == Liquids.water, "Tank has no water");
     }
 
     //===========================================
-    // Mocking Tests
+    // Mocking Tests (Mockito)
     //===========================================
 
     /**
@@ -1133,6 +1066,7 @@ public class ApplicationTests{
         //test game over state and verify how often CheckGameState is run
         verify(logMock, atLeast(1)).update();
 
+        //ensure logic remains for rest of test suite
         logic = oldLogic;
     }
 
@@ -1168,7 +1102,6 @@ public class ApplicationTests{
         verify(duoMock, atLeast(0)).recache();
         verify(duoMock, atLeast(0)).recacheWall();
     }
-
     //===========================================
     // End of Mocking Tests
     //===========================================
@@ -1262,8 +1195,6 @@ public class ApplicationTests{
         }
     }
 
-
-
     @Test
     void liquidOutput(){
         world.loadMap(testMap);
@@ -1278,7 +1209,7 @@ public class ApplicationTests{
         updateBlocks(10);
 
         assertTrue(world.tile(2, 1).build.liquids.currentAmount() >= 1);
-        assertTrue(world.tile(2, 1).build.liquids.current() == Liquids.water);
+        assertSame(world.tile(2, 1).build.liquids.current(), Liquids.water);
     }
 
     @Test

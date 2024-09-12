@@ -470,7 +470,6 @@ public class Turret extends ReloadTurret{
             return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || isControlled() || logicControlled();
         }
 
-
         protected boolean canHeal(){
             return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().heals();
         }

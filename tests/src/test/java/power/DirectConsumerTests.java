@@ -20,10 +20,10 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 /** Tests for direct power consumers. */
 public class DirectConsumerTests extends PowerTestFixture{
 
-
-    //https://www.arhohuttunen.com/junit-5-parameterized-tests/
-    //Option 1
-    // Uses a method to provide parameters via stream arguments
+    /**
+     * No Power tests
+     * Stream arguements provided parameterized tests
+     */
     @ParameterizedTest
     @MethodSource("noPNoItemsParameters")
     void noPowerRequestedWithNoItemsParameterized(int siliconAmount, int leadAmount, float producedPower, float requestedPower, float expectedSatisfaction)
@@ -50,9 +50,9 @@ public class DirectConsumerTests extends PowerTestFixture{
         );
     }
 
-    //Option 2
-    //https://stackoverflow.com/questions/61483452/parameterized-test-with-two-arguments-in-junit-5-jupiter
-    // CsvSource aka comma seperated source
+    /**
+     * CsvSource parameterized tests
+     */
     @ParameterizedTest
     @CsvSource({"0, 0, 0.08f, 0.08f, 1f", "0, 0, 0.08f, 0.08f, 1f", "0, 0, 0.08f, 0.08f, 1f"})
     public void noPowerRequestedWithNoItemsParameterized2(int siliconAmount, int leadAmount, float producedPower, float requestedPower, float expectedSatisfaction)
@@ -60,14 +60,10 @@ public class DirectConsumerTests extends PowerTestFixture{
         testUnitFactory(siliconAmount, leadAmount, producedPower,requestedPower, expectedSatisfaction);
     }
 
-
-
-
     @Test
     void noPowerRequestedWithNoItems(){
         testUnitFactory(0, 0, 0.08f, 0.08f, 1f);
     }
-
 
     /**
      *
@@ -95,6 +91,7 @@ public class DirectConsumerTests extends PowerTestFixture{
     {
         testUnitFactory(siliconAmount, leadAmount, producedPower,requestedPower, expectedSatisfaction);
     }
+
     private static Stream<Arguments> noPowerRequested_InsufficientItems_Parameters()
     {
         return Stream.of(
