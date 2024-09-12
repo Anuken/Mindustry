@@ -324,7 +324,7 @@ public class ApplicationTests{
         }
     }
 
-    /** Start wave and check if we have enemies and we are no longer in prep phase */
+    /** Start wave and check if we have enemies, and we are no longer in prep phase */
     @Test
     void WavesActiveStateTest(){
         world.loadMap(testMap);
@@ -336,7 +336,7 @@ public class ApplicationTests{
         assertFalse(Groups.unit.isEmpty(), "Enemies spawned.");
     }
 
-    /** Checking for Wave countdown state (aka our wavetimer before the wave starts) */
+    /** Checking for Wave countdown state (aka our wave timer before the wave starts) */
     @Test
     void WaveCountdownStateTest(){
         world.loadMap(testMap);
@@ -346,7 +346,7 @@ public class ApplicationTests{
         Time.update();
         Time.update();
         Groups.unit.update();
-        //check if we do not have any enemies spawning and we have a Wave Timer active
+        //check if we do not have any enemies spawning, and we have a Wave Timer active
         //waveTimer (if true we have a wavetime aka (int)(state.wavetime/60)
         assertFalse(Groups.unit.isEmpty() && !state.rules.waveTimer, "Wave Countdown Active.");
     }
@@ -468,7 +468,7 @@ public class ApplicationTests{
         world.endMapLoad();
     }
 
-    /** Creates a map (8 by 8 tileset) and assigns a new coreShard building to cordinates 4,4. Then Verifies block is created successfully */
+    /** Creates a map (8 by 8 tileset) and assigns a new coreShard building to coordinates 4,4. Then Verifies block is created successfully */
     @Test
     void multiblock(){
         createMap();
@@ -550,7 +550,7 @@ public class ApplicationTests{
 
     /** Add an item and use different method of removing. Remove items by ItemStack */
     @Test
-    void iitemStackRemoveAndVerifyCheck(){
+    void itemStackRemoveAndVerifyCheck(){
         multiblock();
         Tile tile = world.tile(1, 1);
         world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
@@ -898,7 +898,7 @@ public class ApplicationTests{
         }
 
         assertTrue(tank.build.liquids.currentAmount() >= 1, "Liquid not moved through junction");
-        assertTrue(tank.build.liquids.current() == Liquids.water, "Tank has no water");
+        assertSame(tank.build.liquids.current(), Liquids.water, "Tank has no water");
     }
 
 
@@ -914,8 +914,8 @@ public class ApplicationTests{
         int waveCount = 0;
         testMap = maps.loadInternalMap("nuclearComplex");
         world.loadMap(testMap);
-        //trigger and surpass boss wave so we can meet parameters of a sector capture status
-        //Any time game state is updated, it must be reset properly and that requires reset to run
+        //trigger and surpass boss wave, so we can meet parameters of a sector capture status
+        //Any time game state is updated, it must be reset properly and that requires a reset to run
         //Involves calling an event to clear timers, stats and other info that needs to be updated
         while (waveCount < 100){
             logic.runWave();
@@ -940,7 +940,7 @@ public class ApplicationTests{
         Call.sectorCapture();
 
         //make sure reset to make sure game state is properly updated and reset. any time game state is updated, it
-        // must be reset properly and that requires reset to run. Involves calling an event to clear timers, stats and
+        // must be reset properly and that requires a reset to run. Involves calling an event to clear timers, stats and
         // other info that needs to be updated
         verify(logMock, atLeast(1)).reset();
         //ensure we return our original logic class to avoid failures in rest of test suite
@@ -1000,7 +1000,7 @@ public class ApplicationTests{
 
         updateBlocks(100);
 
-        //verify the duo Building uses proper setBlock for Turent building
+        //verify the duo Building uses proper setBlock for turent building
         verify(duoMock, atLeast(1)).setBlock(Blocks.duo, Team.sharded);
         //verify that tile is not static we create (if static then we have to recache for renderer)
         verify(duoMock, atLeast(0)).recache();
@@ -1167,10 +1167,10 @@ public class ApplicationTests{
         world.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
-        //declaring a bunmch of different objects/buildings/tiles/etc
+        //declaring a bunch of different objects/buildings/tiles/etc
         Tile source1 = world.rawTile(4, 0), source2 = world.rawTile(6, 0), s1conveyor = world.rawTile(4, 1),
         s2conveyor = world.rawTile(6, 1), s1s2conveyor = world.rawTile(5, 1), sorter = world.rawTile(5, 2),
-        leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2), sortedconveyor = world.rawTile(5, 3),
+        leftConveyor = world.rawTile(4, 2), rightConveyor = world.rawTile(6, 2), sortedConveyor = world.rawTile(5, 3),
         leftVault = world.rawTile(2, 2), rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
 
         source1.setBlock(Blocks.itemSource, Team.sharded);
@@ -1182,9 +1182,9 @@ public class ApplicationTests{
         s1s2conveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
         sorter.setBlock(Blocks.sorter, Team.sharded);
         sorter.build.configureAny(Items.copper);
-        leftconveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
-        rightconveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
-        sortedconveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
+        leftConveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
+        rightConveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
+        sortedConveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
         leftVault.setBlock(Blocks.vault, Team.sharded);
         rightVault.setBlock(Blocks.vault, Team.sharded);
         topVault.setBlock(Blocks.vault, Team.sharded);
@@ -1202,8 +1202,8 @@ public class ApplicationTests{
         state.set(State.playing);
         state.rules.limitMapArea = false;
         Tile source1 = world.rawTile(5, 0),  conveyor = world.rawTile(5, 1),
-        router = world.rawTile(5, 2), leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2),
-        middleconveyor = world.rawTile(5, 3), leftVault = world.rawTile(2, 2),
+        router = world.rawTile(5, 2), leftConveyor = world.rawTile(4, 2), rightConveyor = world.rawTile(6, 2),
+        middleConveyor = world.rawTile(5, 3), leftVault = world.rawTile(2, 2),
         rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
 
         source1.setBlock(Blocks.itemSource, Team.sharded);
@@ -1211,9 +1211,9 @@ public class ApplicationTests{
         conveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
         router.setBlock(Blocks.router, Team.sharded);
         router.build.configureAny(Items.coal);
-        leftconveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
-        rightconveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
-        middleconveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
+        leftConveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
+        rightConveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
+        middleConveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
         leftVault.setBlock(Blocks.vault, Team.sharded);
         rightVault.setBlock(Blocks.vault, Team.sharded);
         topVault.setBlock(Blocks.vault, Team.sharded);
@@ -1671,10 +1671,7 @@ public class ApplicationTests{
         assertEquals(core.build, Team.sharded.data().core());
     }
 
-    /** Test aimed at depositing item into given block. Gets run in test factories.
-     * @param block
-     * @param item
-     */
+    /** Test aimed at depositing item into given block. Gets run in test factories. */
     void depositTest(Block block, Item item){
         Unit unit = UnitTypes.mono.create(Team.sharded);
         Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
