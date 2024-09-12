@@ -239,8 +239,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         }
 
         /** Using in test suite for updating optimal liquid flow for testing purposes. */
-        public void updateTileDummyFlow()
-        {
+        public void updateTileDummyFlow(){
             smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
 
             if(liquids.currentAmount() > 0.0001f && timer(timerFlow, 1)){

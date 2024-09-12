@@ -61,8 +61,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public Tile() { block = floor = overlay = (Floor)Blocks.air; }
 
     /** Mocking scenarios in test suites. */
-    public void constructTile(Tile tile)
-    {
+    public void constructTile(Tile tile){
         this.x = tile.x;
         this.y = tile.y;
         this.floor = tile.floor;

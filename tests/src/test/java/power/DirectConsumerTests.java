@@ -7,8 +7,8 @@ import mindustry.world.blocks.power.PowerGenerator.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,8 +21,7 @@ public class DirectConsumerTests extends PowerTestFixture{
      */
     @ParameterizedTest
     @CsvSource({"0, 0, 0.08f, 0.08f, 1f", "0, 0, 0.08f, 0.08f, 1f", "0, 0, 0.08f, 0.08f, 1f"})
-    public void noPowerRequestedWithNoItemsParameterized2(int siliconAmount, int leadAmount, float producedPower, float requestedPower, float expectedSatisfaction)
-    {
+    public void noPowerRequestedWithNoItemsParameterized2(int siliconAmount, int leadAmount, float producedPower, float requestedPower, float expectedSatisfaction){
         testUnitFactory(siliconAmount, leadAmount, producedPower,requestedPower, expectedSatisfaction);
     }
 
@@ -50,8 +49,7 @@ public class DirectConsumerTests extends PowerTestFixture{
     @ParameterizedTest
     @CsvSource({"30, 30, 0.1f, 0.25f, 0.4f", "0, 0, 0.1f, 0.25f, 0.4f", "2, 0, 0.1f, 0.25f, 0.4f", "0, 15, 0.1f, 0.8f, 0.125f",
     "90, 0, 0.8f, 0.8f, 1f", "0, 90,  0.8f, 0.8f, 1f", "12000, 0,  0.5f, 1.0f, 0.5f", "0, 12000,  0.4f, 0.8f, 0.5f"})
-    void noPowerRequestedSufficiencyParameterized(int siliconAmount, int leadAmount, float producedPower, float requestedPower, float expectedSatisfaction)
-    {
+    void noPowerRequestedSufficiencyParameterized(int siliconAmount, int leadAmount, float producedPower, float requestedPower, float expectedSatisfaction){
         testUnitFactory(siliconAmount, leadAmount, producedPower,requestedPower, expectedSatisfaction);
     }
 
