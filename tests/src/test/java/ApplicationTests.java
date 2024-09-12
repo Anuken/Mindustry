@@ -283,7 +283,7 @@ public class ApplicationTests{
             logic.runWave();
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
             if (boss){
-                System.out.println("BOSS ROUND"); //nuclear complex round 50 eclipse boss spawns.
+                System.out.println("BOSS ROUND"); // nuclear complex round 50 eclipse boss spawns.
                 assertTrue(state.rules.waves); // there are still more waves of enemies. game not finished yet
                 int afterBoss = 0;
                 while (afterBoss < 3){
@@ -300,7 +300,7 @@ public class ApplicationTests{
             waveCount++;
         }
         Call.sectorCapture();
-        assertFalse(state.rules.waves); //state.rules.waves now being false means sector has been captured and game is over
+        assertFalse(state.rules.waves); // state.rules.waves now being false means sector has been captured and game is over
     }
 
     /** Run waves until boss wave is reached to make sure we get there. the boss wave will be run before exiting loop. */
@@ -314,7 +314,7 @@ public class ApplicationTests{
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
             if (boss)
             {
-                //nuclear complex round 50 eclipse boss spawns.
+                // Nuclear complex round 50 eclipse boss spawns.
                 assertTrue(boss, "boss wave assertion");
                 Groups.unit.update();
                 break;
@@ -325,64 +325,64 @@ public class ApplicationTests{
 
     /** Start wave and check if we have enemies, and we are no longer in prep phase */
     @Test
-    void WavesActiveStateTest(){
+    void wavesActiveStateTest(){
         world.loadMap(testMap);
-        //increments the wave number
+        // Increments the wave number
         logic.runWave();
 
         Groups.unit.update();
-        //enemies present and spawned. No longer in prep phase. Wave has started.
+        // Enemies present and spawned. No longer in prep phase. Wave has started.
         assertFalse(Groups.unit.isEmpty(), "Enemies spawned.");
     }
 
     /** Checking for Wave countdown state (aka our wave timer before the wave starts) */
     @Test
-    void WaveCountdownStateTest(){
+    void waveCountdownStateTest(){
         world.loadMap(testMap);
         logic.runWave();
-        //force trigger delayed spawns
+        // Force trigger delayed spawns
         Time.setDeltaProvider(() -> 1000f);
         Time.update();
         Time.update();
         Groups.unit.update();
-        //check if we do not have any enemies spawning, and we have a Wave Timer active
-        //waveTimer (if true we have a wavetime aka (int)(state.wavetime/60)
+        // Check if we do not have any enemies spawning, and we have a Wave Timer active
+        // WaveTimer (if true we have a wavetime aka (int)(state.wavetime/60)
         assertFalse(Groups.unit.isEmpty() && !state.rules.waveTimer, "Wave Countdown Active.");
     }
 
     /** Start wave and kill player's core. */
     @Test
-    void GameOverStateTest(){
+    void gameOverStateTest(){
         world.loadMap(testMap);
-        //to make this a campaign map we need a sector - make a dummy sector
+        // To make this a campaign map we need a sector - make a dummy sector
         state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
         state.rules.winWave = 50;
 
-        //increments the wave number
+        // Increments the wave number
         logic.runWave();
         Groups.unit.update();
 
-        //get our player core and kill it
+        // Get our player core and kill it
         for (CoreBuild core :  state.teams.playerCores()){
             core.kill();
         }
-        //need to set state to is playing to see if we are in fact dead, otherwise we are inside a menu
+        // Need to set state to is playing to see if we are in fact dead, otherwise we are inside a menu
         state.set(State.playing);
         logic.update();
 
-        //if we die or loose, state.gameOver is now true
-        //enemies present and spawned. No longer in prep phase. Wave has started.
+        // If we die or loose, state.gameOver is now true
+        // Enemies present and spawned. No longer in prep phase. Wave has started.
         assertTrue(state.gameOver, "Game Over status reached.");
     }
 
     /** Checks if we reach captured sector status */
     @Test
-    void SectorCapturedStateTest(){
-        //nuclear complex round 50 eclipse boss spawns.
+    void sectorCapturedStateTest(){
+        // Nuclear complex round 50 eclipse boss spawns.
         testMap = maps.loadInternalMap("nuclearComplex");
 
         world.loadMap(testMap);
-        //need to add a sector to our rules, so we know this is a campaign mission
+        // Need to add a sector to our rules, so we know this is a campaign mission
         state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
         state.rules.winWave = 50;
         boolean boss = false;
@@ -391,9 +391,9 @@ public class ApplicationTests{
             boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
             Groups.unit.update();
         }
-        //when killing all the enemies, the wave is over therefore we must reset for the next wave.
+        // When killing all the enemies, the wave is over therefore we must reset for the next wave.
         Groups.clear();
-        //reset for next wave (since we are not naturally killing everything)
+        // Reset for next wave (since we are not naturally killing everything)
         spawner.reset();
         state.set(State.playing);
         logic.update();
@@ -402,25 +402,25 @@ public class ApplicationTests{
 
     /** Update fog of war and verify it is functioning or active in game */
     @Test
-    void FogOfWarUpdateTest(){
+    void fogOfWarUpdateTest(){
         state.set(State.playing);
         testMap = maps.loadInternalMap("onset");
         world.loadMap(testMap);
-        //set rule to have fog of war to true
+        // Set rule to have fog of war to true
         state.rules.fog = true;
-        //Can set it to be a specific sector, onset for example is on Erekir
+        // Can set it to be a specific sector, onset for example is on Erekir
         state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
-        //set planet to erekir which has fog of war active (needs constant static planet Erekir)
+        // Set planet to erekir which has fog of war active (needs constant static planet Erekir)
         state.rules.planet = Planets.erekir;
 
-        //run an update and verify our state.rules.fog = true
+        // Run an update and verify our state.rules.fog = true
         logic.update();
         assertTrue(state.rules.fog, "Fog of war active");
     }
 
     /** Make building, damage building and compare health to see it went through */
     @Test
-    void BuildingDamageTest(){
+    void buildingDamageTest(){
         initBuilding();
 
         Builderc d1 = UnitTypes.poly.create(Team.sharded);
@@ -434,7 +434,7 @@ public class ApplicationTests{
         assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
         Time.setDeltaProvider(() -> 9999f);
 
-        //prevents range issues
+        // Prevents range issues
         state.rules.infiniteResources = true;
         d1.update();
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
@@ -505,21 +505,21 @@ public class ApplicationTests{
     @Test
     void addingEntireTileContentsTile(){
         multiblock();
-        //grab tile of our world at coordinate 4,4
+        // Grab tile of our world at coordinate 4,4
         Tile tile = world.tile(4, 4);
 
-        //set up a tile 2 as well
+        // Set up a tile 2 as well
         Tile tile2 = world.tile(0, 0);
         world.tile(0, 0).setBlock(Blocks.coreShard, Team.sharded, 0);
-        //Adding contents of one tile to another (our total)
+        // Adding contents of one tile to another (our total)
         tile2.build.items.add(Items.titanium, 50);
 
-        //sanity check to ensure we have not created the same tile twice
+        // Sanity check to ensure we have not created the same tile twice
         assertNotSame(tile, tile2);
 
         tile.build.items.add(Items.coal, 5);
-        //add our tile2 items to tile1
-        //adds an extra 55 (50 in one and 5 in the other) to our total (remember between both tiles its shared)
+        // Add our tile2 items to tile1
+        // Adds an extra 55 (50 in one and 5 in the other) to our total (remember between both tiles its shared)
         tile.build.items.add(tile2.build.items);
         assertEquals(tile.build.items.total(), 110);
     }
@@ -538,7 +538,7 @@ public class ApplicationTests{
     /** Check if coal item is properly read */
     @Test
     void itemModuleByItemCoal(){
-        //Add an item and test if the item lookup returns true to ensure proper assignment
+        // Add an item and test if the item lookup returns true to ensure proper assignment
         multiblock();
         Tile tile = world.tile(1, 1);
         world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
@@ -554,7 +554,7 @@ public class ApplicationTests{
         Tile tile = world.tile(1, 1);
         world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
 
-        //make a new ItemStack[], stack of 5 copper stacks each of 100
+        // Make a new ItemStack[], stack of 5 copper stacks each of 100
         ItemStack[] stacks = new ItemStack[]{
             new ItemStack(Items.copper, 100), new ItemStack(Items.copper, 100),
             new ItemStack(Items.copper, 100), new ItemStack(Items.copper, 100),
@@ -562,9 +562,9 @@ public class ApplicationTests{
         };
 
         tile.build.items.add(Items.copper, 600);
-        //remove one stack of 100, passing this as a parameter in remove
+        // Remove one stack of 100, passing this as a parameter in remove
         tile.build.items.remove(new ItemStack(Items.copper, 100));
-        //check if we still have a stack of 500
+        // Check if we still have a stack of 500
         assertTrue(tile.build.items.has(stacks), "Coal Item was found on tile");
     }
 
@@ -602,7 +602,7 @@ public class ApplicationTests{
             "Duo ammo did not stay at cap");
     }
 
-    /** Check that pneumatic drill mined more items than mechanical drill */
+    /** Check that a pneumatic drill mines more items than a mechanical drill */
     @Test
     void testDrillTypes(){
         createMap();
@@ -626,7 +626,7 @@ public class ApplicationTests{
         tile30.setFloor((Floor)Blocks.sand);
         tile31.setFloor((Floor)Blocks.sand);
 
-        //Create 2 different types of drills on top of sand resource tiles with adjacent storage containers
+        // Create 2 different types of drills on top of sand resource tiles with adjacent storage containers
         // Create mechanical drill at 0,0
         tile00.setBlock(Blocks.mechanicalDrill, Team.sharded);
 
@@ -641,7 +641,7 @@ public class ApplicationTests{
 
         updateBlocks(2000);
 
-        //Check that both drills are mining items
+        // Check that both drills are mining items
         assertTrue(container1.build.items.has(Items.sand),"Mechanical drill did not mine any items");
         assertTrue(container2.build.items.has(Items.sand),"Pneumatic drill did not mine any items");
 
@@ -650,7 +650,7 @@ public class ApplicationTests{
             "Pneumatic drill did not mine more items than mechanical drill.");
     }
 
-    /** The drill with the water source should mine faster than the drill without water.*/
+    /** Check that a drill with water source mines faster than a drill without water */
     @Test
     void testDrillWithWater(){
         createMap();
@@ -699,7 +699,7 @@ public class ApplicationTests{
             "Drill with water did not mine more items than drill without water.");
     }
 
-    /** Check that both drills are mining items and sitting on 4 resource tiles mined more than the drill on 2 resource tiles */
+    /** Check that a drill mines more items when placed over more resource tiles */
     @Test
     void testDrillOres(){
         createMap();
@@ -729,7 +729,7 @@ public class ApplicationTests{
         tile30.setOverlay(Blocks.oreCopper);
         tile31.setOverlay(Blocks.oreCopper);
 
-        //Create 2 drills of the same type on top of different numbers of resource tiles with adjacent storage containers
+        // Create 2 drills of the same type on top of different numbers of resource tiles with adjacent storage containers
         // Create pneumatic drills
         tile00.setBlock(Blocks.pneumaticDrill, Team.sharded);
         tile20.setBlock(Blocks.pneumaticDrill, Team.sharded);
@@ -751,7 +751,7 @@ public class ApplicationTests{
             "Pneumatic drill did not mine more items than mechanical drill.");
     }
 
-    /** Check that all 7 fed containers have proper coal */
+    /** Check that a distributor outputs items in all 7 directions */
     @Test
     void testDistributor(){
         createMap();
@@ -760,7 +760,7 @@ public class ApplicationTests{
         // Create tiles
         Tile source = world.rawTile(3, 2);
         Tile distributor = world.rawTile(3,3);
-        //Create 7 conveyor belts leading to 7 containers from the distributor
+        // Create 7 conveyor belts leading to 7 containers from the distributor
         Tile belt1 = world.rawTile(2,3);
         Tile belt2 = world.rawTile(2,4);
         Tile belt3 = world.rawTile(3,5);
@@ -779,7 +779,7 @@ public class ApplicationTests{
         // Create buildings
         source.setBlock(Blocks.itemSource, Team.sharded);
         source.build.configureAny(Items.coal);
-        //Create a distributor with a coal source adjacent
+        // Create a distributor with a coal source adjacent
         distributor.setBlock(Blocks.distributor, Team.sharded);
         belt1.setBlock(Blocks.titaniumConveyor, Team.sharded, 2);
         belt2.setBlock(Blocks.titaniumConveyor, Team.sharded, 2);
@@ -808,10 +808,7 @@ public class ApplicationTests{
            "Not all containers have items.");
     }
 
-    /**
-     * Container with an adjacent copper source and Unloader adjacent to the 1st container, with a conveyor leading to a 2nd container
-     * Check that the 2nd container gets loaded
-     */
+    /** Check that an unloader moves items from one container into another */
     @Test
     void testUnloader(){
         createMap();
@@ -830,7 +827,7 @@ public class ApplicationTests{
         assertTrue(world.tile(5,0).build.items.has(Items.copper),"2nd container is empty");
     }
 
-    /** Ensure overflow gate in between ItemSources have proper loads */
+    /** Check that an overflow gate diverts items when through-path is blocked */
     @Test
     void testOverflowGate(){
         createMap();
@@ -848,7 +845,7 @@ public class ApplicationTests{
         // Create a container to the right of the overflow gate.
         world.tile(2,2).setBlock(Blocks.container, Team.sharded);
 
-        //Once the duo is full and the items back up, the overflow gate should route items to the container.
+        // Once the duo is full and the items back up, the overflow gate should route items to the container.
         updateBlocks(20);
         // Check 2nd container doesn't have copper yet
         assertFalse(world.tile(2,2).build.items.has(Items.copper),"2nd container has copper prematurely");
@@ -858,7 +855,7 @@ public class ApplicationTests{
         assertTrue(world.tile(2,2).build.items.has(Items.copper),"2nd container is empty");
     }
 
-    /** Now using dummy method to always get optimal flow with pipping */
+    /** Now using dummy method to always get optimal flow with piping */
     @Test
     void liquidJunctionOutputTestability(){
         world.loadMap(testMap);
@@ -904,7 +901,7 @@ public class ApplicationTests{
     /** Ensure game state is properly updated and reset */
     @Test
     void mockVerifyLogicGameStateReset(){
-        //make mock of logic
+        // Make mock of logic
         Logic oldLogic = logic;
 
         Logic logMock = Mockito.mock(Logic.class);
@@ -913,9 +910,9 @@ public class ApplicationTests{
         int waveCount = 0;
         testMap = maps.loadInternalMap("nuclearComplex");
         world.loadMap(testMap);
-        //trigger and surpass boss wave, so we can meet parameters of a sector capture status
-        //Any time game state is updated, it must be reset properly and that requires a reset to run
-        //Involves calling an event to clear timers, stats and other info that needs to be updated
+        // Trigger and surpass boss wave, so we can meet parameters of a sector capture status
+        // Any time game state is updated, it must be reset properly and that requires a reset to run
+        // Involves calling an event to clear timers, stats and other info that needs to be updated
         while (waveCount < 100){
             logic.runWave();
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 &&
@@ -938,11 +935,11 @@ public class ApplicationTests{
         }
         Call.sectorCapture();
 
-        //make sure reset to make sure game state is properly updated and reset. any time game state is updated, it
-        // must be reset properly and that requires a reset to run. Involves calling an event to clear timers, stats and
-        // other info that needs to be updated
+        // Make sure reset to make sure game state is properly updated and reset. any time game state is updated, it
+        // Must be reset properly and that requires a reset to run. Involves calling an event to clear timers, stats and
+        // Other info that needs to be updated
         verify(logMock, atLeast(1)).reset();
-        //ensure we return our original logic class to avoid failures in rest of test suite
+        // Ensure we return our original logic class to avoid failures in rest of test suite
         logic = oldLogic;
     }
 
@@ -956,30 +953,30 @@ public class ApplicationTests{
 
         world.loadMap(testMap);
 
-        //to make this a campaign map we need a sector - make a dummy sector
+        // To make this a campaign map we need a sector - make a dummy sector
         state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
         state.rules.winWave = 50;
 
-        //increments the wave number
+        // Increments the wave number
         logic.runWave();
         Groups.unit.update();
 
-        //get our player core and kill it
+        // Get our player core and kill it
         for (CoreBuild core :  state.teams.playerCores()){
             core.kill();
         }
-        //need to set state to is playing to see if we are in fact dead, otherwise we are inside a menu
+        // Need to set state to is playing to see if we are in fact dead, otherwise we are inside a menu
         state.set(State.playing);
         logic.update();
 
-        //test game over state and verify how often CheckGameState is run
+        // Test game over state and verify how often CheckGameState is run
         verify(logMock, atLeast(1)).update();
 
-        //ensure logic remains for rest of test suite
+        // Ensure logic remains for rest of test suite
         logic = oldLogic;
     }
 
-    /** Build turret and verify correct procedure for method calls. */
+    /** Build turret and verify correct procedure for method calls */
     @Test
     void mockTurretBuildVerification(){
         createMap();
@@ -991,17 +988,17 @@ public class ApplicationTests{
         duoMock.setBlock(Blocks.duo, Team.sharded);
 
         // Create copper source at 0,0
-        //this source tile creation shouldn't impact the creation of our turret, should consistently
-        //only require one call of setblocks for our turret
+        // This source tile creation shouldn't impact the creation of our turret, should consistently
+        // Only require one call of setblocks for our turret
         Tile source = world.rawTile(0,0);
         source.setBlock(Blocks.itemSource, Team.sharded);
         source.build.configureAny(Items.copper);
 
         updateBlocks(100);
 
-        //verify the duo Building uses proper setBlock for turent building
+        // Verify the duo Building uses proper setBlock for turent building
         verify(duoMock, atLeast(1)).setBlock(Blocks.duo, Team.sharded);
-        //verify that tile is not static we create (if static then we have to recache for renderer)
+        // Verify that tile is not static we create (if static then we have to recache for renderer)
         verify(duoMock, atLeast(0)).recache();
         verify(duoMock, atLeast(0)).recacheWall();
     }
