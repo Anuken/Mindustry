@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -264,6 +265,14 @@ public class ForceProjector extends Block{
             }
 
             Draw.reset();
+        }
+
+        @Override
+        public void overwrote(Seq<Building> previous){
+            if(previous.size > 0 && previous.first().block == block && previous.first() instanceof ForceBuild b){
+                broken = b.broken;
+                buildup = b.buildup;
+            }
         }
 
         @Override

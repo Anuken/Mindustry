@@ -102,7 +102,7 @@ public class StructProcess extends BaseProcessor{
 
                         //bools: single bit, needs special case to clear things
                         setter.beginControlFlow("if(value)");
-                        setter.addStatement("return ($T)(($L & ~(1L << $LL)) | (1L << $LL))", structType, structParam, offset, offset);
+                        setter.addStatement("return ($T)($L | (1L << $LL))", structType, structParam, offset);
                         setter.nextControlFlow("else");
                         setter.addStatement("return ($T)(($L & ~(1L << $LL)))", structType, structParam, offset);
                         setter.endControlFlow();

@@ -74,7 +74,7 @@ public class MapEditor{
         for(int i = 0; i < tiles.width * tiles.height; i++){
             Tile tile = tiles.geti(i);
             var build = tile.build;
-            if(build != null){
+            if(build != null && tile.isCenter()){
                 builds.add(build);
             }
             tiles.seti(i, new EditorTile(tile.x, tile.y, tile.floorID(), tile.overlayID(), build == null ? tile.blockID() : 0));
@@ -301,6 +301,14 @@ public class MapEditor{
                 if(previous.in(px, py)){
                     tiles.set(x, y, previous.getn(px, py));
                     Tile tile = tiles.getn(x, y);
+
+                    Object config = null;
+
+                    //fetch the old config first, configs can be relative to block position (tileX/tileY) before those are reassigned
+                    if(tile.build != null && tile.isCenter()){
+                        config = tile.build.config();
+                    }
+
                     tile.x = (short)x;
                     tile.y = (short)y;
 
@@ -309,9 +317,12 @@ public class MapEditor{
                         tile.build.y = y * tilesize + tile.block().offset;
 
                         //shift links to account for map resize
-                        Object config = tile.build.config();
                         if(config != null){
-                            Object out = BuildPlan.pointConfig(tile.block(), config, p -> p.sub(offsetX, offsetY));
+                            Object out = BuildPlan.pointConfig(tile.block(), config, p -> {
+                                if(!tile.build.block.ignoreResizeConfig){
+                                    p.sub(offsetX, offsetY);
+                                }
+                            });
                             if(out != config){
                                 tile.build.configureAny(out);
                             }

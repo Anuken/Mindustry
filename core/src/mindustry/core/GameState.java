@@ -78,7 +78,7 @@ public class GameState{
     }
 
     public @Nullable Planet getPlanet(){
-        return rules.sector != null ? rules.sector.planet : null;
+        return rules.sector != null ? rules.sector.planet : rules.planet;
     }
 
     public boolean isEditor(){
@@ -86,11 +86,12 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return is(State.paused);
+        return state == State.paused;
     }
 
+    /** @return whether there is an unpaused game in progress. */
     public boolean isPlaying(){
-        return (state == State.playing) || (state == State.paused && !isPaused());
+        return state == State.playing;
     }
 
     /** @return whether the current state is *not* the menu. */

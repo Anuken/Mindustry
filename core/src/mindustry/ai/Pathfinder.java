@@ -243,6 +243,8 @@ public class Pathfinder implements Runnable{
                 data.dirty = true;
             }
         });
+
+        controlPath.updateTile(tile);
     }
 
     /** Thread implementation. */

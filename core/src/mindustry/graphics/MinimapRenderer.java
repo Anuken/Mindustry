@@ -148,16 +148,19 @@ public class MinimapRenderer{
 
         Tmp.m2.set(Draw.trans());
 
+        float scaleFactor;
         var trans = Tmp.m1.idt();
         trans.translate(lastX, lastY);
         if(!worldSpace){
-            trans.scl(Tmp.v1.set(lastW / rect.width, lastH / rect.height));
+            trans.scl(Tmp.v1.set(scaleFactor = lastW / rect.width, lastH / rect.height));
             trans.translate(-rect.x, -rect.y);
         }else{
-            trans.scl(Tmp.v1.set(lastW / world.unitWidth(), lastH / world.unitHeight()));
+            trans.scl(Tmp.v1.set(scaleFactor = lastW / world.unitWidth(), lastH / world.unitHeight()));
         }
         trans.translate(tilesize / 2f, tilesize / 2f);
         Draw.trans(trans);
+
+        scaleFactor = 1f / scaleFactor;
 
         for(Unit unit : units){
             if(unit.inFogTo(player.team()) || !unit.type.drawMinimap) continue;
@@ -173,10 +176,7 @@ public class MinimapRenderer{
         if(fullView && net.active()){
             for(Player player : Groups.player){
                 if(!player.dead()){
-                    float rx = player.x / (world.width() * tilesize) * w;
-                    float ry = player.y / (world.height() * tilesize) * h;
-
-                    drawLabel(x + rx, y + ry, player.name, player.color);
+                    drawLabel(player.x, player.y, player.name, player.color);
                 }
             }
         }
@@ -198,7 +198,7 @@ public class MinimapRenderer{
             dynamicTex.setFilter(TextureFilter.nearest);
 
             Tmp.tr1.set(dynamicTex);
-            Tmp.tr1.set(0f, 0f, 1f, 1f);
+            Tmp.tr1.set(0f, 1f, 1f, 0f);
 
             float wf = world.width() * tilesize;
             float hf = world.height() * tilesize;
@@ -226,7 +226,7 @@ public class MinimapRenderer{
             if(!mobile){
                 //draw bounds for camera - not drawn on mobile because you can't shift it by tapping anyway
                 Rect r = Core.camera.bounds(Tmp.r1);
-                Lines.stroke(Scl.scl(3f));
+                Lines.stroke(Scl.scl(3f) * scaleFactor);
                 Draw.color(Pal.accent);
                 Lines.rect(r.x, r.y, r.width, r.height);
                 Draw.reset();

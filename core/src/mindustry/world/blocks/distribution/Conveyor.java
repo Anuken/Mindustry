@@ -30,6 +30,7 @@ public class Conveyor extends Block implements Autotiler{
 
     public float speed = 0f;
     public float displayedSpeed = 0f;
+    public boolean pushUnits = true;
 
     public @Nullable Block junctionReplacement, bridgeReplacement;
 
@@ -223,7 +224,7 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void unitOn(Unit unit){
 
-            if(clogHeat > 0.5f || !enabled) return;
+            if(!pushUnits || clogHeat > 0.5f || !enabled) return;
 
             noSleep();
 
@@ -253,7 +254,7 @@ public class Conveyor extends Block implements Autotiler{
             mid = 0;
 
             //skip updates if possible
-            if(len == 0){
+            if(len == 0 && Mathf.equal(timeScale, 1f)){
                 clogHeat = 0f;
                 sleep();
                 return;
@@ -381,12 +382,19 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.i(len);
 
             for(int i = 0; i < len; i++){
-                write.i(Pack.intBytes((byte)ids[i].id, (byte)(xs[i] * 127), (byte)(ys[i] * 255 - 128), (byte)0));
+                write.s(ids[i].id);
+                write.b((byte)(xs[i] * 127));
+                write.b((byte)(ys[i] * 255 - 128));
             }
         }
 
@@ -397,10 +405,20 @@ public class Conveyor extends Block implements Autotiler{
             len = Math.min(amount, capacity);
 
             for(int i = 0; i < amount; i++){
-                int val = read.i();
-                short id = (short)(((byte)(val >> 24)) & 0xff);
-                float x = (float)((byte)(val >> 16)) / 127f;
-                float y = ((float)((byte)(val >> 8)) + 128f) / 255f;
+                short id;
+                float x, y;
+
+                if(revision == 0){
+                    int val = read.i();
+                    id = (short)(((byte)(val >> 24)) & 0xff);
+                    x = (float)((byte)(val >> 16)) / 127f;
+                    y = ((float)((byte)(val >> 8)) + 128f) / 255f;
+                }else{
+                    id = read.s();
+                    x = (float)read.b() / 127f;
+                    y = ((float)read.b() + 128f) / 255f;
+                }
+
                 if(i < capacity){
                     ids[i] = content.item(id);
                     xs[i] = x;
