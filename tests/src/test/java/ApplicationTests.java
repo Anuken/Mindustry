@@ -47,7 +47,6 @@ import static org.mockito.Mockito.*;
 
 public class ApplicationTests{
     static Map testMap;
-    static Map winMap;
     static boolean initialized;
     //core/assets
     static final Fi testDataFolder = new Fi("../../tests/build/test_data");
