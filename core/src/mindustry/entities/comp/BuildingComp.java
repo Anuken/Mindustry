@@ -878,8 +878,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @param liquid
      * @return output flow
      */
-    public float moveLiquidForwardDummy(Liquid liquid)
-    {
+    public float moveLiquidForwardDummy(Liquid liquid) {
         Tile next = tile.nearby(rotation);
         Building nextB;
         if(next == null) return 0;
@@ -887,9 +886,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         nextB = next.build.getLiquidDestination(self(), liquid);
         float flow = 10.0F;
 
-
-        if(nextB.acceptLiquid(self(), liquid))
-        {
+        if(nextB.acceptLiquid(self(), liquid)){
             nextB.handleLiquid(self(), liquid, flow);
             liquids.remove(liquid, flow);
         }

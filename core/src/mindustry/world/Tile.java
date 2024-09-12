@@ -58,10 +58,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     /** Constructor used primarily in mocking scenarios in test suites. */
-    public Tile()
-    {
-        block = floor = overlay = (Floor)Blocks.air;
-    }
+    public Tile() { block = floor = overlay = (Floor)Blocks.air; }
 
     /** Mocking scenarios in test suites. */
     public void constructTile(Tile tile)
