@@ -282,6 +282,10 @@ public class ApplicationTests{
         Groups.unit.update();
         assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
     }
+
+    //==================================================================================================================
+    //Functional State Tests
+    //==================================================================================================================
     @Test
     void runSectorCaptured(){
         int wave_count = 0;
@@ -1150,7 +1154,7 @@ public class ApplicationTests{
         duoMock.setBlock(Blocks.duo, Team.sharded);
 
         // Create copper source at 0,0
-        //this source tile creation shouldn't impact the creation of our turrent, should consistently
+        //this source tile creation shouldn't impact the creation of our turret, should consistently
         //only require one call of setblocks for our turret
         Tile source = world.rawTile(0,0);
         source.setBlock(Blocks.itemSource, Team.sharded);
@@ -1164,6 +1168,10 @@ public class ApplicationTests{
         verify(duoMock, atLeast(0)).recache();
         verify(duoMock, atLeast(0)).recacheWall();
     }
+
+    //===========================================
+    // End of Mocking Tests
+    //===========================================
 
     @Test
     void timers(){
