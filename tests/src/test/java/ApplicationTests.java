@@ -275,34 +275,30 @@ public class ApplicationTests{
         assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
     }
 
-    /** Functional State Tests */
     @Test
     void runSectorCaptured(){
-        int wave_count = 0;
+        int waveCount = 0;
         testMap = maps.loadInternalMap("nuclearComplex");
         world.loadMap(testMap);
-        while (wave_count < 100)
-        {
+        while (waveCount < 100){
             logic.runWave();
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
-            if (boss)
-            {
+            if (boss){
                 System.out.println("BOSS ROUND"); //nuclear complex round 50 eclipse boss spawns.
                 assertTrue(state.rules.waves); // there are still more waves of enemies. game not finished yet
-                int after_boss = 0;
-                while (after_boss < 3)
-                {
+                int afterBoss = 0;
+                while (afterBoss < 3){
                     if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
                             (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
                         Call.sectorCapture();
                     }
                     Groups.unit.update();
-                    after_boss++;
+                    afterBoss++;
                 }
             }
             Groups.unit.update();
             Groups.clear();
-            wave_count++;
+            waveCount++;
         }
         Call.sectorCapture();
         assertFalse(state.rules.waves); //state.rules.waves now being false means sector has been captured and game is over
@@ -311,7 +307,6 @@ public class ApplicationTests{
     /** Run waves until boss wave is reached to make sure we get there. the boss wave will be run before exiting loop. */
     @Test
     void runBossWave(){
-        int wave_count = 0;
         testMap = maps.loadInternalMap("nuclearComplex");
         world.loadMap(testMap);
         while (true)
@@ -326,27 +321,24 @@ public class ApplicationTests{
                 break;
             }
             Groups.unit.update();
-            wave_count++;
         }
     }
 
     /** Start wave and check if we have enemies and we are no longer in prep phase */
     @Test
-    void WavesActiveStateTest()
-    {
+    void WavesActiveStateTest(){
         world.loadMap(testMap);
         //increments the wave number
         logic.runWave();
 
         Groups.unit.update();
         //enemies present and spawned. No longer in prep phase. Wave has started.
-        assertTrue(!Groups.unit.isEmpty(), "Enemies spawned.");
+        assertFalse(Groups.unit.isEmpty(), "Enemies spawned.");
     }
 
-    /** Checking for Wavecountdown state (aka our wavetimer before the wave starts) */
+    /** Checking for Wave countdown state (aka our wavetimer before the wave starts) */
     @Test
-    void WaveCountdownStateTest()
-    {
+    void WaveCountdownStateTest(){
         world.loadMap(testMap);
         logic.runWave();
         //force trigger delayed spawns
@@ -361,8 +353,7 @@ public class ApplicationTests{
 
     /** Start wave and kill player's core. */
     @Test
-    void GameOverStateTest()
-    {
+    void GameOverStateTest(){
         world.loadMap(testMap);
         //to make this a campaign map we need a sector - make a dummy sector
         state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
@@ -373,62 +364,54 @@ public class ApplicationTests{
         Groups.unit.update();
 
         //get our player core and kill it
-        for (CoreBuild core :  state.teams.playerCores())
-        {
+        for (CoreBuild core :  state.teams.playerCores()){
             core.kill();
         }
         //need to set state to is playing to see if we are in fact dead, otherwise we are inside a menu
         state.set(State.playing);
         logic.update();
 
-        //if we die or loose, state.gameOver = true
+        //if we die or loose, state.gameOver is now true
         //enemies present and spawned. No longer in prep phase. Wave has started.
         assertTrue(state.gameOver, "Game Over status reached.");
     }
 
     /** Checks if we reach captured sector status */
     @Test
-    void SectorCapturedStateTest() {
-        int wave_count = 0;
+    void SectorCapturedStateTest(){
         //nuclear complex round 50 eclipse boss spawns.
         testMap = maps.loadInternalMap("nuclearComplex");
 
         world.loadMap(testMap);
-        //need to add a sector to our rules so we know this is a campaign mission
+        //need to add a sector to our rules, so we know this is a campaign mission
         state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
         state.rules.winWave = 50;
         boolean boss = false;
-        while (!boss)
-        {
+        while (!boss){
             logic.runWave();
             boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
-
             Groups.unit.update();
-            wave_count++;
         }
-
         //when killing all the enemies, the wave is over therefore we must reset for the next wave.
         Groups.clear();
         //reset for next wave (since we are not naturally killing everything)
         spawner.reset();
         state.set(State.playing);
         logic.update();
-        assertTrue(state.rules.sector.info.wasCaptured, "GG");
+        assertTrue(state.rules.sector.info.wasCaptured, "Was Captured");
     }
 
-
-    /** Idea is to update fog of war and verify it is functioning or active in game */
+    /** Update fog of war and verify it is functioning or active in game */
     @Test
-    void FogOfWarUpdateTest()
-    {
+    void FogOfWarUpdateTest(){
         state.set(State.playing);
         testMap = maps.loadInternalMap("onset");
         world.loadMap(testMap);
         //set rule to have fog of war to true
         state.rules.fog = true;
-        //Can set it to be a specific sector, onset for example is on erekir
+        //Can set it to be a specific sector, onset for example is on Erekir
         state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
-        //set planet to erekir which has fog of war active (needs constant static planet erekir)
+        //set planet to erekir which has fog of war active (needs constant static planet Erekir)
         state.rules.planet = Planets.erekir;
 
         //run an update and verify our state.rules.fog = true
@@ -438,8 +421,7 @@ public class ApplicationTests{
 
     /** Make building, damage building and compare health to see it went through */
     @Test
-    void BuildingDamageTest()
-    {
+    void BuildingDamageTest(){
         initBuilding();
 
         Builderc d1 = UnitTypes.poly.create(Team.sharded);
@@ -522,7 +504,7 @@ public class ApplicationTests{
 
     /** Gives/Removes a specific tile resources and verify the resources were properly assigned */
     @Test
-    void blockInventories_addingEntireTileContentsToNewTile(){
+    void addingEntireTileContentsTile(){
         multiblock();
         //grab tile of our world at coordinate 4,4
         Tile tile = world.tile(4, 4);
@@ -545,8 +527,7 @@ public class ApplicationTests{
 
     /** Add an item and test its ID to ensure proper assignment and Check if coal ID is properly read */
     @Test
-    void TestItemModuleID_Coal()
-    {
+    void itemModuleIDCoal(){
         multiblock();
         Tile tile = world.tile(1, 1);
         world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
@@ -557,8 +538,7 @@ public class ApplicationTests{
 
     /** Check if coal item is properly read */
     @Test
-    void TestItemModuleByItem_Coal()
-    {
+    void itemModuleByItemCoal(){
         //Add an item and test if the item lookup returns true to ensure proper assignment
         multiblock();
         Tile tile = world.tile(1, 1);
@@ -570,17 +550,16 @@ public class ApplicationTests{
 
     /** Add an item and use different method of removing. Remove items by ItemStack */
     @Test
-    void TestItemModuleItemStack_RemoveAndVerifyCheck()
-    {
+    void iitemStackRemoveAndVerifyCheck(){
         multiblock();
         Tile tile = world.tile(1, 1);
         world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
 
         //make a new ItemStack[], stack of 5 copper stacks each of 100
         ItemStack[] stacks = new ItemStack[]{
-                new ItemStack(Items.copper, 100), new ItemStack(Items.copper, 100),
-                new ItemStack(Items.copper, 100), new ItemStack(Items.copper, 100),
-                new ItemStack(Items.copper, 100)
+            new ItemStack(Items.copper, 100), new ItemStack(Items.copper, 100),
+            new ItemStack(Items.copper, 100), new ItemStack(Items.copper, 100),
+            new ItemStack(Items.copper, 100)
         };
 
         tile.build.items.add(Items.copper, 600);
@@ -592,7 +571,7 @@ public class ApplicationTests{
 
     /** Create a turret, load it, check that loading caps at max ammo */
     @Test
-    void testAmmoLoadingCap() {
+    void testAmmoLoadingCap(){
         createMap();
         state.set(State.playing);
 
@@ -626,7 +605,7 @@ public class ApplicationTests{
 
     /** Check that pneumatic drill mined more items than mechanical drill */
     @Test
-    void testDrillTypes() {
+    void testDrillTypes(){
         createMap();
         state.set(State.playing);
 
@@ -674,7 +653,7 @@ public class ApplicationTests{
 
     /** The drill with the water source should mine faster than the drill without water.*/
     @Test
-    void testDrillWithWater() {
+    void testDrillWithWater(){
         createMap();
         state.set(State.playing);
 
@@ -723,7 +702,7 @@ public class ApplicationTests{
 
     /** Check that both drills are mining items and sitting on 4 resource tiles mined more than the drill on 2 resource tiles */
     @Test
-    void testDrillOres() {
+    void testDrillOres(){
         createMap();
         state.set(State.playing);
 
@@ -775,7 +754,7 @@ public class ApplicationTests{
 
     /** Check that all 7 fed containers have proper coal */
     @Test
-    void testDistributor() {
+    void testDistributor(){
         createMap();
         state.set(State.playing);
 
@@ -835,7 +814,7 @@ public class ApplicationTests{
      * Check that the 2nd container gets loaded
      */
     @Test
-    void testUnloader() {
+    void testUnloader(){
         createMap();
         state.set(State.playing);
 
@@ -854,7 +833,7 @@ public class ApplicationTests{
 
     /** Ensure overflow gate in between ItemSources have proper loads */
     @Test
-    void testOverflowGate() {
+    void testOverflowGate(){
         createMap();
         state.set(State.playing);
 
@@ -925,41 +904,38 @@ public class ApplicationTests{
 
     /** Ensure game state is properly updated and reset */
     @Test
-    void MockVerifyLogicGameStateResetTest(){
+    void mockVerifyLogicGameStateReset(){
         //make mock of logic
         Logic oldLogic = logic;
 
         Logic logMock = Mockito.mock(Logic.class);
         logic = logMock;
 
-        int wave_count = 0;
+        int waveCount = 0;
         testMap = maps.loadInternalMap("nuclearComplex");
         world.loadMap(testMap);
         //trigger and surpass boss wave so we can meet parameters of a sector capture status
         //Any time game state is updated, it must be reset properly and that requires reset to run
         //Involves calling an event to clear timers, stats and other info that needs to be updated
-        while (wave_count < 100)
-        {
+        while (waveCount < 100){
             logic.runWave();
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 &&
                     group.effect == StatusEffects.boss);
-            if (boss)
-            {
-                int after_boss = 0;
-                while (after_boss < 3)
-                {
+            if (boss){
+                int afterBoss = 0;
+                while (afterBoss < 3){
                     if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >=
                             state.rules.winWave && !spawner.isSpawning()) || (state.rules.attackMode &&
                             state.rules.waveTeam.cores().isEmpty())){
                         Call.sectorCapture();
                     }
                     Groups.unit.update();
-                    after_boss++;
+                    afterBoss++;
                 }
             }
             Groups.unit.update();
             Groups.clear();
-            wave_count++;
+            waveCount++;
         }
         Call.sectorCapture();
 
@@ -973,7 +949,7 @@ public class ApplicationTests{
 
     /** Testing how often certain methods are run in our logic class */
     @Test
-    void LogicMockTest() {
+    void logicMockTest(){
         Logic oldLogic = logic;
 
         Logic logMock = Mockito.mock(Logic.class);
@@ -990,8 +966,7 @@ public class ApplicationTests{
         Groups.unit.update();
 
         //get our player core and kill it
-        for (CoreBuild core :  state.teams.playerCores())
-        {
+        for (CoreBuild core :  state.teams.playerCores()){
             core.kill();
         }
         //need to set state to is playing to see if we are in fact dead, otherwise we are inside a menu
@@ -1007,15 +982,13 @@ public class ApplicationTests{
 
     /** Build turret and verify correct procedure for method calls. */
     @Test
-    void TurretBuildVerification_Mocking()
-    {
+    void mockTurretBuildVerification(){
         createMap();
         state.set(State.playing);
 
         // Create duo turret block at 0,1
         Tile duoMock = Mockito.mock(Tile.class);
         duoMock.constructTile(world.rawTile(0, 1));
-
         duoMock.setBlock(Blocks.duo, Team.sharded);
 
         // Create copper source at 0,0

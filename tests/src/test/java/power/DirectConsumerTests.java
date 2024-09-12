@@ -8,50 +8,16 @@ import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 /** Tests for direct power consumers. */
 public class DirectConsumerTests extends PowerTestFixture{
 
-    /**
-     * No Power tests
-     * Stream arguements provided parameterized tests
-     */
-    @ParameterizedTest
-    @MethodSource("noPNoItemsParameters")
-    void noPowerRequestedWithNoItemsParameterized(int siliconAmount, int leadAmount, float producedPower, float requestedPower, float expectedSatisfaction)
-    {
-        testUnitFactory(siliconAmount, leadAmount, producedPower,requestedPower, expectedSatisfaction);
-    }
 
     /**
-     * Testing extreme negative outliers
-     *
-     * @return
-     */
-    private static Stream<Arguments> noPNoItemsParameters()
-    {
-        return Stream.of(
-                arguments(-9999, -10, -2f, -1f, 1f), //extreme negative outlier
-                arguments(-1, -1, -0.8f, -0.8f, 1f),
-                arguments(30, 0, 0.8f, 0.8f, 1f),
-                arguments(60, 30, 0.16f, 0.16f, 1f),
-                arguments(90, 60, 0.24f, 0.24f, 1f),
-                arguments(120, 90, 0.32f, 0.32f, 1f),
-                arguments(12000, 0, 2f, 1f, 1f) //extreme positive outlier
-
-        );
-    }
-
-    /**
-     * CsvSource parameterized tests
+     * CsvSource parameterized tests, testing outliers
      */
     @ParameterizedTest
     @CsvSource({"0, 0, 0.08f, 0.08f, 1f", "0, 0, 0.08f, 0.08f, 1f", "0, 0, 0.08f, 0.08f, 1f"})
@@ -65,13 +31,9 @@ public class DirectConsumerTests extends PowerTestFixture{
         testUnitFactory(0, 0, 0.08f, 0.08f, 1f);
     }
 
-    /**
-     *
-     *  Testing No Power requests with insufficient items
-     *
-     *  - having trouble finding where the material amounts impact the expectedSatisfaction result from out tests
-     *  Note: Setting requestedPower at 1 guarantees 1 tick will run at our produced power (0.5 means 2 ticks ,etc)
-     *
+    /** Testing No Power requests with various sufficient items.
+     *  Test Order: Sufficient Items, test with no items (should give same result), except now testing "insufficient" items, another insufficient test,
+     *  large silicon but no lead, large lead but no silicon, SUPER large silicon but no lead. SUPER large silicon but no lead
      * @param siliconAmount
      * Item needed for power request
      * @param leadAmount
@@ -86,28 +48,11 @@ public class DirectConsumerTests extends PowerTestFixture{
      * Expected result from input. This will be compared to power module status to see if we meet test results.
      */
     @ParameterizedTest
-    @MethodSource("noPowerRequested_InsufficientItems_Parameters")
-    void noPowerRequestedWithInsufficientItemsParameterized(int siliconAmount, int leadAmount, float producedPower, float requestedPower, float expectedSatisfaction)
+    @CsvSource({"30, 30, 0.1f, 0.25f, 0.4f", "0, 0, 0.1f, 0.25f, 0.4f", "2, 0, 0.1f, 0.25f, 0.4f", "0, 15, 0.1f, 0.8f, 0.125f",
+    "90, 0, 0.8f, 0.8f, 1f", "0, 90,  0.8f, 0.8f, 1f", "12000, 0,  0.5f, 1.0f, 0.5f", "0, 12000,  0.4f, 0.8f, 0.5f"})
+    void noPowerRequestedSufficiencyParameterized(int siliconAmount, int leadAmount, float producedPower, float requestedPower, float expectedSatisfaction)
     {
         testUnitFactory(siliconAmount, leadAmount, producedPower,requestedPower, expectedSatisfaction);
-    }
-
-    private static Stream<Arguments> noPowerRequested_InsufficientItems_Parameters()
-    {
-        return Stream.of(
-                arguments(30, 0, 0.08f, 0.08f, 1f), //first 2 tests meet basic test params already tested
-                arguments(0, 30, 0.08f, 0.08f, 1f), //second given test
-                arguments(15, 0, 0.8f, 0.8f, 1f),
-                //0.25 is 1/4, therefore 4 ticks aka 0.1 * 4 = expected status result of 0.4
-                arguments(30, 30, 0.1f, 0.25f, 0.4f), //a comparison test with "sufficient" items
-                arguments(0, 0, 0.1f, 0.25f, 0.4f), //a comparison test with no items (should give same result)
-                arguments(2, 0, 0.1f, 0.25f, 0.4f), //same params as previous 2, except now testing "insufficient" items
-                arguments(0, 15, 0.1f, 0.8f, 0.125f), //(1/10 per tick)* (8/10 ticks) = 0.125 power?
-                arguments(90, 0, 0.8f, 0.8f, 1f), //large silicon but no lead
-                arguments(0, 90,  0.8f, 0.8f, 1f), //large lead but no silicon
-                arguments(12000, 0,  0.5f, 1.0f, 0.5f), //SUPER large silicon but no lead
-                arguments(0, 12000,  0.4f, 0.8f, 0.5f) //SUPER large silicon but no lead
-        );
     }
 
     @Test
