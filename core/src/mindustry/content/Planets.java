@@ -85,6 +85,8 @@ public class Planets{
                 r.coreDestroyClear = true;
                 r.onlyDepositCore = true;
             };
+            campaignRuleDefaults.fog = true;
+            campaignRuleDefaults.showSpawns = true;
 
             unlockedOnLand.add(Blocks.coreBastion);
         }};

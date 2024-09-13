@@ -67,10 +67,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public Label hoverLabel = new Label("");
 
     private Texture[] planetTextures;
+    private CampaignRulesDialog campaignRules = new CampaignRulesDialog();
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
-        
+
         state.renderer = this;
         state.drawUi = true;
 
@@ -387,7 +388,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //preset sectors can only be selected once unlocked
         if(sector.preset != null){
             TechNode node = sector.preset.techNode;
-            return node == null || node.parent == null || (node.parent.content.unlocked() && (!(node.parent.content instanceof SectorPreset preset) || preset.sector.hasBase()));
+            return sector.preset.unlocked() || node == null || node.parent == null || (node.parent.content.unlocked() && (!(node.parent.content instanceof SectorPreset preset) || preset.sector.hasBase()));
         }
 
         return sector.planet.generator != null ?
@@ -474,7 +475,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(state.uiAlpha > 0.001f){
             for(Sector sec : planet.sectors){
                 if(sec.hasBase()){
-                    if(planet.allowSectorInvasion){
+                    if(planet.campaignRules.sectorInvasion){
                         for(Sector enemy : sec.near()){
                             if(enemy.hasEnemyBase()){
                                 planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Color.clear, 0.24f, 110f, 25);
@@ -612,6 +613,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             t.top().left();
             ScrollPane pane = new ScrollPane(null, Styles.smallPane);
             t.add(pane).colspan(2).row();
+            t.button("@campaign.difficulty", Icon.bookSmall, () -> {
+                campaignRules.show(state.planet);
+            }).margin(12f).size(208f, 40f).padTop(12f).visible(() -> state.planet.allowCampaignRules).row();
+            t.add().height(64f); //padding for close button
             Table starsTable = new Table(Styles.black);
             pane.setWidget(starsTable);
             pane.setScrollingDisabled(true, false);
@@ -1133,7 +1138,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(sector.isAttacked()){
             addSurvivedInfo(sector, stable, false);
-        }else if(sector.hasBase() && sector.planet.allowSectorInvasion && sector.near().contains(Sector::hasEnemyBase)){
+        }else if(sector.hasBase() && sector.planet.campaignRules.sectorInvasion && sector.near().contains(Sector::hasEnemyBase)){
             stable.add("@sectors.vulnerable");
             stable.row();
         }else if(!sector.hasBase() && sector.hasEnemyBase()){

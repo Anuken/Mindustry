@@ -66,12 +66,19 @@ public class WaveSpawner{
             if(group.type == null) continue;
 
             int spawned = group.getSpawned(state.wave - 1);
+            if(spawned == 0) continue;
+
+            if(state.isCampaign()){
+                spawned = Math.max(1, Mathf.round(spawned * state.getPlanet().campaignRules.difficulty.enemySpawnMultiplier));
+            }
+
+            int spawnedf = spawned;
 
             if(group.type.flying){
                 float spread = margin / 1.5f;
 
                 eachFlyerSpawn(group.spawn, (spawnX, spawnY) -> {
-                    for(int i = 0; i < spawned; i++){
+                    for(int i = 0; i < spawnedf; i++){
                         Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                         unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
                         spawnEffect(unit);
@@ -82,7 +89,7 @@ public class WaveSpawner{
 
                 eachGroundSpawn(group.spawn, (spawnX, spawnY, doShockwave) -> {
 
-                    for(int i = 0; i < spawned; i++){
+                    for(int i = 0; i < spawnedf; i++){
                         Tmp.v1.rnd(spread);
 
                         Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
@@ -153,7 +160,7 @@ public class WaveSpawner{
 
     private void eachFlyerSpawn(int filterPos, Floatc2 cons){
         boolean airUseSpawns = state.rules.airUseSpawns;
-        
+
         for(Tile tile : spawns){
             if(filterPos != -1 && filterPos != tile.pos()) continue;
 
