@@ -11,5 +11,6 @@ public class CampaignRules{
         rules.showSpawns = showSpawns;
         rules.teams.get(rules.waveTeam).blockHealthMultiplier = difficulty.enemyHealthMultiplier;
         rules.teams.get(rules.waveTeam).unitHealthMultiplier = difficulty.enemyHealthMultiplier;
+        rules.randomAirTargeting = difficulty.ordinal() >= Difficulty.hard.ordinal();
     }
 }

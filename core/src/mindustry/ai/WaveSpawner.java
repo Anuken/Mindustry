@@ -69,7 +69,10 @@ public class WaveSpawner{
             if(spawned == 0) continue;
 
             if(state.isCampaign()){
-                spawned = Math.max(1, Mathf.round(spawned * state.getPlanet().campaignRules.difficulty.enemySpawnMultiplier));
+                //when spawning a boss, round down, so 1.5x (hard) * 1 boss does not result in 2 bosses
+                spawned = Math.max(1, group.effect == StatusEffects.boss ?
+                          (int)(spawned * state.getPlanet().campaignRules.difficulty.enemySpawnMultiplier) :
+                    Mathf.round(spawned * state.getPlanet().campaignRules.difficulty.enemySpawnMultiplier));
             }
 
             int spawnedf = spawned;

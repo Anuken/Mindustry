@@ -6,9 +6,10 @@ import mindustry.gen.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
+import static mindustry.world.meta.BlockFlag.*;
 
-//TODO very strange idle behavior sometimes
 public class FlyingAI extends AIController{
+    final static BlockFlag[] randomTargets = {core, storage, generator, launchPad, factory, repair, battery, reactor, drill};
 
     @Override
     public void updateMovement(){
@@ -41,6 +42,21 @@ public class FlyingAI extends AIController{
         var core = targetFlag(x, y, BlockFlag.core, true);
 
         if(core != null && Mathf.within(x, y, core.getX(), core.getY(), range)){
+            return core;
+        }
+
+        if(state.rules.randomAirTargeting){
+            //when there are no waves, it's just random based on the unit
+            Mathf.rand.setSeed(unit.type.id + (state.rules.waves ? state.wave : unit.id));
+            //try a few random flags first
+            for(int attempt = 0; attempt < 5; attempt++){
+                Teamc result = targetFlag(x, y, randomTargets[Mathf.rand.random(randomTargets.length - 1)], true);
+                if(result != null) return result;
+            }
+            //try the closest target
+            Teamc result = target(x, y, range, air, ground);
+            if(result != null) return result;
+            //default to the core
             return core;
         }
 

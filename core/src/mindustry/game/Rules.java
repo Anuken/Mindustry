@@ -61,6 +61,8 @@ public class Rules{
     public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
+    /** EXPERIMENTAL! If true, air units target random things each wave instead of only generators. */
+    public boolean randomAirTargeting = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */
     public boolean unitPayloadUpdate = false;
     /** If true, units' payloads are destroy()ed when the unit is destroyed. */
