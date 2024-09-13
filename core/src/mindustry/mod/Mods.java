@@ -62,12 +62,13 @@ public class Mods implements Loadable{
         return mainLoader;
     }
 
-    /** @return the folder where configuration files for this mod should go. The folder may not exist yet; call mkdirs() before writing to it.
-     * Call this in init(). */
+    /** @return the folder where configuration files for this mod should go. Call this in init(). */
     public Fi getConfigFolder(Mod mod){
         ModMeta load = metas.get(mod.getClass());
         if(load == null) throw new IllegalArgumentException("Mod is not loaded yet (or missing)!");
-        return modDirectory.child(load.name);
+        Fi result = modDirectory.child(load.name);
+        result.mkdirs();
+        return result;
     }
 
     /** @return a file named 'config.json' in the config folder for the specified mod.

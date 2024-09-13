@@ -21,6 +21,7 @@ public class PayloadConveyor extends Block{
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
     public float payloadLimit = 3f;
+    public boolean pushUnits = true;
 
     public PayloadConveyor(String name){
         super(name);
@@ -257,7 +258,7 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void unitOn(Unit unit){
-            if(!enabled) return;
+            if(!pushUnits || !enabled) return;
 
             //calculate derivative of units moved last frame
             float delta = (curInterp - lastInterp) * size * tilesize;

@@ -695,28 +695,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 editor.undo();
             }
 
-            //more undocumented features, fantastic
-            if(Core.input.keyTap(KeyCode.t)){
-
-                //clears all 'decoration' from the map
-                for(int x = 0; x < editor.width(); x++){
-                    for(int y = 0; y < editor.height(); y++){
-                        Tile tile = editor.tile(x, y);
-                        if(tile.block().breakable && tile.block() instanceof Prop){
-                            tile.setBlock(Blocks.air);
-                            editor.renderer.updatePoint(x, y);
-                        }
-
-                        if(tile.overlay() != Blocks.air && tile.overlay() != Blocks.spawn){
-                            tile.setOverlay(Blocks.air);
-                            editor.renderer.updatePoint(x, y);
-                        }
-                    }
-                }
-
-                editor.flushOp();
-            }
-
             if(Core.input.keyTap(KeyCode.y)){
                 editor.redo();
             }
