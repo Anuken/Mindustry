@@ -45,7 +45,7 @@ public class FlyingAI extends AIController{
             return core;
         }
 
-        if(state.rules.randomAirTargeting){
+        if(state.rules.randomWaveAI){
             //when there are no waves, it's just random based on the unit
             Mathf.rand.setSeed(unit.type.id + (state.rules.waves ? state.wave : unit.id));
             //try a few random flags first
@@ -56,17 +56,15 @@ public class FlyingAI extends AIController{
             //try the closest target
             Teamc result = target(x, y, range, air, ground);
             if(result != null) return result;
-            //default to the core
-            return core;
-        }
-
-        for(var flag : unit.type.targetFlags){
-            if(flag == null){
-                Teamc result = target(x, y, range, air, ground);
-                if(result != null) return result;
-            }else if(ground){
-                Teamc result = targetFlag(x, y, flag, true);
-                if(result != null) return result;
+        }else{
+            for(var flag : unit.type.targetFlags){
+                if(flag == null){
+                    Teamc result = target(x, y, range, air, ground);
+                    if(result != null) return result;
+                }else if(ground){
+                    Teamc result = targetFlag(x, y, flag, true);
+                    if(result != null) return result;
+                }
             }
         }
 

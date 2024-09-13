@@ -59,6 +59,7 @@ public class CampaignRulesDialog extends BaseDialog{
 
             check("@rules.fog", b -> rules.fog = b, () -> rules.fog);
             check("@rules.showspawns", b -> rules.showSpawns = b, () -> rules.showSpawns);
+            check("@rules.randomwaveai", b -> rules.randomWaveAI = b, () -> rules.randomWaveAI);
         }).growY();
     }
 
