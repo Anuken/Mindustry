@@ -32,5 +32,5 @@ public enum BlockFlag{
     public final static BlockFlag[] all = values();
 
     /** Values for logic only. Filters out some internal flags. */
-    public final static BlockFlag[] allLogic = {core, storage, generator, turret, factory, repair, battery, reactor};
+    public final static BlockFlag[] allLogic = {core, storage, generator, turret, factory, repair, battery, reactor, drill};
 }

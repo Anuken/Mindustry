@@ -156,7 +156,7 @@ public class Blocks{
 
     //payloads
     payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, largePayloadMassDriver, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
-    
+
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
     canvas, reinforcedMessage,
@@ -1282,7 +1282,7 @@ public class Blocks{
             itemCapacity = 0;
             consumePower(100f / 60f);
         }};
-        
+
         slagHeater = new HeatProducer("slag-heater"){{
             requirements(Category.crafting, with(Items.tungsten, 50, Items.oxide, 20, Items.beryllium, 20));
 
@@ -3405,7 +3405,7 @@ public class Blocks{
                     lightningLength = 10;
                 }}
             );
-            
+
             shoot = new ShootBarrel(){{
                 barrels = new float[]{
                     -4, -1.25f, 0,
@@ -5326,7 +5326,7 @@ public class Blocks{
             requirements(Category.units, with(Items.copper, 150, Items.lead, 130, Items.metaglass, 120));
             plans = Seq.with(
                 new UnitPlan(UnitTypes.risso, 60f * 45f, with(Items.silicon, 20, Items.metaglass, 35)),
-                new UnitPlan(UnitTypes.retusa, 60f * 50f, with(Items.silicon, 15, Items.metaglass, 25, Items.titanium, 20))
+                new UnitPlan(UnitTypes.retusa, 60f * 35f, with(Items.silicon, 15, Items.titanium, 20))
             );
             size = 3;
             consumePower(1.2f);
@@ -5930,7 +5930,7 @@ public class Blocks{
 
         worldCell = new MemoryBlock("world-cell"){{
             requirements(Category.logic, BuildVisibility.worldProcessorOnly, with());
-            
+
             targetable = false;
             privileged = true;
             memoryCapacity = 128;
@@ -5939,7 +5939,7 @@ public class Blocks{
 
         worldMessage = new MessageBlock("world-message"){{
             requirements(Category.logic, BuildVisibility.worldProcessorOnly, with());
-            
+
             targetable = false;
             privileged = true;
         }};

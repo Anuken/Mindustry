@@ -232,24 +232,7 @@ public class ControlPathfinder implements Runnable{
 
         Events.on(TileChangeEvent.class, e -> {
 
-            e.tile.getLinkedTiles(t -> {
-                int x = t.x, y = t.y, mx = x % clusterSize, my = y % clusterSize, cx = x / clusterSize, cy = y / clusterSize, cluster = cx + cy * cwidth;
-
-                //is at the edge of a cluster; this means the portals may have changed.
-                if(mx == 0 || my == 0 || mx == clusterSize - 1 || my == clusterSize - 1){
-
-                    if(mx == 0) queueClusterUpdate(cx - 1, cy); //left
-                    if(my == 0) queueClusterUpdate(cx, cy - 1); //bottom
-                    if(mx == clusterSize - 1) queueClusterUpdate(cx + 1, cy); //right
-                    if(my == clusterSize - 1) queueClusterUpdate(cx, cy + 1); //top
-
-                    queueClusterUpdate(cx, cy);
-                    //TODO: recompute edge clusters too.
-                }else{
-                    //there is no need to recompute portals for block updates that are not on the edge.
-                    queue.post(() -> clustersToInnerUpdate.add(cluster));
-                }
-            });
+            updateTile(e.tile);
 
             //TODO: recalculate affected flow fields? or just all of them? how to reflow?
         });
@@ -356,6 +339,27 @@ public class ControlPathfinder implements Runnable{
                 Draw.reset();
             });
         }
+    }
+
+    public void updateTile(Tile tile){
+        tile.getLinkedTiles(t -> {
+            int x = t.x, y = t.y, mx = x % clusterSize, my = y % clusterSize, cx = x / clusterSize, cy = y / clusterSize, cluster = cx + cy * cwidth;
+
+            //is at the edge of a cluster; this means the portals may have changed.
+            if(mx == 0 || my == 0 || mx == clusterSize - 1 || my == clusterSize - 1){
+
+                if(mx == 0) queueClusterUpdate(cx - 1, cy); //left
+                if(my == 0) queueClusterUpdate(cx, cy - 1); //bottom
+                if(mx == clusterSize - 1) queueClusterUpdate(cx + 1, cy); //right
+                if(my == clusterSize - 1) queueClusterUpdate(cx, cy + 1); //top
+
+                queueClusterUpdate(cx, cy);
+                //TODO: recompute edge clusters too.
+            }else{
+                //there is no need to recompute portals for block updates that are not on the edge.
+                queue.post(() -> clustersToInnerUpdate.add(cluster));
+            }
+        });
     }
 
     void queueClusterUpdate(int cx, int cy){
@@ -534,7 +538,7 @@ public class ControlPathfinder implements Runnable{
 
     void updateInnerEdges(int team, PathCost cost, int cx, int cy, Cluster cluster){
         int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, wwidth - 1), maxY = Math.min(minY + clusterSize - 1, wheight - 1);
-        
+
         usedEdges.clear();
 
         //clear all connections, since portals changed, they need to be recomputed.
@@ -548,7 +552,7 @@ public class ControlPathfinder implements Runnable{
 
             for(int i = 0; i < portals.size; i++){
                 usedEdges.add(Point2.pack(direction, i));
-                
+
                 int
                 portal = portals.items[i],
                 from = Point2.x(portal), to = Point2.y(portal),

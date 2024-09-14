@@ -1862,6 +1862,23 @@ public class UnitTypes{
                 }};
             }});
 
+            weapons.add(new Weapon("retusa-weapon"){{
+                shootSound = Sounds.lasershoot;
+                reload = 22f;
+                x = 4.5f;
+                y = -3.5f;
+                rotateSpeed = 5f;
+                mirror = true;
+                rotate = true;
+                bullet = new LaserBoltBulletType(5.2f, 10){{
+                    lifetime = 30f;
+                    healPercent = 5.5f;
+                    collidesTeam = true;
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
+                }};
+            }});
+
             weapons.add(new Weapon(){{
                 mirror = false;
                 rotate = true;
@@ -1913,7 +1930,7 @@ public class UnitTypes{
                     trailWidth = 3f;
                     trailLength = 8;
 
-                    splashDamage = 36f;
+                    splashDamage = 40f;
                     splashDamageRadius = 32f;
                 }};
             }});
