@@ -617,6 +617,7 @@ public class UnitTypes{
 
             weapons.add(new Weapon(){{
                 shootOnDeath = true;
+                targetUnderBlocks = false;
                 reload = 24f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
@@ -1861,6 +1862,23 @@ public class UnitTypes{
                 }};
             }});
 
+            weapons.add(new Weapon("retusa-weapon"){{
+                shootSound = Sounds.lasershoot;
+                reload = 22f;
+                x = 4.5f;
+                y = -3.5f;
+                rotateSpeed = 5f;
+                mirror = true;
+                rotate = true;
+                bullet = new LaserBoltBulletType(5.2f, 10){{
+                    lifetime = 30f;
+                    healPercent = 5.5f;
+                    collidesTeam = true;
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
+                }};
+            }});
+
             weapons.add(new Weapon(){{
                 mirror = false;
                 rotate = true;
@@ -1912,7 +1930,7 @@ public class UnitTypes{
                     trailWidth = 3f;
                     trailLength = 8;
 
-                    splashDamage = 33f;
+                    splashDamage = 40f;
                     splashDamageRadius = 32f;
                 }};
             }});
@@ -2646,7 +2664,7 @@ public class UnitTypes{
                         width = 5f;
                         height = 7f;
                         lifetime = 15f;
-                        hitSize = 4f;    
+                        hitSize = 4f;
                         pierceCap = 3;
                         pierce = true;
                         pierceBuilding = true;
@@ -3524,7 +3542,7 @@ public class UnitTypes{
                         trailWidth = 2.2f;
                         trailLength = 7;
                         trailChance = -1f;
-                        
+
                         collidesAir = false;
 
                         despawnEffect = Fx.none;

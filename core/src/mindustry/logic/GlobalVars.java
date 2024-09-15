@@ -132,7 +132,9 @@ public class GlobalVars{
         }
 
         for(UnitType type : Vars.content.units()){
-            put("@" + type.name, type);
+            if(!type.internal){
+                put("@" + type.name, type);
+            }
         }
 
         for(Weather weather : Vars.content.weathers()){

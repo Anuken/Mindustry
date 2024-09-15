@@ -218,8 +218,13 @@ public class CommandAI extends AIController{
                 vecMovePos.add(group.positions[groupIndex * 2], group.positions[groupIndex * 2 + 1]);
             }
 
+            Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
+
             //TODO: should the unit stop when it finds a target?
-            if(stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget){
+            if(
+                (stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
+                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f)))
+            ){
                 move = false;
             }
 
@@ -445,52 +450,4 @@ public class CommandAI extends AIController{
         this.stopAtTarget = stopAtTarget;
     }
 
-    /*
-
-    //TODO ひどい
-    (does not work)
-
-    public static float cohesionScl = 0.3f;
-    public static float cohesionRad = 3f, separationRad = 1.1f, separationScl = 1f, flockMult = 0.5f;
-
-    Vec2 calculateFlock(){
-        if(local.isEmpty()) return flockVec.setZero();
-
-        flockVec.setZero();
-        separation.setZero();
-        cohesion.setZero();
-        massCenter.set(unit);
-
-        float rad = unit.hitSize;
-        float sepDst = rad * separationRad, cohDst = rad * cohesionRad;
-
-        //"cohesed" isn't even a word smh
-        int separated = 0, cohesed = 1;
-
-        for(var other : local){
-            float dst = other.dst(unit);
-            if(dst < sepDst){
-                separation.add(Tmp.v1.set(unit).sub(other).scl(1f / sepDst));
-                separated ++;
-            }
-
-            if(dst < cohDst){
-                massCenter.add(other);
-                cohesed ++;
-            }
-        }
-
-        if(separated > 0){
-            separation.scl(1f / separated);
-            flockVec.add(separation.scl(separationScl));
-        }
-
-        if(cohesed > 1){
-            massCenter.scl(1f / cohesed);
-            flockVec.add(Tmp.v1.set(massCenter).sub(unit).limit(cohesionScl * unit.type.speed));
-            //seek mass center?
-        }
-
-        return flockVec;
-    }*/
 }

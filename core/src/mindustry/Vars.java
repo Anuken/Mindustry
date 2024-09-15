@@ -145,7 +145,7 @@ public class Vars implements Loadable{
     "modeSurvival", "commandRally", "commandAttack",
     };
     /** maximum TCP packet size */
-    public static final int maxTcpSize = 900;
+    public static final int maxTcpSize = 1100;
     /** default server port */
     public static final int port = 6567;
     /** multicast discovery port.*/

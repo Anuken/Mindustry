@@ -10,6 +10,7 @@ public class BuildVisibility{
     shown = new BuildVisibility(() -> true),
     debugOnly = new BuildVisibility(() -> false),
     editorOnly = new BuildVisibility(() -> Vars.state.rules.editor),
+    worldProcessorOnly = new BuildVisibility(() -> Vars.state.rules.editor || Vars.state.rules.allowEditWorldProcessors),
     sandboxOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.rules.infiniteResources),
     campaignOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.isCampaign()),
     lightingOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.rules.lighting || Vars.state.isCampaign()),

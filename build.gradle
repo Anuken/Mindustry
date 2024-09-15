@@ -10,7 +10,7 @@ buildscript{
             return "com.github.Anuken${localArc ? "" : ".Arc"}:$name:$arcHash"
         }
     }
-    
+
     repositories{
         mavenLocal()
         mavenCentral()
@@ -32,7 +32,7 @@ plugins{
 
 allprojects{
     apply plugin: 'maven-publish'
-    
+
     version = project.hasProperty("packageVersion") ? project.getProperty("packageVersion") : 'release'
     group = 'com.github.Anuken'
 
@@ -220,7 +220,7 @@ configure(subprojects - project(":annotations")){
     tasks.withType(Javadoc){
         options{
             addStringOption('Xdoclint:none', '-quiet')
-            addStringOption('-release', '16')
+            addStringOption('-release', '17')
             encoding('UTF-8')
         }
     }
@@ -253,7 +253,7 @@ project(":core"){
 
     kapt{
         javacOptions{
-            option("-source", "16")
+            option("-source", "17")
             option("-target", "1.8")
         }
     }

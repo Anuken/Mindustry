@@ -61,6 +61,8 @@ public class Rules{
     public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
+    /** EXPERIMENTAL! If true, air and ground units target random things each wave instead of only the core/generators. */
+    public boolean randomWaveAI = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */
     public boolean unitPayloadUpdate = false;
     /** If true, units' payloads are destroy()ed when the unit is destroyed. */
@@ -85,6 +87,8 @@ public class Rules{
     public boolean ghostBlocks = true;
     /** Whether to allow units to build with logic. */
     public boolean logicUnitBuild = true;
+    /** If true, world processors can be edited and placed on this map. */
+    public boolean allowEditWorldProcessors = false;
     /** If true, world processors no longer update. Used for testing. */
     public boolean disableWorldProcessors = false;
     /** How much health blocks start with. */

@@ -978,7 +978,6 @@ public class LExecutor{
             return
                 obj == null ? "null" :
                 obj instanceof String s ? s :
-                obj == Blocks.stoneWall ? "solid" : //special alias
                 obj instanceof MappableContent content ? content.name :
                 obj instanceof Content ? "[content]" :
                 obj instanceof Building build ? build.block.name :
@@ -1242,7 +1241,8 @@ public class LExecutor{
                         result.setobj(units == null || i < 0 || i >= units.size ? null : units.get(i));
                     }
                 }
-                case player -> result.setobj(i < 0 || i >= data.players.size ? null : data.players.get(i).unit());
+                case player -> result.setobj(i < 0 || i >= data.players.size ? null :
+                    data.players.get(i).unit() instanceof BlockUnitc block ? block.tile() : data.players.get(i).unit());
                 case core -> result.setobj(i < 0 || i >= data.cores.size ? null : data.cores.get(i));
                 case build -> {
                     Block block = extra.obj() instanceof Block b ? b : null;
@@ -1349,7 +1349,7 @@ public class LExecutor{
                             if(t == null) t = Team.derelict;
 
                             if(tile.block() != b || tile.team() != t){
-                                tile.setBlock(b, t, Mathf.clamp(rotation.numi(), 0, 3));
+                                tile.setNet(b, t, Mathf.clamp(rotation.numi(), 0, 3));
                             }
                         }
                     }
@@ -1380,7 +1380,7 @@ public class LExecutor{
 
             Team t = team.team();
 
-            if(type.obj() instanceof UnitType type && !type.hidden && t != null && Units.canCreate(t, type)){
+            if(type.obj() instanceof UnitType type && !type.internal && !type.hidden && t != null && Units.canCreate(t, type)){
                 //random offset to prevent stacking
                 var unit = type.spawn(t, World.unconv(x.numf()) + Mathf.range(0.01f), World.unconv(y.numf()) + Mathf.range(0.01f));
                 spawner.spawnEffect(unit, rotation.numf());

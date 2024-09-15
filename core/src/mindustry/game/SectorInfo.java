@@ -82,7 +82,7 @@ public class SectorInfo{
     public transient ItemSeq lastImported = new ItemSeq();
 
     /** Special variables for simulation. */
-    public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope, bossHealth, bossDps, curEnemyHealth, curEnemyDps;
+    public float sumHealth, sumRps, sumDps, bossHealth, bossDps, curEnemyHealth, curEnemyDps;
     /** Wave where first boss shows up. */
     public int bossWave = -1;
 
