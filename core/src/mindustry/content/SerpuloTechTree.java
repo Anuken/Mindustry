@@ -427,8 +427,8 @@ public class SerpuloTechTree{
                 });
 
                 node(additiveReconstructor, Seq.with(new SectorComplete(biomassFacility)), () -> {
-                    node(multiplicativeReconstructor, () -> {
-                        node(exponentialReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
+                    node(multiplicativeReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
+                        node(exponentialReconstructor, () -> {
                             node(tetrativeReconstructor, () -> {
 
                             });
@@ -565,7 +565,13 @@ public class SerpuloTechTree{
                         new Research(UnitTypes.mace),
                         new Research(UnitTypes.flare)
                         ), () -> {
+                            node(atolls, Seq.with(
+                            new SectorComplete(windsweptIslands),
+                            new Research(multiplicativeReconstructor),
+                            new Research(mega)
+                            ), () -> {
 
+                            });
                         });
                     });
 

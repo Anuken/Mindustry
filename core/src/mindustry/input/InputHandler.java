@@ -1058,7 +1058,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                         if(ai.currentCommand() == UnitCommand.enterPayloadCommand){
                             var build = world.buildWorld(lineDest.getX(), lineDest.getY());
-                            if(build != null && build.block.acceptsPayloads && build.team == unit.team){
+                            if(build != null && build.block.acceptsUnitPayloads && build.team == unit.team){
                                 Drawf.selected(build, Pal.accent);
                             }
                         }
