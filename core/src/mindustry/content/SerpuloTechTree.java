@@ -378,7 +378,7 @@ public class SerpuloTechTree{
                     node(flare, () -> {
                         node(horizon, () -> {
                             node(zenith, () -> {
-                                node(antumbra, () -> {
+                                node(antumbra, Seq.with(new SectorComplete(polarAerodrome)), () -> {
                                     node(eclipse, () -> {
 
                                     });
@@ -514,7 +514,17 @@ public class SerpuloTechTree{
                                     new Research(airFactory),
                                     new Research(mono)
                                     ), () -> {
+                                        node(polarAerodrome, Seq.with(
+                                        new SectorComplete(fungalPass),
+                                        new SectorComplete(overgrowth),
+                                        new Research(multiplicativeReconstructor),
+                                        new Research(zenith),
+                                        new Research(swarmer),
+                                        new Research(cyclone),
+                                        new Research(blastDrill)
+                                        ), () -> {
 
+                                        });
                                     });
                                 });
 

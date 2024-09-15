@@ -19,6 +19,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -68,6 +69,7 @@ public class ForceProjector extends Block{
         envEnabled |= Env.space;
         ambientSound = Sounds.shield;
         ambientSoundVolume = 0.08f;
+        flags = EnumSet.of(BlockFlag.shield);
 
         if(consumeCoolant){
             consume(coolantConsumer = new ConsumeCoolant(coolantConsumption)).boost().update(false);
@@ -120,7 +122,7 @@ public class ForceProjector extends Block{
         Draw.color();
     }
 
-    public class ForceBuild extends Building implements Ranged{
+    public class ForceBuild extends Building implements Ranged, UnitWreckShield{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
 
@@ -214,6 +216,17 @@ public class ForceProjector extends Block{
             }
         }
 
+        @Override
+        public boolean absorbWreck(Unit unit, float damage){
+            boolean absorb = !broken && Intersector.isInRegularPolygon(sides, x, y, realRadius(), shieldRotation, unit.x, unit.y);
+            if(absorb){
+                absorbEffect.at(unit);
+                hit = 1f;
+                buildup += damage;
+            }
+            return absorb;
+        }
+
         public float realRadius(){
             return (radius + phaseHeat * phaseRadiusBoost) * radscl;
         }
@@ -238,7 +251,7 @@ public class ForceProjector extends Block{
                 Draw.z(Layer.block);
                 Draw.reset();
             }
-            
+
             drawShield();
         }
 
