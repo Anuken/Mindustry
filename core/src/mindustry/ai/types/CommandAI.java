@@ -218,8 +218,13 @@ public class CommandAI extends AIController{
                 vecMovePos.add(group.positions[groupIndex * 2], group.positions[groupIndex * 2 + 1]);
             }
 
+            Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
+
             //TODO: should the unit stop when it finds a target?
-            if(stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget){
+            if(
+                (stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
+                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f)))
+            ){
                 move = false;
             }
 
