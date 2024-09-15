@@ -462,17 +462,23 @@ public class Pathfinder implements Runnable{
         @Override
         protected void getPositions(IntSeq out){
             if(state.rules.randomWaveAI && team == state.rules.waveTeam){
-                rand.setSeed(state.rules.waves ? state.wave : (int)(state.tick / (5400)));
+                rand.setSeed(state.rules.waves ? state.wave : (int)(state.tick / (5400)) + hashCode());
 
                 //maximum amount of different target flag types they will attack
-                int max = 2;
+                int max = 1;
 
                 for(int attempt = 0; attempt < 5 && max > 0; attempt++){
                     var targets = indexer.getEnemy(team, randomTargets[rand.random(randomTargets.length - 1)]);
                     if(!targets.isEmpty()){
-                        max --;
+                        boolean any = false;
                         for(Building other : targets){
-                            out.add(other.tile.array());
+                            if((other.items != null && other.items.any()) || other.status() != BlockStatus.noInput){
+                                out.add(other.tile.array());
+                                any = true;
+                            }
+                        }
+                        if(any){
+                            max --;
                         }
                     }
                 }

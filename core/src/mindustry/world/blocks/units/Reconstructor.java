@@ -311,10 +311,8 @@ public class Reconstructor extends UnitBlock{
                                 if(commandPos != null){
                                     payload.unit.command().commandPosition(commandPos);
                                 }
-                                if(command != null){
-                                    //this already checks if it is a valid command for the unit type
-                                    payload.unit.command().command(command);
-                                }
+                                //this already checks if it is a valid command for the unit type
+                                payload.unit.command().command(command == null && payload.unit.type.defaultCommand != null ? payload.unit.type.defaultCommand : command);
                             }
 
                             progress %= 1f;

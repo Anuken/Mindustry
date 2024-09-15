@@ -2,6 +2,7 @@ package mindustry.ai.types;
 
 import arc.math.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 
@@ -26,6 +27,30 @@ public class FlyingAI extends AIController{
 
         if(target == null && state.rules.waves && unit.team == state.rules.defaultTeam){
             moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 130f);
+        }
+    }
+
+    @Override
+    public Teamc targetFlag(float x, float y, BlockFlag flag, boolean enemy){
+        if(state.rules.randomWaveAI){
+            if(unit.team == Team.derelict) return null;
+            var list = enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag);
+            if(list.isEmpty()) return null;
+
+            Building closest = null;
+            float cdist = 0f;
+            for(Building t : list){
+                if((t.items != null && t.items.any()) || t.status() != BlockStatus.noInput){
+                    float dst = t.dst2(x, y);
+                    if(closest == null || dst < cdist){
+                        closest = t;
+                        cdist = dst;
+                    }
+                }
+            }
+            return closest;
+        }else{
+            return super.targetFlag(x, y, flag, enemy);
         }
     }
 
