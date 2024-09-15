@@ -87,6 +87,7 @@ public class Planets{
             };
             campaignRuleDefaults.fog = true;
             campaignRuleDefaults.showSpawns = true;
+            campaignRuleDefaults.rtsAI = true;
 
             unlockedOnLand.add(Blocks.coreBastion);
         }};
@@ -146,6 +147,7 @@ public class Planets{
                 r.placeRangeCheck = false;
                 r.showSpawns = false;
             };
+            showRtsAIRule = true;
             iconColor = Color.valueOf("7d4dff");
             atmosphereColor = Color.valueOf("3c1b8f");
             atmosphereRadIn = 0.02f;

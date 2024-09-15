@@ -1042,6 +1042,7 @@ public class UnitTypes{
 
                     status = StatusEffects.blasted;
                     statusDuration = 60f;
+                    damage = splashDamage * 0.75f;
                 }};
             }});
         }};
@@ -1446,6 +1447,7 @@ public class UnitTypes{
                     healPercent = 15f;
                     splashDamage = 220f;
                     splashDamageRadius = 80f;
+                    damage = splashDamage * 0.75f;
                 }};
             }});
         }};
@@ -2364,7 +2366,8 @@ public class UnitTypes{
         //region core
 
         alpha = new UnitType("alpha"){{
-            aiController = BuilderAI::new;
+            aiController = () -> new BuilderAI(true, 400f);
+            controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
             isEnemy = false;
 
             lowAltitude = true;
@@ -2402,7 +2405,8 @@ public class UnitTypes{
         }};
 
         beta = new UnitType("beta"){{
-            aiController = BuilderAI::new;
+            aiController = () -> new BuilderAI(true, 400f);
+            controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
             isEnemy = false;
 
             flying = true;
@@ -2443,7 +2447,8 @@ public class UnitTypes{
         }};
 
         gamma = new UnitType("gamma"){{
-            aiController = BuilderAI::new;
+            aiController = () -> new BuilderAI(true, 400f);
+            controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
             isEnemy = false;
 
             lowAltitude = true;

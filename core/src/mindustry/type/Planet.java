@@ -136,12 +136,6 @@ public class Planet extends UnlockableContent{
     public Music launchMusic = Musics.launch;
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
-    /** Global difficulty/modifier settings for this planet's campaign. */
-    public CampaignRules campaignRules = new CampaignRules();
-    /** Defaults applied to the rules. */
-    public CampaignRules campaignRuleDefaults = new CampaignRules();
-    /** Sets up rules on game load for any sector on this planet. */
-    public Cons<Rules> ruleSetter = r -> {};
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system. */
     public @Nullable Planet parent;
     /** The root parent of the whole solar system this planet is in. */
@@ -160,6 +154,15 @@ public class Planet extends UnlockableContent{
     public Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
     /** Loads the planet grid outline mesh. Clientside only. */
     public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineRad * radius);
+
+    /** Global difficulty/modifier settings for this planet's campaign. */
+    public CampaignRules campaignRules = new CampaignRules();
+    /** Defaults applied to the rules. */
+    public CampaignRules campaignRuleDefaults = new CampaignRules();
+    /** Sets up rules on game load for any sector on this planet. */
+    public Cons<Rules> ruleSetter = r -> {};
+    /** If true, RTS AI can be customized. */
+    public boolean showRtsAIRule = false;
 
     /** @deprecated no-op, do not use. */
     @Deprecated
@@ -233,7 +236,7 @@ public class Planet extends UnlockableContent{
         rules.planet = this;
 
         if(!customGame){
-            campaignRules.apply(rules);
+            campaignRules.apply(this, rules);
         }
     }
 

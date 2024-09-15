@@ -40,7 +40,7 @@ public class ForceProjector extends Block{
     public float cooldownBrokenBase = 0.35f;
     public float coolantConsumption = 0.1f;
     public boolean consumeCoolant = true;
-    public float crashDamageMultiplier = 2f;
+    public float crashDamageMultiplier = 2.5f;
     public Effect absorbEffect = Fx.absorb;
     public Effect shieldBreakEffect = Fx.shieldBreak;
     public @Load("@-top") TextureRegion topRegion;
