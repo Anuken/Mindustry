@@ -40,7 +40,7 @@ public class ForceProjector extends Block{
     public float cooldownBrokenBase = 0.35f;
     public float coolantConsumption = 0.1f;
     public boolean consumeCoolant = true;
-    public float crashDamageMultiplier = 2.5f;
+    public float crashDamageMultiplier = 2f;
     public Effect absorbEffect = Fx.absorb;
     public Effect shieldBreakEffect = Fx.shieldBreak;
     public @Load("@-top") TextureRegion topRegion;
@@ -123,7 +123,7 @@ public class ForceProjector extends Block{
         Draw.color();
     }
 
-    public class ForceBuild extends Building implements Ranged, UnitWreckShield{
+    public class ForceBuild extends Building implements Ranged, ExplosionShield{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
 
@@ -218,10 +218,10 @@ public class ForceProjector extends Block{
         }
 
         @Override
-        public boolean absorbWreck(Unit unit, float damage){
-            boolean absorb = !broken && Intersector.isInRegularPolygon(sides, x, y, realRadius(), shieldRotation, unit.x, unit.y);
+        public boolean absorbExplosion(float ex, float ey, float damage){
+            boolean absorb = !broken && Intersector.isInRegularPolygon(sides, x, y, realRadius(), shieldRotation, ex, ey);
             if(absorb){
-                absorbEffect.at(unit);
+                absorbEffect.at(ex, ey);
                 hit = 1f;
                 buildup += damage * crashDamageMultiplier;
             }

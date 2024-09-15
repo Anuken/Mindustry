@@ -1042,7 +1042,7 @@ public class UnitTypes{
 
                     status = StatusEffects.blasted;
                     statusDuration = 60f;
-                    damage = splashDamage * 0.75f;
+                    damage = splashDamage * 0.7f;
                 }};
             }});
         }};
@@ -1447,7 +1447,7 @@ public class UnitTypes{
                     healPercent = 15f;
                     splashDamage = 220f;
                     splashDamageRadius = 80f;
-                    damage = splashDamage * 0.75f;
+                    damage = splashDamage * 0.7f;
                 }};
             }});
         }};

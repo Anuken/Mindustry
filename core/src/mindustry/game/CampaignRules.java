@@ -17,10 +17,11 @@ public class CampaignRules{
         rules.showSpawns = showSpawns;
         rules.randomWaveAI = randomWaveAI;
         if(planet.showRtsAIRule && rules.attackMode){
+            boolean swapped = rules.teams.get(rules.waveTeam).rtsAi != rtsAI;
             rules.teams.get(rules.waveTeam).rtsAi = rtsAI;
             rules.teams.get(rules.waveTeam).rtsMinWeight = 1.2f * difficulty.enemyHealthMultiplier;
 
-            if(Vars.state.isGame()){
+            if(swapped && Vars.state.isGame()){
                 Groups.unit.each(u -> {
                     if(u.team == rules.waveTeam && !u.isPlayer()){
                         u.resetController();
