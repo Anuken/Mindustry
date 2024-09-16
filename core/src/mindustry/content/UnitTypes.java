@@ -1872,7 +1872,7 @@ public class UnitTypes{
                 rotateSpeed = 5f;
                 mirror = true;
                 rotate = true;
-                bullet = new LaserBoltBulletType(5.2f, 10){{
+                bullet = new LaserBoltBulletType(5.2f, 12){{
                     lifetime = 30f;
                     healPercent = 5.5f;
                     collidesTeam = true;

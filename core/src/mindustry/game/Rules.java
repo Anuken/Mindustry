@@ -135,6 +135,8 @@ public class Rules{
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
+    /** If true, the unit cap is disabled. */
+    public boolean disableUnitCap;
     /** Environment drag multiplier. */
     public float dragMultiplier = 1f;
     /** Environmental flags that dictate visuals & how blocks function. */
