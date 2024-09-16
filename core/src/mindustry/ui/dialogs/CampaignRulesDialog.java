@@ -24,7 +24,7 @@ public class CampaignRulesDialog extends BaseDialog{
                 planet.saveRules();
 
                 if(Vars.state.isGame() && Vars.state.isCampaign() && Vars.state.getPlanet() == planet){
-                    planet.campaignRules.apply(Vars.state.rules);
+                    planet.campaignRules.apply(planet, Vars.state.rules);
                     Call.setRules(Vars.state.rules);
                 }
             }
@@ -60,6 +60,9 @@ public class CampaignRulesDialog extends BaseDialog{
             check("@rules.fog", b -> rules.fog = b, () -> rules.fog);
             check("@rules.showspawns", b -> rules.showSpawns = b, () -> rules.showSpawns);
             check("@rules.randomwaveai", b -> rules.randomWaveAI = b, () -> rules.randomWaveAI);
+            if(planet.showRtsAIRule){
+                check("@rules.rtsai.campaign", b -> rules.rtsAI = b, () -> rules.rtsAI);
+            }
         }).growY();
     }
 

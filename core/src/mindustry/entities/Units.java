@@ -475,7 +475,7 @@ public class Units{
         Seq<TeamData> data = state.teams.present;
         for(int i = 0; i < data.size; i++){
             var other = data.items[i];
-            if(other.team != team){
+            if(other.team != team && other.team != Team.derelict){
                 if(other.tree().any(x, y, width, height)){
                     return true;
                 }
