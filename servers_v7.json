@@ -336,4 +336,8 @@
     "name": "LibreDUSTRY",
     "address": ["46.4.114.111"]
   }
+  {
+    "name": "mindustryRealm",
+    "address": ["23.88.73.88:14371"]
+  }
 ]
