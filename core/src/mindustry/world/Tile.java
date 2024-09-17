@@ -690,6 +690,42 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     //remote utility methods
 
+    /** Positions are in 'packed position' format - left bits x, right bits y. */
+    @Remote(called = Loc.server)
+    public static void setTileBlocks(Block block, Team team, int[] positions){
+        if(block == null || positions == null) return;
+        for(int pos : positions){
+            Tile tile = world.tile(pos);
+            if(tile != null){
+                tile.setBlock(block, team, 0);
+            }
+        }
+    }
+
+    /** Positions are in 'packed position' format - left bits x, right bits y. */
+    @Remote(called = Loc.server)
+    public static void setTileFloors(Block block, int[] positions){
+        if(positions == null || !(block instanceof Floor floor)) return;
+        for(int pos : positions){
+            Tile tile = world.tile(pos);
+            if(tile != null){
+                tile.setFloor(floor);
+            }
+        }
+    }
+
+    /** Positions are in 'packed position' format - left bits x, right bits y. */
+    @Remote(called = Loc.server)
+    public static void setTileOverlays(Block block, int[] positions){
+        if(positions == null || !(block instanceof OverlayFloor floor)) return;
+        for(int pos : positions){
+            Tile tile = world.tile(pos);
+            if(tile != null){
+                tile.setOverlay(floor);
+            }
+        }
+    }
+
     @Remote(called = Loc.server)
     public static void setFloor(Tile tile, Block floor, Block overlay){
         tile.setFloor(floor.asFloor());
