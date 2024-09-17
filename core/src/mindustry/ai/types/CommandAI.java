@@ -358,8 +358,8 @@ public class CommandAI extends AIController{
 
     public void commandQueue(Position location){
         if(targetPos == null && attackTarget == null){
-            if(location instanceof Teamc target){
-                commandTarget(target, this.stopAtTarget);
+            if(location instanceof Teamc t){
+                commandTarget(t, this.stopAtTarget);
             }else if(location instanceof Vec2 position){
                 commandPosition(position);
             }
