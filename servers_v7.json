@@ -24,6 +24,10 @@
     "address": ["23.88.73.88:25617"]
   },
   {
+    "name": "EchoDustry",
+    "address": ["sugomadozer.my.to:7003", "sugomadozer.my.to:7004"]
+  },
+  {
     "name": "Meow Empire ≫ MEM PROJECT",
     "address": ["a2.corenodes.host:25514"]
   },
