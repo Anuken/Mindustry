@@ -1126,6 +1126,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void setTexture(String textureName){
             this.textureName = textureName;
 
+            if(headless) return;
             if(fetchedRegion == null) fetchedRegion = new TextureRegion();
             lookupRegion(textureName, fetchedRegion);
         }
