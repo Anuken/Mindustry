@@ -61,6 +61,8 @@ public class Rules{
     public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
+    /** EXPERIMENTAL! If true, air and ground units target random things each wave instead of only the core/generators. */
+    public boolean randomWaveAI = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */
     public boolean unitPayloadUpdate = false;
     /** If true, units' payloads are destroy()ed when the unit is destroyed. */
@@ -133,6 +135,8 @@ public class Rules{
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
+    /** If true, the unit cap is disabled. */
+    public boolean disableUnitCap;
     /** Environment drag multiplier. */
     public float dragMultiplier = 1f;
     /** Environmental flags that dictate visuals & how blocks function. */

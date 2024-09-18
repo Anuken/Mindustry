@@ -220,6 +220,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.wavesending", b -> rules.waveSending = b, () -> rules.waveSending, () -> rules.waves);
         check("@rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer, () -> rules.waves);
         check("@rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies, () -> rules.waves && rules.waveTimer);
+        check("@rules.randomwaveai", b -> rules.randomWaveAI = b, () -> rules.randomWaveAI, () -> rules.waves);
         check("@rules.airUseSpawns", b -> rules.airUseSpawns = b, () -> rules.airUseSpawns, () -> rules.waves);
         numberi("@rules.wavelimit", f -> rules.winWave = f, () -> rules.winWave, () -> rules.waves, 0, Integer.MAX_VALUE);
         number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> rules.waves && rules.waveTimer, 1, Float.MAX_VALUE);
@@ -329,7 +330,7 @@ public class CustomRulesDialog extends BaseDialog{
 
                 for(Planet planet : content.planets().select(p -> p.accessible && p.visible && p.isLandable())){
                     t.button(planet.localizedName, style, () -> {
-                        planet.applyRules(rules);
+                        planet.applyRules(rules, true);
                     }).group(group).checked(b -> rules.planet == planet);
 
                     if(t.getChildren().size % 3 == 0){

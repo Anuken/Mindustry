@@ -16,9 +16,9 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
-import mindustry.game.*;
 import mindustry.game.Saves.*;
 import mindustry.gen.*;
 import mindustry.input.*;
@@ -30,7 +30,6 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -441,6 +440,7 @@ public class Control implements ApplicationListener, Loadable{
                             state.wave = 1;
                             //set up default wave time
                             state.wavetime = state.rules.initialWaveSpacing <= 0f ? (state.rules.waveSpacing * (sector.preset == null ? 2f : sector.preset.startWaveTimeMultiplier)) : state.rules.initialWaveSpacing;
+                            state.wavetime *= sector.planet.campaignRules.difficulty.waveTimeMultiplier;
                             //reset captured state
                             sector.info.wasCaptured = false;
 

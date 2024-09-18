@@ -529,6 +529,10 @@ public class PlacementFragment{
                                 if(stances.size > 1){
                                     u.row();
 
+                                    if(commands.size > 1){
+                                        u.add(new Image(Tex.whiteui)).height(3f).color(Pal.gray).pad(7f).growX().row();
+                                    }
+
                                     u.table(coms -> {
                                         coms.left();
                                         int scol = 0;

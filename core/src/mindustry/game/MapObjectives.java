@@ -164,6 +164,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Base abstract class for any in-map objective. */
     public static abstract class MapObjective{
+        public boolean hidden;
         public @Nullable @Multiline String details;
         public @Unordered String[] flagsAdded = {};
         public @Unordered String[] flagsRemoved = {};
@@ -1125,6 +1126,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void setTexture(String textureName){
             this.textureName = textureName;
 
+            if(headless) return;
             if(fetchedRegion == null) fetchedRegion = new TextureRegion();
             lookupRegion(textureName, fetchedRegion);
         }
