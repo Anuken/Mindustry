@@ -29,6 +29,10 @@ public class CampaignRulesDialog extends BaseDialog{
                 }
             }
         });
+
+        onResize(() -> {
+            rebuild();
+        });
     }
 
     void rebuild(){
@@ -50,6 +54,10 @@ public class CampaignRulesDialog extends BaseDialog{
                     t.button(diff.localized(), style, () -> {
                         rules.difficulty = diff;
                     }).group(group).checked(b -> rules.difficulty == diff);
+
+                    if(Core.graphics.isPortrait() && diff.ordinal() % 2 == 1){
+                        t.row();
+                    }
                 }
             }).left().fill(false).expand(false, false).row();
 
