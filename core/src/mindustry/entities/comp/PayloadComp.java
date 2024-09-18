@@ -90,6 +90,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     void pickup(Unit unit){
+        if(unit.isAdded()) unit.team.data().updateCount(unit.type, 1);
+
         unit.remove();
         addPayload(new UnitPayload(unit));
         Fx.unitPickup.at(unit);

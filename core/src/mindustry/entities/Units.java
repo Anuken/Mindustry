@@ -112,6 +112,10 @@ public class Units{
         return player == null || tile == null || tile.interactable(player.team()) || state.rules.editor;
     }
 
+    public static boolean isHittable(@Nullable Posc target, boolean air, boolean ground){
+        return target != null && (target instanceof Buildingc ? ground : (target instanceof Unit u && u.checkTarget(air, ground)));
+    }
+
     /**
      * Validates a target.
      * @param target The target to validate

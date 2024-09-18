@@ -272,6 +272,13 @@ public class CommandAI extends AIController{
                     vecOut.set(vecMovePos);
                 }else{
                     move = controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+
+                    //TODO: what to do when there's a target and it can't be reached?
+                    /*
+                    if(noFound[0] && attackTarget != null && attackTarget.within(unit, unit.type.range * 2f)){
+                        move = true;
+                        vecOut.set(targetPos);
+                    }*/
                 }
 
                 //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
@@ -403,6 +410,11 @@ public class CommandAI extends AIController{
         }
     }
 
+    @Override
+    public void removed(Unit unit){
+        clearCommands();
+    }
+
     public void commandQueue(Position location){
         if(targetPos == null && attackTarget == null){
             if(location instanceof Teamc t){
@@ -444,7 +456,7 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
-        return !nearAttackTarget(x, y, range) ? super.findTarget(x, y, range, air, ground) : attackTarget;
+        return !nearAttackTarget(x, y, range) ? super.findTarget(x, y, range, air, ground) : Units.isHittable(attackTarget, air, ground) ? attackTarget : null;
     }
 
     public boolean nearAttackTarget(float x, float y, float range){
