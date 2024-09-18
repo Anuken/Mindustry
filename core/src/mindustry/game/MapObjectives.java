@@ -164,6 +164,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Base abstract class for any in-map objective. */
     public static abstract class MapObjective{
+        public boolean hidden;
         public @Nullable @Multiline String details;
         public @Unordered String[] flagsAdded = {};
         public @Unordered String[] flagsRemoved = {};

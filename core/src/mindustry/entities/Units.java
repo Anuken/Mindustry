@@ -95,7 +95,7 @@ public class Units{
 
     public static int getCap(Team team){
         //wave team has no cap
-        if((team == state.rules.waveTeam && !state.rules.pvp) || (state.isCampaign() && team == state.rules.waveTeam)){
+        if((team == state.rules.waveTeam && !state.rules.pvp) || (state.isCampaign() && team == state.rules.waveTeam) || state.rules.disableUnitCap){
             return Integer.MAX_VALUE;
         }
         return Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap);

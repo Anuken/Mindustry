@@ -60,6 +60,7 @@ public enum Binding implements KeyBind{
     unit_command_load_units(KeyCode.unset),
     unit_command_load_blocks(KeyCode.unset),
     unit_command_unload_payload(KeyCode.unset),
+    unit_command_loop_payload(KeyCode.unset),
 
     category_prev(KeyCode.comma, "blocks"),
     category_next(KeyCode.period),
