@@ -16,6 +16,7 @@ public class CampaignRules{
         rules.staticFog = rules.fog = fog;
         rules.showSpawns = showSpawns;
         rules.randomWaveAI = randomWaveAI;
+        rules.objectiveTimerMultiplier = difficulty.waveTimeMultiplier;
         if(planet.showRtsAIRule && rules.attackMode){
             boolean swapped = rules.teams.get(rules.waveTeam).rtsAi != rtsAI;
             rules.teams.get(rules.waveTeam).rtsAi = rtsAI;
