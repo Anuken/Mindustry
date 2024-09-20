@@ -74,6 +74,7 @@ public class Control implements ApplicationListener, Loadable{
                     ui.showInfo("@mods.initfailed");
                 });
             }
+            checkAutoUnlocks();
         });
 
         Events.on(StateChangeEvent.class, event -> {
