@@ -317,10 +317,6 @@
     "address": ["194.247.42.131:27715", "194.247.42.131:27512"]
   },
   {
-    "name": "Erbium",
-    "address": ["hp5.nexcord.com:12066", "hp5.nexcord.com:11999", "hp5.nexcord.com:12067"]
-  },
-  {
     "name": "Vndustry",
     "address": ["vndustry.ddns.net"]
   },
@@ -335,5 +331,9 @@
   {
     "name": "LibreDUSTRY",
     "address": ["46.4.114.111"]
+  },
+  {
+    "name": "Glyph",
+    "address": ["185.186.143.131:26843", "185.186.143.131:26055"]
   }
 ]
