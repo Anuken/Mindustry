@@ -76,6 +76,8 @@ public class Vars implements Loadable{
     /** URL to the JSON file containing all the stable servers.  */
     //TODO merge with v6 list upon release
     public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v7.json";
+    /** Key the usid by domain instead of ip:port for these servers. */
+    public static final Seq<String> serverUsidGroups = Seq.with("mindustry.nydus.app");
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
