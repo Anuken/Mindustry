@@ -25,6 +25,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -465,7 +466,7 @@ public class PlacementFragment{
                                 for(int i = 0; i < counts.length; i++){
                                     if(counts[i] > 0){
                                         var type = content.unit(i);
-                                        unitlist.add(new ItemImage(type.uiIcon, counts[i])).tooltip(type.localizedName).pad(4).with(b -> {
+                                        unitlist.add(StatValues.stack(type, counts[i])).tooltip(type.localizedName).pad(4).with(b -> {
                                             var listener = new ClickListener();
 
                                             //left click -> select
@@ -528,6 +529,10 @@ public class PlacementFragment{
                                 //list stances
                                 if(stances.size > 1){
                                     u.row();
+
+                                    if(commands.size > 1){
+                                        u.add(new Image(Tex.whiteui)).height(3f).color(Pal.gray).pad(7f).growX().row();
+                                    }
 
                                     u.table(coms -> {
                                         coms.left();

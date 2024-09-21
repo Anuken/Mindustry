@@ -90,6 +90,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     void pickup(Unit unit){
+        if(unit.isAdded()) unit.team.data().updateCount(unit.type, 1);
+
         unit.remove();
         addPayload(new UnitPayload(unit));
         Fx.unitPickup.at(unit);
@@ -147,7 +149,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         Unit u = payload.unit;
 
         //can't drop ground units
-        if(!u.canPass(tileX(), tileY()) || Units.count(x, y, u.physicSize(), o -> o.isGrounded()) > 1){
+        //allow stacking for small units for now - otherwise, unit transfer would get annoying
+        if(!u.canPass(tileX(), tileY()) || Units.count(x, y, u.physicSize(), o -> o.isGrounded() && o.hitSize > 14f) > 1){
             return false;
         }
 

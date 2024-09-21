@@ -806,7 +806,7 @@ public class HudFragment{
             if(state.rules.objectives.any()){
                 boolean first = true;
                 for(var obj : state.rules.objectives){
-                    if(!obj.qualified()) continue;
+                    if(!obj.qualified() || obj.hidden) continue;
 
                     String text = obj.text();
                     if(text != null && !text.isEmpty()){

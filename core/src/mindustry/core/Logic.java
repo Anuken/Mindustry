@@ -92,7 +92,7 @@ public class Logic implements ApplicationListener{
                         if(wavesPassed > 0){
                             //simulate wave counter moving forward
                             state.wave += wavesPassed;
-                            state.wavetime = state.rules.waveSpacing;
+                            state.wavetime = state.rules.waveSpacing * state.getPlanet().campaignRules.difficulty.waveTimeMultiplier;
 
                             SectorDamage.applyCalculatedDamage();
                         }
@@ -221,7 +221,7 @@ public class Logic implements ApplicationListener{
     public void play(){
         state.set(State.playing);
         //grace period of 2x wave time before game starts
-        state.wavetime = state.rules.initialWaveSpacing <= 0 ? state.rules.waveSpacing * 2 : state.rules.initialWaveSpacing;
+        state.wavetime = (state.rules.initialWaveSpacing <= 0 ? state.rules.waveSpacing * 2 : state.rules.initialWaveSpacing) * (state.isCampaign() ? state.getPlanet().campaignRules.difficulty.waveTimeMultiplier : 1f);;
         Events.fire(new PlayEvent());
 
         //add starting items
@@ -270,7 +270,7 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = state.rules.waveSpacing;
+        state.wavetime = state.rules.waveSpacing * (state.isCampaign() ? state.getPlanet().campaignRules.difficulty.waveTimeMultiplier : 1f);
 
         Events.fire(new WaveEvent());
     }

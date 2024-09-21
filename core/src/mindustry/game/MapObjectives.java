@@ -164,6 +164,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Base abstract class for any in-map objective. */
     public static abstract class MapObjective{
+        public boolean hidden;
         public @Nullable @Multiline String details;
         public @Unordered String[] flagsAdded = {};
         public @Unordered String[] flagsRemoved = {};
@@ -441,7 +442,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public boolean update(){
-            return (countup += Time.delta) >= duration;
+            return (countup += Time.delta) >= duration * state.rules.objectiveTimerMultiplier;
         }
 
         @Override
@@ -453,7 +454,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             if(text != null){
-                int i = (int)((duration - countup) / 60f);
+                int i = (int)((duration * state.rules.objectiveTimerMultiplier - countup) / 60f);
                 StringBuilder timeString = new StringBuilder();
 
                 int m = i / 60;
@@ -1125,6 +1126,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void setTexture(String textureName){
             this.textureName = textureName;
 
+            if(headless) return;
             if(fetchedRegion == null) fetchedRegion = new TextureRegion();
             lookupRegion(textureName, fetchedRegion);
         }
