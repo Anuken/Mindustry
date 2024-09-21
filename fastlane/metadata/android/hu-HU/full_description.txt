@@ -4,9 +4,9 @@ A Mindustry egy gyárépítő játék Toronyvédő és RTS elemekkel. Készíts 
  
 - Használd a gyártó-blokkokat a legkülönfélébb fejlett nyersanyagok létrehozásához
 - Védd meg az építményeidet a hullámokban támadó ellenségektől
-- Játssz vállvetve a barátaiddal a platformokon átívelő többjátékos módban, vagy hívd ki őket csapat alapú PvP meccsekre
+- Játssz vállvetve a barátaiddal a platformokon átívelő többjátékos módban, vagy hívd ki őket csapat alapú PvP mérkőzésekre
 - Oszd szét a folyadékokat, és küzdj meg az állandó kihívásokkal, mint például a tűzkitörések, vagy az ellenséges repülőgépek rajtaütéseivel
-- Hozd ki a legtöbbet a termelésből az opcionális hűtő- és kenőanyag-ellátással
+- Hozd ki a legtöbbet a termelésből az opcionális hűtőfolyadék-ellátással
 - Egységek széles skáláját állíthatod elő a bázisod automatikus irányításához és az ellenséges bázisok megtámadásához
 - Állíts fel összeszerelősorokat a gépesített egységek hadainak előállításához
 - Használd az egységeidet a hatékonyan felszerelt ellenséges bázisok ellen
@@ -28,7 +28,7 @@ A Mindustry egy gyárépítő játék Toronyvédő és RTS elemekkel. Készíts 
 
 - 16+ beépített pálya az egyéni játékokhoz, a két teljes értékű hadjárat mellett
 - Játssz kooperatív módban, PvP-ben, vagy a homokozóban
-- Hozz létre nyilvános dedikált szervert, vagy hívd meg a barátaidat a saját privát munkamenetedre
-- Testre szabható játékszabályok: Változtasd meg az épületek építési költségeit, az ellenséges statisztikákat, a kezdő elemeket, a hullámok időzítését és így tovább
+- Hozz létre nyilvános dedikált kiszolgálót, vagy hívd meg a barátaidat a saját privát munkamenetedre
+- Testreszabható játékszabályok: Változtasd meg az épületek építési költségeit, az ellenséges statisztikákat, a kezdő elemeket, a hullámok időzítését vagy bármi mást
 - Teljes funkcionalitású térképszerkesztő, parancsfájl támogatással
-- Beépített mod böngésző és mod támogatás
+- Beépített modböngésző és modtámogatás
