@@ -8,6 +8,7 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -466,7 +467,10 @@ public class PlacementFragment{
                                 for(int i = 0; i < counts.length; i++){
                                     if(counts[i] > 0){
                                         var type = content.unit(i);
-                                        unitlist.add(StatValues.stack(type, counts[i])).tooltip(type.localizedName).pad(4).with(b -> {
+                                        unitlist.add(StatValues.stack(type, counts[i])).pad(4).with(b -> {
+                                            b.clearListeners();
+                                            b.addListener(Tooltips.getInstance().create(type.localizedName, false));
+
                                             var listener = new ClickListener();
 
                                             //left click -> select
