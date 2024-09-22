@@ -199,7 +199,7 @@ public class UnitTypes{
 
             abilities.add(new ShieldRegenFieldAbility(25f, 250f, 60f * 1, 60f));
 
-            BulletType smallBullet = new BasicBulletType(3f, 10){{
+            BulletType smallBullet = new BasicBulletType(3f, 15){{
                 width = 7f;
                 height = 9f;
                 lifetime = 50f;
@@ -221,16 +221,16 @@ public class UnitTypes{
                 shoot.shots = 3;
                 shoot.shotDelay = 4f;
 
-                bullet = new BasicBulletType(8f, 80){{
+                bullet = new BasicBulletType(8f, 75){{
                     width = 11f;
                     height = 20f;
-                    lifetime = 27f;
+                    lifetime = 20f;
                     shootEffect = Fx.shootBig;
-                    lightning = 2;
-                    lightningLength = 6;
+                    lightning = 3;
+                    lightningLength = 5;
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
-                    lightningDamage = 20;
+                    lightningDamage = 15;
                 }};
             }},
 
