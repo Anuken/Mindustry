@@ -853,7 +853,7 @@ public class UnitType extends UnlockableContent implements Senseable{
                     cmds.add(UnitCommand.mineCommand);
                 }
                 if(example instanceof Payloadc){
-                    cmds.addAll(UnitCommand.loadUnitsCommand, UnitCommand.loadBlocksCommand, UnitCommand.unloadPayloadCommand);
+                    cmds.addAll(UnitCommand.loadUnitsCommand, UnitCommand.loadBlocksCommand, UnitCommand.unloadPayloadCommand, UnitCommand.loopPayloadCommand);
                 }
             }
 
@@ -1276,7 +1276,9 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(drawCell) drawCell(unit);
         drawWeapons(unit);
         if(drawItems) drawItems(unit);
-        drawLight(unit);
+        if(!isPayload){
+            drawLight(unit);
+        }
 
         if(unit.shieldAlpha > 0 && drawShields){
             drawShield(unit);

@@ -101,6 +101,8 @@ public class Rules{
     public float buildSpeedMultiplier = 1f;
     /** Multiplier for percentage of materials refunded when deconstructing. */
     public float deconstructRefundMultiplier = 0.5f;
+    /** Multiplier for time in timer objectives. */
+    public float objectiveTimerMultiplier = 1f;
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
     /** If true, no-build zones are calculated based on the closest core. */
@@ -135,6 +137,8 @@ public class Rules{
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
+    /** If true, the unit cap is disabled. */
+    public boolean disableUnitCap;
     /** Environment drag multiplier. */
     public float dragMultiplier = 1f;
     /** Environmental flags that dictate visuals & how blocks function. */

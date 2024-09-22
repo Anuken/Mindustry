@@ -170,6 +170,8 @@ public class Vars implements Loadable{
     public static boolean confirmExit = true;
     /** if true, UI is not drawn */
     public static boolean disableUI;
+    /** if true, most autosaving is disabled. internal use only! */
+    public static boolean disableSave;
     /** if true, game is set up in mobile mode, even on desktop. used for debugging */
     public static boolean testMobile;
     /** whether the game is running on a mobile device */

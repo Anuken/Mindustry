@@ -32,9 +32,9 @@ public class ServerLauncher implements ApplicationListener{
                 String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level1.ordinal()] + " " + text + "&fr");
                 System.out.println(result);
             };
-            new HeadlessApplication(new ServerLauncher(), throwable -> CrashSender.send(throwable, f -> {}));
+            new HeadlessApplication(new ServerLauncher(), throwable -> CrashHandler.handle(throwable, f -> {}));
         }catch(Throwable t){
-            CrashSender.send(t, f -> {});
+            CrashHandler.handle(t, f -> {});
         }
     }
 
@@ -46,15 +46,15 @@ public class ServerLauncher implements ApplicationListener{
 
         Vars.loadSettings();
         Vars.init();
-        
+
         UI.loadColors();
         Fonts.loadContentIconsHeadless();
-        
+
         content.createBaseContent();
         mods.loadScripts();
         content.createModContent();
         content.init();
-        
+
         if(mods.hasContentErrors()){
             err("Error occurred loading mod content:");
             for(LoadedMod mod : mods.list()){

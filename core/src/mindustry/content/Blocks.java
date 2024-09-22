@@ -1889,21 +1889,21 @@ public class Blocks{
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
-            health = 65;
+            health = 70;
             speed = 0.08f;
             displayedSpeed = 11f;
         }};
 
         plastaniumConveyor = new StackConveyor("plastanium-conveyor"){{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
-            health = 75;
+            health = 90;
             speed = 4f / 60f;
             itemCapacity = 10;
         }};
 
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
-            health = 180;
+            health = 280;
             speed = 0.08f;
             displayedSpeed = 11f;
         }};
@@ -5786,6 +5786,7 @@ public class Blocks{
             itemCapacity = 0;
             alwaysUnlocked = true;
             ambientSound = Sounds.none;
+            allDatabaseTabs = true;
         }};
 
         //TODO move

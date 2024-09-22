@@ -10,6 +10,7 @@ import static mindustry.Vars.*;
 import static mindustry.world.meta.BlockFlag.*;
 
 public class FlyingAI extends AIController{
+    final static Rand rand = new Rand();
     final static BlockFlag[] randomTargets = {core, storage, generator, launchPad, factory, repair, battery, reactor, drill};
 
     @Override
@@ -72,10 +73,10 @@ public class FlyingAI extends AIController{
 
         if(state.rules.randomWaveAI){
             //when there are no waves, it's just random based on the unit
-            Mathf.rand.setSeed(unit.type.id + (state.rules.waves ? state.wave : unit.id));
+            rand.setSeed(unit.type.id + (state.rules.waves ? state.wave : unit.id));
             //try a few random flags first
             for(int attempt = 0; attempt < 5; attempt++){
-                Teamc result = targetFlag(x, y, randomTargets[Mathf.rand.random(randomTargets.length - 1)], true);
+                Teamc result = targetFlag(x, y, randomTargets[rand.random(randomTargets.length - 1)], true);
                 if(result != null) return result;
             }
             //try the closest target
