@@ -335,5 +335,9 @@
   {
     "name": "LibreDUSTRY",
     "address": ["46.4.114.111"]
-  }
+  },
+  {
+    "name": "Lett's Servers",
+    "address": ["lett.fairuse.org:9378"]
+  },
 ]
