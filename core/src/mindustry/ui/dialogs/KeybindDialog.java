@@ -213,7 +213,6 @@ public class KeybindDialog extends Dialog{
                 @Override
                 public boolean keyDown(InputEvent event, KeyCode keycode){
                     rebindDialog.hide();
-                    if(keycode == KeyCode.escape) return false;
                     rebind(section, name, keycode);
                     return false;
                 }

@@ -73,6 +73,8 @@ public class Styles{
     geni,
     /** Gray, toggleable, no background. */
     grayi,
+    /** Gray square background, standard behavior. Equivalent to grayt. */
+    graySquarei,
     /** Flat, square, black background. */
     flati,
     /** Square border. */
@@ -287,6 +289,14 @@ public class Styles{
         grayi = new ImageButtonStyle(){{
             imageUpColor = Color.lightGray;
             imageDownColor = Color.white;
+        }};
+        graySquarei = new ImageButtonStyle(){{
+            imageUpColor = Color.white;
+            imageDownColor = Color.lightGray;
+
+            over = flatOver;
+            down = flatOver;
+            up = grayPanel;
         }};
         flati = new ImageButtonStyle(){{
             down = flatOver;

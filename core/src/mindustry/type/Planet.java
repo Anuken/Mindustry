@@ -15,11 +15,11 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
-import mindustry.game.EventType.ContentInitEvent;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.io.*;
 import mindustry.maps.generators.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -128,15 +128,15 @@ public class Planet extends UnlockableContent{
     public boolean allowWaves = false;
     /** If false, players are unable to land on this planet's numbered sectors. */
     public boolean allowLaunchToNumbered = true;
+    /** If true, the player is allowed to change the difficulty/rules in the planet UI. */
+    public boolean allowCampaignRules = false;
     /** Icon as displayed in the planet selection dialog. This is a string, as drawables are null at load time. */
     public String icon = "planet";
     /** Plays in the planet dialog when this planet is selected. */
     public Music launchMusic = Musics.launch;
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
-    /** Sets up rules on game load for any sector on this planet. */
-    public Cons<Rules> ruleSetter = r -> {};
-    /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system.*/
+    /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system. */
     public @Nullable Planet parent;
     /** The root parent of the whole solar system this planet is in. */
     public Planet solarSystem;
@@ -146,16 +146,28 @@ public class Planet extends UnlockableContent{
     public @Nullable TechNode techTree;
     /** TODO remove? Planets that can be launched to from this one. Made mutual in init(). */
     public Seq<Planet> launchCandidates = new Seq<>();
-    /** Items not available on this planet. Left out for backwards compatibility. */
-    public Seq<Item> hiddenItems = new Seq<>();
-    /** The only items available on this planet, if defined. */
-    public Seq<Item> itemWhitelist = new Seq<>();
+    /** If true, all content in this planet's tech tree will be assigned this planet in their shownPlanets. */
+    public boolean autoAssignPlanet = true;
     /** Content (usually planet-specific) that is unlocked upon landing here. */
     public Seq<UnlockableContent> unlockedOnLand = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     public Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
     /** Loads the planet grid outline mesh. Clientside only. */
     public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineRad * radius);
+
+    /** Global difficulty/modifier settings for this planet's campaign. */
+    public CampaignRules campaignRules = new CampaignRules();
+    /** Defaults applied to the rules. */
+    public CampaignRules campaignRuleDefaults = new CampaignRules();
+    /** Sets up rules on game load for any sector on this planet. */
+    public Cons<Rules> ruleSetter = r -> {};
+    /** If true, RTS AI can be customized. */
+    public boolean showRtsAIRule = false;
+
+    /** @deprecated no-op, do not use. */
+    @Deprecated
+    public Seq<Item> itemWhitelist = new Seq<>(), hiddenItems = new Seq<>();
+
 
     public Planet(String name, Planet parent, float radius){
         super(name);
@@ -179,15 +191,9 @@ public class Planet extends UnlockableContent{
             parent.updateTotalRadius();
         }
 
-        //if an item whitelist exists, add everything else not in that whitelist to hidden items
-        Events.on(ContentInitEvent.class, e -> {
-            if(itemWhitelist.size > 0){
-                hiddenItems.addAll(content.items().select(i -> !itemWhitelist.contains(i)));
-            }
-        });
-
         //calculate solar system
         for(solarSystem = this; solarSystem.parent != null; solarSystem = solarSystem.parent);
+        allowCampaignRules = isVanilla();
     }
 
     public Planet(String name, Planet parent, float radius, int sectorSize){
@@ -205,19 +211,38 @@ public class Planet extends UnlockableContent{
         }
     }
 
+    public void saveRules(){
+        Core.settings.putJson(name + "-campaign-rules", campaignRules);
+    }
+
+    public void loadRules(){
+        campaignRules = Core.settings.getJson(name + "-campaign-rules", CampaignRules.class, () -> campaignRules);
+    }
+
     public @Nullable Sector getStartSector(){
         return sectors.size == 0 ? null : sectors.get(startSector);
     }
 
     public void applyRules(Rules rules){
+        applyRules(rules, false);
+    }
+
+    public void applyRules(Rules rules, boolean customGame){
         ruleSetter.get(rules);
 
         rules.attributes.clear();
         rules.attributes.add(defaultAttributes);
         rules.env = defaultEnv;
         rules.planet = this;
-        rules.hiddenBuildItems.clear();
-        rules.hiddenBuildItems.addAll(hiddenItems);
+
+        if(!customGame){
+            campaignRules.apply(this, rules);
+        }
+    }
+
+    public void applyDefaultRules(CampaignRules rules){
+        JsonIO.copy(campaignRuleDefaults, rules);
+        rules.sectorInvasion = allowSectorInvasion;
     }
 
     public @Nullable Sector getLastSector(){
@@ -334,8 +359,16 @@ public class Planet extends UnlockableContent{
 
     @Override
     public void init(){
+        applyDefaultRules(campaignRules);
+        loadRules();
+
         if(techTree == null){
             techTree = TechTree.roots.find(n -> n.planet == this);
+        }
+
+        if(techTree != null && autoAssignPlanet){
+            techTree.addDatabaseTab(this);
+            techTree.addPlanet(this);
         }
 
         for(Sector sector : sectors){
@@ -535,5 +568,27 @@ public class Planet extends UnlockableContent{
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
         }
         batch.flush(Gl.lineStrip);
+    }
+
+    public Vec3 lookAt(Sector sector, Vec3 out){
+        return out.set(sector.tile.v).rotate(Vec3.Y, -getRotation());
+    }
+
+    public Vec3 project(Sector sector, Camera3D cam, Vec3 out){
+        return cam.project(out.set(sector.tile.v).setLength(outlineRad * radius).rotate(Vec3.Y, -getRotation()).add(position));
+    }
+
+    public void setPlane(Sector sector, PlaneBatch3D projector){
+        float rotation = -getRotation();
+        float length = 0.01f;
+
+        projector.setPlane(
+            //origin on sector position
+            Tmp.v33.set(sector.tile.v).setLength((outlineRad + length) * radius).rotate(Vec3.Y, rotation).add(position),
+            //face up
+            sector.plane.project(Tmp.v32.set(sector.tile.v).add(Vec3.Y)).sub(sector.tile.v, radius).rotate(Vec3.Y, rotation).nor(),
+            //right vector
+            Tmp.v31.set(Tmp.v32).rotate(Vec3.Y, -rotation).add(sector.tile.v).rotate(sector.tile.v, 90).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor()
+        );
     }
 }

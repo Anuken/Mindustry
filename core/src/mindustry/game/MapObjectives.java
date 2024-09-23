@@ -39,8 +39,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
      * @see #eachRunning(Cons)
      */
     public Seq<MapObjective> all = new Seq<>(4);
-    /** @see #checkChanged() */
-    protected transient boolean changed;
 
     static{
         registerObjective(
@@ -126,21 +124,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         eachRunning(obj -> {
             //objectives cannot get completed on the client, but they do try to update for timers and such
             if(obj.update() && !net.client()){
-                obj.completed = true;
-                obj.done();
+                Call.completeObjective(all.indexOf(obj));
             }
-
-            changed |= obj.changed;
-            obj.changed = false;
         });
     }
 
-    /** @return True if map rules should be synced. Reserved for {@link Vars#logic}; do not invoke directly! */
-    public boolean checkChanged(){
-        boolean has = changed;
-        changed = false;
-
-        return has;
+    public @Nullable MapObjective get(int index){
+        return index < 0 || index >= all.size ? null : all.get(index);
     }
 
     /** @return Whether there are any qualified objectives at all. */
@@ -149,7 +139,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     public void clear(){
-        if(all.size > 0) changed = true;
         all.clear();
     }
 
@@ -175,6 +164,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Base abstract class for any in-map objective. */
     public static abstract class MapObjective{
+        public boolean hidden;
         public @Nullable @Multiline String details;
         public @Unordered String[] flagsAdded = {};
         public @Unordered String[] flagsRemoved = {};
@@ -191,7 +181,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** Whether this objective has been done yet. This is internally set. */
         private boolean completed;
         /** Internal value. Do not modify! */
-        private transient boolean depFinished, changed;
+        private transient boolean depFinished;
 
         /** @return True if this objective is done and should be removed from the executor. */
         public abstract boolean update();
@@ -201,13 +191,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         /** Called once after {@link #update()} returns true, before this objective is removed. */
         public void done(){
-            changed();
-            Call.objectiveCompleted(flagsRemoved, flagsAdded);
-        }
-
-        /** Notifies the executor that map rules should be synced. */
-        protected void changed(){
-            changed = true;
+            state.rules.objectiveFlags.removeAll(flagsRemoved);
+            state.rules.objectiveFlags.addAll(flagsAdded);
+            completed = true;
         }
 
         /** @return True if all {@link #parents} are completed, rendering this objective able to execute. */
@@ -456,7 +442,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public boolean update(){
-            return (countup += Time.delta) >= duration;
+            return (countup += Time.delta) >= duration * state.rules.objectiveTimerMultiplier;
         }
 
         @Override
@@ -468,7 +454,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             if(text != null){
-                int i = (int)((duration - countup) / 60f);
+                int i = (int)((duration * state.rules.objectiveTimerMultiplier - countup) / 60f);
                 StringBuilder timeString = new StringBuilder();
 
                 int m = i / 60;
@@ -866,7 +852,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Displays a shape with an outline and color. */
     public static class ShapeMarker extends PosMarker{
-        public float radius = 8f, rotation = 0f, stroke = 1f;
+        public float radius = 8f, rotation = 0f, stroke = 1f, startAngle = 0f, endAngle = 360f;
         public boolean fill = false, outline = true;
         public int sides = 4;
         public Color color = Color.valueOf("ffd37f");
@@ -892,14 +878,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(!fill){
                 if(outline){
                     Lines.stroke((stroke + 2f) * scaleFactor, Pal.gray);
-                    Lines.poly(pos.x, pos.y, sides, (radius + 1f) * scaleFactor, rotation);
+                    Lines.poly(pos.x, pos.y, sides, (radius + 1f) * scaleFactor, rotation + startAngle, rotation + endAngle);
                 }
 
                 Lines.stroke(stroke * scaleFactor, color);
-                Lines.poly(pos.x, pos.y, sides, (radius + 1f) * scaleFactor, rotation);
+                Lines.poly(pos.x, pos.y, sides, (radius + 1f) * scaleFactor, rotation + startAngle, rotation + endAngle);
             }else{
                 Draw.color(color);
-                Fill.poly(pos.x, pos.y, sides, radius * scaleFactor, rotation);
+                if (startAngle < endAngle){
+                    Fill.arc(pos.x, pos.y, radius * scaleFactor, (endAngle - startAngle) / 360f, rotation + startAngle, sides);
+                }else{
+                    Fill.arc(pos.x, pos.y, radius * scaleFactor, (startAngle - endAngle) / 360f, rotation + endAngle, sides);
+                }
             }
 
             Draw.reset();
@@ -916,12 +906,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     case rotation -> rotation = (float)p1;
                     case color -> color.fromDouble(p1);
                     case shape -> sides = (int)p1;
+                    case arc -> startAngle = (float)p1;
                 }
             }
 
             if(!Double.isNaN(p2)){
                 switch(type){
                     case shape -> fill = !Mathf.equal((float)p2, 0f);
+                    case arc -> endAngle = (float)p2;
                 }
             }
 
@@ -1134,6 +1126,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void setTexture(String textureName){
             this.textureName = textureName;
 
+            if(headless) return;
             if(fetchedRegion == null) fetchedRegion = new TextureRegion();
             lookupRegion(textureName, fetchedRegion);
         }

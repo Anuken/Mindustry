@@ -631,7 +631,7 @@ public class JoinDialog extends BaseDialog{
             Core.settings.remove("server-list");
         }
 
-        var url = becontrol.active() ? serverJsonBeURL : serverJsonURL;
+        var url = Version.type.equals("bleeding-edge")  ? serverJsonBeURL : serverJsonURL;
         Log.info("Fetching community servers at @", url);
 
         //get servers

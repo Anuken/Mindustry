@@ -8,6 +8,7 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -25,6 +26,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -465,7 +467,10 @@ public class PlacementFragment{
                                 for(int i = 0; i < counts.length; i++){
                                     if(counts[i] > 0){
                                         var type = content.unit(i);
-                                        unitlist.add(new ItemImage(type.uiIcon, counts[i])).tooltip(type.localizedName).pad(4).with(b -> {
+                                        unitlist.add(StatValues.stack(type, counts[i])).pad(4).with(b -> {
+                                            b.clearListeners();
+                                            b.addListener(Tooltips.getInstance().create(type.localizedName, false));
+
                                             var listener = new ClickListener();
 
                                             //left click -> select
@@ -528,6 +533,10 @@ public class PlacementFragment{
                                 //list stances
                                 if(stances.size > 1){
                                     u.row();
+
+                                    if(commands.size > 1){
+                                        u.add(new Image(Tex.whiteui)).height(3f).color(Pal.gray).pad(7f).growX().row();
+                                    }
 
                                     u.table(coms -> {
                                         coms.left();
@@ -615,7 +624,7 @@ public class PlacementFragment{
                         blocksSelect.margin(4).marginTop(0);
                         blockPane = blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
                             if(pane.hasScroll()){
-                                Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                                Element result = Core.scene.getHoverElement();
                                 if(result == null || !result.isDescendantOf(pane)){
                                     Core.scene.setScrollFocus(null);
                                 }

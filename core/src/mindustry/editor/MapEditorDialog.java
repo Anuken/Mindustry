@@ -24,7 +24,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.maps.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -212,11 +211,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         margin(0);
 
         update(() -> {
-            if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
-                return;
-            }
-
-            if(Core.scene != null && Core.scene.getKeyboardFocus() == this){
+            if(hasKeyboard()){
                 doInput();
             }
         });
@@ -698,28 +693,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
         if(Core.input.ctrl()){
             if(Core.input.keyTap(KeyCode.z)){
                 editor.undo();
-            }
-
-            //more undocumented features, fantastic
-            if(Core.input.keyTap(KeyCode.t)){
-
-                //clears all 'decoration' from the map
-                for(int x = 0; x < editor.width(); x++){
-                    for(int y = 0; y < editor.height(); y++){
-                        Tile tile = editor.tile(x, y);
-                        if(tile.block().breakable && tile.block() instanceof Prop){
-                            tile.setBlock(Blocks.air);
-                            editor.renderer.updatePoint(x, y);
-                        }
-
-                        if(tile.overlay() != Blocks.air && tile.overlay() != Blocks.spawn){
-                            tile.setOverlay(Blocks.air);
-                            editor.renderer.updatePoint(x, y);
-                        }
-                    }
-                }
-
-                editor.flushOp();
             }
 
             if(Core.input.keyTap(KeyCode.y)){

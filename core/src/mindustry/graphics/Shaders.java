@@ -474,6 +474,6 @@ public class Shaders{
     }
 
     public static Fi getShaderFi(String file){
-        return Core.files.internal("shaders/" + file);
+        return tree.get("shaders/" + file);
     }
 }

@@ -1,6 +1,9 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -19,7 +22,22 @@ public class ReloadTurret extends BaseTurret{
 
         if(coolant != null){
             stats.remove(Stat.booster);
-            stats.add(Stat.booster, StatValues.boosters(reload, coolant.amount, coolantMultiplier, true, l -> l.coolant && consumesLiquid(l)));
+
+            //TODO this is very hacky, there is no current way to check if a ConsumeLiquidBase accepts something individually. fix later
+            ObjectSet<Liquid> notBooster = content.liquids().select(l -> {
+                for(Consume c : consumers){
+                    if(!c.booster && c != coolant &&
+                        ((c instanceof ConsumeLiquid cl && cl.liquid == l) ||
+                        (c instanceof ConsumeLiquids cl2 && Structs.contains(cl2.liquids, s -> s.liquid == l)) ||
+                        (c instanceof ConsumeLiquidFilter clf && clf.filter.get(l)))){
+
+                        return true;
+                    }
+                }
+                return false;
+            }).asSet();
+
+            stats.add(Stat.booster, StatValues.boosters(reload, coolant.amount, coolantMultiplier, true, l -> l.coolant && consumesLiquid(l) && !notBooster.contains(l)));
         }
     }
 

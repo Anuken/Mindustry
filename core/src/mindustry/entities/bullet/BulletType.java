@@ -174,6 +174,10 @@ public class BulletType extends Content implements Cloneable{
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
     /** Random range of frag lifetime as a multiplier. */
     public float fragLifeMin = 1f, fragLifeMax = 1f;
+    /** Random offset of frag bullets from the parent bullet. */
+    public float fragOffsetMin = 1f, fragOffsetMax = 7f;
+    /** How many times this bullet can release frag bullets, if pierce = true. */
+    public int pierceFragCap = -1;
 
     /** Bullet that is created at a fixed interval. */
     public @Nullable BulletType intervalBullet;
@@ -305,6 +309,8 @@ public class BulletType extends Content implements Cloneable{
     /** Color of light emitted by this bullet. */
     public Color lightColor = Pal.powerLight;
 
+    protected float cachedDps = -1;
+
     public BulletType(float speed, float damage){
         this.speed = speed;
         this.damage = damage;
@@ -334,15 +340,20 @@ public class BulletType extends Content implements Cloneable{
 
     /** @return estimated damage per shot. this can be very inaccurate. */
     public float estimateDPS(){
+        if(cachedDps >= 0f) return cachedDps;
+
         if(spawnUnit != null){
             return spawnUnit.estimateDps();
         }
 
-        float sum = damage + splashDamage*0.75f;
+        float sum = (damage + splashDamage*0.75f) * (pierce ? pierceCap == -1 ? 2 : Mathf.clamp(pierceCap, 1, 2) : 1f);
         if(fragBullet != null && fragBullet != this){
             sum += fragBullet.estimateDPS() * fragBullets / 2f;
         }
-        return sum;
+        for(var other : spawnBullets){
+            sum += other.estimateDPS();
+        }
+        return cachedDps = sum;
     }
 
     /** @return maximum distance the bullet this bullet type has can travel. */
@@ -507,12 +518,13 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void createFrags(Bullet b, float x, float y){
-        if(fragBullet != null && (fragOnAbsorb || !b.absorbed)){
+        if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && !(b.frags >= pierceFragCap && pierceFragCap > 0)){
             for(int i = 0; i < fragBullets; i++){
-                float len = Mathf.random(1f, 7f);
+                float len = Mathf.random(fragOffsetMin, fragOffsetMax);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
+            b.frags++;
         }
     }
 
@@ -537,7 +549,7 @@ public class BulletType extends Content implements Cloneable{
         if(!fragOnHit){
             createFrags(b, b.x, b.y);
         }
-        
+
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         despawnSound.at(b);
 
@@ -663,7 +675,7 @@ public class BulletType extends Content implements Cloneable{
             }
         }
     }
-    
+
     public void updateTrail(Bullet b){
         if(!headless && trailLength > 0){
             if(b.trail == null){
@@ -704,7 +716,7 @@ public class BulletType extends Content implements Cloneable{
         if(lightRadius <= -1){
             lightRadius = Math.max(18, hitSize * 5f);
         }
-        
+
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
         range = calculateRange();
     }

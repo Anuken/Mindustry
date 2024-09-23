@@ -7,8 +7,8 @@ import static mindustry.content.Planets.*;
 public class SectorPresets{
     public static SectorPreset
     groundZero,
-    craters, biomassFacility, frozenForest, ruinousShores, windsweptIslands, stainedMountains, tarFields,
-    fungalPass, extractionOutpost, saltFlats, overgrowth,
+    craters, biomassFacility, taintedWoods, frozenForest, ruinousShores, facility32m, windsweptIslands, stainedMountains, tarFields,
+    fungalPass, infestedCanyons, atolls, extractionOutpost, polarAerodrome, saltFlats, overgrowth,
     impact0078, desolateRift, nuclearComplex, planetaryTerminal,
     coastline, navalFortress,
 
@@ -42,6 +42,11 @@ public class SectorPresets{
             difficulty = 3;
         }};
 
+        taintedWoods = new SectorPreset("taintedWoods", serpulo, 221){{
+            captureWave = 32;
+            difficulty = 5;
+        }};
+
         craters = new SectorPreset("craters", serpulo, 18){{
             captureWave = 20;
             difficulty = 2;
@@ -50,6 +55,11 @@ public class SectorPresets{
         ruinousShores = new SectorPreset("ruinousShores", serpulo, 213){{
             captureWave = 30;
             difficulty = 3;
+        }};
+
+        facility32m = new SectorPreset("facility32m", serpulo, 64){{
+            captureWave = 25;
+            difficulty = 4;
         }};
 
         windsweptIslands = new SectorPreset("windsweptIslands", serpulo, 246){{
@@ -66,6 +76,10 @@ public class SectorPresets{
             difficulty = 5;
         }};
 
+        polarAerodrome = new SectorPreset("polarAerodrome", serpulo, 68){{
+            difficulty = 7;
+        }};
+
         coastline = new SectorPreset("coastline", serpulo, 108){{
             captureWave = 30;
             difficulty = 5;
@@ -77,6 +91,14 @@ public class SectorPresets{
 
         fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
             difficulty = 4;
+        }};
+
+        infestedCanyons = new SectorPreset("infestedCanyons", serpulo, 210){{
+            difficulty = 4;
+        }};
+
+        atolls = new SectorPreset("atolls", serpulo, 1){{
+            difficulty = 7;
         }};
 
         overgrowth = new SectorPreset("overgrowth", serpulo, 134){{
