@@ -404,7 +404,7 @@ public class Control implements ApplicationListener, Loadable{
             ui.planet.hide();
             SaveSlot slot = sector.save;
             sector.planet.setLastSector(sector);
-            if(slot != null && !clearSectors && (!sector.planet.clearSectorOnLose || sector.info.hasCore)){
+            if(slot != null && !clearSectors && (!(sector.planet.clearSectorOnLose || sector.info.hasWorldProcessor) || sector.info.hasCore)){
 
                 try{
                     boolean hadNoCore = !sector.info.hasCore;
@@ -417,7 +417,7 @@ public class Control implements ApplicationListener, Loadable{
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty() || hadNoCore){
 
-                        if(sector.planet.clearSectorOnLose){
+                        if(sector.planet.clearSectorOnLose || sector.info.hasWorldProcessor){
                             playNewSector(origin, sector, reloader);
                         }else{
                             //no spawn set -> delete the sector save
