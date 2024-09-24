@@ -4954,6 +4954,7 @@ public class Blocks{
             reload = 100f;
             recoil = 2f;
             range = 300;
+            trackingRange = range * 1.4f;
             shootCone = 30f;
             scaledHealth = 350;
             rotateSpeed = 1.5f;
@@ -5290,6 +5291,7 @@ public class Blocks{
             envEnabled |= Env.space;
             reload = 9f;
             range = 370;
+            trackingRange = range * 1.4f;
             shootCone = 100f;
             scaledHealth = 370;
             rotateSpeed = 2f;
