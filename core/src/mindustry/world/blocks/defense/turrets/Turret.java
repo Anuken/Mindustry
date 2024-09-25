@@ -482,13 +482,21 @@ public class Turret extends ReloadTurret{
             return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().heals();
         }
 
-        protected void findTarget(){
-            float range = trackingRange();
-
+        protected Posc findEnemy(float range){
             if(targetAir && !targetGround){
-                target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
+                return Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
             }else{
-                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+                return Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+            }
+        }
+
+        protected void findTarget(){
+            float trackRange = trackingRange(), range = range();
+
+            target = findEnemy(trackRange);
+            //find another target within the tracking range, but only if there's nothing else (always prioritize standard target)
+            if(!Mathf.equal(trackRange, range) && target == null){
+                target = findEnemy(trackRange);
             }
 
             if(target == null && canHeal()){
