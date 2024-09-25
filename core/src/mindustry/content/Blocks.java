@@ -1889,7 +1889,7 @@ public class Blocks{
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
-            health = 70;
+            health = 65;
             speed = 0.08f;
             displayedSpeed = 11f;
         }};
