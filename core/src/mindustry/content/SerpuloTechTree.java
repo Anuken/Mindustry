@@ -549,8 +549,11 @@ public class SerpuloTechTree{
                                         node(navalFortress, Seq.with(
                                         new SectorComplete(coastline),
                                         new SectorComplete(extractionOutpost),
+                                        new Research(coreNucleus),
+                                        new Research(massDriver),
                                         new Research(oxynoe),
                                         new Research(minke),
+                                        new Research(bryde),
                                         new Research(cyclone),
                                         new Research(ripple)
                                         ), () -> {
