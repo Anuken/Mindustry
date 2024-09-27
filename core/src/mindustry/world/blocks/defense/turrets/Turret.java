@@ -493,7 +493,7 @@ public class Turret extends ReloadTurret{
         protected void findTarget(){
             float trackRange = trackingRange(), range = range();
 
-            target = findEnemy(trackRange);
+            target = findEnemy(range);
             //find another target within the tracking range, but only if there's nothing else (always prioritize standard target)
             if(!Mathf.equal(trackRange, range) && target == null){
                 target = findEnemy(trackRange);

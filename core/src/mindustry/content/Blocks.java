@@ -2991,7 +2991,7 @@ public class Blocks{
         reinforcedContainer = new StorageBlock("reinforced-container"){{
             requirements(Category.effect, with(Items.tungsten, 30, Items.graphite, 40));
             size = 2;
-            itemCapacity = 80;
+            itemCapacity = 160;
             scaledHealth = 120;
             coreMerge = false;
         }};
