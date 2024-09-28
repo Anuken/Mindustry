@@ -178,11 +178,13 @@ public class Drill extends Block{
 
         if(liquidBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase) instanceof ConsumeLiquidBase consBase){
             stats.remove(Stat.booster);
-            stats.add(Stat.booster,
-                StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
-                consBase.amount,
-                liquidBoostIntensity * liquidBoostIntensity, false, this::consumesLiquid)
-            );
+            stats.add(Stat.booster, StatValues.speedBoosters(
+                "{0}" + StatUnit.timesSpeed.localized(),
+                consBase.amount, liquidBoostIntensity * liquidBoostIntensity, false,
+                l -> consumesLiquid(l) && findConsumer(f ->
+                    f instanceof ConsumeLiquid cl && cl.liquid == l && cl.booster
+                ) != null
+            ));
         }
     }
 
