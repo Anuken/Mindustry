@@ -60,7 +60,7 @@ public class Turret extends ReloadTurret{
     public float shootX = 0f, shootY = Float.NEGATIVE_INFINITY;
     /** Random spread on the X axis. */
     public float xRand = 0f;
-    /** Range at which it finds and locks on to the taget, but does not shoot. */
+    /** Range at which it finds and locks on to the target, but does not shoot. */
     public float trackingRange = 0f;
     /** Minimum bullet range. Used for artillery only. */
     public float minRange = 0f;
