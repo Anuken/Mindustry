@@ -16,9 +16,9 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
-import mindustry.game.*;
 import mindustry.game.Saves.*;
 import mindustry.gen.*;
 import mindustry.input.*;
@@ -30,7 +30,6 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -75,6 +74,7 @@ public class Control implements ApplicationListener, Loadable{
                     ui.showInfo("@mods.initfailed");
                 });
             }
+            checkAutoUnlocks();
         });
 
         Events.on(StateChangeEvent.class, event -> {
@@ -404,7 +404,7 @@ public class Control implements ApplicationListener, Loadable{
             ui.planet.hide();
             SaveSlot slot = sector.save;
             sector.planet.setLastSector(sector);
-            if(slot != null && !clearSectors && (!sector.planet.clearSectorOnLose || sector.info.hasCore)){
+            if(slot != null && !clearSectors && (!(sector.planet.clearSectorOnLose || sector.info.hasWorldProcessor) || sector.info.hasCore)){
 
                 try{
                     boolean hadNoCore = !sector.info.hasCore;
@@ -417,7 +417,7 @@ public class Control implements ApplicationListener, Loadable{
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty() || hadNoCore){
 
-                        if(sector.planet.clearSectorOnLose){
+                        if(sector.planet.clearSectorOnLose || sector.info.hasWorldProcessor){
                             playNewSector(origin, sector, reloader);
                         }else{
                             //no spawn set -> delete the sector save
@@ -441,6 +441,7 @@ public class Control implements ApplicationListener, Loadable{
                             state.wave = 1;
                             //set up default wave time
                             state.wavetime = state.rules.initialWaveSpacing <= 0f ? (state.rules.waveSpacing * (sector.preset == null ? 2f : sector.preset.startWaveTimeMultiplier)) : state.rules.initialWaveSpacing;
+                            state.wavetime *= sector.planet.campaignRules.difficulty.waveTimeMultiplier;
                             //reset captured state
                             sector.info.wasCaptured = false;
 

@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -98,7 +99,11 @@ public class ContentInfoDialog extends BaseDialog{
         ScrollPane pane = new ScrollPane(table);
         cont.add(pane);
 
-        show();
+        if(isShown()){
+            show(scene, Actions.fadeIn(0f));
+        }else{
+            show();
+        }
     }
 
 }

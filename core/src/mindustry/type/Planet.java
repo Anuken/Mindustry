@@ -19,6 +19,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.io.*;
 import mindustry.maps.generators.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -127,15 +128,15 @@ public class Planet extends UnlockableContent{
     public boolean allowWaves = false;
     /** If false, players are unable to land on this planet's numbered sectors. */
     public boolean allowLaunchToNumbered = true;
+    /** If true, the player is allowed to change the difficulty/rules in the planet UI. */
+    public boolean allowCampaignRules = false;
     /** Icon as displayed in the planet selection dialog. This is a string, as drawables are null at load time. */
     public String icon = "planet";
     /** Plays in the planet dialog when this planet is selected. */
     public Music launchMusic = Musics.launch;
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
-    /** Sets up rules on game load for any sector on this planet. */
-    public Cons<Rules> ruleSetter = r -> {};
-    /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system.*/
+    /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system. */
     public @Nullable Planet parent;
     /** The root parent of the whole solar system this planet is in. */
     public Planet solarSystem;
@@ -153,6 +154,13 @@ public class Planet extends UnlockableContent{
     public Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
     /** Loads the planet grid outline mesh. Clientside only. */
     public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineRad * radius);
+
+    /** Global difficulty/modifier settings for this planet's campaign. */
+    public CampaignRules campaignRules = new CampaignRules();
+    /** Defaults applied to the rules. */
+    public CampaignRules campaignRuleDefaults = new CampaignRules();
+    /** Sets up rules on game load for any sector on this planet. */
+    public Cons<Rules> ruleSetter = r -> {};
 
     /** @deprecated no-op, do not use. */
     @Deprecated
@@ -183,6 +191,7 @@ public class Planet extends UnlockableContent{
 
         //calculate solar system
         for(solarSystem = this; solarSystem.parent != null; solarSystem = solarSystem.parent);
+        allowCampaignRules = isVanilla();
     }
 
     public Planet(String name, Planet parent, float radius, int sectorSize){
@@ -200,17 +209,38 @@ public class Planet extends UnlockableContent{
         }
     }
 
+    public void saveRules(){
+        Core.settings.putJson(name + "-campaign-rules", campaignRules);
+    }
+
+    public void loadRules(){
+        campaignRules = Core.settings.getJson(name + "-campaign-rules", CampaignRules.class, () -> campaignRules);
+    }
+
     public @Nullable Sector getStartSector(){
         return sectors.size == 0 ? null : sectors.get(startSector);
     }
 
     public void applyRules(Rules rules){
+        applyRules(rules, false);
+    }
+
+    public void applyRules(Rules rules, boolean customGame){
         ruleSetter.get(rules);
 
         rules.attributes.clear();
         rules.attributes.add(defaultAttributes);
         rules.env = defaultEnv;
         rules.planet = this;
+
+        if(!customGame){
+            campaignRules.apply(this, rules);
+        }
+    }
+
+    public void applyDefaultRules(CampaignRules rules){
+        JsonIO.copy(campaignRuleDefaults, rules);
+        rules.sectorInvasion = allowSectorInvasion;
     }
 
     public @Nullable Sector getLastSector(){
@@ -327,6 +357,9 @@ public class Planet extends UnlockableContent{
 
     @Override
     public void init(){
+        applyDefaultRules(campaignRules);
+        loadRules();
+
         if(techTree == null){
             techTree = TechTree.roots.find(n -> n.planet == this);
         }

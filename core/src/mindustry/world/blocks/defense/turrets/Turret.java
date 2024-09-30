@@ -60,6 +60,8 @@ public class Turret extends ReloadTurret{
     public float shootX = 0f, shootY = Float.NEGATIVE_INFINITY;
     /** Random spread on the X axis. */
     public float xRand = 0f;
+    /** Range at which it finds and locks on to the target, but does not shoot. */
+    public float trackingRange = 0f;
     /** Minimum bullet range. Used for artillery only. */
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
@@ -182,6 +184,7 @@ public class Turret extends ReloadTurret{
         if(newTargetInterval <= 0f) newTargetInterval = targetInterval;
 
         super.init();
+        trackingRange = Math.max(range, trackingRange);
     }
 
     @Override
@@ -246,6 +249,10 @@ public class Turret extends ReloadTurret{
                 return range + peekAmmo().rangeChange;
             }
             return range;
+        }
+
+        public float trackingRange(){
+            return range() + trackingRange - range;
         }
 
         @Override
@@ -364,7 +371,7 @@ public class Turret extends ReloadTurret{
             if(!validateTarget()) target = null;
 
             float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
-            if(warmupTarget > 0 && shootWarmup >= minWarmup && !isControlled()){
+            if(warmupTarget > 0 && !isControlled()){
                 warmupHold = 1f;
             }
             if(warmupHold > 0f){
@@ -425,6 +432,7 @@ public class Turret extends ReloadTurret{
                         targetPosition(target);
 
                         if(Float.isNaN(rotation)) rotation = 0;
+                        canShoot = within(target, range() + (target instanceof Sized hb ? hb.hitSize()/1.9f : 0f));
                     }
 
                     if(!isControlled()){
@@ -474,13 +482,21 @@ public class Turret extends ReloadTurret{
             return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().heals();
         }
 
-        protected void findTarget(){
-            float range = range();
-
+        protected Posc findEnemy(float range){
             if(targetAir && !targetGround){
-                target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
+                return Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
             }else{
-                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+                return Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+            }
+        }
+
+        protected void findTarget(){
+            float trackRange = trackingRange(), range = range();
+
+            target = findEnemy(range);
+            //find another target within the tracking range, but only if there's nothing else (always prioritize standard target)
+            if(!Mathf.equal(trackRange, range) && target == null){
+                target = findEnemy(trackRange);
             }
 
             if(target == null && canHeal()){

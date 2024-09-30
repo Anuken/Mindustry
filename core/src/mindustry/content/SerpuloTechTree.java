@@ -427,8 +427,8 @@ public class SerpuloTechTree{
                 });
 
                 node(additiveReconstructor, Seq.with(new SectorComplete(biomassFacility)), () -> {
-                    node(multiplicativeReconstructor, () -> {
-                        node(exponentialReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
+                    node(multiplicativeReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
+                        node(exponentialReconstructor, () -> {
                             node(tetrativeReconstructor, () -> {
 
                             });
@@ -514,7 +514,22 @@ public class SerpuloTechTree{
                                     new Research(airFactory),
                                     new Research(mono)
                                     ), () -> {
+                                        //TODO: removed for now
+                                        /*node(polarAerodrome, Seq.with(
+                                        new SectorComplete(fungalPass),
+                                        new SectorComplete(desolateRift),
+                                        new SectorComplete(overgrowth),
+                                        new Research(multiplicativeReconstructor),
+                                        new Research(zenith),
+                                        new Research(swarmer),
+                                        new Research(cyclone),
+                                        new Research(blastDrill),
+                                        new Research(blastDrill),
+                                        new Research(massDriver)
+                                        ), () -> {
 
+                                        });
+                                        */
                                     });
                                 });
 
@@ -534,8 +549,11 @@ public class SerpuloTechTree{
                                         node(navalFortress, Seq.with(
                                         new SectorComplete(coastline),
                                         new SectorComplete(extractionOutpost),
+                                        new Research(coreNucleus),
+                                        new Research(massDriver),
                                         new Research(oxynoe),
                                         new Research(minke),
+                                        new Research(bryde),
                                         new Research(cyclone),
                                         new Research(ripple)
                                         ), () -> {
@@ -555,7 +573,13 @@ public class SerpuloTechTree{
                         new Research(UnitTypes.mace),
                         new Research(UnitTypes.flare)
                         ), () -> {
+                            node(atolls, Seq.with(
+                            new SectorComplete(windsweptIslands),
+                            new Research(multiplicativeReconstructor),
+                            new Research(mega)
+                            ), () -> {
 
+                            });
                         });
                     });
 
@@ -584,6 +608,16 @@ public class SerpuloTechTree{
                             new Research(groundFactory),
                             new Research(door)
                             ), () -> {
+                                node(infestedCanyons, Seq.with(
+                                new SectorComplete(fungalPass),
+                                new Research(navalFactory),
+                                new Research(risso),
+                                new Research(minke),
+                                new Research(additiveReconstructor)
+                                ), () -> {
+
+                                });
+
                                 node(nuclearComplex, Seq.with(
                                 new SectorComplete(fungalPass),
                                 new Research(thermalGenerator),

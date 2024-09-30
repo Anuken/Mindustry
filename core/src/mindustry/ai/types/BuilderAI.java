@@ -195,7 +195,7 @@ public class BuilderAI extends AIController{
         }
 
         if(!unit.type.flying){
-            unit.updateBoosting(moving || unit.floorOn().isDuct || unit.floorOn().damageTaken > 0f);
+            unit.updateBoosting(moving || unit.floorOn().isDuct || unit.floorOn().damageTaken > 0f || unit.floorOn().isDeep());
         }
     }
 

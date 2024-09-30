@@ -20,11 +20,12 @@ public class CommandAI extends AIController{
     protected static final Vec2 vecOut = new Vec2(), vecMovePos = new Vec2();
     protected static final boolean[] noFound = {false};
     protected static final UnitPayload tmpPayload = new UnitPayload(null);
+    protected static final int transferStateNone = 0, transferStateLoad = 1, transferStateUnload = 2;
 
     public Seq<Position> commandQueue = new Seq<>(5);
     public @Nullable Vec2 targetPos;
     public @Nullable Teamc attackTarget;
-    /** Group of units that were all commanded to reach the same point.. */
+    /** Group of units that were all commanded to reach the same point. */
     public @Nullable UnitGroup group;
     public int groupIndex = 0;
     /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
@@ -36,6 +37,8 @@ public class CommandAI extends AIController{
     protected Vec2 lastTargetPos;
     protected boolean blockingUnit;
     protected float timeSpentBlocked;
+    protected float payloadPickupCooldown;
+    protected int transferState = transferStateNone;
 
     /** Stance, usually related to firing mode. */
     public UnitStance stance = UnitStance.shoot;
@@ -113,9 +116,18 @@ public class CommandAI extends AIController{
         attackTarget = null;
     }
 
+    void tryPickupUnit(Payloadc pay){
+        Unit target = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u.isAI() && u != unit && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize));
+        if(target != null){
+            Call.pickedUnitPayload(unit, target);
+        }
+    }
+
     public void defaultBehavior(){
 
         if(!net.client() && unit instanceof Payloadc pay){
+            payloadPickupCooldown -= Time.delta;
+
             //auto-drop everything
             if(command == UnitCommand.unloadPayloadCommand && pay.hasPayload()){
                 Call.payloadDropped(unit, unit.x, unit.y);
@@ -123,10 +135,7 @@ public class CommandAI extends AIController{
 
             //try to pick up what's under it
             if(command == UnitCommand.loadUnitsCommand){
-                Unit target = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u.isAI() && u != unit && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize));
-                if(target != null){
-                    Call.pickedUnitPayload(unit, target);
-                }
+                tryPickupUnit(pay);
             }
 
             //try to pick up a block
@@ -218,8 +227,14 @@ public class CommandAI extends AIController{
                 vecMovePos.add(group.positions[groupIndex * 2], group.positions[groupIndex * 2 + 1]);
             }
 
+            Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
+
             //TODO: should the unit stop when it finds a target?
-            if(stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget){
+            if(
+                (stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
+                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
+                (command == UnitCommand.loopPayloadCommand && unit.within(targetPos, 10f))
+            ){
                 move = false;
             }
 
@@ -260,6 +275,13 @@ public class CommandAI extends AIController{
                     vecOut.set(vecMovePos);
                 }else{
                     move = controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+
+                    //TODO: what to do when there's a target and it can't be reached?
+                    /*
+                    if(noFound[0] && attackTarget != null && attackTarget.within(unit, unit.type.range * 2f)){
+                        move = true;
+                        vecOut.set(targetPos);
+                    }*/
                 }
 
                 //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
@@ -321,9 +343,53 @@ public class CommandAI extends AIController{
 
     void finishPath(){
         //the enter payload command never finishes until they are actually accepted
-        if(command == UnitCommand.enterPayloadCommand && commandQueue.size == 0 && targetPos != null && world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y).block.acceptsPayloads){
+        if(command == UnitCommand.enterPayloadCommand && commandQueue.size == 0 && targetPos != null && world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y).block.acceptsUnitPayloads){
             return;
         }
+
+        if(!net.client() && command == UnitCommand.loopPayloadCommand && unit instanceof Payloadc pay){
+
+            if(transferState == transferStateNone){
+                transferState = pay.hasPayload() ? transferStateUnload : transferStateLoad;
+            }
+
+            if(payloadPickupCooldown > 0f) return;
+
+            if(transferState == transferStateUnload){
+                //drop until there's a failure
+                int prev = -1;
+                while(pay.hasPayload() && prev != pay.payloads().size){
+                    prev = pay.payloads().size;
+                    Call.payloadDropped(unit, unit.x, unit.y);
+                }
+
+                //wait for everything to unload before running code below
+                if(pay.hasPayload()){
+                    return;
+                }
+                payloadPickupCooldown = 60f;
+            }else if(transferState == transferStateLoad){
+                //pick up units until there's a failure
+                int prev = -1;
+                while(prev != pay.payloads().size){
+                    prev = pay.payloads().size;
+                    tryPickupUnit(pay);
+                }
+
+                //wait to load things before running code below
+                if(!pay.hasPayload()){
+                    return;
+                }
+                payloadPickupCooldown = 60f;
+            }
+
+            //it will never finish
+            if(commandQueue.size == 0){
+                return;
+            }
+        }
+
+        transferState = transferStateNone;
 
         Vec2 prev = targetPos;
         targetPos = null;
@@ -336,7 +402,7 @@ public class CommandAI extends AIController{
                 commandPosition(position);
             }
 
-            if(prev != null && stance == UnitStance.patrol){
+            if(prev != null && (stance == UnitStance.patrol || command == UnitCommand.loopPayloadCommand)){
                 commandQueue.add(prev.cpy());
             }
 
@@ -351,10 +417,15 @@ public class CommandAI extends AIController{
         }
     }
 
+    @Override
+    public void removed(Unit unit){
+        clearCommands();
+    }
+
     public void commandQueue(Position location){
         if(targetPos == null && attackTarget == null){
-            if(location instanceof Teamc target){
-                commandTarget(target, this.stopAtTarget);
+            if(location instanceof Teamc t){
+                commandTarget(t, this.stopAtTarget);
             }else if(location instanceof Vec2 position){
                 commandPosition(position);
             }
@@ -392,7 +463,7 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
-        return !nearAttackTarget(x, y, range) ? super.findTarget(x, y, range, air, ground) : attackTarget;
+        return !nearAttackTarget(x, y, range) ? super.findTarget(x, y, range, air, ground) : Units.isHittable(attackTarget, air, ground) ? attackTarget : null;
     }
 
     public boolean nearAttackTarget(float x, float y, float range){
@@ -445,52 +516,4 @@ public class CommandAI extends AIController{
         this.stopAtTarget = stopAtTarget;
     }
 
-    /*
-
-    //TODO ひどい
-    (does not work)
-
-    public static float cohesionScl = 0.3f;
-    public static float cohesionRad = 3f, separationRad = 1.1f, separationScl = 1f, flockMult = 0.5f;
-
-    Vec2 calculateFlock(){
-        if(local.isEmpty()) return flockVec.setZero();
-
-        flockVec.setZero();
-        separation.setZero();
-        cohesion.setZero();
-        massCenter.set(unit);
-
-        float rad = unit.hitSize;
-        float sepDst = rad * separationRad, cohDst = rad * cohesionRad;
-
-        //"cohesed" isn't even a word smh
-        int separated = 0, cohesed = 1;
-
-        for(var other : local){
-            float dst = other.dst(unit);
-            if(dst < sepDst){
-                separation.add(Tmp.v1.set(unit).sub(other).scl(1f / sepDst));
-                separated ++;
-            }
-
-            if(dst < cohDst){
-                massCenter.add(other);
-                cohesed ++;
-            }
-        }
-
-        if(separated > 0){
-            separation.scl(1f / separated);
-            flockVec.add(separation.scl(separationScl));
-        }
-
-        if(cohesed > 1){
-            massCenter.scl(1f / cohesed);
-            flockVec.add(Tmp.v1.set(massCenter).sub(unit).limit(cohesionScl * unit.type.speed));
-            //seek mass center?
-        }
-
-        return flockVec;
-    }*/
 }

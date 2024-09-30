@@ -53,6 +53,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Used for dropping items. */
     final static float playerSelectRange = mobile ? 17f : 11f;
     final static IntSeq removed = new IntSeq();
+    final static IntSet intSet = new IntSet();
     /** Maximum line length. */
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
@@ -1055,6 +1056,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                     if(ai.attackTarget == null){
                         Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f);
+
+                        if(ai.currentCommand() == UnitCommand.enterPayloadCommand){
+                            var build = world.buildWorld(lineDest.getX(), lineDest.getY());
+                            if(build != null && build.block.acceptsUnitPayloads && build.team == unit.team){
+                                Drawf.selected(build, Pal.accent);
+                            }
+                        }
                     }
                 }
 
@@ -1080,6 +1088,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                             Drawf.target(next.getX(), next.getY(), 6f, Pal.remove);
                         }
                     }
+                }
+
+                if(ai.targetPos != null && ai.currentCommand() == UnitCommand.loopPayloadCommand && unit instanceof Payloadc pay){
+                    Draw.color(Pal.accent, 0.4f + Mathf.absin(5f, 0.5f));
+                    TextureRegion region = pay.hasPayload() ? Icon.download.getRegion() : Icon.upload.getRegion();
+                    float offset = 11f;
+                    float size = 8f;
+                    Draw.rect(region, ai.targetPos.x, ai.targetPos.y + offset, size, size / region.ratio());
+
+                    if(ai.commandQueue.size > 0){
+                        region = !pay.hasPayload() ? Icon.download.getRegion() : Icon.upload.getRegion();
+                        Draw.rect(region, ai.commandQueue.first().getX(), ai.commandQueue.first().getY() + offset, size, size / region.ratio());
+                    }
+                    Draw.color();
                 }
             }
 
@@ -1362,10 +1384,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 
-    protected void drawRebuildSelection(int x, int y, int x2, int y2){
-        drawSelection(x, y, x2, y2, 0, Pal.sapBulletBack, Pal.sapBullet);
+    protected void drawRebuildSelection(int x1, int y1, int x2, int y2){
+        drawSelection(x1, y1, x2, y2, 0, Pal.sapBulletBack, Pal.sapBullet);
 
-        NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x, y, x2, y2, false, 0, 1f);
+        NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, 0, 1f);
 
         Tmp.r1.set(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
 
@@ -1373,6 +1395,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Block block = content.block(plan.block);
             if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
                 drawSelected(plan.x, plan.y, content.block(plan.block), Pal.sapBullet);
+            }
+        }
+
+        NormalizeResult dresult = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, 999999999);
+
+        intSet.clear();
+        for(int x = dresult.x; x <= dresult.x2; x++){
+            for(int y = dresult.y; y <= dresult.y2; y++){
+
+                Tile tile = world.tileBuilding(x, y);
+
+                if(tile != null && intSet.add(tile.pos()) && canRepairDerelict(tile)){
+                    drawSelected(tile.x, tile.y, tile.block(), Pal.sapBullet);
+                }
             }
         }
     }
@@ -1663,11 +1699,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean tryRepairDerelict(Tile selected){
-        if(selected != null && !state.rules.editor && player.team() != Team.derelict && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict && Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
+        if(selected != null && !state.rules.editor && player.team() != Team.derelict && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict &&
+            Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
+
             player.unit().addBuild(new BuildPlan(selected.build.tileX(), selected.build.tileY(), selected.build.rotation, selected.block(), selected.build.config()));
             return true;
         }
         return false;
+    }
+
+    boolean canRepairDerelict(Tile tile){
+        return tile != null && tile.build != null && !state.rules.editor && player.team() != Team.derelict && tile.build.team == Team.derelict && tile.build.block.unlockedNow() &&
+            Build.validPlace(tile.block(), player.team(), tile.build.tileX(), tile.build.tileY(), tile.build.rotation);
     }
 
     boolean canMine(Tile tile){
@@ -1877,8 +1920,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    public void rebuildArea(int x, int y, int x2, int y2){
-        NormalizeResult result = Placement.normalizeArea(x, y, x2, y2, rotation, false, 999999999);
+    public void rebuildArea(int x1, int y1, int x2, int y2){
+        NormalizeResult result = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, 999999999);
         Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
 
         Iterator<BlockPlan> broken = player.team().data().plans.iterator();
@@ -1887,6 +1930,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Block block = content.block(plan.block);
             if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
                 player.unit().addBuild(new BuildPlan(plan.x, plan.y, plan.rotation, content.block(plan.block), plan.config));
+            }
+        }
+
+        intSet.clear();
+        for(int x = result.x; x <= result.x2; x++){
+            for(int y = result.y; y <= result.y2; y++){
+
+                Tile tile = world.tileBuilding(x, y);
+
+                if(tile != null && tile.build != null && intSet.add(tile.pos())){
+                    tryRepairDerelict(tile);
+                }
             }
         }
     }
