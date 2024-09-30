@@ -37,6 +37,7 @@ public class CommandAI extends AIController{
     protected Vec2 lastTargetPos;
     protected boolean blockingUnit;
     protected float timeSpentBlocked;
+    protected float payloadPickupCooldown;
     protected int transferState = transferStateNone;
 
     /** Stance, usually related to firing mode. */
@@ -125,6 +126,8 @@ public class CommandAI extends AIController{
     public void defaultBehavior(){
 
         if(!net.client() && unit instanceof Payloadc pay){
+            payloadPickupCooldown -= Time.delta;
+
             //auto-drop everything
             if(command == UnitCommand.unloadPayloadCommand && pay.hasPayload()){
                 Call.payloadDropped(unit, unit.x, unit.y);
@@ -350,6 +353,8 @@ public class CommandAI extends AIController{
                 transferState = pay.hasPayload() ? transferStateUnload : transferStateLoad;
             }
 
+            if(payloadPickupCooldown > 0f) return;
+
             if(transferState == transferStateUnload){
                 //drop until there's a failure
                 int prev = -1;
@@ -362,6 +367,7 @@ public class CommandAI extends AIController{
                 if(pay.hasPayload()){
                     return;
                 }
+                payloadPickupCooldown = 60f;
             }else if(transferState == transferStateLoad){
                 //pick up units until there's a failure
                 int prev = -1;
@@ -374,6 +380,7 @@ public class CommandAI extends AIController{
                 if(!pay.hasPayload()){
                     return;
                 }
+                payloadPickupCooldown = 60f;
             }
 
             //it will never finish

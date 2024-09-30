@@ -44,7 +44,7 @@ public class MapObjectivesDialog extends BaseDialog{
             name(cont, name, remover, indexer);
 
             if(field != null && field.isAnnotationPresent(Multiline.class)){
-                cont.area(get.get(), set).height(85f).growX();
+                cont.area(get.get(), set).height(100f).growX();
             }else{
                 cont.field(get.get(), set).growX();
             }

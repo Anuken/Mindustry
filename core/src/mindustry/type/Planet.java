@@ -161,8 +161,6 @@ public class Planet extends UnlockableContent{
     public CampaignRules campaignRuleDefaults = new CampaignRules();
     /** Sets up rules on game load for any sector on this planet. */
     public Cons<Rules> ruleSetter = r -> {};
-    /** If true, RTS AI can be customized. */
-    public boolean showRtsAIRule = false;
 
     /** @deprecated no-op, do not use. */
     @Deprecated

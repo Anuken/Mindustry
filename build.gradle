@@ -243,6 +243,7 @@ project(":desktop"){
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
         implementation arcModule("backends:backend-sdl")
+        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
     }
 }
 
@@ -372,6 +373,7 @@ project(":server"){
     dependencies{
         implementation project(":core")
         implementation arcModule("backends:backend-headless")
+        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
     }
 }
 

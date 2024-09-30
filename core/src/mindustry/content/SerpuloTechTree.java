@@ -378,7 +378,7 @@ public class SerpuloTechTree{
                     node(flare, () -> {
                         node(horizon, () -> {
                             node(zenith, () -> {
-                                node(antumbra, Seq.with(new SectorComplete(polarAerodrome)), () -> {
+                                node(antumbra, () -> {
                                     node(eclipse, () -> {
 
                                     });
@@ -514,17 +514,22 @@ public class SerpuloTechTree{
                                     new Research(airFactory),
                                     new Research(mono)
                                     ), () -> {
-                                        node(polarAerodrome, Seq.with(
+                                        //TODO: removed for now
+                                        /*node(polarAerodrome, Seq.with(
                                         new SectorComplete(fungalPass),
+                                        new SectorComplete(desolateRift),
                                         new SectorComplete(overgrowth),
                                         new Research(multiplicativeReconstructor),
                                         new Research(zenith),
                                         new Research(swarmer),
                                         new Research(cyclone),
-                                        new Research(blastDrill)
+                                        new Research(blastDrill),
+                                        new Research(blastDrill),
+                                        new Research(massDriver)
                                         ), () -> {
 
                                         });
+                                        */
                                     });
                                 });
 
@@ -544,8 +549,11 @@ public class SerpuloTechTree{
                                         node(navalFortress, Seq.with(
                                         new SectorComplete(coastline),
                                         new SectorComplete(extractionOutpost),
+                                        new Research(coreNucleus),
+                                        new Research(massDriver),
                                         new Research(oxynoe),
                                         new Research(minke),
+                                        new Research(bryde),
                                         new Research(cyclone),
                                         new Research(ripple)
                                         ), () -> {
