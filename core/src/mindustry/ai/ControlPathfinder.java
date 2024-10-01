@@ -58,8 +58,8 @@ public class ControlPathfinder implements Runnable{
 
     costNaval = (team, tile) ->
     //impassable same-team neutral block, or non-liquid
-    (PathTile.solid(tile) && ((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0)) || !PathTile.liquid(tile) ? impassable :
-    1 +
+    (PathTile.solid(tile) && ((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0)) ? impassable :
+    (!PathTile.liquid(tile) ? 6000 : 1) +
     //impassable synthetic enemy block
     ((PathTile.team(tile) != team && PathTile.team(tile) != 0) && PathTile.solid(tile) ? wallImpassableCap : 0) +
     (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 6 : 0);
