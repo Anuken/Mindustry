@@ -2871,7 +2871,7 @@ public class Blocks{
         //region storage
 
         coreShard = new CoreBlock("core-shard"){{
-            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 1000, Items.lead, 800));
+            requirements(Category.effect, BuildVisibility.coreZoneOnly, with(Items.copper, 1000, Items.lead, 800));
             alwaysUnlocked = true;
 
             isFirstTier = true;
@@ -2879,6 +2879,7 @@ public class Blocks{
             health = 1100;
             itemCapacity = 4000;
             size = 3;
+            buildCostMultiplier = 2f;
 
             unitCapModifier = 8;
         }};
