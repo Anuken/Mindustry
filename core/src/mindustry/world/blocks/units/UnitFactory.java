@@ -184,6 +184,14 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
+        public void created(){
+            //auto-set to the first plan, it's better than nothing.
+            if(currentPlan == -1){
+                currentPlan = plans.indexOf(u -> u.unit.unlockedNow());
+            }
+        }
+
+        @Override
         public Vec2 getCommandPosition(){
             return commandPos;
         }

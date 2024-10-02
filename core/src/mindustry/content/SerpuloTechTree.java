@@ -236,7 +236,7 @@ public class SerpuloTechTree{
 
                         node(steamGenerator, Seq.with(new SectorComplete(craters)), () -> {
                             node(thermalGenerator, () -> {
-                                node(differentialGenerator, () -> {
+                                node(differentialGenerator, Seq.with(new SectorComplete(testingGrounds)), () -> {
                                     node(thoriumReactor, Seq.with(new Research(Liquids.cryofluid)), () -> {
                                         node(impactReactor, () -> {
 
@@ -448,6 +448,16 @@ public class SerpuloTechTree{
                     new Research(mender),
                     new Research(combustionGenerator)
                     ), () -> {
+                        node(frontier, Seq.with(
+                        new Research(groundFactory),
+                        new Research(airFactory),
+                        new Research(thermalGenerator),
+                        new Research(dagger),
+                        new Research(mono)
+                        ), () -> {
+
+                        });
+
                         node(ruinousShores, Seq.with(
                         new SectorComplete(craters),
                         new Research(graphitePress),
@@ -540,6 +550,15 @@ public class SerpuloTechTree{
                                 new Research(airFactory),
                                 new Research(door)
                                 ), () -> {
+                                    node(testingGrounds, Seq.with(
+                                    new Research(cryofluidMixer),
+                                    new Research(cryofluid),
+                                    new Research(waterExtractor),
+                                    new Research(ripple)
+                                    ), () -> {
+
+                                    });
+
                                     node(coastline, Seq.with(
                                     new SectorComplete(windsweptIslands),
                                     new SectorComplete(saltFlats),
@@ -573,6 +592,14 @@ public class SerpuloTechTree{
                         new Research(UnitTypes.mace),
                         new Research(UnitTypes.flare)
                         ), () -> {
+                            node(mycelialBastion, Seq.with(
+                            new Research(atrax),
+                            new Research(spiroct),
+                            new Research(multiplicativeReconstructor)
+                            ), () -> {
+
+                            });
+
                             node(atolls, Seq.with(
                             new SectorComplete(windsweptIslands),
                             new Research(multiplicativeReconstructor),
