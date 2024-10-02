@@ -552,7 +552,7 @@ public class SerpuloTechTree{
                                 ), () -> {
                                     node(testingGrounds, Seq.with(
                                     new Research(cryofluidMixer),
-                                    new Research(cryofluid),
+                                    new Research(Liquids.cryofluid),
                                     new Research(waterExtractor),
                                     new Research(ripple)
                                     ), () -> {
