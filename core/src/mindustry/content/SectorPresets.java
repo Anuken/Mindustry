@@ -34,6 +34,7 @@ public class SectorPresets{
 
         testingGrounds = new SectorPreset("testingGrounds", serpulo, 3){{
             difficulty = 7;
+            captureWave = 33;
         }};
 
         frozenForest = new SectorPreset("frozenForest", serpulo, 86){{
