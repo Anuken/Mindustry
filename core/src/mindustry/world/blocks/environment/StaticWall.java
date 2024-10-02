@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
@@ -21,7 +22,10 @@ public class StaticWall extends Prop{
         variants = 2;
         cacheLayer = CacheLayer.walls;
         allowRectanglePlacement = true;
+        placeEffect = Fx.rotateBlock;
         instantBuild = true;
+        ignoreBuildDarkness = true;
+        placeableLiquid = true;
     }
 
     @Override
@@ -47,6 +51,11 @@ public class StaticWall extends Prop{
     public void load(){
         super.load();
         split = large.split(32, 32);
+    }
+
+    @Override
+    public boolean canReplace(Block other){
+        return other instanceof StaticWall || super.canReplace(other);
     }
 
     boolean eq(int rx, int ry){

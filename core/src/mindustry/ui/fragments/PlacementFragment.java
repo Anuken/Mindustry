@@ -146,10 +146,22 @@ public class PlacementFragment{
                 }
             }
 
-            if(tryRecipe != null && tryRecipe.isVisible() && unlocked(tryRecipe)){
+            if(tryRecipe == null && state.rules.editor){
+                var tile = world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+                if(tile != null){
+                    tryRecipe =
+                        tile.block() != Blocks.air ? tile.block() :
+                        tile.overlay() != Blocks.air ? tile.overlay() :
+                        tile.floor() != Blocks.air ? tile.floor() : null;
+                }
+            }
+
+            if(tryRecipe != null && ((tryRecipe.isVisible() && unlocked(tryRecipe)) || state.rules.editor)){
                 input.block = tryRecipe;
                 tryRecipe.lastConfig = tryConfig;
-                currentCategory = input.block.category;
+                if(tryRecipe.isVisible()){
+                    currentCategory = input.block.category;
+                }
                 return true;
             }
         }

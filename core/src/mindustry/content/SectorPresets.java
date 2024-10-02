@@ -10,7 +10,7 @@ public class SectorPresets{
     craters, biomassFacility, taintedWoods, frozenForest, ruinousShores, facility32m, windsweptIslands, stainedMountains, tarFields,
     frontier, fungalPass, infestedCanyons, atolls, mycelialBastion, extractionOutpost, saltFlats, testingGrounds, overgrowth, //polarAerodrome,
     impact0078, desolateRift, nuclearComplex, planetaryTerminal,
-    coastline, navalFortress,
+    coastline, navalFortress, weatheredChannels, seaPort,
 
     onset, aegis, lake, intersect, basin, atlas, split, marsh, peaks, ravine, caldera,
     stronghold, crevice, siege, crossroads, karst, origin;
@@ -62,6 +62,10 @@ public class SectorPresets{
             difficulty = 3;
         }};
 
+        seaPort = new SectorPreset("seaPort", serpulo, 47){{
+            difficulty = 4;
+        }};
+
         facility32m = new SectorPreset("facility32m", serpulo, 64){{
             captureWave = 25;
             difficulty = 4;
@@ -89,6 +93,11 @@ public class SectorPresets{
         coastline = new SectorPreset("coastline", serpulo, 108){{
             captureWave = 30;
             difficulty = 5;
+        }};
+
+        weatheredChannels = new SectorPreset("weatheredChannels", serpulo, 39){{
+            captureWave = 40;
+            difficulty = 7;
         }};
 
         navalFortress = new SectorPreset("navalFortress", serpulo, 216){{
