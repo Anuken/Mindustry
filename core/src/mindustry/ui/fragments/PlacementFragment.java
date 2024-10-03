@@ -400,7 +400,7 @@ public class PlacementFragment{
                                 }
                             }).growX().left().margin(3);
 
-                            if(!displayBlock.isPlaceable() || !player.isBuilder()){
+                            if((!displayBlock.isPlaceable() || !player.isBuilder()) && !state.rules.editor){
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
