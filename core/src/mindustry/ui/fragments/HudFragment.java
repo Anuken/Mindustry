@@ -344,6 +344,46 @@ public class HudFragment{
 
                 t.row();
 
+                t.table(control.input::buildPlacementUI).growX().left().with(in -> in.left()).row();
+
+                //hovering item display
+                t.table(h -> {
+                    Runnable rebuild = () -> {
+                        h.clear();
+                        h.left();
+
+                        Displayable hover = blockfrag.hovered();
+                        UnlockableContent toDisplay = control.input.block;
+
+                        if(toDisplay == null && hover != null){
+                            if(hover instanceof Building b){
+                                toDisplay = b.block;
+                            }else if(hover instanceof Tile tile){
+                                toDisplay =
+                                    tile.block().itemDrop != null ? tile.block() :
+                                    tile.overlay().itemDrop != null || tile.wallDrop() != null ? tile.overlay() :
+                                    tile.floor();
+                            }else if(hover instanceof Unit u){
+                                toDisplay = u.type;
+                            }
+                        }
+
+                        if(toDisplay != null){
+                            h.image(toDisplay.uiIcon).scaling(Scaling.fit).size(8 * 4);
+                            h.add(toDisplay.localizedName).ellipsis(true).left().growX().padLeft(5);
+                        }
+                    };
+
+                    Object[] hovering = {null};
+                    h.update(() -> {
+                        Object nextHover = control.input.block != null ? control.input.block : blockfrag.hovered();
+                        if(nextHover != hovering[0]){
+                            hovering[0] = nextHover;
+                            rebuild.run();
+                        }
+                    });
+                }).growX().left().minHeight(36f).row();
+
                 t.table(blocks -> {
                     addBlockSelection(blocks);
                 }).fillX().left();
