@@ -43,7 +43,7 @@ public class Blocks{
     public static Block
 
     //environment
-    air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, cryofluid, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space, empty,
+    air, spawn, removeWall, removeOre, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, cryofluid, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space, empty,
     dacite, rhyolite, rhyoliteCrater, roughRhyolite, regolith, yellowStone, redIce, redStone, denseRedStone,
     arkyciteFloor, arkyicStone,
     redmat, bluemat,
@@ -173,6 +173,10 @@ public class Blocks{
         air = new AirBlock("air");
 
         spawn = new SpawnBlock("spawn");
+
+        removeWall = new RemoveWall("remove-wall");
+
+        removeOre = new RemoveOre("remove-ore");
 
         cliff = new Cliff("cliff"){{
             inEditor = false;
