@@ -8,6 +8,10 @@
     "address": ["min7.include-once.org:8000", "min7.include-once.org:8001"]
   },
   {
+    "name": "EchoDustry",
+    "address": ["node1.stellarch.org:7003", "node1.stellarch.org:7004"]
+  },
+  {
     "name": "TSR Network",
     "address": ["de-prem-01.hosts.optikservers.com:35526", "de-prem-01.hosts.optikservers.com:35915", "de-prem-01.hosts.optikservers.com:35250", "de-prem-01.hosts.optikservers.com:27526", "de-prem-01.hosts.optikservers.com:35376", "de-prem-01.hosts.optikservers.com:35895"]
   },
