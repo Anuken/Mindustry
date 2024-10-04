@@ -33,7 +33,7 @@ public class StaticWall extends Prop{
         int rx = tile.x / 2 * 2;
         int ry = tile.y / 2 * 2;
 
-        if(Core.atlas.isFound(large) && eq(rx, ry) && Mathf.randomSeed(Point2.pack(rx, ry)) < 0.5){
+        if(Core.atlas.isFound(large) && eq(rx, ry) && Mathf.randomSeed(Point2.pack(rx, ry)) < 0.5 && split.length >= 2 && split[0].length >= 2){
             Draw.rect(split[tile.x % 2][1 - tile.y % 2], tile.worldx(), tile.worldy());
         }else if(variants > 0){
             Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
