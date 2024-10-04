@@ -271,6 +271,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             ));
             world.endMapLoad();
             player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
+            Core.camera.position.set(player);
             player.clearUnit();
 
             for(var unit : Groups.unit){
@@ -715,7 +716,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     private void addBlockSelection(Table cont){
         blockSelection = new Table();
-        pane = new ScrollPane(blockSelection);
+        pane = new ScrollPane(blockSelection, Styles.smallPane);
         pane.setFadeScrollBars(false);
         pane.setOverscroll(true, false);
         pane.exited(() -> {
@@ -732,7 +733,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         cont.row();
         cont.table(Tex.underline, extra -> extra.labelWrap(() -> editor.drawBlock.localizedName).width(200f).center()).growX();
         cont.row();
-        cont.add(pane).expandY().top().left();
+        cont.add(pane).expandY().growX().top().left();
 
         rebuildBlockSelection("");
     }
@@ -762,7 +763,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.toLowerCase()))
             ) continue;
 
-            ImageButton button = new ImageButton(Tex.whiteui, Styles.squareTogglei);
+            ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.drawBlock = block);
             button.resizeImage(8 * 4f);
@@ -771,7 +772,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(i == 0) editor.drawBlock = block;
 
-            if(++i % 4 == 0){
+            if(++i % 6 == 0){
                 blockSelection.row();
             }
         }

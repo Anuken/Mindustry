@@ -64,7 +64,7 @@ public class CrashHandler{
 
             //don't create crash logs for custom builds, as it's expected
             if(OS.username.equals("anuke") && !"steam".equals(Version.modifier)){
-            //    System.exit(1);
+                System.exit(1);
             }
 
             //attempt to load version regardless

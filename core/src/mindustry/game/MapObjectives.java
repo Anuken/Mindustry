@@ -106,6 +106,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         JsonIO.classTag(name, type);
     }
 
+    public MapObjectives(Seq<MapObjective> all){
+        this.all.addAll(all);
+    }
+
+    public MapObjectives(){
+    }
+
     /** Adds all given objectives to the executor as root objectives. */
     public void add(MapObjective... objectives){
         for(var objective : objectives) flatten(objective);

@@ -146,6 +146,13 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
 
                     if(hasAll){
                         Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation);
+
+                        if(current.block.instantBuild){
+                            if(plans.size > 0){
+                                plans.removeFirst();
+                            }
+                            continue;
+                        }
                     }else{
                         current.stuck = true;
                     }

@@ -2,6 +2,7 @@ package mindustry.world.meta;
 
 import arc.func.*;
 import mindustry.*;
+import mindustry.content.*;
 
 public class BuildVisibility{
     public static final BuildVisibility
@@ -10,6 +11,7 @@ public class BuildVisibility{
     shown = new BuildVisibility(() -> true),
     debugOnly = new BuildVisibility(() -> false),
     editorOnly = new BuildVisibility(() -> Vars.state.rules.editor),
+    coreZoneOnly = new BuildVisibility(() -> Vars.indexer.isBlockPresent(Blocks.coreZone)),
     worldProcessorOnly = new BuildVisibility(() -> Vars.state.rules.editor || Vars.state.rules.allowEditWorldProcessors),
     sandboxOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.rules.infiniteResources),
     campaignOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.isCampaign()),
