@@ -152,7 +152,7 @@ public class StatValues{
             }
         }}).size(iconMed).padRight(3  + (amount != 0 && Strings.autoFixed(amount, 2).length() > 2 ? 8 : 0)).with(s -> withTooltip(s, liquid, false));
 
-        if(perSecond){
+        if(perSecond && amount != 0){
             t.add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.lightGray).style(Styles.outlineLabel);
         }
 
