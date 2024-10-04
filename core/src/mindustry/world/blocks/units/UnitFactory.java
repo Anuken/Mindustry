@@ -122,7 +122,7 @@ public class UnitFactory extends UnitBlock{
                     }
 
                     if(plan.unit.unlockedNow()){
-                        t.image(plan.unit.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        t.image(plan.unit.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> StatValues.withTooltip(i, plan.unit));
                         t.table(info -> {
                             info.add(plan.unit.localizedName).left();
                             info.row();
@@ -137,7 +137,7 @@ public class UnitFactory extends UnitBlock{
                                 }
 
                                 ItemStack stack = plan.requirements[i];
-                                req.add(new ItemDisplay(stack.item, stack.amount, plan.time, true)).pad(5);
+                                req.add(StatValues.displayItem(stack.item, stack.amount, plan.time, true)).pad(5);
                             }
                         }).right().grow().pad(10f);
                     }else{
@@ -181,6 +181,14 @@ public class UnitFactory extends UnitBlock{
 
         public float fraction(){
             return currentPlan == -1 ? 0 : progress / plans.get(currentPlan).time;
+        }
+
+        @Override
+        public void created(){
+            //auto-set to the first plan, it's better than nothing.
+            if(currentPlan == -1){
+                currentPlan = plans.indexOf(u -> u.unit.unlockedNow());
+            }
         }
 
         @Override

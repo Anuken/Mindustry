@@ -188,8 +188,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void buildPlacementUI(Table table){
-        table.image().color(Pal.gray).height(4f).colspan(4).growX();
-        table.row();
         table.left().margin(0f).defaults().size(48f);
 
         table.button(Icon.hammer, Styles.clearNoneTogglei, () -> {
@@ -265,11 +263,11 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).name("confirmplace");
     }
 
-    boolean showCancel(){
-        return !player.dead() && (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !hasSchem();
+    public boolean showCancel(){
+        return !player.dead() && (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !hasSchematic();
     }
 
-    boolean hasSchem(){
+    public boolean hasSchematic(){
         return lastSchematic != null && !selectPlans.isEmpty();
     }
 
@@ -290,7 +288,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(() -> !showCancel() && block == null && !hasSchem());
+            t.visible(() -> !showCancel() && block == null && !hasSchematic() && !state.rules.editor);
             t.bottom().left();
 
             t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
@@ -310,7 +308,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(this::hasSchem);
+            t.visible(this::hasSchematic);
             t.bottom().left();
             t.table(Tex.pane, b -> {
                 b.defaults().size(50f);
@@ -759,7 +757,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             payloadTarget = null;
         }
 
-        if(locked || block != null || scene.hasField() || hasSchem() || selectPlans.size > 0){
+        if(locked || block != null || scene.hasField() || hasSchematic() || selectPlans.size > 0){
             commandMode = false;
         }
 
@@ -772,7 +770,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //zoom camera
-        if(!locked && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
+        if(!locked  && !scene.hasKeyboard() && !scene.hasScroll() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 

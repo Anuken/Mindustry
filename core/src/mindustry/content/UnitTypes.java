@@ -1042,7 +1042,7 @@ public class UnitTypes{
 
                     status = StatusEffects.blasted;
                     statusDuration = 60f;
-                    damage = splashDamage * 0.7f;
+                    damage = splashDamage * 0.5f;
                 }};
             }});
         }};

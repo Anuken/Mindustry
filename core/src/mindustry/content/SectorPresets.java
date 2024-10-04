@@ -8,9 +8,9 @@ public class SectorPresets{
     public static SectorPreset
     groundZero,
     craters, biomassFacility, taintedWoods, frozenForest, ruinousShores, facility32m, windsweptIslands, stainedMountains, tarFields,
-    fungalPass, infestedCanyons, atolls, extractionOutpost, polarAerodrome, saltFlats, overgrowth,
+    frontier, fungalPass, infestedCanyons, atolls, mycelialBastion, extractionOutpost, saltFlats, testingGrounds, overgrowth, //polarAerodrome,
     impact0078, desolateRift, nuclearComplex, planetaryTerminal,
-    coastline, navalFortress,
+    coastline, navalFortress, weatheredChannels, seaPort,
 
     onset, aegis, lake, intersect, basin, atlas, split, marsh, peaks, ravine, caldera,
     stronghold, crevice, siege, crossroads, karst, origin;
@@ -30,6 +30,11 @@ public class SectorPresets{
 
         saltFlats = new SectorPreset("saltFlats", serpulo, 101){{
             difficulty = 5;
+        }};
+
+        testingGrounds = new SectorPreset("testingGrounds", serpulo, 3){{
+            difficulty = 7;
+            captureWave = 33;
         }};
 
         frozenForest = new SectorPreset("frozenForest", serpulo, 86){{
@@ -57,6 +62,10 @@ public class SectorPresets{
             difficulty = 3;
         }};
 
+        seaPort = new SectorPreset("seaPort", serpulo, 47){{
+            difficulty = 4;
+        }};
+
         facility32m = new SectorPreset("facility32m", serpulo, 64){{
             captureWave = 25;
             difficulty = 4;
@@ -76,17 +85,27 @@ public class SectorPresets{
             difficulty = 5;
         }};
 
-        polarAerodrome = new SectorPreset("polarAerodrome", serpulo, 68){{
-            difficulty = 7;
-        }};
+        //TODO: removed for now
+        //polarAerodrome = new SectorPreset("polarAerodrome", serpulo, 68){{
+        //    difficulty = 7;
+        //}};
 
         coastline = new SectorPreset("coastline", serpulo, 108){{
             captureWave = 30;
             difficulty = 5;
         }};
 
+        weatheredChannels = new SectorPreset("weatheredChannels", serpulo, 39){{
+            captureWave = 40;
+            difficulty = 7;
+        }};
+
         navalFortress = new SectorPreset("navalFortress", serpulo, 216){{
             difficulty = 9;
+        }};
+
+        frontier = new SectorPreset("frontier", serpulo, 203){{
+            difficulty = 4;
         }};
 
         fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
@@ -98,6 +117,10 @@ public class SectorPresets{
         }};
 
         atolls = new SectorPreset("atolls", serpulo, 1){{
+            difficulty = 7;
+        }};
+
+        mycelialBastion = new SectorPreset("mycelialBastion", serpulo, 133){{
             difficulty = 7;
         }};
 

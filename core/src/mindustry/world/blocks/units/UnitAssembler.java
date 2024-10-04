@@ -150,7 +150,7 @@ public class UnitAssembler extends PayloadBlock{
                     }
 
                     if(plan.unit.unlockedNow()){
-                        t.image(plan.unit.uiIcon).scaling(Scaling.fit).size(40).pad(10f).left();
+                        t.image(plan.unit.uiIcon).scaling(Scaling.fit).size(40).pad(10f).left().with(i -> StatValues.withTooltip(i, plan.unit));
                         t.table(info -> {
                             info.defaults().left();
                             info.add(plan.unit.localizedName);
@@ -170,7 +170,7 @@ public class UnitAssembler extends PayloadBlock{
                                 }
 
                                 PayloadStack stack = plan.requirements.get(i);
-                                req.add(new ItemImage(stack)).pad(5);
+                                req.add(StatValues.stack(stack)).pad(5);
                             }
                         }).right().grow().pad(10f);
                     }else{

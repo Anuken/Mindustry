@@ -43,7 +43,7 @@ public class Blocks{
     public static Block
 
     //environment
-    air, spawn, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, cryofluid, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space, empty,
+    air, spawn, removeWall, removeOre, cliff, deepwater, water, taintedWater, deepTaintedWater, tar, slag, cryofluid, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space, empty,
     dacite, rhyolite, rhyoliteCrater, roughRhyolite, regolith, yellowStone, redIce, redStone, denseRedStone,
     arkyciteFloor, arkyicStone,
     redmat, bluemat,
@@ -173,6 +173,10 @@ public class Blocks{
         air = new AirBlock("air");
 
         spawn = new SpawnBlock("spawn");
+
+        removeWall = new RemoveWall("remove-wall");
+
+        removeOre = new RemoveOre("remove-ore");
 
         cliff = new Cliff("cliff"){{
             inEditor = false;
@@ -1889,7 +1893,7 @@ public class Blocks{
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
-            health = 70;
+            health = 65;
             speed = 0.08f;
             displayedSpeed = 11f;
         }};
@@ -2871,7 +2875,7 @@ public class Blocks{
         //region storage
 
         coreShard = new CoreBlock("core-shard"){{
-            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 1000, Items.lead, 800));
+            requirements(Category.effect, BuildVisibility.coreZoneOnly, with(Items.copper, 1000, Items.lead, 800));
             alwaysUnlocked = true;
 
             isFirstTier = true;
@@ -2879,6 +2883,7 @@ public class Blocks{
             health = 1100;
             itemCapacity = 4000;
             size = 3;
+            buildCostMultiplier = 2f;
 
             unitCapModifier = 8;
         }};
@@ -2991,7 +2996,7 @@ public class Blocks{
         reinforcedContainer = new StorageBlock("reinforced-container"){{
             requirements(Category.effect, with(Items.tungsten, 30, Items.graphite, 40));
             size = 2;
-            itemCapacity = 80;
+            itemCapacity = 160;
             scaledHealth = 120;
             coreMerge = false;
         }};
@@ -4227,6 +4232,7 @@ public class Blocks{
 
             newTargetInterval = 40f;
             shootWarmupSpeed = 0.07f;
+            warmupMaintainTime = 120f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
             coolantMultiplier = 1.5f;
@@ -4950,10 +4956,11 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             size = 5;
             envEnabled |= Env.space;
-            warmupMaintainTime = 30f;
+            warmupMaintainTime = 120f;
             reload = 100f;
             recoil = 2f;
             range = 300;
+            trackingRange = range * 1.4f;
             shootCone = 30f;
             scaledHealth = 350;
             rotateSpeed = 1.5f;
@@ -5276,7 +5283,7 @@ public class Blocks{
             velocityRnd = 0.15f;
             heatRequirement = 90f;
             maxHeatEfficiency = 2f;
-            warmupMaintainTime = 30f;
+            warmupMaintainTime = 120f;
             consumePower(10f);
 
             shoot = new ShootSummon(0f, 0f, circleRad, 48f);
@@ -5290,6 +5297,7 @@ public class Blocks{
             envEnabled |= Env.space;
             reload = 9f;
             range = 370;
+            trackingRange = range * 1.4f;
             shootCone = 100f;
             scaledHealth = 370;
             rotateSpeed = 2f;
@@ -5786,6 +5794,7 @@ public class Blocks{
             itemCapacity = 0;
             alwaysUnlocked = true;
             ambientSound = Sounds.none;
+            allDatabaseTabs = true;
         }};
 
         //TODO move

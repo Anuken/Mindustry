@@ -68,9 +68,6 @@ public class CampaignRulesDialog extends BaseDialog{
             check("@rules.fog", b -> rules.fog = b, () -> rules.fog);
             check("@rules.showspawns", b -> rules.showSpawns = b, () -> rules.showSpawns);
             check("@rules.randomwaveai", b -> rules.randomWaveAI = b, () -> rules.randomWaveAI);
-            if(planet.showRtsAIRule){
-                check("@rules.rtsai.campaign", b -> rules.rtsAI = b, () -> rules.rtsAI);
-            }
         }).growY();
     }
 

@@ -226,18 +226,31 @@ public class DesktopInput extends InputHandler{
         boolean locked = locked();
         boolean panCam = false;
         float camSpeed = (!Core.input.keyDown(Binding.boost) ? panSpeed : panBoostSpeed) * Time.delta;
+        boolean detached = settings.getBool("detach-camera", false);
 
-        if(input.keyDown(Binding.pan) && !scene.hasField() && !scene.hasDialog()){
-            panCam = true;
-            panning = true;
+        if(!scene.hasField() && !scene.hasDialog()){
+            if(input.keyTap(Binding.detach_camera)){
+                settings.put("detach-camera", detached = !detached);
+                if(!detached){
+                    panning = false;
+                }
+            }
+
+            if(input.keyDown(Binding.pan)){
+                panCam = true;
+                panning = true;
+            }
+
+            if((Math.abs(Core.input.axis(Binding.move_x)) > 0 || Math.abs(Core.input.axis(Binding.move_y)) > 0 || input.keyDown(Binding.mouse_move))){
+                panning = false;
+            }
         }
 
-        if((Math.abs(Core.input.axis(Binding.move_x)) > 0 || Math.abs(Core.input.axis(Binding.move_y)) > 0 || input.keyDown(Binding.mouse_move)) && (!scene.hasField())){
-            panning = false;
-        }
+        panning |= detached;
+
 
         if(!locked){
-            if(((player.dead() || state.isPaused()) && !ui.chatfrag.shown()) && !scene.hasField() && !scene.hasDialog()){
+            if(((player.dead() || state.isPaused() || detached) && !ui.chatfrag.shown()) && !scene.hasField() && !scene.hasDialog()){
                 if(input.keyDown(Binding.mouse_move)){
                     panCam = true;
                 }
@@ -457,7 +470,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = cursor.build.getCursor();
             }
 
-            if(cursor.build != null && !state.rules.editor && player.team() != Team.derelict && cursor.build.team == Team.derelict && cursor.build.block.unlockedNow() && Build.validPlace(cursor.block(), player.team(), cursor.build.tileX(), cursor.build.tileY(), cursor.build.rotation)){
+            if(canRepairDerelict(cursor)){
                 cursorType = ui.repairCursor;
             }
 
@@ -527,8 +540,6 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void buildPlacementUI(Table table){
-        table.image().color(Pal.gray).height(4f).colspan(4).growX();
-        table.row();
         table.left().margin(0f).defaults().size(48f).left();
 
         table.button(Icon.paste, Styles.clearNonei, () -> {
@@ -859,9 +870,20 @@ public class DesktopInput extends InputHandler{
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
-        movement.set(xa, ya).nor().scl(speed);
-        if(Core.input.keyDown(Binding.mouse_move)){
-            movement.add(input.mouseWorld().sub(player).scl(1f / 25f * speed)).limit(speed);
+        if(settings.getBool("detach-camera")){
+            Vec2 targetPos = camera.position;
+
+            movement.set(targetPos).sub(player).limit(speed);
+
+            if(player.within(targetPos, 15f)){
+                movement.setZero();
+                unit.vel.approachDelta(Vec2.ZERO, unit.speed() * unit.type().accel / 2f);
+            }
+        }else{
+            movement.set(xa, ya).nor().scl(speed);
+            if(Core.input.keyDown(Binding.mouse_move)){
+                movement.add(input.mouseWorld().sub(player).scl(1f / 25f * speed)).limit(speed);
+            }
         }
 
         float mouseAngle = Angles.mouseAngle(unit.x, unit.y);

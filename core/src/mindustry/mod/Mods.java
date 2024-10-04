@@ -1252,6 +1252,7 @@ public class Mods implements Loadable{
             if(name != null) name = Strings.stripColors(name);
             if(displayName != null) displayName = Strings.stripColors(displayName);
             if(displayName == null) displayName = name;
+            if(version == null) version = "0";
             if(author != null) author = Strings.stripColors(author);
             if(description != null) description = Strings.stripColors(description);
             if(subtitle != null) subtitle = Strings.stripColors(subtitle).replace("\n", "");

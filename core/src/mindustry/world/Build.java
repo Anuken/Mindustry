@@ -165,7 +165,7 @@ public class Build{
     /** Returns whether a tile can be placed at this location by this team. */
     public static boolean validPlace(Block type, Team team, int x, int y, int rotation, boolean checkVisible){
         //the wave team can build whatever they want as long as it's visible - banned blocks are not applicable
-        if(type == null || (checkVisible && (!type.environmentBuildable() || (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible()))))){
+        if(type == null || (!state.rules.editor && (checkVisible && (!type.environmentBuildable() || (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible())))))){
             return false;
         }
 
@@ -199,21 +199,21 @@ public class Build{
 
         if(tile == null) return false;
 
+        if(!type.canPlaceOn(tile, team, rotation)){
+            return false;
+        }
+
         //floors have different checks
         if(type.isFloor()){
             return type.isOverlay() ? tile.overlay() != type : tile.floor() != type;
         }
 
         //campaign darkness check
-        if(world.getDarkness(x, y) >= 3){
+        if(!type.ignoreBuildDarkness && world.getDarkness(x, y) >= 3){
             return false;
         }
 
         if(!type.requiresWater && !contactsShallows(tile.x, tile.y, type) && !type.placeableLiquid){
-            return false;
-        }
-
-        if(!type.canPlaceOn(tile, team, rotation)){
             return false;
         }
 

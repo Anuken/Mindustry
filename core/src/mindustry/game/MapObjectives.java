@@ -106,6 +106,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         JsonIO.classTag(name, type);
     }
 
+    public MapObjectives(Seq<MapObjective> all){
+        this.all.addAll(all);
+    }
+
+    public MapObjectives(){
+    }
+
     /** Adds all given objectives to the executor as root objectives. */
     public void add(MapObjective... objectives){
         for(var objective : objectives) flatten(objective);
@@ -442,7 +449,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public boolean update(){
-            return (countup += Time.delta) >= duration;
+            return (countup += Time.delta) >= duration * state.rules.objectiveTimerMultiplier;
         }
 
         @Override
@@ -454,7 +461,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             if(text != null){
-                int i = (int)((duration - countup) / 60f);
+                int i = (int)((duration * state.rules.objectiveTimerMultiplier - countup) / 60f);
                 StringBuilder timeString = new StringBuilder();
 
                 int m = i / 60;

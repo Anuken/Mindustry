@@ -328,6 +328,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean instantDeconstruct = false;
     /** If true, this block constructs immediately. This implies no resource requirement, and ignores configs - do not use, this is for performance only! */
     public boolean instantBuild = false;
+    /** If true, this block can be placed even in "dark" areas. Only used for editor static walls. */
+    public boolean ignoreBuildDarkness = false;
     /** Effect for placing the block. Passes size as rotation. */
     public Effect placeEffect = Fx.placeBlock;
     /** Effect for breaking the block. Passes size as rotation. */
@@ -916,6 +918,11 @@ public class Block extends UnlockableContent implements Senseable{
     /** Called when building of this block begins. */
     public void placeBegan(Tile tile, Block previous, @Nullable Unit builder){
         placeBegan(tile, previous);
+    }
+
+    /** Called when building of this block ends. */
+    public void placeEnded(Tile tile, @Nullable Unit builder){
+
     }
 
     /** Called right before building of this block begins. */

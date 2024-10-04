@@ -37,6 +37,7 @@ public class CommandAI extends AIController{
     protected Vec2 lastTargetPos;
     protected boolean blockingUnit;
     protected float timeSpentBlocked;
+    protected float payloadPickupCooldown;
     protected int transferState = transferStateNone;
 
     /** Stance, usually related to firing mode. */
@@ -125,6 +126,8 @@ public class CommandAI extends AIController{
     public void defaultBehavior(){
 
         if(!net.client() && unit instanceof Payloadc pay){
+            payloadPickupCooldown -= Time.delta;
+
             //auto-drop everything
             if(command == UnitCommand.unloadPayloadCommand && pay.hasPayload()){
                 Call.payloadDropped(unit, unit.x, unit.y);
@@ -272,6 +275,13 @@ public class CommandAI extends AIController{
                     vecOut.set(vecMovePos);
                 }else{
                     move = controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+
+                    //TODO: what to do when there's a target and it can't be reached?
+                    /*
+                    if(noFound[0] && attackTarget != null && attackTarget.within(unit, unit.type.range * 2f)){
+                        move = true;
+                        vecOut.set(targetPos);
+                    }*/
                 }
 
                 //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
@@ -343,6 +353,8 @@ public class CommandAI extends AIController{
                 transferState = pay.hasPayload() ? transferStateUnload : transferStateLoad;
             }
 
+            if(payloadPickupCooldown > 0f) return;
+
             if(transferState == transferStateUnload){
                 //drop until there's a failure
                 int prev = -1;
@@ -355,6 +367,7 @@ public class CommandAI extends AIController{
                 if(pay.hasPayload()){
                     return;
                 }
+                payloadPickupCooldown = 60f;
             }else if(transferState == transferStateLoad){
                 //pick up units until there's a failure
                 int prev = -1;
@@ -367,6 +380,7 @@ public class CommandAI extends AIController{
                 if(!pay.hasPayload()){
                     return;
                 }
+                payloadPickupCooldown = 60f;
             }
 
             //it will never finish
@@ -401,6 +415,11 @@ public class CommandAI extends AIController{
                 group = null;
             }
         }
+    }
+
+    @Override
+    public void removed(Unit unit){
+        clearCommands();
     }
 
     public void commandQueue(Position location){
@@ -444,7 +463,7 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
-        return !nearAttackTarget(x, y, range) ? super.findTarget(x, y, range, air, ground) : attackTarget;
+        return !nearAttackTarget(x, y, range) ? super.findTarget(x, y, range, air, ground) : Units.isHittable(attackTarget, air, ground) ? attackTarget : null;
     }
 
     public boolean nearAttackTarget(float x, float y, float range){
