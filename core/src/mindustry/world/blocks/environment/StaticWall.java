@@ -50,7 +50,13 @@ public class StaticWall extends Prop{
     @Override
     public void load(){
         super.load();
-        split = large.split(32, 32);
+        int size = large.width / 2;
+        split = large.split(size, size);
+        for(var arr : split){
+            for(var reg : arr){
+                reg.scale = region.scale;
+            }
+        }
     }
 
     @Override
