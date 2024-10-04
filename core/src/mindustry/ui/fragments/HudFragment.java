@@ -391,6 +391,7 @@ public class HudFragment{
             if(mobile){
                 editorMain.row().spacerY(() -> {
                     if(control.input instanceof MobileInput mob){
+                        if(Core.graphics.isPortrait()) return Core.graphics.getHeight() / 2f / Scl.scl(1f);
                         if(mob.hasSchematic()) return 156f;
                         if(mob.showCancel()) return 50f;
                     }

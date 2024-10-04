@@ -271,6 +271,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             ));
             world.endMapLoad();
             player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
+            Core.camera.position.set(player);
             player.clearUnit();
 
             for(var unit : Groups.unit){
