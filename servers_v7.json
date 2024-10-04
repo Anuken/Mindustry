@@ -334,7 +334,7 @@
   },
   {
     "name": "VNM",
-    "address": ["server.mindustry-tool.app"]
+    "address": ["server.mindustry-tool.app", "server.mindustry-tool.app:6568", "server.mindustry-tool.app:6569"]
   },
   {
     "name": "LibreDUSTRY",
