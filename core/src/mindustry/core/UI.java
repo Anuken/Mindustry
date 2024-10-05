@@ -36,6 +36,7 @@ public class UI implements ApplicationListener, Loadable{
     public static String billions, millions, thousands;
 
     public static PixmapPacker packer;
+    protected static UI instance;
 
     public MenuFragment menufrag;
     public HudFragment hudfrag;
@@ -84,6 +85,7 @@ public class UI implements ApplicationListener, Loadable{
 
     public UI(){
         Fonts.loadFonts();
+        instance = this;
     }
 
     public static void loadColors(){
@@ -93,6 +95,10 @@ public class UI implements ApplicationListener, Loadable{
         Colors.put("stat", Pal.stat);
         Colors.put("negstat", Pal.negativeStat);
     }
+
+    public static UI getInstance(){
+        return instance;
+    }   
 
     @Override
     public void loadAsync(){
