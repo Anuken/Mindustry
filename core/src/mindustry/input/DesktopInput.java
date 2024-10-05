@@ -674,6 +674,15 @@ public class DesktopInput extends InputHandler{
             tappedOne = false;
             BuildPlan plan = getPlan(cursorX, cursorY);
 
+            if(plan != null){
+                //move selected to front
+                int index = player.unit().plans.indexOf(plan, true);
+                if(index != -1){
+                    player.unit().plans.removeIndex(index);
+                    player.unit().plans.addFirst(plan);
+                }
+            }
+
             if(Core.input.keyDown(Binding.break_block)){
                 mode = none;
             }else if(!selectPlans.isEmpty()){
