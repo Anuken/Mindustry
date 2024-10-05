@@ -1,11 +1,15 @@
 [
   {
     "name": "EscoCorp",
-    "address": ["81.30.105.171:6567", "81.30.105.171:6568"]
+    "address": ["81.30.105.171:6567", "81.30.105.171:6568", "202.49.176.213:6567"]
   },
   {
     "name": "Redundancy Dept",
     "address": ["min7.include-once.org:8000", "min7.include-once.org:8001"]
+  },
+  {
+    "name": "EchoDustry",
+    "address": ["node1.stellarch.org:7003", "node1.stellarch.org:7004"]
   },
   {
     "name": "TSR Network",
@@ -62,10 +66,6 @@
   {
     "name": "Crux's Federation",
     "address": ["de-free-01.hosts.optikservers.com:32538", "de-free-01.hosts.optikservers.com:31421", "fsn1.bbn.one:37019"]
-  },
-  {
-    "name": "RCM",
-    "address": ["rcrms.ru:6567"]
   },
   {
     "name": "Tendhost",
@@ -250,7 +250,7 @@
   },
   {
     "name": "abcxyz remaster",
-    "address": ["144.76.57.59:35150", "23.88.73.88:11066", "23.88.73.88:9171", "23.88.73.88:10911"]
+    "address": ["144.76.57.59:35051"]
   },
   {
     "name": "CroCraft Network",
@@ -262,7 +262,7 @@
   },
   {
     "name": "Alex Multiverse",
-    "address": ["alexmindustryv7.servegame.com:25588", "172.234.80.96:6768", "139.162.41.78:6767", "172.245.187.143:6868", "172.245.187.143:6869", "92.119.127.171:6888", "181.215.58.8:1025", "181.215.58.8:1027", "181.215.58.7:1820", "23.95.107.12"]
+    "address": ["alexmindustryv7.servegame.com:25588", "172.234.80.96:6768", "139.162.41.78:6767", "172.245.187.143:6868", "172.245.187.143:6869", "92.119.127.171:6888", "181.215.58.41:1106", "181.215.58.41:1105", "181.215.58.9:1027", "23.95.107.12"]
   },
   {
     "name": "Open PVP",
@@ -290,7 +290,11 @@
   },
   {
     "name": "Erepulo",
-    "address": ["95.84.198.97:5401", "95.84.198.97:5402", "95.84.198.97:5403", "95.84.198.97:5404", "95.84.198.97:2357", "95.84.198.97:5500", "199.83.103.251", "frost-heaven.ru", "frost-heaven.ru:6568", "frost-heaven.ru:6569"]
+    "address": ["95.84.198.97:5401", "95.84.198.97:5402", "95.84.198.97:5403", "95.84.198.97:5404", "95.84.198.97:5500", "199.83.103.251", "frost-heaven.ru", "frost-heaven.ru:6568", "frost-heaven.ru:6569"]
+  },
+  {
+    "name": "FrostHeaven",
+    "address": ["95.84.198.97:2357", "frost-heaven.ru", "frost-heaven.ru:6568", "frost-heaven.ru:6569"]
   },
   {
     "name": "MineCore",
@@ -314,7 +318,7 @@
   },
   {
     "name": "ArmyOFUkraine",
-    "address": ["194.247.42.131:27715", "194.247.42.131:27512"]
+    "address": ["194.247.42.131:27715", "194.247.42.131:27512","220.141.232.67"]
   },
   {
     "name": "Erbium",
@@ -330,7 +334,7 @@
   },
   {
     "name": "VNM",
-    "address": ["server.mindustry-tool.app"]
+    "address": ["server.mindustry-tool.app", "server.mindustry-tool.app:6568", "server.mindustry-tool.app:6569"]
   },
   {
     "name": "LibreDUSTRY",
