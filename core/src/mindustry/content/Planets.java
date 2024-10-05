@@ -65,7 +65,6 @@ public class Planets{
             clearSectorOnLose = true;
             defaultCore = Blocks.coreBastion;
             iconColor = Color.valueOf("ff9266");
-            hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
             enemyBuildSpeedMultiplier = 0.4f;
 
             //TODO disallowed for now
@@ -86,6 +85,8 @@ public class Planets{
                 r.coreDestroyClear = true;
                 r.onlyDepositCore = true;
             };
+            campaignRuleDefaults.fog = true;
+            campaignRuleDefaults.showSpawns = true;
 
             unlockedOnLand.add(Blocks.coreBastion);
         }};
@@ -152,7 +153,6 @@ public class Planets{
             startSector = 15;
             alwaysUnlocked = true;
             landCloudColor = Pal.spore.cpy().a(0.5f);
-            hiddenItems.addAll(Items.erekirItems).removeAll(Items.serpuloItems);
         }};
 
         verilus = makeAsteroid("verlius", sun, Blocks.stoneWall, Blocks.iceWall, 0.5f, 12, 2f, gen -> {

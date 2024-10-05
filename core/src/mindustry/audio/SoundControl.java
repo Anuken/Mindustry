@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 
 /** Controls playback of multiple audio tracks.*/
 public class SoundControl{
-    public float finTime = 120f, foutTime = 120f, musicInterval = 3f * Time.toMinutes, musicChance = 0.6f, musicWaveChance = 0.46f;
+    public float finTime = 120f, foutTime = 120f, musicInterval = 3f * Time.toMinutes, musicChance = 0.8f, musicWaveChance = 0.46f;
 
     /** normal, ambient music, plays at any time */
     public Seq<Music> ambientMusic = Seq.with();
@@ -28,6 +28,7 @@ public class SoundControl{
 
     protected Music lastRandomPlayed;
     protected Interval timer = new Interval(4);
+    protected long lastPlayed;
     protected @Nullable Music current;
     protected float fade;
     protected boolean silenced;
@@ -55,6 +56,10 @@ public class SoundControl{
         }));
 
         setupFilters();
+
+        Events.on(ResetEvent.class, e -> {
+            lastPlayed = Time.millis();
+        });
     }
 
     protected void setupFilters(){
@@ -159,10 +164,14 @@ public class SoundControl{
             //this just fades out the last track to make way for ingame music
             silence();
 
-            //play music at intervals
-            if(timer.get(musicInterval)){
+            if(Core.settings.getBool("alwaysmusic")){
+                if(current == null){
+                    playRandom();
+                }
+            }else if(Time.timeSinceMillis(lastPlayed) > 1000 * musicInterval / 60f){
                 //chance to play it per interval
                 if(Mathf.chance(musicChance)){
+                    lastPlayed = Time.millis();
                     playRandom();
                 }
             }
@@ -207,7 +216,9 @@ public class SoundControl{
 
     /** Plays a random track.*/
     public void playRandom(){
-        if(isDark()){
+        if(state.boss() != null){
+            playOnce(bossMusic.random(lastRandomPlayed));
+        }else if(isDark()){
             playOnce(darkMusic.random(lastRandomPlayed));
         }else{
             playOnce(ambientMusic.random(lastRandomPlayed));

@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -347,7 +348,7 @@ public class Teams{
             }
 
             for(var build : builds){
-                if(build.within(x, y, range) && !cores.contains(c -> c.within(x, y, range))){
+                if(build.within(x, y, range) && !cores.contains(c -> c.within(build, range))){
                     //TODO GPU driver bugs?
                     build.kill();
                     //Time.run(Mathf.random(0f, 60f * 6f), build::kill);
@@ -358,6 +359,10 @@ public class Teams{
         private void scheduleDerelict(Building build){
             //TODO this may cause a lot of packet spam, optimize?
             Call.setTeam(build, Team.derelict);
+
+            if(build.getPayload() instanceof UnitPayload){
+                Call.destroyPayload(build);
+            }
 
             if(Mathf.chance(0.25)){
                 Time.run(Mathf.random(0f, 60f * 6f), build::kill);
@@ -422,6 +427,14 @@ public class Teams{
             "cores=" + cores +
             ", team=" + team +
             '}';
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void destroyPayload(Building build){
+        if(build != null && build.getPayload() instanceof UnitPayload && build.takePayload() instanceof UnitPayload unit){
+            unit.dump();
+            unit.unit.killed();
         }
     }
 

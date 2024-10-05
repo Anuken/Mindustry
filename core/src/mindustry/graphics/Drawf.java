@@ -223,7 +223,7 @@ public class Drawf{
     /** Sets Draw.z to the text layer, and returns the previous layer. */
     public static float text(){
         float z = Draw.z();
-        if(renderer.pixelator.enabled()){
+        if(renderer.pixelate){
             Draw.z(Layer.endPixeled);
         }
 
@@ -480,7 +480,7 @@ public class Drawf{
     
     /** Draws a sprite that should be light-wise correct, when rotated. Provided sprite must be symmetrical in shape. */
     public static void spinSprite(TextureRegion region, float x, float y, float r){
-        float a = Draw.getColor().a;
+        float a = Draw.getColorAlpha();
         r = Mathf.mod(r, 90f);
         Draw.rect(region, x, y, r);
         Draw.alpha(r / 90f*a);

@@ -57,7 +57,7 @@ public class ConsumePayloadFilter extends Consume{
         MultiReqImage image = new MultiReqImage();
 
         content.blocks().each(i -> filter.get(i) && i.unlockedNow(),
-            block -> image.add(new ReqImage(new ItemImage(block.uiIcon, 1),
+            block -> image.add(new ReqImage(StatValues.stack(block, 1),
             () -> inv.contains(block, 1)))
         );
 

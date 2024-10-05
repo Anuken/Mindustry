@@ -28,7 +28,7 @@ public class SwitchBlock extends Block{
     }
 
     public boolean accessible(){
-        return !privileged || state.rules.editor;
+        return !privileged || state.rules.editor || state.rules.allowEditWorldProcessors;
     }
 
     @Override
@@ -41,6 +41,11 @@ public class SwitchBlock extends Block{
         public void damage(float damage){
             if(privileged) return;
             super.damage(damage);
+        }
+        
+        @Override
+        public boolean canPickup(){
+            return !privileged;
         }
 
         @Override

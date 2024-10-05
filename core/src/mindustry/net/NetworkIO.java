@@ -11,6 +11,7 @@ import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.maps.Map;
 import mindustry.net.Administration.*;
+import mindustry.type.*;
 
 import java.io.*;
 import java.nio.*;
@@ -36,6 +37,7 @@ public class NetworkIO{
             }
 
             stream.writeUTF(JsonIO.write(state.rules));
+            stream.writeUTF(JsonIO.write(state.mapLocales));
             SaveIO.getSaveWriter().writeStringMap(stream, state.map.tags);
 
             stream.writeInt(state.wave);
@@ -62,6 +64,7 @@ public class NetworkIO{
         try(DataInputStream stream = new DataInputStream(is)){
             Time.clear();
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
+            state.mapLocales = JsonIO.read(MapLocales.class, stream.readUTF());
             state.map = new Map(SaveIO.getSaveWriter().readStringMap(stream));
 
             state.wave = stream.readInt();

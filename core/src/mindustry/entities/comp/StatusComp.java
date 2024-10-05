@@ -73,6 +73,7 @@ abstract class StatusComp implements Posc, Flyingc{
     }
 
     void clearStatuses(){
+        statuses.each(e -> e.effect.onRemoved(self()));
         statuses.clear();
     }
 
@@ -80,6 +81,7 @@ abstract class StatusComp implements Posc, Flyingc{
     void unapply(StatusEffect effect){
         statuses.remove(e -> {
             if(e.effect == effect){
+                e.effect.onRemoved(self());
                 Pools.free(e);
                 return true;
             }
@@ -127,10 +129,10 @@ abstract class StatusComp implements Posc, Flyingc{
         return entry;
     }
 
-    /** Uses a dynamic status effect to override speed. */
+    /** Uses a dynamic status effect to override speed (in tiles/second). */
     public void statusSpeed(float speed){
         //type.speed should never be 0
-        applyDynamicStatus().speedMultiplier = speed / type.speed;
+        applyDynamicStatus().speedMultiplier = speed / (type.speed * 60f / tilesize);
     }
 
     /** Uses a dynamic status effect to change damage. */
@@ -189,6 +191,10 @@ abstract class StatusComp implements Posc, Flyingc{
             entry.time = Math.max(entry.time - Time.delta, 0);
 
             if(entry.effect == null || (entry.time <= 0 && !entry.effect.permanent)){
+                if(entry.effect != null){
+                    entry.effect.onRemoved(self());
+                }
+
                 Pools.free(entry);
                 index --;
                 statuses.remove(index);

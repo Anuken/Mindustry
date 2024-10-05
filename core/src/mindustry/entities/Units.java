@@ -83,6 +83,7 @@ public class Units{
 
     @Remote(called = Loc.server)
     public static void unitDespawn(Unit unit){
+        if(unit == null) return;
         Fx.unitDespawn.at(unit.x, unit.y, 0, unit);
         unit.remove();
     }
@@ -94,7 +95,7 @@ public class Units{
 
     public static int getCap(Team team){
         //wave team has no cap
-        if((team == state.rules.waveTeam && !state.rules.pvp) || (state.isCampaign() && team == state.rules.waveTeam)){
+        if((team == state.rules.waveTeam && !state.rules.pvp) || (state.isCampaign() && team == state.rules.waveTeam) || state.rules.disableUnitCap){
             return Integer.MAX_VALUE;
         }
         return Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap);
@@ -109,6 +110,10 @@ public class Units{
     /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
     public static boolean canInteract(Player player, Building tile){
         return player == null || tile == null || tile.interactable(player.team()) || state.rules.editor;
+    }
+
+    public static boolean isHittable(@Nullable Posc target, boolean air, boolean ground){
+        return target != null && (target instanceof Buildingc ? ground : (target instanceof Unit u && u.checkTarget(air, ground)));
     }
 
     /**
@@ -192,7 +197,17 @@ public class Units{
 
     /** Returns the nearest enemy tile in a range. */
     public static Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
+        return findEnemyTile(team, x, y, range, false, pred);
+    }
+
+    /** Returns the nearest enemy tile in a range. */
+    public static Building findEnemyTile(Team team, float x, float y, float range, boolean checkUnder, Boolf<Building> pred){
         if(team == Team.derelict) return null;
+
+        if(checkUnder){
+            Building target = indexer.findEnemyTile(team, x, y, range, build -> !build.block.underBullets && pred.get(build));
+            if(target != null) return target;
+        }
 
         return indexer.findEnemyTile(team, x, y, range, pred);
     }
@@ -214,7 +229,10 @@ public class Units{
             }
         });
 
-        return buildResult;
+        var result = buildResult;
+        buildResult = null;
+
+        return result;
     }
 
     /** Iterates through all buildings in a range. */
@@ -240,7 +258,7 @@ public class Units{
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, tilePred);
+            return findEnemyTile(team, x, y, range, true, tilePred);
         }
     }
 
@@ -252,7 +270,7 @@ public class Units{
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, tilePred);
+            return findEnemyTile(team, x, y, range, true, tilePred);
         }
     }
 
@@ -461,7 +479,7 @@ public class Units{
         Seq<TeamData> data = state.teams.present;
         for(int i = 0; i < data.size; i++){
             var other = data.items[i];
-            if(other.team != team){
+            if(other.team != team && other.team != Team.derelict){
                 if(other.tree().any(x, y, width, height)){
                     return true;
                 }
