@@ -52,9 +52,11 @@ public class StaticWall extends Prop{
         super.load();
         int size = large.width / 2;
         split = large.split(size, size);
-        for(var arr : split){
-            for(var reg : arr){
-                reg.scale = region.scale;
+        if(split != null){
+            for(var arr : split){
+                for(var reg : arr){
+                    reg.scale = region.scale;
+                }
             }
         }
     }
