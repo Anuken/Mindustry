@@ -1,5 +1,9 @@
 [
   {
+    "name" : "Neodustry",
+    "address": ["neodustry.ru"]
+  }, 
+  {
     "name": "EscoCorp",
     "address": ["81.30.105.171:6567", "81.30.105.171:6568", "202.49.176.213:6567"]
   },
