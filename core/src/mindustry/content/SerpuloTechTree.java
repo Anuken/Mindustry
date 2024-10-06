@@ -464,18 +464,6 @@ public class SerpuloTechTree{
                         new Research(kiln),
                         new Research(mechanicalPump)
                         ), () -> {
-                            node(seaPort, Seq.with(
-                            new SectorComplete(biomassFacility),
-                            new Research(navalFactory),
-                            new Research(risso),
-                            new Research(retusa),
-                            new Research(steamGenerator),
-                            new Research(cultivator),
-                            new Research(coalCentrifuge)
-                            ), () -> {
-
-                            });
-
                             node(windsweptIslands, Seq.with(
                             new SectorComplete(ruinousShores),
                             new Research(pneumaticDrill),
@@ -483,6 +471,18 @@ public class SerpuloTechTree{
                             new Research(siliconSmelter),
                             new Research(steamGenerator)
                             ), () -> {
+                                node(seaPort, Seq.with(
+                                new SectorComplete(biomassFacility),
+                                new Research(navalFactory),
+                                new Research(risso),
+                                new Research(retusa),
+                                new Research(steamGenerator),
+                                new Research(cultivator),
+                                new Research(coalCentrifuge)
+                                ), () -> {
+
+                                });
+
                                 node(tarFields, Seq.with(
                                 new SectorComplete(windsweptIslands),
                                 new Research(coalCentrifuge),
@@ -577,11 +577,6 @@ public class SerpuloTechTree{
                                     new Research(navalFactory),
                                     new Research(payloadConveyor)
                                     ), () -> {
-                                        node(weatheredChannels, Seq.with(
-                                        new SectorComplete(impact0078)
-                                        ), () -> {
-
-                                        });
 
                                         node(navalFortress, Seq.with(
                                         new SectorComplete(coastline),
@@ -594,7 +589,14 @@ public class SerpuloTechTree{
                                         new Research(cyclone),
                                         new Research(ripple)
                                         ), () -> {
+                                            node(weatheredChannels, Seq.with(
+                                            new SectorComplete(impact0078),
+                                            new Research(bryde),
+                                            new Research(surgeSmelter),
+                                            new Research(overdriveProjector)
+                                            ), () -> {
 
+                                            });
                                         });
                                     });
                                 });
