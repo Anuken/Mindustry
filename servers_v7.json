@@ -1,11 +1,15 @@
 [
   {
     "name": "EscoCorp",
-    "address": ["81.30.105.171:6567", "81.30.105.171:6568"]
+    "address": ["81.30.105.171:6567", "81.30.105.171:6568", "202.49.176.213:6567"]
   },
   {
     "name": "Redundancy Dept",
     "address": ["min7.include-once.org:8000", "min7.include-once.org:8001"]
+  },
+  {
+    "name": "EchoDustry",
+    "address": ["node1.stellarch.org:7003", "node1.stellarch.org:7004"]
   },
   {
     "name": "TSR Network",
@@ -62,10 +66,6 @@
   {
     "name": "Crux's Federation",
     "address": ["de-free-01.hosts.optikservers.com:32538", "de-free-01.hosts.optikservers.com:31421", "fsn1.bbn.one:37019"]
-  },
-  {
-    "name": "RCM",
-    "address": ["rcrms.ru:6567"]
   },
   {
     "name": "Tendhost",
@@ -153,7 +153,7 @@
   },
   {
     "name": "Eradication Mindustry",
-    "address": ["140.238.246.78:7000", "140.238.246.78:7001", "140.238.246.78:7002", "140.238.246.78:7003", "140.238.246.78:7004", "130.61.22.183:7000", "130.61.22.183:7001", "130.61.22.183:7002", "130.61.22.183:7003", "130.61.22.183:7004", "130.61.22.183:7005", "130.61.22.183:7006", "62.30.47.117:7000", "62.30.47.117:7001", "62.30.47.117:7002", "62.30.47.117:7003", "62.30.47.116:7000", "62.30.47.116:7001"]
+    "address": ["140.238.246.78:7000", "140.238.246.78:7001", "140.238.246.78:7002", "140.238.246.78:7003", "130.61.22.183:7000", "130.61.22.183:7001", "130.61.22.183:7002", "130.61.22.183:7003", "62.30.47.116:7000", "62.30.47.116:7001", "62.30.47.116:7002", "62.30.47.116:7003", "144.24.196.119:7000", "144.24.196.119:7001", "144.24.196.119:7002", "144.24.196.119:7003"]
   },
   {
     "name": "Conservatory",
@@ -250,7 +250,7 @@
   },
   {
     "name": "abcxyz remaster",
-    "address": ["144.76.57.59:35150", "23.88.73.88:11066", "23.88.73.88:9171", "23.88.73.88:10911"]
+    "address": ["144.76.57.59:35051"]
   },
   {
     "name": "CroCraft Network",
@@ -258,11 +258,11 @@
   },
   {
     "name": "Extra Utilities",
-    "address": ["p1.i9mr.com:44922", "p1.i9mr.com:44834", "p1.i9mr.com:43189", "203.135.99.65:15142", "203.135.99.65:15143", "203.135.99.71:15142", "203.135.99.71:15143"]
+    "address": ["kub.2k12.win:6567", "203.135.99.65:15142", "203.135.99.65:15143", "203.135.99.71:15142", "203.135.99.71:15143"]
   },
   {
     "name": "Alex Multiverse",
-    "address": ["alexmindustryv7.servegame.com:25588", "172.234.80.96:6768", "139.162.41.78:6767", "172.245.187.143:6868", "172.245.187.143:6869", "92.119.127.171:6888", "181.215.58.8:1025", "181.215.58.8:1027", "181.215.58.7:1820", "23.95.107.12"]
+    "address": ["alexmindustryv7.servegame.com:25588", "172.234.80.96:6768", "139.162.41.78:6767", "172.245.187.143:6868", "172.245.187.143:6869", "92.119.127.171:6888", "181.215.58.41:1106", "181.215.58.41:1105", "181.215.58.9:1027", "23.95.107.12"]
   },
   {
     "name": "Open PVP",
@@ -290,7 +290,11 @@
   },
   {
     "name": "Erepulo",
-    "address": ["95.84.198.97:5401", "95.84.198.97:5402", "95.84.198.97:5403", "95.84.198.97:5404", "95.84.198.97:2357", "95.84.198.97:5500", "199.83.103.251", "frost-heaven.ru", "frost-heaven.ru:6568", "frost-heaven.ru:6569"]
+    "address": ["95.84.198.97:5401", "95.84.198.97:5402", "95.84.198.97:5403", "95.84.198.97:5404", "95.84.198.97:5500", "199.83.103.251", "frost-heaven.ru", "frost-heaven.ru:6568", "frost-heaven.ru:6569"]
+  },
+  {
+    "name": "FrostHeaven",
+    "address": ["95.84.198.97:2357", "frost-heaven.ru", "frost-heaven.ru:6568", "frost-heaven.ru:6569"]
   },
   {
     "name": "MineCore",
@@ -314,7 +318,7 @@
   },
   {
     "name": "ArmyOFUkraine",
-    "address": ["194.247.42.131:27715", "194.247.42.131:27512"]
+    "address": ["194.247.42.131:27715", "194.247.42.131:27512","220.141.232.67"]
   },
   {
     "name": "Erbium",
@@ -330,7 +334,7 @@
   },
   {
     "name": "VNM",
-    "address": ["server.mindustry-tool.app"]
+    "address": ["server.mindustry-tool.app", "server.mindustry-tool.app:6568", "server.mindustry-tool.app:6569", "server.mindustry-tool.app:6760", "server.mindustry-tool.app:6761", "server.mindustry-tool.app:6762", "server.mindustry-tool.app:6763", "server.mindustry-tool.app:6764", "server.mindustry-tool.app:6765", "server.mindustry-tool.app:6766", "server.mindustry-tool.app:6767", "server.mindustry-tool.app:6768", "server.mindustry-tool.app:6769", "server.mindustry-tool.app:6770", "server.mindustry-tool.app:6771", "server.mindustry-tool.app:6772", "server.mindustry-tool.app:6773", "server.mindustry-tool.app:6774", "server.mindustry-tool.app:6775", "server.mindustry-tool.app:6776", "server.mindustry-tool.app:6777", "server.mindustry-tool.app:6778", "server.mindustry-tool.app:6779", "server.mindustry-tool.app:6780"]
   },
   {
     "name": "LibreDUSTRY",

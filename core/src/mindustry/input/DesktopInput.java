@@ -56,6 +56,8 @@ public class DesktopInput extends InputHandler{
     /** Time of most recent control group selection */
     public long lastCtrlGroupSelectMillis;
 
+    private float buildPlanMouseOffsetX, buildPlanMouseOffsetY;
+
     boolean showHint(){
         return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() && !player.dead() &&
             (!isBuilding && !Core.settings.getBool("buildautopause") || player.unit().isBuilding() || !player.dead() && !player.unit().spawnedByCore());
@@ -639,11 +641,10 @@ public class DesktopInput extends InputHandler{
         }
 
         if(splan != null){
-            float offset = ((splan.block.size + 2) % 2) * tilesize / 2f;
-            float x = Core.input.mouseWorld().x + offset;
-            float y = Core.input.mouseWorld().y + offset;
-            splan.x = (int)(x / tilesize);
-            splan.y = (int)(y / tilesize);
+            float x = Core.input.mouseWorld().x + buildPlanMouseOffsetX;
+            float y = Core.input.mouseWorld().y + buildPlanMouseOffsetY;
+            splan.x = Math.round(x / tilesize);
+            splan.y = Math.round(y / tilesize);
         }
 
         if(block == null || mode != placing){
@@ -674,6 +675,15 @@ public class DesktopInput extends InputHandler{
             tappedOne = false;
             BuildPlan plan = getPlan(cursorX, cursorY);
 
+            if(plan != null){
+                //move selected to front
+                int index = player.unit().plans.indexOf(plan, true);
+                if(index != -1){
+                    player.unit().plans.removeIndex(index);
+                    player.unit().plans.addFirst(plan);
+                }
+            }
+
             if(Core.input.keyDown(Binding.break_block)){
                 mode = none;
             }else if(!selectPlans.isEmpty()){
@@ -687,6 +697,8 @@ public class DesktopInput extends InputHandler{
                 updateLine(selectX, selectY);
             }else if(plan != null && !plan.breaking && mode == none && !plan.initialized && plan.progress <= 0f){
                 splan = plan;
+                buildPlanMouseOffsetX = splan.x * tilesize - Core.input.mouseWorld().x;
+                buildPlanMouseOffsetY = splan.y * tilesize - Core.input.mouseWorld().y;
             }else if(plan != null && plan.breaking){
                 deleting = true;
             }else if(commandMode){

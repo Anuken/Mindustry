@@ -240,6 +240,8 @@ public class Teams{
     }
 
     public static class TeamData{
+        private static final IntSeq derelictBuffer = new IntSeq();
+
         public final Team team;
 
         /** Handles building ""bases"". */
@@ -317,6 +319,8 @@ public class Teams{
                 }
             }
 
+            finishScheduleDerelict();
+
             //kill all units randomly
             units.each(u -> Time.run(Mathf.random(0f, 60f * 5f), () -> {
                 //ensure unit hasn't switched teams for whatever reason
@@ -326,21 +330,7 @@ public class Teams{
             }));
         }
 
-        /** Make all buildings within this range derelict / explode. */
-        public void makeDerelict(float x, float y, float range){
-            var builds = new Seq<Building>();
-            if(buildingTree != null){
-                buildingTree.intersect(x - range, y - range, range * 2f, range * 2f, builds);
-            }
-
-            for(var build : builds){
-                if(build.within(x, y, range) && !build.block.privileged){
-                    scheduleDerelict(build);
-                }
-            }
-        }
-
-        /** Make all buildings within this range explode. */
+        /** Make all buildings within this range derelict/explode. */
         public void timeDestroy(float x, float y, float range){
             var builds = new Seq<Building>();
             if(buildingTree != null){
@@ -348,25 +338,29 @@ public class Teams{
             }
 
             for(var build : builds){
-                if(build.within(x, y, range) && !cores.contains(c -> c.within(build, range))){
-                    //TODO GPU driver bugs?
-                    build.kill();
-                    //Time.run(Mathf.random(0f, 60f * 6f), build::kill);
+                if(!build.block.privileged && build.within(x, y, range) && !cores.contains(c -> c.within(build, range))){
+                    scheduleDerelict(build);
                 }
             }
+            finishScheduleDerelict();
         }
 
         private void scheduleDerelict(Building build){
-            //TODO this may cause a lot of packet spam, optimize?
-            Call.setTeam(build, Team.derelict);
+            //queue block to be handled later, avoid packet spam
+            derelictBuffer.add(build.pos());
 
             if(build.getPayload() instanceof UnitPayload){
                 Call.destroyPayload(build);
             }
 
-            if(Mathf.chance(0.25)){
+            if(Mathf.chance(0.2)){
                 Time.run(Mathf.random(0f, 60f * 6f), build::kill);
             }
+        }
+
+        private void finishScheduleDerelict(){
+            derelictBuffer.chunked(1000, values -> Call.setTeams(values, Team.derelict));
+            derelictBuffer.clear();
         }
 
         //this is just an alias for consistency
