@@ -24,7 +24,7 @@ public class ScriptMainGenerator{
 
     public static void main(String[] args) throws Exception{
         String base = "mindustry";
-        Seq<String> blacklist = Seq.with("plugin", "mod", "net", "io", "tools");
+        Seq<String> blacklist = Seq.with("plugin", "mod", "net", "tools");
         Seq<String> nameBlacklist = Seq.with();
         Seq<Class<?>> whitelist = Seq.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
         AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class, Shader.class,
@@ -41,6 +41,8 @@ public class ScriptMainGenerator{
             getClasses("arc.audio"),
             getClasses("arc.input"),
             getClasses("arc.util"),
+            getClasses("arc.files"),
+            getClasses("arc.flabel"),
             getClasses("arc.struct")
         );
         classes.addAll(whitelist);
