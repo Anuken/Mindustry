@@ -45,10 +45,10 @@ public class Vars implements Loadable{
     public static boolean loadLocales = true;
     /** Whether the logger is loaded. */
     public static boolean loadedLogger = false, loadedFileLogger = false;
-    /** Whether to enable various experimental features (e.g. spawn positions for spawn groups) TODO change */
-    public static boolean experimental = true;
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
+    /** If true, the BE server list is always used. */
+    public static boolean forceBeServers = false;
     /** Default accessible content types used for player-selectable icons. */
     public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
     /** Default rule environment. */
@@ -72,10 +72,9 @@ public class Vars implements Loadable{
     /** URL the links to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
     /** URL to the JSON file containing all the BE servers. Only queried in BE. */
-    public static final String serverJsonBeURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_be.json";
+    public static final String serverJsonBeURL = "https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_be.json";
     /** URL to the JSON file containing all the stable servers.  */
-    //TODO merge with v6 list upon release
-    public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v7.json";
+    public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_v8.json";
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/

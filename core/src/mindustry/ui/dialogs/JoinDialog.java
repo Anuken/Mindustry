@@ -599,7 +599,7 @@ public class JoinDialog extends BaseDialog{
                 connect(lastIp, lastPort);
             }, exception -> {});
         }, 1, 1);
-        
+
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
             if(ping == null) return;
@@ -631,7 +631,7 @@ public class JoinDialog extends BaseDialog{
             Core.settings.remove("server-list");
         }
 
-        var url = Version.type.equals("bleeding-edge")  ? serverJsonBeURL : serverJsonURL;
+        var url = Version.type.equals("bleeding-edge") || Vars.forceBeServers ? serverJsonBeURL : serverJsonURL;
         Log.info("Fetching community servers at @", url);
 
         //get servers

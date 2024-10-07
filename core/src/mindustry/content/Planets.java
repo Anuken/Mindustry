@@ -145,6 +145,7 @@ public class Planets{
                 r.waveTeam = Team.crux;
                 r.placeRangeCheck = false;
                 r.showSpawns = false;
+                r.coreDestroyClear = true;
             };
             iconColor = Color.valueOf("7d4dff");
             atmosphereColor = Color.valueOf("3c1b8f");

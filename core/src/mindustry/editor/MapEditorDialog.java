@@ -172,21 +172,18 @@ public class MapEditorDialog extends Dialog implements Disposable{
             menu.cont.row();
         }
 
-        //wip feature
-        if(experimental){
-            menu.cont.button("@editor.sectorgenerate", Icon.terrain, () -> {
-                menu.hide();
-                sectorGenDialog.show();
-            }).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
-            menu.cont.row();
-        }
+        menu.cont.button("@editor.sectorgenerate", Icon.terrain, () -> {
+            menu.hide();
+            sectorGenDialog.show();
+        }).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
+        menu.cont.row();
 
         menu.cont.row();
 
         menu.cont.button("@quit", Icon.exit, () -> {
             tryExit();
             menu.hide();
-        }).padTop(!steam && !experimental ? -3 : 1).size(swidth * 2f + 10, 60f);
+        }).padTop(1).size(swidth * 2f + 10, 60f);
 
         resizeDialog = new MapResizeDialog((width, height, shiftX, shiftY) -> {
             if(!(editor.width() == width && editor.height() == height && shiftX == 0 && shiftY == 0)){
