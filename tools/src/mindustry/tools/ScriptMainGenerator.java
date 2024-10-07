@@ -10,6 +10,7 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import com.google.common.reflect.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -113,7 +114,15 @@ public class ScriptMainGenerator{
     }
 
     public static Seq<Class> getClasses(String packageName) throws Exception{
-        //TODO doesn't work, a java release broke it, look into alternative solutions (or just don't, Javascript modding is a bad idea anyway)
-        return new Seq<>();
+        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+
+        var result = new Seq<Class>();
+
+        for(ClassPath.ClassInfo info : ClassPath.from(loader).getAllClasses()){
+            if(info.getName().startsWith(packageName + ".")){
+                result.add(info.load());
+            }
+        }
+        return result;
     }
 }
