@@ -1100,6 +1100,10 @@ public class ControlPathfinder implements Runnable{
     }
 
     public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 mainDestination, Vec2 out, @Nullable boolean[] noResultFound){
+        if(noResultFound != null){
+            noResultFound[0] = false;
+        }
+
         int costId = unit.type.pathCostId;
         PathCost cost = idToCost(costId);
 
@@ -1253,7 +1257,11 @@ public class ControlPathfinder implements Runnable{
                     return true;
                 }
             }
-        }else if(request == null){
+        }else{
+            //destroy the old one immediately, it's invalid now
+            if(request != null){
+                request.lastUpdateId = -1000;
+            }
 
             //queue new request.
             unitRequests.put(unit, request = new PathRequest(unit, team, costId, destPos));
@@ -1266,9 +1274,7 @@ public class ControlPathfinder implements Runnable{
                 recalculatePath(f);
             });
 
-            out.set(destination);
-
-            return true;
+            return false;
         }
 
         if(noResultFound != null){
