@@ -53,6 +53,16 @@ To debug the application on a connected device/emulator, run `gradlew android:in
 
 If the terminal returns `Permission denied` or `Command not found` on Mac/Linux, run `chmod +x ./gradlew` before running `./gradlew`. *This is a one-time procedure.*
 
+#### Where is the `mindustry.gen` package?
+
+As the name implies, `mindustry.gen` is generated *at build time* based on other code. You will not find source code for this package in the repository, and it should not be edited by hand.
+
+The following is a non-exhaustive list of the "source" of generated code in `mindustry.gen`:
+
+- `Call`, `*Packet` classes: Generated from methods marked with `@Remote`.
+- All entity classes (`Unit`, `EffectState`, `Posc`, etc): Generated from component classes in the `mindustry.entities.comp` package, and combined using definitions in `mindustry.content.UnitTypes`.
+- `Sounds`, `Musics`, `Tex`, `Icon`, etc: Generated based on files in the respective asset folders.
+
 ---
 
 Gradle may take up to several minutes to download files. Be patient. <br>
