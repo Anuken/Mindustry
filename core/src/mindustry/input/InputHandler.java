@@ -98,7 +98,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public BuildPlan bplan = new BuildPlan();
     public Seq<BuildPlan> linePlans = new Seq<>();
     public Seq<BuildPlan> selectPlans = new Seq<>(BuildPlan.class);
-    public @Nullable Queue<BuildPlan> lastPlans;
+    public Queue<BuildPlan> lastPlans = new Queue<>();
+    public @Nullable Unit lastUnit;
 
     //for RTS controls
     public Seq<Unit> selectedUnits = new Seq<>();
@@ -812,13 +813,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(player.isBuilder()){
-            if(lastPlans != null && player.unit().plans != lastPlans && player.unit().plans.size == 0){
+            if(player.unit() != lastUnit && player.unit().plans.size <= 1){
                 for(var plan : lastPlans){
                     player.unit().plans.addLast(plan);
                 }
             }
-            lastPlans = player.unit().plans;
+            lastPlans.clear();
+            for(var plan : player.unit().plans){
+                lastPlans.addLast(plan);
+            }
         }
+
+        lastUnit = player.unit();
 
         playerPlanTree.clear();
         if(!player.dead()){
