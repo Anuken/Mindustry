@@ -120,7 +120,7 @@ public class SectorPresets{
             difficulty = 7;
         }};
 
-        mycelialBastion = new SectorPreset("mycelialBastion", serpulo, 133){{
+        mycelialBastion = new SectorPreset("mycelialBastion", serpulo, 260){{
             difficulty = 7;
         }};
 

@@ -12,6 +12,7 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.struct.Queue;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
@@ -97,6 +98,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public BuildPlan bplan = new BuildPlan();
     public Seq<BuildPlan> linePlans = new Seq<>();
     public Seq<BuildPlan> selectPlans = new Seq<>(BuildPlan.class);
+    public Queue<BuildPlan> lastPlans = new Queue<>();
+    public @Nullable Unit lastUnit;
 
     //for RTS controls
     public Seq<Unit> selectedUnits = new Seq<>();
@@ -809,6 +812,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             commandRect = false;
         }
 
+        if(player.isBuilder()){
+            if(player.unit() != lastUnit && player.unit().plans.size <= 1){
+                for(var plan : lastPlans){
+                    player.unit().plans.addLast(plan);
+                }
+            }
+            lastPlans.clear();
+            for(var plan : player.unit().plans){
+                lastPlans.addLast(plan);
+            }
+        }
+
+        lastUnit = player.unit();
+
         playerPlanTree.clear();
         if(!player.dead()){
             player.unit().plans.each(playerPlanTree::insert);
@@ -831,7 +848,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //you don't want selected blocks while locked, looks weird
         if(locked()){
             block = null;
-
         }
 
         wasShooting = player.shooting;
