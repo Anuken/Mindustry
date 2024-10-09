@@ -151,6 +151,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             logicCutscene = false;
             itemDepositCooldown = 0f;
             Arrays.fill(controlGroups, null);
+            lastUnit = null;
+            lastPlans.clear();
         });
     }
 
@@ -814,6 +816,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(player.isBuilder()){
             if(player.unit() != lastUnit && player.unit().plans.size <= 1){
+                player.unit().plans.ensureCapacity(lastPlans.size);
                 for(var plan : lastPlans){
                     player.unit().plans.addLast(plan);
                 }
