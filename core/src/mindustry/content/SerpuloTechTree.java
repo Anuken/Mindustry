@@ -262,12 +262,21 @@ public class SerpuloTechTree{
             node(duo, () -> {
                 node(copperWall, () -> {
                     node(copperWallLarge, () -> {
+                        node(scrapWall, () -> {
+                            node(scrapWallLarge, () -> {
+                                node(scrapWallHuge, () -> {
+                                    node(scrapWallGigantic);
+                                });
+                            });
+                        });
+
                         node(titaniumWall, () -> {
                             node(titaniumWallLarge);
 
                             node(door, () -> {
                                 node(doorLarge);
                             });
+
                             node(plastaniumWall, () -> {
                                 node(plastaniumWallLarge, () -> {
 
@@ -365,7 +374,7 @@ public class SerpuloTechTree{
                         node(atrax, () -> {
                             node(spiroct, () -> {
                                 node(arkyid, () -> {
-                                    node(toxopid, () -> {
+                                    node(toxopid, Seq.with(new SectorComplete(mycelialBastion)), () -> {
 
                                     });
                                 });
@@ -615,7 +624,8 @@ public class SerpuloTechTree{
                             node(mycelialBastion, Seq.with(
                             new Research(atrax),
                             new Research(spiroct),
-                            new Research(multiplicativeReconstructor)
+                            new Research(multiplicativeReconstructor),
+                            new Research(exponentialReconstructor)
                             ), () -> {
 
                             });
