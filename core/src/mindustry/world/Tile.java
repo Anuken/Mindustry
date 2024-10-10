@@ -57,6 +57,18 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this(x, y, content.block(floor), content.block(overlay), content.block(wall));
     }
 
+    /** Constructor used primarily in mocking scenarios in test suites. */
+    public Tile() { block = floor = overlay = (Floor)Blocks.air; }
+
+    /** Mocking scenarios in test suites. */
+    public void constructTile(Tile tile){
+        this.x = tile.x;
+        this.y = tile.y;
+        this.floor = tile.floor;
+        this.overlay = tile.overlay;
+        this.block = tile.block;
+    }
+
     /** Returns this tile's position as a packed point. */
     public int pos(){
         return Point2.pack(x, y);
