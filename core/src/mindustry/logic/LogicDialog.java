@@ -256,6 +256,8 @@ public class LogicDialog extends BaseDialog{
             dialog.addCloseButton();
             dialog.show();
         }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
+        
+        Core.app.post(canvas::rebuild);
     }
 
     public void show(String code, LExecutor executor, boolean privileged, Cons<String> modified){
