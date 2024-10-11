@@ -22,7 +22,7 @@ jobs:
     - name: Run unit tests and build JAR
       run: ./gradlew desktop:dist
     - name: Upload desktop JAR for testing
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Desktop JAR (zipped)
         path: desktop/build/libs/Mindustry.jar

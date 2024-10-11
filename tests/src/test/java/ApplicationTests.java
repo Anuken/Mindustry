@@ -226,7 +226,7 @@ public class ApplicationTests{
 
     @Test
     void serverListJson(){
-        String[] files = {"servers_v6.json", "servers_v7.json", "servers_be.json"};
+        String[] files = {"servers_v6.json", "servers_v7.json"};
 
 
         for(String file : files){

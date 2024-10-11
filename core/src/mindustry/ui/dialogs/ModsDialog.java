@@ -72,6 +72,7 @@ public class ModsDialog extends BaseDialog{
             browserTable = tablebrow;
         }).scrollX(false);
         browser.addCloseButton();
+        browser.makeButtonOverlay();
 
         browser.onResize(this::rebuildBrowser);
 

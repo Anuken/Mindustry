@@ -309,6 +309,8 @@ public class BulletType extends Content implements Cloneable{
     /** Color of light emitted by this bullet. */
     public Color lightColor = Pal.powerLight;
 
+    protected float cachedDps = -1;
+
     public BulletType(float speed, float damage){
         this.speed = speed;
         this.damage = damage;
@@ -338,15 +340,20 @@ public class BulletType extends Content implements Cloneable{
 
     /** @return estimated damage per shot. this can be very inaccurate. */
     public float estimateDPS(){
+        if(cachedDps >= 0f) return cachedDps;
+
         if(spawnUnit != null){
             return spawnUnit.estimateDps();
         }
 
-        float sum = damage + splashDamage*0.75f;
+        float sum = (damage + splashDamage*0.75f) * (pierce ? pierceCap == -1 ? 2 : Mathf.clamp(pierceCap, 1, 2) : 1f);
         if(fragBullet != null && fragBullet != this){
             sum += fragBullet.estimateDPS() * fragBullets / 2f;
         }
-        return sum;
+        for(var other : spawnBullets){
+            sum += other.estimateDPS();
+        }
+        return cachedDps = sum;
     }
 
     /** @return maximum distance the bullet this bullet type has can travel. */
@@ -542,7 +549,7 @@ public class BulletType extends Content implements Cloneable{
         if(!fragOnHit){
             createFrags(b, b.x, b.y);
         }
-        
+
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         despawnSound.at(b);
 
@@ -668,7 +675,7 @@ public class BulletType extends Content implements Cloneable{
             }
         }
     }
-    
+
     public void updateTrail(Bullet b){
         if(!headless && trailLength > 0){
             if(b.trail == null){
@@ -709,7 +716,7 @@ public class BulletType extends Content implements Cloneable{
         if(lightRadius <= -1){
             lightRadius = Math.max(18, hitSize * 5f);
         }
-        
+
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
         range = calculateRange();
     }
@@ -765,6 +772,13 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public @Nullable Bullet create(@Nullable Entityc owner, @Nullable Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY){
+        return create(owner, shooter, team, x, y, angle, damage, velocityScl, lifetimeScl, data, mover, aimX, aimY, null);
+    }
+
+    public @Nullable Bullet create(
+        @Nullable Entityc owner, @Nullable Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl,
+        float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY, @Nullable Teamc target
+    ){
         if(!Mathf.chance(createChance)) return null;
         if(ignoreSpawnAngle) angle = 0;
         if(spawnUnit != null){
@@ -805,7 +819,7 @@ public class BulletType extends Content implements Cloneable{
         bullet.originX = x;
         bullet.originY = y;
         if(!(aimX == -1f && aimY == -1f)){
-            bullet.aimTile = world.tileWorld(aimX, aimY);
+            bullet.aimTile = target instanceof Building b ? b.tile : world.tileWorld(aimX, aimY);
         }
         bullet.aimX = aimX;
         bullet.aimY = aimY;

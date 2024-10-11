@@ -139,6 +139,16 @@ public class TechTree{
             }
         }
 
+        /** Adds the specified database tab to all the content in this tree. */
+        public void addDatabaseTab(UnlockableContent tab){
+            each(node -> node.content.databaseTabs.add(tab));
+        }
+
+        /** Adds the specified planet to the shownPlanets of all the content in this tree. */
+        public void addPlanet(Planet planet){
+            each(node -> node.content.shownPlanets.add(planet));
+        }
+
         public Drawable icon(){
             return icon == null ? new TextureRegionDrawable(content.uiIcon) : icon;
         }

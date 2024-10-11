@@ -35,6 +35,7 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -42,13 +43,6 @@ import static mindustry.graphics.g3d.PlanetRenderer.*;
 import static mindustry.ui.dialogs.PlanetDialog.Mode.*;
 
 public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
-    static final String[] defaultIcons = {
-    "effect", "power", "logic", "units", "liquid", "production", "defense", "turret", "distribution", "crafting",
-    "settings", "cancel", "zoom", "ok", "star", "home", "pencil", "up", "down", "left", "right",
-    "hammer", "warning", "tree", "admin", "map", "modePvp", "terrain",
-    "modeSurvival", "commandRally", "commandAttack",
-    };
-
     //if true, enables launching anywhere for testing
     public static boolean debugSelect = false;
     public static float sectorShowDuration = 60f * 2.4f;
@@ -73,10 +67,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public Label hoverLabel = new Label("");
 
     private Texture[] planetTextures;
+    private CampaignRulesDialog campaignRules = new CampaignRulesDialog();
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
-        
+
         state.renderer = this;
         state.drawUi = true;
 
@@ -393,7 +388,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //preset sectors can only be selected once unlocked
         if(sector.preset != null){
             TechNode node = sector.preset.techNode;
-            return node == null || node.parent == null || (node.parent.content.unlocked() && (!(node.parent.content instanceof SectorPreset preset) || preset.sector.hasBase()));
+            return sector.preset.unlocked() || node == null || node.parent == null || (node.parent.content.unlocked() && (!(node.parent.content instanceof SectorPreset preset) || preset.sector.hasBase()));
         }
 
         return sector.planet.generator != null ?
@@ -480,7 +475,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(state.uiAlpha > 0.001f){
             for(Sector sec : planet.sectors){
                 if(sec.hasBase()){
-                    if(planet.allowSectorInvasion){
+                    if(planet.campaignRules.sectorInvasion){
                         for(Sector enemy : sec.near()){
                             if(enemy.hasEnemyBase()){
                                 planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Color.clear, 0.24f, 110f, 25);
@@ -593,7 +588,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             @Override
             public void act(float delta){
-                if(scene.getDialog() == PlanetDialog.this && !scene.hit(input.mouseX(), input.mouseY(), true).isDescendantOf(e -> e instanceof ScrollPane)){
+                if(scene.getDialog() == PlanetDialog.this && (scene.getHoverElement() == null || !scene.getHoverElement().isDescendantOf(e -> e instanceof ScrollPane))){
                     scene.setScrollFocus(PlanetDialog.this);
                 }
 
@@ -618,6 +613,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             t.top().left();
             ScrollPane pane = new ScrollPane(null, Styles.smallPane);
             t.add(pane).colspan(2).row();
+            t.button("@campaign.difficulty", Icon.bookSmall, () -> {
+                campaignRules.show(state.planet);
+            }).margin(12f).size(208f, 40f).padTop(12f).visible(() -> state.planet.allowCampaignRules).row();
+            t.add().height(64f); //padding for close button
             Table starsTable = new Table(Styles.black);
             pane.setWidget(starsTable);
             pane.setScrollingDisabled(true, false);
@@ -997,6 +996,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 sector.save = null;
             }
             updateSelected();
+            rebuildList();
         });
     }
 
@@ -1052,6 +1052,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 Icon.icons.get(sector.info.icon + "Small");
 
             title.button(icon == null ? Icon.noneSmall : icon, Styles.clearNonei, iconSmall, () -> {
+                //TODO use IconSelectDialog
                 new Dialog(""){{
                     closeOnBack();
                     setFillParent(true);
@@ -1078,7 +1079,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
                             int i = 1;
-                            for(var key : defaultIcons){
+                            for(var key : accessibleIcons){
                                 var value = Icon.icons.get(key);
 
                                 t.button(value, Styles.squareTogglei, () -> {
@@ -1137,7 +1138,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(sector.isAttacked()){
             addSurvivedInfo(sector, stable, false);
-        }else if(sector.hasBase() && sector.planet.allowSectorInvasion && sector.near().contains(Sector::hasEnemyBase)){
+        }else if(sector.hasBase() && sector.planet.campaignRules.sectorInvasion && sector.near().contains(Sector::hasEnemyBase)){
             stable.add("@sectors.vulnerable");
             stable.row();
         }else if(!sector.hasBase() && sector.hasEnemyBase()){
@@ -1244,7 +1245,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                     Events.fire(new SectorLaunchLoadoutEvent(sector, from, loadout));
 
-                    if(settings.getBool("skipcoreanimation")){
+                    CoreBuild core = player.team().core();
+                    if(core == null || settings.getBool("skipcoreanimation")){
                         //just... go there
                         control.playSector(from, sector);
                         //hide only after load screen is shown
@@ -1256,9 +1258,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                         //allow planet dialog to finish hiding before actually launching
                         Time.runTask(5f, () -> {
                             Runnable doLaunch = () -> {
-                                renderer.showLaunch(schemCore);
+                                renderer.showLaunch(core, schemCore);
                                 //run with less delay, as the loading animation is delayed by several frames
-                                Time.runTask(coreLandDuration - 8f, () -> control.playSector(from, sector));
+                                Time.runTask(core.landDuration() - 8f, () -> control.playSector(from, sector));
                             };
 
                             //load launchFrom sector right before launching so animation is correct
@@ -1276,7 +1278,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }else if(mode == select){
             listener.get(sector);
         }else if(mode == planetLaunch){ //TODO make sure it doesn't have a base already.
-
             //TODO animation
             //schematic selection and cost handled by listener
             listener.get(sector);

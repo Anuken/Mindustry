@@ -10,6 +10,7 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import com.google.common.reflect.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -23,7 +24,7 @@ public class ScriptMainGenerator{
 
     public static void main(String[] args) throws Exception{
         String base = "mindustry";
-        Seq<String> blacklist = Seq.with("plugin", "mod", "net", "io", "tools");
+        Seq<String> blacklist = Seq.with("tools");
         Seq<String> nameBlacklist = Seq.with();
         Seq<Class<?>> whitelist = Seq.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
         AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class, Shader.class,
@@ -40,6 +41,8 @@ public class ScriptMainGenerator{
             getClasses("arc.audio"),
             getClasses("arc.input"),
             getClasses("arc.util"),
+            getClasses("arc.files"),
+            getClasses("arc.flabel"),
             getClasses("arc.struct")
         );
         classes.addAll(whitelist);
@@ -113,7 +116,15 @@ public class ScriptMainGenerator{
     }
 
     public static Seq<Class> getClasses(String packageName) throws Exception{
-        //TODO doesn't work, a java release broke it, look into alternative solutions (or just don't, Javascript modding is a bad idea anyway)
-        return new Seq<>();
+        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+
+        var result = new Seq<Class>();
+
+        for(ClassPath.ClassInfo info : ClassPath.from(loader).getAllClasses()){
+            if(info.getName().startsWith(packageName + ".")){
+                result.add(info.load());
+            }
+        }
+        return result;
     }
 }

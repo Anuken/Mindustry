@@ -1,3 +1,7 @@
+# Note: Server list review is currently on pause. No new servers will be merged until v8 is released!
+
+*PRs to edit addresses of existing servers will still be accepted, although very infrequently.*
+
 ### Adding a server to the list
 
 Mindustry now has a public list of servers that everyone can see and connect to. 

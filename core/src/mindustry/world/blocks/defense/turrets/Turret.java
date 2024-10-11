@@ -36,6 +36,8 @@ public class Turret extends ReloadTurret{
     public final int timerTarget = timers++;
     /** Ticks between attempt at finding a target. */
     public float targetInterval = 20;
+    /** Target interval for when this turret already has a valid target. -1 = targetInterval */
+    public float newTargetInterval = -1f;
 
     /** Maximum ammo units stored. */
     public int maxAmmo = 30;
@@ -58,6 +60,8 @@ public class Turret extends ReloadTurret{
     public float shootX = 0f, shootY = Float.NEGATIVE_INFINITY;
     /** Random spread on the X axis. */
     public float xRand = 0f;
+    /** Range at which it finds and locks on to the target, but does not shoot. */
+    public float trackingRange = 0f;
     /** Minimum bullet range. Used for artillery only. */
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
@@ -137,6 +141,8 @@ public class Turret extends ReloadTurret{
         liquidCapacity = 20f;
         quickRotate = false;
         outlinedIcon = 1;
+        drawLiquidLight = false;
+        sync = true;
     }
 
     @Override
@@ -175,8 +181,10 @@ public class Turret extends ReloadTurret{
         if(elevation < 0) elevation = size / 2f;
         if(recoilTime < 0f) recoilTime = reload;
         if(cooldownTime < 0f) cooldownTime = reload;
+        if(newTargetInterval <= 0f) newTargetInterval = targetInterval;
 
         super.init();
+        trackingRange = Math.max(range, trackingRange);
     }
 
     @Override
@@ -241,6 +249,10 @@ public class Turret extends ReloadTurret{
                 return range + peekAmmo().rangeChange;
             }
             return range;
+        }
+
+        public float trackingRange(){
+            return range() + trackingRange - range;
         }
 
         @Override
@@ -359,7 +371,7 @@ public class Turret extends ReloadTurret{
             if(!validateTarget()) target = null;
 
             float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
-            if(warmupTarget > 0 && shootWarmup >= minWarmup && !isControlled()){
+            if(warmupTarget > 0 && !isControlled()){
                 warmupHold = 1f;
             }
             if(warmupHold > 0f){
@@ -404,7 +416,7 @@ public class Turret extends ReloadTurret{
             if(hasAmmo()){
                 if(Float.isNaN(reloadCounter)) reloadCounter = 0;
 
-                if(timer(timerTarget, targetInterval)){
+                if(timer(timerTarget, target != null ? newTargetInterval : targetInterval)){
                     findTarget();
                 }
 
@@ -420,6 +432,7 @@ public class Turret extends ReloadTurret{
                         targetPosition(target);
 
                         if(Float.isNaN(rotation)) rotation = 0;
+                        canShoot = within(target, range() + (target instanceof Sized hb ? hb.hitSize()/1.9f : 0f));
                     }
 
                     if(!isControlled()){
@@ -437,6 +450,8 @@ public class Turret extends ReloadTurret{
                         wasShooting = true;
                         updateShooting();
                     }
+                }else{
+                    target = null;
                 }
 
                 if(alwaysShooting){
@@ -467,13 +482,21 @@ public class Turret extends ReloadTurret{
             return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().heals();
         }
 
-        protected void findTarget(){
-            float range = range();
-
+        protected Posc findEnemy(float range){
             if(targetAir && !targetGround){
-                target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
+                return Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
             }else{
-                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+                return Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+            }
+        }
+
+        protected void findTarget(){
+            float trackRange = trackingRange(), range = range();
+
+            target = findEnemy(range);
+            //find another target within the tracking range, but only if there's nothing else (always prioritize standard target)
+            if(!Mathf.equal(trackRange, range) && target == null){
+                target = findEnemy(trackRange);
             }
 
             if(target == null && canHeal()){
@@ -657,6 +680,17 @@ public class Turret extends ReloadTurret{
         @Override
         public byte version(){
             return 1;
+        }
+
+        @Override
+        public void readSync(Reads read, byte revision){
+            //maintain rotation and reload when syncing so clients don't see turrets snapping around
+            float oldRot = rotation, oldReload = reloadCounter;
+
+            readAll(read, revision);
+
+            rotation = oldRot;
+            reloadCounter = oldReload;
         }
     }
 

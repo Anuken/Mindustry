@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
@@ -35,8 +36,6 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean hideDetails = true;
     /** If false, all icon generation is disabled for this content; createIcons is not called. */
     public boolean generateIcons = true;
-    /** Special logic icon ID. */
-    public int iconId = 0;
     /** How big the content appears in certain selection menus */
     public float selectionSize = 24f;
     /** Icon of the content to use in UI. */
@@ -45,11 +44,24 @@ public abstract class UnlockableContent extends MappableContent{
     public TextureRegion fullIcon;
     /** Override for the full icon. Useful for mod content with duplicate icons. Overrides any other full icon.*/
     public String fullOverride = "";
+    /** If true, this content will appear in all database tabs. */
+    public boolean allDatabaseTabs = false;
+    /**
+     * Planets that this content is made for. If empty, a planet is decided based on item requirements.
+     * Currently, this is only meaningful for blocks.
+     * */
+    public ObjectSet<Planet> shownPlanets = new ObjectSet<>();
+    /**
+     * Content - usually a planet - that dictates which database tab(s) this content will appear in.
+     * If nothing is defined, it will use the values in shownPlanets.
+     * If shownPlanets is also empty, it will use Serpulo as the "default" tab.
+     * */
+    public ObjectSet<UnlockableContent> databaseTabs = new ObjectSet<>();
     /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
     public @Nullable TechNode techNode;
     /** Tech nodes for all trees that this content is part of. */
     public Seq<TechNode> techNodes = new Seq<>();
-    /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
+    /** Unlock state. Loaded from settings. Do not modify outside the constructor. */
     protected boolean unlocked;
 
     public UnlockableContent(String name){
@@ -62,9 +74,16 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     @Override
+    public void postInit(){
+        super.postInit();
+
+        databaseTabs.addAll(shownPlanets);
+    }
+
+    @Override
     public void loadIcon(){
         fullIcon =
-            Core.atlas.find(fullOverride,
+            Core.atlas.find(fullOverride == null ? "" : fullOverride,
             Core.atlas.find(getContentType().name() + "-" + name + "-full",
             Core.atlas.find(name + "-full",
             Core.atlas.find(name,
@@ -72,6 +91,10 @@ public abstract class UnlockableContent extends MappableContent{
             Core.atlas.find(name + "1"))))));
 
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
+    }
+
+    public boolean isOnPlanet(@Nullable Planet planet){
+        return planet == null || planet == Planets.sun || shownPlanets.isEmpty() || shownPlanets.contains(planet);
     }
 
     public int getLogicId(){
@@ -146,6 +169,11 @@ public abstract class UnlockableContent extends MappableContent{
     public String emoji(){
         return Fonts.getUnicodeStr(name);
     }
+
+    public int emojiChar(){
+        return Fonts.getUnicode(name);
+    }
+
 
     public boolean hasEmoji(){
         return Fonts.hasUnicodeStr(name);

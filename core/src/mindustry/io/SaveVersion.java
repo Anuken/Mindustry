@@ -232,7 +232,8 @@ public abstract class SaveVersion extends SaveFileReader{
             Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
 
-            boolean savedata = tile.block().saveData;
+            boolean savedata = tile.floor().saveData || tile.overlay().saveData || tile.block().saveData;
+
             byte packed = (byte)((tile.build != null ? 1 : 0) | (savedata ? 2 : 0));
 
             //make note of whether there was an entity/rotation here
