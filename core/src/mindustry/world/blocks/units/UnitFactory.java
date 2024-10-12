@@ -54,7 +54,7 @@ public class UnitFactory extends UnitBlock{
             if(build.currentPlan == i) return;
             build.currentPlan = i < 0 || i >= plans.size ? -1 : i;
             build.progress = 0;
-            if(build.command != null && !Structs.contains(build.unit().commands, build.command)){
+            if(build.command != null && !build.unit().commands.contains(build.command)){
                 build.command = null;
             }
         });
@@ -66,7 +66,7 @@ public class UnitFactory extends UnitBlock{
             if(build.currentPlan == next) return;
             build.currentPlan = next;
             build.progress = 0;
-            if(build.command != null && !Structs.contains(val.commands, build.command)){
+            if(build.command != null && !val.commands.contains(build.command)){
                 build.command = null;
             }
         });
@@ -197,9 +197,9 @@ public class UnitFactory extends UnitBlock{
 
         public boolean canSetCommand(){
             var output = unit();
-            return output != null && output.commands.length > 1 && output.allowChangeCommands &&
+            return output != null && output.commands.size > 1 && output.allowChangeCommands &&
                 //to avoid cluttering UI, don't show command selection for "standard" units that only have two commands.
-                !(output.commands.length == 2 && output.commands[1] == UnitCommand.enterPayloadCommand);
+                !(output.commands.size == 2 && output.commands.get(1) == UnitCommand.enterPayloadCommand);
         }
 
         @Override
@@ -275,8 +275,8 @@ public class UnitFactory extends UnitBlock{
                             }
                         }
 
-                        if(list.length < columns){
-                            for(int j = 0; j < (columns - list.length); j++){
+                        if(list.size < columns){
+                            for(int j = 0; j < (columns - list.size); j++){
                                 commands.add().size(40f);
                             }
                         }

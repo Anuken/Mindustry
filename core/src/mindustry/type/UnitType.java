@@ -303,11 +303,11 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** A value of false is used to hide command changing UI in unit factories. */
     public boolean allowChangeCommands = true;
     /** Commands available to this unit through RTS controls. An empty array means commands will be assigned based on unit capabilities in init(). */
-    public UnitCommand[] commands = {};
+    public Seq<UnitCommand> commands = new Seq<>();
     /** Command to assign to this unit upon creation. Null indicates the first command in the array. */
     public @Nullable UnitCommand defaultCommand;
     /** Stances this unit can have.  An empty array means stances will be assigned based on unit capabilities in init(). */
-    public UnitStance[] stances = {};
+    public Seq<UnitStance> stances = new Seq<>();
 
     /** color for outline generated around sprites */
     public Color outlineColor = Pal.darkerMetal;
@@ -828,53 +828,49 @@ public class UnitType extends UnlockableContent implements Senseable{
         canAttack = weapons.contains(w -> !w.noAttack);
 
         //assign default commands.
-        if(commands.length == 0){
-            Seq<UnitCommand> cmds = new Seq<>(UnitCommand.class);
+        if(commands.size == 0){
 
-            cmds.add(UnitCommand.moveCommand, UnitCommand.enterPayloadCommand);
+            commands.add(UnitCommand.moveCommand, UnitCommand.enterPayloadCommand);
 
             if(canBoost){
-                cmds.add(UnitCommand.boostCommand);
+                commands.add(UnitCommand.boostCommand);
 
                 if(buildSpeed > 0f){
-                    cmds.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
+                    commands.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
                 }
             }
 
             //healing, mining and building is only supported for flying units; pathfinding to ambiguously reachable locations is hard.
             if(flying){
                 if(canHeal){
-                    cmds.add(UnitCommand.repairCommand);
+                    commands.add(UnitCommand.repairCommand);
                 }
 
                 if(buildSpeed > 0){
-                    cmds.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
+                    commands.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
                 }
 
                 if(mineTier > 0){
-                    cmds.add(UnitCommand.mineCommand);
+                    commands.add(UnitCommand.mineCommand);
                 }
                 if(example instanceof Payloadc){
-                    cmds.addAll(UnitCommand.loadUnitsCommand, UnitCommand.loadBlocksCommand, UnitCommand.unloadPayloadCommand, UnitCommand.loopPayloadCommand);
+                    commands.addAll(UnitCommand.loadUnitsCommand, UnitCommand.loadBlocksCommand, UnitCommand.unloadPayloadCommand, UnitCommand.loopPayloadCommand);
                 }
             }
-
-            commands = cmds.toArray();
         }
 
-        if(defaultCommand == null && commands.length > 0){
-            defaultCommand = commands[0];
+        if(defaultCommand == null && commands.size > 0){
+            defaultCommand = commands.first();
         }
 
-        if(stances.length == 0){
+        if(stances.size == 0){
             if(canAttack){
-                Seq<UnitStance> seq = Seq.with(UnitStance.stop, UnitStance.shoot, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
+                stances.addAll(UnitStance.stop, UnitStance.shoot, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
                 if(!flying){
-                    seq.add(UnitStance.ram);
+                    stances.add(UnitStance.ram);
                 }
-                stances = seq.toArray(UnitStance.class);
             }else{
-                stances = new UnitStance[]{UnitStance.stop, UnitStance.patrol};
+                stances.addAll(UnitStance.stop, UnitStance.patrol);
             }
         }
 

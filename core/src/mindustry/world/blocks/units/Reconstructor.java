@@ -168,7 +168,7 @@ public class Reconstructor extends UnitBlock{
 
         public boolean canSetCommand(){
             var output = unit();
-            return output != null && output.commands.length > 1 && output.allowChangeCommands;
+            return output != null && output.commands.size > 1 && output.allowChangeCommands;
         }
 
         @Override
