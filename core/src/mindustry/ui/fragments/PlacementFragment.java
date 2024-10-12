@@ -525,7 +525,7 @@ public class PlacementFragment{
                                             firstCommand = true;
                                         }else{
                                             //remove commands that this next unit type doesn't have
-                                            commands.removeAll(com -> !Structs.contains(type.commands, com));
+                                            commands.removeAll(com -> !type.commands.contains(com));
                                         }
 
                                         if(!firstStance){
@@ -533,7 +533,7 @@ public class PlacementFragment{
                                             firstStance = true;
                                         }else{
                                             //remove commands that this next unit type doesn't have
-                                            stances.removeAll(st -> !Structs.contains(type.stances, st));
+                                            stances.removeAll(st -> !type.stances.contains(st));
                                         }
                                     }
                                 }

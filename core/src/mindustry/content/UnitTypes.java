@@ -322,7 +322,7 @@ public class UnitTypes{
             speed = 0.55f;
             hitSize = 8f;
             health = 120f;
-            buildSpeed = 0.35f;
+            buildSpeed = 0.3f;
             armor = 1f;
 
             abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
@@ -1256,6 +1256,7 @@ public class UnitTypes{
             controller = u -> new MinerAI();
 
             defaultCommand = UnitCommand.mineCommand;
+            allowChangeCommands = false;
 
             flying = true;
             drag = 0.06f;

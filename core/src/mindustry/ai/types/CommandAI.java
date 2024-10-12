@@ -55,7 +55,7 @@ public class CommandAI extends AIController{
 
     /** Attempts to assign a command to this unit. If not supported by the unit type, does nothing. */
     public void command(UnitCommand command){
-        if(Structs.contains(unit.type.commands, command)){
+        if(unit.type.commands.contains(command)){
             //clear old state.
             unit.mineTile = null;
             unit.clearBuilding();
@@ -88,8 +88,8 @@ public class CommandAI extends AIController{
         }
 
         //assign defaults
-        if(command == null && unit.type.commands.length > 0){
-            command = unit.type.defaultCommand == null ? unit.type.commands[0] : unit.type.defaultCommand;
+        if(command == null && unit.type.commands.size > 0){
+            command = unit.type.defaultCommand == null ? unit.type.commands.first() : unit.type.defaultCommand;
         }
 
         //update command controller based on index.
