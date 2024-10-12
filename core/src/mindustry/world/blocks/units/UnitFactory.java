@@ -389,7 +389,7 @@ public class UnitFactory extends UnitBlock{
                             unit.command().commandPosition(commandPos);
                         }
 
-                        unit.command().command(command == null && payload.unit.type.defaultCommand != null ? payload.unit.type.defaultCommand : command);
+                        unit.command().command(command == null && unit.type.defaultCommand != null ? unit.type.defaultCommand : command);
                     }
 
                     payload = new UnitPayload(unit);
