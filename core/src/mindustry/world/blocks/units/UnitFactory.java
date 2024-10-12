@@ -197,7 +197,9 @@ public class UnitFactory extends UnitBlock{
 
         public boolean canSetCommand(){
             var output = unit();
-            return output != null && output.commands.length > 1 && output.allowChangeCommands;
+            return output != null && output.commands.length > 1 && output.allowChangeCommands &&
+                //to avoid cluttering UI, don't show command selection for "standard" units that only have two commands.
+                !(output.commands.length == 2 && output.commands[1] == UnitCommand.enterPayloadCommand);
         }
 
         @Override
@@ -247,12 +249,13 @@ public class UnitFactory extends UnitBlock{
 
                 Table commands = new Table();
                 commands.top().left();
-                commands.background(Styles.black6);
 
                 Runnable rebuildCommands = () -> {
                     commands.clear();
+                    commands.background(null);
                     var unit = unit();
                     if(unit != null && canSetCommand()){
+                        commands.background(Styles.black6);
                         var group = new ButtonGroup<ImageButton>();
                         group.setMinCheckCount(0);
                         int i = 0, columns = Mathf.clamp(units.size, 2, selectionColumns);
