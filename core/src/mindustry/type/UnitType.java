@@ -300,6 +300,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** Flags to target based on priority. Null indicates that the closest target should be found. The closest enemy core is used as a fallback. */
     public BlockFlag[] targetFlags = {null};
 
+    /** A value of false is used to hide command changing UI in unit factories. */
+    public boolean allowChangeCommands = true;
     /** Commands available to this unit through RTS controls. An empty array means commands will be assigned based on unit capabilities in init(). */
     public UnitCommand[] commands = {};
     /** Command to assign to this unit upon creation. Null indicates the first command in the array. */
@@ -858,6 +860,10 @@ public class UnitType extends UnlockableContent implements Senseable{
             }
 
             commands = cmds.toArray();
+        }
+
+        if(defaultCommand == null && commands.length > 0){
+            defaultCommand = commands[0];
         }
 
         if(stances.length == 0){
