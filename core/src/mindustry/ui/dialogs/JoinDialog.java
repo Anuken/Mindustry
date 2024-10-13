@@ -599,7 +599,7 @@ public class JoinDialog extends BaseDialog{
                 connect(lastIp, lastPort);
             }, exception -> {});
         }, 1, 1);
-        
+
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
             if(ping == null) return;
@@ -631,12 +631,24 @@ public class JoinDialog extends BaseDialog{
             Core.settings.remove("server-list");
         }
 
-        var url = Version.type.equals("bleeding-edge")  ? serverJsonBeURL : serverJsonURL;
-        Log.info("Fetching community servers at @", url);
+        var urls = Version.type.equals("bleeding-edge") || Vars.forceBeServers ? serverJsonBeURLs : serverJsonURLs;
+
+        fetchServers(urls, 0);
+    }
+
+    private void fetchServers(String[] urls, int index){
+        if(index >= urls.length) return;
 
         //get servers
-        Http.get(url)
-        .error(t -> Log.err("Failed to fetch community servers", t))
+        Http.get(urls[index])
+        .error(t -> {
+            if(index < urls.length - 1){
+                //attempt fetching from the next URL upon failure
+                fetchServers(urls, index + 1);
+            }else{
+                Log.err("Failed to fetch community servers", t);
+            }
+        })
         .submit(result -> {
             Jval val = Jval.read(result.getResultAsString());
             Seq<ServerGroup> servers = new Seq<>();

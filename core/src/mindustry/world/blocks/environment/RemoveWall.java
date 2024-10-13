@@ -45,6 +45,9 @@ public class RemoveWall extends Block{
     @Override
     public void placeEnded(Tile tile, @Nullable Unit builder){
         tile.setBlock(Blocks.air);
+        if(tile.overlay().wallOre){
+            tile.setOverlay(Blocks.air);
+        }
     }
 
 }

@@ -97,11 +97,11 @@ public class SectorPresets{
 
         weatheredChannels = new SectorPreset("weatheredChannels", serpulo, 39){{
             captureWave = 40;
-            difficulty = 7;
+            difficulty = 9;
         }};
 
         navalFortress = new SectorPreset("navalFortress", serpulo, 216){{
-            difficulty = 9;
+            difficulty = 8;
         }};
 
         frontier = new SectorPreset("frontier", serpulo, 203){{
@@ -120,7 +120,7 @@ public class SectorPresets{
             difficulty = 7;
         }};
 
-        mycelialBastion = new SectorPreset("mycelialBastion", serpulo, 133){{
+        mycelialBastion = new SectorPreset("mycelialBastion", serpulo, 260){{
             difficulty = 7;
         }};
 

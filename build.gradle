@@ -410,6 +410,9 @@ project(":tools"){
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
         implementation arcModule("backends:backend-headless")
+
+        implementation("com.google.guava:guava:33.3.1-jre")
+        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
     }
 }
 

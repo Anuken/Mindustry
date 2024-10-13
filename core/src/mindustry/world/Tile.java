@@ -756,6 +756,17 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     @Remote(called = Loc.server)
+    public static void setTeams(int[] positions, Team team){
+        if(positions == null) return;
+        for(int pos : positions){
+            Tile tile = world.tile(pos);
+            if(tile != null && tile.build != null){
+                tile.build.changeTeam(team);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server)
     public static void buildDestroyed(Building build){
         if(build == null) return;
         build.killed();
