@@ -222,6 +222,7 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
+    /** @return in multiplayer, whether this is unlocked for the host player, otherwise, whether it is unlocked for the local player (same as unlocked()) */
     public boolean unlockedNowHost(){
         if(!state.isCampaign()) return true;
         return net != null && net.client() ?
