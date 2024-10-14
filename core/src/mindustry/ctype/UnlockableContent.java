@@ -222,17 +222,25 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
-    /** @return in multiplayer, whether this is unlocked for the host player, otherwise, whether it is unlocked for the local player (same as unlocked()) */
     public boolean unlockedNowHost(){
-        if(!state.isCampaign()) return true;
+        return !state.isCampaign() || unlockedHost();
+    }
+
+    /** @return in multiplayer, whether this is unlocked for the host player, otherwise, whether it is unlocked for the local player (same as unlocked()) */
+    public boolean unlockedHost(){
         return net != null && net.client() ?
-            alwaysUnlocked || state.rules.researched.contains(name) :
+            alwaysUnlocked || state.rules.researched.contains(this) :
             unlocked || alwaysUnlocked;
+    }
+
+    /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */
+    public boolean unlockedNow(){
+        return unlocked() || !state.isCampaign();
     }
 
     public boolean unlocked(){
         return net != null && net.client() ?
-            alwaysUnlocked || unlocked || state.rules.researched.contains(name) :
+            alwaysUnlocked || unlocked || state.rules.researched.contains(this) :
             unlocked || alwaysUnlocked;
     }
 
@@ -242,11 +250,6 @@ public abstract class UnlockableContent extends MappableContent{
             unlocked = false;
             Core.settings.put(name + "-unlocked", false);
         }
-    }
-
-    /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */
-    public boolean unlockedNow(){
-        return unlocked() || !state.isCampaign();
     }
 
     public boolean locked(){

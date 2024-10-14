@@ -395,7 +395,7 @@ public class Logic implements ApplicationListener{
         if(!(content instanceof UnlockableContent u)) return;
 
         boolean was = u.unlockedNow();
-        state.rules.researched.add(u.name);
+        state.rules.researched.add(u);
 
         if(!was){
             Events.fire(new UnlockEvent(u));
