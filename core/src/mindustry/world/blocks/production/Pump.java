@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.game.*;
+import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -77,6 +78,12 @@ public class Pump extends LiquidBlock{
     @Override
     public TextureRegion[] icons(){
         return drawer.finalIcons(this);
+    }
+
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+        drawer.createIcons(this, packer);
     }
 
     @Override
