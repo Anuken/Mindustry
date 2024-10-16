@@ -7,6 +7,7 @@ import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.type.*;
@@ -160,7 +161,7 @@ public class Rules{
     /** Reveals blocks normally hidden by build visibility. */
     public ObjectSet<Block> revealedBlocks = new ObjectSet<>();
     /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */
-    public ObjectSet<String> researched = new ObjectSet<>();
+    public ObjectSet<UnlockableContent> researched = new ObjectSet<>();
     /** In-map objective executor. */
     public MapObjectives objectives = new MapObjectives();
     /** Flags set by objectives. Used in world processors. */
