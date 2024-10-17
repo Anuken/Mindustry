@@ -68,7 +68,7 @@ body:
       label: Submission
       description: Check the boxes to confirm that you have read the lines below.
       options:
-        - label: I have updated to the latest release (https://github.com/Anuken/Mindustry/releases) to make sure my issue has not been fixed.
+        - label: I have updated to the latest release (https://github.com/Anuken/MindustryBuilds/releases) to make sure my issue has not been fixed.
           required: true
         - label: I have searched the closed and open issues to make sure that this problem has not already been reported.
           required: true
