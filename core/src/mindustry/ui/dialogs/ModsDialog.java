@@ -107,6 +107,8 @@ public class ModsDialog extends BaseDialog{
             ui.showErrorMessage("@feature.unsupported");
         }else if(error instanceof HttpStatusException st){
             ui.showErrorMessage(Core.bundle.format("connectfail", Strings.capitalize(st.status.toString().toLowerCase())));
+        }else if(error.getMessage() != null && error.getMessage().toLowerCase(Locale.ROOT).contains("writable dex")){
+            ui.showException("@error.moddex", error);
         }else{
             ui.showException(error);
         }
@@ -189,7 +191,7 @@ public class ModsDialog extends BaseDialog{
                                 mods.importMod(file);
                                 setup();
                             }catch(Exception e){
-                                ui.showException(e);
+                                ui.showException(e.getMessage() != null && e.getMessage().toLowerCase(Locale.ROOT).contains("writable dex") ? "@error.moddex" : "", e);
                                 Log.err(e);
                             }
                         }, "zip", "jar");
