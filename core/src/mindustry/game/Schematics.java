@@ -654,7 +654,7 @@ public class Schematics implements Loadable{
 
     private static Schematic rotated(Schematic input, boolean counter){
         int direction = Mathf.sign(counter);
-        Schematic schem = input == tmpSchem ? tmpSchem2 : tmpSchem2;
+        Schematic schem = input == tmpSchem ? tmpSchem2 : tmpSchem;
         schem.width = input.width;
         schem.height = input.height;
         Pools.freeAll(schem.tiles);
