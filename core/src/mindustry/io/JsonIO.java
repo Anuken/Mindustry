@@ -261,15 +261,8 @@ public class JsonIO{
             public UnlockableContent read(Json json, JsonValue jsonData, Class type){
                 if(jsonData.isNull()) return null;
                 String str = jsonData.asString();
-                Item item = Vars.content.item(str);
-                Liquid liquid = Vars.content.liquid(str);
-                Block block = Vars.content.block(str);
-                UnitType unit = Vars.content.unit(str);
-                return
-                    item != null ? item :
-                    liquid != null ? liquid :
-                    block != null ? block :
-                    unit;
+                var map = Vars.content.byName(str);
+                return map instanceof UnlockableContent u ? u : null;
             }
         });
 

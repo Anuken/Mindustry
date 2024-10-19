@@ -42,7 +42,12 @@ public class ArcNetProvider implements NetProvider{
     public ArcNetProvider(){
         ArcNet.errorHandler = e -> {
             if(Log.level == LogLevel.debug){
-                Log.debug(Strings.getStackTrace(e));
+                var finalCause = Strings.getFinalCause(e);
+
+                //"connection is closed" is a pointless annoying error that should not be logged
+                if(!"Connection is closed.".equals(finalCause.getMessage())){
+                    Log.debug(Strings.getStackTrace(e));
+                }
             }
         };
 
@@ -361,10 +366,12 @@ public class ArcNetProvider implements NetProvider{
         @Override
         public void send(Object object, boolean reliable){
             try{
-                if(reliable){
-                    connection.sendTCP(object);
-                }else{
-                    connection.sendUDP(object);
+                if(connection.isConnected()){
+                    if(reliable){
+                        connection.sendTCP(object);
+                    }else{
+                        connection.sendUDP(object);
+                    }
                 }
             }catch(Exception e){
                 Log.err(e);
