@@ -42,7 +42,6 @@ public class ScriptMainGenerator{
             getClasses("arc.input"),
             getClasses("arc.util"),
             getClasses("arc.files"),
-            getClasses("arc.flabel"),
             getClasses("arc.struct")
         );
         classes.addAll(whitelist);
