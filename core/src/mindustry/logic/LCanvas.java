@@ -13,6 +13,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.pooling.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -20,18 +21,20 @@ import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 
 public class LCanvas extends Table{
-    public static final int maxJumpsDrawn = 100;
+    private static final int invalidJump = Integer.MAX_VALUE; // terrible hack
     //ew static variables
     static LCanvas canvas;
+    private static boolean dynamicJumpHeights = false;
+    private static boolean coloredJumps = false;
+    private static boolean trapezoidalJumps = false;
 
     public DragLayout statements;
     public ScrollPane pane;
-    public Group jumps;
+    public Group jumps; // compatibility
 
     StatementElem dragging;
     StatementElem hovered;
     float targetWidth;
-    int jumpCount = 0;
     boolean privileged;
     Seq<Tooltip> tooltips = new Seq<>();
 
@@ -106,17 +109,23 @@ public class LCanvas extends Table{
         clear();
 
         statements = new DragLayout();
-        jumps = new WidgetGroup();
+        jumps = statements.jumps;
+
+        dynamicJumpHeights = Core.settings.getBool("dynamicjumpheights", false);
+        coloredJumps = Core.settings.getBool("coloredjumps", false);
+        trapezoidalJumps = Core.settings.getBool("trapezoidaljumps", false);
 
         pane = pane(t -> {
             t.center();
             t.add(statements).pad(2f).center().width(targetWidth);
-            t.addChild(jumps);
+            t.addChild(statements.jumps);
 
-            jumps.cullable = false;
+            jumps.touchable = Touchable.disabled;
+            jumps.update(()->jumps.setCullingArea(t.getCullingArea()));
+            statements.jumps.cullable = false;
         }).grow().get();
         pane.setFlickScroll(false);
-        pane.setScrollYForce(s);
+        pane.setScrollY(s);
 
         if(toLoad != null){
             load(toLoad);
@@ -125,7 +134,6 @@ public class LCanvas extends Table{
 
     @Override
     public void draw(){
-        jumpCount = 0;
         super.draw();
     }
 
@@ -141,7 +149,7 @@ public class LCanvas extends Table{
     }
 
     public void load(String asm){
-        jumps.clear();
+        statements.jumps.clear();
 
         Seq<LStatement> statements = LAssembler.read(asm, privileged);
         statements.truncate(LExecutor.maxInstructions);
@@ -154,13 +162,12 @@ public class LCanvas extends Table{
             st.setupUI();
         }
 
-        this.statements.layout();
+        this.statements.updateJumpHeights = true;
     }
 
     public void clearStatements(){
-        jumps.clear();
+        statements.jumps.clear();
         statements.clearChildren();
-        statements.layout();
     }
 
     StatementElem checkHovered(){
@@ -195,9 +202,50 @@ public class LCanvas extends Table{
         Seq<Element> seq = new Seq<>();
         int insertPosition = 0;
         boolean invalidated;
+        public Group jumps = new WidgetGroup();
+        private Seq<JumpCurve> processedJumps = new Seq<JumpCurve>();
+        private IntMap<JumpCurve> reprBefore = new IntMap<JumpCurve>();
+        private IntMap<JumpCurve> reprAfter = new IntMap<JumpCurve>();
+        public boolean updateJumpHeights = true;
+        private Color[] jumpColors = new Color[LExecutor.maxInstructions];
 
         {
             setTransform(true);
+
+            Time.mark();
+
+            //set seed so that colors are consistent between game launches
+            Rand rand = new Rand(0L);
+
+            int checkAmount = 5; //to how many previous hues to compare
+            float minDistance = 360f / checkAmount / 2f; //by at least how much should each hue be different from the checkAmount previous and next ones
+
+            Seq<Float> previousHues = new Seq<>();
+
+            for(int i = 0; i < LExecutor.maxInstructions; i++){
+                float hue = 0f;
+
+                boolean goodEnough = false;
+                while(!goodEnough){
+                    goodEnough = true;
+                    hue = Mathf.random(360f);
+                    for(float previousHue : previousHues){
+                        if(Math.abs(previousHue - hue) < minDistance) {
+                            goodEnough = false;
+                            break;
+                        }
+                    }
+                }
+
+                jumpColors[i] = Color.HSVtoRGB(hue, rand.random(80f, 100f), 100f);
+
+                previousHues.add(hue);
+                if(previousHues.size == checkAmount){
+                    previousHues.remove(0);
+                }
+            }
+
+            Log.debug("Processed logic jump colors in @ms", Time.elapsed()); //2.2ms on my (Ilya246) machine
         }
 
         @Override
@@ -206,10 +254,12 @@ public class LCanvas extends Table{
             float cy = 0;
             seq.clear();
 
-            float totalHeight = getChildren().sumf(e -> e.getHeight() + space);
-
-            height = prefHeight = totalHeight;
-            width = prefWidth = Scl.scl(targetWidth);
+            float totalHeight = getChildren().sumf(e -> e.getPrefHeight() + space);
+            if(height != totalHeight || width != Scl.scl(targetWidth)){
+                height = prefHeight = totalHeight;
+                width = prefWidth = Scl.scl(targetWidth);
+                invalidateHierarchy();
+            }
 
             //layout everything normally
             for(int i = 0; i < getChildren().size; i++){
@@ -219,7 +269,7 @@ public class LCanvas extends Table{
                 if(dragging == e) continue;
 
                 e.setSize(width, e.getPrefHeight());
-                e.setPosition(0, height - cy, Align.topLeft);
+                e.setPosition(0, totalHeight - cy, Align.topLeft);
                 ((StatementElem)e).updateAddress(i);
 
                 cy += e.getPrefHeight() + space;
@@ -250,11 +300,121 @@ public class LCanvas extends Table{
                 }
             }
 
-            if(parent != null) parent.invalidateHierarchy();
+            if(dynamicJumpHeights){
+                if(updateJumpHeights) setJumpHeights();
+                updateJumpHeights = false;
+            }
+
+            if(coloredJumps){
+                jumps.getChildren().each(e -> {
+                    if(!(e instanceof JumpCurve e2) || e2.button.to.get() == null) return;
+                    int idx = e2.button.to.get().index;
+                    if(dragging != null && idx >= dragging.index) idx += 1;
+                    e2.button.defaultColor.set(jumpColors[idx]);
+                });
+            }
 
             if(parent != null && parent instanceof Table){
                 setCullingArea(parent.getCullingArea());
             }
+        }
+
+        private void setJumpHeights(){
+            SnapshotSeq<Element> jumpsChildren = jumps.getChildren();
+            processedJumps.clear();
+            if(trapezoidalJumps){
+                reprBefore.clear();
+                reprAfter.clear();
+                jumpsChildren.each(e -> {
+                    if(!(e instanceof JumpCurve e2)) return;
+                    e2.prepareHeight();
+                    if(e2.jumpUIBegin == invalidJump) return;
+                    if(e2.flipped){
+                        JumpCurve prev = reprAfter.get(e2.jumpUIBegin);
+                        if(prev != null && prev.jumpUIEnd >= e2.jumpUIEnd) return;
+                        reprAfter.put(e2.jumpUIBegin, e2);
+                    }else{
+                        JumpCurve prev = reprBefore.get(e2.jumpUIEnd);
+                        if(prev != null && prev.jumpUIBegin <= e2.jumpUIBegin) return;
+                        reprBefore.put(e2.jumpUIEnd, e2);
+                    }
+                });
+                processedJumps.add(reprBefore.values().toArray());
+                processedJumps.add(reprAfter.values().toArray());
+            } else {
+                jumpsChildren.each(e -> {
+                    if(!(e instanceof JumpCurve e2)) return;
+                    e2.prepareHeight();
+                    processedJumps.add(e2);
+                });
+            }
+            processedJumps.sort((a,b) -> a.jumpUIBegin - b.jumpUIBegin);
+
+            Seq<JumpCurve> occupiers = Pools.obtain(Seq.class, Seq<JumpCurve>::new);
+            Bits occupied = Pools.obtain(Bits.class, Bits::new);
+            occupiers.clear();
+            occupied.clear();
+            for(int i = 0; i < processedJumps.size; i++){
+                JumpCurve cur = processedJumps.get(i);
+                occupiers.retainAll(e -> {
+                    if(e.jumpUIEnd > cur.jumpUIBegin) return true;
+                    occupied.clear(e.predHeight);
+                    return false;
+                });
+                int h = getJumpHeight(i, occupiers, occupied);
+                occupiers.add(cur);
+                occupied.set(h);
+            }
+
+            occupied.clear();
+            occupiers.clear();
+            Pools.free(occupied);
+            Pools.free(occupiers);
+
+            if(trapezoidalJumps){
+                jumpsChildren.each(e -> {
+                    if(!(e instanceof JumpCurve e2)) return;
+                    if(e2.jumpUIBegin == invalidJump) return;
+                    e2.predHeight = e2.flipped ? reprAfter.get(e2.jumpUIBegin).predHeight : reprBefore.get(e2.jumpUIEnd).predHeight;
+                    e2.markedDone = true;
+                });
+            }
+        }
+
+        private int getJumpHeight(int index, Seq<JumpCurve> occupiers, Bits occupied){
+            JumpCurve jmp = processedJumps.get(index);
+            if(jmp.markedDone) return jmp.predHeight;
+
+            Seq<JumpCurve> tmpOccupiers = Pools.obtain(Seq.class, Seq<JumpCurve>::new).clear();
+            Bits tmpOccupied = Pools.obtain(Bits.class, Bits::new);
+            tmpOccupiers.set(occupiers);
+            tmpOccupied.clear();
+            tmpOccupied.set(occupied);
+
+            int max = -1;
+            for(int i = index + 1; i < processedJumps.size; i++){
+                JumpCurve cur = processedJumps.get(i);
+                if(cur.jumpUIEnd > jmp.jumpUIEnd) continue;
+                tmpOccupiers.retainAll(e -> {
+                    if(e.jumpUIEnd > cur.jumpUIBegin) return true;
+                    tmpOccupied.clear(e.predHeight);
+                    return false;
+                });
+                int h = getJumpHeight(i, tmpOccupiers, tmpOccupied);
+                tmpOccupiers.add(cur);
+                tmpOccupied.set(h);
+                max = Math.max(max, h);
+            }
+
+            jmp.predHeight = occupied.nextClearBit(max + 1);
+            jmp.markedDone = true;
+
+            tmpOccupied.clear();
+            tmpOccupiers.clear();
+            Pools.free(tmpOccupied);
+            Pools.free(tmpOccupiers);
+
+            return jmp.predHeight;
         }
 
         @Override
@@ -312,9 +472,10 @@ public class LCanvas extends Table{
                 }
 
                 dragging = null;
+                invalidateHierarchy();
             }
 
-            layout();
+            updateJumpHeights = true;
         }
     }
 
@@ -350,7 +511,7 @@ public class LCanvas extends Table{
                 t.button(Icon.cancel, Styles.logici, () -> {
                     remove();
                     dragging = null;
-                    statements.layout();
+                    statements.updateJumpHeights = true;
                 }).size(24f);
 
                 t.addListener(new InputListener(){
@@ -369,7 +530,8 @@ public class LCanvas extends Table{
                         lasty = v.y;
                         dragging = StatementElem.this;
                         toFront();
-                        statements.layout();
+                        statements.updateJumpHeights = true;
+                        statements.invalidate();
                         return true;
                     }
 
@@ -381,7 +543,7 @@ public class LCanvas extends Table{
                         lastx = v.x;
                         lasty = v.y;
 
-                        statements.layout();
+                        statements.invalidate();
                     }
 
                     @Override
@@ -423,9 +585,9 @@ public class LCanvas extends Table{
                 StatementElem s = new StatementElem(copy);
 
                 statements.addChildAfter(StatementElem.this, s);
-                statements.layout();
                 copy.elem = s;
                 copy.setupUI();
+                statements.updateJumpHeights = true;
             }
         }
 
@@ -444,19 +606,21 @@ public class LCanvas extends Table{
 
     public static class JumpButton extends ImageButton{
         Color hoverColor = Pal.place;
-        Color defaultColor = Color.white;
+        Color defaultColor = new Color(Color.white);
         Prov<StatementElem> to;
         boolean selecting;
         float mx, my;
         ClickListener listener;
 
         public JumpCurve curve;
+        public StatementElem elem;
 
-        public JumpButton(Prov<StatementElem> getter, Cons<StatementElem> setter){
+        public JumpButton(Prov<StatementElem> getter, Cons<StatementElem> setter, StatementElem elem){
             super(Tex.logicNode, new ImageButtonStyle(){{
                 imageUpColor = Color.white;
             }});
 
+            this.elem = elem;
             to = getter;
             addListener(listener = new ClickListener());
 
@@ -467,6 +631,7 @@ public class LCanvas extends Table{
                     setter.get(null);
                     mx = x;
                     my = y;
+                    canvas.statements.updateJumpHeights = true;
                     return true;
                 }
 
@@ -487,6 +652,7 @@ public class LCanvas extends Table{
                         setter.get(null);
                     }
                     selecting = false;
+                    canvas.statements.updateJumpHeights = true;
                 }
             });
 
@@ -516,14 +682,50 @@ public class LCanvas extends Table{
 
     public static class JumpCurve extends Element{
         public JumpButton button;
+        private boolean invertedHeight;
+
+        // for jump prediction; see DragLayout
+        public int predHeight = 0;
+        public boolean markedDone = false;
+        public int jumpUIBegin = 0, jumpUIEnd = 0;
+        public boolean flipped = false;
+
+        private float uiHeight = 60f;
 
         public JumpCurve(JumpButton button){
             this.button = button;
         }
 
         @Override
+        public void setSize(float width, float height){
+            if(height < 0){
+                y += height;
+                height = -height;
+                invertedHeight = true;
+            }
+            super.setSize(width, height);
+        }
+
+        @Override
         public void act(float delta){
             super.act(delta);
+
+            //MDTX(WayZer, 2024/8/6) Support Cull
+            invertedHeight = false;
+            Group desc = canvas.jumps.parent;
+            Vec2 t = Tmp.v1.set(button.getWidth() / 2f, button.getHeight() / 2f);
+            button.localToAscendantCoordinates(desc, t);
+            setPosition(t.x, t.y);
+            Element hover = button.to.get() == null && button.selecting ? canvas.hovered : button.to.get();
+            if(hover != null){
+                t.set(hover.getWidth(), hover.getHeight() / 2f);
+                hover.localToAscendantCoordinates(desc, t);
+                setSize(t.x - x, t.y - y);
+            }else if(button.selecting){
+                setSize(button.mx, button.my);
+            }else{
+                setSize(0, 0);
+            }
 
             if(button.listener.isOver()){
                 toFront();
@@ -532,60 +734,40 @@ public class LCanvas extends Table{
 
         @Override
         public void draw(){
-            canvas.jumpCount ++;
-
-            if(canvas.jumpCount > maxJumpsDrawn && !button.selecting && !button.listener.isOver()){
-                return;
-            }
-
-            Element hover = button.to.get() == null && button.selecting ? canvas.hovered : button.to.get();
-            boolean draw = false;
-            Vec2 t = Tmp.v1, r = Tmp.v2;
+            if(height == 0) return;
+            Vec2 t = Tmp.v1.set(width, !invertedHeight ? height : 0), r = Tmp.v2.set(0, !invertedHeight ? 0 : height);
 
             Group desc = canvas.pane;
+            localToAscendantCoordinates(desc, r);
+            localToAscendantCoordinates(desc, t);
 
-            button.localToAscendantCoordinates(desc, r.set(0, 0));
+            drawCurve(r.x, r.y, t.x, t.y);
 
-            if(hover != null){
-                hover.localToAscendantCoordinates(desc, t.set(hover.getWidth(), hover.getHeight()/2f));
-
-                draw = true;
-            }else if(button.selecting){
-                t.set(r).add(button.mx, button.my);
-                draw = true;
-            }
-
-            float offset = canvas.pane.getVisualScrollY() - canvas.pane.getMaxY();
-
-            t.y += offset;
-            r.y += offset;
-
-            if(draw){
-                drawCurve(r.x + button.getWidth()/2f, r.y + button.getHeight()/2f, t.x, t.y);
-
-                float s = button.getWidth();
-                Draw.color(button.color);
-                Tex.logicNode.draw(t.x + s*0.75f, t.y - s/2f, -s, s);
-                Draw.reset();
-            }
+            float s = button.getWidth();
+            Draw.color(button.color);
+            Tex.logicNode.draw(t.x + s * 0.75f, t.y - s / 2f, -s, s);
+            Draw.reset();
         }
 
         public void drawCurve(float x, float y, float x2, float y2){
             Lines.stroke(4f, button.color);
             Draw.alpha(parentAlpha);
+            Draw.color(button.color);
 
-            float dist = 100f;
+            // exponential smoothing
+            uiHeight = Mathf.lerp(
+                           trapezoidalJumps ? 60f + 20f * (float) predHeight : 100f + 100f * (float) predHeight,
+                           uiHeight,
+                           dynamicJumpHeights ? Mathf.pow(0.9f, Time.delta) : 0
+                       );
 
-            //square jumps
-            if(false){
-                float len = Scl.scl(Mathf.randomSeed(hashCode(), 10, 50));
-
-                float maxX = Math.max(x, x2) + len;
-
+            //trapezoidal jumps
+            if(trapezoidalJumps){
+                float dy = (y2 == y ? 0f : y2 > y ? 1f : -1f) * uiHeight * 0.5f;
                 Lines.beginLine();
                 Lines.linePoint(x, y);
-                Lines.linePoint(maxX, y);
-                Lines.linePoint(maxX, y2);
+                Lines.linePoint(x + uiHeight, y + dy);
+                Lines.linePoint(x + uiHeight, y2 - dy);
                 Lines.linePoint(x2, y2);
                 Lines.endLine();
                 return;
@@ -593,10 +775,28 @@ public class LCanvas extends Table{
 
             Lines.curve(
             x, y,
-            x + dist, y,
-            x2 + dist, y2,
+            x + uiHeight, y,
+            x2 + uiHeight, y2,
             x2, y2,
             Math.max(18, (int)(Mathf.dst(x, y, x2, y2) / 6)));
+            Draw.reset();
+        }
+
+        public void prepareHeight(){
+            if(this.button.to.get() == null){
+                this.markedDone = true;
+                this.predHeight = 0;
+                this.flipped = false;
+                this.jumpUIBegin = this.jumpUIEnd = invalidJump;
+            } else {
+                this.markedDone = false;
+                int i = this.button.elem.index;
+                int j = this.button.to.get().index;
+                this.flipped = i >= j;
+                this.jumpUIBegin = Math.min(i,j);
+                this.jumpUIEnd = Math.max(i,j);
+                // height will be recalculated later
+            }
         }
     }
 }

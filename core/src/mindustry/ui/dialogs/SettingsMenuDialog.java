@@ -502,6 +502,10 @@ public class SettingsMenuDialog extends BaseDialog{
         if(!mobile){
             Core.settings.put("swapdiagonal", false);
         }
+
+        graphics.checkPref("dynamicjumpheights", true);
+        graphics.checkPref("coloredjumps", true);
+        graphics.checkPref("trapezoidaljumps", true);
     }
 
     public void exportData(Fi file) throws IOException{
