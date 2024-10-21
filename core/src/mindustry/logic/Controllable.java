@@ -6,5 +6,7 @@ import mindustry.game.*;
 public interface Controllable{
     void control(LAccess type, double p1, double p2, double p3, double p4);
     void control(LAccess type, Object p1, double p2, double p3, double p4);
+    void control(LAccess type, LVar p1, double p2, double p3, double p4);
+    void control(LAccess type, LVar p1, Object p2, double p3, double p4);
     Team team();
 }
