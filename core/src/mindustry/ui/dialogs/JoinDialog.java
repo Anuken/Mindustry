@@ -138,7 +138,9 @@ public class JoinDialog extends BaseDialog{
 
         refreshLocal();
         refreshRemote();
-        refreshCommunity();
+        if(Core.settings.getBool("communityservers", true)){
+            refreshCommunity();
+        }
     }
 
     void setupRemote(){
@@ -317,7 +319,9 @@ public class JoinDialog extends BaseDialog{
 
         section(steam ? "@servers.local.steam" : "@servers.local", local, false);
         section("@servers.remote", remote, false);
-        section("@servers.global", global, true);
+        if(Core.settings.getBool("communityservers", true)){
+            section("@servers.global", global, true);
+        }
 
         ScrollPane pane = new ScrollPane(hosts);
         pane.setFadeScrollBars(false);
@@ -633,10 +637,12 @@ public class JoinDialog extends BaseDialog{
 
         var urls = Version.type.equals("bleeding-edge") || Vars.forceBeServers ? serverJsonBeURLs : serverJsonURLs;
 
-        fetchServers(urls, 0);
+        if(Core.settings.getBool("communityservers", true)){
+            fetchServers(urls, 0);
+        }
     }
 
-    private void fetchServers(String[] urls, int index){
+    public static void fetchServers(String[] urls, int index){
         if(index >= urls.length) return;
 
         //get servers
