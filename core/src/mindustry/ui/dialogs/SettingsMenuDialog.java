@@ -333,6 +333,14 @@ public class SettingsMenuDialog extends BaseDialog{
             game.checkPref("crashreport", true);
         }
 
+        game.checkPref("communityservers", true, val -> {
+            defaultServers.clear();
+            if(val){
+                var urls = Version.type.equals("bleeding-edge") || forceBeServers ? serverJsonBeURLs : serverJsonURLs;
+                JoinDialog.fetchServers(urls, 0);
+            }
+        });
+
         game.checkPref("savecreate", true);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
