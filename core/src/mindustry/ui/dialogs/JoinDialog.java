@@ -635,6 +635,10 @@ public class JoinDialog extends BaseDialog{
             Core.settings.remove("server-list");
         }
 
+        fetchServers();
+    }
+
+    public static void fetchServers(){
         var urls = Version.type.equals("bleeding-edge") || Vars.forceBeServers ? serverJsonBeURLs : serverJsonURLs;
 
         if(Core.settings.getBool("communityservers", true)){
@@ -642,7 +646,7 @@ public class JoinDialog extends BaseDialog{
         }
     }
 
-    public static void fetchServers(String[] urls, int index){
+    private static void fetchServers(String[] urls, int index){
         if(index >= urls.length) return;
 
         //get servers

@@ -336,8 +336,7 @@ public class SettingsMenuDialog extends BaseDialog{
         game.checkPref("communityservers", true, val -> {
             defaultServers.clear();
             if(val){
-                var urls = Version.type.equals("bleeding-edge") || forceBeServers ? serverJsonBeURLs : serverJsonURLs;
-                JoinDialog.fetchServers(urls, 0);
+                JoinDialog.fetchServers();
             }
         });
 
