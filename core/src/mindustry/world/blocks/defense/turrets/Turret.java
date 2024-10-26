@@ -54,7 +54,7 @@ public class Turret extends ReloadTurret{
     public float inaccuracy = 0f;
     /** Fraction of bullet velocity that is random. */
     public float velocityRnd = 0f;
-    /** Fraction of lifetime that is added. */
+    /** Fraction of lifetime that is added to bullets with lifeScale. */
     public float scaleLifetimeOffset = 0f;
     /** Maximum angle difference in degrees at which turret will still try to shoot. */
     public float shootCone = 8f;
