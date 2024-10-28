@@ -783,6 +783,15 @@ public class DesktopInput extends InputHandler{
                 if(getPlan(splan.x, splan.y, splan.block.size, splan) != null){
                     player.unit().plans().remove(splan, true);
                 }
+
+                if(input.ctrl()){
+                    inv.hide();
+                    config.hideConfig();
+                    planConfig.showConfig(splan);
+                }else{
+                    planConfig.hide();
+                }
+
                 splan = null;
             }
 
