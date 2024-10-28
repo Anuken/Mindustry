@@ -520,12 +520,15 @@ public class SerpuloTechTree{
                                             new Research(risso),
                                             new Research(minke),
                                             new Research(bryde),
+                                            new Research(sei),
+                                            new Research(omura),
                                             new Research(spectre),
                                             new Research(launchPad),
                                             new Research(massDriver),
                                             new Research(impactReactor),
                                             new Research(additiveReconstructor),
-                                            new Research(exponentialReconstructor)
+                                            new Research(exponentialReconstructor),
+                                            new Research(tetrativeReconstructor)
                                             ), () -> {
 
                                             });
