@@ -236,7 +236,7 @@ public class SerpuloTechTree{
 
                         node(steamGenerator, Seq.with(new SectorComplete(craters)), () -> {
                             node(thermalGenerator, () -> {
-                                node(differentialGenerator, Seq.with(new SectorComplete(testingGrounds)), () -> {
+                                node(differentialGenerator, () -> {
                                     node(thoriumReactor, Seq.with(new Research(Liquids.cryofluid)), () -> {
                                         node(impactReactor, () -> {
 
