@@ -217,7 +217,7 @@ public class Placement{
 
         Boolf<BuildPlan> placeable = plan ->
             (plan.placeable(player.team()) || (plan.tile() != null && plan.tile().block() == plan.block)) &&  //don't count the same block as inaccessible
-            !(plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
+            !(plan != plans.first() && plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
 
         var result = plans1.clear();
 
