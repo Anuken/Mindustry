@@ -100,6 +100,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public Seq<BuildPlan> selectPlans = new Seq<>(BuildPlan.class);
     public Queue<BuildPlan> lastPlans = new Queue<>();
     public @Nullable Unit lastUnit;
+    public @Nullable Unit spectating;
 
     //for RTS controls
     public Seq<Unit> selectedUnits = new Seq<>();
@@ -801,7 +802,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return !selectPlans.isEmpty();
     }
 
+    public void spectate(Unit unit){
+        spectating = unit;
+        camera.position.set(unit);
+    }
+
     public void update(){
+        if(spectating != null && (!spectating.isValid() || spectating.team != player.team())){
+            spectating = null;
+        }
+
         if(logicCutscene && !renderer.isCutscene()){
             Core.camera.position.lerpDelta(logicCamPan, logicCamSpeed);
         }else{
