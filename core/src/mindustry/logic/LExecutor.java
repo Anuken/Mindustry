@@ -934,7 +934,7 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
-            if(target.building() instanceof LogicDisplayBuild d && (d.team == exec.team || exec.privileged)){
+            if(target.building() instanceof LogicDisplayBuild d && (exec.privileged || (d.team == exec.team && exec.linkIds.contains(d.id)))){
                 if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
                     for(int i = 0; i < exec.graphicsBuffer.size; i++){
                         d.commands.addLast(exec.graphicsBuffer.items[i]);
