@@ -1277,7 +1277,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(engines.size > 0) drawEngines(unit);
         Draw.z(z);
         if(drawBody) drawBody(unit);
-        if(drawCell) drawCell(unit);
+        if(drawCell && !(unit instanceof Crawlc)) drawCell(unit);
         drawWeapons(unit);
         if(drawItems) drawItems(unit);
         if(!isPayload){
@@ -1644,7 +1644,7 @@ public class UnitType extends UnlockableContent implements Senseable{
                 Draw.rect(regions[i], unit.x + tx, unit.y + ty, rot - 90);
 
                 // Draws the cells
-                if(p != 0 && segmentCellRegions[i].found()){
+                if(drawCell && p != 0 && segmentCellRegions[i].found()){
                     Draw.color(cellColor(unit));
                     Draw.rect(segmentCellRegions[i], unit.x + tx, unit.y + ty, rot - 90);
                     Draw.reset();
