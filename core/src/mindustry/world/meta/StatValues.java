@@ -442,33 +442,36 @@ public class StatValues{
         };
     }
 
-    public static StatValue itemBoosters(String unit, float timePeriod, float speedBoost, float rangeBoost, ItemStack[] items, Boolf<Item> filter){
+    public static StatValue itemBoosters(String unit, float timePeriod, float speedBoost, float rangeBoost, ItemStack[] items){
         return table -> {
             table.row();
             table.table(c -> {
-                for(Item item : content.items()){
-                    if(!filter.get(item)) continue;
-
-                    c.table(Styles.grayPanel, b -> {
+                c.table(Styles.grayPanel, b -> {
+                    b.table(it -> {
                         for(ItemStack stack : items){
                             if(timePeriod < 0){
-                                b.add(displayItem(stack.item, stack.amount, true)).pad(20f).left();
+                                it.add(displayItem(stack.item, stack.amount, true)).pad(10f).padLeft(15f).left();
                             }else{
-                                b.add(displayItem(stack.item, stack.amount, timePeriod, true)).pad(20f).left();
+                                it.add(displayItem(stack.item, stack.amount, timePeriod, true)).pad(10f).padLeft(15f).left();
                             }
-                            if(items.length > 1) b.row();
+                            it.row();
                         }
+                    }).left();
 
-                        b.table(bt -> {
-                            bt.right().defaults().padRight(3).left();
-                            if(rangeBoost != 0) bt.add("[lightgray]+[stat]" + Strings.autoFixed(rangeBoost / tilesize, 2) + "[lightgray] " + StatUnit.blocks.localized()).row();
-                            if(speedBoost != 0) bt.add("[lightgray]" + unit.replace("{0}", "[stat]" + Strings.autoFixed(speedBoost, 2) + "[lightgray]"));
-                        }).right().grow().pad(10f).padRight(15f);
-                    }).growX().pad(5).padBottom(-5).row();
-                }
+                    b.table(bt -> {
+                        bt.right().defaults().padRight(3).left();
+                        if(rangeBoost != 0) bt.add("[lightgray]+[stat]" + Strings.autoFixed(rangeBoost / tilesize, 2) + "[lightgray] " + StatUnit.blocks.localized()).row();
+                        if(speedBoost != 0) bt.add("[lightgray]" + unit.replace("{0}", "[stat]" + Strings.autoFixed(speedBoost, 2) + "[lightgray]"));
+                    }).right().top().grow().pad(10f).padRight(15f);
+                }).growX().pad(5).padBottom(-5).row();
             }).growX().colspan(table.getColumns());
             table.row();
         };
+    }
+
+    /** @deprecated Filter is no longer used. */
+    public static StatValue itemBoosters(String unit, float timePeriod, float speedBoost, float rangeBoost, ItemStack[] items, Boolf<Item> filter){
+        return itemBoosters(unit, timePeriod, speedBoost, rangeBoost, items);
     }
 
     public static StatValue weapons(UnitType unit, Seq<Weapon> weapons){
