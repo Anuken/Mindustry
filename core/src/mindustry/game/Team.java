@@ -15,9 +15,9 @@ import static mindustry.Vars.*;
 
 public class Team implements Comparable<Team>{
     public final int id;
-    public final Color color;
-    public final Color[] palette;
-    public final int[] palettei = new int[3];
+    public Color color;
+    public Color[] palette;
+    public int[] palettei = new int[3];
     public String emoji = "";
     public boolean hasPalette;
     public String name;
@@ -64,26 +64,15 @@ public class Team implements Comparable<Team>{
         all[id] = this;
 
         palette = new Color[3];
-        palette[0] = color;
-        palette[1] = color.cpy().mul(0.75f);
-        palette[2] = color.cpy().mul(0.5f);
-
-        for(int i = 0; i < 3; i++){
-            palettei[i] = palette[i].rgba();
-        }
+        
+		setPalette(color);
     }
 
     /** Specifies a 3-color team palette. */
     protected Team(int id, String name, Color color, Color pal1, Color pal2, Color pal3){
         this(id, name, color);
 
-        palette[0] = pal1;
-        palette[1] = pal2;
-        palette[2] = pal3;
-        for(int i = 0; i < 3; i++){
-            palettei[i] = palette[i].rgba();
-        }
-        hasPalette = true;
+        setPalette(pal1, pal2, pal3);
     }
 
     /** @return the core items for this team, or an empty item module.
@@ -142,6 +131,22 @@ public class Team implements Comparable<Team>{
     public String coloredName(){
         return emoji + "[#" + color + "]" + localized() + "[]";
     }
+	
+	public void setPalette(Color color){
+		setPalette(color, color.cpy().mul(0.75f), color.cpy().mul(0.5f)); 
+		hasPalette = false;
+	}
+	
+	public void setPalette(Color pal1, Color pal2, Color pal3){
+		color = pal1;
+		palette[0] = pal1;
+        palette[1] = pal2;
+        palette[2] = pal3;
+		for(int i = 0; i < 3; i++){
+            palettei[i] = palette[i].rgba();
+        }
+		hasPalette = true;
+	}
 
     @Override
     public int compareTo(Team team){
