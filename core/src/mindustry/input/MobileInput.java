@@ -234,7 +234,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     //actually place/break all selected blocks
                     if(tile != null){
                         if(!plan.breaking){
-                            if(validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+                            if(validPlace(plan.x, plan.y, plan.block, plan.rotation, null, true)){
                                 BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
                                 BuildPlan copy = plan.copy();
 

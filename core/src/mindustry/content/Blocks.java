@@ -977,7 +977,7 @@ public class Blocks{
 
             consumeItems(with(Items.thorium, 4, Items.sand, 10));
             consumePower(5f);
-            itemCapacity = 20;
+            itemCapacity = 30;
         }};
 
         surgeSmelter = new GenericCrafter("surge-smelter"){{
