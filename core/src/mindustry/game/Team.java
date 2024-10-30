@@ -65,7 +65,7 @@ public class Team implements Comparable<Team>{
 
         palette = new Color[3];
         
-		setPalette(color);
+        setPalette(color);
     }
 
     /** Specifies a 3-color team palette. */
@@ -131,22 +131,22 @@ public class Team implements Comparable<Team>{
     public String coloredName(){
         return emoji + "[#" + color + "]" + localized() + "[]";
     }
-	
-	public void setPalette(Color color){
-		setPalette(color, color.cpy().mul(0.75f), color.cpy().mul(0.5f)); 
-		hasPalette = false;
-	}
-	
-	public void setPalette(Color pal1, Color pal2, Color pal3){
-		color = pal1;
-		palette[0] = pal1;
+    
+    public void setPalette(Color color){
+        setPalette(color, color.cpy().mul(0.75f), color.cpy().mul(0.5f)); 
+        hasPalette = false;
+    }
+    
+    public void setPalette(Color pal1, Color pal2, Color pal3){
+        color = pal1;
+        palette[0] = pal1;
         palette[1] = pal2;
         palette[2] = pal3;
-		for(int i = 0; i < 3; i++){
+        for(int i = 0; i < 3; i++){
             palettei[i] = palette[i].rgba();
         }
-		hasPalette = true;
-	}
+        hasPalette = true;
+    }
 
     @Override
     public int compareTo(Team team){
