@@ -83,7 +83,7 @@ public class StatValues{
     }
 
     public static StatValue percentModifier(float value, StatUnit unit){
-        return percentModifier(value, unit, false);
+        return percentModifier(value, unit, true);
     }
 
     public static StatValue liquid(Liquid liquid, float amount, boolean perSecond){
