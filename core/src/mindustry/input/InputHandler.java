@@ -827,15 +827,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(player.isBuilder()){
-            if(player.unit() != lastUnit && player.unit().plans.size <= 1){
-                player.unit().plans.ensureCapacity(lastPlans.size);
+            var playerPlans = player.unit().plans;
+            if(player.unit() != lastUnit && playerPlans.size <= 1){
+                playerPlans.ensureCapacity(lastPlans.size);
                 for(var plan : lastPlans){
-                    player.unit().plans.addLast(plan);
+                    playerPlans.addLast(plan);
                 }
             }
-            lastPlans.clear();
-            for(var plan : player.unit().plans){
-                lastPlans.addLast(plan);
+            if(lastPlans.size != playerPlans.size || (lastPlans.size > 0 && playerPlans.size > 0 && lastPlans.first() != playerPlans.first())){
+                lastPlans.clear();
+                for(var plan : playerPlans){
+                    lastPlans.addLast(plan);
+                }
             }
         }
 
@@ -1465,7 +1468,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     protected void flushSelectPlans(Seq<BuildPlan> plans){
         for(BuildPlan plan : plans){
-            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation, null, true)){
                 BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
                 if(other == null){
                     selectPlans.add(plan.copy());
@@ -1481,7 +1484,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //reversed iteration.
         for(int i = plans.size - 1; i >= 0; i--){
             var plan = plans.get(i);
-            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation, null, true)){
                 BuildPlan copy = plan.copy();
                 plan.block.onNewPlan(copy);
                 player.unit().addBuild(copy, false);
@@ -1491,7 +1494,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     protected void flushPlans(Seq<BuildPlan> plans){
         for(var plan : plans){
-            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation, null, true)){
                 BuildPlan copy = plan.copy();
                 plan.block.onNewPlan(copy);
                 player.unit().addBuild(copy);
@@ -1988,8 +1991,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean validPlace(int x, int y, Block type, int rotation){
         return validPlace(x, y, type, rotation, null);
     }
+    public boolean validPlace(int x, int y, Block type, int rotation, @Nullable BuildPlan ignore){
+        return validPlace(x, y, type, rotation, ignore, false);
+    }
 
-    public boolean validPlace(int x, int y, Block type, int rotation, BuildPlan ignore){
+    public boolean validPlace(int x, int y, Block type, int rotation, @Nullable BuildPlan ignore, boolean ignoreUnits){
         if(player.unit().plans.size > 0){
             Tmp.r1.setCentered(x * tilesize + type.offset, y * tilesize + type.offset, type.size * tilesize);
             plansOut.clear();
@@ -2006,7 +2012,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        return Build.validPlace(type, player.team(), x, y, rotation);
+        return ignoreUnits ? Build.validPlaceIgnoreUnits(type, player.team(), x, y, rotation, true) : Build.validPlace(type, player.team(), x, y, rotation);
     }
 
     public boolean validBreak(int x, int y){
