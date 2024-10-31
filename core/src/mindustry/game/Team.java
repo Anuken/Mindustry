@@ -15,9 +15,9 @@ import static mindustry.Vars.*;
 
 public class Team implements Comparable<Team>{
     public final int id;
-    public Color color;
-    public Color[] palette;
-    public int[] palettei = new int[3];
+    public final Color color;
+    public final Color[] palette;
+    public final int[] palettei = new int[3];
     public String emoji = "";
     public boolean hasPalette;
     public String name;
@@ -64,6 +64,9 @@ public class Team implements Comparable<Team>{
         all[id] = this;
 
         palette = new Color[3];
+        palette[0] = color.cpy();
+        palette[1] = color.cpy().mul(0.75f);
+        palette[2] = color.cpy().mul(0.5f);
         
         setPalette(color);
     }
@@ -138,10 +141,10 @@ public class Team implements Comparable<Team>{
     }
     
     public void setPalette(Color pal1, Color pal2, Color pal3){
-        color = pal1;
-        palette[0] = pal1;
-        palette[1] = pal2;
-        palette[2] = pal3;
+        color.set(pal1);
+        palette[0].set(pal1);
+        palette[1].set(pal2);
+        palette[2].set(pal3);
         for(int i = 0; i < 3; i++){
             palettei[i] = palette[i].rgba();
         }
