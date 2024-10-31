@@ -69,6 +69,23 @@ public class StatValues{
         return number(value, unit, false);
     }
 
+    public static StatValue percentModifier(float value, StatUnit unit, boolean merge){
+        return table -> {
+            String l1 = (unit.icon == null ? "" : unit.icon + " ") + ammoStat((value - 1) * 100), l2 = (unit.space ? " " : "") + unit.localized();
+
+            if(merge){
+                table.add(l1 + l2).left();
+            }else{
+                table.add(l1).left();
+                table.add(l2).left();
+            }
+        };
+    }
+
+    public static StatValue percentModifier(float value, StatUnit unit){
+        return percentModifier(value, unit, false);
+    }
+
     public static StatValue liquid(Liquid liquid, float amount, boolean perSecond){
         return table -> table.add(displayLiquid(liquid, amount, perSecond));
     }
