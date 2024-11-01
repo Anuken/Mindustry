@@ -15,6 +15,7 @@ public class ContinuousTurret extends Turret{
     public BulletType shootType = Bullets.placeholder;
     /** Speed at which the turret can change its bullet "aim" distance. This is only used for point laser bullets. */
     public float aimChangeSpeed = Float.POSITIVE_INFINITY;
+    public boolean scaleDamageEfficiency = false;
 
     public ContinuousTurret(String name){
         super(name);
@@ -115,6 +116,9 @@ public class ContinuousTurret extends Turret{
 
             entry.bullet.aimX = Tmp.v1.x;
             entry.bullet.aimY = Tmp.v1.y;
+            if(scaleDamageEfficiency){
+                entry.bullet.damage = entry.bullet.type.damage * Math.min(efficiency, 1f);
+            }
 
             if(isShooting() && hasAmmo()){
                 entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * Math.min(shootWarmup, efficiency);

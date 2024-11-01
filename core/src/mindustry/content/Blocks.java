@@ -4518,6 +4518,7 @@ public class Blocks{
                 }});
             }};
 
+            scaleDamageEfficiency = true;
             shootSound = Sounds.none;
             loopSoundVolume = 1f;
             loopSound = Sounds.laserbeam;
