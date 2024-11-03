@@ -121,7 +121,7 @@ public class SectorPresets{
         }};
 
         mycelialBastion = new SectorPreset("mycelialBastion", serpulo, 260){{
-            difficulty = 7;
+            difficulty = 8;
         }};
 
         overgrowth = new SectorPreset("overgrowth", serpulo, 134){{
