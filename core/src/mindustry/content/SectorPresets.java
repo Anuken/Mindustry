@@ -12,6 +12,8 @@ public class SectorPresets{
     impact0078, desolateRift, nuclearComplex, planetaryTerminal,
     coastline, navalFortress, weatheredChannels, seaPort,
 
+    geothermalStronghold, cruxscape,
+
     onset, aegis, lake, intersect, basin, atlas, split, marsh, peaks, ravine, caldera,
     stronghold, crevice, siege, crossroads, karst, origin;
 
@@ -151,6 +153,14 @@ public class SectorPresets{
         planetaryTerminal = new SectorPreset("planetaryTerminal", serpulo, 93){{
             difficulty = 10;
             isLastSector = true;
+        }};
+
+        geothermalStronghold = new SectorPreset("geothermalStronghold", serpulo, 264){{
+            difficulty = 10;
+        }};
+
+        cruxscape = new SectorPreset("cruxscape", serpulo, 54){{
+            difficulty = 10;
         }};
 
         //endregion
