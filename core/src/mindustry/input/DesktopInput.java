@@ -236,15 +236,18 @@ public class DesktopInput extends InputHandler{
                 if(!detached){
                     panning = false;
                 }
+                spectating = null;
             }
 
             if(input.keyDown(Binding.pan)){
                 panCam = true;
                 panning = true;
+                spectating = null;
             }
 
             if((Math.abs(Core.input.axis(Binding.move_x)) > 0 || Math.abs(Core.input.axis(Binding.move_y)) > 0 || input.keyDown(Binding.mouse_move))){
                 panning = false;
+                spectating = null;
             }
         }
 
@@ -258,11 +261,13 @@ public class DesktopInput extends InputHandler{
                 }
 
                 Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(camSpeed));
-            }else if(!player.dead() && !panning){
+            }else if((!player.dead() || spectating != null) && !panning){
                 //TODO do not pan
                 Team corePanTeam = state.won ? state.rules.waveTeam : player.team();
                 Position coreTarget = state.gameOver && !state.rules.pvp && corePanTeam.data().lastCore != null ? corePanTeam.data().lastCore : null;
-                Core.camera.position.lerpDelta(coreTarget != null ? coreTarget : player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
+                Position panTarget = coreTarget != null ? coreTarget : spectating != null ? spectating : player;
+
+                Core.camera.position.lerpDelta(panTarget, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
             }
 
             if(panCam){
@@ -783,6 +788,15 @@ public class DesktopInput extends InputHandler{
                 if(getPlan(splan.x, splan.y, splan.block.size, splan) != null){
                     player.unit().plans().remove(splan, true);
                 }
+
+                if(input.ctrl()){
+                    inv.hide();
+                    config.hideConfig();
+                    planConfig.showConfig(splan);
+                }else{
+                    planConfig.hide();
+                }
+
                 splan = null;
             }
 

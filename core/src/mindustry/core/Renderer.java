@@ -548,6 +548,7 @@ public class Renderer implements ApplicationListener{
 
     public void showLaunch(CoreBuild landCore, CoreBlock coreType){
         control.input.config.hideConfig();
+        control.input.planConfig.hide();
         control.input.inv.hide();
 
         this.landCore = landCore;

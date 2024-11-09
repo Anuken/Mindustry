@@ -100,6 +100,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public Seq<BuildPlan> selectPlans = new Seq<>(BuildPlan.class);
     public Queue<BuildPlan> lastPlans = new Queue<>();
     public @Nullable Unit lastUnit;
+    public @Nullable Unit spectating;
 
     //for RTS controls
     public Seq<Unit> selectedUnits = new Seq<>();
@@ -116,6 +117,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public final BlockInventoryFragment inv;
     public final BlockConfigFragment config;
+    public final PlanConfigFragment planConfig;
 
     private WidgetGroup group = new WidgetGroup();
 
@@ -136,6 +138,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         group.touchable = Touchable.childrenOnly;
         inv = new BlockInventoryFragment();
         config = new BlockConfigFragment();
+        planConfig = new PlanConfigFragment();
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit != null && e.unit.isPlayer() && e.unit.getPlayer().isLocal() && e.unit.type.weapons.contains(w -> w.bullet.killShooter)){
@@ -799,7 +802,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return !selectPlans.isEmpty();
     }
 
+    public void spectate(Unit unit){
+        spectating = unit;
+        camera.position.set(unit);
+    }
+
     public void update(){
+        if(spectating != null && (!spectating.isValid() || spectating.team != player.team())){
+            spectating = null;
+        }
+
         if(logicCutscene && !renderer.isCutscene()){
             Core.camera.position.lerpDelta(logicCamPan, logicCamSpeed);
         }else{
@@ -815,15 +827,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(player.isBuilder()){
-            if(player.unit() != lastUnit && player.unit().plans.size <= 1){
-                player.unit().plans.ensureCapacity(lastPlans.size);
+            var playerPlans = player.unit().plans;
+            if(player.unit() != lastUnit && playerPlans.size <= 1){
+                playerPlans.ensureCapacity(lastPlans.size);
                 for(var plan : lastPlans){
-                    player.unit().plans.addLast(plan);
+                    playerPlans.addLast(plan);
                 }
             }
-            lastPlans.clear();
-            for(var plan : player.unit().plans){
-                lastPlans.addLast(plan);
+            if(lastPlans.size != playerPlans.size || (lastPlans.size > 0 && playerPlans.size > 0 && lastPlans.first() != playerPlans.first())){
+                lastPlans.clear();
+                for(var plan : playerPlans){
+                    lastPlans.addLast(plan);
+                }
             }
         }
 
@@ -1453,7 +1468,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     protected void flushSelectPlans(Seq<BuildPlan> plans){
         for(BuildPlan plan : plans){
-            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation, null, true)){
                 BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
                 if(other == null){
                     selectPlans.add(plan.copy());
@@ -1469,7 +1484,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //reversed iteration.
         for(int i = plans.size - 1; i >= 0; i--){
             var plan = plans.get(i);
-            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation, null, true)){
                 BuildPlan copy = plan.copy();
                 plan.block.onNewPlan(copy);
                 player.unit().addBuild(copy, false);
@@ -1479,7 +1494,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     protected void flushPlans(Seq<BuildPlan> plans){
         for(var plan : plans){
-            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation, null, true)){
                 BuildPlan copy = plan.copy();
                 plan.block.onNewPlan(copy);
                 player.unit().addBuild(copy);
@@ -1622,6 +1637,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Handles tile tap events that are not platform specific. */
     boolean tileTapped(@Nullable Building build){
+        planConfig.hide();
         if(build == null){
             inv.hide();
             config.hideConfig();
@@ -1897,6 +1913,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             inv.build(group);
             config.build(group);
+            planConfig.build(group);
         }
     }
 
@@ -1974,9 +1991,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean validPlace(int x, int y, Block type, int rotation){
         return validPlace(x, y, type, rotation, null);
     }
+    public boolean validPlace(int x, int y, Block type, int rotation, @Nullable BuildPlan ignore){
+        return validPlace(x, y, type, rotation, ignore, false);
+    }
 
-    public boolean validPlace(int x, int y, Block type, int rotation, BuildPlan ignore){
-        if(player.unit().plans.size > 0){
+    public boolean validPlace(int x, int y, Block type, int rotation, @Nullable BuildPlan ignore, boolean ignoreUnits){
+        if(player.isBuilder() && player.unit().plans.size > 0){
             Tmp.r1.setCentered(x * tilesize + type.offset, y * tilesize + type.offset, type.size * tilesize);
             plansOut.clear();
             playerPlanTree.intersect(Tmp.r1, plansOut);
@@ -1992,7 +2012,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        return Build.validPlace(type, player.team(), x, y, rotation);
+        return ignoreUnits ? Build.validPlaceIgnoreUnits(type, player.team(), x, y, rotation, true) : Build.validPlace(type, player.team(), x, y, rotation);
     }
 
     public boolean validBreak(int x, int y){
@@ -2000,6 +2020,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void breakBlock(int x, int y){
+        if(!player.isBuilder()) return;
+
         Tile tile = world.tile(x, y);
         if(tile != null && tile.build != null) tile = tile.build.tile;
         player.unit().addBuild(new BuildPlan(tile.x, tile.y));

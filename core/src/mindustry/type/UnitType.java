@@ -155,6 +155,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     circleTarget = false,
     /** if true, this unit can boost into the air if a player/processors controls it*/
     canBoost = false,
+    /** if true, this unit will always boost when using builder AI */
+    boostWhenBuilding = true,
     /** if false, logic processors cannot control this unit */
     logicControllable = true,
     /** if false, players cannot control this unit */
