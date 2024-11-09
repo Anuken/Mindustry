@@ -243,11 +243,13 @@ public class LogicDialog extends BaseDialog{
                     rebuild[0].run();
                 }).growX().get();
                 search.setMessageText("@players.search");
-                search.requestKeyboard();
-                Core.app.post(search::requestKeyboard);
 
                 //auto add first match on enter key
                 if(!mobile){
+
+                    //don't focus on mobile (it may cause issues with a popup keyboard)
+                    Core.app.post(search::requestKeyboard);
+
                     search.keyDown(KeyCode.enter, () -> {
                         if(!searchText[0].isEmpty() && matched[0] != null){
                             canvas.add((LStatement)matched[0].get());
