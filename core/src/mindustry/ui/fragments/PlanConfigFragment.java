@@ -62,7 +62,7 @@ public class PlanConfigFragment{
         Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
         table.update(() -> {
             table.setOrigin(Align.center);
-            if(plan.isDone() || !(control.input.selectPlans.contains(plan) || player.unit().plans.contains(plan))){
+            if(plan.isDone() || !(control.input.selectPlans.contains(plan) || player.dead() || player.unit().plans.contains(plan))){
                 this.hide();
                 return;
             }
