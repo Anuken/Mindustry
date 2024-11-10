@@ -3,6 +3,7 @@ package mindustry.logic;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.input.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
@@ -18,6 +19,8 @@ import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.blocks.logic.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 import static mindustry.logic.LCanvas.*;
@@ -52,6 +55,13 @@ public class LogicDialog extends BaseDialog{
                 canvas.rebuild();
                 wasPortrait = Core.graphics.isPortrait();
                 wasRows = LCanvas.useRows();
+            }
+        });
+
+        //show add instruction on shift+enter
+        keyDown(KeyCode.enter, () -> {
+            if(Core.input.shift()){
+                showAddDialog();
             }
         });
 
@@ -213,13 +223,57 @@ public class LogicDialog extends BaseDialog{
         }).name("variables").disabled(b -> executor == null || executor.vars.length == 0);
 
         buttons.button("@add", Icon.add, () -> {
-            BaseDialog dialog = new BaseDialog("@add");
-            dialog.cont.table(table -> {
-                table.background(Tex.button);
-                table.pane(t -> {
+            showAddDialog();
+        }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
+    }
+
+    public void showAddDialog(){
+        BaseDialog dialog = new BaseDialog("@add");
+        dialog.cont.table(table -> {
+            String[] searchText = {""};
+            Prov[] matched = {null};
+            Runnable[] rebuild = {() -> {}};
+
+            table.background(Tex.button);
+
+            table.table(s -> {
+                s.image(Icon.zoom).padRight(8);
+                var search = s.field(null, text -> {
+                    searchText[0] = text;
+                    rebuild[0].run();
+                }).growX().get();
+                search.setMessageText("@players.search");
+
+                //auto add first match on enter key
+                if(!mobile){
+
+                    //don't focus on mobile (it may cause issues with a popup keyboard)
+                    Core.app.post(search::requestKeyboard);
+
+                    search.keyDown(KeyCode.enter, () -> {
+                        if(!searchText[0].isEmpty() && matched[0] != null){
+                            canvas.add((LStatement)matched[0].get());
+                            dialog.hide();
+                        }
+                    });
+                }
+            }).growX().padBottom(4).row();
+
+            table.pane(t -> {
+                rebuild[0] = () -> {
+                    t.clear();
+
+                    var text = searchText[0].toLowerCase();
+
+                    matched[0] = null;
+
                     for(Prov<LStatement> prov : LogicIO.allStatements){
                         LStatement example = prov.get();
-                        if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged)) continue;
+                        if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged) || (!text.isEmpty() && !example.name().toLowerCase(Locale.ROOT).contains(text))) continue;
+
+                        if(matched[0] == null){
+                            matched[0] = prov;
+                        }
 
                         LCategory category = example.category();
                         Table cat = t.find(category.name);
@@ -251,11 +305,13 @@ public class LogicDialog extends BaseDialog{
 
                         if(cat.getChildren().size % 3 == 0) cat.row();
                     }
-                }).grow();
-            }).fill().maxHeight(Core.graphics.getHeight() * 0.8f);
-            dialog.addCloseButton();
-            dialog.show();
-        }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
+                };
+
+                rebuild[0].run();
+            }).grow();
+        }).fill().maxHeight(Core.graphics.getHeight() * 0.8f);
+        dialog.addCloseButton();
+        dialog.show();
     }
 
     public void show(String code, LExecutor executor, boolean privileged, Cons<String> modified){

@@ -412,6 +412,14 @@ public class Mods implements Loadable{
 
     /** Removes a mod file and marks it for requiring a restart. */
     public void removeMod(LoadedMod mod){
+        if(!android && mod.loader != null){
+            try{
+                ClassLoaderCloser.close(mod.loader);
+            }catch(Exception e){
+                Log.err(e);
+            }
+        }
+
         if(mod.root instanceof ZipFi){
             mod.root.delete();
         }
@@ -958,6 +966,12 @@ public class Mods implements Loadable{
             if(other != null){
                 //steam mods can't really be deleted, they need to be unsubscribed
                 if(overwrite && !other.hasSteamID()){
+
+                    //close the classloader for jar mods
+                    if(!android){
+                        ClassLoaderCloser.close(other.loader);
+                    }
+
                     //close zip file
                     if(other.root instanceof ZipFi){
                         other.root.delete();

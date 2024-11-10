@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.ctype.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.storage.*;
@@ -44,10 +45,15 @@ public class Constructor extends BlockProducer{
         stats.add(Stat.output, "@x@ ~ @x@", minBlockSize, minBlockSize, maxBlockSize, maxBlockSize);
     }
 
+    @Override
+    public void getPlanConfigs(Seq<UnlockableContent> options){
+        options.add(content.blocks().select(this::canProduce));
+    }
+
     public boolean canProduce(Block b){
         return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize && !(b instanceof CoreBlock) && !state.rules.isBanned(b) && b.environmentBuildable() && (filter.isEmpty() || filter.contains(b));
     }
-    
+
     public class ConstructorBuild extends BlockProducerBuild{
         public @Nullable Block recipe;
 
@@ -65,7 +71,7 @@ public class Constructor extends BlockProducer{
         public Object config(){
             return recipe;
         }
-        
+
         @Override
         public void drawSelect(){
             if(recipe != null){

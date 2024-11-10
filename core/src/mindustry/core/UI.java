@@ -628,6 +628,7 @@ public class UI implements ApplicationListener, Loadable{
 
                 int option = 0;
                 for(var optionsRow : options){
+                    if(optionsRow.length == 0) continue;
                     Table buttonRow = table.row().table().get().row();
                     int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
                     int width = fullWidth / optionsRow.length;
