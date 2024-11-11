@@ -236,7 +236,7 @@ public class SerpuloTechTree{
 
                         node(steamGenerator, Seq.with(new SectorComplete(craters)), () -> {
                             node(thermalGenerator, () -> {
-                                node(differentialGenerator, Seq.with(new SectorComplete(testingGrounds)), () -> {
+                                node(differentialGenerator, () -> {
                                     node(thoriumReactor, Seq.with(new Research(Liquids.cryofluid)), () -> {
                                         node(impactReactor, () -> {
 
@@ -520,14 +520,39 @@ public class SerpuloTechTree{
                                             new Research(risso),
                                             new Research(minke),
                                             new Research(bryde),
+                                            new Research(sei),
+                                            new Research(omura),
                                             new Research(spectre),
                                             new Research(launchPad),
                                             new Research(massDriver),
                                             new Research(impactReactor),
                                             new Research(additiveReconstructor),
-                                            new Research(exponentialReconstructor)
+                                            new Research(exponentialReconstructor),
+                                            new Research(tetrativeReconstructor)
                                             ), () -> {
+                                                node(geothermalStronghold, Seq.with(
+                                                new Research(omura),
+                                                new Research(navanax),
+                                                new Research(eclipse),
+                                                new Research(oct),
+                                                new Research(reign),
+                                                new Research(corvus),
+                                                new Research(toxopid)
+                                                ), () -> {
 
+                                                });
+
+                                                node(cruxscape, Seq.with(
+                                                new Research(omura),
+                                                new Research(navanax),
+                                                new Research(eclipse),
+                                                new Research(oct),
+                                                new Research(reign),
+                                                new Research(corvus),
+                                                new Research(toxopid)
+                                                ), () -> {
+
+                                                });
                                             });
                                         });
                                     });

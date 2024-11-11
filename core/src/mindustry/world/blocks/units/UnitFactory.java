@@ -13,6 +13,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -170,6 +171,15 @@ public class UnitFactory extends UnitBlock{
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.rect(outRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
         Draw.rect(topRegion, plan.drawx(), plan.drawy());
+    }
+
+    @Override
+    public void getPlanConfigs(Seq<UnlockableContent> options){
+        for(var plan : plans){
+            if(!plan.unit.isBanned()){
+                options.add(plan.unit);
+            }
+        }
     }
 
     public static class UnitPlan{

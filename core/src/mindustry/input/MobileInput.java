@@ -88,9 +88,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     /** Check and assign targets for a specific position. */
     void checkTargets(float x, float y){
+        if(player.dead()) return;
+
         Unit unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead);
 
-        if(unit != null && !player.dead() && player.unit().type.canAttack){
+        if(unit != null && player.unit().type.canAttack){
             player.unit().mineTile = null;
             target = unit;
         }else{
@@ -232,7 +234,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     //actually place/break all selected blocks
                     if(tile != null){
                         if(!plan.breaking){
-                            if(validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+                            if(validPlace(plan.x, plan.y, plan.block, plan.rotation, null, true)){
                                 BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
                                 BuildPlan copy = plan.copy();
 
@@ -777,7 +779,11 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(!Core.settings.getBool("keyboard") && !locked && !scene.hasKeyboard()){
             //move camera around
             float camSpeed = 6f;
-            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
+            Vec2 delta = Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed);
+            Core.camera.position.add(delta);
+            if(!delta.isZero()){
+                spectating = null;
+            }
         }
 
         if(Core.settings.getBool("keyboard")){
@@ -938,6 +944,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             //pan player
             Core.camera.position.x -= deltaX;
             Core.camera.position.y -= deltaY;
+            spectating = null;
         }
 
         camera.position.clamp(-camera.width/4f, -camera.height/4f, world.unitWidth() + camera.width/4f, world.unitHeight() + camera.height/4f);

@@ -377,13 +377,15 @@ public class LogicBlock extends Block{
                     asm.putConst("@links", executor.links.length);
                     asm.putConst("@ipt", instructionsPerTick);
 
+                    Object oldUnit = null;
+
                     if(keep){
+                        oldUnit = executor.unit.objval;
                         //store any older variables
                         for(LVar var : executor.vars){
-                            boolean unit = var.name.equals("@unit");
-                            if(!var.constant || unit){
+                            if(!var.constant){
                                 LVar dest = asm.getVar(var.name);
-                                if(dest != null && (!dest.constant || unit)){
+                                if(dest != null && !dest.constant){
                                     dest.isobj = var.isobj;
                                     dest.objval = var.objval;
                                     dest.numval = var.numval;
@@ -395,6 +397,10 @@ public class LogicBlock extends Block{
                     //inject any extra variables
                     if(assemble != null){
                         assemble.get(asm);
+
+                        if(oldUnit == null && asm.getVar("@unit") != null && asm.getVar("@unit").objval instanceof Unit u){
+                            oldUnit = u;
+                        }
                     }
 
                     asm.getVar("@this").setconst(this);
@@ -402,6 +408,8 @@ public class LogicBlock extends Block{
                     asm.putConst("@thisy", World.conv(y));
 
                     executor.load(asm);
+                    executor.unit.objval = oldUnit;
+                    executor.unit.isobj = true;
                 }catch(Exception e){
                     //handle malformed code and replace it with nothing
                     executor.load(LAssembler.assemble(code = "", privileged));

@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -64,6 +65,12 @@ public class PayloadSource extends PayloadBlock{
             build.payload = null;
             build.scl = 0f;
         });
+    }
+
+    @Override
+    public void getPlanConfigs(Seq<UnlockableContent> options){
+        options.add(content.blocks().select(this::canProduce));
+        options.add(content.units().select(this::canProduce));
     }
 
     @Override
