@@ -10,6 +10,7 @@ import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
+import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
@@ -18,6 +19,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
@@ -36,6 +38,7 @@ public class NetClient implements ApplicationListener{
     /** ticks between syncs, e.g. 5 means 60/5 = 12 syncs/sec*/
     private static final float playerSyncTime = 4;
     private static final Reads dataReads = new Reads(null);
+    private static final JsonValue tmpJsonMap = new JsonValue(ValueType.object);
 
     private long ping;
     private Interval timer = new Interval(5);
@@ -364,6 +367,18 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.both)
     public static void setRules(Rules rules){
         state.rules = rules;
+    }
+
+    @Remote(variants = Variant.both)
+    public static void setRule(String rule, String jsonData){
+        try{
+            //readField searches for the specified value, so create a fake parent for it.
+            tmpJsonMap.child = null;
+            tmpJsonMap.addChild(rule, new JsonReader().parse(jsonData));
+            JsonIO.json.readField(state.rules, rule, tmpJsonMap);
+        }catch(Throwable error){
+            Log.err("Failed to read rule", error);
+        }
     }
 
     //NOTE: avoid using this, runs into packet/buffer size limitations
