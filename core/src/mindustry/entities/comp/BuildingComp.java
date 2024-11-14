@@ -1199,8 +1199,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void drawItemSelection(UnlockableContent selection){
         if(selection != null){
             TextureRegion region = selection.fullIcon;
-            float wScl = 8f / (region.height / 4f);
-            Draw.rect(selection.fullIcon, x, y + block.size * tilesize / 2f + 4, wScl * (region.width / 4f), 8f);
+            Draw.rect(selection.fullIcon, x, y + block.size * tilesize / 2f + 4, 8f * (region.width / region.height), 8f);
         }
     }
 
