@@ -157,19 +157,25 @@ public class Build{
         result.placeBegan(tile, previous, unit);
     }
 
-    /** Returns whether a tile can be placed at this location by this team. */
+    /** @return whether a tile can be placed at this location by this team. */
     public static boolean validPlace(Block type, Team team, int x, int y, int rotation){
         return validPlace(type, team, x, y, rotation, true);
     }
 
-    /** Returns whether a tile can be placed at this location by this team. */
+    /** @return whether a tile can be placed at this location by this team. */
     public static boolean validPlace(Block type, Team team, int x, int y, int rotation, boolean checkVisible){
+        return validPlaceIgnoreUnits(type, team, x, y, rotation, checkVisible) && checkNoUnitOverlap(type, x, y);
+    }
+
+    /** @return whether a tile can be placed at this location by this team. */
+    public static boolean checkNoUnitOverlap(Block type, int x, int y){
+        return (!type.solid && !type.solidifes) || !Units.anyEntities(x * tilesize + type.offset - type.size * tilesize / 2f, y * tilesize + type.offset - type.size * tilesize / 2f, type.size * tilesize, type.size * tilesize);
+    }
+
+    /** Returns whether a tile can be placed at this location by this team. Ignores units at this location. */
+    public static boolean validPlaceIgnoreUnits(Block type, Team team, int x, int y, int rotation, boolean checkVisible){
         //the wave team can build whatever they want as long as it's visible - banned blocks are not applicable
         if(type == null || (!state.rules.editor && (checkVisible && (!type.environmentBuildable() || (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible())))))){
-            return false;
-        }
-
-        if((type.solid || type.solidifes) && Units.anyEntities(x * tilesize + type.offset - type.size*tilesize/2f, y * tilesize + type.offset - type.size*tilesize/2f, type.size * tilesize, type.size*tilesize)){
             return false;
         }
 

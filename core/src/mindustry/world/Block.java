@@ -1431,6 +1431,16 @@ public class Block extends UnlockableContent implements Senseable{
         }
     }
 
+    /** Fills the specified array with the list of configuration options this block has. Only used for plans. */
+    public void getPlanConfigs(Seq<UnlockableContent> options){
+        if(configurations.containsKey(Item.class)){
+            options.add(content.items());
+        }
+        if(configurations.containsKey(Liquid.class)){
+            options.add(content.liquids());
+        }
+    }
+
     @Override
     public double sense(LAccess sensor){
         return switch(sensor){

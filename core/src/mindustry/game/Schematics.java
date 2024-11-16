@@ -200,8 +200,7 @@ public class Schematics implements Loadable{
             Seq<Schematic> keys = previews.orderedKeys().copy();
             for(int i = 0; i < previews.size - maxPreviewsMobile; i++){
                 //dispose and remove unneeded previews
-                previews.get(keys.get(i)).dispose();
-                previews.remove(keys.get(i));
+                previews.remove(keys.get(i)).dispose();
             }
             //update last clear time
             lastClearTime = Time.millis();

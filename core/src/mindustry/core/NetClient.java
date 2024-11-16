@@ -10,6 +10,7 @@ import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
+import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
@@ -18,6 +19,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
@@ -36,6 +38,7 @@ public class NetClient implements ApplicationListener{
     /** ticks between syncs, e.g. 5 means 60/5 = 12 syncs/sec*/
     private static final float playerSyncTime = 4;
     private static final Reads dataReads = new Reads(null);
+    private static final JsonValue tmpJsonMap = new JsonValue(ValueType.object);
 
     private long ping;
     private Interval timer = new Interval(5);
@@ -57,6 +60,8 @@ public class NetClient implements ApplicationListener{
     private DataInputStream dataStream = new DataInputStream(byteStream);
     /** Packet handlers for custom types of messages. */
     private ObjectMap<String, Seq<Cons<String>>> customPacketHandlers = new ObjectMap<>();
+    /** Packet handlers for custom types of messages, in binary. */
+    private ObjectMap<String, Seq<Cons<byte[]>>> customBinaryPacketHandlers = new ObjectMap<>();
 
     public NetClient(){
 
@@ -147,10 +152,34 @@ public class NetClient implements ApplicationListener{
         return customPacketHandlers.get(type, Seq::new);
     }
 
+    public void addBinaryPacketHandler(String type, Cons<byte[]> handler){
+        customBinaryPacketHandlers.get(type, Seq::new).add(handler);
+    }
+
+    public Seq<Cons<byte[]>> getBinaryPacketHandlers(String type){
+        return customBinaryPacketHandlers.get(type, Seq::new);
+    }
+
+    @Remote(targets = Loc.server, variants = Variant.both)
+    public static void clientBinaryPacketReliable(String type, byte[] contents){
+        var arr = netClient.customBinaryPacketHandlers.get(type);
+        if(arr != null){
+            for(var c : arr){
+                c.get(contents);
+            }
+        }
+    }
+
+    @Remote(targets = Loc.server, variants = Variant.both, unreliable = true)
+    public static void clientBinaryPacketUnreliable(String type, byte[] contents){
+        clientBinaryPacketReliable(type, contents);
+    }
+
     @Remote(targets = Loc.server, variants = Variant.both)
     public static void clientPacketReliable(String type, String contents){
-        if(netClient.customPacketHandlers.containsKey(type)){
-            for(Cons<String> c : netClient.customPacketHandlers.get(type)){
+        var arr = netClient.customPacketHandlers.get(type);
+        if(arr != null){
+            for(Cons<String> c : arr){
                 c.get(contents);
             }
         }
@@ -338,6 +367,18 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.both)
     public static void setRules(Rules rules){
         state.rules = rules;
+    }
+
+    @Remote(variants = Variant.both)
+    public static void setRule(String rule, String jsonData){
+        try{
+            //readField searches for the specified value, so create a fake parent for it.
+            tmpJsonMap.child = null;
+            tmpJsonMap.addChild(rule, new JsonReader().parse(jsonData));
+            JsonIO.json.readField(state.rules, rule, tmpJsonMap);
+        }catch(Throwable error){
+            Log.err("Failed to read rule", error);
+        }
     }
 
     //NOTE: avoid using this, runs into packet/buffer size limitations
