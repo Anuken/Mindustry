@@ -131,6 +131,7 @@ public class Logic implements ApplicationListener{
                 //enable building AI on campaign unless the preset disables it
 
                 state.rules.coreIncinerates = true;
+                state.rules.allowEditWorldProcessors = false;
                 state.rules.waveTeam.rules().infiniteResources = true;
                 state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
 
