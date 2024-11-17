@@ -610,7 +610,7 @@ public class UnitTypes{
 
             speed = 1f;
             hitSize = 8f;
-            health = 200;
+            health = 150;
             mechSideSway = 0.25f;
             range = 40f;
             ammoType = new ItemAmmoType(Items.coal);
@@ -629,12 +629,12 @@ public class UnitTypes{
                     collides = false;
                     hitSound = Sounds.explosion;
 
-                    rangeOverride = 30f;
+                    rangeOverride = 25f;
                     hitEffect = Fx.pulverize;
                     speed = 0f;
-                    splashDamageRadius = 55f;
+                    splashDamageRadius = 44f;
                     instantDisappear = true;
-                    splashDamage = 90f;
+                    splashDamage = 80f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
