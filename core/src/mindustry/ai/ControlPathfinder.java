@@ -1158,7 +1158,11 @@ public class ControlPathfinder implements Runnable{
 
             Tile tileOn = unit.tileOn(), initialTileOn = tileOn;
             //TODO: should fields be accessible from this thread?
-            FieldCache fieldCache = fields.get(fieldKey);
+            FieldCache fieldCache = null;
+            try{
+                fieldCache = fields.get(fieldKey);
+            }catch(ArrayIndexOutOfBoundsException ignored){ //TODO fix this, rare crash due to remove() elsewhere
+            }
             if(fieldCache == null) fieldCache = request.oldCache;
 
             if(fieldCache != null && tileOn != null){

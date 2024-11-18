@@ -173,7 +173,7 @@ public class WaveInfoDialog extends BaseDialog{
                     t.button(b -> {
                         b.left();
                         b.image(group.type.uiIcon).size(32f).padRight(3).scaling(Scaling.fit);
-                        b.add(group.type.localizedName).color(Pal.accent);
+                        b.add(group.type.localizedName).ellipsis(true).width(110f).left().color(Pal.accent);
 
                         b.add().growX();
 
