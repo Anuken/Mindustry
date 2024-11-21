@@ -24,6 +24,10 @@
     "address": ["n2.akiracloud.net:10225","n2.akiracloud.net:10335"]
   },
   {
+    "name": "Vru",
+    "address": ["144.76.57.59:19777"]
+  },
+  {
     "name": "STP",
     "address": ["23.88.73.88:25617"]
   },
