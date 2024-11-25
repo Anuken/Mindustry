@@ -733,15 +733,14 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void onRemoved(){
-            int total = proximity.count(e -> e.items != null && e.items == items);
-            float fract = 1f / total / state.teams.cores(team).size;
+            int totalCapacity = proximity.sum(e -> e.items != null && e.items == items ? e.block.itemCapacity : 0);
 
             proximity.each(e -> owns(e) && e.items == items && owns(e), t -> {
                 StorageBuild ent = (StorageBuild)t;
                 ent.linkedCore = null;
                 ent.items = new ItemModule();
                 for(Item item : content.items()){
-                    ent.items.set(item, (int)(fract * items.get(item)));
+                    ent.items.set(item, (int)Math.min(ent.block.itemCapacity, items.get(item) * (float)ent.block.itemCapacity / totalCapacity));
                 }
             });
 
