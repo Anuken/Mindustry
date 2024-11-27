@@ -14,7 +14,7 @@ import static mindustry.Vars.*;
 public class MapPlayDialog extends BaseDialog{
     public @Nullable Runnable playListener;
 
-    CustomRulesDialog dialog = new CustomRulesDialog();
+    CustomRulesDialog dialog = new CustomRulesDialog(true);
     Rules rules;
     Gamemode selectedGamemode = Gamemode.survival;
     Map lastMap;

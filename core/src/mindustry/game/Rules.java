@@ -7,6 +7,7 @@ import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.type.*;
@@ -19,6 +20,8 @@ import mindustry.world.blocks.*;
  * Does not store game state, just configuration.
  */
 public class Rules{
+    /** Allows editing the rules in-game. Essentially a cheat mode toggle. */
+    public boolean allowEditRules = false;
     /** Sandbox mode: Enables infinite resources, build range and build speed. */
     public boolean infiniteResources;
     /** Team-specific rules. */
@@ -59,6 +62,8 @@ public class Rules{
     public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
+    /** EXPERIMENTAL! If true, air and ground units target random things each wave instead of only the core/generators. */
+    public boolean randomWaveAI = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */
     public boolean unitPayloadUpdate = false;
     /** If true, units' payloads are destroy()ed when the unit is destroyed. */
@@ -83,6 +88,8 @@ public class Rules{
     public boolean ghostBlocks = true;
     /** Whether to allow units to build with logic. */
     public boolean logicUnitBuild = true;
+    /** If true, world processors can be edited and placed on this map. */
+    public boolean allowEditWorldProcessors = false;
     /** If true, world processors no longer update. Used for testing. */
     public boolean disableWorldProcessors = false;
     /** How much health blocks start with. */
@@ -95,6 +102,8 @@ public class Rules{
     public float buildSpeedMultiplier = 1f;
     /** Multiplier for percentage of materials refunded when deconstructing. */
     public float deconstructRefundMultiplier = 0.5f;
+    /** Multiplier for time in timer objectives. */
+    public float objectiveTimerMultiplier = 1f;
     /** No-build zone around enemy core radius. */
     public float enemyCoreBuildRadius = 400f;
     /** If true, no-build zones are calculated based on the closest core. */
@@ -105,6 +114,8 @@ public class Rules{
     public boolean cleanupDeadTeams = true;
     /** If true, items can only be deposited in the core. */
     public boolean onlyDepositCore = false;
+    /** Cooldown, in seconds, of item depositing for players. */
+    public float itemDepositCooldown = 0.5f;
     /** If true, every enemy block in the radius of the (enemy) core is destroyed upon death. Used for campaign maps. */
     public boolean coreDestroyClear = false;
     /** If true, banned blocks are hidden from the build menu. */
@@ -127,6 +138,8 @@ public class Rules{
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
+    /** If true, the unit cap is disabled. */
+    public boolean disableUnitCap;
     /** Environment drag multiplier. */
     public float dragMultiplier = 1f;
     /** Environmental flags that dictate visuals & how blocks function. */
@@ -148,9 +161,7 @@ public class Rules{
     /** Reveals blocks normally hidden by build visibility. */
     public ObjectSet<Block> revealedBlocks = new ObjectSet<>();
     /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */
-    public ObjectSet<String> researched = new ObjectSet<>();
-    /** Block containing these items as requirements are hidden. */
-    public ObjectSet<Item> hiddenBuildItems = Items.erekirOnlyItems.asSet();
+    public ObjectSet<UnlockableContent> researched = new ObjectSet<>();
     /** In-map objective executor. */
     public MapObjectives objectives = new MapObjectives();
     /** Flags set by objectives. Used in world processors. */

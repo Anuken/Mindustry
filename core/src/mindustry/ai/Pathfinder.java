@@ -2,6 +2,7 @@ package mindustry.ai;
 
 import arc.*;
 import arc.func.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -16,6 +17,7 @@ import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
+import static mindustry.world.meta.BlockFlag.*;
 
 public class Pathfinder implements Runnable{
     private static final long maxUpdate = Time.millisToNanos(8);
@@ -243,6 +245,8 @@ public class Pathfinder implements Runnable{
                 data.dirty = true;
             }
         });
+
+        controlPath.updateTile(tile);
     }
 
     /** Thread implementation. */
@@ -452,8 +456,34 @@ public class Pathfinder implements Runnable{
     }
 
     public static class EnemyCoreField extends Flowfield{
+        private final static BlockFlag[] randomTargets = {storage, generator, launchPad, factory, repair, battery, reactor, drill};
+        private Rand rand = new Rand();
+
         @Override
         protected void getPositions(IntSeq out){
+            if(state.rules.randomWaveAI && team == state.rules.waveTeam){
+                rand.setSeed(state.rules.waves ? state.wave : (int)(state.tick / (5400)) + hashCode());
+
+                //maximum amount of different target flag types they will attack
+                int max = 1;
+
+                for(int attempt = 0; attempt < 5 && max > 0; attempt++){
+                    var targets = indexer.getEnemy(team, randomTargets[rand.random(randomTargets.length - 1)]);
+                    if(!targets.isEmpty()){
+                        boolean any = false;
+                        for(Building other : targets){
+                            if((other.items != null && other.items.any()) || other.status() != BlockStatus.noInput){
+                                out.add(other.tile.array());
+                                any = true;
+                            }
+                        }
+                        if(any){
+                            max --;
+                        }
+                    }
+                }
+            }
+
             for(Building other : indexer.getEnemy(team, BlockFlag.core)){
                 out.add(other.tile.array());
             }

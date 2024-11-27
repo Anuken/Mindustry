@@ -35,7 +35,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void setup(){
-        String dataDir = OS.env("MINDUSTRY_DATA_DIR");
+        String dataDir = System.getProperty("mindustry.data.dir", OS.env("MINDUSTRY_DATA_DIR"));
         if(dataDir != null){
             Core.settings.setDataDirectory(files.absolute(dataDir));
         }
@@ -62,7 +62,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         }
         long ram = Runtime.getRuntime().maxMemory();
         boolean gb = ram >= 1024 * 1024 * 1024;
-        Log.info("[RAM] Available: @ @", Strings.fixed(gb ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gb ? "GB" : "MB");
+        if(!OS.isIos){
+            Log.info("[RAM] Available: @ @", Strings.fixed(gb ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gb ? "GB" : "MB");
+        }
 
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;
@@ -70,7 +72,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         });
 
         UI.loadColors();
-        batch = new SortedSpriteBatch();
+        batch = new SpriteBatch();
         assets = new AssetManager();
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
 

@@ -155,6 +155,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     circleTarget = false,
     /** if true, this unit can boost into the air if a player/processors controls it*/
     canBoost = false,
+    /** if true, this unit will always boost when using builder AI */
+    boostWhenBuilding = true,
     /** if false, logic processors cannot control this unit */
     logicControllable = true,
     /** if false, players cannot control this unit */
@@ -259,6 +261,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public Color healColor = Pal.heal;
     /** Color of light that this unit produces when lighting is enabled in the map. */
     public Color lightColor = Pal.powerLight;
+    /** override for unit shield colour. */
+    public @Nullable Color shieldColor;
     /** sound played when this unit explodes (*not* when it is shot down) */
     public Sound deathSound = Sounds.bang;
     /** sound played on loop when this unit is around. */
@@ -298,12 +302,14 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** Flags to target based on priority. Null indicates that the closest target should be found. The closest enemy core is used as a fallback. */
     public BlockFlag[] targetFlags = {null};
 
+    /** A value of false is used to hide command changing UI in unit factories. */
+    public boolean allowChangeCommands = true;
     /** Commands available to this unit through RTS controls. An empty array means commands will be assigned based on unit capabilities in init(). */
-    public UnitCommand[] commands = {};
+    public Seq<UnitCommand> commands = new Seq<>();
     /** Command to assign to this unit upon creation. Null indicates the first command in the array. */
     public @Nullable UnitCommand defaultCommand;
     /** Stances this unit can have.  An empty array means stances will be assigned based on unit capabilities in init(). */
-    public UnitStance[] stances = {};
+    public Seq<UnitStance> stances = new Seq<>();
 
     /** color for outline generated around sprites */
     public Color outlineColor = Pal.darkerMetal;
@@ -456,6 +462,9 @@ public class UnitType extends UnlockableContent implements Senseable{
         Unit unit = constructor.get();
         unit.team = team;
         unit.setType(this);
+        if(controller instanceof CommandAI command && defaultCommand != null){
+            command.command = defaultCommand;
+        }
         unit.ammo = ammoCapacity; //fill up on ammo upon creation
         unit.elevation = flying ? 1f : 0;
         unit.heal();
@@ -673,6 +682,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     @CallSuper
     @Override
     public void init(){
+        super.init();
+
         if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
 
         Unit example = constructor.get();
@@ -819,45 +830,49 @@ public class UnitType extends UnlockableContent implements Senseable{
         canAttack = weapons.contains(w -> !w.noAttack);
 
         //assign default commands.
-        if(commands.length == 0){
-            Seq<UnitCommand> cmds = new Seq<>(UnitCommand.class);
+        if(commands.size == 0){
 
-            cmds.add(UnitCommand.moveCommand, UnitCommand.enterPayloadCommand);
+            commands.add(UnitCommand.moveCommand, UnitCommand.enterPayloadCommand);
 
             if(canBoost){
-                cmds.add(UnitCommand.boostCommand);
+                commands.add(UnitCommand.boostCommand);
+
+                if(buildSpeed > 0f){
+                    commands.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
+                }
             }
 
             //healing, mining and building is only supported for flying units; pathfinding to ambiguously reachable locations is hard.
             if(flying){
                 if(canHeal){
-                    cmds.add(UnitCommand.repairCommand);
+                    commands.add(UnitCommand.repairCommand);
                 }
 
                 if(buildSpeed > 0){
-                    cmds.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
+                    commands.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
                 }
 
                 if(mineTier > 0){
-                    cmds.add(UnitCommand.mineCommand);
+                    commands.add(UnitCommand.mineCommand);
                 }
                 if(example instanceof Payloadc){
-                    cmds.addAll(UnitCommand.loadUnitsCommand, UnitCommand.loadBlocksCommand, UnitCommand.unloadPayloadCommand);
+                    commands.addAll(UnitCommand.loadUnitsCommand, UnitCommand.loadBlocksCommand, UnitCommand.unloadPayloadCommand, UnitCommand.loopPayloadCommand);
                 }
             }
-
-            commands = cmds.toArray();
         }
 
-        if(stances.length == 0){
+        if(defaultCommand == null && commands.size > 0){
+            defaultCommand = commands.first();
+        }
+
+        if(stances.size == 0){
             if(canAttack){
-                Seq<UnitStance> seq = Seq.with(UnitStance.stop, UnitStance.shoot, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
+                stances.addAll(UnitStance.stop, UnitStance.shoot, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
                 if(!flying){
-                    seq.add(UnitStance.ram);
+                    stances.add(UnitStance.ram);
                 }
-                stances = seq.toArray(UnitStance.class);
             }else{
-                stances = new UnitStance[]{UnitStance.stop, UnitStance.patrol};
+                stances.addAll(UnitStance.stop, UnitStance.patrol);
             }
         }
 
@@ -884,7 +899,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             //suicide enemy
             if(weapons.contains(w -> w.bullet.killShooter)){
                 //scale down DPS to be insignificant
-                dpsEstimate /= 25f;
+                dpsEstimate /= 15f;
             }
         }
 
@@ -1265,7 +1280,9 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(drawCell) drawCell(unit);
         drawWeapons(unit);
         if(drawItems) drawItems(unit);
-        drawLight(unit);
+        if(!isPayload){
+            drawLight(unit);
+        }
 
         if(unit.shieldAlpha > 0 && drawShields){
             drawShield(unit);
@@ -1276,9 +1293,9 @@ public class UnitType extends UnlockableContent implements Senseable{
             for(int i = 0; i < parts.size; i++){
                 var part = parts.get(i);
 
-                WeaponMount first = unit.mounts.length > part.weaponIndex ? unit.mounts[part.weaponIndex] : null;
-                if(first != null){
-                    DrawPart.params.set(first.warmup, first.reload / weapons.first().reload, first.smoothReload, first.heat, first.recoil, first.charge, unit.x, unit.y, unit.rotation);
+                WeaponMount mount = unit.mounts.length > part.weaponIndex ? unit.mounts[part.weaponIndex] : null;
+                if(mount != null){
+                    DrawPart.params.set(mount.warmup, mount.reload / mount.weapon.reload, mount.smoothReload, mount.heat, mount.recoil, mount.charge, unit.x, unit.y, unit.rotation);
                 }else{
                     DrawPart.params.set(0f, 0f, 0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation);
                 }
@@ -1305,6 +1322,12 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         Draw.reset();
     }
+
+    //...where do I put this
+    public Color shieldColor(Unit unit){
+        return shieldColor == null ? unit.team.color : shieldColor;
+    }
+
 
     public void drawMining(Unit unit){
         if(!unit.mining()) return;
@@ -1345,7 +1368,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         float radius = unit.hitSize() * 1.3f;
         Fill.light(unit.x, unit.y, Lines.circleVertices(radius), radius,
             Color.clear,
-            Tmp.c2.set(unit.team.color).lerp(Color.white, Mathf.clamp(unit.hitTime() / 2f)).a(0.7f * alpha)
+            Tmp.c2.set(unit.type.shieldColor(unit)).lerp(Color.white, Mathf.clamp(unit.hitTime() / 2f)).a(0.7f * alpha)
         );
     }
 

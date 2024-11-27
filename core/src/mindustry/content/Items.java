@@ -60,7 +60,7 @@ public class Items{
         }};
 
         scrap = new Item("scrap", Color.valueOf("777777")){{
-
+            cost = 0.5f;
         }};
 
         silicon = new Item("silicon", Color.valueOf("53565c")){{

@@ -152,7 +152,7 @@ public class BlockInventoryFragment{
 
                 container.add(i);
 
-                Boolp canPick = () -> player.unit().acceptsItem(item) && !state.isPaused() && player.within(build, itemTransferRange);
+                Boolp canPick = () -> !player.dead() && player.unit().acceptsItem(item) && !state.isPaused() && player.within(build, itemTransferRange);
 
                 HandCursorListener l = new HandCursorListener();
                 l.enabled = canPick;

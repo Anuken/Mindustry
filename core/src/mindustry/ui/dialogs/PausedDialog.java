@@ -1,7 +1,10 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.scene.ui.layout.*;
+import mindustry.*;
 import mindustry.editor.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
@@ -10,11 +13,27 @@ public class PausedDialog extends BaseDialog{
     private MapProcessorsDialog processors = new MapProcessorsDialog();
     private SaveDialog save = new SaveDialog();
     private LoadDialog load = new LoadDialog();
-    private boolean wasClient = false;
+    private CustomRulesDialog rulesDialog = new CustomRulesDialog();
 
     public PausedDialog(){
         super("@menu");
         shouldPause = true;
+
+        clearChildren();
+        add(titleTable).growX().row();
+
+        stack(cont, new Table(t -> {
+            t.bottom().left();
+            t.button(Icon.book, () -> {
+                Rules toEdit = Vars.state.rules.copy();
+                rulesDialog.show(toEdit, () -> state.rules.copy());
+                rulesDialog.hidden(() -> {
+                    //apply rule changes only once it is hidden
+                    Vars.state.rules = toEdit;
+                    Call.setRules(toEdit);
+                });
+            }).size(70f).tooltip("@customize").visible(() -> state.rules.allowEditRules && (net.server() || !net.active()));
+        })).grow().row();
 
         shown(this::rebuild);
 
@@ -130,7 +149,7 @@ public class PausedDialog extends BaseDialog{
     }
 
     public void runExitSave(){
-        wasClient = net.client();
+        boolean wasClient = net.client();
         if(net.client()) netClient.disconnectQuietly();
 
         if(state.isEditor() && !wasClient){
@@ -140,7 +159,7 @@ public class PausedDialog extends BaseDialog{
             return;
         }
 
-        if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || wasClient || state.gameOver){
+        if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || wasClient || state.gameOver || disableSave){
             logic.reset();
             return;
         }
