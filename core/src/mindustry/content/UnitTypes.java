@@ -255,7 +255,7 @@ public class UnitTypes{
 
         reign = new UnitType("reign"){{
             speed = 0.4f;
-            hitSize = 26f;
+            hitSize = 30f;
             rotateSpeed = 1.65f;
             health = 24000;
             armor = 18f;
@@ -1012,7 +1012,7 @@ public class UnitTypes{
             accel = 0.08f;
             drag = 0.016f;
             flying = true;
-            hitSize = 10f;
+            hitSize = 11f;
             targetAir = false;
             engineOffset = 7.8f;
             range = 140f;

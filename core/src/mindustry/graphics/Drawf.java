@@ -306,7 +306,7 @@ public class Drawf{
         Draw.rect(region, x, y);
         Draw.color();
     }
-    
+
     public static void shadow(TextureRegion region, float x, float y, float width, float height, float rotation){
         Draw.color(Pal.shadow);
         Draw.rect(region, x, y, width, height, rotation);
@@ -358,6 +358,14 @@ public class Drawf{
         Lines.square(x, y, radius + 1f, rotation);
         Lines.stroke(1f, color);
         Lines.square(x, y, radius + 1f, rotation);
+        Draw.reset();
+    }
+
+    public static void poly(float x, float y, int sides, float radius, float rotation, Color color){
+        Lines.stroke(3f, Pal.gray);
+        Lines.poly(x, y, sides, radius + 1f, rotation);
+        Lines.stroke(1f, color);
+        Lines.poly(x, y, sides, radius + 1f, rotation);
         Draw.reset();
     }
 
@@ -436,7 +444,7 @@ public class Drawf{
     public static void construct(float x, float y, TextureRegion region, float rotation, float progress, float alpha, float time){
         construct(x, y, region, Pal.accent, rotation, progress, alpha, time);
     }
-    
+
     public static void construct(float x, float y, TextureRegion region, Color color, float rotation, float progress, float alpha, float time){
         Shaders.build.region = region;
         Shaders.build.progress = progress;
@@ -458,7 +466,7 @@ public class Drawf{
     public static void construct(Building t, TextureRegion region, Color color, float rotation, float progress, float alpha, float time){
         construct(t, region, color, rotation, progress, alpha, time, t.block.size * tilesize - 4f);
     }
-        
+
     public static void construct(Building t, TextureRegion region, Color color, float rotation, float progress, float alpha, float time, float size){
         Shaders.build.region = region;
         Shaders.build.progress = progress;
@@ -477,7 +485,7 @@ public class Drawf{
 
         Draw.reset();
     }
-    
+
     /** Draws a sprite that should be light-wise correct, when rotated. Provided sprite must be symmetrical in shape. */
     public static void spinSprite(TextureRegion region, float x, float y, float r){
         float a = Draw.getColorAlpha();

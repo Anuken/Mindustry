@@ -95,6 +95,8 @@ public class Vars implements Loadable{
     public static final float finalWorldBounds = 250;
     /** default range for building */
     public static final float buildingRange = 220f;
+    /** scaling for unit circle collider radius, based on hitbox size */
+    public static final float unitCollisionRadiusScale = 0.6f;
     /** range for moving items */
     public static final float itemTransferRange = 220f;
     /** range for moving items for logic units */
