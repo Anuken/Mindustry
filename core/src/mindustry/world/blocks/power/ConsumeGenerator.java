@@ -3,6 +3,7 @@ package mindustry.world.blocks.power;
 import arc.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.struct.ObjectFloatMap;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -28,6 +29,8 @@ public class ConsumeGenerator extends PowerGenerator{
 
     public @Nullable ConsumeItemFilter filterItem;
     public @Nullable ConsumeLiquidFilter filterLiquid;
+    /** Multiplies the itemDuration for a given item. */
+    public ObjectFloatMap<Item> itemDurationMultipliers = new ObjectFloatMap<>();
 
     public ConsumeGenerator(String name){
         super(name);
@@ -76,7 +79,7 @@ public class ConsumeGenerator extends PowerGenerator{
     }
 
     public class ConsumeGeneratorBuild extends GeneratorBuild{
-        public float warmup, totalTime, efficiencyMultiplier = 1f;
+        public float warmup, totalTime, efficiencyMultiplier = 1f, itemDurationMultiplier = 1;
 
         @Override
         public void updateEfficiencyMultiplier(){
@@ -103,6 +106,11 @@ public class ConsumeGenerator extends PowerGenerator{
                 generateEffect.at(x + Mathf.range(generateEffectRange), y + Mathf.range(generateEffectRange));
             }
 
+            //make sure the multiplier doesn't change when there is nothing to consume while it's still running
+            if(filterItem != null && valid && filterItem.getConsumed(this) != null){
+                itemDurationMultiplier = itemDurationMultipliers.get(filterItem.getConsumed(this), 1);
+            }
+
             //take in items periodically
             if(hasItems && valid && generateTime <= 0f){
                 consume();
@@ -122,7 +130,7 @@ public class ConsumeGenerator extends PowerGenerator{
             }
 
             //generation time always goes down, but only at the end so consumeTriggerValid doesn't assume fake items
-            generateTime -= delta() / itemDuration;
+            generateTime -= delta() / (itemDuration * itemDurationMultiplier);
         }
 
         @Override
