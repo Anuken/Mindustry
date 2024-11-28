@@ -141,11 +141,18 @@ public class Drawf{
         Draw.z(pz);
     }
 
-    public static void limitLine(Position start, Position dest, float len1, float len2){
+    public static void limitLine(Position start, Position dest, float len1, float len2, Color color){
+        if(start.within(dest, len1 + len2)){
+            return;
+        }
         Tmp.v1.set(dest).sub(start).setLength(len1);
         Tmp.v2.set(Tmp.v1).scl(-1f).setLength(len2);
 
-        Drawf.line(Pal.accent, start.getX() + Tmp.v1.x, start.getY() + Tmp.v1.y, dest.getX() + Tmp.v2.x, dest.getY() + Tmp.v2.y);
+        Drawf.line(color, start.getX() + Tmp.v1.x, start.getY() + Tmp.v1.y, dest.getX() + Tmp.v2.x, dest.getY() + Tmp.v2.y);
+    }
+
+    public static void limitLine(Position start, Position dest, float len1, float len2){
+        limitLine(start, dest, len1, len2, Pal.accent);
     }
 
     public static void dashLineDst(Color color, float x, float y, float x2, float y2){
@@ -354,7 +361,7 @@ public class Drawf{
     }
 
     public static void square(float x, float y, float radius, float rotation, Color color){
-        Lines.stroke(3f, Pal.gray);
+        Lines.stroke(3f, Pal.gray.write(Tmp.c3).a(color.a));
         Lines.square(x, y, radius + 1f, rotation);
         Lines.stroke(1f, color);
         Lines.square(x, y, radius + 1f, rotation);
