@@ -23,7 +23,6 @@ public enum LogicRule{
     buildSpeed,
     unitHealth,
     unitBuildSpeed,
-    unitCrashDamage,
     unitMineSpeed,
     unitCost,
     unitDamage,
