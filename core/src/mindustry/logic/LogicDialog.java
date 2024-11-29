@@ -188,7 +188,7 @@ public class LogicDialog extends BaseDialog{
                             Label label = out.add("").style(Styles.outlineLabel).padLeft(4).padRight(4).width(140f).wrap().get();
                             label.update(() -> {
                                 if(counter[0] < 0 || (counter[0] += Time.delta) >= period){
-                                    String text = s.isobj ? PrintI.toString(s.objval) : Math.abs(s.numval - (long)(s.numval+0.5)) < 0.00001 ? (long)(s.numval+0.5) + "" : s.numval + "";
+                                    String text = s.isobj ? PrintI.toString(s.objval) : Math.abs(s.numval - Math.round(s.numval)) < 0.00001 ? Math.round(s.numval) + "" : s.numval + "";
                                     if(!label.textEquals(text)){
                                         label.setText(text);
                                         if(counter[0] >= 0f){
