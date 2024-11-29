@@ -966,8 +966,8 @@ public class LExecutor{
                 exec.textBuffer.append(strValue);
             }else{
                 //display integer version when possible
-                if(Math.abs(value.numval - (long)value.numval) < 0.00001){
-                    exec.textBuffer.append((long)value.numval);
+                if(Math.abs(value.numval - (long)(value.numval+0.5)) < 0.00001){
+                    exec.textBuffer.append((long)(value.numval+0.5));
                 }else{
                     exec.textBuffer.append(value.numval);
                 }
@@ -1027,8 +1027,8 @@ public class LExecutor{
                 exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, strValue);
             }else{
                 //display integer version when possible
-                if(Math.abs(value.numval - (long)value.numval) < 0.00001){
-                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, (long)value.numval + "");
+                if(Math.abs(value.numval - (long)(value.numval+0.5)) < 0.00001){
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, (long)(value.numval+0.5) + "");
                 }else{
                     exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, value.numval + "");
                 }
