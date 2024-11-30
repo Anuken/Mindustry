@@ -1835,7 +1835,6 @@ public class UnitTypes{
         //region naval support
         retusa = new UnitType("retusa"){{
             speed = 0.9f;
-            targetAir = false;
             drag = 0.14f;
             hitSize = 11f;
             health = 270;
