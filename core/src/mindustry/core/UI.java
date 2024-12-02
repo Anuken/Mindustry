@@ -703,13 +703,17 @@ public class UI implements ApplicationListener, Loadable{
                     buffer.append(ch);
                 }
             }else if(ch == ':'){
-                String content = s.substring(indexStart + 1, i);
-                if(Fonts.hasUnicodeStr(content)){
-                    buffer.append(Fonts.getUnicodeStr(content));
+                String icon = s.substring(indexStart + 1, i);
+                if(Iconc.codes.containsKey(icon)){
+                    buffer.append((char)Iconc.codes.get(icon));
+                    changed = true;
+                    indexStart = -1;
+                }else if(Fonts.hasUnicodeStr(icon)){
+                    buffer.append(Fonts.getUnicodeStr(icon));
                     changed = true;
                     indexStart = -1;
                 }else{
-                    buffer.append(":").append(content);
+                    buffer.append(":").append(icon);
                     indexStart = i;
                 }
             }
