@@ -80,7 +80,7 @@ public class MessageBlock extends Block{
             font.getData().setScale(1 / 4f / Scl.scl(1f));
             font.setUseIntegerPositions(false);
 
-            String text = message == null || message.isEmpty() ? "[lightgray]" + Core.bundle.get("empty") : UI.formatIcons(message.toString());
+            String text = message == null || message.length() == 0 ? "[lightgray]" + Core.bundle.get("empty") : UI.formatIcons(message.toString());
 
             l.setText(font, text, Color.white, 90f, Align.left, true);
             float offset = 1f;
