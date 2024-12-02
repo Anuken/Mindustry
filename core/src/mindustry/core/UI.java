@@ -703,12 +703,6 @@ public class UI implements ApplicationListener, Loadable{
                     buffer.append(ch);
                 }
             }else if(ch == ':'){
-                if(i == indexStart + 1){
-                    buffer.append(":");
-                    indexStart = -1;
-                    continue;
-                }
-
                 String content = s.substring(indexStart + 1, i);
                 if(Fonts.hasUnicodeStr(content)){
                     buffer.append(Fonts.getUnicodeStr(content));
