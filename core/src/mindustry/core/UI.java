@@ -707,17 +707,15 @@ public class UI implements ApplicationListener, Loadable{
                 }else{
                     buffer.append(ch);
                 }
-            }else{
-                if(ch == ':'){
-                    String content = s.substring(indexStart + 1, i);
-                    if(Fonts.hasUnicodeStr(content)){
-                        buffer.append(Fonts.getUnicodeStr(content));
-                        changed = true;
-                        indexStart = -1;
-                    }else{
-                        buffer.append(content);
-                        indexStart = i;
-                    }
+            }else if(ch == ':'){
+                String content = s.substring(indexStart + 1, i);
+                if(Fonts.hasUnicodeStr(content)){
+                    buffer.append(Fonts.getUnicodeStr(content));
+                    changed = true;
+                    indexStart = -1;
+                }else{
+                    buffer.append(content);
+                    indexStart = i;
                 }
             }
         }
