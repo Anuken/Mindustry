@@ -463,7 +463,7 @@ public class Vars implements Loadable{
             Fi handle = Core.files.local("bundle");
 
             Locale locale = Locale.ENGLISH;
-            Core.bundle = MBundle.createBundle(I18NBundle.createBundle(handle, locale));
+            Core.bundle = I18NBundle.createBundle(handle, locale);
 
             Log.info("NOTE: external translation bundle has been loaded.");
 
@@ -491,7 +491,7 @@ public class Vars implements Loadable{
             }
 
             Locale.setDefault(locale);
-            Core.bundle = MBundle.createBundle(I18NBundle.createBundle(handle, locale));
+            Core.bundle = I18NBundle.createBundle(handle, locale);
 
             //router
             if(locale.toString().equals("router")){
