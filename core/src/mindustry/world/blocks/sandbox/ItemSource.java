@@ -79,6 +79,12 @@ public class ItemSource extends Block{
         }
 
         @Override
+        public void drawSelect(){
+            super.drawSelect();
+            drawItemSelection(outputItem);
+        }
+
+        @Override
         public void updateTile(){
             if(outputItem == null) return;
 
