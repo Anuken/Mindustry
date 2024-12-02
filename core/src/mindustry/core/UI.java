@@ -698,16 +698,17 @@ public class UI implements ApplicationListener, Loadable{
             char ch = s.charAt(i);
             if(indexStart < 0){
                 if(ch == ':'){
-                    if(i + 1 < length && s.charAt(i + 1) == ':'){
-                        buffer.append(ch);
-                        i++;
-                    }else{
-                        indexStart = i;
-                    }
+                    indexStart = i;
                 }else{
                     buffer.append(ch);
                 }
             }else if(ch == ':'){
+                if(i == indexStart + 1){
+                    buffer.append(":");
+                    indexStart = -1;
+                    continue;
+                }
+
                 String content = s.substring(indexStart + 1, i);
                 if(Fonts.hasUnicodeStr(content)){
                     buffer.append(Fonts.getUnicodeStr(content));
