@@ -708,14 +708,16 @@ public class UI implements ApplicationListener, Loadable{
                     buffer.append(ch);
                 }
             }else{
-                if(ch == ' '){
-                    buffer.append(s, indexStart, i + 1);
-                    indexStart = -1;
-                }else if(ch == ':'){
+                if(ch == ':'){
                     String content = s.substring(indexStart + 1, i);
-                    buffer.append(Fonts.getUnicodeStr(content));
-                    indexStart = -1;
-                    changed = true;
+                    if(Fonts.hasUnicodeStr(content)){
+                        buffer.append(Fonts.getUnicodeStr(content));
+                        changed = true;
+                        indexStart = -1;
+                    }else{
+                        buffer.append(content);
+                        indexStart = i;
+                    }
                 }
             }
         }
