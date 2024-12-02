@@ -26,7 +26,6 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.service.*;
-import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
@@ -463,7 +462,7 @@ public class Vars implements Loadable{
             Fi handle = Core.files.local("bundle");
 
             Locale locale = Locale.ENGLISH;
-            Core.bundle = MBundle.createBundle(handle, locale);
+            Core.bundle = I18NBundle.createBundle(handle, locale);
 
             Log.info("NOTE: external translation bundle has been loaded.");
 
@@ -491,7 +490,7 @@ public class Vars implements Loadable{
             }
 
             Locale.setDefault(locale);
-            Core.bundle = MBundle.createBundle(handle, locale);
+            Core.bundle = I18NBundle.createBundle(handle, locale);
 
             //router
             if(locale.toString().equals("router")){
