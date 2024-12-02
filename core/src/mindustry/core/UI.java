@@ -685,7 +685,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     /**
-     * Finds all :name: in a string an replaces them with the icon, if such exists.
+     * Finds all :name: in a string and replaces them with the icon, if such exists.
      * Based on TextFormatter::simpleFormat
      */
     public static String formatIcons(String s){
@@ -714,7 +714,7 @@ public class UI implements ApplicationListener, Loadable{
                     changed = true;
                     indexStart = -1;
                 }else{
-                    buffer.append(content);
+                    buffer.append(":").append(content);
                     indexStart = i;
                 }
             }
