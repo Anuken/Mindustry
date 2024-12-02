@@ -689,38 +689,30 @@ public class UI implements ApplicationListener, Loadable{
      * Based on TextFormatter::simpleFormat
      */
     public static String formatIcons(String s){
+        if(!s.contains(":")) return s;
+
         buffer.setLength(0);
         boolean changed = false;
-        int indexStart = -1;
-        int length = s.length();
 
-        for(int i = 0; i < length; i++){
-            char ch = s.charAt(i);
-            if(indexStart < 0){
-                if(ch == ':'){
-                    indexStart = i;
-                }else{
-                    buffer.append(ch);
-                }
-            }else if(ch == ':'){
-                String icon = s.substring(indexStart + 1, i);
-                if(Iconc.codes.containsKey(icon)){
-                    buffer.append((char)Iconc.codes.get(icon));
+        boolean checkIcon = false;
+        String[] tokens = s.split(":");
+        for(String token : tokens){
+            if(checkIcon){
+                if(Iconc.codes.containsKey(token)){
+                    buffer.append((char)Iconc.codes.get(token));
                     changed = true;
-                    indexStart = -1;
-                }else if(Fonts.hasUnicodeStr(icon)){
-                    buffer.append(Fonts.getUnicodeStr(icon));
+                    checkIcon = false;
+                }else if(Fonts.hasUnicodeStr(token)){
+                    buffer.append(Fonts.getUnicodeStr(token));
                     changed = true;
-                    indexStart = -1;
+                    checkIcon = false;
                 }else{
-                    buffer.append(":").append(icon);
-                    indexStart = i;
+                    buffer.append(":").append(token);
                 }
+            }else{
+                buffer.append(token);
+                checkIcon = true;
             }
-        }
-
-        if(indexStart >= 0){
-            buffer.append(s, indexStart, length);
         }
 
         return changed ? buffer.toString() : s;
