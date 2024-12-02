@@ -35,6 +35,8 @@ import static mindustry.Vars.*;
 public class UI implements ApplicationListener, Loadable{
     public static String billions, millions, thousands;
 
+    public static StringBuilder buffer = new StringBuilder();
+
     public static PixmapPacker packer;
 
     public MenuFragment menufrag;
@@ -680,6 +682,49 @@ public class UI implements ApplicationListener, Loadable{
     public void hideFollowUpMenu(int menuId) {
         if(!followUpMenus.containsKey(menuId)) return;
         followUpMenus.remove(menuId).hide();
+    }
+
+    /**
+     * Finds all :name: in a string an replaces them with the icon, if such exists.
+     * Based on TextFormatter::simpleFormat
+     */
+    public static String formatIcons(String s){
+        buffer.setLength(0);
+        boolean changed = false;
+        int indexStart = -1;
+        int length = s.length();
+
+        for(int i = 0; i < length; i++){
+            char ch = s.charAt(i);
+            if(indexStart < 0){
+                if(ch == ':'){
+                    if(i + 1 < length && s.charAt(i + 1) == ':'){
+                        buffer.append(ch);
+                        i++;
+                    }else{
+                        indexStart = i;
+                    }
+                }else{
+                    buffer.append(ch);
+                }
+            }else{
+                if(ch == ' '){
+                    buffer.append(s, indexStart, i + 1);
+                    indexStart = -1;
+                }else if(ch == ':'){
+                    String content = s.substring(indexStart + 1, i);
+                    buffer.append(Fonts.getUnicodeStr(content));
+                    indexStart = -1;
+                    changed = true;
+                }
+            }
+        }
+
+        if(indexStart >= 0){
+            buffer.append(s, indexStart, length);
+        }
+
+        return changed ? buffer.toString() : s;
     }
 
     /** Formats time with hours:minutes:seconds. */
