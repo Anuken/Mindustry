@@ -7,14 +7,14 @@ import mindustry.core.*;
 import java.util.*;
 
 public class MBundle extends I18NBundle{
-    private static final Locale ROOT_LOCALE = new Locale("", "", "");
 
     public static MBundle createBundle(I18NBundle parent){
         MBundle bundle = new MBundle();
-        Reflect.set(I18NBundle.class, bundle, "locale", ROOT_LOCALE);
+        Reflect.set(I18NBundle.class, bundle, "locale", Reflect.get(I18NBundle.class, parent, "locale"));
         ObjectMap<String, String> properties = new ObjectMap<>();
         Reflect.set(I18NBundle.class, bundle, "properties", properties);
         Reflect.set(I18NBundle.class, bundle, "parent", parent);
+        Reflect.set(I18NBundle.class, bundle, "formatter", Reflect.get(I18NBundle.class, parent, "formatter"));
         return bundle;
     }
 
