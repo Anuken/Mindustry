@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
@@ -661,17 +662,19 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(text.startsWith("@")){
                 String key = text.substring(1);
 
+                String out;
                 if(mobile){
-                    return state.mapLocales.containsProperty(key + ".mobile") ?
-                    state.mapLocales.getProperty(key + ".mobile") :
-                    Core.bundle.get(key + ".mobile", Core.bundle.get(key));
+                    out = state.mapLocales.containsProperty(key + ".mobile") ?
+                        state.mapLocales.getProperty(key + ".mobile") :
+                        Core.bundle.get(key + ".mobile", Core.bundle.get(key));
                 }else{
-                    return state.mapLocales.containsProperty(key) ?
-                    state.mapLocales.getProperty(key) :
-                    Core.bundle.get(key);
+                    out = state.mapLocales.containsProperty(key) ?
+                        state.mapLocales.getProperty(key) :
+                        Core.bundle.get(key);
                 }
+                return UI.formatIcons(out);
             }else{
-                return text;
+                return UI.formatIcons(text);
             }
         }
     }
