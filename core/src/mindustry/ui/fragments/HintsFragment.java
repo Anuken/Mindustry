@@ -13,6 +13,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -250,7 +251,7 @@ public class HintsFragment{
                 text = Vars.mobile && Core.bundle.has("hint." + name() + ".mobile") ? Core.bundle.get("hint." + name() + ".mobile") : Core.bundle.get("hint." + name());
                 if(!Vars.mobile) text = text.replace("tap", "click").replace("Tap", "Click");
             }
-            return text;
+            return UI.formatIcons(text);
         }
 
         @Override
