@@ -1498,11 +1498,11 @@ public class LStatements{
             table.add("natural ");
             fields(table, natural, str -> natural = str);
 
-            table.add("x ").visible(() -> natural.equals("false"));
-            fields(table, x, str -> x = str).visible(() -> natural.equals("false"));
+            table.add("x ").visible(() -> !natural.equals("true"));
+            fields(table, x, str -> x = str).visible(() -> !natural.equals("true"));
 
-            table.add(" y ").visible(() -> natural.equals("false"));
-            fields(table, y, str -> y = str).visible(() -> natural.equals("false"));
+            table.add(" y ").visible(() -> !natural.equals("true"));
+            fields(table, y, str -> y = str).visible(() -> !natural.equals("true"));
         }
 
         @Override
