@@ -53,6 +53,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Used for dropping items. */
     final static float playerSelectRange = mobile ? 17f : 11f;
+    final static float unitSelectRadScl = 1f;
     final static IntSeq removed = new IntSeq();
     final static IntSet intSet = new IntSet();
     /** Maximum line length. */
@@ -1070,37 +1071,69 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void drawCommand(Unit sel){
-        Drawf.square(sel.x, sel.y, sel.hitSize / 1.4f + Mathf.absin(4f, 1f), selectedUnits.contains(sel) ? Pal.remove : Pal.accent);
+        Drawf.poly(sel.x, sel.y, 6, sel.hitSize / unitSelectRadScl + Mathf.absin(4f, 1f), 0f, selectedUnits.contains(sel) ? Pal.remove : Pal.accent);
     }
 
     public void drawCommanded(){
+        Draw.draw(Layer.plans, () -> {
+            drawCommanded(true);
+        });
+
+        Draw.draw(Layer.groundUnit - 1, () -> {
+            drawCommanded(false);
+        });
+    }
+
+    public void drawCommanded(boolean flying){
+        float lineLimit = 6.5f;
+        Color color = Pal.accent;
+        int sides = 6;
+        float alpha = 0.5f;
+
         if(commandMode){
             //happens sometimes
             selectedUnits.removeAll(u -> !u.isCommandable());
 
             //draw command overlay UI
             for(Unit unit : selectedUnits){
+                if(unit.isFlying() != flying) continue;
                 CommandAI ai = unit.command();
                 Position lastPos = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
 
                 //draw target line
                 if(ai.targetPos != null && ai.currentCommand().drawTarget){
                     Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
-                    Drawf.limitLine(unit, lineDest, unit.hitSize / 2f, 3.5f);
+                    Drawf.limitLine(unit, lineDest, unit.hitSize / unitSelectRadScl + 1f, lineLimit, color.write(Tmp.c1).a(alpha));
 
                     if(ai.attackTarget == null){
-                        Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f);
+                        Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f, color.write(Tmp.c1).a(alpha));
 
                         if(ai.currentCommand() == UnitCommand.enterPayloadCommand){
                             var build = world.buildWorld(lineDest.getX(), lineDest.getY());
                             if(build != null && build.block.acceptsUnitPayloads && build.team == unit.team){
-                                Drawf.selected(build, Pal.accent);
+                                Drawf.selected(build, color);
                             }
                         }
                     }
                 }
 
-                Drawf.square(unit.x, unit.y, unit.hitSize / 1.4f + 1f);
+                float rad = unit.hitSize / unitSelectRadScl + 1f;
+
+                Fill.lightInner(unit.x, unit.y, sides,
+                Math.max(0f, rad * 0.8f),
+                rad,
+                0f,
+                Tmp.c3.set(color).a(0f),
+                Tmp.c2.set(color).a(0.7f)
+                );
+
+                Lines.stroke(1f);
+                Draw.color(color);
+                Lines.poly(unit.x, unit.y, sides, rad + 0.5f);
+                //uncomment for a dark border
+                //Draw.color(Pal.gray);
+                //Lines.poly(unit.x, unit.y, sides, rad + 1.5f);
+                Draw.reset();
 
                 if(ai.attackTarget != null && ai.currentCommand().drawTarget){
                     Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
@@ -1113,11 +1146,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 //draw command queue
                 if(ai.currentCommand().drawTarget && ai.commandQueue.size > 0){
                     for(var next : ai.commandQueue){
-                        Drawf.limitLine(lastPos, next, 3.5f, 3.5f);
+                        Drawf.limitLine(lastPos, next, lineLimit, lineLimit, color.write(Tmp.c1).a(alpha));
                         lastPos = next;
 
                         if(next instanceof Vec2 vec){
-                            Drawf.square(vec.x, vec.y, 3.5f);
+                            Drawf.square(vec.x, vec.y, 3.5f, color.write(Tmp.c1).a(alpha));
                         }else{
                             Drawf.target(next.getX(), next.getY(), 6f, Pal.remove);
                         }
@@ -1125,7 +1158,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
 
                 if(ai.targetPos != null && ai.currentCommand() == UnitCommand.loopPayloadCommand && unit instanceof Payloadc pay){
-                    Draw.color(Pal.accent, 0.4f + Mathf.absin(5f, 0.5f));
+                    Draw.color(color, 0.4f + Mathf.absin(5f, 0.5f));
                     TextureRegion region = pay.hasPayload() ? Icon.download.getRegion() : Icon.upload.getRegion();
                     float offset = 11f;
                     float size = 8f;
@@ -1139,40 +1172,44 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
             }
 
-            for(var commandBuild : commandBuildings){
-                if(commandBuild != null){
-                    Drawf.square(commandBuild.x, commandBuild.y, commandBuild.hitSize() / 1.4f + 1f);
-                    var cpos = commandBuild.getCommandPosition();
+            if(flying){
+                for(var commandBuild : commandBuildings){
+                    if(commandBuild != null){
+                        Drawf.square(commandBuild.x, commandBuild.y, commandBuild.hitSize() / 1.4f + 1f);
+                        var cpos = commandBuild.getCommandPosition();
 
-                    if(cpos != null){
-                        Drawf.limitLine(commandBuild, cpos, commandBuild.hitSize() / 2f, 3.5f);
-                        Drawf.square(cpos.x, cpos.y, 3.5f);
+                        if(cpos != null){
+                            Drawf.limitLine(commandBuild, cpos, commandBuild.hitSize() / 2f, lineLimit, color.write(Tmp.c1).a(alpha));
+                            Drawf.square(cpos.x, cpos.y, 3.5f, color.write(Tmp.c1).a(alpha));
+                        }
                     }
                 }
-            }
-
-            if(commandMode && !commandRect){
-                Unit sel = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
-
-                if(sel != null && !(!multiUnitSelect() && selectedUnits.size == 1 && selectedUnits.contains(sel))){
-                    drawCommand(sel);
-                }
-            }
-
-            if(commandRect){
-                float x2 = input.mouseWorldX(), y2 = input.mouseWorldY();
-                var units = selectedCommandUnits(commandRectX, commandRectY, x2 - commandRectX, y2 - commandRectY);
-                for(var unit : units){
-                    drawCommand(unit);
-                }
-
-                Draw.color(Pal.accent, 0.3f);
-                Fill.crect(commandRectX, commandRectY, x2 - commandRectX, y2 - commandRectY);
             }
         }
 
         Draw.reset();
 
+    }
+
+    public void drawUnitSelection(){
+        if(commandRect && commandMode){
+            float x2 = input.mouseWorldX(), y2 = input.mouseWorldY();
+            var units = selectedCommandUnits(commandRectX, commandRectY, x2 - commandRectX, y2 - commandRectY);
+            for(var unit : units){
+                drawCommand(unit);
+            }
+
+            Draw.color(Pal.accent, 0.3f);
+            Fill.crect(commandRectX, commandRectY, x2 - commandRectX, y2 - commandRectY);
+        }
+
+        if(commandMode && !commandRect){
+            Unit sel = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
+
+            if(sel != null && !(!multiUnitSelect() && selectedUnits.size == 1 && selectedUnits.contains(sel))){
+                drawCommand(sel);
+            }
+        }
     }
 
     public void drawBottom(){

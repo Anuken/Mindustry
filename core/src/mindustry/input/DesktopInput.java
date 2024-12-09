@@ -132,9 +132,6 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-
-        drawCommanded();
-
         Draw.reset();
     }
 

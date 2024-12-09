@@ -144,7 +144,7 @@ public class ArcNetProvider implements NetProvider{
 
             @Override
             public void received(Connection connection, Object object){
-                if(!(connection.getArbitraryData() instanceof ArcConnection k) || !(object instanceof Packet pack)) return;
+                if(!(connection.getArbitraryData() instanceof ArcConnection k)) return;
 
                 if(packetSpamLimit > 0 && !k.packetRate.allow(3000, packetSpamLimit)){
                     Log.warn("Blacklisting IP '@' as potential DOS attack - packet spam.", k.address);
@@ -152,6 +152,8 @@ public class ArcNetProvider implements NetProvider{
                     netServer.admins.blacklistDos(k.address);
                     return;
                 }
+
+                if(!(object instanceof Packet pack)) return;
 
                 Core.app.post(() -> {
                     try{

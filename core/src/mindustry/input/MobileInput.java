@@ -391,8 +391,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == rebuildSelect){
             drawRebuildSelection(lineStartX, lineStartY, lastLineX, lastLineY);
         }
-
-        drawCommanded();
     }
 
     @Override

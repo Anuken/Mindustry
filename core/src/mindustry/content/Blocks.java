@@ -5947,7 +5947,7 @@ public class Blocks{
 
             targetable = false;
             privileged = true;
-            memoryCapacity = 128;
+            memoryCapacity = 512;
             forceDark = true;
         }};
 

@@ -50,7 +50,7 @@ public class SectorPresets{
         }};
 
         taintedWoods = new SectorPreset("taintedWoods", serpulo, 221){{
-            captureWave = 32;
+            captureWave = 33;
             difficulty = 5;
         }};
 

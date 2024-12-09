@@ -207,7 +207,7 @@ public class BeamNode extends PowerBlock{
         public void draw(){
             super.draw();
 
-            if(Mathf.zero(Renderer.laserOpacity)) return;
+            if(Mathf.zero(Renderer.laserOpacity) || team == Team.derelict) return;
 
             Draw.z(Layer.power);
             Draw.color(laserColor1, laserColor2, (1f - power.graph.getSatisfaction()) * 0.86f + Mathf.absin(3f, 0.1f));
