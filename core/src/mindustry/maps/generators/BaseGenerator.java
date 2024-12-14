@@ -209,10 +209,12 @@ public class BaseGenerator{
         int cx = x - (int)rotator.x;
         int cy = y - (int)rotator.y;
 
-        for(Stile tile : result.tiles){
-            int realX = tile.x + cx, realY = tile.y + cy;
-            if(!insanity && isTaken(tile.block, realX, realY)){
-                return false;
+        if(!insanity){
+            for(Stile tile : result.tiles){
+                int realX = tile.x + cx, realY = tile.y + cy;
+                if(isTaken(tile.block, realX, realY)){
+                    return false;
+                }
             }
         }
 
