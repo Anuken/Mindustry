@@ -413,7 +413,7 @@ public class Planet extends UnlockableContent{
         Vec3 vec = intersect(ray, radius);
         if(vec == null) return null;
         vec.sub(position).rotate(Vec3.Y, getRotation());
-        return sectors.min(t -> t.tile.v.dst2(vec));
+        return sectors.min(t -> Tmp.v31.set(t.tile.v).setLength(radius).dst2(vec));
     }
 
     /** @return the sector that is hit by this ray, or null if nothing intersects it. */
