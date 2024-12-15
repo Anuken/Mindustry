@@ -92,7 +92,7 @@ public class Planets{
         }};
 
         //TODO names
-        gier = makeAsteroid("gier", erekir, Blocks.ferricStoneWall, Blocks.carbonWall, 2, 0.4f, 7, 1f, gen -> {
+        gier = makeAsteroid("gier", erekir, Blocks.ferricStoneWall, Blocks.carbonWall, -5, 0.4f, 7, 1f, gen -> {
             gen.min = 25;
             gen.max = 35;
             gen.carbonChance = 0.6f;
@@ -100,7 +100,7 @@ public class Planets{
             gen.berylChance = 0.1f;
         });
 
-        notva = makeAsteroid("notva", sun, Blocks.ferricStoneWall, Blocks.beryllicStoneWall, 3, 0.55f, 9, 1.3f, gen -> {
+        notva = makeAsteroid("notva", sun, Blocks.ferricStoneWall, Blocks.beryllicStoneWall, -4, 0.55f, 9, 1.3f, gen -> {
             gen.berylChance = 0.8f;
             gen.iceChance = 0f;
             gen.carbonChance = 0.01f;
@@ -156,7 +156,7 @@ public class Planets{
             landCloudColor = Pal.spore.cpy().a(0.5f);
         }};
 
-        verilus = makeAsteroid("verlius", sun, Blocks.stoneWall, Blocks.iceWall, 6, 0.5f, 12, 2f, gen -> {
+        verilus = makeAsteroid("verlius", sun, Blocks.stoneWall, Blocks.iceWall, -1, 0.5f, 12, 2f, gen -> {
             gen.berylChance = 0f;
             gen.iceChance = 0.6f;
             gen.carbonChance = 0.1f;
