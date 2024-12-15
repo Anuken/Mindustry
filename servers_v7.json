@@ -339,5 +339,10 @@
   {
     "name": "LibreDUSTRY",
     "address": ["46.4.114.111"]
+  },
+  {
+    "name": "SV VN",
+    "address": ["fr2.element.staircloud.xyz:25548"]
   }
 ]
+
