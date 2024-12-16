@@ -97,6 +97,8 @@ public class ContentInfoDialog extends BaseDialog{
         content.displayExtra(table);
 
         ScrollPane pane = new ScrollPane(table);
+        table.marginRight(30f);
+        pane.setScrollingDisabled(true, false);
         cont.add(pane);
 
         if(isShown()){
