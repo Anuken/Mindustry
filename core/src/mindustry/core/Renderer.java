@@ -339,6 +339,8 @@ public class Renderer implements ApplicationListener{
             Draw.draw(Layer.effect + 0.02f, bloom::render);
         }
 
+        control.input.drawCommanded();
+
         Draw.draw(Layer.plans, overlays::drawBottom);
 
         if(animateShields && Shaders.shield != null){
@@ -548,6 +550,7 @@ public class Renderer implements ApplicationListener{
 
     public void showLaunch(CoreBuild landCore, CoreBlock coreType){
         control.input.config.hideConfig();
+        control.input.planConfig.hide();
         control.input.inv.hide();
 
         this.landCore = landCore;

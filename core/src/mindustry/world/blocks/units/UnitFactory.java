@@ -13,6 +13,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -172,6 +173,15 @@ public class UnitFactory extends UnitBlock{
         Draw.rect(topRegion, plan.drawx(), plan.drawy());
     }
 
+    @Override
+    public void getPlanConfigs(Seq<UnlockableContent> options){
+        for(var plan : plans){
+            if(!plan.unit.isBanned()){
+                options.add(plan.unit);
+            }
+        }
+    }
+
     public static class UnitPlan{
         public UnitType unit;
         public ItemStack[] requirements;
@@ -285,6 +295,8 @@ public class UnitFactory extends UnitBlock{
 
                 rebuildCommands.run();
 
+                //Since the menu gets hidden when a new unit is selected, this is unnecessary.
+                /*
                 UnitType[] lastUnit = {unit()};
 
                 commands.update(() -> {
@@ -292,7 +304,7 @@ public class UnitFactory extends UnitBlock{
                         lastUnit[0] = unit();
                         rebuildCommands.run();
                     }
-                });
+                });*/
 
                 table.row();
 

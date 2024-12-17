@@ -977,7 +977,7 @@ public class Blocks{
 
             consumeItems(with(Items.thorium, 4, Items.sand, 10));
             consumePower(5f);
-            itemCapacity = 20;
+            itemCapacity = 30;
         }};
 
         surgeSmelter = new GenericCrafter("surge-smelter"){{
@@ -4518,6 +4518,7 @@ public class Blocks{
                 }});
             }};
 
+            scaleDamageEfficiency = true;
             shootSound = Sounds.none;
             loopSoundVolume = 1f;
             loopSound = Sounds.laserbeam;
@@ -5946,7 +5947,7 @@ public class Blocks{
 
             targetable = false;
             privileged = true;
-            memoryCapacity = 128;
+            memoryCapacity = 512;
             forceDark = true;
         }};
 

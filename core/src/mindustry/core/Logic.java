@@ -131,6 +131,7 @@ public class Logic implements ApplicationListener{
                 //enable building AI on campaign unless the preset disables it
 
                 state.rules.coreIncinerates = true;
+                state.rules.allowEditWorldProcessors = false;
                 state.rules.waveTeam.rules().infiniteResources = true;
                 state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
 
@@ -394,8 +395,8 @@ public class Logic implements ApplicationListener{
     public static void researched(Content content){
         if(!(content instanceof UnlockableContent u)) return;
 
-        boolean was = u.unlockedNow();
-        state.rules.researched.add(u.name);
+        boolean was = u.unlockedNowHost();
+        state.rules.researched.add(u);
 
         if(!was){
             Events.fire(new UnlockEvent(u));

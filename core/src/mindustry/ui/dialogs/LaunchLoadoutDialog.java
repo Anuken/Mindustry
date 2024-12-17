@@ -89,7 +89,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
             total.clear();
             selected.requirements().each(total::add);
             universe.getLaunchResources().each(total::add);
-            valid = sitems.has(total);
+            valid = sitems.has(total) || PlanetDialog.debugSelect;
         };
 
         Cons<Table> rebuild = table -> {

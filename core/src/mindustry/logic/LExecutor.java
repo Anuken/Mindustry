@@ -966,8 +966,8 @@ public class LExecutor{
                 exec.textBuffer.append(strValue);
             }else{
                 //display integer version when possible
-                if(Math.abs(value.numval - (long)value.numval) < 0.00001){
-                    exec.textBuffer.append((long)value.numval);
+                if(Math.abs(value.numval - Math.round(value.numval)) < 0.00001){
+                    exec.textBuffer.append(Math.round(value.numval));
                 }else{
                     exec.textBuffer.append(value.numval);
                 }
@@ -1027,8 +1027,8 @@ public class LExecutor{
                 exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, strValue);
             }else{
                 //display integer version when possible
-                if(Math.abs(value.numval - (long)value.numval) < 0.00001){
-                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, (long)value.numval + "");
+                if(Math.abs(value.numval - Math.round(value.numval)) < 0.00001){
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, Math.round(value.numval) + "");
                 }else{
                     exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, value.numval + "");
                 }
@@ -1702,7 +1702,7 @@ public class LExecutor{
     public static void logicExplosion(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, boolean pierce, boolean effect){
         if(damage < 0f) return;
 
-        Damage.damage(team, x, y, radius, damage, pierce, air, ground);
+        Damage.damage(team, x, y, radius, damage, pierce, air, ground, true, null);
         if(effect){
             if(pierce){
                 Fx.spawnShockwave.at(x, y, World.conv(radius));
