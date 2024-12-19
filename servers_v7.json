@@ -273,10 +273,6 @@
     "address": ["mdt.xuwenblock.cn:6567","mdt.nekopark.cloud:6567"]
   },
   {
-    "name": "Atomic",
-    "address": ["atomic-de.ddns.net:35876", "atomic-de.ddns.net:35663", "atomic-de.ddns.net:35724", "atomic-de.ddns.net:35847"]
-  },
-  {
     "name": "Gadgetroch's Server",
     "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568", "mindustry.gadgetroch.com:6569"]
   },
