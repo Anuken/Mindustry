@@ -32,6 +32,16 @@ public class Stats{
         add(stat, StatValues.number((int)(value * 100), StatUnit.percent));
     }
 
+    /** Adds a multiplicative modifier stat value. Value is assumed to be in the 0-1 range. */
+    public void addMultModifier(Stat stat, float value){
+        add(stat, StatValues.multiplierModifier(value));
+    }
+
+    /** Adds an percent modifier stat value. Value is assumed to be in the 0-1 range. */
+    public void addPercentModifier(Stat stat, float value){
+        add(stat, StatValues.percentModifier(value));
+    }
+
     /** Adds a single y/n boolean value. */
     public void add(Stat stat, boolean value){
         add(stat, StatValues.bool(value));
