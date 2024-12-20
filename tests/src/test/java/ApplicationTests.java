@@ -15,6 +15,7 @@ import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.maps.*;
@@ -24,12 +25,17 @@ import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.defense.turrets.*;
+import mindustry.world.blocks.environment.Floor;
+import mindustry.world.blocks.storage.CoreBlock.*;
 import org.json.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
+import org.mockito.*;
 
 import java.io.*;
 import java.nio.*;
@@ -37,6 +43,7 @@ import java.nio.*;
 import static mindustry.Vars.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.DynamicTest.*;
+import static org.mockito.Mockito.*;
 
 public class ApplicationTests{
     static Map testMap;
@@ -268,6 +275,190 @@ public class ApplicationTests{
     }
 
     @Test
+    void runSectorCaptured(){
+        int waveCount = 0;
+        testMap = maps.loadInternalMap("nuclearComplex");
+        world.loadMap(testMap);
+        while (waveCount < 100){
+            logic.runWave();
+            boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
+            if (boss){
+                System.out.println("BOSS ROUND"); // nuclear complex round 50 eclipse boss spawns.
+                assertTrue(state.rules.waves); // there are still more waves of enemies. game not finished yet
+                int afterBoss = 0;
+                while (afterBoss < 3){
+                    if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
+                            (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
+                        Call.sectorCapture();
+                    }
+                    Groups.unit.update();
+                    afterBoss++;
+                }
+            }
+            Groups.unit.update();
+            Groups.clear();
+            waveCount++;
+        }
+        Call.sectorCapture();
+        assertFalse(state.rules.waves); // state.rules.waves now being false means sector has been captured and game is over
+    }
+
+    /** Run waves until boss wave is reached to make sure we get there. the boss wave will be run before exiting loop. */
+    @Test
+    void runBossWave(){
+        testMap = maps.loadInternalMap("nuclearComplex");
+        world.loadMap(testMap);
+        while (true)
+        {
+            logic.runWave();
+            boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
+            if (boss)
+            {
+                // Nuclear complex round 50 eclipse boss spawns.
+                assertTrue(boss, "boss wave assertion");
+                Groups.unit.update();
+                break;
+            }
+            Groups.unit.update();
+        }
+    }
+
+    /** Start wave and check if we have enemies, and we are no longer in prep phase */
+    @Test
+    void wavesActiveStateTest(){
+        world.loadMap(testMap);
+        // Increments the wave number
+        logic.runWave();
+
+        Groups.unit.update();
+        // Enemies present and spawned. No longer in prep phase. Wave has started.
+        assertFalse(Groups.unit.isEmpty(), "Enemies spawned.");
+    }
+
+    /** Checking for Wave countdown state (aka our wave timer before the wave starts) */
+    @Test
+    void waveCountdownStateTest(){
+        world.loadMap(testMap);
+        logic.runWave();
+        // Force trigger delayed spawns
+        Time.setDeltaProvider(() -> 1000f);
+        Time.update();
+        Time.update();
+        Groups.unit.update();
+        // Check if we do not have any enemies spawning, and we have a Wave Timer active
+        // WaveTimer (if true we have a wavetime aka (int)(state.wavetime/60)
+        assertFalse(Groups.unit.isEmpty() && !state.rules.waveTimer, "Wave Countdown Active.");
+    }
+
+    /** Start wave and kill player's core. */
+    @Test
+    void gameOverStateTest(){
+        world.loadMap(testMap);
+        // To make this a campaign map we need a sector - make a dummy sector
+        state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
+        state.rules.winWave = 50;
+
+        // Increments the wave number
+        logic.runWave();
+        Groups.unit.update();
+
+        // Get our player core and kill it
+        for (CoreBuild core :  state.teams.playerCores()){
+            core.kill();
+        }
+        // Need to set state to is playing to see if we are in fact dead, otherwise we are inside a menu
+        state.set(State.playing);
+        logic.update();
+
+        // If we die or loose, state.gameOver is now true
+        // Enemies present and spawned. No longer in prep phase. Wave has started.
+        assertTrue(state.gameOver, "Game Over status reached.");
+    }
+
+    /** Checks if we reach captured sector status */
+    @Test
+    void sectorCapturedStateTest(){
+        // Nuclear complex round 50 eclipse boss spawns.
+        testMap = maps.loadInternalMap("nuclearComplex");
+
+        world.loadMap(testMap);
+        // Need to add a sector to our rules, so we know this is a campaign mission
+        state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
+        state.rules.winWave = 50;
+        boolean boss = false;
+        while (!boss){
+            logic.runWave();
+            boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
+            Groups.unit.update();
+        }
+        // When killing all the enemies, the wave is over therefore we must reset for the next wave.
+        Groups.clear();
+        // Reset for next wave (since we are not naturally killing everything)
+        spawner.reset();
+        state.set(State.playing);
+        logic.update();
+        assertTrue(state.rules.sector.info.wasCaptured, "Was Captured");
+    }
+
+    /** Update fog of war and verify it is functioning or active in game */
+    @Test
+    void fogOfWarUpdateTest(){
+        state.set(State.playing);
+        testMap = maps.loadInternalMap("onset");
+        world.loadMap(testMap);
+        // Set rule to have fog of war to true
+        state.rules.fog = true;
+        // Can set it to be a specific sector, onset for example is on Erekir
+        state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
+        // Set planet to erekir which has fog of war active (needs constant static planet Erekir)
+        state.rules.planet = Planets.erekir;
+
+        // Run an update and verify our state.rules.fog = true
+        logic.update();
+        assertTrue(state.rules.fog, "Fog of war active");
+    }
+
+    /** Make building, damage building and compare health to see it went through */
+    @Test
+    void buildingDamageTest(){
+        initBuilding();
+
+        Builderc d1 = UnitTypes.poly.create(Team.sharded);
+        d1.set(10f, 20f);
+        d1.addBuild(new BuildPlan(0, 0, 0, Blocks.copperWallLarge));
+
+        Time.setDeltaProvider(() -> 3f);
+        d1.update();
+        Time.setDeltaProvider(() -> 1f);
+
+        assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
+        Time.setDeltaProvider(() -> 9999f);
+
+        // Prevents range issues
+        state.rules.infiniteResources = true;
+        d1.update();
+        assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
+
+        d1.addBuild(new BuildPlan(0, 0));
+        d1.damage(10000); //attack and destroy the building
+        d1.update();
+
+        assertEquals(Blocks.air, world.tile(0, 0).block());
+    }
+
+    @Test
+    void verifyWorldCreation(){
+        Tiles tiles = world.resize(8, 8);
+        world.beginMapLoad();
+        tiles.fill();
+        world.endMapLoad();
+
+        for(Tile tile : world.tiles){
+            assertEquals(tile.data, 0);
+        }
+    }
+
+    @Test
     void createMap(){
         Tiles tiles = world.resize(8, 8);
 
@@ -276,13 +467,18 @@ public class ApplicationTests{
         world.endMapLoad();
     }
 
+    /** Creates a map (8 by 8 tileset) and assigns a new coreShard building to coordinates 4,4. Then Verifies block is created successfully */
     @Test
     void multiblock(){
         createMap();
         int bx = 4;
         int by = 4;
+        //create a coreShard block at this tile location of cordinate (4,4)
+        //Default team for single player is automatically team sharded
         world.tile(bx, by).setBlock(Blocks.coreShard, Team.sharded, 0);
+        //check if created block we just made is created properly
         assertEquals(world.tile(bx, by).team(), Team.sharded);
+        //Runs through each coordinate starting at 4,4 to verify they are core shard
         for(int x = bx - 1; x <= bx + 1; x++){
             for(int y = by - 1; y <= by + 1; y++){
                 assertEquals(world.tile(x, y).block(), Blocks.coreShard);
@@ -291,9 +487,11 @@ public class ApplicationTests{
         }
     }
 
+    /** Gives/Removes a specific tile resources and verify the resources were properly assigned */
     @Test
     void blockInventories(){
         multiblock();
+        //grab tile of our world at coordinate 4,4
         Tile tile = world.tile(4, 4);
         tile.build.items.add(Items.coal, 5);
         tile.build.items.add(Items.titanium, 50);
@@ -301,6 +499,508 @@ public class ApplicationTests{
         tile.build.items.remove(Items.phaseFabric, 10);
         tile.build.items.remove(Items.titanium, 10);
         assertEquals(tile.build.items.total(), 45);
+    }
+
+    /** Gives/Removes a specific tile resources and verify the resources were properly assigned */
+    @Test
+    void addingEntireTileContentsTile(){
+        multiblock();
+        // Grab tile of our world at coordinate 4,4
+        Tile tile = world.tile(4, 4);
+
+        // Set up a tile 2 as well
+        Tile tile2 = world.tile(0, 0);
+        world.tile(0, 0).setBlock(Blocks.coreShard, Team.sharded, 0);
+        // Adding contents of one tile to another (our total)
+        tile2.build.items.add(Items.titanium, 50);
+
+        // Sanity check to ensure we have not created the same tile twice
+        assertNotSame(tile, tile2);
+
+        tile.build.items.add(Items.coal, 5);
+        // Add our tile2 items to tile1
+        // Adds an extra 55 (50 in one and 5 in the other) to our total (remember between both tiles its shared)
+        tile.build.items.add(tile2.build.items);
+        assertEquals(tile.build.items.total(), 110);
+    }
+
+    /** Add an item and test its ID to ensure proper assignment and Check if coal ID is properly read */
+    @Test
+    void itemModuleIDCoal(){
+        multiblock();
+        Tile tile = world.tile(1, 1);
+        world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
+        tile.build.items.add(Items.coal, 5);
+
+        assertTrue(tile.build.items.has(5), "Coal ID was found on tile");
+    }
+
+    /** Check if coal item is properly read */
+    @Test
+    void itemModuleByItemCoal(){
+        // Add an item and test if the item lookup returns true to ensure proper assignment
+        multiblock();
+        Tile tile = world.tile(1, 1);
+        world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
+        tile.build.items.add(Items.coal, 5);
+
+        assertTrue(tile.build.items.has(Items.coal), "Coal Item was found on tile");
+    }
+
+    /** Add an item and use different method of removing. Remove items by ItemStack */
+    @Test
+    void itemStackRemoveAndVerifyCheck(){
+        multiblock();
+        Tile tile = world.tile(1, 1);
+        world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
+
+        // Make a new ItemStack[], stack of 5 copper stacks each of 100
+        ItemStack[] stacks = new ItemStack[]{
+            new ItemStack(Items.copper, 100), new ItemStack(Items.copper, 100),
+            new ItemStack(Items.copper, 100), new ItemStack(Items.copper, 100),
+            new ItemStack(Items.copper, 100)
+        };
+
+        tile.build.items.add(Items.copper, 600);
+        // Remove one stack of 100, passing this as a parameter in remove
+        tile.build.items.remove(new ItemStack(Items.copper, 100));
+        // Check if we still have a stack of 500
+        assertTrue(tile.build.items.has(stacks), "Coal Item was found on tile");
+    }
+
+    /** Create a turret, load it, check that loading caps at max ammo */
+    @Test
+    void testAmmoLoadingCap(){
+        createMap();
+        state.set(State.playing);
+
+        // Create duo turret block at 0,1
+        Tile tileDuo = world.rawTile(0, 1);
+        tileDuo.setBlock(Blocks.duo, Team.sharded);
+
+        // Create copper source at 0,0
+        Tile source = world.rawTile(0,0);
+        source.setBlock(Blocks.itemSource, Team.sharded);
+        source.build.configureAny(Items.copper);
+
+        // Check that ammo is initially 0
+        assertEquals(0, ((ItemTurret.ItemTurretBuild) tileDuo.build).totalAmmo,
+            "Newly built turret ammo is not 0");
+
+        // Allow turret to load from ammo sources
+        updateBlocks(100);
+        
+        // Check ammo amount is capped at maxAmmo
+        assertEquals(((ItemTurret) tileDuo.block()).maxAmmo, ((ItemTurret.ItemTurretBuild) tileDuo.build).totalAmmo,
+            "Duo is not fully loaded");
+
+        // Allow more loading time
+        updateBlocks(100);
+
+        // Check ammo amount is still capped at maxAmmo
+        assertEquals(((ItemTurret) tileDuo.block()).maxAmmo, ((ItemTurret.ItemTurretBuild) tileDuo.build).totalAmmo,
+            "Duo ammo did not stay at cap");
+    }
+
+    /** Check that a pneumatic drill mines more items than a mechanical drill */
+    @Test
+    void testDrillTypes(){
+        createMap();
+        state.set(State.playing);
+
+        // Create sand resource tiles
+        Tile tile00 = world.rawTile(0,0);
+        Tile tile01 = world.rawTile(0,1);
+        Tile tile10 = world.rawTile(1,0);
+        Tile tile11 = world.rawTile(1,1);
+        Tile tile20 = world.rawTile(2,0);
+        Tile tile21 = world.rawTile(2,1);
+        Tile tile30 = world.rawTile(3,0);
+        Tile tile31 = world.rawTile(3,1);
+        tile00.setFloor((Floor)Blocks.sand);
+        tile01.setFloor((Floor)Blocks.sand);
+        tile10.setFloor((Floor)Blocks.sand);
+        tile11.setFloor((Floor)Blocks.sand);
+        tile20.setFloor((Floor)Blocks.sand);
+        tile21.setFloor((Floor)Blocks.sand);
+        tile30.setFloor((Floor)Blocks.sand);
+        tile31.setFloor((Floor)Blocks.sand);
+
+        // Create 2 different types of drills on top of sand resource tiles with adjacent storage containers
+        // Create mechanical drill at 0,0
+        tile00.setBlock(Blocks.mechanicalDrill, Team.sharded);
+
+        // Create pneumatic drill at 2,0
+        tile20.setBlock(Blocks.pneumaticDrill, Team.sharded);
+
+        // Create storage containers
+        Tile container1 = world.rawTile(0,2);
+        Tile container2 = world.rawTile(2,2);
+        container1.setBlock(Blocks.container, Team.sharded);
+        container2.setBlock(Blocks.container, Team.sharded);
+
+        updateBlocks(2000);
+
+        // Check that both drills are mining items
+        assertTrue(container1.build.items.has(Items.sand),"Mechanical drill did not mine any items");
+        assertTrue(container2.build.items.has(Items.sand),"Pneumatic drill did not mine any items");
+
+        // Test that pneumatic drill has mined more items than mechanical drill
+        assertTrue(container2.build.items.total() > container1.build.items.total(),
+            "Pneumatic drill did not mine more items than mechanical drill.");
+    }
+
+    /** Check that a drill with water source mines faster than a drill without water */
+    @Test
+    void testDrillWithWater(){
+        createMap();
+        state.set(State.playing);
+
+        // Create sand resource tiles
+        Tile tile00 = world.rawTile(0,0);
+        Tile tile01 = world.rawTile(0,1);
+        Tile tile10 = world.rawTile(1,0);
+        Tile tile11 = world.rawTile(1,1);
+        Tile tile20 = world.rawTile(2,0);
+        Tile tile21 = world.rawTile(2,1);
+        Tile tile30 = world.rawTile(3,0);
+        Tile tile31 = world.rawTile(3,1);
+        tile00.setFloor((Floor)Blocks.sand);
+        tile01.setFloor((Floor)Blocks.sand);
+        tile10.setFloor((Floor)Blocks.sand);
+        tile11.setFloor((Floor)Blocks.sand);
+        tile20.setFloor((Floor)Blocks.sand);
+        tile21.setFloor((Floor)Blocks.sand);
+        tile30.setFloor((Floor)Blocks.sand);
+        tile31.setFloor((Floor)Blocks.sand);
+
+        // Create 2 drills of the same type, one with a water source and one without a water source.
+        // Create mechanical drill at 0,0
+        tile00.setBlock(Blocks.mechanicalDrill, Team.sharded);
+
+        // Create mechanical drill at 2,0
+        tile20.setBlock(Blocks.mechanicalDrill, Team.sharded);
+
+        // Create storage containers
+        Tile container1 = world.rawTile(0,2);
+        Tile container2 = world.rawTile(2,2);
+        container1.setBlock(Blocks.container, Team.sharded);
+        container2.setBlock(Blocks.container, Team.sharded);
+
+        // Create water source
+        Tile waterSource = world.rawTile(4,0);
+        waterSource.setBlock(Blocks.liquidSource, Team.sharded);
+        waterSource.build.configureAny(Liquids.water);
+
+        updateBlocks(2000);
+
+        // Test that drill with water has mined more items than drill without water
+        assertTrue(container2.build.items.total() > container1.build.items.total(),
+            "Drill with water did not mine more items than drill without water.");
+    }
+
+    /** Check that a drill mines more items when placed over more resource tiles */
+    @Test
+    void testDrillOres(){
+        createMap();
+        state.set(State.playing);
+
+        // Create resource tiles
+        Tile tile00 = world.rawTile(0,0);
+        Tile tile01 = world.rawTile(0,1);
+        Tile tile10 = world.rawTile(1,0);
+        Tile tile11 = world.rawTile(1,1);
+        Tile tile20 = world.rawTile(2,0);
+        Tile tile21 = world.rawTile(2,1);
+        Tile tile30 = world.rawTile(3,0);
+        Tile tile31 = world.rawTile(3,1);
+        tile00.setFloor((Floor)Blocks.dirt);
+        tile01.setFloor((Floor)Blocks.dirt);
+        tile10.setFloor((Floor)Blocks.dirt);
+        tile11.setFloor((Floor)Blocks.dirt);
+        tile20.setFloor((Floor)Blocks.dirt);
+        tile21.setFloor((Floor)Blocks.dirt);
+        tile30.setFloor((Floor)Blocks.dirt);
+        tile31.setFloor((Floor)Blocks.dirt);
+        tile00.setOverlay(Blocks.oreCopper);
+        tile01.setOverlay(Blocks.oreCopper);
+        tile20.setOverlay(Blocks.oreCopper);
+        tile21.setOverlay(Blocks.oreCopper);
+        tile30.setOverlay(Blocks.oreCopper);
+        tile31.setOverlay(Blocks.oreCopper);
+
+        // Create 2 drills of the same type on top of different numbers of resource tiles with adjacent storage containers
+        // Create pneumatic drills
+        tile00.setBlock(Blocks.pneumaticDrill, Team.sharded);
+        tile20.setBlock(Blocks.pneumaticDrill, Team.sharded);
+
+        // Create storage containers
+        Tile container1 = world.rawTile(0,2);
+        Tile container2 = world.rawTile(2,2);
+        container1.setBlock(Blocks.container, Team.sharded);
+        container2.setBlock(Blocks.container, Team.sharded);
+
+        updateBlocks(2000);
+
+        // Test that drills successfully mined items
+        assertTrue(container1.build.items.has(Items.copper) && container2.build.items.has(Items.copper),
+            "Drill(s) did not mine any items");
+
+        // Test that drill on 4 copper tiles has mined more items than drill on 2 copper tiles
+        assertTrue(container2.build.items.total() > container1.build.items.total(),
+            "Pneumatic drill did not mine more items than mechanical drill.");
+    }
+
+    /** Check that a distributor outputs items in all 7 directions */
+    @Test
+    void testDistributor(){
+        createMap();
+        state.set(State.playing);
+
+        // Create tiles
+        Tile source = world.rawTile(3, 2);
+        Tile distributor = world.rawTile(3,3);
+        // Create 7 conveyor belts leading to 7 containers from the distributor
+        Tile belt1 = world.rawTile(2,3);
+        Tile belt2 = world.rawTile(2,4);
+        Tile belt3 = world.rawTile(3,5);
+        Tile belt4 = world.rawTile(4,5);
+        Tile belt5 = world.rawTile(5,4);
+        Tile belt6 = world.rawTile(5,3);
+        Tile belt7 = world.rawTile(4,2);
+        Tile container1 = world.rawTile(0,2);
+        Tile container2 = world.rawTile(0,4);
+        Tile container3 = world.rawTile(2,6);
+        Tile container4 = world.rawTile(4,6);
+        Tile container5 = world.rawTile(6,4);
+        Tile container6 = world.rawTile(6,2);
+        Tile container7 = world.rawTile(4,0);
+
+        // Create buildings
+        source.setBlock(Blocks.itemSource, Team.sharded);
+        source.build.configureAny(Items.coal);
+        // Create a distributor with a coal source adjacent
+        distributor.setBlock(Blocks.distributor, Team.sharded);
+        belt1.setBlock(Blocks.titaniumConveyor, Team.sharded, 2);
+        belt2.setBlock(Blocks.titaniumConveyor, Team.sharded, 2);
+        belt3.setBlock(Blocks.titaniumConveyor, Team.sharded, 1);
+        belt4.setBlock(Blocks.titaniumConveyor, Team.sharded, 1);
+        belt5.setBlock(Blocks.titaniumConveyor, Team.sharded, 0);
+        belt6.setBlock(Blocks.titaniumConveyor, Team.sharded, 0);
+        belt7.setBlock(Blocks.titaniumConveyor, Team.sharded, 3);
+        container1.setBlock(Blocks.container, Team.sharded);
+        container2.setBlock(Blocks.container, Team.sharded);
+        container3.setBlock(Blocks.container, Team.sharded);
+        container4.setBlock(Blocks.container, Team.sharded);
+        container5.setBlock(Blocks.container, Team.sharded);
+        container6.setBlock(Blocks.container, Team.sharded);
+        container7.setBlock(Blocks.container, Team.sharded);
+
+        updateBlocks(200);
+
+        assertTrue(container1.build.items.has(Items.coal) &&
+            container2.build.items.has(Items.coal) &&
+            container3.build.items.has(Items.coal) &&
+            container4.build.items.has(Items.coal) &&
+            container5.build.items.has(Items.coal) &&
+            container6.build.items.has(Items.coal) &&
+            container7.build.items.has(Items.coal),
+           "Not all containers have items.");
+    }
+
+    /** Check that an unloader moves items from one container into another */
+    @Test
+    void testUnloader(){
+        createMap();
+        state.set(State.playing);
+
+        // Create tiles and buildings
+        world.tile(0,0).setBlock(Blocks.itemSource, Team.sharded);
+        world.tile(0,0).build.configureAny(Items.copper);
+        world.tile(1,0).setBlock(Blocks.container, Team.sharded);
+        world.tile(3,0).setBlock(Blocks.unloader, Team.sharded);
+        world.tile(4,0).setBlock(Blocks.conveyor, Team.sharded, 0);
+        world.tile(5,0).setBlock(Blocks.container, Team.sharded);
+
+        updateBlocks(200);
+
+        assertTrue(world.tile(5,0).build.items.has(Items.copper),"2nd container is empty");
+    }
+
+    /** Check that an overflow gate diverts items when through-path is blocked */
+    @Test
+    void testOverflowGate(){
+        createMap();
+        state.set(State.playing);
+
+        // Create tiles and buildings
+        // Create an item source leading to a duo turret with an overflow gate in between.
+        world.tile(0,0).setBlock(Blocks.itemSource, Team.sharded);
+        world.tile(0,0).build.configureAny(Items.copper);
+        world.tile(0,1).setBlock(Blocks.titaniumConveyor, Team.sharded, 1);
+        world.tile(0,2).setBlock(Blocks.overflowGate, Team.sharded);
+        world.tile(0,3).setBlock(Blocks.titaniumConveyor, Team.sharded, 1);
+        world.tile(0,4).setBlock(Blocks.duo, Team.sharded);
+        world.tile(1,2).setBlock(Blocks.titaniumConveyor, Team.sharded, 0);
+        // Create a container to the right of the overflow gate.
+        world.tile(2,2).setBlock(Blocks.container, Team.sharded);
+
+        // Once the duo is full and the items back up, the overflow gate should route items to the container.
+        updateBlocks(20);
+        // Check 2nd container doesn't have copper yet
+        assertFalse(world.tile(2,2).build.items.has(Items.copper),"2nd container has copper prematurely");
+
+        updateBlocks(200);
+        // Check 2nd container has copper, container gets loaded.
+        assertTrue(world.tile(2,2).build.items.has(Items.copper),"2nd container is empty");
+    }
+
+    /** Now using dummy method to always get optimal flow with piping */
+    @Test
+    void liquidJunctionOutputTestability(){
+        world.loadMap(testMap);
+        state.set(State.playing);
+        state.rules.limitMapArea = false;
+
+        Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4),
+            junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
+
+        source.setBlock(Blocks.liquidSource, Team.sharded);
+        source.build.configureAny(Liquids.water);
+
+        junction.setBlock(Blocks.liquidJunction, Team.sharded);
+
+        conduit.setBlock(Blocks.conduit, Team.sharded, 1);
+
+        tank.setBlock(Blocks.liquidTank, Team.sharded);
+
+        // New tile updates
+        for(Tile tile : world.tiles){
+            if(tile.build != null && tile.isCenter()){
+                tile.build.updateProximity();
+            }
+        }
+        for(int i = 0; i < 20; i++){
+            Time.update();
+            for(Tile tile : world.tiles){
+                if(tile.build instanceof Conduit.ConduitBuild){
+                    ((Conduit.ConduitBuild) conduit.build).updateTileDummyFlow();
+                }else{
+                    if (tile.build != null && tile.isCenter()){
+                        tile.build.update();
+                    }
+                }
+            }
+        }
+
+        assertTrue(tank.build.liquids.currentAmount() >= 1, "Liquid not moved through junction");
+        assertSame(tank.build.liquids.current(), Liquids.water, "Tank has no water");
+    }
+
+
+    /** Ensure game state is properly updated and reset */
+    @Test
+    void mockVerifyLogicGameStateReset(){
+        // Make mock of logic
+        Logic oldLogic = logic;
+
+        Logic logMock = Mockito.mock(Logic.class);
+        logic = logMock;
+
+        int waveCount = 0;
+        testMap = maps.loadInternalMap("nuclearComplex");
+        world.loadMap(testMap);
+        // Trigger and surpass boss wave, so we can meet parameters of a sector capture status
+        // Any time game state is updated, it must be reset properly and that requires a reset to run
+        // Involves calling an event to clear timers, stats and other info that needs to be updated
+        while (waveCount < 100){
+            logic.runWave();
+            boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 &&
+                    group.effect == StatusEffects.boss);
+            if (boss){
+                int afterBoss = 0;
+                while (afterBoss < 3){
+                    if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >=
+                            state.rules.winWave && !spawner.isSpawning()) || (state.rules.attackMode &&
+                            state.rules.waveTeam.cores().isEmpty())){
+                        Call.sectorCapture();
+                    }
+                    Groups.unit.update();
+                    afterBoss++;
+                }
+            }
+            Groups.unit.update();
+            Groups.clear();
+            waveCount++;
+        }
+        Call.sectorCapture();
+
+        // Make sure reset to make sure game state is properly updated and reset. any time game state is updated, it
+        // Must be reset properly and that requires a reset to run. Involves calling an event to clear timers, stats and
+        // Other info that needs to be updated
+        verify(logMock, atLeast(1)).reset();
+        // Ensure we return our original logic class to avoid failures in rest of test suite
+        logic = oldLogic;
+    }
+
+    /** Testing how often certain methods are run in our logic class */
+    @Test
+    void logicMockTest(){
+        Logic oldLogic = logic;
+
+        Logic logMock = Mockito.mock(Logic.class);
+        logic = logMock;
+
+        world.loadMap(testMap);
+
+        // To make this a campaign map we need a sector - make a dummy sector
+        state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
+        state.rules.winWave = 50;
+
+        // Increments the wave number
+        logic.runWave();
+        Groups.unit.update();
+
+        // Get our player core and kill it
+        for (CoreBuild core :  state.teams.playerCores()){
+            core.kill();
+        }
+        // Need to set state to is playing to see if we are in fact dead, otherwise we are inside a menu
+        state.set(State.playing);
+        logic.update();
+
+        // Test game over state and verify how often CheckGameState is run
+        verify(logMock, atLeast(1)).update();
+
+        // Ensure logic remains for rest of test suite
+        logic = oldLogic;
+    }
+
+    /** Build turret and verify correct procedure for method calls */
+    @Test
+    void mockTurretBuildVerification(){
+        createMap();
+        state.set(State.playing);
+
+        // Create duo turret block at 0,1
+        Tile duoMock = Mockito.mock(Tile.class);
+        duoMock.constructTile(world.rawTile(0, 1));
+        duoMock.setBlock(Blocks.duo, Team.sharded);
+
+        // Create copper source at 0,0
+        // This source tile creation shouldn't impact the creation of our turret, should consistently
+        // Only require one call of setblocks for our turret
+        Tile source = world.rawTile(0,0);
+        source.setBlock(Blocks.itemSource, Team.sharded);
+        source.build.configureAny(Items.copper);
+
+        updateBlocks(100);
+
+        // Verify the duo Building uses proper setBlock for turent building
+        verify(duoMock, atLeast(1)).setBlock(Blocks.duo, Team.sharded);
+        // Verify that tile is not static we create (if static then we have to recache for renderer)
+        verify(duoMock, atLeast(0)).recache();
+        verify(duoMock, atLeast(0)).recacheWall();
     }
 
     @Test
@@ -406,7 +1106,7 @@ public class ApplicationTests{
         updateBlocks(10);
 
         assertTrue(world.tile(2, 1).build.liquids.currentAmount() >= 1);
-        assertTrue(world.tile(2, 1).build.liquids.current() == Liquids.water);
+        assertSame(world.tile(2, 1).build.liquids.current(), Liquids.water);
     }
 
     @Test
@@ -463,9 +1163,10 @@ public class ApplicationTests{
         world.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
+        //declaring a bunch of different objects/buildings/tiles/etc
         Tile source1 = world.rawTile(4, 0), source2 = world.rawTile(6, 0), s1conveyor = world.rawTile(4, 1),
         s2conveyor = world.rawTile(6, 1), s1s2conveyor = world.rawTile(5, 1), sorter = world.rawTile(5, 2),
-        leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2), sortedconveyor = world.rawTile(5, 3),
+        leftConveyor = world.rawTile(4, 2), rightConveyor = world.rawTile(6, 2), sortedConveyor = world.rawTile(5, 3),
         leftVault = world.rawTile(2, 2), rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
 
         source1.setBlock(Blocks.itemSource, Team.sharded);
@@ -477,9 +1178,9 @@ public class ApplicationTests{
         s1s2conveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
         sorter.setBlock(Blocks.sorter, Team.sharded);
         sorter.build.configureAny(Items.copper);
-        leftconveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
-        rightconveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
-        sortedconveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
+        leftConveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
+        rightConveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
+        sortedConveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
         leftVault.setBlock(Blocks.vault, Team.sharded);
         rightVault.setBlock(Blocks.vault, Team.sharded);
         topVault.setBlock(Blocks.vault, Team.sharded);
@@ -497,8 +1198,8 @@ public class ApplicationTests{
         state.set(State.playing);
         state.rules.limitMapArea = false;
         Tile source1 = world.rawTile(5, 0),  conveyor = world.rawTile(5, 1),
-        router = world.rawTile(5, 2), leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2),
-        middleconveyor = world.rawTile(5, 3), leftVault = world.rawTile(2, 2),
+        router = world.rawTile(5, 2), leftConveyor = world.rawTile(4, 2), rightConveyor = world.rawTile(6, 2),
+        middleConveyor = world.rawTile(5, 3), leftVault = world.rawTile(2, 2),
         rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
 
         source1.setBlock(Blocks.itemSource, Team.sharded);
@@ -506,9 +1207,9 @@ public class ApplicationTests{
         conveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
         router.setBlock(Blocks.router, Team.sharded);
         router.build.configureAny(Items.coal);
-        leftconveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
-        rightconveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
-        middleconveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
+        leftConveyor.setBlock(Blocks.conveyor, Team.sharded, 2);
+        rightConveyor.setBlock(Blocks.conveyor, Team.sharded, 0);
+        middleConveyor.setBlock(Blocks.conveyor, Team.sharded, 1);
         leftVault.setBlock(Blocks.vault, Team.sharded);
         rightVault.setBlock(Blocks.vault, Team.sharded);
         topVault.setBlock(Blocks.vault, Team.sharded);
@@ -953,6 +1654,7 @@ public class ApplicationTests{
         return out.toArray(DynamicTest.class);
     }
 
+    /** Create a building */
     void initBuilding(){
         createMap();
 
@@ -965,6 +1667,7 @@ public class ApplicationTests{
         assertEquals(core.build, Team.sharded.data().core());
     }
 
+    /** Test aimed at depositing item into given block. Gets run in test factories. */
     void depositTest(Block block, Item item){
         Unit unit = UnitTypes.mono.create(Team.sharded);
         Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
