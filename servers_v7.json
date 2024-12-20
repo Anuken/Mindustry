@@ -4,6 +4,10 @@
     "address": ["121.127.37.17:6567", "121.127.37.17:6568", "121.127.37.17:6569", "121.127.37.17:6570", "121.127.37.17:6571"]
   },
   {
+    "name": "AzurLine",
+    "address": ["78.47.238.87"]
+  },
+  {
     "name": "Redundancy Dept",
     "address": ["min7.include-once.org:8000", "min7.include-once.org:8001"]
   },
