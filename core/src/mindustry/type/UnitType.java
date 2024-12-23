@@ -66,6 +66,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     accel = 0.5f,
     /** size of one side of the hitbox square */
     hitSize = 6f,
+    /** shake on unit death */
+    deathShake = -1f,
     /** shake on each step for leg/mech units */
     stepShake = -1f,
     /** ripple / dust size for legged units */
