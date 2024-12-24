@@ -335,5 +335,9 @@
   {
     "name": "LibreDUSTRY",
     "address": ["46.4.114.111"]
+  },
+  {
+    "name": "Omega Network",
+    "address": ["omegahub.my.to"]
   }
 ]
