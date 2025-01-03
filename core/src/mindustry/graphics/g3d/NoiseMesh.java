@@ -14,7 +14,7 @@ public class NoiseMesh extends HexMesh{
         this.mesh = MeshBuilder.buildHex(new HexMesher(){
             @Override
             public float getHeight(Vec3 position){
-                return Simplex.noise3d(planet.id + seed, octaves, persistence, scale, 5f + position.x, 5f + position.y, 5f + position.z) * mag;
+                return Simplex.noise3d(7 + seed, octaves, persistence, scale, 5f + position.x, 5f + position.y, 5f + position.z) * mag;
             }
 
             @Override
@@ -31,12 +31,12 @@ public class NoiseMesh extends HexMesh{
         this.mesh = MeshBuilder.buildHex(new HexMesher(){
             @Override
             public float getHeight(Vec3 position){
-                return Simplex.noise3d(planet.id + seed, octaves, persistence, scale, 5f + position.x, 5f + position.y, 5f + position.z) * mag;
+                return Simplex.noise3d(7 + seed, octaves, persistence, scale, 5f + position.x, 5f + position.y, 5f + position.z) * mag;
             }
 
             @Override
             public Color getColor(Vec3 position){
-                return Simplex.noise3d(planet.id + seed + 1, coct, cper, cscl, 5f + position.x, 5f + position.y, 5f + position.z) > cthresh ? color2 : color1;
+                return Simplex.noise3d(8 + seed, coct, cper, cscl, 5f + position.x, 5f + position.y, 5f + position.z) > cthresh ? color2 : color1;
             }
         }, divisions, false, radius, 0.2f);
     }
