@@ -250,7 +250,7 @@
   },
   {
     "name": "abcxyz remaster",
-    "address": ["144.76.57.59:35051"]
+    "address": ["144.76.57.59:25978", "23.88.73.88:13612", "144.76.57.59:11999", "144.76.57.59:16491", "144.76.57.59:28740"]
   },
   {
     "name": "CroCraft Network",
@@ -273,10 +273,6 @@
     "address": ["mdt.xuwenblock.cn:6567","mdt.nekopark.cloud:6567"]
   },
   {
-    "name": "Atomic",
-    "address": ["atomic-de.ddns.net:35876", "atomic-de.ddns.net:35663", "atomic-de.ddns.net:35724", "atomic-de.ddns.net:35847"]
-  },
-  {
     "name": "Gadgetroch's Server",
     "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568", "mindustry.gadgetroch.com:6569"]
   },
@@ -294,7 +290,7 @@
   },
   {
     "name": "FrostHeaven",
-    "address": ["95.84.198.97:2357", "frost-heaven.ru", "frost-heaven.ru:6568", "frost-heaven.ru:6569", "91.200.150.116"]
+    "address": ["95.84.198.97:2357", "frost-heaven.ru", "frost-heaven.ru:6568", "frost-heaven.ru:6569", "91.200.150.116", "frost-heaven.ru:6570", "frost-heaven.ru:6571", "frost-heaven.ru:6572"]
   },
   {
     "name": "MineCore",
@@ -334,7 +330,7 @@
   },
   {
     "name": "VNM",
-    "address": ["server.mindustry-tool.app", "server.mindustry-tool.app:6568", "server.mindustry-tool.app:6569", "server.mindustry-tool.app:6760", "server.mindustry-tool.app:6761", "server.mindustry-tool.app:6762", "server.mindustry-tool.app:6763", "server.mindustry-tool.app:6764", "server.mindustry-tool.app:6765", "server.mindustry-tool.app:6766", "server.mindustry-tool.app:6767", "server.mindustry-tool.app:6768", "server.mindustry-tool.app:6769", "server.mindustry-tool.app:6770", "server.mindustry-tool.app:6771", "server.mindustry-tool.app:6772", "server.mindustry-tool.app:6773", "server.mindustry-tool.app:6774", "server.mindustry-tool.app:6775", "server.mindustry-tool.app:6776", "server.mindustry-tool.app:6777", "server.mindustry-tool.app:6778", "server.mindustry-tool.app:6779", "server.mindustry-tool.app:6780"]
+    "address": ["server.mindustry-tool.com", "server.mindustry-tool.com:6568", "server.mindustry-tool.com:6569", "server.mindustry-tool.com:6760", "server.mindustry-tool.com:6761", "server.mindustry-tool.com:6762", "server.mindustry-tool.com:6763", "server.mindustry-tool.com:6764", "server.mindustry-tool.com:6765", "server.mindustry-tool.com:6766", "server.mindustry-tool.com:6767", "server.mindustry-tool.com:6768", "server.mindustry-tool.com:6769", "server.mindustry-tool.com:6770", "server.mindustry-tool.com:6771", "server.mindustry-tool.com:6772", "server.mindustry-tool.com:6773", "server.mindustry-tool.com:6774", "server.mindustry-tool.com:6775", "server.mindustry-tool.com:6776", "server.mindustry-tool.com:6777", "server.mindustry-tool.com:6778", "server.mindustry-tool.com:6779", "server.mindustry-tool.com:6780"]
   },
   {
     "name": "LibreDUSTRY",

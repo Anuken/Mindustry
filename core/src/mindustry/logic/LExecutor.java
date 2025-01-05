@@ -1702,7 +1702,7 @@ public class LExecutor{
     public static void logicExplosion(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, boolean pierce, boolean effect){
         if(damage < 0f) return;
 
-        Damage.damage(team, x, y, radius, damage, pierce, air, ground);
+        Damage.damage(team, x, y, radius, damage, pierce, air, ground, true, null);
         if(effect){
             if(pierce){
                 Fx.spawnShockwave.at(x, y, World.conv(radius));

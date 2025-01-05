@@ -79,6 +79,8 @@ public class Turret extends ReloadTurret{
     public boolean targetAir = true;
     /** If true, this block targets ground units and structures. */
     public boolean targetGround = true;
+    /** If true, this block targets blocks. */
+    public boolean targetBlocks = true;
     /** If true, this block targets friend blocks, to heal them. */
     public boolean targetHealing = false;
     /** If true, this turret can be controlled by players. */
@@ -486,7 +488,11 @@ public class Turret extends ReloadTurret{
             if(targetAir && !targetGround){
                 return Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
             }else{
-                return Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+                var ammo = peekAmmo();
+                boolean buildings = targetGround && targetBlocks && (ammo == null || ammo.targetBlocks), missiles = ammo == null || ammo.targetMissiles;
+                return Units.bestTarget(team, x, y, range,
+                    e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround) && (missiles || !(e instanceof TimedKillc)),
+                    b -> buildings && buildingFilter.get(b), unitSort);
             }
         }
 

@@ -20,7 +20,6 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
     public int baseSeed = 0;
     public int seed = 0;
 
-    protected IntSeq ints = new IntSeq();
     protected @Nullable Sector sector;
 
     /** Should generate sector bases for a planet. */

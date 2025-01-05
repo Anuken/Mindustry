@@ -102,6 +102,10 @@ public class BulletType extends Content implements Cloneable{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
     public float statusDuration = 60 * 8f;
+    /** Turret only. If false, blocks will not be targeted. */
+    public boolean targetBlocks = true;
+    /** Turret only. If false, missiles will not be targeted. */
+    public boolean targetMissiles = true;
     /** Whether this bullet type collides with tiles. */
     public boolean collidesTiles = true;
     /** Whether this bullet type collides with tiles that are of the same team. */

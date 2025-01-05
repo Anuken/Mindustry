@@ -73,7 +73,7 @@ public class Blocks{
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //crafting - erekir
-    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, slagHeater, phaseHeater, heatRedirector, heatRouter, slagIncinerator,
+    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, slagHeater, phaseHeater, heatRedirector, smallHeatRedirector, heatRouter, slagIncinerator,
     carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
 
     //sandbox
@@ -1323,6 +1323,17 @@ public class Blocks{
 
             group = BlockGroup.heat;
             size = 3;
+            drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput(), new DrawHeatInput("-heat"));
+            regionRotated1 = 1;
+        }};
+
+        smallHeatRedirector = new HeatConductor("small-heat-redirector"){{
+            requirements(Category.crafting, with(Items.surgeAlloy, 10, Items.graphite, 10));
+
+            researchCostMultiplier = 10f;
+
+            group = BlockGroup.heat;
+            size = 2;
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput(), new DrawHeatInput("-heat"));
             regionRotated1 = 1;
         }};
@@ -4006,7 +4017,7 @@ public class Blocks{
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
                 reloadMultiplier = 1f;
-                pierceCap = 3;
+                pierceCap = 4;
                 pierce = true;
                 pierceBuilding = true;
                 hitColor = backColor = trailColor = Pal.tungstenShot;
@@ -4016,6 +4027,26 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitBulletColor;
                 rangeChange = 40f;
                 buildingDamageMultiplier = 0.3f;
+            }},
+            Items.carbide, new BasicBulletType(12f, 400f/0.75f){{
+                width = 15f;
+                height = 21f;
+                hitSize = 7f;
+                shootEffect = sfe;
+                smokeEffect = Fx.shootBigSmoke;
+                ammoMultiplier = 1;
+                reloadMultiplier = 0.67f;
+                hitColor = backColor = trailColor = Color.valueOf("ab8ec5");
+                frontColor = Color.white;
+                trailWidth = 2.2f;
+                trailLength = 11;
+                trailEffect = Fx.disperseTrail;
+                trailInterval = 2f;
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+                rangeChange = 136f;
+                buildingDamageMultiplier = 0.3f;
+                targetBlocks = false;
+                targetMissiles = false;
             }}
             );
 
@@ -5947,7 +5978,7 @@ public class Blocks{
 
             targetable = false;
             privileged = true;
-            memoryCapacity = 128;
+            memoryCapacity = 512;
             forceDark = true;
         }};
 

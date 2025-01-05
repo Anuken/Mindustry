@@ -220,7 +220,9 @@ public class ErekirTechTree{
                                         });
 
                                         node(heatRouter, () -> {
+                                            node(smallHeatRedirector, () -> {
 
+                                            });
                                         });
                                     });
                                 });
