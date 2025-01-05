@@ -433,7 +433,7 @@ public class Mods implements Loadable{
         mods.remove(mod);
         mod.dispose();
         
-        if (mod.state != ModState.disabled){
+        if(mod.state != ModState.disabled){
         requiresReload = true;
         }
         
