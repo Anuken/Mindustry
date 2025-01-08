@@ -158,7 +158,7 @@ public class Blocks{
     payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, largePayloadMassDriver, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
 
     //logic
-    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
+    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, logicDisplayTile, memoryCell, memoryBank,
     canvas, reinforcedMessage,
     worldProcessor, worldCell, worldMessage, worldSwitch,
 
@@ -6064,6 +6064,10 @@ public class Blocks{
             displaySize = 176;
 
             size = 6;
+        }};
+
+        logicDisplayTile = new TileableLogicDisplay("tile-logic-display"){{
+            requirements(Category.logic, with(Items.lead, 10, Items.silicon, 10, Items.metaglass, 10, Items.phaseFabric, 6));
         }};
 
         canvas = new CanvasBlock("canvas"){{

@@ -45,9 +45,9 @@ public class LExecutor{
     public LInstruction[] instructions = {};
     /** Non-constant variables used for network sync */
     public LVar[] vars = {};
-    
+
     public LVar counter, unit, thisv, ipt;
-    
+
     public int[] binds;
     public boolean yield;
 
@@ -226,8 +226,8 @@ public class LExecutor{
                         cache.found = false;
                         outFound.setnum(0);
                     }
-                    
-                    if(res != null && res.build != null && 
+
+                    if(res != null && res.build != null &&
                         (unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange)) || res.build.team == exec.team)){
                         cache.build = res.build;
                         outBuild.setobj(res.build);
@@ -935,11 +935,7 @@ public class LExecutor{
             if(Vars.headless) return;
 
             if(target.building() instanceof LogicDisplayBuild d && (d.team == exec.team || exec.privileged)){
-                if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
-                    for(int i = 0; i < exec.graphicsBuffer.size; i++){
-                        d.commands.addLast(exec.graphicsBuffer.items[i]);
-                    }
-                }
+                d.flushCommands(exec.graphicsBuffer);
                 exec.graphicsBuffer.clear();
             }
         }
@@ -1939,7 +1935,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             Sound sound = Sounds.getSound(id.numi());
             if(sound == null || sound == Sounds.swish) sound = Sounds.none; //no.
-            
+
             if(positional){
                 sound.at(World.unconv(x.numf()), World.unconv(y.numf()), pitch.numf(), Math.min(volume.numf(), 2f), limit.bool());
             }else{
