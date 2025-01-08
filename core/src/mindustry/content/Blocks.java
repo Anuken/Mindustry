@@ -4632,7 +4632,7 @@ public class Blocks{
             requirements(Category.turret, with(Items.silicon, 250, Items.graphite, 200, Items.oxide, 50, Items.carbide, 90));
 
             shootType = new PointLaserBulletType(){{
-                damage = 220f;
+                damage = 210f;
                 buildingDamageMultiplier = 0.3f;
                 hitColor = Color.valueOf("fda981");
             }};
@@ -4690,7 +4690,7 @@ public class Blocks{
             unitSort = UnitSorts.strongest;
 
             consumeLiquid(Liquids.nitrogen, 6f / 60f);
-            consumePower(150f / 60f);
+            consumePower(200f / 60f);
         }};
 
         scathe = new ItemTurret("scathe"){{
