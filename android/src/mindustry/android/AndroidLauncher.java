@@ -110,6 +110,7 @@ public class AndroidLauncher extends AndroidApplication{
                         Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
                         intent.addCategory(Intent.CATEGORY_OPENABLE);
                         intent.setType(extension.equals("zip") && !open && extensions.length == 1 ? "application/zip" : "*/*");
+                        intent.putExtra(Intent.EXTRA_TITLE, "export." + extension);
 
                         addResultListener(i -> startActivityForResult(intent, i), (code, in) -> {
                             if(code == Activity.RESULT_OK && in != null && in.getData() != null){

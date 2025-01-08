@@ -125,7 +125,7 @@ public class Blocks{
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
-    cliffCrusher, plasmaBore, largePlasmaBore, impactDrill, eruptionDrill,
+    cliffCrusher, largeCliffCrusher, plasmaBore, largePlasmaBore, impactDrill, eruptionDrill,
 
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
@@ -1436,7 +1436,6 @@ public class Blocks{
             }});
 
             consumeItem(Items.silicon, 3);
-            //TODO consume hydrogen/ozone?
             consumeLiquid(Liquids.slag, 40f / 60f);
             consumePower(2f);
         }};
@@ -1466,7 +1465,6 @@ public class Blocks{
             liquidCapacity = 80f;
             outputLiquid = new LiquidStack(Liquids.cyanogen, 3f / 60f);
 
-            //consumeLiquids(LiquidStack.with(Liquids.hydrogen, 3f / 60f, Liquids.nitrogen, 2f / 60f));
             consumeLiquid(Liquids.arkycite, 40f / 60f);
             consumeItem(Items.graphite);
             consumePower(2f);
@@ -2804,6 +2802,28 @@ public class Blocks{
             ambientSoundVolume = 0.04f;
         }};
 
+        largeCliffCrusher = new WallCrafter("large-cliff-crusher"){{
+            requirements(Category.production, with(Items.silicon, 80, Items.surgeAlloy, 60, Items.beryllium, 100, Items.tungsten, 50));
+            consumePower(30 / 60f);
+
+            drillTime = 50f;
+            size = 3;
+            attribute = Attribute.sand;
+            output = Items.sand;
+            fogRadius = 3;
+            ambientSound = Sounds.drill;
+            ambientSoundVolume = 0.05f;
+
+            consumeLiquid(Liquids.ozone, 1f / 60f);
+
+            itemConsumer = consumeItem(Items.tungsten).boost();
+            itemCapacity = 20;
+            boostItemUseTime = 60f * 10f;
+
+            //alternatively, boost using nitrogen:
+            //consumeLiquid(Liquids.nitrogen, 3f / 60f).boost();
+        }};
+
         plasmaBore = new BeamDrill("plasma-bore"){{
             requirements(Category.production, with(Items.beryllium, 40));
             consumePower(0.15f);
@@ -2818,7 +2838,6 @@ public class Blocks{
             consumeLiquid(Liquids.hydrogen, 0.25f / 60f).boost();
         }};
 
-        //TODO awful name
         largePlasmaBore = new BeamDrill("large-plasma-bore"){{
             requirements(Category.production, with(Items.silicon, 100, Items.oxide, 25, Items.beryllium, 100, Items.tungsten, 70));
             consumePower(0.8f);
@@ -4035,7 +4054,7 @@ public class Blocks{
                 shootEffect = sfe;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
-                reloadMultiplier = 0.67f;
+                reloadMultiplier = 0.7f;
                 hitColor = backColor = trailColor = Color.valueOf("ab8ec5");
                 frontColor = Color.white;
                 trailWidth = 2.2f;
@@ -4047,6 +4066,7 @@ public class Blocks{
                 buildingDamageMultiplier = 0.3f;
                 targetBlocks = false;
                 targetMissiles = false;
+                trailRotation = true;
             }}
             );
 
@@ -4089,6 +4109,37 @@ public class Blocks{
                 frontColor = Pal.redLight;
                 trailWidth = 6f;
                 trailLength = 3;
+                hitEffect = despawnEffect = Fx.hitSquaresColor;
+                buildingDamageMultiplier = 0.2f;
+            }},
+            Items.oxide, new BasicBulletType(8f, 90){{
+                knockback = 3f;
+                width = 25f;
+                hitSize = 7f;
+                height = 20f;
+                shootEffect = Fx.shootBigColor;
+                smokeEffect = Fx.shootSmokeSquareSparse;
+                ammoMultiplier = 2;
+                hitColor = backColor = trailColor = Color.valueOf("a0b380");
+                frontColor = Color.valueOf("e4ffd6");
+                trailWidth = 6f;
+                trailLength = 3;
+                hitEffect = despawnEffect = Fx.hitSquaresColor;
+                buildingDamageMultiplier = 0.2f;
+            }},
+            Items.silicon, new BasicBulletType(8f, 33){{
+                knockback = 2f;
+                width = 25f;
+                hitSize = 7f;
+                height = 20f;
+                homingPower = 0.045f;
+                shootEffect = Fx.shootBigColor;
+                smokeEffect = Fx.shootSmokeSquareSparse;
+                ammoMultiplier = 1;
+                hitColor = backColor = trailColor = Color.valueOf("858a9b");
+                frontColor = Color.valueOf("dae1ee");
+                trailWidth = 6f;
+                trailLength = 6;
                 hitEffect = despawnEffect = Fx.hitSquaresColor;
                 buildingDamageMultiplier = 0.2f;
             }}
@@ -4182,7 +4233,6 @@ public class Blocks{
             shootSound = Sounds.none;
             loopSoundVolume = 1f;
 
-            //TODO balance, set up, where is liquid/sec displayed? status effects maybe?
             ammo(
             Liquids.ozone, new ContinuousFlameBulletType(){{
                 damage = 60f;
@@ -4219,7 +4269,7 @@ public class Blocks{
             requirements(Category.turret, with(Items.tungsten, 250, Items.silicon, 300, Items.thorium, 400));
 
             ammo(
-            //TODO 1 more ammo type, decide on base type
+            //TODO another ammo type
             Items.thorium, new ArtilleryBulletType(2.5f, 350, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                 despawnEffect = Fx.none;
@@ -4251,6 +4301,76 @@ public class Blocks{
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.3f;
+            }},
+            Items.carbide, new ArtilleryBulletType(2.5f, 500, "shell"){{
+                hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
+                despawnEffect = Fx.none;
+                knockback = 3f;
+                lifetime = 140f;
+                height = 19f;
+                width = 17f;
+                splashDamageRadius = 55f;
+                splashDamage = 650f;
+                rangeChange = 10f*8f;
+                scaledSplashDamage = true;
+                backColor = hitColor = trailColor = Color.valueOf("ab8ec5");
+                frontColor = Color.white;
+                ammoMultiplier = 1f;
+                hitSound = Sounds.titanExplosion;
+
+                status = StatusEffects.blasted;
+
+                trailLength = 32;
+                trailWidth = 3.35f;
+                trailSinScl = 2.5f;
+                trailSinMag = 0.5f;
+                trailEffect = Fx.disperseTrail;
+                trailInterval = 2f;
+                despawnShake = 7f;
+
+                shootEffect = Fx.shootTitan;
+                smokeEffect = Fx.shootSmokeTitan;
+                trailRotation = true;
+
+                trailInterp = v -> Math.max(Mathf.slope(v), 0.8f);
+                shrinkX = 0.2f;
+                shrinkY = 0.1f;
+                buildingDamageMultiplier = 0.3f;
+            }},
+            Items.oxide, new ArtilleryBulletType(2.5f, 300, "shell"){{
+                hitEffect = new MultiEffect(Fx.titanExplosionLarge, Fx.titanSmokeLarge);
+                despawnEffect = Fx.none;
+                knockback = 2f;
+                lifetime = 190f;
+                height = 19f;
+                width = 17f;
+                reloadMultiplier = 0.8f;
+                splashDamageRadius = 110f;
+                rangeChange = 8f;
+                splashDamage = 300f;
+                scaledSplashDamage = true;
+                hitColor = backColor = trailColor = Color.valueOf("a0b380");
+                frontColor = Color.valueOf("e4ffd6");
+                ammoMultiplier = 1f;
+                hitSound = Sounds.titanExplosion;
+
+                status = StatusEffects.blasted;
+
+                trailLength = 32;
+                trailWidth = 3.35f;
+                trailSinScl = 2.5f;
+                trailSinMag = 0.5f;
+                trailEffect = Fx.vapor;
+                trailInterval = 3f;
+                despawnShake = 7f;
+
+                shootEffect = Fx.shootTitan;
+                smokeEffect = Fx.shootSmokeTitan;
+
+                trailInterp = v -> Math.max(Mathf.slope(v), 0.8f);
+                shrinkX = 0.2f;
+                shrinkY = 0.1f;
+                buildingDamageMultiplier = 0.25f;
             }}
             );
 
@@ -4567,7 +4687,6 @@ public class Blocks{
             range = 250f;
             scaledHealth = 210;
 
-            //TODO is this a good idea to begin with?
             unitSort = UnitSorts.strongest;
 
             consumeLiquid(Liquids.nitrogen, 6f / 60f);

@@ -28,7 +28,7 @@ public class Fx{
     public static final Effect
 
     none = new Effect(0, 0f, e -> {}),
-    
+
     blockCrash = new Effect(90f, e -> {
         if(!(e.data instanceof Block block)) return;
 
@@ -445,6 +445,20 @@ public class Fx{
         }
     }),
 
+    titanExplosionLarge = new Effect(45f, 220f, e -> {
+        color(e.color);
+        stroke(e.fout() * 3f);
+        float circleRad = 6f + e.finpow() * 110f;
+        Lines.circle(e.x, e.y, circleRad);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 21; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 50f * rand.random(1f, 0.6f) + 2f, e.finpow() * 100f * lenRand + 6f);
+        }
+    }),
+
     titanSmoke = new Effect(300f, 300f, b -> {
         float intensity = 3f;
 
@@ -455,6 +469,26 @@ public class Fx{
             int fi = i;
             b.scaled(b.lifetime * lenScl, e -> {
                 randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 22f * intensity, (x, y, in, out) -> {
+                    float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                    float rad = fout * ((2f + intensity) * 2.35f);
+
+                    Fill.circle(e.x + x, e.y + y, rad);
+                    Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
+                });
+            });
+        }
+    }),
+
+    titanSmokeLarge = new Effect(400f, 400f, b -> {
+        float intensity = 4f;
+
+        color(b.color, 0.65f);
+        for(int i = 0; i < 4; i++){
+            rand.setSeed(b.id*2 + i);
+            float lenScl = rand.random(0.5f, 1f);
+            int fi = i;
+            b.scaled(b.lifetime * lenScl, e -> {
+                randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 26f * intensity, (x, y, in, out) -> {
                     float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
                     float rad = fout * ((2f + intensity) * 2.35f);
 
@@ -761,7 +795,7 @@ public class Fx{
             Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
         });
     }),
-    
+
     hitLaserBlast = new Effect(12, e -> {
         color(e.color);
         stroke(e.fout() * 1.5f);
@@ -1114,7 +1148,7 @@ public class Fx{
         stroke(2f * e.fout());
         Lines.circle(e.x, e.y, 5f * e.fout());
     }),
-    
+
     forceShrink = new Effect(20, e -> {
         color(e.color, e.fout());
         if(renderer.animateShields){
