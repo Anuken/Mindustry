@@ -239,6 +239,8 @@ public class Turret extends ReloadTurret{
         public float heatReq;
         public float[] sideHeat = new float[4];
 
+        float lastRangeChange;
+
         @Override
         public float estimateDps(){
             if(!hasAmmo()) return 0f;
@@ -314,6 +316,11 @@ public class Turret extends ReloadTurret{
                 case progress -> progress();
                 default -> super.sense(sensor);
             };
+        }
+
+        @Override
+        public float fogRadius(){
+            return (range + (hasAmmo() ? peekAmmo().rangeChange : 0f)) / tilesize * fogRadiusMultiplier;
         }
 
         @Override
@@ -414,6 +421,14 @@ public class Turret extends ReloadTurret{
 
             //turret always reloads regardless of whether it's targeting something
             updateReload();
+
+            if(state.rules.fog){
+                float newRange = hasAmmo() ? peekAmmo().rangeChange : 0f;
+                if(newRange != lastRangeChange){
+                    lastRangeChange = newRange;
+                    fogControl.forceUpdate(team, this);
+                }
+            }
 
             if(hasAmmo()){
                 if(Float.isNaN(reloadCounter)) reloadCounter = 0;
