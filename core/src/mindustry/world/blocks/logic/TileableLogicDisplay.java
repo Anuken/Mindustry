@@ -1,8 +1,10 @@
 package mindustry.world.blocks.logic;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -14,6 +16,9 @@ public class TileableLogicDisplay extends LogicDisplay{
     protected static final Seq<TileableLogicDisplayBuild> queue = new Seq<>();
     protected static final Seq<TileableLogicDisplayBuild> displays = new Seq<>();
     protected static final IntSet processed = new IntSet();
+
+    //in tiles
+    public int maxDisplayDimensions = 12;
 
     public TileableLogicDisplay(String name){
         super(name);
@@ -80,6 +85,15 @@ public class TileableLogicDisplay extends LogicDisplay{
         public int tilesWidth = 1, tilesHeight = 1, originX, originY;
 
         @Override
+        public void display(Table table){
+            super.display(table);
+
+            if(tilesWidth > maxDisplayDimensions || tilesHeight > maxDisplayDimensions){
+                table.row().add(Core.bundle.format("bar.displaytoolarge", maxDisplayDimensions, maxDisplayDimensions)).color(Color.scarlet).growX().wrap();
+            }
+        }
+
+        @Override
         public void draw(){
             Draw.rect(block.region, x, y);
 
@@ -88,9 +102,8 @@ public class TileableLogicDisplay extends LogicDisplay{
 
             if(isRoot()){
                 Draw.draw(Draw.z(), () -> {
-                    if(buffer == null){
+                    if(buffer == null && tilesWidth <= maxDisplayDimensions && tilesHeight <= maxDisplayDimensions){
                         buffer = new FrameBuffer(32 * tilesWidth, 32 * tilesHeight);
-                        Log.info("create " + buffer.getWidth() + " " + buffer.getHeight());
                         //clear the buffer - some OSs leave garbage in it
                         buffer.begin(Pal.darkerMetal);
                         buffer.end();
