@@ -2803,10 +2803,10 @@ public class Blocks{
         }};
 
         largeCliffCrusher = new WallCrafter("large-cliff-crusher"){{
-            requirements(Category.production, with(Items.silicon, 80, Items.surgeAlloy, 60, Items.beryllium, 100, Items.tungsten, 50));
+            requirements(Category.production, with(Items.silicon, 80, Items.surgeAlloy, 15, Items.beryllium, 100, Items.tungsten, 50));
             consumePower(30 / 60f);
 
-            drillTime = 50f;
+            drillTime = 48f;
             size = 3;
             attribute = Attribute.sand;
             output = Items.sand;
@@ -4047,14 +4047,14 @@ public class Blocks{
                 rangeChange = 40f;
                 buildingDamageMultiplier = 0.3f;
             }},
-            Items.carbide, new BasicBulletType(12f, 400f/0.75f){{
+            Items.carbide, new BasicBulletType(12f, 450f/0.75f){{
                 width = 15f;
                 height = 21f;
                 hitSize = 7f;
                 shootEffect = sfe;
                 smokeEffect = Fx.shootBigSmoke;
-                ammoMultiplier = 1;
-                reloadMultiplier = 0.7f;
+                ammoMultiplier = 2;
+                reloadMultiplier = 0.5f;
                 hitColor = backColor = trailColor = Color.valueOf("ab8ec5");
                 frontColor = Color.white;
                 trailWidth = 2.2f;
@@ -4062,7 +4062,7 @@ public class Blocks{
                 trailEffect = Fx.disperseTrail;
                 trailInterval = 2f;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
-                rangeChange = 136f;
+                rangeChange = 20f*8f;
                 buildingDamageMultiplier = 0.3f;
                 targetBlocks = false;
                 targetMissiles = false;
@@ -4632,7 +4632,7 @@ public class Blocks{
             requirements(Category.turret, with(Items.silicon, 250, Items.graphite, 200, Items.oxide, 50, Items.carbide, 90));
 
             shootType = new PointLaserBulletType(){{
-                damage = 200f;
+                damage = 220f;
                 buildingDamageMultiplier = 0.3f;
                 hitColor = Color.valueOf("fda981");
             }};
@@ -4690,6 +4690,7 @@ public class Blocks{
             unitSort = UnitSorts.strongest;
 
             consumeLiquid(Liquids.nitrogen, 6f / 60f);
+            consumePower(150f / 60f);
         }};
 
         scathe = new ItemTurret("scathe"){{
