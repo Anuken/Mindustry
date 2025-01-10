@@ -13,7 +13,7 @@ public class DrawSoftParticles extends DrawBlock{
     public TextureRegion region;
 
     public Color color = Color.valueOf("e3ae6f"), color2 = Color.valueOf("d04d46");
-
+    public float x = 0, y = 0;
     public float alpha = 0.5f;
     public int particles = 30;
     public float particleLife = 70f, particleRad = 7f, particleSize = 3f, fadeMargin = 0.4f, rotateScl = 1.5f;
@@ -43,8 +43,8 @@ public class DrawSoftParticles extends DrawBlock{
                 float r = particleSize * fin * build.warmup()*2f;
                 Draw.rect(
                     region,
-                    build.x + Angles.trnsx(angle, len),
-                    build.y + Angles.trnsy(angle, len),
+                    build.x + x + Angles.trnsx(angle, len),
+                    build.y + y + Angles.trnsy(angle, len),
                     r, r
                 );
             }
