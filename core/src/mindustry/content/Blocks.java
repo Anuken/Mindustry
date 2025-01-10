@@ -4070,7 +4070,7 @@ public class Blocks{
             }}
             );
 
-            coolantMultiplier = 6f;
+            coolantMultiplier = 15f;
             shootSound = Sounds.shootAlt;
 
             targetUnderBlocks = false;
@@ -4147,7 +4147,7 @@ public class Blocks{
 
             shoot = new ShootSpread(15, 4f);
 
-            coolantMultiplier = 6f;
+            coolantMultiplier = 15f;
 
             inaccuracy = 0.2f;
             velocityRnd = 0.17f;
@@ -4390,7 +4390,7 @@ public class Blocks{
             warmupMaintainTime = 120f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
-            coolantMultiplier = 1.5f;
+            coolantMultiplier = 3.75f;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.addAll(
@@ -4501,7 +4501,7 @@ public class Blocks{
             size = 4;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 20f / 60f));
-            coolantMultiplier = 2.5f;
+            coolantMultiplier = 6.25f;
 
             limitRange(5f);
         }};
@@ -4829,7 +4829,7 @@ public class Blocks{
             recoil = 0.5f;
 
             fogRadiusMultiplier = 0.4f;
-            coolantMultiplier = 6f;
+            coolantMultiplier = 15f;
             shootSound = Sounds.missileLaunch;
 
             minWarmup = 0.94f;
@@ -4933,7 +4933,7 @@ public class Blocks{
 
             shootSound = Sounds.shootSmite;
             minWarmup = 0.99f;
-            coolantMultiplier = 6f;
+            coolantMultiplier = 15f;
 
             var haloProgress = PartProgress.warmup.delay(0.5f);
             float haloY = -15f, haloRotSpeed = 1f;
