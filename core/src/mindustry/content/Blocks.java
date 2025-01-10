@@ -2812,7 +2812,7 @@ public class Blocks{
             output = Items.sand;
             fogRadius = 3;
             ambientSound = Sounds.drill;
-            ambientSoundVolume = 0.05f;
+            ambientSoundVolume = 0.08f;
 
             consumeLiquid(Liquids.ozone, 1f / 60f);
 

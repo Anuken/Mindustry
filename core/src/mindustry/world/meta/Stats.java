@@ -73,6 +73,12 @@ public class Stats{
         add(stat, StatValues.string(format, args));
     }
 
+    /** Replaces a stat, removing the old value if it exists. */
+    public void replace(Stat stat, StatValue value){
+        remove(stat);
+        add(stat, value);
+    }
+
     /** Adds a stat value. */
     public void add(Stat stat, StatValue value){
         if(map == null) map = new OrderedMap<>();
