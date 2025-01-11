@@ -4426,7 +4426,8 @@ public class Blocks{
         disperse = new ItemTurret("disperse"){{
             requirements(Category.turret, with(Items.thorium, 50, Items.oxide, 150, Items.silicon, 200, Items.beryllium, 350));
 
-            ammo(Items.tungsten, new BasicBulletType(){{
+            ammo(
+            Items.tungsten, new BasicBulletType(){{
                 damage = 65;
                 speed = 8.5f;
                 width = height = 16;
@@ -4447,6 +4448,58 @@ public class Blocks{
                 rotationOffset = 90f;
                 trailRotation = true;
                 trailEffect = Fx.disperseTrail;
+
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+            }},
+            Items.thorium, new BasicBulletType(){{
+                damage = 90;
+                reloadMultiplier = 0.85f;
+                speed = 9.5f;
+                width = height = 16;
+                shrinkY = 0.3f;
+                backSprite = "large-bomb-back";
+                sprite = "mine-bullet";
+                velocityRnd = 0.5f;
+                collidesGround = false;
+                collidesTiles = false;
+                shootEffect = Fx.shootBig2;
+                smokeEffect = Fx.shootSmokeDisperse;
+                frontColor = Color.white;
+                backColor = trailColor = hitColor = Color.valueOf("e89dbd");
+                trailChance = 0.44f;
+                ammoMultiplier = 2f;
+
+                lifetime = 34f;
+                rotationOffset = 90f;
+                trailRotation = true;
+                trailEffect = Fx.disperseTrail;
+
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+            }},
+            Items.silicon, new BasicBulletType(){{
+                damage = 35;
+                homingPower = 0.03f;
+
+                reloadMultiplier = 0.9f;
+                speed = 8.5f;
+                width = height = 16;
+                shrinkY = 0.3f;
+                backSprite = "large-bomb-back";
+                sprite = "mine-bullet";
+                velocityRnd = 0.11f;
+                collidesGround = false;
+                collidesTiles = false;
+                shootEffect = Fx.shootBig2;
+                smokeEffect = Fx.shootSmokeDisperse;
+                frontColor = Color.valueOf("dae1ee");
+                backColor = trailColor = hitColor = Color.valueOf("858a9b");
+                ammoMultiplier = 3f;
+
+                lifetime = 34f;
+                rotationOffset = 90f;
+                trailLength = 7;
+                //for chasing targets
+                extraRangeMargin = 32f;
 
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }});
@@ -4503,7 +4556,7 @@ public class Blocks{
             coolant = consume(new ConsumeLiquid(Liquids.water, 20f / 60f));
             coolantMultiplier = 6.25f;
 
-            limitRange(5f);
+            limitRange(16f);
         }};
 
         afflict = new PowerTurret("afflict"){{

@@ -141,6 +141,8 @@ public class BulletType extends Content implements Cloneable{
     public float rangeOverride = -1f;
     /** When used in a turret with multiple ammo types, this can be set to a non-zero value to influence range. */
     public float rangeChange = 0f;
+    /** When used in turrets with limitRange() applied, this adds extra range to the bullets that extends past targeting range. Only particularly relevant in vanilla. */
+    public float extraRangeMargin = 0f;
     /** Range initialized in init(). */
     public float range = 0f;
     /** % of block health healed **/
