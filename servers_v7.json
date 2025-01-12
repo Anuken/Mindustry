@@ -310,5 +310,11 @@
       "server.mindustry-tool.com",
       "server.mindustry-tool.com:6568"
     ]
+  },
+  {
+    "name": "Korea",
+    "address": [
+      "mindustry.kr"
+    ]
   }
 ]
