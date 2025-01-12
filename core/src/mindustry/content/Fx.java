@@ -519,6 +519,26 @@ public class Fx{
         }
     }).layer(Layer.bullet - 1f),
 
+    missileTrailSmokeSmall = new Effect(120f, 200f, b -> {
+        float intensity = 1.3f;
+
+        color(b.color, 0.7f);
+        for(int i = 0; i < 3; i++){
+            rand.setSeed(b.id*2 + i);
+            float lenScl = rand.random(0.5f, 1f);
+            int fi = i;
+            b.scaled(b.lifetime * lenScl, e -> {
+                randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 13f * intensity, (x, y, in, out) -> {
+                    float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                    float rad = fout * ((2f + intensity) * 2.35f);
+
+                    Fill.circle(e.x + x, e.y + y, rad);
+                    Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
+                });
+            });
+        }
+    }).layer(Layer.bullet - 1f),
+
     neoplasmSplat = new Effect(400f, 300f, b -> {
         float intensity = 3f;
 
@@ -557,8 +577,33 @@ public class Fx{
         }
     }),
 
+    scatheExplosionSmall = new Effect(40f, 160f, e -> {
+        color(e.color);
+        stroke(e.fout() * 4f);
+        float circleRad = 6f + e.finpow() * 40f;
+        Lines.circle(e.x, e.y, circleRad);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 16; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            Tmp.v1.trns(angle, circleRad);
+
+            for(int s : Mathf.signs){
+                Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.foutpow() * 30f, e.fout() * 25f * lenRand + 6f, angle + 90f + s * 90f);
+            }
+        }
+    }),
+
     scatheLight = new Effect(60f, 160f, e -> {
         float circleRad = 6f + e.finpow() * 60f;
+
+        color(e.color, e.foutpow());
+        Fill.circle(e.x, e.y, circleRad);
+    }).layer(Layer.bullet + 2f),
+
+    scatheLightSmall = new Effect(60f, 160f, e -> {
+        float circleRad = 6f + e.finpow() * 40f;
 
         color(e.color, e.foutpow());
         Fill.circle(e.x, e.y, circleRad);
@@ -1727,6 +1772,18 @@ public class Fx{
 
     shootSmokeMissile = new Effect(130f, 300f, e -> {
         color(Pal.redLight);
+        alpha(0.5f);
+        rand.setSeed(e.id);
+        for(int i = 0; i < 35; i++){
+            v.trns(e.rotation + 180f + rand.range(21f), rand.random(e.finpow() * 90f)).add(rand.range(3f), rand.range(3f));
+            e.scaled(e.lifetime * rand.random(0.2f, 1f), b -> {
+                Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 9f + 0.3f);
+            });
+        }
+    }),
+
+    shootSmokeMissileColor = new Effect(130f, 300f, e -> {
+        color(e.color);
         alpha(0.5f);
         rand.setSeed(e.id);
         for(int i = 0; i < 35; i++){

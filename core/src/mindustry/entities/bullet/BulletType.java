@@ -527,7 +527,7 @@ public class BulletType extends Content implements Cloneable{
         if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && !(b.frags >= pierceFragCap && pierceFragCap > 0)){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(fragOffsetMin, fragOffsetMax);
-                float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
+                float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + fragSpread * i - (fragBullets - 1) * fragSpread / 2f;
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
             b.frags++;
@@ -819,7 +819,7 @@ public class BulletType extends Content implements Cloneable{
 
         Bullet bullet = Bullet.create();
         bullet.type = this;
-        bullet.owner = owner;
+        bullet.owner = shooter == null ? owner : shooter;
         bullet.team = team;
         bullet.time = 0f;
         bullet.originX = x;
