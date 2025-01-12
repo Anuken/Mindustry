@@ -49,6 +49,12 @@ public class HeatConductor extends Block{
         return drawer.finalIcons(this);
     }
 
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+        drawer.createIcons(this, packer);
+    }
+
     public class HeatConductorBuild extends Building implements HeatBlock, HeatConsumer{
         public float heat = 0f;
         public float[] sideHeat = new float[4];
