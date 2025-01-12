@@ -359,6 +359,7 @@ public class Renderer implements ApplicationListener{
         float scaleFactor = 4f / renderer.getDisplayScale();
 
         //draw objective markers
+        Tmp.m2.set(Draw.trans());
         state.rules.objectives.eachRunning(obj -> {
             for(var marker : obj.markers){
                 if(marker.world){
@@ -372,7 +373,7 @@ public class Renderer implements ApplicationListener{
                 marker.draw(marker.autoscale ? scaleFactor : 1);
             }
         }
-
+        Draw.trans(Tmp.m2);
         Draw.reset();
 
         Draw.draw(Layer.overlayUI, overlays::drawTop);
