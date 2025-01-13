@@ -359,8 +359,8 @@ public class Turret extends ReloadTurret{
                 offset.set(h.deltaX(), h.deltaY()).scl(shoot.firstShotDelay / Time.delta);
             }
 
-            if(predictTarget){
-                targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
+            if(predictTarget && bullet.speed >= 0.01f){
+                targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed));
             }else{
                 targetPos.set(pos);
             }

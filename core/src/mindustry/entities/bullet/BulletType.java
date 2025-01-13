@@ -754,15 +754,15 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public @Nullable Bullet create(Bullet parent, float x, float y, float angle){
-        return create(parent.owner, parent.team, x, y, angle);
+        return create(parent.owner, parent.shooter, parent.team, x, y, angle, -1, 1f, 1f, null, null, -1f, -1f);
     }
 
     public @Nullable Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
-        return create(parent.owner, parent.team, x, y, angle, velocityScl, lifeScale);
+        return create(parent.owner, parent.shooter, parent.team, x, y, angle, -1, velocityScl, lifeScale, null, null, -1f, -1f);
     }
 
     public @Nullable Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
-        return create(parent.owner(), parent.team, x, y, angle, velocityScl);
+        return create(parent.owner, parent.shooter, parent.team, x, y, angle, -1, velocityScl, 1f, null, null, -1f, -1f);
     }
 
     public @Nullable Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
@@ -819,7 +819,8 @@ public class BulletType extends Content implements Cloneable{
 
         Bullet bullet = Bullet.create();
         bullet.type = this;
-        bullet.owner = shooter == null ? owner : shooter;
+        bullet.owner = owner;
+        bullet.shooter = (shooter == null ? owner : shooter);
         bullet.team = team;
         bullet.time = 0f;
         bullet.originX = x;

@@ -4749,8 +4749,10 @@ public class Blocks{
         scathe = new ItemTurret("scathe"){{
             requirements(Category.turret, with(Items.silicon, 450, Items.graphite, 400, Items.tungsten, 500, Items.oxide, 100, Items.carbide, 200));
 
+            predictTarget = false;
+
             ammo(
-            Items.carbide, new BulletType(){{
+            Items.carbide, new BulletType(0f, 0f){{
                 shootEffect = Fx.shootBig;
                 smokeEffect = Fx.shootSmokeMissileColor;
                 hitColor = Pal.redLight;
@@ -4837,7 +4839,7 @@ public class Blocks{
             }},
 
             //TODO - needs balancing
-            Items.phaseFabric, new BulletType(){{
+            Items.phaseFabric, new BulletType(0f, 0f){{
                 shootEffect = Fx.shootBig;
                 smokeEffect = Fx.shootSmokeMissileColor;
                 hitColor = Color.valueOf("ffd37f");
@@ -4927,7 +4929,7 @@ public class Blocks{
                 }};
             }},
 
-            Items.surgeAlloy, new BulletType(){{
+            Items.surgeAlloy, new BulletType(0f, 0f){{
                 shootEffect = Fx.shootBig;
                 smokeEffect = Fx.shootSmokeMissileColor;
                 hitColor = Color.valueOf("f7e97e");
