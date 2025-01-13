@@ -96,12 +96,8 @@
     ]
   },
   {
-    "name": "Extra Utilities",
-    "address": ["9k38.igla.pics:6567", "203.135.99.51:15142", "203.135.99.51:15143"]
-  },
-  {
-    "name": "WaterDrop",
-    "address": ["igla.pics:46567", "9k310.igla.pics:33456"]
+    "name": "homecloud",
+    "address": ["9k38.igla.pics:6567", "igla.pics:46567", "9k310.igla.pics:33456"]
   },
   {
     "name": "io",
