@@ -11,6 +11,11 @@ public class MissileAI extends AIController{
     public @Nullable Unit shooter;
 
     @Override
+    protected void resetTimers(){
+        timer.reset(timerTarget, Mathf.random(3f));
+    }
+
+    @Override
     public void updateMovement(){
         unloadPayloads();
 
@@ -33,7 +38,7 @@ public class MissileAI extends AIController{
 
     @Override
     public Teamc target(float x, float y, float range, boolean air, boolean ground){
-        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground && (!t.block.underBullets || (shooter != null && t == Vars.world.buildWorld(shooter.aimX, shooter.aimY))));
+        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground) && !u.isMissile(), t -> ground && (!t.block.underBullets || (shooter != null && t == Vars.world.buildWorld(shooter.aimX, shooter.aimY))));
     }
 
     @Override
