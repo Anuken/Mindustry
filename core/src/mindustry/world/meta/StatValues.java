@@ -619,7 +619,7 @@ public class StatValues{
                     }
 
                     if(type.maxDamageFraction > 0){
-                        sep(bt, Core.bundle.format("bullet.maxdamagefraction", (int)(type.maxDamageFraction * 100))); 
+                        sep(bt, Core.bundle.format("bullet.maxdamagefraction", (int)(type.maxDamageFraction * 100)));
                     }
 
                     if(type.suppressionRange > 0){
@@ -629,6 +629,14 @@ public class StatValues{
                     if(type.status != StatusEffects.none){
                         sep(bt, (type.status.hasEmoji() ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" +
                             ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds"))).with(c -> withTooltip(c, type.status));
+                    }
+
+                    if(!type.targetMissiles){
+                        sep(bt, "@bullet.notargetsmissiles");
+                    }
+
+                    if(!type.targetBlocks){
+                        sep(bt, "@bullet.notargetsbuildings");
                     }
 
                     if(type.intervalBullet != null){

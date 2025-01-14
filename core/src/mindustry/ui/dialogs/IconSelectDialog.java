@@ -15,8 +15,13 @@ import static mindustry.Vars.*;
 
 public class IconSelectDialog extends Dialog{
     private Intc consumer = i -> Log.info("you have mere seconds");
+    private boolean allowLocked;
 
     public IconSelectDialog(){
+        this(true);
+    }
+
+    public IconSelectDialog(boolean allowLocked){
         closeOnBack();
         setFillParent(true);
 
@@ -52,7 +57,7 @@ public class IconSelectDialog extends Dialog{
 
                     i = 0;
                     for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
-                        if(!u.isHidden() && u.unlocked()){
+                        if(!u.isHidden() && (allowLocked || u.unlocked())){
                             t.button(new TextureRegionDrawable(u.uiIcon), Styles.flati, iconMed, () -> {
                                 hide();
                                 consumer.get(u.emojiChar());

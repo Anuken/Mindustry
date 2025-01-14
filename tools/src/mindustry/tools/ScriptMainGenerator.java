@@ -24,7 +24,7 @@ public class ScriptMainGenerator{
 
     public static void main(String[] args) throws Exception{
         String base = "mindustry";
-        Seq<String> blacklist = Seq.with("tools");
+        Seq<String> blacklist = Seq.with("tools", "arc.flabel.effects");
         Seq<String> nameBlacklist = Seq.with();
         Seq<Class<?>> whitelist = Seq.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
         AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class, Shader.class,
@@ -49,7 +49,7 @@ public class ScriptMainGenerator{
         classes.sort(Structs.comparing(Class::getName));
 
         classes.removeAll(type -> type.isSynthetic() || type.isAnonymousClass() || type.getCanonicalName() == null || Modifier.isPrivate(type.getModifiers())
-        || blacklist.contains(s -> type.getName().startsWith(base + "." + s + ".")) || nameBlacklist.contains(type.getSimpleName()));
+        || blacklist.contains(s -> type.getName().startsWith(base + "." + s + ".")) || nameBlacklist.contains(type.getSimpleName()) || blacklist.contains(type.getPackage().getName()));
         classes.add(NetConnection.class, SaveIO.class, SystemCursor.class);
 
         classes.distinct();

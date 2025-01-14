@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -64,7 +65,6 @@ public class BuildPlan implements Position, QuadTreeObject{
     public BuildPlan(){
 
     }
-
     public boolean placeable(Team team){
         return Build.validPlace(block, team, x, y, rotation);
     }
@@ -150,6 +150,17 @@ public class BuildPlan implements Position, QuadTreeObject{
 
     public float drawy(){
         return y*tilesize + (block == null ? 0 : block.offset);
+    }
+
+    public boolean isDone(){
+        Tile tile = world.tile(x, y);
+        if(tile == null) return true;
+        Block tblock = tile.block();
+        if(breaking){
+            return tblock == Blocks.air || tblock == tile.floor();
+        }else{
+            return tblock == block && (tile.build == null || tile.build.rotation == rotation);
+        }
     }
 
     public @Nullable Tile tile(){

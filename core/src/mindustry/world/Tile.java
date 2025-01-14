@@ -293,6 +293,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         if(build != null){
             build.onProximityUpdate();
         }
+        if(!world.isGenerating() && pathfinder != null){
+            pathfinder.updateTile(this);
+        }
     }
 
     public boolean isEditorTile(){

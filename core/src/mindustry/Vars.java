@@ -71,10 +71,12 @@ public class Vars implements Loadable{
     public static final String discordURL = "https://discord.gg/mindustry";
     /** URL the links to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
-    /** URL to the JSON file containing all the BE servers. Only queried in BE. */
-    public static final String serverJsonBeURL = "https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_be.json";
-    /** URL to the JSON file containing all the stable servers.  */
-    public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_v8.json";
+    /** URLs to the JSON file containing all the BE servers. Only queried in BE. */
+    public static final String[] serverJsonBeURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_be.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_be.json"};
+    /** URLs to the JSON file containing all the stable servers.  */
+    public static final String[] serverJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_v8.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_v8.json"};
+    /** URLs to the JSON files containing the list of mods.  */
+    public static final String[] modJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrymods/mods.json"};
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
@@ -93,6 +95,8 @@ public class Vars implements Loadable{
     public static final float finalWorldBounds = 250;
     /** default range for building */
     public static final float buildingRange = 220f;
+    /** scaling for unit circle collider radius, based on hitbox size */
+    public static final float unitCollisionRadiusScale = 0.6f;
     /** range for moving items */
     public static final float itemTransferRange = 220f;
     /** range for moving items for logic units */

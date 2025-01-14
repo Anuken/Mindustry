@@ -30,6 +30,8 @@ public class ItemsDisplay extends Table{
         top().left();
         margin(0);
 
+        if(items == null) return;
+
         table(Tex.button, c -> {
             c.margin(10).marginLeft(12).marginTop(15f);
             c.marginRight(12f);

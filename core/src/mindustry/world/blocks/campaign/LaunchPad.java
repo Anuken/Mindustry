@@ -56,8 +56,6 @@ public class LaunchPad extends Block{
         super.setBars();
 
         addBar("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
-
-        //TODO is "bar.launchcooldown" the right terminology?
         addBar("progress", (LaunchPadBuild build) -> new Bar(() -> Core.bundle.get("bar.launchcooldown"), () -> Pal.ammo, () -> Mathf.clamp(build.launchCounter / launchTime)));
     }
 
