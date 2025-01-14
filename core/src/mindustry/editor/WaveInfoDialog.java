@@ -47,7 +47,6 @@ public class WaveInfoDialog extends BaseDialog{
         });
         hidden(() -> state.rules.spawns = groups);
 
-        onResize(this::setup);
         addCloseButton();
 
         buttons.button("@waves.edit", Icon.edit, () -> {

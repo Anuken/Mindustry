@@ -4112,7 +4112,7 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitSquaresColor;
                 buildingDamageMultiplier = 0.2f;
             }},
-            Items.oxide, new BasicBulletType(8f, 95){{
+            Items.oxide, new BasicBulletType(8f, 120){{
                 knockback = 3f;
                 width = 25f;
                 hitSize = 7f;
@@ -4456,6 +4456,7 @@ public class Blocks{
                 reloadMultiplier = 0.85f;
                 speed = 9.5f;
                 width = height = 16;
+                pierceCap = 2;
                 shrinkY = 0.3f;
                 backSprite = "large-bomb-back";
                 sprite = "mine-bullet";
@@ -4982,7 +4983,8 @@ public class Blocks{
                             fragSpread = 37f;
                             fragBullet = new BulletType(){{
                                 shootEffect = Fx.shootBig;
-                                smokeEffect = Fx.shootSmokeMissile;
+                                smokeEffect = Fx.shootSmokeMissileColor;
+                                hitColor = engineColor;
                                 ammoMultiplier = 1f;
 
                                 spawnUnit = new MissileUnitType("scathe-missile-surge-split"){{
@@ -4994,9 +4996,8 @@ public class Blocks{
                                     engineLayer = Layer.effect;
                                     engineSize = 2.2f;
                                     engineOffset = 8f;
-                                    rotateSpeed = 1.35f;
+                                    rotateSpeed = 1.4f;
                                     trailLength = 12;
-                                    //missileAccelTime = 20f;
                                     lowAltitude = true;
                                     loopSound = Sounds.missileTrail;
                                     loopSoundVolume = 0.6f;
@@ -5016,7 +5017,7 @@ public class Blocks{
                                         shootOnDeath = true;
                                         shake = 10f;
                                         bullet = new ExplosionBulletType(340f, 35f){{
-                                            lightning = 5;
+                                            lightning = 6;
                                             lightningDamage = 35f;
                                             lightningLength = 8;
 
