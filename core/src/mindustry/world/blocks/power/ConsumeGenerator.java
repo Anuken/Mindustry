@@ -3,13 +3,14 @@ package mindustry.world.blocks.power;
 import arc.*;
 import arc.graphics.*;
 import arc.math.*;
-import arc.struct.ObjectFloatMap;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -42,6 +43,14 @@ public class ConsumeGenerator extends PowerGenerator{
 
         if(outputLiquid != null){
             addLiquidBar(outputLiquid.liquid);
+        }
+
+        if(itemDurationMultipliers.size > 0){
+            addBar("efficiency", (ConsumeGeneratorBuild entity) ->
+            new Bar(() ->
+            Core.bundle.format("bar.efficiency", (int)(entity.itemDurationMultiplier * 100)),
+            () -> Pal.lightOrange,
+            () -> entity.itemDurationMultiplier));
         }
     }
 
