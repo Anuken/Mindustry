@@ -4127,7 +4127,7 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitSquaresColor;
                 buildingDamageMultiplier = 0.2f;
             }},
-            Items.silicon, new BasicBulletType(8f, 34){{
+            Items.silicon, new BasicBulletType(8f, 35){{
                 knockback = 3f;
                 width = 25f;
                 hitSize = 7f;
@@ -4980,7 +4980,7 @@ public class Blocks{
                             fragLifeMin = 0.1f;
                             fragBullets = 5;
                             fragRandomSpread = 0f;
-                            fragSpread = 37f;
+                            fragSpread = 30f;
                             fragBullet = new BulletType(){{
                                 shootEffect = Fx.shootBig;
                                 smokeEffect = Fx.shootSmokeMissileColor;
