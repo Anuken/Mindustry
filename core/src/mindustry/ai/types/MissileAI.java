@@ -11,6 +11,11 @@ public class MissileAI extends AIController{
     public @Nullable Unit shooter;
 
     @Override
+    protected void resetTimers(){
+        timer.reset(timerTarget, Mathf.random(3f));
+    }
+
+    @Override
     public void updateMovement(){
         unloadPayloads();
 
