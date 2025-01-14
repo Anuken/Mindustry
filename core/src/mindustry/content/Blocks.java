@@ -4503,7 +4503,52 @@ public class Blocks{
                 extraRangeMargin = 32f;
 
                 hitEffect = despawnEffect = Fx.hitBulletColor;
-            }});
+            }},
+
+            Items.surgeAlloy, new BasicBulletType(){{
+                reloadMultiplier = 0.5f;
+                damage = 65;
+                rangeChange = 8f * 3f;
+                lightning = 3;
+                lightningLength = 4;
+                lightningDamage = 18f;
+                lightningLengthRand = 3;
+                speed = 7f;
+                width = height = 16;
+                shrinkY = 0.3f;
+                backSprite = "large-bomb-back";
+                sprite = "mine-bullet";
+                velocityRnd = 0.11f;
+                collidesGround = false;
+                collidesTiles = false;
+                shootEffect = Fx.shootBig2;
+                smokeEffect = Fx.shootSmokeDisperse;
+                frontColor = Color.white;
+                backColor = trailColor = hitColor = Pal.surge;
+                trailChance = 0.44f;
+                ammoMultiplier = 3f;
+
+                lifetime = 34f;
+                rotationOffset = 90f;
+                trailRotation = true;
+                trailEffect = Fx.disperseTrail;
+
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+
+                bulletInterval = 4f;
+
+                intervalBullet = new BulletType(){{
+                    lightningLengthRand = 4;
+                    lightningLength = 2;
+                    lightningCone = 30f;
+                    lightningDamage = 20f;
+                    lightning = 1;
+                    hittable = collides = false;
+                    instantDisappear = true;
+                    hitEffect = despawnEffect = Fx.none;
+                }};
+            }}
+            );
 
             reload = 9f;
             shootY = 15f;
