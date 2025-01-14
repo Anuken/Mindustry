@@ -234,6 +234,12 @@ public class Unloader extends Block{
         }
 
         @Override
+        public void drawSelect(){
+            super.drawSelect();
+            drawItemSelection(sortItem);
+        }
+
+        @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(Unloader.this, table, content.items(), () -> sortItem, this::configure, selectionRows, selectionColumns);
         }

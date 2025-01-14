@@ -90,6 +90,12 @@ public class DuctRouter extends Block{
         }
 
         @Override
+        public void drawSelect(){
+            super.drawSelect();
+            drawItemSelection(sortItem);
+        }
+
+        @Override
         public void updateTile(){
             progress += edelta() / speed * 2f;
 
