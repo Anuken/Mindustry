@@ -4513,7 +4513,7 @@ public class Blocks{
                 lightningLength = 4;
                 lightningDamage = 18f;
                 lightningLengthRand = 3;
-                speed = 7f;
+                speed = 6f;
                 width = height = 16;
                 shrinkY = 0.3f;
                 backSprite = "large-bomb-back";
@@ -4538,6 +4538,8 @@ public class Blocks{
                 bulletInterval = 4f;
 
                 intervalBullet = new BulletType(){{
+                    collidesGround = false;
+                    collidesTiles = false;
                     lightningLengthRand = 4;
                     lightningLength = 2;
                     lightningCone = 30f;
@@ -5009,7 +5011,8 @@ public class Blocks{
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
-                        mirror = false;
+                        rotate = true;
+                        rotationLimit = rotateSpeed = 0f;
                         reload = 1f;
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
@@ -5178,7 +5181,6 @@ public class Blocks{
             requirements(Category.turret, with(Items.oxide, 200, Items.surgeAlloy, 400, Items.silicon, 800, Items.carbide, 500, Items.phaseFabric, 300));
 
             ammo(
-            //this is really lazy
             Items.surgeAlloy, new BasicBulletType(7f, 250){{
                 sprite = "large-orb";
                 width = 17f;
