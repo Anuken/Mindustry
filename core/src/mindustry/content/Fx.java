@@ -499,6 +499,14 @@ public class Fx{
         }
     }),
 
+    smokeAoeCloud = new Effect(60f * 3f, 250f, e -> {
+        color(e.color, 0.65f);
+
+        randLenVectors(e.id, 80, 90f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 6f * Mathf.clamp(e.fin() / 0.1f) * Mathf.clamp(e.fout() / 0.1f));
+        });
+    }),
+
     missileTrailSmoke = new Effect(180f, 300f, b -> {
         float intensity = 2f;
 

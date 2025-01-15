@@ -4338,7 +4338,7 @@ public class Blocks{
                 buildingDamageMultiplier = 0.3f;
             }},
             Items.oxide, new ArtilleryBulletType(2.5f, 300, "shell"){{
-                hitEffect = new MultiEffect(Fx.titanExplosionLarge, Fx.titanSmokeLarge);
+                hitEffect = new MultiEffect(Fx.titanExplosionLarge, Fx.titanSmokeLarge, Fx.smokeAoeCloud);
                 despawnEffect = Fx.none;
                 knockback = 2f;
                 lifetime = 190f;
@@ -4347,7 +4347,7 @@ public class Blocks{
                 reloadMultiplier = 0.8f;
                 splashDamageRadius = 110f;
                 rangeChange = 8f;
-                splashDamage = 330f;
+                splashDamage = 300f;
                 scaledSplashDamage = true;
                 hitColor = backColor = trailColor = Color.valueOf("a0b380");
                 frontColor = Color.valueOf("e4ffd6");
@@ -4374,7 +4374,7 @@ public class Blocks{
 
                 fragBullets = 1;
                 fragBullet = new EmptyBulletType(){{
-                    lifetime = 60f * 2f;
+                    lifetime = 60f * 2.5f;
                     bulletInterval = 20f;
                     intervalBullet = new EmptyBulletType(){{
                         splashDamage = 30f;
