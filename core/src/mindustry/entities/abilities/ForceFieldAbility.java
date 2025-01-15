@@ -131,6 +131,11 @@ public class ForceFieldAbility extends Ability{
         bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> unit.shield / max)).row();
     }
 
+    @Override
+    public void created(Unit unit){
+        unit.shield = max;
+    }
+
     public void checkRadius(Unit unit){
         //timer2 is used to store radius scale as an effect
         realRad = radiusScale * radius;

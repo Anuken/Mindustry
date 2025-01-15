@@ -23,7 +23,7 @@ public class DirectionalItemBuffer{
 
     public void accept(int buffer, Item item){
         if(!accepts(buffer)) return;
-        buffers[buffer][indexes[buffer]++] = BufferItem.get((byte)item.id, Time.time);
+        buffers[buffer][indexes[buffer]++] = BufferItem.get(item.id, Time.time);
     }
 
     public Item poll(int buffer, float speed){
@@ -68,7 +68,7 @@ public class DirectionalItemBuffer{
 
     @Struct
     class BufferItemStruct{
-        byte item;
+        short item;
         float time;
     }
 }
