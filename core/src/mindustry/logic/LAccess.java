@@ -54,6 +54,7 @@ public enum LAccess{
     controller,
     name,
     payloadCount,
+    payloadCapacity,
     payloadType,
     id,
 
