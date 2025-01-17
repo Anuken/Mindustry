@@ -47,6 +47,7 @@ public class WallCrafter extends Block{
     public float itemBoostIntensity = 1.6f;
     public @Nullable Consume itemConsumer;
     public boolean hasLiquidBooster;
+
     public final int timerUse = timers ++;
 
     public WallCrafter(String name){
@@ -79,23 +80,28 @@ public class WallCrafter extends Block{
         stats.add(Stat.drillSpeed, 60f / drillTime * size, StatUnit.itemsSecond);
 
         boolean consItems = itemConsumer != null;
+
         if(consItems) stats.timePeriod = boostItemUseTime;
+
         if(consItems && itemConsumer instanceof ConsumeItems coni){
             stats.remove(Stat.booster);
             stats.add(Stat.booster, StatValues.itemBoosters("{0}" + StatUnit.timesSpeed.localized(), stats.timePeriod, itemBoostIntensity, 0f, coni.items, i -> Structs.contains(coni.items, s -> s.item == i)));
         }
+
         if(liquidBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
             stats.remove(Stat.booster);
             stats.add(Stat.booster,
-                    StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
-                            consBase.amount,
-                            liquidBoostIntensity, false, consBase::consumes)
+                StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
+                consBase.amount,
+                liquidBoostIntensity, false, consBase::consumes)
             );
         }
     }
+
     @Override
     public void init(){
         super.init();
+
         hasLiquidBooster = findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) != null;
     }
 
@@ -196,6 +202,7 @@ public class WallCrafter extends Block{
                     );
                 }
             }, null) * Mathf.lerp(1f, liquidBoostIntensity, hasLiquidBooster ? optionalEfficiency : 0f) * (itemValid ? itemBoostIntensity : 1f);
+
             if(itemValid && eff * efficiency > 0 && timer(timerUse, boostItemUseTime)){
                 consume();
             }

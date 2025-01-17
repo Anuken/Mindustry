@@ -506,8 +506,8 @@ public class Turret extends ReloadTurret{
                 var ammo = peekAmmo();
                 boolean buildings = targetGround && targetBlocks && (ammo == null || ammo.targetBlocks), missiles = ammo == null || ammo.targetMissiles;
                 return Units.bestTarget(team, x, y, range,
-                        e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround) && (missiles || !(e instanceof TimedKillc)),
-                        b -> buildings && buildingFilter.get(b), unitSort);
+                    e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround) && (missiles || !(e instanceof TimedKillc)),
+                    b -> buildings && buildingFilter.get(b), unitSort);
             }
         }
 
@@ -575,7 +575,6 @@ public class Turret extends ReloadTurret{
         }
 
         protected void updateReload(){
-            float multiplier = hasAmmo() ? peekAmmo().reloadMultiplier : 1f;
             reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
 
             //cap reload for visual reasons

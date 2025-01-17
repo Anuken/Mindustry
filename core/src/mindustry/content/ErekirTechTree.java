@@ -145,6 +145,10 @@ public class ErekirTechTree{
                                 node(unstableDrill, Seq.with(new Research(berylliteForge), new Research(neoplasiaReactor)), () -> {});
                             });
                         });
+
+                        node(largeCliffCrusher, Seq.with(new OnSector(stronghold)), () -> {
+
+                        });
                     });
                 });
 

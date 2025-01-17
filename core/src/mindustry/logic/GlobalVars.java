@@ -34,9 +34,9 @@ public class GlobalVars{
     private ObjectSet<String> privilegedNames = new ObjectSet<>();
     private UnlockableContent[][] logicIdToContent;
     private int[][] contentIdToLogicId;
-    
+
     public static final Seq<String> soundNames = new Seq<>();
-    
+
     public void init(){
         putEntryOnly("sectionProcessor");
 
@@ -91,7 +91,7 @@ public class GlobalVars{
         put("@ctrlProcessor", ctrlProcessor);
         put("@ctrlPlayer", ctrlPlayer);
         put("@ctrlCommand", ctrlCommand);
-        
+
         //sounds
         if(Core.assets != null){
             for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){

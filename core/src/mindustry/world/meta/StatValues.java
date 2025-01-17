@@ -619,7 +619,7 @@ public class StatValues{
                     }
 
                     if(type.maxDamageFraction > 0){
-                        sep(bt, Core.bundle.format("bullet.maxdamagefraction", (int)(type.maxDamageFraction * 100))); 
+                        sep(bt, Core.bundle.format("bullet.maxdamagefraction", (int)(type.maxDamageFraction * 100)));
                     }
 
                     if(type.suppressionRange > 0){
@@ -634,6 +634,7 @@ public class StatValues{
                     if(!type.targetMissiles){
                         sep(bt, "@bullet.notargetsmissiles");
                     }
+
                     if(!type.targetBlocks){
                         sep(bt, "@bullet.notargetsbuildings");
                     }

@@ -53,7 +53,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
         if(ed <= 0.00000001f) return 0f;
         return liq != null ? Math.min(build.liquids.get(liq) / (amount * ed * multiplier.get(build)), 1f) : 0f;
     }
-    
+
     public @Nullable Liquid getConsumed(Building build){
         if(filter.get(build.liquids.current()) && build.liquids.currentAmount() > 0){
             return build.liquids.current();

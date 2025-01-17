@@ -37,40 +37,40 @@ public class Pathfinder implements Runnable{
     );
 
     public static final int
-            costGround = 0,
-            costLegs = 1,
-            costNaval = 2,
-            costHover = 3;
+        costGround = 0,
+        costLegs = 1,
+        costNaval = 2,
+        costHover = 3;
 
     public static final Seq<PathCost> costTypes = Seq.with(
-            //ground
-            (team, tile) ->
-                    (PathTile.allDeep(tile) || ((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
-                            PathTile.health(tile) * 5 +
-                            (PathTile.nearSolid(tile) ? 2 : 0) +
-                            (PathTile.nearLiquid(tile) ? 6 : 0) +
-                            (PathTile.deep(tile) ? 6000 : 0) +
-                            (PathTile.damages(tile) ? 30 : 0),
+        //ground
+        (team, tile) ->
+            (PathTile.allDeep(tile) || ((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
+            PathTile.health(tile) * 5 +
+            (PathTile.nearSolid(tile) ? 2 : 0) +
+            (PathTile.nearLiquid(tile) ? 6 : 0) +
+            (PathTile.deep(tile) ? 6000 : 0) +
+            (PathTile.damages(tile) ? 30 : 0),
 
-            //legs
-            (team, tile) ->
-                    PathTile.legSolid(tile) ? impassable : 1 +
-                            (PathTile.deep(tile) ? 6000 : 0) + //leg units can now drown
-                            (PathTile.solid(tile) ? 5 : 0),
+        //legs
+        (team, tile) ->
+            PathTile.legSolid(tile) ? impassable : 1 +
+            (PathTile.deep(tile) ? 6000 : 0) + //leg units can now drown
+            (PathTile.solid(tile) ? 5 : 0),
 
-            //water
-            (team, tile) ->
-                    (!PathTile.liquid(tile) ? 6000 : 1) +
-                            PathTile.health(tile) * 5 +
-                            (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
-                            (PathTile.deep(tile) ? 0 : 1) +
-                            (PathTile.damages(tile) ? 35 : 0),
+        //water
+        (team, tile) ->
+            (!PathTile.liquid(tile) ? 6000 : 1) +
+            PathTile.health(tile) * 5 +
+            (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
+            (PathTile.deep(tile) ? 0 : 1) +
+            (PathTile.damages(tile) ? 35 : 0),
 
-            //hover
-            (team, tile) ->
-                    (((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
-                            PathTile.health(tile) * 5 +
-                            (PathTile.nearSolid(tile) ? 2 : 0)
+        //hover
+        (team, tile) ->
+            (((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
+            PathTile.health(tile) * 5 +
+            (PathTile.nearSolid(tile) ? 2 : 0)
     );
 
     /** tile data, see PathTileStruct - kept as a separate array for threading reasons */

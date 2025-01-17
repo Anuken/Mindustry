@@ -7,6 +7,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 
 public class LightningBulletType extends BulletType{
+
     public LightningBulletType(){
         damage = 1f;
         speed = 0f;
