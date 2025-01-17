@@ -78,7 +78,7 @@ public class UI implements ApplicationListener, Loadable{
 
     public IntMap<Dialog> followUpMenus;
 
-    public Cursor drillCursor, unloadCursor, targetCursor;
+    public Cursor drillCursor, unloadCursor, targetCursor, repairCursor;
 
     private @Nullable Element lastAnnouncement;
 
@@ -101,8 +101,6 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void loadSync(){
-        loadColors();
-
         Fonts.outline.getData().markupEnabled = true;
         Fonts.def.getData().markupEnabled = true;
         Fonts.def.setOwnsTexture(false);
@@ -128,6 +126,9 @@ public class UI implements ApplicationListener, Loadable{
 
         Tooltips.getInstance().animations = false;
         Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black6).margin(4f).add(text));
+        if(mobile){
+            Tooltips.getInstance().offsetY += Scl.scl(60f);
+        }
 
         Core.settings.setErrorHandler(e -> {
             Log.err(e);
@@ -139,6 +140,7 @@ public class UI implements ApplicationListener, Loadable{
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
         targetCursor = Core.graphics.newCursor("target", Fonts.cursorScale());
+        repairCursor = Core.graphics.newCursor("repair", Fonts.cursorScale());
     }
 
     @Override
@@ -156,7 +158,7 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.draw();
 
         if(Core.input.keyTap(KeyCode.mouseLeft) && Core.scene.hasField()){
-            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+            Element e = Core.scene.getHoverElement();
             if(!(e instanceof TextField)){
                 Core.scene.setKeyboardFocus(null);
             }
@@ -270,8 +272,15 @@ public class UI implements ApplicationListener, Loadable{
         });
     }
 
-    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, Cons<String> confirmed, Runnable closed){
+
+    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, Cons<String> confirmed, Runnable closed) {
+        showTextInput(titleText, text, textLength, def, numbers, false, confirmed, closed);
+    }
+
+    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, boolean allowEmpty, Cons<String> confirmed, Runnable closed){
         if(mobile){
+            var description = (text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text);
+            var empty = allowEmpty;
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);
                 this.text = def;
@@ -279,7 +288,8 @@ public class UI implements ApplicationListener, Loadable{
                 this.maxLength = textLength;
                 this.accepted = confirmed;
                 this.canceled = closed;
-                this.allowEmpty = false;
+                this.allowEmpty = empty;
+                this.message = description;
             }});
         }else{
             new Dialog(titleText){{
@@ -296,11 +306,11 @@ public class UI implements ApplicationListener, Loadable{
                 buttons.button("@ok", () -> {
                     confirmed.get(field.getText());
                     hide();
-                }).disabled(b -> field.getText().isEmpty());
+                }).disabled(b -> !allowEmpty && field.getText().isEmpty());
 
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
-                    if(!text.isEmpty()){
+                    if(allowEmpty || !text.isEmpty()){
                         confirmed.get(text);
                         hide();
                     }
@@ -618,6 +628,7 @@ public class UI implements ApplicationListener, Loadable{
 
                 int option = 0;
                 for(var optionsRow : options){
+                    if(optionsRow.length == 0) continue;
                     Table buttonRow = table.row().table().get().row();
                     int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
                     int width = fullWidth / optionsRow.length;

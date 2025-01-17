@@ -16,7 +16,6 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-/** Highly experimental fog-of-war renderer. */
 public final class FogRenderer{
     private FrameBuffer staticFog = new FrameBuffer(), dynamicFog = new FrameBuffer();
     private LongSeq events = new LongSeq();
@@ -111,12 +110,12 @@ public final class FogRenderer{
         dynamicFog.getTexture().setFilter(TextureFilter.linear);
 
         Draw.shader(Shaders.fog);
-        Draw.color(state.rules.dynamicColor);
+        Draw.color(state.rules.dynamicColor, 0.5f);
         Draw.fbo(dynamicFog.getTexture(), world.width(), world.height(), tilesize);
         //TODO ai check?
         if(state.rules.staticFog){
             //TODO why does this require a half-tile offset while dynamic does not
-            Draw.color(state.rules.staticColor);
+            Draw.color(state.rules.staticColor, 1f);
             Draw.fbo(staticFog.getTexture(), world.width(), world.height(), tilesize, tilesize/2f);
         }
         Draw.shader();

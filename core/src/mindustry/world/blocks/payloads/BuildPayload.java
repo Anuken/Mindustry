@@ -52,6 +52,12 @@ public class BuildPayload implements Payload{
     }
 
     @Override
+    public void destroyed(){
+        build.dead = true;
+        build.onDestroyed();
+    }
+
+    @Override
     public ItemStack[] requirements(){
         return build.block.requirements;
     }
@@ -98,10 +104,13 @@ public class BuildPayload implements Payload{
     @Override
     public void draw(){
         float prevZ = Draw.z();
-        Draw.z(prevZ - 0.0001f);
+        Draw.z(prevZ - 0.001f);
         drawShadow(1f);
         Draw.z(prevZ);
-        Draw.zTransform(z -> z >= Layer.flyingUnitLow + 1f ? z : 0.0011f + Math.min(Mathf.clamp(z, prevZ - 0.001f, prevZ + 0.9f), Layer.flyingUnitLow - 1f));
+        Draw.zTransform(z ->
+            z >= Layer.flyingUnitLow + 1f ? z :
+            0.0011f + Math.min(Mathf.clamp((z - prevZ)/100f, -0.0009f, 0.9f) + prevZ, Layer.flyingUnitLow - 1f)
+        );
         build.tile = emptyTile;
         build.payloadDraw();
         Draw.zTransform();

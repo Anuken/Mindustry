@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.freetype.FreeTypeFontGenerator.*;
 import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
@@ -35,6 +36,7 @@ public class JoinDialog extends BaseDialog{
     int refreshes;
     boolean showHidden;
     TextButtonStyle style;
+    Task fontIgnoreDirtyTask;
 
     String lastIp;
     int lastPort, lastColumns = -1;
@@ -247,29 +249,13 @@ public class JoinDialog extends BaseDialog{
     void setupServer(Server server, Host host){
         server.lastHost = host;
         server.content.clear();
-        buildServer(host, server.content);
+        buildServer(host, server.content, false, true);
     }
 
-    void buildServer(Host host, Table content){
+    void buildServer(Host host, Table content, boolean local, boolean addName){
         content.top().left();
-        String versionString;
-
-        if(host.version == -1){
-            versionString = Core.bundle.format("server.version", Core.bundle.get("server.custombuild"), "");
-        }else if(host.version == 0){
-            versionString = Core.bundle.get("server.outdated");
-        }else if(host.version < Version.build && Version.build != -1){
-            versionString = Core.bundle.get("server.outdated") + "\n" +
-            Core.bundle.format("server.version", host.version, "");
-        }else if(host.version > Version.build && Version.build != -1){
-            versionString = Core.bundle.get("server.outdated.client") + "\n" +
-            Core.bundle.format("server.version", host.version, "");
-        }else if(host.version == Version.build && Version.type.equals(host.versionType)){
-            //not important
-            versionString = "";
-        }else{
-            versionString = Core.bundle.format("server.version", host.version, host.versionType);
-        }
+        boolean isBanned = local && Vars.steam && host.description != null && host.description.equals("[banned]");
+        String versionString = getVersionString(host) + (isBanned ? "[red] [banned]" : "");
 
         float twidth = targetWidth() - 40f;
 
@@ -277,19 +263,21 @@ public class JoinDialog extends BaseDialog{
 
         Color color = Pal.gray;
 
-        content.table(Tex.whiteui, t -> {
-            t.left();
-            t.setColor(color);
+        if(addName){
+            content.table(Tex.whiteui, t -> {
+                t.left();
+                t.setColor(color);
 
-            t.add(host.name + "   " + versionString).style(Styles.outlineLabel).padLeft(10f).width(twidth).left().ellipsis(true);
-        }).growX().height(36f).row();
+                t.add(host.name + "   " + versionString).style(Styles.outlineLabel).padLeft(10f).width(twidth).left().ellipsis(true);
+            }).growX().height(36f).row();
+        }
 
         content.table(Tex.whitePane, t -> {
             t.top().left();
             t.setColor(color);
             t.left();
 
-            if(!host.description.isEmpty()){
+            if(!host.description.isEmpty() && !isBanned){
                 //limit newlines.
                 int count = 0;
                 StringBuilder result = new StringBuilder(host.description.length());
@@ -427,6 +415,15 @@ public class JoinDialog extends BaseDialog{
                 net.pingHost(resaddress, resport, res -> {
                     if(refreshes != cur) return;
 
+                    //don't recache the texture for a while
+                    if(fontIgnoreDirtyTask == null){
+                        FreeTypeFontData.ignoreDirty = true;
+                        fontIgnoreDirtyTask = Time.runTask(0.6f * 60f, () -> {
+                            FreeTypeFontData.ignoreDirty = false;
+                            fontIgnoreDirtyTask = null;
+                        });
+                    }
+
                     if(!serverSearch.isEmpty() && !(group.name.toLowerCase().contains(serverSearch)
                         || res.name.toLowerCase().contains(serverSearch)
                         || res.description.toLowerCase().contains(serverSearch)
@@ -485,11 +482,16 @@ public class JoinDialog extends BaseDialog{
 
     void addCommunityHost(Host host, Table container){
         global.background(null);
+        String versionString = getVersionString(host);
         float w = targetWidth();
 
         container.left().top();
 
-        container.button(b -> buildServer(host, b), style, () -> {
+        Button[] button = {null};
+
+        button[0] = container.button(b -> {}, style, () -> {
+            if(button[0].childrenPressed()) return;
+
             Events.fire(new ClientPreConnectEvent(host));
             if(!Core.settings.getBool("server-disclaimer", false)){
                 ui.showCustomConfirm("@warning", "@servers.disclaimer", "@ok", "@back", () -> {
@@ -501,7 +503,28 @@ public class JoinDialog extends BaseDialog{
             }else{
                 safeConnect(host.address, host.port, host.version);
             }
-        }).width(w).padBottom(7).padRight(4f).top().left().growY().uniformY();
+        }).width(w).padBottom(7).padRight(4f).top().left().growY().uniformY().get();
+
+        Table inner = new Table(Tex.whiteui);
+        inner.setColor(Pal.gray);
+
+        button[0].clearChildren();
+        button[0].add(inner).growX();
+
+        inner.add(host.name + "   " + versionString).left().padLeft(10f).wrap().style(Styles.outlineLabel).growX();
+
+        inner.button(Icon.add, Styles.emptyi, () -> {
+            Server server = new Server();
+            server.setIP(host.address + ":" + host.port);
+            servers.add(server);
+            saveServers();
+            setupRemote();
+            refreshRemote();
+        }).margin(3f).pad(8f).padRight(4f).top().right();
+
+        button[0].row();
+
+        buildServer(host, button[0].table(t -> {}).grow().get(), false, false);
 
         if((container.getChildren().size) % columns() == 0){
             container.row();
@@ -532,7 +555,7 @@ public class JoinDialog extends BaseDialog{
             local.row();
         }
 
-        local.button(b -> buildServer(host, b), style, () -> {
+        local.button(b -> buildServer(host, b, true, true), style, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             safeConnect(host.address, host.port, host.version);
         }).width(w).top().left().growY();
@@ -576,7 +599,7 @@ public class JoinDialog extends BaseDialog{
                 connect(lastIp, lastPort);
             }, exception -> {});
         }, 1, 1);
-        
+
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
             if(ping == null) return;
@@ -608,12 +631,24 @@ public class JoinDialog extends BaseDialog{
             Core.settings.remove("server-list");
         }
 
-        var url = becontrol.active() ? serverJsonBeURL : serverJsonURL;
-        Log.info("Fetching community servers at @", url);
+        var urls = Version.type.equals("bleeding-edge") || Vars.forceBeServers ? serverJsonBeURLs : serverJsonURLs;
+
+        fetchServers(urls, 0);
+    }
+
+    private void fetchServers(String[] urls, int index){
+        if(index >= urls.length) return;
 
         //get servers
-        Http.get(url)
-        .error(t -> Log.err("Failed to fetch community servers", t))
+        Http.get(urls[index])
+        .error(t -> {
+            if(index < urls.length - 1){
+                //attempt fetching from the next URL upon failure
+                fetchServers(urls, index + 1);
+            }else{
+                Log.err("Failed to fetch community servers", t);
+            }
+        })
         .submit(result -> {
             Jval val = Jval.read(result.getResultAsString());
             Seq<ServerGroup> servers = new Seq<>();
@@ -639,6 +674,25 @@ public class JoinDialog extends BaseDialog{
 
     private void saveServers(){
         Core.settings.putJson("servers", Server.class, servers);
+    }
+
+    private String getVersionString(Host host){
+        if(host.version == -1){
+            return Core.bundle.format("server.version", Core.bundle.get("server.custombuild"), "");
+        }else if(host.version == 0){
+            return Core.bundle.get("server.outdated");
+        }else if(host.version < Version.build && Version.build != -1){
+            return Core.bundle.get("server.outdated") + "\n" +
+            Core.bundle.format("server.version", host.version, "");
+        }else if(host.version > Version.build && Version.build != -1){
+            return Core.bundle.get("server.outdated.client") + "\n" +
+            Core.bundle.format("server.version", host.version, "");
+        }else if(host.version == Version.build && Version.type.equals(host.versionType)){
+            //not important
+            return "";
+        }else{
+            return Core.bundle.format("server.version", host.version, host.versionType);
+        }
     }
 
     public static class Server{

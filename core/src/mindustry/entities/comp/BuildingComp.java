@@ -59,6 +59,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     
     @Import float x, y, health, maxHealth;
     @Import Team team;
+    @Import boolean dead;
 
     transient Tile tile;
     transient Block block;
@@ -87,9 +88,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient float optionalEfficiency;
     /** The efficiency this block *would* have if shouldConsume() returned true. */
     transient float potentialEfficiency;
+    /** Whether there are any consumers (aside from power) that have efficiency > 0. */
+    transient boolean shouldConsumePower;
 
     transient float healSuppressionTime = -1f;
     transient float lastHealTime = -120f * 10f;
+    transient Color suppressColor = Pal.sapBullet;
 
     private transient float lastDamageTime = -recentDamageTime;
     private transient float timeScale = 1f, timeScaleDuration;
@@ -258,6 +262,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         read(read, revision);
     }
 
+    public void writeSync(Writes write){
+        writeAll(write);
+    }
+
+    public void readSync(Reads read, byte revision){
+        readAll(read, revision);
+    }
+
     @CallSuper
     public void write(Writes write){
         //overriden by subclasses!
@@ -326,7 +338,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        data.plans.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, toAdd.id, overrideConfig == null ? config() : overrideConfig));
+        data.plans.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, toAdd, overrideConfig == null ? config() : overrideConfig));
     }
 
     public @Nullable Tile findClosestEdge(Position to, Boolf<Tile> solid){
@@ -377,13 +389,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         float heat = 0f;
 
-        for(var edge : block.getEdges()){
-            Building build = nearby(edge.x, edge.y);
+        for(var build : proximity){
             if(build != null && build.team == team && build instanceof HeatBlock heater){
-                //massive hack but I don't really care anymore
-                if(heater instanceof HeatConductorBuild cond){
-                    cond.updateHeat();
-                }
+
 
                 boolean split = build.block instanceof HeatConductor cond && cond.splitHeat;
                 // non-routers must face us, routers must face away - next to a redirector, they're forced to face away due to cycles anyway
@@ -391,8 +399,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
                     //if there's a cycle, ignore its heat
                     if(!(build instanceof HeatConductorBuild hc && hc.cameFrom.contains(id()))){
+                        //x/y coordinate difference across point of contact
+                        float diff = (Math.min(Math.abs(build.x - x), Math.abs(build.y - y)) / tilesize);
+                        //number of points that this block had contact with
+                        int contactPoints = Math.min((int)(block.size/2f + build.block.size/2f - diff), Math.min(build.block.size, block.size));
+
                         //heat is distributed across building size
-                        float add = heater.heat() / build.block.size;
+                        float add = heater.heat() / build.block.size * contactPoints;
                         if(split){
                             //heat routers split heat across 3 surfaces
                             add /= 3f;
@@ -408,6 +421,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                         if(build instanceof HeatConductorBuild hc){
                             cameFrom.addAll(hc.cameFrom);
                         }
+                    }
+
+                    //massive hack but I don't really care anymore
+                    if(heater instanceof HeatConductorBuild cond){
+                        cond.updateHeat();
                     }
                 }
             }
@@ -432,7 +450,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void applyHealSuppression(float amount){
+        applyHealSuppression(amount, Pal.sapBullet);
+    }
+    public void applyHealSuppression(float amount, Color suppressColor){
         healSuppressionTime = Math.max(healSuppressionTime, Time.time + amount);
+        this.suppressColor = suppressColor;
     }
 
     public boolean isHealSuppressed(){
@@ -1195,6 +1217,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void payloadDraw(){
+        if(block.isAir()) return;
         draw();
     }
 
@@ -1236,7 +1259,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public boolean checkSuppression(){
         if(isHealSuppressed()){
             if(Mathf.chanceDelta(0.03)){
-                Fx.regenSuppressParticle.at(x + Mathf.range(block.size * tilesize/2f - 1f), y + Mathf.range(block.size * tilesize/2f - 1f));
+                Fx.regenSuppressParticle.at(x + Mathf.range(block.size * tilesize/2f - 1f), y + Mathf.range(block.size * tilesize/2f - 1f), suppressColor);
             }
 
             return true;
@@ -1299,7 +1322,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(value instanceof UnitType) type = UnitType.class;
         
         if(builder != null && builder.isPlayer()){
-            lastAccessed = builder.getPlayer().coloredName();
+            updateLastAccess(builder.getPlayer());
         }
 
         if(block.configurations.containsKey(type)){
@@ -1311,6 +1334,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 configured(builder, conf);
             }
         }
+    }
+
+    public void updateLastAccess(Player player){
+        lastAccessed = player.coloredName();
     }
 
     /** Called when the block is tapped by the local player. */
@@ -1333,8 +1360,21 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return block.itemCapacity;
     }
 
+    /** Called when a block begins (not finishes!) deconstruction. The building is still present at this point. */
+    public void onDeconstructed(@Nullable Unit builder){
+        //deposit non-incinerable liquid on ground
+        if(liquids != null && liquids.currentAmount() > 0 && (!liquids.current().incinerable || block.deconstructDropAllLiquid)){
+            float perCell = liquids.currentAmount() / (block.size * block.size) * 2f;
+            tile.getLinkedTiles(other -> Puddles.deposit(other, liquids.current(), perCell));
+        }
+    }
+
     /** Called when the block is destroyed. The tile is still intact at this stage. */
     public void onDestroyed(){
+        if(sound != null){
+            sound.stop();
+        }
+
         float explosiveness = block.baseExplosiveness;
         float flammability = 0f;
         float power = 0f;
@@ -1373,6 +1413,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             });
         }
 
+        //cap explosiveness so fluid tanks/vaults don't instakill units
         Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, state.rules.damageExplosions, block.destroyEffect);
 
         if(block.createRubble && !floor().solid && !floor().isLiquid){
@@ -1748,6 +1789,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(!block.hasConsumers || cheating()){
             potentialEfficiency = enabled && productionValid() ? 1f : 0f;
             efficiency = optionalEfficiency = shouldConsume() ? potentialEfficiency : 0f;
+            shouldConsumePower = true;
             updateEfficiencyMultiplier();
             return;
         }
@@ -1755,6 +1797,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //disabled -> nothing works
         if(!enabled){
             potentialEfficiency = efficiency = optionalEfficiency = 0f;
+            shouldConsumePower = false;
             return;
         }
 
@@ -1764,10 +1807,17 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         //assume efficiency is 1 for the calculations below
         efficiency = optionalEfficiency = 1f;
+        shouldConsumePower = true;
 
         //first pass: get the minimum efficiency of any consumer
         for(var cons : block.nonOptionalConsumers){
-            minEfficiency = Math.min(minEfficiency, cons.efficiency(self()));
+            float result = cons.efficiency(self());
+
+            if(cons != block.consPower && result <= 0.0000001f){
+                shouldConsumePower = false;
+            }
+
+            minEfficiency = Math.min(minEfficiency, result);
         }
 
         //same for optionals
@@ -1890,6 +1940,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case y -> World.conv(y);
             case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
             case dead -> !isValid() ? 1 : 0;
+            case solid -> block.solid || checkSolid() ? 1 : 0;
             case team -> team.id;
             case health -> health;
             case maxHealth -> maxHealth;
@@ -1912,6 +1963,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case controlled -> this instanceof ControlBlock c && c.isControlled() ? GlobalVars.ctrlPlayer : 0;
             case payloadCount -> getPayload() != null ? 1 : 0;
             case size -> block.size;
+            case cameraX, cameraY, cameraWidth, cameraHeight -> this instanceof ControlBlock c ? c.unit().sense(sensor) : 0;
             default -> Float.NaN; //gets converted to null in logic
         };
     }
@@ -1955,9 +2007,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         switch(prop){
             case health -> {
                 health = (float)Mathf.clamp(value, 0, maxHealth);
-                healthChanged();
                 if(health <= 0f && !dead()){
                     Call.buildDestroyed(self());
+                }else{
+                    healthChanged();
                 }
             }
             case team -> {
@@ -2034,6 +2087,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public void killed(){
+        dead = true;
         Events.fire(new BlockDestroyEvent(tile));
         block.destroySound.at(tile);
         onDestroyed();

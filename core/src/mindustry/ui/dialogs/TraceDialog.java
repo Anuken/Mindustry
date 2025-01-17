@@ -27,7 +27,7 @@ public class TraceDialog extends BaseDialog{
 
         var style = Styles.emptyi;
         float s = 28f;
-
+        
         table.table(c -> {
             c.left().defaults().left();
             c.button(Icon.copySmall, style, () -> copy(player.name)).size(s).padRight(4f);

@@ -111,7 +111,7 @@ public class Saves{
 
         if(state.isGame() && !state.gameOver && current != null && current.isAutosave()){
             time += Time.delta;
-            if(time > Core.settings.getInt("saveinterval") * 60){
+            if(time > Core.settings.getInt("saveinterval") * 60 && !Vars.disableSave){
                 saving = true;
 
                 try{

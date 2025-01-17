@@ -25,6 +25,7 @@ public class PayloadBlock extends Block{
         update = true;
         sync = true;
         group = BlockGroup.payloads;
+        acceptsUnitPayloads = true;
         envEnabled |= Env.space | Env.underwater;
     }
 
@@ -32,9 +33,18 @@ public class PayloadBlock extends Block{
     public void load(){
         super.load();
 
-        topRegion = Core.atlas.find(name + "-top", "factory-top-" + size + regionSuffix);
-        outRegion = Core.atlas.find(name + "-out", "factory-out-" + size + regionSuffix);
-        inRegion = Core.atlas.find(name + "-in", "factory-in-" + size + regionSuffix);
+        topRegion = findFactoryRegion("-top");
+        outRegion =  findFactoryRegion("-out");
+        inRegion =  findFactoryRegion("-in");
+    }
+
+    protected TextureRegion findFactoryRegion(String suf){
+        TextureRegion region = Core.atlas.find(name + suf);
+
+        if(!region.found() && minfo.mod != null) region = Core.atlas.find(minfo.mod.name + "-factory" + suf + "-" + size + regionSuffix);
+        if(!region.found()) region = Core.atlas.find("factory" + suf + "-" + size + regionSuffix);
+
+        return region;
     }
 
     public static boolean blends(Building build, int direction){
@@ -148,6 +158,12 @@ public class PayloadBlock extends Block{
             if(payload != null){
                 payload.update(null, this);
             }
+        }
+
+        @Override
+        public void onDestroyed(){
+            if(payload != null) payload.destroyed();
+            super.onDestroyed();
         }
 
         public boolean blends(int direction){

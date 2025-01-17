@@ -7,7 +7,6 @@ import arc.backend.sdl.jni.*;
 import arc.discord.*;
 import arc.discord.DiscordRPC.*;
 import arc.files.*;
-import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -19,6 +18,7 @@ import mindustry.core.*;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.mod.Mods.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.service.*;
@@ -41,6 +41,9 @@ public class DesktopLauncher extends ClientLauncher{
                 maximized = true;
                 width = 900;
                 height = 700;
+                //request 3.1, which has instancing
+                gl30Minor = 1;
+                gl30 = true;
                 for(int i = 0; i < arg.length; i++){
                     if(arg[i].charAt(0) == '-'){
                         String name = arg[i].substring(1);
@@ -49,6 +52,7 @@ public class DesktopLauncher extends ClientLauncher{
                                 case "width": width = Integer.parseInt(arg[i + 1]); break;
                                 case "height": height = Integer.parseInt(arg[i + 1]); break;
                                 case "gl3": gl30 = true; break;
+                                case "gl2": gl30 = false; break;
                                 case "antialias": samples = 16; break;
                                 case "debug": Log.level = LogLevel.debug; break;
                                 case "maximized": maximized = Boolean.parseBoolean(arg[i + 1]); break;
@@ -219,27 +223,30 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     static void handleCrash(Throwable e){
-        Cons<Runnable> dialog = Runnable::run;
         boolean badGPU = false;
         String finalMessage = Strings.getFinalMessage(e);
         String total = Strings.getCauses(e).toString();
 
         if(total.contains("Couldn't create window") || total.contains("OpenGL 2.0 or higher") || total.toLowerCase().contains("pixel format") || total.contains("GLEW")|| total.contains("unsupported combination of formats")){
 
-            dialog.get(() -> message(
+            message(
                 total.contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + finalMessage :
                             "Your graphics card does not support the right OpenGL features.\n" +
                                     "Try to update your graphics drivers. If this doesn't work, your computer may not support Mindustry.\n\n" +
-                                    "Full message: " + finalMessage));
+                                    "Full message: " + finalMessage);
             badGPU = true;
         }
 
         boolean fbgp = badGPU;
 
-        CrashSender.send(e, file -> {
+        LoadedMod cause = CrashHandler.getModCause(e);
+        String causeString = cause == null ? (Structs.contains(e.getStackTrace(), st -> st.getClassName().contains("rhino.gen.")) ? "A mod or script has caused Mindustry to crash.\nConsider disabling your mods if the issue persists.\n" : "Mindustry has crashed.") :
+            "'" + cause.meta.displayName + "' (" + cause.name + ") has caused Mindustry to crash.\nConsider disabling this mod if issues persist.\n";
+
+        CrashHandler.handle(e, file -> {
             Throwable fc = Strings.getFinalCause(e);
             if(!fbgp){
-                dialog.get(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + fc.getClass().getSimpleName().replace("Exception", "") + (fc.getMessage() == null ? "" : ":\n" + fc.getMessage())));
+                message(causeString + "\nThe logs have been saved in:\n" + file.getAbsolutePath() + "\n" + fc.getClass().getSimpleName().replace("Exception", "") + (fc.getMessage() == null ? "" : ":\n" + fc.getMessage()));
             }
         });
     }

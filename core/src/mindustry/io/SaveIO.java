@@ -20,7 +20,7 @@ public class SaveIO{
     /** Save format header. */
     public static final byte[] header = {'M', 'S', 'A', 'V'};
     public static final IntMap<SaveVersion> versions = new IntMap<>();
-    public static final Seq<SaveVersion> versionArray = Seq.with(new Save1(), new Save2(), new Save3(), new Save4(), new Save5(), new Save6(), new Save7());
+    public static final Seq<SaveVersion> versionArray = Seq.with(new Save1(), new Save2(), new Save3(), new Save4(), new Save5(), new Save6(), new Save7(), new Save8());
 
     static{
         for(SaveVersion version : versionArray){
@@ -56,8 +56,13 @@ public class SaveIO{
     }
 
     public static boolean isSaveValid(Fi file){
+        return isSaveFileValid(file) || isSaveFileValid(backupFileFor(file));
+    }
+
+    private static boolean isSaveFileValid(Fi file){
         try(DataInputStream stream = new DataInputStream(new InflaterInputStream(file.read(bufferSize)))){
-            return isSaveValid(stream);
+            getMeta(stream);
+            return true;
         }catch(Throwable e){
             return false;
         }
