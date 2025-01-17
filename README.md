@@ -1,3 +1,8 @@
+# Mindustry Extended
+
+Is a custom client for Mindustry, note that it is a *separate game* with more content, under the GPLv3.0 licence.
+It adds new, cut, and unused content to the game.
+
 ## Building
 
 To compile on your own, follow these instructions.
