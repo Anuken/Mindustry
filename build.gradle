@@ -1,6 +1,6 @@
 buildscript{
-    ext{
-        arcHash = property("archash")
+    ext {
+        arcHash = '124ba82104838db4309cff09d293ee4edd130710' // Set this to the version or hash of your local Arc package
 
         localArc = !project.hasProperty("release") && new File(rootDir.parent, 'Arc').exists() && !project.hasProperty("noLocalArc")
 
@@ -10,6 +10,7 @@ buildscript{
             return "com.github.Anuken${localArc ? "" : ".Arc"}:$name:$arcHash"
         }
     }
+
 
     repositories{
         mavenLocal()

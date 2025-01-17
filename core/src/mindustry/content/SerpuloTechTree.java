@@ -20,7 +20,7 @@ public class SerpuloTechTree{
                 node(junction, () -> {
                     node(router, () -> {
                         node(launchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
-                            //no longer necessary to beat the campaign
+                            //TODO
                             //node(interplanetaryAccelerator, Seq.with(new SectorComplete(planetaryTerminal)), () -> {
 
                             //});
@@ -33,10 +33,12 @@ public class SerpuloTechTree{
                                 node(underflowGate);
                             });
                         });
-                        node(container, Seq.with(new SectorComplete(biomassFacility)), () -> {
-                            node(unloader);
-                            node(vault, Seq.with(new SectorComplete(stainedMountains)), () -> {
 
+                        node(chest, Seq.with(new SectorComplete(biomassFacility)), () -> {
+                            node(unloader);
+                            node(container, Seq.with(new Research(chest)), () -> {
+                                node(vault, Seq.with(new SectorComplete(stainedMountains)), () -> {
+                                });
                             });
                         });
 
@@ -55,6 +57,16 @@ public class SerpuloTechTree{
                                 });
 
                                 node(armoredConveyor, () -> {
+                                    node(armoredJunction, () -> {
+                                        node(armoredRouter, () -> {
+                                            node(armoredDistributor, () -> {
+                                                node(armoredOverflowGate);
+                                                node(armoredUnderflowGate);
+                                            });
+
+                                            node(armoredBridgeConveyor);
+                                        });
+                                    });
                                     node(plastaniumConveyor, () -> {
 
                                     });
@@ -251,8 +263,10 @@ public class SerpuloTechTree{
                         });
 
                         node(solarPanel, () -> {
-                            node(largeSolarPanel, () -> {
+                            node(solarPanelNormal, () -> {
+                                node(largeSolarPanel, () -> {
 
+                                });
                             });
                         });
                     });

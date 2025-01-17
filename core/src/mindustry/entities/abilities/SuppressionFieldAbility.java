@@ -78,9 +78,9 @@ public class SuppressionFieldAbility extends Ability{
             float angle = rand.random(360f) + (Time.time / rotateScl + unit.rotation) % 360f;
             float len = particleLen * particleInterp.apply(fout);
             Fill.circle(
-            rx + Angles.trnsx(angle, len),
-            ry + Angles.trnsy(angle, len),
-            particleSize * Mathf.slope(fin)
+                    rx + Angles.trnsx(angle, len),
+                    ry + Angles.trnsy(angle, len),
+                    particleSize * Mathf.slope(fin)
             );
         }
 

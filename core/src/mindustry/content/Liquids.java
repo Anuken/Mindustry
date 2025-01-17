@@ -50,7 +50,8 @@ public class Liquids{
             heatCapacity = 0.4f;
             temperature = 0.54f;
             viscosity = 0.85f;
-            flammability = 0f;
+            flammability = 0.2f;
+            explosiveness = 0.3f;
             capPuddles = false;
             spreadTarget = Liquids.water;
             moveThroughBlocks = true;

@@ -203,7 +203,7 @@ public class GlobalVars{
         varClient.numval = net.client() ? 1 : 0;
 
         //client
-        if(!net.server() && player != null){
+        if(player != null){
             varClientLocale.objval = player.locale();
             varClientUnit.objval = player.unit();
             varClientName.objval = player.name();

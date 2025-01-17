@@ -15,6 +15,7 @@ public abstract class Ability implements Cloneable{
     public void update(Unit unit){}
     public void draw(Unit unit){}
     public void death(Unit unit){}
+    public void created(Unit unit){}
     public void init(UnitType type){}
     public void displayBars(Unit unit, Table bars){}
     public void addStats(Table t){

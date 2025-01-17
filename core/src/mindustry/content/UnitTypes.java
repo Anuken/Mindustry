@@ -32,7 +32,7 @@ public class UnitTypes{
     //region standard
 
     //mech
-    public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign, vela;
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign, vela, king;
 
     //mech, legacy
     public static @EntityDef(value = {Unitc.class, Mechc.class}, legacy = true) UnitType nova, pulsar, quasar;
@@ -49,8 +49,8 @@ public class UnitTypes{
     public static @EntityDef({Unitc.class, ElevationMovec.class}) UnitType elude;
 
     //air
-    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
-    avert, obviate;
+    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra, twilight,
+    avert, obviate, heal, filaria, botfly, daremir;
 
     //air, legacy
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
@@ -310,6 +310,83 @@ public class UnitTypes{
                 }};
             }}
 
+            );
+        }};
+
+        king = new UnitType("king"){{
+            speed = 0.3f;
+            hitSize = 40f;
+            rotateSpeed = 1.4f;
+            health = 40000;
+            armor = 22f;
+            stepShake = 1.8f;
+            canDrown = false;
+            mechFrontSway = 0.8f;
+            mechSideSway = 1f;
+            singleTarget = canBoost = mechStepParticles = true;
+            boostMultiplier = 0.95f;
+            immunities = ObjectSet.with(StatusEffects.wet);
+            ammoType = new ItemAmmoType(Items.thorium);
+            range = 250;
+
+            weapons.add(
+                    new Weapon("king-meltdown-weapon"){{
+                        top = false;
+                        y = 0;
+                        x = 26;
+                        shootY = 11f;
+                        reload = 200;
+                        recoil = 1.5f;
+                        shake = 1;
+                        shootSound = Sounds.beam;
+                        alternate = false;
+                        cooldownTime = 200;
+                        chargeSound = Sounds.lasercharge2;
+                        continuous = true;
+                        rotate = true;
+                        rotateSpeed = 1;
+
+                        bullet = new ContinuousLaserBulletType(25){{
+                            pierce = true;
+                            width = 7;
+                            lifetime = 280;
+                            shootEffect = Fx.bigShockwave;
+                            drawSize = 470;
+                            shake = 0.5f;
+                            despawnEffect = smokeEffect = Fx.smokeCloud;
+                            hitEffect = Fx.hitMeltdown;
+                            status = StatusEffects.melting;
+                            statusDuration = 60;
+                            incendChance = 0.2f;
+                        }};
+                    }},
+
+                    new Weapon("king-gun"){{
+                        shootCone = 15;
+                        mirror = true;
+                        x = 16;
+                        y = -6;
+                        reload = 15;
+                        recoil = 4;
+                        ejectEffect = Fx.casing2;
+                        shootSound = Sounds.shootBig;
+                        shake = 1;
+                        alternate = true;
+                        rotate = true;
+                        rotateSpeed = 1;
+
+                        bullet = new BasicBulletType(4, 60){{
+                            knockback = 1;
+                            lightning = 4;
+                            lightningLength = 3;
+                            lightningLengthRand = 6;
+                            hitEffect = despawnEffect = Fx.blastExplosion;
+                            shootEffect = Fx.shootBig2;
+                            lifetime = 70;
+                            width = 10;
+                            height = 8;
+                        }};
+                    }}
             );
         }};
 
@@ -1246,6 +1323,132 @@ public class UnitTypes{
                 shootY = 7.25f;
                 bullet = fragBullet;
             }});
+        }};
+
+        twilight = new UnitType("twilight"){{
+            speed = 0.8f;
+            accel = 0.4f;
+            drag = 0.4f;
+            rotateSpeed = 1.9f;
+            flying = true;
+            lowAltitude = true;
+            faceTarget = true;
+            crashDamageMultiplier = 10;
+            range = 200;
+            maxRange = 200;
+            aimDst = 430;
+            lightRadius = 250;
+            health = 34000;
+            armor = 16f;
+            engineOffset = 46;
+            engineSize = 7;
+            hitSize = 80;
+            targetFlags = new BlockFlag[]{BlockFlag.generator, BlockFlag.core, null};
+            ammoType = new ItemAmmoType(Items.thorium);
+
+            weapons.add(
+                    new Weapon("king-gun"){{
+                        top = true;
+                        mirror = true;
+                        alternate = false;
+                        y = 7;
+                        x = 13;
+                        rotate = true;
+                        rotateSpeed = 4;
+                        inaccuracy = 8;
+                        reload = 4.5f;
+                        recoil = 2;
+                        shake = 0.5f;
+                        ejectEffect = Fx.casing2;
+                        shootSound = Sounds.shoot;
+
+                        bullet = new BasicBulletType(4, 20){{
+                            hitEffect = Fx.hitBulletSmall;
+                            shootEffect = Fx.shootBig2;
+                            despawnEffect = Fx.flakExplosion;
+                            trailParam = 5;
+                            trailLength = 13;
+                            trailWidth = 2;
+                            knockback = 0.5f;
+                            status = StatusEffects.blasted;
+                            statusDuration = 60;
+                            lifetime = 60;
+                            speed = 4;
+                            width = 9;
+                            height = 10;
+                            splashDamage = 17;
+                            splashDamageRadius = 35;
+                        }};
+                    }},
+
+                    new Weapon("king-gun"){{
+                        top = true;
+                        mirror = true;
+                        alternate = false;
+                        y = -12;
+                        x = 18;
+                        rotate = true;
+                        rotateSpeed = 4;
+                        inaccuracy = 8;
+                        reload = 4.5f;
+                        recoil = 2;
+                        shake = 0.5f;
+                        ejectEffect = Fx.casing2;
+                        shootSound = Sounds.shoot;
+
+                        bullet = new BasicBulletType(4, 20){{
+                            hitEffect = Fx.hitBulletSmall;
+                            shootEffect = Fx.shootBig2;
+                            despawnEffect = Fx.flakExplosion;
+                            trailParam = 5;
+                            trailLength = 13;
+                            trailWidth = 2;
+                            knockback = 0.5f;
+                            status = StatusEffects.blasted;
+                            statusDuration = 60;
+                            lifetime = 60;
+                            speed = 4;
+                            width = 9;
+                            height = 10;
+                            splashDamage = 17;
+                            splashDamageRadius = 35;
+                        }};
+                    }},
+
+                    new Weapon("twilight-rifle"){{
+                        top = mirror = alternate = rotate = true;
+                        y = -17;
+                        x = 32;
+                        rotateSpeed = 4;
+                        inaccuracy = 2;
+                        reload = 36;
+                        recoil = 4;
+                        shake = 0.5f;
+                        ejectEffect = Fx.casing2;
+                        shootSound = Sounds.shootBig;
+
+                        bullet = new BasicBulletType(5.6f, 130){{
+                            hitEffect = Fx.flakExplosionBig;
+                            shootEffect = Fx.shootBig2;
+                            despawnEffect = Fx.flakExplosionBig;
+                            trailParam = 5;
+                            trailLength = 13;
+                            trailWidth = 3.4f;
+                            pierce = true;
+                            pierceBuilding = true;
+                            hittable = false;
+                            pierceCap = 2;
+                            knockback = 1.8f;
+                            status = StatusEffects.blasted;
+                            statusDuration = 60;
+                            lifetime = 46;
+                            width = 14;
+                            height = 16;
+                            splashDamage = 15;
+                            splashDamageRadius = 20;
+                        }};
+                    }}
+            );
         }};
 
         //endregion
@@ -3574,6 +3777,52 @@ public class UnitTypes{
         //endregion
         //region erekir - flying
 
+        heal = new ErekirUnitType("heal"){{
+            defaultCommand = UnitCommand.repairCommand;
+            lowAltitude = false;
+            flying = true;
+            drag = 0.08f;
+            speed = 7f;
+            rotateSpeed = 4f;
+            accel = 0.09f;
+            health = 600f;
+            armor = 1f;
+            hitSize = 11f;
+            engineSize = 0;
+            fogRadius = 25;
+            itemCapacity = 0;
+
+            weapons.add(new RepairBeamWeapon(){{
+                widthSinMag = 0.11f;
+                reload = 20f;
+                x = 0f;
+                y = 6.5f;
+                rotate = false;
+                shootY = 0f;
+                beamWidth = 0.7f;
+                repairSpeed = 3.1f;
+                fractionRepairSpeed = 0.06f;
+                aimDst = 0f;
+                shootCone = 15f;
+                mirror = false;
+
+                targetUnits = false;
+                targetBuildings = true;
+                autoTarget = false;
+                controllable = true;
+                laserColor = Pal.heal;
+                healColor = Pal.heal;
+
+                bullet = new BulletType(){{
+                    maxRange = 60f;
+                }};
+            }});
+
+            setEnginesMirror(
+                    new UnitEngine(2.5f, -5.6f, 1f, 2.3f)
+            );
+        }};
+
         elude = new ErekirUnitType("elude"){{
             hovering = true;
             shadowElevation = 0.1f;
@@ -4033,7 +4282,7 @@ public class UnitTypes{
         }};
 
         //endregion
-        //region erekir - neoplasm
+        //region neoplasm
 
         renale = new NeoplasmUnitType("renale"){{
             health = 500;
@@ -4292,6 +4541,127 @@ public class UnitTypes{
 
                 bullet = new BulletType(){{
                     maxRange = 65f;
+                }};
+            }});
+        }};
+
+        //endregion
+        //region tantros - air
+
+        filaria = new UnitType("filaria"){{
+            speed = 2.7f;
+            accel = 0.08f;
+            drag = 0.04f;
+            flying = true;
+            health = 65;
+            engineOffset = 7f;
+            targetAir = true;
+            hitSize = 9;
+            itemCapacity = 0;
+
+            weapons.add(new Weapon(){{
+                y = 0f;
+                x = 2f;
+                reload = 20f;
+                ejectEffect = Fx.casing1;
+                bullet = new BasicBulletType(2.5f, 7){{
+                    width = 7f;
+                    height = 9f;
+                    lifetime = 45f;
+                    shootEffect = Fx.shootSmall;
+                    smokeEffect = Fx.shootSmallSmoke;
+                    ammoMultiplier = 2;
+                }};
+                shootSound = Sounds.pew;
+            }});
+        }};
+
+        //TODO nerf overall armor and have frontal damage resistance?
+        botfly = new UnitType("botfly"){{
+            health = 315;
+            speed = 1.65f;
+            accel = 0.08f;
+            drag = 0.016f;
+            flying = true;
+            hitSize = 11f;
+            targetAir = false;
+            engineOffset = 7.8f;
+            range = 140f;
+            faceTarget = false;
+            armor = 4f;
+            itemCapacity = 0;
+            targetFlags = new BlockFlag[]{BlockFlag.factory, BlockFlag.reactor, BlockFlag.drill, null};
+            circleTarget = true;
+            ammoType = new ItemAmmoType(Items.scrap);
+
+            weapons.add(new Weapon(){{
+                minShootVelocity = 0.75f;
+                x = 3f;
+                shootY = 0f;
+                reload = 12f;
+                shootCone = 180f;
+                ejectEffect = Fx.none;
+                inaccuracy = 15f;
+                ignoreRotation = true;
+                shootSound = Sounds.none;
+                bullet = new BombBulletType(24f, 26f){{
+                    width = 10f;
+                    height = 14f;
+                    hitEffect = Fx.flakExplosion;
+                    shootEffect = Fx.none;
+                    smokeEffect = Fx.none;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+                    damage = splashDamage * 0.5f;
+                }};
+            }});
+        }};
+
+        daremir = new UnitType("daremir"){{
+            health = 700;
+            speed = 1.7f;
+            accel = 0.04f;
+            drag = 0.016f;
+            flying = true;
+            range = 140f;
+            hitSize = 20f;
+            lowAltitude = true;
+            forceMultiTarget = true;
+            armor = 4.5f;
+
+            targetFlags = new BlockFlag[]{BlockFlag.launchPad, BlockFlag.storage, BlockFlag.battery, null};
+            engineOffset = 12f;
+            engineSize = 3f;
+            ammoType = new ItemAmmoType(Items.copper);
+
+            weapons.add(new Weapon("scrap-zenith-missiles"){{
+                reload = 40f;
+                x = 7f;
+                rotate = true;
+                shake = 1f;
+                shoot.shots = 2;
+                inaccuracy = 5f;
+                velocityRnd = 0.2f;
+                shootSound = Sounds.missile;
+
+                bullet = new MissileBulletType(3f, 14){{
+                    width = 8f;
+                    height = 8f;
+                    shrinkY = 0f;
+                    drag = -0.003f;
+                    homingRange = 60f;
+                    keepVelocity = false;
+                    splashDamageRadius = 25f;
+                    splashDamage = 15f;
+                    lifetime = 50f;
+                    trailColor = Color.valueOf("212121");
+                    backColor = Color.valueOf("212121");
+                    frontColor = Color.valueOf("3b3a3b");
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    weaveScale = 6f;
+                    weaveMag = 1f;
                 }};
             }});
         }};

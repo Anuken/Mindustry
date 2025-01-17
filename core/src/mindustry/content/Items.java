@@ -8,7 +8,7 @@ public class Items{
     public static Item
     scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium,
     phaseFabric, surgeAlloy, sporePod, sand, blastCompound, pyratite, metaglass,
-    beryllium, tungsten, oxide, carbide, fissileMatter, dormantCyst;
+    beryllium, tungsten, oxide, carbide, fissileMatter, dormantCyst, beryllite, hardenedClay;
 
     public static final Seq<Item> serpuloItems = new Seq<>(), erekirItems = new Seq<>(), erekirOnlyItems = new Seq<>();
 
@@ -135,6 +135,14 @@ public class Items{
             hidden = true;
         }};
 
+        beryllite = new Item("beryllite", Color.valueOf("3a8f64")){{
+            hardness = 3;
+        }};
+
+        hardenedClay = new Item("hardened-clay", Color.valueOf("a3590a")){{
+            cost = 0.7f;
+        }};
+
         serpuloItems.addAll(
         scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium,
         phaseFabric, surgeAlloy, sporePod, sand, blastCompound, pyratite, metaglass
@@ -142,10 +150,9 @@ public class Items{
 
         erekirItems.addAll(
         graphite, thorium, silicon, phaseFabric, surgeAlloy, sand,
-        beryllium, tungsten, oxide, carbide, fissileMatter, dormantCyst
+        beryllium, tungsten, oxide, carbide, fissileMatter, dormantCyst, beryllite
         );
 
         erekirOnlyItems.addAll(erekirItems).removeAll(serpuloItems);
-
     }
 }

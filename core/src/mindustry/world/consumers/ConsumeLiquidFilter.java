@@ -74,4 +74,9 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     public void display(Stats stats){
         stats.add(booster ? Stat.booster : Stat.input, StatValues.liquids(filter, amount * 60f, true));
     }
+
+    @Override
+    public boolean consumes(Liquid liquid){
+        return filter.get(liquid);
+    }
 }

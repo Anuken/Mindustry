@@ -29,7 +29,6 @@ public class DrawGlowRegion extends DrawBlock{
         this.rotate = rotate;
     }
 
-
     public DrawGlowRegion(String suffix){
         this.suffix = suffix;
     }

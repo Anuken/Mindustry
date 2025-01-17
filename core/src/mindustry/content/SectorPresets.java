@@ -15,7 +15,9 @@ public class SectorPresets{
     geothermalStronghold, cruxscape,
 
     onset, aegis, lake, intersect, basin, atlas, split, marsh, peaks, ravine, caldera,
-    stronghold, crevice, siege, crossroads, karst, origin;
+    stronghold, crevice, slagRiver, siege, crossroads, karst, origin,
+
+    crimsonDive;
 
     public static void load(){
         //region serpulo
@@ -224,6 +226,11 @@ public class SectorPresets{
             captureWave = 46;
         }};
 
+        slagRiver = new SectorPreset("slag-river", erekir, 34){{
+            difficulty = 7;
+            captureWave = 20;
+        }};
+
         siege = new SectorPreset("siege", erekir, 58){{
             difficulty = 8;
         }};
@@ -243,5 +250,11 @@ public class SectorPresets{
         }};
 
         //endregion
+        //region tantros
+        crimsonDive = new SectorPreset("crimson-dive", tantros, 10){{
+            difficulty = 1;
+            captureWave = 15;
+            alwaysUnlocked = true; //TODO post-start planet, neoplasm infestation for enemy reveal after tut (WIP)
+        }};
     }
 }

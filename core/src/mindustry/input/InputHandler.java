@@ -1441,9 +1441,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         for(BlockPlan plan : player.team().data().plans){
-            Block block = content.block(plan.block);
+            Block block = plan.block;
             if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
-                drawSelected(plan.x, plan.y, content.block(plan.block), Pal.remove);
+                drawSelected(plan.x, plan.y, plan.block, Pal.remove);
             }
         }
 
@@ -1463,9 +1463,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Tmp.r1.set(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
 
         for(BlockPlan plan : player.team().data().plans){
-            Block block = content.block(plan.block);
+            Block block = plan.block;
             if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
-                drawSelected(plan.x, plan.y, content.block(plan.block), Pal.sapBullet);
+                drawSelected(plan.x, plan.y, plan.block, Pal.sapBullet);
             }
         }
 
@@ -1629,7 +1629,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Iterator<BlockPlan> broken = player.team().data().plans.iterator();
         while(broken.hasNext()){
             BlockPlan plan = broken.next();
-            Block block = content.block(plan.block);
+            Block block = plan.block;
             if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
                 removed.add(Point2.pack(plan.x, plan.y));
                 plan.removed = true;
@@ -2000,9 +2000,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Iterator<BlockPlan> broken = player.team().data().plans.iterator();
         while(broken.hasNext()){
             BlockPlan plan = broken.next();
-            Block block = content.block(plan.block);
+            Block block = plan.block;
             if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
-                player.unit().addBuild(new BuildPlan(plan.x, plan.y, plan.rotation, content.block(plan.block), plan.config));
+                player.unit().addBuild(new BuildPlan(plan.x, plan.y, plan.rotation, plan.block, plan.config));
             }
         }
 

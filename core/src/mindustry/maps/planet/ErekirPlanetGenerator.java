@@ -8,11 +8,13 @@ import arc.util.noise.*;
 import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.graphics.g3d.PlanetGrid;
 import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
+import java.util.Random;
 
 import static mindustry.Vars.*;
 
@@ -27,16 +29,42 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     public static float crystalScl = 0.9f, crystalMag = 0.3f;
     public static float airThresh = 0.13f, airScl = 14;
 
-    Block[] terrain = {Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.yellowStone, Blocks.rhyolite, Blocks.rhyolite, Blocks.carbonStone};
+    Block[] terrain = {Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.regolith, Blocks.yellowStone};
 
     {
         baseSeed = 2;
         defaultLoadout = Loadouts.basicBastion;
     }
 
+    //TODO implement numbered sectors
     @Override
-    public void generateSector(Sector sector){
-        //no bases right now
+    public void generateSector(Sector sector) {
+    //    PlanetGrid.Ptile tile = sector.tile;
+    //    Random random = new Random();
+    //    boolean generateBase = random.nextBoolean();
+
+    //    float poles = Math.abs(tile.v.y);
+    //    float noise = Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.001f, 0.58f);
+
+    //    if (noise + poles / 7.1 > 0.12 && poles > 0.23) {
+    //        generateBase = true;
+    //    }
+
+    //    if (noise < 0.16) {
+    //        for (PlanetGrid.Ptile other : tile.tiles) {
+    //            var osec = sector.planet.getSector(other);
+    //            if (osec != null && (
+    //                    osec.id == sector.planet.startSector ||
+    //                            osec.generateEnemyBase && poles < 0.85 ||
+    //                            (sector.preset != null && noise < 0.11)
+    //             )) {
+    //                generateBase = false;
+    //                break;
+    //            }
+    //        }
+    //    }
+
+    //    sector.generateEnemyBase = false;
     }
 
     @Override
@@ -58,7 +86,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
     @Override
     public float getSizeScl(){
-        //TODO should sectors be 600, or 500 blocks?
         return 2000 * 1.07f * 6f / 5f;
     }
 

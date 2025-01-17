@@ -21,8 +21,8 @@ public class CacheLayer{
     /** Registers cache layers that will render before the 'normal' layer. */
     public static void add(CacheLayer... layers){
         for(var layer : layers){
-            //7 = 'normal' index
-            add(7, layer);
+            //8 = 'normal' index
+            add(8, layer);
         }
     }
 

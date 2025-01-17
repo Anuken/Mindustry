@@ -631,6 +631,13 @@ public class StatValues{
                             ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds"))).with(c -> withTooltip(c, type.status));
                     }
 
+                    if(!type.targetMissiles){
+                        sep(bt, "@bullet.notargetsmissiles");
+                    }
+                    if(!type.targetBlocks){
+                        sep(bt, "@bullet.notargetsbuildings");
+                    }
+
                     if(type.intervalBullet != null){
                         bt.row();
 

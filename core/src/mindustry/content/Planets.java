@@ -66,9 +66,9 @@ public class Planets{
             defaultCore = Blocks.coreBastion;
             iconColor = Color.valueOf("ff9266");
             enemyBuildSpeedMultiplier = 0.4f;
-
-            //TODO disallowed for now
-            allowLaunchToNumbered = false;
+            allowLaunchToNumbered = false; //TODO implement
+            allowWaveSimulation = true;
+            allowSectorInvasion = false; //should there be invasions?
 
             //TODO SHOULD there be lighting?
             updateLighting = false;
@@ -110,17 +110,34 @@ public class Planets{
         tantros = new Planet("tantros", sun, 1f, 2){{
             generator = new TantrosPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 4);
-            accessible = false;
-            visible = false;
-            atmosphereColor = Color.valueOf("3db899");
-            iconColor = Color.valueOf("597be3");
+            accessible = true;
+            visible = true;
+            atmosphereColor = Liquids.neoplasm.color;
+            iconColor = Liquids.neoplasm.color;
             startSector = 10;
+            defaultCore = Blocks.coreRaft;
             atmosphereRadIn = -0.01f;
             atmosphereRadOut = 0.3f;
             defaultEnv = Env.underwater | Env.terrestrial;
+            allowLaunchToNumbered = false; //TODO implement
             ruleSetter = r -> {
-
+                //TODO neoplasm source? Attack sectors galore, neoplastic surface?
+                r.waveTeam = Team.derelict2;
+                r.placeRangeCheck = false;
+                r.showSpawns = false;
+                r.coreDestroyClear = true;
             };
+
+            cloudMeshLoader = () -> new MultiMesh(
+                    new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, new Color().set(Pal.spore).mul(0.9f).a(0.75f), 2, 0.45f, 0.9f, 0.38f),
+                    new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Pal.spore, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f)
+            );
+
+            alwaysUnlocked = true;
+            allowLaunchLoadout = false;
+            enemyCoreSpawnReplace = true;
+
+            unlockedOnLand.add(Blocks.coreRaft);
         }};
 
         serpulo = new Planet("serpulo", sun, 1f, 3){{
@@ -172,7 +189,10 @@ public class Planets{
             camRadius = 0.68f * scale;
             minZoom = 0.6f;
             drawOrbit = false;
+            //TODO implement, change values to test
             accessible = false;
+            alwaysUnlocked = false;
+            //end change-to-test test values
             clipRadius = 2f;
             defaultEnv = Env.space;
             icon = "commandRally";
