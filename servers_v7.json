@@ -1,5 +1,9 @@
 [
   {
+    "name": "Yuzo",
+    "address": ["node.yuzo.fr:5015"]
+  },
+  {
     "name": "EscoCorp",
     "address": [
       "121.127.37.17:6567",
