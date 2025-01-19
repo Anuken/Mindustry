@@ -106,6 +106,15 @@ public class ForceFieldAbility extends Ability{
     }
 
     @Override
+    public void death(Unit unit){
+
+        //self-destructing units can have a shield on death
+        if(unit.shield > 0f && !wasBroken){
+            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), this);
+        }
+    }
+
+    @Override
     public void draw(Unit unit){
         checkRadius(unit);
 
