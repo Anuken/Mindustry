@@ -465,6 +465,9 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(unit.controller() instanceof CommandAI command && defaultCommand != null){
             command.command = defaultCommand;
         }
+        for(var ability : unit.abilities){
+            ability.created(unit);
+        }
         unit.ammo = ammoCapacity; //fill up on ammo upon creation
         unit.elevation = flying ? 1f : 0;
         unit.heal();

@@ -93,13 +93,13 @@ public class WaveGraph extends Table{
                 case totals -> nextStep(maxTotal);
             };
 
-            lay.setText(font, maxY + "");
+            lay.setText(font, "1");
 
             float spacing = zoom * defaultSpace;
             pan = Math.max(pan, (width/2f)/zoom-defaultSpace);
 
             float fh = lay.height;
-            float offsetX = lay.width, offsetY = Scl.scl(22f) + fh + Scl.scl(5f);
+            float offsetX = 0f, offsetY = Scl.scl(22f) + fh + Scl.scl(5f);
             float graphX = x + offsetX - pan * zoom + width/2f, graphY = y + offsetY, graphW = width - offsetX, graphH = height - offsetY;
 
             float left = (x-graphX)/spacing, right = (x + width - graphX)/spacing;
@@ -196,13 +196,13 @@ public class WaveGraph extends Table{
             Draw.alpha(0.1f);
 
             for(int i = 0; i < maxY; i += markSpace){
-                float cy = graphY + i * graphH / maxY, cx = offsetX + x;
+                float cy = graphY + i * graphH / maxY, cx = x;
 
                 Lines.line(cx, cy, cx + graphW, cy);
 
                 lay.setText(font, "" + i);
 
-                font.draw("" + i, cx, cy + lay.height / 2f, Align.right);
+                font.draw("" + i, cx, cy + lay.height / 2f, Align.left);
             }
             Draw.alpha(1f);
 

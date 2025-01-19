@@ -338,7 +338,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        data.plans.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, toAdd.id, overrideConfig == null ? config() : overrideConfig));
+        data.plans.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, toAdd, overrideConfig == null ? config() : overrideConfig));
     }
 
     public @Nullable Tile findClosestEdge(Position to, Boolf<Tile> solid){

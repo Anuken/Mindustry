@@ -28,7 +28,7 @@ public class Fx{
     public static final Effect
 
     none = new Effect(0, 0f, e -> {}),
-    
+
     blockCrash = new Effect(90f, e -> {
         if(!(e.data instanceof Block block)) return;
 
@@ -445,6 +445,20 @@ public class Fx{
         }
     }),
 
+    titanExplosionLarge = new Effect(45f, 220f, e -> {
+        color(e.color);
+        stroke(e.fout() * 3f);
+        float circleRad = 6f + e.finpow() * 110f;
+        Lines.circle(e.x, e.y, circleRad);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 21; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 50f * rand.random(1f, 0.6f) + 2f, e.finpow() * 100f * lenRand + 6f);
+        }
+    }),
+
     titanSmoke = new Effect(300f, 300f, b -> {
         float intensity = 3f;
 
@@ -465,11 +479,59 @@ public class Fx{
         }
     }),
 
+    titanSmokeLarge = new Effect(400f, 400f, b -> {
+        float intensity = 4f;
+
+        color(b.color, 0.65f);
+        for(int i = 0; i < 4; i++){
+            rand.setSeed(b.id*2 + i);
+            float lenScl = rand.random(0.5f, 1f);
+            int fi = i;
+            b.scaled(b.lifetime * lenScl, e -> {
+                randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 26f * intensity, (x, y, in, out) -> {
+                    float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                    float rad = fout * ((2f + intensity) * 2.35f);
+
+                    Fill.circle(e.x + x, e.y + y, rad);
+                    Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
+                });
+            });
+        }
+    }),
+
+    smokeAoeCloud = new Effect(60f * 3f, 250f, e -> {
+        color(e.color, 0.65f);
+
+        randLenVectors(e.id, 80, 90f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 6f * Mathf.clamp(e.fin() / 0.1f) * Mathf.clamp(e.fout() / 0.1f));
+        });
+    }),
+
     missileTrailSmoke = new Effect(180f, 300f, b -> {
         float intensity = 2f;
 
         color(b.color, 0.7f);
         for(int i = 0; i < 4; i++){
+            rand.setSeed(b.id*2 + i);
+            float lenScl = rand.random(0.5f, 1f);
+            int fi = i;
+            b.scaled(b.lifetime * lenScl, e -> {
+                randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 13f * intensity, (x, y, in, out) -> {
+                    float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                    float rad = fout * ((2f + intensity) * 2.35f);
+
+                    Fill.circle(e.x + x, e.y + y, rad);
+                    Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
+                });
+            });
+        }
+    }).layer(Layer.bullet - 1f),
+
+    missileTrailSmokeSmall = new Effect(120f, 200f, b -> {
+        float intensity = 1.3f;
+
+        color(b.color, 0.7f);
+        for(int i = 0; i < 3; i++){
             rand.setSeed(b.id*2 + i);
             float lenScl = rand.random(0.5f, 1f);
             int fi = i;
@@ -523,8 +585,33 @@ public class Fx{
         }
     }),
 
+    scatheExplosionSmall = new Effect(40f, 160f, e -> {
+        color(e.color);
+        stroke(e.fout() * 4f);
+        float circleRad = 6f + e.finpow() * 40f;
+        Lines.circle(e.x, e.y, circleRad);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 16; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            Tmp.v1.trns(angle, circleRad);
+
+            for(int s : Mathf.signs){
+                Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.foutpow() * 30f, e.fout() * 25f * lenRand + 6f, angle + 90f + s * 90f);
+            }
+        }
+    }),
+
     scatheLight = new Effect(60f, 160f, e -> {
         float circleRad = 6f + e.finpow() * 60f;
+
+        color(e.color, e.foutpow());
+        Fill.circle(e.x, e.y, circleRad);
+    }).layer(Layer.bullet + 2f),
+
+    scatheLightSmall = new Effect(60f, 160f, e -> {
+        float circleRad = 6f + e.finpow() * 40f;
 
         color(e.color, e.foutpow());
         Fill.circle(e.x, e.y, circleRad);
@@ -761,7 +848,7 @@ public class Fx{
             Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
         });
     }),
-    
+
     hitLaserBlast = new Effect(12, e -> {
         color(e.color);
         stroke(e.fout() * 1.5f);
@@ -1114,7 +1201,7 @@ public class Fx{
         stroke(2f * e.fout());
         Lines.circle(e.x, e.y, 5f * e.fout());
     }),
-    
+
     forceShrink = new Effect(20, e -> {
         color(e.color, e.fout());
         if(renderer.animateShields){
@@ -1693,6 +1780,18 @@ public class Fx{
 
     shootSmokeMissile = new Effect(130f, 300f, e -> {
         color(Pal.redLight);
+        alpha(0.5f);
+        rand.setSeed(e.id);
+        for(int i = 0; i < 35; i++){
+            v.trns(e.rotation + 180f + rand.range(21f), rand.random(e.finpow() * 90f)).add(rand.range(3f), rand.range(3f));
+            e.scaled(e.lifetime * rand.random(0.2f, 1f), b -> {
+                Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 9f + 0.3f);
+            });
+        }
+    }),
+
+    shootSmokeMissileColor = new Effect(130f, 300f, e -> {
+        color(e.color);
         alpha(0.5f);
         rand.setSeed(e.id);
         for(int i = 0; i < 35; i++){

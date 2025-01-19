@@ -458,7 +458,7 @@ public class Control implements ApplicationListener, Loadable{
                                 for(var plan : state.rules.waveTeam.data().plans){
                                     Tile tile = world.tile(plan.x, plan.y);
                                     if(tile != null){
-                                        tile.setBlock(content.block(plan.block), state.rules.waveTeam, plan.rotation);
+                                        tile.setBlock(plan.block, state.rules.waveTeam, plan.rotation);
                                         if(plan.config != null && tile.build != null){
                                             tile.build.configureAny(plan.config);
                                         }
