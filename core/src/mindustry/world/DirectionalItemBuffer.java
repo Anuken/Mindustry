@@ -54,11 +54,21 @@ public class DirectionalItemBuffer{
     }
 
     public void read(Reads read){
+        read(read, false);
+    }
+
+    public void read(Reads read, boolean legacy){
         for(int i = 0; i < 4; i++){
             indexes[i] = read.b();
             byte length = read.b();
             for(int j = 0; j < length; j++){
                 long value = read.l();
+
+                if(legacy){
+                    //read value as the old format with 1-byte items, and create a new one with the new 2-byte format
+                    value = BufferItem.get(BufferItemLegacy.item(value), BufferItemLegacy.time(value));
+                }
+
                 if(j < buffers[i].length){
                     buffers[i][j] = value;
                 }
@@ -69,6 +79,12 @@ public class DirectionalItemBuffer{
     @Struct
     class BufferItemStruct{
         short item;
+        float time;
+    }
+
+    @Struct
+    class BufferItemLegacyStruct{
+        byte item;
         float time;
     }
 }

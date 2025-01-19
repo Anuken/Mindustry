@@ -1273,7 +1273,7 @@ public class Blocks{
         }};
 
         electricHeater = new HeatProducer("electric-heater"){{
-            requirements(Category.crafting, with(Items.tungsten, 30, Items.oxide, 30));
+            requirements(Category.crafting, with(Items.tungsten, 30, Items.oxide, 30, Items.beryllium, 30));
 
             researchCostMultiplier = 4f;
 
@@ -4047,14 +4047,14 @@ public class Blocks{
                 rangeChange = 40f;
                 buildingDamageMultiplier = 0.3f;
             }},
-            Items.carbide, new BasicBulletType(12f, 450f/0.75f){{
+            Items.carbide, new BasicBulletType(12f, 325f/0.75f){{
                 width = 15f;
                 height = 21f;
                 hitSize = 7f;
                 shootEffect = sfe;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 2;
-                reloadMultiplier = 0.5f;
+                reloadMultiplier = 0.2f;
                 hitColor = backColor = trailColor = Color.valueOf("ab8ec5");
                 frontColor = Color.white;
                 trailWidth = 2.2f;
@@ -4062,11 +4062,35 @@ public class Blocks{
                 trailEffect = Fx.disperseTrail;
                 trailInterval = 2f;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
-                rangeChange = 20f*8f;
+                rangeChange = 7f*8f;
                 buildingDamageMultiplier = 0.3f;
-                targetBlocks = false;
-                targetMissiles = false;
+                //targetBlocks = false;
+                //targetMissiles = false;
                 trailRotation = true;
+
+                fragBullets = 3;
+                fragRandomSpread = 0f;
+                fragSpread = 25f;
+                fragVelocityMin = 1f;
+
+                fragBullet = new BasicBulletType(8.1f, 227f){{
+                    lifetime = 8f;
+                    width = 11f;
+                    height = 14f;
+                    hitSize = 7f;
+                    shootEffect = sfe;
+                    ammoMultiplier = 1;
+                    reloadMultiplier = 1f;
+                    pierceCap = 2;
+                    pierce = true;
+                    pierceBuilding = true;
+                    hitColor = backColor = trailColor = Color.valueOf("ab8ec5");
+                    frontColor = Color.white;
+                    trailWidth = 1.8f;
+                    trailLength = 11;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                    buildingDamageMultiplier = 0.2f;
+                }};
             }}
             );
 
@@ -4335,10 +4359,10 @@ public class Blocks{
                 trailInterp = v -> Math.max(Mathf.slope(v), 0.8f);
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
-                buildingDamageMultiplier = 0.3f;
+                buildingDamageMultiplier = 0.2f;
             }},
             Items.oxide, new ArtilleryBulletType(2.5f, 300, "shell"){{
-                hitEffect = new MultiEffect(Fx.titanExplosionLarge, Fx.titanSmokeLarge);
+                hitEffect = new MultiEffect(Fx.titanExplosionLarge, Fx.titanSmokeLarge, Fx.smokeAoeCloud);
                 despawnEffect = Fx.none;
                 knockback = 2f;
                 lifetime = 190f;
@@ -4371,6 +4395,23 @@ public class Blocks{
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.25f;
+
+                fragBullets = 1;
+                fragBullet = new EmptyBulletType(){{
+                    lifetime = 60f * 2.5f;
+                    bulletInterval = 20f;
+                    intervalBullet = new EmptyBulletType(){{
+                        splashDamage = 30f;
+                        collidesGround = true;
+                        collidesAir = false;
+                        collides = false;
+                        hitEffect = Fx.none;
+                        pierce = true;
+                        instantDisappear = true;
+                        splashDamageRadius = 90f;
+                        buildingDamageMultiplier = 0.2f;
+                    }};
+                }};
             }}
             );
 
@@ -4608,7 +4649,7 @@ public class Blocks{
         }};
 
         afflict = new PowerTurret("afflict"){{
-            requirements(Category.turret, with(Items.surgeAlloy, 100, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
+            requirements(Category.turret, with(Items.surgeAlloy, 125, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
 
             shootType = new BasicBulletType(){{
                 shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{
@@ -4886,18 +4927,17 @@ public class Blocks{
                 }};
             }},
 
-            //TODO - needs balancing
             Items.phaseFabric, new BulletType(0f, 0f){{
                 shootEffect = Fx.shootBig;
                 smokeEffect = Fx.shootSmokeMissileColor;
                 hitColor = Color.valueOf("ffd37f");
-                ammoMultiplier = 1f;
+                ammoMultiplier = 5f;
                 reloadMultiplier = 0.8f;
 
                 spawnUnit = new MissileUnitType("scathe-missile-phase"){{
-                    speed = 4.4f;
+                    speed = 4f;
                     maxRange = 6f;
-                    lifetime = 60f * 5.7f;
+                    lifetime = 60f * 6.1f;
                     outlineColor = Pal.darkOutline;
                     engineColor = trailColor = Color.valueOf("ffd37f");
                     engineLayer = Layer.effect;
@@ -4913,9 +4953,20 @@ public class Blocks{
                     targetAir = false;
                     targetUnderBlocks = false;
 
+                    parts.add(new ShapePart(){{
+                        progress = PartProgress.constant(1f);
+                        color = Pal.accent;
+                        sides = 6;
+                        radius = 3f;
+                        rotateSpeed = 3f;
+                        hollow = true;
+                        layer = Layer.effect;
+                        y = 1.8f;
+                    }});
+
                     fogRadius = 6f;
 
-                    health = 250;
+                    health = 500;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -4924,7 +4975,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(1500f, 50f){{
+                        bullet = new ExplosionBulletType(400f, 120f){{
                             hitColor = engineColor;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;
@@ -4933,7 +4984,7 @@ public class Blocks{
                             }});
 
                             collidesAir = false;
-                            buildingDamageMultiplier = 0.2f;
+                            buildingDamageMultiplier = 0.1f;
 
                             ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
@@ -4947,8 +4998,8 @@ public class Blocks{
                                 lifetime = 23f;
                                 width = height = 18f;
                                 collidesTiles = false;
-                                splashDamageRadius = 40f;
-                                splashDamage = 160f;
+                                splashDamageRadius = 56f;
+                                splashDamage = 164f;
                                 backColor = trailColor = hitColor = engineColor;
                                 frontColor = Color.white;
                                 smokeEffect = Fx.shootBigSmoke2;
@@ -4972,7 +5023,7 @@ public class Blocks{
                         interval = 7f;
                     }});
 
-                    abilities.add(new ForceFieldAbility(30f, 0f, 160f, 999999999f));
+                    abilities.add(new ForceFieldAbility(90f, 0f, 2000f, 999999999f));
 
                 }};
             }},
@@ -5017,12 +5068,12 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(400f, 40f){{
+                        bullet = new ExplosionBulletType(300f, 40f){{
                             hitColor = engineColor;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosionSmall);
 
                             collidesAir = false;
-                            buildingDamageMultiplier = 0.25f;
+                            buildingDamageMultiplier = 0.1f;
 
                             ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
@@ -5064,7 +5115,7 @@ public class Blocks{
                                         deathExplosionEffect = Fx.massiveExplosion;
                                         shootOnDeath = true;
                                         shake = 10f;
-                                        bullet = new ExplosionBulletType(340f, 35f){{
+                                        bullet = new ExplosionBulletType(360f, 35f){{
                                             lightning = 6;
                                             lightningDamage = 35f;
                                             lightningLength = 8;
@@ -5077,7 +5128,7 @@ public class Blocks{
                                             }});
 
                                             collidesAir = false;
-                                            buildingDamageMultiplier = 0.2f;
+                                            buildingDamageMultiplier = 0.1f;
                                         }};
                                     }});
 
