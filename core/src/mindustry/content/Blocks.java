@@ -2874,7 +2874,7 @@ public class Blocks{
             fogRadius = 4;
 
             consumePower(160f / 60f);
-            consumeLiquid(Liquids.water, 0.2f);
+            consumeLiquid(Liquids.water, 10f/60f);
         }};
 
         eruptionDrill = new BurstDrill("eruption-drill"){{
