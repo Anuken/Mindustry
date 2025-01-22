@@ -14,6 +14,7 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -27,8 +28,11 @@ import mindustry.input.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 import static mindustry.gen.Tex.*;
@@ -36,11 +40,11 @@ import static mindustry.gen.Tex.*;
 public class HudFragment{
     private static final float dsize = 65f, pauseHeight = 36f;
 
-    public final PlacementFragment blockfrag = new PlacementFragment();
+    public PlacementFragment blockfrag = new PlacementFragment();
+    public CoreItemsDisplay coreItems = new CoreItemsDisplay();
     public boolean shown = true;
 
     private ImageButton flip;
-    private CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
     private String hudText = "";
     private boolean showHudText;
@@ -48,6 +52,80 @@ public class HudFragment{
     private Table lastUnlockTable;
     private Table lastUnlockLayout;
     private long lastToast;
+
+    private Seq<Block> blocksOut = new Seq<>();
+
+    private void addBlockSelection(Table cont){
+        Table blockSelection = new Table();
+        var pane = new ScrollPane(blockSelection, Styles.smallPane);
+        pane.setFadeScrollBars(false);
+        Planet[] last = {state.rules.planet};
+        pane.update(() -> {
+            if(pane.hasScroll()){
+                Element result = Core.scene.getHoverElement();
+                if(result == null || !result.isDescendantOf(pane)){
+                    Core.scene.setScrollFocus(null);
+                }
+            }
+
+            if(state.rules.planet != last[0]){
+                last[0] = state.rules.planet;
+                rebuildBlockSelection(blockSelection, "");
+            }
+        });
+
+        cont.table(search -> {
+            search.image(Icon.zoom).padRight(8);
+            search.field("", text -> rebuildBlockSelection(blockSelection, text)).growX()
+            .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
+        }).growX().pad(-2).padLeft(6f);
+        cont.row();
+        cont.add(pane).expandY().top().left();
+
+        rebuildBlockSelection(blockSelection, "");
+    }
+
+    private void rebuildBlockSelection(Table blockSelection, String searchText){
+        blockSelection.clear();
+
+        blocksOut.clear();
+        blocksOut.addAll(Vars.content.blocks());
+        blocksOut.sort((b1, b2) -> {
+            int synth = Boolean.compare(b1.synthetic(), b2.synthetic());
+            if(synth != 0) return synth;
+            int ore = Boolean.compare(b1 instanceof OverlayFloor && b1 != Blocks.removeOre, b2 instanceof OverlayFloor && b2 != Blocks.removeOre);
+            if(ore != 0) return ore;
+            return Integer.compare(b1.id, b2.id);
+        });
+
+        int i = 0;
+
+        for(Block block : blocksOut){
+            TextureRegion region = block.uiIcon;
+
+            if(!Core.atlas.isFound(region)
+            || (!block.inEditor && !(block instanceof RemoveWall) && !(block instanceof RemoveOre))
+            || !block.isOnPlanet(state.rules.planet)
+            || block.buildVisibility == BuildVisibility.debugOnly
+            || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.toLowerCase()))
+            ) continue;
+
+            ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
+            button.getStyle().imageUp = new TextureRegionDrawable(region);
+            button.clicked(() -> control.input.block = block);
+            button.resizeImage(8 * 4f);
+            button.update(() -> button.setChecked(control.input.block == block));
+            blockSelection.add(button).size(48f).tooltip(block.localizedName);
+
+            if(++i % 6 == 0){
+                blockSelection.row();
+            }
+        }
+
+        if(i == 0){
+            blockSelection.add("@none.found").padLeft(54f).padTop(10f);
+        }
+    }
 
     public void build(Group parent){
 
@@ -247,26 +325,79 @@ public class HudFragment{
 
             editorMain.name = "editor";
             editorMain.table(Tex.buttonEdge4, t -> {
-                //t.margin(0f);
                 t.name = "teams";
-                t.add("@editor.teams").growX().left();
-                t.row();
-                t.table(teams -> {
+                t.top().table(teams -> {
                     teams.left();
                     int i = 0;
                     for(Team team : Team.baseTeams){
-                        ImageButton button = teams.button(Tex.whiteui, Styles.clearNoneTogglei, 40f, () -> Call.setPlayerTeamEditor(player, team))
+                        ImageButton button = teams.button(Tex.whiteui, Styles.clearNoneTogglei, 38f, () -> Call.setPlayerTeamEditor(player, team))
                         .size(50f).margin(6f).get();
                         button.getImageCell().grow();
                         button.getStyle().imageUpColor = team.color;
                         button.update(() -> button.setChecked(player.team() == team));
 
-                        if(++i % 3 == 0){
+                        if(++i % 6 == 0){
                             teams.row();
                         }
                     }
-                }).left();
+                }).top().left();
+
+                t.row();
+
+                t.table(control.input::buildPlacementUI).growX().left().with(in -> in.left()).row();
+
+                //hovering item display
+                t.table(h -> {
+                    Runnable rebuild = () -> {
+                        h.clear();
+                        h.left();
+
+                        Displayable hover = blockfrag.hovered();
+                        UnlockableContent toDisplay = control.input.block;
+
+                        if(toDisplay == null && hover != null){
+                            if(hover instanceof Building b){
+                                toDisplay = b.block;
+                            }else if(hover instanceof Tile tile){
+                                toDisplay =
+                                    tile.block().itemDrop != null ? tile.block() :
+                                    tile.overlay().itemDrop != null || tile.wallDrop() != null ? tile.overlay() :
+                                    tile.floor();
+                            }else if(hover instanceof Unit u){
+                                toDisplay = u.type;
+                            }
+                        }
+
+                        if(toDisplay != null){
+                            h.image(toDisplay.uiIcon).scaling(Scaling.fit).size(8 * 4);
+                            h.add(toDisplay.localizedName).ellipsis(true).left().growX().padLeft(5);
+                        }
+                    };
+
+                    Object[] hovering = {null};
+                    h.update(() -> {
+                        Object nextHover = control.input.block != null ? control.input.block : blockfrag.hovered();
+                        if(nextHover != hovering[0]){
+                            hovering[0] = nextHover;
+                            rebuild.run();
+                        }
+                    });
+                }).growX().left().minHeight(36f).row();
+
+                t.table(blocks -> {
+                    addBlockSelection(blocks);
+                }).fillX().left();
             }).width(dsize * 5 + 4f);
+            if(mobile){
+                editorMain.row().spacerY(() -> {
+                    if(control.input instanceof MobileInput mob){
+                        if(Core.graphics.isPortrait()) return Core.graphics.getHeight() / 2f / Scl.scl(1f);
+                        if(mob.hasSchematic()) return 156f;
+                        if(mob.showCancel()) return 50f;
+                    }
+                    return 0f;
+                });
+            }
             editorMain.visible(() -> shown && state.isEditor());
 
             //fps display
@@ -806,7 +937,7 @@ public class HudFragment{
             if(state.rules.objectives.any()){
                 boolean first = true;
                 for(var obj : state.rules.objectives){
-                    if(!obj.qualified()) continue;
+                    if(!obj.qualified() || obj.hidden) continue;
 
                     String text = obj.text();
                     if(text != null && !text.isEmpty()){

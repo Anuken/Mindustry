@@ -246,7 +246,7 @@ public class TypeIO{
 
     //this is irrelevant.
     static final WeaponMount[] noMounts = {};
-    
+
     public static WeaponMount[] readMounts(Reads read){
         read.skip(read.b() * (1 + 4 + 4));
 
@@ -581,7 +581,7 @@ public class TypeIO{
                 if(ai.command == null) ai.command = UnitCommand.moveCommand;
             }
 
-            //command queue only in type 7
+            //command queue only in type 7/8
             if(type == 7 || type == 8){
                 ai.commandQueue.clear();
                 int length = read.ub();

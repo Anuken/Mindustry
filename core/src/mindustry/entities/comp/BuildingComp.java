@@ -338,7 +338,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        data.plans.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, toAdd.id, overrideConfig == null ? config() : overrideConfig));
+        data.plans.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, toAdd, overrideConfig == null ? config() : overrideConfig));
     }
 
     public @Nullable Tile findClosestEdge(Position to, Boolf<Tile> solid){
@@ -1217,6 +1217,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void payloadDraw(){
+        if(block.isAir()) return;
         draw();
     }
 
@@ -1370,6 +1371,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called when the block is destroyed. The tile is still intact at this stage. */
     public void onDestroyed(){
+        if(sound != null){
+            sound.stop();
+        }
+
         float explosiveness = block.baseExplosiveness;
         float flammability = 0f;
         float power = 0f;

@@ -1,5 +1,6 @@
 package mindustry.world.consumers;
 
+import mindustry.type.*;
 import mindustry.world.*;
 
 public abstract class ConsumeLiquidBase extends Consume{
@@ -16,4 +17,6 @@ public abstract class ConsumeLiquidBase extends Consume{
     public void apply(Block block){
         block.hasLiquids = true;
     }
+
+    public abstract boolean consumes(Liquid liquid);
 }

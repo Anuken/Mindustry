@@ -117,6 +117,8 @@ public class NetServer implements ApplicationListener{
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
     /** Packet handlers for custom types of messages. */
     private ObjectMap<String, Seq<Cons2<Player, String>>> customPacketHandlers = new ObjectMap<>();
+    /** Packet handlers for custom types of messages - binary version. */
+    private ObjectMap<String, Seq<Cons2<Player, byte[]>>> customBinaryPacketHandlers = new ObjectMap<>();
     /** Packet handlers for logic client data */
     private ObjectMap<String, Seq<Cons2<Player, Object>>> logicClientDataHandlers = new ObjectMap<>();
 
@@ -423,7 +425,7 @@ public class NetServer implements ApplicationListener{
             }
         });
 
-        clientCommands.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Admin can cancel the voting with 'c'.", (arg, player) -> {
+        clientCommands.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Admins can cancel the voting with 'c'.", (arg, player) -> {
             if(currentlyKicking == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
@@ -517,6 +519,14 @@ public class NetServer implements ApplicationListener{
         return customPacketHandlers.get(type, Seq::new);
     }
 
+    public void addBinaryPacketHandler(String type, Cons2<Player, byte[]> handler){
+        customBinaryPacketHandlers.get(type, Seq::new).add(handler);
+    }
+
+    public Seq<Cons2<Player, byte[]>> getBinaryPacketHandlers(String type){
+        return customBinaryPacketHandlers.get(type, Seq::new);
+    }
+
     public void addLogicDataHandler(String type, Cons2<Player, Object> handler){
         logicClientDataHandlers.get(type, Seq::new).add(handler);
     }
@@ -587,6 +597,20 @@ public class NetServer implements ApplicationListener{
     @Remote(targets = Loc.client, unreliable = true)
     public static void serverPacketUnreliable(Player player, String type, String contents){
         serverPacketReliable(player, type, contents);
+    }
+
+    @Remote(targets = Loc.client)
+    public static void serverBinaryPacketReliable(Player player, String type, byte[] contents){
+        if(netServer.customPacketHandlers.containsKey(type)){
+            for(var c : netServer.customBinaryPacketHandlers.get(type)){
+                c.get(player, contents);
+            }
+        }
+    }
+
+    @Remote(targets = Loc.client, unreliable = true)
+    public static void serverBinaryPacketUnreliable(Player player, String type, byte[] contents){
+        serverBinaryPacketReliable(player, type, contents);
     }
 
     @Remote(targets = Loc.client)
@@ -674,7 +698,7 @@ public class NetServer implements ApplicationListener{
                     //auto-skip done requests
                     if(req.breaking && tile.block() == Blocks.air){
                         continue;
-                    }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || (tile.build != null && tile.build.rotation == req.rotation))){
+                    }else if(!req.breaking && tile.block() == req.block && tile.team() != Team.derelict && (!req.block.rotate || (tile.build != null && tile.build.rotation == req.rotation))){
                         continue;
                     }else if(con.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
                         continue;
@@ -1058,7 +1082,7 @@ public class NetServer implements ApplicationListener{
                 try{
                     writeEntitySnapshot(player);
                 }catch(IOException e){
-                    e.printStackTrace();
+                    Log.err(e);
                 }
             });
 
