@@ -306,14 +306,17 @@ public class Net{
      * Call to handle a packet being received for the server.
      */
     public void handleServerReceived(NetConnection connection, Packet object){
-        object.handled();
 
         try{
-            //handle object normally
-            if(serverListeners.get(object.getClass()) != null){
-                serverListeners.get(object.getClass()).get(connection, object);
-            }else{
-                object.handleServer(connection);
+            if(connection.hasConnected || object.getPriority() == Packet.priorityHigh){
+                object.handled();
+
+                //handle object normally
+                if(serverListeners.get(object.getClass()) != null){
+                    serverListeners.get(object.getClass()).get(connection, object);
+                }else{
+                    object.handleServer(connection);
+                }
             }
         }catch(ValidateException e){
             //ignore invalid actions
