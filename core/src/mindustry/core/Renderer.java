@@ -20,8 +20,7 @@ import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.maps.*;
 import mindustry.type.*;
-import mindustry.world.blocks.storage.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.blocks.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -51,8 +50,7 @@ public class Renderer implements ApplicationListener{
     public TextureRegion[][] fluidFrames;
 
     //currently landing core, null if there are no cores or it has finished landing.
-    private @Nullable CoreBuild landCore;
-    private @Nullable CoreBlock launchCoreType;
+    private @Nullable LaunchAnimator landCore;
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
     private float
     //target camera scale that is lerp-ed to
@@ -379,7 +377,7 @@ public class Renderer implements ApplicationListener{
         if(state.rules.fog) Draw.draw(Layer.fogOfWar, fog::drawFog);
         Draw.draw(Layer.space, () -> {
             if(landCore == null || landTime <= 0f) return;
-            landCore.drawLanding(launching && launchCoreType != null ? launchCoreType : (CoreBlock)landCore.block);
+            landCore.drawLanding();
         });
 
         Events.fire(Trigger.drawOver);
@@ -504,10 +502,6 @@ public class Renderer implements ApplicationListener{
         return launching;
     }
 
-    public CoreBlock getLaunchCoreType(){
-        return launchCoreType;
-    }
-
     public float getLandTime(){
         return landTime;
     }
@@ -527,28 +521,16 @@ public class Renderer implements ApplicationListener{
         this.landPTimer = landPTimer;
     }
 
-    @Deprecated
-    public void showLanding(){
-        var core = player.bestCore();
-        if(core != null) showLanding(core);
-    }
-
-    public void showLanding(CoreBuild landCore){
+    public void showLanding(LaunchAnimator landCore){
         this.landCore = landCore;
         launching = false;
         landTime = landCore.landDuration();
 
-        landCore.beginLaunch(null);
+        landCore.beginLaunch(false);
         camerascale = landCore.zoomLaunching();
     }
 
-    @Deprecated
-    public void showLaunch(CoreBlock coreType){
-        var core = player.team().core();
-        if(core != null) showLaunch(core, coreType);
-    }
-
-    public void showLaunch(CoreBuild landCore, CoreBlock coreType){
+    public void showLaunch(LaunchAnimator landCore){
         control.input.config.hideConfig();
         control.input.planConfig.hide();
         control.input.inv.hide();
@@ -556,14 +538,13 @@ public class Renderer implements ApplicationListener{
         this.landCore = landCore;
         launching = true;
         landTime = landCore.landDuration();
-        launchCoreType = coreType;
 
         Music music = landCore.launchMusic();
         music.stop();
         music.play();
         music.setVolume(settings.getInt("musicvol") / 100f);
 
-        landCore.beginLaunch(coreType);
+        landCore.beginLaunch(true);
     }
 
     public void takeMapScreenshot(){
