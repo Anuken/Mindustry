@@ -12,7 +12,7 @@ public class MissileAI extends AIController{
 
     @Override
     protected void resetTimers(){
-        timer.reset(timerTarget, Mathf.random(3f));
+        timer.reset(timerTarget, 5f);
     }
 
     @Override

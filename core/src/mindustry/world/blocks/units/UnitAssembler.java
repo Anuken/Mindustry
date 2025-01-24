@@ -452,7 +452,7 @@ public class UnitAssembler extends PayloadBlock{
                     unit.command().commandPosition(commandPos);
                 }
                 unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
-                unit.rotation = 90f;
+                unit.rotation = rotdeg();
                 unit.add();
             }
 
@@ -507,7 +507,7 @@ public class UnitAssembler extends PayloadBlock{
                 //margin due to units not taking up whole region
                 Shaders.blockbuild.progress = Mathf.clamp(progress + 0.05f);
 
-                Draw.rect(plan.unit.fullIcon, sx, sy);
+                Draw.rect(plan.unit.fullIcon, sx, sy, rotdeg() - 90f);
                 Draw.flush();
                 Draw.color();
             });
@@ -519,7 +519,7 @@ public class UnitAssembler extends PayloadBlock{
             //draw unit silhouette
             Draw.mixcol(Tmp.c1.set(Pal.accent).lerp(Pal.remove, invalidWarmup), 1f);
             Draw.alpha(Math.min(powerWarmup, sameTypeWarmup));
-            Draw.rect(plan.unit.fullIcon, spawn.x, spawn.y);
+            Draw.rect(plan.unit.fullIcon, spawn.x, spawn.y, rotdeg() - 90f);
 
             //build beams do not draw when invalid
             Draw.alpha(Math.min(1f - invalidWarmup, warmup));

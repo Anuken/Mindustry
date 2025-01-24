@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
+import mindustry.game.Schematic.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
@@ -113,6 +114,11 @@ public class Universe{
     public void updateLaunchResources(ItemSeq stacks){
         this.lastLaunchResources = stacks;
         Core.settings.putJson("launch-resources-seq", lastLaunchResources);
+    }
+
+    /** Updates selected loadout for future deployment. Creates an empty schematic with a single core block. */
+    public void updateLoadout(CoreBlock block){
+        updateLoadout(block, new Schematic(Seq.with(new Stile(block, 0, 0, null, (byte)0)), new StringMap(), block.size, block.size));
     }
 
     /** Updates selected loadout for future deployment. */
