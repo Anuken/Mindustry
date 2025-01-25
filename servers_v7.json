@@ -96,6 +96,10 @@
     ]
   },
   {
+    "name": "homecloud",
+    "address": ["9k38.igla.pics:6567", "igla.pics:46567", "9k310.igla.pics:33456"]
+  },
+  {
     "name": "io",
     "address": [
       "148.251.184.58",
