@@ -55,6 +55,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Log.info("[GL] Version: @", graphics.getGLVersion());
         Log.info("[GL] Max texture size: @", maxTextureSize);
         Log.info("[GL] Using @ context.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
+        if(NvGpuInfo.hasMemoryInfo()){
+            Log.info("[GL] Total available VRAM: @mb", NvGpuInfo.getMaxMemoryKB()/1024);
+        }
         if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
         Log.info("[JAVA] Version: @", OS.javaVersion);
         if(Core.app.isAndroid()){

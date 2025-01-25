@@ -153,6 +153,7 @@ public class Planets{
             atmosphereRadOut = 0.3f;
             startSector = 15;
             alwaysUnlocked = true;
+            allowSelfSectorLaunch = true;
             landCloudColor = Pal.spore.cpy().a(0.5f);
         }};
 

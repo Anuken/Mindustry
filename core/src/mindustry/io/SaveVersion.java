@@ -368,7 +368,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 stream.writeShort(block.x);
                 stream.writeShort(block.y);
                 stream.writeShort(block.rotation);
-                stream.writeShort(block.block);
+                stream.writeShort(block.block.id);
                 TypeIO.writeObject(Writes.get(stream), block.config);
             }
         }
@@ -426,7 +426,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 var obj = TypeIO.readObject(reads);
                 //cannot have two in the same position
                 if(set.add(Point2.pack(x, y))){
-                    data.plans.addLast(new BlockPlan(x, y, rot, content.block(bid).id, obj));
+                    data.plans.addLast(new BlockPlan(x, y, rot, content.block(bid), obj));
                 }
             }
         }

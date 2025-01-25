@@ -20,10 +20,9 @@ public class SerpuloTechTree{
                 node(junction, () -> {
                     node(router, () -> {
                         node(launchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
-                            //no longer necessary to beat the campaign
-                            //node(interplanetaryAccelerator, Seq.with(new SectorComplete(planetaryTerminal)), () -> {
+                            node(interplanetaryAccelerator, Seq.with(new SectorComplete(planetaryTerminal)), () -> {
 
-                            //});
+                            });
                         });
 
                         node(distributor);

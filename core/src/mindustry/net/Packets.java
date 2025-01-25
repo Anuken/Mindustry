@@ -157,5 +157,10 @@ public class Packets{
                 mods.add(TypeIO.readString(buffer));
             }
         }
+
+        @Override
+        public int getPriority(){
+            return priorityHigh;
+        }
     }
 }

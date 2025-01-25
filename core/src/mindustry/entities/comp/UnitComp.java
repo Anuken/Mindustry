@@ -445,6 +445,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
     }
 
+    public boolean isMissile(){
+        return this instanceof TimedKillc;
+    }
+
     public int count(){
         return team.data().countType(type);
     }

@@ -529,7 +529,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             //random stuff
             dec: {
                 for(int i = 0; i < 4; i++){
-                    Tile near = world.tile(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
+                    Tile near = tiles.get(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
                     if(near != null && near.block() != Blocks.air){
                         break dec;
                     }
@@ -542,11 +542,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         });
 
         float difficulty = sector.threat;
-        ints.clear();
-        ints.ensureCapacity(width * height / 4);
-
         int ruinCount = rand.random(-2, 4);
+
         if(ruinCount > 0){
+            IntSeq ints = new IntSeq(width * height / 4);
+
             int padding = 25;
 
             //create list of potential positions
@@ -586,7 +586,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                 }
 
                 //actually place the part
-                if(part != null && BaseGenerator.tryPlace(part, x, y, Team.derelict, (cx, cy) -> {
+                if(part != null && BaseGenerator.tryPlace(part, x, y, Team.derelict, rand, (cx, cy) -> {
                     Tile other = tiles.getn(cx, cy);
                     if(other.floor().hasSurface()){
                         other.setOverlay(Blocks.oreScrap);

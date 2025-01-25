@@ -632,7 +632,7 @@ public class NetServer implements ApplicationListener{
         return Float.isInfinite(f) || Float.isNaN(f);
     }
 
-    @Remote(targets = Loc.client, unreliable = true)
+    @Remote(targets = Loc.client, unreliable = true, priority = PacketPriority.high)
     public static void clientSnapshot(
     Player player,
     int snapshotID,
@@ -830,7 +830,7 @@ public class NetServer implements ApplicationListener{
         }
     }
 
-    @Remote(targets = Loc.client)
+    @Remote(targets = Loc.client, priority = PacketPriority.high)
     public static void connectConfirm(Player player){
         if(player.con.kicked) return;
 
@@ -1082,7 +1082,7 @@ public class NetServer implements ApplicationListener{
                 try{
                     writeEntitySnapshot(player);
                 }catch(IOException e){
-                    e.printStackTrace();
+                    Log.err(e);
                 }
             });
 

@@ -144,8 +144,10 @@ public class Planet extends UnlockableContent{
     public Seq<Planet> children = new Seq<>();
     /** Default root node shown when the tech tree is opened here. */
     public @Nullable TechNode techTree;
-    /** TODO remove? Planets that can be launched to from this one. Made mutual in init(). */
+    /** Planets that can be launched to from this one. */
     public Seq<Planet> launchCandidates = new Seq<>();
+    /** Whether interplanetary accelerators can launch to 'any' procedural sector on this planet's surface. */
+    public boolean allowSelfSectorLaunch;
     /** If true, all content in this planet's tech tree will be assigned this planet in their shownPlanets. */
     public boolean autoAssignPlanet = true;
     /** Content (usually planet-specific) that is unlocked upon landing here. */
@@ -383,18 +385,6 @@ public class Planet extends UnlockableContent{
             updateBaseCoverage();
         }
 
-        //make planet launch candidates mutual.
-        var candidates = launchCandidates.copy();
-
-        for(Planet planet : content.planets()){
-            if(planet.launchCandidates.contains(this)){
-                candidates.addUnique(planet);
-            }
-        }
-
-        //TODO currently, mutual launch candidates are simply a nuisance.
-        //launchCandidates = candidates;
-
         clipRadius = Math.max(clipRadius, radius + atmosphereRadOut + 0.5f);
     }
 
@@ -413,7 +403,7 @@ public class Planet extends UnlockableContent{
         Vec3 vec = intersect(ray, radius);
         if(vec == null) return null;
         vec.sub(position).rotate(Vec3.Y, getRotation());
-        return sectors.min(t -> t.tile.v.dst2(vec));
+        return sectors.min(t -> Tmp.v31.set(t.tile.v).setLength(radius).dst2(vec));
     }
 
     /** @return the sector that is hit by this ray, or null if nothing intersects it. */

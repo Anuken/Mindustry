@@ -39,7 +39,8 @@ public class Pathfinder implements Runnable{
     public static final int
         costGround = 0,
         costLegs = 1,
-        costNaval = 2;
+        costNaval = 2,
+        costHover = 3;
 
     public static final Seq<PathCost> costTypes = Seq.with(
         //ground
@@ -63,7 +64,13 @@ public class Pathfinder implements Runnable{
             PathTile.health(tile) * 5 +
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
             (PathTile.deep(tile) ? 0 : 1) +
-            (PathTile.damages(tile) ? 35 : 0)
+            (PathTile.damages(tile) ? 35 : 0),
+
+        //hover
+        (team, tile) ->
+            (((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
+            PathTile.health(tile) * 5 +
+            (PathTile.nearSolid(tile) ? 2 : 0)
     );
 
     /** tile data, see PathTileStruct - kept as a separate array for threading reasons */
