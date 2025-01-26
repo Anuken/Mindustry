@@ -65,7 +65,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
     }
 
     public boolean canMine(){
-        return type.mineSpeed > 0 && type.mineTier >= 0;
+        return type.mineSpeed * state.rules.unitMineSpeed(team()) > 0 && type.mineTier >= 0;
     }
 
     @Override
@@ -89,7 +89,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
             mineTile = null;
             mineTimer = 0f;
         }else if(mining() && item != null){
-            mineTimer += Time.delta * type.mineSpeed;
+            mineTimer += Time.delta * type.mineSpeed * state.rules.unitMineSpeed(team());
 
             if(Mathf.chance(0.06 * Time.delta)){
                 Fx.pulverizeSmall.at(mineTile.worldx() + Mathf.range(tilesize / 2f), mineTile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
