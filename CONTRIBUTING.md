@@ -11,6 +11,16 @@ Specifically, IntelliJ IDEA. Download the (free) Community Edition of it [here](
 Do not submit something without at least running the game to see if it compiles.  
 If you are submitting a new block, make sure it has a name and description, and that it works correctly in-game. If you are changing existing block mechanics, test them out first.
 
+### Testing structure
+- Utilize the JUnit 5 framework when implementing tests
+- Use the appropriate annotation for each test method, e.g., @Test
+- Use naming convention testWhatToTest, e.g., testAddNewIndicator.
+- Comment your tests. Others should be able to understand them.
+- Format your tests in accordance to Arrange, Act, Assert (AAA) pattern to maintain clarity and consistency.
+    - Arrange: Set up the necessary objects and prepare for the test, e.g., initializing objects or setting the context for the test.
+    - Act: Perform the action or invoke the needed method.
+    - Assert: Verify that the result of the action matches the expected outcome by using assertions.
+  
 ### Do not make large changes before discussing them first.
 If you are interested in adding a large mechanic/feature or changing large amounts of code, first contact me (Anuken) via [Discord](https://discord.gg/mindustry) - either via PM or by posting in the `#pulls` channel.
 For most changes, this should not be necessary. I just want to know if you're doing something big so I can offer advice and/or make sure you're not wasting your time on it.
