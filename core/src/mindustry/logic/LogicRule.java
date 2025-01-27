@@ -14,6 +14,7 @@ public enum LogicRule{
     mapArea,
     lighting,
     ambientLight,
+    unitLight,
     solarMultiplier,
     dragMultiplier,
     ban,
