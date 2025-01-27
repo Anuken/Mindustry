@@ -54,7 +54,6 @@ public class SectorPreset extends UnlockableContent{
         this.planet = planet;
         sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector);
-        inlineDescription = false;
 
         planet.preset(sector, this);
     }
