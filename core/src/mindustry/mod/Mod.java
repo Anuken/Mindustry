@@ -21,7 +21,7 @@ public abstract class Mod{
 
     }
 
-    /** Called on clientside mods. Load content here. */
+    /** Called on clientside mods. You can load content here. */
     public void loadContent(){
 
     }
