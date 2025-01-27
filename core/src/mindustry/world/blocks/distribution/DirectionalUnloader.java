@@ -129,6 +129,12 @@ public class DirectionalUnloader extends Block{
         }
 
         @Override
+        public void drawSelect(){
+            super.drawSelect();
+            drawItemSelection(unloadItem);
+        }
+
+        @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(DirectionalUnloader.this, table, content.items(), () -> unloadItem, this::configure);
         }
