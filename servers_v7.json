@@ -236,11 +236,12 @@
   {
     "name": "Exdustry",
     "address": [
-      "exd.noxia.cloud:6001",
-      "exd.noxia.cloud:6002",
-      "exd.noxia.cloud:6003",
-      "exd.noxia.cloud:6004",
-      "exd.noxia.cloud:6006"
+      "play.exdustry.xyz:6001",
+      "play.exdustry.xyz:6002",
+      "play.exdustry.xyz:6003",
+      "play.exdustry.xyz:6004",
+      "play.exdustry.xyz:6005",
+      "play.exdustry.xyz:6006"
     ]
   },
   {
