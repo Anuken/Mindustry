@@ -1143,13 +1143,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     public static class QuadMarker extends ObjectiveMarker{
         public String textureName = "white";
         public @Vertices float[] vertices = new float[24];
+        public @Transform Mat transform = new Mat();
         private boolean mapRegion = true;
 
         private transient TextureRegion fetchedRegion;
 
         public QuadMarker() {
             for(int i = 0; i < 4; i++){
+                vertices[i * 6] = Geometry.d8edge(i).x * tilesize / 2f;
+                vertices[i * 6 + 1] = Geometry.d8edge(i).y * tilesize / 2f;
                 vertices[i * 6 + 2] = Color.white.toFloatBits();
+                vertices[i * 6 + 3] = Geometry.d8edge(i).x / 2f + 0.5f;
+                vertices[i * 6 + 4] = Geometry.d8edge(i).y / 2f + 0.5f;
                 vertices[i * 6 + 5] = Color.clearFloatBits;
             }
         }
@@ -1159,6 +1164,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(fetchedRegion == null) setTexture(textureName);
 
             Draw.z(drawLayer);
+            Draw.trans(transform);
             Draw.vert(fetchedRegion.texture, vertices, 0, vertices.length);
         }
 
@@ -1172,7 +1178,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                         float col = Tmp.c1.fromDouble(p1).toFloatBits();
                         for(int i = 0; i < 4; i++) vertices[i * 6 + 2] = col;
                     }
-                    case pos -> vertices[0] = (float)p1 * tilesize;
+                    case pos -> transform.val[Mat.M02] = (float)p1 * tilesize;
+                    case rotation -> setRotation((float)p1 * Mathf.degRad);
                     case posi -> setPos((int)p1, p2, p3);
                     case uvi -> setUv((int)p1, p2, p3);
                 }
@@ -1180,7 +1187,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             if(!Double.isNaN(p2)){
                 switch(type){
-                    case pos -> vertices[1] = (float)p1 * tilesize;
+                    case pos -> transform.val[Mat.M12] = (float)p2 * tilesize;
                 }
             }
 
@@ -1218,6 +1225,15 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     vertices[i * 6 + 4] = Mathf.map(vertices[i * 6 + 4], Tmp.tr1.v, Tmp.tr1.v2, fetchedRegion.v, fetchedRegion.v2);
                 }
             }
+        }
+
+        private void setRotation(float radians){
+            float cos = Mathf.cos(radians);
+            float sin = Mathf.sin(radians);
+            transform.val[Mat.M00] = cos;
+            transform.val[Mat.M10] = sin;
+            transform.val[Mat.M01] = -sin;
+            transform.val[Mat.M11] = cos;
         }
 
         private void setPos(int i, double x, double y){
@@ -1271,6 +1287,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     @Target(FIELD)
     @Retention(RUNTIME)
     public @interface Vertices{}
+
+    /** For {@code Mat}; treats it as a 2D rotation and translation. */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface Transform{}
 
     /** For {@code byte}; treats it as a world label flag. */
     @Target(FIELD)
