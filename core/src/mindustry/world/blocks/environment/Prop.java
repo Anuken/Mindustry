@@ -13,8 +13,7 @@ public class Prop extends Block{
 
     public Prop(String name){
         super(name);
-        breakable = true;
-        alwaysReplace = true;
+        breakable = alwaysReplace = true;
         instantDeconstruct = true;
         breakEffect = Fx.breakProp;
         breakSound = Sounds.rockBreak;

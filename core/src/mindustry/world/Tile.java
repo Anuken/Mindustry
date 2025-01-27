@@ -429,7 +429,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean breakable(){
-        return block.destructible || block.breakable || block.update;
+        return block.breakable || (block.deconstructable && (block.destructible || block.update));
     }
 
     /** @return whether the floor on this tile deals damage or can be drowned on. */
