@@ -1148,7 +1148,7 @@ public class ContentParser{
         if(object instanceof UnlockableContent unlock && research != null){
 
             //add research tech node
-            String researchName;
+            String researchName, rootName = "serpulo";
             ItemStack[] customRequirements;
 
             //research can be a single string or an object with parent and requirements
@@ -1157,11 +1157,13 @@ public class ContentParser{
                 customRequirements = null;
             }else{
                 researchName = research.getString("parent", null);
+                rootName = research.getString("rootName", "serpulo");
                 customRequirements = research.has("requirements") ? parser.readValue(ItemStack[].class, research.get("requirements")) : null;
             }
+            String finalRootName = rootName; //Amazing language design
 
             //remove old node
-            TechNode lastNode = TechTree.all.find(t -> t.content == unlock);
+            TechNode lastNode = TechTree.findNode(finalRootName, unlock);
             if(lastNode != null){
                 lastNode.remove();
             }
@@ -1203,7 +1205,7 @@ public class ContentParser{
                 }else{
                     if(researchName != null){
                         //find parent node.
-                        TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName) || t.content.name.equals(SaveVersion.mapFallback(researchName)));
+                        TechNode parent = TechTree.all.find(t -> (t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName) || t.content.name.equals(SaveVersion.mapFallback(researchName))) && t.root.equals(finalRootName));
 
                         if(parent == null){
                             Log.warn("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
@@ -1214,6 +1216,8 @@ public class ContentParser{
                             }
                             //reparent the node
                             node.parent = parent;
+                            //reroot the node
+                            node.root = parent.root;
                         }
                     }else{
                         Log.warn(unlock.name + " is not a root node, and does not have a `parent: ` property. Ignoring.");
