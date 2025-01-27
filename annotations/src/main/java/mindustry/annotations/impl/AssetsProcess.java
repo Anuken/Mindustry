@@ -128,20 +128,25 @@ public class AssetsProcess extends BaseProcessor{
         CodeBlock.Builder staticb = CodeBlock.builder();
 
         if(genid){
-            type.addField(FieldSpec.builder(IntMap.class, "idToSound", Modifier.STATIC, Modifier.PRIVATE).initializer("new IntMap()").build());
-            type.addField(FieldSpec.builder(ObjectIntMap.class, "soundToId", Modifier.STATIC, Modifier.PRIVATE).initializer("new ObjectIntMap()").build());
+            type.addField(FieldSpec.builder(ClassName.get("","arc.struct.Seq<arc.func.Prov<Sound>>"), "soundList", Modifier.STATIC, Modifier.PRIVATE).initializer("new arc.struct.Seq<>()").build());
 
             type.addMethod(MethodSpec.methodBuilder("getSoundId")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addParameter(Sound.class, "sound")
             .returns(int.class)
-            .addStatement("return soundToId.get(sound, -1)").build());
+            .addStatement("return soundList.indexOf(prov -> prov.get() == sound)").build());
 
             type.addMethod(MethodSpec.methodBuilder("getSound")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addParameter(int.class, "id")
             .returns(Sound.class)
-            .addStatement("return (Sound)idToSound.get(id, () -> Sounds.none)").build());
+            .addStatement("return id >= 0 && id < soundList.size ? soundList.get(id).get() : none").build());
+
+            type.addMethod(MethodSpec.methodBuilder("registerSound")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addParameter(ClassName.get("","arc.func.Prov<Sound>"), "soundProv")
+            .returns(void.class)
+            .addStatement("soundList.add(soundProv)").build());
         }
 
         HashSet<String> names = new HashSet<>();
@@ -149,7 +154,6 @@ public class AssetsProcess extends BaseProcessor{
         Fi.get(path).walk(files::add);
 
         files.sortComparing(Fi::name);
-        int id = 0;
 
         for(Fi p : files){
             String name = p.nameWithoutExtension();
@@ -165,17 +169,11 @@ public class AssetsProcess extends BaseProcessor{
             String filepath =  path.substring(path.lastIndexOf("/") + 1) + p.path().substring(p.path().lastIndexOf(path) + path.length());
 
             if(genid){
-                staticb.addStatement("soundToId.put($L, $L)", name, id);
-
-                loadBegin.addStatement("$T.assets.load($S, $L.class).loaded = a -> { $L = ($L)a; soundToId.put(a, $L); idToSound.put($L, a); }",
-                Core.class, filepath, rtype, name, rtype, id, id);
-            }else{
-                loadBegin.addStatement("$T.assets.load($S, $L.class).loaded = a -> { $L = ($L)a; }", Core.class, filepath, rtype, name, rtype);
+                staticb.addStatement("soundList.add(()->$L)", name);
             }
+            loadBegin.addStatement("$T.assets.load($S, $L.class).loaded = a -> { $L = ($L)a; }", Core.class, filepath, rtype, name, rtype);
 
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new " + rtype + "()").build());
-
-            id ++;
         }
 
         if(genid){
