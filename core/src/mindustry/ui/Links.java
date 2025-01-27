@@ -26,7 +26,7 @@ public class Links{
         new LinkEntry("f-droid", "https://f-droid.org/packages/io.anuke.mindustry/", Icon.android, Color.valueOf("026aa7")),
         new LinkEntry("github", "https://github.com/Anuken/Mindustry/", Icon.github, Color.valueOf("24292e")),
         new LinkEntry("dev-builds", "https://github.com/Anuken/MindustryBuilds", Icon.githubSquare, Color.valueOf("fafbfc")),
-        new LinkEntry("bug", report(), Icon.wrench, Color.valueOf("cbd97f"))
+        new LinkEntry("bug", "https://github.com/Anuken/Mindustry/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml", Icon.wrench, Color.valueOf("cbd97f"))
         };
     }
 
@@ -51,34 +51,5 @@ public class Links{
             this.icon = icon;
             this.title = Core.bundle.get("link." + name + ".title", Strings.capitalize(name.replace("-", " ")));
         }
-    }
-
-    private static String report(){
-        return "https://github.com/Anuken/Mindustry/issues/new?assignees=&labels=bug&body=" +
-        Strings.encode(Strings.format(
-        """
-        **Platform**: `@`
-                    
-        **Build**: `@`
-                    
-        **Issue**: *Explain your issue in detail.*
-                    
-        **Steps to reproduce**: *How you happened across the issue, and what exactly you did to make the bug happen.*
-                    
-        **Link(s) to mod(s) used**: `@`
-                    
-        **Save file**: *The (zipped) save file you were playing on when the bug happened. THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME, REGARDLESS OF WHETHER YOU THINK IT HAPPENS EVERYWHERE. DO NOT DELETE OR OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME.*
-                    
-        **Crash report**: *The contents of relevant crash report files. REQUIRED if you are reporting a crash.*
-                    
-        ---
-                    
-        *Place an X (no spaces) between the brackets to confirm that you have read the line below.*
-        - [ ] **I have updated to the latest release (https://github.com/Anuken/Mindustry/releases) to make sure my issue has not been fixed.**
-        - [ ] **I have searched the closed and open issues to make sure that this problem has not already been reported.**
-        """,
-        OS.isAndroid ? "Android " + Core.app.getVersion() : (OS.osName + " x" + OS.osArchBits),
-        Version.combined(),
-        Vars.mods.list().any() ? Vars.mods.list().select(LoadedMod::enabled).map(l -> l.meta.author + "/" + l.name + ":" + l.meta.version) : "none"));
     }
 }
