@@ -132,6 +132,14 @@ public class CommandAI extends AIController{
         }
     }
 
+    @Override
+    public Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
+        if(!unit.type.autoFindTarget && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
+            return null;
+        }
+        return super.findMainTarget(x, y, range, air, ground);
+    }
+
     public void defaultBehavior(){
 
         if(!net.client() && unit instanceof Payloadc pay){
@@ -183,18 +191,7 @@ public class CommandAI extends AIController{
         }
 
         updateVisuals();
-        //only autotarget if the unit supports it
-        if((targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range())) || unit.type.autoFindTarget){
-            updateTargeting();
-        }else if(attackTarget == null){
-            //if the unit does not have an attack target, is currently moving, and does not have autotargeting, stop attacking stuff
-            target = null;
-            for(var mount : unit.mounts){
-                if(mount.weapon.controllable){
-                    mount.target = null;
-                }
-            }
-        }
+        updateTargeting();
 
         if(attackTarget != null && invalid(attackTarget)){
             attackTarget = null;
