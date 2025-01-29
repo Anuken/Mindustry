@@ -2464,6 +2464,12 @@ public class Fx{
         });
     }),
 
+    launchAccelerator = new Effect(22, e -> {
+        color(Pal.accent);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * 160f);
+    }),
+
     launch = new Effect(28, e -> {
         color(Pal.command);
         stroke(e.fout() * 2f);

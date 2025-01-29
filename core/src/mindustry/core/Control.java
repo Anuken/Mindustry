@@ -199,9 +199,9 @@ public class Control implements ApplicationListener, Loadable{
 
             float coreDelay = 0f;
             if(!settings.getBool("skipcoreanimation") && !state.rules.pvp){
-                coreDelay = core.landDuration();
+                coreDelay = core.launchDuration();
                 //delay player respawn so animation can play.
-                player.deathTimer = Player.deathDelay - core.landDuration();
+                player.deathTimer = Player.deathDelay - core.launchDuration();
                 //TODO this sounds pretty bad due to conflict
                 if(settings.getInt("musicvol") > 0){
                     //TODO what to do if another core with different music is already playing?

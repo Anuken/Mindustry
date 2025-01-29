@@ -1287,7 +1287,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             Runnable doLaunch = () -> {
                                 renderer.showLaunch(core);
                                 //run with less delay, as the loading animation is delayed by several frames
-                                Time.runTask(core.landDuration() - 8f, () -> control.playSector(from, sector));
+                                Time.runTask(core.launchDuration() - 8f, () -> control.playSector(from, sector));
                             };
 
                             //load launchFrom sector right before launching so animation is correct

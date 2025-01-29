@@ -405,7 +405,9 @@ public class Logic implements ApplicationListener{
     @Override
     public void dispose(){
         //save the settings before quitting
-        netServer.admins.forceSave();
+        if(netServer != null){
+            netServer.admins.forceSave();
+        }
         Core.settings.manualSave();
     }
 
