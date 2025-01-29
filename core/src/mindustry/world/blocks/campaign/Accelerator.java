@@ -117,7 +117,7 @@ public class Accelerator extends Block{
         @Override
         public void updateTile(){
             super.updateTile();
-            heat = Mathf.lerpDelta(heat, efficiency, 0.05f);
+            heat = Mathf.lerpDelta(heat, launching ? 1f : efficiency, 0.05f);
             statusLerp = Mathf.lerpDelta(statusLerp, power.status, 0.05f);
 
             if(!launching){
@@ -212,7 +212,7 @@ public class Accelerator extends Block{
         }
 
         public boolean canLaunch(){
-            return isValid() && state.isCampaign() && efficiency > 0f && power.graph.getBatteryStored() >= powerBufferRequirement-0.00001f && progress >= 1f;
+            return isValid() && state.isCampaign() && efficiency > 0f && power.graph.getBatteryStored() >= powerBufferRequirement-0.00001f && progress >= 1f && !launching;
         }
 
         @Override
@@ -224,7 +224,7 @@ public class Accelerator extends Block{
         public void drawSelect(){
             super.drawSelect();
 
-            if(power.graph.getBatteryStored() < powerBufferRequirement){
+            if(power.graph.getBatteryStored() < powerBufferRequirement && !launching){
                 drawPlaceText(Core.bundle.get("bar.nobatterypower"), tile.x, tile.y, false);
             }
         }
@@ -241,12 +241,11 @@ public class Accelerator extends Block{
                     power.graph.useBatteries(powerBufferRequirement);
                     progress = 0f;
 
-                    var core = team.core();
-
                     renderer.showLaunch(this);
 
-                    Time.runTask(core.launchDuration() - 8f, () -> {
+                    Time.runTask(launchDuration() - 6f, () -> {
                         //unlock right before launch
+                        launching = false;
                         sector.planet.unlockedOnLand.each(UnlockableContent::unlock);
 
                         universe.clearLoadoutInfo();
