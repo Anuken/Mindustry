@@ -84,6 +84,8 @@ public class Rules{
     public float unitHealthMultiplier = 1f;
     /** How much damage unit crash damage deals. (Compounds with unitDamageMultiplier) */
     public float unitCrashDamageMultiplier = 1f;
+    /** How fast units can mine. */
+    public float unitMineSpeedMultiplier = 1f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
     public boolean ghostBlocks = true;
     /** Whether to allow units to build with logic. */
@@ -262,6 +264,10 @@ public class Rules{
         return unitDamage(team) * unitCrashDamageMultiplier * teams.get(team).unitCrashDamageMultiplier;
     }
 
+    public float unitMineSpeed(Team team){
+        return unitMineSpeedMultiplier * teams.get(team).unitMineSpeedMultiplier;
+    }
+
     public float blockHealth(Team team){
         return blockHealthMultiplier * teams.get(team).blockHealthMultiplier;
     }
@@ -312,6 +318,8 @@ public class Rules{
         public float unitDamageMultiplier = 1f;
         /** How much damage unit crash damage deals. (Compounds with unitDamageMultiplier) */
         public float unitCrashDamageMultiplier = 1f;
+        /** How fast units can mine. */
+        public float unitMineSpeedMultiplier = 1f;
         /** Multiplier of resources that units take to build. */
         public float unitCostMultiplier = 1f;
         /** How much health units start with. */
