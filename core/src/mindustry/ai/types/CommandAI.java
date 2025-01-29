@@ -82,6 +82,15 @@ public class CommandAI extends AIController{
             commandTarget(target, false);
         }
 
+        //pursue the target for patrol, keeping the current position
+        if(stance == UnitStance.patrol && target != null && attackTarget == null){
+            //commanding a target overwrites targetPos, so add it to the queue
+            if(targetPos != null){
+                commandQueue.add(targetPos.cpy());
+            }
+            commandTarget(target, false);
+        }
+
         //remove invalid targets
         if(commandQueue.any()){
             commandQueue.removeAll(e -> e instanceof Healthc h && !h.isValid());
