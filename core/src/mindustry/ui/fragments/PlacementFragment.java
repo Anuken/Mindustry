@@ -746,7 +746,7 @@ public class PlacementFragment{
         Vec2 v = topTable.stageToLocalCoordinates(Core.input.mouse());
 
         //if the mouse intersects the table or the UI has the mouse, no hovering can occur
-        if(Core.scene.hasMouse() || topTable.hit(v.x, v.y, false) != null) return null;
+        if(Core.scene.hasMouse(Core.input.mouseX(), Core.input.mouseY()) || topTable.hit(v.x, v.y, false) != null) return null;
 
         //check for a unit
         Unit unit = Units.closestOverlap(player.team(), Core.input.mouseWorldX(), Core.input.mouseWorldY(), 5f, u -> !u.isLocal() && u.displayable());
