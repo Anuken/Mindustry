@@ -290,8 +290,19 @@ public class HudFragment{
 
             Table wavesMain, editorMain;
 
-            cont.stack(wavesMain = new Table(), editorMain = new Table()).height(wavesMain.getPrefHeight())
-            .name("waves/editor");
+            cont.stack(wavesMain = new Table(), editorMain = new Table(), new Element(){
+                //this may seem insane, but adding an empty element of a specific height to this stack fixes layout issues on mobile.
+
+                {
+                    visible = false;
+                    touchable = Touchable.disabled;
+                }
+
+                @Override
+                public float getPrefHeight(){
+                    return Scl.scl(120f);
+                }
+            }).name("waves/editor");
 
             wavesMain.visible(() -> shown && !state.isEditor());
             wavesMain.top().left().name = "waves";
@@ -342,11 +353,7 @@ public class HudFragment{
                     .size(45f).update(m -> m.getStyle().imageUp = (Core.settings.getBool("editor-blocks-shown") ? Icon.upOpen : Icon.downOpen));
                 }).top().left().row();
 
-                t.collapser(blocks -> {
-                    addBlockSelection(blocks);
-                }, () -> Core.settings.getBool("editor-blocks-shown"));
-
-
+                t.collapser(this::addBlockSelection, () -> Core.settings.getBool("editor-blocks-shown"));
 
             }).width(dsize * 5 + 4f).top();
             if(mobile){
