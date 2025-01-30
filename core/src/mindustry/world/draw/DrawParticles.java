@@ -9,10 +9,11 @@ import mindustry.gen.*;
 
 public class DrawParticles extends DrawBlock{
     public Color color = Color.valueOf("f2d585");
-
+    public int sides = 12;
+    public float x = 0, y = 0;
     public float alpha = 0.5f;
     public int particles = 30;
-    public float particleLife = 70f, particleRad = 7f, particleSize = 3f, fadeMargin = 0.4f, rotateScl = 3f;
+    public float particleRotation= 0, particleLife = 70f, particleRad = 7f, particleSize = 3f, fadeMargin = 0.4f, rotateScl = 3f;
     public boolean reverse = false;
     public Interp particleInterp = new PowIn(1.5f);
     public Interp particleSizeInterp = Interp.slope;
@@ -36,10 +37,12 @@ public class DrawParticles extends DrawBlock{
                 float angle = rand.random(360f) + (Time.time / rotateScl) % 360f;
                 float len = particleRad * particleInterp.apply(fout);
                 Draw.alpha(a * (1f - Mathf.curve(fin, 1f - fadeMargin)));
-                Fill.circle(
-                    build.x + Angles.trnsx(angle, len),
-                    build.y + Angles.trnsy(angle, len),
-                    particleSize * particleSizeInterp.apply(fin) * build.warmup()
+                Fill.poly(
+                    build.x + x + Angles.trnsx(angle, len),
+                    build.y + y + Angles.trnsy(angle, len),
+                    sides,
+                    particleSize * particleSizeInterp.apply(fin) * build.warmup(),
+                        particleRotation
                 );
             }
 
