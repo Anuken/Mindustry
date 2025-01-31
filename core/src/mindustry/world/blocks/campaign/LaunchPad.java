@@ -27,13 +27,14 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class LaunchPad extends Block{
-    /** Time inbetween launches. */
+    /** Time between launches. */
     public float launchTime = 1f;
     public Sound launchSound = Sounds.none;
 
     public @Load("@-light") TextureRegion lightRegion;
     public @Load(value = "@-pod", fallback = "launchpod") TextureRegion podRegion;
     public Color lightColor = Color.valueOf("eab678");
+    public boolean acceptMultipleItems = false;
 
     public LaunchPad(String name){
         super(name);
@@ -116,7 +117,7 @@ public class LaunchPad extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return items.total() < itemCapacity;
+            return items.total() < itemCapacity && (acceptMultipleItems || items.total() == 0 || items.first() == item);
         }
 
         @Override
@@ -159,7 +160,8 @@ public class LaunchPad extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            if(!state.isCampaign() || net.client()){
+            //TODO: this UI should be on landing pads
+            if(!state.isCampaign() || net.client() || true){
                 deselect();
                 return;
             }

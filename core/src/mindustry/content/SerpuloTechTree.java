@@ -19,7 +19,7 @@ public class SerpuloTechTree{
 
                 node(junction, () -> {
                     node(router, () -> {
-                        node(launchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
+                        node(advancedLaunchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
                             node(interplanetaryAccelerator, Seq.with(new SectorComplete(planetaryTerminal)), () -> {
 
                             });
@@ -522,7 +522,7 @@ public class SerpuloTechTree{
                                             new Research(sei),
                                             new Research(omura),
                                             new Research(spectre),
-                                            new Research(launchPad),
+                                            new Research(advancedLaunchPad),
                                             new Research(massDriver),
                                             new Research(impactReactor),
                                             new Research(additiveReconstructor),

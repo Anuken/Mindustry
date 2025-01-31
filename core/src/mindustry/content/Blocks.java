@@ -163,7 +163,8 @@ public class Blocks{
     worldProcessor, worldCell, worldMessage, worldSwitch,
 
     //campaign
-    launchPad, interplanetaryAccelerator
+    launchPad, advancedLaunchPad, landingPad,
+    interplanetaryAccelerator
 
     ;
 
@@ -6353,12 +6354,34 @@ public class Blocks{
         //region campaign
 
         launchPad = new LaunchPad("launch-pad"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            requirements(Category.effect, BuildVisibility.debugOnly, with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 3;
             itemCapacity = 100;
             launchTime = 60f * 20;
             hasPower = true;
+            acceptMultipleItems = true;
             consumePower(4f);
+        }};
+
+        advancedLaunchPad = new LaunchPad("advanced-launch-pad"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            size = 4;
+            itemCapacity = 100;
+            launchTime = 60f * 30;
+            hasPower = true;
+            consumeLiquid(Liquids.oil, 9f/60f);
+            consumePower(8f);
+        }};
+
+        landingPad = new LandingPad("landing-pad"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            size = 4;
+
+            itemCapacity = 100;
+
+            liquidCapacity = 2000;
+            addLiquidBar(Liquids.water);
+            consumeLiquid(Liquids.water, liquidCapacity).trigger(true).update(false);
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
