@@ -318,7 +318,30 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            field(table, value, str -> value = str).width(0f).growX().padRight(3);
+            table.add(" char ");
+            TextField field = field(table, value, str -> value = str).get();
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    t.row();
+                    t.table( i -> {
+                        i.left();
+                        int c = 0;
+                        for(char j=32;j<127;j++){
+                            final int chr = (int)j;
+                            i.button(String.valueOf(j),Styles.flatt, () -> {
+                                value = Integer.toString(chr);
+                                field.setText(value);
+                                hide.run();
+                            }).size(32f);
+
+                            if(++c % 8 == 0) i.row();
+                        }
+
+
+                    });
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
         }
 
         @Override
