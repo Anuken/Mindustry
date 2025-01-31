@@ -312,6 +312,26 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("printchar")
+    public static class PrintCharStatement extends LStatement{
+        public String value = "65";
+
+        @Override
+        public void build(Table table){
+            field(table, value, str -> value = str).width(0f).growX().padRight(3);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PrintCharI(builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
+        }
+    }
+
     @RegisterStatement("format")
     public static class FormatStatement extends LStatement{
         public String value = "\"frog\"";
