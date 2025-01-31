@@ -5285,7 +5285,7 @@ public class Blocks{
             maxHeatEfficiency = 2f;
             warmupMaintainTime = 120f;
             consumePower(40f);
-
+            unitSort = UnitSorts.strongest;
             shoot = new ShootSummon(0f, 0f, circleRad, 20f);
 
             minWarmup = 0.96f;
