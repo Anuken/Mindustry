@@ -5214,7 +5214,7 @@ public class Blocks{
 
             shake = 6f;
             ammoPerShot = 15;
-            maxAmmo = 30;
+            maxAmmo = 45;
             shootY = -1;
             outlineColor = Pal.darkOutline;
             size = 4;
