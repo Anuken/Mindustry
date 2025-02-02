@@ -6379,9 +6379,8 @@ public class Blocks{
 
             itemCapacity = 100;
 
-            liquidCapacity = 2000;
-            addLiquidBar(Liquids.water);
-            consumeLiquid(Liquids.water, liquidCapacity).trigger(true).update(false);
+            liquidCapacity = 4000f;
+            consumeLiquidAmount = 2000f;
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{

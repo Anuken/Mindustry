@@ -86,6 +86,9 @@ public class SectorInfo{
     /** Wave where first boss shows up. */
     public int bossWave = -1;
 
+    public ObjectFloatMap<Item> importCooldownTimers = new ObjectFloatMap<>();
+    public @Nullable transient float[] importRateCache;
+
     /** Counter refresh state. */
     private transient Interval time = new Interval();
     /** Core item storage input/output deltas. */
@@ -105,12 +108,6 @@ public class SectorInfo{
         productionDeltas[item.id] += amount;
     }
 
-    /** @return the real location items go when launched on this sector */
-    public Sector getRealDestination(){
-        //on multiplayer the destination is, by default, the first captured sector (basically random)
-        return !net.client() || destination != null ? destination : state.rules.sector.planet.sectors.find(Sector::hasBase);
-    }
-
     /** Updates export statistics. */
     public void handleItemExport(ItemStack stack){
         handleItemExport(stack.item, stack.amount);
@@ -123,6 +120,29 @@ public class SectorInfo{
 
     public float getExport(Item item){
         return export.get(item, ExportStat::new).mean;
+    }
+
+    public void refreshImportRates(Planet planet){
+        if(importRateCache == null || importRateCache.length != content.items().size){
+            importRateCache = new float[content.items().size];
+        }else{
+            Arrays.fill(importRateCache, 0f);
+        }
+        eachImport(planet, sector -> sector.info.export.each((item, stat) -> {
+            importRateCache[item.id] += stat.mean;
+        }));
+    }
+
+    public float[] getImportRates(Planet planet){
+        if(importRateCache == null){
+            refreshImportRates(planet);
+        }
+        return importRateCache;
+    }
+
+    /** @return the import rate of an item as item/second. */
+    public float getImportRate(Planet planet, Item item){
+        return getImportRates(planet)[item.id];
     }
 
     /** Write contents of meta into main storage. */
@@ -291,7 +311,7 @@ public class SectorInfo{
     /** Iterates through every sector this one imports from. */
     public void eachImport(Planet planet, Cons<Sector> cons){
         for(Sector sector : planet.sectors){
-            Sector dest = sector.info.getRealDestination();
+            Sector dest = sector.info.destination;
             if(sector.hasBase() && sector.info != this && dest != null && dest.info == this && sector.info.anyExports()){
                 cons.get(sector);
             }

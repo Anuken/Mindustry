@@ -12,7 +12,6 @@ import static mindustry.Vars.*;
 //TODO replace with ConsumeLiquids?
 public class ConsumeLiquid extends ConsumeLiquidBase{
     public final Liquid liquid;
-    public boolean trigger;
 
     public ConsumeLiquid(Liquid liquid, float amount){
         super(amount);
@@ -23,10 +22,6 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
         this(null, 0f);
     }
 
-    public ConsumeLiquid trigger(boolean trigger){
-        this.trigger = trigger;
-        return this;
-    }
 
     @Override
     public void apply(Block block){
@@ -42,13 +37,6 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
     @Override
     public void update(Building build){
         build.liquids.remove(liquid, amount * build.edelta() * multiplier.get(build));
-    }
-
-    @Override
-    public void trigger(Building build){
-        if(trigger){
-            build.liquids.remove(liquid, amount);
-        }
     }
 
     @Override

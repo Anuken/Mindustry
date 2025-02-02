@@ -163,9 +163,17 @@ public class Universe{
                 continue;
             }
 
+            //don't simulate the planet if there is an in-progress mission on that planet
+            if(!planet.allowWaveSimulation && planet.sectors.contains(s -> s.hasBase() && !s.isBeingPlayed() && s.isAttacked())){
+                continue;
+            }
+
             //third pass: everything else
             for(Sector sector : planet.sectors){
                 if(sector.hasBase()){
+                    if(sector.info.importRateCache != null){
+                        sector.info.refreshImportRates(planet);
+                    }
 
                     //if it is being attacked, capture time is 0; otherwise, increment the timer
                     if(sector.isAttacked()){

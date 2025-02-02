@@ -150,7 +150,7 @@ public class LaunchPad extends Block{
 
             table.row();
             table.label(() -> {
-                Sector dest = state.rules.sector == null ? null : state.rules.sector.info.getRealDestination();
+                Sector dest = state.rules.sector == null ? null : state.rules.sector.info.destination;
 
                 return Core.bundle.format("launch.destination",
                     dest == null || !dest.hasBase() ? Core.bundle.get("sectors.nonelaunch") :
@@ -161,7 +161,7 @@ public class LaunchPad extends Block{
         @Override
         public void buildConfiguration(Table table){
             //TODO: this UI should be on landing pads
-            if(!state.isCampaign() || net.client() || true){
+            if(!state.isCampaign() || net.client()){
                 deselect();
                 return;
             }
@@ -262,27 +262,23 @@ public class LaunchPad extends Block{
 
         @Override
         public void remove(){
-            if(!state.isCampaign()) return;
+            if(!state.isCampaign() || net.client()) return;
 
-            Sector destsec = state.rules.sector.info.getRealDestination();
+            Sector destsec = state.rules.sector.info.destination;
 
             //actually launch the items upon removal
-            if(team() == state.rules.defaultTeam){
-                if(destsec != null && (destsec != state.rules.sector || net.client())){
-                    ItemSeq dest = new ItemSeq();
+            if(team() == state.rules.defaultTeam && destsec != null && destsec != state.rules.sector){
+                ItemSeq dest = new ItemSeq();
 
-                    for(ItemStack stack : stacks){
-                        dest.add(stack);
+                for(ItemStack stack : stacks){
+                    dest.add(stack);
 
-                        //update export
-                        state.rules.sector.info.handleItemExport(stack);
-                        Events.fire(new LaunchItemEvent(stack));
-                    }
-
-                    if(!net.client()){
-                        destsec.addItems(dest);
-                    }
+                    //update export statistics
+                    state.rules.sector.info.handleItemExport(stack);
+                    Events.fire(new LaunchItemEvent(stack));
                 }
+
+                destsec.addItems(dest);
             }
         }
     }
