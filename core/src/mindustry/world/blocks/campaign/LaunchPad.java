@@ -22,6 +22,7 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -35,6 +36,13 @@ public class LaunchPad extends Block{
     public @Load(value = "@-pod", fallback = "launchpod") TextureRegion podRegion;
     public Color lightColor = Color.valueOf("eab678");
     public boolean acceptMultipleItems = false;
+
+    public float lightStep = 1f;
+    public int lightSteps = 3;
+
+    public float liquidPad = 2f;
+    public @Nullable Liquid drawLiquid;
+    public Color bottomColor = Pal.darkerMetal;
 
     public LaunchPad(String name){
         super(name);
@@ -87,6 +95,13 @@ public class LaunchPad extends Block{
 
         @Override
         public void draw(){
+            if(hasLiquids && drawLiquid != null){
+                Draw.color(bottomColor);
+                Fill.square(x, y, size * tilesize/2f - liquidPad);
+                Draw.color();
+                LiquidBlock.drawTiledFrames(block.size, x, y, liquidPad, liquidPad, liquidPad, liquidPad, drawLiquid, liquids.get(drawLiquid) / liquidCapacity);
+            }
+
             super.draw();
 
             if(!state.isCampaign()) return;
@@ -94,13 +109,11 @@ public class LaunchPad extends Block{
             if(lightRegion.found()){
                 Draw.color(lightColor);
                 float progress = Math.min((float)items.total() / itemCapacity, launchCounter / launchTime);
-                int steps = 3;
-                float step = 1f;
 
                 for(int i = 0; i < 4; i++){
-                    for(int j = 0; j < steps; j++){
-                        float alpha = Mathf.curve(progress, (float)j / steps, (j+1f) / steps);
-                        float offset = -(j - 1f) * step;
+                    for(int j = 0; j < lightSteps; j++){
+                        float alpha = Mathf.curve(progress, (float)j / lightSteps, (j+1f) / lightSteps);
+                        float offset = -(j - 1f) * lightStep;
 
                         Draw.color(Pal.metalGrayDark, lightColor, alpha);
                         Draw.rect(lightRegion, x + Geometry.d8edge(i).x * offset, y + Geometry.d8edge(i).y * offset, i * 90);
@@ -110,6 +123,7 @@ public class LaunchPad extends Block{
                 Draw.reset();
             }
 
+            Drawf.shadow(x, y, size * tilesize);
             Draw.rect(podRegion, x, y);
 
             Draw.reset();
@@ -169,7 +183,11 @@ public class LaunchPad extends Block{
             table.button(Icon.upOpen, Styles.cleari, () -> {
                 ui.planet.showSelect(state.rules.sector, other -> {
                     if(state.isCampaign() && other.planet == state.rules.sector.planet){
+                        var prev = state.rules.sector.info.destination;
                         state.rules.sector.info.destination = other;
+                        if(prev != null){
+                            prev.info.refreshImportRates(state.getPlanet());
+                        }
                     }
                 });
                 deselect();

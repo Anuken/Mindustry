@@ -20,8 +20,10 @@ public class SerpuloTechTree{
                 node(junction, () -> {
                     node(router, () -> {
                         node(advancedLaunchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
-                            node(interplanetaryAccelerator, Seq.with(new SectorComplete(planetaryTerminal)), () -> {
+                            node(landingPad, () -> {
+                                node(interplanetaryAccelerator, Seq.with(new SectorComplete(planetaryTerminal)), () -> {
 
+                                });
                             });
                         });
 
