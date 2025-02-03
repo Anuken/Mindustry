@@ -6376,7 +6376,7 @@ public class Blocks{
         }};
 
         landingPad = new LandingPad("landing-pad"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 300, Items.graphite, 200, Items.titanium, 150));
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 200, Items.graphite, 100, Items.titanium, 100));
             size = 4;
 
             itemCapacity = 100;

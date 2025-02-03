@@ -38,7 +38,7 @@ public class LandingPad extends Block{
 
     public @Load(value = "@-pod", fallback = "advanced-launch-pad-pod") TextureRegion podRegion;
     public float arrivalDuration = 150f;
-    public float cooldownTime = 180f;
+    public float cooldownTime = 150f;
     public float consumeLiquidAmount = 100f;
     public Liquid consumeLiquid = Liquids.water;
 
@@ -95,7 +95,7 @@ public class LandingPad extends Block{
 
         addLiquidBar(consumeLiquid);
         //TODO: does cooldown even need to exist?
-        addBar("heat", (LandingPadBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.cooldown));
+        addBar("cooldown", (LandingPadBuild entity) -> new Bar("bar.cooldown", Pal.lightOrange, () -> entity.cooldown));
     }
 
     @Override
@@ -378,11 +378,22 @@ public class LandingPad extends Block{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             config = TypeIO.readItem(read);
             priority = read.i();
             cooldown = read.f();
+
+            if(revision >= 1){
+                arriving = TypeIO.readItem(read);
+                arrivingTimer = read.f();
+                liquidRemoved = read.f();
+            }
         }
 
         @Override
@@ -391,6 +402,10 @@ public class LandingPad extends Block{
             TypeIO.writeItem(write, config);
             write.i(priority);
             write.f(cooldown);
+
+            TypeIO.writeItem(write, arriving);
+            write.f(arrivingTimer);
+            write.f(liquidRemoved);
         }
     }
 }
