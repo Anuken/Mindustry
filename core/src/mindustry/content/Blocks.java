@@ -6382,8 +6382,8 @@ public class Blocks{
             itemCapacity = 100;
 
             coolingEffect = new RadialEffect(Fx.steamCoolSmoke, 4, 90f, 9.5f, 180f);
-            liquidCapacity = 5000f;
-            consumeLiquidAmount = 2500f;
+            liquidCapacity = 4000f;
+            consumeLiquidAmount = 2000f;
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{

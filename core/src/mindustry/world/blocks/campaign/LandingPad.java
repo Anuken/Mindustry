@@ -58,6 +58,7 @@ public class LandingPad extends Block{
         update = true;
         configurable = true;
         acceptsItems = false;
+        canOverdrive = false; //overdriving can't do anything meaningful besides decrease cooldown, which is very small anyway, so don't bother
         emitLight = true;
         lightRadius = 90f;
 

@@ -31,7 +31,7 @@ public class SectorInfo{
     /** Export statistics. */
     public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
     //TODO: there is an obvious exploit with launch pad redirection here; pads can be redirected after leaving a sector, which doesn't update calculations.
-    /** Import statistics, based on what launch pads are actually receiving. TODO: this is not actually used or displayed anywhere (yet) */
+    /** Import statistics, based on what launch pads are actually receiving. */
     public ObjectMap<Item, ExportStat> imports = new ObjectMap<>();
     /** Items stored in all cores. */
     public ItemSeq items = new ItemSeq();
