@@ -199,9 +199,9 @@ public class Control implements ApplicationListener, Loadable{
 
             float coreDelay = 0f;
             if(!settings.getBool("skipcoreanimation") && !state.rules.pvp){
-                coreDelay = core.landDuration();
+                coreDelay = core.launchDuration();
                 //delay player respawn so animation can play.
-                player.deathTimer = Player.deathDelay - core.landDuration();
+                player.deathTimer = Player.deathDelay - core.launchDuration();
                 //TODO this sounds pretty bad due to conflict
                 if(settings.getInt("musicvol") > 0){
                     //TODO what to do if another core with different music is already playing?
@@ -215,6 +215,10 @@ public class Control implements ApplicationListener, Loadable{
             }
 
             if(state.isCampaign()){
+                if(state.rules.sector.info.importRateCache != null){
+                    state.rules.sector.info.refreshImportRates(state.rules.sector.planet);
+                }
+
                 //don't run when hosting, that doesn't really work.
                 if(state.rules.sector.planet.prebuildBase){
                     toBePlaced.clear();

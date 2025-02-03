@@ -315,7 +315,10 @@ public class Drill extends Block{
             }
 
             if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
-                offload(dominantItem);
+                int amount = (int)(progress / delay);
+                for(int i = 0; i < amount; i++){
+                    offload(dominantItem);
+                }
 
                 progress %= delay;
 

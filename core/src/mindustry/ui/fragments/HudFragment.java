@@ -290,8 +290,19 @@ public class HudFragment{
 
             Table wavesMain, editorMain;
 
-            cont.stack(wavesMain = new Table(), editorMain = new Table()).height(wavesMain.getPrefHeight())
-            .name("waves/editor");
+            cont.stack(wavesMain = new Table(), editorMain = new Table(), new Element(){
+                //this may seem insane, but adding an empty element of a specific height to this stack fixes layout issues on mobile.
+
+                {
+                    visible = false;
+                    touchable = Touchable.disabled;
+                }
+
+                @Override
+                public float getPrefHeight(){
+                    return Scl.scl(120f);
+                }
+            }).name("waves/editor");
 
             wavesMain.visible(() -> shown && !state.isEditor());
             wavesMain.top().left().name = "waves";
@@ -326,71 +337,28 @@ public class HudFragment{
             editorMain.name = "editor";
             editorMain.table(Tex.buttonEdge4, t -> {
                 t.name = "teams";
+
+
                 t.top().table(teams -> {
                     teams.left();
-                    int i = 0;
                     for(Team team : Team.baseTeams){
-                        ImageButton button = teams.button(Tex.whiteui, Styles.clearNoneTogglei, 38f, () -> Call.setPlayerTeamEditor(player, team))
-                        .size(50f).margin(6f).get();
+                        ImageButton button = teams.button(Tex.whiteui, Styles.clearNoneTogglei, 33f, () -> Call.setPlayerTeamEditor(player, team))
+                        .size(45f).margin(6f).get();
                         button.getImageCell().grow();
                         button.getStyle().imageUpColor = team.color;
                         button.update(() -> button.setChecked(player.team() == team));
-
-                        if(++i % 6 == 0){
-                            teams.row();
-                        }
                     }
-                }).top().left();
 
-                t.row();
+                    teams.button(Icon.downOpen, Styles.emptyi, () -> Core.settings.put("editor-blocks-shown", !Core.settings.getBool("editor-blocks-shown")))
+                    .size(45f).update(m -> m.getStyle().imageUp = (Core.settings.getBool("editor-blocks-shown") ? Icon.upOpen : Icon.downOpen));
+                }).top().left().row();
 
-                t.table(control.input::buildPlacementUI).growX().left().with(in -> in.left()).row();
+                t.collapser(this::addBlockSelection, () -> Core.settings.getBool("editor-blocks-shown"));
 
-                //hovering item display
-                t.table(h -> {
-                    Runnable rebuild = () -> {
-                        h.clear();
-                        h.left();
-
-                        Displayable hover = blockfrag.hovered();
-                        UnlockableContent toDisplay = control.input.block;
-
-                        if(toDisplay == null && hover != null){
-                            if(hover instanceof Building b){
-                                toDisplay = b.block;
-                            }else if(hover instanceof Tile tile){
-                                toDisplay =
-                                    tile.block().itemDrop != null ? tile.block() :
-                                    tile.overlay().itemDrop != null || tile.wallDrop() != null ? tile.overlay() :
-                                    tile.floor();
-                            }else if(hover instanceof Unit u){
-                                toDisplay = u.type;
-                            }
-                        }
-
-                        if(toDisplay != null){
-                            h.image(toDisplay.uiIcon).scaling(Scaling.fit).size(8 * 4);
-                            h.add(toDisplay.localizedName).ellipsis(true).left().growX().padLeft(5);
-                        }
-                    };
-
-                    Object[] hovering = {null};
-                    h.update(() -> {
-                        Object nextHover = control.input.block != null ? control.input.block : blockfrag.hovered();
-                        if(nextHover != hovering[0]){
-                            hovering[0] = nextHover;
-                            rebuild.run();
-                        }
-                    });
-                }).growX().left().minHeight(36f).row();
-
-                t.table(blocks -> {
-                    addBlockSelection(blocks);
-                }).fillX().left();
-            }).width(dsize * 5 + 4f);
+            }).width(dsize * 5 + 4f).top();
             if(mobile){
                 editorMain.row().spacerY(() -> {
-                    if(control.input instanceof MobileInput mob){
+                    if(control.input instanceof MobileInput mob && Core.settings.getBool("editor-blocks-shown")){
                         if(Core.graphics.isPortrait()) return Core.graphics.getHeight() / 2f / Scl.scl(1f);
                         if(mob.hasSchematic()) return 156f;
                         if(mob.showCancel()) return 50f;
@@ -398,6 +366,8 @@ public class HudFragment{
                     return 0f;
                 });
             }
+
+            editorMain.row().add().growY();
             editorMain.visible(() -> shown && state.isEditor());
 
             //fps display

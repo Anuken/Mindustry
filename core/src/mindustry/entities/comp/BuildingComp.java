@@ -56,7 +56,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     static final BuildTeamChangeEvent teamChangeEvent = new BuildTeamChangeEvent();
     static final BuildDamageEvent bulletDamageEvent = new BuildDamageEvent();
     static int sleepingEntities = 0;
-    
+
     @Import float x, y, health, maxHealth;
     @Import Team team;
     @Import boolean dead;
@@ -1029,10 +1029,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         int itemSize = allItems.size;
         Object[] itemArray = allItems.items;
 
-        for(int i = 0; i < proximity.size; i++){
-            Building other = proximity.get((i + dump) % proximity.size);
-
-            if(todump == null){
+        if(todump == null){
+            for(int i = 0; i < proximity.size; i++){
+                Building other = proximity.get((i + dump) % proximity.size);
 
                 for(int ii = 0; ii < itemSize; ii++){
                     if(!items.has(ii)) continue;
@@ -1045,16 +1044,22 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                         return true;
                     }
                 }
-            }else{
+
+                incrementDump(proximity.size);
+            }
+        }else{
+            for(int i = 0; i < proximity.size; i++){
+                Building other = proximity.get((i + dump) % proximity.size);
+
                 if(other.acceptItem(self(), todump) && canDump(other, todump)){
                     other.handleItem(self(), todump);
                     items.remove(todump, 1);
                     incrementDump(proximity.size);
                     return true;
                 }
-            }
 
-            incrementDump(proximity.size);
+                incrementDump(proximity.size);
+            }
         }
 
         return false;
@@ -1118,7 +1123,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
         power.links.clear();
     }
-    
+
     public boolean conductsTo(Building other){
         return !block.insulated;
     }
@@ -1320,7 +1325,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(value instanceof Block) type = Block.class;
         if(value instanceof Liquid) type = Liquid.class;
         if(value instanceof UnitType) type = UnitType.class;
-        
+
         if(builder != null && builder.isPlayer()){
             updateLastAccess(builder.getPlayer());
         }
@@ -1727,7 +1732,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void updateProximity(){
         tmpTiles.clear();
         proximity.clear();
-        
+
         Point2[] nearby = Edges.getEdges(block.size);
         for(Point2 point : nearby){
             Building other = world.build(tile.x + point.x, tile.y + point.y);

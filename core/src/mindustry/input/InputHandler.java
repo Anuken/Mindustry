@@ -1096,9 +1096,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             //draw command overlay UI
             for(Unit unit : selectedUnits){
-                if(unit.isFlying() != flying) continue;
+
                 CommandAI ai = unit.command();
                 Position lastPos = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
+
+                if(flying && ai.attackTarget != null && ai.currentCommand().drawTarget){
+                    Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
+                }
+
+                if(unit.isFlying() != flying) continue;
 
                 //draw target line
                 if(ai.targetPos != null && ai.currentCommand().drawTarget){
@@ -1135,9 +1141,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 //Lines.poly(unit.x, unit.y, sides, rad + 1.5f);
                 Draw.reset();
 
-                if(ai.attackTarget != null && ai.currentCommand().drawTarget){
-                    Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
-                }
+
 
                 if(lastPos == null){
                     lastPos = unit;

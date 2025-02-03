@@ -38,6 +38,8 @@ public class EventType{
         teamCoreDamage,
         socketConfigChanged,
         update,
+        beforeGameUpdate,
+        afterGameUpdate,
         unitCommandChange,
         unitCommandPosition,
         unitCommandAttack,

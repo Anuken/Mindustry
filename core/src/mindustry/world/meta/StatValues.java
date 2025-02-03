@@ -150,7 +150,7 @@ public class StatValues{
                 t.add(Strings.autoFixed(amount, 2)).style(Styles.outlineLabel);
                 add(t);
             }
-        }}).size(iconMed).padRight(3  + (amount != 0 && Strings.autoFixed(amount, 2).length() > 2 ? 8 : 0)).with(s -> withTooltip(s, liquid, false));
+        }}).size(iconMed).padRight(3  + (amount != 0 ? (Strings.autoFixed(amount, 2).length() - 1) * 10 : 0)).with(s -> withTooltip(s, liquid, false));
 
         if(perSecond && amount != 0){
             t.add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.lightGray).style(Styles.outlineLabel);
