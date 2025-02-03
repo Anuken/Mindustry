@@ -762,7 +762,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //validate commanding units
-        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
+        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid() || u.team != player.team());
 
         if(!commandMode){
             commandBuildings.clear();

@@ -163,7 +163,8 @@ public class Blocks{
     worldProcessor, worldCell, worldMessage, worldSwitch,
 
     //campaign
-    launchPad, interplanetaryAccelerator
+    launchPad, advancedLaunchPad, landingPad,
+    interplanetaryAccelerator
 
     ;
 
@@ -5213,7 +5214,7 @@ public class Blocks{
 
             shake = 6f;
             ammoPerShot = 15;
-            maxAmmo = 30;
+            maxAmmo = 45;
             shootY = -1;
             outlineColor = Pal.darkOutline;
             size = 4;
@@ -6353,12 +6354,36 @@ public class Blocks{
         //region campaign
 
         launchPad = new LaunchPad("launch-pad"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            requirements(Category.effect, BuildVisibility.debugOnly, with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 3;
             itemCapacity = 100;
             launchTime = 60f * 20;
             hasPower = true;
+            acceptMultipleItems = true;
             consumePower(4f);
+        }};
+
+        advancedLaunchPad = new LaunchPad("advanced-launch-pad"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 350, Items.silicon, 250, Items.lead, 300, Items.titanium, 200));
+            size = 4;
+            itemCapacity = 100;
+            launchTime = 60f * 30;
+            liquidCapacity = 40f;
+            hasPower = true;
+            drawLiquid = Liquids.oil;
+            consumeLiquid(Liquids.oil, 9f/60f);
+            consumePower(8f);
+        }};
+
+        landingPad = new LandingPad("landing-pad"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 200, Items.graphite, 100, Items.titanium, 100));
+            size = 4;
+
+            itemCapacity = 100;
+
+            coolingEffect = new RadialEffect(Fx.steamCoolSmoke, 4, 90f, 9.5f, 180f);
+            liquidCapacity = 4000f;
+            consumeLiquidAmount = 2000f;
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{

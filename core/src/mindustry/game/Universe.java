@@ -163,34 +163,17 @@ public class Universe{
                 continue;
             }
 
-            //first pass: clear import stats
-            for(Sector sector : planet.sectors){
-                if(sector.hasBase() && !sector.isBeingPlayed()){
-                    sector.info.lastImported.clear();
-                }
-            }
-
-            //second pass: update export & import statistics
-            for(Sector sector : planet.sectors){
-                if(sector.hasBase() && !sector.isBeingPlayed()){
-
-                    //export to another sector
-                    if(sector.info.destination != null){
-                        Sector to = sector.info.destination;
-                        if(to.hasBase() && to.planet == planet){
-                            ItemSeq items = new ItemSeq();
-                            //calculated exported items to this sector
-                            sector.info.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed * sector.getProductionScale())));
-                            to.addItems(items);
-                            to.info.lastImported.add(items);
-                        }
-                    }
-                }
+            //don't simulate the planet if there is an in-progress mission on that planet
+            if(!planet.allowWaveSimulation && planet.sectors.contains(s -> s.hasBase() && !s.isBeingPlayed() && s.isAttacked())){
+                continue;
             }
 
             //third pass: everything else
             for(Sector sector : planet.sectors){
                 if(sector.hasBase()){
+                    if(sector.info.importRateCache != null){
+                        sector.info.refreshImportRates(planet);
+                    }
 
                     //if it is being attacked, capture time is 0; otherwise, increment the timer
                     if(sector.isAttacked()){
@@ -201,6 +184,8 @@ public class Universe{
 
                     //increment seconds passed for this sector by the time that just passed with this turn
                     if(!sector.isBeingPlayed()){
+
+                        //TODO: if a planet has sectors under attack and simulation is OFF, just don't simulate it
 
                         //increment time if attacked
                         if(sector.isAttacked()){
@@ -247,7 +232,8 @@ public class Universe{
                         sector.info.export.each((item, stat) -> {
                             if(sector.info.items.get(item) <= 0 && sector.info.production.get(item, ExportStat::new).mean < 0 && stat.mean > 0){
                                 //cap export by import when production is negative.
-                                stat.mean = Math.min(sector.info.lastImported.get(item) / (float)newSecondsPassed, stat.mean);
+                                //TODO remove
+                                stat.mean = Math.min(0f, stat.mean);
                             }
                         });
 

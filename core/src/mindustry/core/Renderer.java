@@ -50,7 +50,7 @@ public class Renderer implements ApplicationListener{
     public TextureRegion[][] fluidFrames;
 
     //currently landing core, null if there are no cores or it has finished landing.
-    private @Nullable LaunchAnimator landCore;
+    private @Nullable LaunchAnimator launchAnimator;
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
     private float
     //target camera scale that is lerp-ed to
@@ -59,8 +59,6 @@ public class Renderer implements ApplicationListener{
     camerascale = targetscale,
     //starts at coreLandDuration, ends at 0. if positive, core is landing.
     landTime,
-    //timer for core landing particles
-    landPTimer,
     //intensity for screen shake
     shakeIntensity,
     //reduction rate of screen shake
@@ -170,21 +168,21 @@ public class Renderer implements ApplicationListener{
         pixelate = settings.getBool("pixelate");
 
         //don't bother drawing landing animation if core is null
-        if(landCore == null) landTime = 0f;
+        if(launchAnimator == null) landTime = 0f;
         if(landTime > 0){
-            if(!state.isPaused()) landCore.updateLaunching();
+            if(!state.isPaused()) launchAnimator.updateLaunch();
 
             weatherAlpha = 0f;
-            camerascale = landCore.zoomLaunching();
+            camerascale = launchAnimator.zoomLaunch();
 
             if(!state.isPaused()) landTime -= Time.delta;
         }else{
             weatherAlpha = Mathf.lerpDelta(weatherAlpha, 1f, 0.08f);
         }
 
-        if(landCore != null && landTime <= 0f){
-            landCore.endLaunch();
-            landCore = null;
+        if(launchAnimator != null && landTime <= 0f){
+            launchAnimator.endLaunch();
+            launchAnimator = null;
         }
 
         camera.width = graphics.getWidth() / camerascale;
@@ -376,9 +374,14 @@ public class Renderer implements ApplicationListener{
         Draw.draw(Layer.overlayUI, overlays::drawTop);
         if(state.rules.fog) Draw.draw(Layer.fogOfWar, fog::drawFog);
         Draw.draw(Layer.space, () -> {
-            if(landCore == null || landTime <= 0f) return;
-            landCore.drawLanding();
+            if(launchAnimator == null || landTime <= 0f) return;
+            launchAnimator.drawLaunch();
         });
+        if(launchAnimator != null){
+            Draw.z(Layer.space);
+            launchAnimator.drawLaunchGlobalZ();
+            Draw.reset();
+        }
 
         Events.fire(Trigger.drawOver);
         blocks.drawBlocks();
@@ -507,27 +510,19 @@ public class Renderer implements ApplicationListener{
     }
 
     public float getLandTimeIn(){
-        if(landCore == null) return 0f;
-        float fin = landTime / landCore.landDuration();
+        if(launchAnimator == null) return 0f;
+        float fin = landTime / launchAnimator.launchDuration();
         if(!launching) fin = 1f - fin;
         return fin;
     }
 
-    public float getLandPTimer(){
-        return landPTimer;
-    }
-
-    public void setLandPTimer(float landPTimer){
-        this.landPTimer = landPTimer;
-    }
-
     public void showLanding(LaunchAnimator landCore){
-        this.landCore = landCore;
+        this.launchAnimator = landCore;
         launching = false;
-        landTime = landCore.landDuration();
+        landTime = landCore.launchDuration();
 
         landCore.beginLaunch(false);
-        camerascale = landCore.zoomLaunching();
+        camerascale = landCore.zoomLaunch();
     }
 
     public void showLaunch(LaunchAnimator landCore){
@@ -535,9 +530,9 @@ public class Renderer implements ApplicationListener{
         control.input.planConfig.hide();
         control.input.inv.hide();
 
-        this.landCore = landCore;
+        this.launchAnimator = landCore;
         launching = true;
-        landTime = landCore.landDuration();
+        landTime = landCore.launchDuration();
 
         Music music = landCore.launchMusic();
         music.stop();
