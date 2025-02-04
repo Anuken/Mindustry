@@ -1001,7 +1001,11 @@ public class LExecutor{
         public void run(LExecutor exec){
 
             if(exec.textBuffer.length() >= maxTextBuffer) return;
-            if(value.isobj) return;
+            if(value.isobj){
+                    if(!(value.objval instanceof UnlockableContent cont)) return;
+                    exec.textBuffer.append((char)cont.emojiChar());
+                    return;
+            };
 
             exec.textBuffer.append((char)Math.floor(value.numval));
         }
