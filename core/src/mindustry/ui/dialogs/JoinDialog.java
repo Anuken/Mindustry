@@ -667,7 +667,7 @@ public class JoinDialog extends BaseDialog{
             Core.app.post(() -> {
                 servers.sort(s -> s.name == null ? Integer.MAX_VALUE : s.name.hashCode());
                 defaultServers.addAll(servers);
-                Log.info("Fetched @ community servers.", defaultServers.size);
+                Log.info("Fetched @ community servers.", defaultServers.sum(s -> s.addresses.length));
             });
         });
     }

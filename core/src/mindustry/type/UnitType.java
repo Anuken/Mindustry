@@ -1348,6 +1348,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time, 0.5f, flashScl));
 
+        Draw.alpha(Renderer.unitLaserOpacity);
         Drawf.laser(mineLaserRegion, mineLaserEndRegion, px, py, ex, ey, 0.75f);
 
         if(unit.isLocal()){
