@@ -29,6 +29,7 @@ public class StatUnit{
     perMinute = new StatUnit("perMinute", false),
     perShot = new StatUnit("perShot", false),
     timesSpeed = new StatUnit("timesSpeed", false),
+    multiplier = new StatUnit("multiplier", false),
     percent = new StatUnit("percent", false),
     shieldHealth = new StatUnit("shieldHealth"),
     none = new StatUnit("none"),

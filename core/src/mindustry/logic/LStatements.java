@@ -1533,11 +1533,11 @@ public class LStatements{
             table.add("natural ");
             fields(table, natural, str -> natural = str);
 
-            table.add("x ").visible(() -> natural.equals("false"));
-            fields(table, x, str -> x = str).visible(() -> natural.equals("false"));
+            table.add("x ").visible(() -> !natural.equals("true"));
+            fields(table, x, str -> x = str).visible(() -> !natural.equals("true"));
 
-            table.add(" y ").visible(() -> natural.equals("false"));
-            fields(table, y, str -> y = str).visible(() -> natural.equals("false"));
+            table.add(" y ").visible(() -> !natural.equals("true"));
+            fields(table, y, str -> y = str).visible(() -> !natural.equals("true"));
         }
 
         @Override
@@ -1587,7 +1587,7 @@ public class LStatements{
                     fields(table, "w", p3, s -> p3 = s);
                     fields(table, "h", p4, s -> p4 = s);
                 }
-                case buildSpeed, unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, rtsMinSquad, rtsMinWeight -> {
+                case buildSpeed, unitHealth, unitBuildSpeed, unitMineSpeed, unitCost, unitDamage, blockHealth, blockDamage, rtsMinSquad, rtsMinWeight -> {
                     if(p1.equals("0")){
                         p1 = "@sharded";
                     }

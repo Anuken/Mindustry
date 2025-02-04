@@ -69,6 +69,48 @@ public class StatValues{
         return number(value, unit, false);
     }
 
+    public static StatValue multiplierModifier(float value, StatUnit unit, boolean merge){
+        return table -> {
+            String l1 = (unit.icon == null ? "" : unit.icon + " ") + multStat(value), l2 = (unit.space ? " " : "") + unit.localized();
+
+            if(merge){
+                table.add(l1 + l2).left();
+            }else{
+                table.add(l1).left();
+                table.add(l2).left();
+            }
+        };
+    }
+
+    public static StatValue multiplierModifier(float value, StatUnit unit){
+        return multiplierModifier(value, unit, true);
+    }
+
+    public static StatValue multiplierModifier(float value){
+        return multiplierModifier(value, StatUnit.multiplier);
+    }
+
+    public static StatValue percentModifier(float value, StatUnit unit, boolean merge){
+        return table -> {
+            String l1 = (unit.icon == null ? "" : unit.icon + " ") + ammoStat((value - 1) * 100), l2 = (unit.space ? " " : "") + unit.localized();
+
+            if(merge){
+                table.add(l1 + l2).left();
+            }else{
+                table.add(l1).left();
+                table.add(l2).left();
+            }
+        };
+    }
+
+    public static StatValue percentModifier(float value, StatUnit unit){
+        return percentModifier(value, unit, true);
+    }
+
+    public static StatValue percentModifier(float value){
+        return percentModifier(value, StatUnit.percent);
+    }
+
     public static StatValue liquid(Liquid liquid, float amount, boolean perSecond){
         return table -> table.add(displayLiquid(liquid, amount, perSecond));
     }
@@ -442,33 +484,36 @@ public class StatValues{
         };
     }
 
-    public static StatValue itemBoosters(String unit, float timePeriod, float speedBoost, float rangeBoost, ItemStack[] items, Boolf<Item> filter){
+    public static StatValue itemBoosters(String unit, float timePeriod, float speedBoost, float rangeBoost, ItemStack[] items){
         return table -> {
             table.row();
             table.table(c -> {
-                for(Item item : content.items()){
-                    if(!filter.get(item)) continue;
-
-                    c.table(Styles.grayPanel, b -> {
+                c.table(Styles.grayPanel, b -> {
+                    b.table(it -> {
                         for(ItemStack stack : items){
                             if(timePeriod < 0){
-                                b.add(displayItem(stack.item, stack.amount, true)).pad(20f).left();
+                                it.add(displayItem(stack.item, stack.amount, true)).pad(10f).padLeft(15f).left();
                             }else{
-                                b.add(displayItem(stack.item, stack.amount, timePeriod, true)).pad(20f).left();
+                                it.add(displayItem(stack.item, stack.amount, timePeriod, true)).pad(10f).padLeft(15f).left();
                             }
-                            if(items.length > 1) b.row();
+                            it.row();
                         }
+                    }).left();
 
-                        b.table(bt -> {
-                            bt.right().defaults().padRight(3).left();
-                            if(rangeBoost != 0) bt.add("[lightgray]+[stat]" + Strings.autoFixed(rangeBoost / tilesize, 2) + "[lightgray] " + StatUnit.blocks.localized()).row();
-                            if(speedBoost != 0) bt.add("[lightgray]" + unit.replace("{0}", "[stat]" + Strings.autoFixed(speedBoost, 2) + "[lightgray]"));
-                        }).right().grow().pad(10f).padRight(15f);
-                    }).growX().pad(5).padBottom(-5).row();
-                }
+                    b.table(bt -> {
+                        bt.right().defaults().padRight(3).left();
+                        if(rangeBoost != 0) bt.add("[lightgray]+[stat]" + Strings.autoFixed(rangeBoost / tilesize, 2) + "[lightgray] " + StatUnit.blocks.localized()).row();
+                        if(speedBoost != 0) bt.add("[lightgray]" + unit.replace("{0}", "[stat]" + Strings.autoFixed(speedBoost, 2) + "[lightgray]"));
+                    }).right().top().grow().pad(10f).padRight(15f);
+                }).growX().pad(5).padBottom(-5).row();
             }).growX().colspan(table.getColumns());
             table.row();
         };
+    }
+
+    /** @deprecated Filter is no longer used. */
+    public static StatValue itemBoosters(String unit, float timePeriod, float speedBoost, float rangeBoost, ItemStack[] items, Boolf<Item> filter){
+        return itemBoosters(unit, timePeriod, speedBoost, rangeBoost, items);
     }
 
     public static StatValue weapons(UnitType unit, Seq<Weapon> weapons){
@@ -689,6 +734,10 @@ public class StatValues{
     //for AmmoListValue
     private static String ammoStat(float val){
         return (val > 0 ? "[stat]+" : "[negstat]") + Strings.autoFixed(val, 1);
+    }
+
+    private static String multStat(float val){
+        return (val >= 1 ? "[stat]" : "[negstat]") + Strings.autoFixed(val, 2);
     }
 
     private static TextureRegion icon(UnlockableContent t){

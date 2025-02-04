@@ -90,11 +90,11 @@ public class StatusEffect extends UnlockableContent{
 
     @Override
     public void setStats(){
-        if(damageMultiplier != 1) stats.addPercent(Stat.damageMultiplier, damageMultiplier);
-        if(healthMultiplier != 1) stats.addPercent(Stat.healthMultiplier, healthMultiplier);
-        if(speedMultiplier != 1) stats.addPercent(Stat.speedMultiplier, speedMultiplier);
-        if(reloadMultiplier != 1) stats.addPercent(Stat.reloadMultiplier, reloadMultiplier);
-        if(buildSpeedMultiplier != 1) stats.addPercent(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
+        if(damageMultiplier != 1) stats.addMultModifier(Stat.damageMultiplier, damageMultiplier);
+        if(healthMultiplier != 1) stats.addMultModifier(Stat.healthMultiplier, healthMultiplier);
+        if(speedMultiplier != 1) stats.addMultModifier(Stat.speedMultiplier, speedMultiplier);
+        if(reloadMultiplier != 1) stats.addMultModifier(Stat.reloadMultiplier, reloadMultiplier);
+        if(buildSpeedMultiplier != 1) stats.addMultModifier(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
         if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
         if(damage < 0) stats.add(Stat.healing, -damage * 60f, StatUnit.perSecond);
 
