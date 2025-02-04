@@ -511,11 +511,6 @@ public class StatValues{
         };
     }
 
-    /** @deprecated Filter is no longer used. */
-    public static StatValue itemBoosters(String unit, float timePeriod, float speedBoost, float rangeBoost, ItemStack[] items, Boolf<Item> filter){
-        return itemBoosters(unit, timePeriod, speedBoost, rangeBoost, items);
-    }
-
     public static StatValue weapons(UnitType unit, Seq<Weapon> weapons){
         return table -> {
             table.row();
