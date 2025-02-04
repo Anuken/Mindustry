@@ -429,6 +429,8 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
+                Events.fire(Trigger.beforeGameUpdate);
+
                 float delta = Core.graphics.getDeltaTime();
                 state.tick += Float.isNaN(delta) || Float.isInfinite(delta) ? 0f : delta * 60f;
                 state.updateId ++;
@@ -488,6 +490,8 @@ public class Logic implements ApplicationListener{
                 Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
                 Groups.update();
+
+                Events.fire(Trigger.afterGameUpdate);
             }
 
             if(runStateCheck){

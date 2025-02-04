@@ -134,6 +134,7 @@ public class Planets{
             launchCapacityMultiplier = 0.5f;
             sectorSeed = 2;
             allowWaves = true;
+            allowLegacyLaunchPads = true;
             allowWaveSimulation = true;
             allowSectorInvasion = true;
             allowLaunchSchematics = true;

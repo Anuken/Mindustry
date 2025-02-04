@@ -215,6 +215,10 @@ public class Control implements ApplicationListener, Loadable{
             }
 
             if(state.isCampaign()){
+                if(state.rules.sector.info.importRateCache != null){
+                    state.rules.sector.info.refreshImportRates(state.rules.sector.planet);
+                }
+
                 //don't run when hosting, that doesn't really work.
                 if(state.rules.sector.planet.prebuildBase){
                     toBePlaced.clear();

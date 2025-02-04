@@ -1474,6 +1474,12 @@ public class Fx{
         Lines.circle(e.x, e.y, e.fin() * (e.rotation + 50f));
     }),
 
+    podLandShockwave = new Effect(12f, 80f, e -> {
+        color(Pal.accent);
+        stroke(e.fout() * 2f + 0.2f);
+        Lines.circle(e.x, e.y, e.fin() * 26f);
+    }),
+
     explosion = new Effect(30, e -> {
         e.scaled(7, i -> {
             stroke(3f * i.fout());
@@ -1621,6 +1627,15 @@ public class Fx{
         randLenVectors(e.id, 6, 4f + 30f * e.finpow(), (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 3f);
             Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout());
+        });
+    }),
+
+    steamCoolSmoke = new Effect(35f, e -> {
+        color(Pal.water, Color.lightGray, e.fin(Interp.pow2Out));
+        alpha(e.fout(Interp.pow3Out));
+
+        randLenVectors(e.id, 4, e.finpow() * 7f, e.rotation, 30f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, Math.max(e.fout(), Math.min(1f, e.fin() * 8f)) * 2.8f);
         });
     }),
 
@@ -2572,6 +2587,13 @@ public class Fx{
         rand.setSeed(e.id);
         Tmp.v1.trns(e.rotation, e.finpow() * 90f * rand.random(0.2f, 1f));
         Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 8f * rand.random(0.6f, 1f) * e.fout(0.2f));
+    }).layer(Layer.groundUnit + 1f),
+
+    podLandDust = new Effect(70f, e -> {
+        color(e.color, e.fout(0.1f));
+        rand.setSeed(e.id);
+        Tmp.v1.trns(e.rotation, e.finpow() * 35f * rand.random(0.2f, 1f));
+        Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 5f * rand.random(0.6f, 1f) * e.fout(0.2f));
     }).layer(Layer.groundUnit + 1f),
 
     unitShieldBreak = new Effect(35, e -> {

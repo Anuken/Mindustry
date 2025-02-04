@@ -86,7 +86,7 @@ public class DatabaseDialog extends BaseDialog{
         all.table(t -> {
             int i = 0;
             for(var content : allTabs){
-                t.button(content == Planets.sun ? Icon.eyeSmall : content instanceof Planet ? Icon.planet : new TextureRegionDrawable(content.uiIcon), Styles.clearNoneTogglei, iconMed, () -> {
+                t.button(content == Planets.sun ? Icon.eyeSmall : content instanceof Planet p ? Icon.icons.get(p.icon, Icon.commandRally) : new TextureRegionDrawable(content.uiIcon), Styles.clearNoneTogglei, iconMed, () -> {
                     tab = content;
                     rebuild();
                 }).size(50f).checked(b -> tab == content).tooltip(content == Planets.sun ? "@all" : content.localizedName).with(but -> {

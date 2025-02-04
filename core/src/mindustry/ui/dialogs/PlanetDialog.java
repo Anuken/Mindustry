@@ -504,11 +504,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                     if(selected != null && selected != sec && selected.hasBase()){
                         //imports
-                        if(sec.info.getRealDestination() == selected && sec.info.anyExports()){
+                        if(sec.info.destination == selected && sec.info.anyExports()){
                             planets.drawArc(planet, sec.tile.v, selected.tile.v, Color.gray.write(Tmp.c2).a(state.uiAlpha), Pal.accent.write(Tmp.c3).a(state.uiAlpha), 0.4f, 90f, 25);
                         }
                         //exports
-                        if(selected.info.getRealDestination() == sec && selected.info.anyExports()){
+                        if(selected.info.destination == sec && selected.info.anyExports()){
                             planets.drawArc(planet, selected.tile.v, sec.tile.v, Pal.place.write(Tmp.c2).a(state.uiAlpha), Pal.accent.write(Tmp.c3).a(state.uiAlpha), 0.4f, 90f, 25);
                         }
                     }
@@ -962,7 +962,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             //import
             if(sector.hasBase()){
-                displayItems(c, 1f, sector.info.importStats(sector.planet), "@sectors.import", t -> {
+                displayItems(c, 1f, sector.info.imports, "@sectors.import", t -> {
                     sector.info.eachImport(sector.planet, other -> {
                         String ic = other.iconChar();
                         t.add(Iconc.rightOpen + " " + (ic == null || ic.isEmpty() ? "" : ic + " ") + other.name()).padLeft(10f).row();
@@ -1219,24 +1219,24 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             return;
         }
 
-        //make sure there are no under-attack sectors (other than this one)
-        for(Planet planet : content.planets()){
-            if(!planet.allowWaveSimulation && !debugSelect && planet.allowWaveSimulation == sector.planet.allowWaveSimulation){
-                //if there are two or more attacked sectors... something went wrong, don't show the dialog to prevent softlock
-                Sector attacked = planet.sectors.find(s -> s.isAttacked() && s != sector);
-                if(attacked != null &&  planet.sectors.count(s -> s.isAttacked()) < 2){
-                    BaseDialog dialog = new BaseDialog("@sector.noswitch.title");
-                    dialog.cont.add(bundle.format("sector.noswitch", attacked.name(), attacked.planet.localizedName)).width(400f).labelAlign(Align.center).center().wrap();
-                    dialog.addCloseButton();
-                    dialog.buttons.button("@sector.view", Icon.eyeSmall, () -> {
-                        dialog.hide();
-                        lookAt(attacked);
-                        selectSector(attacked);
-                    });
-                    dialog.show();
+        Planet planet = sector.planet;
 
-                    return;
-                }
+        //make sure there are no under-attack sectors (other than this one)
+        if(!planet.allowWaveSimulation && !debugSelect){
+            //if there are two or more attacked sectors... something went wrong, don't show the dialog to prevent softlock
+            Sector attacked = planet.sectors.find(s -> s.isAttacked() && s != sector);
+            if(attacked != null &&  planet.sectors.count(s -> s.isAttacked()) < 2){
+                BaseDialog dialog = new BaseDialog("@sector.noswitch.title");
+                dialog.cont.add(bundle.format("sector.noswitch", attacked.name(), attacked.planet.localizedName)).width(400f).labelAlign(Align.center).center().wrap();
+                dialog.addCloseButton();
+                dialog.buttons.button("@sector.view", Icon.eyeSmall, () -> {
+                    dialog.hide();
+                    lookAt(attacked);
+                    selectSector(attacked);
+                });
+                dialog.show();
+
+                return;
             }
         }
 
