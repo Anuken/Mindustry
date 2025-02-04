@@ -316,7 +316,7 @@ public class MenuFragment{
             this.icon = icon;
             this.text = text;
             this.runnable = runnable;
-            this.submenu = Seq.with(submenu);
+            this.submenu = submenu != null ? Seq.with(submenu) : null;
         }
 
         /** Comstructs a desktop-only button; used internally. */
@@ -324,7 +324,7 @@ public class MenuFragment{
             this.icon = icon;
             this.text = text;
             this.runnable = () -> {};
-            this.submenu = Seq.with(submenu);
+            this.submenu = submenu != null ? Seq.with(submenu) : null;
         }
     }
 }
