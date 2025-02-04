@@ -3754,6 +3754,7 @@ public class Blocks{
             ammoUseEffect = Fx.casing3Double;
             ammoPerShot = 2;
             velocityRnd = 0.2f;
+            scaleLifetimeOffset = 1f / 9f;
             recoil = 6f;
             shake = 2f;
             range = 290f;
