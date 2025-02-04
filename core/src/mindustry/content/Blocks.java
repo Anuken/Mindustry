@@ -6354,7 +6354,7 @@ public class Blocks{
         //region campaign
 
         launchPad = new LaunchPad("launch-pad"){{
-            requirements(Category.effect, BuildVisibility.debugOnly, with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            requirements(Category.effect, BuildVisibility.legacyLaunchPadOnly, with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 3;
             itemCapacity = 100;
             launchTime = 60f * 20;
@@ -6364,7 +6364,7 @@ public class Blocks{
         }};
 
         advancedLaunchPad = new LaunchPad("advanced-launch-pad"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 350, Items.silicon, 250, Items.lead, 300, Items.titanium, 200));
+            requirements(Category.effect, BuildVisibility.notLegacyLaunchPadOnly, with(Items.copper, 350, Items.silicon, 250, Items.lead, 300, Items.titanium, 200));
             size = 4;
             itemCapacity = 100;
             launchTime = 60f * 30;
@@ -6376,14 +6376,14 @@ public class Blocks{
         }};
 
         landingPad = new LandingPad("landing-pad"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 200, Items.graphite, 100, Items.titanium, 100));
+            requirements(Category.effect, BuildVisibility.notLegacyLaunchPadOnly, with(Items.copper, 200, Items.graphite, 100, Items.titanium, 100));
             size = 4;
 
             itemCapacity = 100;
 
             coolingEffect = new RadialEffect(Fx.steamCoolSmoke, 4, 90f, 9.5f, 180f);
-            liquidCapacity = 4000f;
-            consumeLiquidAmount = 2000f;
+            liquidCapacity = 3000f;
+            consumeLiquidAmount = 1500f;
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
