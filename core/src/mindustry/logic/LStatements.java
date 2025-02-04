@@ -324,21 +324,18 @@ public class LStatements{
                 b.image(Icon.pencilSmall);
                 b.clicked(() -> showSelectTable(b, (t, hide) -> {
                     t.row();
-                    t.table( i -> {
+                    t.table(i -> {
                         i.left();
                         int c = 0;
-                        for(char j=32;j<127;j++){
+                        for(char j = 32 ; j < 127 ; j++){
                             final int chr = j;
                             i.button(String.valueOf(j),Styles.flatt, () -> {
                                 value = Integer.toString(chr);
                                 field.setText(value);
                                 hide.run();
                             }).size(32f);
-
                             if(++c % 8 == 0) i.row();
                         }
-
-
                     });
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);

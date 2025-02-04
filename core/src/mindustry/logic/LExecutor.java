@@ -992,7 +992,7 @@ public class LExecutor{
         public LVar value;
 
         public PrintCharI(LVar value){
-            this.value=value;
+            this.value = value;
         }
 
         PrintCharI(){}
@@ -1002,10 +1002,10 @@ public class LExecutor{
 
             if(exec.textBuffer.length() >= maxTextBuffer) return;
             if(value.isobj){
-                    if(!(value.objval instanceof UnlockableContent cont)) return;
-                    exec.textBuffer.append((char)cont.emojiChar());
-                    return;
-            };
+                if(!(value.objval instanceof UnlockableContent cont)) return;
+                exec.textBuffer.append((char)cont.emojiChar());
+                return;
+            }
 
             exec.textBuffer.append((char)Math.floor(value.numval));
         }
