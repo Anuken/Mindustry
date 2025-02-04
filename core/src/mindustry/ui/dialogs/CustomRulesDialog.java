@@ -30,15 +30,23 @@ public class CustomRulesDialog extends BaseDialog{
     private Table main;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
+
+    public boolean showRuleEditRule;
     public Seq<Table> categories;
     public Table current;
     public Seq<String> categoryNames;
-    public String currentName;
+    public String currentName = "";
     public String ruleSearch = "";
     public Seq<Runnable> additionalSetup; // for modding to easily add new rules
 
     public CustomRulesDialog(){
+        this(false);
+    }
+
+    public CustomRulesDialog(boolean showRuleEditRule){
         super("@mode.custom");
+
+        this.showRuleEditRule = showRuleEditRule;
 
         loadoutDialog = new LoadoutDialog();
 
@@ -49,8 +57,6 @@ public class CustomRulesDialog extends BaseDialog{
         additionalSetup = new Seq<>();
         categories = new Seq<>();
         categoryNames = new Seq<>();
-        currentName = "";
-        ruleSearch = "";
 
         buttons.button("@edit", Icon.pencil, () -> {
             BaseDialog dialog = new BaseDialog("@waves.edit");
@@ -209,33 +215,21 @@ public class CustomRulesDialog extends BaseDialog{
         main.left().defaults().fillX().left();
         main.row();
 
-
         category("waves");
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
         check("@rules.wavesending", b -> rules.waveSending = b, () -> rules.waveSending, () -> rules.waves);
         check("@rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer, () -> rules.waves);
         check("@rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies, () -> rules.waves && rules.waveTimer);
+        check("@rules.randomwaveai", b -> rules.randomWaveAI = b, () -> rules.randomWaveAI, () -> rules.waves);
+        check("@rules.airUseSpawns", b -> rules.airUseSpawns = b, () -> rules.airUseSpawns, () -> rules.waves);
         numberi("@rules.wavelimit", f -> rules.winWave = f, () -> rules.winWave, () -> rules.waves, 0, Integer.MAX_VALUE);
         number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> rules.waves && rules.waveTimer, 1, Float.MAX_VALUE);
-        //this is experimental, because it's not clear that 0 makes it default.
-        if(experimental){
-            number("@rules.initialwavespacing", false, f -> rules.initialWaveSpacing = f * 60f, () -> rules.initialWaveSpacing / 60f, () -> rules.waves && rules.waveTimer, 0, Float.MAX_VALUE);
-        }
+        number("@rules.initialwavespacing", false, f -> rules.initialWaveSpacing = f * 60f, () -> rules.initialWaveSpacing / 60f, () -> rules.waves && rules.waveTimer, 0, Float.MAX_VALUE);
         number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> rules.waves);
 
-
         category("resourcesbuilding");
-        check("@rules.infiniteresources", b -> {
-            rules.infiniteResources = b;
-
-            //reset to serpulo if any env was enabled
-            if(!b && rules.hiddenBuildItems.isEmpty()){
-                rules.env = Planets.serpulo.defaultEnv;
-                rules.hiddenBuildItems.clear();
-                rules.hiddenBuildItems.addAll(Planets.serpulo.hiddenItems);
-                setup();
-            }
-        }, () -> rules.infiniteResources);
+        check("@rules.alloweditworldprocessors", b -> rules.allowEditWorldProcessors = b, () -> rules.allowEditWorldProcessors);
+        check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
         check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore);
         check("@rules.derelictrepair", b -> rules.derelictRepair = b, () -> rules.derelictRepair);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
@@ -271,6 +265,7 @@ public class CustomRulesDialog extends BaseDialog{
         numberi("@rules.unitcap", f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("@rules.unitcrashdamagemultiplier", f -> rules.unitCrashDamageMultiplier = f, () -> rules.unitCrashDamageMultiplier);
+        number("@rules.unitminespeedmultiplier", f -> rules.unitMineSpeedMultiplier = f, () -> rules.unitMineSpeedMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0f, 50f);
         number("@rules.unitcostmultiplier", f -> rules.unitCostMultiplier = f, () -> rules.unitCostMultiplier);
         number("@rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
@@ -295,13 +290,11 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.fog", b -> rules.fog = b, () -> rules.fog);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
 
-        if(experimental){
-            check("@rules.limitarea", b -> rules.limitMapArea = b, () -> rules.limitMapArea);
-            numberi("x", x -> rules.limitX = x, () -> rules.limitX, () -> rules.limitMapArea, 0, 10000);
-            numberi("y", y -> rules.limitY = y, () -> rules.limitY, () -> rules.limitMapArea, 0, 10000);
-            numberi("w", w -> rules.limitWidth = w, () -> rules.limitWidth, () -> rules.limitMapArea, 0, 10000);
-            numberi("h", h -> rules.limitHeight = h, () -> rules.limitHeight, () -> rules.limitMapArea, 0, 10000);
-        }
+        check("@rules.limitarea", b -> rules.limitMapArea = b, () -> rules.limitMapArea);
+        numberi("x", x -> rules.limitX = x, () -> rules.limitX, () -> rules.limitMapArea, 0, 10000);
+        numberi("y", y -> rules.limitY = y, () -> rules.limitY, () -> rules.limitMapArea, 0, 10000);
+        numberi("w", w -> rules.limitWidth = w, () -> rules.limitWidth, () -> rules.limitMapArea, 0, 10000);
+        numberi("h", h -> rules.limitHeight = h, () -> rules.limitHeight, () -> rules.limitMapArea, 0, 10000);
 
         number("@rules.solarmultiplier", f -> rules.solarMultiplier = f, () -> rules.solarMultiplier);
 
@@ -333,7 +326,7 @@ public class CustomRulesDialog extends BaseDialog{
 
                 for(Planet planet : content.planets().select(p -> p.accessible && p.visible && p.isLandable())){
                     t.button(planet.localizedName, style, () -> {
-                        planet.applyRules(rules);
+                        planet.applyRules(rules, true);
                     }).group(group).checked(b -> rules.planet == planet);
 
                     if(t.getChildren().size % 3 == 0){
@@ -343,7 +336,6 @@ public class CustomRulesDialog extends BaseDialog{
 
                 t.button("@rules.anyenv", style, () -> {
                     rules.env = Vars.defaultEnv;
-                    rules.hiddenBuildItems.clear();
                     rules.planet = Planets.sun;
                 }).group(group).checked(b -> rules.planet == Planets.sun);
             }).left().fill(false).expand(false, false).row();
@@ -351,6 +343,10 @@ public class CustomRulesDialog extends BaseDialog{
 
 
         category("teams");
+        //not sure where else to put this
+        if(showRuleEditRule){
+            check("@rules.allowedit", b -> rules.allowEditRules = b, () -> rules.allowEditRules);
+        }
         team("@rules.playerteam", t -> rules.defaultTeam = t, () -> rules.defaultTeam);
         team("@rules.enemyteam", t -> rules.waveTeam = t, () -> rules.waveTeam);
 
@@ -388,6 +384,7 @@ public class CustomRulesDialog extends BaseDialog{
 
                 number("@rules.unitdamagemultiplier", f -> teams.unitDamageMultiplier = f, () -> teams.unitDamageMultiplier);
                 number("@rules.unitcrashdamagemultiplier", f -> teams.unitCrashDamageMultiplier = f, () -> teams.unitCrashDamageMultiplier);
+                number("@rules.unitminespeedmultiplier", f -> teams.unitMineSpeedMultiplier = f, () -> teams.unitMineSpeedMultiplier);
                 number("@rules.unitbuildspeedmultiplier", f -> teams.unitBuildSpeedMultiplier = f, () -> teams.unitBuildSpeedMultiplier, 0.001f, 50f);
                 number("@rules.unitcostmultiplier", f -> teams.unitCostMultiplier = f, () -> teams.unitCostMultiplier);
                 number("@rules.unithealthmultiplier", f -> teams.unitHealthMultiplier = f, () -> teams.unitHealthMultiplier);

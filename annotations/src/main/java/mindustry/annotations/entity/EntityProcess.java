@@ -445,6 +445,7 @@ public class EntityProcess extends BaseProcessor{
                     MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(first.name()).addModifiers(first.is(Modifier.PRIVATE) ? Modifier.PRIVATE : Modifier.PUBLIC);
                     //if(isFinal || entry.value.contains(s -> s.has(Final.class))) mbuilder.addModifiers(Modifier.FINAL);
                     if(entry.value.contains(s -> s.has(CallSuper.class))) mbuilder.addAnnotation(CallSuper.class); //add callSuper here if necessary
+                    if(first.has(Nullable.class)) mbuilder.addAnnotation(Nullable.class);
                     if(first.is(Modifier.STATIC)) mbuilder.addModifiers(Modifier.STATIC);
                     mbuilder.addTypeVariables(first.typeVariables().map(TypeVariableName::get));
                     mbuilder.returns(first.retn());
@@ -851,89 +852,6 @@ public class EntityProcess extends BaseProcessor{
             for(TypeSpec.Builder b : baseClasses){
                 write(b, imports.toSeq());
             }
-
-            //TODO nulls were an awful idea
-            //store nulls
-            TypeSpec.Builder nullsBuilder = TypeSpec.classBuilder("Nulls").addModifiers(Modifier.PUBLIC).addModifiers(Modifier.FINAL);
-            //TODO should be dynamic
-            ObjectSet<String> nullList = ObjectSet.with("unit");
-
-            //create mock types of all components
-            for(Stype interf : allInterfaces){
-                //indirect interfaces to implement methods for
-                Seq<Stype> dependencies = interf.allInterfaces().add(interf);
-                Seq<Smethod> methods = dependencies.flatMap(Stype::methods);
-                methods.sortComparing(Object::toString);
-
-                //optionally add superclass
-                Stype superclass = dependencies.map(this::interfaceToComp).find(s -> s != null && s.annotation(Component.class).base());
-                //use the base type when the interface being emulated has a base
-                TypeName type = superclass != null && interfaceToComp(interf).annotation(Component.class).base() ? tname(baseName(superclass)) : interf.tname();
-
-                //used method signatures
-                ObjectSet<String> signatures = new ObjectSet<>();
-
-                //create null builder
-                String baseName = interf.name().substring(0, interf.name().length() - 1);
-
-                //prevent Nulls bloat
-                if(!nullList.contains(Strings.camelize(baseName))){
-                    continue;
-                }
-
-                String className = "Null" + baseName;
-                TypeSpec.Builder nullBuilder = TypeSpec.classBuilder(className)
-                .addModifiers(Modifier.FINAL);
-
-                skipDeprecated(nullBuilder);
-
-                nullBuilder.addSuperinterface(interf.tname());
-                if(superclass != null) nullBuilder.superclass(tname(baseName(superclass)));
-
-                for(Smethod method : methods){
-                    String signature = method.toString();
-                    if(!signatures.add(signature)) continue;
-
-                    Stype compType = interfaceToComp(method.type());
-                    MethodSpec.Builder builder = MethodSpec.overriding(method.e).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
-                    int index = 0;
-                    for(ParameterSpec spec : builder.parameters){
-                        Reflect.set(spec, "name",  "arg" + index++);
-                    }
-                    builder.addAnnotation(OverrideCallSuper.class); //just in case
-
-                    if(!method.isVoid()){
-                        String methodName = method.name();
-                        switch(methodName){
-                            case "isNull":
-                                builder.addStatement("return true");
-                                break;
-                            case "id":
-                                builder.addStatement("return -1");
-                                break;
-                            case "toString":
-                                builder.addStatement("return $S", className);
-                                break;
-                            default:
-                                Svar variable = compType == null || method.params().size > 0 ? null : compType.fields().find(v -> v.name().equals(methodName));
-                                String desc = variable == null ? null : variable.descString();
-                                if(variable == null || !varInitializers.containsKey(desc)){
-                                    builder.addStatement("return " + getDefault(method.ret().toString()));
-                                }else{
-                                    String init = varInitializers.get(desc);
-                                    builder.addStatement("return " + (init.equals("{}") ? "new " + variable.mirror().toString() : "") + init);
-                                }
-                        }
-                    }
-                    nullBuilder.addMethod(builder.build());
-                }
-
-                nullsBuilder.addField(FieldSpec.builder(type, Strings.camelize(baseName)).initializer("new " + className + "()").addModifiers(Modifier.FINAL, Modifier.STATIC, Modifier.PUBLIC).build());
-
-                write(nullBuilder, imports.toSeq());
-            }
-
-            write(nullsBuilder);
         }
     }
 

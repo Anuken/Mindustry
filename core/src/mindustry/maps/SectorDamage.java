@@ -3,12 +3,11 @@ package mindustry.maps;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.ai.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
-import mindustry.entities.abilities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
@@ -22,7 +21,7 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class SectorDamage{
-    public static final int maxRetWave = 40, maxWavesSimulated = 50;
+    public static final int maxRetWave = 110, maxWavesSimulated = 111;
 
     //direct damage is for testing only
     private static final boolean rubble = true;
@@ -42,7 +41,7 @@ public class SectorDamage{
         return (int)getDamage(info, maxRetWave, true);
     }
 
-    /** @return calculated capture progress of the enemy if retWave if false, otherwise return the maximum waves survived as int.
+    /** @return calculated capture progress of the enemy if retWave is false, otherwise return the maximum waves survived as int.
      * if it survives all the waves, returns maxRetWave. */
     public static float getDamage(SectorInfo info, int wavesPassed, boolean retWave){
         float health = info.sumHealth;
@@ -60,14 +59,28 @@ public class SectorDamage{
                 waveBegin = waveEnd - maxWavesSimulated;
             }
 
+            int groundSpawns = Math.max(spawner.countFlyerSpawns(), 1), airSpawns = Math.max(spawner.countGroundSpawns(), 1);
+
             for(int i = waveBegin; i <= waveEnd; i++){
+                float enemyDps = 0f, enemyHealth = 0f;
+
+                for(SpawnGroup group : state.rules.spawns){
+                    //calculate the amount of spawn points used
+                    //if there's a spawn position override, there is only one potential place they spawn
+                    //assume that all overridden positions are valid, should always be true in properly designed campaign maps
+                    int spawnCount = group.spawn != -1 ? 1 : group.type.flying ? airSpawns : groundSpawns;
+
+                    float healthMult = 1f + Mathf.clamp(group.type.armor / 20f);
+                    StatusEffect effect = (group.effect == null ? StatusEffects.none : group.effect);
+                    int spawned = group.getSpawned(i) * spawnCount;
+                    if(spawned <= 0) continue;
+                    enemyHealth += spawned * (group.getShield(i) + group.type.health * effect.healthMultiplier * healthMult);
+                    enemyDps += spawned * group.type.dpsEstimate * effect.damageMultiplier;
+                }
 
                 float efficiency = health / info.sumHealth;
                 float dps = info.sumDps * efficiency;
                 float rps = info.sumRps * efficiency;
-
-                float enemyDps = info.waveDpsBase + info.waveDpsSlope * (i);
-                float enemyHealth = info.waveHealthBase + info.waveHealthSlope * (i);
 
                 if(info.bossWave == i){
                     enemyDps += info.bossDps;
@@ -320,13 +333,9 @@ public class SectorDamage{
             if(unit.team == state.rules.defaultTeam){
                 sumHealth += unit.health*healthMult + unit.shield;
                 sumDps += unit.type.dpsEstimate;
-                if(Structs.find(unit.abilities, a -> a instanceof RepairFieldAbility) instanceof RepairFieldAbility h){
-                    sumRps += h.amount / h.reload * 60f;
-                }
-                sumRps += unit.type.weapons.sumf(w -> w.shotsPerSec() * (w.bullet.healPercent * 60f + w.bullet.healAmount));
-                if(unit.canBuild()){
-                    //assume it rebuilds 1 block with 'standard' build cost (20) and health (50) every 2 seconds
-                    sumRps += unit.type.buildSpeed * (60f / 20f) * (1f / 2f) * 50f;
+                sumRps += unit.type.weapons.sumf(w -> w.shotsPerSec() * (w.bullet.healPercent/100f * 20f + w.bullet.healAmount));
+                if(unit.controller() instanceof CommandAI ai && ai.command == UnitCommand.rebuildCommand){
+                    sumRps += unit.type.buildSpeed * 20f;
                 }
             }else{
                 float bossMult = unit.isBoss() ? 3f : 1f;
@@ -335,41 +344,11 @@ public class SectorDamage{
             }
         }
 
-        //calculate DPS and health for the next few waves and store in list
-        var reg = new LinearRegression();
-        SpawnGroup bossGroup = null;
-        Seq<Vec2> waveDps = new Seq<>(), waveHealth = new Seq<>();
-        int groundSpawns = Math.max(spawner.countFlyerSpawns(), 1), airSpawns = Math.max(spawner.countGroundSpawns(), 1);
-
-        //TODO storing all this is dumb when you can just calculate it exactly from the rules...
-        for(int wave = state.wave; wave < state.wave + 10; wave ++){
-            float sumWaveDps = 0f, sumWaveHealth = 0f;
-
-            for(SpawnGroup group : state.rules.spawns){
-                //calculate the amount of spawn points used
-                //if there's a spawn position override, there is only one potential place they spawn
-                //assume that all overridden positions are valid, should always be true in properly designed campaign maps
-                int spawnCount = group.spawn != -1 ? 1 : group.type.flying ? airSpawns : groundSpawns;
-
-                float healthMult = 1f + Mathf.clamp(group.type.armor / 20f);
-                StatusEffect effect = (group.effect == null ? StatusEffects.none : group.effect);
-                int spawned = group.getSpawned(wave) * spawnCount;
-                //save the boss group
-                if(group.effect == StatusEffects.boss){
-                    bossGroup = group;
-                    continue;
-                }
-                if(spawned <= 0) continue;
-                sumWaveHealth += spawned * (group.getShield(wave) + group.type.health * effect.healthMultiplier * healthMult);
-                sumWaveDps += spawned * group.type.dpsEstimate * effect.damageMultiplier;
-            }
-            waveDps.add(new Vec2(wave, sumWaveDps));
-            waveHealth.add(new Vec2(wave, sumWaveHealth));
-        }
+        SpawnGroup bossGroup = state.rules.spawns.find(s -> s.effect == StatusEffects.boss);
 
         if(bossGroup != null){
             float bossMult = 1.2f;
-            //calculate first boss appearaance
+            //calculate first boss appearance
             for(int wave = state.wave; wave < state.wave + 60; wave++){
                 int spawned = bossGroup.getSpawned(wave - 1);
                 if(spawned > 0){
@@ -381,15 +360,6 @@ public class SectorDamage{
                 }
             }
         }
-
-        //calculate linear regression of the wave data and store it
-        reg.calculate(waveHealth);
-        info.waveHealthBase = reg.intercept;
-        info.waveHealthSlope = reg.slope;
-
-        reg.calculate(waveDps);
-        info.waveDpsBase = reg.intercept;
-        info.waveDpsSlope = reg.slope;
 
         info.sumHealth = sumHealth * 0.9f;
         info.sumDps = sumDps;

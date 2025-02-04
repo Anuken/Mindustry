@@ -89,8 +89,14 @@ public class ThermalGenerator extends PowerGenerator{
         }
 
         @Override
+        public void afterPickedUp(){
+            super.afterPickedUp();
+            sum = 0f;
+        }
+
+        @Override
         public float totalProgress(){
-            return enabled ? super.totalProgress() : 0f;
+            return enabled && sum > 0 ? super.totalProgress() : 0f;
         }
 
         @Override

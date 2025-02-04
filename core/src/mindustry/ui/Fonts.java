@@ -20,26 +20,20 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 
-import java.util.*;
+import java.io.*;
 
 public class Fonts{
     private static final String mainFont = "fonts/font.woff";
     private static final ObjectSet<String> unscaled = ObjectSet.with("iconLarge");
     private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
+    private static IntMap<String> unicodeToName = new IntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
     private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
-    private static TextureRegion[] iconTable;
-    private static int lastCid;
 
     public static Font def, outline, icon, iconLarge, tech, logic;
-
-    public static TextureRegion logicIcon(int id){
-        return iconTable[id];
-    }
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -95,12 +89,16 @@ public class Fonts{
         }})).loaded = f -> Fonts.logic = f;
     }
 
+    public static @Nullable String unicodeToName(int unicode){
+        return unicodeToName.get(unicode, () -> Iconc.codeToName.get(unicode));
+    }
+
     public static TextureRegion getLargeIcon(String name){
         return largeIcons.get(name, () -> {
             var region = new TextureRegion();
             int code = Iconc.codes.get(name, '\uF8D4');
             var glyph = iconLarge.getData().getGlyph((char)code);
-            if(glyph == null) return Core.atlas.find("error");
+            if(glyph == null) return Core.atlas.find(name);
             region.set(iconLarge.getRegion().texture);
             region.set(glyph.u, glyph.v2, glyph.u2, glyph.v);
             return region;
@@ -112,9 +110,9 @@ public class Fonts{
         Texture uitex = Core.atlas.find("logo").texture;
         int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
 
-        try(Scanner scan = new Scanner(Core.files.internal("icons/icons.properties").read(512))){
-            while(scan.hasNextLine()){
-                String line = scan.nextLine();
+        try(var reader = Core.files.internal("icons/icons.properties").reader(Vars.bufferSize)){
+            String line;
+            while((line = reader.readLine()) != null){
                 String[] split = line.split("=");
                 String[] nametex = split[1].split("\\|");
                 String character = split[0], texture = nametex[1];
@@ -127,6 +125,7 @@ public class Fonts{
 
                 unicodeIcons.put(nametex[0], ch);
                 stringIcons.put(nametex[0], ((char)ch) + "");
+                unicodeToName.put(ch, texture);
 
                 Vec2 out = Scaling.fit.apply(region.width, region.height, size, size);
 
@@ -148,22 +147,11 @@ public class Fonts{
                 glyph.page = 0;
                 fonts.each(f -> f.getData().setGlyph(ch, glyph));
             }
+        }catch(IOException e){
+            throw new RuntimeException(e);
         }
 
         stringIcons.put("alphachan", stringIcons.get("alphaaaa"));
-
-        iconTable = new TextureRegion[512];
-        iconTable[0] = Core.atlas.find("error");
-        lastCid = 1;
-
-        Vars.content.each(c -> {
-            if(c instanceof UnlockableContent u){
-                TextureRegion region = Core.atlas.find(u.name + "-icon-logic");
-                if(region.found()){
-                    iconTable[u.iconId = lastCid++] = region;
-                }
-            }
-        });
 
         for(Team team : Team.baseTeams){
             team.emoji = stringIcons.get(team.name, "");
@@ -171,9 +159,9 @@ public class Fonts{
     }
     
     public static void loadContentIconsHeadless(){
-        try(Scanner scan = new Scanner(Core.files.internal("icons/icons.properties").read(512))){
-            while(scan.hasNextLine()){
-                String line = scan.nextLine();
+        try(var reader = Core.files.internal("icons/icons.properties").reader(Vars.bufferSize)){
+            String line;
+            while((line = reader.readLine()) != null){
                 String[] split = line.split("=");
                 String[] nametex = split[1].split("\\|");
                 String character = split[0];
@@ -182,6 +170,8 @@ public class Fonts{
                 unicodeIcons.put(nametex[0], ch);
                 stringIcons.put(nametex[0], ((char)ch) + "");
             }
+        }catch(IOException e){
+            throw new RuntimeException(e);
         }
 
         stringIcons.put("alphachan", stringIcons.get("alphaaaa"));

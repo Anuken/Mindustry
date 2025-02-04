@@ -79,7 +79,7 @@ public class ParticleEffect extends Effect{
                 float x = rv.x, y = rv.y;
 
                 Lines.lineAngle(ox + x, oy + y, Mathf.angle(x, y), len, cap);
-                Drawf.light(ox + x, oy + y, len * lightScl, lightColor, lightOpacity * Draw.getColor().a);
+                Drawf.light(ox + x, oy + y, len * lightScl, lightColor, lightOpacity * Draw.getColorAlpha());
             }
         }else{
             rand.setSeed(e.id);
@@ -89,7 +89,7 @@ public class ParticleEffect extends Effect{
                 float x = rv.x, y = rv.y;
 
                 Draw.rect(tex, ox + x, oy + y, rad, rad / tex.ratio(), realRotation + offset + e.time * spin);
-                Drawf.light(ox + x, oy + y, rad * lightScl, lightColor, lightOpacity * Draw.getColor().a);
+                Drawf.light(ox + x, oy + y, rad * lightScl, lightColor, lightOpacity * Draw.getColorAlpha());
             }
         }
     }

@@ -281,8 +281,8 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new DrawI((byte)type.ordinal(), 0, builder.var(x), builder.var(y),
-                type == GraphicsType.print ? nameToAlign.get(p1, Align.bottomLeft) : builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+            return new DrawI((byte)type.ordinal(), builder.var(x), builder.var(y),
+                type == GraphicsType.print ? new LVar(p1, nameToAlign.get(p1, Align.bottomLeft), true) : builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
 
         @Override
@@ -1045,7 +1045,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new RadarI(target1, target2, target3, sort, LExecutor.varUnit, builder.var(sortOrder), builder.var(output));
+            return new RadarI(target1, target2, target3, sort, builder.var("@unit"), builder.var(sortOrder), builder.var(output));
         }
 
         @Override
@@ -1324,15 +1324,11 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            rebuild(table);
-        }
-
-        void rebuild(Table table){
             table.clearChildren();
 
             table.button(clear ? "clear" : "apply", Styles.logict, () -> {
                 clear = !clear;
-                rebuild(table);
+                build(table);
             }).size(80f, 40f).pad(4f).color(table.color);
 
             if(statusNames == null){
@@ -1343,10 +1339,9 @@ public class LStatements{
                 b.label(() -> effect).grow().wrap().labelAlign(Align.center).center();
                 b.clicked(() -> showSelect(b, statusNames, effect, o -> {
                     effect = o;
+                    build(table);
                 }, 2, c -> c.size(120f, 38f)));
             }, Styles.logict, () -> {}).size(120f, 40f).pad(4f).color(table.color);
-
-            //TODO effect select
 
             table.add(clear ? " from " : " to ");
 
@@ -1498,11 +1493,11 @@ public class LStatements{
             table.add("natural ");
             fields(table, natural, str -> natural = str);
 
-            table.add("x ").visible(() -> natural.equals("false"));
-            fields(table, x, str -> x = str).visible(() -> natural.equals("false"));
+            table.add("x ").visible(() -> !natural.equals("true"));
+            fields(table, x, str -> x = str).visible(() -> !natural.equals("true"));
 
-            table.add(" y ").visible(() -> natural.equals("false"));
-            fields(table, y, str -> y = str).visible(() -> natural.equals("false"));
+            table.add(" y ").visible(() -> !natural.equals("true"));
+            fields(table, y, str -> y = str).visible(() -> !natural.equals("true"));
         }
 
         @Override
@@ -1552,7 +1547,7 @@ public class LStatements{
                     fields(table, "w", p3, s -> p3 = s);
                     fields(table, "h", p4, s -> p4 = s);
                 }
-                case buildSpeed, unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, rtsMinSquad, rtsMinWeight -> {
+                case buildSpeed, unitHealth, unitBuildSpeed, unitMineSpeed, unitCost, unitDamage, blockHealth, blockDamage, rtsMinSquad, rtsMinWeight -> {
                     if(p1.equals("0")){
                         p1 = "@sharded";
                     }
@@ -1594,7 +1589,7 @@ public class LStatements{
     @RegisterStatement("message")
     public static class FlushMessageStatement extends LStatement{
         public MessageType type = MessageType.announce;
-        public String duration = "3", outSuccess = "success";
+        public String duration = "3", outSuccess = "@wait";
 
         @Override
         public void build(Table table){
@@ -1616,9 +1611,11 @@ public class LStatements{
                 case announce, toast  -> {
                     table.add(" for ");
                     fields(table, duration, str -> duration = str);
-                    table.add(" secs ");
+                    table.add(" sec ");
                 }
             }
+            row(table);
+
             table.add(" success ");
             fields(table, outSuccess, str -> outSuccess = str);
         }
@@ -1911,6 +1908,42 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("clientdata")
+    public static class ClientDataStatement extends LStatement{
+        public String channel = "\"frog\"", value = "\"bar\"", reliable = "0";
+
+        @Override
+        public void build(Table table){
+            table.add("send ");
+            fields(table, value, str -> value = str);
+            table.add(" on ");
+            fields(table, channel, str -> channel = str);
+            table.add(", reliable ");
+            fields(table, reliable, str -> reliable = str);
+        }
+
+        @Override
+        public boolean hidden(){
+            return true;
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            if(!state.rules.allowLogicData) return null;
+            return new ClientDataI(builder.var(channel), builder.var(value), builder.var(reliable));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
     @RegisterStatement("getflag")
     public static class GetFlagStatement extends LStatement{
         public String result = "result", flag = "\"flag\"";
@@ -2078,6 +2111,74 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SetPropI(builder.var(type), builder.var(of), builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("playsound")
+    public static class PlaySoundStatement extends LStatement{
+        public boolean positional;
+        public String id = "@sfx-pew", volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy", limit = "true";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.button(positional ? "positional" : "global", Styles.logict, () -> {
+                positional = !positional;
+                rebuild(table);
+            }).size(160f, 40f).pad(4f).color(table.color);
+
+            row(table);
+
+            field(table, id, str -> id = str).padRight(0f).get();
+
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+
+                String soundName = id.startsWith("@sfx-") ? id.substring(5) : id;
+                b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), soundName, t -> {
+                    id = "@sfx-" + t;
+                    rebuild(table);
+                }, 2, cell -> cell.size(160, 50)));
+            }, Styles.logict, () -> {}).size(40).color(table.color).left().padLeft(-1);
+
+            row(table);
+
+            fieldst(table, "volume", volume, str -> volume = str);
+            fieldst(table, "pitch", pitch, str -> pitch = str);
+
+            table.row();
+
+            if(positional){
+                fieldst(table, "x", x, str -> x = str);
+
+                fieldst(table, "y", y, str -> y = str);
+            }else{
+                fieldst(table, "pan", pan, str -> pan = str);
+            }
+
+            table.row();
+
+            fieldst(table, "limit", limit, str -> limit = str);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PlaySoundI(positional, builder.var(id), builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y), builder.var(limit));
         }
 
         @Override

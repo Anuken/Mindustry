@@ -13,7 +13,6 @@ import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.input.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
@@ -127,11 +126,8 @@ public class PlayerListFragment{
 
             iconTable.tapped(() -> {
                 if(!user.dead() && clickable){
-                    Core.camera.position.set(user.unit());
+                    control.input.spectate(user.unit());
                     ui.showInfoFade(Core.bundle.format("viewplayer", user.name), 1f);
-                    if(control.input instanceof DesktopInput input){
-                        input.panning = true;
-                    }
                 }
             });
 

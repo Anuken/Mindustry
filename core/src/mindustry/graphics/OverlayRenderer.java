@@ -151,6 +151,7 @@ public class OverlayRenderer{
         }
 
         input.drawTop();
+        input.drawUnitSelection();
 
         buildFade = Mathf.lerpDelta(buildFade, input.isPlacing() || input.isUsingSchematic() ? 1f : 0f, 0.06f);
 
@@ -241,7 +242,9 @@ public class OverlayRenderer{
             Draw.reset();
 
             Building build = world.buildWorld(v.x, v.y);
-            if(input.canDropItem() && build != null && build.interactable(player.team()) && build.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(build, itemTransferRange)){
+            if(input.canDropItem() && build != null && build.interactable(player.team()) && build.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(build, itemTransferRange) &&
+                input.itemDepositCooldown <= 0f){
+
                 boolean invalid = (state.rules.onlyDepositCore && !(build instanceof CoreBuild));
 
                 Lines.stroke(3f, Pal.gray);

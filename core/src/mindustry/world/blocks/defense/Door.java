@@ -26,6 +26,7 @@ public class Door extends Wall{
     public Effect openfx = Fx.dooropen;
     public Effect closefx = Fx.doorclose;
     public Sound doorSound = Sounds.door;
+    public boolean chainEffect = false;
     public @Load("@-open") TextureRegion openRegion;
 
     public Door(String name){
@@ -44,6 +45,7 @@ public class Door extends Wall{
                     continue;
                 }
 
+                if(chainEffect) entity.effect();
                 entity.open = open;
                 pathfinder.updateTile(entity.tile());
             }

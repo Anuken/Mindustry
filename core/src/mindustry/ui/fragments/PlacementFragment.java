@@ -8,6 +8,7 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -25,6 +26,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -122,9 +124,7 @@ public class PlacementFragment{
         toggler.setZIndex(index);
     }
 
-    boolean gridUpdate(InputHandler input){
-        scrollPositions.put(currentCategory, blockPane.getScrollY());
-
+    boolean updatePick(InputHandler input){
         if(Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
             var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
@@ -144,12 +144,33 @@ public class PlacementFragment{
                 }
             }
 
-            if(tryRecipe != null && tryRecipe.isVisible() && unlocked(tryRecipe)){
+            if(tryRecipe == null && state.rules.editor){
+                var tile = world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+                if(tile != null){
+                    tryRecipe =
+                    tile.block() != Blocks.air ? tile.block() :
+                    tile.overlay() != Blocks.air ? tile.overlay() :
+                    tile.floor() != Blocks.air ? tile.floor() : null;
+                }
+            }
+
+            if(tryRecipe != null && ((tryRecipe.isVisible() && unlocked(tryRecipe)) || state.rules.editor)){
                 input.block = tryRecipe;
                 tryRecipe.lastConfig = tryConfig;
-                currentCategory = input.block.category;
+                if(tryRecipe.isVisible()){
+                    currentCategory = input.block.category;
+                }
                 return true;
             }
+        }
+        return false;
+    }
+
+    boolean gridUpdate(InputHandler input){
+        scrollPositions.put(currentCategory, blockPane.getScrollY());
+
+        if(updatePick(input)){
+            return true;
         }
 
         if(ui.chatfrag.shown() || ui.consolefrag.shown() || Core.scene.hasKeyboard()) return false;
@@ -386,7 +407,7 @@ public class PlacementFragment{
                                 }
                             }).growX().left().margin(3);
 
-                            if(!displayBlock.isPlaceable() || !player.isBuilder()){
+                            if((!displayBlock.isPlaceable() || !player.isBuilder()) && !state.rules.editor){
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
@@ -465,7 +486,10 @@ public class PlacementFragment{
                                 for(int i = 0; i < counts.length; i++){
                                     if(counts[i] > 0){
                                         var type = content.unit(i);
-                                        unitlist.add(new ItemImage(type.uiIcon, counts[i])).tooltip(type.localizedName).pad(4).with(b -> {
+                                        unitlist.add(StatValues.stack(type, counts[i])).pad(4).with(b -> {
+                                            b.clearListeners();
+                                            b.addListener(Tooltips.getInstance().create(type.localizedName, false));
+
                                             var listener = new ClickListener();
 
                                             //left click -> select
@@ -494,7 +518,7 @@ public class PlacementFragment{
                                             firstCommand = true;
                                         }else{
                                             //remove commands that this next unit type doesn't have
-                                            commands.removeAll(com -> !Structs.contains(type.commands, com));
+                                            commands.removeAll(com -> !type.commands.contains(com));
                                         }
 
                                         if(!firstStance){
@@ -502,7 +526,7 @@ public class PlacementFragment{
                                             firstStance = true;
                                         }else{
                                             //remove commands that this next unit type doesn't have
-                                            stances.removeAll(st -> !Structs.contains(type.stances, st));
+                                            stances.removeAll(st -> !type.stances.contains(st));
                                         }
                                     }
                                 }
@@ -528,6 +552,10 @@ public class PlacementFragment{
                                 //list stances
                                 if(stances.size > 1){
                                     u.row();
+
+                                    if(commands.size > 1){
+                                        u.add(new Image(Tex.whiteui)).height(3f).color(Pal.gray).pad(7f).growX().row();
+                                    }
 
                                     u.table(coms -> {
                                         coms.left();
@@ -615,7 +643,7 @@ public class PlacementFragment{
                         blocksSelect.margin(4).marginTop(0);
                         blockPane = blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
                             if(pane.hasScroll()){
-                                Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                                Element result = Core.scene.getHoverElement();
                                 if(result == null || !result.isDescendantOf(pane)){
                                     Core.scene.setScrollFocus(null);
                                 }
@@ -623,7 +651,11 @@ public class PlacementFragment{
                         }).grow().get();
                         blockPane.setStyle(Styles.smallPane);
                         blocksSelect.row();
-                        blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
+                        blocksSelect.table(t -> {
+                            t.image().color(Pal.gray).height(4f).colspan(4).growX();
+                            t.row();
+                            control.input.buildPlacementUI(t);
+                        }).name("inputTable").growX();
                     }).fillY().bottom().touchable(Touchable.enabled);
                     blockCatTable.table(categories -> {
                         categories.bottom();
@@ -700,8 +732,8 @@ public class PlacementFragment{
     }
 
     boolean unlocked(Block block){
-        return block.unlockedNow() && block.placeablePlayer && block.environmentBuildable() &&
-            block.supportsEnv(state.rules.env); //TODO this hides env unsupported blocks, not always a good thing
+        return block.unlockedNowHost() && block.placeablePlayer && block.environmentBuildable() &&
+            block.supportsEnv(state.rules.env);
     }
 
     boolean hasInfoBox(){
@@ -709,13 +741,12 @@ public class PlacementFragment{
         return control.input.block != null || menuHoverBlock != null || hover != null;
     }
 
-    /** Returns the thing being hovered over. */
-    @Nullable
-    Displayable hovered(){
+    /** @return the thing being hovered over. */
+    public @Nullable Displayable hovered(){
         Vec2 v = topTable.stageToLocalCoordinates(Core.input.mouse());
 
         //if the mouse intersects the table or the UI has the mouse, no hovering can occur
-        if(Core.scene.hasMouse() || topTable.hit(v.x, v.y, false) != null) return null;
+        if(Core.scene.hasMouse(Core.input.mouseX(), Core.input.mouseY()) || topTable.hit(v.x, v.y, false) != null) return null;
 
         //check for a unit
         Unit unit = Units.closestOverlap(player.team(), Core.input.mouseWorldX(), Core.input.mouseWorldY(), 5f, u -> !u.isLocal() && u.displayable());
