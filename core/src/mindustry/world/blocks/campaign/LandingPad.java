@@ -292,7 +292,7 @@ public class LandingPad extends Block{
                 cooldown = Mathf.clamp(cooldown);
             }
 
-            if(config != null && state.isCampaign()){
+            if(config != null && state.isCampaign() && !state.getPlanet().campaignRules.legacyLaunchPads){
 
                 if(cooldown <= 0f && efficiency > 0f && items.total() == 0 && state.rules.sector.info.getImportRate(state.getPlanet(), config) > 0f && state.rules.sector.info.importCooldownTimers.get(config, 0f) >= 1f){
 
@@ -344,9 +344,14 @@ public class LandingPad extends Block{
 
             table.row();
             table.label(() -> {
-                if(config == null || !state.isCampaign()){
-                    return "";
+                if(!state.isCampaign()) return "";
+
+                if(state.getPlanet().campaignRules.legacyLaunchPads){
+                    return Core.bundle.get("landingpad.legacy.disabled");
                 }
+
+                if(config == null) return "";
+
                 int sources = 0;
                 float perSecond = 0f;
                 for(var s : state.getPlanet().sectors){

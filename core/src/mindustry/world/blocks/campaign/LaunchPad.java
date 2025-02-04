@@ -296,7 +296,9 @@ public class LaunchPad extends Block{
                     Events.fire(new LaunchItemEvent(stack));
                 }
 
-                destsec.addItems(dest);
+                if(state.getPlanet().campaignRules.legacyLaunchPads){
+                    destsec.addItems(dest);
+                }
             }
         }
     }

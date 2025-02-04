@@ -92,6 +92,9 @@ public class SectorInfo{
     public ObjectFloatMap<Item> importCooldownTimers = new ObjectFloatMap<>();
     public @Nullable transient float[] importRateCache;
 
+    /** Temporary seq for last imported items. Do not use. */
+    public transient ItemSeq lastImported = new ItemSeq();
+
     /** Counter refresh state. */
     private transient Interval time = new Interval();
     /** Core item storage input/output deltas. */
