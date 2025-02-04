@@ -105,6 +105,8 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** for ground units, the layer upon which this unit is drawn */
     groundLayer = Layer.groundUnit,
+    /** For units that fly, the layer upon which this unit is drawn. If no value is set, defaults to Layer.flyingUnitLow or Layer.flyingUnit depending on lowAltitude */
+    flyingLayer = -1,
     /** Payload capacity of this unit in world units^2 */
     payloadCapacity = 8,
     /** building speed multiplier; <0 to disable. */
@@ -730,6 +732,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
         }
 
+        if(flyingLayer < 0) flyingLayer = lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit;
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
         singleTarget = weapons.size <= 1 && !forceMultiTarget;
 
@@ -1226,7 +1229,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         boolean isPayload = !unit.isAdded();
 
         Mechc mech = unit instanceof Mechc ? (Mechc)unit : null;
-        float z = isPayload ? Draw.z() : unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f);
+        float z = isPayload ? Draw.z() : (unit.elevation > 0.5f ? flyingLayer : groundLayer) + Mathf.clamp(hitSize / 4000f, 0, 0.01f);
 
         if(unit.controller().isBeingControlled(player.unit())){
             drawControl(unit);
