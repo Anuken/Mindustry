@@ -255,7 +255,7 @@ public class MenuFragment{
                     currentMenu = null;
                     fadeOutMenu();
                 }else{
-                    if(b.submenu != null){
+                    if(b.submenu != null && b.submenu.any()){
                         currentMenu = out[0];
                         submenu.clearChildren();
                         fadeInMenu();
