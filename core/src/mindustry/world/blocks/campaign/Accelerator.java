@@ -7,7 +7,6 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
@@ -15,7 +14,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -33,7 +31,8 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class Accelerator extends Block{
-    public @Load("launch-arrow") TextureRegion arrowRegion;
+    public @Load(value = "@-launch-arrow", fallback = "launch-arrow") TextureRegion arrowRegion;
+    public @Load("select-arrow-small") TextureRegion selectArrowRegion;
 
     /** Core block that is launched. Should match the starting core of the planet being launched to. */
     public Block launchBlock = Blocks.coreNucleus;
@@ -41,9 +40,26 @@ public class Accelerator extends Block{
     /** Override for planets that this block can launch to. If null, the planet's launch candidates are used. */
     public @Nullable Seq<Planet> launchCandidates;
 
+    //TODO: launching needs audio!
+
     public Music launchMusic = Musics.coreLaunch;
-    public float launchDuration = 160f;
+    public float launchDuration = 120f;
+    public float chargeDuration = 220f;
     public float buildDuration = 120f;
+    public Interp landZoomInterp = Interp.pow4In, chargeZoomInterp = Interp.pow4In;
+    public float landZoomFrom = 0.02f, landZoomTo = 4f, chargeZoomTo = 5f;
+
+    public int chargeRings = 4;
+    public float ringRadBase = 60f, ringRadSpacing = 25f, ringRadPow = 1.6f, ringStroke = 3f, ringSpeedup = 1.4f, chargeRingMerge = 2f, ringArrowRad = 3f;
+    public float ringHandleTilt = 0.8f, ringHandleLen = 30f;
+    public Color ringColor = Pal.accent;
+
+    public int launchLightning = 20;
+    public Color lightningColor = Pal.accent;
+    public float lightningDamage = 40;
+    public float lightningOffset = 24f;
+    public int lightningLengthMin = 5, lightningLengthMax = 25;
+    public double lightningLaunchChance = 0.8;
 
     protected int[] capacities = {};
 
@@ -55,6 +71,9 @@ public class Accelerator extends Block{
         hasPower = true;
         itemCapacity = 8000;
         configurable = true;
+        emitLight = true;
+        lightRadius = 70f;
+        lightColor = Pal.accent;
     }
 
     @Override
@@ -90,17 +109,24 @@ public class Accelerator extends Block{
     public class AcceleratorBuild extends Building implements LaunchAnimator{
         public float heat, statusLerp;
         public float progress;
-        public float time;
+        public float time, launchHeat;
+        public boolean launching;
 
         protected float cloudSeed;
 
         @Override
         public void updateTile(){
             super.updateTile();
-            heat = Mathf.lerpDelta(heat, efficiency, 0.05f);
+            heat = Mathf.lerpDelta(heat, launching ? 1f : efficiency, 0.05f);
             statusLerp = Mathf.lerpDelta(statusLerp, power.status, 0.05f);
 
-            time += Time.delta * efficiency;
+            if(!launching){
+                time += Time.delta * efficiency;
+            }else{
+                time = Mathf.slerpDelta(time, 0f, 0.4f);
+            }
+
+            launchHeat = Mathf.lerpDelta(launchHeat, launching ? 1f : 0f, 0.1f);
 
             if(efficiency >= 0f){
                 progress += Time.delta * efficiency / buildDuration;
@@ -128,58 +154,65 @@ public class Accelerator extends Block{
             }
 
             {
-                Drawf.shadow(x, y, launchBlock.size * tilesize * 2f, progress);
-                Draw.draw(Layer.blockBuilding, () -> {
-                    Draw.color(Pal.accent, heat);
+                if(launching){
+                    Draw.reset();
+                    Draw.rect(launchBlock.fullIcon, x, y);
+                }else{
+                    Drawf.shadow(x, y, launchBlock.size * tilesize * 2f, progress);
+                    Draw.draw(Layer.blockBuilding, () -> {
+                        Draw.color(Pal.accent, heat);
 
-                    for(TextureRegion region : launchBlock.getGeneratedIcons()){
-                        Shaders.blockbuild.region = region;
-                        Shaders.blockbuild.time = time;
-                        Shaders.blockbuild.progress = progress;
+                        for(TextureRegion region : launchBlock.getGeneratedIcons()){
+                            Shaders.blockbuild.region = region;
+                            Shaders.blockbuild.time = time;
+                            Shaders.blockbuild.progress = progress;
 
-                        Draw.rect(region, x, y);
-                        Draw.flush();
-                    }
+                            Draw.rect(region, x, y);
+                            Draw.flush();
+                        }
 
-                    Draw.color();
-                });
+                        Draw.color();
+                    });
+                }
 
-                //TODO: build line?
-                //Draw.z(Layer.blockBuilding + 1);
-                //Draw.color(Pal.accent, heat);
-
-                //Lines.lineAngleCenter(x + Mathf.sin(time, 10f, Vars.tilesize / 2f * recipe.size + 1f), y, 90, recipe.size * Vars.tilesize + 1f);
 
                 Draw.reset();
             }
 
             if(heat < 0.0001f) return;
 
-            float rad = size * tilesize / 2f * 0.74f;
+            float rad = size * tilesize / 2f * 0.74f * Mathf.lerp(1f, 1.3f, launchHeat);
             float scl = 2f;
 
             Draw.z(Layer.bullet - 0.0001f);
             Lines.stroke(1.75f * heat, Pal.accent);
-            Lines.square(x, y, rad * 1.22f, 45f);
+            Lines.square(x, y, rad * 1.22f, Mathf.lerp(45f, 0f, launchHeat));
+
+            //TODO: lock time when launching
 
             Lines.stroke(3f * heat, Pal.accent);
-            Lines.square(x, y, rad, Time.time / scl);
-            Lines.square(x, y, rad, -Time.time / scl);
+            Lines.square(x, y, rad * Mathf.lerp(1f, 1.3f, launchHeat), 45f + time / scl);
+            Lines.square(x, y, rad * Mathf.lerp(1f, 1.8f, launchHeat), Mathf.lerp(45f, 0f, launchHeat) - time / scl);
 
             Draw.color(team.color);
             Draw.alpha(Mathf.clamp(heat * 3f));
 
             for(int i = 0; i < 4; i++){
-                float rot = i*90f + 45f + (-Time.time /3f)%360f;
-                float length = 26f * heat;
+                float rot = i*90f + 45f + (-time/3f)%360f;
+                float length = 26f * heat * Mathf.lerp(1f, 1.5f, launchHeat);
                 Draw.rect(arrowRegion, x + Angles.trnsx(rot, length), y + Angles.trnsy(rot, length), rot + 180f);
             }
 
             Draw.reset();
         }
 
+        @Override
+        public void drawLight(){
+            Drawf.light(x, y, lightRadius, lightColor, launchHeat);
+        }
+
         public boolean canLaunch(){
-            return isValid() && state.isCampaign() && efficiency > 0f && power.graph.getBatteryStored() >= powerBufferRequirement-0.00001f && progress >= 1f;
+            return isValid() && state.isCampaign() && efficiency > 0f && power.graph.getBatteryStored() >= powerBufferRequirement-0.00001f && progress >= 1f && !launching;
         }
 
         @Override
@@ -191,7 +224,7 @@ public class Accelerator extends Block{
         public void drawSelect(){
             super.drawSelect();
 
-            if(power.graph.getBatteryStored() < powerBufferRequirement){
+            if(power.graph.getBatteryStored() < powerBufferRequirement && !launching){
                 drawPlaceText(Core.bundle.get("bar.nobatterypower"), tile.x, tile.y, false);
             }
         }
@@ -204,18 +237,15 @@ public class Accelerator extends Block{
 
             ui.planet.showPlanetLaunch(state.rules.sector, launchCandidates == null ? state.rules.sector.planet.launchCandidates : launchCandidates, sector -> {
                 if(canLaunch()){
-                    //TODO: animation!
-
                     consume();
                     power.graph.useBatteries(powerBufferRequirement);
                     progress = 0f;
 
-                    var core = team.core();
-
                     renderer.showLaunch(this);
 
-                    Time.runTask(core.landDuration() - 8f, () -> {
+                    Time.runTask(launchDuration() - 6f, () -> {
                         //unlock right before launch
+                        launching = false;
                         sector.planet.unlockedOnLand.each(UnlockableContent::unlock);
 
                         universe.clearLoadoutInfo();
@@ -260,34 +290,9 @@ public class Accelerator extends Block{
         }
 
         //launch animator stuff:
-
         @Override
-        public float zoomLaunching(){
-            CoreBlock core = (CoreBlock)launchBlock;
-            Core.camera.position.set(this);
-            return core.landZoomInterp.apply(Scl.scl(core.landZoomFrom), Scl.scl(core.landZoomTo), renderer.getLandTimeIn());
-        }
-
-        @Override
-        public void updateLaunching(){
-            float in = renderer.getLandTimeIn() * landDuration();
-            float tsize = Mathf.sample(CoreBlock.thrusterSizes, (in + 35f) / landDuration());
-
-            renderer.setLandPTimer(renderer.getLandPTimer() + tsize * Time.delta);
-            if(renderer.getLandTime() >= 1f){
-                tile.getLinkedTiles(t -> {
-                    if(Mathf.chance(0.4f)){
-                        Fx.coreLandDust.at(t.worldx(), t.worldy(), angleTo(t.worldx(), t.worldy()) + Mathf.range(30f), Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)));
-                    }
-                });
-
-                renderer.setLandPTimer(0f);
-            }
-        }
-
-        @Override
-        public float landDuration(){
-            return launchDuration;
+        public float launchDuration(){
+            return launchDuration + chargeDuration;
         }
 
         @Override
@@ -303,67 +308,112 @@ public class Accelerator extends Block{
 
         @Override
         public void beginLaunch(boolean launching){
+            if(!launching) return;
+
+            this.launching = true;
+            Fx.coreLaunchConstruct.at(x, y, launchBlock.size);
+
             cloudSeed = Mathf.random(1f);
-            if(launching){
+            float margin = 30f;
+
+            Image image = new Image();
+            image.color.a = 0f;
+            image.touchable = Touchable.disabled;
+            image.setFillParent(true);
+            image.actions(Actions.delay((launchDuration() - margin) / 60f), Actions.fadeIn(margin / 60f, Interp.pow2In), Actions.delay(6f / 60f), Actions.remove());
+            image.update(() -> {
+                image.toFront();
+                ui.loadfrag.toFront();
+                if(state.isMenu()){
+                    image.remove();
+                }
+            });
+            Core.scene.add(image);
+
+            Time.run(chargeDuration, () -> {
                 Fx.coreLaunchConstruct.at(x, y, launchBlock.size);
+                Fx.launchAccelerator.at(x, y);
+                Effect.shake(10f, 14f, this);
+
+                for(int i = 0; i < launchLightning; i++){
+                    float a = Mathf.random(360f);
+                    Lightning.create(team, lightningColor, lightningDamage, x + Angles.trnsx(a, lightningOffset), y + Angles.trnsy(a, lightningOffset), a, Mathf.random(lightningLengthMin, lightningLengthMax));
+                }
+
+                float spacing = 12f;
+                for(int i = 0; i < 13; i++){
+                    int fi = i;
+                    Time.run(i * 1.1f, () -> {
+                        float radius = block.size/2f + 1 + spacing * fi;
+                        int rays = Mathf.ceil(radius * Mathf.PI * 2f / 6f);
+                        for(int r = 0; r < rays; r++){
+                            if(Mathf.chance(0.7f - fi  * 0.02f)){
+                                float angle = r * 360f / (float)rays;
+                                float ox = Angles.trnsx(angle, radius), oy = Angles.trnsy(angle, radius);
+                                Tile t = world.tileWorld(x + ox, y + oy);
+                                if(t != null){
+                                    Fx.coreLandDust.at(t.worldx(), t.worldy(), angle + Mathf.range(30f), Tmp.c1.set(t.floor().mapColor).mul(1.7f + Mathf.range(0.15f)));
+                                }
+                            }
+                        }
+                    });
+                }
+
+
+            });
+        }
+
+        @Override
+        public void endLaunch(){
+            launching = false;
+        }
+
+        @Override
+        public float zoomLaunch(){
+            float rawTime = launchDuration() - renderer.getLandTime();
+
+            Core.camera.position.set(this);
+
+            if(rawTime < chargeDuration){
+                float fin = rawTime / chargeDuration;
+
+                return chargeZoomInterp.apply(Scl.scl(landZoomTo), Scl.scl(chargeZoomTo), fin);
+            }else{
+                float rawFin = renderer.getLandTimeIn();
+                float fin = 1f - Mathf.clamp((1f - rawFin) - (chargeDuration / (launchDuration + chargeDuration))) / (1f - (chargeDuration / (launchDuration + chargeDuration)));
+
+                return landZoomInterp.apply(Scl.scl(landZoomFrom), Scl.scl(landZoomTo), fin);
             }
+        }
 
-            if(!headless){
-                // Add fade-in and fade-out foreground when landing or launching.
-                if(renderer.isLaunching()){
-                    float margin = 30f;
+        @Override
+        public void updateLaunch(){
+            float in = renderer.getLandTimeIn() * launchDuration();
+            float tsize = Mathf.sample(CoreBlock.thrusterSizes, (in + 35f) / launchDuration());
 
-                    Image image = new Image();
-                    image.color.a = 0f;
-                    image.touchable = Touchable.disabled;
-                    image.setFillParent(true);
-                    image.actions(Actions.delay((landDuration() - margin) / 60f), Actions.fadeIn(margin / 60f, Interp.pow2In), Actions.delay(6f / 60f), Actions.remove());
-                    image.update(() -> {
-                        image.toFront();
-                        ui.loadfrag.toFront();
-                        if(state.isMenu()){
-                            image.remove();
-                        }
-                    });
-                    Core.scene.add(image);
-                }else{
-                    Image image = new Image();
-                    image.color.a = 1f;
-                    image.touchable = Touchable.disabled;
-                    image.setFillParent(true);
-                    image.actions(Actions.fadeOut(35f / 60f), Actions.remove());
-                    image.update(() -> {
-                        image.toFront();
-                        ui.loadfrag.toFront();
-                        if(state.isMenu()){
-                            image.remove();
-                        }
-                    });
-                    Core.scene.add(image);
+            float rawFin = renderer.getLandTimeIn();
+            float chargeFin = 1f - Mathf.clamp((1f - rawFin) / (chargeDuration / (launchDuration + chargeDuration)));
+            float chargeFout = 1f - chargeFin;
 
-                    Time.run(landDuration(), () -> {
-                        CoreBlock core = (CoreBlock)launchBlock;
-                        core.launchEffect.at(this);
-                        Effect.shake(5f, 5f, this);
-
-                        if(state.isCampaign() && Vars.showSectorLandInfo && (state.rules.sector.preset == null || state.rules.sector.preset.showSectorLandInfo)){
-                            ui.announce("[accent]" + state.rules.sector.name() + "\n" +
-                            (state.rules.sector.info.resources.any() ? "[lightgray]" + Core.bundle.get("sectors.resources") + "[white] " +
-                            state.rules.sector.info.resources.toString(" ", UnlockableContent::emoji) : ""), 5);
-                        }
-                    });
+            if(in > launchDuration){
+                if(Mathf.chanceDelta(lightningLaunchChance * Interp.pow3In.apply(chargeFout))){
+                    float a = Mathf.random(360f);
+                    Lightning.create(team, lightningColor, lightningDamage, x + Angles.trnsx(a, lightningOffset), y + Angles.trnsy(a, lightningOffset), a, Mathf.random(lightningLengthMin, lightningLengthMax));
                 }
             }
         }
 
         @Override
-        public void endLaunch(){}
-
-        @Override
-        public void drawLanding(){
+        public void drawLaunch(){
             var clouds = Core.assets.get("sprites/clouds.png", Texture.class);
 
-            float fin = renderer.getLandTimeIn();
+            float rawFin = renderer.getLandTimeIn();
+            float rawTime = launchDuration() - renderer.getLandTime();
+            float fin = 1f - Mathf.clamp((1f - rawFin) - (chargeDuration / (launchDuration + chargeDuration))) / (1f - (chargeDuration / (launchDuration + chargeDuration)));
+
+            float chargeFin = 1f - Mathf.clamp((1f - rawFin) / (chargeDuration / (launchDuration + chargeDuration)));
+            float chargeFout = 1f - chargeFin;
+
             float cameraScl = renderer.getDisplayScale();
 
             float fout = 1f - fin;
@@ -378,7 +428,9 @@ public class Accelerator extends Block{
             });
             Draw.color();
 
-            drawLanding(x, y);
+            if(rawTime >= chargeDuration){
+                drawLanding(fin, x, y);
+            }
 
             Draw.color();
             Draw.mixcol(Color.white, Interp.pow5In.apply(fout));
@@ -412,11 +464,73 @@ public class Accelerator extends Block{
             }
         }
 
-        public void drawLanding(float x, float y){
-            float fin = renderer.getLandTimeIn();
+        @Override
+        public void drawLaunchGlobalZ(){
+            float rawFin = renderer.getLandTimeIn();
+
+            float chargeFin = 1f - Mathf.clamp((1f - rawFin) / (chargeDuration / (launchDuration + chargeDuration)));
+            float fin = 1f - Mathf.clamp((1f - rawFin) - (chargeDuration / (launchDuration + chargeDuration))) / (1f - (chargeDuration / (launchDuration + chargeDuration)));
+            float fout = 1f - fin;
+            float chargeFout = 1f - chargeFin;
+
+            //fade out rings during launch.
+            chargeFout = Mathf.clamp(chargeFout - fout * 2f);
+
+            float
+            spacing = 1f / (chargeRings + chargeRingMerge);
+
+            for(int i = 0; i < chargeRings; i++){
+                float cfin = Mathf.clamp((chargeFout*ringSpeedup - spacing * i) / (spacing * (1f + chargeRingMerge)));
+                if(cfin > 0){
+                    drawRing(ringRadBase + ringRadSpacing * Mathf.pow(i, ringRadPow), cfin);
+                }
+            }
+        }
+
+        protected void drawRing(float radius, float fin){
+            Draw.z(Layer.effect);
+
+            float fout = 1f - fin;
+            float rotate = Interp.pow4In.apply(fout) * 90f;
+            float rad = radius + 20f * Interp.pow4In.apply(fout);
+
+            Lines.stroke(ringStroke * fin, ringColor);
+
+            Draw.color(Pal.command, ringColor, fin);
+
+            //handles
+            for(int i = 0; i < 4; i++){
+                float angle = i * 90f + 45f + rotate;
+                Lines.beginLine();
+                Lines.linePoint(Tmp.v1.trns(angle - ringHandleLen, rad * ringHandleTilt).add(x, y));
+                Lines.linePoint(Tmp.v2.trns(angle, rad).add(x, y));
+                Lines.linePoint(Tmp.v3.trns(angle + ringHandleLen, rad * ringHandleTilt).add(x, y));
+                Lines.endLine(false);
+
+            }
+
+            Draw.scl(fin);
+
+            //selection triangles
+            for(int i = 0; i < 4; i++){
+                float angle = i * 90f + rotate;
+
+
+                Draw.rect(selectArrowRegion, x + Angles.trnsx(angle, rad), y + Angles.trnsy(angle, rad), angle + 180f + 45f);
+
+                //shape variant:
+                //Lines.poly(x + Angles.trnsx(angle, rad), y + Angles.trnsy(angle, rad), 3, ringArrowRad * fin, angle + 180f);
+            }
+
+            Draw.scl();
+
+        }
+
+        protected void drawLanding(float fin, float x, float y){
+            float rawTime = launchDuration() - renderer.getLandTime();
             float fout = 1f - fin;
 
-            float scl = Scl.scl(4f) / renderer.getDisplayScale();
+            float scl = rawTime < chargeDuration ? 1f : Scl.scl(4f) / renderer.getDisplayScale();
             float shake = 0f;
             float s = launchBlock.region.width * launchBlock.region.scl() * scl * 3.6f * Interp.pow2Out.apply(fout);
             float rotation = Interp.pow2In.apply(fout) * 135f;
@@ -497,16 +611,6 @@ public class Accelerator extends Block{
                 }
             }
             Draw.alpha(1f);
-        }
-
-        public void drawThrusters(float frame){
-            CoreBlock core = (CoreBlock)launchBlock;
-            float length = core.thrusterLength * (frame - 1f) - 1f/4f;
-            for(int i = 0; i < 4; i++){
-                var reg = i >= 2 ? core.thruster2 : core.thruster1;
-                float dx = Geometry.d4x[i] * length, dy = Geometry.d4y[i] * length;
-                Draw.rect(reg, x + dx, y + dy, i * 90);
-            }
         }
     }
 }

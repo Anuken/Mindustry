@@ -238,7 +238,7 @@ public class CoreBlock extends StorageBlock{
         public float iframes = -1f;
         public float thrusterTime = 0f;
 
-        protected float cloudSeed;
+        protected float cloudSeed, landParticleTimer;
 
         @Override
         public void draw(){
@@ -260,7 +260,7 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public float landDuration(){
+        public float launchDuration(){
             return landDuration;
         }
 
@@ -290,7 +290,7 @@ public class CoreBlock extends StorageBlock{
                     image.color.a = 0f;
                     image.touchable = Touchable.disabled;
                     image.setFillParent(true);
-                    image.actions(Actions.delay((landDuration() - margin) / 60f), Actions.fadeIn(margin / 60f, Interp.pow2In), Actions.delay(6f / 60f), Actions.remove());
+                    image.actions(Actions.delay((launchDuration() - margin) / 60f), Actions.fadeIn(margin / 60f, Interp.pow2In), Actions.delay(6f / 60f), Actions.remove());
                     image.update(() -> {
                         image.toFront();
                         ui.loadfrag.toFront();
@@ -314,7 +314,7 @@ public class CoreBlock extends StorageBlock{
                     });
                     Core.scene.add(image);
 
-                    Time.run(landDuration(), () -> {
+                    Time.run(launchDuration(), () -> {
                         launchEffect.at(this);
                         Effect.shake(5f, 5f, this);
                         thrusterTime = 1f;
@@ -333,7 +333,7 @@ public class CoreBlock extends StorageBlock{
         public void endLaunch(){}
 
         @Override
-        public void drawLanding(){
+        public void drawLaunch(){
             var clouds = Core.assets.get("sprites/clouds.png", Texture.class);
 
             float fin = renderer.getLandTimeIn();
@@ -551,25 +551,25 @@ public class CoreBlock extends StorageBlock{
 
         /** @return Camera zoom while landing or launching. May optionally do other things such as setting camera position to itself. */
         @Override
-        public float zoomLaunching(){
+        public float zoomLaunch(){
             Core.camera.position.set(this);
             return landZoomInterp.apply(Scl.scl(landZoomFrom), Scl.scl(landZoomTo), renderer.getLandTimeIn());
         }
 
         @Override
-        public void updateLaunching(){
-            float in = renderer.getLandTimeIn() * landDuration();
-            float tsize = Mathf.sample(thrusterSizes, (in + 35f) / landDuration());
+        public void updateLaunch(){
+            float in = renderer.getLandTimeIn() * launchDuration();
+            float tsize = Mathf.sample(thrusterSizes, (in + 35f) / launchDuration());
 
-            renderer.setLandPTimer(renderer.getLandPTimer() + tsize * Time.delta);
-            if(renderer.getLandTime() >= 1f){
+            landParticleTimer += tsize * Time.delta;
+            if(landParticleTimer >= 1f){
                 tile.getLinkedTiles(t -> {
                     if(Mathf.chance(0.4f)){
                         Fx.coreLandDust.at(t.worldx(), t.worldy(), angleTo(t.worldx(), t.worldy()) + Mathf.range(30f), Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)));
                     }
                 });
 
-                renderer.setLandPTimer(0f);
+                landParticleTimer = 0f;
             }
         }
 

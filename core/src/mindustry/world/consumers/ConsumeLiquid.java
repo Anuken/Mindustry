@@ -22,6 +22,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
         this(null, 0f);
     }
 
+
     @Override
     public void apply(Block block){
         super.apply(block);

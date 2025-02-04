@@ -1,22 +1,29 @@
 package mindustry.world.blocks;
 
 import arc.audio.*;
+import mindustry.gen.*;
 
 public interface LaunchAnimator{
 
-    void drawLanding();
+    void drawLaunch();
+
+    default void drawLaunchGlobalZ(){}
 
     void beginLaunch(boolean launching);
 
     void endLaunch();
 
-    void updateLaunching();
+    void updateLaunch();
 
-    float landDuration();
+    float launchDuration();
 
-    Music landMusic();
+    default Music landMusic(){
+        return Musics.land;
+    }
 
-    Music launchMusic();
+    default Music launchMusic(){
+        return Musics.launch;
+    }
 
-    float zoomLaunching();
+    float zoomLaunch();
 }
