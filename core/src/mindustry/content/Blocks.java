@@ -1007,7 +1007,7 @@ public class Blocks{
             outputsLiquid = true;
             envEnabled = Env.any;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.water), new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = true;}}, new DrawDefault());
-            liquidCapacity = 24f;
+            liquidCapacity = 36f;
             craftTime = 120;
             lightLiquid = Liquids.cryofluid;
 
@@ -1238,7 +1238,7 @@ public class Blocks{
 
             researchCostMultiplier = 1.1f;
             itemCapacity = 0;
-            liquidCapacity = 40f;
+            liquidCapacity = 60f;
             consumePower(2f);
             ambientSound = Sounds.extractLoop;
             ambientSoundVolume = 0.06f;
@@ -1296,7 +1296,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.slag), new DrawDefault(), new DrawHeatOutput());
             size = 3;
             itemCapacity = 0;
-            liquidCapacity = 40f;
+            liquidCapacity = 120f;
             rotateDraw = false;
             regionRotated1 = 1;
             ambientSound = Sounds.hum;
@@ -2721,7 +2721,7 @@ public class Blocks{
             result = Liquids.water;
             pumpAmount = 0.11f;
             size = 2;
-            liquidCapacity = 30f;
+            liquidCapacity = 40f;
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
             envRequired |= Env.groundWater;
@@ -2737,6 +2737,7 @@ public class Blocks{
             hasLiquids = true;
             hasPower = true;
             hasItems = true;
+            liquidCapacity = 80f;
 
             craftEffect = Fx.none;
             envRequired |= Env.spores;
@@ -2763,7 +2764,7 @@ public class Blocks{
             updateEffectChance = 0.05f;
             pumpAmount = 0.25f;
             size = 3;
-            liquidCapacity = 30f;
+            liquidCapacity = 40f;
             attribute = Attribute.oil;
             baseEfficiency = 0f;
             itemUseTime = 60f;
