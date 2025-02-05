@@ -49,6 +49,8 @@ public class PowerNode extends PowerBlock{
         drawDisabled = false;
         envEnabled |= Env.space;
         destructible = true;
+        underBullets = true;
+        solid = false;
 
         //nodes do not even need to update
         update = false;
