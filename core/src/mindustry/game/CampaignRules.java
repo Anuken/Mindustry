@@ -8,6 +8,7 @@ public class CampaignRules{
     public boolean showSpawns;
     public boolean sectorInvasion;
     public boolean randomWaveAI;
+    public boolean legacyLaunchPads;
 
     public void apply(Planet planet, Rules rules){
         rules.staticFog = rules.fog = fog;

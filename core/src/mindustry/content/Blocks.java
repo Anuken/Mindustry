@@ -163,7 +163,8 @@ public class Blocks{
     worldProcessor, worldCell, worldMessage, worldSwitch,
 
     //campaign
-    launchPad, interplanetaryAccelerator
+    launchPad, advancedLaunchPad, landingPad,
+    interplanetaryAccelerator
 
     ;
 
@@ -2874,7 +2875,7 @@ public class Blocks{
             fogRadius = 4;
 
             consumePower(160f / 60f);
-            consumeLiquid(Liquids.water, 0.2f);
+            consumeLiquid(Liquids.water, 10f/60f);
         }};
 
         eruptionDrill = new BurstDrill("eruption-drill"){{
@@ -3753,6 +3754,7 @@ public class Blocks{
             ammoUseEffect = Fx.casing3Double;
             ammoPerShot = 2;
             velocityRnd = 0.2f;
+            scaleLifetimeOffset = 1f / 9f;
             recoil = 6f;
             shake = 2f;
             range = 290f;
@@ -4927,18 +4929,17 @@ public class Blocks{
                 }};
             }},
 
-            //TODO - needs balancing
             Items.phaseFabric, new BulletType(0f, 0f){{
                 shootEffect = Fx.shootBig;
                 smokeEffect = Fx.shootSmokeMissileColor;
                 hitColor = Color.valueOf("ffd37f");
-                ammoMultiplier = 1f;
+                ammoMultiplier = 5f;
                 reloadMultiplier = 0.8f;
 
                 spawnUnit = new MissileUnitType("scathe-missile-phase"){{
-                    speed = 4.4f;
+                    speed = 4f;
                     maxRange = 6f;
-                    lifetime = 60f * 5.7f;
+                    lifetime = 60f * 6.1f;
                     outlineColor = Pal.darkOutline;
                     engineColor = trailColor = Color.valueOf("ffd37f");
                     engineLayer = Layer.effect;
@@ -4954,9 +4955,20 @@ public class Blocks{
                     targetAir = false;
                     targetUnderBlocks = false;
 
+                    parts.add(new ShapePart(){{
+                        progress = PartProgress.constant(1f);
+                        color = Pal.accent;
+                        sides = 6;
+                        radius = 3f;
+                        rotateSpeed = 3f;
+                        hollow = true;
+                        layer = Layer.effect;
+                        y = 1.8f;
+                    }});
+
                     fogRadius = 6f;
 
-                    health = 250;
+                    health = 500;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -4965,7 +4977,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(1500f, 50f){{
+                        bullet = new ExplosionBulletType(400f, 120f){{
                             hitColor = engineColor;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;
@@ -4974,7 +4986,7 @@ public class Blocks{
                             }});
 
                             collidesAir = false;
-                            buildingDamageMultiplier = 0.2f;
+                            buildingDamageMultiplier = 0.1f;
 
                             ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
@@ -4988,8 +5000,8 @@ public class Blocks{
                                 lifetime = 23f;
                                 width = height = 18f;
                                 collidesTiles = false;
-                                splashDamageRadius = 40f;
-                                splashDamage = 160f;
+                                splashDamageRadius = 56f;
+                                splashDamage = 164f;
                                 backColor = trailColor = hitColor = engineColor;
                                 frontColor = Color.white;
                                 smokeEffect = Fx.shootBigSmoke2;
@@ -5013,7 +5025,7 @@ public class Blocks{
                         interval = 7f;
                     }});
 
-                    abilities.add(new ForceFieldAbility(30f, 0f, 160f, 999999999f));
+                    abilities.add(new ForceFieldAbility(90f, 0f, 2000f, 999999999f));
 
                 }};
             }},
@@ -5058,12 +5070,12 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(400f, 40f){{
+                        bullet = new ExplosionBulletType(300f, 40f){{
                             hitColor = engineColor;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosionSmall);
 
                             collidesAir = false;
-                            buildingDamageMultiplier = 0.25f;
+                            buildingDamageMultiplier = 0.1f;
 
                             ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
@@ -5105,7 +5117,7 @@ public class Blocks{
                                         deathExplosionEffect = Fx.massiveExplosion;
                                         shootOnDeath = true;
                                         shake = 10f;
-                                        bullet = new ExplosionBulletType(340f, 35f){{
+                                        bullet = new ExplosionBulletType(360f, 35f){{
                                             lightning = 6;
                                             lightningDamage = 35f;
                                             lightningLength = 8;
@@ -5118,7 +5130,7 @@ public class Blocks{
                                             }});
 
                                             collidesAir = false;
-                                            buildingDamageMultiplier = 0.2f;
+                                            buildingDamageMultiplier = 0.1f;
                                         }};
                                     }});
 
@@ -5203,7 +5215,7 @@ public class Blocks{
 
             shake = 6f;
             ammoPerShot = 15;
-            maxAmmo = 30;
+            maxAmmo = 45;
             shootY = -1;
             outlineColor = Pal.darkOutline;
             size = 4;
@@ -6343,17 +6355,42 @@ public class Blocks{
         //region campaign
 
         launchPad = new LaunchPad("launch-pad"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            requirements(Category.effect, BuildVisibility.legacyLaunchPadOnly, with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 3;
             itemCapacity = 100;
             launchTime = 60f * 20;
             hasPower = true;
+            acceptMultipleItems = true;
             consumePower(4f);
         }};
 
+        advancedLaunchPad = new LaunchPad("advanced-launch-pad"){{
+            requirements(Category.effect, BuildVisibility.notLegacyLaunchPadOnly, with(Items.copper, 350, Items.silicon, 250, Items.lead, 300, Items.titanium, 200));
+            size = 4;
+            itemCapacity = 100;
+            launchTime = 60f * 30;
+            liquidCapacity = 40f;
+            hasPower = true;
+            drawLiquid = Liquids.oil;
+            consumeLiquid(Liquids.oil, 9f/60f);
+            consumePower(8f);
+        }};
+
+        landingPad = new LandingPad("landing-pad"){{
+            requirements(Category.effect, BuildVisibility.notLegacyLaunchPadOnly, with(Items.copper, 200, Items.graphite, 100, Items.titanium, 100));
+            size = 4;
+
+            itemCapacity = 100;
+
+            coolingEffect = new RadialEffect(Fx.steamCoolSmoke, 4, 90f, 9.5f, 180f);
+            liquidCapacity = 3000f;
+            consumeLiquidAmount = 1500f;
+        }};
+
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
-            requirements(Category.effect, BuildVisibility.hidden, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
             researchCostMultiplier = 0.1f;
+            powerBufferRequirement = 1_000_000f;
             size = 7;
             hasPower = true;
             consumePower(10f);
