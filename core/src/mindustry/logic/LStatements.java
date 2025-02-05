@@ -327,7 +327,7 @@ public class LStatements{
                     t.table(i -> {
                         i.left();
                         int c = 0;
-                        for(char j = 32 ; j < 127 ; j++){
+                        for(char j = 32; j < 127; j++){
                             final int chr = j;
                             i.button(String.valueOf(j), Styles.flatt, () -> {
                                 value = Integer.toString(chr);
