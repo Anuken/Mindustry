@@ -52,7 +52,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region vars and initialization
     static final float timeToSleep = 60f * 1, recentDamageTime = 60f * 5f;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
-    static final Seq<Building> tempBuilds = new Seq<>();
+    static final Seq<Building> tempBuilds = new Seq<>(Building.class);
     static final BuildTeamChangeEvent teamChangeEvent = new BuildTeamChangeEvent();
     static final BuildDamageEvent bulletDamageEvent = new BuildDamageEvent();
     static int sleepingEntities = 0;
@@ -827,18 +827,60 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     //TODO entire liquid system is awful
     public void dumpLiquid(Liquid liquid){
-        dumpLiquid(liquid, 2f);
-    }
-
-    public void dumpLiquid(Liquid liquid, float scaling){
-        dumpLiquid(liquid, scaling, -1);
+        dumpLiquid(liquid, -1);
     }
 
     /** @param outputDir output liquid direction relative to rotation, or -1 to use any direction. */
-    public void dumpLiquid(Liquid liquid, float scaling, int outputDir){
-        int dump = this.cdump;
+    public void dumpLiquid(Liquid liquid, int outputDir){
+        float amount = liquids.get(liquid);
 
+        if(amount <= 0.0001f) return;
+
+        if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) liquid.unlock();
+
+        float sum = 0f;
+        tempBuilds.clear();
+
+        for(int i = 0; i < proximity.size; i++){
+            Building other = proximity.get(i);
+
+            if(outputDir != -1 && (outputDir + rotation) % 4 != relativeTo(other)) continue;
+
+            other = other.getLiquidDestination(self(), liquid);
+
+            if(other != null && other.liquids != null && canDumpLiquid(other, liquid) && other.acceptLiquid(self(), liquid)){
+                //I don't want huge-capacity blocks hogging all the output, so cap their 'weight' by the amount.
+                sum += Math.min(amount, other.block.liquidCapacity - other.liquids.get(liquid));
+
+                tempBuilds.add(other);
+            }
+        }
+
+        //nothing to output.
+        if(sum <= 0.00001f){
+            return;
+        }
+
+        var outputs = tempBuilds.items;
+        int outputSize = tempBuilds.size;
+        for(int i = 0; i < outputSize; i++){
+            Building other = outputs[i];
+
+            float maxOutput = Math.min(amount, other.block.liquidCapacity - other.liquids.get(liquid));
+            //fraction of total possible output that this block represents.
+            float fraction = maxOutput / sum;
+
+            //note: transferLiquid already clamps the amount by capacity.
+            transferLiquid(other, fraction * amount, liquid);
+        }
+    }
+
+    /** Tries to evenly distribute the specified liquid to nearby blocks. This method will likely be removed in the future! */
+    public void distributeLiquid(Liquid liquid){
         if(liquids.get(liquid) <= 0.0001f) return;
+        float scaling = 2f;
+
+        int dump = this.cdump;
 
         if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) liquid.unlock();
 
@@ -846,7 +888,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             incrementDump(proximity.size);
 
             Building other = proximity.get((i + dump) % proximity.size);
-            if(outputDir != -1 && (outputDir + rotation) % 4 != relativeTo(other)) continue;
 
             other = other.getLiquidDestination(self(), liquid);
 

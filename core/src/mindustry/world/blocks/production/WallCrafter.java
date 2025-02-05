@@ -85,7 +85,7 @@ public class WallCrafter extends Block{
 
         if(consItems && itemConsumer instanceof ConsumeItems coni){
             stats.remove(Stat.booster);
-            stats.add(Stat.booster, StatValues.itemBoosters("{0}" + StatUnit.timesSpeed.localized(), stats.timePeriod, itemBoostIntensity, 0f, coni.items, i -> Structs.contains(coni.items, s -> s.item == i)));
+            stats.add(Stat.booster, StatValues.itemBoosters("{0}" + StatUnit.timesSpeed.localized(), stats.timePeriod, itemBoostIntensity, 0f, coni.items));
         }
 
         if(liquidBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){

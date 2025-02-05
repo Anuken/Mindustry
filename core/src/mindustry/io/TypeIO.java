@@ -955,6 +955,7 @@ public class TypeIO{
     public static void writeTraceInfo(Writes write, TraceInfo trace){
         writeString(write, trace.ip);
         writeString(write, trace.uuid);
+        writeString(write, trace.locale);
         write.b(trace.modded ? (byte)1 : 0);
         write.b(trace.mobile ? (byte)1 : 0);
         write.i(trace.timesJoined);
@@ -965,7 +966,7 @@ public class TypeIO{
     }
 
     public static TraceInfo readTraceInfo(Reads read){
-        return new TraceInfo(readString(read), readString(read), read.b() == 1, read.b() == 1, read.i(), read.i(), readStrings(read), readStrings(read));
+        return new TraceInfo(readString(read), readString(read), readString(read), read.b() == 1, read.b() == 1, read.i(), read.i(), readStrings(read), readStrings(read));
     }
 
     public static void writeStrings(Writes write, String[] strings, int maxLen){

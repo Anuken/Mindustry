@@ -1007,7 +1007,7 @@ public class Blocks{
             outputsLiquid = true;
             envEnabled = Env.any;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.water), new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = true;}}, new DrawDefault());
-            liquidCapacity = 24f;
+            liquidCapacity = 36f;
             craftTime = 120;
             lightLiquid = Liquids.cryofluid;
 
@@ -1238,7 +1238,7 @@ public class Blocks{
 
             researchCostMultiplier = 1.1f;
             itemCapacity = 0;
-            liquidCapacity = 40f;
+            liquidCapacity = 60f;
             consumePower(2f);
             ambientSound = Sounds.extractLoop;
             ambientSoundVolume = 0.06f;
@@ -1296,7 +1296,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.slag), new DrawDefault(), new DrawHeatOutput());
             size = 3;
             itemCapacity = 0;
-            liquidCapacity = 40f;
+            liquidCapacity = 120f;
             rotateDraw = false;
             regionRotated1 = 1;
             ambientSound = Sounds.hum;
@@ -2120,13 +2120,14 @@ public class Blocks{
         mechanicalPump = new Pump("mechanical-pump"){{
             requirements(Category.liquid, with(Items.copper, 15, Items.metaglass, 10));
             pumpAmount = 7f / 60f;
+            liquidCapacity = 20f;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
             requirements(Category.liquid, with(Items.copper, 70, Items.metaglass, 50, Items.silicon, 20, Items.titanium, 35));
             pumpAmount = 0.2f;
             consumePower(0.3f);
-            liquidCapacity = 30f;
+            liquidCapacity = 80f;
             hasPower = true;
             size = 2;
         }};
@@ -2135,33 +2136,34 @@ public class Blocks{
             requirements(Category.liquid, with(Items.copper, 80, Items.metaglass, 90, Items.silicon, 30, Items.titanium, 40, Items.thorium, 35));
             pumpAmount = 0.22f;
             consumePower(1.3f);
-            liquidCapacity = 40f;
+            liquidCapacity = 200f;
             hasPower = true;
             size = 3;
         }};
 
         conduit = new Conduit("conduit"){{
             requirements(Category.liquid, with(Items.metaglass, 1));
+            liquidCapacity = 20f;
             health = 45;
         }};
 
         pulseConduit = new Conduit("pulse-conduit"){{
             requirements(Category.liquid, with(Items.titanium, 2, Items.metaglass, 1));
-            liquidCapacity = 16f;
+            liquidCapacity = 40f;
             liquidPressure = 1.025f;
             health = 90;
         }};
 
         platedConduit = new ArmoredConduit("plated-conduit"){{
             requirements(Category.liquid, with(Items.thorium, 2, Items.metaglass, 1, Items.plastanium, 1));
-            liquidCapacity = 16f;
+            liquidCapacity = 50f;
             liquidPressure = 1.025f;
             health = 220;
         }};
 
         liquidRouter = new LiquidRouter("liquid-router"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 2));
-            liquidCapacity = 20f;
+            liquidCapacity = 120f;
             underBullets = true;
             solid = false;
         }};
@@ -2192,6 +2194,7 @@ public class Blocks{
             arrowSpacing = 6f;
             range = 4;
             hasPower = false;
+            liquidCapacity = 100f;
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
@@ -2202,6 +2205,7 @@ public class Blocks{
             hasPower = true;
             canOverdrive = false;
             pulse = true;
+            liquidCapacity = 100f;
             consumePower(0.30f);
         }};
 
@@ -2220,19 +2224,17 @@ public class Blocks{
             requirements(Category.liquid, with(Items.beryllium, 2));
             botColor = Pal.darkestMetal;
             leaks = true;
-            liquidCapacity = 20f;
+            liquidCapacity = 50f;
             liquidPressure = 1.03f;
             health = 250;
             researchCostMultiplier = 3;
             underBullets = true;
         }};
 
-        //TODO is this necessary? junctions are not good design
-        //TODO make it leak
         reinforcedLiquidJunction = new LiquidJunction("reinforced-liquid-junction"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.beryllium, 8));
             buildCostMultiplier = 3f;
-            health = 260;
+            health = 250;
             ((Conduit)reinforcedConduit).junctionReplacement = this;
             researchCostMultiplier = 1;
             solid = false;
@@ -2243,19 +2245,22 @@ public class Blocks{
             requirements(Category.liquid, with(Items.graphite, 8, Items.beryllium, 20));
             range = 4;
             hasPower = false;
+            liquidCapacity = 120f;
             researchCostMultiplier = 1;
             underBullets = true;
+            health = 250;
 
             ((Conduit)reinforcedConduit).rotBridgeReplacement = this;
         }};
 
         reinforcedLiquidRouter = new LiquidRouter("reinforced-liquid-router"){{
             requirements(Category.liquid, with(Items.graphite, 8, Items.beryllium, 4));
-            liquidCapacity = 30f;
+            liquidCapacity = 150f;
             liquidPadding = 3f/4f;
             researchCostMultiplier = 3;
             underBullets = true;
             solid = false;
+            health = 250;
         }};
 
         reinforcedLiquidContainer = new LiquidRouter("reinforced-liquid-container"){{
@@ -2265,6 +2270,7 @@ public class Blocks{
             liquidPadding = 6f/4f;
             researchCostMultiplier = 4;
             solid = true;
+            health = 600;
         }};
 
         reinforcedLiquidTank = new LiquidRouter("reinforced-liquid-tank"){{
@@ -2273,6 +2279,7 @@ public class Blocks{
             solid = true;
             liquidCapacity = 2700f;
             liquidPadding = 2f;
+            health = 1200;
         }};
 
         //endregion
@@ -2434,7 +2441,7 @@ public class Blocks{
             itemDuration = 140f;
             ambientSound = Sounds.pulse;
             ambientSoundVolume = 0.07f;
-            liquidCapacity = 60f;
+            liquidCapacity = 80f;
 
             consumePower(25f);
             consumeItem(Items.blastCompound);
@@ -2716,7 +2723,7 @@ public class Blocks{
             result = Liquids.water;
             pumpAmount = 0.11f;
             size = 2;
-            liquidCapacity = 30f;
+            liquidCapacity = 40f;
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
             envRequired |= Env.groundWater;
@@ -2732,6 +2739,7 @@ public class Blocks{
             hasLiquids = true;
             hasPower = true;
             hasItems = true;
+            liquidCapacity = 80f;
 
             craftEffect = Fx.none;
             envRequired |= Env.spores;
@@ -2758,7 +2766,7 @@ public class Blocks{
             updateEffectChance = 0.05f;
             pumpAmount = 0.25f;
             size = 3;
-            liquidCapacity = 30f;
+            liquidCapacity = 40f;
             attribute = Attribute.oil;
             baseEfficiency = 0f;
             itemUseTime = 60f;
@@ -3754,6 +3762,7 @@ public class Blocks{
             ammoUseEffect = Fx.casing3Double;
             ammoPerShot = 2;
             velocityRnd = 0.2f;
+            scaleLifetimeOffset = 1f / 9f;
             recoil = 6f;
             shake = 2f;
             range = 290f;
@@ -5501,7 +5510,7 @@ public class Blocks{
         }};
 
         malign = new PowerTurret("malign"){{
-            requirements(Category.turret, with(Items.carbide, 400, Items.beryllium, 2000, Items.silicon, 800, Items.graphite, 800, Items.phaseFabric, 300));
+            requirements(Category.turret, with(Items.carbide, 200, Items.beryllium, 1000, Items.silicon, 500, Items.graphite, 500, Items.phaseFabric, 200));
 
             var haloProgress = PartProgress.warmup;
             Color haloColor = Color.valueOf("d370d3"), heatCol = Color.purple;
@@ -5809,26 +5818,26 @@ public class Blocks{
             }};
 
             velocityRnd = 0.15f;
-            heatRequirement = 90f;
+            heatRequirement = 72f;
             maxHeatEfficiency = 2f;
             warmupMaintainTime = 120f;
-            consumePower(10f);
-
-            shoot = new ShootSummon(0f, 0f, circleRad, 48f);
+            consumePower(40f);
+            unitSort = UnitSorts.strongest;
+            shoot = new ShootSummon(0f, 0f, circleRad, 20f);
 
             minWarmup = 0.96f;
-            shootWarmupSpeed = 0.03f;
+            shootWarmupSpeed = 0.08f;
 
             shootY = circleY - 5f;
 
             outlineColor = Pal.darkOutline;
             envEnabled |= Env.space;
-            reload = 9f;
-            range = 370;
+            reload = 7f;
+            range = 380;
             trackingRange = range * 1.4f;
             shootCone = 100f;
             scaledHealth = 370;
-            rotateSpeed = 2f;
+            rotateSpeed = 2.6f;
             recoil = 0.5f;
             recoilTime = 30f;
             shake = 3f;

@@ -175,9 +175,13 @@ public class BaseGenerator{
         if(tiles == null) return;
 
         for(Tile tile : tiles){
-            if(tile.isCenter() && tile.block() instanceof PowerNode && tile.team() == state.rules.waveTeam){
-                tile.build.configureAny(new Point2[0]);
-                tile.build.placed();
+            if(tile.isCenter() && tile.team() == state.rules.waveTeam){
+                if(tile.block() instanceof PowerNode){
+                    tile.build.configureAny(new Point2[0]);
+                    tile.build.placed();
+                }else if(tile.block() instanceof Battery){
+                    tile.build.power.status = 1f;
+                }
             }
         }
     }
