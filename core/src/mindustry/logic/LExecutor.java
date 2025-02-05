@@ -988,6 +988,29 @@ public class LExecutor{
         }
     }
 
+    public static class PrintCharI implements LInstruction{
+        public LVar value;
+
+        public PrintCharI(LVar value){
+            this.value = value;
+        }
+
+        PrintCharI(){}
+
+        @Override
+        public void run(LExecutor exec){
+
+            if(exec.textBuffer.length() >= maxTextBuffer) return;
+            if(value.isobj){
+                if(!(value.objval instanceof UnlockableContent cont)) return;
+                exec.textBuffer.append((char)cont.emojiChar());
+                return;
+            }
+
+            exec.textBuffer.append((char)Math.floor(value.numval));
+        }
+    }
+
     public static class FormatI implements LInstruction{
         public LVar value;
 
