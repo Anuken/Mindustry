@@ -54,6 +54,8 @@ public class Turret extends ReloadTurret{
     public float inaccuracy = 0f;
     /** Fraction of bullet velocity that is random. */
     public float velocityRnd = 0f;
+    /** Fraction of lifetime that is added to bullets with lifeScale. */
+    public float scaleLifetimeOffset = 0f;
     /** Maximum angle difference in degrees at which turret will still try to shoot. */
     public float shootCone = 8f;
     /** Turret shoot point. */
@@ -359,8 +361,8 @@ public class Turret extends ReloadTurret{
                 offset.set(h.deltaX(), h.deltaY()).scl(shoot.firstShotDelay / Time.delta);
             }
 
-            if(predictTarget){
-                targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
+            if(predictTarget && bullet.speed >= 0.01f){
+                targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed));
             }else{
                 targetPos.set(pos);
             }
@@ -559,13 +561,13 @@ public class Turret extends ReloadTurret{
 
         /** @return whether the turret has ammo. */
         public boolean hasAmmo(){
-            //used for "side-ammo" like gas in some turrets
-            if(!canConsume()) return false;
-
             //skip first entry if it has less than the required amount of ammo
             if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot && ammo.get(ammo.size - 2).amount >= ammoPerShot){
                 ammo.swap(ammo.size - 1, ammo.size - 2);
             }
+
+            //used for "side-ammo" like gas in some turrets
+            if(!canConsume()) return false;
 
             return ammo.size > 0 && (ammo.peek().amount >= ammoPerShot || cheating());
         }
@@ -640,7 +642,7 @@ public class Turret extends ReloadTurret{
             bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             shootAngle = rotation + angleOffset + Mathf.range(inaccuracy + type.inaccuracy);
 
-            float lifeScl = type.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
+            float lifeScl = type.scaleLife ? Mathf.clamp((1 + scaleLifetimeOffset) * Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
 
             //TODO aimX / aimY for multi shot turrets?
             handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, shootAngle - rotation);

@@ -15,10 +15,6 @@ if(new File(settingsDir, 'local.properties').exists()){
 if(System.getenv("JITPACK") == "true") hasSdk = false
 
 if(hasSdk){
-    //hack: pretend the Android module doesn't exist when imported through IntelliJ
-    //why? because IntelliJ chokes on the new version of the Android plugin
-
-    //UPDATE: it no longer chokes on AGP with the latest version, but instead gives a completely different error. brilliant.
     include 'android'
 }else{
     println("No Android SDK found. Skipping Android module.")
