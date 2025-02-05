@@ -258,7 +258,7 @@ public class BaseBuilderAI{
 
         //queue it
         for(Stile tile : result.tiles){
-            data.plans.add(new BlockPlan(cx + tile.x, cy + tile.y, tile.rotation, tile.block.id, tile.config));
+            data.plans.add(new BlockPlan(cx + tile.x, cy + tile.y, tile.rotation, tile.block, tile.config));
         }
 
         return true;

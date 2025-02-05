@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
@@ -31,12 +32,12 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean alwaysUnlocked = false;
     /** Whether to show the description in the research dialog preview. */
     public boolean inlineDescription = true;
-    /** Whether details of blocks are hidden in custom games if they haven't been unlocked in campaign mode. */
+    /** Whether details are hidden in custom games if this hasn't been unlocked in campaign mode. */
     public boolean hideDetails = true;
+    /** Whether this is hidden from the Core Database. */
+    public boolean hideDatabase = false;
     /** If false, all icon generation is disabled for this content; createIcons is not called. */
     public boolean generateIcons = true;
-    /** Special logic icon ID. */
-    public int iconId = 0;
     /** How big the content appears in certain selection menus */
     public float selectionSize = 24f;
     /** Icon of the content to use in UI. */
@@ -45,11 +46,24 @@ public abstract class UnlockableContent extends MappableContent{
     public TextureRegion fullIcon;
     /** Override for the full icon. Useful for mod content with duplicate icons. Overrides any other full icon.*/
     public String fullOverride = "";
+    /** If true, this content will appear in all database tabs. */
+    public boolean allDatabaseTabs = false;
+    /**
+     * Planets that this content is made for. If empty, a planet is decided based on item requirements.
+     * Currently, this is only meaningful for blocks.
+     * */
+    public ObjectSet<Planet> shownPlanets = new ObjectSet<>();
+    /**
+     * Content - usually a planet - that dictates which database tab(s) this content will appear in.
+     * If nothing is defined, it will use the values in shownPlanets.
+     * If shownPlanets is also empty, it will use Serpulo as the "default" tab.
+     * */
+    public ObjectSet<UnlockableContent> databaseTabs = new ObjectSet<>();
     /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
     public @Nullable TechNode techNode;
     /** Tech nodes for all trees that this content is part of. */
     public Seq<TechNode> techNodes = new Seq<>();
-    /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
+    /** Unlock state. Loaded from settings. Do not modify outside the constructor. */
     protected boolean unlocked;
 
     public UnlockableContent(String name){
@@ -59,6 +73,13 @@ public abstract class UnlockableContent extends MappableContent{
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
         this.details = Core.bundle.getOrNull(getContentType() + "." + this.name + ".details");
         this.unlocked = Core.settings != null && Core.settings.getBool(this.name + "-unlocked", false);
+    }
+
+    @Override
+    public void postInit(){
+        super.postInit();
+
+        databaseTabs.addAll(shownPlanets);
     }
 
     @Override
@@ -72,6 +93,10 @@ public abstract class UnlockableContent extends MappableContent{
             Core.atlas.find(name + "1"))))));
 
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
+    }
+
+    public boolean isOnPlanet(@Nullable Planet planet){
+        return planet == null || planet == Planets.sun || shownPlanets.isEmpty() || shownPlanets.contains(planet);
     }
 
     public int getLogicId(){
@@ -200,15 +225,24 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public boolean unlockedNowHost(){
-        if(!state.isCampaign()) return true;
+        return !state.isCampaign() || unlockedHost();
+    }
+
+    /** @return in multiplayer, whether this is unlocked for the host player, otherwise, whether it is unlocked for the local player (same as unlocked()) */
+    public boolean unlockedHost(){
         return net != null && net.client() ?
-            alwaysUnlocked || state.rules.researched.contains(name) :
+            alwaysUnlocked || state.rules.researched.contains(this) :
             unlocked || alwaysUnlocked;
+    }
+
+    /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */
+    public boolean unlockedNow(){
+        return unlocked() || !state.isCampaign();
     }
 
     public boolean unlocked(){
         return net != null && net.client() ?
-            alwaysUnlocked || unlocked || state.rules.researched.contains(name) :
+            alwaysUnlocked || unlocked || state.rules.researched.contains(this) :
             unlocked || alwaysUnlocked;
     }
 
@@ -218,11 +252,6 @@ public abstract class UnlockableContent extends MappableContent{
             unlocked = false;
             Core.settings.put(name + "-unlocked", false);
         }
-    }
-
-    /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */
-    public boolean unlockedNow(){
-        return unlocked() || !state.isCampaign();
     }
 
     public boolean locked(){

@@ -116,14 +116,7 @@ public class LCanvas extends Table{
             jumps.cullable = false;
         }).grow().get();
         pane.setFlickScroll(false);
-
         pane.setScrollYForce(s);
-        pane.updateVisualScroll();
-        //load old scroll percent
-        Core.app.post(() -> {
-            pane.setScrollYForce(s);
-            pane.updateVisualScroll();
-        });
 
         if(toLoad != null){
             load(toLoad);
@@ -171,7 +164,7 @@ public class LCanvas extends Table{
     }
 
     StatementElem checkHovered(){
-        Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+        Element e = Core.scene.getHoverElement();
         if(e != null){
             while(e != null && !(e instanceof StatementElem)){
                 e = e.parent;
@@ -257,7 +250,7 @@ public class LCanvas extends Table{
                 }
             }
 
-            if(parent != null) parent.invalidateHierarchy();//don't invalid self
+            if(parent != null) parent.invalidateHierarchy();
 
             if(parent != null && parent instanceof Table){
                 setCullingArea(parent.getCullingArea());

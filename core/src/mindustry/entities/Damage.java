@@ -16,6 +16,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -101,9 +103,13 @@ public class Damage{
             float damagePerWave = explosiveness / 2f;
 
             for(int i = 0; i < waves; i++){
+                var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
                 int f = i;
                 Time.run(i * 2f, () -> {
-                    damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
+                    if(shields == null || shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, damagePerWave))){
+                        damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
+                    }
+
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
                 });
             }
@@ -166,7 +172,7 @@ public class Damage{
     public static float findPierceLength(Bullet b, int pierceCap, float length){
         return findPierceLength(b, pierceCap, b.type.laserAbsorb, length);
     }
-    
+
     public static float findPierceLength(Bullet b, int pierceCap, boolean laser, float length){
         vec.trnsExact(b.rotation(), length);
         rect.setPosition(b.x, b.y).setSize(vec.x, vec.y).normalize().grow(3f);
@@ -358,7 +364,7 @@ public class Damage{
      */
     public static Healthc linecast(Bullet hitter, float x, float y, float angle, float length){
         vec.trns(angle, length);
-        
+
         tmpBuilding = null;
 
         if(hitter.type.collidesGround){
@@ -644,7 +650,7 @@ public class Damage{
             this.target = target;
             return this;
         }
-        
+
         @Override
         public void reset(){
             target = null;
