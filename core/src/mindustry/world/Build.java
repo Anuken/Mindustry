@@ -157,19 +157,25 @@ public class Build{
         result.placeBegan(tile, previous, unit);
     }
 
-    /** Returns whether a tile can be placed at this location by this team. */
+    /** @return whether a tile can be placed at this location by this team. */
     public static boolean validPlace(Block type, Team team, int x, int y, int rotation){
         return validPlace(type, team, x, y, rotation, true);
     }
 
-    /** Returns whether a tile can be placed at this location by this team. */
+    /** @return whether a tile can be placed at this location by this team. */
     public static boolean validPlace(Block type, Team team, int x, int y, int rotation, boolean checkVisible){
-        //the wave team can build whatever they want as long as it's visible - banned blocks are not applicable
-        if(type == null || (checkVisible && (!type.environmentBuildable() || (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible()))))){
-            return false;
-        }
+        return validPlaceIgnoreUnits(type, team, x, y, rotation, checkVisible) && checkNoUnitOverlap(type, x, y);
+    }
 
-        if((type.solid || type.solidifes) && Units.anyEntities(x * tilesize + type.offset - type.size*tilesize/2f, y * tilesize + type.offset - type.size*tilesize/2f, type.size * tilesize, type.size*tilesize)){
+    /** @return whether a tile can be placed at this location by this team. */
+    public static boolean checkNoUnitOverlap(Block type, int x, int y){
+        return (!type.solid && !type.solidifes) || !Units.anyEntities(x * tilesize + type.offset - type.size * tilesize / 2f, y * tilesize + type.offset - type.size * tilesize / 2f, type.size * tilesize, type.size * tilesize);
+    }
+
+    /** Returns whether a tile can be placed at this location by this team. Ignores units at this location. */
+    public static boolean validPlaceIgnoreUnits(Block type, Team team, int x, int y, int rotation, boolean checkVisible){
+        //the wave team can build whatever they want as long as it's visible - banned blocks are not applicable
+        if(type == null || (!state.rules.editor && (checkVisible && (!type.environmentBuildable() || (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible())))))){
             return false;
         }
 
@@ -199,21 +205,21 @@ public class Build{
 
         if(tile == null) return false;
 
+        if(!type.canPlaceOn(tile, team, rotation)){
+            return false;
+        }
+
         //floors have different checks
         if(type.isFloor()){
             return type.isOverlay() ? tile.overlay() != type : tile.floor() != type;
         }
 
         //campaign darkness check
-        if(world.getDarkness(x, y) >= 3){
+        if(!type.ignoreBuildDarkness && world.getDarkness(x, y) >= 3){
             return false;
         }
 
         if(!type.requiresWater && !contactsShallows(tile.x, tile.y, type) && !type.placeableLiquid){
-            return false;
-        }
-
-        if(!type.canPlaceOn(tile, team, rotation)){
             return false;
         }
 
@@ -233,7 +239,7 @@ public class Build{
                 (check.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) || //deep water
                 (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate && !((type == check.block && team != Team.derelict && check.team() == Team.derelict))) || //same block, same rotation
                 !check.interactable(team) || //cannot interact
-                !check.floor().placeableOn  || //solid floor
+                !check.floor().placeableOn && !type.ignoreBuildDarkness || //solid floor
                 (!checkVisible && !check.block().alwaysReplace) || //replacing a block that should be replaced (e.g. payload placement)
                     !(((type.canReplace(check.block()) || (type == check.block && team != Team.derelict && state.rules.derelictRepair && check.team() == Team.derelict)) || //can replace type OR can replace derelict block of same type
                         (check.build instanceof ConstructBuild build && build.current == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction

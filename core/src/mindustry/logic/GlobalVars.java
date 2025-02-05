@@ -34,9 +34,9 @@ public class GlobalVars{
     private ObjectSet<String> privilegedNames = new ObjectSet<>();
     private UnlockableContent[][] logicIdToContent;
     private int[][] contentIdToLogicId;
-    
+
     public static final Seq<String> soundNames = new Seq<>();
-    
+
     public void init(){
         putEntryOnly("sectionProcessor");
 
@@ -91,7 +91,7 @@ public class GlobalVars{
         put("@ctrlProcessor", ctrlProcessor);
         put("@ctrlPlayer", ctrlPlayer);
         put("@ctrlCommand", ctrlCommand);
-        
+
         //sounds
         if(Core.assets != null){
             for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
@@ -132,7 +132,9 @@ public class GlobalVars{
         }
 
         for(UnitType type : Vars.content.units()){
-            put("@" + type.name, type);
+            if(!type.internal){
+                put("@" + type.name, type);
+            }
         }
 
         for(Weather weather : Vars.content.weathers()){
@@ -201,7 +203,7 @@ public class GlobalVars{
         varClient.numval = net.client() ? 1 : 0;
 
         //client
-        if(!net.server() && player != null){
+        if(player != null){
             varClientLocale.objval = player.locale();
             varClientUnit.objval = player.unit();
             varClientName.objval = player.name();

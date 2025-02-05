@@ -37,6 +37,7 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
         incendSpread = 5;
         incendChance = 0.4f;
         lightColor = Color.orange;
+        lightOpacity = 0.7f;
     }
 
     @Override
@@ -66,7 +67,7 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
 
         Tmp.v1.trns(b.rotation(), realLength * 1.1f);
 
-        Drawf.light(b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, lightStroke, lightColor, 0.7f);
+        Drawf.light(b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, lightStroke, lightColor, lightOpacity);
         Draw.reset();
     }
 

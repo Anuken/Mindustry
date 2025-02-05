@@ -93,6 +93,7 @@ public class SectorGenerateDialog extends BaseDialog{
                 var preset = sectorobj.preset;
                 sectorobj.preset = null;
 
+                logic.reset(); //TODO: is this a good idea? all rules and map state are cleared, but it fixes inconsistent gen
                 world.loadSector(sectorobj, seed, false);
 
                 sectorobj.preset = preset;

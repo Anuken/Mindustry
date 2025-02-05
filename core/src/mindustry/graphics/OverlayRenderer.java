@@ -151,6 +151,7 @@ public class OverlayRenderer{
         }
 
         input.drawTop();
+        input.drawUnitSelection();
 
         buildFade = Mathf.lerpDelta(buildFade, input.isPlacing() || input.isUsingSchematic() ? 1f : 0f, 0.06f);
 

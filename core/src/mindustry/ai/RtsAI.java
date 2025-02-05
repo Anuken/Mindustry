@@ -343,7 +343,7 @@ public class RtsAI{
         //other can never be destroyed | other destroys self instantly
         if(Float.isInfinite(timeDestroyOther) || Mathf.zero(timeDestroySelf)) return 0f;
         //self can never be destroyed | self destroys other instantly
-        if(Float.isInfinite(timeDestroySelf) || Mathf.zero(timeDestroyOther)) return 1f;
+        if(Float.isInfinite(timeDestroySelf) || Mathf.zero(timeDestroyOther)) return 100000f;
 
         //examples:
         // self 10 sec / other 10 sec -> can destroy target with 100 % losses -> returns 1

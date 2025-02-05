@@ -34,7 +34,7 @@ public class BaseGenerator{
         Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.isVanilla() && b.size == size
             && !b.insulated && b.buildVisibility == BuildVisibility.shown
             && !(b instanceof Door)
-            && !(Structs.contains(b.requirements, i -> state.rules.hiddenBuildItems.contains(i.item))));
+            && b.isOnPlanet(state.getPlanet()));
         wallsSmall.sort(b -> b.buildCost);
         return wallsSmall.getFrac(difficulty * 0.91f);
     }
@@ -74,14 +74,14 @@ public class BaseGenerator{
             pass(tile -> {
                 if(!tile.block().alwaysReplace) return;
 
-                if(((tile.overlay().asFloor().itemDrop != null || (tile.drop() != null && Mathf.chance(nonResourceChance)))
-                || (tile.floor().liquidDrop != null && Mathf.chance(nonResourceChance * 2))) && Mathf.chance(resourceChance)){
+                if(((tile.overlay().asFloor().itemDrop != null || (tile.drop() != null && Mathf.rand.chance(nonResourceChance)))
+                || (tile.floor().liquidDrop != null && Mathf.rand.chance(nonResourceChance * 2))) && Mathf.rand.chance(resourceChance)){
                     Seq<BasePart> parts = bases.forResource(tile.drop() != null ? tile.drop() : tile.floor().liquidDrop);
                     if(!parts.isEmpty()){
-                        tryPlace(parts.getFrac(difficulty + Mathf.range(bracketRange)), tile.x, tile.y, team);
+                        tryPlace(parts.getFrac(difficulty + Mathf.rand.range(bracketRange)), tile.x, tile.y, team, Mathf.rand);
                     }
-                }else if(Mathf.chance(nonResourceChance)){
-                    tryPlace(bases.parts.getFrac(Mathf.rand.random(1f)), tile.x, tile.y, team);
+                }else if(Mathf.rand.chance(nonResourceChance)){
+                    tryPlace(bases.parts.getFrac(Mathf.rand.random(1f)), tile.x, tile.y, team, Mathf.rand);
                 }
             });
         }
@@ -175,9 +175,13 @@ public class BaseGenerator{
         if(tiles == null) return;
 
         for(Tile tile : tiles){
-            if(tile.isCenter() && tile.block() instanceof PowerNode && tile.team() == state.rules.waveTeam){
-                tile.build.configureAny(new Point2[0]);
-                tile.build.placed();
+            if(tile.isCenter() && tile.team() == state.rules.waveTeam){
+                if(tile.block() instanceof PowerNode){
+                    tile.build.configureAny(new Point2[0]);
+                    tile.build.placed();
+                }else if(tile.block() instanceof Battery){
+                    tile.build.power.status = 1f;
+                }
             }
         }
     }
@@ -191,31 +195,36 @@ public class BaseGenerator{
      * Tries to place a base part at a certain location with a certain team.
      * @return success state
      * */
-    public static boolean tryPlace(BasePart part, int x, int y, Team team){
-        return tryPlace(part, x, y, team, null);
+    public static boolean tryPlace(BasePart part, int x, int y, Team team, Rand rand){
+        return tryPlace(part, x, y, team, rand, null);
     }
 
     /**
      * Tries to place a base part at a certain location with a certain team.
      * @return success state
      * */
-    public static boolean tryPlace(BasePart part, int x, int y, Team team, @Nullable Intc2 posc){
-        int rotation = Mathf.range(2);
+    public static boolean tryPlace(BasePart part, int x, int y, Team team, Rand random, @Nullable Intc2 posc){
+        int rotation = random.range(2);
         axis.set((int)(part.schematic.width / 2f), (int)(part.schematic.height / 2f));
         Schematic result = Schematics.rotate(part.schematic, rotation);
-        int rotdeg = rotation*90;
 
-        rotator.set(part.centerX, part.centerY).rotateAround(axis, rotdeg);
+        rotator.set(part.centerX, part.centerY).rotateAround(axis, rotation * 90);
         //bottom left schematic corner
         int cx = x - (int)rotator.x;
         int cy = y - (int)rotator.y;
 
+        if(!insanity){
+            for(Stile tile : result.tiles){
+                int realX = tile.x + cx, realY = tile.y + cy;
+                if(isTaken(tile.block, realX, realY)){
+                    return false;
+                }
+            }
+        }
+
+        //only do callback after validation
         for(Stile tile : result.tiles){
             int realX = tile.x + cx, realY = tile.y + cy;
-            if(!insanity && isTaken(tile.block, realX, realY)){
-                return false;
-            }
-
             if(posc != null){
                 posc.get(realX, realY);
             }
@@ -223,7 +232,6 @@ public class BaseGenerator{
 
         if(part.required instanceof Item item){
             for(Stile tile : result.tiles){
-                //uncomment for extra checks if changed above
                 if(tile.block instanceof Drill && (!insanity || !isTaken(tile.block, tile.x + cx, tile.y + cy))){
 
                     tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
@@ -235,7 +243,7 @@ public class BaseGenerator{
                             set(placed, item);
                         }
 
-                        Tile rand = world.tiles.getc(ex + Mathf.rand.range(1), ey + Mathf.rand.range(1));
+                        Tile rand = world.tiles.getc(ex + random.range(1), ey + random.range(1));
                         if(rand.floor().hasSurface()){
                             //random ores nearby to make it look more natural
                             set(rand, item);
@@ -273,6 +281,8 @@ public class BaseGenerator{
     }
 
     static boolean isTaken(Block block, int x, int y){
+        if(state.teams.anyEnemyCoresWithin(state.rules.waveTeam, x * tilesize + block.offset, y * tilesize + block.offset, state.rules.enemyCoreBuildRadius + tilesize)) return true;
+
         int offsetx = -(block.size - 1) / 2;
         int offsety = -(block.size - 1) / 2;
         int pad = 1;

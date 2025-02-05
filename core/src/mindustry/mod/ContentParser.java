@@ -1097,29 +1097,41 @@ public class ContentParser{
             }
             Field field = metadata.field;
             try{
-                boolean isMap = ObjectMap.class.isAssignableFrom(field.getType()) || ObjectIntMap.class.isAssignableFrom(field.getType()) || ObjectFloatMap.class.isAssignableFrom(field.getType());
-                boolean mergeMap = isMap && child.has("add") && child.get("add").isBoolean() && child.getBoolean("add", false);
+                if(child.isObject() && child.has("add") && (Seq.class.isAssignableFrom(field.getType()) || ObjectSet.class.isAssignableFrom(field.getType()))){
+                    Object readField = parser.readValue(field.getType(), metadata.elementType, child.get("add"), metadata.keyType);
+                    Object fieldObj = field.get(object);
 
-                if(mergeMap){
-                    child.remove("add");
-                }
-
-                Object readField = parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType);
-                Object fieldObj = field.get(object);
-
-                //if a map has add: true, add its contents to the map instead
-                if(mergeMap && (fieldObj instanceof ObjectMap<?,?> || fieldObj instanceof ObjectIntMap<?> || fieldObj instanceof ObjectFloatMap<?>)){
-                    if(field.get(object) instanceof ObjectMap<?,?> baseMap){
-                        baseMap.putAll((ObjectMap)readField);
-                    }else if(field.get(object) instanceof ObjectIntMap<?> baseMap){
-                        baseMap.putAll((ObjectIntMap)readField);
-                    }else if(field.get(object) instanceof ObjectFloatMap<?> baseMap){
-                        baseMap.putAll((ObjectFloatMap)readField);
+                    if(fieldObj instanceof ObjectSet set){
+                        set.addAll((ObjectSet)readField);
+                    }else if(fieldObj instanceof Seq seq){
+                        seq.addAll((Seq)readField);
+                    }else{
+                        throw new SerializationException("This should be impossible");
                     }
                 }else{
-                    field.set(object, readField);
-                }
+                    boolean isMap = ObjectMap.class.isAssignableFrom(field.getType()) || ObjectIntMap.class.isAssignableFrom(field.getType()) || ObjectFloatMap.class.isAssignableFrom(field.getType());
+                    boolean mergeMap = isMap && child.has("add") && child.get("add").isBoolean() && child.getBoolean("add", false);
 
+                    if(mergeMap){
+                        child.remove("add");
+                    }
+
+                    Object readField = parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType);
+                    Object fieldObj = field.get(object);
+
+                    //if a map has add: true, add its contents to the map instead
+                    if(mergeMap && (fieldObj instanceof ObjectMap<?,?> || fieldObj instanceof ObjectIntMap<?> || fieldObj instanceof ObjectFloatMap<?>)){
+                        if(field.get(object) instanceof ObjectMap<?,?> baseMap){
+                            baseMap.putAll((ObjectMap)readField);
+                        }else if(field.get(object) instanceof ObjectIntMap<?> baseMap){
+                            baseMap.putAll((ObjectIntMap)readField);
+                        }else if(field.get(object) instanceof ObjectFloatMap<?> baseMap){
+                            baseMap.putAll((ObjectFloatMap)readField);
+                        }
+                    }else{
+                        field.set(object, readField);
+                    }
+                }
             }catch(IllegalAccessException ex){
                 throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
             }catch(SerializationException ex){

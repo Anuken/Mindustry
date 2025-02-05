@@ -19,7 +19,7 @@ import mindustry.world.blocks.logic.LogicBlock.*;
 import static mindustry.Vars.*;
 
 public class MapProcessorsDialog extends BaseDialog{
-    private IconSelectDialog iconSelect = new IconSelectDialog();
+    private IconSelectDialog iconSelect = new IconSelectDialog(true);
     private TextField search;
     private Seq<Building> processors = new Seq<>();
     private Table list;
