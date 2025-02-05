@@ -118,6 +118,7 @@ public class PointLaserBulletType extends BulletType{
         }
     }
 
+    @Override
     public void updateBulletInterval(Bullet b){
         if(intervalBullet != null && b.time >= intervalDelay && b.timer.get(2, bulletInterval)){
             float ang = b.rotation();

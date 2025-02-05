@@ -24,6 +24,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     @Import float x, y, rotation, speedMultiplier;
     @Import UnitType type;
     @Import Team team;
+    @Import boolean disarmed;
 
     transient Leg[] legs = {};
     transient float totalLength;
@@ -191,7 +192,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
                         }
                     }
 
-                    if(type.legSplashDamage > 0){
+                    if(type.legSplashDamage > 0 && !disarmed){
                         Damage.damage(team, l.base.x, l.base.y, type.legSplashRange, type.legSplashDamage * state.rules.unitDamage(team), false, true);
                     }
                 }

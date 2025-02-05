@@ -15,6 +15,7 @@ public enum LogicRule{
     lighting,
     ambientLight,
     solarMultiplier,
+    dragMultiplier,
     ban,
     unban,
 
@@ -22,6 +23,7 @@ public enum LogicRule{
     buildSpeed,
     unitHealth,
     unitBuildSpeed,
+    unitMineSpeed,
     unitCost,
     unitDamage,
     blockHealth,

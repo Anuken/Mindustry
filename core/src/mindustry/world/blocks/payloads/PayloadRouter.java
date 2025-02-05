@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -22,7 +23,7 @@ import static mindustry.Vars.*;
 
 public class PayloadRouter extends PayloadConveyor{
     public boolean invert = false;
-    
+
     public @Load("@-over") TextureRegion overRegion;
 
     public PayloadRouter(String name){
@@ -43,6 +44,12 @@ public class PayloadRouter extends PayloadConveyor{
         super.drawPlanRegion(plan, list);
 
         Draw.rect(overRegion, plan.drawx(), plan.drawy());
+    }
+
+    @Override
+    public void getPlanConfigs(Seq<UnlockableContent> options){
+        options.add(content.blocks().select(this::canSort));
+        options.add(content.units().select(this::canSort));
     }
 
     public boolean canSort(Block b){

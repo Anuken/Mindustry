@@ -190,6 +190,13 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
+        public void dropped(){
+            super.dropped();
+            var prev = Geometry.d4[(rotation + 2) % 4];
+            link = Point2.pack(tile.x + prev.x, tile.y + prev.y);
+        }
+
+        @Override
         public void drawCracks(){
             Draw.z(Layer.block - 0.15f);
             super.drawCracks();
@@ -252,7 +259,8 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void updateTile(){
-            float eff = enabled ? (efficiency + baseEfficiency) : 0f;
+            //the item still needs to be "reeled" in when disabled
+            float eff = enabled ? (efficiency + baseEfficiency) : 1f;
 
             //reel in crater
             if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * eff * delta(), 0f, recharge);
@@ -272,14 +280,15 @@ public class StackConveyor extends Block implements Autotiler{
             if(!enabled) return;
 
             if(state == stateUnload){ //unload
-                while(lastItem != null && (!outputRouter ? moveForward(lastItem) : dump(lastItem))){
+                while(lastItem != null && !outputRouter ? moveForward(lastItem) : dump(lastItem)){
                     if(!outputRouter){
                         items.remove(lastItem, 1);
                     }
 
-                    if(items.empty()){
+                    if(!items.has(lastItem)){
                         poofOut();
                         lastItem = null;
+                        break;
                     }
                 }
             }else{ //transfer
@@ -386,6 +395,7 @@ public class StackConveyor extends Block implements Autotiler{
 
             link = read.i();
             cooldown = read.f();
+            lastItem = items.first();
         }
     }
 }

@@ -25,6 +25,9 @@ public abstract class Content implements Comparable<Content>{
     /** Called after all content and modules are created. Do not use to load regions or texture data! */
     public void init(){}
 
+    /** Called after init(). */
+    public void postInit(){}
+
     /**
      * Called after all content is created, only on non-headless versions.
      * Use for loading regions or other image data.
