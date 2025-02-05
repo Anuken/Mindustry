@@ -5502,7 +5502,7 @@ public class Blocks{
         }};
 
         malign = new PowerTurret("malign"){{
-            requirements(Category.turret, with(Items.carbide, 400, Items.beryllium, 2000, Items.silicon, 800, Items.graphite, 800, Items.phaseFabric, 300));
+            requirements(Category.turret, with(Items.carbide, 200, Items.beryllium, 1000, Items.silicon, 500, Items.graphite, 500, Items.phaseFabric, 200));
 
             var haloProgress = PartProgress.warmup;
             Color haloColor = Color.valueOf("d370d3"), heatCol = Color.purple;
@@ -5810,26 +5810,26 @@ public class Blocks{
             }};
 
             velocityRnd = 0.15f;
-            heatRequirement = 90f;
+            heatRequirement = 72f;
             maxHeatEfficiency = 2f;
             warmupMaintainTime = 120f;
-            consumePower(10f);
-
-            shoot = new ShootSummon(0f, 0f, circleRad, 48f);
+            consumePower(40f);
+            unitSort = UnitSorts.strongest;
+            shoot = new ShootSummon(0f, 0f, circleRad, 20f);
 
             minWarmup = 0.96f;
-            shootWarmupSpeed = 0.03f;
+            shootWarmupSpeed = 0.08f;
 
             shootY = circleY - 5f;
 
             outlineColor = Pal.darkOutline;
             envEnabled |= Env.space;
-            reload = 9f;
-            range = 370;
+            reload = 7f;
+            range = 380;
             trackingRange = range * 1.4f;
             shootCone = 100f;
             scaledHealth = 370;
-            rotateSpeed = 2f;
+            rotateSpeed = 2.6f;
             recoil = 0.5f;
             recoilTime = 30f;
             shake = 3f;
