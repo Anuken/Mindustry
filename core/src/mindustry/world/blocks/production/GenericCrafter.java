@@ -312,7 +312,7 @@ public class GenericCrafter extends Block{
                 for(int i = 0; i < outputLiquids.length; i++){
                     int dir = liquidOutputDirections.length > i ? liquidOutputDirections[i] : -1;
 
-                    dumpLiquid(outputLiquids[i].liquid, dir);
+                    dumpLiquid(outputLiquids[i].liquid, 2f, dir);
                 }
             }
         }

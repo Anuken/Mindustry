@@ -2270,7 +2270,7 @@ public class Blocks{
             liquidPadding = 6f/4f;
             researchCostMultiplier = 4;
             solid = true;
-            health = 600;
+            health = 400;
         }};
 
         reinforcedLiquidTank = new LiquidRouter("reinforced-liquid-tank"){{
@@ -2279,7 +2279,7 @@ public class Blocks{
             solid = true;
             liquidCapacity = 2700f;
             liquidPadding = 2f;
-            health = 1200;
+            health = 900;
         }};
 
         //endregion

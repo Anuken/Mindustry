@@ -23,7 +23,7 @@ public class LiquidRouter extends LiquidBlock{
     public class LiquidRouterBuild extends LiquidBuild{
         @Override
         public void updateTile(){
-            distributeLiquid(liquids.current());
+            dumpLiquid(liquids.current());
         }
 
         @Override
