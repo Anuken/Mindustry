@@ -415,6 +415,12 @@ public class ModsDialog extends BaseDialog{
                 desc.add(mod.meta.author).growX().wrap().padTop(2);
                 desc.row();
             }
+            if(mod.meta.version != null){
+                desc.add("@mod.version").padRight(10).color(Color.gray).top();
+                desc.row();
+                desc.add(mod.meta.version).growX().wrap().padTop(2);
+                desc.row();
+            }
             if(mod.meta.description != null){
                 desc.add("@editor.description").padRight(10).color(Color.gray).top();
                 desc.row();

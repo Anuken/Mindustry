@@ -155,13 +155,13 @@ public class LogicDialog extends BaseDialog{
         buttons.button("@variables", Icon.menu, () -> {
             BaseDialog dialog = new BaseDialog("@variables");
             dialog.hidden(() -> {
-                if(!wasPaused && !net.active()){
+                if(!wasPaused && !net.active() && !state.isMenu()){
                     state.set(State.paused);
                 }
             });
 
             dialog.shown(() -> {
-                if(!wasPaused && !net.active()){
+                if(!wasPaused && !net.active() && !state.isMenu()){
                     state.set(State.playing);
                 }
             });
@@ -188,7 +188,7 @@ public class LogicDialog extends BaseDialog{
                             Label label = out.add("").style(Styles.outlineLabel).padLeft(4).padRight(4).width(140f).wrap().get();
                             label.update(() -> {
                                 if(counter[0] < 0 || (counter[0] += Time.delta) >= period){
-                                    String text = s.isobj ? PrintI.toString(s.objval) : Math.abs(s.numval - (long)s.numval) < 0.00001 ? (long)s.numval + "" : s.numval + "";
+                                    String text = s.isobj ? PrintI.toString(s.objval) : Math.abs(s.numval - Math.round(s.numval)) < 0.00001 ? Math.round(s.numval) + "" : s.numval + "";
                                     if(!label.textEquals(text)){
                                         label.setText(text);
                                         if(counter[0] >= 0f){
@@ -220,7 +220,7 @@ public class LogicDialog extends BaseDialog{
             dialog.buttons.button("@logic.globals", Icon.list, () -> globalsDialog.show()).size(210f, 64f);
 
             dialog.show();
-        }).name("variables").disabled(b -> executor == null || executor.vars.length == 0);
+        }).name("variables").disabled(b -> executor == null || executor.vars.length == 0 || state.isMenu());
 
         buttons.button("@add", Icon.add, () -> {
             showAddDialog();

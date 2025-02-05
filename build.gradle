@@ -309,7 +309,7 @@ project(":core"){
     task assetsJar(type: Jar, dependsOn: ":tools:pack"){
         archiveClassifier = 'assets'
         from files("assets"){
-            exclude "config", "cache", "music", "sounds"
+            exclude "config", "cache", "music", "sounds", "sprites/fallback"
         }
     }
 

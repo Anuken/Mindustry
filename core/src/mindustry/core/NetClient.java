@@ -34,6 +34,7 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class NetClient implements ApplicationListener{
+    private static final long entitySnapshotTimeout = 1000 * 20;
     private static final float dataTimeout = 60 * 30;
     /** ticks between syncs, e.g. 5 means 60/5 = 12 syncs/sec*/
     private static final float playerSyncTime = 4;
@@ -50,6 +51,8 @@ public class NetClient implements ApplicationListener{
     private boolean quietReset = false;
     /** Counter for data timeout. */
     private float timeoutTime = 0f;
+    /** Timestamp for last UDP state snapshot received. */
+    private long lastSnapshotTimestamp;
     /** Last sent client snapshot ID. */
     private int lastSent;
 
@@ -319,7 +322,7 @@ public class NetClient implements ApplicationListener{
         ui.join.connect(ip, port);
     }
 
-    @Remote(targets = Loc.client)
+    @Remote(targets = Loc.client, priority = PacketPriority.high)
     public static void ping(Player player, long time){
         Call.pingResponse(player.con, time);
     }
@@ -478,6 +481,7 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
     public static void entitySnapshot(short amount, byte[] data){
         try{
+            netClient.lastSnapshotTimestamp = Time.millis();
             netClient.byteStream.setBytes(data);
             DataInputStream input = netClient.dataStream;
 
@@ -575,7 +579,18 @@ public class NetClient implements ApplicationListener{
         if(!net.client()) return;
 
         if(state.isGame()){
-            if(!connecting) sync();
+            if(!connecting){
+                sync();
+
+                //timeout if UDP snapshot packets are not received for a while
+                if(lastSnapshotTimestamp > 0 && Time.timeSinceMillis(lastSnapshotTimestamp) > entitySnapshotTimeout){
+                    Log.err("Timed out after not received UDP snapshots.");
+                    quiet = true;
+                    ui.showErrorMessage("@disconnect.snapshottimeout");
+                    net.disconnect();
+                    lastSnapshotTimestamp = 0;
+                }
+            }
         }else if(!connecting){
             net.disconnect();
         }else{ //...must be connecting
@@ -612,6 +627,7 @@ public class NetClient implements ApplicationListener{
         Core.app.post(Call::connectConfirm);
         Time.runTask(40f, platform::updateRPC);
         Core.app.post(ui.loadfrag::hide);
+        lastSnapshotTimestamp = Time.millis();
     }
 
     private void reset(){
@@ -622,6 +638,7 @@ public class NetClient implements ApplicationListener{
         quietReset = false;
         quiet = false;
         lastSent = 0;
+        lastSnapshotTimestamp = 0;
 
         Groups.clear();
         ui.chatfrag.clearMessages();

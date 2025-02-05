@@ -343,24 +343,26 @@ public class ControlPathfinder implements Runnable{
     }
 
     public void updateTile(Tile tile){
-        tile.getLinkedTiles(t -> {
-            int x = t.x, y = t.y, mx = x % clusterSize, my = y % clusterSize, cx = x / clusterSize, cy = y / clusterSize, cluster = cx + cy * cwidth;
+        tile.getLinkedTiles(this::updateSingleTile);
+    }
 
-            //is at the edge of a cluster; this means the portals may have changed.
-            if(mx == 0 || my == 0 || mx == clusterSize - 1 || my == clusterSize - 1){
+    public void updateSingleTile(Tile t){
+        int x = t.x, y = t.y, mx = x % clusterSize, my = y % clusterSize, cx = x / clusterSize, cy = y / clusterSize, cluster = cx + cy * cwidth;
 
-                if(mx == 0) queueClusterUpdate(cx - 1, cy); //left
-                if(my == 0) queueClusterUpdate(cx, cy - 1); //bottom
-                if(mx == clusterSize - 1) queueClusterUpdate(cx + 1, cy); //right
-                if(my == clusterSize - 1) queueClusterUpdate(cx, cy + 1); //top
+        //is at the edge of a cluster; this means the portals may have changed.
+        if(mx == 0 || my == 0 || mx == clusterSize - 1 || my == clusterSize - 1){
 
-                queueClusterUpdate(cx, cy);
-                //TODO: recompute edge clusters too.
-            }else{
-                //there is no need to recompute portals for block updates that are not on the edge.
-                queue.post(() -> clustersToInnerUpdate.add(cluster));
-            }
-        });
+            if(mx == 0) queueClusterUpdate(cx - 1, cy); //left
+            if(my == 0) queueClusterUpdate(cx, cy - 1); //bottom
+            if(mx == clusterSize - 1) queueClusterUpdate(cx + 1, cy); //right
+            if(my == clusterSize - 1) queueClusterUpdate(cx, cy + 1); //top
+
+            queueClusterUpdate(cx, cy);
+            //TODO: recompute edge clusters too.
+        }else{
+            //there is no need to recompute portals for block updates that are not on the edge.
+            queue.post(() -> clustersToInnerUpdate.add(cluster));
+        }
     }
 
     void queueClusterUpdate(int cx, int cy){

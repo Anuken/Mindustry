@@ -11,7 +11,6 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 
 public class ShieldArcAbility extends Ability{
@@ -102,7 +101,7 @@ public class ShieldArcAbility extends Ability{
     }
 
     @Override
-    public void init(UnitType type){
+    public void created(Unit unit){
         data = max;
     }
 
