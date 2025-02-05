@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 /** Stores global logic variables for logic processors. */
 public class GlobalVars{
     public static final int ctrlProcessor = 1, ctrlPlayer = 2, ctrlCommand = 3;
-    public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid};
+    public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid, ContentType.team};
     /** Global random state. */
     public static final Rand rand = new Rand();
 
@@ -220,8 +220,13 @@ public class GlobalVars{
         return varEntries;
     }
 
-    /** @return a piece of content based on its logic ID. This is not equivalent to content ID. */
-    public @Nullable Content lookupContent(ContentType type, int id){
+    /** @return a piece of content based on its logic ID. This is not equivalent to content ID. In the case of teams, the return value may not be Content. */
+    public @Nullable Object lookupContent(ContentType type, int id){
+        //teams are a special case; they are not technically content, but can be looked up
+        if(type == ContentType.team){
+            return id >= 0 && id < 256 ? Team.all[id] : null;
+        }
+
         var arr = logicIdToContent[type.ordinal()];
         return arr != null && id >= 0 && id < arr.length ? arr[id] : null;
     }
