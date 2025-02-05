@@ -43,6 +43,7 @@ public class BeamNode extends PowerBlock{
         envEnabled |= Env.space;
         allowDiagonal = false;
         underBullets = true;
+        solid = false;
         priority = TargetPriority.transport;
     }
 
