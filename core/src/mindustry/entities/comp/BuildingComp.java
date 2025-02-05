@@ -878,6 +878,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Tries to evenly distribute the specified liquid to nearby blocks. This method will likely be removed in the future! */
     public void distributeLiquid(Liquid liquid){
         if(liquids.get(liquid) <= 0.0001f) return;
+        float scaling = 2f;
 
         int dump = this.cdump;
 
@@ -894,7 +895,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 float ofract = other.liquids.get(liquid) / other.block.liquidCapacity;
                 float fract = liquids.get(liquid) / block.liquidCapacity;
 
-                if(ofract < fract) transferLiquid(other, (fract - ofract) * block.liquidCapacity, liquid);
+                if(ofract < fract) transferLiquid(other, (fract - ofract) * block.liquidCapacity / scaling, liquid);
             }
         }
     }
