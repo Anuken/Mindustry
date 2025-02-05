@@ -116,7 +116,7 @@ public class ConsumeGenerator extends PowerGenerator{
             }
 
             //make sure the multiplier doesn't change when there is nothing to consume while it's still running
-            if(filterItem != null && valid && filterItem.getConsumed(this) != null){
+            if(filterItem != null && valid && itemDurationMultipliers.size > 0 && filterItem.getConsumed(this) != null){
                 itemDurationMultiplier = itemDurationMultipliers.get(filterItem.getConsumed(this), 1);
             }
 
