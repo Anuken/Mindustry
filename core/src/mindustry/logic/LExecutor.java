@@ -45,9 +45,9 @@ public class LExecutor{
     public LInstruction[] instructions = {};
     /** Non-constant variables used for network sync */
     public LVar[] vars = {};
-    
+
     public LVar counter, unit, thisv, ipt;
-    
+
     public int[] binds;
     public boolean yield;
 
@@ -226,7 +226,7 @@ public class LExecutor{
                         cache.found = false;
                         outFound.setnum(0);
                     }
-                    
+
                     if(res != null && res.build != null && 
                         (unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange)) || res.build.team == exec.team)){
                         cache.build = res.build;
@@ -1512,6 +1512,7 @@ public class LExecutor{
                 case dropZoneRadius -> state.rules.dropZoneRadius = value.numf() * 8f;
                 case unitCap -> state.rules.unitCap = Math.max(value.numi(), 0);
                 case lighting -> state.rules.lighting = value.bool();
+                case canGameOver -> state.rules.canGameOver = value.bool();
                 case mapArea -> {
                     int x = p1.numi(), y = p2.numi(), w = p3.numi(), h = p4.numi();
                     if(!checkMapArea(x, y, w, h, false)){
@@ -1963,7 +1964,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             Sound sound = Sounds.getSound(id.numi());
             if(sound == null || sound == Sounds.swish) sound = Sounds.none; //no.
-            
+
             if(positional){
                 sound.at(World.unconv(x.numf()), World.unconv(y.numf()), pitch.numf(), Math.min(volume.numf(), 2f), limit.bool());
             }else{
