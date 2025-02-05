@@ -27,7 +27,7 @@ public class LiquidBridge extends ItemBridge{
 
         @Override
         public void doDump(){
-            dumpLiquid(liquids.current(), 1f);
+            dumpLiquid(liquids.current());
         }
     }
 }

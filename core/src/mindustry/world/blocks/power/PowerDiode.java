@@ -62,20 +62,23 @@ public class PowerDiode extends Block{
             PowerGraph frontGraph = front().power.graph;
             if(backGraph == frontGraph) return;
 
-            // 0f - 1f of battery capacity in use
-            float backStored = backGraph.getBatteryStored() / backGraph.getTotalBatteryCapacity();
-            float frontStored = frontGraph.getBatteryStored() / frontGraph.getTotalBatteryCapacity();
+            float backStored = backGraph.getBatteryStored();
+            float backCapacity = backGraph.getTotalBatteryCapacity();
+            float frontStored = frontGraph.getBatteryStored();
+            float frontCapacity = frontGraph.getTotalBatteryCapacity();
 
-            // try to send if the back side has more % capacity stored than the front side
-            if(backStored > frontStored){
-                // send half of the difference
-                float amount = backGraph.getBatteryStored() * (backStored - frontStored) / 2;
-                // prevent sending more than the front can handle
-                amount = Mathf.clamp(amount, 0, frontGraph.getTotalBatteryCapacity() * (1 - frontStored));
+            if(backStored/backCapacity <= frontStored/frontCapacity) return;
 
-                backGraph.transferPower(-amount);
-                frontGraph.transferPower(amount);
-            }
+            float targetPercentage = (frontStored + backStored) / (frontCapacity + backCapacity);
+
+            // send half of the difference
+            float amount = (targetPercentage * frontCapacity - frontStored) / 2;
+
+            // prevent sending more than the front can handle
+            amount = Mathf.clamp(amount, 0, frontCapacity - frontStored);
+
+            backGraph.transferPower(-amount);
+            frontGraph.transferPower(amount);
         }
     }
 }

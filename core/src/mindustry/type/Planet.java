@@ -116,6 +116,8 @@ public class Planet extends UnlockableContent{
     public boolean allowWaveSimulation = false;
     /** Whether to simulate sector invasions from enemy bases. */
     public boolean allowSectorInvasion = false;
+    /** If true, legacy launch pads can be enabled. */
+    public boolean allowLegacyLaunchPads = false;
     /** If true, sectors saves are cleared when lost. */
     public boolean clearSectorOnLose = false;
     /** Multiplier for enemy rebuild speeds; only applied in campaign (not standard rules) */

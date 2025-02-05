@@ -988,6 +988,29 @@ public class LExecutor{
         }
     }
 
+    public static class PrintCharI implements LInstruction{
+        public LVar value;
+
+        public PrintCharI(LVar value){
+            this.value = value;
+        }
+
+        PrintCharI(){}
+
+        @Override
+        public void run(LExecutor exec){
+
+            if(exec.textBuffer.length() >= maxTextBuffer) return;
+            if(value.isobj){
+                if(!(value.objval instanceof UnlockableContent cont)) return;
+                exec.textBuffer.append((char)cont.emojiChar());
+                return;
+            }
+
+            exec.textBuffer.append((char)Math.floor(value.numval));
+        }
+    }
+
     public static class FormatI implements LInstruction{
         public LVar value;
 
@@ -1515,7 +1538,7 @@ public class LExecutor{
                         state.rules.bannedUnits.remove(u);
                     }
                 }
-                case unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
+                case unitHealth, unitBuildSpeed, unitMineSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     Team team = p1.team();
                     if(team != null){
                         float num = value.numf();
@@ -1523,6 +1546,7 @@ public class LExecutor{
                             case buildSpeed -> team.rules().buildSpeedMultiplier = Mathf.clamp(num, 0.001f, 50f);
                             case unitHealth -> team.rules().unitHealthMultiplier = Math.max(num, 0.001f);
                             case unitBuildSpeed -> team.rules().unitBuildSpeedMultiplier = Mathf.clamp(num, 0f, 50f);
+                            case unitMineSpeed -> team.rules().unitMineSpeedMultiplier = Math.max(num, 0f);
                             case unitCost -> team.rules().unitCostMultiplier = Math.max(num, 0f);
                             case unitDamage -> team.rules().unitDamageMultiplier = Math.max(num, 0f);
                             case blockHealth -> team.rules().blockHealthMultiplier = Math.max(num, 0.001f);

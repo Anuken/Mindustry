@@ -68,6 +68,11 @@ public class CampaignRulesDialog extends BaseDialog{
             check("@rules.fog", b -> rules.fog = b, () -> rules.fog);
             check("@rules.showspawns", b -> rules.showSpawns = b, () -> rules.showSpawns);
             check("@rules.randomwaveai", b -> rules.randomWaveAI = b, () -> rules.randomWaveAI);
+
+            //TODO: this is intentionally hidden until the new mechanics have been well-tested. I don't want people immediately switching to the old mechanics
+            if(planet.allowLegacyLaunchPads){
+            //    check("@rules.legacylaunchpads", b -> rules.legacyLaunchPads = b, () -> rules.legacyLaunchPads);
+            }
         }).growY();
     }
 
