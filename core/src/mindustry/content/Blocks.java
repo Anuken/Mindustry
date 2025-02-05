@@ -2231,12 +2231,10 @@ public class Blocks{
             underBullets = true;
         }};
 
-        //TODO is this necessary? junctions are not good design
-        //TODO make it leak
         reinforcedLiquidJunction = new LiquidJunction("reinforced-liquid-junction"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.beryllium, 8));
             buildCostMultiplier = 3f;
-            health = 260;
+            health = 250;
             ((Conduit)reinforcedConduit).junctionReplacement = this;
             researchCostMultiplier = 1;
             solid = false;
@@ -2250,6 +2248,7 @@ public class Blocks{
             liquidCapacity = 120f;
             researchCostMultiplier = 1;
             underBullets = true;
+            health = 250;
 
             ((Conduit)reinforcedConduit).rotBridgeReplacement = this;
         }};
@@ -2261,6 +2260,7 @@ public class Blocks{
             researchCostMultiplier = 3;
             underBullets = true;
             solid = false;
+            health = 250;
         }};
 
         reinforcedLiquidContainer = new LiquidRouter("reinforced-liquid-container"){{
@@ -2270,6 +2270,7 @@ public class Blocks{
             liquidPadding = 6f/4f;
             researchCostMultiplier = 4;
             solid = true;
+            health = 600;
         }};
 
         reinforcedLiquidTank = new LiquidRouter("reinforced-liquid-tank"){{
@@ -2278,6 +2279,7 @@ public class Blocks{
             solid = true;
             liquidCapacity = 2700f;
             liquidPadding = 2f;
+            health = 1200;
         }};
 
         //endregion
