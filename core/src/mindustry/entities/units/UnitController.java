@@ -1,10 +1,11 @@
 package mindustry.entities.units;
 
+import arc.util.*;
 import mindustry.gen.*;
 
 public interface UnitController{
     void unit(Unit unit);
-    Unit unit();
+    @Nullable Unit unit();
 
     default void hit(Bullet bullet){
 

@@ -555,7 +555,7 @@ public class LExecutor{
             int address = position.numi();
             Building from = target.building();
 
-            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team)){
+            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
                 output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
             }
         }
@@ -662,7 +662,7 @@ public class LExecutor{
             LogicAI ai = null;
 
             if(base instanceof Ranged r && (exec.privileged || r.team() == exec.team) &&
-                (base instanceof Building || (ai = UnitControlI.checkLogicAI(exec, base)) != null)){ //must be a building or a controllable unit
+                ((base instanceof Building b && (!b.block.privileged || exec.privileged)) || (ai = UnitControlI.checkLogicAI(exec, base)) != null)){ //must be a building or a controllable unit
                 float range = r.range();
 
                 Healthc targeted;
@@ -966,8 +966,8 @@ public class LExecutor{
                 exec.textBuffer.append(strValue);
             }else{
                 //display integer version when possible
-                if(Math.abs(value.numval - (long)value.numval) < 0.00001){
-                    exec.textBuffer.append((long)value.numval);
+                if(Math.abs(value.numval - Math.round(value.numval)) < 0.00001){
+                    exec.textBuffer.append(Math.round(value.numval));
                 }else{
                     exec.textBuffer.append(value.numval);
                 }
@@ -978,7 +978,6 @@ public class LExecutor{
             return
                 obj == null ? "null" :
                 obj instanceof String s ? s :
-                obj == Blocks.stoneWall ? "solid" : //special alias
                 obj instanceof MappableContent content ? content.name :
                 obj instanceof Content ? "[content]" :
                 obj instanceof Building build ? build.block.name :
@@ -986,6 +985,29 @@ public class LExecutor{
                 obj instanceof Enum<?> e ? e.name() :
                 obj instanceof Team team ? team.name :
                 "[object]";
+        }
+    }
+
+    public static class PrintCharI implements LInstruction{
+        public LVar value;
+
+        public PrintCharI(LVar value){
+            this.value = value;
+        }
+
+        PrintCharI(){}
+
+        @Override
+        public void run(LExecutor exec){
+
+            if(exec.textBuffer.length() >= maxTextBuffer) return;
+            if(value.isobj){
+                if(!(value.objval instanceof UnlockableContent cont)) return;
+                exec.textBuffer.append((char)cont.emojiChar());
+                return;
+            }
+
+            exec.textBuffer.append((char)Math.floor(value.numval));
         }
     }
 
@@ -1028,8 +1050,8 @@ public class LExecutor{
                 exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, strValue);
             }else{
                 //display integer version when possible
-                if(Math.abs(value.numval - (long)value.numval) < 0.00001){
-                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, (long)value.numval + "");
+                if(Math.abs(value.numval - Math.round(value.numval)) < 0.00001){
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, Math.round(value.numval) + "");
                 }else{
                     exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, value.numval + "");
                 }
@@ -1050,7 +1072,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(target.building() instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
+            if(target.building() instanceof MessageBuild d && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
@@ -1242,7 +1264,8 @@ public class LExecutor{
                         result.setobj(units == null || i < 0 || i >= units.size ? null : units.get(i));
                     }
                 }
-                case player -> result.setobj(i < 0 || i >= data.players.size ? null : data.players.get(i).unit());
+                case player -> result.setobj(i < 0 || i >= data.players.size ? null :
+                    data.players.get(i).unit() instanceof BlockUnitc block ? block.tile() : data.players.get(i).unit());
                 case core -> result.setobj(i < 0 || i >= data.cores.size ? null : data.cores.get(i));
                 case build -> {
                     Block block = extra.obj() instanceof Block b ? b : null;
@@ -1295,7 +1318,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            Tile tile = world.tile(x.numi(), y.numi());
+            Tile tile = world.tile(Mathf.round(x.numf()), Mathf.round(y.numf()));
             if(tile == null){
                 dest.setobj(null);
             }else{
@@ -1349,7 +1372,7 @@ public class LExecutor{
                             if(t == null) t = Team.derelict;
 
                             if(tile.block() != b || tile.team() != t){
-                                tile.setBlock(b, t, Mathf.clamp(rotation.numi(), 0, 3));
+                                tile.setNet(b, t, Mathf.clamp(rotation.numi(), 0, 3));
                             }
                         }
                     }
@@ -1380,7 +1403,7 @@ public class LExecutor{
 
             Team t = team.team();
 
-            if(type.obj() instanceof UnitType type && !type.hidden && t != null && Units.canCreate(t, type)){
+            if(type.obj() instanceof UnitType type && !type.internal && !type.hidden && t != null && Units.canCreate(t, type)){
                 //random offset to prevent stacking
                 var unit = type.spawn(t, World.unconv(x.numf()) + Mathf.range(0.01f), World.unconv(y.numf()) + Mathf.range(0.01f));
                 spawner.spawnEffect(unit, rotation.numf());
@@ -1515,7 +1538,7 @@ public class LExecutor{
                         state.rules.bannedUnits.remove(u);
                     }
                 }
-                case unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
+                case unitHealth, unitBuildSpeed, unitMineSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     Team team = p1.team();
                     if(team != null){
                         float num = value.numf();
@@ -1523,6 +1546,7 @@ public class LExecutor{
                             case buildSpeed -> team.rules().buildSpeedMultiplier = Mathf.clamp(num, 0.001f, 50f);
                             case unitHealth -> team.rules().unitHealthMultiplier = Math.max(num, 0.001f);
                             case unitBuildSpeed -> team.rules().unitBuildSpeedMultiplier = Mathf.clamp(num, 0f, 50f);
+                            case unitMineSpeed -> team.rules().unitMineSpeedMultiplier = Math.max(num, 0f);
                             case unitCost -> team.rules().unitCostMultiplier = Math.max(num, 0f);
                             case unitDamage -> team.rules().unitDamageMultiplier = Math.max(num, 0f);
                             case blockHealth -> team.rules().blockHealthMultiplier = Math.max(num, 0.001f);
@@ -1702,7 +1726,7 @@ public class LExecutor{
     public static void logicExplosion(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, boolean pierce, boolean effect){
         if(damage < 0f) return;
 
-        Damage.damage(team, x, y, radius, damage, pierce, air, ground);
+        Damage.damage(team, x, y, radius, damage, pierce, air, ground, true, null);
         if(effect){
             if(pierce){
                 Fx.spawnShockwave.at(x, y, World.conv(radius));

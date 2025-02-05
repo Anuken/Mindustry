@@ -21,7 +21,7 @@ public class LAssembler{
 
     public LAssembler(){
         //instruction counter
-        putVar("@counter");
+        putVar("@counter").isobj = false;
         //currently controlled unit
         putConst("@unit", null);
         //reference to self
@@ -33,8 +33,9 @@ public class LAssembler{
 
         Seq<LStatement> st = read(data, privileged);
 
-        asm.instructions = st.map(l -> l.build(asm)).retainAll(l -> l != null).toArray(LInstruction.class);
         asm.privileged = privileged;
+        
+        asm.instructions = st.map(l -> l.build(asm)).retainAll(l -> l != null).toArray(LInstruction.class);
         return asm;
     }
 
@@ -58,7 +59,7 @@ public class LAssembler{
     /** @return a variable by name.
      * This may be a constant variable referring to a number or object. */
     public LVar var(String symbol){
-        LVar constVar = Vars.logicVars.get(symbol);
+        LVar constVar = Vars.logicVars.get(symbol, privileged);
         if(constVar != null) return constVar;
 
         symbol = symbol.trim();
@@ -120,7 +121,9 @@ public class LAssembler{
         if(vars.containsKey(name)){
             return vars.get(name);
         }else{
+            //variables are null objects by default
             LVar var = new LVar(name);
+            var.isobj = true;
             vars.put(name, var);
             return var;
         }
