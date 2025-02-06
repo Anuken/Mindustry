@@ -20,7 +20,7 @@ public class FileChooser extends BaseDialog{
     private static final Fi homeDirectory = Core.files.absolute(Core.files.getExternalStoragePath());
     static Fi lastDirectory = Core.files.absolute(Core.settings.getString("lastDirectory", homeDirectory.absolutePath()));
 
-    Fi directory = lastDirectory;
+    Fi directory;
     private Table files;
     private ScrollPane pane;
     private TextField navigation, filefield;
@@ -37,10 +37,7 @@ public class FileChooser extends BaseDialog{
         this.filter = filter;
         this.selectListener = result;
 
-        if(!lastDirectory.exists()){
-            lastDirectory = homeDirectory;
-            directory = lastDirectory;
-        }
+        directory = getLastDirectory();
 
         onResize(() -> {
             cont.clear();
@@ -196,7 +193,7 @@ public class FileChooser extends BaseDialog{
         Fi[] names = getFileNames();
 
         Image upimage = new Image(Icon.upOpen);
-        TextButton upbutton = new TextButton(".." + directory.toString(), Styles.clearTogglet);
+        TextButton upbutton = new TextButton(".." + directory.toString(), Styles.flatTogglet);
         upbutton.clicked(() -> {
             directory = directory.parent();
             setLastDirectory(directory);
@@ -218,7 +215,7 @@ public class FileChooser extends BaseDialog{
 
             String filename = file.name();
 
-            TextButton button = new TextButton(filename, Styles.clearTogglet);
+            TextButton button = new TextButton(filename.replace("[", "[["), Styles.flatTogglet);
             button.getLabel().setWrap(false);
             button.getLabel().setEllipsis(true);
             group.add(button);
@@ -254,18 +251,16 @@ public class FileChooser extends BaseDialog{
         if(open) filefield.clearText();
     }
 
-    public static void setLastDirectory(Fi directory){
+    public static synchronized void setLastDirectory(Fi directory){
         lastDirectory = directory;
         Core.settings.put("lastDirectory", directory.absolutePath());
     }
 
-    private String shorten(String string){
-        int max = 30;
-        if(string.length() <= max){
-            return string;
-        }else{
-            return string.substring(0, max - 3).concat("...");
+    public static synchronized Fi getLastDirectory(){
+        if(!lastDirectory.exists()){
+            lastDirectory = homeDirectory;
         }
+        return lastDirectory;
     }
 
     public class FileHistory{
@@ -304,20 +299,6 @@ public class FileChooser extends BaseDialog{
 
         public boolean canBack(){
             return !(index == 1) && index > 0;
-        }
-
-        void print(){
-
-            System.out.println("\n\n\n\n\n\n");
-            int i = 0;
-            for(Fi file : history){
-                i++;
-                if(index == i){
-                    System.out.println("[[" + file.toString() + "]]");
-                }else{
-                    System.out.println("--" + file.toString() + "--");
-                }
-            }
         }
     }
 }

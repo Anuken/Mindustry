@@ -43,17 +43,17 @@ public class Lightning{
         bhit = false;
 
         for(int i = 0; i < length / 2; i++){
-            hitCreate.create(null, team, x, y, rotation, damage, 1f, 1f, hitter);
+            hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, hitter);
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
             if(lines.size > 1){
                 bhit = false;
                 Vec2 from = lines.get(lines.size - 2);
                 Vec2 to = lines.get(lines.size - 1);
-                world.raycastEach(World.toTile(from.getX()), World.toTile(from.getY()), World.toTile(to.getX()), World.toTile(to.getY()), (wx, wy) -> {
+                World.raycastEach(World.toTile(from.getX()), World.toTile(from.getY()), World.toTile(to.getX()), World.toTile(to.getY()), (wx, wy) -> {
 
                     Tile tile = world.tile(wx, wy);
-                    if(tile != null && tile.block().insulated && tile.team() != team){
+                    if(tile != null && (tile.build != null && tile.build.isInsulated()) && tile.team() != team){
                         bhit = true;
                         //snap it instead of removing
                         lines.get(lines.size - 1).set(wx * tilesize, wy * tilesize);

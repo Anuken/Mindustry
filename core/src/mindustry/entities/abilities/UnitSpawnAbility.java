@@ -3,6 +3,7 @@ package mindustry.entities.abilities;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -18,6 +19,7 @@ public class UnitSpawnAbility extends Ability{
     public UnitType unit;
     public float spawnTime = 60f, spawnX, spawnY;
     public Effect spawnEffect = Fx.spawn;
+    public boolean parentizeEffects;
 
     protected float timer;
 
@@ -32,12 +34,20 @@ public class UnitSpawnAbility extends Ability{
     }
 
     @Override
+    public void addStats(Table t){
+        super.addStats(t);
+        t.add(abilityStat("buildtime", Strings.autoFixed(spawnTime / 60f, 2)));
+        t.row();
+        t.add((unit.hasEmoji() ? unit.emoji() : "") + "[stat]" + unit.localizedName);
+    }
+
+    @Override
     public void update(Unit unit){
         timer += Time.delta * state.rules.unitBuildSpeed(unit.team);
 
         if(timer >= spawnTime && Units.canCreate(unit.team, this.unit)){
             float x = unit.x + Angles.trnsx(unit.rotation, spawnY, spawnX), y = unit.y + Angles.trnsy(unit.rotation, spawnY, spawnX);
-            spawnEffect.at(x, y);
+            spawnEffect.at(x, y, 0f, parentizeEffects ? unit : null);
             Unit u = this.unit.create(unit.team);
             u.set(x, y);
             u.rotation = unit.rotation;

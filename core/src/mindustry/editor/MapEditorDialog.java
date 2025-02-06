@@ -19,6 +19,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -38,6 +39,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private MapLoadDialog loadDialog;
     private MapResizeDialog resizeDialog;
     private MapGenerateDialog generateDialog;
+    private SectorGenerateDialog sectorGenDialog;
+    private MapPlayDialog playtestDialog;
     private ScrollPane pane;
     private BaseDialog menu;
     private Table blockSelection;
@@ -54,6 +57,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
         view = new MapView();
         infoDialog = new MapInfoDialog();
         generateDialog = new MapGenerateDialog(true);
+        sectorGenDialog = new SectorGenerateDialog();
+        playtestDialog = new MapPlayDialog();
 
         menu = new BaseDialog("@menu");
         menu.addCloseButton();
@@ -120,6 +125,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     file.writePng(out);
                     out.dispose();
                 })));
+
+            t.row();
+
+            t.button("@editor.ingame", Icon.right, this::editInGame);
+
+            t.button("@editor.playtest", Icon.play, this::playtest);
         });
 
         menu.cont.row();
@@ -161,19 +172,23 @@ public class MapEditorDialog extends Dialog implements Disposable{
             menu.cont.row();
         }
 
-        menu.cont.button("@editor.ingame", Icon.right, this::playtest).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
+        menu.cont.button("@editor.sectorgenerate", Icon.terrain, () -> {
+            menu.hide();
+            sectorGenDialog.show();
+        }).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
+        menu.cont.row();
 
         menu.cont.row();
 
         menu.cont.button("@quit", Icon.exit, () -> {
             tryExit();
             menu.hide();
-        }).size(swidth * 2f + 10, 60f);
+        }).padTop(1).size(swidth * 2f + 10, 60f);
 
-        resizeDialog = new MapResizeDialog((x, y) -> {
-            if(!(editor.width() == x && editor.height() == y)){
+        resizeDialog = new MapResizeDialog((width, height, shiftX, shiftY) -> {
+            if(!(editor.width() == width && editor.height() == height && shiftX == 0 && shiftY == 0)){
                 ui.loadAnd(() -> {
-                    editor.resize(x, y);
+                    editor.resize(width, height, shiftX, shiftY);
                 });
             }
         });
@@ -193,11 +208,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         margin(0);
 
         update(() -> {
-            if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
-                return;
-            }
-
-            if(Core.scene != null && Core.scene.getKeyboardFocus() == this){
+            if(hasKeyboard()){
                 doInput();
             }
         });
@@ -238,7 +249,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         editor.renderer.updateAll();
     }
 
-    private void playtest(){
+    private void editInGame(){
         menu.hide();
         ui.loadAnd(() -> {
             lastSavedRules = state.rules;
@@ -247,7 +258,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.teams = new Teams();
             player.reset();
             state.rules = Gamemode.editor.apply(lastSavedRules.copy());
+            state.rules.limitMapArea = false;
             state.rules.sector = null;
+            state.rules.fog = false;
             state.map = new Map(StringMap.of(
                 "name", "Editor Playtesting",
                 "width", editor.width(),
@@ -255,30 +268,72 @@ public class MapEditorDialog extends Dialog implements Disposable{
             ));
             world.endMapLoad();
             player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
+            Core.camera.position.set(player);
             player.clearUnit();
-            Groups.unit.clear();
+
+            for(var unit : Groups.unit){
+                if(unit.spawnedByCore){
+                    unit.remove();
+                }
+            }
+
             Groups.build.clear();
             Groups.weather.clear();
             logic.play();
 
             if(player.team().core() == null){
                 player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
-                var unit = UnitTypes.alpha.spawn(player.team(), player.x, player.y);
+                var unit = (state.rules.hasEnv(Env.scorching) ? UnitTypes.evoke : UnitTypes.alpha).spawn(player.team(), player.x, player.y);
                 unit.spawnedByCore = true;
                 player.unit(unit);
             }
+
+            player.checkSpawn();
         });
+    }
+
+    public void resumeAfterPlaytest(Map map){
+        beginEditMap(map.file);
+    }
+
+    private void playtest(){
+        menu.hide();
+        Map map = save();
+
+        if(map != null){
+            //skip dialog, play immediately when shift clicked
+            if(Core.input.shift()){
+                hide();
+                //auto pick best fit
+                control.playMap(map, map.applyRules(
+                    Gamemode.survival.valid(map) ? Gamemode.survival :
+                    Gamemode.attack.valid(map) ? Gamemode.attack :
+                    Gamemode.sandbox), true
+                );
+            }else{
+                playtestDialog.playListener = this::hide;
+                playtestDialog.show(map, true);
+            }
+        }
     }
 
     public @Nullable Map save(){
         boolean isEditor = state.rules.editor;
         state.rules.editor = false;
+        state.rules.objectiveFlags.clear();
+        state.rules.objectives.each(MapObjective::reset);
         String name = editor.tags.get("name", "").trim();
         editor.tags.put("rules", JsonIO.write(state.rules));
         editor.tags.remove("width");
         editor.tags.remove("height");
 
         player.clearUnit();
+
+        //remove player unit
+        Unit unit = Groups.unit.find(u -> u.spawnedByCore);
+        if(unit != null){
+            unit.remove();
+        }
 
         Map returned = null;
 
@@ -287,10 +342,19 @@ public class MapEditorDialog extends Dialog implements Disposable{
             Core.app.post(() -> ui.showErrorMessage("@editor.save.noname"));
         }else{
             Map map = maps.all().find(m -> m.name().equals(name));
-            if(map != null && !map.custom){
+            if(map != null && !map.custom && !map.workshop){
                 handleSaveBuiltin(map);
             }else{
+                boolean workshop = false;
+                //try to preserve Steam ID
+                if(map != null && map.tags.containsKey("steamid")){
+                    editor.tags.put("steamid", map.tags.get("steamid"));
+                    workshop = true;
+                }
                 returned = maps.saveMap(editor.tags);
+                if(workshop){
+                    returned.workshop = workshop;
+                }
                 ui.showInfoFade("@editor.saved");
             }
         }
@@ -394,7 +458,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     public void build(){
-        float size = 58f;
+        float size = mobile ? 50f : 58f;
 
         clearChildren();
         table(cont -> {
@@ -410,7 +474,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 Cons<EditorTool> addTool = tool -> {
 
-                    ImageButton button = new ImageButton(ui.getIcon(tool.name()), Styles.clearTogglei);
+                    ImageButton button = new ImageButton(ui.getIcon(tool.name()), Styles.squareTogglei);
                     button.clicked(() -> {
                         view.setTool(tool);
                         if(lastTable[0] != null){
@@ -446,7 +510,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                 table.button(b -> {
                                     b.left();
                                     b.marginLeft(6);
-                                    b.setStyle(Styles.clearTogglet);
+                                    b.setStyle(Styles.flatTogglet);
                                     b.add(Core.bundle.get("toolmode." + name)).left();
                                     b.row();
                                     b.add(Core.bundle.get("toolmode." + name + ".description")).color(Color.lightGray).left();
@@ -486,16 +550,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.defaults().size(size, size);
 
-                tools.button(Icon.menu, Styles.cleari, menu::show);
+                tools.button(Icon.menu, Styles.flati, menu::show);
 
-                ImageButton grid = tools.button(Icon.grid, Styles.clearTogglei, () -> view.setGrid(!view.isGrid())).get();
+                ImageButton grid = tools.button(Icon.grid, Styles.squareTogglei, () -> view.setGrid(!view.isGrid())).get();
 
                 addTool.get(EditorTool.zoom);
 
                 tools.row();
 
-                ImageButton undo = tools.button(Icon.undo, Styles.cleari, editor::undo).get();
-                ImageButton redo = tools.button(Icon.redo, Styles.cleari, editor::redo).get();
+                ImageButton undo = tools.button(Icon.undo, Styles.flati, editor::undo).get();
+                ImageButton redo = tools.button(Icon.redo, Styles.flati, editor::redo).get();
 
                 addTool.get(EditorTool.pick);
 
@@ -517,7 +581,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 addTool.get(EditorTool.fill);
                 addTool.get(EditorTool.spray);
 
-                ImageButton rotate = tools.button(Icon.right, Styles.cleari, () -> editor.rotation = (editor.rotation + 1) % 4).get();
+                ImageButton rotate = tools.button(Icon.right, Styles.flati, () -> editor.rotation = (editor.rotation + 1) % 4).get();
                 rotate.getImage().update(() -> {
                     rotate.getImage().setRotation(editor.rotation * 90);
                     rotate.getImage().setOrigin(Align.center);
@@ -535,7 +599,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 int i = 0;
 
                 for(Team team : Team.baseTeams){
-                    ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglePartiali);
+                    ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
                     button.margin(4f);
                     button.getImageCell().grow();
                     button.getStyle().imageUpColor = team.color;
@@ -572,14 +636,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 if(!mobile){
                     mid.table(t -> {
-                        t.button("@editor.center", Icon.move, Styles.cleart, view::center).growX().margin(9f);
+                        t.button("@editor.center", Icon.move, Styles.flatt, view::center).growX().margin(9f);
                     }).growX().top();
                 }
 
                 mid.row();
 
                 mid.table(t -> {
-                    t.button("@editor.cliffs", Icon.terrain, Styles.cleart, editor::addCliffs).growX().margin(9f);
+                    t.button("@editor.cliffs", Icon.terrain, Styles.flatt, editor::addCliffs).growX().margin(9f);
                 }).growX().top();
             }).margin(0).left().growY();
 
@@ -629,28 +693,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 editor.undo();
             }
 
-            //more undocumented features, fantastic
-            if(Core.input.keyTap(KeyCode.t)){
-
-                //clears all 'decoration' from the map
-                for(int x = 0; x < editor.width(); x++){
-                    for(int y = 0; y < editor.height(); y++){
-                        Tile tile = editor.tile(x, y);
-                        if(tile.block().breakable && tile.block() instanceof Prop){
-                            tile.setBlock(Blocks.air);
-                            editor.renderer.updatePoint(x, y);
-                        }
-
-                        if(tile.overlay() != Blocks.air && tile.overlay() != Blocks.spawn){
-                            tile.setOverlay(Blocks.air);
-                            editor.renderer.updatePoint(x, y);
-                        }
-                    }
-                }
-
-                editor.flushOp();
-            }
-
             if(Core.input.keyTap(KeyCode.y)){
                 editor.redo();
             }
@@ -671,7 +713,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     private void addBlockSelection(Table cont){
         blockSelection = new Table();
-        pane = new ScrollPane(blockSelection);
+        pane = new ScrollPane(blockSelection, Styles.smallPane);
         pane.setFadeScrollBars(false);
         pane.setOverscroll(true, false);
         pane.exited(() -> {
@@ -682,13 +724,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         cont.table(search -> {
             search.image(Icon.zoom).padRight(8);
-            search.field("", this::rebuildBlockSelection)
+            search.field("", this::rebuildBlockSelection).growX()
             .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
-        }).pad(-2);
+        }).growX().pad(-2).padLeft(6f);
         cont.row();
         cont.table(Tex.underline, extra -> extra.labelWrap(() -> editor.drawBlock.localizedName).width(200f).center()).growX();
         cont.row();
-        cont.add(pane).expandY().top().left();
+        cont.add(pane).expandY().growX().top().left();
 
         rebuildBlockSelection("");
     }
@@ -718,7 +760,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.toLowerCase()))
             ) continue;
 
-            ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglei);
+            ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.drawBlock = block);
             button.resizeImage(8 * 4f);
@@ -727,13 +769,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(i == 0) editor.drawBlock = block;
 
-            if(++i % 4 == 0){
+            if(++i % 6 == 0){
                 blockSelection.row();
             }
         }
 
         if(i == 0){
-            blockSelection.add("@none").color(Color.lightGray).padLeft(80f).padTop(10f);
+            blockSelection.add("@none.found").padLeft(54f).padTop(10f);
         }
     }
 }

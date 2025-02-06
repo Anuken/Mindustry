@@ -9,6 +9,8 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
+import static mindustry.Vars.*;
+
 /**
  * Note that this requires several things:
  * - A bullet with positive maxRange
@@ -32,6 +34,8 @@ public class PointDefenseWeapon extends Weapon{
         controllable = false;
         rotate = true;
         useAmmo = false;
+        useAttackRange = false;
+        targetInterval = 10f;
     }
 
     @Override
@@ -45,11 +49,13 @@ public class PointDefenseWeapon extends Weapon{
     }
 
     @Override
-    protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float aimX, float aimY, float mountX, float mountY, float rotation, int side){
+    protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float rotation){
         if(!(mount.target instanceof Bullet target)) return;
 
-        if(target.damage() > bullet.damage){
-            target.damage(target.damage() - bullet.damage);
+        // not sure whether it should multiply by the damageMultiplier of the unit
+        float bulletDamage = bullet.damage * unit.damageMultiplier() * state.rules.unitDamage(unit.team);
+        if(target.damage() > bulletDamage){
+            target.damage(target.damage() - bulletDamage);
         }else{
             target.remove();
         }
@@ -58,5 +64,7 @@ public class PointDefenseWeapon extends Weapon{
         bullet.shootEffect.at(shootX, shootY, rotation, color);
         bullet.hitEffect.at(target.x, target.y, color);
         shootSound.at(shootX, shootY, Mathf.random(0.9f, 1.1f));
+        mount.recoil = 1f;
+        mount.heat = 1f;
     }
 }

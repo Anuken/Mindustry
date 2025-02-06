@@ -12,14 +12,13 @@ import arc.scene.ui.layout.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
-public class LoadingFragment extends Fragment{
+public class LoadingFragment{
     private Table table;
     private TextButton button;
     private Bar bar;
     private Label nameLabel;
     private float progValue;
 
-    @Override
     public void build(Group parent){
         parent.fill(t -> {
             //rect must fill screen completely.

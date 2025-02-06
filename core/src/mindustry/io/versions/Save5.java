@@ -1,8 +1,7 @@
 package mindustry.io.versions;
 
-import mindustry.io.*;
-
-public class Save5 extends SaveVersion{
+/** Uses the legacy readWorldEntities function without entity IDs. */
+public class Save5 extends LegacySaveVersion2{
 
     public Save5(){
         super(5);

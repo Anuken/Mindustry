@@ -33,15 +33,12 @@ public class AndroidLauncher extends AndroidApplication{
     FileChooser chooser;
     Runnable permCallback;
 
-    Object gpService;
-    Class<?> serviceClass;
-
     @Override
     protected void onCreate(Bundle savedInstanceState){
         UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
 
         Thread.setDefaultUncaughtExceptionHandler((thread, error) -> {
-            CrashSender.log(error);
+            CrashHandler.log(error);
 
             //try to forward exception to system handler
             if(handler != null){
@@ -75,6 +72,8 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
+                //Required to load jar files in Android 14: https://developer.android.com/about/versions/14/behavior-changes-14#safer-dynamic-code-loading
+                jar.file().setReadOnly();
                 return new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, parent){
                     @Override
                     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException{
@@ -104,64 +103,69 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             void showFileChooser(boolean open, String title, Cons<Fi> cons, String... extensions){
-                String extension = extensions[0];
+                try{
+                    String extension = extensions[0];
 
-                if(VERSION.SDK_INT >= VERSION_CODES.Q){
-                    Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType(extension.equals("zip") && !open && extensions.length == 1 ? "application/zip" : "*/*");
+                    if(VERSION.SDK_INT >= VERSION_CODES.Q){
+                        Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        intent.setType(extension.equals("zip") && !open && extensions.length == 1 ? "application/zip" : "*/*");
+                        intent.putExtra(Intent.EXTRA_TITLE, "export." + extension);
 
-                    addResultListener(i -> startActivityForResult(intent, i), (code, in) -> {
-                        if(code == Activity.RESULT_OK && in != null && in.getData() != null){
-                            Uri uri = in.getData();
+                        addResultListener(i -> startActivityForResult(intent, i), (code, in) -> {
+                            if(code == Activity.RESULT_OK && in != null && in.getData() != null){
+                                Uri uri = in.getData();
 
-                            if(uri.getPath().contains("(invalid)")) return;
+                                if(uri.getPath().contains("(invalid)")) return;
 
-                            Core.app.post(() -> Core.app.post(() -> cons.get(new Fi(uri.getPath()){
-                                @Override
-                                public InputStream read(){
-                                    try{
-                                        return getContentResolver().openInputStream(uri);
-                                    }catch(IOException e){
-                                        throw new ArcRuntimeException(e);
+                                Core.app.post(() -> Core.app.post(() -> cons.get(new Fi(uri.getPath()){
+                                    @Override
+                                    public InputStream read(){
+                                        try{
+                                            return getContentResolver().openInputStream(uri);
+                                        }catch(IOException e){
+                                            throw new ArcRuntimeException(e);
+                                        }
                                     }
-                                }
 
-                                @Override
-                                public OutputStream write(boolean append){
-                                    try{
-                                        return getContentResolver().openOutputStream(uri);
-                                    }catch(IOException e){
-                                        throw new ArcRuntimeException(e);
+                                    @Override
+                                    public OutputStream write(boolean append){
+                                        try{
+                                            return getContentResolver().openOutputStream(uri);
+                                        }catch(IOException e){
+                                            throw new ArcRuntimeException(e);
+                                        }
                                     }
-                                }
-                            })));
-                        }
-                    });
-                }else if(VERSION.SDK_INT >= VERSION_CODES.M && !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                                })));
+                            }
+                        });
+                    }else if(VERSION.SDK_INT >= VERSION_CODES.M && !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                     checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
-                    chooser = new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), open, file -> {
-                        if(!open){
-                            cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
-                        }else{
-                            cons.get(file);
-                        }
-                    });
+                        chooser = new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), open, file -> {
+                            if(!open){
+                                cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
+                            }else{
+                                cons.get(file);
+                            }
+                        });
 
-                    ArrayList<String> perms = new ArrayList<>();
-                    if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                        perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                    }
-                    if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                        perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-                    }
-                    requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
-                }else{
-                    if(open){
-                        new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+                        ArrayList<String> perms = new ArrayList<>();
+                        if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                            perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                        }
+                        if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                            perms.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+                        }
+                        requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                     }else{
-                        super.showFileChooser(open, "@open", extension, cons);
+                        if(open){
+                            new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+                        }else{
+                            super.showFileChooser(open, "@open", extension, cons);
+                        }
                     }
+                }catch(Throwable error){
+                    Core.app.post(() -> Vars.ui.showException(error));
                 }
             }
 
@@ -183,6 +187,7 @@ public class AndroidLauncher extends AndroidApplication{
         }, new AndroidApplicationConfiguration(){{
             useImmersiveMode = true;
             hideStatusBar = true;
+            useGL30 = true;
         }});
         checkFiles(getIntent());
 
@@ -239,24 +244,6 @@ public class AndroidLauncher extends AndroidApplication{
             if(permCallback != null){
                 Core.app.post(permCallback);
                 permCallback = null;
-            }
-        }
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        //TODO enable once GPGS is set up on the GP console
-        if(false && getPackageName().endsWith(".gp")){
-            try{
-                if(gpService == null){
-                    serviceClass = Class.forName("mindustry.android.GPGameService");
-                    gpService = serviceClass.getConstructor().newInstance();
-                }
-                serviceClass.getMethod("onResume", Context.class).invoke(gpService, this);
-            }catch(Exception e){
-                Log.err("Failed to update Google Play Services", e);
             }
         }
     }

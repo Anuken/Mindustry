@@ -6,7 +6,6 @@ import arc.files.*;
 import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
@@ -18,14 +17,16 @@ import mindustry.type.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
 public class Saves{
+    private static final DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance();
+
     Seq<SaveSlot> saves = new Seq<>();
     @Nullable SaveSlot current;
     private @Nullable SaveSlot lastSectorSave;
-    AsyncExecutor previewExecutor = new AsyncExecutor(1);
     private boolean saving;
     private float time;
 
@@ -47,13 +48,36 @@ public class Saves{
     public void load(){
         saves.clear();
 
+        //read saves in parallel
+        Seq<Future<SaveSlot>> futures = new Seq<>();
+
         for(Fi file : saveDirectory.list()){
             if(!file.name().contains("backup") && SaveIO.isSaveValid(file)){
-                SaveSlot slot = new SaveSlot(file);
-                saves.add(slot);
-                slot.meta = SaveIO.getMeta(file);
+                futures.add(mainExecutor.submit(() -> {
+                    SaveSlot slot = new SaveSlot(file);
+                    slot.meta = SaveIO.getMeta(file);
+                    return slot;
+                }));
             }
         }
+
+        for(var future : futures){
+            try{
+                saves.add(future.get());
+            }catch(Exception e){
+                Log.err(e);
+            }
+        }
+
+        //clear saves from build <130 that had the new naval sectors.
+        saves.removeAll(s -> {
+            if(s.getSector() != null && (s.getSector().id == 108 || s.getSector().id == 216) && s.meta.build <= 130 && s.meta.build > 0){
+                s.getSector().clearInfo();
+                s.file.delete();
+                return true;
+            }
+            return false;
+        });
 
         lastSectorSave = saves.find(s -> s.isSector() && s.getName().equals(Core.settings.getString("last-sector-save", "<none>")));
 
@@ -87,7 +111,7 @@ public class Saves{
 
         if(state.isGame() && !state.gameOver && current != null && current.isAutosave()){
             time += Time.delta;
-            if(time > Core.settings.getInt("saveinterval") * 60){
+            if(time > Core.settings.getInt("saveinterval") * 60 && !Vars.disableSave){
                 saving = true;
 
                 try{
@@ -145,6 +169,7 @@ public class Saves{
         SaveSlot slot = new SaveSlot(getNextSlotFile());
         slot.importFile(file);
         slot.setName(file.nameWithoutExtension());
+
         saves.add(slot);
         slot.meta = SaveIO.getMeta(slot.file);
         current = slot;
@@ -194,9 +219,7 @@ public class Saves{
         }
 
         public void save(){
-            long time = totalPlaytime;
             long prev = totalPlaytime;
-            totalPlaytime = time;
 
             SaveIO.save(file);
             meta = SaveIO.getMeta(file);
@@ -212,7 +235,7 @@ public class Saves{
             if(Core.assets.isLoaded(loadPreviewFile().path())){
                 Core.assets.unload(loadPreviewFile().path());
             }
-            previewExecutor.submit(() -> {
+            mainExecutor.submit(() -> {
                 try{
                     previewFile().writePng(renderer.minimap.getPixmap());
                     requestedPreview = false;
@@ -259,7 +282,7 @@ public class Saves{
         }
 
         public String getDate(){
-            return SimpleDateFormat.getDateTimeInstance().format(new Date(meta.timestamp));
+            return dateFormat.format(new Date(meta.timestamp));
         }
 
         public Map getMap(){
@@ -289,7 +312,7 @@ public class Saves{
             return meta.mods;
         }
 
-        public Sector getSector(){
+        public @Nullable Sector getSector(){
             return meta == null || meta.rules == null ? null : meta.rules.sector;
         }
 
@@ -320,6 +343,10 @@ public class Saves{
         public void importFile(Fi from) throws IOException{
             try{
                 from.copyTo(file);
+                if(previewFile().exists()){
+                    requestedPreview = false;
+                    previewFile().delete();
+                }
             }catch(Exception e){
                 throw new IOException(e);
             }

@@ -11,8 +11,8 @@ import static mindustry.Vars.*;
 public class MedianFilter extends GenerateFilter{
     private static final IntSeq blocks = new IntSeq(), floors = new IntSeq();
 
-    float radius = 2;
-    float percentile = 0.5f;
+    public float radius = 2;
+    public float percentile = 0.5f;
 
     @Override
     public FilterOption[] options(){
@@ -50,8 +50,7 @@ public class MedianFilter extends GenerateFilter{
         floors.sort();
         blocks.sort();
 
-        int index = Math.min((int)(floors.size * percentile), floors.size - 1);
-        int floor = floors.get(index), block = blocks.get(index);
+        int floor = floors.get(Math.min((int)(floors.size * percentile), floors.size - 1)), block = blocks.get(Math.min((int)(blocks.size * percentile), blocks.size - 1));
 
         in.floor = content.block(floor);
         if(!content.block(block).synthetic() && !in.block.synthetic()) in.block = content.block(block);

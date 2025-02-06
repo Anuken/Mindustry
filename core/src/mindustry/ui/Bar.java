@@ -30,19 +30,11 @@ public class Bar extends Element{
 
     public Bar(Prov<CharSequence> name, Prov<Color> color, Floatp fraction){
         this.fraction = fraction;
-        try{
-            lastValue = value = Mathf.clamp(fraction.get());
-        }catch(Exception e){ //getting the fraction may involve referring to invalid data
-            lastValue = value = 0f;
-        }
+        lastValue = value = Mathf.clamp(fraction.get());
         update(() -> {
-            try{
-                this.name = name.get();
-                this.blinkColor.set(color.get());
-                setColor(color.get());
-            }catch(Exception e){ //getting the fraction may involve referring to invalid data
-                this.name = "";
-            }
+            this.name = name.get();
+            this.blinkColor.set(color.get());
+            setColor(color.get());
         });
     }
 
@@ -85,12 +77,8 @@ public class Bar extends Element{
     public void draw(){
         if(fraction == null) return;
 
-        float computed;
-        try{
-            computed = Mathf.clamp(fraction.get());
-        }catch(Exception e){ //getting the fraction may involve referring to invalid data
-            computed = 0f;
-        }
+        float computed = Mathf.clamp(fraction.get());
+
 
         if(lastValue > computed){
             blink = 1f;
@@ -138,8 +126,10 @@ public class Bar extends Element{
         GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         lay.setText(font, name);
 
-        font.setColor(1f, 1f, 1f, parentAlpha);
-        font.draw(name, x + width / 2f - lay.width / 2f, y + height / 2f + lay.height / 2f + 1);
+        font.setColor(1f, 1f, 1f, 1f);
+        font.getCache().clear();
+        font.getCache().addText(name, x + width / 2f - lay.width / 2f, y + height / 2f + lay.height / 2f + 1);
+        font.getCache().draw(parentAlpha);
 
         Pools.free(lay);
     }

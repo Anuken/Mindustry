@@ -1,13 +1,18 @@
 package mindustry.world.blocks.logic;
 
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.func.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.Bits;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.*;
+import arc.util.pooling.*;
 import mindustry.ai.types.*;
 import mindustry.core.*;
 import mindustry.gen.*;
@@ -15,8 +20,6 @@ import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
 import mindustry.logic.*;
-import mindustry.logic.LAssembler.*;
-import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -28,10 +31,13 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
-    private static final int maxByteLen = 1024 * 500;
+    private static final int maxByteLen = 1024 * 100;
+    public static final int maxNameLength = 32;
 
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
+    //privileged only
+    public int maxInstructionsPerTick = 40;
     public float range = 8 * 10;
 
     public LogicBlock(String name){
@@ -41,10 +47,34 @@ public class LogicBlock extends Block{
         configurable = true;
         group = BlockGroup.logic;
         schematicPriority = 5;
+        ignoreResizeConfig = true;
 
-        config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
+        //universal, no real requirements
+        envEnabled = Env.any;
+
+        config(byte[].class, (LogicBuild build, byte[] data) -> {
+            if(!accessible()) return;
+
+            build.readCompressed(data, true);
+        });
+
+        config(String.class, (LogicBuild build, String data) -> {
+            if(!accessible() || !privileged) return;
+
+            if(data != null && data.length() < maxNameLength){
+                build.tag = data;
+            }
+        });
+
+        config(Character.class, (LogicBuild build, Character data) -> {
+            if(!accessible() || !privileged) return;
+
+            build.iconTag = data;
+        });
 
         config(Integer.class, (LogicBuild entity, Integer pos) -> {
+            if(!accessible()) return;
+
             //if there is no valid link in the first place, nobody cares
             if(!entity.validLink(world.build(pos))) return;
             var lbuild = world.build(pos);
@@ -60,6 +90,10 @@ public class LogicBlock extends Block{
                     link.name = "";
                     link.name = entity.findLinkName(lbuild.block);
                 }
+                //disable when unlinking
+                if(!link.active && lbuild.block.autoResetEnabled && lbuild.lastDisabler == entity){
+                    lbuild.enabled = true;
+                }
             }else{
                 entity.links.remove(l -> world.build(l.x, l.y) == lbuild);
                 entity.links.add(new LogicLink(x, y, entity.findLinkName(lbuild.block), true));
@@ -67,6 +101,20 @@ public class LogicBlock extends Block{
 
             entity.updateCode(entity.code, true, null);
         });
+    }
+
+    @Override
+    public boolean checkForceDark(Tile tile){
+        return !accessible();
+    }
+
+    public boolean accessible(){
+        return !privileged || state.rules.editor || state.playtestingMap != null || state.rules.allowEditWorldProcessors;
+    }
+
+    @Override
+    public boolean canBreak(Tile tile){
+        return accessible();
     }
 
     public static String getLinkName(Block block){
@@ -89,8 +137,8 @@ public class LogicBlock extends Block{
 
     public static byte[] compress(byte[] bytes, Seq<LogicLink> links){
         try{
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DataOutputStream stream = new DataOutputStream(new DeflaterOutputStream(baos));
+            var baos = new ByteArrayOutputStream();
+            var stream = new DataOutputStream(new DeflaterOutputStream(baos));
 
             //current version of config format
             stream.write(1);
@@ -122,12 +170,16 @@ public class LogicBlock extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.linkRange, range / 8, StatUnit.blocks);
-        stats.add(Stat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
+        if(!privileged){
+            stats.add(Stat.linkRange, range / 8, StatUnit.blocks);
+            stats.add(Stat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
+        }
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        if(privileged) return;
+
         Drawf.circles(x*tilesize + offset, y*tilesize + offset, range);
     }
 
@@ -141,7 +193,7 @@ public class LogicBlock extends Block{
 
                 int bytelen = stream.readInt();
 
-                if(bytelen > maxByteLen) throw new RuntimeException("Malformed logic data! Length: " + bytelen);
+                if(bytelen > maxByteLen) throw new RuntimeException("Logic data too long or malformed! Length: " + bytelen);
 
                 byte[] bytes = new byte[bytelen];
                 stream.readFully(bytes);
@@ -197,9 +249,19 @@ public class LogicBlock extends Block{
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
         public boolean checkedDuplicates = false;
+        //dynamic only for privileged processors
+        public int ipt = instructionsPerTick;
+        /** Display name, for convenience. This is currently only available for world processors. */
+        public @Nullable String tag;
+        public char iconTag;
 
         /** Block of code to run after load. */
         public @Nullable Runnable loadBlock;
+
+        {
+            executor.privileged = privileged;
+            executor.build = this;
+        }
 
         public void readCompressed(byte[] data, boolean relative){
             try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
@@ -290,7 +352,7 @@ public class LogicBlock extends Block{
 
                 try{
                     //create assembler to store extra variables
-                    LAssembler asm = LAssembler.assemble(str);
+                    LAssembler asm = LAssembler.assemble(str, privileged);
 
                     //store connections
                     for(LogicLink link : links){
@@ -312,19 +374,21 @@ public class LogicBlock extends Block{
                         }
                     }
 
-                    asm.putConst("@mapw", world.width());
-                    asm.putConst("@maph", world.height());
                     asm.putConst("@links", executor.links.length);
                     asm.putConst("@ipt", instructionsPerTick);
 
+                    Object oldUnit = null;
+
                     if(keep){
+                        oldUnit = executor.unit.objval;
                         //store any older variables
-                        for(Var var : executor.vars){
-                            boolean unit = var.name.equals("@unit");
-                            if(!var.constant || unit){
-                                BVar dest = asm.getVar(var.name);
-                                if(dest != null && (!dest.constant || unit)){
-                                    dest.value = var.isobj ? var.objval : var.numval;
+                        for(LVar var : executor.vars){
+                            if(!var.constant){
+                                LVar dest = asm.getVar(var.name);
+                                if(dest != null && !dest.constant){
+                                    dest.isobj = var.isobj;
+                                    dest.objval = var.objval;
+                                    dest.numval = var.numval;
                                 }
                             }
                         }
@@ -333,18 +397,58 @@ public class LogicBlock extends Block{
                     //inject any extra variables
                     if(assemble != null){
                         assemble.get(asm);
+
+                        if(oldUnit == null && asm.getVar("@unit") != null && asm.getVar("@unit").objval instanceof Unit u){
+                            oldUnit = u;
+                        }
                     }
 
-                    asm.getVar("@this").value = this;
+                    asm.getVar("@this").setconst(this);
                     asm.putConst("@thisx", World.conv(x));
                     asm.putConst("@thisy", World.conv(y));
 
                     executor.load(asm);
+                    executor.unit.objval = oldUnit;
+                    executor.unit.isobj = true;
                 }catch(Exception e){
                     //handle malformed code and replace it with nothing
-                    executor.load(code = "");
+                    executor.load(LAssembler.assemble(code = "", privileged));
                 }
             }
+        }
+
+        //editor-only processors cannot be damaged or destroyed
+        @Override
+        public boolean collide(Bullet other){
+            return !privileged;
+        }
+
+        @Override
+        public boolean displayable(){
+            return accessible();
+        }
+
+        @Override
+        public void damage(float damage){
+            if(!privileged){
+                super.damage(damage);
+            }
+        }
+
+        @Override
+        public void removeFromProximity(){
+            super.removeFromProximity();
+
+            for(var link : executor.links){
+                if(!link.enabled && link.lastDisabler == this){
+                    link.enabled = true;
+                }
+            }
+        }
+
+        @Override
+        public Cursor getCursor(){
+            return !accessible() ? SystemCursor.arrow : super.getCursor();
         }
 
         //logic blocks cause write problems when picked up
@@ -424,16 +528,24 @@ public class LogicBlock extends Block{
                 updateCode(code, true, null);
             }
 
-            if(enabled){
-                accumulator += edelta() * instructionsPerTick * (consValid() ? 1 : 0);
+            if(!privileged){
+                ipt = instructionsPerTick;
+            }
 
-                if(accumulator > maxInstructionScale * instructionsPerTick) accumulator = maxInstructionScale * instructionsPerTick;
+            if(state.rules.disableWorldProcessors && privileged) return;
+
+            if(enabled && executor.initialized()){
+                accumulator += edelta() * ipt;
+
+                if(accumulator > maxInstructionScale * ipt) accumulator = maxInstructionScale * ipt;
 
                 for(int i = 0; i < (int)accumulator; i++){
-                    if(executor.initialized()){
-                        executor.runOnce();
-                    }
+                    executor.runOnce();
                     accumulator --;
+                    if(executor.yield){
+                        executor.yield = false;
+                        break;
+                    }
                 }
             }
         }
@@ -458,7 +570,9 @@ public class LogicBlock extends Block{
         public void drawConfigure(){
             super.drawConfigure();
 
-            Drawf.circles(x, y, range);
+            if(!privileged){
+                Drawf.circles(x, y, range);
+            }
 
             for(LogicLink l : links){
                 Building build = world.build(l.x, l.y);
@@ -478,25 +592,78 @@ public class LogicBlock extends Block{
 
         @Override
         public void drawSelect(){
+            if(!accessible()) return;
+
             Groups.unit.each(u -> u.controller() instanceof LogicAI ai && ai.controller == this, unit -> {
                 Drawf.square(unit.x, unit.y, unit.hitSize, unit.rotation + 45);
             });
+
+            //draw tag over processor (world processor only)
+            if(!(renderer.pixelate || !privileged || tag == null || tag.isEmpty())){
+                Font font = Fonts.outline;
+                GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+                boolean ints = font.usesIntegerPositions();
+                font.getData().setScale(1 / 4f / Scl.scl(1f));
+                font.setUseIntegerPositions(false);
+
+                l.setText(font, tag, Color.white, 90f, Align.left, true);
+                float offset = 1f;
+
+                //Draw.color(0f, 0f, 0f, 0.1f);
+                //Fill.rect(x, y + tilesize/2f - l.height/2f - offset, l.width + offset*2f, l.height + offset*2f);
+                Draw.color();
+                font.setColor(1f, 1f, 1f, 0.5f);
+                font.draw(tag, x - l.width/2f, y + tilesize + 2f - offset, 90f, Align.left, true);
+                font.setUseIntegerPositions(ints);
+
+                font.getData().setScale(1f);
+
+                Pools.free(l);
+            }
+
+            if(iconTag != 0){
+                TextureRegion icon = Fonts.getLargeIcon(Fonts.unicodeToName(iconTag));
+                if(icon.found()){
+                    Draw.alpha(0.5f);
+
+                    Draw.rect(icon, x, y, tilesize, tilesize / icon.ratio());
+
+                    Draw.color();
+                }
+            }
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof ConstructBuild);
+            return other != null && other.isValid() && (privileged || (!other.block.privileged && other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(other instanceof ConstructBuild);
+        }
+
+        @Override
+        public boolean shouldShowConfigure(Player player){
+            return accessible();
         }
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Icon.pencil, Styles.clearTransi, () -> {
-                Vars.ui.logic.show(code, code -> configure(compress(code, relativeConnections())));
-            }).size(40);
+            table.button(Icon.pencil, Styles.cleari, this::showEditDialog).size(40);
+        }
+
+        public void showEditDialog(){
+            showEditDialog(false);
+        }
+
+        public void showEditDialog(boolean forceEditor){
+            ui.logic.show(code, executor, privileged, code -> {
+                boolean prev = state.rules.editor;
+                //this is a hack to allow configuration to work correctly in the editor for privileged processors
+                if(forceEditor) state.rules.editor = true;
+                configure(compress(code, relativeConnections()));
+                state.rules.editor = prev;
+            });
         }
 
         @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
+        public boolean onConfigureBuildTapped(Building other){
+            if(this == other || !accessible()){
                 deselect();
                 return false;
             }
@@ -506,12 +673,12 @@ public class LogicBlock extends Block{
                 return false;
             }
 
-            return super.onConfigureTileTapped(other);
+            return super.onConfigureBuildTapped(other);
         }
 
         @Override
         public byte version(){
-            return 1;
+            return 3;
         }
 
         @Override
@@ -523,31 +690,41 @@ public class LogicBlock extends Block{
             write.b(compressed);
 
             //write only the non-constant variables
-            int count = Structs.count(executor.vars, v -> !v.constant);
+            int count = Structs.count(executor.vars, v -> (!v.constant || v == executor.unit) && !(v.isobj && v.objval == null));
 
             write.i(count);
             for(int i = 0; i < executor.vars.length; i++){
-                Var v = executor.vars[i];
+                LVar v = executor.vars[i];
 
-                if(v.constant) continue;
+                //null is the default variable value, so waste no time serializing that
+                if(v.isobj && v.objval == null) continue;
+
+                //skip constants
+                if(v.constant && v != executor.unit) continue;
 
                 //write the name and the object value
                 write.str(v.name);
 
                 Object value = v.isobj ? v.objval : v.numval;
-                if(value instanceof Unit) value = null; //do not save units.
                 TypeIO.writeObject(write, value);
             }
 
             //no memory
             write.i(0);
+
+            if(privileged){
+                write.s(Mathf.clamp(ipt, 1, maxInstructionsPerTick));
+            }
+
+            TypeIO.writeString(write, tag);
+            write.s(iconTag);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            if(revision == 1){
+            if(revision >= 1){
                 int compl = read.i();
                 byte[] bytes = new byte[compl];
                 read.b(bytes);
@@ -582,12 +759,30 @@ public class LogicBlock extends Block{
             loadBlock = () -> updateCode(code, false, asm -> {
                 //load up the variables that were stored
                 for(int i = 0; i < varcount; i++){
-                    BVar dest = asm.getVar(names[i]);
-                    if(dest != null && !dest.constant){
-                        dest.value = values[i] instanceof BuildingBox box ? world.build(box.pos) : values[i];
+                    LVar var = asm.getVar(names[i]);
+                    if(var != null && (!var.constant || var.name.equals("@unit"))){
+                        var value = values[i];
+                        if(value instanceof Boxed<?> boxed) value = boxed.unbox();
+
+                        if(value instanceof Number num){
+                            var.numval = num.doubleValue();
+                            var.isobj = false;
+                        }else{
+                            var.objval = value;
+                            var.isobj = true;
+                        }
                     }
                 }
             });
+
+            if(privileged && revision >= 2){
+                ipt = Mathf.clamp(read.s(), 1, maxInstructionsPerTick);
+            }
+
+            if(revision >= 3){
+                tag = TypeIO.readString(read);
+                iconTag = (char)read.us();
+            }
 
         }
     }

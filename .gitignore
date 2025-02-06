@@ -6,6 +6,7 @@ logs/
 /core/assets/.gifimages/
 /deploy/
 /out/
+ios/libs/
 /desktop/packr-out/
 /desktop/packr-export/
 /desktop/mindustry-saves/
@@ -43,6 +44,7 @@ steam_appid.txt
 ios/robovm.properties
 packr-out/
 config/
+buildSrc/
 *.gif
 /tests/out
 
@@ -162,3 +164,6 @@ gradle-app.setting
 .DS_Store
 Thumbs.db
 android/libs/
+
+# ignored due to frequent branch conflicts.
+core/assets/logicids.dat

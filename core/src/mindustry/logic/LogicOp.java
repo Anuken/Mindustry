@@ -32,15 +32,16 @@ public enum LogicOp{
     max("max", true, Math::max),
     min("min", true, Math::min),
     angle("angle", true, (x, y) -> Angles.angle((float)x, (float)y)),
+    angleDiff("anglediff", true, (x, y) -> Angles.angleDist((float)x, (float)y)),
     len("len", true, (x, y) -> Mathf.dst((float)x, (float)y)),
     noise("noise", true, (x, y) -> Simplex.raw2d(0, x, y)),
-    abs("abs", a -> Math.abs(a)),
+    abs("abs", a -> Math.abs(a)), //not a method reference because it fails to compile for some reason
     log("log", Math::log),
     log10("log10", Math::log10),
     floor("floor", Math::floor),
     ceil("ceil", Math::ceil),
     sqrt("sqrt", Math::sqrt),
-    rand("rand", d -> Mathf.rand.nextDouble() * d),
+    rand("rand", d -> GlobalVars.rand.nextDouble() * d),
 
     sin("sin", d -> Math.sin(d * Mathf.doubleDegRad)),
     cos("cos", d -> Math.cos(d * Mathf.doubleDegRad)),

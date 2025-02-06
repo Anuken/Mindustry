@@ -5,7 +5,7 @@ import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
 public class DistortFilter extends GenerateFilter{
-    float scl = 40, mag = 5;
+    public float scl = 40, mag = 5;
 
     @Override
     public FilterOption[] options(){
@@ -27,7 +27,7 @@ public class DistortFilter extends GenerateFilter{
 
     @Override
     public void apply(GenerateInput in){
-        Tile tile = in.tile(in.x + noise(in, scl, mag) - mag / 2f, in.y + noise(in, scl, mag) - mag / 2f);
+        Tile tile = in.tile(in.x + noise(in, scl, mag) - mag / 2f, in.y + noise(1, in, scl, mag) - mag / 2f);
 
         in.floor = tile.floor();
         if(!tile.block().synthetic() && !in.block.synthetic()) in.block = tile.block();

@@ -9,7 +9,7 @@ import static mindustry.Vars.*;
 
 /** Selects X spawns from the core spawn pool.*/
 public class CoreSpawnFilter extends GenerateFilter{
-    int amount = 1;
+    public int amount = 1;
 
     @Override
     public FilterOption[] options(){

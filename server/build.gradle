@@ -8,7 +8,7 @@ ext.getServerFolder = {
 }
 
 task run(dependsOn: classes, type: JavaExec){
-    main = project.mainClassName
+    mainClass = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
@@ -22,7 +22,7 @@ task run(dependsOn: classes, type: JavaExec){
 }
 
 task debug(dependsOn: classes, type: JavaExec){
-    main = project.mainClassName
+    mainClass = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
@@ -39,12 +39,15 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     exclude("music/**")
     exclude("sounds/**")
     exclude("fonts/**")
-    exclude("zones/**")
-    exclude("icons/**")
     exclude("bundles/**")
     exclude("cubemaps/**")
     exclude("cursors/**")
     exclude("shaders/**")
+    exclude("icons/icon.icns")
+    exclude("icons/icon.ico")
+    exclude("icons/icon_64.png")
+
+    duplicatesStrategy = 'exclude'
 
     manifest{
         attributes 'Main-Class': project.mainClassName

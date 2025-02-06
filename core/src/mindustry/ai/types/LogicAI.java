@@ -1,7 +1,6 @@
 package mindustry.ai.types;
 
 import arc.math.*;
-import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
@@ -9,7 +8,6 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.world.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -21,7 +19,7 @@ public class LogicAI extends AIController{
 
     public LUnitControl control = LUnitControl.idle;
     public float moveX, moveY, moveRad;
-    public float itemTimer, payTimer, controlTimer = logicControlTimeout, targetTimer;
+    public float controlTimer = logicControlTimeout, targetTimer;
     @Nullable
     public Building controller;
     public BuildPlan plan = new BuildPlan();
@@ -43,11 +41,14 @@ public class LogicAI extends AIController{
 
     private ObjectSet<Object> radars = new ObjectSet<>();
 
+    // LogicAI state should not be reset after reading.
+    @Override
+    public boolean keepState(){
+        return true;
+    }
+
     @Override
     public void updateMovement(){
-        if(itemTimer >= 0) itemTimer -= Time.delta;
-        if(payTimer >= 0) payTimer -= Time.delta;
-
         if(targetTimer > 0f){
             targetTimer -= Time.delta;
         }else{
@@ -68,27 +69,38 @@ public class LogicAI extends AIController{
                 moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
             }
             case approach -> {
-                moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7);
+                moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7, true, null);
             }
             case pathfind -> {
+                if(unit.isFlying()){
+                    moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
+                }else{
+                    if(controlPath.getPathPosition(unit, Tmp.v2.set(moveX, moveY), Tmp.v2, Tmp.v1, null)){
+                        moveTo(Tmp.v1, 1f, Tmp.v2.epsilonEquals(Tmp.v1, 4.1f) ? 30f : 0f);
+                    }
+                }
+            }
+            case autoPathfind -> {
                 Building core = unit.closestEnemyCore();
 
-                if((core == null || !unit.within(core, unit.range() * 0.5f)) && command() == UnitCommand.attack){
+                if((core == null || !unit.within(core, unit.range() * 0.5f))){
                     boolean move = true;
+                    Tile spawner = null;
 
                     if(state.rules.waves && unit.team == state.rules.defaultTeam){
-                        Tile spawner = getClosestSpawner();
+                        spawner = getClosestSpawner();
                         if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
                     }
 
-                    if(move) pathfind(Pathfinder.fieldCore);
-                }
-
-                if(command() == UnitCommand.rally){
-                    Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
-
-                    if(target != null && !unit.within(target, 70f)){
-                        pathfind(Pathfinder.fieldRally);
+                    if(move){
+                        if(unit.isFlying()){
+                            var target = core == null ? spawner : core;
+                            if(target != null){
+                                moveTo(target, unit.range() * 0.5f);
+                            }
+                        }else{
+                            pathfind(Pathfinder.fieldCore);
+                        }
                     }
                 }
             }
@@ -111,33 +123,6 @@ public class LogicAI extends AIController{
 
     public boolean checkTargetTimer(Object radar){
         return radars.add(radar);
-    }
-
-    @Override
-    public void moveTo(Position target, float circleLength, float smooth){
-        if(target == null) return;
-
-        vec.set(target).sub(unit);
-
-        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
-
-        vec.setLength(unit.speed() * length);
-        if(length < -0.5f){
-            vec.rotate(180f);
-        }else if(length < 0){
-            vec.setZero();
-        }
-
-        //do not move when infinite vectors are used.
-        if(vec.isNaN() || vec.isInfinite()) return;
-
-        if(unit.type.omniMovement){
-            unit.approach(vec);
-        }else{
-            unit.rotateMove(vec);
-        }
-
-
     }
 
     @Override

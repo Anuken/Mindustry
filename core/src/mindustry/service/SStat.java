@@ -22,6 +22,8 @@ public enum SStat{
     maxProduction,
     sectorsControlled,
     schematicsCreated,
+    bouldersDeconstructed, //TODO
+    totalCampaignItems, //TODO
     ;
 
     public int get(){

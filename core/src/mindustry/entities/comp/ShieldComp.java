@@ -1,18 +1,20 @@
 package mindustry.entities.comp;
 
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-
-import static mindustry.Vars.*;
+import mindustry.type.*;
 
 @Component
 abstract class ShieldComp implements Healthc, Posc{
-    @Import float health, hitTime, x, y, healthMultiplier;
+    @Import float health, hitTime, x, y, healthMultiplier, armorOverride;
     @Import boolean dead;
     @Import Team team;
+    @Import UnitType type;
 
     /** Absorbs health damage. */
     float shield;
@@ -24,11 +26,8 @@ abstract class ShieldComp implements Healthc, Posc{
     @Replace
     @Override
     public void damage(float amount){
-        //apply armor
-        amount = Math.max(amount - armor, minArmorDamage * amount);
-        amount /= healthMultiplier;
-
-        rawDamage(amount);
+        //apply armor and scaling effects
+        rawDamage(Damage.applyArmor(amount, armorOverride >= 0f ? armorOverride : armor) / healthMultiplier / Vars.state.rules.unitHealth(team));
     }
 
     @Replace
@@ -36,15 +35,17 @@ abstract class ShieldComp implements Healthc, Posc{
     public void damagePierce(float amount, boolean withEffect){
         float pre = hitTime;
 
-        rawDamage(amount);
+        rawDamage(amount / healthMultiplier / Vars.state.rules.unitHealth(team));
 
         if(!withEffect){
             hitTime = pre;
         }
     }
 
-    private void rawDamage(float amount){
+    protected void rawDamage(float amount){
         boolean hadShields = shield > 0.0001f;
+
+        if(Float.isNaN(health)) health = 0f;
 
         if(hadShields){
             shieldAlpha = 1f;
@@ -55,14 +56,14 @@ abstract class ShieldComp implements Healthc, Posc{
         hitTime = 1f;
         amount -= shieldDamage;
 
-        if(amount > 0){
+        if(amount > 0 && type.killable){
             health -= amount;
             if(health <= 0 && !dead){
                 kill();
             }
 
             if(hadShields && shield <= 0.0001f){
-                Fx.unitShieldBreak.at(x, y, 0, team.color, this);
+                Fx.unitShieldBreak.at(x, y, 0, type.shieldColor(self()), this);
             }
         }
     }

@@ -1,6 +1,8 @@
 package mindustry.world.blocks.logic;
 
 import arc.*;
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.Input.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -30,9 +32,10 @@ public class MessageBlock extends Block{
         destructible = true;
         group = BlockGroup.logic;
         drawDisabled = false;
+        envEnabled = Env.any;
 
         config(String.class, (MessageBuild tile, String text) -> {
-            if(text.length() > maxTextLength){
+            if(text.length() > maxTextLength || !accessible()){
                 return; //no.
             }
 
@@ -54,12 +57,21 @@ public class MessageBlock extends Block{
         });
     }
 
+    public boolean accessible(){
+        return !privileged || state.rules.editor || state.rules.allowEditWorldProcessors;
+    }
+
+    @Override
+    public boolean canBreak(Tile tile){
+        return accessible();
+    }
+
     public class MessageBuild extends Building{
         public StringBuilder message = new StringBuilder();
 
         @Override
         public void drawSelect(){
-            if(renderer.pixelator.enabled()) return;
+            if(renderer.pixelate) return;
 
             Font font = Fonts.outline;
             GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
@@ -85,11 +97,17 @@ public class MessageBlock extends Block{
         }
 
         @Override
+        public boolean shouldShowConfigure(Player player){
+            return accessible();
+        }
+
+        @Override
         public void buildConfiguration(Table table){
-            table.button(Icon.pencil, () -> {
+            table.button(Icon.pencil, Styles.cleari, () -> {
                 if(mobile){
+                    var contents = this.message.toString();
                     Core.input.getTextInput(new TextInput(){{
-                        text = message.toString();
+                        text = contents;
                         multiline = true;
                         maxLength = maxTextLength;
                         accepted = str -> {
@@ -113,19 +131,53 @@ public class MessageBlock extends Block{
                         return true;
                     });
                     a.setMaxLength(maxTextLength);
+                    dialog.cont.row();
+                    dialog.cont.label(() -> a.getText().length() + " / " + maxTextLength).color(Color.lightGray);
                     dialog.buttons.button("@ok", () -> {
                         if(!a.getText().equals(message.toString())) configure(a.getText());
                         dialog.hide();
                     }).size(130f, 60f);
                     dialog.update(() -> {
-                        if(tile.block() != MessageBlock.this){
+                        if(tile.build != this){
                             dialog.hide();
                         }
                     });
+                    dialog.closeOnBack();
                     dialog.show();
                 }
                 deselect();
             }).size(40f);
+        }
+
+        @Override
+        public boolean onConfigureBuildTapped(Building other){
+            if(this == other || !accessible()){
+                deselect();
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public Cursor getCursor(){
+            return !accessible() ? SystemCursor.arrow : super.getCursor();
+        }
+
+        @Override
+        public void damage(float damage){
+            if(privileged) return;
+            super.damage(damage);
+        }
+
+        @Override
+        public boolean canPickup(){
+            return false;
+        }
+
+        @Override
+        public boolean collide(Bullet other){
+            return !privileged;
         }
 
         @Override

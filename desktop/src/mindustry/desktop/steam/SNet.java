@@ -105,11 +105,11 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             }
         }));
 
-        Events.on(WaveEvent.class, e -> {
-            if(currentLobby != null && net.server()){
-                smat.setLobbyData(currentLobby, "wave", state.wave + "");
-            }
-        });
+        Events.on(WaveEvent.class, e -> updateWave());
+        Events.run(Trigger.newGame, this::updateWave);
+
+        Events.on(PlayerIpBanEvent.class, e -> updateBans(e.ip));
+        Events.on(PlayerIpUnbanEvent.class, e -> updateBans(e.ip));
     }
 
     public boolean isSteamClient(){
@@ -147,7 +147,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                 int length = writeBuffer.position();
                 writeBuffer.flip();
 
-                snet.sendP2PPacket(currentServer, writeBuffer, reliable || length >= 1200 ? P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
+                snet.sendP2PPacket(currentServer, writeBuffer, reliable || length >= 1000 ? P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
             }catch(Exception e){
                 net.showError(e);
             }
@@ -190,16 +190,30 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     @Override
     public void hostServer(int port) throws IOException{
         provider.hostServer(port);
-        smat.createLobby(Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly, Core.settings.getInt("playerlimit"));
+        smat.createLobby(Core.settings.getBool("steampublichost") ? LobbyType.Public : LobbyType.FriendsOnly, Core.settings.getInt("playerlimit"));
 
         Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: @\nClient: @\nActive: @", net.server(), net.client(), net.active()))));
     }
 
     public void updateLobby(){
         if(currentLobby != null && net.server()){
-            smat.setLobbyType(currentLobby, Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly);
+            smat.setLobbyType(currentLobby, Core.settings.getBool("steampublichost") ? LobbyType.Public : LobbyType.FriendsOnly);
             smat.setLobbyMemberLimit(currentLobby, Core.settings.getInt("playerlimit"));
         }
+    }
+    
+    void updateWave(){
+        if(currentLobby != null && net.server()){
+            smat.setLobbyData(currentLobby, "mapname", state.map.name());
+            smat.setLobbyData(currentLobby, "wave", state.wave + "");
+            smat.setLobbyData(currentLobby, "gamemode", state.rules.mode().name() + "");
+        }
+    }
+
+    /** Updates the ban list so that lobbies don't appear for banned players. The list will only be updated when a steam player is banned/unbanned. */
+    void updateBans(String changed){
+        if(changed != null && !changed.startsWith("steam:")) return; //hacky way to ignore non-steam ids
+        smat.setLobbyData(currentLobby, "banned", netServer.admins.bannedIPs.select(ip -> ip.contains("steam:")).reduce(new StringBuilder(), (ip, str) -> str.append(ip.substring(6)).append(',')).toString()); //list of handles split by commas
     }
 
     @Override
@@ -258,7 +272,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         //check version
         if(version != Version.build){
             ui.loadfrag.hide();
-            ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated).toString() + "\n[]" +
+            ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated) + "\n[]" +
                 Core.bundle.format("server.versions", Version.build, version));
             smat.leaveLobby(steamIDLobby);
             return;
@@ -316,6 +330,11 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                     String mode = smat.getLobbyData(lobby, "gamemode");
                     //make sure versions are equal, don't list incompatible lobbies
                     if(mode == null || mode.isEmpty() || (Version.build != -1 && Strings.parseInt(smat.getLobbyData(lobby, "version"), -1) != Version.build)) continue;
+
+                    String banList = smat.getLobbyData(lobby, "banned");
+
+                    boolean banned = banList.length() > 0 && Structs.contains(banList.split(","), SVars.user.user.getSteamID().getAccountID() + "");
+
                     Host out = new Host(
                         -1, //invalid ping
                         smat.getLobbyData(lobby, "name"),
@@ -327,7 +346,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         smat.getLobbyData(lobby, "versionType"),
                         Gamemode.valueOf(mode),
                         smat.getLobbyMemberLimit(lobby),
-                        "",
+                        banned ? "[banned]" : "",
                         null
                     );
                     hosts.add(out);
@@ -360,6 +379,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             smat.setLobbyData(steamID, "versionType", Version.type);
             smat.setLobbyData(steamID, "wave", state.wave + "");
             smat.setLobbyData(steamID, "gamemode", state.rules.mode().name() + "");
+            updateBans(null);
         }
     }
 
@@ -400,9 +420,9 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         final SteamID sid;
 
         public SteamConnection(SteamID sid){
-            super(sid.getAccountID() + "");
+            super("steam:" + sid.getAccountID());
             this.sid = sid;
-            Log.info("Create STEAM client @", sid.getAccountID());
+            Log.info("Created STEAM connection: @", sid.getAccountID());
         }
 
         @Override
@@ -414,7 +434,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                 int length = writeBuffer.position();
                 writeBuffer.flip();
 
-                snet.sendP2PPacket(sid, writeBuffer, reliable || length >= 1200 ? object instanceof StreamChunk ? P2PSend.ReliableWithBuffering : P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
+                snet.sendP2PPacket(sid, writeBuffer, reliable || length >= 1000 ? object instanceof StreamChunk ? P2PSend.ReliableWithBuffering : P2PSend.Reliable : P2PSend.UnreliableNoDelay, 0);
             }catch(Exception e){
                 Log.err(e);
                 Log.info("Error sending packet. Disconnecting invalid client!");
@@ -430,6 +450,12 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             //TODO ???
             //snet.getP2PSessionState(sid, state);
             return true;//state.isConnectionActive();
+        }
+
+        @Override
+        protected void kickDisconnect(){
+            //delay the close so the kick packet can be sent on steam
+            Time.runTask(10f, this::close);
         }
 
         @Override

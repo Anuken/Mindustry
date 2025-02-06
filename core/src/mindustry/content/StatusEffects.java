@@ -3,20 +3,17 @@ package mindustry.content;
 import arc.*;
 import arc.graphics.*;
 import arc.math.*;
-import mindustry.ctype.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
-import mindustry.type.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
-
+import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
-public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, unmoving, slow, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed, disarmed, electrified, invincible;
+public class StatusEffects{
+    public static StatusEffect none, burning, freezing, unmoving, slow, fast, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed, disarmed, electrified, invincible, dynamic;
 
-    @Override
-    public void load(){
+    public static void load(){
 
         none = new StatusEffect("none");
 
@@ -28,11 +25,11 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 opposite(wet, freezing);
-                affinity(tarred, ((unit, result, time) -> {
+                affinity(tarred, (unit, result, time) -> {
                     unit.damagePierce(transitionDamage);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
                     result.set(burning, Math.min(time + result.time, 300f));
-                }));
+                });
             });
         }};
 
@@ -46,20 +43,32 @@ public class StatusEffects implements ContentList{
             init(() -> {
                 opposite(melting, burning);
 
-                affinity(blasted, ((unit, result, time) -> {
+                affinity(blasted, (unit, result, time) -> {
                     unit.damagePierce(transitionDamage);
-                }));
+                    if(unit.team == state.rules.waveTeam){
+                        Events.fire(Trigger.blastFreeze);
+                    }
+                });
             });
         }};
 
         unmoving = new StatusEffect("unmoving"){{
             color = Pal.gray;
-            speedMultiplier = 0.001f;
+            speedMultiplier = 0f;
         }};
 
         slow = new StatusEffect("slow"){{
             color = Pal.lightishGray;
             speedMultiplier = 0.4f;
+
+            init(() -> opposite(fast));
+        }};
+
+        fast = new StatusEffect("fast"){{
+            color = Pal.boostTo;
+            speedMultiplier = 1.6f;
+
+            init(() -> opposite(slow));
         }};
 
         wet = new StatusEffect("wet"){{
@@ -71,7 +80,8 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 affinity(shocked, (unit, result, time) -> {
-                    unit.damagePierce(transitionDamage);
+                    unit.damage(transitionDamage);
+
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
@@ -79,7 +89,7 @@ public class StatusEffects implements ContentList{
                 opposite(burning, melting);
             });
         }};
-		
+
         muddy = new StatusEffect("muddy"){{
             color = Color.valueOf("46382a");
             speedMultiplier = 0.94f;
@@ -192,6 +202,12 @@ public class StatusEffects implements ContentList{
 
         invincible = new StatusEffect("invincible"){{
             healthMultiplier = Float.POSITIVE_INFINITY;
+        }};
+
+        dynamic = new StatusEffect("dynamic"){{
+            show = false;
+            dynamic = true;
+            permanent = true;
         }};
     }
 }

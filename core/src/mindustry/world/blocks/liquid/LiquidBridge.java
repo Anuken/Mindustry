@@ -13,6 +13,7 @@ public class LiquidBridge extends ItemBridge{
         outputsLiquid = true;
         canOverdrive = false;
         group = BlockGroup.liquids;
+        envEnabled = Env.any;
     }
 
     public class LiquidBridgeBuild extends ItemBridgeBuild{

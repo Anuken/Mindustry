@@ -10,6 +10,8 @@ import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.graphics.MultiPacker.*;
 import mindustry.world.meta.*;
 
 public class StatusEffect extends UnlockableContent{
@@ -33,18 +35,32 @@ public class StatusEffect extends UnlockableContent{
     public float damage;
     /** Chance of effect appearing. */
     public float effectChance = 0.15f;
+    /** Should the effect be given a parent. */
+    public boolean parentizeEffect;
     /** If true, the effect never disappears. */
     public boolean permanent;
     /** If true, this effect will only react with other effects and cannot be applied. */
     public boolean reactive;
+    /** Special flag for the dynamic effect type with custom stats - do not use. */
+    public boolean dynamic = false;
     /** Whether to show this effect in the database. */
     public boolean show = true;
     /** Tint color of effect. */
     public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
     public Effect effect = Fx.none;
+    /** Effect that is displayed once when applied to a unit. */
+    public Effect applyEffect = Fx.none;
+    /** Whether the apply effect should display even if effect is already on the unit. */
+    public boolean applyExtend;
+    /** Tint color of apply effect. */
+    public Color applyColor = Color.white.cpy();
+    /** Should the apply effect be given a parent. */
+    public boolean parentizeApplyEffect;
     /** Affinity & opposite values for stat displays. */
     public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
+    /** Set to false to disable outline generation. */
+    public boolean outline = true;
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */
@@ -52,11 +68,15 @@ public class StatusEffect extends UnlockableContent{
 
     public StatusEffect(String name){
         super(name);
+        allDatabaseTabs = true;
     }
 
     @Override
     public void init(){
-        initblock.run();
+        super.init();
+        if(initblock != null){
+            initblock.run();
+        }
     }
 
     public void init(Runnable run){
@@ -70,18 +90,18 @@ public class StatusEffect extends UnlockableContent{
 
     @Override
     public void setStats(){
-        if(damageMultiplier != 1) stats.addPercent(Stat.damageMultiplier, damageMultiplier);
-        if(healthMultiplier != 1) stats.addPercent(Stat.healthMultiplier, healthMultiplier);
-        if(speedMultiplier != 1) stats.addPercent(Stat.speedMultiplier, speedMultiplier);
-        if(reloadMultiplier != 1) stats.addPercent(Stat.reloadMultiplier, reloadMultiplier);
-        if(buildSpeedMultiplier != 1) stats.addPercent(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
+        if(damageMultiplier != 1) stats.addMultModifier(Stat.damageMultiplier, damageMultiplier);
+        if(healthMultiplier != 1) stats.addMultModifier(Stat.healthMultiplier, healthMultiplier);
+        if(speedMultiplier != 1) stats.addMultModifier(Stat.speedMultiplier, speedMultiplier);
+        if(reloadMultiplier != 1) stats.addMultModifier(Stat.reloadMultiplier, reloadMultiplier);
+        if(buildSpeedMultiplier != 1) stats.addMultModifier(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
         if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
         if(damage < 0) stats.add(Stat.healing, -damage * 60f, StatUnit.perSecond);
 
         boolean reacts = false;
 
-        for(var e : opposites.asArray().sort()){
-            stats.add(Stat.opposites, e.emoji() + "" + e);
+        for(var e : opposites.toSeq().sort()){
+            stats.add(Stat.opposites, e.emoji() + e);
         }
 
         if(reactive){
@@ -94,8 +114,8 @@ public class StatusEffect extends UnlockableContent{
 
         //don't list affinities *and* reactions, as that would be redundant
         if(!reacts){
-            for(var e : affinities.asArray().sort()){
-                stats.add(Stat.affinities, e.emoji() + "" + e);
+            for(var e : affinities.toSeq().sort()){
+                stats.add(Stat.affinities, e.emoji() + e);
             }
 
             if(affinities.size > 0 && transitionDamage != 0){
@@ -120,8 +140,13 @@ public class StatusEffect extends UnlockableContent{
 
         if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
-            effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, color);
+            effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
+    }
+
+    /** Called when status effect is removed. */
+    public void onRemoved(Unit unit){
+
     }
 
     protected void trans(StatusEffect effect, TransitionHandler handler){
@@ -177,6 +202,19 @@ public class StatusEffect extends UnlockableContent{
             return true;
         }
         return false;
+    }
+
+    public void applied(Unit unit, float time, boolean extend){
+        if(!extend || applyExtend) applyEffect.at(unit.x, unit.y, 0, applyColor, parentizeApplyEffect ? unit : null);
+    }
+
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+
+        if(outline){
+            makeOutline(PageType.ui, packer, uiIcon, true, Pal.gray, 3);
+        }
     }
 
     @Override
