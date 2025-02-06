@@ -48,7 +48,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
         ItemSeq launch = universe.getLaunchResources();
         if(sector.planet.allowLaunchLoadout){
             for(var item : content.items()){
-                if(sector.planet.hiddenItems.contains(item)){
+                if(!item.isOnPlanet(sector.planet)){
                     launch.set(item, 0);
                 }
             }
@@ -72,7 +72,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 if(destination.preset != null){
                     var rules = destination.preset.generator.map.rules();
                     for(var stack : rules.loadout){
-                        if(!sector.planet.hiddenItems.contains(stack.item)){
+                        if(stack.item.isOnPlanet(sector.planet)){
                             resources.add(stack.item, stack.amount);
                         }
                     }
@@ -89,7 +89,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
             total.clear();
             selected.requirements().each(total::add);
             universe.getLaunchResources().each(total::add);
-            valid = sitems.has(total);
+            valid = sitems.has(total) || PlanetDialog.debugSelect;
         };
 
         Cons<Table> rebuild = table -> {
@@ -136,7 +136,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 ItemSeq realItems = sitems.copy();
                 selected.requirements().each(realItems::remove);
 
-                loadout.show(lastCapacity, realItems, out, i -> i.unlocked() && !sector.planet.hiddenItems.contains(i), out::clear, () -> {}, () -> {
+                loadout.show(lastCapacity, realItems, out, i -> i.unlocked() && i.isOnPlanet(sector.planet), out::clear, () -> {}, () -> {
                     universe.updateLaunchResources(new ItemSeq(out));
                     update.run();
                     rebuildItems.run();
@@ -172,7 +172,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 Cons<Schematic> handler = s -> {
                     if(s.tiles.contains(tile -> !tile.block.supportsEnv(sector.planet.defaultEnv) ||
                     //make sure block can be built here.
-                    (!sector.planet.hiddenItems.isEmpty() && Structs.contains(tile.block.requirements, stack -> sector.planet.hiddenItems.contains(stack.item))))){
+                    !tile.block.isOnPlanet(sector.planet))){
                         return;
                     }
 

@@ -9,7 +9,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 
-import java.io.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -90,8 +90,8 @@ public class HostDialog extends BaseDialog{
                 }
 
 
-            }catch(IOException e){
-                ui.showException("@server.error", e);
+            }catch(Exception e){
+                ui.showException(e.getMessage() != null && e.getMessage().toLowerCase(Locale.ROOT).contains("address already in use") ? "@server.error.addressinuse" : "@server.error", e);
             }
             ui.loadfrag.hide();
             hide();

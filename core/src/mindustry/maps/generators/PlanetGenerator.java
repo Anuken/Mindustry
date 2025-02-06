@@ -20,7 +20,6 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
     public int baseSeed = 0;
     public int seed = 0;
 
-    protected IntSeq ints = new IntSeq();
     protected @Nullable Sector sector;
 
     /** Should generate sector bases for a planet. */
@@ -40,7 +39,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
                 if(sector.planet.getSector(other).id == sector.planet.startSector){
                     return;
                 }
-                
+
                 if(sector.planet.getSector(other).generateEnemyBase){
                     any = false;
                     break;
@@ -56,6 +55,11 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
     /** @return whether to allow landing on the specified procedural sector */
     public boolean allowLanding(Sector sector){
         return sector.planet.allowLaunchToNumbered && (sector.hasBase() || sector.near().contains(Sector::hasBase));
+    }
+
+    /** @return whether to allow landing on the specified procedural sector */
+    public boolean allowAcceleratorLanding(Sector sector){
+        return sector.planet.allowLaunchToNumbered;
     }
 
     public void addWeather(Sector sector, Rules rules){

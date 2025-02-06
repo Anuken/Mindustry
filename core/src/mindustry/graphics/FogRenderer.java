@@ -16,7 +16,6 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-/** Highly experimental fog-of-war renderer. */
 public final class FogRenderer{
     private FrameBuffer staticFog = new FrameBuffer(), dynamicFog = new FrameBuffer();
     private LongSeq events = new LongSeq();

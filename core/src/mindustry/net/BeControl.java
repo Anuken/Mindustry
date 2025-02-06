@@ -31,7 +31,7 @@ public class BeControl{
 
     /** @return whether this is a bleeding edge build. */
     public boolean active(){
-        return Version.type.equals("bleeding-edge");
+        return Version.type.equals("bleeding-edge") && !steam;
     }
 
     public BeControl(){

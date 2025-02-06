@@ -20,6 +20,7 @@ public class HaloPart extends DrawPart{
     public Color color = Color.white;
     public @Nullable Color colorTo;
     public boolean mirror = false;
+    public boolean clampProgress = true;
     public PartProgress progress = PartProgress.warmup;
     public float layer = -1f, layerOffset = 0f;
 
@@ -32,7 +33,7 @@ public class HaloPart extends DrawPart{
         Draw.z(Draw.z() + layerOffset);
 
         float
-        prog = progress.getClamp(params),
+        prog = progress.getClamp(params, clampProgress),
         baseRot = Time.time * rotateSpeed,
         rad = radiusTo < 0 ? radius : Mathf.lerp(radius, radiusTo, prog),
         triLen = triLengthTo < 0 ? triLength : Mathf.lerp(triLength, triLengthTo, prog),

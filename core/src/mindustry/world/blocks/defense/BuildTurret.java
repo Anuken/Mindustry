@@ -77,7 +77,7 @@ public class BuildTurret extends BaseTurret{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public class BuildTurretBuild extends BaseTurretBuild implements ControlBlock{
+    public class BuildTurretBuild extends BaseTurretBuild implements ControlBlock, RotBlock{
         public BlockUnitc unit = (BlockUnitc)unitType.create(team);
         public @Nullable Unit following;
         public @Nullable BlockPlan lastPlan;
@@ -90,6 +90,11 @@ public class BuildTurret extends BaseTurret{
         @Override
         public boolean canControl(){
             return true;
+        }
+
+        @Override
+        public float buildRotation(){
+            return unit.rotation();
         }
 
         @Override
@@ -141,10 +146,10 @@ public class BuildTurret extends BaseTurret{
                     for(int i = 0; i < blocks.size; i++){
                         var block = blocks.get(i);
                         if(within(block.x * tilesize, block.y * tilesize, range)){
-                            var btype = content.block(block.block);
+                            var btype = block.block;
 
                             if(Build.validPlace(btype, unit.team(), block.x, block.y, block.rotation) && (state.rules.infiniteResources || team.rules().infiniteResources || team.items().has(btype.requirements, state.rules.buildCostMultiplier))){
-                                unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
+                                unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, block.block, block.config));
                                 //shift build plan to tail so next unit builds something else
                                 blocks.addLast(blocks.removeIndex(i));
                                 lastPlan = block;
