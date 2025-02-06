@@ -636,8 +636,7 @@ public class StatValues{
                     }
 
                     if(type.buildingDamageMultiplier != 1){
-                        int val = (int)(type.buildingDamageMultiplier * 100 - 100);
-                        sep(bt, Core.bundle.format("bullet.buildingdamage", ammoStat(val)));
+                        sep(bt, Core.bundle.format("bullet.buildingdamage", ammoStat((int)(type.buildingDamageMultiplier * 100 - 100))));
                     }
 
                     if(type.rangeChange != 0 && !compact){
@@ -645,7 +644,7 @@ public class StatValues{
                     }
 
                     if(type.shieldDamageMultiplier != 1){
-                        sep(bt, Core.bundle.format("bullet.shielddamage", (int)(type.shieldDamageMultiplier * 100)));
+                        sep(bt, Core.bundle.format("bullet.shielddamage", ammoStat((int)(type.shieldDamageMultiplier * 100 - 100))));
                     }
 
                     if(type.splashDamage > 0){
