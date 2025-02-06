@@ -1,0 +1,34 @@
+A Mindustry egy gyárépítő játék Toronyvédő és RTS elemekkel. Készíts bonyolult ellátási láncokat, hogy lőszert juttass a lövegtornyokba, termelj az építkezéshez használható nyersanyagokat, és állíts elő egységeket. Irányítsd az egységeket, hogy elfoglald az ellenséges bázisokat, és bővítsd a termelésedet. Védd meg a magodat a hullámokban támadó ellenségtől.
+
+<h2>A játékmenet szolgáltatásai</h2>
+ 
+- Használd a gyártó-blokkokat a legkülönfélébb fejlett nyersanyagok létrehozásához
+- Védd meg az építményeidet a hullámokban támadó ellenségektől
+- Játssz vállvetve a barátaiddal a platformokon átívelő többjátékos módban, vagy hívd ki őket csapat alapú PvP meccsekre
+- Oszd szét a folyadékokat, és küzdj meg az állandó kihívásokkal, mint például a tűzkitörések, vagy az ellenséges repülőgépek rajtaütéseivel
+- Hozd ki a legtöbbet a termelésből az opcionális hűtő- és kenőanyag-ellátással
+- Egységek széles skáláját állíthatod elő a bázisod automatikus irányításához és az ellenséges bázisok megtámadásához
+- Állíts fel összeszerelősorokat a gépesített egységek hadainak előállításához
+- Használd az egységeidet a hatékonyan felszerelt ellenséges bázisok ellen
+
+
+<h2>Hadjárat</h2>
+
+- Hódítsd meg a Serpulo és az Erekir bolygót, miközben 35 kézzel készített pályán és 250+ procedurálisan generált szektoron keresztül haladsz
+- Foglalj el területeket és építs gyárakat, hogy nyersanyagokat termelhess, miközben más szektorokban játszol
+- Védd meg a szektorokat az időszakos invázióktól
+- Koordináld az erőforrások elosztását a szektorok között az indítóállások felhasználásával
+- Fedezz fel új épületeket, gyárakat a fejlődés elősegítése érdekében
+- Hívd meg barátaidat, hogy együtt teljesítsék a küldetéseket
+- 250+ technológiai épület használatának elsajátítása
+- 50+ különböző típusú drón, mech és hajó
+
+
+<h2>Egyéni és platformokon átívelő többjátékos módok</h2>
+
+- 16+ beépített pálya az egyéni játékokhoz, a két teljes értékű hadjárat mellett
+- Játssz kooperatív módban, PvP-ben, vagy a homokozóban
+- Hozz létre nyilvános dedikált szervert, vagy hívd meg a barátaidat a saját privát munkamenetedre
+- Testre szabható játékszabályok: Változtasd meg az épületek építési költségeit, az ellenséges statisztikákat, a kezdő elemeket, a hullámok időzítését és így tovább
+- Teljes funkcionalitású térképszerkesztő, parancsfájl támogatással
+- Beépített mod böngésző és mod támogatás

@@ -180,6 +180,8 @@ public class SettingsMenuDialog extends BaseDialog{
             t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
                 try{
                     importData(file);
+                    control.saves.resetSave();
+                    state = new GameState();
                     Core.app.exit();
                 }catch(IllegalArgumentException e){
                     ui.showErrorMessage("@data.invalid");
@@ -295,6 +297,7 @@ public class SettingsMenuDialog extends BaseDialog{
     }
 
     void addSettings(){
+        sound.checkPref("alwaysmusic", false);
         sound.sliderPref("musicvol", 100, 0, 100, 1, i -> i + "%");
         sound.sliderPref("sfxvol", 100, 0, 100, 1, i -> i + "%");
         sound.sliderPref("ambientvol", 100, 0, 100, 1, i -> i + "%");
@@ -330,6 +333,13 @@ public class SettingsMenuDialog extends BaseDialog{
             game.checkPref("crashreport", true);
         }
 
+        game.checkPref("communityservers", true, val -> {
+            defaultServers.clear();
+            if(val){
+                JoinDialog.fetchServers();
+            }
+        });
+
         game.checkPref("savecreate", true);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
@@ -339,6 +349,7 @@ public class SettingsMenuDialog extends BaseDialog{
         if(!mobile){
             game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
+            game.checkPref("distinctcontrolgroups", true);
         }
 
         game.checkPref("doubletapmine", false);
@@ -386,6 +397,7 @@ public class SettingsMenuDialog extends BaseDialog{
             }
             return s + "%";
         });
+        graphics.sliderPref("unitlaseropacity", 100, 0, 100, 5, s -> s + "%");
         graphics.sliderPref("bridgeopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
@@ -438,6 +450,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         graphics.checkPref("effects", true);
         graphics.checkPref("atmosphere", !mobile);
+        graphics.checkPref("drawlight", true);
         graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
@@ -524,7 +537,9 @@ public class SettingsMenuDialog extends BaseDialog{
                 path = path.startsWith("/") ? path.substring(1) : path;
                 zos.putNextEntry(new ZipEntry(path));
                 if(!add.isDirectory()){
-                    Streams.copy(add.read(), zos);
+                    try(var stream = add.read()){
+                        Streams.copy(stream, zos);
+                    }
                 }
                 zos.closeEntry();
             }

@@ -6,12 +6,14 @@ import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.io.*;
 import mindustry.maps.filters.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -101,6 +103,10 @@ public class Map implements Comparable<Map>, Publishable{
             //this replacement is a MASSIVE hack but it fixes some incorrect overwriting of team-specific rules.
             //may need to be tweaked later
             Rules result = JsonIO.read(Rules.class, base, tags.get("rules", "{}").replace("teams:{2:{infiniteAmmo:true}},", ""));
+            //replace the default serpulo env with erekir
+            if(result.planet == Planets.serpulo && result.hasEnv(Env.scorching)){
+                result.planet = Planets.erekir;
+            }
             if(result.spawns.isEmpty()) result.spawns = Vars.waves.get();
             return result;
         }catch(Exception e){

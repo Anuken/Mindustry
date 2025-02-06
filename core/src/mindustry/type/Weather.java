@@ -161,7 +161,7 @@ public class Weather extends UnlockableContent{
         Core.camera.bounds(Tmp.r2);
         int total = (int)(Tmp.r1.area() / density * intensity);
         Lines.stroke(stroke);
-        float alpha = Draw.getColor().a;
+        float alpha = Draw.getColorAlpha();
         Draw.color(color);
 
         for(int i = 0; i < total; i++){
@@ -314,7 +314,7 @@ public class Weather extends UnlockableContent{
     @EntityDef(value = {WeatherStatec.class}, pooled = true, isFinal = false)
     @Component(base = true)
     abstract static class WeatherStateComp implements Drawc, Syncc{
-        private static final float fadeTime = 60 * 4;
+        public static final float fadeTime = 60 * 4;
 
         Weather weather;
         float intensity = 1f, opacity = 0f, life, effectTimer;

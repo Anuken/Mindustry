@@ -153,7 +153,7 @@ public abstract class MapListDialog extends BaseDialog{
 
                 if(displayType){
                     button.row();
-                    button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName() : "@builtin").color(Color.gray).padTop(3);
+                    button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName : "@builtin").color(Color.gray).padTop(3);
                 }
 
                 i++;

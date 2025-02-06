@@ -27,13 +27,15 @@ public class TraceDialog extends BaseDialog{
 
         var style = Styles.emptyi;
         float s = 28f;
-
+        
         table.table(c -> {
             c.left().defaults().left();
             c.button(Icon.copySmall, style, () -> copy(player.name)).size(s).padRight(4f);
             c.add(Core.bundle.format("trace.playername", player.name)).row();
             c.button(Icon.copySmall, style, () -> copy(info.ip)).size(s).padRight(4f);
             c.add(Core.bundle.format("trace.ip", info.ip)).row();
+            c.button(Icon.copySmall, style, () -> copy(info.locale)).size(s).padRight(4f);
+            c.add(Core.bundle.format("trace.language", info.locale)).row();
             c.button(Icon.copySmall, style, () -> copy(info.uuid)).size(s).padRight(4f);
             c.add(Core.bundle.format("trace.id", info.uuid)).row();
         }).row();

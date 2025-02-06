@@ -32,7 +32,6 @@ public class BaseBuilderAI{
 
     private static int correct = 0, incorrect = 0;
 
-    private int lastX, lastY, lastW, lastH;
     private boolean foundPath;
 
     final TeamData data;
@@ -259,13 +258,8 @@ public class BaseBuilderAI{
 
         //queue it
         for(Stile tile : result.tiles){
-            data.plans.add(new BlockPlan(cx + tile.x, cy + tile.y, tile.rotation, tile.block.id, tile.config));
+            data.plans.add(new BlockPlan(cx + tile.x, cy + tile.y, tile.rotation, tile.block, tile.config));
         }
-
-        lastX = cx - 1;
-        lastY = cy - 1;
-        lastW = result.width + 2;
-        lastH = result.height + 2;
 
         return true;
     }
