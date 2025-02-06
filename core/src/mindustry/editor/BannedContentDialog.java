@@ -70,7 +70,7 @@ public class BannedContentDialog<T extends UnlockableContent> extends BaseDialog
                 t.table(c -> {
                     c.marginTop(8f);
                     c.defaults().marginRight(4f);
-                    for (Category category : Category.values()){
+                    for(Category category : Category.values()){
                         c.button(ui.getIcon(category.name()), Styles.squareTogglei, () -> {
                             if(selectedCategory == category){
                                 selectedCategory = null;
@@ -183,7 +183,7 @@ public class BannedContentDialog<T extends UnlockableContent> extends BaseDialog
             for(T content : array){
                 TextureRegion region = content.uiIcon;
 
-                ImageButton button = new ImageButton(Tex.whiteui, Styles.squarei);
+                ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNonei);
                 button.getStyle().imageUp = new TextureRegionDrawable(region);
                 button.resizeImage(8 * 4f);
                 if(isSelected) button.clicked(() -> {
