@@ -163,7 +163,7 @@ public class Sector{
     }
 
     public boolean isCaptured(){
-        if(isBeingPlayed()) return !info.waves && !info.attack;
+        if(isBeingPlayed()) return !state.rules.waves && !state.rules.attackMode;
         return save != null && !info.waves && !info.attack;
     }
 

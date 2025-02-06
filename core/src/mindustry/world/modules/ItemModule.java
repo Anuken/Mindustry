@@ -179,8 +179,7 @@ public class ItemModule extends BlockModule{
         return total > 0;
     }
 
-    @Nullable
-    public Item first(){
+    public @Nullable Item first(){
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
                 return content.item(i);
@@ -189,8 +188,7 @@ public class ItemModule extends BlockModule{
         return null;
     }
 
-    @Nullable
-    public Item take(){
+    public @Nullable Item take(){
         for(int i = 0; i < items.length; i++){
             int index = (i + takeRotation);
             if(index >= items.length) index -= items.length;
@@ -202,30 +200,6 @@ public class ItemModule extends BlockModule{
             }
         }
         return null;
-    }
-
-    /** Begins a speculative take operation. This returns the item that would be returned by #take(), but does not change state. */
-    @Nullable
-    public Item takeIndex(int takeRotation){
-        for(int i = 0; i < items.length; i++){
-            int index = (i + takeRotation);
-            if(index >= items.length) index -= items.length;
-            if(items[index] > 0){
-                return content.item(index);
-            }
-        }
-        return null;
-    }
-
-    public int nextIndex(int takeRotation){
-        for(int i = 1; i < items.length; i++){
-            int index = (i + takeRotation);
-            if(index >= items.length) index -= items.length;
-            if(items[index] > 0){
-                return (takeRotation + i) % items.length;
-            }
-        }
-        return takeRotation;
     }
 
     public int get(int id){

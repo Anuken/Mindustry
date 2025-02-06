@@ -117,6 +117,8 @@ public class NetServer implements ApplicationListener{
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
     /** Packet handlers for custom types of messages. */
     private ObjectMap<String, Seq<Cons2<Player, String>>> customPacketHandlers = new ObjectMap<>();
+    /** Packet handlers for custom types of messages - binary version. */
+    private ObjectMap<String, Seq<Cons2<Player, byte[]>>> customBinaryPacketHandlers = new ObjectMap<>();
     /** Packet handlers for logic client data */
     private ObjectMap<String, Seq<Cons2<Player, Object>>> logicClientDataHandlers = new ObjectMap<>();
 
@@ -423,7 +425,7 @@ public class NetServer implements ApplicationListener{
             }
         });
 
-        clientCommands.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Admin can cancel the voting with 'c'.", (arg, player) -> {
+        clientCommands.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Admins can cancel the voting with 'c'.", (arg, player) -> {
             if(currentlyKicking == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
@@ -517,6 +519,14 @@ public class NetServer implements ApplicationListener{
         return customPacketHandlers.get(type, Seq::new);
     }
 
+    public void addBinaryPacketHandler(String type, Cons2<Player, byte[]> handler){
+        customBinaryPacketHandlers.get(type, Seq::new).add(handler);
+    }
+
+    public Seq<Cons2<Player, byte[]>> getBinaryPacketHandlers(String type){
+        return customBinaryPacketHandlers.get(type, Seq::new);
+    }
+
     public void addLogicDataHandler(String type, Cons2<Player, Object> handler){
         logicClientDataHandlers.get(type, Seq::new).add(handler);
     }
@@ -590,6 +600,20 @@ public class NetServer implements ApplicationListener{
     }
 
     @Remote(targets = Loc.client)
+    public static void serverBinaryPacketReliable(Player player, String type, byte[] contents){
+        if(netServer.customPacketHandlers.containsKey(type)){
+            for(var c : netServer.customBinaryPacketHandlers.get(type)){
+                c.get(player, contents);
+            }
+        }
+    }
+
+    @Remote(targets = Loc.client, unreliable = true)
+    public static void serverBinaryPacketUnreliable(Player player, String type, byte[] contents){
+        serverBinaryPacketReliable(player, type, contents);
+    }
+
+    @Remote(targets = Loc.client)
     public static void clientLogicDataReliable(Player player, String channel, Object value){
         Seq<Cons2<Player, Object>> handlers = netServer.logicClientDataHandlers.get(channel);
         if(handlers != null){
@@ -608,7 +632,7 @@ public class NetServer implements ApplicationListener{
         return Float.isInfinite(f) || Float.isNaN(f);
     }
 
-    @Remote(targets = Loc.client, unreliable = true)
+    @Remote(targets = Loc.client, unreliable = true, priority = PacketPriority.high)
     public static void clientSnapshot(
     Player player,
     int snapshotID,
@@ -791,7 +815,7 @@ public class NetServer implements ApplicationListener{
             }
             case trace -> {
                 PlayerInfo stats = netServer.admins.getInfo(other.uuid());
-                TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.con.modclient, other.con.mobile, stats.timesJoined, stats.timesKicked, stats.ips.toArray(String.class), stats.names.toArray(String.class));
+                TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.locale, other.con.modclient, other.con.mobile, stats.timesJoined, stats.timesKicked, stats.ips.toArray(String.class), stats.names.toArray(String.class));
                 if(player.con != null){
                     Call.traceInfo(player.con, other, info);
                 }else{
@@ -806,7 +830,7 @@ public class NetServer implements ApplicationListener{
         }
     }
 
-    @Remote(targets = Loc.client)
+    @Remote(targets = Loc.client, priority = PacketPriority.high)
     public static void connectConfirm(Player player){
         if(player.con.kicked) return;
 
@@ -1058,7 +1082,7 @@ public class NetServer implements ApplicationListener{
                 try{
                     writeEntitySnapshot(player);
                 }catch(IOException e){
-                    e.printStackTrace();
+                    Log.err(e);
                 }
             });
 

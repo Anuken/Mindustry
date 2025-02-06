@@ -62,12 +62,13 @@ public class Mods implements Loadable{
         return mainLoader;
     }
 
-    /** @return the folder where configuration files for this mod should go. The folder may not exist yet; call mkdirs() before writing to it.
-     * Call this in init(). */
+    /** @return the folder where configuration files for this mod should go. Call this in init(). */
     public Fi getConfigFolder(Mod mod){
         ModMeta load = metas.get(mod.getClass());
         if(load == null) throw new IllegalArgumentException("Mod is not loaded yet (or missing)!");
-        return modDirectory.child(load.name);
+        Fi result = modDirectory.child(load.name);
+        result.mkdirs();
+        return result;
     }
 
     /** @return a file named 'config.json' in the config folder for the specified mod.
@@ -411,6 +412,14 @@ public class Mods implements Loadable{
 
     /** Removes a mod file and marks it for requiring a restart. */
     public void removeMod(LoadedMod mod){
+        if(!android && mod.loader != null){
+            try{
+                ClassLoaderCloser.close(mod.loader);
+            }catch(Exception e){
+                Log.err(e);
+            }
+        }
+
         if(mod.root instanceof ZipFi){
             mod.root.delete();
         }
@@ -423,7 +432,9 @@ public class Mods implements Loadable{
         }
         mods.remove(mod);
         mod.dispose();
-        requiresReload = true;
+        if(mod.state != ModState.disabled){
+            requiresReload = true;
+        }
     }
 
     public Scripts getScripts(){
@@ -786,6 +797,8 @@ public class Mods implements Loadable{
 
         //this finishes parsing content fields
         parser.finishParsing();
+
+        Events.fire(new ModContentLoadEvent());
     }
 
     public void handleContentError(Content content, Throwable error){
@@ -957,6 +970,12 @@ public class Mods implements Loadable{
             if(other != null){
                 //steam mods can't really be deleted, they need to be unsubscribed
                 if(overwrite && !other.hasSteamID()){
+
+                    //close the classloader for jar mods
+                    if(!android){
+                        ClassLoaderCloser.close(other.loader);
+                    }
+
                     //close zip file
                     if(other.root instanceof ZipFi){
                         other.root.delete();
@@ -1251,6 +1270,7 @@ public class Mods implements Loadable{
             if(name != null) name = Strings.stripColors(name);
             if(displayName != null) displayName = Strings.stripColors(displayName);
             if(displayName == null) displayName = name;
+            if(version == null) version = "0";
             if(author != null) author = Strings.stripColors(author);
             if(description != null) description = Strings.stripColors(description);
             if(subtitle != null) subtitle = Strings.stripColors(subtitle).replace("\n", "");

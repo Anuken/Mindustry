@@ -17,7 +17,7 @@ public class UnitCommand extends MappableContent{
     @Deprecated
     public static final Seq<UnitCommand> all = new Seq<>();
 
-    public static UnitCommand moveCommand, repairCommand, rebuildCommand, assistCommand, mineCommand, boostCommand, enterPayloadCommand, loadUnitsCommand, loadBlocksCommand, unloadPayloadCommand;
+    public static UnitCommand moveCommand, repairCommand, rebuildCommand, assistCommand, mineCommand, boostCommand, enterPayloadCommand, loadUnitsCommand, loadBlocksCommand, unloadPayloadCommand, loopPayloadCommand;
 
     /** Name of UI icon (from Icon class). */
     public final String icon;
@@ -106,6 +106,11 @@ public class UnitCommand extends MappableContent{
             exactArrival = true;
         }};
         unloadPayloadCommand = new UnitCommand("unloadPayload", "download", Binding.unit_command_unload_payload, null){{
+            switchToMove = false;
+            drawTarget = true;
+            resetTarget = false;
+        }};
+        loopPayloadCommand = new UnitCommand("loopPayload", "resize", Binding.unit_command_loop_payload, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;

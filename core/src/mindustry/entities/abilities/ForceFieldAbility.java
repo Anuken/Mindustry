@@ -106,6 +106,15 @@ public class ForceFieldAbility extends Ability{
     }
 
     @Override
+    public void death(Unit unit){
+
+        //self-destructing units can have a shield on death
+        if(unit.shield > 0f && !wasBroken){
+            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), this);
+        }
+    }
+
+    @Override
     public void draw(Unit unit){
         checkRadius(unit);
 
@@ -129,6 +138,11 @@ public class ForceFieldAbility extends Ability{
     @Override
     public void displayBars(Unit unit, Table bars){
         bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> unit.shield / max)).row();
+    }
+
+    @Override
+    public void created(Unit unit){
+        unit.shield = max;
     }
 
     public void checkRadius(Unit unit){

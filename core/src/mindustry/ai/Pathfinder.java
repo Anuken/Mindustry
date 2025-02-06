@@ -2,6 +2,7 @@ package mindustry.ai;
 
 import arc.*;
 import arc.func.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -16,6 +17,7 @@ import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
+import static mindustry.world.meta.BlockFlag.*;
 
 public class Pathfinder implements Runnable{
     private static final long maxUpdate = Time.millisToNanos(8);
@@ -37,7 +39,8 @@ public class Pathfinder implements Runnable{
     public static final int
         costGround = 0,
         costLegs = 1,
-        costNaval = 2;
+        costNaval = 2,
+        costHover = 3;
 
     public static final Seq<PathCost> costTypes = Seq.with(
         //ground
@@ -61,7 +64,13 @@ public class Pathfinder implements Runnable{
             PathTile.health(tile) * 5 +
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
             (PathTile.deep(tile) ? 0 : 1) +
-            (PathTile.damages(tile) ? 35 : 0)
+            (PathTile.damages(tile) ? 35 : 0),
+
+        //hover
+        (team, tile) ->
+            (((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
+            PathTile.health(tile) * 5 +
+            (PathTile.nearSolid(tile) ? 2 : 0)
     );
 
     /** tile data, see PathTileStruct - kept as a separate array for threading reasons */
@@ -243,6 +252,8 @@ public class Pathfinder implements Runnable{
                 data.dirty = true;
             }
         });
+
+        controlPath.updateTile(tile);
     }
 
     /** Thread implementation. */
@@ -452,8 +463,34 @@ public class Pathfinder implements Runnable{
     }
 
     public static class EnemyCoreField extends Flowfield{
+        private final static BlockFlag[] randomTargets = {storage, generator, launchPad, factory, repair, battery, reactor, drill};
+        private Rand rand = new Rand();
+
         @Override
         protected void getPositions(IntSeq out){
+            if(state.rules.randomWaveAI && team == state.rules.waveTeam){
+                rand.setSeed(state.rules.waves ? state.wave : (int)(state.tick / (5400)) + hashCode());
+
+                //maximum amount of different target flag types they will attack
+                int max = 1;
+
+                for(int attempt = 0; attempt < 5 && max > 0; attempt++){
+                    var targets = indexer.getEnemy(team, randomTargets[rand.random(randomTargets.length - 1)]);
+                    if(!targets.isEmpty()){
+                        boolean any = false;
+                        for(Building other : targets){
+                            if((other.items != null && other.items.any()) || other.status() != BlockStatus.noInput){
+                                out.add(other.tile.array());
+                                any = true;
+                            }
+                        }
+                        if(any){
+                            max --;
+                        }
+                    }
+                }
+            }
+
             for(Building other : indexer.getEnemy(team, BlockFlag.core)){
                 out.add(other.tile.array());
             }

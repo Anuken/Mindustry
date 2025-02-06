@@ -35,7 +35,10 @@ public class Net{
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
     private final ObjectMap<Class<?>, Cons2<NetConnection, Object>> serverListeners = new ObjectMap<>();
     private final IntMap<StreamBuilder> streams = new IntMap<>();
-    private final ExecutorService pingExecutor = OS.isWindows && !OS.is64Bit ? Threads.boundedExecutor("Ping Servers", 5) : Threads.unboundedExecutor();
+    private final ExecutorService pingExecutor =
+        OS.isWindows && !OS.is64Bit ? Threads.boundedExecutor("Ping Servers", 5) : //on 32-bit windows, thread spam crashes
+        OS.isIos ? Threads.boundedExecutor("Ping Servers", 32) : //on IOS, 256 threads can crash, so limit the amount
+        Threads.unboundedExecutor();
 
     private final NetProvider provider;
 
@@ -303,14 +306,17 @@ public class Net{
      * Call to handle a packet being received for the server.
      */
     public void handleServerReceived(NetConnection connection, Packet object){
-        object.handled();
 
         try{
-            //handle object normally
-            if(serverListeners.get(object.getClass()) != null){
-                serverListeners.get(object.getClass()).get(connection, object);
-            }else{
-                object.handleServer(connection);
+            if(connection.hasConnected || object.getPriority() == Packet.priorityHigh){
+                object.handled();
+
+                //handle object normally
+                if(serverListeners.get(object.getClass()) != null){
+                    serverListeners.get(object.getClass()).get(connection, object);
+                }else{
+                    object.handleServer(connection);
+                }
             }
         }catch(ValidateException e){
             //ignore invalid actions

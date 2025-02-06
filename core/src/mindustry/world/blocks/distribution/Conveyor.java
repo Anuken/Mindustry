@@ -30,6 +30,7 @@ public class Conveyor extends Block implements Autotiler{
 
     public float speed = 0f;
     public float displayedSpeed = 0f;
+    public boolean pushUnits = true;
 
     public @Nullable Block junctionReplacement, bridgeReplacement;
 
@@ -223,7 +224,7 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void unitOn(Unit unit){
 
-            if(clogHeat > 0.5f || !enabled) return;
+            if(!pushUnits || clogHeat > 0.5f || !enabled) return;
 
             noSleep();
 

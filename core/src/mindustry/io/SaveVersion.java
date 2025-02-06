@@ -232,7 +232,8 @@ public abstract class SaveVersion extends SaveFileReader{
             Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
 
-            boolean savedata = tile.block().saveData;
+            boolean savedata = tile.floor().saveData || tile.overlay().saveData || tile.block().saveData;
+
             byte packed = (byte)((tile.build != null ? 1 : 0) | (savedata ? 2 : 0));
 
             //make note of whether there was an entity/rotation here
@@ -367,7 +368,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 stream.writeShort(block.x);
                 stream.writeShort(block.y);
                 stream.writeShort(block.rotation);
-                stream.writeShort(block.block);
+                stream.writeShort(block.block.id);
                 TypeIO.writeObject(Writes.get(stream), block.config);
             }
         }
@@ -425,7 +426,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 var obj = TypeIO.readObject(reads);
                 //cannot have two in the same position
                 if(set.add(Point2.pack(x, y))){
-                    data.plans.addLast(new BlockPlan(x, y, rot, content.block(bid).id, obj));
+                    data.plans.addLast(new BlockPlan(x, y, rot, content.block(bid), obj));
                 }
             }
         }

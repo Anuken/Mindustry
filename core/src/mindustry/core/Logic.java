@@ -92,7 +92,7 @@ public class Logic implements ApplicationListener{
                         if(wavesPassed > 0){
                             //simulate wave counter moving forward
                             state.wave += wavesPassed;
-                            state.wavetime = state.rules.waveSpacing;
+                            state.wavetime = state.rules.waveSpacing * state.getPlanet().campaignRules.difficulty.waveTimeMultiplier;
 
                             SectorDamage.applyCalculatedDamage();
                         }
@@ -131,6 +131,7 @@ public class Logic implements ApplicationListener{
                 //enable building AI on campaign unless the preset disables it
 
                 state.rules.coreIncinerates = true;
+                state.rules.allowEditWorldProcessors = false;
                 state.rules.waveTeam.rules().infiniteResources = true;
                 state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
 
@@ -209,8 +210,7 @@ public class Logic implements ApplicationListener{
         var bounds = tile.block().bounds(tile.x, tile.y, Tmp.r1);
         while(it.hasNext()){
             BlockPlan b = it.next();
-            Block block = content.block(b.block);
-            if(bounds.overlaps(block.bounds(b.x, b.y, Tmp.r2))){
+            if(bounds.overlaps(b.block.bounds(b.x, b.y, Tmp.r2))){
                 b.removed = true;
                 it.remove();
             }
@@ -221,7 +221,7 @@ public class Logic implements ApplicationListener{
     public void play(){
         state.set(State.playing);
         //grace period of 2x wave time before game starts
-        state.wavetime = state.rules.initialWaveSpacing <= 0 ? state.rules.waveSpacing * 2 : state.rules.initialWaveSpacing;
+        state.wavetime = (state.rules.initialWaveSpacing <= 0 ? state.rules.waveSpacing * 2 : state.rules.initialWaveSpacing) * (state.isCampaign() ? state.getPlanet().campaignRules.difficulty.waveTimeMultiplier : 1f);;
         Events.fire(new PlayEvent());
 
         //add starting items
@@ -270,7 +270,7 @@ public class Logic implements ApplicationListener{
     public void runWave(){
         spawner.spawnEnemies();
         state.wave++;
-        state.wavetime = state.rules.waveSpacing;
+        state.wavetime = state.rules.waveSpacing * (state.isCampaign() ? state.getPlanet().campaignRules.difficulty.waveTimeMultiplier : 1f);
 
         Events.fire(new WaveEvent());
     }
@@ -394,8 +394,8 @@ public class Logic implements ApplicationListener{
     public static void researched(Content content){
         if(!(content instanceof UnlockableContent u)) return;
 
-        boolean was = u.unlockedNow();
-        state.rules.researched.add(u.name);
+        boolean was = u.unlockedNowHost();
+        state.rules.researched.add(u);
 
         if(!was){
             Events.fire(new UnlockEvent(u));
@@ -405,7 +405,9 @@ public class Logic implements ApplicationListener{
     @Override
     public void dispose(){
         //save the settings before quitting
-        netServer.admins.forceSave();
+        if(netServer != null){
+            netServer.admins.forceSave();
+        }
         Core.settings.manualSave();
     }
 
@@ -427,6 +429,8 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
+                Events.fire(Trigger.beforeGameUpdate);
+
                 float delta = Core.graphics.getDeltaTime();
                 state.tick += Float.isNaN(delta) || Float.isInfinite(delta) ? 0f : delta * 60f;
                 state.updateId ++;
@@ -486,6 +490,8 @@ public class Logic implements ApplicationListener{
                 Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
                 Groups.update();
+
+                Events.fire(Trigger.afterGameUpdate);
             }
 
             if(runStateCheck){

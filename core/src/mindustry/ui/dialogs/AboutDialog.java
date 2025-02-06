@@ -41,7 +41,7 @@ public class AboutDialog extends BaseDialog{
         ScrollPane pane = new ScrollPane(in);
 
         for(LinkEntry link : Links.getLinks()){
-            if((ios || OS.isMac || steam) && bannedItems.contains(link.name)){
+            if((ios || steam) && bannedItems.contains(link.name)){
                 continue;
             }
 
@@ -50,7 +50,7 @@ public class AboutDialog extends BaseDialog{
             table.table(img -> {
                 img.image().height(h - 5).width(40f).color(link.color);
                 img.row();
-                img.image().height(5).width(40f).color(link.color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
+                img.image().height(5).width(40f).color(link.color.cpy().mul(0.6f, 0.6f, 0.8f, 1f));
             }).expandY();
 
             table.table(i -> {
@@ -64,7 +64,7 @@ public class AboutDialog extends BaseDialog{
                 inset.labelWrap(link.description).width(w - 100f - h).color(Color.lightGray).growX();
             }).padLeft(8);
 
-            table.button(Icon.link, Styles.clearNoneTogglei, () -> {
+            table.button(Icon.link, Styles.clearNonei, () -> {
                 if(link.name.equals("wiki")) Events.fire(Trigger.openWiki);
 
                 if(!Core.app.openURI(link.link)){

@@ -138,7 +138,9 @@ public class JoinDialog extends BaseDialog{
 
         refreshLocal();
         refreshRemote();
-        refreshCommunity();
+        if(Core.settings.getBool("communityservers", true)){
+            refreshCommunity();
+        }
     }
 
     void setupRemote(){
@@ -317,7 +319,9 @@ public class JoinDialog extends BaseDialog{
 
         section(steam ? "@servers.local.steam" : "@servers.local", local, false);
         section("@servers.remote", remote, false);
-        section("@servers.global", global, true);
+        if(Core.settings.getBool("communityservers", true)){
+            section("@servers.global", global, true);
+        }
 
         ScrollPane pane = new ScrollPane(hosts);
         pane.setFadeScrollBars(false);
@@ -599,7 +603,7 @@ public class JoinDialog extends BaseDialog{
                 connect(lastIp, lastPort);
             }, exception -> {});
         }, 1, 1);
-        
+
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
             if(ping == null) return;
@@ -631,12 +635,30 @@ public class JoinDialog extends BaseDialog{
             Core.settings.remove("server-list");
         }
 
-        var url = Version.type.equals("bleeding-edge")  ? serverJsonBeURL : serverJsonURL;
-        Log.info("Fetching community servers at @", url);
+        fetchServers();
+    }
+
+    public static void fetchServers(){
+        var urls = Version.type.equals("bleeding-edge") || Vars.forceBeServers ? serverJsonBeURLs : serverJsonURLs;
+
+        if(Core.settings.getBool("communityservers", true)){
+            fetchServers(urls, 0);
+        }
+    }
+
+    private static void fetchServers(String[] urls, int index){
+        if(index >= urls.length) return;
 
         //get servers
-        Http.get(url)
-        .error(t -> Log.err("Failed to fetch community servers", t))
+        Http.get(urls[index])
+        .error(t -> {
+            if(index < urls.length - 1){
+                //attempt fetching from the next URL upon failure
+                fetchServers(urls, index + 1);
+            }else{
+                Log.err("Failed to fetch community servers", t);
+            }
+        })
         .submit(result -> {
             Jval val = Jval.read(result.getResultAsString());
             Seq<ServerGroup> servers = new Seq<>();
@@ -655,7 +677,7 @@ public class JoinDialog extends BaseDialog{
             Core.app.post(() -> {
                 servers.sort(s -> s.name == null ? Integer.MAX_VALUE : s.name.hashCode());
                 defaultServers.addAll(servers);
-                Log.info("Fetched @ community servers.", defaultServers.size);
+                Log.info("Fetched @ community servers.", defaultServers.sum(s -> s.addresses.length));
             });
         });
     }
