@@ -27,7 +27,7 @@ public class HexSkyMesh extends PlanetMesh{
 
             @Override
             public boolean skip(Vec3 position){
-                return Simplex.noise3d(planet.id + seed, octaves, persistence, scl, position.x, position.y * 3f, position.z) >= thresh;
+                return Simplex.noise3d(7 + seed, octaves, persistence, scl, position.x, position.y * 3f, position.z) >= thresh;
             }
         }, divisions, false, planet.radius, radius), Shaders.clouds);
 
@@ -44,7 +44,7 @@ public class HexSkyMesh extends PlanetMesh{
     @Override
     public void render(PlanetParams params, Mat3D projection, Mat3D transform){
         //don't waste performance rendering 0-alpha clouds
-        if(Mathf.zero(1f - params.uiAlpha, 0.01f)) return;
+        if(params.planet == planet && Mathf.zero(1f - params.uiAlpha, 0.01f)) return;
 
         preRender(params);
         shader.bind();
@@ -59,6 +59,6 @@ public class HexSkyMesh extends PlanetMesh{
         Shaders.clouds.planet = planet;
         Shaders.clouds.lightDir.set(planet.solarSystem.position).sub(planet.position).rotate(Vec3.Y, planet.getRotation() + relRot()).nor();
         Shaders.clouds.ambientColor.set(planet.solarSystem.lightColor);
-        Shaders.clouds.alpha = 1f - params.uiAlpha;
+        Shaders.clouds.alpha = params.planet == planet ? 1f - params.uiAlpha : 1f;
     }
 }

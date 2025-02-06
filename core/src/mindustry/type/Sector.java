@@ -9,6 +9,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.game.Saves.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -79,12 +80,30 @@ public class Sector{
         return hasBase() || (preset != null && preset.alwaysUnlocked);
     }
 
+    public boolean allowLaunchSchematics(){
+        return (preset != null && preset.overrideLaunchDefaults) ? preset.allowLaunchSchematics : planet.allowLaunchSchematics;
+    }
+
+    public boolean allowLaunchLoadout(){
+        return (preset != null && preset.overrideLaunchDefaults) ? preset.allowLaunchLoadout : planet.allowLaunchLoadout;
+    }
+
     public void saveInfo(){
         Core.settings.putJson(planet.name + "-s-" + id + "-info", info);
     }
 
     public void loadInfo(){
         info = Core.settings.getJson(planet.name + "-s-" + id + "-info", SectorInfo.class, SectorInfo::new);
+
+        //fix an old naming bug; this doesn't happen with new saves, but old saves need manual fixes
+        if(info.resources.contains(Blocks.water)){
+            info.resources.remove(Blocks.water);
+            info.resources.add(Liquids.water);
+        }
+
+        if(info.resources.contains(u -> u == null)){
+            info.resources = info.resources.select(u -> u != null);
+        }
     }
 
     /** Removes any sector info. */
@@ -98,11 +117,11 @@ public class Sector{
     }
 
     public boolean isAttacked(){
-        if(isBeingPlayed()) return state.rules.waves;
-        return save != null && info.waves && info.hasCore;
+        if(isBeingPlayed()) return state.rules.waves || state.rules.attackMode;
+        return save != null && (info.waves || info.attack) && info.hasCore;
     }
 
-    /** @return whether the player has a base here. */
+    /** @return whether the player has a base (active save with a core) here. */
     public boolean hasBase(){
         return save != null && info.hasCore && !(Vars.state.isGame() && Vars.state.rules.sector == this && state.gameOver);
     }
@@ -119,6 +138,10 @@ public class Sector{
 
     public String name(){
         if(preset != null && info.name == null) return preset.localizedName;
+        //single-sector "planets" use their own name for the sector name.
+        if(info.name == null && planet.sectors.size == 1){
+            return planet.localizedName;
+        }
         return info.name == null ? id + "" : info.name;
     }
 
@@ -140,7 +163,8 @@ public class Sector{
     }
 
     public boolean isCaptured(){
-        return save != null && !info.waves;
+        if(isBeingPlayed()) return !state.rules.waves && !state.rules.attackMode;
+        return save != null && !info.waves && !info.attack;
     }
 
     public boolean hasSave(){
@@ -212,7 +236,7 @@ public class Sector{
 
     /** Projects this sector onto a 4-corner square for use in map gen.
      * Allocates a new object. Do not call in the main loop. */
-    private SectorRect makeRect(){
+    protected SectorRect makeRect(){
         Vec3[] corners = new Vec3[tile.corners.length];
         for(int i = 0; i < corners.length; i++){
             corners[i] = tile.corners[i].v.cpy().setLength(planet.radius);

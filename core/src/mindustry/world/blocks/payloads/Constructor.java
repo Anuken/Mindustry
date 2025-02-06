@@ -3,10 +3,11 @@ package mindustry.world.blocks.payloads;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.gen.*;
+import mindustry.ctype.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.storage.*;
@@ -16,7 +17,8 @@ import static mindustry.Vars.*;
 
 /** Configurable BlockProducer variant. */
 public class Constructor extends BlockProducer{
-    public float buildSpeed = 0.4f;
+    /** Empty seq for no filter. */
+    public Seq<Block> filter = new Seq<>();
     public int minBlockSize = 1, maxBlockSize = 2;
 
     public Constructor(String name){
@@ -24,6 +26,7 @@ public class Constructor extends BlockProducer{
 
         size = 3;
         configurable = true;
+        clearOnDoubleTap = true;
 
         configClear((ConstructorBuild tile) -> tile.recipe = null);
         config(Block.class, (ConstructorBuild tile, Block block) -> {
@@ -32,6 +35,7 @@ public class Constructor extends BlockProducer{
                 tile.recipe = block;
             }
         });
+        configClear((ConstructorBuild tile) -> tile.recipe = null);
     }
 
     @Override
@@ -41,10 +45,15 @@ public class Constructor extends BlockProducer{
         stats.add(Stat.output, "@x@ ~ @x@", minBlockSize, minBlockSize, maxBlockSize, maxBlockSize);
     }
 
-    public boolean canProduce(Block b){
-        return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b);
+    @Override
+    public void getPlanConfigs(Seq<UnlockableContent> options){
+        options.add(content.blocks().select(this::canProduce));
     }
-    
+
+    public boolean canProduce(Block b){
+        return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize && !(b instanceof CoreBlock) && !state.rules.isBanned(b) && b.environmentBuildable() && (filter.isEmpty() || filter.contains(b));
+    }
+
     public class ConstructorBuild extends BlockProducerBuild{
         public @Nullable Block recipe;
 
@@ -55,25 +64,14 @@ public class Constructor extends BlockProducer{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(Constructor.this, table, content.blocks().select(Constructor.this::canProduce), () -> recipe, this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
+            ItemSelection.buildTable(Constructor.this, table, filter.isEmpty() ? content.blocks().select(Constructor.this::canProduce) : filter, () -> recipe, this::configure, selectionRows, selectionColumns);
         }
 
         @Override
         public Object config(){
             return recipe;
         }
-        
+
         @Override
         public void drawSelect(){
             if(recipe != null){

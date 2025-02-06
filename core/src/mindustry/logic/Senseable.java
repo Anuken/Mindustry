@@ -6,7 +6,10 @@ public interface Senseable{
     Object noSensed = new Object();
 
     double sense(LAccess sensor);
-    double sense(Content content);
+
+    default double sense(Content content){
+        return 0;
+    }
 
     default Object senseObject(LAccess sensor){
         return noSensed;

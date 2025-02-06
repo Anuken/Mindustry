@@ -57,6 +57,10 @@ public class OverlayRenderer{
             }
         }
 
+        if(pos.isEmpty()){
+            return;
+        }
+
         //if this is laggy, it could be shoved in another thread.
         var result = Voronoi.generate(pos.toArray(Vec2.class), 0, world.unitWidth(), 0, world.unitHeight());
         for(var edge : result){
@@ -95,7 +99,7 @@ public class OverlayRenderer{
                 }
             }
 
-            if(Core.settings.getBool("indicators")){
+            if(Core.settings.getBool("indicators") && !state.rules.fog){
                 Groups.unit.each(unit -> {
                     if(!unit.isLocal() && unit.team != player.team() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                     .setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x, unit.y)){
@@ -113,10 +117,9 @@ public class OverlayRenderer{
 
         InputHandler input = control.input;
 
-
         Sized select = input.selectedUnit();
         if(select == null) select = input.selectedControlBuild();
-        if(!Core.input.keyDown(Binding.control)) select = null;
+        if(!Core.input.keyDown(Binding.control) || !state.rules.possessionAllowed) select = null;
 
         unitFade = Mathf.lerpDelta(unitFade, Mathf.num(select != null), 0.1f);
 
@@ -126,12 +129,10 @@ public class OverlayRenderer{
             Draw.mixcol(Pal.accent, 1f);
             Draw.alpha(unitFade);
             Building build = (select instanceof BlockUnitc b ? b.tile() : select instanceof Building b ? b : null);
+            TextureRegion region = build != null ? build.block.fullIcon : Core.atlas.white();
 
-            if(build != null){
-                //special selection for block "units"
-                Fill.square(build.x, build.y, build.block.size * tilesize/2f);
-            }else if(select instanceof Unit u){
-                Draw.rect(u.type.fullIcon, u.x, u.y, u.rotation - 90);
+            if(!(select instanceof Unitc)){
+                Draw.rect(region, select.getX(), select.getY());
             }
 
             for(int i = 0; i < 4; i++){
@@ -144,12 +145,13 @@ public class OverlayRenderer{
         }
 
         //draw config selected block
-        if(input.frag.config.isShown()){
-            Building tile = input.frag.config.getSelectedTile();
+        if(input.config.isShown()){
+            Building tile = input.config.getSelected();
             tile.drawConfigure();
         }
 
         input.drawTop();
+        input.drawUnitSelection();
 
         buildFade = Mathf.lerpDelta(buildFade, input.isPlacing() || input.isUsingSchematic() ? 1f : 0f, 0.06f);
 
@@ -175,11 +177,13 @@ public class OverlayRenderer{
                 Draw.color();
             }else{
                 state.teams.eachEnemyCore(player.team(), core -> {
-                    if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(core.x, core.y, state.rules.enemyCoreBuildRadius * 2f))){
+                    //it must be clear that there is a core here.
+                    float br = state.rules.buildRadius(core.team);
+                    if(/*core.wasVisible && */Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(core.x, core.y, br * 2f))){
                         Draw.color(Color.darkGray);
-                        Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
+                        Lines.circle(core.x, core.y - 2,br);
                         Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time, 10f, 0.5f));
-                        Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
+                        Lines.circle(core.x, core.y, br);
                     }
                 });
             }
@@ -238,15 +242,29 @@ public class OverlayRenderer{
             Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time, 5f, 1f));
             Draw.reset();
 
-            Building tile = world.buildWorld(v.x, v.y);
-            if(input.canDropItem() && tile != null && tile.interactable(player.team()) && tile.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(tile, itemTransferRange)){
+            Building build = world.buildWorld(v.x, v.y);
+            if(input.canDropItem() && build != null && build.interactable(player.team()) && build.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(build, itemTransferRange) &&
+                input.itemDepositCooldown <= 0f){
+
+                boolean invalid = (state.rules.onlyDepositCore && !(build instanceof CoreBuild));
+
                 Lines.stroke(3f, Pal.gray);
-                Lines.square(tile.x, tile.y, tile.block.size * tilesize / 2f + 3 + Mathf.absin(Time.time, 5f, 1f));
-                Lines.stroke(1f, Pal.place);
-                Lines.square(tile.x, tile.y, tile.block.size * tilesize / 2f + 2 + Mathf.absin(Time.time, 5f, 1f));
+                Lines.square(build.x, build.y, build.block.size * tilesize / 2f + 3 + Mathf.absin(Time.time, 5f, 1f));
+                Lines.stroke(1f, invalid ? Pal.remove : Pal.place);
+                Lines.square(build.x, build.y, build.block.size * tilesize / 2f + 2 + Mathf.absin(Time.time, 5f, 1f));
                 Draw.reset();
 
+                if(invalid){
+                    build.block.drawPlaceText(Core.bundle.get("bar.onlycoredeposit"), build.tileX(), build.tileY(), false);
+                }
             }
+        }
+    }
+
+    public void checkApplySelection(Unit u){
+        if(unitFade > 0.001f && lastSelect == u){
+            Color prev = Draw.getMixColor();
+            Draw.mixcol(prev.a > 0.001f ? prev.lerp(Pal.accent, unitFade) : Pal.accent, Math.max(unitFade, prev.a));
         }
     }
 

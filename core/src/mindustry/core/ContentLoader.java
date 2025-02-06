@@ -6,6 +6,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
@@ -26,46 +27,36 @@ import static mindustry.Vars.*;
 public class ContentLoader{
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.all.length];
     private Seq<Content>[] contentMap = new Seq[ContentType.all.length];
+    private ObjectMap<String, MappableContent> nameMap = new ObjectMap<>();
     private MappableContent[][] temporaryMapper;
     private @Nullable LoadedMod currentMod;
     private @Nullable Content lastAdded;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
-    private ContentList[] content = {
-        new Items(),
-        new StatusEffects(),
-        new Liquids(),
-        new Bullets(),
-        new UnitTypes(),
-        new Blocks(),
-        new Loadouts(),
-        new Weathers(),
-        new Planets(),
-        new SectorPresets(),
-        new TechTree(),
-    };
 
     public ContentLoader(){
-        clear();
-    }
-
-    /** Clears all initialized content.*/
-    public void clear(){
-        contentNameMap = new ObjectMap[ContentType.all.length];
-        contentMap = new Seq[ContentType.all.length];
-        initialization = new ObjectSet<>();
-
         for(ContentType type : ContentType.all){
             contentMap[type.ordinal()] = new Seq<>();
             contentNameMap[type.ordinal()] = new ObjectMap<>();
         }
     }
 
-
     /** Creates all base types. */
     public void createBaseContent(){
-        for(ContentList list : content){
-            list.load();
-        }
+        UnitCommand.loadAll();
+        UnitStance.loadAll();
+        TeamEntries.load();
+        Items.load();
+        StatusEffects.load();
+        Liquids.load();
+        Bullets.load();
+        UnitTypes.load();
+        Blocks.load();
+        Loadouts.load();
+        Weathers.load();
+        Planets.load();
+        SectorPresets.load();
+        SerpuloTechTree.load();
+        ErekirTechTree.load();
     }
 
     /** Creates mod content, if applicable. */
@@ -75,7 +66,7 @@ public class ContentLoader{
         }
     }
 
-    /** Logs content statistics.*/
+    /** Logs content statistics. */
     public void logContent(){
         //check up ID mapping, make sure it's linear (debug only)
         for(Seq<Content> arr : contentMap){
@@ -91,18 +82,19 @@ public class ContentLoader{
         for(int k = 0; k < contentMap.length; k++){
             Log.debug("[@]: loaded @", ContentType.all[k].name(), contentMap[k].size);
         }
-        Log.debug("Total content loaded: @", Seq.with(ContentType.all).mapInt(c -> contentMap[c.ordinal()].size).sum());
+        Log.debug("Total content loaded: @", Seq.with(ContentType.all).sum(c -> contentMap[c.ordinal()].size));
         Log.debug("-------------------");
     }
 
-    /** Calls Content#init() on everything. Use only after all modules have been created.*/
+    /** Calls Content#init() on everything. Use only after all modules have been created. */
     public void init(){
         initialize(Content::init);
-        if(constants != null) constants.init();
+        initialize(Content::postInit);
+        if(logicVars != null) logicVars.init();
         Events.fire(new ContentInitEvent());
     }
 
-    /** Calls Content#load() on everything. Use only after all modules have been created on the client.*/
+    /** Calls Content#loadIcon() and Content#load() on everything. Use only after all modules have been created on the client. */
     public void load(){
         initialize(Content::loadIcon);
         initialize(Content::load);
@@ -181,6 +173,13 @@ public class ContentLoader{
 
     public void handleMappableContent(MappableContent content){
         if(contentNameMap[content.getContentType().ordinal()].containsKey(content.name)){
+            var list = contentMap[content.getContentType().ordinal()];
+
+            //this method is only called when registering content, and after handleContent.
+            //If this is the last registered content, and it is invalid, make sure to remove it from the list to prevent invalid stuff from being registered
+            if(list.size > 0 && list.peek() == content){
+                list.pop();
+            }
             throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + content.name + "')");
         }
         if(currentMod != null){
@@ -190,10 +189,16 @@ public class ContentLoader{
             }
         }
         contentNameMap[content.getContentType().ordinal()].put(content.name, content);
+        nameMap.put(content.name, content);
     }
 
     public void setTemporaryMapper(MappableContent[][] temporaryMapper){
         this.temporaryMapper = temporaryMapper;
+    }
+
+    /** @return the last registered content with the specified name. Note that the content loader makes no attempt to resolve name conflicts. This method can be unreliable. */
+    public @Nullable MappableContent byName(String name){
+        return nameMap.get(name);
     }
 
     public Seq<Content>[] getContentMap(){
@@ -264,12 +269,20 @@ public class ContentLoader{
         return getByID(ContentType.item, id);
     }
 
+    public Item item(String name){
+        return getByName(ContentType.item, name);
+    }
+
     public Seq<Liquid> liquids(){
         return getBy(ContentType.liquid);
     }
 
     public Liquid liquid(int id){
         return getByID(ContentType.liquid, id);
+    }
+
+    public Liquid liquid(String name){
+        return getByName(ContentType.liquid, name);
     }
 
     public Seq<BulletType> bullets(){
@@ -284,8 +297,16 @@ public class ContentLoader{
         return getBy(ContentType.status);
     }
 
+    public StatusEffect statusEffect(String name){
+        return getByName(ContentType.status, name);
+    }
+
     public Seq<SectorPreset> sectors(){
         return getBy(ContentType.sector);
+    }
+
+    public SectorPreset sector(String name){
+        return getByName(ContentType.sector, name);
     }
 
     public Seq<UnitType> units(){
@@ -296,7 +317,47 @@ public class ContentLoader{
         return getByID(ContentType.unit, id);
     }
 
+    public UnitType unit(String name){
+        return getByName(ContentType.unit, name);
+    }
+
     public Seq<Planet> planets(){
         return getBy(ContentType.planet);
+    }
+
+    public Planet planet(String name){
+        return getByName(ContentType.planet, name);
+    }
+
+    public Seq<Weather> weathers(){
+        return getBy(ContentType.weather);
+    }
+
+    public Weather weather(String name){
+        return getByName(ContentType.weather, name);
+    }
+
+    public Seq<UnitStance> unitStances(){
+        return getBy(ContentType.unitStance);
+    }
+
+    public UnitStance unitStance(int id){
+        return getByID(ContentType.unitStance, id);
+    }
+
+    public UnitStance unitStance(String name){
+        return getByName(ContentType.unitStance, name);
+    }
+
+    public Seq<UnitCommand> unitCommands(){
+        return getBy(ContentType.unitCommand);
+    }
+
+    public UnitCommand unitCommand(int id){
+        return getByID(ContentType.unitCommand, id);
+    }
+
+    public UnitCommand unitCommand(String name){
+        return getByName(ContentType.unitCommand, name);
     }
 }

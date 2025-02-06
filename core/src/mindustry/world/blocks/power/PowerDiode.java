@@ -30,14 +30,14 @@ public class PowerDiode extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("back", entity -> new Bar("bar.input", Pal.powerBar, () -> bar(entity.back())));
-        bars.add("front", entity -> new Bar("bar.output", Pal.powerBar, () -> bar(entity.front())));
+        addBar("back", entity -> new Bar("bar.input", Pal.powerBar, () -> bar(entity.back())));
+        addBar("front", entity -> new Bar("bar.output", Pal.powerBar, () -> bar(entity.front())));
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        Draw.rect(fullIcon, req.drawx(), req.drawy());
-        Draw.rect(arrow, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        Draw.rect(fullIcon, plan.drawx(), plan.drawy());
+        Draw.rect(arrow, plan.drawx(), plan.drawy(), !rotate ? 0 : plan.rotation * 90);
     }
 
     // battery % of the graph on either side, defaults to zero
@@ -56,26 +56,29 @@ public class PowerDiode extends Block{
         public void updateTile(){
             super.updateTile();
 
-            if(tile == null || front() == null || back() == null || !back().block.hasPower || !front().block.hasPower || back().team != front().team) return;
+            if(tile == null || front() == null || back() == null || !back().block.hasPower || !front().block.hasPower || back().team != team || front().team != team) return;
 
             PowerGraph backGraph = back().power.graph;
             PowerGraph frontGraph = front().power.graph;
             if(backGraph == frontGraph) return;
 
-            // 0f - 1f of battery capacity in use
-            float backStored = backGraph.getBatteryStored() / backGraph.getTotalBatteryCapacity();
-            float frontStored = frontGraph.getBatteryStored() / frontGraph.getTotalBatteryCapacity();
+            float backStored = backGraph.getBatteryStored();
+            float backCapacity = backGraph.getTotalBatteryCapacity();
+            float frontStored = frontGraph.getBatteryStored();
+            float frontCapacity = frontGraph.getTotalBatteryCapacity();
 
-            // try to send if the back side has more % capacity stored than the front side
-            if(backStored > frontStored){
-                // send half of the difference
-                float amount = backGraph.getBatteryStored() * (backStored - frontStored) / 2;
-                // prevent sending more than the front can handle
-                amount = Mathf.clamp(amount, 0, frontGraph.getTotalBatteryCapacity() * (1 - frontStored));
+            if(backStored/backCapacity <= frontStored/frontCapacity) return;
 
-                backGraph.transferPower(-amount);
-                frontGraph.transferPower(amount);
-            }
+            float targetPercentage = (frontStored + backStored) / (frontCapacity + backCapacity);
+
+            // send half of the difference
+            float amount = (targetPercentage * frontCapacity - frontStored) / 2;
+
+            // prevent sending more than the front can handle
+            amount = Mathf.clamp(amount, 0, frontCapacity - frontStored);
+
+            backGraph.transferPower(-amount);
+            frontGraph.transferPower(amount);
         }
     }
 }

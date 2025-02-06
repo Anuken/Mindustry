@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.util.*;
-import arc.util.async.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -25,7 +24,6 @@ import static mindustry.Vars.*;
 public class BeControl{
     private static final int updateInterval = 60;
 
-    private AsyncExecutor executor = new AsyncExecutor(1);
     private boolean checkUpdates = true;
     private boolean updateAvailable;
     private String updateUrl;
@@ -33,7 +31,7 @@ public class BeControl{
 
     /** @return whether this is a bleeding edge build. */
     public boolean active(){
-        return Version.type.equals("bleeding-edge");
+        return Version.type.equals("bleeding-edge") && !steam;
     }
 
     public BeControl(){
@@ -62,7 +60,10 @@ public class BeControl{
     /** asynchronously checks for updates. */
     public void checkUpdate(Boolc done){
         Http.get("https://api.github.com/repos/Anuken/MindustryBuilds/releases/latest")
-        .error(e -> {}) //ignore errors
+        .error(e -> {
+            //don't log the error, as it would clog output if there is no internet. make sure it's handled to prevent infinite loading.
+            done.get(false);
+        })
         .submit(res -> {
             Jval val = Jval.read(res.getResultAsString());
             int newBuild = Strings.parseInt(val.getString("tag_name", "0"));
@@ -150,7 +151,7 @@ public class BeControl{
                         Log.info("&lcAutosaved.");
 
                         netServer.kickAll(KickReason.serverRestarting);
-                        Threads.sleep(32);
+                        Threads.sleep(500);
 
                         Log.info("&lcVersion downloaded, exiting. Note that if you are not using a auto-restart script, the server will not restart automatically.");
                         //replace old file with new
@@ -168,7 +169,7 @@ public class BeControl{
     }
 
     private void download(String furl, Fi dest, Intc length, Floatc progressor, Boolp canceled, Runnable done, Cons<Throwable> error){
-        executor.submit(() -> {
+        mainExecutor.submit(() -> {
             try{
                 HttpURLConnection con = (HttpURLConnection)new URL(furl).openConnection();
                 BufferedInputStream in = new BufferedInputStream(con.getInputStream());

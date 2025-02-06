@@ -11,22 +11,21 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.power.*;
 
 /** An entity that holds a payload. */
 @Component
 abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     @Import float x, y, rotation;
+    @Import Team team;
     @Import UnitType type;
 
     Seq<Payload> payloads = new Seq<>();
-
-    //uncomment for insanity
-
-    /*
 
     private transient @Nullable PowerGraph payloadPower;
 
@@ -39,8 +38,9 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         //update power graph first, resolve everything
         for(Payload pay : payloads){
             if(pay instanceof BuildPayload pb && pb.build.power != null){
-                if(payloadPower == null) payloadPower = new PowerGraph();
+                if(payloadPower == null) payloadPower = new PowerGraph(false);
 
+                //pb.build.team = team;
                 pb.build.power.graph = null;
                 payloadPower.add(pb.build);
             }
@@ -51,25 +51,41 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
 
         for(Payload pay : payloads){
+            //apparently BasedUser doesn't want this and several plugins use it
+            //if(pay instanceof BuildPayload build){
+            //    build.build.team = team;
+            //}
             pay.set(x, y, rotation);
-            pay.update(true);
+            pay.update(self(), null);
         }
-    }*/
+    }
+
+    @Override
+    public void remove(){
+        for(Payload pay : payloads){
+            pay.remove();
+        }
+        payloads.clear();
+    }
+  
+    public void destroy(){
+        if(Vars.state.rules.unitPayloadsExplode) payloads.each(Payload::destroyed);
+    }
 
     float payloadUsed(){
         return payloads.sumf(p -> p.size() * p.size());
     }
 
     boolean canPickup(Unit unit){
-        return payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity + 0.001f && unit.team == team() && unit.isAI();
+        return type.pickupUnits && payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity + 0.001f && unit.team == team() && unit.isAI();
     }
 
     boolean canPickup(Building build){
-        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity + 0.001f && build.canPickup();
+        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity + 0.001f && build.canPickup() && build.team == team;
     }
 
     boolean canPickupPayload(Payload pay){
-        return payloadUsed() + pay.size()*pay.size() <= type.payloadCapacity + 0.001f;
+        return payloadUsed() + pay.size()*pay.size() <= type.payloadCapacity + 0.001f && (type.pickupUnits || !(pay instanceof UnitPayload));
     }
 
     boolean hasPayload(){
@@ -81,6 +97,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     void pickup(Unit unit){
+        if(unit.isAdded()) unit.team.data().updateCount(unit.type, 1);
+
         unit.remove();
         addPayload(new UnitPayload(unit));
         Fx.unitPickup.at(unit);
@@ -120,7 +138,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
 
         //drop off payload on an acceptor if possible
-        if(on != null && on.build != null && on.build.acceptPayload(on.build, payload)){
+        if(on != null && on.build != null && on.build.team == team && on.build.acceptPayload(on.build, payload)){
             Fx.unitDrop.at(on.build);
             on.build.handlePayload(on.build, payload);
             return true;
@@ -137,8 +155,12 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     boolean dropUnit(UnitPayload payload){
         Unit u = payload.unit;
 
+        //add random offset to prevent unit stacking
+        Tmp.v1.rnd(Mathf.random(2f));
+
         //can't drop ground units
-        if(!u.canPass(tileX(), tileY()) || Units.count(x, y, u.physicSize(), o -> o.isGrounded()) > 1){
+        //allow stacking for small units for now - otherwise, unit transfer would get annoying
+        if(!u.canPass(World.toTile(x + Tmp.v1.x), World.toTile(y + Tmp.v1.y)) || Units.count(x, y, u.physicSize(), o -> o.isGrounded() && o.hitSize > 14f) > 1){
             return false;
         }
 
@@ -147,8 +169,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         //clients do not drop payloads
         if(Vars.net.client()) return true;
 
-        u.set(this);
-        u.trns(Tmp.v1.rnd(Mathf.random(2f)));
+        u.set(x + Tmp.v1.x, y + Tmp.v1.y);
         u.rotation(rotation);
         //reset the ID to a new value to make sure it's synced
         u.id = EntityGroup.nextId();
@@ -156,6 +177,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         if(!u.isAdded()) u.team.data().updateCount(u.type, -1);
         u.add();
         u.unloaded();
+        Events.fire(new PayloadDropEvent(self(), u));
 
         return true;
     }
@@ -166,15 +188,15 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         int tx = World.toTile(x - tile.block.offset), ty = World.toTile(y - tile.block.offset);
         Tile on = Vars.world.tile(tx, ty);
         if(on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false)){
-            int rot = (int)((rotation + 45f) / 90f) % 4;
-            payload.place(on, rot);
+            payload.place(on, tile.rotation);
+            Events.fire(new PayloadDropEvent(self(), tile));
 
             if(getControllerName() != null){
                 payload.build.lastAccessed = getControllerName();
             }
 
             Fx.unitDrop.at(tile);
-            Fx.placeBlock.at(on.drawx(), on.drawy(), on.block().size);
+            on.block().placeEffect.at(on.drawx(), on.drawy(), on.block().size);
             return true;
         }
 

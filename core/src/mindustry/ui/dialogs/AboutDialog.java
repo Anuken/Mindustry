@@ -35,36 +35,36 @@ public class AboutDialog extends BaseDialog{
         buttons.clear();
 
         float h = Core.graphics.isPortrait() ? 90f : 80f;
-        float w = Core.graphics.isPortrait() ? 330f : 600f;
+        float w = Core.graphics.isPortrait() ? 400f : 600f;
 
         Table in = new Table();
         ScrollPane pane = new ScrollPane(in);
 
         for(LinkEntry link : Links.getLinks()){
-            if((ios || OS.isMac || steam) && bannedItems.contains(link.name)){
+            if((ios || steam) && bannedItems.contains(link.name)){
                 continue;
             }
 
-            Table table = new Table(Tex.underline);
+            Table table = new Table(Styles.grayPanel);
             table.margin(0);
             table.table(img -> {
                 img.image().height(h - 5).width(40f).color(link.color);
                 img.row();
-                img.image().height(5).width(40f).color(link.color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
+                img.image().height(5).width(40f).color(link.color.cpy().mul(0.6f, 0.6f, 0.8f, 1f));
             }).expandY();
 
             table.table(i -> {
-                i.background(Tex.buttonEdge3);
+                i.background(Styles.grayPanel);
                 i.image(link.icon);
             }).size(h - 5, h);
 
             table.table(inset -> {
                 inset.add("[accent]" + link.title).growX().left();
                 inset.row();
-                inset.labelWrap(link.description).width(w - 100f).color(Color.lightGray).growX();
+                inset.labelWrap(link.description).width(w - 100f - h).color(Color.lightGray).growX();
             }).padLeft(8);
 
-            table.button(Icon.link, () -> {
+            table.button(Icon.link, Styles.clearNonei, () -> {
                 if(link.name.equals("wiki")) Events.fire(Trigger.openWiki);
 
                 if(!Core.app.openURI(link.link)){
@@ -83,12 +83,6 @@ public class AboutDialog extends BaseDialog{
         addCloseButton();
 
         buttons.button("@credits", this::showCredits).size(200f, 64f);
-
-        if(Core.graphics.isPortrait()){
-            for(Cell<?> cell : buttons.getCells()){
-                cell.width(140f);
-            }
-        }
 
     }
 

@@ -5,6 +5,8 @@ import arc.graphics.*;
 public class Pal{
     public static Color
 
+    water = Color.valueOf("596ab8"),
+    darkOutline = Color.valueOf("2d2f39"),
     thoriumPink = Color.valueOf("f9a3c7"),
     coalBlack = Color.valueOf("272727"),
 
@@ -14,6 +16,10 @@ public class Pal{
     sap = Color.valueOf("665c9f"),
     sapBullet = Color.valueOf("bf92f9"),
     sapBulletBack = Color.valueOf("6d56bf"),
+
+    suppress = Pal.sap.cpy().mul(1.6f),
+
+    regen = Color.valueOf("d1efff"),
 
     reactorPurple = Color.valueOf("bf92f9"),
     reactorPurple2 = Color.valueOf("8a73c6"),
@@ -27,6 +33,7 @@ public class Pal{
 
     darkMetal = Color.valueOf("6e7080"),
     darkerMetal = Color.valueOf("565666"),
+    darkestMetal = Color.valueOf("38393f"),
 
     missileYellow = Color.valueOf("ffd2ae"),
     missileYellowBack = Color.valueOf("e58956"),
@@ -69,6 +76,7 @@ public class Pal{
     bar = Color.slate,
     accent = Color.valueOf("ffd37f"),
     stat = Color.valueOf("ffd37f"),
+    negativeStat = Color.valueOf("e55454"),
     gray = Color.valueOf("454545"),
     metalGrayDark = Color.valueOf("6e7080"),
     accentBack = Color.valueOf("d4816b"),
@@ -100,12 +108,33 @@ public class Pal{
     redderDust = Color.valueOf("ff7b69"),
 
     plasticSmoke = Color.valueOf("f1e479"),
-	
+
     adminChat = Color.valueOf("ff4000"),
+
+    neoplasmOutline = Color.valueOf("2e191d"),
+
+    neoplasm1 = Color.valueOf("f98f4a"),
+    neoplasmMid = Color.valueOf("e05438"),
+    neoplasm2 = Color.valueOf("9e172c"),
 
     logicBlocks = Color.valueOf("d4816b"),
     logicControl = Color.valueOf("6bb2b2"),
     logicOperations = Color.valueOf("877bad"),
     logicIo = Color.valueOf("a08a8a"),
-    logicUnits = Color.valueOf("c7b59d");
+    logicUnits = Color.valueOf("c7b59d"),
+    logicWorld = Color.valueOf("6b84d4"),
+
+    berylShot = Color.valueOf("b1dd7e"),
+    tungstenShot = Color.valueOf("768a9a"),
+
+    plasticBurn = Color.valueOf("e9ead3"),
+
+    muddy = Color.valueOf("432722"),
+
+    redLight = Color.valueOf("feb380"),
+    slagOrange = Color.valueOf("ffa166"),
+    techBlue = Color.valueOf("8ca9e8"),
+
+    vent = Color.valueOf("6b4e4e"),
+    vent2 = Color.valueOf("3b2a2a");
 }

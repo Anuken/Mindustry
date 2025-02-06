@@ -6,21 +6,22 @@ uniform mat4 u_proj;
 uniform mat4 u_trans;
 uniform vec3 u_lightdir;
 uniform vec3 u_camdir;
+uniform vec3 u_campos;
 uniform vec3 u_ambientColor;
 
 varying vec4 v_col;
 
 const vec3 diffuse = vec3(0.01);
-const float shinefalloff = 4.0;
-const float shinelen = 0.2;
 
 void main(){
     vec3 specular = vec3(0.0, 0.0, 0.0);
 
+    //TODO this calculation is probably wrong
     vec3 lightReflect = normalize(reflect(a_normal, u_lightdir));
-    float specularFactor = dot(u_camdir, lightReflect);
+    vec3 vertexEye = normalize(u_campos - (u_trans * a_position).xyz);
+    float specularFactor = dot(vertexEye, lightReflect);
     if(specularFactor > 0.0){
-        specular = vec3(1.0 * pow(specularFactor, 64.0)) * (1.0-a_color.a);  //specular power = 32
+        specular = vec3(1.0 * pow(specularFactor, 40.0)) * (1.0-a_color.a);
     }
 
 	vec3 norc = (u_ambientColor + specular) * (diffuse + vec3(clamp((dot(a_normal, u_lightdir) + 1.0) / 2.0, 0.0, 1.0)));

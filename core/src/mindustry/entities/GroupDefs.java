@@ -15,4 +15,5 @@ class GroupDefs<G>{
     @GroupDef(value = Puddlec.class) G puddle;
     @GroupDef(value = WeatherStatec.class) G weather;
     @GroupDef(value = WorldLabelc.class, mapping = true) G label;
+    @GroupDef(value = PowerGraphUpdaterc.class) G powerGraph;
 }

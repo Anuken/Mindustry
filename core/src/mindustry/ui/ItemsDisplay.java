@@ -15,6 +15,7 @@ import static mindustry.Vars.*;
 
 /** Displays a list of items, e.g. launched items.*/
 public class ItemsDisplay extends Table{
+    boolean collapsed;
 
     public ItemsDisplay(){
         rebuild(new ItemSeq());
@@ -28,6 +29,8 @@ public class ItemsDisplay extends Table{
         clear();
         top().left();
         margin(0);
+
+        if(items == null) return;
 
         table(Tex.button, c -> {
             c.margin(10).marginLeft(12).marginTop(15f);
@@ -52,8 +55,11 @@ public class ItemsDisplay extends Table{
                 }
             }).scrollX(false), false).setDuration(0.3f);
 
-            c.button("@globalitems", Icon.downOpen, Styles.clearTogglet, col::toggle).update(t -> {
+            col.setCollapsed(collapsed, false);
+
+            c.button("@globalitems", Icon.downOpen, Styles.flatTogglet, col::toggle).update(t -> {
                 t.setChecked(col.isCollapsed());
+                collapsed = col.isCollapsed();
                 ((Image)t.getChildren().get(1)).setDrawable(col.isCollapsed() ? Icon.upOpen : Icon.downOpen);
             }).padBottom(4).left().fillX().margin(12f).minWidth(200f);
             c.row();

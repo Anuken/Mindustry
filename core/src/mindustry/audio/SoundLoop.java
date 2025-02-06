@@ -19,11 +19,15 @@ public class SoundLoop{
     }
 
     public void update(float x, float y, boolean play){
+        update(x, y, play, 1f);
+    }
+
+    public void update(float x, float y, boolean play, float volumeScl){
         if(baseVolume <= 0) return;
 
         if(id < 0){
             if(play){
-                id = sound.loop(sound.calcVolume(x, y) * volume * baseVolume, 1f, sound.calcPan(x, y));
+                id = sound.loop(sound.calcVolume(x, y) * volume * baseVolume * volumeScl, 1f, sound.calcPan(x, y));
             }
         }else{
             //fade the sound in or out
@@ -38,7 +42,7 @@ public class SoundLoop{
                 }
             }
 
-            Core.audio.set(id, sound.calcPan(x, y), sound.calcVolume(x, y) * volume * baseVolume);
+            Core.audio.set(id, sound.calcPan(x, y), sound.calcVolume(x, y) * volume * baseVolume * volumeScl);
         }
     }
 

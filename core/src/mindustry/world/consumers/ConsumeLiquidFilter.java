@@ -3,15 +3,17 @@ package mindustry.world.consumers;
 import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class ConsumeLiquidFilter extends ConsumeLiquidBase{
-    public Boolf<Liquid> filter;
+    public Boolf<Liquid> filter = l -> false;
 
     public ConsumeLiquidFilter(Boolf<Liquid> liquid, float amount){
         super(amount);
@@ -19,41 +21,72 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     }
 
     public ConsumeLiquidFilter(){
-        this.filter = l -> false;
     }
 
     @Override
-    public void applyLiquidFilter(Bits arr){
-        content.liquids().each(filter, item -> arr.set(item.id));
+    public void apply(Block block){
+        block.hasLiquids = true;
+        content.liquids().each(filter, item -> block.liquidFilter[item.id] = true);
     }
 
     @Override
     public void build(Building build, Table table){
         Seq<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.get(l));
         MultiReqImage image = new MultiReqImage();
-        list.each(liquid -> image.add(new ReqImage(liquid.uiIcon, () ->
-            build.liquids != null && build.liquids.current() == liquid && build.liquids.get(liquid) >= Math.max(use(build), amount * build.delta()))));
+        list.each(liquid -> image.add(new ReqImage(liquid.uiIcon, () -> getConsumed(build) == liquid)));
 
         table.add(image).size(8 * 4);
     }
 
     @Override
-    public String getIcon(){
-        return "icon-liquid-consume";
+    public void update(Building build){
+        Liquid liq = getConsumed(build);
+        if(liq != null){
+            build.liquids.remove(liq, amount * build.edelta() * multiplier.get(build));
+        }
     }
 
     @Override
-    public void update(Building entity){
-        entity.liquids.remove(entity.liquids.current(), use(entity));
+    public float efficiency(Building build){
+        var liq = getConsumed(build);
+        float ed = build.edelta();
+        if(ed <= 0.00000001f) return 0f;
+        return liq != null ? Math.min(build.liquids.get(liq) / (amount * ed * multiplier.get(build)), 1f) : 0f;
     }
 
     @Override
-    public boolean valid(Building entity){
-        return entity != null && entity.liquids != null && filter.get(entity.liquids.current()) && entity.liquids.currentAmount() >= use(entity);
+    public float efficiencyMultiplier(Building build){
+        var liq = getConsumed(build);
+        return liq == null ? 0 : liquidEfficiencyMultiplier(liq);
+    }
+
+    public @Nullable Liquid getConsumed(Building build){
+        if(filter.get(build.liquids.current()) && build.liquids.currentAmount() > 0){
+            return build.liquids.current();
+        }
+
+        var liqs = content.liquids();
+
+        for(int i = 0; i < liqs.size; i++){
+            var liq = liqs.get(i);
+            if(filter.get(liq) && build.liquids.get(liq) > 0){
+                return liq;
+            }
+        }
+        return null;
     }
 
     @Override
     public void display(Stats stats){
         stats.add(booster ? Stat.booster : Stat.input, StatValues.liquids(filter, amount * 60f, true));
+    }
+
+    @Override
+    public boolean consumes(Liquid liquid){
+        return filter.get(liquid);
+    }
+
+    public float liquidEfficiencyMultiplier(Liquid liquid){
+        return 1f;
     }
 }

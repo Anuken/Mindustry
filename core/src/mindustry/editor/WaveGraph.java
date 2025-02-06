@@ -1,8 +1,13 @@
 package mindustry.editor;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
 import arc.math.*;
+import arc.math.geom.*;
+import arc.scene.*;
+import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -17,7 +22,6 @@ import mindustry.ui.*;
 
 public class WaveGraph extends Table{
     public Seq<SpawnGroup> groups = new Seq<>();
-    public int from = 0, to = 20;
 
     private Mode mode = Mode.counts;
     private int[][] values;
@@ -26,17 +30,62 @@ public class WaveGraph extends Table{
     private float maxHealth;
     private Table colors;
     private ObjectSet<UnitType> hidden = new ObjectSet<>();
+    private StringBuilder countStr = new StringBuilder();
+
+    private float pan;
+    private float zoom = 1f;
+    private int from = 0, to = 20;
+    private int lastFrom = -1, lastTo = -1;
+    private float lastZoom = -1f;
+
+    private float defaultSpace = Scl.scl(40f);
+    private FloatSeq points = new FloatSeq(40);
 
     public WaveGraph(){
         background(Tex.pane);
 
+        scrolled((scroll) -> {
+            zoom -= scroll * 2f / 10f * zoom;
+            clampZoom();
+        });
+
+        touchable = Touchable.enabled;
+        addListener(new InputListener(){
+
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Element fromActor){
+                requestScroll();
+            }
+        });
+
+        addListener(new ElementGestureListener(){
+            @Override
+            public void pan(InputEvent event, float x, float y, float deltaX, float deltaY){
+                pan -= deltaX/zoom;
+            }
+
+            @Override
+            public void zoom(InputEvent event, float initialDistance, float distance){
+                if(lastZoom < 0) lastZoom = zoom;
+
+                zoom = distance / initialDistance * lastZoom;
+                clampZoom();
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
+                lastZoom = zoom;
+            }
+        });
+
         rect((x, y, width, height) -> {
             Lines.stroke(Scl.scl(3f));
+            countStr.setLength(0);
+
+            Vec2 mouse = stageToLocalCoordinates(Core.input.mouse());
 
             GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
             Font font = Fonts.outline;
-
-            lay.setText(font, "1");
 
             int maxY = switch(mode){
                 case counts -> nextStep(max);
@@ -44,29 +93,51 @@ public class WaveGraph extends Table{
                 case totals -> nextStep(maxTotal);
             };
 
-            float fh = lay.height;
-            float offsetX = Scl.scl(lay.width * (maxY + "").length() * 2), offsetY = Scl.scl(22f) + fh + Scl.scl(5f);
+            lay.setText(font, "1");
 
-            float graphX = x + offsetX, graphY = y + offsetY, graphW = width - offsetX, graphH = height - offsetY;
-            float spacing = graphW / (values.length - 1);
+            float spacing = zoom * defaultSpace;
+            pan = Math.max(pan, (width/2f)/zoom-defaultSpace);
+
+            float fh = lay.height;
+            float offsetX = 0f, offsetY = Scl.scl(22f) + fh + Scl.scl(5f);
+            float graphX = x + offsetX - pan * zoom + width/2f, graphY = y + offsetY, graphW = width - offsetX, graphH = height - offsetY;
+
+            float left = (x-graphX)/spacing, right = (x + width - graphX)/spacing;
+
+            //int radius = Mathf.ceil(graphW / spacing / 2f);
+
+            from = (int)left - 1;
+            to = (int)right + 1;
+
+            if(lastFrom != from || lastTo != to){
+                rebuild();
+            }
+
+            lastFrom = from;
+            lastTo = to;
+
+            if(!clipBegin(x + offsetX, y + offsetY, graphW, graphH)) return;
+
+            int selcol = Rect.contains(x, y, width, height, mouse.x, mouse.y) ? Mathf.round((mouse.x - graphX - (from * spacing)) / spacing) : -1;
+            if(selcol + from <= -1) selcol = -1;
 
             if(mode == Mode.counts){
                 for(UnitType type : used.orderedItems()){
                     Draw.color(color(type));
                     Draw.alpha(parentAlpha);
 
-                    Lines.beginLine();
+                    beginLine();
 
                     for(int i = 0; i < values.length; i++){
                         int val = values[i][type.id];
-                        float cx = graphX + i * spacing, cy = graphY + val * graphH / maxY;
-                        Lines.linePoint(cx, cy);
+                        float cx = graphX + (i+from) * spacing, cy = graphY + val * graphH / maxY;
+                        linePoint(cx, cy);
                     }
 
-                    Lines.endLine();
+                    endLine();
                 }
             }else if(mode == Mode.totals){
-                Lines.beginLine();
+                beginLine();
 
                 Draw.color(Pal.accent);
                 for(int i = 0; i < values.length; i++){
@@ -75,13 +146,13 @@ public class WaveGraph extends Table{
                         sum += values[i][type.id];
                     }
 
-                    float cx = graphX + i * spacing, cy = graphY + sum * graphH / maxY;
-                    Lines.linePoint(cx, cy);
+                    float cx = graphX + (i+from) * spacing, cy = graphY + sum * graphH / maxY;
+                    linePoint(cx, cy);
                 }
 
-                Lines.endLine();
+                endLine();
             }else if(mode == Mode.health){
-                Lines.beginLine();
+                beginLine();
 
                 Draw.color(Pal.health);
                 for(int i = 0; i < values.length; i++){
@@ -90,12 +161,31 @@ public class WaveGraph extends Table{
                         sum += (type.health) * values[i][type.id];
                     }
 
-                    float cx = graphX + i * spacing, cy = graphY + sum * graphH / maxY;
-                    Lines.linePoint(cx, cy);
+                    float cx = graphX + (i+from) * spacing, cy = graphY + sum * graphH / maxY;
+                    linePoint(cx, cy);
                 }
 
-                Lines.endLine();
+                endLine();
             }
+
+
+            if(selcol >= 0 && selcol < values.length){
+                Draw.color(1f, 0f, 0f, 0.2f);
+                Fill.crect((selcol+from) * spacing + graphX - spacing/2f, graphY, spacing, graphH);
+                Draw.color();
+                font.getData().setScale(1.5f);
+                for(UnitType type : used.orderedItems()){
+                    int amount = values[Mathf.clamp(selcol, 0, values.length - 1)][type.id];
+                    if(amount > 0){
+                        countStr.append(type.emoji()).append(" ").append(amount).append("\n");
+                    }
+                }
+                float pad = Scl.scl(5f);
+                font.draw(countStr, (selcol+from) * spacing + graphX - spacing/2f + pad, graphY + graphH - pad);
+                font.getData().setScale(1f);
+            }
+
+            clipEnd();
 
             //how many numbers can fit here
             float totalMarks = Mathf.clamp(maxY, 1, 10);
@@ -106,13 +196,13 @@ public class WaveGraph extends Table{
             Draw.alpha(0.1f);
 
             for(int i = 0; i < maxY; i += markSpace){
-                float cy = graphY + i * graphH / maxY, cx = graphX;
+                float cy = graphY + i * graphH / maxY, cx = x;
 
                 Lines.line(cx, cy, cx + graphW, cy);
 
                 lay.setText(font, "" + i);
 
-                font.draw("" + i, cx, cy + lay.height / 2f, Align.right);
+                font.draw("" + i, cx, cy + lay.height / 2f, Align.left);
             }
             Draw.alpha(1f);
 
@@ -120,10 +210,12 @@ public class WaveGraph extends Table{
             font.setColor(Color.lightGray);
 
             for(int i = 0; i < values.length; i++){
-                float cy = y + fh, cx = graphX + graphW / (values.length - 1) * i;
+                float cy = y + fh, cx = graphX + spacing * (i + from);
 
-                Lines.line(cx, cy, cx, cy + len);
-                if(i == values.length / 2){
+                if(cx >= x + offsetX && cx <= x + offsetX + graphW){
+                    Lines.line(cx, cy, cx, cy + len);
+                }
+                if(i == selcol){
                     font.draw("" + (i + from + 1), cx, cy - Scl.scl(2f), Align.center);
                 }
             }
@@ -152,6 +244,28 @@ public class WaveGraph extends Table{
         }).growX();
     }
 
+    private void clampZoom(){
+        zoom = Mathf.clamp(zoom, 0.5f / Scl.scl(1f), 40f / Scl.scl(1f));
+    }
+
+    private void linePoint(float x, float y){
+        points.add(x, y);
+    }
+
+    private void beginLine(){
+        points.clear();
+    }
+
+    private void endLine(){
+        var items = points.items;
+        for(int i = 0; i < points.size - 2; i += 2){
+            Lines.line(items[i], items[i + 1], items[i + 2], items[i + 3], false);
+            Fill.circle(items[i], items[i + 1], Lines.getStroke()/2f);
+        }
+        Fill.circle(items[points.size - 2], items[points.size - 1], Lines.getStroke());
+        points.clear();
+    }
+
     public void rebuild(){
         values = new int[to - from + 1][Vars.content.units().size];
         used.clear();
@@ -177,11 +291,13 @@ public class WaveGraph extends Table{
             maxHealth = Math.max(maxHealth, healthsum);
         }
 
+        used.orderedItems().sort();
+
         ObjectSet<UnitType> usedCopy = new ObjectSet<>(used);
 
         colors.clear();
         colors.left();
-        colors.button("@waves.units.hide", Styles.cleart, () -> {
+        colors.button("@waves.units.hide", Styles.flatt, () -> {
             if(hidden.size == usedCopy.size){
                 hidden.clear();
             }else{
@@ -198,7 +314,7 @@ public class WaveGraph extends Table{
                 t.button(b -> {
                     Color tcolor = color(type).cpy();
                     b.image().size(32f).update(i -> i.setColor(b.isChecked() ? Tmp.c1.set(tcolor).mul(0.5f) : tcolor)).get().act(1);
-                    b.image(type.uiIcon).size(32f).padRight(20).update(i -> i.setColor(b.isChecked() ? Color.gray : Color.white)).get().act(1);
+                    b.image(type.uiIcon).size(32f).scaling(Scaling.fit).padRight(20).update(i -> i.setColor(b.isChecked() ? Color.gray : Color.white)).get().act(1);
                     b.margin(0f);
                 }, Styles.fullTogglet, () -> {
                     if(!hidden.add(type)){
@@ -211,6 +327,8 @@ public class WaveGraph extends Table{
                 }).update(b -> b.setChecked(hidden.contains(type)));
             }
         }).scrollY(false);
+
+        colors.act(0.000001f);
 
         for(UnitType type : hidden){
             used.remove(type);

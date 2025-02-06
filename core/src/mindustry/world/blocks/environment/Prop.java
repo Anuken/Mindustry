@@ -5,9 +5,11 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.content.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 
 public class Prop extends Block{
+    public float layer = Layer.blockProp;
 
     public Prop(String name){
         super(name);
@@ -20,6 +22,7 @@ public class Prop extends Block{
 
     @Override
     public void drawBase(Tile tile){
+        Draw.z(layer);
         Draw.rect(variants > 0 ? variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))] : region, tile.worldx(), tile.worldy());
     }
 

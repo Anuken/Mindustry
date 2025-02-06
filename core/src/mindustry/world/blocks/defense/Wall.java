@@ -36,6 +36,8 @@ public class Wall extends Block{
         buildCostMultiplier = 6f;
         canOverdrive = false;
         drawDisabled = false;
+        crushDamageMultiplier = 5f;
+        priority = TargetPriority.wall;
 
         //it's a wall of course it's supported everywhere
         envEnabled = Env.any;

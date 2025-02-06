@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -8,8 +9,10 @@ import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.world.meta.*;
 
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class ContentInfoDialog extends BaseDialog{
@@ -18,6 +21,12 @@ public class ContentInfoDialog extends BaseDialog{
         super("@info.title");
 
         addCloseButton();
+
+        keyDown(key -> {
+            if(key == keybinds.get(Binding.block_info).key){
+                Core.app.post(this::hide);
+            }
+        });
     }
 
     public void show(UnlockableContent content){
@@ -31,7 +40,7 @@ public class ContentInfoDialog extends BaseDialog{
 
         table.table(title1 -> {
             title1.image(content.uiIcon).size(iconXLarge).scaling(Scaling.fit);
-            title1.add("[accent]" + content.localizedName + (enableConsole ? "\n[gray]" + content.name : "")).padLeft(5);
+            title1.add("[accent]" + content.localizedName + (settings.getBool("console") ? "\n[gray]" + content.name : "")).padLeft(5);
         });
 
         table.row();
@@ -61,7 +70,7 @@ public class ContentInfoDialog extends BaseDialog{
             if(map.size == 0) continue;
 
             if(stats.useCategories){
-                table.add("@category." + cat.name()).color(Pal.accent).fillX();
+                table.add("@category." + cat.name).color(Pal.accent).fillX();
                 table.row();
             }
 
@@ -74,7 +83,6 @@ public class ContentInfoDialog extends BaseDialog{
                         value.display(inset);
                         inset.add().size(10f);
                     }
-
                 }).fillX().padLeft(10);
                 table.row();
             }
@@ -85,10 +93,19 @@ public class ContentInfoDialog extends BaseDialog{
             table.row();
         }
 
+        content.displayExtra(table);
+
         ScrollPane pane = new ScrollPane(table);
+        table.marginRight(30f);
+        //TODO: some things (e.g. reconstructor requirements) are too long and screw up the layout
+        //pane.setScrollingDisabled(true, false);
         cont.add(pane);
 
-        show();
+        if(isShown()){
+            show(scene, Actions.fadeIn(0f));
+        }else{
+            show();
+        }
     }
 
 }

@@ -4,9 +4,9 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.ui.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -36,9 +36,8 @@ public interface Payload extends Position{
     /** @return the time taken to build this payload. */
     float buildTime();
 
-    /** update this payload if it is a block
-     * @param inUnit whether this payload is in a unit */
-    default void update(boolean inUnit){}
+    /** update this payload inside a container unit or building. either can be null. */
+    default void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){}
 
     /** @return whether this payload was dumped. */
     default boolean dump(){
@@ -55,17 +54,16 @@ public interface Payload extends Position{
         return 0f;
     }
 
+    default void destroyed(){};
+
     /** writes the payload for saving. */
     void write(Writes write);
 
     /** @return icon describing the contents. */
     TextureRegion icon();
 
-    /** @deprecated use icon() instead. */
-    @Deprecated
-    default TextureRegion icon(Cicon icon){
-        return icon();
-    }
+    /** @return content describing this payload (block or unit) */
+    UnlockableContent content();
 
     @Override
     default float getX(){
@@ -76,6 +74,8 @@ public interface Payload extends Position{
     default float getY(){
         return y();
     }
+
+    default void remove(){}
 
     static void write(@Nullable Payload payload, Writes write){
         if(payload == null){

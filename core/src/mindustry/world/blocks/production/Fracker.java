@@ -28,14 +28,14 @@ public class Fracker extends SolidPump{
 
         @Override
         public void updateTile(){
-            if(consValid()){
+            if(efficiency > 0){
                 if(accumulator >= itemUseTime){
                     consume();
                     accumulator -= itemUseTime;
                 }
 
                 super.updateTile();
-                accumulator += delta() * efficiency();
+                accumulator += delta() * efficiency;
             }else{
                 warmup = Mathf.lerpDelta(warmup, 0f, 0.02f);
                 lastPump = 0f;

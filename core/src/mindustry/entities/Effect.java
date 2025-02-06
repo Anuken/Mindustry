@@ -10,6 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -93,40 +94,84 @@ public class Effect{
         return this;
     }
 
+    public WrapEffect wrap(Color color){
+        return new WrapEffect(this, color);
+    }
+
+    public WrapEffect wrap(Color color, float rotation){
+        return new WrapEffect(this, color, rotation);
+    }
+
     public void at(Position pos){
-        create(this, pos.getX(), pos.getY(), 0, Color.white, null);
+        create(pos.getX(), pos.getY(), 0, Color.white, null);
     }
 
     public void at(Position pos, boolean parentize){
-        create(this, pos.getX(), pos.getY(), 0, Color.white, parentize ? pos : null);
+        create(pos.getX(), pos.getY(), 0, Color.white, parentize ? pos : null);
     }
 
     public void at(Position pos, float rotation){
-        create(this, pos.getX(), pos.getY(), rotation, Color.white, null);
+        create(pos.getX(), pos.getY(), rotation, Color.white, null);
     }
 
     public void at(float x, float y){
-        create(this, x, y, 0, Color.white, null);
+        create(x, y, 0, Color.white, null);
     }
 
     public void at(float x, float y, float rotation){
-        create(this, x, y, rotation, Color.white, null);
+        create(x, y, rotation, Color.white, null);
     }
 
     public void at(float x, float y, float rotation, Color color){
-        create(this, x, y, rotation, color, null);
+        create(x, y, rotation, color, null);
     }
 
     public void at(float x, float y, Color color){
-        create(this, x, y, 0, color, null);
+        create(x, y, 0, color, null);
     }
 
     public void at(float x, float y, float rotation, Color color, Object data){
-        create(this, x, y, rotation, color, data);
+        create(x, y, rotation, color, data);
     }
 
     public void at(float x, float y, float rotation, Object data){
-        create(this, x, y, rotation, Color.white, data);
+        create(x, y, rotation, Color.white, data);
+    }
+
+    public boolean shouldCreate(){
+        return !headless && this != Fx.none && Vars.renderer.enableEffects;
+    }
+
+    public void create(float x, float y, float rotation, Color color, Object data){
+        if(!shouldCreate()) return;
+
+        if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(x, y, clip))){
+            if(!initialized){
+                initialized = true;
+                init();
+            }
+
+            if(startDelay <= 0f){
+                add(x, y, rotation, color, data);
+            }else{
+                Time.run(startDelay, () -> add(x, y, rotation, color, data));
+            }
+        }
+    }
+
+    protected void add(float x, float y, float rotation, Color color, Object data){
+        var entity = EffectState.create();
+        entity.effect = this;
+        entity.rotation = baseRotation + rotation;
+        entity.data = data;
+        entity.lifetime = lifetime;
+        entity.set(x, y);
+        entity.color.set(color);
+        if(followParent && data instanceof Posc p){
+            entity.parent = p;
+            entity.rotWithParent = rotWithParent;
+        }
+        entity.add();
     }
 
     public float render(int id, Color color, float life, float lifetime, float rotation, float x, float y, Object data){
@@ -166,36 +211,20 @@ public class Effect{
         shake(intensity, duration, loc.getX(), loc.getY());
     }
 
-    public static void create(Effect effect, float x, float y, float rotation, Color color, Object data){
-        if(headless || effect == Fx.none || !Core.settings.getBool("effects")) return;
-
-        if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(x, y, effect.clip))){
-            if(!effect.initialized){
-                effect.initialized = true;
-                effect.init();
-            }
-
-            if(effect.startDelay <= 0f){
-                inst(effect, x, y, rotation, color, data);
-            }else{
-                Time.runTask(effect.startDelay, () -> inst(effect, x, y, rotation, color, data));
-            }
+    public static void floorDust(float x, float y, float size){
+        Tile tile = world.tileWorld(x, y);
+        if(tile != null){
+            Color color = tile.floor().mapColor;
+            Fx.unitLand.at(x, y, size, color);
         }
     }
 
-    private static void inst(Effect effect, float x, float y, float rotation, Color color, Object data){
-        EffectState entity = EffectState.create();
-        entity.effect = effect;
-        entity.rotation = effect.baseRotation + rotation;
-        entity.data = data;
-        entity.lifetime = effect.lifetime;
-        entity.set(x, y);
-        entity.color.set(color);
-        if(effect.followParent && data instanceof Posc p){
-            entity.parent = p;
-            entity.rotWithParent = effect.rotWithParent;
+    public static void floorDustAngle(Effect effect, float x, float y, float angle){
+        Tile tile = world.tileWorld(x, y);
+        if(tile != null){
+            Color color = tile.floor().mapColor;
+            effect.at(x, y, angle, color);
         }
-        entity.add();
     }
 
     public static void decal(TextureRegion region, float x, float y, float rotation){
@@ -253,6 +282,10 @@ public class Effect{
 
         public <T> T data(){
             return (T)data;
+        }
+
+        public EffectContainer inner(){
+            return innerContainer == null ? (innerContainer = new EffectContainer()) : innerContainer;
         }
 
         public void scaled(float lifetime, Cons<EffectContainer> cons){

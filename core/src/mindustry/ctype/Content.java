@@ -25,18 +25,31 @@ public abstract class Content implements Comparable<Content>{
     /** Called after all content and modules are created. Do not use to load regions or texture data! */
     public void init(){}
 
+    /** Called after init(). */
+    public void postInit(){}
+
     /**
      * Called after all content is created, only on non-headless versions.
      * Use for loading regions or other image data.
      */
     public void load(){}
 
-    /** Called right after load(). */
+    /** Called right before load(). */
     public void loadIcon(){}
 
     /** @return whether an error occurred during mod loading. */
     public boolean hasErrored(){
         return minfo.error != null;
+    }
+
+    /** @return whether this is content from the base game. */
+    public boolean isVanilla(){
+        return minfo.mod == null;
+    }
+
+    /** @return whether this content is from a mod. */
+    public boolean isModded(){
+        return !isVanilla();
     }
 
     @Override

@@ -5,7 +5,7 @@ import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
 public class DistortFilter extends GenerateFilter{
-    float scl = 40, mag = 5;
+    public float scl = 40, mag = 5;
 
     @Override
     public FilterOption[] options(){

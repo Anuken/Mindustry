@@ -1,17 +1,23 @@
 package mindustry.entities.units;
 
+import arc.util.*;
 import mindustry.gen.*;
 
 public interface UnitController{
     void unit(Unit unit);
-    Unit unit();
+    @Nullable Unit unit();
+
+    default void hit(Bullet bullet){
+
+    }
 
     default boolean isValidController(){
         return true;
     }
 
-    default void command(UnitCommand command){
-
+    /** @return whether logic AI can take over */
+    default boolean isLogicControllable(){
+        return false;
     }
 
     default void updateUnit(){
@@ -19,6 +25,10 @@ public interface UnitController{
     }
 
     default void removed(Unit unit){
+
+    }
+
+    default void afterRead(Unit unit){
 
     }
 

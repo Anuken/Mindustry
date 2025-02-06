@@ -5,11 +5,13 @@ import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.event.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -17,44 +19,91 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class DatabaseDialog extends BaseDialog{
     private TextField search;
     private Table all = new Table();
 
+    private @Nullable Seq<UnlockableContent> allTabs;
+    //sun means "all content"
+    private UnlockableContent tab = Planets.sun;
+
     public DatabaseDialog(){
         super("@database");
 
         shouldPause = true;
         addCloseButton();
-        shown(this::rebuild);
+        shown(() -> {
+            checkTabList();
+            if(state.isCampaign() && allTabs.contains(state.getPlanet())){
+                tab = state.getPlanet();
+            }else if(state.isGame() && state.rules.planet != null && allTabs.contains(state.rules.planet)){
+                tab = state.rules.planet;
+            }
+
+            rebuild();
+        });
         onResize(this::rebuild);
 
-        all.margin(20).marginTop(0f);
+        all.margin(20).marginTop(0f).marginRight(30f);
 
+        cont.top();
         cont.table(s -> {
             s.image(Icon.zoom).padRight(8);
             search = s.field(null, text -> rebuild()).growX().get();
             search.setMessageText("@players.search");
         }).fillX().padBottom(4).row();
 
-        cont.pane(all);
+        cont.pane(all).scrollX(false);
+    }
+
+    void checkTabList(){
+        if(allTabs == null){
+            Seq<Content>[] allContent = Vars.content.getContentMap();
+            ObjectSet<UnlockableContent> all = new ObjectSet<>();
+            for(var contents : allContent){
+                for(var content : contents){
+                    if(content instanceof UnlockableContent u){
+                        all.addAll(u.databaseTabs);
+                    }
+                }
+            }
+            allTabs = all.toSeq().sort();
+            allTabs.insert(0, Planets.sun);
+        }
     }
 
     void rebuild(){
+        checkTabList();
+
         all.clear();
-        var text = search.getText();
+        var text = search.getText().toLowerCase();
 
         Seq<Content>[] allContent = Vars.content.getContentMap();
+
+        all.table(t -> {
+            int i = 0;
+            for(var content : allTabs){
+                t.button(content == Planets.sun ? Icon.eyeSmall : content instanceof Planet p ? Icon.icons.get(p.icon, Icon.commandRally) : new TextureRegionDrawable(content.uiIcon), Styles.clearNoneTogglei, iconMed, () -> {
+                    tab = content;
+                    rebuild();
+                }).size(50f).checked(b -> tab == content).tooltip(content == Planets.sun ? "@all" : content.localizedName).with(but -> {
+                    but.getStyle().imageUpColor = content instanceof Planet p ? p.iconColor : Color.white.cpy();
+                });
+
+                if(++i % 10 == 0) t.row();
+            }
+        }).row();;
 
         for(int j = 0; j < allContent.length; j++){
             ContentType type = ContentType.all[j];
 
-            Seq<Content> array = allContent[j]
-                .select(c -> c instanceof UnlockableContent u &&
-                    (!u.isHidden() || u.node() != null) &&
-                    (text.isEmpty() || u.localizedName.toLowerCase().contains(text.toLowerCase())));
+            Seq<UnlockableContent> array = allContent[j]
+                .select(c -> c instanceof UnlockableContent u && !u.isHidden() && !u.hideDatabase && (tab == Planets.sun || u.allDatabaseTabs || u.databaseTabs.contains(tab)) &&
+                    (text.isEmpty() || u.localizedName.toLowerCase().contains(text))).as();
+
             if(array.size == 0) continue;
 
             all.add("@content." + type.name() + ".name").growX().left().color(Pal.accent);
@@ -64,16 +113,16 @@ public class DatabaseDialog extends BaseDialog{
             all.table(list -> {
                 list.left();
 
-                int cols = (int)Mathf.clamp((Core.graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 10), 1, 22);
+                int cols = (int)Mathf.clamp((Core.graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 12), 1, 22);
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){
-                    UnlockableContent unlock = (UnlockableContent)array.get(i);
+                    UnlockableContent unlock = array.get(i);
 
                     Image image = unlocked(unlock) ? new Image(unlock.uiIcon).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
 
                     //banned cross
-                    if(state.isGame() && (unlock instanceof UnitType u && u.isBanned() || unlock instanceof Block b && state.rules.bannedBlocks.contains(b))){
+                    if(state.isGame() && (unlock instanceof UnitType u && u.isBanned() || unlock instanceof Block b && state.rules.isBanned(b))){
                         list.stack(image, new Image(Icon.cancel){{
                             setColor(Color.scarlet);
                             touchable = Touchable.disabled;
@@ -98,7 +147,7 @@ public class DatabaseDialog extends BaseDialog{
                                 ui.content.show(unlock);
                             }
                         });
-                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName + (enableConsole ? "\n[gray]" + unlock.name : ""))));
+                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName + (settings.getBool("console") ? "\n[gray]" + unlock.name : ""))));
                     }
 
                     if((++count) % cols == 0){

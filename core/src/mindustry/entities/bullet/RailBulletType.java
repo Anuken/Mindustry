@@ -7,16 +7,12 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 
 public class RailBulletType extends BulletType{
-    //for calculating the furthest point
-    static float furthest = 0;
-
-    public Effect pierceEffect = Fx.hitBulletSmall, updateEffect = Fx.none;
-    /** Multiplier of damage decreased per health pierced. */
-    public float pierceDamageFactor = 1f;
+    public Effect pierceEffect = Fx.hitBulletSmall, pointEffect = Fx.none, lineEffect = Fx.none;
+    public Effect endEffect = Fx.none;
 
     public float length = 100f;
 
-    public float updateEffectSeg = 20f;
+    public float pointEffectSpace = 20f;
 
     public RailBulletType(){
         speed = 0f;
@@ -26,26 +22,27 @@ public class RailBulletType extends BulletType{
         hitEffect = Fx.none;
         despawnEffect = Fx.none;
         collides = false;
+        keepVelocity = false;
         lifetime = 1f;
+        delayFrags = true;
     }
 
     @Override
-    public float range(){
+    protected float calculateRange(){
         return length;
     }
 
-    void handle(Bullet b, Posc pos, float initialHealth){
-        float sub = Math.max(initialHealth*pierceDamageFactor, 0);
+    @Override
+    public void handlePierce(Bullet b, float initialHealth, float x, float y){
+        float sub = Math.max(initialHealth * pierceDamageFactor, 0);
 
         if(b.damage <= 0){
-            b.fdata = Math.min(b.fdata, b.dst(pos));
+            b.fdata = Math.min(b.fdata, b.dst(x, y));
             return;
         }
 
         if(b.damage > 0){
-            pierceEffect.at(pos.getX(), pos.getY(), b.rotation());
-
-            hitEffect.at(pos.getX(), pos.getY());
+            pierceEffect.at(x, y, b.rotation());
         }
 
         //subtract health from each consecutive pierce
@@ -53,7 +50,7 @@ public class RailBulletType extends BulletType{
 
         //bullet was stopped, decrease furthest distance
         if(b.damage <= 0f){
-            furthest = Math.min(furthest, b.dst(pos));
+            b.fdata = Math.min(b.fdata, b.dst(x, y));
         }
     }
 
@@ -62,13 +59,24 @@ public class RailBulletType extends BulletType{
         super.init(b);
 
         b.fdata = length;
-        furthest = length;
-        Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), length, false, false);
-        float resultLen = furthest;
+        Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), length, false, false, pierceCap);
+        float resultLen = b.fdata;
 
         Vec2 nor = Tmp.v1.trns(b.rotation(), 1f).nor();
-        for(float i = 0; i <= resultLen; i += updateEffectSeg){
-            updateEffect.at(b.x + nor.x * i, b.y + nor.y * i, b.rotation());
+        if(pointEffect != Fx.none){
+            for(float i = 0; i <= resultLen; i += pointEffectSpace){
+                pointEffect.at(b.x + nor.x * i, b.y + nor.y * i, b.rotation(), trailColor);
+            }
+        }
+
+        boolean any = b.collided.size > 0;
+
+        if(!any && endEffect != Fx.none){
+            endEffect.at(b.x + nor.x * resultLen, b.y + nor.y * resultLen, b.rotation(), hitColor);
+        }
+
+        if(lineEffect != Fx.none){
+            lineEffect.at(b.x, b.y, b.rotation(), hitColor, new Vec2(b.x, b.y).mulAdd(nor, resultLen));
         }
     }
 
@@ -78,13 +86,7 @@ public class RailBulletType extends BulletType{
     }
 
     @Override
-    public void hitEntity(Bullet b, Hitboxc entity, float health){
-        super.hitEntity(b, entity, health);
-        handle(b, entity, health);
-    }
-
-    @Override
-    public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
-        handle(b, build, initialHealth);
+    public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct){
+        handlePierce(b, initialHealth, x, y);
     }
 }

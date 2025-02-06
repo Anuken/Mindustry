@@ -8,12 +8,13 @@ import arc.util.*;
 import mindustry.game.Rules.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
-public class Team implements Comparable<Team>{
+public class Team implements Comparable<Team>, Senseable{
     public final int id;
     public final Color color;
     public final Color[] palette;
@@ -29,19 +30,24 @@ public class Team implements Comparable<Team>{
 
     public final static Team
         derelict = new Team(0, "derelict", Color.valueOf("4d4e58")),
-        sharded = new Team(1, "sharded", Pal.accent.cpy(),
-            Color.valueOf("ffd37f"), Color.valueOf("eab678"), Color.valueOf("d4816b")),
-        crux = new Team(2, "crux", Color.valueOf("f25555"),
-            Color.valueOf("fc8e6c"), Color.valueOf("f25555"), Color.valueOf("a04553")),
-        green = new Team(3, "green", Color.valueOf("54d67d"), Color.valueOf("96f58c"), Color.valueOf("54d67d"), Color.valueOf("28785c")),
-        purple = new Team(4, "purple", Color.valueOf("995bb0"), Color.valueOf("f08dd5"), Color.valueOf("995bb0"), Color.valueOf("312c63")),
-        blue = new Team(5, "blue", Color.valueOf("554deb"), Color.valueOf("80aaff"), Color.valueOf("554deb"), Color.valueOf("3f207d"));
+        sharded = new Team(1, "sharded", Pal.accent.cpy(), Color.valueOf("ffd37f"), Color.valueOf("eab678"), Color.valueOf("d4816b")),
+        crux = new Team(2, "crux", Color.valueOf("f25555"), Color.valueOf("fc8e6c"), Color.valueOf("f25555"), Color.valueOf("a04553")),
+        malis = new Team(3, "malis", Color.valueOf("a27ce5"), Color.valueOf("c7a4f5"), Color.valueOf("896fd6"), Color.valueOf("504cba")),
+
+        //TODO temporarily no palettes for these teams.
+        green = new Team(4, "green", Color.valueOf("54d67d")),//Color.valueOf("96f58c"), Color.valueOf("54d67d"), Color.valueOf("28785c")),
+        blue = new Team(5, "blue", Color.valueOf("6c87fd")), //Color.valueOf("85caf9"), Color.valueOf("6c87fd"), Color.valueOf("3b3392")
+        neoplastic = new Team(6, "neoplastic", Color.valueOf("e05438")); //yes, it looks very similar to crux, you're not supposed to use this team for block regions anyway
 
     static{
         Mathf.rand.setSeed(8);
+        //fix random seed shift caused by new team
+        for(int i = 0; i < 3; i++){
+            Mathf.random();
+        }
         //create the whole 256 placeholder teams
-        for(int i = 6; i < all.length; i++){
-            new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.6f, 1f), 100f * Mathf.random(0.8f, 1f), 1f));
+        for(int i = 7; i < all.length; i++){
+            new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.4f, 1f), 100f * Mathf.random(0.6f, 1f), 1f));
         }
         Mathf.rand.setSeed(new Rand().nextLong());
     }
@@ -105,11 +111,23 @@ public class Team implements Comparable<Team>{
         return state.teams.isActive(this);
     }
 
-    /** @return whether this team is solely comprised of AI, with no players. */
+    /** @return whether this team is supposed to be AI-controlled. */
     public boolean isAI(){
-        return state.rules.waves && this == state.rules.waveTeam;
+        return (state.rules.waves || state.rules.attackMode) && this != state.rules.defaultTeam && !state.rules.pvp;
     }
 
+    /** @return whether this team is solely comprised of AI (with no players possible). */
+    public boolean isOnlyAI(){
+        return isAI() && data().players.size == 0;
+    }
+
+    /** @return whether this team needs a flow field for "dumb" wave pathfinding. */
+    public boolean needsFlowField(){
+        return isAI() && !rules().rtsAi;
+    }
+
+    /** @deprecated There is absolutely no reason to use this. */
+    @Deprecated
     public boolean isEnemy(Team other){
         return this != other;
     }
@@ -122,6 +140,10 @@ public class Team implements Comparable<Team>{
         return Core.bundle.get("team." + name + ".name", name);
     }
 
+    public String coloredName(){
+        return emoji + "[#" + color + "]" + localized() + "[]";
+    }
+
     @Override
     public int compareTo(Team team){
         return Integer.compare(id, team.id);
@@ -130,5 +152,11 @@ public class Team implements Comparable<Team>{
     @Override
     public String toString(){
         return name;
+    }
+
+    @Override
+    public double sense(LAccess sensor){
+        if(sensor == LAccess.id) return id;
+        return 0;
     }
 }

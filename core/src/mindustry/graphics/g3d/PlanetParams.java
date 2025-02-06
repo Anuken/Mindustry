@@ -10,14 +10,19 @@ import mindustry.type.*;
 public class PlanetParams{
     /** Camera direction relative to the planet. Length is determined by zoom. */
     public Vec3 camPos = new Vec3(0f, 0f, 4f);
+    /** If not null, this is the position of the "previous" planet for smooth camera movement. */
+    public @Nullable Vec3 otherCamPos;
+    /** Interpolation value for otherCamPos. */
+    public float otherCamAlpha = 0f;
     /** Camera up vector. */
     public Vec3 camUp = new Vec3(0f, 1f, 0f);
     /** the unit length direction vector of the camera **/
     public Vec3 camDir = new Vec3(0, 0, -1);
-    /** The sun/main planet of the solar system from which everything is rendered. */
-    public Planet solarSystem = Planets.sun;
+    /** The sun/main planet of the solar system from which everything is rendered. Deprecated use planet.solarSystem instead */
+    public @Deprecated Planet solarSystem = Planets.sun;
     /** Planet being looked at. */
     public Planet planet = Planets.serpulo;
+
     /** Zoom relative to planet. */
     public float zoom = 1f;
     /** Alpha of orbit rings and other UI elements. */
@@ -33,8 +38,4 @@ public class PlanetParams{
     public transient int viewW = -1, viewH = -1;
     /** If true, atmosphere will be drawn regardless of player options. */
     public transient boolean alwaysDrawAtmosphere = false;
-
-    //TODO:
-    //- blur
-    //- darken
 }

@@ -5,8 +5,11 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
@@ -42,7 +45,7 @@ public class PayloadDeconstructor extends PayloadBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (PayloadDeconstructorBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
+        addBar("progress", (PayloadDeconstructorBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
     }
 
     public class PayloadDeconstructorBuild extends PayloadBlockBuild<Payload>{
@@ -87,7 +90,8 @@ public class PayloadDeconstructor extends PayloadBlock{
 
         @Override
         public boolean acceptUnitPayload(Unit unit){
-            return payload == null && deconstructing == null && !unit.spawnedByCore && unit.type.getTotalRequirements().length > 0 && unit.hitSize / tilesize <= maxPayloadSize;
+            return payload == null && deconstructing == null && unit.type.allowedInPayloads && !unit.spawnedByCore
+                && unit.type.getTotalRequirements().length > 0 && unit.hitSize / tilesize <= maxPayloadSize;
         }
 
         @Override
@@ -138,11 +142,21 @@ public class PayloadDeconstructor extends PayloadBlock{
                     float shift = edelta() * deconstructSpeed / deconstructing.buildTime();
                     float realShift = Math.min(shift, 1f - progress);
 
+                    //if began deconstruction...
+                    if(progress == 0f && shift > 0f && deconstructing instanceof BuildPayload pay){
+                        var build = pay.build;
+                        //dump liquid on floor (does not respect block configuration with respect to dumping liquids on floor)
+                        if(build.liquids != null && build.liquids.currentAmount() > 0){
+                            float perCell = build.liquids.currentAmount() / (block.size * block.size) * 2f;
+                            tile.getLinkedTiles(other -> Puddles.deposit(other, build.liquids.current(), perCell));
+                        }
+                    }
+
                     progress += shift;
                     time += edelta();
 
                     for(int i = 0; i < reqs.length; i++){
-                        accum[i] += reqs[i].amount * realShift;
+                        accum[i] += reqs[i].amount * (deconstructing instanceof BuildPayload ? state.rules.buildCostMultiplier : state.rules.unitCost(team)) * realShift;
                     }
                 }
 
@@ -186,6 +200,19 @@ public class PayloadDeconstructor extends PayloadBlock{
                 payload = null;
                 progress = 0f;
             }
+        }
+
+        @Override
+        public double sense(Content content){
+            if(deconstructing instanceof UnitPayload up) return up.unit.type == content ? 1 : 0;
+            if(deconstructing instanceof BuildPayload bp) return bp.build.block == content ? 1 : 0;
+            return super.sense(content);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return progress;
+            return super.sense(sensor);
         }
 
         @Override

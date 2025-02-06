@@ -16,7 +16,7 @@ public class ModTestBM extends GenericModTest{
 
     @Test
     public void begin(){
-        grabMod("https://github.com/sk7725/BetaMindy/releases/download/v0.955/BetaMindy.jar");
+        grabMod("https://github.com/sk7725/BetaMindy/releases/download/v1.11/BetaMindy.jar");
 
         checkExistence("betamindy");
 

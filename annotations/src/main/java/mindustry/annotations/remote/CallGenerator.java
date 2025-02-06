@@ -60,7 +60,13 @@ public class CallGenerator{
             register.addStatement("mindustry.net.Net.registerPacket($L.$L::new)", packageName, ent.packetClassName);
 
             //add fields to the type
-            for(Svar param : ent.element.params()){
+            Seq<Svar> params = ent.element.params();
+            for(int i = 0; i < params.size; i++){
+                if(!ent.where.isServer && i == 0){
+                    continue;
+                }
+
+                Svar param = params.get(i);
                 packet.addField(param.tname(), param.name(), Modifier.PUBLIC);
             }
 
@@ -120,7 +126,7 @@ public class CallGenerator{
                 builder.addStatement("WRITE.$L($L)", typeName.equals("boolean") ? "bool" : typeName.charAt(0) + "", varName);
             }else{
                 //else, try and find a serializer
-                String ser = serializer.writers.get(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(ent.element.e, var.mirror(), true));
+                String ser = serializer.getNetWriter(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(ent.element.e, var.mirror(), true));
 
                 if(ser == null){ //make sure a serializer exists!
                     BaseProcessor.err("No method to write class type: '" + typeName + "'", var);

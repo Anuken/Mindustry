@@ -1,14 +1,15 @@
 package mindustry.world.consumers;
 
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
+//TODO replace with ConsumeLiquids?
 public class ConsumeLiquid extends ConsumeLiquidBase{
     public final Liquid liquid;
 
@@ -21,33 +22,38 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
         this(null, 0f);
     }
 
+
     @Override
-    public void applyLiquidFilter(Bits filter){
-        filter.set(liquid.id);
+    public void apply(Block block){
+        super.apply(block);
+        block.liquidFilter[liquid.id] = true;
     }
 
     @Override
-    public void build(Building tile, Table table){
-        table.add(new ReqImage(liquid.uiIcon, () -> valid(tile))).size(iconMed).top().left();
+    public void build(Building build, Table table){
+        table.add(new ReqImage(liquid.uiIcon, () -> build.liquids.get(liquid) > 0)).size(iconMed).top().left();
     }
 
     @Override
-    public String getIcon(){
-        return "icon-liquid-consume";
+    public void update(Building build){
+        build.liquids.remove(liquid, amount * build.edelta() * multiplier.get(build));
     }
 
     @Override
-    public void update(Building entity){
-        entity.liquids.remove(liquid, Math.min(use(entity), entity.liquids.get(liquid)));
-    }
-
-    @Override
-    public boolean valid(Building entity){
-        return entity != null && entity.liquids != null && entity.liquids.get(liquid) >= amount * entity.delta();
+    public float efficiency(Building build){
+        float ed = build.edelta() * build.efficiencyScale();
+        if(ed <= 0.00000001f) return 0f;
+        //there can be more liquid than necessary, so cap at 1
+        return Math.min(build.liquids.get(liquid) / (amount * ed * multiplier.get(build)), 1f);
     }
 
     @Override
     public void display(Stats stats){
         stats.add(booster ? Stat.booster : Stat.input, liquid, amount * 60f, true);
+    }
+
+    @Override
+    public boolean consumes(Liquid liquid){
+        return liquid == this.liquid;
     }
 }

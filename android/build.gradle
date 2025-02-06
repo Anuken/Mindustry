@@ -7,7 +7,7 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.android.tools.build:gradle:7.0.3'
+        classpath 'com.android.tools.build:gradle:8.2.2'
     }
 }
 
@@ -23,14 +23,15 @@ repositories{
 task deploy(type: Copy){
     dependsOn "assembleRelease"
 
-    from "build/outputs/apk/standard/release/android-standard-release.apk"
+    from "build/outputs/apk/release/android-release.apk"
     into "../deploy/"
-    rename("android-standard-release.apk", "${generateDeployName('android')}.apk")
+    rename("android-release.apk", "${generateDeployName('android')}.apk")
 }
 
 android{
-    buildToolsVersion '30.0.3'
-    compileSdkVersion 30
+    namespace = "io.anuke.mindustry"
+    buildToolsVersion = '34.0.0'
+    compileSdk = 34
     sourceSets{
         main{
             manifest.srcFile 'AndroidManifest.xml'
@@ -40,9 +41,6 @@ android{
             res.srcDirs = ['res']
             assets.srcDirs = ['assets', 'src/main/assets', '../core/assets/']
             jniLibs.srcDirs = ['libs']
-        }
-        gp{
-            java.srcDirs = ['srcgp']
         }
 
         androidTest.setRoot('tests')
@@ -59,15 +57,17 @@ android{
 
         applicationId "io.anuke.mindustry"
         minSdkVersion 14
-        targetSdkVersion 30
+        targetSdkVersion 34
         
         versionName versionNameResult
-        versionCode = (System.getenv("TRAVIS_BUILD_ID") != null ? System.getenv("TRAVIS_BUILD_ID").toInteger() : vcode)
+        versionCode = vcode
 
         if(project.hasProperty("release")){
             props['androidBuildCode'] = (vcode + 1).toString()
         }
         props.store(file('../core/assets/version.properties').newWriter(), null)
+
+        multiDexEnabled true
     }
 
     compileOptions{
@@ -75,7 +75,7 @@ android{
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    flavorDimensions "google"
+    flavorDimensions = ["google"]
 
     signingConfigs{
         release{
@@ -97,11 +97,12 @@ android{
 
     buildTypes{
         all{
+            //TODO without these lines (r8 enabled), Mindustry crashes with missing default interface method errors.
+            //WHY THE HELL ARE DEFAULT INTERFACES NOT BEING DESUGARED? WHY DID UPDATING AGP MAKE THIS HAPPEN?
+            //When I ENABLE shrinking, r8 goes and REMOVES ALL DEFAULT INTERFACE CLASSES, which breaks mods. Why?
+            //-keep class mindustry.** { *; } should *keep the classes* - WHY IS R8 REMOVING THEM?
             minifyEnabled = true
             shrinkResources = true
-            //this is the ONLY WAY I could find to force r8 to keep its filthy hands off of my default interfaces.
-            //may have undesirable side effects
-            debuggable = true
             proguardFiles("proguard-rules.pro")
         }
     }
@@ -113,18 +114,6 @@ android{
             }
         }
     }
-
-    // Specifies one flavor dimension.
-    flavorDimensions "version"
-    productFlavors{
-        standard{
-
-        }
-        gp{
-            applicationIdSuffix ".gp"
-            versionNameSuffix "-gp"
-        }
-    }
 }
 
 dependencies{
@@ -133,14 +122,17 @@ dependencies{
     implementation arcModule("backends:backend-android")
     implementation 'com.jakewharton.android.repackaged:dalvik-dx:9.0.0_r3'
 
-    natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
-    natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
+    natives "com.github.Anuken.Arc:natives-android:$arcHash"
+    natives "com.github.Anuken.Arc:natives-freetype-android:$arcHash"
 
-    gpImplementation "com.google.android.gms:play-services-games:21.0.0"
-    gpImplementation "com.google.android.gms:play-services-auth:19.0.0"
+    def version;
+    def highestVersion;
+    new File((String)findSdkDir(), "/platforms").eachFileMatch ~/android-\d+/, {
+        version = it.name.find(/\d+/).toInteger();
+        highestVersion = version > highestVersion ? version : highestVersion;
+    }
 
-    //TODO dynamically find best android platform jar instead of hard-coding to 30
-    def sdkFile = new File((String)findSdkDir(), "/platforms/android-30/android.jar")
+    def sdkFile = new File((String)findSdkDir(), "/platforms/android-${highestVersion}/android.jar")
     if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
 }
 

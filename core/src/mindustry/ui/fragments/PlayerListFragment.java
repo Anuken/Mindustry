@@ -10,22 +10,23 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
+import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.*;
 
-public class PlayerListFragment extends Fragment{
+public class PlayerListFragment{
     public Table content = new Table().marginRight(13f).marginLeft(13f);
     private boolean visible = false;
     private Interval timer = new Interval();
     private TextField search;
     private Seq<Player> players = new Seq<>();
 
-    @Override
     public void build(Group parent){
         content.name = "players";
         parent.fill(cont -> {
@@ -73,9 +74,11 @@ public class PlayerListFragment extends Fragment{
     }
 
     public void rebuild(){
+        boolean allowTeamSwitch = !state.isCampaign() && (state.rules.pvp || state.rules.infiniteResources);
+
         content.clear();
 
-        float h = 74f;
+        float h = 50f;
         boolean found = false;
 
         players.clear();
@@ -83,7 +86,7 @@ public class PlayerListFragment extends Fragment{
 
         players.sort(Structs.comps(Structs.comparing(Player::team), Structs.comparingBool(p -> !p.admin)));
         if(search.getText().length() > 0){
-            players.filter(p -> Strings.stripColors(p.name().toLowerCase()).contains(search.getText().toLowerCase()));
+            players.retainAll(p -> Strings.stripColors(p.name().toLowerCase()).contains(search.getText().toLowerCase()));
         }
 
         for(var user : players){
@@ -96,35 +99,45 @@ public class PlayerListFragment extends Fragment{
             button.left();
             button.margin(5).marginBottom(10);
 
-            Table table = new Table(){
+            ClickListener listener = new ClickListener();
+
+            Table iconTable = new Table(){
                 @Override
                 public void draw(){
                     super.draw();
-                    Draw.color(Pal.gray);
+                    Draw.colorMul(user.team().color, listener.isOver() ? 1.3f : 1f);
                     Draw.alpha(parentAlpha);
                     Lines.stroke(Scl.scl(4f));
                     Lines.rect(x, y, width, height);
                     Draw.reset();
                 }
             };
-            table.margin(8);
-            table.add(new Image(user.icon()).setScaling(Scaling.bounded)).grow();
-            table.name = user.name();
 
-            button.add(table).size(h);
-            button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).width(170f).pad(10);
+            boolean clickable = !(state.rules.fog && state.rules.pvp && user.team() != player.team());
+
+            if(clickable){
+                iconTable.addListener(listener);
+                iconTable.addListener(new HandCursorListener());
+            }
+            iconTable.margin(8);
+            iconTable.add(new Image(user.icon()).setScaling(Scaling.bounded)).grow();
+            iconTable.name = user.name();
+            iconTable.touchable = Touchable.enabled;
+
+            iconTable.tapped(() -> {
+                if(!user.dead() && clickable){
+                    control.input.spectate(user.unit());
+                    ui.showInfoFade(Core.bundle.format("viewplayer", user.name), 1f);
+                }
+            });
+
+            button.add(iconTable).size(h);
+            button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).style(Styles.outlineLabel).width(170f).pad(10);
             button.add().grow();
 
-            button.image(Icon.admin).visible(() -> user.admin && !(!user.isLocal() && net.server())).padRight(5).get().updateVisibility();
+            button.background(Tex.underline);
 
-            var style = new ImageButtonStyle(){{
-                down = Styles.none;
-                up = Styles.none;
-                imageCheckedColor = Pal.accent;
-                imageDownColor = Pal.accent;
-                imageUpColor = Color.white;
-                imageOverColor = Color.lightGray;
-            }};
+            button.image(Icon.admin).visible(() -> user.admin && !(!user.isLocal() && net.server())).padRight(5).get().updateVisibility();
 
             var ustyle = new ImageButtonStyle(){{
                 down = Styles.none;
@@ -134,59 +147,111 @@ public class PlayerListFragment extends Fragment{
                 imageOverColor = Color.lightGray;
             }};
 
-            if((net.server() || player.admin) && !user.isLocal() && (!user.admin || net.server())){
+            if(net.server() || (player.admin && (!user.admin || user == player))){
                 button.add().growY();
 
-                float bs = (h) / 2f;
+                if(allowTeamSwitch || user != player){
+                    button.button(Icon.menu, ustyle, () -> {
+                        var dialog = new BaseDialog(user.coloredName());
 
-                button.table(t -> {
-                    t.defaults().size(bs);
+                        dialog.title.setColor(Color.white);
+                        dialog.titleTable.remove();
 
-                    t.button(Icon.hammer, ustyle,
-                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.adminRequest(user, AdminAction.ban)));
-                    t.button(Icon.cancel, ustyle,
-                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick)));
+                        dialog.closeOnBack();
 
-                    t.row();
+                        var bstyle = Styles.defaultt;
 
-                    t.button(Icon.admin, style, () -> {
-                        if(net.client()) return;
+                        dialog.cont.add(user.coloredName()).row();
+                        dialog.cont.image(Tex.whiteui, Pal.accent).fillX().height(3f).pad(4f).row();
 
-                        String id = user.uuid();
+                        dialog.cont.pane(t -> {
+                            t.defaults().size(220f, 55f).pad(3f);
 
-                        if(user.admin){
-                            ui.showConfirm("@confirm", Core.bundle.format("confirmunadmin",  user.name()), () -> {
-                                netServer.admins.unAdminPlayer(id);
-                                user.admin = false;
-                            });
-                        }else{
-                            ui.showConfirm("@confirm", Core.bundle.format("confirmadmin",  user.name()), () -> {
-                                netServer.admins.adminPlayer(id, user.usid());
-                                user.admin = true;
-                            });
-                        }
-                    }).update(b -> b.setChecked(user.admin))
-                        .disabled(b -> net.client())
-                        .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
-                        .checked(user.admin);
+                            if(user != player){
+                                t.button("@player.ban", Icon.hammer, bstyle, () -> {
+                                    ui.showConfirm("@confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.adminRequest(user, AdminAction.ban, null));
+                                    dialog.hide();
+                                }).row();
 
-                    t.button(Icon.zoom, ustyle, () -> Call.adminRequest(user, AdminAction.trace));
+                                t.button("@player.kick", Icon.cancel, bstyle, () -> {
+                                    ui.showConfirm("@confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick, null));
+                                    dialog.hide();
+                                }).row();
 
-                }).padRight(12).size(bs + 10f, bs);
+                                t.button("@player.trace", Icon.zoom, bstyle, () -> {
+                                    Call.adminRequest(user, AdminAction.trace, null);
+                                    dialog.hide();
+                                }).row();
+                            }
+
+                            //there's generally no reason to team switch outside PvP or sandbox, and it's basically an easy way to cheat
+                            if(allowTeamSwitch){
+                                t.button("@player.team", Icon.redo, bstyle, () -> {
+                                    var teamSelect = new BaseDialog(Core.bundle.get("player.team") + ": " + user.name);
+                                    teamSelect.setFillParent(false);
+
+                                    var group = new ButtonGroup<>();
+
+                                    int i = 0;
+
+                                    for(Team team : Team.baseTeams){
+                                        var b = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
+                                        b.margin(4f);
+                                        b.getImageCell().grow();
+                                        b.getStyle().imageUpColor = team.color;
+                                        b.clicked(() -> {
+                                            Call.adminRequest(user, AdminAction.switchTeam, team);
+                                            teamSelect.hide();
+                                        });
+                                        teamSelect.cont.add(b).size(50f).checked(a -> user.team() == team).group(group);
+
+                                        if(i++ % 3 == 2) teamSelect.cont.row();
+                                    }
+
+                                    teamSelect.addCloseButton();
+                                    teamSelect.show();
+
+                                    dialog.hide();
+                                }).row();
+                            }
+
+                            if(!net.client() && !user.isLocal()){
+                                t.button("@player.admin", Icon.admin, Styles.togglet, () -> {
+                                    dialog.hide();
+                                    String id = user.uuid();
+
+                                    if(user.admin){
+                                        ui.showConfirm("@confirm", Core.bundle.format("confirmunadmin",  user.name()), () -> {
+                                            netServer.admins.unAdminPlayer(id);
+                                            user.admin = false;
+                                        });
+                                    }else{
+                                        ui.showConfirm("@confirm", Core.bundle.format("confirmadmin",  user.name()), () -> {
+                                            netServer.admins.adminPlayer(id, user.usid());
+                                            user.admin = true;
+                                        });
+                                    }
+                                }).checked(b -> user.admin).row();
+                            }
+                        }).row();
+
+                        dialog.cont.button("@back", Icon.left, dialog::hide).padTop(-1f).size(220f, 55f);
+
+                        dialog.show();
+
+
+                    }).size(h);
+                }
             }else if(!user.isLocal() && !user.admin && net.client() && Groups.player.size() >= 3 && player.team() == user.team()){ //votekick
                 button.add().growY();
 
                 button.button(Icon.hammer, ustyle,
-                () -> {
-                    ui.showConfirm("@confirm", Core.bundle.format("confirmvotekick",  user.name()), () -> {
-                        Call.sendChatMessage("/votekick " + user.name());
-                    });
-                }).size(h);
+                    () -> ui.showTextInput("@votekick.reason", Core.bundle.format("votekick.reason.message", user.name()), "",
+                    reason -> Call.sendChatMessage("/votekick #" + user.id + " " + reason)))
+                .size(h);
             }
 
-            content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
-            content.row();
-            content.image().height(4f).color(state.rules.pvp ? user.team().color : Pal.gray).growX();
+            content.add(button).width(350f).height(h + 14);
             content.row();
         }
 
