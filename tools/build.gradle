@@ -315,7 +315,7 @@ task updateBundles{
             removals.clear()
 
             for(String key : other.orderedKeys()){
-                if(!base.containsKey(key) && key.contains(".details")){
+                if(!base.containsKey(key) && key.contains(".details") && false){
                     extras.put(key, other.get(key))
                 }else if(!base.containsKey(key)){
                     removals.add(key)

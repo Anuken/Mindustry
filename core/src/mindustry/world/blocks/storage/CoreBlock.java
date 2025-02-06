@@ -1,16 +1,23 @@
 package mindustry.world.blocks.storage;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.actions.*;
+import arc.scene.event.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -20,22 +27,36 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
+    public static final float cloudScaling = 1700f, cfinScl = -2f, cfinOffset = 0.3f, calphaFinOffset = 0.25f, cloudAlpha = 0.81f;
+    public static final float[] cloudAlphas = {0, 0.5f, 1f, 0.1f, 0, 0f};
+
     //hacky way to pass item modules between methods
     private static ItemModule nextItems;
+    public static final float[] thrusterSizes = {0f, 0f, 0f, 0f, 0.3f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 0f};
 
     public @Load(value = "@-thruster1", fallback = "clear-effect") TextureRegion thruster1; //top right
     public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
     public float thrusterLength = 14f/4f;
     public boolean isFirstTier;
+    /** If true, this core type requires a core zone to upgrade. */
+    public boolean requiresCoreZone;
     public boolean incinerateNonBuildable = false;
 
     public UnitType unitType = UnitTypes.alpha;
+    public float landDuration = 160f;
+    public Music landMusic = Musics.land;
+    public Music launchMusic = Musics.coreLaunch;
+    public Effect launchEffect = Fx.launch;
+
+    public Interp landZoomInterp = Interp.pow3;
+    public float landZoomFrom = 0.02f, landZoomTo = 4f;
 
     public float captureInvicibility = 60f * 15f;
 
@@ -56,32 +77,31 @@ public class CoreBlock extends StorageBlock{
 
         //support everything
         replaceable = false;
-        rebuildable = false;
     }
 
     @Remote(called = Loc.server)
     public static void playerSpawn(Tile tile, Player player){
-        if(player == null || tile == null || !(tile.build instanceof CoreBuild entity)) return;
+        if(player == null || tile == null || !(tile.build instanceof CoreBuild core)) return;
 
-        CoreBlock block = (CoreBlock)tile.block();
-        if(entity.wasVisible){
-            Fx.spawn.at(entity);
+        UnitType spawnType = ((CoreBlock)core.block).unitType;
+        if(core.wasVisible){
+            Fx.spawn.at(core);
         }
 
-        player.set(entity);
+        player.set(core);
 
         if(!net.client()){
-            Unit unit = block.unitType.create(tile.team());
-            unit.set(entity);
+            Unit unit = spawnType.create(tile.team());
+            unit.set(core);
             unit.rotation(90f);
             unit.impulse(0f, 3f);
-            unit.controller(player);
             unit.spawnedByCore(true);
+            unit.controller(player);
             unit.add();
         }
 
         if(state.isCampaign() && player == Vars.player){
-            block.unitType.unlock();
+            spawnType.unlock();
         }
     }
 
@@ -90,6 +110,20 @@ public class CoreBlock extends StorageBlock{
         super.setStats();
 
         stats.remove(Stat.buildTime);
+        stats.add(Stat.unitType, table -> {
+            table.row();
+            table.table(Styles.grayPanel, b -> {
+                b.image(unitType.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                b.table(info -> {
+                    info.add(unitType.localizedName).left();
+                    if(Core.settings.getBool("console")){
+                        info.row();
+                        info.add(unitType.name).left().color(Color.lightGray);
+                    }
+                });
+                b.button("?", Styles.flatBordert, () -> ui.content.show(unitType)).size(40f).pad(10).right().grow().visible(() -> unitType.unlockedNow());
+            }).growX().pad(5).row();
+        });
     }
 
     @Override
@@ -99,7 +133,7 @@ public class CoreBlock extends StorageBlock{
         addBar("capacity", (CoreBuild e) -> new Bar(
             () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
             () -> Pal.items,
-            () -> e.items.total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))
+            () -> e.items.total() / ((float)e.storageCapacity * content.items().count(UnlockableContent::unlockedNow))
         ));
     }
 
@@ -141,15 +175,15 @@ public class CoreBlock extends StorageBlock{
         //must have all requirements
         if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements, state.rules.buildCostMultiplier))) return false;
 
-        return tile.block() instanceof CoreBlock && size > tile.block().size;
+        return tile.block() instanceof CoreBlock && size > tile.block().size && (!requiresCoreZone || tempTiles.allMatch(o -> o.floor().allowCorePlacement));
     }
 
     @Override
-    public void placeBegan(Tile tile, Block previous){
+    public void placeBegan(Tile tile, Block previous, Unit builder){
         //finish placement immediately when a block is replaced.
         if(previous instanceof CoreBlock){
             tile.setBlock(this, tile.team());
-            Fx.placeBlock.at(tile, tile.block().size);
+            tile.block().placeEffect.at(tile, tile.block().size);
             Fx.upgradeCore.at(tile.drawx(), tile.drawy(), 0f, tile.block());
             Fx.upgradeCoreBloom.at(tile, tile.block().size);
 
@@ -162,6 +196,8 @@ public class CoreBlock extends StorageBlock{
 
                 nextItems = null;
             }
+
+            Events.fire(new BlockBuildEndEvent(tile, builder, tile.team(), false, null));
         }
     }
 
@@ -195,12 +231,14 @@ public class CoreBlock extends StorageBlock{
         }
     }
 
-    public class CoreBuild extends Building{
+    public class CoreBuild extends Building implements LaunchAnimator{
         public int storageCapacity;
         public boolean noEffect = false;
         public Team lastDamage = Team.derelict;
         public float iframes = -1f;
         public float thrusterTime = 0f;
+
+        protected float cloudSeed, landParticleTimer;
 
         @Override
         public void draw(){
@@ -219,6 +257,218 @@ public class CoreBlock extends StorageBlock{
             }else{
                 super.draw();
             }
+        }
+
+        @Override
+        public float launchDuration(){
+            return landDuration;
+        }
+
+        @Override
+        public Music landMusic(){
+            return landMusic;
+        }
+
+        @Override
+        public Music launchMusic(){
+            return launchMusic;
+        }
+
+        @Override
+        public void beginLaunch(boolean launching){
+            cloudSeed = Mathf.random(1f);
+            if(launching){
+                Fx.coreLaunchConstruct.at(x, y, size);
+            }
+
+            if(!headless){
+                // Add fade-in and fade-out foreground when landing or launching.
+                if(renderer.isLaunching()){
+                    float margin = 30f;
+
+                    Image image = new Image();
+                    image.color.a = 0f;
+                    image.touchable = Touchable.disabled;
+                    image.setFillParent(true);
+                    image.actions(Actions.delay((launchDuration() - margin) / 60f), Actions.fadeIn(margin / 60f, Interp.pow2In), Actions.delay(6f / 60f), Actions.remove());
+                    image.update(() -> {
+                        image.toFront();
+                        ui.loadfrag.toFront();
+                        if(state.isMenu()){
+                            image.remove();
+                        }
+                    });
+                    Core.scene.add(image);
+                }else{
+                    Image image = new Image();
+                    image.color.a = 1f;
+                    image.touchable = Touchable.disabled;
+                    image.setFillParent(true);
+                    image.actions(Actions.fadeOut(35f / 60f), Actions.remove());
+                    image.update(() -> {
+                        image.toFront();
+                        ui.loadfrag.toFront();
+                        if(state.isMenu()){
+                            image.remove();
+                        }
+                    });
+                    Core.scene.add(image);
+
+                    Time.run(launchDuration(), () -> {
+                        launchEffect.at(this);
+                        Effect.shake(5f, 5f, this);
+                        thrusterTime = 1f;
+
+                        if(state.isCampaign() && Vars.showSectorLandInfo && (state.rules.sector.preset == null || state.rules.sector.preset.showSectorLandInfo)){
+                            ui.announce("[accent]" + state.rules.sector.name() + "\n" +
+                                (state.rules.sector.info.resources.any() ? "[lightgray]" + Core.bundle.get("sectors.resources") + "[white] " +
+                                    state.rules.sector.info.resources.toString(" ", UnlockableContent::emoji) : ""), 5);
+                        }
+                    });
+                }
+            }
+        }
+
+        @Override
+        public void endLaunch(){}
+
+        @Override
+        public void drawLaunch(){
+            var clouds = Core.assets.get("sprites/clouds.png", Texture.class);
+
+            float fin = renderer.getLandTimeIn();
+            float cameraScl = renderer.getDisplayScale();
+
+            float fout = 1f - fin;
+            float scl = Scl.scl(4f) / cameraScl;
+            float pfin = Interp.pow3Out.apply(fin), pf = Interp.pow2In.apply(fout);
+
+            //draw particles
+            Draw.color(Pal.lightTrail);
+            Angles.randLenVectors(1, pfin, 100, 800f * scl * pfin, (ax, ay, ffin, ffout) -> {
+                Lines.stroke(scl * ffin * pf * 3f);
+                Lines.lineAngle(x + ax, y + ay, Mathf.angle(ax, ay), (ffin * 20 + 1f) * scl);
+            });
+            Draw.color();
+
+            drawLanding(x, y);
+
+            Draw.color();
+            Draw.mixcol(Color.white, Interp.pow5In.apply(fout));
+
+            //accent tint indicating that the core was just constructed
+            if(renderer.isLaunching()){
+                float f = Mathf.clamp(1f - fout * 12f);
+                if(f > 0.001f){
+                    Draw.mixcol(Pal.accent, f);
+                }
+            }
+
+            //draw clouds
+            if(state.rules.cloudColor.a > 0.0001f){
+                float scaling = cloudScaling;
+                float sscl = Math.max(1f + Mathf.clamp(fin + cfinOffset) * cfinScl, 0f) * cameraScl;
+
+                Tmp.tr1.set(clouds);
+                Tmp.tr1.set(
+                    (Core.camera.position.x - Core.camera.width/2f * sscl) / scaling,
+                    (Core.camera.position.y - Core.camera.height/2f * sscl) / scaling,
+                    (Core.camera.position.x + Core.camera.width/2f * sscl) / scaling,
+                    (Core.camera.position.y + Core.camera.height/2f * sscl) / scaling);
+
+                Tmp.tr1.scroll(10f * cloudSeed, 10f * cloudSeed);
+
+                Draw.alpha(Mathf.sample(cloudAlphas, fin + calphaFinOffset) * cloudAlpha);
+                Draw.mixcol(state.rules.cloudColor, state.rules.cloudColor.a);
+                Draw.rect(Tmp.tr1, Core.camera.position.x, Core.camera.position.y, Core.camera.width, Core.camera.height);
+                Draw.reset();
+            }
+        }
+
+        public void drawLanding(float x, float y){
+            float fin = renderer.getLandTimeIn();
+            float fout = 1f - fin;
+
+            float scl = Scl.scl(4f) / renderer.getDisplayScale();
+            float shake = 0f;
+            float s = region.width * region.scl() * scl * 3.6f * Interp.pow2Out.apply(fout);
+            float rotation = Interp.pow2In.apply(fout) * 135f;
+            x += Mathf.range(shake);
+            y += Mathf.range(shake);
+            float thrustOpen = 0.25f;
+            float thrusterFrame = fin >= thrustOpen ? 1f : fin / thrustOpen;
+            float thrusterSize = Mathf.sample(thrusterSizes, fin);
+
+            //when launching, thrusters stay out the entire time.
+            if(renderer.isLaunching()){
+                Interp i = Interp.pow2Out;
+                thrusterFrame = i.apply(Mathf.clamp(fout*13f));
+                thrusterSize = i.apply(Mathf.clamp(fout*9f));
+            }
+
+            Draw.color(Pal.lightTrail);
+            //TODO spikier heat
+            Draw.rect("circle-shadow", x, y, s, s);
+
+            Draw.scl(scl);
+
+            //draw thruster flame
+            float strength = (1f + (size - 3)/2.5f) * scl * thrusterSize * (0.95f + Mathf.absin(2f, 0.1f));
+            float offset = (size - 3) * 3f * scl;
+
+            for(int i = 0; i < 4; i++){
+                Tmp.v1.trns(i * 90 + rotation, 1f);
+
+                Tmp.v1.setLength((size * tilesize/2f + 1f)*scl + strength*2f + offset);
+                Draw.color(team.color);
+                Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 6f * strength);
+
+                Tmp.v1.setLength((size * tilesize/2f + 1f)*scl + strength*0.5f + offset);
+                Draw.color(Color.white);
+                Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 3.5f * strength);
+            }
+
+            drawLandingThrusters(x, y, rotation, thrusterFrame);
+
+            Drawf.spinSprite(region, x, y, rotation);
+
+            Draw.alpha(Interp.pow4In.apply(thrusterFrame));
+            drawLandingThrusters(x, y, rotation, thrusterFrame);
+            Draw.alpha(1f);
+
+            if(teamRegions[team.id] == teamRegion) Draw.color(team.color);
+
+            Drawf.spinSprite(teamRegions[team.id], x, y, rotation);
+
+            Draw.color();
+            Draw.scl();
+            Draw.reset();
+        }
+
+        protected void drawLandingThrusters(float x, float y, float rotation, float frame){
+            float length = thrusterLength * (frame - 1f) - 1f/4f;
+            float alpha = Draw.getColorAlpha();
+
+            //two passes for consistent lighting
+            for(int j = 0; j < 2; j++){
+                for(int i = 0; i < 4; i++){
+                    var reg = i >= 2 ? thruster2 : thruster1;
+                    float rot = (i * 90) + rotation % 90f;
+                    Tmp.v1.trns(rot, length * Draw.xscl);
+
+                    //second pass applies extra layer of shading
+                    if(j == 1){
+                        Tmp.v1.rotate(-90f);
+                        Draw.alpha((rotation % 90f) / 90f * alpha);
+                        rot -= 90f;
+                        Draw.rect(reg, x + Tmp.v1.x, y + Tmp.v1.y, rot);
+                    }else{
+                        Draw.alpha(alpha);
+                        Draw.rect(reg, x + Tmp.v1.x, y + Tmp.v1.y, rot);
+                    }
+                }
+            }
+            Draw.alpha(1f);
         }
 
         public void drawThrusters(float frame){
@@ -249,7 +499,13 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void changeTeam(Team next){
+            if(this.team == next) return;
+
+            onRemoved();
+
             super.changeTeam(next);
+
+            onProximityUpdate();
 
             Events.fire(new CoreChangeEvent(this));
         }
@@ -293,6 +549,30 @@ public class CoreBlock extends StorageBlock{
             thrusterTime -= Time.delta/90f;
         }
 
+        /** @return Camera zoom while landing or launching. May optionally do other things such as setting camera position to itself. */
+        @Override
+        public float zoomLaunch(){
+            Core.camera.position.set(this);
+            return landZoomInterp.apply(Scl.scl(landZoomFrom), Scl.scl(landZoomTo), renderer.getLandTimeIn());
+        }
+
+        @Override
+        public void updateLaunch(){
+            float in = renderer.getLandTimeIn() * launchDuration();
+            float tsize = Mathf.sample(thrusterSizes, (in + 35f) / launchDuration());
+
+            landParticleTimer += tsize * Time.delta;
+            if(landParticleTimer >= 1f){
+                tile.getLinkedTiles(t -> {
+                    if(Mathf.chance(0.4f)){
+                        Fx.coreLandDust.at(t.worldx(), t.worldy(), angleTo(t.worldx(), t.worldy()) + Mathf.range(30f), Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)));
+                    }
+                });
+
+                landParticleTimer = 0f;
+            }
+        }
+
         @Override
         public boolean canPickup(){
             //cores can never be picked up
@@ -324,6 +604,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void afterDestroyed(){
+            super.afterDestroyed();
             if(state.rules.coreCapture){
                 if(!net.client()){
                     tile.setBlock(block, lastDamage);
@@ -446,33 +727,27 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public float handleDamage(float amount){
+        public void damage(float amount){
             if(player != null && team == player.team()){
                 Events.fire(Trigger.teamCoreDamage);
             }
-            return amount;
+            super.damage(amount);
         }
 
         @Override
         public void onRemoved(){
-            int total = proximity.count(e -> e.items != null && e.items == items);
-            float fract = 1f / total / state.teams.cores(team).size;
+            int totalCapacity = proximity.sum(e -> e.items != null && e.items == items ? e.block.itemCapacity : 0);
 
             proximity.each(e -> owns(e) && e.items == items && owns(e), t -> {
                 StorageBuild ent = (StorageBuild)t;
                 ent.linkedCore = null;
                 ent.items = new ItemModule();
                 for(Item item : content.items()){
-                    ent.items.set(item, (int)(fract * items.get(item)));
+                    ent.items.set(item, (int)Math.min(ent.block.itemCapacity, items.get(item) * (float)ent.block.itemCapacity / totalCapacity));
                 }
             });
 
             state.teams.unregisterCore(this);
-
-            int max = itemCapacity * state.teams.cores(team).size;
-            for(Item item : content.items()){
-                items.set(item, Math.min(items.get(item), max));
-            }
 
             for(CoreBuild other : state.teams.cores(team)){
                 other.onProximityUpdate();

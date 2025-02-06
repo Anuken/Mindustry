@@ -2,6 +2,7 @@ package mindustry.mod;
 
 import arc.*;
 import arc.assets.*;
+import arc.assets.loaders.MusicLoader.*;
 import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
@@ -16,6 +17,7 @@ import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
@@ -55,9 +57,10 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unchecked")
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
+    private static final ContentType[] typesToSearch = {ContentType.block, ContentType.item, ContentType.unit, ContentType.liquid, ContentType.planet};
+
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class, TextureRegion[][][].class);
-    ObjectMap<String, AssetDescriptor<?>> sounds = new ObjectMap<>();
     Seq<ParseListener> listeners = new Seq<>();
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
@@ -78,7 +81,12 @@ public class ContentParser{
         put(Interp.class, (type, data) -> field(Interp.class, data));
         put(Blending.class, (type, data) -> field(Blending.class, data));
         put(CacheLayer.class, (type, data) -> field(CacheLayer.class, data));
-        put(Attribute.class, (type, data) -> Attribute.get(data.asString()));
+        put(Attribute.class, (type, data) -> {
+            String attr = data.asString();
+            if(Attribute.exists(attr)) return Attribute.get(attr);
+            return Attribute.add(attr);
+        });
+        put(BuildVisibility.class, (type, data) -> field(BuildVisibility.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
             if(result != null){
@@ -104,6 +112,30 @@ public class ContentParser{
             readFields(effect, data);
             return effect;
         });
+        put(UnitCommand.class, (type, data) -> {
+            if(data.isString()){
+               var cmd = content.unitCommand(data.asString());
+               if(cmd != null){
+                   return cmd;
+               }else{
+                   throw new IllegalArgumentException("Unknown unit command name: " + data.asString());
+               }
+            }else{
+                throw new IllegalArgumentException("Unit commands must be strings.");
+            }
+        });
+        put(UnitStance.class, (type, data) -> {
+            if(data.isString()){
+                var cmd = content.unitStance(data.asString());
+                if(cmd != null){
+                    return cmd;
+                }else{
+                    throw new IllegalArgumentException("Unknown unit stance name: " + data.asString());
+                }
+            }else{
+                throw new IllegalArgumentException("Unit stances must be strings.");
+            }
+        });
         put(BulletType.class, (type, data) -> {
             if(data.isString()){
                 return field(Bullets.class, data);
@@ -111,6 +143,11 @@ public class ContentParser{
             Class<?> bc = resolve(data.getString("type", ""), BasicBulletType.class);
             data.remove("type");
             BulletType result = (BulletType)make(bc);
+            readFields(result, data);
+            return result;
+        });
+        put(MassDriverBolt.class, (type, data) -> {
+            MassDriverBolt result = (MassDriverBolt)make(MassDriverBolt.class);
             readFields(result, data);
             return result;
         });
@@ -172,56 +209,38 @@ public class ContentParser{
                 data.has("operation") ? data.get("operation") :
                 data.has("op") ? data.get("op") : null;
 
-            //no operations I guess (why would you do this?)
+            //no singular operation, check for multi-operation
             if(opval == null){
+                JsonValue opsVal =
+                    data.has("operations") ? data.get("operations") :
+                    data.has("ops") ? data.get("ops") : null;
+
+                if(opsVal != null){
+                    if(!opsVal.isArray()) throw new RuntimeException("Chained PartProgress operations must be an array.");
+                    int i = 0;
+                    while(true){
+                        JsonValue val = opsVal.get(i);
+                        if(val == null) break;
+                        JsonValue op = val.has("operation") ? val.get("operation") :
+                            val.has("op") ? val.get("op") : null;
+
+                        base = parseProgressOp(base, op.asString(), val);
+                        i++;
+                    }
+                }
+
                 return base;
             }
 
             //this is the name of the method to call
             String op = opval.asString();
 
-            //I have to hard-code this, no easy way of getting parameter names, unfortunately
-            return switch(op){
-                case "inv" -> base.inv();
-                case "slope" -> base.slope();
-                case "clamp" -> base.clamp();
-                case "delay" -> base.delay(data.getFloat("amount"));
-                case "sustain" -> base.sustain(data.getFloat("offset", 0f), data.getFloat("grow", 0f), data.getFloat("sustain"));
-                case "shorten" -> base.shorten(data.getFloat("amount"));
-                case "add" -> data.has("amount") ? base.add(data.getFloat("amount")) : base.add(parser.readValue(PartProgress.class, data.get("other")));
-                case "blend" -> base.blend(parser.readValue(PartProgress.class, data.get("other")), data.getFloat("amount"));
-                case "mul" -> base.mul(parser.readValue(PartProgress.class, data.get("other")));
-                case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
-                case "sin" -> base.sin(data.getFloat("scl"), data.getFloat("mag"));
-                case "absin" -> base.absin(data.getFloat("scl"), data.getFloat("mag"));
-                case "curve" -> base.curve(parser.readValue(Interp.class, data.get("interp")));
-                default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
-            };
+            return parseProgressOp(base, op, data);
         });
         put(PlanetGenerator.class, (type, data) -> {
             var result = new AsteroidGenerator(); //only one type for now
             readFields(result, data);
             return result;
-        });
-        put(GenericMesh.class, (type, data) -> {
-            if(!data.isObject()) throw new RuntimeException("Meshes must be objects.");
-            if(!(currentContent instanceof Planet planet)) throw new RuntimeException("Meshes can only be parsed as parts of planets.");
-
-            String tname = Strings.capitalize(data.getString("type", "NoiseMesh"));
-
-            return switch(tname){
-                //TODO NoiseMesh is bad
-                case "NoiseMesh" -> new NoiseMesh(planet,
-                    data.getInt("seed", 0), data.getInt("divisions", 1), data.getFloat("radius", 1f),
-                    data.getInt("octaves", 1), data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("mag", 0.5f),
-                    Color.valueOf(data.getString("color1", data.getString("color", "ffffff"))),
-                    Color.valueOf(data.getString("color2", data.getString("color", "ffffff"))),
-                    data.getInt("colorOct", 1), data.getFloat("colorPersistence", 0.5f), data.getFloat("colorScale", 1f),
-                    data.getFloat("colorThreshold", 0.5f));
-                case "MultiMesh" -> new MultiMesh(parser.readValue(GenericMesh[].class, data.get("meshes")));
-                case "MatMesh" -> new MatMesh(parser.readValue(GenericMesh.class, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
-                default -> throw new RuntimeException("Unknown mesh type: " + tname);
-            };
         });
         put(Mat3D.class, (type, data) -> {
             if(data == null) return new Mat3D();
@@ -257,18 +276,15 @@ public class ContentParser{
             return new Vec3(data.getFloat("x", 0f), data.getFloat("y", 0f), data.getFloat("z", 0f));
         });
         put(Sound.class, (type, data) -> {
-            if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
-            if(Vars.headless) return new Sound();
+            if(data.isArray()) return new RandomSound(parser.readValue(Sound[].class, data));
 
-            String name = "sounds/" + data.asString();
-            String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
+            var field = fieldOpt(Sounds.class, data);
+            return field != null ? field : Vars.tree.loadSound(data.asString());
+        });
+        put(Music.class, (type, data) -> {
+            var field = fieldOpt(Musics.class, data);
 
-            if(sounds.containsKey(path)) return ((SoundParameter)sounds.get(path).params).sound;
-            var sound = new Sound();
-            AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
-            desc.errored = Throwable::printStackTrace;
-            sounds.put(path, desc);
-            return sound;
+            return field != null ? field : Vars.tree.loadMusic(data.asString());
         });
         put(Objectives.Objective.class, (type, data) -> {
             if(data.isString()){
@@ -296,6 +312,34 @@ public class ContentParser{
             readFields(weapon, data);
             weapon.name = currentMod.name + "-" + weapon.name;
             return weapon;
+        });
+        put(Consume.class, (type, data) -> {
+            var oc = resolve(data.getString("type", ""), Consume.class);
+            data.remove("type");
+            var consume = make(oc);
+            readFields(consume, data);
+            return consume;
+        });
+        put(ConsumeLiquidBase.class, (type, data) -> {
+            var oc = resolve(data.getString("type", ""), ConsumeLiquidBase.class);
+            data.remove("type");
+            var consume = make(oc);
+            readFields(consume, data);
+            return consume;
+        });
+        put(Team.class, (type, data) -> {
+            if(data.isString()){
+                Team out = Structs.find(Team.baseTeams, t -> t.name.equals(data.asString()));
+                if(out == null) throw new IllegalArgumentException("Unknown team: " + data.asString());
+                return out;
+            }else if(data.isNumber()){
+                if(data.asInt() >= Team.all.length || data.asInt() < 0){
+                    throw new IllegalArgumentException("Unknown team: " + data.asString());
+                }
+                return Team.get(data.asInt());
+            }else{
+                throw new IllegalArgumentException("Unknown team: " + data.asString() + ". Team must either be a string or a number.");
+            }
         });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
@@ -347,6 +391,15 @@ public class ContentParser{
                     return (T)fromJson(ItemStack.class, "{item: " + split[0] + ", amount: " + split[1] + "}");
                 }
 
+                //try to parse "payloaditem/amount" syntax
+                if(type == PayloadStack.class && jsonData.isString() && jsonData.asString().contains("/")){
+                    String[] split = jsonData.asString().split("/");
+                    int number = Strings.parseInt(split[1], 1);
+                    UnlockableContent cont = content.unit(split[0]) == null ? content.block(split[0]) : content.unit(split[0]);
+
+                    return (T)new PayloadStack(cont == null ? Blocks.router : cont, number);
+                }
+
                 //try to parse "liquid/amount" syntax
                 if(jsonData.isString() && jsonData.asString().contains("/")){
                     String[] split = jsonData.asString().split("/");
@@ -355,6 +408,22 @@ public class ContentParser{
                     }else if(type == ConsumeLiquid.class){
                         return (T)fromJson(ConsumeLiquid.class, "{liquid: " + split[0] + ", amount: " + split[1] + "}");
                     }
+                }
+
+                //try to parse Rect as array
+                if(type == Rect.class && jsonData.isArray() && jsonData.size == 4){
+                    return (T)new Rect(jsonData.get(0).asFloat(), jsonData.get(1).asFloat(), jsonData.get(2).asFloat(), jsonData.get(3).asFloat());
+                }
+
+                //search across different content types to find one by name
+                if(type == UnlockableContent.class){
+                    for(ContentType c : typesToSearch){
+                        T found = (T)locate(c, jsonData.asString());
+                        if(found != null){
+                            return found;
+                        }
+                    }
+                    throw new IllegalArgumentException("\"" + jsonData.name + "\": No content found with name '" + jsonData.asString() + "'.");
                 }
 
                 if(Content.class.isAssignableFrom(type)){
@@ -396,11 +465,23 @@ public class ContentParser{
                 if(value.has("consumes") && value.get("consumes").isObject()){
                     for(JsonValue child : value.get("consumes")){
                         switch(child.name){
+                            case "remove" -> {
+                                String[] values = child.isString() ? new String[]{child.asString()} : child.asStringArray();
+                                for(String type : values){
+                                    Class<?> consumeType = resolve("Consume" + Strings.capitalize(type), Consume.class);
+                                    if(consumeType != Consume.class){
+                                        block.removeConsumers(b -> consumeType.isAssignableFrom(b.getClass()));
+                                    }else{
+                                        Log.warn("Unknown consumer type '@' (Class: @) in consume: remove.", type, "Consume" + Strings.capitalize(type));
+                                    }
+                                }
+                            }
                             case "item" -> block.consumeItem(find(ContentType.item, child.asString()));
                             case "itemCharged" -> block.consume((Consume)parser.readValue(ConsumeItemCharged.class, child));
                             case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
                             case "itemRadioactive" -> block.consume((Consume)parser.readValue(ConsumeItemRadioactive.class, child));
                             case "itemExplosive" -> block.consume((Consume)parser.readValue(ConsumeItemExplosive.class, child));
+                            case "itemList" -> block.consume((Consume)parser.readValue(ConsumeItemList.class, child));
                             case "itemExplode" -> block.consume((Consume)parser.readValue(ConsumeItemExplode.class, child));
                             case "items" -> block.consume(child.isArray() ?
                                     new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
@@ -452,12 +533,13 @@ public class ContentParser{
                 }
 
                 var typeVal = value.get("type");
+                if(unit.constructor == null || typeVal != null){
+                    if(typeVal != null && !typeVal.isString()){
+                        throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
+                    }
 
-                if(typeVal != null && !typeVal.isString()){
-                    throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
+                    unit.constructor = unitType(typeVal);
                 }
-
-                unit.constructor = unitType(typeVal);
             }else{
                 unit = locate(ContentType.unit, name);
             }
@@ -547,21 +629,57 @@ public class ContentParser{
 
             if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
-            SectorPreset out = new SectorPreset(name, locate(ContentType.planet, value.getString("planet", "serpulo")), value.getInt("sector"));
-            value.remove("sector");
-            value.remove("planet");
+            SectorPreset out = new SectorPreset(mod + "-" + name, currentMod);
+
             currentContent = out;
-            read(() -> readFields(out, value));
+            read(() -> {
+                Planet planet = locate(ContentType.planet, value.getString("planet", "serpulo"));
+
+                if(planet == null) throw new RuntimeException("Planet '" + value.getString("planet") + "' not found.");
+
+                out.initialize(planet, value.getInt("sector", 0));
+
+                value.remove("sector");
+                value.remove("planet");
+
+                readFields(out, value);
+            });
             return out;
         },
         ContentType.planet, (TypeParser<Planet>)(mod, name, value) -> {
             if(value.isString()) return locate(ContentType.planet, name);
 
-            Planet parent = locate(ContentType.planet, value.getString("parent"));
-            Planet planet = new Planet(name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
+            Planet parent = locate(ContentType.planet, value.getString("parent", ""));
+            Planet planet = new Planet(mod + "-" + name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
 
             if(value.has("mesh")){
-                planet.meshLoader = () -> parser.readValue(GenericMesh.class, value.get("mesh"));
+                var mesh = value.get("mesh");
+                if(!mesh.isObject() && !mesh.isArray()) throw new RuntimeException("Meshes must be objects.");
+                value.remove("mesh");
+                planet.meshLoader = () -> {
+                    //don't crash, just log an error
+                    try{
+                        return parseMesh(planet, mesh);
+                    }catch(Exception e){
+                        Log.err(e);
+                        return new ShaderSphereMesh(planet, Shaders.unlit, 2);
+                    }
+                };
+            }
+
+            if(value.has("cloudMesh")){
+                var mesh = value.get("cloudMesh");
+                if(!mesh.isObject() && !mesh.isArray()) throw new RuntimeException("Meshes must be objects.");
+                value.remove("cloudMesh");
+                planet.cloudMeshLoader = () -> {
+                    //don't crash, just log an error
+                    try{
+                        return parseMesh(planet, mesh);
+                    }catch(Exception e){
+                        Log.err(e);
+                        return null;
+                    }
+                };
             }
 
             //always one sector right now...
@@ -570,6 +688,27 @@ public class ContentParser{
             currentContent = planet;
             read(() -> readFields(planet, value));
             return planet;
+        },
+        ContentType.team, (TypeParser<TeamEntry>)(mod, name, value) -> {
+            TeamEntry entry;
+            Team team;
+            if(value.has("team")){
+                team = (Team)classParsers.get(Team.class).parse(Team.class, value.get("team"));
+            }else{
+                throw new RuntimeException("Team field missing.");
+            }
+            value.remove("team");
+            
+            if(locate(ContentType.team, name) != null){
+                entry = locate(ContentType.team, name);
+                readBundle(ContentType.team, name, value);
+            }else{
+                readBundle(ContentType.team, name, value);
+                entry = new TeamEntry(mod + "-" + name, team);
+            }
+            currentContent = entry;
+            read(() -> readFields(entry, value));
+            return entry;
         }
     );
 
@@ -717,13 +856,14 @@ public class ContentParser{
             json = json.replace("#", "\\#");
         }
 
+        currentMod = mod;
+
         JsonValue value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
 
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
         }
 
-        currentMod = mod;
         boolean located = locate(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
         c.minfo.sourceFile = file;
@@ -788,6 +928,75 @@ public class ContentParser{
         return null;
     }
 
+    private GenericMesh[] parseMeshes(Planet planet, JsonValue array){
+        var res = new GenericMesh[array.size];
+        for(int i = 0; i < array.size; i++){
+            //yes get is O(n) but it's practically irrelevant here
+            res[i] = parseMesh(planet, array.get(i));
+        }
+        return res;
+    }
+
+    private GenericMesh parseMesh(Planet planet, JsonValue data){
+        if(data.isArray()){
+            return new MultiMesh(parseMeshes(planet, data));
+        }
+
+        String tname = Strings.capitalize(data.getString("type", "NoiseMesh"));
+
+        return switch(tname){
+            //TODO NoiseMesh is bad
+            case "NoiseMesh" -> new NoiseMesh(planet,
+            data.getInt("seed", 0), data.getInt("divisions", 1), data.getFloat("radius", 1f),
+            data.getInt("octaves", 1), data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("mag", 0.5f),
+            Color.valueOf(data.getString("color1", data.getString("color", "ffffff"))),
+            Color.valueOf(data.getString("color2", data.getString("color", "ffffff"))),
+            data.getInt("colorOct", 1), data.getFloat("colorPersistence", 0.5f), data.getFloat("colorScale", 1f),
+            data.getFloat("colorThreshold", 0.5f));
+            case "SunMesh" -> {
+                var cvals = data.get("colors").asStringArray();
+                var colors = new Color[cvals.length];
+                for(int i=0; i<cvals.length; i++){
+                    colors[i] = Color.valueOf(cvals[i]);
+                }
+
+                yield new SunMesh(planet, data.getInt("divisions", 1), data.getInt("octaves", 1), data.getFloat("persistence", 0.5f),
+                data.getFloat("scl", 1f), data.getFloat("pow", 1f), data.getFloat("mag", 0.5f),
+                data.getFloat("colorScale", 1f), colors);
+            }
+            case "HexSkyMesh" -> new HexSkyMesh(planet,
+            data.getInt("seed", 0), data.getFloat("speed", 0), data.getFloat("radius", 1f),
+            data.getInt("divisions", 3), Color.valueOf(data.getString("color", "ffffff")), data.getInt("octaves", 1),
+            data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("thresh", 0.5f));
+            case "MultiMesh" -> new MultiMesh(parseMeshes(planet, data.get("meshes")));
+            case "MatMesh" -> new MatMesh(parseMesh(planet, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
+            default -> throw new RuntimeException("Unknown mesh type: " + tname);
+        };
+    }
+
+    private PartProgress parseProgressOp(PartProgress base, String op, JsonValue data){
+        //I have to hard-code this, no easy way of getting parameter names, unfortunately
+        return switch(op){
+            case "inv" -> base.inv();
+            case "slope" -> base.slope();
+            case "clamp" -> base.clamp();
+            case "delay" -> base.delay(data.getFloat("amount"));
+            case "sustain" -> base.sustain(data.getFloat("offset", 0f), data.getFloat("grow", 0f), data.getFloat("sustain"));
+            case "shorten" -> base.shorten(data.getFloat("amount"));
+            case "compress" -> base.compress(data.getFloat("start"), data.getFloat("end"));
+            case "add" -> data.has("amount") ? base.add(data.getFloat("amount")) : base.add(parser.readValue(PartProgress.class, data.get("other")));
+            case "blend" -> base.blend(parser.readValue(PartProgress.class, data.get("other")), data.getFloat("amount"));
+            case "mul" -> data.has("amount") ? base.mul(data.getFloat("amount")) : base.mul(parser.readValue(PartProgress.class, data.get("other")));
+            case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
+            case "sin" -> base.sin(data.has("offset") ? data.getFloat("offset") : 0f, data.getFloat("scl"), data.getFloat("mag"));
+            case "absin" -> base.absin(data.getFloat("scl"), data.getFloat("mag"));
+            case "mod" -> base.mod(data.getFloat("amount"));
+            case "loop" -> base.loop(data.getFloat("time"));
+            case "curve" -> data.has("interp") ? base.curve(parser.readValue(Interp.class, data.get("interp"))) : base.curve(data.getFloat("offset"), data.getFloat("duration"));
+            default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
+        };
+    }
+
     <T> T make(Class<T> type){
         try{
             Constructor<T> cons = type.getDeclaredConstructor();
@@ -837,7 +1046,6 @@ public class ContentParser{
             throw new RuntimeException(e);
         }
     }
-
     Object fieldOpt(Class<?> type, JsonValue value){
         try{
             return type.getField(value.asString()).get(null);
@@ -889,7 +1097,41 @@ public class ContentParser{
             }
             Field field = metadata.field;
             try{
-                field.set(object, parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType));
+                if(child.isObject() && child.has("add") && (Seq.class.isAssignableFrom(field.getType()) || ObjectSet.class.isAssignableFrom(field.getType()))){
+                    Object readField = parser.readValue(field.getType(), metadata.elementType, child.get("add"), metadata.keyType);
+                    Object fieldObj = field.get(object);
+
+                    if(fieldObj instanceof ObjectSet set){
+                        set.addAll((ObjectSet)readField);
+                    }else if(fieldObj instanceof Seq seq){
+                        seq.addAll((Seq)readField);
+                    }else{
+                        throw new SerializationException("This should be impossible");
+                    }
+                }else{
+                    boolean isMap = ObjectMap.class.isAssignableFrom(field.getType()) || ObjectIntMap.class.isAssignableFrom(field.getType()) || ObjectFloatMap.class.isAssignableFrom(field.getType());
+                    boolean mergeMap = isMap && child.has("add") && child.get("add").isBoolean() && child.getBoolean("add", false);
+
+                    if(mergeMap){
+                        child.remove("add");
+                    }
+
+                    Object readField = parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType);
+                    Object fieldObj = field.get(object);
+
+                    //if a map has add: true, add its contents to the map instead
+                    if(mergeMap && (fieldObj instanceof ObjectMap<?,?> || fieldObj instanceof ObjectIntMap<?> || fieldObj instanceof ObjectFloatMap<?>)){
+                        if(field.get(object) instanceof ObjectMap<?,?> baseMap){
+                            baseMap.putAll((ObjectMap)readField);
+                        }else if(field.get(object) instanceof ObjectIntMap<?> baseMap){
+                            baseMap.putAll((ObjectIntMap)readField);
+                        }else if(field.get(object) instanceof ObjectFloatMap<?> baseMap){
+                            baseMap.putAll((ObjectFloatMap)readField);
+                        }
+                    }else{
+                        field.set(object, readField);
+                    }
+                }
             }catch(IllegalAccessException ex){
                 throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
             }catch(SerializationException ex){
@@ -937,8 +1179,8 @@ public class ContentParser{
                 }
 
                 //all items have a produce requirement unless already specified
-                if(object instanceof Item i && !node.objectives.contains(o -> o instanceof Produce p && p.content == i)){
-                    node.objectives.add(new Produce(i));
+                if((unlock instanceof Item || unlock instanceof Liquid) && !node.objectives.contains(o -> o instanceof Produce p && p.content == unlock)){
+                    node.objectives.add(new Produce(unlock));
                 }
 
                 //remove old node from parent
@@ -948,6 +1190,10 @@ public class ContentParser{
 
                 if(customRequirements == null){
                     node.setupRequirements(unlock.researchRequirements());
+                }
+
+                if(research.has("planet")){
+                    node.planet = find(ContentType.planet, research.getString("planet"));
                 }
 
                 if(research.getBoolean("root", false)){

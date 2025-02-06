@@ -143,11 +143,8 @@ public class IOSLauncher extends IOSApplication.Delegate{
                     Log.info("Attempting to share file " + file);
                     List<Object> list = new ArrayList<>();
 
-                    list.add(file.name());
-                    list.add(NSData.read(file.file()));
-
                     //better choice?
-                    //list.add(new NSURL(file.file()));
+                    list.add(new NSURL(file.file()));
 
                     UIActivityViewController p = new UIActivityViewController(list, null);
                     UIViewController rootVc = UIApplication.getSharedApplication().getKeyWindow().getRootViewController();
@@ -177,7 +174,9 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 forced = false;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
-        }, new IOSApplicationConfiguration());
+        }, new IOSApplicationConfiguration(){{
+            useGL30 = true;
+        }});
     }
 
     @Override
@@ -221,8 +220,8 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
             if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
 
-                if(SaveIO.isSaveValid(file)){
-                    try{
+                try{
+                    if(SaveIO.isSaveValid(file)){
                         SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.defaultBufferSize))));
                         if(meta.tags.containsKey("name")){
                             //is map
@@ -235,13 +234,12 @@ public class IOSLauncher extends IOSApplication.Delegate{
                             SaveSlot slot = control.saves.importSave(file);
                             ui.load.runLoadSave(slot);
                         }
-                    }catch(IOException e){
-                        ui.showException("@save.import.fail", e);
+                    }else{
+                        ui.showErrorMessage("@save.import.invalid");
                     }
-                }else{
-                    ui.showErrorMessage("@save.import.invalid");
+                }catch(Throwable e){
+                    ui.showException("@save.import.fail", e);
                 }
-
             }
         }));
     }
@@ -252,7 +250,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
             UIApplication.main(argv, null, IOSLauncher.class);
         }catch(Throwable t){
             //attempt to log the exception
-            CrashSender.log(t);
+            CrashHandler.log(t);
             Log.err(t);
             //rethrow the exception so it actually crashes
             throw t;

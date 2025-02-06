@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -21,6 +22,8 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class PayloadRouter extends PayloadConveyor{
+    public boolean invert = false;
+
     public @Load("@-over") TextureRegion overRegion;
 
     public PayloadRouter(String name){
@@ -43,8 +46,14 @@ public class PayloadRouter extends PayloadConveyor{
         Draw.rect(overRegion, plan.drawx(), plan.drawy());
     }
 
+    @Override
+    public void getPlanConfigs(Seq<UnlockableContent> options){
+        options.add(content.blocks().select(this::canSort));
+        options.add(content.units().select(this::canSort));
+    }
+
     public boolean canSort(Block b){
-        return b.isVisible() && b.size <= size && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b) && b.environmentBuildable();
+        return b.isVisible() && b.size <= size && !(b instanceof CoreBlock) && !state.rules.isBanned(b) && b.environmentBuildable();
     }
 
     public boolean canSort(UnitType t){
@@ -130,6 +139,8 @@ public class PayloadRouter extends PayloadConveyor{
             matches = sorted != null &&
                 (item instanceof BuildPayload build && build.block() == sorted) ||
                 (item instanceof UnitPayload unit && unit.unit.type == sorted);
+
+            if(invert) matches = !matches;
         }
 
         @Override

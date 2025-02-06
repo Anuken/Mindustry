@@ -1,6 +1,7 @@
 package mindustry.entities.pattern;
 
 import arc.math.*;
+import arc.util.*;
 
 public class ShootSine extends ShootPattern{
     /** scaling applied to bullet index */
@@ -17,7 +18,7 @@ public class ShootSine extends ShootPattern{
     }
 
     @Override
-    public void shoot(int totalShots, BulletHandler handler){
+    public void shoot(int totalShots, BulletHandler handler, @Nullable Runnable barrelIncrementer){
         for(int i = 0; i < shots; i++){
             float angleOffset = Mathf.sin(i + totalShots, scl, mag);
             handler.shoot(0, 0, angleOffset, firstShotDelay + shotDelay * i);

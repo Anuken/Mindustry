@@ -5,6 +5,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.util.*;
@@ -13,6 +14,7 @@ import static mindustry.Vars.*;
 
 public class LanguageDialog extends BaseDialog{
     public static final ObjectMap<String, String> displayNames = ObjectMap.of(
+    "ca", "Català",
     "id_ID", "Bahasa Indonesia",
     "da", "Dansk",
     "de", "Deutsch",
@@ -77,6 +79,7 @@ public class LanguageDialog extends BaseDialog{
                 if(getLocale().equals(loc)) return;
                 Core.settings.put("locale", loc.toString());
                 Log.info("Setting locale: @", loc.toString());
+                player.locale = loc.toString();
                 ui.showInfo("@language.restart");
             });
             langs.add(button).group(group).update(t -> t.setChecked(loc.equals(getLocale()))).size(400f, 50f).row();

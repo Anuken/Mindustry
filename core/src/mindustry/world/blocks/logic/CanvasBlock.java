@@ -1,5 +1,6 @@
 package mindustry.world.blocks.logic;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
@@ -12,7 +13,10 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -21,9 +25,19 @@ import static mindustry.Vars.*;
 public class CanvasBlock extends Block{
     public float padding = 0f;
     public int canvasSize = 8;
-    public int[] palette = {0x634b7dff, 0xc45d9f_ff, 0xe39aac_ff, 0xf0dab1_ff, 0x6461c2_ff, 0x2ba9b4_ff, 0x93d4b5_ff, 0xf0f6e8_ff};
+    public int[] palette = {0x362944_ff, 0xc45d9f_ff, 0xe39aac_ff, 0xf0dab1_ff, 0x6461c2_ff, 0x2ba9b4_ff, 0x93d4b5_ff, 0xf0f6e8_ff};
     public int bitsPerPixel;
     public IntIntMap colorToIndex = new IntIntMap();
+
+    public @Load("@-side1") TextureRegion side1;
+    public @Load("@-side2") TextureRegion side2;
+
+    public @Load("@-corner1") TextureRegion corner1;
+    public @Load("@-corner2") TextureRegion corner2;
+
+    protected @Nullable Pixmap previewPixmap;
+    protected @Nullable Texture previewTexture;
+    protected int tempBlend = 0;
 
     public CanvasBlock(String name){
         super(name);
@@ -51,32 +65,101 @@ public class CanvasBlock extends Block{
         bitsPerPixel = Mathf.log2(Mathf.nextPowerOfTwo(palette.length));
     }
 
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        //only draw the preview in schematics, as it lags otherwise
+        if(!plan.worldContext && plan.config instanceof byte[] data){
+            Pixmap pix = makePixmap(data);
+
+            if(previewTexture == null){
+                previewTexture = new Texture(pix);
+            }else{
+                previewTexture.draw(pix);
+            }
+
+            tempBlend = 0;
+
+            //O(N^2), awful
+            list.each(other -> {
+                if(other.block == this){
+                    for(int i = 0; i < 4; i++){
+                        if(other.x == plan.x + Geometry.d4x(i) * size && other.y == plan.y + Geometry.d4y(i) * size){
+                            tempBlend |= (1 << i);
+                        }
+                    }
+                }
+            });
+
+            int blending = tempBlend;
+
+            float x = plan.drawx(), y = plan.drawy();
+            Tmp.tr1.set(previewTexture);
+            float pad = blending == 0 ? padding : 0f;
+
+            Draw.rect(Tmp.tr1, x, y, size * tilesize - pad, size * tilesize - pad);
+            Draw.flush(); //texture is reused, so flush it now
+
+            //code duplication, awful
+            for(int i = 0; i < 4; i ++){
+                if((blending & (1 << i)) == 0){
+                    Draw.rect(i >= 2 ? side2 : side1, x, y, i * 90);
+
+                    if((blending & (1 << ((i + 1) % 4))) != 0){
+                        Draw.rect(i >= 2 ? corner2 : corner1, x, y, i * 90);
+                    }
+
+                    if((blending & (1 << (Mathf.mod(i - 1, 4)))) != 0){
+                        Draw.yscl = -1f;
+                        Draw.rect(i >= 2 ? corner2 : corner1, x, y, i * 90);
+                        Draw.yscl = 1f;
+                    }
+                }
+            }
+
+        }else{
+            super.drawPlanRegion(plan, list);
+        }
+    }
+
+    /** returns the same pixmap instance each time, use with care */
+    public Pixmap makePixmap(byte[] data){
+        if(previewPixmap == null){
+            previewPixmap = new Pixmap(canvasSize, canvasSize);
+        }
+
+        int bpp = bitsPerPixel;
+        int pixels = canvasSize * canvasSize;
+        for(int i = 0; i < pixels; i++){
+            int bitOffset = i * bpp;
+            int pal = getByte(data, bitOffset);
+            previewPixmap.set(i % canvasSize, i / canvasSize, palette[pal]);
+        }
+        return previewPixmap;
+    }
+
+    protected int getByte(byte[] data, int bitOffset){
+        int result = 0, bpp = bitsPerPixel;
+        for(int i = 0; i < bpp; i++){
+            int word = i + bitOffset >>> 3;
+            result |= (((data[word] & (1 << (i + bitOffset & 7))) == 0 ? 0 : 1) << i);
+        }
+        return result;
+    }
+
     public class CanvasBuild extends Building{
         public @Nullable Texture texture;
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
+        public int blending;
 
         public void updateTexture(){
             if(headless) return;
 
-            Pixmap pix = makePixmap();
+            Pixmap pix = makePixmap(data);
             if(texture != null){
                 texture.draw(pix);
             }else{
                 texture = new Texture(pix);
             }
-            pix.dispose();
-        }
-
-        public Pixmap makePixmap(){
-            Pixmap pix = new Pixmap(canvasSize, canvasSize);
-            int bpp = bitsPerPixel;
-            int pixels = canvasSize * canvasSize;
-            for(int i = 0; i < pixels; i++){
-                int bitOffset = i * bpp;
-                int pal = getByte(bitOffset);
-                pix.set(i % canvasSize, i / canvasSize, palette[pal]);
-            }
-            return pix;
         }
 
         public byte[] packPixmap(Pixmap pixmap){
@@ -88,15 +171,6 @@ public class CanvasBlock extends Block{
                 setByte(bytes, i * bitsPerPixel, palIndex);
             }
             return bytes;
-        }
-
-        protected int getByte(int bitOffset){
-            int result = 0, bpp = bitsPerPixel;
-            for(int i = 0; i < bpp; i++){
-                int word = i + bitOffset >>> 3;
-                result |= (((data[word] & (1 << (i + bitOffset & 7))) == 0 ? 0 : 1) << i);
-            }
-            return result;
         }
 
         protected void setByte(byte[] bytes, int bitOffset, int value){
@@ -113,14 +187,53 @@ public class CanvasBlock extends Block{
         }
 
         @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+
+            blending = 0;
+            for(int i = 0; i < 4; i++){
+                if(blends(world.tile(tile.x + Geometry.d4[i].x * size, tile.y + Geometry.d4[i].y * size))) blending |= (1 << i);
+            }
+        }
+
+        boolean blends(Tile other){
+            return other != null && other.build != null && other.build.block == block && other.build.tileX() == other.x && other.build.tileY() == other.y;
+        }
+
+        @Override
         public void draw(){
-            super.draw();
+            if(!renderer.drawDisplays){
+                super.draw();
+
+                return;
+            }
+
+            if(blending == 0){
+                super.draw();
+            }
 
             if(texture == null){
                 updateTexture();
             }
             Tmp.tr1.set(texture);
-            Draw.rect(Tmp.tr1, x, y, size * tilesize - padding, size * tilesize - padding);
+            float pad = blending == 0 ? padding : 0f;
+
+            Draw.rect(Tmp.tr1, x, y, size * tilesize - pad, size * tilesize - pad);
+            for(int i = 0; i < 4; i ++){
+                if((blending & (1 << i)) == 0){
+                    Draw.rect(i >= 2 ? side2 : side1, x, y, i * 90);
+
+                    if((blending & (1 << ((i + 1) % 4))) != 0){
+                        Draw.rect(i >= 2 ? corner2 : corner1, x, y, i * 90);
+                    }
+
+                    if((blending & (1 << (Mathf.mod(i - 1, 4)))) != 0){
+                        Draw.yscl = -1f;
+                        Draw.rect(i >= 2 ? corner2 : corner1, x, y, i * 90);
+                        Draw.yscl = 1f;
+                    }
+                }
+            }
         }
 
         @Override
@@ -137,36 +250,63 @@ public class CanvasBlock extends Block{
             table.button(Icon.pencil, Styles.cleari, () -> {
                 Dialog dialog = new Dialog();
 
-                Pixmap pix = makePixmap();
+                Pixmap pix = makePixmap(data);
                 Texture texture = new Texture(pix);
                 int[] curColor = {palette[0]};
                 boolean[] modified = {false};
+                boolean[] fill = {false};
+
+                dialog.resized(dialog::hide);
 
                 dialog.cont.table(Tex.pane, body -> {
-                    body.stack(new Element(){
+                    body.add(new Element(){
                         int lastX, lastY;
+                        IntSeq stack = new IntSeq();
+
+                        int convertX(float ex){
+                            return (int)((ex) / (width / canvasSize));
+                        }
+
+                        int convertY(float ey){
+                            return pix.height - 1 - (int)((ey) / (height / canvasSize));
+                        }
 
                         {
                             addListener(new InputListener(){
-                                int convertX(float ex){
-                                    return (int)((ex - x) / width * canvasSize);
-                                }
-
-                                int convertY(float ey){
-                                    return pix.height - 1 - (int)((ey - y) / height * canvasSize);
-                                }
 
                                 @Override
                                 public boolean touchDown(InputEvent event, float ex, float ey, int pointer, KeyCode button){
                                     int cx = convertX(ex), cy = convertY(ey);
-                                    draw(cx, cy);
-                                    lastX = cx;
-                                    lastY = cy;
+                                    if(fill[0]){
+                                        stack.clear();
+                                        int src = curColor[0];
+                                        int dst = pix.get(cx, cy);
+                                        if(src != dst){
+                                            stack.add(Point2.pack(cx, cy));
+                                            while(!stack.isEmpty()){
+                                                int current = stack.pop();
+                                                int x = Point2.x(current), y = Point2.y(current);
+                                                draw(x, y);
+                                                for(int i = 0; i < 4; i++){
+                                                    int nx = x + Geometry.d4x(i), ny = y + Geometry.d4y(i);
+                                                    if(nx >= 0 && ny >= 0 && nx < pix.width && ny < pix.height && pix.getRaw(nx, ny) == dst){
+                                                        stack.add(Point2.pack(nx, ny));
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                    }else{
+                                        draw(cx, cy);
+                                        lastX = cx;
+                                        lastY = cy;
+                                    }
                                     return true;
                                 }
 
                                 @Override
                                 public void touchDragged(InputEvent event, float ex, float ey, int pointer){
+                                    if(fill[0]) return;
                                     int cx = convertX(ex), cy = convertY(ey);
                                     Bresenham2.line(lastX, lastY, cx, cy, (x, y) -> draw(x, y));
                                     lastX = cx;
@@ -188,13 +328,46 @@ public class CanvasBlock extends Block{
                             Tmp.tr1.set(texture);
                             Draw.alpha(parentAlpha);
                             Draw.rect(Tmp.tr1, x + width/2f, y + height/2f, width, height);
+
+                            //draw grid
+                            {
+                                float xspace = (getWidth() / canvasSize);
+                                float yspace = (getHeight() / canvasSize);
+                                float s = 1f;
+
+                                int minspace = 10;
+
+                                int jumpx = (int)(Math.max(minspace, xspace) / xspace);
+                                int jumpy = (int)(Math.max(minspace, yspace) / yspace);
+
+                                for(int x = 0; x <= canvasSize; x += jumpx){
+                                    Fill.crect((int)(this.x + xspace * x - s), y - s, 2, getHeight() + (x == canvasSize ? 1 : 0));
+                                }
+
+                                for(int y = 0; y <= canvasSize; y += jumpy){
+                                    Fill.crect(x - s, (int)(this.y + y * yspace - s), getWidth(), 2);
+                                }
+                            }
+
+                            if(!mobile){
+                                Vec2 s = screenToLocalCoordinates(Core.input.mouse());
+                                if(s.x >= 0 && s.y >= 0 && s.x < width && s.y < height){
+                                    float sx = Mathf.round(s.x, width / canvasSize), sy = Mathf.round(s.y, height / canvasSize);
+
+                                    Lines.stroke(Scl.scl(6f));
+                                    Draw.color(Pal.accent);
+                                    Lines.rect(sx + x, sy + y, width / canvasSize, height / canvasSize, Lines.getStroke() - 1f);
+
+                                    Draw.reset();
+                                }
+                            }
                         }
-                    }, new GridImage(canvasSize, canvasSize){{
-                        touchable = Touchable.disabled;
-                    }}).size(500f);
-                });
+                    }).size(mobile && !Core.graphics.isPortrait() ? Math.min(290f, Core.graphics.getHeight() / Scl.scl(1f) - 75f / Scl.scl(1f)) : 480f);
+                }).colspan(3);
 
                 dialog.cont.row();
+
+                dialog.cont.add().size(60f);
 
                 dialog.cont.table(Tex.button, p -> {
                     for(int i = 0; i < palette.length; i++){
@@ -207,6 +380,12 @@ public class CanvasBlock extends Block{
                     }
                 });
 
+                dialog.cont.table(Tex.button, t -> {
+                    t.button(Icon.fill, Styles.clearNoneTogglei, () -> {
+                        fill[0] = !fill[0];
+                    }).size(44f);
+                });
+
                 dialog.closeOnBack();
 
                 dialog.buttons.defaults().size(150f, 64f);
@@ -214,7 +393,6 @@ public class CanvasBlock extends Block{
                 dialog.buttons.button("@ok", Icon.ok, () -> {
                     if(modified[0]){
                         configure(packPixmap(pix));
-                        pix.dispose();
                         texture.dispose();
                     }
                     dialog.hide();
@@ -222,6 +400,16 @@ public class CanvasBlock extends Block{
 
                 dialog.show();
             }).size(40f);
+        }
+
+        @Override
+        public boolean onConfigureBuildTapped(Building other){
+            if(this == other){
+                deselect();
+                return false;
+            }
+
+            return true;
         }
 
         @Override

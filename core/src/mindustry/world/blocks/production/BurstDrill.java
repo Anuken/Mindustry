@@ -1,5 +1,6 @@
 package mindustry.world.blocks.production;
 
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -7,7 +8,9 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 
 public class BurstDrill extends Drill{
     public float shake = 2f;
@@ -24,19 +27,30 @@ public class BurstDrill extends Drill{
     public Color arrowColor = Color.valueOf("feb380"), baseArrowColor = Color.valueOf("6e7080");
     public Color glowColor = arrowColor.cpy();
 
+    public Sound drillSound = Sounds.drillImpact;
+    public float drillSoundVolume = 0.6f, drillSoundPitchRand = 0.1f;
+
     public BurstDrill(String name){
         super(name);
 
         //does not drill in the traditional sense, so this is not even used
         hardnessDrillMultiplier = 0f;
+        liquidBoostIntensity = 1f;
         //generally at center
         drillEffectRnd = 0f;
         drillEffect = Fx.shockwave;
+        ambientSoundVolume = 0.18f;
+        ambientSound = Sounds.drillCharge;
     }
 
     @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{region, topRegion};
+    }
+
+    @Override
+    public float getDrillTime(Item item){
+        return drillTime / drillMultipliers.get(item, 1f);
     }
 
     public class BurstDrillBuild extends DrillBuild{
@@ -55,6 +69,8 @@ public class BurstDrill extends Drill{
             if(timer(timerDump, dumpTime)){
                 dump(items.has(dominantItem) ? dominantItem : null);
             }
+
+            float drillTime = getDrillTime(dominantItem);
 
             smoothProgress = Mathf.lerpDelta(smoothProgress, progress / (drillTime - 20f), 0.1f);
 
@@ -83,9 +99,15 @@ public class BurstDrill extends Drill{
 
                 if(wasVisible){
                     Effect.shake(shake, shake, this);
+                    drillSound.at(x, y, 1f + Mathf.range(drillSoundPitchRand), drillSoundVolume);
                     drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
                 }
             }
+        }
+
+        @Override
+        public float ambientVolume(){
+            return super.ambientVolume() * Mathf.pow(progress(), 4f);
         }
 
         @Override

@@ -93,6 +93,8 @@ public class TechTree{
         public Seq<Objective> objectives = new Seq<>();
         /** Nodes that depend on this node. */
         public final Seq<TechNode> children = new Seq<>();
+        /** Planet associated with this tech node. Null to auto-detect, or use Serpulo if no associated planet is found. */
+        public @Nullable Planet planet;
 
         public TechNode(@Nullable TechNode parent, UnlockableContent content, ItemStack[] requirements){
             if(parent != null){
@@ -125,6 +127,7 @@ public class TechTree{
             });
 
             content.techNode = this;
+            content.techNodes.add(this);
             all.add(this);
         }
 
@@ -134,6 +137,16 @@ public class TechTree{
             for(var child : children){
                 child.each(consumer);
             }
+        }
+
+        /** Adds the specified database tab to all the content in this tree. */
+        public void addDatabaseTab(UnlockableContent tab){
+            each(node -> node.content.databaseTabs.add(tab));
+        }
+
+        /** Adds the specified planet to the shownPlanets of all the content in this tree. */
+        public void addPlanet(Planet planet){
+            each(node -> node.content.shownPlanets.add(planet));
         }
 
         public Drawable icon(){

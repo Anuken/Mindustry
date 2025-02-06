@@ -5,6 +5,8 @@ public enum LUnitControl{
     stop,
     move("x", "y"),
     approach("x", "y", "radius"),
+    pathfind("x", "y"),
+    autoPathfind,
     boost("enable"),
     target("x", "y", "shoot"),
     targetp("unit", "shoot"),
@@ -16,7 +18,7 @@ public enum LUnitControl{
     mine("x", "y"),
     flag("value"),
     build("x", "y", "block", "rotation", "config"),
-    getBlock("x", "y", "type", "building"),
+    getBlock("x", "y", "type", "building", "floor"),
     within("x", "y", "radius", "result"),
     unbind;
 

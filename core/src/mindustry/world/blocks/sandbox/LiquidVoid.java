@@ -14,6 +14,7 @@ public class LiquidVoid extends Block{
         update = true;
         group = BlockGroup.liquids;
         envEnabled = Env.any;
+        liquidCapacity = 10000f;
     }
 
     @Override
@@ -23,6 +24,12 @@ public class LiquidVoid extends Block{
     }
 
     public class LiquidVoidBuild extends Building{
+        @Override
+        public void placed(){
+            super.placed();
+            liquids.clear();
+        }
+
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
             return enabled;

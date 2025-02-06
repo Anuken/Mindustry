@@ -1,10 +1,12 @@
 package mindustry.world.blocks.power;
 
+import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
@@ -21,6 +23,8 @@ public class ConsumeGenerator extends PowerGenerator{
     public float generateEffectRange = 3f;
 
     public @Nullable LiquidStack outputLiquid;
+    /** If true, this block explodes when outputLiquid exceeds capacity. */
+    public boolean explodeOnFull = false;
 
     public @Nullable ConsumeItemFilter filterItem;
     public @Nullable ConsumeLiquidFilter filterLiquid;
@@ -48,6 +52,10 @@ public class ConsumeGenerator extends PowerGenerator{
             hasLiquids = true;
         }
 
+        if(explodeOnFull && outputLiquid != null && explosionPuddleLiquid == null){
+            explosionPuddleLiquid = outputLiquid.liquid;
+        }
+
         //TODO hardcoded
         emitLight = true;
         lightRadius = 65f * size;
@@ -56,6 +64,7 @@ public class ConsumeGenerator extends PowerGenerator{
 
     @Override
     public void setStats(){
+        stats.timePeriod = itemDuration;
         super.setStats();
 
         if(hasItems){
@@ -72,12 +81,14 @@ public class ConsumeGenerator extends PowerGenerator{
 
         @Override
         public void updateEfficiencyMultiplier(){
+            efficiencyMultiplier = 1f;
             if(filterItem != null){
                 float m = filterItem.efficiencyMultiplier(this);
-                if(m > 0) efficiencyMultiplier = m;
-            }else if(filterLiquid != null){
+                if(m > 0) efficiencyMultiplier *= m;
+            }
+            if(filterLiquid != null){
                 float m = filterLiquid.efficiencyMultiplier(this);
-                if(m > 0) efficiencyMultiplier = m;
+                if(m > 0) efficiencyMultiplier *= m;
             }
         }
 
@@ -106,6 +117,11 @@ public class ConsumeGenerator extends PowerGenerator{
                 float added = Math.min(productionEfficiency * delta() * outputLiquid.amount, liquidCapacity - liquids.get(outputLiquid.liquid));
                 liquids.add(outputLiquid.liquid, added);
                 dumpLiquid(outputLiquid.liquid);
+
+                if(explodeOnFull && liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.01f){
+                    kill();
+                    Events.fire(new GeneratorPressureExplodeEvent(this));
+                }
             }
 
             //generation time always goes down, but only at the end so consumeTriggerValid doesn't assume fake items

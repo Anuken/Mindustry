@@ -158,7 +158,7 @@ public class ColorPicker extends BaseDialog{
                     return false;
                 }
             }).get();
-        });
+        }).grow();
 
         buttons.clear();
         addCloseButton();

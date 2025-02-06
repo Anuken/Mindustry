@@ -34,6 +34,8 @@ public class ParticleEffect extends Effect{
     public float spin = 0f;
     /** Controls the initial and final sprite sizes. */
     public float sizeFrom = 2f, sizeTo = 0f;
+    /** Controls the amount of ticks the effect waits before changing size. */
+    public float sizeChangeStart = 0f;
     /** Whether the rotation adds with the parent */
     public boolean useRotation = true;
     /** Rotation offset. */
@@ -44,12 +46,14 @@ public class ParticleEffect extends Effect{
     //line only
     public boolean line;
     public float strokeFrom = 2f, strokeTo = 0f, lenFrom = 4f, lenTo = 2f;
+    public boolean cap = true;
 
     private @Nullable TextureRegion tex;
 
     @Override
     public void init(){
         clip = Math.max(clip, length + Math.max(sizeFrom, sizeTo));
+        sizeChangeStart = Mathf.clamp(sizeChangeStart, 0f, lifetime);
         if(sizeInterp == null) sizeInterp = interp;
     }
 
@@ -61,7 +65,7 @@ public class ParticleEffect extends Effect{
         int flip = casingFlip ? -Mathf.sign(e.rotation) : 1;
         float rawfin = e.fin();
         float fin = e.fin(interp);
-        float rad = sizeInterp.apply(sizeFrom, sizeTo, rawfin) * 2;
+        float rad = sizeInterp.apply(sizeFrom, sizeTo, Mathf.curve(rawfin, sizeChangeStart / lifetime, 1f)) * 2;
         float ox = e.x + Angles.trnsx(realRotation, offsetX * flip, offsetY), oy = e.y + Angles.trnsy(realRotation, offsetX * flip, offsetY);
 
         Draw.color(colorFrom, colorTo, fin);
@@ -77,8 +81,8 @@ public class ParticleEffect extends Effect{
                 rv.trns(realRotation + rand.range(cone), !randLength ? l : rand.random(l));
                 float x = rv.x, y = rv.y;
 
-                Lines.lineAngle(ox + x, oy + y, Mathf.angle(x, y), len);
-                Drawf.light(ox + x, oy + y, len * lightScl, lightColor, lightOpacity * Draw.getColor().a);
+                Lines.lineAngle(ox + x, oy + y, Mathf.angle(x, y), len, cap);
+                Drawf.light(ox + x, oy + y, len * lightScl, lightColor, lightOpacity * Draw.getColorAlpha());
             }
         }else{
             rand.setSeed(e.id);
@@ -87,8 +91,8 @@ public class ParticleEffect extends Effect{
                 rv.trns(realRotation + rand.range(cone), !randLength ? l : rand.random(l));
                 float x = rv.x, y = rv.y;
 
-                Draw.rect(tex, ox + x, oy + y, rad, rad, realRotation + offset + e.time * spin);
-                Drawf.light(ox + x, oy + y, rad * lightScl, lightColor, lightOpacity * Draw.getColor().a);
+                Draw.rect(tex, ox + x, oy + y, rad, rad / tex.ratio(), realRotation + offset + e.time * spin);
+                Drawf.light(ox + x, oy + y, rad * lightScl, lightColor, lightOpacity * Draw.getColorAlpha());
             }
         }
     }

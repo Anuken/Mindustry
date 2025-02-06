@@ -10,11 +10,11 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 
 public class PhysicsProcess implements AsyncProcess{
-    private static final int
-        layers = 3,
-        layerGround = 0,
-        layerLegs = 1,
-        layerFlying = 2;
+    public static final int
+    layers = 3,
+    layerGround = 0,
+    layerLegs = 1,
+    layerFlying = 2;
 
     private PhysicsWorld physics;
     private Seq<PhysicRef> refs = new Seq<>(false);
@@ -45,7 +45,7 @@ public class PhysicsProcess implements AsyncProcess{
                 body.x = entity.x;
                 body.y = entity.y;
                 body.mass = entity.mass();
-                body.radius = entity.hitSize / 2f;
+                body.radius = entity.hitSize * Vars.unitCollisionRadiusScale;
 
                 PhysicRef ref = new PhysicRef(entity, body);
                 refs.add(ref);
@@ -58,9 +58,7 @@ public class PhysicsProcess implements AsyncProcess{
             //save last position
             PhysicRef ref = entity.physref;
 
-            ref.body.layer =
-                entity.type.allowLegStep && entity.type.legPhysicsLayer ? layerLegs :
-                entity.isGrounded() ? layerGround : layerFlying;
+            ref.body.layer = entity.collisionLayer();
             ref.x = entity.x;
             ref.y = entity.y;
             ref.body.local = local || entity.isLocal();

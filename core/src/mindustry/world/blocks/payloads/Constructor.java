@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.ctype.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.storage.*;
@@ -18,7 +19,6 @@ import static mindustry.Vars.*;
 public class Constructor extends BlockProducer{
     /** Empty seq for no filter. */
     public Seq<Block> filter = new Seq<>();
-    public float buildSpeed = 0.4f;
     public int minBlockSize = 1, maxBlockSize = 2;
 
     public Constructor(String name){
@@ -45,10 +45,15 @@ public class Constructor extends BlockProducer{
         stats.add(Stat.output, "@x@ ~ @x@", minBlockSize, minBlockSize, maxBlockSize, maxBlockSize);
     }
 
-    public boolean canProduce(Block b){
-        return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b) && b.environmentBuildable() && (filter.isEmpty() || filter.contains(b));
+    @Override
+    public void getPlanConfigs(Seq<UnlockableContent> options){
+        options.add(content.blocks().select(this::canProduce));
     }
-    
+
+    public boolean canProduce(Block b){
+        return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize && !(b instanceof CoreBlock) && !state.rules.isBanned(b) && b.environmentBuildable() && (filter.isEmpty() || filter.contains(b));
+    }
+
     public class ConstructorBuild extends BlockProducerBuild{
         public @Nullable Block recipe;
 
@@ -59,14 +64,14 @@ public class Constructor extends BlockProducer{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(Constructor.this, table, filter.isEmpty() ? content.blocks().select(Constructor.this::canProduce) : filter, () -> recipe, this::configure);
+            ItemSelection.buildTable(Constructor.this, table, filter.isEmpty() ? content.blocks().select(Constructor.this::canProduce) : filter, () -> recipe, this::configure, selectionRows, selectionColumns);
         }
 
         @Override
         public Object config(){
             return recipe;
         }
-        
+
         @Override
         public void drawSelect(){
             if(recipe != null){
