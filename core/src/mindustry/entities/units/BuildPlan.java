@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -25,8 +26,10 @@ public class BuildPlan implements Position, QuadTreeObject{
 
     /** Last progress.*/
     public float progress;
-    /** Whether construction has started for this plan, and other special variables.*/
-    public boolean initialized, worldContext = true, stuck, cachedValid;
+    /** Whether construction has started for this plan. */
+    public boolean initialized, stuck, cachedValid;
+    /** If true, this plan is in the world. If false, it is being rendered in a schematic. */
+    public boolean worldContext = true;
 
     /** Visual scale. Used only for rendering.*/
     public float animScale = 0f;
@@ -35,7 +38,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     public BuildPlan(int x, int y, int rotation, Block block){
         this.x = x;
         this.y = y;
-        this.rotation = rotation;
+        if(block != null) this.rotation = block.planRotation(rotation);
         this.block = block;
         this.breaking = false;
     }
@@ -44,7 +47,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     public BuildPlan(int x, int y, int rotation, Block block, Object config){
         this.x = x;
         this.y = y;
-        this.rotation = rotation;
+        if(block != null) this.rotation = block.planRotation(rotation);
         this.block = block;
         this.breaking = false;
         this.config = config;
@@ -62,7 +65,6 @@ public class BuildPlan implements Position, QuadTreeObject{
     public BuildPlan(){
 
     }
-
     public boolean placeable(Team team){
         return Build.validPlace(block, team, x, y, rotation);
     }
@@ -136,7 +138,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     public BuildPlan set(int x, int y, int rotation, Block block){
         this.x = x;
         this.y = y;
-        this.rotation = rotation;
+        if(block != null) this.rotation = block.planRotation(rotation);
         this.block = block;
         this.breaking = false;
         return this;
@@ -148,6 +150,17 @@ public class BuildPlan implements Position, QuadTreeObject{
 
     public float drawy(){
         return y*tilesize + (block == null ? 0 : block.offset);
+    }
+
+    public boolean isDone(){
+        Tile tile = world.tile(x, y);
+        if(tile == null) return true;
+        Block tblock = tile.block();
+        if(breaking){
+            return tblock == Blocks.air || tblock == tile.floor();
+        }else{
+            return tblock == block && (tile.build == null || tile.build.rotation == rotation);
+        }
     }
 
     public @Nullable Tile tile(){

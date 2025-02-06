@@ -4,6 +4,9 @@ import arc.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 import mindustry.net.Administration.*;
+import mindustry.ui.*;
+
+import static mindustry.Vars.*;
 
 public class TraceDialog extends BaseDialog{
 
@@ -11,7 +14,6 @@ public class TraceDialog extends BaseDialog{
         super("@trace");
 
         addCloseButton();
-        setFillParent(false);
     }
 
     public void show(Player player, TraceInfo info){
@@ -22,20 +24,38 @@ public class TraceDialog extends BaseDialog{
         table.defaults().pad(1);
 
         table.defaults().left();
-        table.add(Core.bundle.format("trace.playername", player.name));
-        table.row();
-        table.add(Core.bundle.format("trace.ip", info.ip));
-        table.row();
-        table.add(Core.bundle.format("trace.id", info.uuid));
-        table.row();
-        table.add(Core.bundle.format("trace.modclient", info.modded));
-        table.row();
-        table.add(Core.bundle.format("trace.mobile", info.mobile));
-        table.row();
-        table.add(Core.bundle.format("trace.times.joined", info.timesJoined));
-        table.row();
-        table.add(Core.bundle.format("trace.times.kicked", info.timesKicked));
-        table.row();
+
+        var style = Styles.emptyi;
+        float s = 28f;
+        
+        table.table(c -> {
+            c.left().defaults().left();
+            c.button(Icon.copySmall, style, () -> copy(player.name)).size(s).padRight(4f);
+            c.add(Core.bundle.format("trace.playername", player.name)).row();
+            c.button(Icon.copySmall, style, () -> copy(info.ip)).size(s).padRight(4f);
+            c.add(Core.bundle.format("trace.ip", info.ip)).row();
+            c.button(Icon.copySmall, style, () -> copy(info.locale)).size(s).padRight(4f);
+            c.add(Core.bundle.format("trace.language", info.locale)).row();
+            c.button(Icon.copySmall, style, () -> copy(info.uuid)).size(s).padRight(4f);
+            c.add(Core.bundle.format("trace.id", info.uuid)).row();
+        }).row();
+
+        table.add(Core.bundle.format("trace.modclient", info.modded)).row();
+        table.add(Core.bundle.format("trace.mobile", info.mobile)).row();
+        table.add(Core.bundle.format("trace.times.joined", info.timesJoined)).row();
+        table.add(Core.bundle.format("trace.times.kicked", info.timesKicked)).row();
+
+        for(int i = 0; i < 2; i++){
+            table.add(i == 0 ? "@trace.ips" : "@trace.names").row();
+            String[] list = i == 0 ? info.ips : info.names;
+
+            table.pane(t -> {
+                t.left();
+                for(String val : list){
+                    t.add("[lightgray]" + val).left().row();
+                }
+            }).padLeft(20f).fill().left().row();
+        }
 
         table.add().pad(5);
         table.row();
@@ -43,5 +63,10 @@ public class TraceDialog extends BaseDialog{
         cont.add(table);
 
         show();
+    }
+
+    private void copy(String content){
+        Core.app.setClipboardText(content);
+        ui.showInfoFade("@copied");
     }
 }

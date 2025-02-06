@@ -5,10 +5,15 @@ import arc.func.*;
 import arc.math.*;
 import arc.net.*;
 import arc.net.FrameworkMessage.*;
+import arc.net.Server.*;
+import arc.net.dns.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import arc.util.io.*;
+import mindustry.*;
+import mindustry.game.EventType.*;
+import mindustry.net.Administration.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import net.jpountz.lz4.*;
@@ -32,14 +37,27 @@ public class ArcNetProvider implements NetProvider{
     private static final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
     private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 
+    private volatile int playerLimitCache, packetSpamLimit;
+
     public ArcNetProvider(){
         ArcNet.errorHandler = e -> {
             if(Log.level == LogLevel.debug){
-                Log.debug(Strings.getStackTrace(e));
+                var finalCause = Strings.getFinalCause(e);
+
+                //"connection is closed" is a pointless annoying error that should not be logged
+                if(!"Connection is closed.".equals(finalCause.getMessage())){
+                    Log.debug(Strings.getStackTrace(e));
+                }
             }
         };
 
-        client = new Client(8192, 8192, new PacketSerializer());
+        //fetch this in the main thread to prevent threading issues
+        Events.run(Trigger.update, () -> {
+            playerLimitCache = netServer.admins.getPlayerLimit();
+            packetSpamLimit = Config.packetSpamLimit.num();
+        });
+
+        client = new Client(8192, 16384, new PacketSerializer());
         client.setDiscoveryPacket(packetSupplier);
         client.addListener(new NetListener(){
             @Override
@@ -77,11 +95,13 @@ public class ArcNetProvider implements NetProvider{
             }
         });
 
-        server = new Server(32768, 8192, new PacketSerializer());
+        server = new Server(32768, 16384, new PacketSerializer());
         server.setMulticast(multicastGroup, multicastPort);
         server.setDiscoveryHandler((address, handler) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
+            int length = buffer.position();
             buffer.position(0);
+            buffer.limit(length);
             handler.respond(buffer);
         });
 
@@ -91,6 +111,12 @@ public class ArcNetProvider implements NetProvider{
             public void connected(Connection connection){
                 String ip = connection.getRemoteAddressTCP().getAddress().getHostAddress();
 
+                //kill connections above the limit to prevent spam
+                if((playerLimitCache > 0 && server.getConnections().length > playerLimitCache) || netServer.admins.isDosBlacklisted(ip)){
+                    connection.close(DcReason.closed);
+                    return;
+                }
+
                 ArcConnection kn = new ArcConnection(ip, connection);
 
                 Connect c = new Connect();
@@ -98,14 +124,14 @@ public class ArcNetProvider implements NetProvider{
 
                 Log.debug("&bReceived connection: @", c.addressTCP);
 
+                connection.setArbitraryData(kn);
                 connections.add(kn);
                 Core.app.post(() -> net.handleServerReceived(kn, c));
             }
 
             @Override
             public void disconnected(Connection connection, DcReason reason){
-                ArcConnection k = getByArcID(connection.getID());
-                if(k == null) return;
+                if(!(connection.getArbitraryData() instanceof ArcConnection k)) return;
 
                 Disconnect c = new Disconnect();
                 c.reason = reason.toString();
@@ -118,8 +144,16 @@ public class ArcNetProvider implements NetProvider{
 
             @Override
             public void received(Connection connection, Object object){
-                ArcConnection k = getByArcID(connection.getID());
-                if(!(object instanceof Packet pack) || k == null) return;
+                if(!(connection.getArbitraryData() instanceof ArcConnection k)) return;
+
+                if(packetSpamLimit > 0 && !k.packetRate.allow(3000, packetSpamLimit)){
+                    Log.warn("Blacklisting IP '@' as potential DOS attack - packet spam.", k.address);
+                    connection.close(DcReason.closed);
+                    netServer.admins.blacklistDos(k.address);
+                    return;
+                }
+
+                if(!(object instanceof Packet pack)) return;
 
                 Core.app.post(() -> {
                     try{
@@ -130,6 +164,16 @@ public class ArcNetProvider implements NetProvider{
                 });
             }
         });
+    }
+
+    @Override
+    public void setConnectFilter(Server.ServerConnectFilter connectFilter){
+        server.setConnectFilter(connectFilter);
+    }
+
+    @Override
+    public @Nullable ServerConnectFilter getConnectFilter(){
+        return server.getConnectFilter();
     }
 
     private static boolean isLocal(InetAddress addr){
@@ -189,8 +233,27 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> invalid){
         try{
-            DatagramSocket socket = new DatagramSocket();
+            var host = pingHostImpl(address, port);
+            Core.app.post(() -> valid.get(host));
+        }catch(IOException e){
+            if(port == Vars.port){
+                for(var record : ArcDns.getSrvRecords("_mindustry._tcp." + address)){
+                    try{
+                        var host = pingHostImpl(record.target, record.port);
+                        Core.app.post(() -> valid.get(host));
+                        return;
+                    }catch(IOException ignored){
+                    }
+                }
+            }
+            Core.app.post(() -> invalid.get(e));
+        }
+    }
+
+    private Host pingHostImpl(String address, int port) throws IOException{
+        try(DatagramSocket socket = new DatagramSocket()){
             long time = Time.millis();
+
             socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
             socket.setSoTimeout(2000);
 
@@ -199,10 +262,8 @@ public class ArcNetProvider implements NetProvider{
 
             ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
             Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
-
-            Core.app.post(() -> valid.get(host));
-        }catch(Exception e){
-            Core.app.post(() -> invalid.get(e));
+            host.port = port;
+            return host;
         }
     }
 
@@ -210,21 +271,22 @@ public class ArcNetProvider implements NetProvider{
     public void discoverServers(Cons<Host> callback, Runnable done){
         Seq<InetAddress> foundAddresses = new Seq<>();
         long time = Time.millis();
+
         client.discoverHosts(port, multicastGroup, multicastPort, 3000, packet -> {
-            Core.app.post(() -> {
+            synchronized(foundAddresses){
                 try{
                     if(foundAddresses.contains(address -> address.equals(packet.getAddress()) || (isLocal(address) && isLocal(packet.getAddress())))){
                         return;
                     }
                     ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
                     Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
-                    callback.get(host);
+                    Core.app.post(() -> callback.get(host));
                     foundAddresses.add(packet.getAddress());
                 }catch(Exception e){
-                    //don't crash when there's an error pinging a a server or parsing data
+                    //don't crash when there's an error pinging a server or parsing data
                     e.printStackTrace();
                 }
-            });
+            }
         }, () -> Core.app.post(done));
     }
 
@@ -265,17 +327,6 @@ public class ArcNetProvider implements NetProvider{
         mainExecutor.submit(server::stop);
     }
 
-    ArcConnection getByArcID(int id){
-        for(int i = 0; i < connections.size(); i++){
-            ArcConnection con = connections.get(i);
-            if(con.connection != null && con.connection.getID() == id){
-                return con;
-            }
-        }
-
-        return null;
-    }
-
     class ArcConnection extends NetConnection{
         public final Connection connection;
 
@@ -291,7 +342,7 @@ public class ArcNetProvider implements NetProvider{
 
         @Override
         public void sendStream(Streamable stream){
-            connection.addListener(new InputStreamSender(stream.stream, 512){
+            connection.addListener(new InputStreamSender(stream.stream, 1024){
                 int id;
 
                 @Override
@@ -317,18 +368,21 @@ public class ArcNetProvider implements NetProvider{
         @Override
         public void send(Object object, boolean reliable){
             try{
-                if(reliable){
-                    connection.sendTCP(object);
-                }else{
-                    connection.sendUDP(object);
+                if(connection.isConnected()){
+                    if(reliable){
+                        connection.sendTCP(object);
+                    }else{
+                        connection.sendUDP(object);
+                    }
                 }
             }catch(Exception e){
                 Log.err(e);
                 Log.info("Error sending packet. Disconnecting invalid client!");
                 connection.close(DcReason.error);
 
-                ArcConnection k = getByArcID(connection.getID());
-                if(k != null) connections.remove(k);
+                if(connection.getArbitraryData() instanceof ArcConnection k){
+                    connections.remove(k);
+                }
             }
         }
 
@@ -409,7 +463,7 @@ public class ArcNetProvider implements NetProvider{
                 byteBuffer.put((byte)-2); //code for framework message
                 writeFramework(byteBuffer, msg);
             }else{
-                if(!(o instanceof Packet pack)) throw new RuntimeException("All sent objects must implement be Packets! Class: " + o.getClass());
+                if(!(o instanceof Packet pack)) throw new RuntimeException("All sent objects must extend Packet! Class: " + o.getClass());
                 byte id = Net.getPacketId(pack);
                 byteBuffer.put(id);
 

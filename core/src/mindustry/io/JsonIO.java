@@ -1,5 +1,7 @@
 package mindustry.io;
 
+import arc.graphics.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
@@ -7,6 +9,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -23,9 +26,9 @@ public class JsonIO{
 
         @Override
         public void writeValue(Object value, Class knownType, Class elementType){
-            if(value instanceof MappableContent){
+            if(value instanceof MappableContent c){
                 try{
-                    getWriter().value(((MappableContent)value).name);
+                    getWriter().value(c.name);
                 }catch(IOException e){
                     throw new RuntimeException(e);
                 }
@@ -36,12 +39,19 @@ public class JsonIO{
 
         @Override
         protected String convertToString(Object object){
-            if(object instanceof MappableContent){
-                return ((MappableContent)object).name;
-            }
+            if(object instanceof MappableContent c) return c.name;
             return super.convertToString(object);
         }
     };
+
+    public static void writeBytes(Object value, Class<?> elementType, DataOutputStream output){
+        json.setWriter(new UBJsonWriter(output));
+        json.writeValue(value, value == null ? null : value.getClass(), elementType);
+    }
+
+    public static <T> T readBytes(Class<T> type, Class<?> elementType, DataInputStream input) throws IOException{
+        return json.readValue(type, elementType, new UBJsonReader().parseWihoutClosing(input));
+    }
 
     public static String write(Object object){
         return json.toJson(object, object.getClass());
@@ -68,9 +78,31 @@ public class JsonIO{
         return json.prettyPrint(in);
     }
 
+    public static void classTag(String tag, Class<?> type){
+        json.addClassTag(tag, type);
+        jsonBase.addClassTag(tag, type);
+    }
+
     static void apply(Json json){
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
+
+        json.setSerializer(Color.class, new Serializer<>(){
+            @Override
+            public void write(Json json, Color object, Class knownType){
+                json.writeValue(object.toString());
+            }
+
+            @Override
+            public Color read(Json json, JsonValue jsonData, Class type){
+                if(jsonData.isString()){
+                    return Color.valueOf(jsonData.asString());
+                }
+                Color out = new Color();
+                json.readFields(out, jsonData);
+                return out;
+            }
+        });
 
         json.setSerializer(Sector.class, new Serializer<>(){
             @Override
@@ -159,6 +191,7 @@ public class JsonIO{
             @Override
             public Block read(Json json, JsonValue jsonData, Class type){
                 Block block = Vars.content.getByName(ContentType.block, jsonData.asString());
+                if(block == null) block = Vars.content.getByName(ContentType.block, SaveVersion.fallback.get(jsonData.asString(), ""));
                 return block == null ? Blocks.air : block;
             }
         });
@@ -171,6 +204,9 @@ public class JsonIO{
 
             @Override
             public Planet read(Json json, JsonValue jsonData, Class type){
+                if(jsonData.asString() == null){
+                    return null;
+                }
                 Planet block = Vars.content.getByName(ContentType.planet, jsonData.asString());
                 return block == null ? Planets.serpulo : block;
             }
@@ -225,15 +261,67 @@ public class JsonIO{
             public UnlockableContent read(Json json, JsonValue jsonData, Class type){
                 if(jsonData.isNull()) return null;
                 String str = jsonData.asString();
-                Item item = Vars.content.item(str);
-                Liquid liquid = Vars.content.liquid(str);
-                Block block = Vars.content.block(str);
-                UnitType unit = Vars.content.unit(str);
-                return
-                    item != null ? item :
-                    liquid != null ? liquid :
-                    block != null ? block :
-                    unit;
+                var map = Vars.content.byName(str);
+                return map instanceof UnlockableContent u ? u : null;
+            }
+        });
+
+        json.setSerializer(MapObjectives.class, new Serializer<>(){
+            @Override
+            public void write(Json json, MapObjectives exec, Class knownType){
+                json.writeArrayStart();
+                for(var obj : exec){
+                    json.writeObjectStart(obj.getClass().isAnonymousClass() ? obj.getClass().getSuperclass() : obj.getClass(), null);
+                    json.writeFields(obj);
+
+                    json.writeArrayStart("parents");
+                    for(var parent : obj.parents){
+                        json.writeValue(exec.all.indexOf(parent));
+                    }
+
+                    json.writeArrayEnd();
+
+                    json.writeValue("editorPos", Point2.pack(obj.editorX, obj.editorY));
+                    json.writeObjectEnd();
+                }
+
+                json.writeArrayEnd();
+            }
+
+            @Override
+            public MapObjectives read(Json json, JsonValue data, Class type){
+                var exec = new MapObjectives();
+                // First iteration to instantiate the objectives.
+                for(var value = data.child; value != null; value = value.next){
+                    //glenn why did you implement this in the least backwards compatible way possible
+                    //the old objectives had lowercase class tags, now they're uppercase and either way I can't deserialize them without errors
+                    if(value.has("class") && Character.isLowerCase(value.getString("class").charAt(0))){
+                        return new MapObjectives();
+                    }
+
+                    MapObjective obj = json.readValue(MapObjective.class, value);
+
+                    if(value.has("editorPos")){
+                        int pos = value.getInt("editorPos");
+                        obj.editorX = Point2.x(pos);
+                        obj.editorY = Point2.y(pos);
+                    }
+
+                    exec.all.add(obj);
+                }
+
+                // Second iteration to map the parents.
+                int i = 0;
+                for(var value = data.child; value != null; value = value.next, i++){
+                    for(var parent = value.get("parents").child; parent != null; parent = parent.next){
+                        int val = parent.asInt();
+                        if(val >= 0 && val < exec.all.size){
+                            exec.all.get(i).parents.add(exec.all.get(val));
+                        }
+                    }
+                }
+
+                return exec;
             }
         });
 
@@ -241,18 +329,6 @@ public class JsonIO{
         for(var filter : Maps.allFilterTypes){
             var i = filter.get();
             json.addClassTag(Strings.camelize(i.getClass().getSimpleName().replace("Filter", "")), i.getClass());
-        }
-
-        //use short names for all objective types
-        for(var obj : MapObjectives.allObjectiveTypes){
-            var i = obj.get();
-            json.addClassTag(Strings.camelize(i.getClass().getSimpleName().replace("Objective", "")), i.getClass());
-        }
-
-        //use short names for all marker types
-        for(var obj : MapObjectives.allMarkerTypes){
-            var i = obj.get();
-            json.addClassTag(Strings.camelize(i.getClass().getSimpleName().replace("Marker", "")), i.getClass());
         }
     }
 

@@ -14,7 +14,9 @@ public class PayloadUnloader extends PayloadLoader{
         super(name);
         outputsPower = true;
         consumesPower = true;
+        outputsLiquid = true;
         loadPowerDynamic = false;
+        canOverdrive = false;
     }
 
     @Override
@@ -85,7 +87,7 @@ public class PayloadUnloader extends PayloadLoader{
                     (liquids.current() == payload.build.liquids.current() || liquids.currentAmount() <= 0.2f)){
                     var liq = payload.build.liquids.current();
                     float remaining = liquidCapacity - liquids.currentAmount();
-                    float flow = Math.min(Math.min(liquidsLoaded * delta(), remaining), payload.build.liquids.currentAmount());
+                    float flow = Math.min(Math.min(liquidsLoaded * edelta(), remaining), payload.build.liquids.currentAmount());
 
                     liquids.add(liq, flow);
                     payload.build.liquids.remove(liq, flow);
@@ -114,7 +116,7 @@ public class PayloadUnloader extends PayloadLoader{
         public boolean shouldExport(){
             return payload != null && (
                 (!payload.block().hasItems || payload.build.items.empty()) &&
-                (!payload.block().hasLiquids || payload.build.liquids.currentAmount() <= 0.001f) &&
+                (!payload.block().hasLiquids || payload.build.liquids.currentAmount() <= 0.011f) &&
                 (!hasBattery() || payload.build.power.status <= 0.0000001f)
             );
         }

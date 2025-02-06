@@ -5,6 +5,7 @@ import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.generators.*;
+import mindustry.mod.Mods.*;
 
 public class SectorPreset extends UnlockableContent{
     public FileMapGenerator generator;
@@ -17,15 +18,42 @@ public class SectorPreset extends UnlockableContent{
     public float difficulty;
     public float startWaveTimeMultiplier = 2f;
     public boolean addStartingItems = false;
+    public boolean noLighting = false;
+    /** If true, this is the last sector in its planetary campaign. */
+    public boolean isLastSector;
     public boolean showSectorLandInfo = true;
+    /** If true, uses this sector's launch fields instead */
+    public boolean overrideLaunchDefaults = false;
+    /** Whether to allow users to specify a custom launch schematic for this map. */
+    public boolean allowLaunchSchematics = false;
+    /** Whether to allow users to specify the resources they take to this map. */
+    public boolean allowLaunchLoadout = false;
+    /** If true, switches to attack mode after waves end. */
+    public boolean attackAfterWaves = false;
 
     public SectorPreset(String name, Planet planet, int sector){
+        this(name);
+        initialize(planet, sector);
+    }
+
+    /** Internal use only! */
+    public SectorPreset(String name, LoadedMod mod){
         super(name);
-        this.generator = new FileMapGenerator(name, this);
+        if(mod != null){
+            this.minfo.mod = mod;
+        }
+        this.generator = new FileMapGenerator(this.name, this);
+    }
+
+    /** Internal use only! */
+    public SectorPreset(String name){
+       this(name, null);
+    }
+
+    public void initialize(Planet planet, int sector){
         this.planet = planet;
         sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector);
-        inlineDescription = false;
 
         planet.preset(sector, this);
     }

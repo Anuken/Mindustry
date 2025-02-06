@@ -1,5 +1,6 @@
 package mindustry.world.consumers;
 
+import arc.func.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -7,14 +8,14 @@ import mindustry.world.meta.*;
 
 /** An abstract class that defines a type of resource that a block can consume. */
 public abstract class Consume{
-
-    //TODO maybe remove these and make it an interface if possible?
     /** If true, this consumer will not influence consumer validity. */
     public boolean optional;
     /** If true, this consumer will be displayed as a boost input. */
     public boolean booster;
     /** If false, this consumer will still be checked, but it will need to updated manually. */
     public boolean update = true;
+    /** Multiplier for costs. Does not work for power consumers. */
+    public Floatf<Building> multiplier = b -> 1f;
 
     /**
      * Apply extra filters to a block.
@@ -61,7 +62,4 @@ public abstract class Consume{
     }
 
     public void display(Stats stats){}
-
-    //TODO this should use efficiency instead - remove or deprecate
-    //public abstract boolean valid(Building build);
 }

@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
-import mindustry.world.consumers.*;
 
 public class PowerGraph{
     private static final Queue<Building> queue = new Queue<>();
@@ -18,7 +17,7 @@ public class PowerGraph{
     public final Seq<Building> batteries = new Seq<>(false, 16, Building.class);
     public final Seq<Building> all = new Seq<>(false, 16, Building.class);
 
-    private final PowerGraphUpdater entity;
+    private final @Nullable PowerGraphUpdater entity;
     private final WindowedMean powerBalance = new WindowedMean(60);
     private float lastPowerProduced, lastPowerNeeded, lastPowerStored;
     private float lastScaledPowerIn, lastScaledPowerOut, lastCapacity;
@@ -31,6 +30,11 @@ public class PowerGraph{
     public PowerGraph(){
         entity = PowerGraphUpdater.create();
         entity.graph = this;
+        graphID = lastGraphID++;
+    }
+
+    public PowerGraph(boolean noEntity){
+        entity = null;
         graphID = lastGraphID++;
     }
 
@@ -52,6 +56,10 @@ public class PowerGraph{
 
     public float getPowerBalance(){
         return powerBalance.rawMean();
+    }
+
+    public boolean hasPowerBalanceSamples(){
+        return powerBalance.hasEnoughData();
     }
 
     public float getLastPowerNeeded(){
@@ -100,7 +108,7 @@ public class PowerGraph{
         for(int i = 0; i < consumers.size; i++){
             var consumer = items[i];
             var consumePower = consumer.block.consPower;
-            if(otherConsumersAreValid(consumer, consumePower)){
+            if(consumer.shouldConsumePower){
                 powerNeeded += consumePower.requestedPower(consumer) * consumer.delta();
             }
         }
@@ -192,7 +200,7 @@ public class PowerGraph{
                 }
             }else{
                 //valid consumers get power as usual
-                if(otherConsumersAreValid(consumer, cons)){
+                if(consumer.shouldConsumePower){
                     consumer.power.status = coverage;
                 }else{ //invalid consumers get an estimate, if they were to activate
                     consumer.power.status = Math.min(1, produced / (needed + cons.usage * consumer.delta()));
@@ -250,12 +258,20 @@ public class PowerGraph{
 
     public void addGraph(PowerGraph graph){
         if(graph == this) return;
+
+        //merge into other graph instead.
+        if(graph.all.size > all.size){
+            graph.addGraph(this);
+            return;
+        }
+
         //other entity should be removed as the graph was merged
-        graph.entity.remove();
+        if(graph.entity != null) graph.entity.remove();
 
         for(Building tile : graph.all){
             add(tile);
         }
+        checkAdd();
     }
 
     public void add(Building build){
@@ -264,14 +280,12 @@ public class PowerGraph{
         if(build.power.graph != this || !build.power.init){
             //any old graph that is added here MUST be invalid, remove it
             if(build.power.graph != null && build.power.graph != this){
-                build.power.graph.entity.remove();
+                if(build.power.graph.entity != null) build.power.graph.entity.remove();
             }
 
             build.power.graph = this;
             build.power.init = true;
             all.add(build);
-            //there's something to update, add the entity
-            entity.add();
 
             if(build.block.outputsPower && build.block.consumesPower && !build.block.consPower.buffered){
                 producers.add(build);
@@ -286,13 +300,17 @@ public class PowerGraph{
         }
     }
 
+    public void checkAdd(){
+        if(entity != null) entity.add();
+    }
+
     public void clear(){
         all.clear();
         producers.clear();
         consumers.clear();
         batteries.clear();
         //nothing left
-        entity.remove();
+        if(entity != null) entity.remove();
     }
 
     public void reflow(Building tile){
@@ -302,6 +320,7 @@ public class PowerGraph{
         while(queue.size > 0){
             Building child = queue.removeFirst();
             add(child);
+            checkAdd();
             for(Building next : child.getPowerConnections(outArray2)){
                 if(closedSet.add(next.pos())){
                     queue.addLast(next);
@@ -329,6 +348,7 @@ public class PowerGraph{
 
             //create graph for this branch
             PowerGraph graph = new PowerGraph();
+            graph.checkAdd();
             graph.add(other);
             //add to queue for BFS
             queue.clear();
@@ -353,18 +373,11 @@ public class PowerGraph{
         }
 
         //implied empty graph here
-        entity.remove();
+        if(entity != null) entity.remove();
     }
 
-    @Deprecated
-    private boolean otherConsumersAreValid(Building build, Consume consumePower){
-        for(Consume cons : build.block.nonOptionalConsumers){
-            //TODO fix this properly
-            if(cons != consumePower && cons.efficiency(build) <= 0.0000001f){
-                return false;
-            }
-        }
-        return true;
+    public int getId(){
+        return graphID;
     }
 
     @Override

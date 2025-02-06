@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 public class TractorBeamTurret extends BaseTurret{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
-    
+
     public float shootCone = 6f;
     public float shootLength = 5f;
     public float laserWidth = 0.6f;
@@ -58,7 +58,7 @@ public class TractorBeamTurret extends BaseTurret{
 
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
-        stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
+        if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class TractorBeamTurret extends BaseTurret{
                 //shoot when possible
                 if(Angles.within(rotation, dest, shootCone)){
                     if(damage > 0){
-                        target.damageContinuous(damage * eff);
+                        target.damageContinuous(damage * eff * state.rules.blockDamage(team));
                     }
 
                     if(status != StatusEffects.none){
@@ -135,6 +135,12 @@ public class TractorBeamTurret extends BaseTurret{
         @Override
         public boolean shouldConsume(){
             return super.shouldConsume() && target != null;
+        }
+
+        @Override
+        public float estimateDps(){
+            if(!any || damage <= 0) return 0f;
+            return damage * 60f * efficiency * coolantMultiplier;
         }
 
         @Override

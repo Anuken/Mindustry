@@ -11,6 +11,7 @@ import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.consumers.*;
@@ -19,7 +20,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ItemTurret extends Turret{
-    public ObjectMap<Item, BulletType> ammoTypes = new ObjectMap<>();
+    public ObjectMap<Item, BulletType> ammoTypes = new OrderedMap<>();
 
     public ItemTurret(String name){
         super(name);
@@ -28,21 +29,18 @@ public class ItemTurret extends Turret{
 
     /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
     public void ammo(Object... objects){
-        ammoTypes = ObjectMap.of(objects);
+        ammoTypes = OrderedMap.of(objects);
     }
 
-    /** Makes copies of all bullets and limits their range. */
+    /** Limits bullet range to this turret's range value. */
     public void limitRange(){
         limitRange(9f);
     }
 
-    /** Makes copies of all bullets and limits their range. */
+    /** Limits bullet range to this turret's range value. */
     public void limitRange(float margin){
-        for(var entry : ammoTypes.copy().entries()){
-            var bullet = entry.value;
-            float realRange = bullet.rangeChange + range;
-            //doesn't handle drag
-            bullet.lifetime = (realRange + margin) / bullet.speed;
+        for(var entry : ammoTypes.entries()){
+            limitRange(entry.value, margin);
         }
     }
 
@@ -52,6 +50,20 @@ public class ItemTurret extends Turret{
 
         stats.remove(Stat.itemCapacity);
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
+        stats.add(Stat.ammoCapacity, maxAmmo / ammoPerShot, StatUnit.shots);
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        addBar("ammo", (ItemTurretBuild entity) ->
+            new Bar(
+                "stat.ammo",
+                Pal.ammo,
+                () -> (float)entity.totalAmmo / maxAmmo
+            )
+        );
     }
 
     @Override
@@ -69,8 +81,8 @@ public class ItemTurret extends Turret{
 
             @Override
             public float efficiency(Building build){
-                //valid when there's any ammo in the turret
-                return build instanceof ItemTurretBuild it && !it.ammo.isEmpty() ? 1f : 0f;
+                //valid when it can shoot
+                return build instanceof ItemTurretBuild it && it.ammo.size > 0 && (it.ammo.peek().amount >= ammoPerShot || it.cheating()) ? 1f : 0f;
             }
 
             @Override
@@ -78,6 +90,8 @@ public class ItemTurret extends Turret{
                 //don't display
             }
         });
+
+        ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
 
         super.init();
     }
@@ -89,9 +103,17 @@ public class ItemTurret extends Turret{
             super.onProximityAdded();
 
             //add first ammo item to cheaty blocks so they can shoot properly
-            if(cheating() && ammo.size > 0){
-                handleItem(this, ammoTypes.entries().next().key);
+            if(!hasAmmo() && cheating() && ammoTypes.size > 0){
+                handleItem(this, ammoTypes.keys().next());
             }
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            return switch(sensor){
+                case currentAmmoType -> ammo.size > 0 ? ((ItemEntry)ammo.peek()).item : null;
+                default -> super.senseObject(sensor);
+            };
         }
 
         @Override
@@ -99,14 +121,6 @@ public class ItemTurret extends Turret{
             unit.ammo((float)unit.type().ammoCapacity * totalAmmo / maxAmmo);
 
             super.updateTile();
-        }
-
-        @Override
-        public void displayBars(Table bars){
-            super.displayBars(bars);
-
-            bars.add(new Bar("stat.ammo", Pal.ammo, () -> (float)totalAmmo / maxAmmo)).growX();
-            bars.row();
         }
 
         @Override
@@ -137,6 +151,10 @@ public class ItemTurret extends Turret{
 
             if(item == Items.pyratite){
                 Events.fire(Trigger.flameAmmo);
+            }
+
+            if(totalAmmo == 0){
+                Events.fire(Trigger.resupplyTurret);
             }
 
             BulletType type = ammoTypes.get(item);

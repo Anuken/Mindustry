@@ -8,18 +8,29 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
-/** Not standalone. */
 public class DrawRegion extends DrawBlock{
     public TextureRegion region;
     public String suffix = "";
     public boolean spinSprite = false;
     public boolean drawPlan = true;
-    public float rotateSpeed, x, y;
+    public boolean buildingRotate = false;
+    public float rotateSpeed, x, y, rotation;
     /** Any number <=0 disables layer changes. */
     public float layer = -1;
 
     public DrawRegion(String suffix){
         this.suffix = suffix;
+    }
+
+    public DrawRegion(String suffix, float rotateSpeed){
+        this.suffix = suffix;
+        this.rotateSpeed = rotateSpeed;
+    }
+
+    public DrawRegion(String suffix, float rotateSpeed, boolean spinSprite){
+        this.suffix = suffix;
+        this.spinSprite = spinSprite;
+        this.rotateSpeed = rotateSpeed;
     }
 
     public DrawRegion(){
@@ -30,9 +41,9 @@ public class DrawRegion extends DrawBlock{
         float z = Draw.z();
         if(layer > 0) Draw.z(layer);
         if(spinSprite){
-            Drawf.spinSprite(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed);
+            Drawf.spinSprite(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed + rotation + (buildingRotate ? build.rotdeg() : 0));
         }else{
-            Draw.rect(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed);
+            Draw.rect(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed + rotation + (buildingRotate ? build.rotdeg() : 0));
         }
         Draw.z(z);
     }
@@ -40,7 +51,11 @@ public class DrawRegion extends DrawBlock{
     @Override
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
         if(!drawPlan) return;
-        Draw.rect(region, plan.drawx(), plan.drawy());
+        if(spinSprite){
+            Drawf.spinSprite(region, plan.drawx() + x, plan.drawy() + y, (buildingRotate ? plan.rotation * 90f : 0 + rotation));
+        }else{
+            Draw.rect(region, plan.drawx()+ x, plan.drawy() + y, (buildingRotate ? plan.rotation * 90f : 0 + rotation));
+        }
     }
 
     @Override

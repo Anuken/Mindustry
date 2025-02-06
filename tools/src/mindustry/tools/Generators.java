@@ -19,7 +19,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.legacy.*;
-import mindustry.world.meta.*;
 
 import java.util.concurrent.*;
 
@@ -27,7 +26,7 @@ import static mindustry.Vars.*;
 import static mindustry.tools.ImagePacker.*;
 
 public class Generators{
-    static final int logicIconSize = (int)iconMed, maxUiIcon = 128;
+    static final int maxUiIcon = 128;
 
     private static float fluid(boolean gas, double x, double y, float frame){
         int keyframes = gas ? 4 : 3;
@@ -44,9 +43,7 @@ public class Generators{
         }else{ //liquids
             float min = 0.84f;
             double rx = (x + frame*32) % 32, ry = (y + frame*32) % 32;
-            //rx = x; ry = y;
-            //(float)liquidFrame(rx, ry, 0)
-            float interpolated = (float)liquidFrame(rx, ry, 2);//Mathf.lerp((float)liquidFrame(rx, ry, curFrame), (float)liquidFrame(rx, ry, nextFrame), progress);
+            float interpolated = (float)liquidFrame(rx, ry, 2);
             //only two colors here
             return min + (interpolated >= 0.3f ? 1f - min : 0f);
         }
@@ -285,9 +282,6 @@ public class Generators{
             for(Block block : content.blocks()){
                 if(block.isAir() || block instanceof ConstructBlock || block instanceof OreBlock || block instanceof LegacyBlock) continue;
 
-                block.load();
-                block.loadIcon();
-
                 Seq<TextureRegion> toOutline = new Seq<>();
                 block.getRegionsToOutline(toOutline);
 
@@ -354,7 +348,13 @@ public class Generators{
 
                         region.path.delete();
 
-                        save(out, region.name);
+                        //1 pixel of padding to prevent edges with linear filtering
+                        int padding = 1;
+                        Pixmap padded = new Pixmap(base.width + padding*2, base.height + padding*2);
+                        padded.draw(base, padding, padding);
+                        padded = padded.outline(block.outlineColor, block.outlineRadius);
+
+                        save(padded, region.name);
                     }
 
                     if(!regions[0].found()){
@@ -383,10 +383,6 @@ public class Generators{
                     }
 
                     save(image, "../editor/" + block.name + "-icon-editor");
-
-                    if(block.buildVisibility != BuildVisibility.hidden){
-                        saveScaled(image, block.name + "-icon-logic", logicIconSize);
-                    }
                     saveScaled(image, "../ui/block-" + block.name + "-ui", Math.min(image.width, maxUiIcon));
 
                     boolean hasEmpty = false;
@@ -463,7 +459,6 @@ public class Generators{
                     base = container.outline(Pal.gray, 3);
                 }
 
-                saveScaled(base, item.name + "-icon-logic", logicIconSize);
                 save(base, "../ui/" + item.getContentType().name() + "-" + item.name + "-ui");
             }
         });
@@ -481,6 +476,37 @@ public class Generators{
             }
         });
 
+        MultiPacker packer = new MultiPacker(){
+            @Override
+            public void add(PageType type, String name, PixmapRegion region, int[] splits, int[] pads){
+                String prefix = type == PageType.main ? "" : "../" + type.name() + "/";
+                Log.info("@ | @x@", prefix + name, region.width, region.height);
+                //save(region.pixmap, prefix + name);
+            }
+        };
+
+        //TODO !!!!! currently just an experiment
+
+        if(false)
+        generate("all-icons", () -> {
+            for(Seq<Content> arr : content.getContentMap()){
+                for(Content cont : arr){
+                    if(cont instanceof UnlockableContent && !(cont instanceof Planet)){
+                        UnlockableContent unlock = (UnlockableContent)cont;
+
+                        if(unlock.generateIcons){
+                            try{
+                                unlock.createIcons(packer);
+                            }catch(IllegalArgumentException e){
+                                Log.err(e);
+                                Log.err("Skip: @", unlock.name);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
         generate("unit-icons", () -> content.units().each(type -> {
             if(type.internal) return; //internal hidden units don't generate
 
@@ -488,9 +514,6 @@ public class Generators{
 
             try{
                 Unit sample = type.constructor.get();
-                type.load();
-                type.loadIcon();
-                type.init();
 
                 Func<Pixmap, Pixmap> outline = i -> i.outline(type.outlineColor, 3);
                 Cons<TextureRegion> outliner = t -> {
@@ -693,7 +716,6 @@ public class Generators{
                 Pixmap fit = new Pixmap(maxd, maxd);
                 drawScaledFit(fit, image);
 
-                saveScaled(fit, type.name + "-icon-logic", logicIconSize);
                 save(fit, "../ui/unit-" + type.name + "-ui");
             }catch(IllegalArgumentException e){
                 Log.err("WARNING: Skipping unit @: @", type.name, e.getMessage());
@@ -703,7 +725,6 @@ public class Generators{
 
         generate("ore-icons", () -> {
             content.blocks().<OreBlock>each(b -> b instanceof OreBlock, ore -> {
-                ore.load();
                 int shadowColor = Color.rgba8888(0, 0, 0, 0.3f);
 
                 for(int i = 0; i < ore.variants; i++){

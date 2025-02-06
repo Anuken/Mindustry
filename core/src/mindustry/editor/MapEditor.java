@@ -74,7 +74,7 @@ public class MapEditor{
         for(int i = 0; i < tiles.width * tiles.height; i++){
             Tile tile = tiles.geti(i);
             var build = tile.build;
-            if(build != null){
+            if(build != null && tile.isCenter()){
                 builds.add(build);
             }
             tiles.seti(i, new EditorTile(tile.x, tile.y, tile.floorID(), tile.overlayID(), build == null ? tile.blockID() : 0));
@@ -284,20 +284,31 @@ public class MapEditor{
         }
     }
 
-    public void resize(int width, int height){
+    public void resize(int width, int height, int shiftX, int shiftY){
         clearOp();
 
         Tiles previous = world.tiles;
-        int offsetX = (width() - width) / 2, offsetY = (height() - height) / 2;
+        int offsetX = (width() - width) / 2 - shiftX, offsetY = (height() - height) / 2 - shiftY;
         loading = true;
 
-        Tiles tiles = world.resize(width, height);
+        world.clearBuildings();
+
+        Tiles tiles = world.tiles = new Tiles(width, height);
+
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 int px = offsetX + x, py = offsetY + y;
                 if(previous.in(px, py)){
                     tiles.set(x, y, previous.getn(px, py));
                     Tile tile = tiles.getn(x, y);
+
+                    Object config = null;
+
+                    //fetch the old config first, configs can be relative to block position (tileX/tileY) before those are reassigned
+                    if(tile.build != null && tile.isCenter()){
+                        config = tile.build.config();
+                    }
+
                     tile.x = (short)x;
                     tile.y = (short)y;
 
@@ -306,9 +317,12 @@ public class MapEditor{
                         tile.build.y = y * tilesize + tile.block().offset;
 
                         //shift links to account for map resize
-                        Object config = tile.build.config();
                         if(config != null){
-                            Object out = BuildPlan.pointConfig(tile.block(), config, p -> p.sub(offsetX, offsetY));
+                            Object out = BuildPlan.pointConfig(tile.block(), config, p -> {
+                                if(!tile.build.block.ignoreResizeConfig){
+                                    p.sub(offsetX, offsetY);
+                                }
+                            });
                             if(out != config){
                                 tile.build.configureAny(out);
                             }

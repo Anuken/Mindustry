@@ -184,7 +184,9 @@ public class DuctRouter extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            sortItem = content.item(read.s());
+            if(revision >= 1){
+                sortItem = content.item(read.s());
+            }
         }
     }
 }

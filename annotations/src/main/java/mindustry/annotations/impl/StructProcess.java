@@ -97,25 +97,25 @@ public class StructProcess extends BaseProcessor{
                     }
 
                     //[setter] + [constructor building]
-                    if(varType == TypeName.BOOLEAN){
+                    if(isBool){
                         cons.append(" | (").append(varName).append(" ? ").append("1L << ").append(offset).append("L : 0)");
 
                         //bools: single bit, needs special case to clear things
                         setter.beginControlFlow("if(value)");
-                        setter.addStatement("return ($T)(($L & ~(1L << $LL)))", structType, structParam, offset);
+                        setter.addStatement("return ($T)($L | (1L << $LL))", structType, structParam, offset);
                         setter.nextControlFlow("else");
-                        setter.addStatement("return ($T)(($L & ~(1L << $LL)) | (1L << $LL))", structType, structParam, offset, offset);
+                        setter.addStatement("return ($T)(($L & ~(1L << $LL)))", structType, structParam, offset);
                         setter.endControlFlow();
                     }else if(varType == TypeName.FLOAT){
                         cons.append(" | (").append("(").append(structType).append(")").append("Float.floatToIntBits(").append(varName).append(") << ").append(offset).append("L)");
 
                         //floats: need conversion
-                        setter.addStatement("return ($T)(($L & $L) | (($T)Float.floatToIntBits(value) << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
+                        setter.addStatement("return ($T)(($L & (~$L)) | (($T)Float.floatToIntBits(value) << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
                     }else{
                         cons.append(" | (((").append(structType).append(")").append(varName).append(" << ").append(offset).append("L)").append(" & ").append(bitString(offset, size, structTotalSize)).append(")");
 
                         //bytes, shorts, chars, ints
-                        setter.addStatement("return ($T)(($L & $L) | (($T)value << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
+                        setter.addStatement("return ($T)(($L & (~$L)) | (($T)value << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
                     }
 
                     doc.append("<br>  ").append(varName).append(" [").append(offset).append("..").append(size + offset).append("]\n");

@@ -23,6 +23,8 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.units.UnitAssemblerModule.*;
 import mindustry.world.consumers.*;
@@ -85,7 +87,9 @@ public class UnitAssembler extends PayloadBlock{
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         //overlapping construction areas not allowed; grow by a tiny amount so edges can't overlap either.
         Rect rect = getRect(Tmp.r1, tile.worldx() + offset, tile.worldy() + offset, rotation).grow(0.1f);
-        return !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
+        return
+            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
+            !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> ((ConstructBuild)b).current instanceof UnitAssembler && getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
     }
 
     @Override
@@ -99,10 +103,10 @@ public class UnitAssembler extends PayloadBlock{
             Core.bundle.format("bar.unitcap",
                 Fonts.getUnicodeStr(e.unit().name),
                 e.team.data().countType(e.unit()),
-                Units.getStringCap(e.team)
+                e.unit().useUnitCap ? Units.getStringCap(e.team) : "∞"
             ),
             () -> Pal.power,
-            () -> (float)e.team.data().countType(e.unit()) / Units.getCap(e.team)
+            () -> e.unit().useUnitCap ? ((float)e.team.data().countType(e.unit()) / Units.getCap(e.team)) : 1f
         ));
     }
 
@@ -123,6 +127,8 @@ public class UnitAssembler extends PayloadBlock{
         updateClipRadius(areaSize * tilesize);
         consume(consPayload = new ConsumePayloadDynamic((UnitAssemblerBuild build) -> build.plan().requirements));
 
+        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
+
         super.init();
     }
 
@@ -131,22 +137,48 @@ public class UnitAssembler extends PayloadBlock{
         super.setStats();
 
         stats.add(Stat.output, table -> {
-            Seq<AssemblerUnitPlan> p = plans.select(u -> u.unit.unlockedNow());
             table.row();
-            for(var plan : p){
-                if(plan.unit.unlockedNow()){
-                    table.image(plan.unit.uiIcon).size(8 * 3).padRight(2).right();
-                    table.add(plan.unit.localizedName).left();
-                    table.add(Strings.autoFixed(plan.time / 60f, 1) + " " + Core.bundle.get("unit.seconds")).color(Color.lightGray).padLeft(12).left();
-                    table.row();
-                    table.add().right();
-                    table.table(t -> {
-                        t.left();
-                        for(var stack : plan.requirements){
-                            t.add(new ItemImage(stack)).padRight(4).padTop(4).left();
-                        }
-                    }).left().fillX().padLeft(-8 * 3f - 2).padBottom(6).row();
-                }
+
+            int tier = 0;
+            for(var plan : plans){
+                int ttier = tier;
+                table.table(Styles.grayPanel, t -> {
+
+                    if(plan.unit.isBanned()){
+                        t.image(Icon.cancel).color(Pal.remove).size(40).pad(10);
+                        return;
+                    }
+
+                    if(plan.unit.unlockedNow()){
+                        t.image(plan.unit.uiIcon).scaling(Scaling.fit).size(40).pad(10f).left().with(i -> StatValues.withTooltip(i, plan.unit));
+                        t.table(info -> {
+                            info.defaults().left();
+                            info.add(plan.unit.localizedName);
+                            info.row();
+                            info.add(Strings.autoFixed(plan.time / 60f, 1) + " " + Core.bundle.get("unit.seconds")).color(Color.lightGray);
+                            if(ttier > 0){
+                                info.row();
+                                info.add(Stat.moduleTier.localized() + ": " + ttier).color(Color.lightGray);
+                            }
+                        }).left();
+
+                        t.table(req -> {
+                            req.right();
+                            for(int i = 0; i < plan.requirements.size; i++){
+                                if(i % 6 == 0){
+                                    req.row();
+                                }
+
+                                PayloadStack stack = plan.requirements.get(i);
+                                req.add(StatValues.stack(stack)).pad(5);
+                            }
+                        }).right().grow().pad(10f);
+                    }else{
+                        t.image(Icon.lock).color(Pal.darkerGray).size(40).pad(10);
+                    }
+                }).growX().pad(5);
+                table.row();
+                tier++;
             }
         });
     }
@@ -200,6 +232,7 @@ public class UnitAssembler extends PayloadBlock{
         public float progress, warmup, droneWarmup, powerWarmup, sameTypeWarmup;
         public float invalidWarmup = 0f;
         public int currentTier = 0;
+        public int lastTier = -2;
         public boolean wasOccupied = false;
 
         public float droneProgress, totalDroneProgress;
@@ -212,8 +245,8 @@ public class UnitAssembler extends PayloadBlock{
 
         public boolean moduleFits(Block other, float ox, float oy, int rotation){
             float
-            dx = ox + Geometry.d4x(rotation) * (other.size/2 + 1) * tilesize,
-            dy = oy + Geometry.d4y(rotation) * (other.size/2 + 1) * tilesize;
+            dx = ox + Geometry.d4x(rotation) * (other.size/2f + 0.5f) * tilesize,
+            dy = oy + Geometry.d4y(rotation) * (other.size/2f + 0.5f) * tilesize;
 
             Vec2 spawn = getUnitSpawn();
 
@@ -247,6 +280,7 @@ public class UnitAssembler extends PayloadBlock{
                     break;
                 }
             }
+
             currentTier = max;
         }
 
@@ -270,6 +304,8 @@ public class UnitAssembler extends PayloadBlock{
             for(var module : modules){
                 Drawf.selected(module, Pal.accent);
             }
+
+            Drawf.dashRect(Tmp.c1.set(Pal.accent).lerp(Pal.remove, invalidWarmup), getRect(Tmp.r1, x, y, rotation));
         }
 
         @Override
@@ -292,7 +328,7 @@ public class UnitAssembler extends PayloadBlock{
                     prev = mod.block;
                 }
 
-                t.label(() -> "[accent] -> []" + unit().emoji() + " " + unit().name);
+                t.label(() -> "[accent] -> []" + unit().emoji() + " " + unit().localizedName);
             }).pad(4).padLeft(0f).fillX().left();
         }
 
@@ -307,6 +343,15 @@ public class UnitAssembler extends PayloadBlock{
                     }
                 });
                 readUnits.clear();
+            }
+
+            if(lastTier != currentTier){
+                if(lastTier >= 0f){
+                    progress = 0f;
+                }
+
+                lastTier =
+                    lastTier == -2 ? -1 : currentTier;
             }
 
             //read newly synced drones on client end
@@ -328,12 +373,12 @@ public class UnitAssembler extends PayloadBlock{
                 units.clear();
             }
 
-            float powerStatus = power == null ? 1f : power.status;
+            float powerStatus = !enabled ? 0f : power == null ? 1f : power.status;
             powerWarmup = Mathf.lerpDelta(powerStatus, powerStatus > 0.0001f ? 1f : 0f, 0.1f);
             droneWarmup = Mathf.lerpDelta(droneWarmup, units.size < dronesCreated ? powerStatus : 0f, 0.1f);
             totalDroneProgress += droneWarmup * delta();
 
-            if(units.size < dronesCreated && (droneProgress += delta() * powerStatus / droneConstructTime) >= 1f){
+            if(units.size < dronesCreated && enabled && (droneProgress += delta() * state.rules.unitBuildSpeed(team) * powerStatus / droneConstructTime) >= 1f){
                 if(!net.client()){
                     var unit = droneType.create(team);
                     if(unit instanceof BuildingTetherc bt){
@@ -380,7 +425,7 @@ public class UnitAssembler extends PayloadBlock{
             if(!wasOccupied && efficiency > 0 && Units.canCreate(team, plan.unit)){
                 warmup = Mathf.lerpDelta(warmup, efficiency, 0.1f);
 
-                if((progress += edelta() * eff / plan.time) >= 1f){
+                if((progress += edelta() * state.rules.unitBuildSpeed(team) * eff / plan.time) >= 1f){
                     Call.assemblerUnitSpawned(tile);
                 }
             }else{
@@ -403,11 +448,11 @@ public class UnitAssembler extends PayloadBlock{
 
             if(!net.client()){
                 var unit = plan.unit.create(team);
-                if(unit != null && unit.isCommandable()){
+                if(unit != null && unit.isCommandable() && commandPos != null){
                     unit.command().commandPosition(commandPos);
                 }
                 unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
-                unit.rotation = 90f;
+                unit.rotation = rotdeg();
                 unit.add();
             }
 
@@ -438,6 +483,8 @@ public class UnitAssembler extends PayloadBlock{
 
             Draw.rect(topRegion, x, y);
 
+            if(isPayload()) return;
+
             //draw drone construction
             if(droneWarmup > 0.001f){
                 Draw.draw(Layer.blockOver + 0.2f, () -> {
@@ -460,7 +507,7 @@ public class UnitAssembler extends PayloadBlock{
                 //margin due to units not taking up whole region
                 Shaders.blockbuild.progress = Mathf.clamp(progress + 0.05f);
 
-                Draw.rect(plan.unit.fullIcon, sx, sy);
+                Draw.rect(plan.unit.fullIcon, sx, sy, rotdeg() - 90f);
                 Draw.flush();
                 Draw.color();
             });
@@ -472,7 +519,7 @@ public class UnitAssembler extends PayloadBlock{
             //draw unit silhouette
             Draw.mixcol(Tmp.c1.set(Pal.accent).lerp(Pal.remove, invalidWarmup), 1f);
             Draw.alpha(Math.min(powerWarmup, sameTypeWarmup));
-            Draw.rect(plan.unit.fullIcon, spawn.x, spawn.y);
+            Draw.rect(plan.unit.fullIcon, spawn.x, spawn.y, rotdeg() - 90f);
 
             //build beams do not draw when invalid
             Draw.alpha(Math.min(1f - invalidWarmup, warmup));
@@ -551,7 +598,7 @@ public class UnitAssembler extends PayloadBlock{
         public boolean acceptPayload(Building source, Payload payload){
             var plan = plan();
             return (this.payload == null || source instanceof UnitAssemblerModuleBuild) &&
-                    plan.requirements.contains(b -> b.item == payload.content() && blocks.get(payload.content()) < b.amount);
+                    plan.requirements.contains(b -> b.item == payload.content() && blocks.get(payload.content()) < Mathf.round(b.amount * state.rules.unitCost(team)));
         }
 
         @Override

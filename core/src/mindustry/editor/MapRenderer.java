@@ -100,6 +100,7 @@ public class MapRenderer implements Disposable{
 
     private void render(int wx, int wy){
         int x = wx / chunkSize, y = wy / chunkSize;
+        if(x >= chunks.length || y >= chunks[0].length) return;
         IndexedRenderer mesh = chunks[x][y];
         Tile tile = editor.tiles().getn(wx, wy);
 
@@ -119,7 +120,7 @@ public class MapRenderer implements Disposable{
         if(wall != Blocks.air && useSyntheticWall){
             region = !center ? clearEditor : getIcon(wall, idxWall);
 
-            float width = region.width * Draw.scl, height = region.height * Draw.scl, ox = wall.offset + (tilesize - width) / 2f, oy = wall.offset + (tilesize - height) / 2f;
+            float width = region.width * region.scl(), height = region.height * region.scl(), ox = wall.offset + (tilesize - width) / 2f, oy = wall.offset + (tilesize - height) / 2f;
 
             //force fit to tile
             if(overlay.wallOre && !wall.synthetic()){
@@ -138,12 +139,16 @@ public class MapRenderer implements Disposable{
             mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
         }
 
-        float offsetX = -(wall.size / 3) * tilesize, offsetY = -(wall.size / 3) * tilesize;
+        float offsetX = -((wall.size + 1) / 3) * tilesize, offsetY = -((wall.size + 1) / 3) * tilesize;
 
         //draw non-synthetic wall or ore
         if((wall.update || wall.destructible) && center){
             mesh.setColor(team.color);
             region = Core.atlas.find("block-border-editor");
+            if(wall.size == 2){
+                offsetX += tilesize;
+                offsetY += tilesize;
+            }
         }else if(!useSyntheticWall && wall != Blocks.air && center){
             region = getIcon(wall, idxWall);
 
@@ -152,8 +157,8 @@ public class MapRenderer implements Disposable{
                 region = ((Cliff)Blocks.cliff).editorCliffs[tile.data & 0xff];
             }
 
-            offsetX = tilesize / 2f - region.width / 2f * Draw.scl;
-            offsetY = tilesize / 2f - region.height / 2f * Draw.scl;
+            offsetX = tilesize / 2f - region.width * region.scl() / 2f;
+            offsetY = tilesize / 2f - region.height * region.scl() / 2f;
         }else if((wall == Blocks.air || overlay.wallOre) && !overlay.isAir()){
             if(floor.isLiquid){
                 mesh.setColor(Tmp.c1.set(1f, 1f, 1f, floor.overlayAlpha));
@@ -163,7 +168,7 @@ public class MapRenderer implements Disposable{
             region = clearEditor;
         }
 
-        float width = region.width * Draw.scl, height = region.height * Draw.scl;
+        float width = region.width * region.scl(), height = region.height * region.scl();
         if(!wall.synthetic() && wall != Blocks.air && !wall.isMultiblock()){
             offsetX = offsetY = 0f;
             width = height = tilesize;

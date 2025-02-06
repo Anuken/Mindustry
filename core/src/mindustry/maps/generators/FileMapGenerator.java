@@ -1,6 +1,7 @@
 package mindustry.maps.generators;
 
 import arc.math.geom.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.io.*;
@@ -16,7 +17,13 @@ public class FileMapGenerator implements WorldGenerator{
     public final SectorPreset preset;
 
     public FileMapGenerator(String mapName, SectorPreset preset){
-        this.map = maps != null ? maps.loadInternalMap(mapName) : null;
+        //try to look for the prefixed map first, then the mod-specific one
+        this.map = maps != null ? maps.loadInternalMap(
+            preset.minfo.mod == null || Vars.tree.get("maps/" + mapName + "." + mapExtension).exists() ?
+                mapName :
+                mapName.substring(1 + preset.minfo.mod.name.length())
+        ) : null;
+
         this.preset = preset;
     }
 
@@ -77,10 +84,13 @@ public class FileMapGenerator implements WorldGenerator{
             }
 
             if(tile.isCenter() && tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
-                Schematics.placeLaunchLoadout(tile.x, tile.y);
+                if(state.rules.sector != null && state.rules.sector.allowLaunchLoadout()){
+                    Schematics.placeLaunchLoadout(tile.x, tile.y);
+                }
                 anyCores = true;
 
-                if(preset.addStartingItems){
+                if(preset.addStartingItems || !preset.planet.allowLaunchLoadout){
+                    tile.build.items.clear();
                     tile.build.items.add(state.rules.loadout);
                 }
             }

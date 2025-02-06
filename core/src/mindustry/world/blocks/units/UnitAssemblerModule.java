@@ -29,6 +29,13 @@ public class UnitAssemblerModule extends PayloadBlock{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.moduleTier, tier);
+    }
+
+    @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 

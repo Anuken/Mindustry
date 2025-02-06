@@ -48,7 +48,7 @@ public class EmpBulletType extends BasicBulletType{
 
             if(hitUnits){
                 Units.nearbyEnemies(b.team, x, y, radius, other -> {
-                    if(other.team != b.team){
+                    if(other.team != b.team && other.hittable()){
                         var absorber = Damage.findAbsorber(b.team, x, y, other.x, other.y);
                         if(absorber != null){
                             return;

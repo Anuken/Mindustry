@@ -9,13 +9,17 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.HeatCrafter.*;
 
-/** Not standalone. */
 public class DrawHeatRegion extends DrawBlock{
     public Color color = new Color(1f, 0.22f, 0.22f, 0.8f);
     public float pulse = 0.3f, pulseScl = 10f;
+    public float layer = Layer.blockAdditive;
 
     public TextureRegion heat;
     public String suffix = "-glow";
+
+    public DrawHeatRegion(float layer){
+        this.layer = layer;
+    }
 
     public DrawHeatRegion(String suffix){
         this.suffix = suffix;
@@ -28,13 +32,16 @@ public class DrawHeatRegion extends DrawBlock{
     public void draw(Building build){
         Draw.z(Layer.blockAdditive);
         if(build instanceof HeatCrafterBuild hc && hc.heat > 0){
+
+            float z = Draw.z();
+            if(layer > 0) Draw.z(layer);
             Draw.blend(Blending.additive);
             Draw.color(color, Mathf.clamp(hc.heat / hc.heatRequirement()) * (color.a * (1f - pulse + Mathf.absin(pulseScl, pulse))));
             Draw.rect(heat, build.x, build.y);
             Draw.blend();
             Draw.color();
+            Draw.z(z);
         }
-        Draw.z(Layer.block);
     }
 
     @Override

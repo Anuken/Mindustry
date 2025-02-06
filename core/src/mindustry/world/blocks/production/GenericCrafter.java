@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.liquid.Conduit.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -35,11 +36,11 @@ public class GenericCrafter extends Block{
     public boolean dumpExtraLiquid = true;
     public boolean ignoreLiquidFullness = false;
 
-    //TODO should be seconds?
     public float craftTime = 80;
     public Effect craftEffect = Fx.none;
     public Effect updateEffect = Fx.none;
     public float updateEffectChance = 0.04f;
+    public float updateEffectSpread = 4f;
     public float warmupSpeed = 0.019f;
     /** Only used for legacy cultivator blocks. */
     public boolean legacyReadWarmup = false;
@@ -62,7 +63,9 @@ public class GenericCrafter extends Block{
     public void setStats(){
         stats.timePeriod = craftTime;
         super.setStats();
-        stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
+        if((hasItems && itemCapacity > 0) || outputItems != null){
+            stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
+        }
 
         if(outputItems != null){
             stats.add(Stat.output, StatValues.items(craftTime, outputItems));
@@ -90,8 +93,17 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public boolean rotatedOutput(int x, int y){
-        return false;
+    public boolean rotatedOutput(int fromX, int fromY, Tile destination){
+        if(!(destination.build instanceof ConduitBuild)) return false;
+
+        Building crafter = world.build(fromX, fromY);
+        if(crafter == null) return false;
+        int relative = Mathf.mod(crafter.relativeTo(destination) - crafter.rotation, 4);
+        for(int dir : liquidOutputDirections){
+            if(dir == -1 || dir == relative) return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -222,7 +234,7 @@ public class GenericCrafter extends Block{
                 }
 
                 if(wasVisible && Mathf.chanceDelta(updateEffectChance)){
-                    updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
+                    updateEffect.at(x + Mathf.range(size * updateEffectSpread), y + Mathf.range(size * updateEffectSpread));
                 }
             }else{
                 warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
@@ -236,6 +248,27 @@ public class GenericCrafter extends Block{
             }
 
             dumpOutputs();
+        }
+
+        @Override
+        public float getProgressIncrease(float baseTime){
+            if(ignoreLiquidFullness){
+                return super.getProgressIncrease(baseTime);
+            }
+
+            //limit progress increase by maximum amount of liquid it can produce
+            float scaling = 1f, max = 1f;
+            if(outputLiquids != null){
+                max = 0f;
+                for(var s : outputLiquids){
+                    float value = (liquidCapacity - liquids.get(s.liquid)) / (s.amount * edelta());
+                    scaling = Math.min(scaling, value);
+                    max = Math.max(max, value);
+                }
+            }
+
+            //when dumping excess take the maximum value instead of the minimum.
+            return super.getProgressIncrease(baseTime) * (dumpExtraLiquid ? Math.min(max, 1f) : scaling);
         }
 
         public float warmupTarget(){

@@ -26,7 +26,7 @@ public class HeatCrafter extends GenericCrafter{
 
         addBar("heat", (HeatCrafterBuild entity) ->
             new Bar(() ->
-            Core.bundle.format("bar.heatpercent", (int)entity.heat, (int)(entity.efficiencyScale() * 100)),
+            Core.bundle.format("bar.heatpercent", (int)(entity.heat + 0.01f), (int)(entity.efficiencyScale() * 100 + 0.01f)),
             () -> Pal.lightOrange,
             () -> entity.heat / heatRequirement));
     }
@@ -67,11 +67,6 @@ public class HeatCrafter extends GenericCrafter{
         }
 
         @Override
-        public void updateEfficiencyMultiplier(){
-            efficiency *= efficiencyScale();
-            potentialEfficiency *= efficiencyScale();
-        }
-
         public float efficiencyScale(){
             float over = Math.max(heat - heatRequirement, 0f);
             return Math.min(Mathf.clamp(heat / heatRequirement) + over / heatRequirement * overheatScale, maxEfficiency);

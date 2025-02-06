@@ -88,6 +88,13 @@ public class LiquidModule extends BlockModule{
         current = liquid;
     }
 
+    public void set(Liquid liquid, float amount){
+        if(amount >= liquids[current.id]){
+            current = liquid;
+        }
+        liquids[liquid.id] = amount;
+    }
+
     public float currentAmount(){
         return liquids[current.id];
     }
@@ -162,11 +169,13 @@ public class LiquidModule extends BlockModule{
 
         for(int j = 0; j < count; j++){
             Liquid liq = content.liquid(legacy ? read.ub() : read.s());
-            int liquidid = liq.id;
             float amount = read.f();
-            liquids[liquidid] = amount;
-            if(amount > 0){
-                current = liq;
+            if(liq != null){
+                int liquidid = liq.id;
+                liquids[liquidid] = amount;
+                if(amount > liquids[current.id]){
+                    current = liq;
+                }
             }
         }
     }

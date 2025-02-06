@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -21,6 +22,8 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class PayloadRouter extends PayloadConveyor{
+    public boolean invert = false;
+
     public @Load("@-over") TextureRegion overRegion;
 
     public PayloadRouter(String name){
@@ -43,8 +46,14 @@ public class PayloadRouter extends PayloadConveyor{
         Draw.rect(overRegion, plan.drawx(), plan.drawy());
     }
 
+    @Override
+    public void getPlanConfigs(Seq<UnlockableContent> options){
+        options.add(content.blocks().select(this::canSort));
+        options.add(content.units().select(this::canSort));
+    }
+
     public boolean canSort(Block b){
-        return b.isVisible() && b.size <= size && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b) && b.environmentBuildable();
+        return b.isVisible() && b.size <= size && !(b instanceof CoreBlock) && !state.rules.isBanned(b) && b.environmentBuildable();
     }
 
     public boolean canSort(UnitType t){
@@ -89,6 +98,8 @@ public class PayloadRouter extends PayloadConveyor{
                         //"accept from self" conditions are for dropped payloads and are less restrictive
                     }while((blocked || next == null || !next.acceptPayload(next, item)) && ++rotations < 4);
                 }
+            }else{
+                onProximityUpdate();
             }
         }
 
@@ -96,15 +107,20 @@ public class PayloadRouter extends PayloadConveyor{
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             super.control(type, p1, p2, p3, p4);
             if(type == LAccess.config){
-                rotation = (int)p1;
+                int prev = rotation;
+                rotation = Mathf.mod((int)p1, 4);
                 //when manually controlled, routers do not turn automatically for a while, same as turrets
                 controlTime = 60f * 6f;
+                if(prev != rotation){
+                    onProximityUpdate();
+                }
             }
         }
 
         @Override
         public void onControlSelect(Unit player){
             super.onControlSelect(player);
+            //this will immediately snap back if logic controlled
             recDir = rotation;
             checkMatch();
         }
@@ -112,7 +128,9 @@ public class PayloadRouter extends PayloadConveyor{
         @Override
         public void handlePayload(Building source, Payload payload){
             super.handlePayload(source, payload);
-            recDir = source == null ? rotation : source.relativeTo(this);
+            if(controlTime < 0f){ //don't overwrite logic recDir
+                recDir = source == null ? rotation : source.relativeTo(this);
+            }
             checkMatch();
             pickNext();
         }
@@ -121,6 +139,8 @@ public class PayloadRouter extends PayloadConveyor{
             matches = sorted != null &&
                 (item instanceof BuildPayload build && build.block() == sorted) ||
                 (item instanceof UnitPayload unit && unit.unit.type == sorted);
+
+            if(invert) matches = !matches;
         }
 
         @Override

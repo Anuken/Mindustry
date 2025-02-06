@@ -1,5 +1,6 @@
 package mindustry.world.blocks.units;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -15,6 +16,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -70,7 +72,8 @@ public class RepairTurret extends Block{
         stats.add(Stat.repairSpeed, repairSpeed * 60f, StatUnit.perSecond);
 
         if(acceptCoolant){
-            stats.add(Stat.booster, StatValues.strengthBoosters(coolantMultiplier, this::consumesLiquid));
+            stats.remove(Stat.booster);
+            stats.add(Stat.booster, StatValues.speedBoosters(Core.bundle.get("bar.strength"), coolantUse, coolantMultiplier, true, this::consumesLiquid));
         }
     }
 
@@ -145,10 +148,15 @@ public class RepairTurret extends Block{
         }
     }
 
-    public class RepairPointBuild extends Building implements Ranged{
+    public class RepairPointBuild extends Building implements Ranged, RotBlock{
         public Unit target;
         public Vec2 offset = new Vec2(), lastEnd = new Vec2();
         public float strength, rotation = 90;
+
+        @Override
+        public float buildRotation(){
+            return rotation;
+        }
 
         @Override
         public void draw(){
@@ -209,7 +217,7 @@ public class RepairTurret extends Block{
 
         @Override
         public BlockStatus status(){
-            return Mathf.equal(efficiency, 0f, 0.01f) ? BlockStatus.noInput : super.status();
+            return Mathf.equal(potentialEfficiency, 0f, 0.01f) ? BlockStatus.noInput : super.status();
         }
 
         @Override
@@ -220,7 +228,7 @@ public class RepairTurret extends Block{
         @Override
         public void write(Writes write){
             super.write(write);
-            
+
             write.f(rotation);
         }
 

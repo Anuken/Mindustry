@@ -3,6 +3,7 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.util.*;
 import mindustry.game.*;
 import mindustry.logic.*;
@@ -19,6 +20,7 @@ public class Pump extends LiquidBlock{
     public float pumpAmount = 0.2f;
     /** Interval in-between item consumptions, if applicable. */
     public float consumeTime = 60f * 5f;
+    public float warmupSpeed = 0.019f;
     public DrawBlock drawer = new DrawMulti(new DrawDefault(), new DrawPumpLiquid());
 
     public Pump(String name){
@@ -58,10 +60,11 @@ public class Pump extends LiquidBlock{
         if(liquidDrop != null){
             float width = drawPlaceText(Core.bundle.formatFloat("bar.pumpspeed", amount * pumpAmount * 60f, 0), x, y, valid);
             float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
+            float ratio = (float)liquidDrop.fullIcon.width / liquidDrop.fullIcon.height;
             Draw.mixcol(Color.darkGray, 1f);
-            Draw.rect(liquidDrop.fullIcon, dx, dy - 1, s, s);
+            Draw.rect(liquidDrop.fullIcon, dx, dy - 1, s * ratio, s);
             Draw.reset();
-            Draw.rect(liquidDrop.fullIcon, dx, dy, s, s);
+            Draw.rect(liquidDrop.fullIcon, dx, dy, s * ratio, s);
         }
     }
 
@@ -104,6 +107,7 @@ public class Pump extends LiquidBlock{
     }
 
     public class PumpBuild extends LiquidBuild{
+        public float warmup, totalProgress;
         public float consTimer;
         public float amount = 0f;
         public @Nullable Liquid liquidDrop = null;
@@ -126,6 +130,7 @@ public class Pump extends LiquidBlock{
 
         @Override
         public double sense(LAccess sensor){
+            if(sensor == LAccess.efficiency) return shouldConsume() ? efficiency : 0f;
             if(sensor == LAccess.totalLiquids) return liquidDrop == null ? 0f : liquids.get(liquidDrop);
             return super.sense(sensor);
         }
@@ -159,14 +164,34 @@ public class Pump extends LiquidBlock{
                 //does nothing for most pumps, as those do not require items.
                 if((consTimer += delta()) >= consumeTime){
                     consume();
-                    consTimer = 0f;
+                    consTimer %= 1f;
                 }
+                
+                warmup = Mathf.approachDelta(warmup, maxPump > 0.001f ? 1f : 0f, warmupSpeed);
+            }else{
+                warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
             }
+            
+            totalProgress += warmup * Time.delta;
 
             if(liquidDrop != null){
                 dumpLiquid(liquidDrop);
             }
         }
-    }
 
+        @Override
+        public float warmup(){
+            return warmup;
+        }
+        
+        @Override
+        public float progress(){
+            return Mathf.clamp(consTimer / consumeTime);
+        }
+
+        @Override
+        public float totalProgress(){
+            return totalProgress;
+        }
+    }
 }

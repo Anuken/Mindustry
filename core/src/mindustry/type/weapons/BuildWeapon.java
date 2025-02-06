@@ -1,5 +1,6 @@
 package mindustry.type.weapons;
 
+import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
@@ -19,19 +20,16 @@ public class BuildWeapon extends Weapon{
 
     {
         rotate = true;
+        noAttack = true;
+        predictTarget = false;
+        display = false;
         bullet = new BulletType();
-    }
-
-    @Override
-    public boolean hasStats(UnitType u){
-        return false;
+        useAttackRange = false;
     }
 
     @Override
     public void update(Unit unit, WeaponMount mount){
-        //no
         mount.shoot = false;
-        //yes
         mount.rotate = true;
 
         //always aim at build plan
@@ -40,7 +38,7 @@ public class BuildWeapon extends Weapon{
             mount.aimY = unit.buildPlan().drawy();
         }else{
             //aim for front
-            float weaponRotation = unit.rotation - 90;
+            float weaponRotation = unit.rotation - 90 + baseRotation;
             mount.aimX = unit.x + Angles.trnsx(unit.rotation - 90, x, y) + Angles.trnsx(weaponRotation, this.shootX, this.shootY);
             mount.aimY = unit.y + Angles.trnsy(unit.rotation - 90, x, y) + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
         }
@@ -54,6 +52,7 @@ public class BuildWeapon extends Weapon{
 
         if(unit.activelyBuilding()){
             float
+            z = Draw.z(),
             rotation = unit.rotation - 90,
             weaponRotation  = rotation + (rotate ? mount.rotation : 0),
             wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
@@ -62,6 +61,7 @@ public class BuildWeapon extends Weapon{
             py = wy + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
 
             unit.drawBuildingBeam(px, py);
+            Draw.z(z);
         }
     }
 }

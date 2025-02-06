@@ -174,7 +174,7 @@ public class World{
         return x + y * tiles.width;
     }
 
-    private void clearTileEntities(){
+    public void clearBuildings(){
         for(Tile tile : tiles){
             if(tile != null && tile.build != null){
                 tile.build.remove();
@@ -187,7 +187,7 @@ public class World{
      * Only use for loading saves!
      */
     public Tiles resize(int width, int height){
-        clearTileEntities();
+        clearBuildings();
 
         if(tiles.width != width || tiles.height != height){
             tiles = new Tiles(width, height);
@@ -202,6 +202,7 @@ public class World{
      */
     public void beginMapLoad(){
         generating = true;
+        Events.fire(new WorldLoadBeginEvent());
     }
 
     /**
@@ -209,6 +210,7 @@ public class World{
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
+        Events.fire(new WorldLoadEndEvent());
 
         for(Tile tile : tiles){
             //remove legacy blocks; they need to stop existing
@@ -252,11 +254,11 @@ public class World{
     }
 
     public void loadSector(Sector sector){
-        loadSector(sector, 0);
+        loadSector(sector, 0, true);
     }
 
-    public void loadSector(Sector sector, int seedOffset){
-        setSectorRules(sector);
+    public void loadSector(Sector sector, int seedOffset, boolean saveInfo){
+        setSectorRules(sector, saveInfo);
 
         int size = sector.getSize();
         loadGenerator(size, size, tiles -> {
@@ -272,20 +274,24 @@ public class World{
             state.rules.sector = sector;
         });
 
+        if(saveInfo && state.rules.waves){
+            sector.info.waves = state.rules.waves;
+        }
+
         //postgenerate for bases
         if(sector.preset == null && sector.planet.generator != null){
             sector.planet.generator.postGenerate(tiles);
         }
 
         //reset rules
-        setSectorRules(sector);
+        setSectorRules(sector, saveInfo);
 
         if(state.rules.defaultTeam.core() != null){
             sector.info.spawnPosition = state.rules.defaultTeam.core().pos();
         }
     }
 
-    private void setSectorRules(Sector sector){
+    private void setSectorRules(Sector sector, boolean saveInfo){
         state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
         state.rules.weather.clear();
@@ -294,6 +300,10 @@ public class World{
 
         ObjectSet<UnlockableContent> content = new ObjectSet<>();
 
+        //resources can be outside area
+        boolean border = state.rules.limitMapArea;
+        state.rules.limitMapArea = false;
+
         //TODO duplicate code?
         for(Tile tile : tiles){
             if(getDarkness(tile.x, tile.y) >= 3){
@@ -301,20 +311,23 @@ public class World{
             }
 
             Liquid liquid = tile.floor().liquidDrop;
-            if(tile.floor().itemDrop != null) content.add(tile.floor().itemDrop);
-            if(tile.overlay().itemDrop != null) content.add(tile.overlay().itemDrop);
+            if(tile.floor().itemDrop != null && tile.block() == Blocks.air) content.add(tile.floor().itemDrop);
+            if(tile.overlay().itemDrop != null && tile.block() == Blocks.air) content.add(tile.overlay().itemDrop);
             if(tile.wallDrop() != null) content.add(tile.wallDrop());
             if(liquid != null) content.add(liquid);
         }
+        state.rules.limitMapArea = border;
 
         state.rules.cloudColor = sector.planet.landCloudColor;
         state.rules.env = sector.planet.defaultEnv;
-        state.rules.hiddenBuildItems.clear();
-        state.rules.hiddenBuildItems.addAll(sector.planet.hiddenItems);
+        state.rules.planet = sector.planet;
         sector.planet.applyRules(state.rules);
         sector.info.resources = content.toSeq();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
-        sector.saveInfo();
+
+        if(saveInfo){
+            sector.saveInfo();
+        }
     }
 
     public Context filterContext(Map map){
@@ -351,8 +364,8 @@ public class World{
 
         if(!headless){
             if(state.teams.cores(checkRules.defaultTeam).size == 0 && !checkRules.pvp){
-                ui.showErrorMessage(Core.bundle.format("map.nospawn", checkRules.defaultTeam.color, checkRules.defaultTeam.localized()));
                 invalidMap = true;
+                ui.showErrorMessage(Core.bundle.format("map.nospawn", checkRules.defaultTeam.coloredName()));
             }else if(checkRules.pvp){ //pvp maps need two cores to be valid
                 if(state.teams.getActive().count(TeamData::hasCore) < 2){
                     invalidMap = true;
@@ -361,7 +374,7 @@ public class World{
             }else if(checkRules.attackMode){ //attack maps need two cores to be valid
                 invalidMap = state.rules.waveTeam.data().noCores();
                 if(invalidMap){
-                    ui.showErrorMessage(Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.color, checkRules.waveTeam.localized()));
+                    ui.showErrorMessage(Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.coloredName()));
                 }
             }
         }else{
@@ -448,7 +461,7 @@ public class World{
     public void checkMapArea(){
         for(var build : Groups.build){
             //reset map-area-based disabled blocks.
-            if(build.allowUpdate() && !build.enabled){
+            if(!build.enabled && build.block.autoResetEnabled){
                 build.enabled = true;
             }
         }

@@ -11,7 +11,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-/** A turret that fires a continuous beam with a delay between shots. Liquid coolant is required. Yes, this class name is awful. NEEDS RENAME */
+/** A turret that fires a continuous beam with a delay between shots. Liquid coolant is required. Yes, this class name is awful. */
 public class LaserTurret extends PowerTurret{
     public float firingMoveFract = 0.25f;
     public float shootDuration = 100f;
@@ -50,7 +50,14 @@ public class LaserTurret extends PowerTurret{
         @Override
         public boolean shouldConsume(){
             //still consumes power when bullet is around
-            return bullets.any() || isActive();
+            return bullets.any() || isActive() || isShooting();
+        }
+
+        @Override
+        public void placed(){
+            super.placed();
+
+            reloadCounter = reload;
         }
 
         @Override
@@ -71,14 +78,13 @@ public class LaserTurret extends PowerTurret{
                     entry.bullet.set(bulletX, bulletY);
                     entry.bullet.time = entry.bullet.type.lifetime * entry.bullet.type.optimalLifeFract;
                     entry.bullet.keepAlive = true;
-                    entry.life -= Time.delta / Math.max(efficiency, 0.00001f);
+                    entry.life -= Time.delta * timeScale / Math.max(efficiency, 0.00001f);
                 }
 
                 wasShooting = true;
                 heat = 1f;
                 curRecoil = 1f;
             }else if(reloadCounter > 0){
-                wasShooting = true;
 
                 if(coolant != null){
                     //TODO does not handle multi liquid req?
@@ -132,6 +138,11 @@ public class LaserTurret extends PowerTurret{
             if(bullet != null){
                 bullets.add(new BulletEntry(bullet, offsetX, offsetY, angleOffset, shootDuration));
             }
+        }
+
+        @Override
+        public float activeSoundVolume(){
+            return 1f;
         }
 
         @Override

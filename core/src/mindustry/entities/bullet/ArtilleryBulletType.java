@@ -1,10 +1,9 @@
 package mindustry.entities.bullet;
 
-import arc.graphics.g2d.*;
+import arc.math.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 
-//TODO scale velocity depending on fslope()
 public class ArtilleryBulletType extends BasicBulletType{
     public float trailMult = 1f, trailSize = 4f;
 
@@ -23,6 +22,7 @@ public class ArtilleryBulletType extends BasicBulletType{
         //default settings:
         shrinkX = 0.15f;
         shrinkY = 0.63f;
+        shrinkInterp = Interp.slope;
 
         //for trail:
 
@@ -52,19 +52,7 @@ public class ArtilleryBulletType extends BasicBulletType{
         super.update(b);
 
         if(b.timer(0, (3 + b.fslope() * 2f) * trailMult)){
-            trailEffect.at(b.x, b.y, b.fslope() * trailSize, backColor);
+            trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : b.fslope() * trailSize, backColor);
         }
-    }
-
-    @Override
-    public void draw(Bullet b){
-        drawTrail(b);
-        float xscale = (1f - shrinkX + b.fslope() * (shrinkX)), yscale = (1f - shrinkY + b.fslope() * (shrinkY)), rot = b.rotation();
-
-        Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, width * xscale, height * yscale, rot - 90);
-        Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, width * xscale, height * yscale, rot - 90);
-        Draw.color();
     }
 }

@@ -43,7 +43,7 @@ public class HugAI extends AIController{
             }
             return false;
         })){
-            if(unit.within(target, (unit.hitSize + (target instanceof Sized s ? s.hitSize() : 1f)) * 0.6f)){
+            if(unit.within(target, (unit.hitSize + (target instanceof Sized s ? s.hitSize() : 1f)) * 0.5f)){
                 //circle target
                 unit.movePref(vec.set(target).sub(unit).rotate(90f).setLength(unit.speed()));
             }else{
