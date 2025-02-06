@@ -246,7 +246,7 @@ public class TypeIO{
 
     //this is irrelevant.
     static final WeaponMount[] noMounts = {};
-    
+
     public static WeaponMount[] readMounts(Reads read){
         read.skip(read.b() * (1 + 4 + 4));
 
@@ -581,7 +581,7 @@ public class TypeIO{
                 if(ai.command == null) ai.command = UnitCommand.moveCommand;
             }
 
-            //command queue only in type 7
+            //command queue only in type 7/8
             if(type == 7 || type == 8){
                 ai.commandQueue.clear();
                 int length = read.ub();
@@ -955,6 +955,7 @@ public class TypeIO{
     public static void writeTraceInfo(Writes write, TraceInfo trace){
         writeString(write, trace.ip);
         writeString(write, trace.uuid);
+        writeString(write, trace.locale);
         write.b(trace.modded ? (byte)1 : 0);
         write.b(trace.mobile ? (byte)1 : 0);
         write.i(trace.timesJoined);
@@ -965,7 +966,7 @@ public class TypeIO{
     }
 
     public static TraceInfo readTraceInfo(Reads read){
-        return new TraceInfo(readString(read), readString(read), read.b() == 1, read.b() == 1, read.i(), read.i(), readStrings(read), readStrings(read));
+        return new TraceInfo(readString(read), readString(read), readString(read), read.b() == 1, read.b() == 1, read.i(), read.i(), readStrings(read), readStrings(read));
     }
 
     public static void writeStrings(Writes write, String[] strings, int maxLen){

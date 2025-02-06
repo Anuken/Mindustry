@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
@@ -31,8 +32,10 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean alwaysUnlocked = false;
     /** Whether to show the description in the research dialog preview. */
     public boolean inlineDescription = true;
-    /** Whether details of blocks are hidden in custom games if they haven't been unlocked in campaign mode. */
+    /** Whether details are hidden in custom games if this hasn't been unlocked in campaign mode. */
     public boolean hideDetails = true;
+    /** Whether this is hidden from the Core Database. */
+    public boolean hideDatabase = false;
     /** If false, all icon generation is disabled for this content; createIcons is not called. */
     public boolean generateIcons = true;
     /** How big the content appears in certain selection menus */
@@ -93,7 +96,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public boolean isOnPlanet(@Nullable Planet planet){
-        return planet == null || shownPlanets.isEmpty() || shownPlanets.contains(planet);
+        return planet == null || planet == Planets.sun || shownPlanets.isEmpty() || shownPlanets.contains(planet);
     }
 
     public int getLogicId(){
@@ -222,15 +225,24 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public boolean unlockedNowHost(){
-        if(!state.isCampaign()) return true;
+        return !state.isCampaign() || unlockedHost();
+    }
+
+    /** @return in multiplayer, whether this is unlocked for the host player, otherwise, whether it is unlocked for the local player (same as unlocked()) */
+    public boolean unlockedHost(){
         return net != null && net.client() ?
-            alwaysUnlocked || state.rules.researched.contains(name) :
+            alwaysUnlocked || state.rules.researched.contains(this) :
             unlocked || alwaysUnlocked;
+    }
+
+    /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */
+    public boolean unlockedNow(){
+        return unlocked() || !state.isCampaign();
     }
 
     public boolean unlocked(){
         return net != null && net.client() ?
-            alwaysUnlocked || unlocked || state.rules.researched.contains(name) :
+            alwaysUnlocked || unlocked || state.rules.researched.contains(this) :
             unlocked || alwaysUnlocked;
     }
 
@@ -240,11 +252,6 @@ public abstract class UnlockableContent extends MappableContent{
             unlocked = false;
             Core.settings.put(name + "-unlocked", false);
         }
-    }
-
-    /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */
-    public boolean unlockedNow(){
-        return unlocked() || !state.isCampaign();
     }
 
     public boolean locked(){

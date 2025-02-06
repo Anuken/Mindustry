@@ -5,7 +5,7 @@ import arc.struct.*;
 @SuppressWarnings("deprecation")
 public class ClassMap{
     public static final ObjectMap<String, Class<?>> classes = new ObjectMap<>();
-
+    
     static{
         classes.put("AssemblerAI", mindustry.ai.types.AssemblerAI.class);
         classes.put("BoostAI", mindustry.ai.types.BoostAI.class);
@@ -104,6 +104,7 @@ public class ClassMap{
         classes.put("ItemStack", mindustry.type.ItemStack.class);
         classes.put("Liquid", mindustry.type.Liquid.class);
         classes.put("LiquidStack", mindustry.type.LiquidStack.class);
+        classes.put("MapLocales", mindustry.type.MapLocales.class);
         classes.put("PayloadSeq", mindustry.type.PayloadSeq.class);
         classes.put("PayloadStack", mindustry.type.PayloadStack.class);
         classes.put("Planet", mindustry.type.Planet.class);
@@ -140,7 +141,9 @@ public class ClassMap{
         classes.put("ConstructBlock", mindustry.world.blocks.ConstructBlock.class);
         classes.put("ConstructBuild", mindustry.world.blocks.ConstructBlock.ConstructBuild.class);
         classes.put("ControlBlock", mindustry.world.blocks.ControlBlock.class);
+        classes.put("ExplosionShield", mindustry.world.blocks.ExplosionShield.class);
         classes.put("ItemSelection", mindustry.world.blocks.ItemSelection.class);
+        classes.put("RotBlock", mindustry.world.blocks.RotBlock.class);
         classes.put("UnitTetherBlock", mindustry.world.blocks.UnitTetherBlock.class);
         classes.put("Accelerator", mindustry.world.blocks.campaign.Accelerator.class);
         classes.put("AcceleratorBuild", mindustry.world.blocks.campaign.Accelerator.AcceleratorBuild.class);
@@ -250,6 +253,8 @@ public class ClassMap{
         classes.put("OreBlock", mindustry.world.blocks.environment.OreBlock.class);
         classes.put("OverlayFloor", mindustry.world.blocks.environment.OverlayFloor.class);
         classes.put("Prop", mindustry.world.blocks.environment.Prop.class);
+        classes.put("RemoveOre", mindustry.world.blocks.environment.RemoveOre.class);
+        classes.put("RemoveWall", mindustry.world.blocks.environment.RemoveWall.class);
         classes.put("SeaBush", mindustry.world.blocks.environment.SeaBush.class);
         classes.put("Seaweed", mindustry.world.blocks.environment.Seaweed.class);
         classes.put("ShallowLiquid", mindustry.world.blocks.environment.ShallowLiquid.class);
@@ -435,6 +440,7 @@ public class ClassMap{
         classes.put("ConsumeItemExplosive", mindustry.world.consumers.ConsumeItemExplosive.class);
         classes.put("ConsumeItemFilter", mindustry.world.consumers.ConsumeItemFilter.class);
         classes.put("ConsumeItemFlammable", mindustry.world.consumers.ConsumeItemFlammable.class);
+        classes.put("ConsumeItemList", mindustry.world.consumers.ConsumeItemList.class);
         classes.put("ConsumeItemRadioactive", mindustry.world.consumers.ConsumeItemRadioactive.class);
         classes.put("ConsumeItems", mindustry.world.consumers.ConsumeItems.class);
         classes.put("ConsumeLiquid", mindustry.world.consumers.ConsumeLiquid.class);

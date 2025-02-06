@@ -10,7 +10,7 @@ import mindustry.entities.bullet.*;
 public class Bullets{
     public static BulletType
 
-    placeholder, spaceLiquid, damageLightning, damageLightningGround, fireball;
+    placeholder, spaceLiquid, damageLightning, damageLightningGround, damageLightningAir, fireball;
 
     public static void load(){
 
@@ -36,6 +36,10 @@ public class Bullets{
         //this is just a copy of the damage lightning bullet that doesn't damage air units
         damageLightningGround = damageLightning.copy();
         damageLightningGround.collidesAir = false;
+
+        damageLightningAir = damageLightning.copy();
+        damageLightningAir.collidesGround = false;
+        damageLightningAir.collidesTiles = false;
 
         fireball = new FireBulletType(1f, 4){{
             hittable = false;

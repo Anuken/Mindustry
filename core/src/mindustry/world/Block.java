@@ -58,7 +58,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** If true, this block can output payloads; affects blending. */
     public boolean outputsPayload = false;
     /** If true, this block can input payloads; affects unit payload enter behavior. */
-    public boolean acceptsPayloads = false;
+    public boolean acceptsUnitPayloads = false;
     /** If true, payloads will attempt to move into this block. */
     public boolean acceptsPayload = false;
     /** Visual flag use for blending of certain transportation blocks. */
@@ -328,6 +328,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean instantDeconstruct = false;
     /** If true, this block constructs immediately. This implies no resource requirement, and ignores configs - do not use, this is for performance only! */
     public boolean instantBuild = false;
+    /** If true, this block can be placed even in "dark" areas. Only used for editor static walls. */
+    public boolean ignoreBuildDarkness = false;
     /** Effect for placing the block. Passes size as rotation. */
     public Effect placeEffect = Fx.placeBlock;
     /** Effect for breaking the block. Passes size as rotation. */
@@ -918,6 +920,11 @@ public class Block extends UnlockableContent implements Senseable{
         placeBegan(tile, previous);
     }
 
+    /** Called when building of this block ends. */
+    public void placeEnded(Tile tile, @Nullable Unit builder){
+
+    }
+
     /** Called right before building of this block begins. */
     public void beforePlaceBegan(Tile tile, Block previous){
 
@@ -1421,6 +1428,16 @@ public class Block extends UnlockableContent implements Senseable{
     public void flipRotation(BuildPlan req, boolean x){
         if((x == (req.rotation % 2 == 0)) != invertFlip){
             req.rotation = planRotation(Mathf.mod(req.rotation + 2, 4));
+        }
+    }
+
+    /** Fills the specified array with the list of configuration options this block has. Only used for plans. */
+    public void getPlanConfigs(Seq<UnlockableContent> options){
+        if(configurations.containsKey(Item.class)){
+            options.add(content.items());
+        }
+        if(configurations.containsKey(Liquid.class)){
+            options.add(content.liquids());
         }
     }
 
