@@ -560,14 +560,14 @@ public class StatValues{
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map){
-        return ammo(map, 0, false);
+        return ammo(map, false, false);
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit){
-        return ammo(map, 0, showUnit);
+        return ammo(map, false, showUnit);
     }
 
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, int indent, boolean showUnit){
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean nested, boolean showUnit){
         return table -> {
 
             table.row();
@@ -576,12 +576,12 @@ public class StatValues{
             orderedKeys.sort();
 
             for(T t : orderedKeys){
-                boolean compact = t instanceof UnitType && !showUnit || indent > 0;
+                boolean compact = t instanceof UnitType && !showUnit || nested;
 
                 BulletType type = map.get(t);
 
                 if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
-                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), indent, false).display(table);
+                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false).display(table);
                     continue;
                 }
 
@@ -683,7 +683,7 @@ public class StatValues{
                         bt.row();
 
                         Table ic = new Table();
-                        ammo(ObjectMap.of(t, type.intervalBullet), indent + 1, false).display(ic);
+                        ammo(ObjectMap.of(t, type.intervalBullet), true, false).display(ic);
                         Collapser coll = new Collapser(ic, true);
                         coll.setDuration(0.1f);
 
@@ -701,7 +701,7 @@ public class StatValues{
                         bt.row();
 
                         Table fc = new Table();
-                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(fc);
+                        ammo(ObjectMap.of(t, type.fragBullet), true, false).display(fc);
                         Collapser coll = new Collapser(fc, true);
                         coll.setDuration(0.1f);
 
@@ -714,7 +714,7 @@ public class StatValues{
                         bt.row();
                         bt.add(coll);
                     }
-                }).padLeft(indent * 5).padTop(5).padBottom(compact ? 0 : 5).growX().margin(compact ? 0 : 10);
+                }).padLeft(5).padTop(5).padBottom(compact ? 0 : 5).growX().margin(compact ? 0 : 10);
                 table.row();
             }
         };
