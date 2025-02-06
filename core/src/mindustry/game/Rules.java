@@ -243,6 +243,10 @@ public class Rules{
         return (this.env & env) != 0;
     }
 
+    public float buildRadius(Team team){
+        return enemyCoreBuildRadius + teams.get(team).extraCoreBuildRadius;
+    }
+
     public float unitBuildSpeed(Team team){
         return unitBuildSpeedMultiplier * teams.get(team).unitBuildSpeedMultiplier;
     }
@@ -330,6 +334,9 @@ public class Rules{
         public float blockDamageMultiplier = 1f;
         /** Multiplier for building speed. */
         public float buildSpeedMultiplier = 1f;
+        /** Extra spacing added to the no-build zone around the core. */
+        public float extraCoreBuildRadius = 0f;
+
 
         //build cost disabled due to technical complexity
     }

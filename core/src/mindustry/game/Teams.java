@@ -56,6 +56,19 @@ public class Teams{
         return Geometry.findClosest(x, y, get(team).cores);
     }
 
+    public boolean anyEnemyCoresWithinBuildRadius(Team team, float x, float y){
+        for(TeamData data : active){
+            if(team != data.team){
+                for(CoreBuild tile : data.cores){
+                    if(tile.within(x, y, state.rules.buildRadius(tile.team) + tilesize)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public boolean anyEnemyCoresWithin(Team team, float x, float y, float radius){
         for(TeamData data : active){
             if(team != data.team){
