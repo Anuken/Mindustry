@@ -2286,9 +2286,10 @@ public class Blocks{
         //region power
 
         powerNode = new PowerNode("power-node"){{
-            requirements(Category.power, with(Items.copper, 1, Items.lead, 3));
+            requirements(Category.power, with(Items.copper, 2, Items.lead, 5));
             maxNodes = 10;
             laserRange = 6;
+            buildCostMultiplier = 2f;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{
@@ -2451,12 +2452,13 @@ public class Blocks{
         //erekir
 
         beamNode = new BeamNode("beam-node"){{
-            requirements(Category.power, with(Items.beryllium, 8));
+            requirements(Category.power, with(Items.beryllium, 10));
             consumesPower = outputsPower = true;
             health = 90;
             range = 10;
             fogRadius = 1;
             researchCost = with(Items.beryllium, 5);
+            buildCostMultiplier = 2f;
 
             consumePowerBuffered(1000f);
         }};

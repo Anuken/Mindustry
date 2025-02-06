@@ -19,6 +19,7 @@ import mindustry.logic.LExecutor.*;
 import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -614,6 +615,29 @@ public class LStatements{
                                 if(++c % 6 == 0) i.row();
                             }
                         }),
+                        new Table(i -> {
+                            i.left();
+                            int c = 0;
+                            for(UnitType item : Vars.content.units()){
+                                if(!item.unlockedNow() || item.hidden) continue;
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
+                                    stype("@" + item.name);
+                                    hide.run();
+                                }).size(40f);
+
+                                if(++c % 6 == 0) i.row();
+                            }
+
+                            for(Block item : Vars.content.blocks()){
+                                if(!item.unlockedNow() || item.isHidden()) continue;
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
+                                    stype("@" + item.name);
+                                    hide.run();
+                                }).size(40f);
+
+                                if(++c % 6 == 0) i.row();
+                            }
+                        }),
                         //sensors
                         new Table(i -> {
                             for(LAccess sensor : LAccess.senseable){
@@ -625,7 +649,7 @@ public class LStatements{
                         })
                     };
 
-                    Drawable[] icons = {Icon.box, Icon.liquid, Icon.tree};
+                    Drawable[] icons = {Icon.box, Icon.liquid, Icon.units, Icon.tree};
                     Stack stack = new Stack(tables[selected]);
                     ButtonGroup<Button> group = new ButtonGroup<>();
 
@@ -643,7 +667,7 @@ public class LStatements{
                         }).height(50f).growX().checked(selected == fi).group(group);
                     }
                     t.row();
-                    t.add(stack).colspan(3).width(240f).left();
+                    t.add(stack).colspan(4).width(240f).left();
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 

@@ -54,7 +54,7 @@ public class Drill extends Block{
     /** Drill effect randomness. Block size by default. */
     public float drillEffectRnd = -1f;
     /** Chance of displaying the effect. Useful for extremely fast drills. */
-    public float drillEffectChance = 1f;
+    public float drillEffectChance = 0.02f;
     /** Speed the drill bit rotates at. */
     public float rotateSpeed = 2f;
     /** Effect randomly played while drilling. */
@@ -327,7 +327,7 @@ public class Drill extends Block{
 
                 progress %= delay;
 
-                if(wasVisible && Mathf.chanceDelta(updateEffectChance * warmup)) drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
+                if(wasVisible && Mathf.chanceDelta(drillEffectChance * warmup)) drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
             }
         }
 

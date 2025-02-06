@@ -432,7 +432,9 @@ public class Mods implements Loadable{
         }
         mods.remove(mod);
         mod.dispose();
-        requiresReload = true;
+        if(mod.state != ModState.disabled){
+            requiresReload = true;
+        }
     }
 
     public Scripts getScripts(){
@@ -795,6 +797,8 @@ public class Mods implements Loadable{
 
         //this finishes parsing content fields
         parser.finishParsing();
+
+        Events.fire(new ModContentLoadEvent());
     }
 
     public void handleContentError(Content content, Throwable error){

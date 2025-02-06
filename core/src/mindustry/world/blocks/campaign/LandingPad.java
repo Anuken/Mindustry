@@ -13,6 +13,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -65,12 +66,12 @@ public class LandingPad extends Block{
         lightRadius = 90f;
 
         config(Item.class, (LandingPadBuild build, Item item) -> {
-            if(!accessible()) return;
+            if(!build.accessible()) return;
 
             build.config = item;
         });
         configClear((LandingPadBuild build) -> {
-            if(!accessible()) return;
+            if(!build.accessible()) return;
 
             build.config = null;
         });
@@ -119,10 +120,6 @@ public class LandingPad extends Block{
         build.handleLanding();
     }
 
-    public boolean accessible(){
-        return state.rules.editor || state.rules.allowEditWorldProcessors || state.isCampaign();
-    }
-
     public class LandingPadBuild extends Building{
         public @Nullable Item config;
         //priority collisions are possible, but should be extremely rare
@@ -144,6 +141,11 @@ public class LandingPad extends Block{
             if(state.isCampaign() && !isFake()){
                 state.rules.sector.info.importCooldownTimers.put(config, 0f);
             }
+        }
+
+        public boolean accessible(){
+            //In custom games, this block can be configured by anyone except the player team; this allows for enemy builder AI to use it
+            return state.rules.editor || state.rules.allowEditWorldProcessors || state.isCampaign() || state.rules.infiniteResources || (team != state.rules.defaultTeam && !state.rules.pvp && team != Team.derelict);
         }
 
         public void updateTimers(){
