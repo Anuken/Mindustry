@@ -44,14 +44,6 @@ public class ConsumeGenerator extends PowerGenerator{
         if(outputLiquid != null){
             addLiquidBar(outputLiquid.liquid);
         }
-
-        if(itemDurationMultipliers.size > 0){
-            addBar("efficiency", (ConsumeGeneratorBuild entity) ->
-            new Bar(() ->
-            Core.bundle.format("bar.efficiency", (int)(entity.itemDurationMultiplier * 100)),
-            () -> Pal.lightOrange,
-            () -> entity.itemDurationMultiplier));
-        }
     }
 
     @Override
