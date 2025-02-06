@@ -11,10 +11,12 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 
+import static mindustry.Vars.*;
 import static mindustry.logic.LCanvas.*;
 
 /**
@@ -101,12 +103,41 @@ public abstract class LStatement{
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
         return table.field(value, Styles.nodeField, s -> setter.get(sanitize(s)))
-            .size(144f, 40f).pad(2f).color(table.color).maxTextLength(LAssembler.maxTokenLength);
+            .size(144f, 40f).pad(2f).color(table.color);
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
         table.add(desc).padLeft(10).left().self(this::param);
         return field(table, value, setter).width(85f).padRight(10).left();
+    }
+
+    /** Puts the text and field in one table, taking up one cell. */
+    protected Cell<TextField> fieldst(Table table, String desc, String value, Cons<String> setter){
+        Cell[] result = {null};
+        table.table(t -> {
+            t.setColor(table.color);
+            t.add(desc).padLeft(10).left().self(this::param);
+            result[0] = field(t, value, setter).width(85f).padRight(10).left();
+        });
+
+        return result[0];
+    }
+
+    /** Adds color edit button */
+    protected Cell<Button> col(Table table, String value, Cons<Color> setter){
+        return table.button(b -> {
+            b.image(Icon.pencilSmall);
+            b.clicked(() -> {
+                Color current = Pal.accent.cpy();
+                if(value.startsWith("%")){
+                    try{
+                        current = Color.valueOf(value.substring(1));
+                    }catch(Exception ignored){}
+                }
+
+                ui.picker.show(current, setter);
+            });
+        }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
     }
 
     protected Cell<TextField> fields(Table table, String value, Cons<String> setter){
@@ -133,7 +164,7 @@ public abstract class LStatement{
                     if(p instanceof Enum e){
                         tooltip(c, e);
                     }
-                }).checked(current == p).group(group));
+                }).checked(current.equals(p)).group(group));
 
                 if(++i % cols == 0) t.row();
             }

@@ -64,6 +64,7 @@ public class ConsumeGenerator extends PowerGenerator{
 
     @Override
     public void setStats(){
+        stats.timePeriod = itemDuration;
         super.setStats();
 
         if(hasItems){
@@ -80,12 +81,14 @@ public class ConsumeGenerator extends PowerGenerator{
 
         @Override
         public void updateEfficiencyMultiplier(){
+            efficiencyMultiplier = 1f;
             if(filterItem != null){
                 float m = filterItem.efficiencyMultiplier(this);
-                if(m > 0) efficiencyMultiplier = m;
-            }else if(filterLiquid != null){
+                if(m > 0) efficiencyMultiplier *= m;
+            }
+            if(filterLiquid != null){
                 float m = filterLiquid.efficiencyMultiplier(this);
-                if(m > 0) efficiencyMultiplier = m;
+                if(m > 0) efficiencyMultiplier *= m;
             }
         }
 
@@ -115,7 +118,7 @@ public class ConsumeGenerator extends PowerGenerator{
                 liquids.add(outputLiquid.liquid, added);
                 dumpLiquid(outputLiquid.liquid);
 
-                if(explodeOnFull && liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.0001f){
+                if(explodeOnFull && liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.01f){
                     kill();
                     Events.fire(new GeneratorPressureExplodeEvent(this));
                 }

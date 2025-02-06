@@ -1,5 +1,6 @@
 package mindustry.world.blocks;
 
+import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.scene.style.*;
@@ -9,7 +10,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -65,7 +65,7 @@ public class ItemSelection{
 
             Seq<T> list = items.select(u -> (text.isEmpty() || u.localizedName.toLowerCase().contains(text.toLowerCase())));
             for(T item : list){
-                if(!item.unlockedNow() || (item instanceof Item checkVisible && state.rules.hiddenBuildItems.contains(checkVisible)) || item.isHidden()) continue;
+                if(!item.unlockedNow() || !item.isOnPlanet(state.getPlanet()) || item.isHidden()) continue;
 
                 ImageButton button = cont.button(Tex.whiteui, Styles.clearNoneTogglei, Mathf.clamp(item.selectionSize, 0f, 40f), () -> {
                     if(closeSelect) control.input.config.hideConfig();
@@ -85,13 +85,20 @@ public class ItemSelection{
 
         Table main = new Table().background(Styles.black6);
         if(rowCount > rows * 1.5f){
-            search = main.field(null, text -> rebuild.run()).width(40 * columns).padBottom(4).left().growX().get();
-            search.setMessageText("@players.search");
-            main.row();
+            main.table(s -> {
+                s.image(Icon.zoom).padLeft(4f);
+                search = s.field(null, text -> rebuild.run()).padBottom(4).left().growX().get();
+                search.setMessageText("@players.search");
+            }).fillX().row();
         }
 
         ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
         pane.setScrollingDisabled(true, false);
+        pane.exited(() -> {
+            if(pane.hasScroll()){
+                Core.scene.setScrollFocus(null);
+            }
+        });
 
         if(block != null){
             pane.setScrollYForce(block.selectScroll);

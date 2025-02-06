@@ -21,18 +21,21 @@ public class PayloadConveyor extends Block{
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
     public float payloadLimit = 3f;
+    public boolean pushUnits = true;
 
     public PayloadConveyor(String name){
         super(name);
-        group = BlockGroup.transportation;
+        group = BlockGroup.payloads;
         size = 3;
         rotate = true;
         update = true;
         outputsPayload = true;
         noUpdateDisabled = true;
+        acceptsUnitPayloads = true;
         priority = TargetPriority.transport;
         envEnabled |= Env.space | Env.underwater;
         sync = true;
+        underBullets = true;
     }
 
     @Override
@@ -155,7 +158,7 @@ public class PayloadConveyor extends Block{
                         next.updateTile();
 
                         //TODO add self to queue of next conveyor, then check if this conveyor was selected next frame - selection happens deterministically
-                        if(next.acceptPayload(this, item)){
+                        if(next != null && next.acceptPayload(this, item)){
                             //move forward.
                             next.handlePayload(this, item);
                             item = null;
@@ -186,6 +189,12 @@ public class PayloadConveyor extends Block{
 
         public void drawBottom(){
             super.draw();
+        }
+
+        @Override
+        public void onDestroyed(){
+            if(item != null) item.destroyed();
+            super.onDestroyed();
         }
 
         @Override
@@ -249,6 +258,8 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void unitOn(Unit unit){
+            if(!pushUnits || !enabled) return;
+
             //calculate derivative of units moved last frame
             float delta = (curInterp - lastInterp) * size * tilesize;
             Tmp.v1.trns(rotdeg(), delta * moveForce).scl(1f / Math.max(unit.mass(), 201f));

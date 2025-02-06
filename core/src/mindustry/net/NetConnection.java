@@ -40,6 +40,11 @@ public abstract class NetConnection{
         this.address = address;
     }
 
+    /** Kick with the standard kick reason. */
+    public void kick(){
+        kick(KickReason.kick);
+    }
+
     /** Kick with a special, localized reason. Use this if possible. */
     public void kick(KickReason reason){
         kick(reason, (reason == KickReason.kick || reason == KickReason.banned || reason == KickReason.vote) ? 30 * 1000 : 0);
@@ -76,10 +81,14 @@ public abstract class NetConnection{
             Call.kick(this, reason);
         }
 
-        close();
+        kickDisconnect();
 
         netServer.admins.save();
         kicked = true;
+    }
+
+    protected void kickDisconnect(){
+        close();
     }
 
     public boolean isConnected(){

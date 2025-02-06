@@ -137,6 +137,10 @@ public class ErekirTechTree{
                         node(eruptionDrill, Seq.with(new OnSector(stronghold)), () -> {
 
                         });
+
+                        node(largeCliffCrusher, Seq.with(new OnSector(stronghold)), () -> {
+
+                        });
                     });
                 });
             });
@@ -220,7 +224,9 @@ public class ErekirTechTree{
                                         });
 
                                         node(heatRouter, () -> {
+                                            node(smallHeatRedirector, () -> {
 
+                                            });
                                         });
                                     });
                                 });
@@ -447,11 +453,11 @@ public class ErekirTechTree{
 
                                 //nodeProduce(Liquids.gallium, () -> {});
                             });
+                        });
 
-                            nodeProduce(Items.surgeAlloy, () -> {
-                                nodeProduce(Items.phaseFabric, () -> {
+                        nodeProduce(Items.surgeAlloy, () -> {
+                            nodeProduce(Items.phaseFabric, () -> {
 
-                                });
                             });
                         });
                     });

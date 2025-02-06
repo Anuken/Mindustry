@@ -23,6 +23,7 @@ public class SeaBush extends Prop{
 
     @Override
     public void drawBase(Tile tile){
+        Draw.z(layer);
         rand.setSeed(tile.pos());
         float offset = rand.random(180f);
         int lobes = rand.random(lobesMin, lobesMax);

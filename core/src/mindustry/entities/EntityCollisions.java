@@ -5,7 +5,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -82,8 +81,8 @@ public class EntityCollisions{
 
                     if(tmp.overlaps(r1)){
                         Vec2 v = Geometry.overlap(r1, tmp, x);
-                        if(x) r1.x += v.x;
-                        if(!x) r1.y += v.y;
+                        r1.x += v.x;
+                        r1.y += v.y;
                     }
                 }
             }
@@ -129,7 +128,7 @@ public class EntityCollisions{
 
     public static boolean legsSolid(int x, int y){
         Tile tile = world.tile(x, y);
-        return tile == null || tile.staticDarkness() >= 2 || (tile.floor().solid && tile.block() == Blocks.air);
+        return tile == null || tile.legSolid();
     }
 
     public static boolean waterSolid(int x, int y){

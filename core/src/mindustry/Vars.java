@@ -28,6 +28,7 @@ import mindustry.net.*;
 import mindustry.service.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
@@ -44,10 +45,10 @@ public class Vars implements Loadable{
     public static boolean loadLocales = true;
     /** Whether the logger is loaded. */
     public static boolean loadedLogger = false, loadedFileLogger = false;
-    /** Whether to enable various experimental features (e.g. spawn positions for spawn groups) TODO change */
-    public static boolean experimental = true;
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
+    /** If true, the BE server list is always used. */
+    public static boolean forceBeServers = false;
     /** Default accessible content types used for player-selectable icons. */
     public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
     /** Default rule environment. */
@@ -70,11 +71,12 @@ public class Vars implements Loadable{
     public static final String discordURL = "https://discord.gg/mindustry";
     /** URL the links to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
-    /** URL to the JSON file containing all the BE servers. Only queried in BE. */
-    public static final String serverJsonBeURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_be.json";
-    /** URL to the JSON file containing all the stable servers.  */
-    //TODO merge with v6 list upon release
-    public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v7.json";
+    /** URLs to the JSON file containing all the BE servers. Only queried in BE. */
+    public static final String[] serverJsonBeURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_be.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_be.json"};
+    /** URLs to the JSON file containing all the stable servers.  */
+    public static final String[] serverJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_v8.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_v8.json"};
+    /** URLs to the JSON files containing the list of mods.  */
+    public static final String[] modJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrymods/mods.json"};
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
@@ -93,6 +95,8 @@ public class Vars implements Loadable{
     public static final float finalWorldBounds = 250;
     /** default range for building */
     public static final float buildingRange = 220f;
+    /** scaling for unit circle collider radius, based on hitbox size */
+    public static final float unitCollisionRadiusScale = 0.6f;
     /** range for moving items */
     public static final float itemTransferRange = 220f;
     /** range for moving items for logic units */
@@ -105,14 +109,16 @@ public class Vars implements Loadable{
     public static final float invasionGracePeriod = 20;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.1f;
-    /** land/launch animation duration */
-    public static final float coreLandDuration = 160f;
+    /** @deprecated see {@link CoreBlock#landDuration} instead! */
+    public static final @Deprecated float coreLandDuration = 160f;
     /** size of tiles in units */
     public static final int tilesize = 8;
     /** size of one tile payload (^2) */
     public static final float tilePayload = tilesize * tilesize;
     /** icon sizes for UI */
     public static final float iconXLarge = 8*6f, iconLarge = 8*5f, iconMed = 8*4f, iconSmall = 8*3f;
+    /** macbook screen notch height */
+    public static float macNotchHeight = 32f;
     /** for map generator dialog */
     public static boolean updateEditorOnChange = false;
     /** all choosable player colors in join/host dialog */
@@ -134,8 +140,15 @@ public class Vars implements Loadable{
         Color.valueOf("4b5ef1"),
         Color.valueOf("2cabfe"),
     };
+    /** Icons available to the user for customization in certain dialogs. */
+    public static final String[] accessibleIcons = {
+    "effect", "power", "logic", "units", "liquid", "production", "defense", "turret", "distribution", "crafting",
+    "settings", "cancel", "zoom", "ok", "star", "home", "pencil", "up", "down", "left", "right",
+    "hammer", "warning", "tree", "admin", "map", "modePvp", "terrain",
+    "modeSurvival", "commandRally", "commandAttack",
+    };
     /** maximum TCP packet size */
-    public static final int maxTcpSize = 900;
+    public static final int maxTcpSize = 1100;
     /** default server port */
     public static final int port = 6567;
     /** multicast discovery port.*/
@@ -144,12 +157,14 @@ public class Vars implements Loadable{
     public static final int maxModSubtitleLength = 40;
     /** multicast group for discovery.*/
     public static final String multicastGroup = "227.2.7.7";
+    /** Maximum delta time. If the actual delta time (*60) between frames is higher than this number, the game will start to slow down. */
+    public static float maxDeltaClient = 6f, maxDeltaServer = 10f;
     /** whether the graphical game client has loaded */
     public static boolean clientLoaded = false;
     /** max GL texture size */
     public static int maxTextureSize = 2048;
     /** Maximum schematic size.*/
-    public static int maxSchematicSize = 32;
+    public static int maxSchematicSize = 64;
     /** Whether to show sector info upon landing. */
     public static boolean showSectorLandInfo = true;
     /** Whether to check for memory use before taking screenshots. */
@@ -158,6 +173,8 @@ public class Vars implements Loadable{
     public static boolean confirmExit = true;
     /** if true, UI is not drawn */
     public static boolean disableUI;
+    /** if true, most autosaving is disabled. internal use only! */
+    public static boolean disableSave;
     /** if true, game is set up in mobile mode, even on desktop. used for debugging */
     public static boolean testMobile;
     /** whether the game is running on a mobile device */
@@ -431,7 +448,12 @@ public class Vars implements Loadable{
         settings.setAutosave(false);
         settings.load();
 
-        Scl.setProduct(settings.getInt("uiscale", 100) / 100f);
+        //https://github.com/Anuken/Mindustry/issues/8483
+        if(settings.getInt("uiscale") == 5){
+            settings.put("uiscale", 100);
+        }
+
+        Scl.setProduct(Math.max(settings.getInt("uiscale", 100), 25) / 100f);
 
         if(!loadLocales) return;
 
