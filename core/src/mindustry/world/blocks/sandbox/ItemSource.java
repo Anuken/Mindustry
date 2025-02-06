@@ -88,6 +88,7 @@ public class ItemSource extends Block{
             while(counter >= limit){
                 items.set(outputItem, 1);
                 dump(outputItem);
+                produced(outputItem);
                 items.set(outputItem, 0);
                 counter -= limit;
             }

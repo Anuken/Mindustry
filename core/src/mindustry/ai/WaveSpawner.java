@@ -66,12 +66,22 @@ public class WaveSpawner{
             if(group.type == null) continue;
 
             int spawned = group.getSpawned(state.wave - 1);
+            if(spawned == 0) continue;
+
+            if(state.isCampaign()){
+                //when spawning a boss, round down, so 1.5x (hard) * 1 boss does not result in 2 bosses
+                spawned = Math.max(1, group.effect == StatusEffects.boss ?
+                          (int)(spawned * state.getPlanet().campaignRules.difficulty.enemySpawnMultiplier) :
+                    Mathf.round(spawned * state.getPlanet().campaignRules.difficulty.enemySpawnMultiplier));
+            }
+
+            int spawnedf = spawned;
 
             if(group.type.flying){
                 float spread = margin / 1.5f;
 
                 eachFlyerSpawn(group.spawn, (spawnX, spawnY) -> {
-                    for(int i = 0; i < spawned; i++){
+                    for(int i = 0; i < spawnedf; i++){
                         Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                         unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
                         spawnEffect(unit);
@@ -82,7 +92,7 @@ public class WaveSpawner{
 
                 eachGroundSpawn(group.spawn, (spawnX, spawnY, doShockwave) -> {
 
-                    for(int i = 0; i < spawned; i++){
+                    for(int i = 0; i < spawnedf; i++){
                         Tmp.v1.rnd(spread);
 
                         Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
@@ -152,14 +162,21 @@ public class WaveSpawner{
     }
 
     private void eachFlyerSpawn(int filterPos, Floatc2 cons){
+        boolean airUseSpawns = state.rules.airUseSpawns;
+
         for(Tile tile : spawns){
             if(filterPos != -1 && filterPos != tile.pos()) continue;
 
-            float angle = Angles.angle(world.width() / 2f, world.height() / 2f, tile.x, tile.y);
-            float trns = Math.max(world.width(), world.height()) * Mathf.sqrt2 * tilesize;
-            float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width() * tilesize + margin);
-            float spawnY = Mathf.clamp(world.height() * tilesize / 2f + Angles.trnsy(angle, trns), -margin, world.height() * tilesize + margin);
-            cons.get(spawnX, spawnY);
+            if(!airUseSpawns){
+
+                float angle = Angles.angle(world.width() / 2f, world.height() / 2f, tile.x, tile.y);
+                float trns = Math.max(world.width(), world.height()) * Mathf.sqrt2 * tilesize;
+                float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width() * tilesize + margin);
+                float spawnY = Mathf.clamp(world.height() * tilesize / 2f + Angles.trnsy(angle, trns), -margin, world.height() * tilesize + margin);
+                cons.get(spawnX, spawnY);
+            }else{
+                cons.get(tile.worldx(), tile.worldy());
+            }
         }
 
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){

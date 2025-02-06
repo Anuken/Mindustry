@@ -174,7 +174,9 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 forced = false;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
-        }, new IOSApplicationConfiguration());
+        }, new IOSApplicationConfiguration(){{
+            useGL30 = true;
+        }});
     }
 
     @Override
@@ -248,7 +250,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
             UIApplication.main(argv, null, IOSLauncher.class);
         }catch(Throwable t){
             //attempt to log the exception
-            CrashSender.log(t);
+            CrashHandler.log(t);
             Log.err(t);
             //rethrow the exception so it actually crashes
             throw t;

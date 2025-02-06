@@ -14,16 +14,15 @@ import mindustry.ui.dialogs.*;
 import static mindustry.Vars.*;
 
 public class MapInfoDialog extends BaseDialog{
-    private final WaveInfoDialog waveInfo;
-    private final MapGenerateDialog generate;
-    private final CustomRulesDialog ruleInfo = new CustomRulesDialog();
-    private final MapObjectivesDialog objectives = new MapObjectivesDialog();
-    private final MapLocalesDialog locales = new MapLocalesDialog();
+    private WaveInfoDialog waveInfo  = new WaveInfoDialog();
+    private MapGenerateDialog generate = new MapGenerateDialog(false);
+    private CustomRulesDialog ruleInfo = new CustomRulesDialog();
+    private MapObjectivesDialog objectives = new MapObjectivesDialog();
+    private MapLocalesDialog locales = new MapLocalesDialog();
+    private MapProcessorsDialog processors = new MapProcessorsDialog();
 
     public MapInfoDialog(){
         super("@editor.mapinfo");
-        this.waveInfo = new WaveInfoDialog();
-        this.generate = new MapGenerateDialog(false);
 
         addCloseButton();
 
@@ -108,7 +107,12 @@ public class MapInfoDialog extends BaseDialog{
                         ui.showException(e);
                     }
                     hide();
-                }).marginLeft(10f).width(0f).colspan(2).center().growX();
+                }).marginLeft(10f);
+
+                r.button("@editor.worldprocessors", Icon.logic, style, () -> {
+                    hide();
+                    processors.show();
+                }).marginLeft(10f);
             }).colspan(2).center();
 
             name.change();

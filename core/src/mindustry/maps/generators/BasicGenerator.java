@@ -158,7 +158,7 @@ public abstract class BasicGenerator implements WorldGenerator{
 
             int rotation = 0;
             for(int i = 0; i < 8; i++){
-                Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
+                Tile other = tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
                 if(other != null && !other.block().isStatic()){
                     rotation |= (1 << i);
                 }
@@ -209,7 +209,7 @@ public abstract class BasicGenerator implements WorldGenerator{
 
     public void overlay(Block floor, Block block, float chance, int octaves, float falloff, float scl, float threshold){
         pass((x, y) -> {
-            if(noise(x, y, octaves, falloff, scl) > threshold && Mathf.chance(chance) && tiles.getn(x, y).floor() == floor){
+            if(noise(x, y, octaves, falloff, scl) > threshold && rand.chance(chance) && tiles.getn(x, y).floor() == floor){
                 ore = block;
             }
         });
@@ -227,14 +227,14 @@ public abstract class BasicGenerator implements WorldGenerator{
             int mx = x % secSize, my = y % secSize;
             int sclx = x / secSize, scly = y / secSize;
             if(noise(sclx, scly, 0.2f, 1f) > 0.63f && noise(sclx, scly + 999, 200f, 1f) > 0.6f && (mx == 0 || my == 0 || mx == secSize - 1 || my == secSize - 1)){
-                if(Mathf.chance(noise(x + 0x231523, y, 40f, 1f))){
+                if(rand.chance(noise(x + 0x231523, y, 40f, 1f))){
                     floor = floor1;
                     if(Mathf.dst(mx, my, secSize/2, secSize/2) > secSize/2f + 2){
                         floor = floor2;
                     }
                 }
 
-                if(block.solid && Mathf.chance(0.7)){
+                if(block.solid && rand.chance(0.7)){
                     block = wall;
                 }
             }
@@ -262,7 +262,7 @@ public abstract class BasicGenerator implements WorldGenerator{
 
     public void scatter(Block target, Block dst, float chance){
         pass((x, y) -> {
-            if(!Mathf.chance(chance)) return;
+            if(!rand.chance(chance)) return;
             if(floor == target){
                 floor = dst;
             }else if(block == target){
@@ -444,7 +444,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         }
     }
 
-    public Seq<Tile> pathfind(int startX, int startY, int endX, int endY, TileHueristic th, DistanceHeuristic dh){
+    public Seq<Tile> pathfind(int startX, int startY, int endX, int endY, TileHeuristic th, DistanceHeuristic dh){
         return Astar.pathfind(startX, startY, endX, endY, th, dh, tile -> world.getDarkness(tile.x, tile.y) <= 1f);
     }
 

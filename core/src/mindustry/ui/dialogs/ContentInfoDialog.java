@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -82,7 +83,6 @@ public class ContentInfoDialog extends BaseDialog{
                         value.display(inset);
                         inset.add().size(10f);
                     }
-
                 }).fillX().padLeft(10);
                 table.row();
             }
@@ -96,9 +96,16 @@ public class ContentInfoDialog extends BaseDialog{
         content.displayExtra(table);
 
         ScrollPane pane = new ScrollPane(table);
+        table.marginRight(30f);
+        //TODO: some things (e.g. reconstructor requirements) are too long and screw up the layout
+        //pane.setScrollingDisabled(true, false);
         cont.add(pane);
 
-        show();
+        if(isShown()){
+            show(scene, Actions.fadeIn(0f));
+        }else{
+            show();
+        }
     }
 
 }

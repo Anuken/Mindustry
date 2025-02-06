@@ -35,10 +35,6 @@ abstract class EntityComp{
         return ((Object)this) instanceof Unitc u && u.isPlayer() && !isLocal();
     }
 
-    boolean isNull(){
-        return false;
-    }
-
     /** Replaced with `this` after code generation. */
     <T extends Entityc> T self(){
         return (T)this;

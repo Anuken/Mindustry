@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -25,7 +26,7 @@ public class PayloadBlock extends Block{
         update = true;
         sync = true;
         group = BlockGroup.payloads;
-        acceptsPayloads = true;
+        acceptsUnitPayloads = true;
         envEnabled |= Env.space | Env.underwater;
     }
 
@@ -33,9 +34,18 @@ public class PayloadBlock extends Block{
     public void load(){
         super.load();
 
-        topRegion = Core.atlas.find(name + "-top", "factory-top-" + size + regionSuffix);
-        outRegion = Core.atlas.find(name + "-out", "factory-out-" + size + regionSuffix);
-        inRegion = Core.atlas.find(name + "-in", "factory-in-" + size + regionSuffix);
+        topRegion = findFactoryRegion("-top");
+        outRegion =  findFactoryRegion("-out");
+        inRegion =  findFactoryRegion("-in");
+    }
+
+    protected TextureRegion findFactoryRegion(String suf){
+        TextureRegion region = Core.atlas.find(name + suf);
+
+        if(!region.found() && minfo.mod != null) region = Core.atlas.find(minfo.mod.name + "-factory" + suf + "-" + size + regionSuffix);
+        if(!region.found()) region = Core.atlas.find("factory" + suf + "-" + size + regionSuffix);
+
+        return region;
     }
 
     public static boolean blends(Building build, int direction){
@@ -240,6 +250,13 @@ public class PayloadBlock extends Block{
                 Draw.z(Layer.blockOver);
                 payload.draw();
             }
+        }
+
+        @Override
+        public double sense(Content content){
+            if(payload instanceof UnitPayload up) return up.unit.type == content ? 1 : 0;
+            if(payload instanceof BuildPayload bp) return bp.build.block == content ? 1 : 0;
+            return super.sense(content);
         }
 
         @Override
