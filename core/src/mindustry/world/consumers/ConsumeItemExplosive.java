@@ -1,8 +1,8 @@
 package mindustry.world.consumers;
 
-import mindustry.gen.*;
+import mindustry.type.*;
 
-public class ConsumeItemExplosive extends ConsumeItemFilter{
+public class ConsumeItemExplosive extends ConsumeItemEfficiency{
     public float minExplosiveness;
 
     public ConsumeItemExplosive(float minCharge){
@@ -15,8 +15,7 @@ public class ConsumeItemExplosive extends ConsumeItemFilter{
     }
 
     @Override
-    public float efficiencyMultiplier(Building build){
-        var item = getConsumed(build);
-        return item == null ? 0f : item.explosiveness;
+    public float itemEfficiencyMultiplier(Item item){
+        return item.explosiveness;
     }
 }
