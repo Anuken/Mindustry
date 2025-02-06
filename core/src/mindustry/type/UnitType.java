@@ -1188,6 +1188,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             case size -> hitSize / tilesize;
             case itemCapacity -> itemCapacity;
             case speed -> speed * 60f / tilesize;
+            case payloadCapacity -> sample instanceof Payloadc ? payloadCapacity / tilePayload : 0f;
             case id -> getLogicId();
             default -> Double.NaN;
         };
