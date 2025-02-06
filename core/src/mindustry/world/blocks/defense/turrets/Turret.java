@@ -68,10 +68,12 @@ public class Turret extends ReloadTurret{
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
     public float minWarmup = 0f;
-    /** If true, this turret will accurately target moving targets with respect to charge time. */
+    /** If true, this turret will accurately target moving targets with respect to shoot.firstShotDelay. */
     public boolean accurateDelay = true;
     /** If false, this turret can't move while charging. */
     public boolean moveWhileCharging = true;
+    /** If false, this turret can't reload while charging */
+    public boolean reloadWhileCharging = true;
     /** How long warmup is maintained even if this turret isn't shooting. */
     public float warmupMaintainTime = 0f;
     /** pattern used for bullets */
@@ -159,7 +161,7 @@ public class Turret extends ReloadTurret{
         super.setStats();
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(Stat.reload, 60f / (reload) * shoot.shots, StatUnit.perSecond);
+        stats.add(Stat.reload, 60f / (reload + !reloadWhileCharging ? shoot.firstShotDelay : 0f) * shoot.shots, StatUnit.perSecond);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
@@ -422,7 +424,10 @@ public class Turret extends ReloadTurret{
             }
 
             //turret always reloads regardless of whether it's targeting something
-            updateReload();
+            if(reloadWhileCharging || !charging()){
+                updateReload();
+                updateCooling();
+            }
 
             if(state.rules.fog){
                 float newRange = hasAmmo() ? peekAmmo().rangeChange : 0f;
@@ -477,10 +482,6 @@ public class Turret extends ReloadTurret{
                     wasShooting = true;
                     updateShooting();
                 }
-            }
-
-            if(coolant != null){
-                updateCooling();
             }
         }
 
