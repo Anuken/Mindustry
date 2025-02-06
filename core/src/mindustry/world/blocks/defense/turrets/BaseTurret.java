@@ -9,6 +9,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -79,12 +80,17 @@ public class BaseTurret extends Block{
         stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
     }
 
-    public class BaseTurretBuild extends Building implements Ranged{
+    public class BaseTurretBuild extends Building implements Ranged, RotBlock{
         public float rotation = 90;
 
         @Override
         public float range(){
             return range;
+        }
+
+        @Override
+        public float buildRotation(){
+            return rotation;
         }
 
         @Override

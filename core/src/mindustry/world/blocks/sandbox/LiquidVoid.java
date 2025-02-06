@@ -25,6 +25,12 @@ public class LiquidVoid extends Block{
 
     public class LiquidVoidBuild extends Building{
         @Override
+        public void placed(){
+            super.placed();
+            liquids.clear();
+        }
+
+        @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
             return enabled;
         }

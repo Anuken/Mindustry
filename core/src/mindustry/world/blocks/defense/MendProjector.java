@@ -59,7 +59,7 @@ public class MendProjector extends Block{
             stats.add(Stat.booster, StatValues.itemBoosters(
                 "{0}" + StatUnit.timesSpeed.localized(),
                 stats.timePeriod, (phaseBoost + healPercent) / healPercent, phaseRangeBoost,
-                cons.items, this::consumesItem)
+                cons.items)
             );
         }
     }

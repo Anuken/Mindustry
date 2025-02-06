@@ -11,6 +11,7 @@ import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.consumers.*;
@@ -49,6 +50,7 @@ public class ItemTurret extends Turret{
 
         stats.remove(Stat.itemCapacity);
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
+        stats.add(Stat.ammoCapacity, maxAmmo / ammoPerShot, StatUnit.shots);
     }
 
     @Override
@@ -79,8 +81,8 @@ public class ItemTurret extends Turret{
 
             @Override
             public float efficiency(Building build){
-                //valid when there's any ammo in the turret
-                return build instanceof ItemTurretBuild it && !it.ammo.isEmpty() ? 1f : 0f;
+                //valid when it can shoot
+                return build instanceof ItemTurretBuild it && it.ammo.size > 0 && (it.ammo.peek().amount >= ammoPerShot || it.cheating()) ? 1f : 0f;
             }
 
             @Override
@@ -104,6 +106,14 @@ public class ItemTurret extends Turret{
             if(!hasAmmo() && cheating() && ammoTypes.size > 0){
                 handleItem(this, ammoTypes.keys().next());
             }
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            return switch(sensor){
+                case currentAmmoType -> ammo.size > 0 ? ((ItemEntry)ammo.peek()).item : null;
+                default -> super.senseObject(sensor);
+            };
         }
 
         @Override

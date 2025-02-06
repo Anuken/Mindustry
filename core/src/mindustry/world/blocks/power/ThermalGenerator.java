@@ -89,6 +89,17 @@ public class ThermalGenerator extends PowerGenerator{
         }
 
         @Override
+        public void afterPickedUp(){
+            super.afterPickedUp();
+            sum = 0f;
+        }
+
+        @Override
+        public float totalProgress(){
+            return enabled && sum > 0 ? super.totalProgress() : 0f;
+        }
+
+        @Override
         public void drawLight(){
             Drawf.light(x, y, (40f + Mathf.absin(10f, 5f)) * Math.min(productionEfficiency, 2f) * size, Color.scarlet, 0.4f);
         }

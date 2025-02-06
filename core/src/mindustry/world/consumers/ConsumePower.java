@@ -43,7 +43,7 @@ public class ConsumePower extends Consume{
     public void display(Stats stats){
         if(buffered){
             stats.add(Stat.powerCapacity, capacity, StatUnit.none);
-        }else{
+        }else if(usage > 0f){
             stats.add(Stat.powerUse, usage * 60f, StatUnit.powerSecond);
         }
     }

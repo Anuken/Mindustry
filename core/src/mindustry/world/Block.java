@@ -58,7 +58,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** If true, this block can output payloads; affects blending. */
     public boolean outputsPayload = false;
     /** If true, this block can input payloads; affects unit payload enter behavior. */
-    public boolean acceptsPayloads = false;
+    public boolean acceptsUnitPayloads = false;
     /** If true, payloads will attempt to move into this block. */
     public boolean acceptsPayload = false;
     /** Visual flag use for blending of certain transportation blocks. */
@@ -328,6 +328,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean instantDeconstruct = false;
     /** If true, this block constructs immediately. This implies no resource requirement, and ignores configs - do not use, this is for performance only! */
     public boolean instantBuild = false;
+    /** If true, this block can be placed even in "dark" areas. Only used for editor static walls. */
+    public boolean ignoreBuildDarkness = false;
     /** Effect for placing the block. Passes size as rotation. */
     public Effect placeEffect = Fx.placeBlock;
     /** Effect for breaking the block. Passes size as rotation. */
@@ -409,7 +411,7 @@ public class Block extends UnlockableContent implements Senseable{
         Draw.rect(
             variants == 0 ? customShadowRegion :
             variantShadowRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantShadowRegions.length - 1))],
-        tile.drawx(), tile.drawy(), tile.build == null ? 0f : tile.build.drawrot());
+        tile.drawx(), tile.drawy());
         Draw.color();
     }
 
@@ -438,6 +440,14 @@ public class Block extends UnlockableContent implements Senseable{
                     PowerNode node = (PowerNode)other.block;
                     Draw.color(node.laserColor1, Renderer.laserOpacity * 0.5f);
                     node.drawLaser(x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
+
+                    Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
+                });
+
+                BeamNode.getNodeLinks(tile, this, player.team(), other -> {
+                    BeamNode node = (BeamNode)other.block;
+                    Draw.color(node.laserColor1, Renderer.laserOpacity * 0.5f);
+                    node.drawLaser(other.x, other.y, x * tilesize + offset, y * tilesize + offset, size, other.block.size);
 
                     Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
                 });
@@ -517,6 +527,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public boolean rotatedOutput(int x, int y){
         return rotate;
+    }
+
+    public boolean rotatedOutput(int fromX, int fromY, Tile destination){
+        return rotatedOutput(fromX, fromY);
     }
 
     public boolean synthetic(){
@@ -887,10 +901,6 @@ public class Block extends UnlockableContent implements Senseable{
         return !isHidden() && (state.rules.editor || (!state.rules.hideBannedBlocks || !state.rules.isBanned(this)));
     }
 
-    public boolean isVisibleOn(Planet planet){
-        return !Structs.contains(requirements, i -> planet.hiddenItems.contains(i.item));
-    }
-
     public boolean isPlaceable(){
         return isVisible() && (!state.rules.isBanned(this) || state.rules.editor) && supportsEnv(state.rules.env);
     }
@@ -908,6 +918,11 @@ public class Block extends UnlockableContent implements Senseable{
     /** Called when building of this block begins. */
     public void placeBegan(Tile tile, Block previous, @Nullable Unit builder){
         placeBegan(tile, previous);
+    }
+
+    /** Called when building of this block ends. */
+    public void placeEnded(Tile tile, @Nullable Unit builder){
+
     }
 
     /** Called right before building of this block begins. */
@@ -936,7 +951,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean environmentBuildable(){
-        return (state.rules.hiddenBuildItems.isEmpty() || !Structs.contains(requirements, i -> state.rules.hiddenBuildItems.contains(i.item)));
+        return isOnPlanet(state.getPlanet());
     }
 
     public boolean isStatic(){
@@ -991,6 +1006,11 @@ public class Block extends UnlockableContent implements Senseable{
     /** Creates a consumer that consumes a dynamic amount of power. */
     public <T extends Building> ConsumePower consumePowerDynamic(Floatf<T> usage){
         return consume(new ConsumePowerDynamic((Floatf<Building>)usage));
+    }
+
+    /** Creates a consumer that consumes a dynamic amount of power. */
+    public <T extends Building> ConsumePower consumePowerDynamic(float displayed, Floatf<T> usage){
+        return consume(new ConsumePowerDynamic(displayed, (Floatf<Building>)usage));
     }
 
     /**
@@ -1147,10 +1167,28 @@ public class Block extends UnlockableContent implements Senseable{
         return buildVisibility != BuildVisibility.hidden;
     }
 
+    @Override
+    public void postInit(){
+        //usually, an empty set of planets is a configuration error. auto-assign based on requirements
+        if(requirements.length > 0 && shownPlanets.isEmpty()){
+            for(Planet planet : content.planets()){
+                if(planet.isLandable()){
+                    if(!Structs.contains(requirements, s -> !s.item.isOnPlanet(planet))){
+                        shownPlanets.add(planet);
+                    }
+                }
+            }
+        }
+
+        super.postInit();
+    }
+
     /** Called after all blocks are created. */
     @Override
     @CallSuper
     public void init(){
+        super.init();
+
         //disable standard shadow
         if(customShadow){
             hasShadow = false;
@@ -1393,11 +1431,22 @@ public class Block extends UnlockableContent implements Senseable{
         }
     }
 
+    /** Fills the specified array with the list of configuration options this block has. Only used for plans. */
+    public void getPlanConfigs(Seq<UnlockableContent> options){
+        if(configurations.containsKey(Item.class)){
+            options.add(content.items());
+        }
+        if(configurations.containsKey(Liquid.class)){
+            options.add(content.liquids());
+        }
+    }
+
     @Override
     public double sense(LAccess sensor){
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
+            case solid -> solid ? 1 : 0;
             case size -> size;
             case itemCapacity -> itemCapacity;
             case liquidCapacity -> liquidCapacity;
