@@ -85,6 +85,14 @@ public class ConsumeGenerator extends PowerGenerator{
         if(outputLiquid != null){
             stats.add(Stat.output, StatValues.liquid(outputLiquid.liquid, outputLiquid.amount * 60f, true));
         }
+
+        if(itemDurationMultipliers.size > 0){
+            stats.add(Stat.durationAmplifier, table -> {
+                for(ObjectFloatMap.Entry<Item> stack : itemDurationMultipliers){
+                    table.add(StatValues.displayItemPercent(stack.key, (int)(stack.value * 100), true)).padRight(5);
+                }
+            });
+        }
     }
 
     public class ConsumeGeneratorBuild extends GeneratorBuild{
