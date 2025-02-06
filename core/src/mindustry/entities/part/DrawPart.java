@@ -14,6 +14,8 @@ public abstract class DrawPart{
     public boolean under = false;
     /** For units, this is the index of the weapon this part gets its progress for. */
     public int weaponIndex = 0;
+    /** Which recoil counter to use. < 0 to use base recoil.  */
+    public int recoilIndex = -1;
 
     public abstract void draw(PartParams params);
     public abstract void load(String name);
@@ -41,17 +43,27 @@ public abstract class DrawPart{
             this.sideMultiplier = 1;
             return this;
         }
+
+        public PartParams setRecoil(float recoils){
+            this.recoil = recoils;
+            return this;
+        }
     }
 
     public static class PartMove{
         public PartProgress progress = PartProgress.warmup;
-        public float x, y, rot;
+        public float x, y, gx, gy, rot;
 
-        public PartMove(PartProgress progress, float x, float y, float rot){
+        public PartMove(PartProgress progress, float x, float y, float gx, float gy, float rot){
             this.progress = progress;
             this.x = x;
             this.y = y;
+            this.gx = gx;
+            this.gy = gy;
             this.rot = rot;
+        }
+        public PartMove(PartProgress progress, float x, float y, float rot){
+            this(progress, x, y, 0, 0, rot);
         }
 
         public PartMove(){
@@ -73,8 +85,10 @@ public abstract class DrawPart{
         /** Weapon heat, 1 when just fired, 0, when it has cooled down (duration depends on weapon) */
         heat = p -> p.heat,
         /** Lifetime fraction, 0 to 1. Only for missiles. */
-        life = p -> p.life;
-
+        life = p -> p.life,
+        /** Current unscaled value of Time.time. */
+        time = p -> Time.time;
+        
         float get(PartParams p);
 
         static PartProgress constant(float value){
@@ -82,9 +96,13 @@ public abstract class DrawPart{
         }
 
         default float getClamp(PartParams p){
-            return Mathf.clamp(get(p));
+            return getClamp(p, true);
         }
-
+        
+        default float getClamp(PartParams p, boolean clamp){
+            return clamp ? Mathf.clamp(get(p)) : get(p);
+        }
+        
         default PartProgress inv(){
             return p -> 1f - get(p);
         }
@@ -154,6 +172,14 @@ public abstract class DrawPart{
 
         default PartProgress absin(float scl, float mag){
             return p -> get(p) + Mathf.absin(scl, mag);
+        }
+        
+        default PartProgress mod(float amount){
+            return p -> Mathf.mod(get(p), amount);
+        }
+        
+        default PartProgress loop(float time){
+            return p -> Mathf.mod(get(p)/time, 1);
         }
 
         default PartProgress apply(PartProgress other, PartFunc func){

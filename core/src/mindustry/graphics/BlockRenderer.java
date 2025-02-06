@@ -85,6 +85,10 @@ public class BlockRenderer{
                     updateFloors.add(new UpdateRenderState(tile, tile.floor()));
                 }
 
+                if(tile.overlay().updateRender(tile)){
+                    updateFloors.add(new UpdateRenderState(tile, tile.overlay()));
+                }
+
                 if(tile.build != null && (tile.team() == player.team() || !state.rules.fog || (tile.build.visibleFlags & (1L << player.team().id)) != 0)){
                     tile.build.wasVisible = true;
                 }
@@ -262,7 +266,7 @@ public class BlockRenderer{
     public void drawDestroyed(){
         if(!Core.settings.getBool("destroyedblocks")) return;
 
-        if(control.input.isPlacing() || control.input.isBreaking() || control.input.isRebuildSelecting()){
+        if(control.input.isPlacing() || control.input.isBreaking() || (control.input.isRebuildSelecting() && !scene.hasKeyboard())){
             brokenFade = Mathf.lerpDelta(brokenFade, 1f, 0.1f);
         }else{
             brokenFade = Mathf.lerpDelta(brokenFade, 0f, 0.1f);
@@ -270,7 +274,7 @@ public class BlockRenderer{
 
         if(brokenFade > 0.001f){
             for(BlockPlan block : player.team().data().plans){
-                Block b = content.block(block.block);
+                Block b = block.block;
                 if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset, block.y * tilesize + b.offset))) continue;
 
                 Draw.alpha(0.33f * brokenFade);
@@ -348,7 +352,7 @@ public class BlockRenderer{
         var bounds = camera.bounds(Tmp.r3).grow(tilesize * 2f);
 
         //draw floor lights
-        floorTree.intersect(bounds, tile -> lightview.add(tile));
+        floorTree.intersect(bounds, lightview::add);
 
         blockTree.intersect(bounds, tile -> {
             if(tile.build == null || procLinks.add(tile.build.id)){

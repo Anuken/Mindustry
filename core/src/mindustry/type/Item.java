@@ -47,7 +47,9 @@ public class Item extends UnlockableContent implements Senseable{
     /** If true, this material is used by buildings. If false, this material will be incinerated in certain cores. */
     public boolean buildable = true;
     public boolean hidden = false;
-    /** For mods. Adds this item to the listed planets' hidden items Seq. */
+
+    /** @deprecated no-op, do not use. */
+    @Deprecated
     public @Nullable Planet[] hiddenOnPlanets;
 
     public Item(String name, Color color){
@@ -60,14 +62,9 @@ public class Item extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void init(){
-        super.init();
-
-        if(hiddenOnPlanets != null){
-            for(Planet planet : hiddenOnPlanets){
-                planet.hiddenItems.add(this);
-            }
-        }
+    public boolean isOnPlanet(Planet planet){
+        //hidden items should not appear on any planet's resource selection screen
+        return super.isOnPlanet(planet) && !hidden;
     }
 
     @Override
@@ -146,6 +143,7 @@ public class Item extends UnlockableContent implements Senseable{
 
                     Pixmap res = Pixmaps.blend(pixmaps[i], pixmaps[(i + 1) % frames], f);
                     packer.add(PageType.main, name + "-t" + index, res);
+                    res.dispose();
                 }
             }
         }
@@ -153,8 +151,9 @@ public class Item extends UnlockableContent implements Senseable{
 
     @Override
     public double sense(LAccess sensor){
-        if(sensor == LAccess.color) return color.toFloatBits();
-        return 0;
+        if(sensor == LAccess.color) return color.toDoubleBits();
+        if(sensor == LAccess.id) return getLogicId();
+        return Float.NaN;
     }
 
     @Override

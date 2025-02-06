@@ -88,6 +88,13 @@ public class LiquidModule extends BlockModule{
         current = liquid;
     }
 
+    public void set(Liquid liquid, float amount){
+        if(amount >= liquids[current.id]){
+            current = liquid;
+        }
+        liquids[liquid.id] = amount;
+    }
+
     public float currentAmount(){
         return liquids[current.id];
     }

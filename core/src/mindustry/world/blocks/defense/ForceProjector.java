@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -18,6 +19,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -30,12 +32,15 @@ public class ForceProjector extends Block{
     public float phaseRadiusBoost = 80f;
     public float phaseShieldBoost = 400f;
     public float radius = 101.7f;
+    public int sides = 6;
+    public float shieldRotation = 0f;
     public float shieldHealth = 700f;
     public float cooldownNormal = 1.75f;
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
     public float coolantConsumption = 0.1f;
     public boolean consumeCoolant = true;
+    public float crashDamageMultiplier = 2f;
     public Effect absorbEffect = Fx.absorb;
     public Effect shieldBreakEffect = Fx.shieldBreak;
     public @Load("@-top") TextureRegion topRegion;
@@ -46,7 +51,7 @@ public class ForceProjector extends Block{
     protected static ForceBuild paramEntity;
     protected static Effect paramEffect;
     protected static final Cons<Bullet> shieldConsumer = bullet -> {
-        if(bullet.team != paramEntity.team && bullet.type.absorbable && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, bullet.x, bullet.y)){
+        if(bullet.team != paramEntity.team && bullet.type.absorbable && !bullet.absorbed && Intersector.isInRegularPolygon(((ForceProjector)(paramEntity.block)).sides, paramEntity.x, paramEntity.y, paramEntity.realRadius(), ((ForceProjector)(paramEntity.block)).shieldRotation, bullet.x, bullet.y)){
             bullet.absorb();
             paramEffect.at(bullet);
             paramEntity.hit = 1f;
@@ -65,6 +70,7 @@ public class ForceProjector extends Block{
         envEnabled |= Env.space;
         ambientSound = Sounds.shield;
         ambientSoundVolume = 0.08f;
+        flags = EnumSet.of(BlockFlag.shield);
 
         if(consumeCoolant){
             consume(coolantConsumer = new ConsumeCoolant(coolantConsumption)).boost().update(false);
@@ -97,9 +103,10 @@ public class ForceProjector extends Block{
         stats.add(Stat.shieldHealth, shieldHealth, StatUnit.none);
         stats.add(Stat.cooldownTime, (int) (shieldHealth / cooldownBrokenBase / 60f), StatUnit.seconds);
 
-        if(consItems){
-            stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
-            stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
+        if(consItems && itemConsumer instanceof ConsumeItems coni){
+            stats.remove(Stat.booster);
+            stats.add(Stat.booster, StatValues.itemBoosters("+{0} " + StatUnit.shieldHealth.localized(), stats.timePeriod, phaseShieldBoost, phaseRadiusBoost, coni.items));
+            stats.add(Stat.booster, StatValues.speedBoosters("", coolantConsumption, Float.MAX_VALUE, true, this::consumesLiquid));
         }
     }
 
@@ -109,14 +116,14 @@ public class ForceProjector extends Block{
 
         Draw.color(Pal.gray);
         Lines.stroke(3f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
+        Lines.poly(x * tilesize + offset, y * tilesize + offset, sides, radius, shieldRotation);
         Draw.color(player.team().color);
         Lines.stroke(1f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
+        Lines.poly(x * tilesize + offset, y * tilesize + offset, sides, radius, shieldRotation);
         Draw.color();
     }
 
-    public class ForceBuild extends Building implements Ranged{
+    public class ForceBuild extends Building implements Ranged, ExplosionShield{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
 
@@ -210,6 +217,17 @@ public class ForceProjector extends Block{
             }
         }
 
+        @Override
+        public boolean absorbExplosion(float ex, float ey, float damage){
+            boolean absorb = !broken && Intersector.isInRegularPolygon(sides, x, y, realRadius(), shieldRotation, ex, ey);
+            if(absorb){
+                absorbEffect.at(ex, ey);
+                hit = 1f;
+                buildup += damage * crashDamageMultiplier;
+            }
+            return absorb;
+        }
+
         public float realRadius(){
             return (radius + phaseHeat * phaseRadiusBoost) * radscl;
         }
@@ -217,6 +235,7 @@ public class ForceProjector extends Block{
         @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.heat) return buildup;
+            if(sensor == LAccess.shield) return broken ? 0f : Math.max(shieldHealth + phaseShieldBoost * phaseHeat - buildup, 0);
             return super.sense(sensor);
         }
 
@@ -233,7 +252,7 @@ public class ForceProjector extends Block{
                 Draw.z(Layer.block);
                 Draw.reset();
             }
-            
+
             drawShield();
         }
 
@@ -241,23 +260,33 @@ public class ForceProjector extends Block{
             if(!broken){
                 float radius = realRadius();
 
-                Draw.z(Layer.shields);
+                if(radius > 0.001f){
+                    Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
-                Draw.color(team.color, Color.white, Mathf.clamp(hit));
-
-                if(renderer.animateShields){
-                    Fill.poly(x, y, 6, radius);
-                }else{
-                    Lines.stroke(1.5f);
-                    Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
-                    Fill.poly(x, y, 6, radius);
-                    Draw.alpha(1f);
-                    Lines.poly(x, y, 6, radius);
-                    Draw.reset();
+                    if(renderer.animateShields){
+                        Draw.z(Layer.shields + 0.001f * hit);
+                        Fill.poly(x, y, sides, radius, shieldRotation);
+                    }else{
+                        Draw.z(Layer.shields);
+                        Lines.stroke(1.5f);
+                        Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
+                        Fill.poly(x, y, sides, radius, shieldRotation);
+                        Draw.alpha(1f);
+                        Lines.poly(x, y, sides, radius, shieldRotation);
+                        Draw.reset();
+                    }
                 }
             }
 
             Draw.reset();
+        }
+
+        @Override
+        public void overwrote(Seq<Building> previous){
+            if(previous.size > 0 && previous.first().block == block && previous.first() instanceof ForceBuild b){
+                broken = b.broken;
+                buildup = b.buildup;
+            }
         }
 
         @Override

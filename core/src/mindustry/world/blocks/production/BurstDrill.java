@@ -4,7 +4,6 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -30,9 +29,6 @@ public class BurstDrill extends Drill{
 
     public Sound drillSound = Sounds.drillImpact;
     public float drillSoundVolume = 0.6f, drillSoundPitchRand = 0.1f;
-
-    /** Multipliers of drill speed for each item. Defaults to 1. */
-    public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
 
     public BurstDrill(String name){
         super(name);

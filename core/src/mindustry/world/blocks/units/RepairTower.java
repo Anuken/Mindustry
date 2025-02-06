@@ -110,7 +110,7 @@ public class RepairTower extends Block{
         public float warmup(){
             return warmup;
         }
-        
+
         @Override
         public void drawSelect(){
             Drawf.dashCircle(x, y, range, Pal.placing);

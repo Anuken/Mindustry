@@ -2,6 +2,7 @@ package mindustry.ui;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import mindustry.graphics.*;
@@ -26,6 +27,10 @@ public class BorderImage extends Image{
     public BorderImage(TextureRegion region, float thick){
         super(region);
         thickness = thick;
+    }
+
+    public BorderImage(Drawable region){
+        super(region);
     }
 
     public BorderImage border(Color color){

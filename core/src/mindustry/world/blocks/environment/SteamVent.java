@@ -60,7 +60,7 @@ public class SteamVent extends Floor{
 
     @Override
     public void renderUpdate(UpdateRenderState state){
-        if(state.tile.block() == Blocks.air && (state.data += Time.delta) >= effectSpacing){
+        if(state.tile.nearby(-1, -1) != null && state.tile.nearby(-1, -1).block() == Blocks.air && (state.data += Time.delta) >= effectSpacing){
             effect.at(state.tile.x * tilesize - tilesize, state.tile.y * tilesize - tilesize, effectColor);
             state.data = 0f;
         }

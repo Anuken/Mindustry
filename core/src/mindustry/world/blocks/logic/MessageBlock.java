@@ -24,7 +24,6 @@ public class MessageBlock extends Block{
     //don't change this too much unless you want to run into issues with packet sizes
     public int maxTextLength = 220;
     public int maxNewlines = 24;
-    public boolean privileged = false;
 
     public MessageBlock(String name){
         super(name);
@@ -59,7 +58,7 @@ public class MessageBlock extends Block{
     }
 
     public boolean accessible(){
-        return !privileged || state.rules.editor;
+        return !privileged || state.rules.editor || state.rules.allowEditWorldProcessors;
     }
 
     @Override
@@ -72,7 +71,7 @@ public class MessageBlock extends Block{
 
         @Override
         public void drawSelect(){
-            if(renderer.pixelator.enabled()) return;
+            if(renderer.pixelate) return;
 
             Font font = Fonts.outline;
             GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
@@ -98,16 +97,17 @@ public class MessageBlock extends Block{
         }
 
         @Override
-        public void buildConfiguration(Table table){
-            if(!accessible()){
-                deselect();
-                return;
-            }
+        public boolean shouldShowConfigure(Player player){
+            return accessible();
+        }
 
+        @Override
+        public void buildConfiguration(Table table){
             table.button(Icon.pencil, Styles.cleari, () -> {
                 if(mobile){
+                    var contents = this.message.toString();
                     Core.input.getTextInput(new TextInput(){{
-                        text = message.toString();
+                        text = contents;
                         multiline = true;
                         maxLength = maxTextLength;
                         accepted = str -> {

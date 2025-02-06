@@ -31,7 +31,7 @@ public class BeControl{
 
     /** @return whether this is a bleeding edge build. */
     public boolean active(){
-        return Version.type.equals("bleeding-edge");
+        return Version.type.equals("bleeding-edge") && !steam;
     }
 
     public BeControl(){
@@ -151,7 +151,7 @@ public class BeControl{
                         Log.info("&lcAutosaved.");
 
                         netServer.kickAll(KickReason.serverRestarting);
-                        Threads.sleep(32);
+                        Threads.sleep(500);
 
                         Log.info("&lcVersion downloaded, exiting. Note that if you are not using a auto-restart script, the server will not restart automatically.");
                         //replace old file with new

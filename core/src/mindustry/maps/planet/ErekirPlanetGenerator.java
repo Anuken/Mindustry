@@ -62,12 +62,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         return 2000 * 1.07f * 6f / 5f;
     }
 
-    @Override
-    public boolean allowLanding(Sector sector){
-        //TODO disallowed for now
-        return false;
-    }
-
     float rawHeight(Vec3 position){
         return Simplex.noise3d(seed, octaves, persistence, 1f/heightScl, 10f + position.x, 10f + position.y, 10f + position.z);
     }

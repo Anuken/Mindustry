@@ -20,6 +20,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     private final Seq<T> intersectArray = new Seq<>();
     private final Rect viewport = new Rect();
     private final Rect intersectRect = new Rect();
+    private final EntityIndexer indexer;
     private IntMap<T> map;
     private QuadTree tree;
     private boolean clearing;
@@ -27,6 +28,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     private int index;
 
     public static int nextId(){
+        if(lastId >= Integer.MAX_VALUE - 2) lastId = 0;
         return lastId++;
     }
 
@@ -36,6 +38,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     }
 
     public EntityGroup(Class<T> type, boolean spatial, boolean mapping){
+        this(type, spatial, mapping, null);
+    }
+
+    public EntityGroup(Class<T> type, boolean spatial, boolean mapping, EntityIndexer indexer){
         array = new Seq<>(false, 32, type);
 
         if(spatial){
@@ -45,6 +51,8 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         if(mapping){
             map = new IntMap<>();
         }
+
+        this.indexer = indexer;
     }
 
     /** @return entities with colliding IDs, or an empty array. */
@@ -77,6 +85,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         }
     }
 
+    public Seq<T> copy(){
+        return copy(new Seq<>());
+    }
+
     public Seq<T> copy(Seq<T> arr){
         arr.addAll(array);
         return arr;
@@ -107,7 +119,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     }
 
     public boolean useTree(){
-        return map != null;
+        return tree != null;
     }
 
     public boolean mappingEnabled(){
@@ -132,6 +144,12 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         //don't waste time for empty groups
         if(isEmpty()) return;
         tree.intersect(x, y, width, height, out);
+    }
+
+    public boolean intersect(float x, float y, float width, float height, Boolf<? super T> out){
+        //don't waste time for empty groups
+        if(isEmpty()) return false;
+        return tree.intersect(x, y, width, height, out);
     }
 
     public Seq<T> intersect(float x, float y, float width, float height){
@@ -183,18 +201,63 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         }
     }
 
+    public int addIndex(T type){
+        int index = array.size;
+        add(type);
+        return index;
+    }
+
     public void remove(T type){
         if(clearing) return;
         if(type == null) throw new RuntimeException("Cannot remove a null entity!");
         int idx = array.indexOf(type, true);
         if(idx != -1){
             array.remove(idx);
+
+            //fix incorrect HEAD index since it was swapped
+            if(array.size > 0 && idx != array.size){
+                var swapped = array.items[idx];
+                if(indexer != null) indexer.change(swapped, idx);
+            }
+
             if(map != null){
                 map.remove(type.id());
             }
 
             //fix iteration index when removing
             if(index >= idx){
+                index --;
+            }
+        }
+    }
+
+    public void removeIndex(T type, int position){
+        if(clearing) return;
+        if(type == null) throw new RuntimeException("Cannot remove a null entity!");
+        if(position != -1 && position < array.size){
+
+            //rarely the entity index is wrong; fallback to slow implementation
+            if(array.items[position] != type){
+                remove(type);
+                return;
+            }
+
+            //swap head with current
+            if(array.size > 1){
+                var head = array.items[array.size - 1];
+                if(indexer != null) indexer.change(head, position);
+                array.items[position] = head;
+            }
+
+            array.size --;
+            array.items[array.size] = null;
+
+            if(map != null){
+                map.remove(type.id());
+            }
+
+            //fix iteration index when removing
+            if(index >= position){
                 index --;
             }
         }

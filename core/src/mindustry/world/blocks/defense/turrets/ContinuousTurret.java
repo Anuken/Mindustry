@@ -15,6 +15,7 @@ public class ContinuousTurret extends Turret{
     public BulletType shootType = Bullets.placeholder;
     /** Speed at which the turret can change its bullet "aim" distance. This is only used for point laser bullets. */
     public float aimChangeSpeed = Float.POSITIVE_INFINITY;
+    public boolean scaleDamageEfficiency = false;
 
     public ContinuousTurret(String name){
         super(name);
@@ -39,6 +40,12 @@ public class ContinuousTurret extends Turret{
         public float lastLength = size * 4f;
 
         @Override
+        public float estimateDps(){
+            if(!hasAmmo()) return 0f;
+            return shootType.damage * 60f / (shootType instanceof ContinuousBulletType c ? c.damageInterval : 5f);
+        }
+
+        @Override
         protected void updateCooling(){
             //TODO how does coolant work here, if at all?
         }
@@ -51,7 +58,6 @@ public class ContinuousTurret extends Turret{
 
         @Override
         public boolean hasAmmo(){
-            //TODO update ammo in unit so it corresponds to liquids
             return canConsume();
         }
 
@@ -110,9 +116,12 @@ public class ContinuousTurret extends Turret{
 
             entry.bullet.aimX = Tmp.v1.x;
             entry.bullet.aimY = Tmp.v1.y;
+            if(scaleDamageEfficiency){
+                entry.bullet.damage = entry.bullet.type.damage * Math.min(efficiency, 1f) * entry.bullet.damageMultiplier();
+            }
 
             if(isShooting() && hasAmmo()){
-                entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * shootWarmup;
+                entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * Math.min(shootWarmup, efficiency);
                 entry.bullet.keepAlive = true;
             }
         }

@@ -11,6 +11,7 @@ import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.maps.Map;
 import mindustry.net.Administration.*;
+import mindustry.type.*;
 
 import java.io.*;
 import java.nio.*;
@@ -29,13 +30,14 @@ public class NetworkIO{
                 for(ContentType type : ContentType.all){
                     for(Content c : content.getBy(type)){
                         if(c instanceof UnlockableContent u && u.unlocked() && u.techNode != null){
-                            state.rules.researched.add(u.name);
+                            state.rules.researched.add(u);
                         }
                     }
                 }
             }
 
             stream.writeUTF(JsonIO.write(state.rules));
+            stream.writeUTF(JsonIO.write(state.mapLocales));
             SaveIO.getSaveWriter().writeStringMap(stream, state.map.tags);
 
             stream.writeInt(state.wave);
@@ -50,6 +52,7 @@ public class NetworkIO{
             SaveIO.getSaveWriter().writeContentHeader(stream);
             SaveIO.getSaveWriter().writeMap(stream);
             SaveIO.getSaveWriter().writeTeamBlocks(stream);
+            SaveIO.getSaveWriter().writeMarkers(stream);
             SaveIO.getSaveWriter().writeCustomChunks(stream, true);
         }catch(IOException e){
             throw new RuntimeException(e);
@@ -61,6 +64,7 @@ public class NetworkIO{
         try(DataInputStream stream = new DataInputStream(is)){
             Time.clear();
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
+            state.mapLocales = JsonIO.read(MapLocales.class, stream.readUTF());
             state.map = new Map(SaveIO.getSaveWriter().readStringMap(stream));
 
             state.wave = stream.readInt();
@@ -81,6 +85,7 @@ public class NetworkIO{
             SaveIO.getSaveWriter().readContentHeader(stream);
             SaveIO.getSaveWriter().readMap(stream, world.context);
             SaveIO.getSaveWriter().readTeamBlocks(stream);
+            SaveIO.getSaveWriter().readMarkers(stream);
             SaveIO.getSaveWriter().readCustomChunks(stream);
         }catch(IOException e){
             throw new RuntimeException(e);
