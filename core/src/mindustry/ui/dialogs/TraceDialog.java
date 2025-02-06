@@ -34,10 +34,10 @@ public class TraceDialog extends BaseDialog{
             c.add(Core.bundle.format("trace.playername", player.name)).row();
             c.button(Icon.copySmall, style, () -> copy(info.ip)).size(s).padRight(4f);
             c.add(Core.bundle.format("trace.ip", info.ip)).row();
+            c.button(Icon.copySmall, style, () -> copy(info.locale)).size(s).padRight(4f);
+            c.add(Core.bundle.format("trace.language", info.locale)).row();
             c.button(Icon.copySmall, style, () -> copy(info.uuid)).size(s).padRight(4f);
             c.add(Core.bundle.format("trace.id", info.uuid)).row();
-            c.button(Icon.copySmall, style, () -> copy(player.locale)).size(s).padRight(4f);
-            c.add(Core.bundle.format("trace.language", player.locale)).row();
         }).row();
 
         table.add(Core.bundle.format("trace.modclient", info.modded)).row();

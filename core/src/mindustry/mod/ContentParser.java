@@ -2,6 +2,7 @@ package mindustry.mod;
 
 import arc.*;
 import arc.assets.*;
+import arc.assets.loaders.MusicLoader.*;
 import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
@@ -60,7 +61,6 @@ public class ContentParser{
 
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class, TextureRegion[][][].class);
-    ObjectMap<String, AssetDescriptor<?>> sounds = new ObjectMap<>();
     Seq<ParseListener> listeners = new Seq<>();
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
@@ -143,6 +143,11 @@ public class ContentParser{
             Class<?> bc = resolve(data.getString("type", ""), BasicBulletType.class);
             data.remove("type");
             BulletType result = (BulletType)make(bc);
+            readFields(result, data);
+            return result;
+        });
+        put(MassDriverBolt.class, (type, data) -> {
+            MassDriverBolt result = (MassDriverBolt)make(MassDriverBolt.class);
             readFields(result, data);
             return result;
         });
@@ -271,18 +276,15 @@ public class ContentParser{
             return new Vec3(data.getFloat("x", 0f), data.getFloat("y", 0f), data.getFloat("z", 0f));
         });
         put(Sound.class, (type, data) -> {
-            if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
-            if(Vars.headless) return new Sound();
+            if(data.isArray()) return new RandomSound(parser.readValue(Sound[].class, data));
 
-            String name = "sounds/" + data.asString();
-            String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
+            var field = fieldOpt(Sounds.class, data);
+            return field != null ? field : Vars.tree.loadSound(data.asString());
+        });
+        put(Music.class, (type, data) -> {
+            var field = fieldOpt(Musics.class, data);
 
-            if(sounds.containsKey(path)) return ((SoundParameter)sounds.get(path).params).sound;
-            var sound = new Sound();
-            AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
-            desc.errored = Throwable::printStackTrace;
-            sounds.put(path, desc);
-            return sound;
+            return field != null ? field : Vars.tree.loadMusic(data.asString());
         });
         put(Objectives.Objective.class, (type, data) -> {
             if(data.isString()){
@@ -324,6 +326,20 @@ public class ContentParser{
             var consume = make(oc);
             readFields(consume, data);
             return consume;
+        });
+        put(Team.class, (type, data) -> {
+            if(data.isString()){
+                Team out = Structs.find(Team.baseTeams, t -> t.name.equals(data.asString()));
+                if(out == null) throw new IllegalArgumentException("Unknown team: " + data.asString());
+                return out;
+            }else if(data.isNumber()){
+                if(data.asInt() >= Team.all.length || data.asInt() < 0){
+                    throw new IllegalArgumentException("Unknown team: " + data.asString());
+                }
+                return Team.get(data.asInt());
+            }else{
+                throw new IllegalArgumentException("Unknown team: " + data.asString() + ". Team must either be a string or a number.");
+            }
         });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
@@ -449,11 +465,23 @@ public class ContentParser{
                 if(value.has("consumes") && value.get("consumes").isObject()){
                     for(JsonValue child : value.get("consumes")){
                         switch(child.name){
+                            case "remove" -> {
+                                String[] values = child.isString() ? new String[]{child.asString()} : child.asStringArray();
+                                for(String type : values){
+                                    Class<?> consumeType = resolve("Consume" + Strings.capitalize(type), Consume.class);
+                                    if(consumeType != Consume.class){
+                                        block.removeConsumers(b -> consumeType.isAssignableFrom(b.getClass()));
+                                    }else{
+                                        Log.warn("Unknown consumer type '@' (Class: @) in consume: remove.", type, "Consume" + Strings.capitalize(type));
+                                    }
+                                }
+                            }
                             case "item" -> block.consumeItem(find(ContentType.item, child.asString()));
                             case "itemCharged" -> block.consume((Consume)parser.readValue(ConsumeItemCharged.class, child));
                             case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
                             case "itemRadioactive" -> block.consume((Consume)parser.readValue(ConsumeItemRadioactive.class, child));
                             case "itemExplosive" -> block.consume((Consume)parser.readValue(ConsumeItemExplosive.class, child));
+                            case "itemList" -> block.consume((Consume)parser.readValue(ConsumeItemList.class, child));
                             case "itemExplode" -> block.consume((Consume)parser.readValue(ConsumeItemExplode.class, child));
                             case "items" -> block.consume(child.isArray() ?
                                     new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
@@ -660,6 +688,27 @@ public class ContentParser{
             currentContent = planet;
             read(() -> readFields(planet, value));
             return planet;
+        },
+        ContentType.team, (TypeParser<TeamEntry>)(mod, name, value) -> {
+            TeamEntry entry;
+            Team team;
+            if(value.has("team")){
+                team = (Team)classParsers.get(Team.class).parse(Team.class, value.get("team"));
+            }else{
+                throw new RuntimeException("Team field missing.");
+            }
+            value.remove("team");
+            
+            if(locate(ContentType.team, name) != null){
+                entry = locate(ContentType.team, name);
+                readBundle(ContentType.team, name, value);
+            }else{
+                readBundle(ContentType.team, name, value);
+                entry = new TeamEntry(mod + "-" + name, team);
+            }
+            currentContent = entry;
+            read(() -> readFields(entry, value));
+            return entry;
         }
     );
 
@@ -941,6 +990,8 @@ public class ContentParser{
             case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
             case "sin" -> base.sin(data.has("offset") ? data.getFloat("offset") : 0f, data.getFloat("scl"), data.getFloat("mag"));
             case "absin" -> base.absin(data.getFloat("scl"), data.getFloat("mag"));
+            case "mod" -> base.mod(data.getFloat("amount"));
+            case "loop" -> base.loop(data.getFloat("time"));
             case "curve" -> data.has("interp") ? base.curve(parser.readValue(Interp.class, data.get("interp"))) : base.curve(data.getFloat("offset"), data.getFloat("duration"));
             default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
         };
@@ -995,7 +1046,6 @@ public class ContentParser{
             throw new RuntimeException(e);
         }
     }
-
     Object fieldOpt(Class<?> type, JsonValue value){
         try{
             return type.getField(value.asString()).get(null);
@@ -1047,7 +1097,41 @@ public class ContentParser{
             }
             Field field = metadata.field;
             try{
-                field.set(object, parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType));
+                if(child.isObject() && child.has("add") && (Seq.class.isAssignableFrom(field.getType()) || ObjectSet.class.isAssignableFrom(field.getType()))){
+                    Object readField = parser.readValue(field.getType(), metadata.elementType, child.get("add"), metadata.keyType);
+                    Object fieldObj = field.get(object);
+
+                    if(fieldObj instanceof ObjectSet set){
+                        set.addAll((ObjectSet)readField);
+                    }else if(fieldObj instanceof Seq seq){
+                        seq.addAll((Seq)readField);
+                    }else{
+                        throw new SerializationException("This should be impossible");
+                    }
+                }else{
+                    boolean isMap = ObjectMap.class.isAssignableFrom(field.getType()) || ObjectIntMap.class.isAssignableFrom(field.getType()) || ObjectFloatMap.class.isAssignableFrom(field.getType());
+                    boolean mergeMap = isMap && child.has("add") && child.get("add").isBoolean() && child.getBoolean("add", false);
+
+                    if(mergeMap){
+                        child.remove("add");
+                    }
+
+                    Object readField = parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType);
+                    Object fieldObj = field.get(object);
+
+                    //if a map has add: true, add its contents to the map instead
+                    if(mergeMap && (fieldObj instanceof ObjectMap<?,?> || fieldObj instanceof ObjectIntMap<?> || fieldObj instanceof ObjectFloatMap<?>)){
+                        if(field.get(object) instanceof ObjectMap<?,?> baseMap){
+                            baseMap.putAll((ObjectMap)readField);
+                        }else if(field.get(object) instanceof ObjectIntMap<?> baseMap){
+                            baseMap.putAll((ObjectIntMap)readField);
+                        }else if(field.get(object) instanceof ObjectFloatMap<?> baseMap){
+                            baseMap.putAll((ObjectFloatMap)readField);
+                        }
+                    }else{
+                        field.set(object, readField);
+                    }
+                }
             }catch(IllegalAccessException ex){
                 throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
             }catch(SerializationException ex){
@@ -1095,8 +1179,8 @@ public class ContentParser{
                 }
 
                 //all items have a produce requirement unless already specified
-                if(object instanceof Item i && !node.objectives.contains(o -> o instanceof Produce p && p.content == i)){
-                    node.objectives.add(new Produce(i));
+                if((unlock instanceof Item || unlock instanceof Liquid) && !node.objectives.contains(o -> o instanceof Produce p && p.content == unlock)){
+                    node.objectives.add(new Produce(unlock));
                 }
 
                 //remove old node from parent

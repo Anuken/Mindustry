@@ -72,3 +72,5 @@ body:
           required: true
         - label: I have searched the closed and open issues to make sure that this problem has not already been reported.
           required: true
+        - label: "I am not using Foo's Client, and have made sure the bug is not caused by mods I have installed."
+          required: true

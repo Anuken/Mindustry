@@ -1,3 +1,7 @@
+# Note: Server list review is currently on pause. No new servers will be merged until v8 is released!
+
+*PRs to edit addresses of existing servers will still be accepted, although very infrequently.*
+
 ### Adding a server to the list
 
 Mindustry now has a public list of servers that everyone can see and connect to. 
@@ -18,13 +22,16 @@ You'll need to either hire some moderators, or make use of (currently non-existe
 4. **Get some good maps.** *(optional, but highly recommended)*. Add some maps to your server and set the map rotation to custom-only. You can get maps from the Steam workshop by subscribing and exporting them; using the `#maps` channel on Discord is also an option.
 5. **Check your server configuration.** *(optional)* I would recommend adding a message rate limit of 1 second (`config messageRateLimit 1`), and disabling connect/disconnect messages to reduce spam (`config showConnectMessages false`).
 6. Finally, **submit a pull request** to add your server's IP to the list. 
-This should be fairly straightforward: Press the edit button on the [server file](https://github.com/Anuken/Mindustry/blob/master/servers_v7.json), then add a JSON object with a single key, indicating your server address.
-For example, if your server address is `example.com:6000`, you would add a comma after the last entry and insert:
+This should be fairly straightforward: Press the edit button on the [server file](https://github.com/Anuken/Mindustry/blob/master/servers_v7.json), then add a JSON object with the following format:
     ```json
       {
-        "address": "example.com:6000"
+        "name": "Your Server Group Name",
+        "address": ["your.server.address"]
       }
     ```
+
+    If your group has multiple servers, simply add extra addresses inside the square brackets, separated by commas. For example: `["address1", "address2"]`
+    
     > Note that Mindustry also support SRV records. This allows you to use a subdomain for your server address instead of specifying the port. For example, if you want to use `play.example.com` instead of `example.com:6000`, in the dns settings of your domain, add an SRV record with `_mindustry` as the service, `tcp` as the protocol, `play` as the target and `6000` as the port. You can also setup fallback servers by modifying the weight or priority of the record. Although SRV records are very convenient, keep in mind they are slower than regular addresses. Avoid using them in the server list, but rather as an easy way to share your server address.
 
     Then, press the *'submit pull request'* button and I'll take a look at your server. If I have any issues with it, I'll let you know in the PR comments.

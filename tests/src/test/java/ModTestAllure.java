@@ -17,7 +17,7 @@ public class ModTestAllure extends GenericModTest{
 
     @Test
     public void begin(){
-        grabMod("https://github.com/BlueWolf3682/Allure/archive/4150f74db1ea6058dc090959cf0fe5dc9d239e37.zip");
+        grabMod("https://github.com/LixieWulf/Allure/archive/4150f74db1ea6058dc090959cf0fe5dc9d239e37.zip");
         checkExistence("allure");
 
         UnitType type = Vars.content.unit("allure-0b11-exodus");

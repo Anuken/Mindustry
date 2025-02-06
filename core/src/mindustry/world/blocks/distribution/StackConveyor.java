@@ -29,6 +29,7 @@ public class StackConveyor extends Block implements Autotiler{
     public @Load("@-stack") TextureRegion stackRegion;
     /** requires power to work properly */
     public @Load(value = "@-glow") TextureRegion glowRegion;
+    public @Load(value = "@-edge-glow", fallback = "@-glow") TextureRegion edgeGlowRegion;
 
     public float glowAlpha = 1f;
     public Color glowColor = Pal.redLight;
@@ -154,7 +155,7 @@ public class StackConveyor extends Block implements Autotiler{
                 Draw.z(Layer.blockAdditive);
                 Draw.color(glowColor, glowAlpha * power.status);
                 Draw.blend(Blending.additive);
-                Draw.rect(glowRegion, x, y, rotation * 90);
+                Draw.rect(state == stateLoad ? edgeGlowRegion : glowRegion, x, y, rotation * 90);
                 Draw.blend();
                 Draw.color();
                 Draw.z(Layer.block - 0.1f);
@@ -186,6 +187,13 @@ public class StackConveyor extends Block implements Autotiler{
             float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
             Drawf.shadow(Tmp.v1.x, Tmp.v1.y, size * 1.2f);
             Draw.rect(lastItem.fullIcon, Tmp.v1.x, Tmp.v1.y, size, size, 0);
+        }
+
+        @Override
+        public void dropped(){
+            super.dropped();
+            var prev = Geometry.d4[(rotation + 2) % 4];
+            link = Point2.pack(tile.x + prev.x, tile.y + prev.y);
         }
 
         @Override
@@ -251,7 +259,8 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void updateTile(){
-            float eff = enabled ? (efficiency + baseEfficiency) : 0f;
+            //the item still needs to be "reeled" in when disabled
+            float eff = enabled ? (efficiency + baseEfficiency) : 1f;
 
             //reel in crater
             if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * eff * delta(), 0f, recharge);
@@ -271,14 +280,15 @@ public class StackConveyor extends Block implements Autotiler{
             if(!enabled) return;
 
             if(state == stateUnload){ //unload
-                while(lastItem != null && (!outputRouter ? moveForward(lastItem) : dump(lastItem))){
+                while(lastItem != null && !outputRouter ? moveForward(lastItem) : dump(lastItem)){
                     if(!outputRouter){
                         items.remove(lastItem, 1);
                     }
 
-                    if(items.empty()){
+                    if(!items.has(lastItem)){
                         poofOut();
                         lastItem = null;
+                        break;
                     }
                 }
             }else{ //transfer
@@ -385,6 +395,7 @@ public class StackConveyor extends Block implements Autotiler{
 
             link = read.i();
             cooldown = read.f();
+            lastItem = items.first();
         }
     }
 }

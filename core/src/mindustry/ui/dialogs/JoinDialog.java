@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.freetype.FreeTypeFontGenerator.*;
 import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
@@ -35,6 +36,7 @@ public class JoinDialog extends BaseDialog{
     int refreshes;
     boolean showHidden;
     TextButtonStyle style;
+    Task fontIgnoreDirtyTask;
 
     String lastIp;
     int lastPort, lastColumns = -1;
@@ -136,7 +138,9 @@ public class JoinDialog extends BaseDialog{
 
         refreshLocal();
         refreshRemote();
-        refreshCommunity();
+        if(Core.settings.getBool("communityservers", true)){
+            refreshCommunity();
+        }
     }
 
     void setupRemote(){
@@ -247,12 +251,13 @@ public class JoinDialog extends BaseDialog{
     void setupServer(Server server, Host host){
         server.lastHost = host;
         server.content.clear();
-        buildServer(host, server.content, false);
+        buildServer(host, server.content, false, true);
     }
 
-    void buildServer(Host host, Table content, boolean inner){
+    void buildServer(Host host, Table content, boolean local, boolean addName){
         content.top().left();
-        String versionString = getVersionString(host);
+        boolean isBanned = local && Vars.steam && host.description != null && host.description.equals("[banned]");
+        String versionString = getVersionString(host) + (isBanned ? "[red] [banned]" : "");
 
         float twidth = targetWidth() - 40f;
 
@@ -260,7 +265,7 @@ public class JoinDialog extends BaseDialog{
 
         Color color = Pal.gray;
 
-        if(inner){
+        if(addName){
             content.table(Tex.whiteui, t -> {
                 t.left();
                 t.setColor(color);
@@ -274,7 +279,7 @@ public class JoinDialog extends BaseDialog{
             t.setColor(color);
             t.left();
 
-            if(!host.description.isEmpty()){
+            if(!host.description.isEmpty() && !isBanned){
                 //limit newlines.
                 int count = 0;
                 StringBuilder result = new StringBuilder(host.description.length());
@@ -314,7 +319,9 @@ public class JoinDialog extends BaseDialog{
 
         section(steam ? "@servers.local.steam" : "@servers.local", local, false);
         section("@servers.remote", remote, false);
-        section("@servers.global", global, true);
+        if(Core.settings.getBool("communityservers", true)){
+            section("@servers.global", global, true);
+        }
 
         ScrollPane pane = new ScrollPane(hosts);
         pane.setFadeScrollBars(false);
@@ -411,6 +418,15 @@ public class JoinDialog extends BaseDialog{
                 int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
                 net.pingHost(resaddress, resport, res -> {
                     if(refreshes != cur) return;
+
+                    //don't recache the texture for a while
+                    if(fontIgnoreDirtyTask == null){
+                        FreeTypeFontData.ignoreDirty = true;
+                        fontIgnoreDirtyTask = Time.runTask(0.6f * 60f, () -> {
+                            FreeTypeFontData.ignoreDirty = false;
+                            fontIgnoreDirtyTask = null;
+                        });
+                    }
 
                     if(!serverSearch.isEmpty() && !(group.name.toLowerCase().contains(serverSearch)
                         || res.name.toLowerCase().contains(serverSearch)
@@ -512,7 +528,7 @@ public class JoinDialog extends BaseDialog{
 
         button[0].row();
 
-        buildServer(host, button[0].table(t -> {}).grow().get(), false);
+        buildServer(host, button[0].table(t -> {}).grow().get(), false, false);
 
         if((container.getChildren().size) % columns() == 0){
             container.row();
@@ -543,7 +559,7 @@ public class JoinDialog extends BaseDialog{
             local.row();
         }
 
-        local.button(b -> buildServer(host, b, true), style, () -> {
+        local.button(b -> buildServer(host, b, true, true), style, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             safeConnect(host.address, host.port, host.version);
         }).width(w).top().left().growY();
@@ -587,7 +603,7 @@ public class JoinDialog extends BaseDialog{
                 connect(lastIp, lastPort);
             }, exception -> {});
         }, 1, 1);
-        
+
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
             if(ping == null) return;
@@ -619,12 +635,30 @@ public class JoinDialog extends BaseDialog{
             Core.settings.remove("server-list");
         }
 
-        var url = becontrol.active() ? serverJsonBeURL : serverJsonURL;
-        Log.info("Fetching community servers at @", url);
+        fetchServers();
+    }
+
+    public static void fetchServers(){
+        var urls = Version.type.equals("bleeding-edge") || Vars.forceBeServers ? serverJsonBeURLs : serverJsonURLs;
+
+        if(Core.settings.getBool("communityservers", true)){
+            fetchServers(urls, 0);
+        }
+    }
+
+    private static void fetchServers(String[] urls, int index){
+        if(index >= urls.length) return;
 
         //get servers
-        Http.get(url)
-        .error(t -> Log.err("Failed to fetch community servers", t))
+        Http.get(urls[index])
+        .error(t -> {
+            if(index < urls.length - 1){
+                //attempt fetching from the next URL upon failure
+                fetchServers(urls, index + 1);
+            }else{
+                Log.err("Failed to fetch community servers", t);
+            }
+        })
         .submit(result -> {
             Jval val = Jval.read(result.getResultAsString());
             Seq<ServerGroup> servers = new Seq<>();
@@ -643,7 +677,7 @@ public class JoinDialog extends BaseDialog{
             Core.app.post(() -> {
                 servers.sort(s -> s.name == null ? Integer.MAX_VALUE : s.name.hashCode());
                 defaultServers.addAll(servers);
-                Log.info("Fetched @ community servers.", defaultServers.size);
+                Log.info("Fetched @ community servers.", defaultServers.sum(s -> s.addresses.length));
             });
         });
     }

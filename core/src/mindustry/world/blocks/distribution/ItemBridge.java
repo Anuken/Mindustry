@@ -53,6 +53,7 @@ public class ItemBridge extends Block{
         unloadable = false;
         group = BlockGroup.transportation;
         noUpdateDisabled = true;
+        allowDiagonal = false;
         copyConfig = false;
         //disabled as to not be annoying
         allowConfigInventory = false;
@@ -237,13 +238,15 @@ public class ItemBridge extends Block{
             Lines.stroke(2.5f);
             Lines.line(tx + Tmp.v2.x, ty + Tmp.v2.y, ox - Tmp.v2.x, oy - Tmp.v2.y);
 
+            float color = (linked ? Pal.place : Pal.accent).toFloatBits();
+
             //draw foreground colors
-            Draw.color(linked ? Pal.place : Pal.accent);
+            Draw.color(color);
             Lines.stroke(1f);
             Lines.line(tx + Tmp.v2.x, ty + Tmp.v2.y, ox - Tmp.v2.x, oy - Tmp.v2.y);
 
             Lines.square(ox, oy, 2f, 45f);
-            Draw.mixcol(Draw.getColor(), 1f);
+            Draw.mixcol(color);
             Draw.color();
             Draw.rect(arrowRegion, x, y, rel * 90);
             Draw.mixcol();

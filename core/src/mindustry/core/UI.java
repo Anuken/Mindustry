@@ -101,8 +101,6 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void loadSync(){
-        loadColors();
-
         Fonts.outline.getData().markupEnabled = true;
         Fonts.def.getData().markupEnabled = true;
         Fonts.def.setOwnsTexture(false);
@@ -160,7 +158,7 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.draw();
 
         if(Core.input.keyTap(KeyCode.mouseLeft) && Core.scene.hasField()){
-            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+            Element e = Core.scene.getHoverElement();
             if(!(e instanceof TextField)){
                 Core.scene.setKeyboardFocus(null);
             }
@@ -281,7 +279,7 @@ public class UI implements ApplicationListener, Loadable{
 
     public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, boolean allowEmpty, Cons<String> confirmed, Runnable closed){
         if(mobile){
-            var description = text;
+            var description = (text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text);
             var empty = allowEmpty;
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);
@@ -630,6 +628,7 @@ public class UI implements ApplicationListener, Loadable{
 
                 int option = 0;
                 for(var optionsRow : options){
+                    if(optionsRow.length == 0) continue;
                     Table buttonRow = table.row().table().get().row();
                     int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
                     int width = fullWidth / optionsRow.length;

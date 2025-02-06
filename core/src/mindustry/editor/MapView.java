@@ -329,7 +329,7 @@ public class MapView extends Element implements GestureListener{
         return Core.scene != null && Core.scene.getKeyboardFocus() != null
         && Core.scene.getKeyboardFocus().isDescendantOf(ui.editor)
         && ui.editor.isShown() && tool == EditorTool.zoom &&
-        Core.scene.hit(Core.input.mouse().x, Core.input.mouse().y, true) == this;
+        Core.scene.getHoverElement() == this;
     }
 
     @Override

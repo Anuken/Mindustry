@@ -141,11 +141,18 @@ public class Drawf{
         Draw.z(pz);
     }
 
-    public static void limitLine(Position start, Position dest, float len1, float len2){
+    public static void limitLine(Position start, Position dest, float len1, float len2, Color color){
+        if(start.within(dest, len1 + len2)){
+            return;
+        }
         Tmp.v1.set(dest).sub(start).setLength(len1);
         Tmp.v2.set(Tmp.v1).scl(-1f).setLength(len2);
 
-        Drawf.line(Pal.accent, start.getX() + Tmp.v1.x, start.getY() + Tmp.v1.y, dest.getX() + Tmp.v2.x, dest.getY() + Tmp.v2.y);
+        Drawf.line(color, start.getX() + Tmp.v1.x, start.getY() + Tmp.v1.y, dest.getX() + Tmp.v2.x, dest.getY() + Tmp.v2.y);
+    }
+
+    public static void limitLine(Position start, Position dest, float len1, float len2){
+        limitLine(start, dest, len1, len2, Pal.accent);
     }
 
     public static void dashLineDst(Color color, float x, float y, float x2, float y2){
@@ -223,7 +230,7 @@ public class Drawf{
     /** Sets Draw.z to the text layer, and returns the previous layer. */
     public static float text(){
         float z = Draw.z();
-        if(renderer.pixelator.enabled()){
+        if(renderer.pixelate){
             Draw.z(Layer.endPixeled);
         }
 
@@ -306,7 +313,7 @@ public class Drawf{
         Draw.rect(region, x, y);
         Draw.color();
     }
-    
+
     public static void shadow(TextureRegion region, float x, float y, float width, float height, float rotation){
         Draw.color(Pal.shadow);
         Draw.rect(region, x, y, width, height, rotation);
@@ -354,10 +361,18 @@ public class Drawf{
     }
 
     public static void square(float x, float y, float radius, float rotation, Color color){
-        Lines.stroke(3f, Pal.gray);
+        Lines.stroke(3f, Pal.gray.write(Tmp.c3).a(color.a));
         Lines.square(x, y, radius + 1f, rotation);
         Lines.stroke(1f, color);
         Lines.square(x, y, radius + 1f, rotation);
+        Draw.reset();
+    }
+
+    public static void poly(float x, float y, int sides, float radius, float rotation, Color color){
+        Lines.stroke(3f, Pal.gray);
+        Lines.poly(x, y, sides, radius + 1f, rotation);
+        Lines.stroke(1f, color);
+        Lines.poly(x, y, sides, radius + 1f, rotation);
         Draw.reset();
     }
 
@@ -436,7 +451,7 @@ public class Drawf{
     public static void construct(float x, float y, TextureRegion region, float rotation, float progress, float alpha, float time){
         construct(x, y, region, Pal.accent, rotation, progress, alpha, time);
     }
-    
+
     public static void construct(float x, float y, TextureRegion region, Color color, float rotation, float progress, float alpha, float time){
         Shaders.build.region = region;
         Shaders.build.progress = progress;
@@ -458,7 +473,7 @@ public class Drawf{
     public static void construct(Building t, TextureRegion region, Color color, float rotation, float progress, float alpha, float time){
         construct(t, region, color, rotation, progress, alpha, time, t.block.size * tilesize - 4f);
     }
-        
+
     public static void construct(Building t, TextureRegion region, Color color, float rotation, float progress, float alpha, float time, float size){
         Shaders.build.region = region;
         Shaders.build.progress = progress;
@@ -477,10 +492,10 @@ public class Drawf{
 
         Draw.reset();
     }
-    
+
     /** Draws a sprite that should be light-wise correct, when rotated. Provided sprite must be symmetrical in shape. */
     public static void spinSprite(TextureRegion region, float x, float y, float r){
-        float a = Draw.getColor().a;
+        float a = Draw.getColorAlpha();
         r = Mathf.mod(r, 90f);
         Draw.rect(region, x, y, r);
         Draw.alpha(r / 90f*a);
