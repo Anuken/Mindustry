@@ -443,7 +443,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     public TextureRegion baseRegion, legRegion, region, previewRegion, shadowRegion, cellRegion, itemCircleRegion,
         softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion, treadRegion,
         mineLaserRegion, mineLaserEndRegion;
-    public TextureRegion[] wreckRegions, segmentRegions, segmentOutlineRegions;
+    public TextureRegion[] wreckRegions, segmentRegions, segmentCellRegions, segmentOutlineRegions;
     public TextureRegion[][] treadRegions;
 
     //INTERNAL REQUIREMENTS
@@ -963,9 +963,11 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         segmentRegions = new TextureRegion[segments];
         segmentOutlineRegions = new TextureRegion[segments];
+        segmentCellRegions = new TextureRegion[segments];
         for(int i = 0; i < segments; i++){
             segmentRegions[i] = Core.atlas.find(name + "-segment" + i);
             segmentOutlineRegions[i] = Core.atlas.find(name + "-segment-outline" + i);
+            segmentCellRegions[i] = Core.atlas.find(name + "-segment-cell" + i);
         }
 
         clipSize = Math.max(region.width * 2f, clipSize);
@@ -1286,7 +1288,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(engines.size > 0) drawEngines(unit);
         Draw.z(z);
         if(drawBody) drawBody(unit);
-        if(drawCell) drawCell(unit);
+        if(drawCell && !(unit instanceof Crawlc)) drawCell(unit);
         drawWeapons(unit);
         if(drawItems) drawItems(unit);
         if(!isPayload){
@@ -1652,6 +1654,13 @@ public class UnitType extends UnlockableContent implements Senseable{
 
                 //TODO merge outlines?
                 Draw.rect(regions[i], unit.x + tx, unit.y + ty, rot - 90);
+
+                // Draws the cells
+                if(drawCell && p != 0 && segmentCellRegions[i].found()){
+                    Draw.color(cellColor(unit));
+                    Draw.rect(segmentCellRegions[i], unit.x + tx, unit.y + ty, rot - 90);
+                    Draw.reset();
+                }
             }
         }
     }
