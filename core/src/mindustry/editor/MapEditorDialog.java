@@ -24,7 +24,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.maps.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -173,21 +172,18 @@ public class MapEditorDialog extends Dialog implements Disposable{
             menu.cont.row();
         }
 
-        //wip feature
-        if(experimental){
-            menu.cont.button("@editor.sectorgenerate", Icon.terrain, () -> {
-                menu.hide();
-                sectorGenDialog.show();
-            }).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
-            menu.cont.row();
-        }
+        menu.cont.button("@editor.sectorgenerate", Icon.terrain, () -> {
+            menu.hide();
+            sectorGenDialog.show();
+        }).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
+        menu.cont.row();
 
         menu.cont.row();
 
         menu.cont.button("@quit", Icon.exit, () -> {
             tryExit();
             menu.hide();
-        }).padTop(!steam && !experimental ? -3 : 1).size(swidth * 2f + 10, 60f);
+        }).padTop(1).size(swidth * 2f + 10, 60f);
 
         resizeDialog = new MapResizeDialog((width, height, shiftX, shiftY) -> {
             if(!(editor.width() == width && editor.height() == height && shiftX == 0 && shiftY == 0)){
@@ -212,11 +208,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         margin(0);
 
         update(() -> {
-            if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
-                return;
-            }
-
-            if(Core.scene != null && Core.scene.getKeyboardFocus() == this){
+            if(hasKeyboard()){
                 doInput();
             }
         });
@@ -276,6 +268,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             ));
             world.endMapLoad();
             player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
+            Core.camera.position.set(player);
             player.clearUnit();
 
             for(var unit : Groups.unit){
@@ -700,28 +693,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 editor.undo();
             }
 
-            //more undocumented features, fantastic
-            if(Core.input.keyTap(KeyCode.t)){
-
-                //clears all 'decoration' from the map
-                for(int x = 0; x < editor.width(); x++){
-                    for(int y = 0; y < editor.height(); y++){
-                        Tile tile = editor.tile(x, y);
-                        if(tile.block().breakable && tile.block() instanceof Prop){
-                            tile.setBlock(Blocks.air);
-                            editor.renderer.updatePoint(x, y);
-                        }
-
-                        if(tile.overlay() != Blocks.air && tile.overlay() != Blocks.spawn){
-                            tile.setOverlay(Blocks.air);
-                            editor.renderer.updatePoint(x, y);
-                        }
-                    }
-                }
-
-                editor.flushOp();
-            }
-
             if(Core.input.keyTap(KeyCode.y)){
                 editor.redo();
             }
@@ -742,7 +713,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     private void addBlockSelection(Table cont){
         blockSelection = new Table();
-        pane = new ScrollPane(blockSelection);
+        pane = new ScrollPane(blockSelection, Styles.smallPane);
         pane.setFadeScrollBars(false);
         pane.setOverscroll(true, false);
         pane.exited(() -> {
@@ -759,7 +730,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         cont.row();
         cont.table(Tex.underline, extra -> extra.labelWrap(() -> editor.drawBlock.localizedName).width(200f).center()).growX();
         cont.row();
-        cont.add(pane).expandY().top().left();
+        cont.add(pane).expandY().growX().top().left();
 
         rebuildBlockSelection("");
     }
@@ -789,7 +760,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.toLowerCase()))
             ) continue;
 
-            ImageButton button = new ImageButton(Tex.whiteui, Styles.squareTogglei);
+            ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.drawBlock = block);
             button.resizeImage(8 * 4f);
@@ -798,7 +769,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(i == 0) editor.drawBlock = block;
 
-            if(++i % 4 == 0){
+            if(++i % 6 == 0){
                 blockSelection.row();
             }
         }

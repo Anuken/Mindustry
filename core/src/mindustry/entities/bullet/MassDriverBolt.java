@@ -10,31 +10,24 @@ import mindustry.world.blocks.distribution.MassDriver.*;
 
 import static mindustry.Vars.*;
 
-public class MassDriverBolt extends BulletType{
+public class MassDriverBolt extends BasicBulletType{
 
     public MassDriverBolt(){
         super(1f, 75);
         collidesTiles = false;
         lifetime = 1f;
+        width = 11f;
+        height = 13f;
+        shrinkY = 0f;
+        sprite = "shell";
         despawnEffect = Fx.smeltsmoke;
         hitEffect = Fx.hitBulletBig;
     }
 
     @Override
-    public void draw(Bullet b){
-        float w = 11f, h = 13f;
-
-        Draw.color(Pal.bulletYellowBack);
-        Draw.rect("shell-back", b.x, b.y, w, h, b.rotation() + 90);
-
-        Draw.color(Pal.bulletYellow);
-        Draw.rect("shell", b.x, b.y, w, h, b.rotation() + 90);
-
-        Draw.reset();
-    }
-
-    @Override
     public void update(Bullet b){
+        super.update(b);
+        
         //data MUST be an instance of DriverBulletData
         if(!(b.data() instanceof DriverBulletData data)){
             hit(b);

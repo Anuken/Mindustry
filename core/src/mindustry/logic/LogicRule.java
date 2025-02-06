@@ -13,8 +13,10 @@ public enum LogicRule{
     unitCap,
     mapArea,
     lighting,
+    canGameOver,
     ambientLight,
     solarMultiplier,
+    dragMultiplier,
     ban,
     unban,
 
@@ -22,6 +24,7 @@ public enum LogicRule{
     buildSpeed,
     unitHealth,
     unitBuildSpeed,
+    unitMineSpeed,
     unitCost,
     unitDamage,
     blockHealth,

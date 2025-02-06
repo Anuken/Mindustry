@@ -45,7 +45,7 @@ public class PhysicsProcess implements AsyncProcess{
                 body.x = entity.x;
                 body.y = entity.y;
                 body.mass = entity.mass();
-                body.radius = entity.hitSize / 2f;
+                body.radius = entity.hitSize * Vars.unitCollisionRadiusScale;
 
                 PhysicRef ref = new PhysicRef(entity, body);
                 refs.add(ref);
