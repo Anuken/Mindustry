@@ -1645,7 +1645,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public boolean collision(Bullet other){
         boolean wasDead = health <= 0;
 
-        float damage = other.damage() * other.type().buildingDamageMultiplier;
+        float damage = other.type.buildingDamage(other);
         if(!other.type.pierceArmor){
             damage = Damage.applyArmor(damage, block.armor);
         }

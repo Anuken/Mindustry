@@ -84,6 +84,8 @@ public class BulletType extends Content implements Cloneable{
     public float reloadMultiplier = 1f;
     /** Multiplier of how much base damage is done to tiles. */
     public float buildingDamageMultiplier = 1f;
+    /** Multiplier of how much base damage is done to force shields. */
+    public float shieldDamageMultiplier = 1f;
     /** Recoil from shooter entities. */
     public float recoil;
     /** Whether to kill the shooter when this is shot. For suicide bombers. */
@@ -567,6 +569,14 @@ public class BulletType extends Content implements Cloneable{
         if(trailLength > 0 && b.trail != null && b.trail.size() > 0){
             Fx.trailFade.at(b.x, b.y, trailWidth, trailColor, b.trail.copy());
         }
+    }
+
+    public float buildingDamage(Bullet b){
+        return b.damage() * buildingDamageMultiplier;
+    }
+
+    public float shieldDamage(Bullet b){
+        return b.damage() * shieldDamageMultiplier;
     }
 
     public void draw(Bullet b){
