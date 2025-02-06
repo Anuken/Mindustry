@@ -51,9 +51,9 @@ public class DrawRegion extends DrawBlock{
     @Override
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
         if(!drawPlan) return;
-        if(spinSprite) {
+        if(spinSprite){
             Drawf.spinSprite(region, plan.drawx() + x, plan.drawy() + y, (buildingRotate ? plan.rotation * 90f : 0 + rotation));
-        } else {
+        }else{
             Draw.rect(region, plan.drawx()+ x, plan.drawy() + y, (buildingRotate ? plan.rotation * 90f : 0 + rotation));
         }
     }

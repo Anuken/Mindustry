@@ -39,7 +39,7 @@ public class DrawArcSmelt extends DrawBlock{
                 float fin = (rand.random(1f) + base) % 1f, fout = 1f - fin;
                 float angle = rand.random(360f);
                 float len = particleRad * Interp.pow2Out.apply(fin);
-                Lines.lineAngle(build.x + Angles.trnsx(angle, len) + x, build.y + Angles.trnsy(angle, len),  + y, particleLen * fout * build.warmup());
+                Lines.lineAngle(build.x + Angles.trnsx(angle, len) + x, build.y + Angles.trnsy(angle, len) + y, angle, particleLen * fout * build.warmup());
             }
 
             Draw.blend();

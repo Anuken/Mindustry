@@ -9,8 +9,7 @@ import mindustry.gen.*;
 
 public class DrawCrucibleFlame extends DrawBlock{
     public Color flameColor = Color.valueOf("f58349"), midColor = Color.valueOf("f2d585");
-    public float flameRad = 1f, circleSpace = 2f, flameRadiusScl = 10f, flameRadiusMag = 0.6f, circleStroke = 1.5f;
-    public float x = 0, y = 0;
+    public float flameRad = 1f, circleSpace = 2f, flameRadiusScl = 10f, flameRadiusMag = 0.6f, circleStroke = 1.5f, x = 0, y = 0;
     public float alpha = 0.5f;
     public int particles = 30;
     public float particleLife = 70f, particleRad = 7f, particleSize = 3f, fadeMargin = 0.4f, rotateScl = 1.5f;
