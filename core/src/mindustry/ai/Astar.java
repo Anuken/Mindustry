@@ -18,15 +18,15 @@ public class Astar{
     private static float[] costs;
     private static byte[][] rotations;
 
-    public static Seq<Tile> pathfind(Tile from, Tile to, TileHueristic th, Boolf<Tile> passable){
+    public static Seq<Tile> pathfind(Tile from, Tile to, TileHeuristic th, Boolf<Tile> passable){
         return pathfind(from.x, from.y, to.x, to.y, th, manhattan, passable);
     }
 
-    public static Seq<Tile> pathfind(int startX, int startY, int endX, int endY, TileHueristic th, Boolf<Tile> passable){
+    public static Seq<Tile> pathfind(int startX, int startY, int endX, int endY, TileHeuristic th, Boolf<Tile> passable){
         return pathfind(startX, startY, endX, endY, th, manhattan, passable);
     }
 
-    public static Seq<Tile> pathfind(int startX, int startY, int endX, int endY, TileHueristic th, DistanceHeuristic dh, Boolf<Tile> passable){
+    public static Seq<Tile> pathfind(int startX, int startY, int endX, int endY, TileHeuristic th, DistanceHeuristic dh, Boolf<Tile> passable){
         Tiles tiles = world.tiles;
 
         Tile start = tiles.getn(startX, startY);
@@ -94,7 +94,7 @@ public class Astar{
         float cost(int x1, int y1, int x2, int y2);
     }
 
-    public interface TileHueristic{
+    public interface TileHeuristic{
         float cost(Tile tile);
 
         default float cost(Tile from, Tile tile){

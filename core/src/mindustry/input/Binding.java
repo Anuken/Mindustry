@@ -60,6 +60,7 @@ public enum Binding implements KeyBind{
     unit_command_load_units(KeyCode.unset),
     unit_command_load_blocks(KeyCode.unset),
     unit_command_unload_payload(KeyCode.unset),
+    unit_command_loop_payload(KeyCode.unset),
 
     category_prev(KeyCode.comma, "blocks"),
     category_next(KeyCode.period),
@@ -80,6 +81,7 @@ public enum Binding implements KeyBind{
     block_select_10(KeyCode.num0),
 
     zoom(new Axis(KeyCode.scroll), "view"),
+    detach_camera(KeyCode.unset),
     menu(Vars.android ? KeyCode.back : KeyCode.escape),
     fullscreen(KeyCode.f11),
     pause(KeyCode.space),

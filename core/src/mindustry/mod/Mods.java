@@ -62,12 +62,19 @@ public class Mods implements Loadable{
         return mainLoader;
     }
 
-    /** Returns a file named 'config.json' in a special folder for the specified plugin.
-     * Call this in init(). */
-    public Fi getConfig(Mod mod){
+    /** @return the folder where configuration files for this mod should go. Call this in init(). */
+    public Fi getConfigFolder(Mod mod){
         ModMeta load = metas.get(mod.getClass());
         if(load == null) throw new IllegalArgumentException("Mod is not loaded yet (or missing)!");
-        return modDirectory.child(load.name).child("config.json");
+        Fi result = modDirectory.child(load.name);
+        result.mkdirs();
+        return result;
+    }
+
+    /** @return a file named 'config.json' in the config folder for the specified mod.
+     * Call this in init(). */
+    public Fi getConfig(Mod mod){
+        return getConfigFolder(mod).child("config.json");
     }
 
     /** Returns a list of files per mod subdirectory. */
@@ -405,6 +412,14 @@ public class Mods implements Loadable{
 
     /** Removes a mod file and marks it for requiring a restart. */
     public void removeMod(LoadedMod mod){
+        if(!android && mod.loader != null){
+            try{
+                ClassLoaderCloser.close(mod.loader);
+            }catch(Exception e){
+                Log.err(e);
+            }
+        }
+
         if(mod.root instanceof ZipFi){
             mod.root.delete();
         }
@@ -417,7 +432,9 @@ public class Mods implements Loadable{
         }
         mods.remove(mod);
         mod.dispose();
-        requiresReload = true;
+        if(mod.state != ModState.disabled){
+            requiresReload = true;
+        }
     }
 
     public Scripts getScripts(){
@@ -722,6 +739,11 @@ public class Mods implements Loadable{
         Seq<LoadRun> runs = new Seq<>();
 
         for(LoadedMod mod : orderedMods()){
+            Seq<LoadRun> unorderedContent = new Seq<>();
+            ObjectMap<String, LoadRun> orderedContent = new ObjectMap<>();
+            String[] contentOrder = mod.meta.contentOrder;
+            ObjectSet<String> orderSet = contentOrder == null ? null : ObjectSet.with(contentOrder);
+
             if(mod.root.child("content").exists()){
                 Fi contentRoot = mod.root.child("content");
                 for(ContentType type : ContentType.all){
@@ -729,15 +751,34 @@ public class Mods implements Loadable{
                     Fi folder = contentRoot.child(lower + (lower.endsWith("s") ? "" : "s"));
                     if(folder.exists()){
                         for(Fi file : folder.findAll(f -> f.extension().equals("json") || f.extension().equals("hjson"))){
-                            runs.add(new LoadRun(type, file, mod));
+
+                            //if this is part of the ordered content, put it aside to be dealt with later
+                            if(orderSet != null && orderSet.contains(file.nameWithoutExtension())){
+                                orderedContent.put(file.nameWithoutExtension(), new LoadRun(type, file, mod));
+                            }else{
+                                unorderedContent.add(new LoadRun(type, file, mod));
+                            }
                         }
                     }
                 }
             }
+
+            //ordered content will be loaded first, if it exists
+            if(contentOrder != null){
+                for(String contentName : contentOrder){
+                    LoadRun run = orderedContent.get(contentName);
+                    if(run != null){
+                        runs.add(run);
+                    }else{
+                        Log.warn("Cannot find content defined in contentOrder: @", contentName);
+                    }
+                }
+            }
+
+            //unordered content is sorted alphabetically per mod
+            runs.addAll(unorderedContent.sort());
         }
 
-        //make sure mod content is in proper order
-        runs.sort();
         for(LoadRun l : runs){
             Content current = content.getLastAdded();
             try{
@@ -756,6 +797,8 @@ public class Mods implements Loadable{
 
         //this finishes parsing content fields
         parser.finishParsing();
+
+        Events.fire(new ModContentLoadEvent());
     }
 
     public void handleContentError(Content content, Throwable error){
@@ -927,6 +970,12 @@ public class Mods implements Loadable{
             if(other != null){
                 //steam mods can't really be deleted, they need to be unsubscribed
                 if(overwrite && !other.hasSteamID()){
+
+                    //close the classloader for jar mods
+                    if(!android){
+                        ClassLoaderCloser.close(other.loader);
+                    }
+
                     //close zip file
                     if(other.root instanceof ZipFi){
                         other.root.delete();
@@ -1204,6 +1253,8 @@ public class Mods implements Loadable{
         public float texturescale = 1.0f;
         /** If true, bleeding is skipped and no content icons are generated. */
         public boolean pregenerated;
+        /** If set, load the mod content in this order by content names */
+        public String[] contentOrder;
 
         public String displayName(){
             //useless, kept for legacy reasons
@@ -1219,6 +1270,7 @@ public class Mods implements Loadable{
             if(name != null) name = Strings.stripColors(name);
             if(displayName != null) displayName = Strings.stripColors(displayName);
             if(displayName == null) displayName = name;
+            if(version == null) version = "0";
             if(author != null) author = Strings.stripColors(author);
             if(description != null) description = Strings.stripColors(description);
             if(subtitle != null) subtitle = Strings.stripColors(subtitle).replace("\n", "");

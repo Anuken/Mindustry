@@ -168,7 +168,7 @@ public class Weapon implements Cloneable{
             t.row();
             t.add("[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)inaccuracy + " " + StatUnit.degrees.localized());
         }
-        if(!alwaysContinuous && reload > 0){
+        if(!alwaysContinuous && reload > 0 && !bullet.killShooter){
             t.row();
             t.add("[lightgray]" + Stat.reload.localized() + ": " + (mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / reload * shoot.shots, 2) + " " + StatUnit.perSecond.localized());
         }
@@ -228,6 +228,7 @@ public class Weapon implements Cloneable{
                 var part = parts.get(i);
                 DrawPart.params.setRecoil(part.recoilIndex >= 0 && mount.recoils != null ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(part.under){
+                    unit.type.applyColor(unit);
                     part.draw(DrawPart.params);
                 }
             }
@@ -262,6 +263,7 @@ public class Weapon implements Cloneable{
                 var part = parts.get(i);
                 DrawPart.params.setRecoil(part.recoilIndex >= 0 && mount.recoils != null ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(!part.under){
+                    unit.type.applyColor(unit);
                     part.draw(DrawPart.params);
                 }
             }
@@ -487,7 +489,7 @@ public class Weapon implements Cloneable{
         angle = shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
 
         Entityc shooter = unit.controller() instanceof MissileAI ai ? ai.shooter : unit; //Pass the missile's shooter down to its bullets
-        mount.bullet = bullet.create(unit, shooter, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);
+        mount.bullet = bullet.create(unit, shooter, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY, mount.target);
         handleBullet(unit, mount, mount.bullet);
 
         if(!continuous){

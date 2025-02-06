@@ -68,10 +68,12 @@ public class StatusEffect extends UnlockableContent{
 
     public StatusEffect(String name){
         super(name);
+        allDatabaseTabs = true;
     }
 
     @Override
     public void init(){
+        super.init();
         if(initblock != null){
             initblock.run();
         }
@@ -88,18 +90,18 @@ public class StatusEffect extends UnlockableContent{
 
     @Override
     public void setStats(){
-        if(damageMultiplier != 1) stats.addPercent(Stat.damageMultiplier, damageMultiplier);
-        if(healthMultiplier != 1) stats.addPercent(Stat.healthMultiplier, healthMultiplier);
-        if(speedMultiplier != 1) stats.addPercent(Stat.speedMultiplier, speedMultiplier);
-        if(reloadMultiplier != 1) stats.addPercent(Stat.reloadMultiplier, reloadMultiplier);
-        if(buildSpeedMultiplier != 1) stats.addPercent(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
+        if(damageMultiplier != 1) stats.addMultModifier(Stat.damageMultiplier, damageMultiplier);
+        if(healthMultiplier != 1) stats.addMultModifier(Stat.healthMultiplier, healthMultiplier);
+        if(speedMultiplier != 1) stats.addMultModifier(Stat.speedMultiplier, speedMultiplier);
+        if(reloadMultiplier != 1) stats.addMultModifier(Stat.reloadMultiplier, reloadMultiplier);
+        if(buildSpeedMultiplier != 1) stats.addMultModifier(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
         if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
         if(damage < 0) stats.add(Stat.healing, -damage * 60f, StatUnit.perSecond);
 
         boolean reacts = false;
 
         for(var e : opposites.toSeq().sort()){
-            stats.add(Stat.opposites, e.emoji() + "" + e);
+            stats.add(Stat.opposites, e.emoji() + e);
         }
 
         if(reactive){
@@ -113,7 +115,7 @@ public class StatusEffect extends UnlockableContent{
         //don't list affinities *and* reactions, as that would be redundant
         if(!reacts){
             for(var e : affinities.toSeq().sort()){
-                stats.add(Stat.affinities, e.emoji() + "" + e);
+                stats.add(Stat.affinities, e.emoji() + e);
             }
 
             if(affinities.size > 0 && transitionDamage != 0){
@@ -140,6 +142,11 @@ public class StatusEffect extends UnlockableContent{
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
+    }
+
+    /** Called when status effect is removed. */
+    public void onRemoved(Unit unit){
+
     }
 
     protected void trans(StatusEffect effect, TransitionHandler handler){

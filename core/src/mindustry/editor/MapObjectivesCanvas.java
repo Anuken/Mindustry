@@ -368,7 +368,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
                                     () -> obj,
                                     res -> {}
                                 );
-                            }).width(400f).fillY()).grow();
+                            }).width(Math.min(Core.graphics.getWidth() * 0.95f / Scl.scl(1f) - Scl.scl(20f), 700f)).fillY()).grow();
 
                             dialog.addCloseButton();
                             dialog.show();

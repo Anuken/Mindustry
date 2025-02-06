@@ -148,7 +148,7 @@ public class ServerControl implements ApplicationListener{
             return useColors ? addColors(text) : removeColors(text);
         };
 
-        Time.setDeltaProvider(() -> Core.graphics.getDeltaTime() * 60f);
+        Time.setDeltaProvider(() -> Math.min(Core.graphics.getDeltaTime() * 60f, maxDeltaServer));
 
         registerCommands();
 
@@ -527,7 +527,7 @@ public class ServerControl implements ApplicationListener{
             }
             boolean pause = arg[0].equals("on");
             autoPaused = false;
-            state.set(state.isPaused() ? State.playing : State.paused);
+            state.set(pause ? State.paused : State.playing);
             info(pause ? "Game paused." : "Game unpaused.");
         });
 

@@ -71,6 +71,13 @@ public class SchematicsDialog extends BaseDialog{
                 rebuildPane.run();
             }).growX().get();
             searchField.setMessageText("@schematic.search");
+            searchField.clicked(KeyCode.mouseRight, () -> {
+                if(!search.isEmpty()){
+                    search = "";
+                    searchField.clearText();
+                    rebuildPane.run();
+                }
+            });
         }).fillX().padBottom(4);
 
         cont.row();
@@ -398,6 +405,7 @@ public class SchematicsDialog extends BaseDialog{
             closeOnBack();
             setFillParent(true);
 
+            //TODO: use IconSelectDialog
             cont.pane(t -> {
                 resized(true, () -> {
                     t.clearChildren();
@@ -407,7 +415,7 @@ public class SchematicsDialog extends BaseDialog{
                     int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
                     int i = 0;
-                    for(String icon : PlanetDialog.defaultIcons){
+                    for(String icon : accessibleIcons){
                         String out = (char)Iconc.codes.get(icon) + "";
                         if(tags.contains(out)) continue;
 

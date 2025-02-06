@@ -11,7 +11,6 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 
 public class ShieldArcAbility extends Ability{
@@ -20,9 +19,9 @@ public class ShieldArcAbility extends Ability{
     private static Vec2 paramPos = new Vec2();
     private static final Cons<Bullet> shieldConsumer = b -> {
         if(b.team != paramUnit.team && b.type.absorbable && paramField.data > 0 &&
-            !b.within(paramPos, paramField.radius - paramField.width/2f) &&
-            Tmp.v1.set(b).add(b.vel).within(paramPos, paramField.radius + paramField.width/2f) &&
-            Angles.within(paramPos.angleTo(b), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f)){
+            !(b.within(paramPos, paramField.radius - paramField.width/2f) && paramPos.within(b.x - b.deltaX, b.y - b.deltaY, paramField.radius - paramField.width/2f)) &&
+            (Tmp.v1.set(b).add(b.deltaX, b.deltaY).within(paramPos, paramField.radius + paramField.width/2f) || b.within(paramPos, paramField.radius + paramField.width/2f)) &&
+            (Angles.within(paramPos.angleTo(b), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(b.x + b.deltaX, b.y + b.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
 
             b.absorb();
             Fx.absorb.at(b);
@@ -31,7 +30,7 @@ public class ShieldArcAbility extends Ability{
             if(paramField.data <= b.damage()){
                 paramField.data -= paramField.cooldown * paramField.regen;
 
-                Fx.arcShieldBreak.at(paramPos.x, paramPos.y, 0, paramUnit.team.color, paramUnit);
+                Fx.arcShieldBreak.at(paramPos.x, paramPos.y, 0, paramField.color == null ? paramUnit.type.shieldColor(paramUnit) : paramField.color, paramUnit);
             }
 
             paramField.data -= b.damage();
@@ -60,6 +59,8 @@ public class ShieldArcAbility extends Ability{
     public boolean drawArc = true;
     /** If not null, will be drawn on top. */
     public @Nullable String region;
+    /** Color override of the shield. Uses unit shield colour by default. */
+    public @Nullable Color color;
     /** If true, sprite position will be influenced by x/y. */
     public boolean offsetRegion = false;
 
@@ -78,7 +79,7 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void update(Unit unit){
-        
+
         if(data < max){
             data += Time.delta * regen;
         }
@@ -100,7 +101,7 @@ public class ShieldArcAbility extends Ability{
     }
 
     @Override
-    public void init(UnitType type){
+    public void created(Unit unit){
         data = max;
     }
 
@@ -109,7 +110,7 @@ public class ShieldArcAbility extends Ability{
         if(widthScale > 0.001f){
             Draw.z(Layer.shields);
 
-            Draw.color(unit.team.color, Color.white, Mathf.clamp(alpha));
+            Draw.color(color == null ? unit.type.shieldColor(unit) : color, Color.white, Mathf.clamp(alpha));
             var pos = paramPos.set(x, y).rotate(unit.rotation - 90f).add(unit);
 
             if(!Vars.renderer.animateShields){

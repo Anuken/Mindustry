@@ -297,6 +297,7 @@ public class SettingsMenuDialog extends BaseDialog{
     }
 
     void addSettings(){
+        sound.checkPref("alwaysmusic", false);
         sound.sliderPref("musicvol", 100, 0, 100, 1, i -> i + "%");
         sound.sliderPref("sfxvol", 100, 0, 100, 1, i -> i + "%");
         sound.sliderPref("ambientvol", 100, 0, 100, 1, i -> i + "%");
@@ -331,6 +332,13 @@ public class SettingsMenuDialog extends BaseDialog{
         if(!mobile){
             game.checkPref("crashreport", true);
         }
+
+        game.checkPref("communityservers", true, val -> {
+            defaultServers.clear();
+            if(val){
+                JoinDialog.fetchServers();
+            }
+        });
 
         game.checkPref("savecreate", true);
         game.checkPref("blockreplace", true);
@@ -389,6 +397,7 @@ public class SettingsMenuDialog extends BaseDialog{
             }
             return s + "%";
         });
+        graphics.sliderPref("unitlaseropacity", 100, 0, 100, 5, s -> s + "%");
         graphics.sliderPref("bridgeopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
