@@ -41,21 +41,9 @@ public class Scripts implements Disposable{
         return errored;
     }
 
-    public String injectConsoleVariables(){
-        //FIXME: this may cause issues if someone tries to use the variables in their own code multiple times. Investigate potential issues with this system.
-        return
-        "var unit = Vars.player.unit();" +
-        "var team = Vars.player.team();" +
-        "var core = Vars.player.core();" +
-        "var items = Vars.player.team().items();" +
-        "var build = Vars.world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
-        "var cursor = Vars.world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
-        "\n";
-    }
-
     public String runConsole(String text){
         try{
-            Object o = context.evaluateString(scope, injectConsoleVariables() + text, "console.js", 1);
+            Object o = context.evaluateString(scope, text, "console.js", 1);
             if(o instanceof NativeJavaObject n) o = n.unwrap();
             if(o == null) o = "null";
 
