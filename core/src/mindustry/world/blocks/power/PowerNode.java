@@ -28,7 +28,7 @@ public class PowerNode extends PowerBlock{
     protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     /** The maximum range of all power nodes on the map */
     protected static float maxRange;
-
+    public @Load(value = "@-glow") TextureRegion glowRegion;
     public @Load(value = "@-laser", fallback = "laser") TextureRegion laser;
     public @Load(value = "@-laser-end", fallback = "laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
@@ -37,7 +37,9 @@ public class PowerNode extends PowerBlock{
     public float laserScale = 0.25f;
     public Color laserColor1 = Color.white;
     public Color laserColor2 = Pal.powerLight;
-
+    public Color glowColor = Pal.powerLight;
+    public float glowPulse = 0.3f, glowPulseScl = 7f, alpha = 0.15f, glowScale = 10f, glowIntensity = 0.25f;
+    public Blending blending = Blending.additive;
     public PowerNode(String name){
         super(name);
         configurable = true;
@@ -467,11 +469,9 @@ public class PowerNode extends PowerBlock{
                 });
             }
         }
-
         @Override
         public void draw(){
             super.draw();
-
             if(Mathf.zero(Renderer.laserOpacity) || isPayload() || team == Team.derelict) return;
 
             Draw.z(Layer.power);
@@ -479,16 +479,28 @@ public class PowerNode extends PowerBlock{
 
             for(int i = 0; i < power.links.size; i++){
                 Building link = world.build(power.links.get(i));
-
                 if(!linkValid(this, link)) continue;
-
                 if(link.block instanceof PowerNode && link.id >= id) continue;
 
                 drawLaser(x, y, link.x, link.y, size, link.block.size);
             }
 
+            float satisfaction = power.graph.getSatisfaction();
+            Draw.alpha((Mathf.absin(satisfaction, glowScale, alpha) * glowIntensity + 1f - glowIntensity) * satisfaction * alpha);
+
+            Draw.alpha(1 * satisfaction);
+            if(glowRegion.found()){
+                Draw.z(Layer.blockAdditive);
+                Draw.blend(blending);
+                Draw.color(Tmp.c1.set(glowColor), satisfaction * (glowColor.a * (1f - glowPulse + Mathf.absin(glowPulseScl, glowPulse))));
+                Draw.rect(glowRegion, x, y);
+                Draw.blend();
+                Draw.color();
+            }
             Draw.reset();
+
         }
+
 
         protected boolean linked(Building other){
             return power.links.contains(other.pos());
