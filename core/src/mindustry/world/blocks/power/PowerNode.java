@@ -38,7 +38,7 @@ public class PowerNode extends PowerBlock{
     public Color laserColor1 = Color.white;
     public Color laserColor2 = Pal.powerLight;
     public Color glowColor = Pal.powerLight;
-    public float glowPulse = 0.3f, glowPulseScl = 7f, alpha = 0.15f, glowScale = 10f, glowIntensity = 0.25f;
+    public float alpha = 0.45f, glowScale = 10f, glowIntensity = 0.45f;
     public Blending blending = Blending.additive;
     public PowerNode(String name){
         super(name);
@@ -492,8 +492,8 @@ public class PowerNode extends PowerBlock{
             if(glowRegion.found()){
                 Draw.z(Layer.blockAdditive);
                 Draw.blend(blending);
-                Draw.color(Tmp.c1.set(glowColor), satisfaction * (glowColor.a * (1f - glowPulse + Mathf.absin(glowPulseScl, glowPulse))));
-                Draw.rect(glowRegion, x, y);
+                setupColor(satisfaction);
+                Draw.alpha((Mathf.absin(satisfaction, glowScale, alpha) * glowIntensity + 1f - glowIntensity) * satisfaction * alpha);                Draw.rect(glowRegion, x, y);
                 Draw.blend();
                 Draw.color();
             }
