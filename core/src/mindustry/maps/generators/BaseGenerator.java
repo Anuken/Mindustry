@@ -216,7 +216,7 @@ public class BaseGenerator{
         if(!insanity){
             for(Stile tile : result.tiles){
                 int realX = tile.x + cx, realY = tile.y + cy;
-                if(isTaken(tile.block, realX, realY)){
+                if(isTaken(tile.block, realX, realY) || (tile.block == Blocks.oilExtractor && tile.block.sumAttribute(Attribute.oil, realX, realY) <= 0.001f)){
                     return false;
                 }
             }
