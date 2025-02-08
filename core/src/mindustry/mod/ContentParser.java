@@ -1224,6 +1224,7 @@ public class ContentParser{
                             }
                             //reparent the node
                             node.parent = parent;
+                            node.planet = parent.planet;
                         }
                     }else{
                         Log.warn(unlock.name + " is not a root node, and does not have a `parent: ` property. Ignoring.");
