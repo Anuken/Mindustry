@@ -3,7 +3,6 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
@@ -12,6 +11,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.editor.BannedContentDialog;
 import mindustry.game.*;
 import mindustry.game.Rules.*;
 import mindustry.gen.*;
@@ -30,7 +30,8 @@ public class CustomRulesDialog extends BaseDialog{
     private Table main;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
-
+    private BannedContentDialog<Block> bannedBlocks = new BannedContentDialog<>("@bannedblocks", ContentType.block, Block::canBeBuilt);
+    private BannedContentDialog<UnitType> bannedUnits = new BannedContentDialog<>("@bannedunits", ContentType.unit, u -> !u.isHidden());
     public boolean showRuleEditRule;
     public Seq<Table> categories;
     public Table current;
@@ -109,84 +110,6 @@ public class CustomRulesDialog extends BaseDialog{
         requestScroll();
     }
 
-    private <T extends UnlockableContent> void showBanned(String title, ContentType type, ObjectSet<T> set, Boolf<T> pred){
-        BaseDialog bd = new BaseDialog(title);
-        bd.addCloseButton();
-
-        Runnable[] rebuild = {null};
-
-        rebuild[0] = () -> {
-            float previousScroll = bd.cont.getChildren().isEmpty() ? 0f : ((ScrollPane)bd.cont.getChildren().first()).getScrollY();
-            bd.cont.clear();
-            bd.cont.pane(t -> {
-                t.margin(10f);
-
-                if(set.isEmpty()){
-                    t.add("@empty");
-                }
-
-                Seq<T> array = set.toSeq();
-                array.sort();
-
-                int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;
-                int i = 0;
-
-                for(T con : array){
-                    t.table(Tex.underline, b -> {
-                        b.left().margin(4f);
-                        b.image(con.uiIcon).size(iconMed).padRight(3);
-                        b.add(con.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
-
-                        b.button(Icon.cancel, Styles.emptyi, () -> {
-                            set.remove(con);
-                            rebuild[0].run();
-                        }).size(70f).pad(-4f).padLeft(0f);
-                    }).size(300f, 70f).padRight(5);
-
-                    if(++i % cols == 0){
-                        t.row();
-                    }
-                }
-            }).get().setScrollYForce(previousScroll);
-            bd.cont.row();
-            bd.cont.button("@add", Icon.add, () -> {
-                BaseDialog dialog = new BaseDialog("@add");
-                dialog.cont.pane(t -> {
-                    t.left().margin(14f);
-                    int[] i = {0};
-                    content.<T>getBy(type).each(b -> !set.contains(b) && pred.get(b), b -> {
-                        int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
-                        t.button(new TextureRegionDrawable(b.uiIcon), Styles.flati, iconMed, () -> {
-                            set.add(b);
-                            rebuild[0].run();
-                            dialog.hide();
-                        }).size(60f).tooltip(b.localizedName);
-
-                        if(++i[0] % cols == 0){
-                            t.row();
-                        }
-                    });
-                });
-
-                dialog.addCloseButton();
-                dialog.show();
-            }).size(300f, 64f).disabled(b -> set.size == content.<T>getBy(type).count(pred));
-        };
-
-        bd.shown(rebuild[0]);
-        bd.buttons.button("@addall", Icon.add, () -> {
-            set.addAll(content.<T>getBy(type).select(pred));
-            rebuild[0].run();
-        }).size(180, 64f);
-
-        bd.buttons.button("@clear", Icon.trash, () -> {
-            set.clear();
-            rebuild[0].run();
-        }).size(180, 64f);
-
-        bd.show();
-    }
-
     public void show(Rules rules, Prov<Rules> resetter){
         this.rules = rules;
         this.resetter = resetter;
@@ -253,7 +176,7 @@ public class CustomRulesDialog extends BaseDialog{
         }
 
         if(Core.bundle.get("bannedblocks").toLowerCase().contains(ruleSearch)){
-            current.button("@bannedblocks", () -> showBanned("@bannedblocks", ContentType.block, rules.bannedBlocks, Block::canBeBuilt)).left().width(300f).row();
+            current.button("@bannedblocks", () -> bannedBlocks.show(rules.bannedBlocks)).left().width(300f).row();
         }
         check("@rules.hidebannedblocks", b -> rules.hideBannedBlocks = b, () -> rules.hideBannedBlocks);
         check("@bannedblocks.whitelist", b -> rules.blockWhitelist = b, () -> rules.blockWhitelist);
@@ -265,12 +188,13 @@ public class CustomRulesDialog extends BaseDialog{
         numberi("@rules.unitcap", f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("@rules.unitcrashdamagemultiplier", f -> rules.unitCrashDamageMultiplier = f, () -> rules.unitCrashDamageMultiplier);
+        number("@rules.unitminespeedmultiplier", f -> rules.unitMineSpeedMultiplier = f, () -> rules.unitMineSpeedMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0f, 50f);
         number("@rules.unitcostmultiplier", f -> rules.unitCostMultiplier = f, () -> rules.unitCostMultiplier);
         number("@rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
 
         if(Core.bundle.get("bannedunits").toLowerCase().contains(ruleSearch)){
-            current.button("@bannedunits", () -> showBanned("@bannedunits", ContentType.unit, rules.bannedUnits, u -> !u.isHidden())).left().width(300f).row();
+            current.button("@bannedunits", () -> bannedUnits.show(rules.bannedUnits)).left().width(300f).row();
         }
         check("@bannedunits.whitelist", b -> rules.unitWhitelist = b, () -> rules.unitWhitelist);
 
@@ -378,11 +302,14 @@ public class CustomRulesDialog extends BaseDialog{
                 check("@rules.buildai", b -> teams.buildAi = b, () -> teams.buildAi, () -> team != rules.defaultTeam && rules.env != Planets.erekir.defaultEnv && !rules.pvp);
                 number("@rules.buildaitier", false, f -> teams.buildAiTier = f, () -> teams.buildAiTier, () -> teams.buildAi && rules.env != Planets.erekir.defaultEnv && !rules.pvp, 0, 1);
 
+                number("@rules.extracorebuildradius", f -> teams.extraCoreBuildRadius = f * tilesize, () -> Math.min(teams.extraCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection);
+
                 check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
                 number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
 
                 number("@rules.unitdamagemultiplier", f -> teams.unitDamageMultiplier = f, () -> teams.unitDamageMultiplier);
                 number("@rules.unitcrashdamagemultiplier", f -> teams.unitCrashDamageMultiplier = f, () -> teams.unitCrashDamageMultiplier);
+                number("@rules.unitminespeedmultiplier", f -> teams.unitMineSpeedMultiplier = f, () -> teams.unitMineSpeedMultiplier);
                 number("@rules.unitbuildspeedmultiplier", f -> teams.unitBuildSpeedMultiplier = f, () -> teams.unitBuildSpeedMultiplier, 0.001f, 50f);
                 number("@rules.unitcostmultiplier", f -> teams.unitCostMultiplier = f, () -> teams.unitCostMultiplier);
                 number("@rules.unithealthmultiplier", f -> teams.unitHealthMultiplier = f, () -> teams.unitHealthMultiplier);
@@ -456,7 +383,7 @@ public class CustomRulesDialog extends BaseDialog{
 
     public void numberi(String text, Intc cons, Intp prov, Boolp condition, int min, int max){
         if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
-        current.table(t -> {
+        var cell = current.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
                 .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
@@ -464,12 +391,14 @@ public class CustomRulesDialog extends BaseDialog{
                 .update(a -> a.setDisabled(!condition.get()))
                 .padRight(100f)
                 .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left();
-        }).padTop(0).row();
+        }).padTop(0);
+        ruleInfo(cell, text);
+        current.row();
     }
 
     public void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){
         if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
-        current.table(t -> {
+        var cell = current.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
             .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
@@ -478,6 +407,7 @@ public class CustomRulesDialog extends BaseDialog{
             .update(a -> a.setDisabled(!condition.get()))
             .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left();
         }).padTop(0);
+        ruleInfo(cell, text);
         current.row();
     }
 
@@ -487,13 +417,24 @@ public class CustomRulesDialog extends BaseDialog{
 
     public void check(String text, Boolc cons, Boolp prov, Boolp condition){
         if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
-        String infoText = text.substring(1) + ".info";
-        var cell = current.check(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get())).padRight(100f);
-        if(Core.bundle.has(infoText)){
-            cell.tooltip(text + ".info");
-        }
+        var cell = current.check(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get()));
         cell.get().left();
+        ruleInfo(cell, text);
         current.row();
+    }
+
+    public void ruleInfo(Cell<?> cell, String text){
+        if(Core.bundle.has(text.substring(1) + ".info")){
+            if(mobile){
+                Table table = new Table();
+                table.add(cell.get()).left().expandX().fillX();
+                cell.clearElement();
+                table.button(Icon.infoSmall, () -> ui.showInfo(text + ".info")).size(32f).padRight(24f).right();
+                cell.setElement(table).left().expandX().fillX();
+            }else{
+                cell.tooltip(text + ".info");
+            }
+        }
     }
 
     Cell<TextField> field(Table table, float value, Floatc setter){

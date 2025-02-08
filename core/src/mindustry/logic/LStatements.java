@@ -19,6 +19,7 @@ import mindustry.logic.LExecutor.*;
 import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -312,6 +313,46 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("printchar")
+    public static class PrintCharStatement extends LStatement{
+        public String value = "65";
+
+        @Override
+        public void build(Table table){
+            table.add(" char ");
+            TextField field = field(table, value, str -> value = str).get();
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    t.row();
+                    t.table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(char j = 32; j < 127; j++){
+                            final int chr = j;
+                            i.button(String.valueOf(j), Styles.flatt, () -> {
+                                value = Integer.toString(chr);
+                                field.setText(value);
+                                hide.run();
+                            }).size(32f);
+                            if(++c % 8 == 0) i.row();
+                        }
+                    });
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PrintCharI(builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
+        }
+    }
+
     @RegisterStatement("format")
     public static class FormatStatement extends LStatement{
         public String value = "\"frog\"";
@@ -574,6 +615,29 @@ public class LStatements{
                                 if(++c % 6 == 0) i.row();
                             }
                         }),
+                        new Table(i -> {
+                            i.left();
+                            int c = 0;
+                            for(UnitType item : Vars.content.units()){
+                                if(!item.unlockedNow() || item.hidden) continue;
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
+                                    stype("@" + item.name);
+                                    hide.run();
+                                }).size(40f);
+
+                                if(++c % 6 == 0) i.row();
+                            }
+
+                            for(Block item : Vars.content.blocks()){
+                                if(!item.unlockedNow() || item.isHidden()) continue;
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
+                                    stype("@" + item.name);
+                                    hide.run();
+                                }).size(40f);
+
+                                if(++c % 6 == 0) i.row();
+                            }
+                        }),
                         //sensors
                         new Table(i -> {
                             for(LAccess sensor : LAccess.senseable){
@@ -585,7 +649,7 @@ public class LStatements{
                         })
                     };
 
-                    Drawable[] icons = {Icon.box, Icon.liquid, Icon.tree};
+                    Drawable[] icons = {Icon.box, Icon.liquid, Icon.units, Icon.tree};
                     Stack stack = new Stack(tables[selected]);
                     ButtonGroup<Button> group = new ButtonGroup<>();
 
@@ -603,7 +667,7 @@ public class LStatements{
                         }).height(50f).growX().checked(selected == fi).group(group);
                     }
                     t.row();
-                    t.add(stack).colspan(3).width(240f).left();
+                    t.add(stack).colspan(4).width(240f).left();
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
@@ -1493,11 +1557,11 @@ public class LStatements{
             table.add("natural ");
             fields(table, natural, str -> natural = str);
 
-            table.add("x ").visible(() -> natural.equals("false"));
-            fields(table, x, str -> x = str).visible(() -> natural.equals("false"));
+            table.add("x ").visible(() -> !natural.equals("true"));
+            fields(table, x, str -> x = str).visible(() -> !natural.equals("true"));
 
-            table.add(" y ").visible(() -> natural.equals("false"));
-            fields(table, y, str -> y = str).visible(() -> natural.equals("false"));
+            table.add(" y ").visible(() -> !natural.equals("true"));
+            fields(table, y, str -> y = str).visible(() -> !natural.equals("true"));
         }
 
         @Override
@@ -1547,7 +1611,7 @@ public class LStatements{
                     fields(table, "w", p3, s -> p3 = s);
                     fields(table, "h", p4, s -> p4 = s);
                 }
-                case buildSpeed, unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, rtsMinSquad, rtsMinWeight -> {
+                case buildSpeed, unitHealth, unitBuildSpeed, unitMineSpeed, unitCost, unitDamage, blockHealth, blockDamage, rtsMinSquad, rtsMinWeight -> {
                     if(p1.equals("0")){
                         p1 = "@sharded";
                     }

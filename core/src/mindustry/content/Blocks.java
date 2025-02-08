@@ -163,7 +163,8 @@ public class Blocks{
     worldProcessor, worldCell, worldMessage, worldSwitch,
 
     //campaign
-    launchPad, interplanetaryAccelerator
+    launchPad, advancedLaunchPad, landingPad,
+    interplanetaryAccelerator
 
     ;
 
@@ -1006,7 +1007,7 @@ public class Blocks{
             outputsLiquid = true;
             envEnabled = Env.any;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.water), new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = true;}}, new DrawDefault());
-            liquidCapacity = 24f;
+            liquidCapacity = 36f;
             craftTime = 120;
             lightLiquid = Liquids.cryofluid;
 
@@ -1237,7 +1238,7 @@ public class Blocks{
 
             researchCostMultiplier = 1.1f;
             itemCapacity = 0;
-            liquidCapacity = 40f;
+            liquidCapacity = 60f;
             consumePower(2f);
             ambientSound = Sounds.extractLoop;
             ambientSoundVolume = 0.06f;
@@ -1295,7 +1296,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.slag), new DrawDefault(), new DrawHeatOutput());
             size = 3;
             itemCapacity = 0;
-            liquidCapacity = 40f;
+            liquidCapacity = 120f;
             rotateDraw = false;
             regionRotated1 = 1;
             ambientSound = Sounds.hum;
@@ -1934,12 +1935,13 @@ public class Blocks{
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
-            requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
+            requirements(Category.distribution, with(Items.lead, 10, Items.copper, 10));
             fadeIn = moveArrows = false;
             range = 4;
             speed = 74f;
             arrowSpacing = 6f;
             bufferCapacity = 14;
+            buildCostMultiplier = 2f;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
@@ -2119,13 +2121,14 @@ public class Blocks{
         mechanicalPump = new Pump("mechanical-pump"){{
             requirements(Category.liquid, with(Items.copper, 15, Items.metaglass, 10));
             pumpAmount = 7f / 60f;
+            liquidCapacity = 20f;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
             requirements(Category.liquid, with(Items.copper, 70, Items.metaglass, 50, Items.silicon, 20, Items.titanium, 35));
             pumpAmount = 0.2f;
             consumePower(0.3f);
-            liquidCapacity = 30f;
+            liquidCapacity = 80f;
             hasPower = true;
             size = 2;
         }};
@@ -2134,33 +2137,34 @@ public class Blocks{
             requirements(Category.liquid, with(Items.copper, 80, Items.metaglass, 90, Items.silicon, 30, Items.titanium, 40, Items.thorium, 35));
             pumpAmount = 0.22f;
             consumePower(1.3f);
-            liquidCapacity = 40f;
+            liquidCapacity = 200f;
             hasPower = true;
             size = 3;
         }};
 
         conduit = new Conduit("conduit"){{
             requirements(Category.liquid, with(Items.metaglass, 1));
+            liquidCapacity = 20f;
             health = 45;
         }};
 
         pulseConduit = new Conduit("pulse-conduit"){{
             requirements(Category.liquid, with(Items.titanium, 2, Items.metaglass, 1));
-            liquidCapacity = 16f;
+            liquidCapacity = 40f;
             liquidPressure = 1.025f;
             health = 90;
         }};
 
         platedConduit = new ArmoredConduit("plated-conduit"){{
             requirements(Category.liquid, with(Items.thorium, 2, Items.metaglass, 1, Items.plastanium, 1));
-            liquidCapacity = 16f;
+            liquidCapacity = 50f;
             liquidPressure = 1.025f;
             health = 220;
         }};
 
         liquidRouter = new LiquidRouter("liquid-router"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 2));
-            liquidCapacity = 20f;
+            liquidCapacity = 120f;
             underBullets = true;
             solid = false;
         }};
@@ -2191,6 +2195,7 @@ public class Blocks{
             arrowSpacing = 6f;
             range = 4;
             hasPower = false;
+            liquidCapacity = 100f;
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
@@ -2201,6 +2206,7 @@ public class Blocks{
             hasPower = true;
             canOverdrive = false;
             pulse = true;
+            liquidCapacity = 100f;
             consumePower(0.30f);
         }};
 
@@ -2219,19 +2225,17 @@ public class Blocks{
             requirements(Category.liquid, with(Items.beryllium, 2));
             botColor = Pal.darkestMetal;
             leaks = true;
-            liquidCapacity = 20f;
+            liquidCapacity = 50f;
             liquidPressure = 1.03f;
             health = 250;
             researchCostMultiplier = 3;
             underBullets = true;
         }};
 
-        //TODO is this necessary? junctions are not good design
-        //TODO make it leak
         reinforcedLiquidJunction = new LiquidJunction("reinforced-liquid-junction"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.beryllium, 8));
             buildCostMultiplier = 3f;
-            health = 260;
+            health = 250;
             ((Conduit)reinforcedConduit).junctionReplacement = this;
             researchCostMultiplier = 1;
             solid = false;
@@ -2242,19 +2246,22 @@ public class Blocks{
             requirements(Category.liquid, with(Items.graphite, 8, Items.beryllium, 20));
             range = 4;
             hasPower = false;
+            liquidCapacity = 120f;
             researchCostMultiplier = 1;
             underBullets = true;
+            health = 250;
 
             ((Conduit)reinforcedConduit).rotBridgeReplacement = this;
         }};
 
         reinforcedLiquidRouter = new LiquidRouter("reinforced-liquid-router"){{
             requirements(Category.liquid, with(Items.graphite, 8, Items.beryllium, 4));
-            liquidCapacity = 30f;
+            liquidCapacity = 150f;
             liquidPadding = 3f/4f;
             researchCostMultiplier = 3;
             underBullets = true;
             solid = false;
+            health = 250;
         }};
 
         reinforcedLiquidContainer = new LiquidRouter("reinforced-liquid-container"){{
@@ -2264,6 +2271,7 @@ public class Blocks{
             liquidPadding = 6f/4f;
             researchCostMultiplier = 4;
             solid = true;
+            health = 400;
         }};
 
         reinforcedLiquidTank = new LiquidRouter("reinforced-liquid-tank"){{
@@ -2272,15 +2280,17 @@ public class Blocks{
             solid = true;
             liquidCapacity = 2700f;
             liquidPadding = 2f;
+            health = 900;
         }};
 
         //endregion
         //region power
 
         powerNode = new PowerNode("power-node"){{
-            requirements(Category.power, with(Items.copper, 1, Items.lead, 3));
+            requirements(Category.power, with(Items.copper, 2, Items.lead, 6));
             maxNodes = 10;
             laserRange = 6;
+            buildCostMultiplier = 2.5f;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{
@@ -2396,17 +2406,18 @@ public class Blocks{
             envEnabled = Env.any;
             generateEffect = Fx.generatespark;
 
+            itemDurationMultipliers.put(Items.phaseFabric, 210f / 14f);
             drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion());
             consume(new ConsumeItemRadioactive());
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
-            requirements(Category.power, with(Items.lead, 10, Items.silicon, 15));
-            powerProduction = 0.1f;
+            requirements(Category.power, with(Items.lead, 10, Items.silicon, 10));
+            powerProduction = 0.12f;
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
-            requirements(Category.power, with(Items.lead, 80, Items.silicon, 110, Items.phaseFabric, 15));
+            requirements(Category.power, with(Items.lead, 60, Items.silicon, 70, Items.phaseFabric, 15));
             size = 3;
             powerProduction = 1.6f;
         }};
@@ -2433,7 +2444,7 @@ public class Blocks{
             itemDuration = 140f;
             ambientSound = Sounds.pulse;
             ambientSoundVolume = 0.07f;
-            liquidCapacity = 60f;
+            liquidCapacity = 80f;
 
             consumePower(25f);
             consumeItem(Items.blastCompound);
@@ -2443,12 +2454,13 @@ public class Blocks{
         //erekir
 
         beamNode = new BeamNode("beam-node"){{
-            requirements(Category.power, with(Items.beryllium, 8));
+            requirements(Category.power, with(Items.beryllium, 10));
             consumesPower = outputsPower = true;
             health = 90;
             range = 10;
             fogRadius = 1;
             researchCost = with(Items.beryllium, 5);
+            buildCostMultiplier = 2f;
 
             consumePowerBuffered(1000f);
         }};
@@ -2715,7 +2727,7 @@ public class Blocks{
             result = Liquids.water;
             pumpAmount = 0.11f;
             size = 2;
-            liquidCapacity = 30f;
+            liquidCapacity = 40f;
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
             envRequired |= Env.groundWater;
@@ -2731,6 +2743,7 @@ public class Blocks{
             hasLiquids = true;
             hasPower = true;
             hasItems = true;
+            liquidCapacity = 80f;
 
             craftEffect = Fx.none;
             envRequired |= Env.spores;
@@ -2757,7 +2770,7 @@ public class Blocks{
             updateEffectChance = 0.05f;
             pumpAmount = 0.25f;
             size = 3;
-            liquidCapacity = 30f;
+            liquidCapacity = 40f;
             attribute = Attribute.oil;
             baseEfficiency = 0f;
             itemUseTime = 60f;
@@ -3390,18 +3403,18 @@ public class Blocks{
         }};
 
         parallax = new TractorBeamTurret("parallax"){{
-            requirements(Category.turret, with(Items.silicon, 120, Items.titanium, 90, Items.graphite, 30));
+            requirements(Category.turret, with(Items.silicon, 160, Items.titanium, 110, Items.graphite, 50));
 
             hasPower = true;
             size = 2;
-            force = 12f;
-            scaledForce = 6f;
-            range = 240f;
-            damage = 0.3f;
+            force = 16f;
+            scaledForce = 9f;
+            range = 300f;
+            damage = 0.5f;
             scaledHealth = 160;
-            rotateSpeed = 10;
+            rotateSpeed = 12;
 
-            consumePower(3f);
+            consumePower(3.3f);
         }};
 
         swarmer = new ItemTurret("swarmer"){{
@@ -3757,6 +3770,7 @@ public class Blocks{
             ammoUseEffect = Fx.casing3Double;
             ammoPerShot = 2;
             velocityRnd = 0.2f;
+            scaleLifetimeOffset = 1f / 9f;
             recoil = 6f;
             shake = 2f;
             range = 290f;
@@ -5217,7 +5231,7 @@ public class Blocks{
 
             shake = 6f;
             ammoPerShot = 15;
-            maxAmmo = 30;
+            maxAmmo = 45;
             shootY = -1;
             outlineColor = Pal.darkOutline;
             size = 4;
@@ -5504,7 +5518,7 @@ public class Blocks{
         }};
 
         malign = new PowerTurret("malign"){{
-            requirements(Category.turret, with(Items.carbide, 400, Items.beryllium, 2000, Items.silicon, 800, Items.graphite, 800, Items.phaseFabric, 300));
+            requirements(Category.turret, with(Items.carbide, 200, Items.beryllium, 1000, Items.silicon, 500, Items.graphite, 500, Items.phaseFabric, 200));
 
             var haloProgress = PartProgress.warmup;
             Color haloColor = Color.valueOf("d370d3"), heatCol = Color.purple;
@@ -5812,26 +5826,26 @@ public class Blocks{
             }};
 
             velocityRnd = 0.15f;
-            heatRequirement = 90f;
+            heatRequirement = 72f;
             maxHeatEfficiency = 2f;
             warmupMaintainTime = 120f;
-            consumePower(10f);
-
-            shoot = new ShootSummon(0f, 0f, circleRad, 48f);
+            consumePower(40f);
+            unitSort = UnitSorts.strongest;
+            shoot = new ShootSummon(0f, 0f, circleRad, 20f);
 
             minWarmup = 0.96f;
-            shootWarmupSpeed = 0.03f;
+            shootWarmupSpeed = 0.08f;
 
             shootY = circleY - 5f;
 
             outlineColor = Pal.darkOutline;
             envEnabled |= Env.space;
-            reload = 9f;
-            range = 370;
+            reload = 7f;
+            range = 380;
             trackingRange = range * 1.4f;
             shootCone = 100f;
             scaledHealth = 370;
-            rotateSpeed = 2f;
+            rotateSpeed = 2.6f;
             recoil = 0.5f;
             recoilTime = 30f;
             shake = 3f;
@@ -6357,17 +6371,42 @@ public class Blocks{
         //region campaign
 
         launchPad = new LaunchPad("launch-pad"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            requirements(Category.effect, BuildVisibility.legacyLaunchPadOnly, with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 3;
             itemCapacity = 100;
             launchTime = 60f * 20;
             hasPower = true;
+            acceptMultipleItems = true;
             consumePower(4f);
         }};
 
+        advancedLaunchPad = new LaunchPad("advanced-launch-pad"){{
+            requirements(Category.effect, BuildVisibility.notLegacyLaunchPadOnly, with(Items.copper, 350, Items.silicon, 250, Items.lead, 300, Items.titanium, 200));
+            size = 4;
+            itemCapacity = 100;
+            launchTime = 60f * 30;
+            liquidCapacity = 40f;
+            hasPower = true;
+            drawLiquid = Liquids.oil;
+            consumeLiquid(Liquids.oil, 9f/60f);
+            consumePower(8f);
+        }};
+
+        landingPad = new LandingPad("landing-pad"){{
+            requirements(Category.effect, BuildVisibility.notLegacyLaunchPadOnly, with(Items.copper, 200, Items.graphite, 100, Items.titanium, 100));
+            size = 4;
+
+            itemCapacity = 100;
+
+            coolingEffect = new RadialEffect(Fx.steamCoolSmoke, 4, 90f, 9.5f, 180f);
+            liquidCapacity = 3000f;
+            consumeLiquidAmount = 1500f;
+        }};
+
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
-            requirements(Category.effect, BuildVisibility.hidden, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
             researchCostMultiplier = 0.1f;
+            powerBufferRequirement = 1_000_000f;
             size = 7;
             hasPower = true;
             consumePower(10f);

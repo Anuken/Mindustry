@@ -1,9 +1,6 @@
 package mindustry.mod;
 
 import arc.*;
-import arc.assets.*;
-import arc.assets.loaders.MusicLoader.*;
-import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
@@ -642,6 +639,19 @@ public class ContentParser{
                 value.remove("sector");
                 value.remove("planet");
 
+                if(value.has("rules")){
+                    JsonValue r = value.remove("rules");
+                    if(!r.isObject()) throw new RuntimeException("Rules must be an object!");
+                    out.rules = rules -> {
+                        try{
+                            //Use standard JSON, this is not content-parser relevant
+                            JsonIO.json.readFields(rules, r);
+                        }catch(Throwable e){ //Try not to crash here, as that would be catastrophic and confusing
+                            Log.err(e);
+                        }
+                    };
+                }
+
                 readFields(out, value);
             });
             return out;
@@ -698,7 +708,7 @@ public class ContentParser{
                 throw new RuntimeException("Team field missing.");
             }
             value.remove("team");
-            
+
             if(locate(ContentType.team, name) != null){
                 entry = locate(ContentType.team, name);
                 readBundle(ContentType.team, name, value);
@@ -1214,6 +1224,7 @@ public class ContentParser{
                             }
                             //reparent the node
                             node.parent = parent;
+                            node.planet = parent.planet;
                         }
                     }else{
                         Log.warn(unlock.name + " is not a root node, and does not have a `parent: ` property. Ignoring.");

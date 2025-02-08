@@ -45,9 +45,9 @@ public class LExecutor{
     public LInstruction[] instructions = {};
     /** Non-constant variables used for network sync */
     public LVar[] vars = {};
-    
+
     public LVar counter, unit, thisv, ipt;
-    
+
     public int[] binds;
     public boolean yield;
 
@@ -226,7 +226,7 @@ public class LExecutor{
                         cache.found = false;
                         outFound.setnum(0);
                     }
-                    
+
                     if(res != null && res.build != null && 
                         (unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange)) || res.build.team == exec.team)){
                         cache.build = res.build;
@@ -988,6 +988,29 @@ public class LExecutor{
         }
     }
 
+    public static class PrintCharI implements LInstruction{
+        public LVar value;
+
+        public PrintCharI(LVar value){
+            this.value = value;
+        }
+
+        PrintCharI(){}
+
+        @Override
+        public void run(LExecutor exec){
+
+            if(exec.textBuffer.length() >= maxTextBuffer) return;
+            if(value.isobj){
+                if(!(value.objval instanceof UnlockableContent cont)) return;
+                exec.textBuffer.append((char)cont.emojiChar());
+                return;
+            }
+
+            exec.textBuffer.append((char)Math.floor(value.numval));
+        }
+    }
+
     public static class FormatI implements LInstruction{
         public LVar value;
 
@@ -1489,6 +1512,7 @@ public class LExecutor{
                 case dropZoneRadius -> state.rules.dropZoneRadius = value.numf() * 8f;
                 case unitCap -> state.rules.unitCap = Math.max(value.numi(), 0);
                 case lighting -> state.rules.lighting = value.bool();
+                case canGameOver -> state.rules.canGameOver = value.bool();
                 case mapArea -> {
                     int x = p1.numi(), y = p2.numi(), w = p3.numi(), h = p4.numi();
                     if(!checkMapArea(x, y, w, h, false)){
@@ -1515,7 +1539,7 @@ public class LExecutor{
                         state.rules.bannedUnits.remove(u);
                     }
                 }
-                case unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
+                case unitHealth, unitBuildSpeed, unitMineSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     Team team = p1.team();
                     if(team != null){
                         float num = value.numf();
@@ -1523,6 +1547,7 @@ public class LExecutor{
                             case buildSpeed -> team.rules().buildSpeedMultiplier = Mathf.clamp(num, 0.001f, 50f);
                             case unitHealth -> team.rules().unitHealthMultiplier = Math.max(num, 0.001f);
                             case unitBuildSpeed -> team.rules().unitBuildSpeedMultiplier = Mathf.clamp(num, 0f, 50f);
+                            case unitMineSpeed -> team.rules().unitMineSpeedMultiplier = Math.max(num, 0f);
                             case unitCost -> team.rules().unitCostMultiplier = Math.max(num, 0f);
                             case unitDamage -> team.rules().unitDamageMultiplier = Math.max(num, 0f);
                             case blockHealth -> team.rules().blockHealthMultiplier = Math.max(num, 0.001f);
@@ -1939,7 +1964,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             Sound sound = Sounds.getSound(id.numi());
             if(sound == null || sound == Sounds.swish) sound = Sounds.none; //no.
-            
+
             if(positional){
                 sound.at(World.unconv(x.numf()), World.unconv(y.numf()), pitch.numf(), Math.min(volume.numf(), 2f), limit.bool());
             }else{

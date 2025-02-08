@@ -61,6 +61,13 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     @Override
+    public void remove(){
+        for(Payload pay : payloads){
+            pay.remove();
+        }
+        payloads.clear();
+    }
+  
     public void destroy(){
         if(Vars.state.rules.unitPayloadsExplode) payloads.each(Payload::destroyed);
     }

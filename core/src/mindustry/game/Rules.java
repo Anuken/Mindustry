@@ -84,6 +84,8 @@ public class Rules{
     public float unitHealthMultiplier = 1f;
     /** How much damage unit crash damage deals. (Compounds with unitDamageMultiplier) */
     public float unitCrashDamageMultiplier = 1f;
+    /** How fast units can mine. */
+    public float unitMineSpeedMultiplier = 1f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
     public boolean ghostBlocks = true;
     /** Whether to allow units to build with logic. */
@@ -241,6 +243,10 @@ public class Rules{
         return (this.env & env) != 0;
     }
 
+    public float buildRadius(Team team){
+        return enemyCoreBuildRadius + teams.get(team).extraCoreBuildRadius;
+    }
+
     public float unitBuildSpeed(Team team){
         return unitBuildSpeedMultiplier * teams.get(team).unitBuildSpeedMultiplier;
     }
@@ -260,6 +266,10 @@ public class Rules{
 
     public float unitCrashDamage(Team team){
         return unitDamage(team) * unitCrashDamageMultiplier * teams.get(team).unitCrashDamageMultiplier;
+    }
+
+    public float unitMineSpeed(Team team){
+        return unitMineSpeedMultiplier * teams.get(team).unitMineSpeedMultiplier;
     }
 
     public float blockHealth(Team team){
@@ -312,6 +322,8 @@ public class Rules{
         public float unitDamageMultiplier = 1f;
         /** How much damage unit crash damage deals. (Compounds with unitDamageMultiplier) */
         public float unitCrashDamageMultiplier = 1f;
+        /** How fast units can mine. */
+        public float unitMineSpeedMultiplier = 1f;
         /** Multiplier of resources that units take to build. */
         public float unitCostMultiplier = 1f;
         /** How much health units start with. */
@@ -322,6 +334,9 @@ public class Rules{
         public float blockDamageMultiplier = 1f;
         /** Multiplier for building speed. */
         public float buildSpeedMultiplier = 1f;
+        /** Extra spacing added to the no-build zone around the core. */
+        public float extraCoreBuildRadius = 0f;
+
 
         //build cost disabled due to technical complexity
     }
