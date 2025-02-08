@@ -2406,6 +2406,7 @@ public class Blocks{
             envEnabled = Env.any;
             generateEffect = Fx.generatespark;
 
+            itemDurationMultipliers.put(Items.phaseFabric, 210f / 14f);
             drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion());
             consume(new ConsumeItemRadioactive());
         }};
