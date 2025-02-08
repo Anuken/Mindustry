@@ -12,6 +12,10 @@ import java.lang.Class;
 import java.lang.annotation.*;
 import java.lang.reflect.*;
 
+/**
+ * Wrapper over Element with added utility functions.
+ * I would have preferred to use extension methods for this, but Java doesn't have any.
+ * */
 public class Selement<T extends Element>{
     public final T e;
 

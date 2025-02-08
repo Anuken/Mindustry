@@ -5,6 +5,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
@@ -50,14 +51,19 @@ abstract class PosComp implements Position{
         return tile == null ? Blocks.air : tile.block();
     }
 
-    boolean onSolid(){
-        Tile tile = tileOn();
-        return tile == null || tile.solid();
+    @Nullable
+    Building buildOn(){
+        return world.buildWorld(x, y);
     }
 
     @Nullable
     Tile tileOn(){
         return world.tileWorld(x, y);
+    }
+
+    boolean onSolid(){
+        Tile tile = tileOn();
+        return tile == null || tile.solid();
     }
 
     @Override

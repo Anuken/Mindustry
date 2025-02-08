@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.style.*;
+import arc.scene.ui.layout.*;
 import arc.util.pooling.*;
 import mindustry.gen.*;
 
@@ -15,9 +16,9 @@ public class Bar extends Element{
     private static Rect scissor = new Rect();
 
     private Floatp fraction;
-    private String name = "";
-    private float value, lastValue, blink;
-    private Color blinkColor = new Color();
+    private CharSequence name = "";
+    private float value, lastValue, blink, outlineRadius;
+    private Color blinkColor = new Color(), outlineColor = new Color();
 
     public Bar(String name, Color color, Floatp fraction){
         this.fraction = fraction;
@@ -27,21 +28,13 @@ public class Bar extends Element{
         setColor(color);
     }
 
-    public Bar(Prov<String> name, Prov<Color> color, Floatp fraction){
+    public Bar(Prov<CharSequence> name, Prov<Color> color, Floatp fraction){
         this.fraction = fraction;
-        try{
-            lastValue = value = Mathf.clamp(fraction.get());
-        }catch(Exception e){ //getting the fraction may involve referring to invalid data
-            lastValue = value = 0f;
-        }
+        lastValue = value = Mathf.clamp(fraction.get());
         update(() -> {
-            try{
-                this.name = name.get();
-                this.blinkColor.set(color.get());
-                setColor(color.get());
-            }catch(Exception e){ //getting the fraction may involve referring to invalid data
-                this.name = "";
-            }
+            this.name = name.get();
+            this.blinkColor.set(color.get());
+            setColor(color.get());
         });
     }
 
@@ -61,6 +54,20 @@ public class Bar extends Element{
         update(() -> this.name = name.get());
     }
 
+    public void snap(){
+        lastValue = value = fraction.get();
+    }
+
+    public Bar outline(Color color, float stroke){
+        outlineColor.set(color);
+        outlineRadius = Scl.scl(stroke);
+        return this;
+    }
+
+    public void flash(){
+        blink = 1f;
+    }
+
     public Bar blink(Color color){
         blinkColor.set(color);
         return this;
@@ -70,12 +77,8 @@ public class Bar extends Element{
     public void draw(){
         if(fraction == null) return;
 
-        float computed;
-        try{
-            computed = Mathf.clamp(fraction.get());
-        }catch(Exception e){ //getting the fraction may involve referring to invalid data
-            computed = 0f;
-        }
+        float computed = Mathf.clamp(fraction.get());
+
 
         if(lastValue > computed){
             blink = 1f;
@@ -94,9 +97,16 @@ public class Bar extends Element{
 
         Drawable bar = Tex.bar;
 
+        if(outlineRadius > 0){
+            Draw.color(outlineColor);
+            bar.draw(x - outlineRadius, y - outlineRadius, width + outlineRadius*2, height + outlineRadius*2);
+        }
+
         Draw.colorl(0.1f);
+        Draw.alpha(parentAlpha);
         bar.draw(x, y, width, height);
         Draw.color(color, blinkColor, blink);
+        Draw.alpha(parentAlpha);
 
         Drawable top = Tex.barTop;
         float topWidth = width * value;
@@ -116,8 +126,10 @@ public class Bar extends Element{
         GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         lay.setText(font, name);
 
-        font.setColor(Color.white);
-        font.draw(name, x + width / 2f - lay.width / 2f, y + height / 2f + lay.height / 2f + 1);
+        font.setColor(1f, 1f, 1f, 1f);
+        font.getCache().clear();
+        font.getCache().addText(name, x + width / 2f - lay.width / 2f, y + height / 2f + lay.height / 2f + 1);
+        font.getCache().draw(parentAlpha);
 
         Pools.free(lay);
     }

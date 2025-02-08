@@ -2,23 +2,24 @@ package mindustry.maps.filters;
 
 import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
+import mindustry.gen.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 public class MedianFilter extends GenerateFilter{
-    float radius = 2;
-    float percentile = 0.5f;
-    IntSeq blocks = new IntSeq(), floors = new IntSeq();
+    private static final IntSeq blocks = new IntSeq(), floors = new IntSeq();
+
+    public float radius = 2;
+    public float percentile = 0.5f;
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("radius", () -> radius, f -> radius = f, 1f, 12f),
-        new SliderOption("percentile", () -> percentile, f -> percentile = f, 0f, 1f)
-        );
+        return new SliderOption[]{
+            new SliderOption("radius", () -> radius, f -> radius = f, 1f, 10f),
+            new SliderOption("percentile", () -> percentile, f -> percentile = f, 0f, 1f)
+        };
     }
 
     @Override
@@ -27,7 +28,12 @@ public class MedianFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(){
+    public char icon(){
+        return Iconc.blockSporePine;
+    }
+
+    @Override
+    public void apply(GenerateInput in){
         int rad = (int)radius;
         blocks.clear();
         floors.clear();
@@ -44,8 +50,7 @@ public class MedianFilter extends GenerateFilter{
         floors.sort();
         blocks.sort();
 
-        int index = Math.min((int)(floors.size * percentile), floors.size - 1);
-        int floor = floors.get(index), block = blocks.get(index);
+        int floor = floors.get(Math.min((int)(floors.size * percentile), floors.size - 1)), block = blocks.get(Math.min((int)(blocks.size * percentile), blocks.size - 1));
 
         in.floor = content.block(floor);
         if(!content.block(block).synthetic() && !in.block.synthetic()) in.block = content.block(block);

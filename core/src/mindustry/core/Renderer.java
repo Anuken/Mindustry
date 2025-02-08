@@ -1,29 +1,36 @@
 package mindustry.core;
 
 import arc.*;
+import arc.assets.loaders.TextureLoader.*;
+import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.content.*;
+import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
-import mindustry.ui.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.maps.*;
+import mindustry.type.*;
+import mindustry.world.blocks.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class Renderer implements ApplicationListener{
     /** These are global variables, for headless access. Cached. */
-    public static float laserOpacity = 0.5f, bridgeOpacity = 0.75f;
+    public static float laserOpacity = 0.5f, unitLaserOpacity = 1f, bridgeOpacity = 0.75f;
 
     public final BlockRenderer blocks = new BlockRenderer();
+    public final FogRenderer fog = new FogRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
     public final LightRenderer lights = new LightRenderer();
@@ -31,24 +38,59 @@ public class Renderer implements ApplicationListener{
     public PlanetRenderer planets;
 
     public @Nullable Bloom bloom;
+    public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, drawWeather = true, drawStatus;
+    public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false;
+    public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
+    public Seq<EnvRenderer> envRenderers = new Seq<>();
+    public ObjectMap<String, Runnable> customBackgrounds = new ObjectMap<>();
+    public TextureRegion[] bubbles = new TextureRegion[16], splashes = new TextureRegion[12];
+    public TextureRegion[][] fluidFrames;
 
-    private @Nullable CoreBuild landCore;
+    //currently landing core, null if there are no cores or it has finished landing.
+    private @Nullable LaunchAnimator launchAnimator;
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
-    private float targetscale = Scl.scl(4), camerascale = targetscale, landscale, landTime, weatherAlpha, minZoomScl = Scl.scl(0.01f);
-    private float shakeIntensity, shaketime;
+    private float
+    //target camera scale that is lerp-ed to
+    targetscale = Scl.scl(4),
+    //current actual camera scale
+    camerascale = targetscale,
+    //starts at coreLandDuration, ends at 0. if positive, core is landing.
+    landTime,
+    //intensity for screen shake
+    shakeIntensity,
+    //reduction rate of screen shake
+    shakeReduction,
+    //current duration of screen shake
+    shakeTime;
+    //for landTime > 0: if true, core is currently *launching*, otherwise landing.
+    private boolean launching;
+    private Vec2 camShakeOffset = new Vec2();
 
     public Renderer(){
         camera = new Camera();
         Shaders.init();
+
+        Events.on(ResetEvent.class, e -> {
+            shakeTime = shakeIntensity = shakeReduction = 0f;
+            camShakeOffset.setZero();
+        });
     }
 
     public void shake(float intensity, float duration){
-        shakeIntensity = Math.max(shakeIntensity, intensity);
-        shaketime = Math.max(shaketime, duration);
+        shakeIntensity = Math.max(shakeIntensity, Mathf.clamp(intensity, 0, 100));
+        shakeTime = Math.max(shakeTime, duration);
+        shakeReduction = shakeIntensity / shakeTime;
+    }
+
+    public void addEnvRenderer(int mask, Runnable render){
+        envRenderers.add(new EnvRenderer(mask, render));
+    }
+
+    public void addCustomBackground(String name, Runnable render){
+        customBackgrounds.put(name, render);
     }
 
     @Override
@@ -59,30 +101,89 @@ public class Renderer implements ApplicationListener{
             setupBloom();
         }
 
-        Events.on(WorldLoadEvent.class, e -> {
-            landCore = player.bestCore();
+        EnvRenderers.init();
+        for(int i = 0; i < bubbles.length; i++) bubbles[i] = atlas.find("bubble-" + i);
+        for(int i = 0; i < splashes.length; i++) splashes[i] = atlas.find("splash-" + i);
+
+        loadFluidFrames();
+
+        Events.on(ClientLoadEvent.class, e -> {
+            loadFluidFrames();
         });
+
+        assets.load("sprites/clouds.png", Texture.class).loaded = t -> {
+            t.setWrap(TextureWrap.repeat);
+            t.setFilter(TextureFilter.linear);
+        };
+
+        Events.on(WorldLoadEvent.class, e -> {
+            //reset background buffer on every world load, so it can be re-cached first render
+            if(backgroundBuffer != null){
+                backgroundBuffer.dispose();
+                backgroundBuffer = null;
+            }
+        });
+    }
+
+    public void loadFluidFrames(){
+        fluidFrames = new TextureRegion[2][Liquid.animationFrames];
+
+        String[] fluidTypes = {"liquid", "gas"};
+
+        for(int i = 0; i < fluidTypes.length; i++){
+
+            for(int j = 0; j < Liquid.animationFrames; j++){
+                fluidFrames[i][j] = atlas.find("fluid-" + fluidTypes[i] + "-" + j);
+            }
+        }
+    }
+
+    public TextureRegion[][] getFluidFrames(){
+        if(fluidFrames == null || fluidFrames[0][0].texture.isDisposed()){
+            loadFluidFrames();
+        }
+        return fluidFrames;
     }
 
     @Override
     public void update(){
         Color.white.set(1f, 1f, 1f, 1f);
 
-        float dest = Mathf.round(targetscale, 0.5f);
+        float baseTarget = targetscale;
+
+        if(control.input.logicCutscene){
+            baseTarget = Mathf.lerp(minZoom, maxZoom, control.input.logicCutsceneZoom);
+        }
+
+        float dest = Mathf.clamp(Mathf.round(baseTarget, 0.5f), minScale(), maxScale());
         camerascale = Mathf.lerpDelta(camerascale, dest, 0.1f);
         if(Mathf.equal(camerascale, dest, 0.001f)) camerascale = dest;
+        unitLaserOpacity = settings.getInt("unitlaseropacity") / 100f;
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
         animateShields = settings.getBool("animatedshields");
-        drawStatus = Core.settings.getBool("blockstatus");
+        drawStatus = settings.getBool("blockstatus");
+        enableEffects = settings.getBool("effects");
+        drawDisplays = !settings.getBool("hidedisplays");
+        drawLight = settings.getBool("drawlight", true);
+        pixelate = settings.getBool("pixelate");
 
+        //don't bother drawing landing animation if core is null
+        if(launchAnimator == null) landTime = 0f;
         if(landTime > 0){
-            landTime -= Time.delta;
-            landscale = Interp.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
-            camerascale = landscale;
+            if(!state.isPaused()) launchAnimator.updateLaunch();
+
             weatherAlpha = 0f;
+            camerascale = launchAnimator.zoomLaunch();
+
+            if(!state.isPaused()) landTime -= Time.delta;
         }else{
             weatherAlpha = Mathf.lerpDelta(weatherAlpha, 1f, 0.08f);
+        }
+
+        if(launchAnimator != null && landTime <= 0f){
+            launchAnimator.endLaunch();
+            launchAnimator = null;
         }
 
         camera.width = graphics.getWidth() / camerascale;
@@ -92,25 +193,42 @@ public class Renderer implements ApplicationListener{
             landTime = 0f;
             graphics.clear(Color.black);
         }else{
-            updateShake(0.75f);
-            if(pixelator.enabled()){
+            minimap.update();
+
+            if(shakeTime > 0){
+                float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * 0.75f;
+                camShakeOffset.setToRandomDirection().scl(Mathf.random(intensity));
+                camera.position.add(camShakeOffset);
+                shakeIntensity -= shakeReduction * Time.delta;
+                shakeTime -= Time.delta;
+                shakeIntensity = Mathf.clamp(shakeIntensity, 0f, 100f);
+            }else{
+                camShakeOffset.setZero();
+                shakeIntensity = 0f;
+            }
+
+            if(renderer.pixelate){
                 pixelator.drawPixelate();
             }else{
                 draw();
             }
+
+            camera.position.sub(camShakeOffset);
         }
     }
 
-    public boolean isLanding(){
+    public void updateAllDarkness(){
+        blocks.updateDarkness();
+        minimap.updateAll();
+    }
+
+    /** @return whether a launch/land cutscene is playing. */
+    public boolean isCutscene(){
         return landTime > 0;
     }
 
-    public float weatherAlpha(){
-        return weatherAlpha;
-    }
-
     public float landScale(){
-        return landTime > 0 ? landscale : 1f;
+        return landTime > 0 ? camerascale : 1f;
     }
 
     @Override
@@ -152,20 +270,9 @@ public class Renderer implements ApplicationListener{
         }
     }
 
-    void updateShake(float scale){
-        if(shaketime > 0){
-            float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * scale;
-            camera.position.add(Mathf.range(intensity), Mathf.range(intensity));
-            shakeIntensity -= 0.25f * Time.delta;
-            shaketime -= Time.delta;
-            shakeIntensity = Mathf.clamp(shakeIntensity, 0f, 100f);
-        }else{
-            shakeIntensity = 0f;
-        }
-    }
-
     public void draw(){
         Events.fire(Trigger.preDraw);
+        MapPreviewLoader.checkPreviews();
 
         camera.update();
 
@@ -176,20 +283,22 @@ public class Renderer implements ApplicationListener{
         graphics.clear(clearColor);
         Draw.reset();
 
-        if(Core.settings.getBool("animatedwater") || animateShields){
+        if(settings.getBool("animatedwater") || animateShields){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
         Draw.proj(camera);
 
+        blocks.checkChanges();
         blocks.floor.checkChanges();
         blocks.processBlocks();
 
         Draw.sort(true);
 
         Events.fire(Trigger.draw);
+        MapPreviewLoader.checkPreviews();
 
-        if(pixelator.enabled()){
+        if(renderer.pixelate){
             pixelator.register();
         }
 
@@ -204,7 +313,14 @@ public class Renderer implements ApplicationListener{
 
         Draw.drawRange(Layer.blockBuilding, () -> Draw.shader(Shaders.blockbuild, true), Draw::shader);
 
-        if(state.rules.lighting){
+        //render all matching environments
+        for(var renderer : envRenderers){
+            if((renderer.env & state.rules.env) == renderer.env){
+                renderer.renderer.run();
+            }
+        }
+
+        if(state.rules.lighting && drawLight){
             Draw.draw(Layer.light, lights::draw);
         }
 
@@ -213,14 +329,19 @@ public class Renderer implements ApplicationListener{
         }
 
         if(bloom != null){
-            bloom.resize(graphics.getWidth() / 4, graphics.getHeight() / 4);
-            Draw.draw(Layer.bullet - 0.01f, bloom::capture);
-            Draw.draw(Layer.effect + 0.01f, bloom::render);
+            bloom.resize(graphics.getWidth(), graphics.getHeight());
+            bloom.setBloomIntensity(settings.getInt("bloomintensity", 6) / 4f + 1f);
+            bloom.blurPasses = settings.getInt("bloomblur", 1);
+            Draw.draw(Layer.bullet - 0.02f, bloom::capture);
+            Draw.draw(Layer.effect + 0.02f, bloom::render);
         }
+
+        control.input.drawCommanded();
 
         Draw.draw(Layer.plans, overlays::drawBottom);
 
         if(animateShields && Shaders.shield != null){
+            //TODO would be nice if there were a way to detect if any shields or build beams actually *exist* before beginning/ending buffers, otherwise you're just blitting and swapping shaders for nothing
             Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
                 effectBuffer.end();
                 effectBuffer.blit(Shaders.shield);
@@ -232,9 +353,38 @@ public class Renderer implements ApplicationListener{
             });
         }
 
-        Draw.draw(Layer.overlayUI, overlays::drawTop);
-        Draw.draw(Layer.space, this::drawLanding);
+        float scaleFactor = 4f / renderer.getDisplayScale();
 
+        //draw objective markers
+        state.rules.objectives.eachRunning(obj -> {
+            for(var marker : obj.markers){
+                if(marker.world){
+                    marker.draw(marker.autoscale ? scaleFactor : 1);
+                }
+            }
+        });
+
+        for(var marker : state.markers){
+            if(marker.world){
+                marker.draw(marker.autoscale ? scaleFactor : 1);
+            }
+        }
+
+        Draw.reset();
+
+        Draw.draw(Layer.overlayUI, overlays::drawTop);
+        if(state.rules.fog) Draw.draw(Layer.fogOfWar, fog::drawFog);
+        Draw.draw(Layer.space, () -> {
+            if(launchAnimator == null || landTime <= 0f) return;
+            launchAnimator.drawLaunch();
+        });
+        if(launchAnimator != null){
+            Draw.z(Layer.space);
+            launchAnimator.drawLaunchGlobalZ();
+            Draw.reset();
+        }
+
+        Events.fire(Trigger.drawOver);
         blocks.drawBlocks();
 
         Groups.draw.draw(Drawc::draw);
@@ -246,32 +396,79 @@ public class Renderer implements ApplicationListener{
         Events.fire(Trigger.postDraw);
     }
 
-    private void drawBackground(){
+    protected void drawBackground(){
+        //draw background only if there is no planet background with a skybox
+        if(state.rules.backgroundTexture != null && (state.rules.planetBackground == null || !state.rules.planetBackground.drawSkybox)){
+            if(!assets.isLoaded(state.rules.backgroundTexture, Texture.class)){
+                var file = assets.getFileHandleResolver().resolve(state.rules.backgroundTexture);
 
-    }
+                //don't draw invalid/non-existent backgrounds.
+                if(!file.exists() || !file.extEquals("png")){
+                    return;
+                }
 
-    private void drawLanding(){
-        CoreBuild entity = landCore == null ? player.bestCore() : landCore;
-        if(landTime > 0 && entity != null){
-            float fract = landTime / Fx.coreLand.lifetime;
+                var desc = assets.load(state.rules.backgroundTexture, Texture.class, new TextureParameter(){{
+                    wrapU = wrapV = TextureWrap.mirroredRepeat;
+                    magFilter = minFilter = TextureFilter.linear;
+                }});
 
-            TextureRegion reg = entity.block.icon(Cicon.full);
-            float scl = Scl.scl(4f) / camerascale;
-            float s = reg.width * Draw.scl * scl * 4f * fract;
+                assets.finishLoadingAsset(desc);
+            }
 
-            Draw.color(Pal.lightTrail);
-            Draw.rect("circle-shadow", entity.x, entity.y, s, s);
+            Texture tex = assets.get(state.rules.backgroundTexture, Texture.class);
+            Tmp.tr1.set(tex);
+            Tmp.tr1.u = 0f;
+            Tmp.tr1.v = 0f;
 
-            Angles.randLenVectors(1, (1f- fract), 100, 1000f * scl * (1f-fract), (x, y, fin, fout) -> {
-                Lines.stroke(scl * fin);
-                Lines.lineAngle(entity.x + x, entity.y + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
-            });
+            float ratio = camera.width / camera.height;
+            float size = state.rules.backgroundScl;
 
-            Draw.color();
-            Draw.mixcol(Color.white, fract);
-            Draw.rect(reg, entity.x, entity.y, reg.width * Draw.scl * scl, reg.height * Draw.scl * scl, fract * 135f);
+            Tmp.tr1.u2 = size;
+            Tmp.tr1.v2 = size / ratio;
 
-            Draw.reset();
+            float sx = 0f, sy = 0f;
+
+            if(!Mathf.zero(state.rules.backgroundSpeed)){
+                sx = (camera.position.x) / state.rules.backgroundSpeed;
+                sy = (camera.position.y) / state.rules.backgroundSpeed;
+            }
+
+            Tmp.tr1.scroll(sx + state.rules.backgroundOffsetX, -sy + state.rules.backgroundOffsetY);
+
+            Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
+        }
+
+        if(state.rules.planetBackground != null){
+            int size = Math.max(graphics.getWidth(), graphics.getHeight());
+
+            boolean resized = false;
+            if(backgroundBuffer == null){
+                resized = true;
+                backgroundBuffer = new FrameBuffer(size, size);
+            }
+
+            if(resized || backgroundBuffer.resizeCheck(size, size)){
+                backgroundBuffer.begin(Color.clear);
+
+                var params = state.rules.planetBackground;
+
+                //override some values
+                params.viewW = size;
+                params.viewH = size;
+                params.alwaysDrawAtmosphere = true;
+                params.drawUi = false;
+
+                planets.render(params);
+
+                backgroundBuffer.end();
+            }
+
+            float drawSize = Math.max(camera.width, camera.height);
+            Draw.rect(Draw.wrap(backgroundBuffer.getTexture()), camera.position.x, camera.position.y, drawSize, -drawSize);
+        }
+
+        if(state.rules.customBackgroundCallback != null && customBackgrounds.containsKey(state.rules.customBackgroundCallback)){
+            customBackgrounds.get(state.rules.customBackgroundCallback).run();
         }
     }
 
@@ -305,16 +502,52 @@ public class Renderer implements ApplicationListener{
         clampScale();
     }
 
-    public void zoomIn(float duration){
-        landscale = minZoomScl;
-        landTime = duration;
+    public boolean isLaunching(){
+        return launching;
+    }
+
+    public float getLandTime(){
+        return landTime;
+    }
+
+    public float getLandTimeIn(){
+        if(launchAnimator == null) return 0f;
+        float fin = landTime / launchAnimator.launchDuration();
+        if(!launching) fin = 1f - fin;
+        return fin;
+    }
+
+    public void showLanding(LaunchAnimator landCore){
+        this.launchAnimator = landCore;
+        launching = false;
+        landTime = landCore.launchDuration();
+
+        landCore.beginLaunch(false);
+        camerascale = landCore.zoomLaunch();
+    }
+
+    public void showLaunch(LaunchAnimator landCore){
+        control.input.config.hideConfig();
+        control.input.planConfig.hide();
+        control.input.inv.hide();
+
+        this.launchAnimator = landCore;
+        launching = true;
+        landTime = landCore.launchDuration();
+
+        Music music = landCore.launchMusic();
+        music.stop();
+        music.play();
+        music.setVolume(settings.getInt("musicvol") / 100f);
+
+        landCore.beginLaunch(true);
     }
 
     public void takeMapScreenshot(){
         int w = world.width() * tilesize, h = world.height() * tilesize;
         int memory = w * h * 4 / 1024 / 1024;
 
-        if(memory >= (mobile ? 65 : 120)){
+        if(Vars.checkScreenshotMemory && memory >= (mobile ? 65 : 120)){
             ui.showInfo("@screenshot.invalid");
             return;
         }
@@ -330,25 +563,39 @@ public class Renderer implements ApplicationListener{
         camera.position.y = h / 2f + tilesize / 2f;
         buffer.begin();
         draw();
+        Draw.flush();
+        byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
         buffer.end();
         disableUI = false;
         camera.width = vpW;
         camera.height = vpH;
         camera.position.set(px, py);
-        buffer.begin();
-        byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
-        for(int i = 0; i < lines.length; i += 4){
-            lines[i + 3] = (byte)255;
-        }
-        buffer.end();
-        Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.rgba8888);
-        Buffers.copy(lines, 0, fullPixmap.getPixels(), lines.length);
-        Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
-        PixmapIO.writePNG(file, fullPixmap);
-        fullPixmap.dispose();
-        ui.showInfoFade(Core.bundle.format("screenshot", file.toString()));
         drawWeather = true;
-
         buffer.dispose();
+
+        Threads.thread(() -> {
+            for(int i = 0; i < lines.length; i += 4){
+                lines[i + 3] = (byte)255;
+            }
+            Pixmap fullPixmap = new Pixmap(w, h);
+            Buffers.copy(lines, 0, fullPixmap.pixels, lines.length);
+            Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
+            PixmapIO.writePng(file, fullPixmap);
+            fullPixmap.dispose();
+            app.post(() -> ui.showInfoFade(bundle.format("screenshot", file.toString())));
+        });
     }
+
+    public static class EnvRenderer{
+        /** Environment bitmask; must match env exactly when and-ed. */
+        public final int env;
+        /** Rendering callback. */
+        public final Runnable renderer;
+
+        public EnvRenderer(int env, Runnable renderer){
+            this.env = env;
+            this.renderer = renderer;
+        }
+    }
+
 }

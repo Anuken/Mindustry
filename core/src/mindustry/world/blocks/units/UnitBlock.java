@@ -1,20 +1,12 @@
 package mindustry.world.blocks.units;
 
-import arc.*;
-import arc.math.*;
-import arc.util.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
-import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.*;
-
-public class UnitBlock extends PayloadAcceptor{
+public class UnitBlock extends PayloadBlock{
 
     public UnitBlock(String name){
         super(name);
@@ -31,7 +23,7 @@ public class UnitBlock extends PayloadAcceptor{
         build.spawned();
     }
 
-    public class UnitBuild extends PayloadAcceptorBuild<UnitPayload>{
+    public class UnitBuild extends PayloadBlockBuild<UnitPayload>{
         public float progress, time, speedScl;
 
         public void spawned(){

@@ -17,7 +17,7 @@ public class SapBulletType extends BulletType{
     public float width = 0.4f;
 
     public SapBulletType(){
-        speed = 0.0001f;
+        speed = 0f;
         despawnEffect = Fx.none;
         pierce = true;
         collides = false;
@@ -25,7 +25,10 @@ public class SapBulletType extends BulletType{
         hittable = false;
         hitEffect = Fx.hitLiquid;
         status = StatusEffects.sapped;
+        lightColor = Pal.sap;
+        lightOpacity = 0.6f;
         statusDuration = 60f * 3f;
+        impact = true;
     }
 
     @Override
@@ -34,12 +37,12 @@ public class SapBulletType extends BulletType{
             Tmp.v1.set(data).lerp(b, b.fin());
 
             Draw.color(color);
-            Drawf.laser(b.team, Core.atlas.find("laser"), Core.atlas.find("laser-end"),
+            Drawf.laser(Core.atlas.find("laser"), Core.atlas.find("laser-end"),
                 b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * b.fout());
 
             Draw.reset();
 
-            Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, 15f * b.fout(), lightColor, 0.6f);
+            Drawf.light(b.x, b.y, Tmp.v1.x, Tmp.v1.y, 15f * b.fout(), lightColor, lightOpacity);
         }
     }
 
@@ -49,7 +52,7 @@ public class SapBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
+    protected float calculateRange(){
         return Math.max(length, maxRange);
     }
 

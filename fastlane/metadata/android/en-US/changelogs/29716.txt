@@ -1,9 +1,0 @@
-Yes, it's another one. Get ready for more rapid-fire releases.
-
-- Fixed sound not working [Android]
-- Fixed sound being muffled at start of game
-- Fixed continuous lasers setting shooters on fire
-- Fixed deconstruction area not being queued [Mobile]
-- Limited logic symbols to 40 characters
-- Added "Launching From" info to sector launch dialog
-- Added final campaign sector (untested!)

@@ -26,7 +26,7 @@ public class BranchTreeLayout implements TreeLayout{
     }
 
     private float getWidthOrHeightOfNode(TreeNode treeNode, boolean returnWidth){
-        return returnWidth ? treeNode.width : treeNode.height;
+        return returnWidth ? treeNode.calcWidth() : treeNode.height;
     }
 
     private float getNodeThickness(TreeNode treeNode){

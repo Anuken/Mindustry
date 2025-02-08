@@ -1,3 +1,0 @@
-- Fixed file chooser crash [Android]
-- Fixed time stopping after sector capture
-- Moved Ruinous Shores map to more approppriate location

@@ -4,11 +4,9 @@ import arc.struct.*;
 import mindustry.entities.bullet.*;
 import mindustry.logic.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
 public class PowerTurret extends Turret{
     public BulletType shootType;
-    public float powerUse = 1f;
 
     public PowerTurret(String name){
         super(name);
@@ -18,13 +16,11 @@ public class PowerTurret extends Turret{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(Stat.ammo, new AmmoListValue<>(OrderedMap.of(this, shootType)));
+        stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType)));
     }
 
-    @Override
-    public void init(){
-        consumes.powerCond(powerUse, TurretBuild::isActive);
-        super.init();
+    public void limitRange(float margin){
+        limitRange(shootType, margin);
     }
 
     public class PowerTurretBuild extends TurretBuild{

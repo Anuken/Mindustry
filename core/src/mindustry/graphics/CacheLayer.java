@@ -3,95 +3,113 @@ package mindustry.graphics;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.gl.*;
+import arc.math.*;
+import arc.util.*;
 
 import static mindustry.Vars.*;
 
-public enum CacheLayer{
-    water{
-        @Override
-        public void begin(){
-            beginShader();
-        }
+public class CacheLayer{
+    public static CacheLayer
 
-        @Override
-        public void end(){
-            endShader(Shaders.water);
-        }
-    },
-    mud{
-        @Override
-        public void begin(){
-            beginShader();
-        }
+    water, mud, cryofluid, tar, slag, arkycite,
+    space, normal, walls;
 
-        @Override
-        public void end(){
-            endShader(Shaders.mud);
-        }
-    },
-    tar{
-        @Override
-        public void begin(){
-            beginShader();
-        }
+    public static CacheLayer[] all = {};
 
-        @Override
-        public void end(){
-            endShader(Shaders.tar);
-        }
-    },
-    slag{
-        @Override
-        public void begin(){
-            beginShader();
-        }
+    public int id;
 
-        @Override
-        public void end(){
-            endShader(Shaders.slag);
+    /** Registers cache layers that will render before the 'normal' layer. */
+    public static void add(CacheLayer... layers){
+        for(var layer : layers){
+            //7 = 'normal' index
+            add(7, layer);
         }
-    },
-    space{
-        @Override
-        public void begin(){
-            beginShader();
+    }
+
+    /** Register CacheLayers at the end of the array. This will render over "normal" tiles. This is likely not the method you want to use. */
+    public static void addLast(CacheLayer... layers){
+        int newSize = all.length + layers.length;
+        var prev = all;
+        //reallocate the array and copy everything over; performance matters very little here anyway
+        all = new CacheLayer[newSize];
+        System.arraycopy(prev, 0, all, 0, prev.length);
+        System.arraycopy(layers, 0, all, prev.length, layers.length);
+
+        for(int i = 0; i < all.length; i++){
+            all[i].id = i;
         }
+    }
 
-        @Override
-        public void end(){
-            endShader(Shaders.space);
+    /** Adds a cache layer at a certain position. All layers >= this index are shifted upwards.*/
+    public static void add(int index, CacheLayer layer){
+        index = Mathf.clamp(index, 0, all.length - 1);
+
+        var prev = all;
+        all = new CacheLayer[all.length + 1];
+
+        System.arraycopy(prev, 0, all, 0, index);
+        System.arraycopy(prev, index, all, index + 1, prev.length - index);
+
+        all[index] = layer;
+
+        for(int i = 0; i < all.length; i++){
+            all[i].id = i;
         }
-    },
-    normal,
-    walls;
+    }
 
-    public static final CacheLayer[] all = values();
+    /** Loads default cache layers. */
+    public static void init(){
+        addLast(
+            water = new ShaderLayer(Shaders.water),
+            mud = new ShaderLayer(Shaders.mud),
+            tar = new ShaderLayer(Shaders.tar),
+            slag = new ShaderLayer(Shaders.slag),
+            arkycite = new ShaderLayer(Shaders.arkycite),
+            cryofluid = new ShaderLayer(Shaders.cryofluid),
+            space = new ShaderLayer(Shaders.space),
+            normal = new CacheLayer(),
+            walls = new CacheLayer()
+        );
+    }
 
+    /** Called before the cache layer begins rendering. Begin FBOs here. */
     public void begin(){
 
     }
 
+    /** Called after the cache layer ends rendering. Blit FBOs here. */
     public void end(){
 
     }
 
-    void beginShader(){
-        if(!Core.settings.getBool("animatedwater")) return;
+    public static class ShaderLayer extends CacheLayer{
+        public @Nullable Shader shader;
 
-        renderer.blocks.floor.endc();
-        renderer.effectBuffer.begin();
-        Core.graphics.clear(Color.clear);
-        renderer.blocks.floor.beginc();
-    }
+        public ShaderLayer(Shader shader){
+            //shader will be null on headless backend, but that's ok
+            this.shader = shader;
+        }
 
-    void endShader(Shader shader){
-        if(!Core.settings.getBool("animatedwater")) return;
+        @Override
+        public void begin(){
+            if(!Core.settings.getBool("animatedwater")) return;
 
-        renderer.blocks.floor.endc();
-        renderer.effectBuffer.end();
+            renderer.blocks.floor.endc();
+            renderer.effectBuffer.begin();
+            Core.graphics.clear(Color.clear);
+            renderer.blocks.floor.beginc();
+        }
 
-        renderer.effectBuffer.blit(shader);
+        @Override
+        public void end(){
+            if(!Core.settings.getBool("animatedwater")) return;
 
-        renderer.blocks.floor.beginc();
+            renderer.blocks.floor.endc();
+            renderer.effectBuffer.end();
+
+            renderer.effectBuffer.blit(shader);
+
+            renderer.blocks.floor.beginc();
+        }
     }
 }

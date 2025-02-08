@@ -16,6 +16,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 
 public class LCanvas extends Table{
@@ -26,10 +27,12 @@ public class LCanvas extends Table{
     public DragLayout statements;
     public ScrollPane pane;
     public Group jumps;
+
     StatementElem dragging;
     StatementElem hovered;
     float targetWidth;
     int jumpCount = 0;
+    boolean privileged;
     Seq<Tooltip> tooltips = new Seq<>();
 
     public LCanvas(){
@@ -97,7 +100,7 @@ public class LCanvas extends Table{
 
     public void rebuild(){
         targetWidth = useRows() ? 400f : 900f;
-        float s = pane != null ? pane.getScrollPercentY() : 0f;
+        float s = pane != null ? pane.getVisualScrollY() : 0f;
         String toLoad = statements != null ? save() : null;
 
         clear();
@@ -112,14 +115,8 @@ public class LCanvas extends Table{
 
             jumps.cullable = false;
         }).grow().get();
-        //pane.setClip(false);
         pane.setFlickScroll(false);
-
-        //load old scroll percent
-        Core.app.post(() -> {
-            pane.setScrollPercentY(s);
-            pane.updateVisualScroll();
-        });
+        pane.setScrollYForce(s);
 
         if(toLoad != null){
             load(toLoad);
@@ -146,7 +143,7 @@ public class LCanvas extends Table{
     public void load(String asm){
         jumps.clear();
 
-        Seq<LStatement> statements = LAssembler.read(asm);
+        Seq<LStatement> statements = LAssembler.read(asm, privileged);
         statements.truncate(LExecutor.maxInstructions);
         this.statements.clearChildren();
         for(LStatement st : statements){
@@ -160,8 +157,14 @@ public class LCanvas extends Table{
         this.statements.layout();
     }
 
+    public void clearStatements(){
+        jumps.clear();
+        statements.clearChildren();
+        statements.layout();
+    }
+
     StatementElem checkHovered(){
-        Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+        Element e = Core.scene.getHoverElement();
         if(e != null){
             while(e != null && !(e instanceof StatementElem)){
                 e = e.parent;
@@ -182,7 +185,7 @@ public class LCanvas extends Table{
             float dst = Math.min(y - this.y, Core.graphics.getHeight() - y);
             if(dst < Scl.scl(100f)){ //scroll margin
                 int sign = Mathf.sign(Core.graphics.getHeight()/2f - y);
-                pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f));
+                pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f) * Time.delta);
             }
         }
     }
@@ -217,6 +220,7 @@ public class LCanvas extends Table{
 
                 e.setSize(width, e.getPrefHeight());
                 e.setPosition(0, height - cy, Align.topLeft);
+                ((StatementElem)e).updateAddress(i);
 
                 cy += e.getPrefHeight() + space;
                 seq.add(e);
@@ -246,7 +250,7 @@ public class LCanvas extends Table{
                 }
             }
 
-            invalidateHierarchy();
+            if(parent != null) parent.invalidateHierarchy();
 
             if(parent != null && parent instanceof Table){
                 setCullingArea(parent.getCullingArea());
@@ -316,13 +320,15 @@ public class LCanvas extends Table{
 
     public class StatementElem extends Table{
         public LStatement st;
+        public int index;
+        Label addressLabel;
 
         public StatementElem(LStatement st){
             this.st = st;
             st.elem = this;
 
             background(Tex.whitePane);
-            setColor(st.color());
+            setColor(st.category().color);
             margin(0f);
             touchable = Touchable.enabled;
 
@@ -333,8 +339,10 @@ public class LCanvas extends Table{
                 t.margin(6f);
                 t.touchable = Touchable.enabled;
 
-                t.add(st.name()).style(Styles.outlineLabel).color(color).padRight(8);
+                t.add(st.name()).style(Styles.outlineLabel).name("statement-name").color(color).padRight(8);
                 t.add().growX();
+
+                addressLabel = t.add(index + "").style(Styles.outlineLabel).color(color).padRight(8).get();
 
                 t.button(Icon.copy, Styles.logici, () -> {
                 }).size(24f).padRight(6).get().tapped(this::copy);
@@ -395,12 +403,26 @@ public class LCanvas extends Table{
             marginBottom(7);
         }
 
+        public void updateAddress(int index){
+            this.index = index;
+            addressLabel.setText(index + "");
+        }
+
         public void copy(){
+            st.saveUI();
             LStatement copy = st.copy();
+
+            if(copy instanceof JumpStatement st && st.destIndex != -1){
+                int index = statements.getChildren().indexOf(this);
+                if(index != -1 && index < st.destIndex){
+                    st.destIndex ++;
+                }
+            }
+
             if(copy != null){
                 StatementElem s = new StatementElem(copy);
 
-                statements.addChildAfter(StatementElem.this,s);
+                statements.addChildAfter(StatementElem.this, s);
                 statements.layout();
                 copy.elem = s;
                 copy.setupUI();
@@ -431,7 +453,9 @@ public class LCanvas extends Table{
         public JumpCurve curve;
 
         public JumpButton(Prov<StatementElem> getter, Cons<StatementElem> setter){
-            super(Tex.logicNode, Styles.colori);
+            super(Tex.logicNode, new ImageButtonStyle(){{
+                imageUpColor = Color.white;
+            }});
 
             to = getter;
             addListener(listener = new ClickListener());

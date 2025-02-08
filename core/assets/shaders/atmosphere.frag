@@ -1,3 +1,5 @@
+#define HIGHP
+
 const float PI = 3.14159265359;
 const float MAX = 10000.0;
 

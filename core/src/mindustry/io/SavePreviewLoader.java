@@ -1,14 +1,14 @@
 package mindustry.io;
 
+import arc.*;
 import arc.assets.*;
 import arc.assets.loaders.*;
-import arc.assets.loaders.resolvers.*;
 import arc.files.*;
 
 public class SavePreviewLoader extends TextureLoader{
 
     public SavePreviewLoader(){
-        super(new AbsoluteFileHandleResolver());
+        super(Core.files::absolute);
     }
 
     @Override

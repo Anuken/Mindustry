@@ -25,7 +25,7 @@ public class Stype extends Selement<TypeElement>{
     }
 
     public Seq<Stype> allInterfaces(){
-        return interfaces().flatMap(s -> s.allInterfaces().and(s)).distinct();
+        return interfaces().flatMap(s -> s.allInterfaces().add(s)).distinct();
     }
 
     public Seq<Stype> superclasses(){
@@ -33,7 +33,7 @@ public class Stype extends Selement<TypeElement>{
     }
 
     public Seq<Stype> allSuperclasses(){
-        return superclasses().flatMap(s -> s.allSuperclasses().and(s)).distinct();
+        return superclasses().flatMap(s -> s.allSuperclasses().add(s)).distinct();
     }
 
     public Stype superclass(){

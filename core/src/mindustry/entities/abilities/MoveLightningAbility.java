@@ -5,16 +5,19 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 
+import static mindustry.Vars.*;
+
 public class MoveLightningAbility extends Ability{
     /** Lightning damage */
     public float damage = 35f;
-    /** Chance of firing every tick. Set >= 1 to always fire lightning every tick at max speed. */
+    /** Chance of firing every tick. Set >= 1 to always fire lightning every tick at max speed */
     public float chance = 0.15f;
     /** Length of the lightning. <= 0 to disable */
     public int length = 12;
@@ -23,7 +26,11 @@ public class MoveLightningAbility extends Ability{
     /** Lightning color */
     public Color color = Color.valueOf("a9d8ff");
     /** Shifts where the lightning spawns along the Y axis */
-    public float offset = 0f;
+    public float y = 0f;
+    /** Offset along the X axis */
+    public float x = 0f;
+    /** Whether the spawn side alternates */
+    public boolean alternate = true;
     /** Jittering heat sprite like the shield on v5 Javelin */
     public String heatRegion = "error";
     /** Bullet type that is fired. Can be null */
@@ -32,39 +39,50 @@ public class MoveLightningAbility extends Ability{
     public float bulletAngle = 0f, bulletSpread = 0f;
     
     public Effect shootEffect = Fx.sparkShoot;
+    public boolean parentizeEffects;
     public Sound shootSound = Sounds.spark;
+
+    protected float side = 1f;
     
     MoveLightningAbility(){}
     
-    public MoveLightningAbility(float damage, int length, float chance, float offset, float minSpeed, float maxSpeed, Color color, String heatRegion){
+    public MoveLightningAbility(float damage, int length, float chance, float y, float minSpeed, float maxSpeed, Color color, String heatRegion){
         this.damage = damage;
         this.length = length;
         this.chance = chance;
-        this.offset = offset;
+        this.y = y;
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.color = color;
         this.heatRegion = heatRegion;
     }
     
-    public MoveLightningAbility(float damage, int length, float chance, float offset, float minSpeed, float maxSpeed, Color color){
+    public MoveLightningAbility(float damage, int length, float chance, float y, float minSpeed, float maxSpeed, Color color){
         this.damage = damage;
         this.length = length;
         this.chance = chance;
-        this.offset = offset;
+        this.y = y;
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.color = color;
     }
-    
+
+    @Override
+    public void addStats(Table t){
+        super.addStats(t);
+        t.add(abilityStat("minspeed", Strings.autoFixed(minSpeed * 60f / tilesize, 2)));
+        t.row();
+        t.add(Core.bundle.format("bullet.damage", damage));
+    }
+
     @Override
     public void update(Unit unit){
         float scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
         if(Mathf.chance(Time.delta * chance * scl)){
-            float x = unit.x + Angles.trnsx(unit.rotation, offset, 0), y = unit.y + Angles.trnsy(unit.rotation, offset, 0);
+            float x = unit.x + Angles.trnsx(unit.rotation, this.y, this.x * side), y = unit.y + Angles.trnsy(unit.rotation, this.y, this.x * side);
 
-            shootEffect.at(x, y, unit.rotation, color);
-            shootSound.at(unit);
+            shootEffect.at(x, y, unit.rotation, color, parentizeEffects ? unit : null);
+            shootSound.at(x, y);
 
             if(length > 0){
                 Lightning.create(unit.team, color, damage, x + unit.vel.x, y + unit.vel.y, unit.rotation, length);
@@ -73,6 +91,8 @@ public class MoveLightningAbility extends Ability{
             if(bullet != null){
                 bullet.create(unit, unit.team, x, y, unit.rotation + bulletAngle + Mathf.range(bulletSpread));
             }
+
+            if(alternate) side *= -1f;
         }
     }
     

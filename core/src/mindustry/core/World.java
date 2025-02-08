@@ -6,9 +6,9 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.Geometry.*;
 import arc.struct.*;
-import arc.struct.ObjectIntMap.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
@@ -21,7 +21,6 @@ import mindustry.maps.*;
 import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
 import mindustry.type.*;
-import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.legacy.*;
@@ -32,12 +31,20 @@ public class World{
     public final Context context = new Context();
 
     public Tiles tiles = new Tiles(0, 0);
+    /** The number of times tiles have changed in this session. Used for blocks that need to poll world state, but not frequently. */
+    public int tileChanges = -1;
 
     private boolean generating, invalidMap;
     private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
 
     public World(){
+        Events.on(TileChangeEvent.class, e -> {
+            tileChanges ++;
+        });
 
+        Events.on(WorldLoadEvent.class, e -> {
+            tileChanges = -1;
+        });
     }
 
     /** Adds a custom handler function for loading a custom map - usually a generated one. */
@@ -163,7 +170,11 @@ public class World{
         return Math.round(coord / tilesize);
     }
 
-    private void clearTileEntities(){
+    public int packArray(int x, int y){
+        return x + y * tiles.width;
+    }
+
+    public void clearBuildings(){
         for(Tile tile : tiles){
             if(tile != null && tile.build != null){
                 tile.build.remove();
@@ -176,7 +187,7 @@ public class World{
      * Only use for loading saves!
      */
     public Tiles resize(int width, int height){
-        clearTileEntities();
+        clearBuildings();
 
         if(tiles.width != width || tiles.height != height){
             tiles = new Tiles(width, height);
@@ -191,6 +202,7 @@ public class World{
      */
     public void beginMapLoad(){
         generating = true;
+        Events.fire(new WorldLoadBeginEvent());
     }
 
     /**
@@ -198,6 +210,7 @@ public class World{
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
+        Events.fire(new WorldLoadEndEvent());
 
         for(Tile tile : tiles){
             //remove legacy blocks; they need to stop existing
@@ -220,7 +233,7 @@ public class World{
     }
 
     public Rect getQuadBounds(Rect in){
-        return in.set(-finalWorldBounds, -finalWorldBounds, world.width() * tilesize + finalWorldBounds * 2, world.height() * tilesize + finalWorldBounds * 2);
+        return in.set(-finalWorldBounds, -finalWorldBounds, width() * tilesize + finalWorldBounds * 2, height() * tilesize + finalWorldBounds * 2);
     }
 
     public void setGenerating(boolean gen){
@@ -241,98 +254,80 @@ public class World{
     }
 
     public void loadSector(Sector sector){
-        setSectorRules(sector);
+        loadSector(sector, 0, true);
+    }
+
+    public void loadSector(Sector sector, int seedOffset, boolean saveInfo){
+        setSectorRules(sector, saveInfo);
 
         int size = sector.getSize();
         loadGenerator(size, size, tiles -> {
             if(sector.preset != null){
                 sector.preset.generator.generate(tiles);
                 sector.preset.rules.get(state.rules); //apply extra rules
+            }else if(sector.planet.generator != null){
+                sector.planet.generator.generate(tiles, sector, seedOffset);
             }else{
-                sector.planet.generator.generate(tiles, sector);
+                throw new RuntimeException("Sector " + sector.id + " on planet " + sector.planet.name + " has no generator or preset defined. Provide a planet generator or preset map.");
             }
             //just in case
             state.rules.sector = sector;
         });
 
+        if(saveInfo && state.rules.waves){
+            sector.info.waves = state.rules.waves;
+        }
+
         //postgenerate for bases
-        if(sector.preset == null){
+        if(sector.preset == null && sector.planet.generator != null){
             sector.planet.generator.postGenerate(tiles);
         }
 
         //reset rules
-        setSectorRules(sector);
+        setSectorRules(sector, saveInfo);
 
         if(state.rules.defaultTeam.core() != null){
             sector.info.spawnPosition = state.rules.defaultTeam.core().pos();
         }
     }
 
-    private void setSectorRules(Sector sector){
+    private void setSectorRules(Sector sector, boolean saveInfo){
         state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
-
         state.rules.weather.clear();
 
-        //apply weather based on terrain
-        ObjectIntMap<Block> floorc = new ObjectIntMap<>();
+        sector.planet.generator.addWeather(sector, state.rules);
+
         ObjectSet<UnlockableContent> content = new ObjectSet<>();
 
-        for(Tile tile : world.tiles){
-            if(world.getDarkness(tile.x, tile.y) >= 3){
+        //resources can be outside area
+        boolean border = state.rules.limitMapArea;
+        state.rules.limitMapArea = false;
+
+        //TODO duplicate code?
+        for(Tile tile : tiles){
+            if(getDarkness(tile.x, tile.y) >= 3){
                 continue;
             }
 
             Liquid liquid = tile.floor().liquidDrop;
-            if(tile.floor().itemDrop != null) content.add(tile.floor().itemDrop);
-            if(tile.overlay().itemDrop != null) content.add(tile.overlay().itemDrop);
+            if(tile.floor().itemDrop != null && tile.block() == Blocks.air) content.add(tile.floor().itemDrop);
+            if(tile.overlay().itemDrop != null && tile.block() == Blocks.air) content.add(tile.overlay().itemDrop);
+            if(tile.wallDrop() != null) content.add(tile.wallDrop());
             if(liquid != null) content.add(liquid);
-
-            if(!tile.block().isStatic()){
-                floorc.increment(tile.floor());
-                if(tile.overlay() != Blocks.air){
-                    floorc.increment(tile.overlay());
-                }
-            }
         }
+        state.rules.limitMapArea = border;
 
-        //sort counts in descending order
-        Seq<Entry<Block>> entries = floorc.entries().toArray();
-        entries.sort(e -> -e.value);
-        //remove all blocks occuring < 30 times - unimportant
-        entries.removeAll(e -> e.value < 30);
-
-        Block[] floors = new Block[entries.size];
-        for(int i = 0; i < entries.size; i++){
-            floors[i] = entries.get(i).key;
-        }
-
-        //TODO bad code
-        boolean hasSnow = floors[0].name.contains("ice") || floors[0].name.contains("snow");
-        boolean hasRain = !hasSnow && content.contains(Liquids.water) && !floors[0].name.contains("sand");
-        boolean hasDesert = !hasSnow && !hasRain && floors[0] == Blocks.sand;
-        boolean hasSpores = floors[0].name.contains("spore") || floors[0].name.contains("moss") || floors[0].name.contains("tainted");
-
-        if(hasSnow){
-            state.rules.weather.add(new WeatherEntry(Weathers.snow));
-        }
-
-        if(hasRain){
-            state.rules.weather.add(new WeatherEntry(Weathers.rain));
-            state.rules.weather.add(new WeatherEntry(Weathers.fog));
-        }
-
-        if(hasDesert){
-            state.rules.weather.add(new WeatherEntry(Weathers.sandstorm));
-        }
-
-        if(hasSpores){
-            state.rules.weather.add(new WeatherEntry(Weathers.sporestorm));
-        }
-
-        sector.info.resources = content.asArray();
+        state.rules.cloudColor = sector.planet.landCloudColor;
+        state.rules.env = sector.planet.defaultEnv;
+        state.rules.planet = sector.planet;
+        sector.planet.applyRules(state.rules);
+        sector.info.resources = content.toSeq();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
-        sector.saveInfo();
+
+        if(saveInfo){
+            sector.saveInfo();
+        }
     }
 
     public Context filterContext(Map map){
@@ -368,18 +363,18 @@ public class World{
         invalidMap = false;
 
         if(!headless){
-            if(state.teams.playerCores().size == 0 && !checkRules.pvp){
-                ui.showErrorMessage("@map.nospawn");
+            if(state.teams.cores(checkRules.defaultTeam).size == 0 && !checkRules.pvp){
                 invalidMap = true;
+                ui.showErrorMessage(Core.bundle.format("map.nospawn", checkRules.defaultTeam.coloredName()));
             }else if(checkRules.pvp){ //pvp maps need two cores to be valid
                 if(state.teams.getActive().count(TeamData::hasCore) < 2){
                     invalidMap = true;
                     ui.showErrorMessage("@map.nospawn.pvp");
                 }
             }else if(checkRules.attackMode){ //attack maps need two cores to be valid
-                invalidMap = state.teams.get(state.rules.waveTeam).noCores();
+                invalidMap = state.rules.waveTeam.data().noCores();
                 if(invalidMap){
-                    ui.showErrorMessage("@map.nospawn.attack");
+                    ui.showErrorMessage(Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.coloredName()));
                 }
             }
         }else{
@@ -393,78 +388,11 @@ public class World{
         if(invalidMap) Core.app.post(() -> state.set(State.menu));
     }
 
-    public void notifyChanged(Tile tile){
-        if(!generating){
-            Core.app.post(() -> Events.fire(new TileChangeEvent(tile)));
-        }
-    }
-
-    public void raycastEachWorld(float x0, float y0, float x1, float y1, Raycaster cons){
-        raycastEach(toTile(x0), toTile(y0), toTile(x1), toTile(y1), cons);
-    }
-
-    public void raycastEach(int x0f, int y0f, int x1, int y1, Raycaster cons){
-        int x0 = x0f;
-        int y0 = y0f;
-        int dx = Math.abs(x1 - x0);
-        int dy = Math.abs(y1 - y0);
-
-        int sx = x0 < x1 ? 1 : -1;
-        int sy = y0 < y1 ? 1 : -1;
-
-        int err = dx - dy;
-        int e2;
-        while(true){
-
-            if(cons.accept(x0, y0)) break;
-            if(x0 == x1 && y0 == y1) break;
-
-            e2 = 2 * err;
-            if(e2 > -dy){
-                err = err - dy;
-                x0 = x0 + sx;
-            }
-
-            if(e2 < dx){
-                err = err + dx;
-                y0 = y0 + sy;
-            }
-        }
-    }
-
-    public boolean raycast(int x0f, int y0f, int x1, int y1, Raycaster cons){
-        int x0 = x0f;
-        int y0 = y0f;
-        int dx = Math.abs(x1 - x0);
-        int dy = Math.abs(y1 - y0);
-
-        int sx = x0 < x1 ? 1 : -1;
-        int sy = y0 < y1 ? 1 : -1;
-
-        int err = dx - dy;
-        int e2;
-        while(true){
-            if(cons.accept(x0, y0)) return true;
-            if(x0 == x1 && y0 == y1) return false;
-
-            e2 = 2 * err;
-            if(e2 > -dy){
-                err = err - dy;
-                x0 = x0 + sx;
-            }
-
-            if(e2 < dx){
-                err = err + dx;
-                y0 = y0 + sy;
-            }
-        }
-    }
-
     public void addDarkness(Tiles tiles){
         byte[] dark = new byte[tiles.width * tiles.height];
         byte[] writeBuffer = new byte[tiles.width * tiles.height];
 
-        byte darkIterations = 4;
+        byte darkIterations = darkRadius;
 
         for(int i = 0; i < dark.length; i++){
             Tile tile = tiles.geti(i);
@@ -498,7 +426,7 @@ public class World{
                 tile.data = dark[idx];
             }
 
-            if(dark[idx] == 4){
+            if(dark[idx] == darkRadius){
                 boolean full = true;
                 for(Point2 p : Geometry.d4){
                     int px = p.x + tile.x, py = p.y + tile.y;
@@ -509,22 +437,60 @@ public class World{
                     }
                 }
 
-                if(full) tile.data = 5;
+                if(full) tile.data = darkRadius + 1;
             }
         }
     }
 
-    public float getDarkness(int x, int y){
-        int edgeBlend = 2;
+    public byte getWallDarkness(Tile tile){
+        if(tile.isDarkened()){
+            int minDst = darkRadius + 1;
+            for(int cx = tile.x - darkRadius; cx <= tile.x + darkRadius; cx++){
+                for(int cy = tile.y - darkRadius; cy <= tile.y + darkRadius; cy++){
+                    if(tiles.in(cx, cy) && !rawTile(cx, cy).isDarkened()){
+                        minDst = Math.min(minDst, Math.abs(cx - tile.x) + Math.abs(cy - tile.y));
+                    }
+                }
+            }
 
+            return (byte)Math.max((minDst - 1), 0);
+        }
+        return 0;
+    }
+
+    public void checkMapArea(){
+        for(var build : Groups.build){
+            //reset map-area-based disabled blocks.
+            if(!build.enabled && build.block.autoResetEnabled){
+                build.enabled = true;
+            }
+        }
+    }
+
+    //TODO optimize; this is very slow and called too often!
+    public float getDarkness(int x, int y){
         float dark = 0;
-        int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (tiles.width - 1)), Math.abs(y - (tiles.height - 1)))));
-        if(edgeDst <= edgeBlend){
-            dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
+
+        if(Vars.state.rules.borderDarkness){
+            int edgeBlend = 2;
+            int edgeDst;
+
+            if(!state.rules.limitMapArea){
+                edgeDst = Math.min(x, Math.min(y, Math.min(-(x - (tiles.width - 1)), -(y - (tiles.height - 1)))));
+            }else{
+                edgeDst =
+                    Math.min(x - state.rules.limitX,
+                    Math.min(y - state.rules.limitY,
+                    Math.min(-(x - (state.rules.limitX + state.rules.limitWidth - 1)), -(y - (state.rules.limitY + state.rules.limitHeight - 1)))));
+            }
+
+            if(edgeDst <= edgeBlend){
+                dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
+            }
         }
 
         if(state.hasSector() && state.getSector().preset == null){
-            int circleBlend = 14;
+            int circleBlend = 5;
             //quantized angle
             float offset = state.getSector().rect.rotation + 90;
             float angle = Angles.angle(x, y, tiles.width/2, tiles.height/2) + offset;
@@ -547,18 +513,65 @@ public class World{
             }
         }
 
-        Tile tile = world.tile(x, y);
-        if(tile != null && tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()){
+        Tile tile = tile(x, y);
+        if(tile != null && tile.isDarkened()){
             dark = Math.max(dark, tile.data);
         }
 
         return dark;
     }
 
+    public static void raycastEachWorld(float x0, float y0, float x1, float y1, Raycaster cons){
+        raycastEach(toTile(x0), toTile(y0), toTile(x1), toTile(y1), cons);
+    }
+
+    public static void raycastEach(int x1, int y1, int x2, int y2, Raycaster cons){
+        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
+        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
+        int e2, err = dx - dy;
+
+        while(true){
+            if(cons.accept(x, y)) break;
+            if(x == x2 && y == y2) break;
+
+            e2 = 2 * err;
+            if(e2 > -dy){
+                err -= dy;
+                x += sx;
+            }
+
+            if(e2 < dx){
+                err += dx;
+                y += sy;
+            }
+        }
+    }
+
+    public static boolean raycast(int x1, int y1, int x2, int y2, Raycaster cons){
+        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
+        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
+        int e2, err = dx - dy;
+
+        while(true){
+            if(cons.accept(x, y)) return true;
+            if(x == x2 && y == y2) return false;
+
+            e2 = 2 * err;
+            if(e2 > -dy){
+                err = err - dy;
+                x = x + sx;
+            }
+
+            if(e2 < dx){
+                err = err + dx;
+                y = y + sy;
+            }
+        }
+    }
+
     private class Context implements WorldContext{
 
-        Context(){
-        }
+        Context(){}
 
         @Override
         public Tile tile(int index){
@@ -594,15 +607,21 @@ public class World{
     }
 
     /** World context that applies filters after generation end. */
-    private class FilterContext extends Context{
+    public class FilterContext extends Context{
         final Map map;
 
-        FilterContext(Map map){
+        public FilterContext(Map map){
             this.map = map;
         }
 
         @Override
         public void end(){
+            applyFilters();
+
+            super.end();
+        }
+
+        public void applyFilters(){
             Seq<GenerateFilter> filters = map.filters();
 
             if(!filters.isEmpty()){
@@ -611,12 +630,10 @@ public class World{
 
                 for(GenerateFilter filter : filters){
                     filter.randomize();
-                    input.begin(filter, width(), height(), (x, y) -> tiles.getn(x, y));
+                    input.begin(width(), height(), (x, y) -> tiles.getn(x, y));
                     filter.apply(tiles, input);
                 }
             }
-
-            super.end();
         }
     }
 }

@@ -1,12 +1,11 @@
 package mindustry.world.consumers;
 
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
-import mindustry.world.meta.values.*;
 
 public class ConsumeItems extends Consume{
     public final ItemStack[] items;
@@ -21,53 +20,40 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
-    public void applyItemFilter(Bits filter){
-        for(ItemStack stack : items){
-            filter.set(stack.item.id);
+    public void apply(Block block){
+        block.hasItems = true;
+        block.acceptsItems = true;
+        for(var stack : items){
+            block.itemFilter[stack.item.id] = true;
         }
     }
 
     @Override
-    public ConsumeType type(){
-        return ConsumeType.item;
-    }
-
-    @Override
-    public void build(Building tile, Table table){
+    public void build(Building build, Table table){
         table.table(c -> {
             int i = 0;
-            for(ItemStack stack : items){
-                c.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
-                () -> tile.items != null && tile.items.has(stack.item, stack.amount))).padRight(8);
-                if(++i % 4 == 0) table.row();
+            for(var stack : items){
+                c.add(new ReqImage(StatValues.stack(stack.item, Math.round(stack.amount * multiplier.get(build))),
+                () -> build.items.has(stack.item, Math.round(stack.amount * multiplier.get(build))))).padRight(8);
+                if(++i % 4 == 0) c.row();
             }
         }).left();
     }
 
     @Override
-    public String getIcon(){
-        return "icon-item";
-    }
-
-    @Override
-    public void update(Building entity){
-
-    }
-
-    @Override
-    public void trigger(Building entity){
-        for(ItemStack stack : items){
-            entity.items.remove(stack);
+    public void trigger(Building build){
+        for(var stack : items){
+            build.items.remove(stack.item, Math.round(stack.amount * multiplier.get(build)));
         }
     }
 
     @Override
-    public boolean valid(Building entity){
-        return entity.items != null && entity.items.has(items);
+    public float efficiency(Building build){
+        return build.consumeTriggerValid() || build.items.has(items, multiplier.get(build)) ? 1f : 0f;
     }
 
     @Override
     public void display(Stats stats){
-        stats.add(booster ? Stat.booster : Stat.input, new ItemListValue(items));
+        stats.add(booster ? Stat.booster : Stat.input, stats.timePeriod < 0 ? StatValues.items(items) : StatValues.items(stats.timePeriod, items));
     }
 }

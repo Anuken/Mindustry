@@ -12,20 +12,25 @@ import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class MassDriver extends Block{
     public float range;
-    public float rotateSpeed = 0.04f;
+    public float rotateSpeed = 5f;
     public float translation = 7f;
     public int minDistribute = 10;
     public float knockback = 4f;
-    public float reloadTime = 100f;
+    public float reload = 100f;
+    public MassDriverBolt bullet = new MassDriverBolt();
     public float bulletSpeed = 5.5f;
     public float bulletLifetime = 200f;
     public Effect shootEffect = Fx.shootBig2;
@@ -44,10 +49,19 @@ public class MassDriver extends Block{
         hasPower = true;
         outlineIcon = true;
         sync = true;
+        envEnabled |= Env.space;
 
         //point2 is relative
         config(Point2.class, (MassDriverBuild tile, Point2 point) -> tile.link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));
         config(Integer.class, (MassDriverBuild tile, Integer point) -> tile.link = point);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
+        stats.add(Stat.reload, 60f / reload, StatUnit.perSecond);
     }
 
     @Override
@@ -62,9 +76,9 @@ public class MassDriver extends Block{
         Drawf.dashCircle(x * tilesize, y * tilesize, range, Pal.accent);
 
         //check if a mass driver is selected while placing this driver
-        if(!control.input.frag.config.isShown()) return;
-        Building selected = control.input.frag.config.getSelectedTile();
-        if(selected == null || !(selected.block instanceof MassDriver) || !(selected.within(x * tilesize, y * tilesize, range))) return;
+        if(!control.input.config.isShown()) return;
+        Building selected = control.input.config.getSelected();
+        if(selected == null || selected.block != this || !selected.within(x * tilesize, y * tilesize, range)) return;
 
         //if so, draw a dotted line towards it while it is in range
         float sin = Mathf.absin(Time.time, 6f, 1f);
@@ -80,7 +94,7 @@ public class MassDriver extends Block{
         Draw.reset();
     }
 
-    public class DriverBulletData implements Poolable{
+    public static class DriverBulletData implements Poolable{
         public MassDriverBuild from, to;
         public int[] items = new int[content.items().size];
 
@@ -91,14 +105,20 @@ public class MassDriver extends Block{
         }
     }
 
-    public class MassDriverBuild extends Building{
+    public class MassDriverBuild extends Building implements RotBlock{
         public int link = -1;
         public float rotation = 90;
-        public float reload = 0f;
+        public float reloadCounter = 0f;
         public DriverState state = DriverState.idle;
-        public OrderedSet<Tile> waitingShooters = new OrderedSet<>();
+        //TODO use queue? this array usually holds about 3 shooters max anyway
+        public OrderedSet<Building> waitingShooters = new OrderedSet<>();
 
-        public Tile currentShooter(){
+        @Override
+        public float buildRotation(){
+            return rotation;
+        }
+
+        public Building currentShooter(){
             return waitingShooters.isEmpty() ? null : waitingShooters.first();
         }
 
@@ -112,13 +132,15 @@ public class MassDriver extends Block{
             }
 
             //reload regardless of state
-            if(reload > 0f){
-                reload = Mathf.clamp(reload - edelta() / reloadTime);
+            if(reloadCounter > 0f){
+                reloadCounter = Mathf.clamp(reloadCounter - edelta() / reload);
             }
 
+            var current = currentShooter();
+
             //cleanup waiting shooters that are not valid
-            if(!shooterValid(currentShooter())){
-                waitingShooters.remove(currentShooter());
+            if(current != null && !shooterValid(current)){
+                waitingShooters.remove(current);
             }
 
             //switch states
@@ -133,11 +155,11 @@ public class MassDriver extends Block{
 
             //dump when idle or accepting
             if(state == DriverState.idle || state == DriverState.accepting){
-                dump();
+                dumpAccumulate();
             }
 
             //skip when there's no power
-            if(!consValid()){
+            if(efficiency <= 0f){
                 return;
             }
 
@@ -149,7 +171,7 @@ public class MassDriver extends Block{
                 }
 
                 //align to shooter rotation
-                rotation = Mathf.slerpDelta(rotation, tile.angleTo(currentShooter()), rotateSpeed * efficiency());
+                rotation = Angles.moveToward(rotation, angleTo(currentShooter()), rotateSpeed * efficiency);
             }else if(state == DriverState.shooting){
                 //if there's nothing to shoot at OR someone wants to shoot at this thing, bail
                 if(!hasLink || (!waitingShooters.isEmpty() && (itemCapacity - items.total() >= minDistribute))){
@@ -157,22 +179,22 @@ public class MassDriver extends Block{
                     return;
                 }
 
-                float targetRotation = tile.angleTo(link);
+                float targetRotation = angleTo(link);
 
                 if(
                 items.total() >= minDistribute && //must shoot minimum amount of items
                 link.block.itemCapacity - link.items.total() >= minDistribute //must have minimum amount of space
                 ){
                     MassDriverBuild other = (MassDriverBuild)link;
-                    other.waitingShooters.add(tile);
+                    other.waitingShooters.add(this);
 
-                    if(reload <= 0.0001f){
+                    if(reloadCounter <= 0.0001f){
 
                         //align to target location
-                        rotation = Mathf.slerpDelta(rotation, targetRotation, rotateSpeed * efficiency());
+                        rotation = Angles.moveToward(rotation, targetRotation, rotateSpeed * efficiency);
 
                         //fire when it's the first in the queue and angles are ready.
-                        if(other.currentShooter() == tile &&
+                        if(other.currentShooter() == this &&
                         other.state == DriverState.accepting &&
                         Angles.near(rotation, targetRotation, 2f) && Angles.near(other.rotation, targetRotation + 180f, 2f)){
                             //actually fire
@@ -180,7 +202,7 @@ public class MassDriver extends Block{
                             float timeToArrive = Math.min(bulletLifetime, dst(other) / bulletSpeed);
                             Time.run(timeToArrive, () -> {
                                 //remove waiting shooters, it's done firing
-                                other.waitingShooters.remove(tile);
+                                other.waitingShooters.remove(this);
                                 other.state = DriverState.idle;
                             });
                             //driver is immediately idle
@@ -192,17 +214,23 @@ public class MassDriver extends Block{
         }
 
         @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return Mathf.clamp(1f - reloadCounter / reload);
+            return super.sense(sensor);
+        }
+
+        @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
 
             Draw.z(Layer.turret);
 
             Drawf.shadow(region,
-            x + Angles.trnsx(rotation + 180f, reload * knockback) - (size / 2),
-            y + Angles.trnsy(rotation + 180f, reload * knockback) - (size / 2), rotation - 90);
+            x + Angles.trnsx(rotation + 180f, reloadCounter * knockback) - (size / 2),
+            y + Angles.trnsy(rotation + 180f, reloadCounter * knockback) - (size / 2), rotation - 90);
             Draw.rect(region,
-            x + Angles.trnsx(rotation + 180f, reload * knockback),
-            y + Angles.trnsy(rotation + 180f, reload * knockback), rotation - 90);
+            x + Angles.trnsx(rotation + 180f, reloadCounter * knockback),
+            y + Angles.trnsy(rotation + 180f, reloadCounter * knockback), rotation - 90);
         }
 
         @Override
@@ -213,9 +241,9 @@ public class MassDriver extends Block{
             Lines.stroke(1f);
             Drawf.circles(x, y, (tile.block().size / 2f + 1) * tilesize + sin - 2f, Pal.accent);
 
-            for(Tile shooter : waitingShooters){
-                Drawf.circles(shooter.drawx(), shooter.drawy(), (tile.block().size / 2f + 1) * tilesize + sin - 2f, Pal.place);
-                Drawf.arrow(shooter.drawx(), shooter.drawy(), x, y, size * tilesize + sin, 4f + sin, Pal.place);
+            for(var shooter : waitingShooters){
+                Drawf.circles(shooter.x, shooter.y, (tile.block().size / 2f + 1) * tilesize + sin - 2f, Pal.place);
+                Drawf.arrow(shooter.x, shooter.y, x, y, size * tilesize + sin, 4f + sin, Pal.place);
             }
 
             if(linkValid()){
@@ -228,8 +256,9 @@ public class MassDriver extends Block{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Building other){
+        public boolean onConfigureBuildTapped(Building other){
             if(this == other){
+                if(link == -1) deselect();
                 configure(-1);
                 return false;
             }
@@ -237,7 +266,7 @@ public class MassDriver extends Block{
             if(link == other.pos()){
                 configure(-1);
                 return false;
-            }else if(other.block instanceof MassDriver && other.dst(tile) <= range && other.team == team){
+            }else if(other.block == block && other.dst(tile) <= range && other.team == team){
                 configure(other.pos());
                 return false;
             }
@@ -253,7 +282,7 @@ public class MassDriver extends Block{
 
         protected void fire(MassDriverBuild target){
             //reset reload, use power.
-            reload = 1f;
+            reloadCounter = 1f;
 
             DriverBulletData data = Pools.obtain(DriverBulletData.class, DriverBulletData::new);
             data.from = this;
@@ -268,15 +297,12 @@ public class MassDriver extends Block{
 
             float angle = tile.angleTo(target);
 
-            Bullets.driverBolt.create(this, team,
+            bullet.create(this, team,
                 x + Angles.trnsx(angle, translation), y + Angles.trnsy(angle, translation),
                 angle, -1f, bulletSpeed, bulletLifetime, data);
 
-            shootEffect.at(x + Angles.trnsx(angle, translation),
-            y + Angles.trnsy(angle, translation), angle);
-
-            smokeEffect.at(x + Angles.trnsx(angle, translation),
-            y + Angles.trnsy(angle, translation), angle);
+            shootEffect.at(x + Angles.trnsx(angle, translation), y + Angles.trnsy(angle, translation), angle);
+            smokeEffect.at(x + Angles.trnsx(angle, translation), y + Angles.trnsy(angle, translation), angle);
 
             Effect.shake(shake, shake, this);
             
@@ -301,24 +327,22 @@ public class MassDriver extends Block{
             Effect.shake(shake, shake, this);
             receiveEffect.at(bullet);
 
-            reload = 1f;
+            reloadCounter = 1f;
             bullet.remove();
         }
 
-        protected boolean shooterValid(Tile other){
-            if(other == null) return true;
-            if(!(other.build instanceof MassDriverBuild entity)) return false;
-            return entity.link == tile.pos() && tile.dst(other) <= range;
+        protected boolean shooterValid(Building other){
+            return other instanceof MassDriverBuild entity && other.isValid() && other.efficiency > 0 && entity.block == block && entity.link == pos() && within(other, range);
         }
 
         protected boolean linkValid(){
             if(link == -1) return false;
-            Building link = world.build(this.link);
-            return link instanceof MassDriverBuild && link.team == team && within(link, range);
+            return world.build(this.link) instanceof MassDriverBuild other && other.block == block && other.team == team && within(other, range);
         }
 
         @Override
         public Point2 config(){
+            if(tile == null) return null;
             return Point2.unpack(link).sub(tile.x, tile.y);
         }
 
@@ -342,8 +366,7 @@ public class MassDriver extends Block{
     public enum DriverState{
         idle, //nothing is shooting at this mass driver and it does not have any target
         accepting, //currently getting shot at, unload items
-        shooting,
-        unloading;
+        shooting;
 
         public static final DriverState[] all = values();
     }

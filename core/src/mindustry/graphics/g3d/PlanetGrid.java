@@ -221,6 +221,8 @@ public class PlanetGrid{
     }
 
     public static class Ptile{
+        public static final Ptile empty = new Ptile(0, 0);
+
         public int id;
         public int edgeCount;
 

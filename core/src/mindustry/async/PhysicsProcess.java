@@ -10,11 +10,11 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 
 public class PhysicsProcess implements AsyncProcess{
-    private static final int
-        layers = 3,
-        layerGround = 0,
-        layerLegs = 1,
-        layerFlying = 2;
+    public static final int
+    layers = 3,
+    layerGround = 0,
+    layerLegs = 1,
+    layerFlying = 2;
 
     private PhysicsWorld physics;
     private Seq<PhysicRef> refs = new Seq<>(false);
@@ -24,6 +24,7 @@ public class PhysicsProcess implements AsyncProcess{
     @Override
     public void begin(){
         if(physics == null) return;
+        boolean local = !Vars.net.client();
 
         //remove stale entities
         refs.removeAll(ref -> {
@@ -35,16 +36,16 @@ public class PhysicsProcess implements AsyncProcess{
             return false;
         });
 
-        //find Unit without bodies and assign them
+        //find Units without bodies and assign them
         for(Unit entity : group){
-            if(entity.type == null) continue;
+            if(entity == null || entity.type == null || !entity.type.physics) continue;
 
             if(entity.physref == null){
                 PhysicsBody body = new PhysicsBody();
-                body.x = entity.x();
-                body.y = entity.y();
+                body.x = entity.x;
+                body.y = entity.y;
                 body.mass = entity.mass();
-                body.radius = entity.hitSize() / 2f;
+                body.radius = entity.hitSize * Vars.unitCollisionRadiusScale;
 
                 PhysicRef ref = new PhysicRef(entity, body);
                 refs.add(ref);
@@ -57,11 +58,10 @@ public class PhysicsProcess implements AsyncProcess{
             //save last position
             PhysicRef ref = entity.physref;
 
-            ref.body.layer =
-                entity.type.allowLegStep ? layerLegs :
-                entity.isGrounded() ? layerGround : layerFlying;
-            ref.x = entity.x();
-            ref.y = entity.y();
+            ref.body.layer = entity.collisionLayer();
+            ref.x = entity.x;
+            ref.y = entity.y;
+            ref.body.local = local || entity.isLocal();
         }
     }
 
@@ -148,21 +148,30 @@ public class PhysicsProcess implements AsyncProcess{
                 trees[i].clear();
             }
 
-            for(int i = 0; i < bodies.size; i++){
-                PhysicsBody body = bodies.items[i];
+            var bodyItems = bodies.items;
+            int bodySize = bodies.size;
+
+            for(int i = 0; i < bodySize; i++){
+                PhysicsBody body = bodyItems[i];
                 body.collided = false;
                 trees[body.layer].insert(body);
             }
 
-            for(int i = 0; i < bodies.size; i++){
-                PhysicsBody body = bodies.items[i];
+            for(int i = 0; i < bodySize; i++){
+                PhysicsBody body = bodyItems[i];
+
+                //for clients, the only body that collides is the local one; all other physics simulations are handled by the server.
+                if(!body.local) continue;
+
                 body.hitbox(rect);
 
                 seq.size = 0;
                 trees[body.layer].intersect(rect, seq);
+                int size = seq.size;
+                var items = seq.items;
 
-                for(int j = 0; j < seq.size; j++){
-                    PhysicsBody other = seq.items[j];
+                for(int j = 0; j < size; j++){
+                    PhysicsBody other = items[j];
 
                     if(other == body || other.collided) continue;
 
@@ -174,10 +183,14 @@ public class PhysicsProcess implements AsyncProcess{
                         float ms = body.mass + other.mass;
                         float m1 = other.mass / ms, m2 = body.mass / ms;
 
+                        //first body is always local due to guard check above
                         body.x += vec.x * m1 / scl;
                         body.y += vec.y * m1 / scl;
-                        other.x -= vec.x * m2 / scl;
-                        other.y -= vec.y * m2 / scl;
+
+                        if(other.local){
+                            other.x -= vec.x * m2 / scl;
+                            other.y -= vec.y * m2 / scl;
+                        }
                     }
                 }
                 body.collided = true;
@@ -187,7 +200,7 @@ public class PhysicsProcess implements AsyncProcess{
         public static class PhysicsBody implements QuadTreeObject{
             public float x, y, radius, mass;
             public int layer = 0;
-            public boolean collided = false;
+            public boolean collided = false, local = true;
 
             @Override
             public void hitbox(Rect out){

@@ -1,7 +1,0 @@
-[This is a truncated changelog, see Github for full notes]
-This is a minor update that reduces building splash damage for certain projectiles and fixes various mods issues.
-While build 125 servers should be compatible with 125.1 clients, updating is still recommended.
-
-- Fixed player health bar glitching out at negative health
-- Fixed large power nodes sometimes not connecting to placed blocks
-- Made unit payloads draw with correct cell colors
