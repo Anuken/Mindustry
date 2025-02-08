@@ -9,8 +9,7 @@ import mindustry.gen.*;
 
 public class DrawCrucibleFlame extends DrawBlock{
     public Color flameColor = Color.valueOf("f58349"), midColor = Color.valueOf("f2d585");
-    public float flameRad = 1f, circleSpace = 2f, flameRadiusScl = 10f, flameRadiusMag = 0.6f, circleStroke = 1.5f;
-
+    public float flameRad = 1f, circleSpace = 2f, flameRadiusScl = 10f, flameRadiusMag = 0.6f, circleStroke = 1.5f, x = 0, y = 0;
     public float alpha = 0.5f;
     public int particles = 30;
     public float particleLife = 70f, particleRad = 7f, particleSize = 3f, fadeMargin = 0.4f, rotateScl = 1.5f;
@@ -27,10 +26,10 @@ public class DrawCrucibleFlame extends DrawBlock{
             Draw.blend(Blending.additive);
 
             Draw.color(midColor, a);
-            Fill.circle(build.x, build.y, flameRad + si);
+            Fill.circle(build.x + x, build.y + y, flameRad + si);
 
             Draw.color(flameColor, a);
-            Lines.circle(build.x, build.y, (flameRad + circleSpace + si) * build.warmup());
+            Lines.circle(build.x + x, build.y + y, (flameRad + circleSpace + si) * build.warmup());
 
             float base = (Time.time / particleLife);
             rand.setSeed(build.id);
@@ -40,8 +39,8 @@ public class DrawCrucibleFlame extends DrawBlock{
                 float len = particleRad * particleInterp.apply(fout);
                 Draw.alpha(a * (1f - Mathf.curve(fin, 1f - fadeMargin)));
                 Fill.circle(
-                    build.x + Angles.trnsx(angle, len),
-                    build.y + Angles.trnsy(angle, len),
+                    build.x + Angles.trnsx(angle, len) + x,
+                    build.y + Angles.trnsy(angle, len) + y,
                     particleSize * fin * build.warmup()
                 );
             }

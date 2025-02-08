@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.*;
+import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.math.*;
@@ -8,6 +9,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
+import mindustry.gen.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -20,18 +22,20 @@ import static mindustry.Vars.*;
 /** Stores global logic variables for logic processors. */
 public class GlobalVars{
     public static final int ctrlProcessor = 1, ctrlPlayer = 2, ctrlCommand = 3;
-    public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid};
+    public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid, ContentType.team};
     /** Global random state. */
     public static final Rand rand = new Rand();
 
     //non-constants that depend on state
-    private static LVar varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varServer, varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile;
+    private static LVar varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varWait, varServer, varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile;
 
     private ObjectMap<String, LVar> vars = new ObjectMap<>();
     private Seq<VarEntry> varEntries = new Seq<>();
     private ObjectSet<String> privilegedNames = new ObjectSet<>();
     private UnlockableContent[][] logicIdToContent;
     private int[][] contentIdToLogicId;
+
+    public static final Seq<String> soundNames = new Seq<>();
 
     public void init(){
         putEntryOnly("sectionProcessor");
@@ -69,6 +73,7 @@ public class GlobalVars{
 
         varMapW = putEntry("@mapw", 0);
         varMapH = putEntry("@maph", 0);
+        varWait = putEntry("@wait", null);
 
         putEntryOnly("sectionNetwork");
 
@@ -86,6 +91,17 @@ public class GlobalVars{
         put("@ctrlProcessor", ctrlProcessor);
         put("@ctrlPlayer", ctrlPlayer);
         put("@ctrlCommand", ctrlCommand);
+
+        //sounds
+        if(Core.assets != null){
+            for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
+                if(sound != Sounds.none && sound != Sounds.swish && sound.file != null){
+                    String name = sound.file.nameWithoutExtension();
+                    soundNames.add(name);
+                    put("@sfx-" + name, Sounds.getSoundId(sound));
+                }
+            }
+        }
 
         //store base content
 
@@ -116,7 +132,9 @@ public class GlobalVars{
         }
 
         for(UnitType type : Vars.content.units()){
-            put("@" + type.name, type);
+            if(!type.internal){
+                put("@" + type.name, type);
+            }
         }
 
         for(Weather weather : Vars.content.weathers()){
@@ -185,7 +203,7 @@ public class GlobalVars{
         varClient.numval = net.client() ? 1 : 0;
 
         //client
-        if(!net.server() && player != null){
+        if(player != null){
             varClientLocale.objval = player.locale();
             varClientUnit.objval = player.unit();
             varClientName.objval = player.name();
@@ -194,12 +212,21 @@ public class GlobalVars{
         }
     }
 
+    public LVar waitVar(){
+        return varWait;
+    }
+
     public Seq<VarEntry> getEntries(){
         return varEntries;
     }
 
-    /** @return a piece of content based on its logic ID. This is not equivalent to content ID. */
-    public @Nullable Content lookupContent(ContentType type, int id){
+    /** @return a piece of content based on its logic ID. This is not equivalent to content ID. In the case of teams, the return value may not be Content. */
+    public @Nullable Object lookupContent(ContentType type, int id){
+        //teams are a special case; they are not technically content, but can be looked up
+        if(type == ContentType.team){
+            return id >= 0 && id < 256 ? Team.all[id] : null;
+        }
+
         var arr = logicIdToContent[type.ordinal()];
         return arr != null && id >= 0 && id < arr.length ? arr[id] : null;
     }

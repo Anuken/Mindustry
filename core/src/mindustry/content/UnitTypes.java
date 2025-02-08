@@ -255,7 +255,7 @@ public class UnitTypes{
 
         reign = new UnitType("reign"){{
             speed = 0.4f;
-            hitSize = 26f;
+            hitSize = 30f;
             rotateSpeed = 1.65f;
             health = 24000;
             armor = 18f;
@@ -322,7 +322,7 @@ public class UnitTypes{
             speed = 0.55f;
             hitSize = 8f;
             health = 120f;
-            buildSpeed = 0.35f;
+            buildSpeed = 0.3f;
             armor = 1f;
 
             abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
@@ -610,13 +610,14 @@ public class UnitTypes{
 
             speed = 1f;
             hitSize = 8f;
-            health = 200;
+            health = 150;
             mechSideSway = 0.25f;
             range = 40f;
             ammoType = new ItemAmmoType(Items.coal);
 
             weapons.add(new Weapon(){{
                 shootOnDeath = true;
+                targetUnderBlocks = false;
                 reload = 24f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
@@ -628,12 +629,12 @@ public class UnitTypes{
                     collides = false;
                     hitSound = Sounds.explosion;
 
-                    rangeOverride = 30f;
+                    rangeOverride = 25f;
                     hitEffect = Fx.pulverize;
                     speed = 0f;
-                    splashDamageRadius = 55f;
+                    splashDamageRadius = 44f;
                     instantDisappear = true;
-                    splashDamage = 90f;
+                    splashDamage = 80f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
@@ -1011,7 +1012,7 @@ public class UnitTypes{
             accel = 0.08f;
             drag = 0.016f;
             flying = true;
-            hitSize = 10f;
+            hitSize = 11f;
             targetAir = false;
             engineOffset = 7.8f;
             range = 140f;
@@ -1041,6 +1042,7 @@ public class UnitTypes{
 
                     status = StatusEffects.blasted;
                     statusDuration = 60f;
+                    damage = splashDamage * 0.5f;
                 }};
             }});
         }};
@@ -1254,6 +1256,7 @@ public class UnitTypes{
             controller = u -> new MinerAI();
 
             defaultCommand = UnitCommand.mineCommand;
+            allowChangeCommands = false;
 
             flying = true;
             drag = 0.06f;
@@ -1445,6 +1448,7 @@ public class UnitTypes{
                     healPercent = 15f;
                     splashDamage = 220f;
                     splashDamageRadius = 80f;
+                    damage = splashDamage * 0.7f;
                 }};
             }});
         }};
@@ -1831,7 +1835,6 @@ public class UnitTypes{
         //region naval support
         retusa = new UnitType("retusa"){{
             speed = 0.9f;
-            targetAir = false;
             drag = 0.14f;
             hitSize = 11f;
             health = 270;
@@ -1858,6 +1861,23 @@ public class UnitTypes{
 
                 bullet = new BulletType(){{
                     maxRange = 120f;
+                }};
+            }});
+
+            weapons.add(new Weapon("retusa-weapon"){{
+                shootSound = Sounds.lasershoot;
+                reload = 22f;
+                x = 4.5f;
+                y = -3.5f;
+                rotateSpeed = 5f;
+                mirror = true;
+                rotate = true;
+                bullet = new LaserBoltBulletType(5.2f, 12){{
+                    lifetime = 30f;
+                    healPercent = 5.5f;
+                    collidesTeam = true;
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
                 }};
             }});
 
@@ -1912,7 +1932,7 @@ public class UnitTypes{
                     trailWidth = 3f;
                     trailLength = 8;
 
-                    splashDamage = 33f;
+                    splashDamage = 40f;
                     splashDamageRadius = 32f;
                 }};
             }});
@@ -2346,7 +2366,8 @@ public class UnitTypes{
         //region core
 
         alpha = new UnitType("alpha"){{
-            aiController = BuilderAI::new;
+            aiController = () -> new BuilderAI(true, 400f);
+            controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
             isEnemy = false;
 
             lowAltitude = true;
@@ -2384,7 +2405,8 @@ public class UnitTypes{
         }};
 
         beta = new UnitType("beta"){{
-            aiController = BuilderAI::new;
+            aiController = () -> new BuilderAI(true, 400f);
+            controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
             isEnemy = false;
 
             flying = true;
@@ -2425,7 +2447,8 @@ public class UnitTypes{
         }};
 
         gamma = new UnitType("gamma"){{
-            aiController = BuilderAI::new;
+            aiController = () -> new BuilderAI(true, 400f);
+            controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
             isEnemy = false;
 
             lowAltitude = true;
@@ -2646,7 +2669,7 @@ public class UnitTypes{
                         width = 5f;
                         height = 7f;
                         lifetime = 15f;
-                        hitSize = 4f;    
+                        hitSize = 4f;
                         pierceCap = 3;
                         pierce = true;
                         pierceBuilding = true;
@@ -3524,7 +3547,7 @@ public class UnitTypes{
                         trailWidth = 2.2f;
                         trailLength = 7;
                         trailChance = -1f;
-                        
+
                         collidesAir = false;
 
                         despawnEffect = Fx.none;
