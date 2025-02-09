@@ -113,8 +113,10 @@ public class UnitType extends UnlockableContent implements Senseable{
     buildSpeed = -1f,
     /** Minimum distance from this unit that weapons can target. Prevents units from firing "inside" the unit. */
     aimDst = -1f,
-    /** Visual offset of build beam from front. */
+    /** Visual offset of the build beam from the front. */
     buildBeamOffset = 3.8f,
+    /** Visual offset of the mining beam from the front. */
+    mineBeamOffset = Float.NEGATIVE_INFINITY,
     /** WIP: Units of low priority will always be ignored in favor of those with higher priority, regardless of distance. */
     targetPriority = 0f,
     /** Elevation of shadow drawn under this (ground) unit. Visual only. */
@@ -236,6 +238,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     squareShape = false,
     /** if true, this unit will draw its building beam towards blocks. */
     drawBuildBeam = true,
+    /** if true, this unit will draw its mining beam towards blocks */
+    drawMineBeam = true,
     /** if false, the team indicator/cell is not drawn. */
     drawCell = true,
     /** if false, carried items are not drawn. */
@@ -803,6 +807,8 @@ public class UnitType extends UnlockableContent implements Senseable{
             }).layer(Layer.debris);
         }
 
+        if(mineBeamOffset == Float.NEGATIVE_INFINITY) mineBeamOffset = hitSize / 2;
+
         for(Ability ab : abilities){
             ab.init(this);
         }
@@ -1226,8 +1232,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(unit.inFogTo(Vars.player.team())) return;
 
         unit.drawBuilding();
-
-        drawMining(unit);
+        unit.drawMining();
 
         boolean isPayload = !unit.isAdded();
 
@@ -1339,32 +1344,9 @@ public class UnitType extends UnlockableContent implements Senseable{
         return shieldColor == null ? unit.team.color : shieldColor;
     }
 
-
+    @Deprecated
     public void drawMining(Unit unit){
-        if(!unit.mining()) return;
-        float focusLen = unit.hitSize / 2f + Mathf.absin(Time.time, 1.1f, 0.5f);
-        float swingScl = 12f, swingMag = tilesize / 8f;
-        float flashScl = 0.3f;
-
-        float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
-        float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
-
-        float ex = unit.mineTile.worldx() + Mathf.sin(Time.time + 48, swingScl, swingMag);
-        float ey = unit.mineTile.worldy() + Mathf.sin(Time.time + 48, swingScl + 2f, swingMag);
-
-        Draw.z(Layer.flyingUnit + 0.1f);
-
-        Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time, 0.5f, flashScl));
-
-        Draw.alpha(Renderer.unitLaserOpacity);
-        Drawf.laser(mineLaserRegion, mineLaserEndRegion, px, py, ex, ey, 0.75f);
-
-        if(unit.isLocal()){
-            Lines.stroke(1f, Pal.accent);
-            Lines.poly(unit.mineTile.worldx(), unit.mineTile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Time.time);
-        }
-
-        Draw.color();
+        unit.drawMining();
     }
 
     public <T extends Unit & Payloadc> void drawPayload(T unit){
