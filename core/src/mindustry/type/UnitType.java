@@ -1547,7 +1547,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     public void drawLight(Unit unit){
-        if(lightRadius > 0){
+        if(lightRadius > 0 && state.rules.unitLight){
             Drawf.light(unit.x, unit.y, lightRadius, lightColor, lightOpacity);
         }
     }
