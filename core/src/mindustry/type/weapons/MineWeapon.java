@@ -56,8 +56,9 @@ public class MineWeapon extends Weapon{
                 weaponRotation  = rotation + (rotate ? mount.rotation : 0),
                 wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
                 wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -mount.recoil),
-                px = wx + Angles.trnsx(weaponRotation, shootX, shootY),
-                py = wy + Angles.trnsy(weaponRotation, shootX, shootY);
+                sY = shootY + Mathf.absin(Time.time, 1.1f, 0.5f),
+                px = wx + Angles.trnsx(weaponRotation, shootX, sY),
+                py = wy + Angles.trnsy(weaponRotation, shootX, sY);
 
             unit.drawMiningBeam(px, py);
             Draw.z(z);
