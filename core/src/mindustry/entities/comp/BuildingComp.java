@@ -1201,6 +1201,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         block.drawOverlay(x, y, rotation);
     }
 
+    public void drawItemSelection(UnlockableContent selection){
+        if(selection != null && Core.settings.getBool("displayselection", true)){
+            TextureRegion region = selection.fullIcon;
+            Draw.rect(region, x, y + block.size * tilesize / 2f + 4, 8f * region.ratio(), 8f);
+        }
+    }
+
     public void drawDisabled(){
         Draw.color(Color.scarlet);
         Draw.alpha(0.8f);

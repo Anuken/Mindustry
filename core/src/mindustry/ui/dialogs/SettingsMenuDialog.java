@@ -453,6 +453,7 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("drawlight", true);
         graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("blockstatus", false);
+        graphics.checkPref("displayselection", true);
         graphics.checkPref("playerchat", true);
         if(!mobile){
             graphics.checkPref("coreitems", true);
