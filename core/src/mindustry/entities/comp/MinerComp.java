@@ -126,7 +126,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
 
     public void drawMining(){
         if(type.drawMineBeam){
-            float focusLen = hitSize / 2f + Mathf.absin(Time.time, 1.1f, 0.5f);
+            float focusLen = type.mineBeamOffset + Mathf.absin(Time.time, 1.1f, 0.5f);
             float px = x + Angles.trnsx(rotation, focusLen);
             float py = y + Angles.trnsy(rotation, focusLen);
 
