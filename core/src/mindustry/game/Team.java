@@ -16,7 +16,7 @@ import static mindustry.Vars.*;
 
 public class Team implements Comparable<Team>, Senseable{
     public final int id;
-    public final Color color;
+    public final Color color = new Color();
     public final Color[] palette = {new Color(), new Color(), new Color()};
     public final int[] palettei = new int[3];
     public String emoji = "";
@@ -58,7 +58,7 @@ public class Team implements Comparable<Team>, Senseable{
 
     protected Team(int id, String name, Color color){
         this.name = name;
-        this.color = color;
+        this.color.set(color);
         this.id = id;
 
         if(id < 6) baseTeams[id] = this;
