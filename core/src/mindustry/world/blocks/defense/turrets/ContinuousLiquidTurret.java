@@ -50,13 +50,6 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
             public void display(Stats stats){
 
             }
-
-            //TODO
-            //@Override
-            //protected float use(Building entity){
-            //    BulletType type = ammoTypes.get(entity.liquids.current());
-            //    return Math.min(amount * entity.edelta(), entity.block.liquidCapacity) / (type == null ? 1f : type.ammoMultiplier);
-            //}
         });
 
         ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
@@ -73,9 +66,9 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         @Override
         public void updateTile(){
-            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
-
             super.updateTile();
+
+            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
         }
 
         @Override

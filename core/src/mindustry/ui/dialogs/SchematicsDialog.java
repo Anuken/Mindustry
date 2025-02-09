@@ -71,6 +71,13 @@ public class SchematicsDialog extends BaseDialog{
                 rebuildPane.run();
             }).growX().get();
             searchField.setMessageText("@schematic.search");
+            searchField.clicked(KeyCode.mouseRight, () -> {
+                if(!search.isEmpty()){
+                    search = "";
+                    searchField.clearText();
+                    rebuildPane.run();
+                }
+            });
         }).fillX().padBottom(4);
 
         cont.row();

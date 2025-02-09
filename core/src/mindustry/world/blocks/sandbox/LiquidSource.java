@@ -84,6 +84,12 @@ public class LiquidSource extends Block{
         }
 
         @Override
+        public void drawSelect(){
+            super.drawSelect();
+            drawItemSelection(source);
+        }
+
+        @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(LiquidSource.this, table, content.liquids(), () -> source, this::configure, selectionRows, selectionColumns);
         }
