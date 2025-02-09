@@ -84,8 +84,6 @@ public class Liquid extends UnlockableContent implements Senseable{
         super.init();
 
         if(gas){
-            //gases can't be coolants
-            coolant = false;
             //always "boils", it's a gas
             boilPoint = -1;
             //ensure no accidental global mutation
@@ -171,8 +169,9 @@ public class Liquid extends UnlockableContent implements Senseable{
 
     @Override
     public double sense(LAccess sensor){
-        if(sensor == LAccess.color) return color.toFloatBits();
-        return 0;
+        if(sensor == LAccess.color) return color.toDoubleBits();
+        if(sensor == LAccess.id) return getLogicId();
+        return Double.NaN;
     }
 
     @Override

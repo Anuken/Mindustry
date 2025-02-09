@@ -43,7 +43,8 @@ abstract class LaunchCoreComp implements Drawc, Timedc{
         Draw.z(Layer.weather - 1);
 
         TextureRegion region = block.fullIcon;
-        float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
+        scale *= region.scl();
+        float rw = region.width * scale, rh = region.height * scale;
 
         Draw.alpha(alpha);
         Draw.rect(region, cx, cy, rw, rh, rotation - 45);

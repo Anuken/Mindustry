@@ -1,18 +1,39 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.scene.ui.layout.*;
+import mindustry.*;
+import mindustry.editor.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
 public class PausedDialog extends BaseDialog{
+    private MapProcessorsDialog processors = new MapProcessorsDialog();
     private SaveDialog save = new SaveDialog();
     private LoadDialog load = new LoadDialog();
-    private boolean wasClient = false;
+    private CustomRulesDialog rulesDialog = new CustomRulesDialog();
 
     public PausedDialog(){
         super("@menu");
         shouldPause = true;
+
+        clearChildren();
+        add(titleTable).growX().row();
+
+        stack(cont, new Table(t -> {
+            t.bottom().left();
+            t.button(Icon.book, () -> {
+                Rules toEdit = Vars.state.rules.copy();
+                rulesDialog.show(toEdit, () -> state.rules.copy());
+                rulesDialog.hidden(() -> {
+                    //apply rule changes only once it is hidden
+                    Vars.state.rules = toEdit;
+                    Call.setRules(toEdit);
+                });
+            }).size(70f).tooltip("@customize").visible(() -> state.rules.allowEditRules && (net.server() || !net.active()));
+        })).grow().row();
 
         shown(this::rebuild);
 
@@ -32,10 +53,11 @@ public class PausedDialog extends BaseDialog{
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
-            cont.button("@objective", Icon.info, () -> {
-                ui.fullText.show("@objective", state.rules.sector.preset.description);
-            }).padTop(-60f).colspan(2)
-            .visible(() -> state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.description != null).row();
+            cont.button("@objective", Icon.info, () -> ui.fullText.show("@objective", state.rules.sector.preset.description))
+            .visible(() -> state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.description != null).padTop(-60f);
+
+            cont.button("@abandon", Icon.cancel, () -> ui.planet.abandonSectorConfirm(state.rules.sector, this::hide)).padTop(-60f)
+            .disabled(b -> net.client()).visible(() -> state.rules.sector != null).row();
 
             cont.button("@back", Icon.left, this::hide).name("back");
             cont.button("@settings", Icon.settings, ui.settings::show).name("settings");
@@ -48,17 +70,22 @@ public class PausedDialog extends BaseDialog{
 
             cont.row();
 
-            cont.button("@hostserver", Icon.host, () -> {
+            //the button runs out of space when the editor button is added, so use the mobile text
+            cont.button(state.isEditor() ? "@hostserver.mobile" : "@hostserver", Icon.host, () -> {
                 if(net.server() && steam){
                     platform.inviteFriends();
                 }else{
-                    if(steam){
-                        ui.host.runHost();
-                    }else{
-                        ui.host.show();
-                    }
+                    ui.host.show();
                 }
-            }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(2).width(dw * 2 + 10f).update(e -> e.setText(net.server() && steam ? "@invitefriends" : "@hostserver"));
+            }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(state.isEditor() ? 1 : 2).width(state.isEditor() ? dw : dw * 2 + 10f)
+                .update(e -> e.setText(net.server() && steam ? "@invitefriends" : state.isEditor() ? "@hostserver.mobile" : "@hostserver"));
+
+            if(state.isEditor()){
+                cont.button("@editor.worldprocessors", Icon.logic, () -> {
+                    hide();
+                    processors.show();
+                });
+            }
 
             cont.row();
 
@@ -99,8 +126,6 @@ public class PausedDialog extends BaseDialog{
 
     void showQuitConfirm(){
         Runnable quit = () -> {
-            wasClient = net.client();
-            if(net.client()) netClient.disconnectQuietly();
             runExitSave();
             hide();
         };
@@ -124,6 +149,9 @@ public class PausedDialog extends BaseDialog{
     }
 
     public void runExitSave(){
+        boolean wasClient = net.client();
+        if(net.client()) netClient.disconnectQuietly();
+
         if(state.isEditor() && !wasClient){
             ui.editor.resumeEditing();
             return;
@@ -131,7 +159,7 @@ public class PausedDialog extends BaseDialog{
             return;
         }
 
-        if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || wasClient || state.gameOver){
+        if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || wasClient || state.gameOver || disableSave){
             logic.reset();
             return;
         }

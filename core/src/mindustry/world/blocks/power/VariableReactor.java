@@ -78,7 +78,7 @@ public class VariableReactor extends PowerGenerator{
         public void updateTile(){
             heat = calculateHeat(sideHeat);
 
-            productionEfficiency = Mathf.clamp(heat / maxHeat) * efficiency;
+            productionEfficiency = efficiency;
             warmup = Mathf.lerpDelta(warmup, productionEfficiency > 0 ? 1f : 0f, warmupSpeed);
 
             if(instability >= 1f){
@@ -90,6 +90,11 @@ public class VariableReactor extends PowerGenerator{
             if(Mathf.chanceDelta(effectChance * warmup)){
                 effect.at(x, y, effectColor);
             }
+        }
+
+        @Override
+        public boolean shouldExplode(){
+            return heat > 0f;
         }
 
         @Override

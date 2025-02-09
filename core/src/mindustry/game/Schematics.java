@@ -200,8 +200,7 @@ public class Schematics implements Loadable{
             Seq<Schematic> keys = previews.orderedKeys().copy();
             for(int i = 0; i < previews.size - maxPreviewsMobile; i++){
                 //dispose and remove unneeded previews
-                previews.get(keys.get(i)).dispose();
-                previews.remove(keys.get(i));
+                previews.remove(keys.get(i)).dispose();
             }
             //update last clear time
             lastClearTime = Time.millis();
@@ -292,6 +291,10 @@ public class Schematics implements Loadable{
         return defaultLoadouts.get(block);
     }
 
+    public boolean isDefaultLoadout(Schematic schem){
+        return defaultLoadouts.containsValue(schem, true);
+    }
+
     /** Checks a schematic for deployment validity and adds it to the cache. */
     private void checkLoadout(Schematic s, boolean customSchem){
         Stile core = s.tiles.find(t -> t.block instanceof CoreBlock);
@@ -316,11 +319,24 @@ public class Schematics implements Loadable{
         return block.size + maxLoadoutSchematicPad*2;
     }
 
+    Fi findFile(String schematicName){
+        if(schematicName.isEmpty()) schematicName = "empty";
+        Fi result = null;
+        int index = 0;
+
+        while(result == null || result.exists()){
+            result = schematicDirectory.child(schematicName + (index == 0 ? "" : "_" + index) + "." + schematicExtension);
+            index ++;
+        }
+
+        return result;
+    }
+
     /** Adds a schematic to the list, also copying it into the files.*/
     public void add(Schematic schematic){
         all.add(schematic);
         try{
-            Fi file = schematicDirectory.child(Time.millis() + "." + schematicExtension);
+            Fi file = findFile(Strings.sanitizeFilename(schematic.name()));
             write(schematic, file);
             schematic.file = file;
         }catch(Exception e){
@@ -348,6 +364,7 @@ public class Schematics implements Loadable{
 
     /** Creates a schematic from a world selection. */
     public Schematic create(int x, int y, int x2, int y2){
+        Team team = headless ? null : Vars.player.team();
         NormalizeResult result = Placement.normalizeArea(x, y, x2, y2, 0, false, maxSchematicSize);
         x = result.x;
         y = result.y;
@@ -363,7 +380,7 @@ public class Schematics implements Loadable{
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
-                if(linked != null && !linked.wasVisible) continue;
+                if(linked != null && (!linked.isDiscovered(team) || !linked.wasVisible)) continue;
 
                 Block realBlock = linked == null ? null : linked instanceof ConstructBuild cons ? cons.current : linked.block;
 
@@ -394,6 +411,7 @@ public class Schematics implements Loadable{
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
                 Building tile = world.build(cx, cy);
+                if(tile != null && (!tile.isDiscovered(team) || !tile.wasVisible)) continue;
                 Block realBlock = tile == null ? null : tile instanceof ConstructBuild cons ? cons.current : tile.block;
 
                 if(tile != null && !counted.contains(tile.pos()) && realBlock != null
@@ -473,10 +491,14 @@ public class Schematics implements Loadable{
     }
 
     public static void place(Schematic schem, int x, int y, Team team){
+        place(schem, x, y, team, true);
+    }
+
+    public static void place(Schematic schem, int x, int y, Team team, boolean overwrite){
         int ox = x - schem.width/2, oy = y - schem.height/2;
         schem.tiles.each(st -> {
             Tile tile = world.tile(st.x + ox, st.y + oy);
-            if(tile == null) return;
+            if(tile == null || (!overwrite && !Build.validPlace(st.block, team, tile.x, tile.y, st.rotation))) return;
 
             tile.setBlock(st.block, team, st.rotation);
 
@@ -580,7 +602,7 @@ public class Schematics implements Loadable{
             schematic.tags.put("labels", JsonIO.write(schematic.labels.toArray(String.class)));
 
             stream.writeByte(schematic.tags.size);
-            for(ObjectMap.Entry<String, String> e : schematic.tags.entries()){
+            for(var e : schematic.tags.entries()){
                 stream.writeUTF(e.key);
                 stream.writeUTF(e.value);
             }
@@ -631,7 +653,7 @@ public class Schematics implements Loadable{
 
     private static Schematic rotated(Schematic input, boolean counter){
         int direction = Mathf.sign(counter);
-        Schematic schem = input == tmpSchem ? tmpSchem2 : tmpSchem2;
+        Schematic schem = input == tmpSchem ? tmpSchem2 : tmpSchem;
         schem.width = input.width;
         schem.height = input.height;
         Pools.freeAll(schem.tiles);

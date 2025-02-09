@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 public class LoadDialog extends BaseDialog{
     Table slots;
     String searchString;
-    Gamemode filteredMode;
+    Seq<Gamemode> hidden;
     TextField searchField;
     ScrollPane pane;
 
@@ -50,6 +50,7 @@ public class LoadDialog extends BaseDialog{
         cont.clear();
 
         slots = new Table();
+        hidden = new Seq<>();
         pane = new ScrollPane(slots);
 
         rebuild();
@@ -66,9 +67,9 @@ public class LoadDialog extends BaseDialog{
             boolean sandbox = mode == Gamemode.sandbox;
             if(Core.atlas.isFound(icon.getRegion()) || sandbox){
                 search.button(sandbox ? Icon.terrain : icon, Styles.emptyTogglei, () -> {
-                    filteredMode = filteredMode == mode ? null : mode;
+                    if(!hidden.addUnique(mode)) hidden.remove(mode);
                     rebuild();
-                }).size(60f).checked(b -> filteredMode == mode).tooltip("@mode." + mode.name() + ".name");
+                }).size(60f).padLeft(-12f).checked(b -> !hidden.contains(mode)).tooltip("@mode." + mode.name() + ".name");
             }
         }
 
@@ -97,7 +98,7 @@ public class LoadDialog extends BaseDialog{
         for(SaveSlot slot : array){
             if(slot.isHidden()
             || (searchString != null && !Strings.stripColors(slot.getName()).toLowerCase().contains(searchString))
-            || (filteredMode != null && filteredMode != slot.mode())){
+            || (!hidden.isEmpty() && hidden.contains(slot.mode()))){
                 continue;
             }
 
@@ -191,12 +192,18 @@ public class LoadDialog extends BaseDialog{
         buttons.button("@save.import", Icon.add, () -> {
             platform.showFileChooser(true, saveExtension, file -> {
                 if(SaveIO.isSaveValid(file)){
-                    try{
-                        control.saves.importSave(file);
-                        rebuild();
-                    }catch(IOException e){
-                        e.printStackTrace();
-                        ui.showException("@save.import.fail", e);
+                    var meta = SaveIO.getMeta(file);
+
+                    if(meta.rules.sector != null){
+                        ui.showErrorMessage("@save.nocampaign");
+                    }else{
+                        try{
+                            control.saves.importSave(file);
+                            rebuild();
+                        }catch(IOException e){
+                            e.printStackTrace();
+                            ui.showException("@save.import.fail", e);
+                        }
                     }
                 }else{
                     ui.showErrorMessage("@save.import.invalid");

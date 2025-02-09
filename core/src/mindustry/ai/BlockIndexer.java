@@ -130,13 +130,13 @@ public class BlockIndexer{
                 data.turretTree.remove(build);
             }
 
-            //is no longer registered
-            build.wasDamaged = false;
-
             //unregister damaged buildings
-            if(build.damaged() && damagedTiles[team.id] != null){
+            if(build.wasDamaged && damagedTiles[team.id] != null){
                 damagedTiles[team.id].remove(build);
             }
+
+            //is no longer registered
+            build.wasDamaged = false;
         }
     }
 
@@ -158,12 +158,13 @@ public class BlockIndexer{
             int pos = tile.pos();
             var seq = ores[drop.id][qx][qy];
 
-            //when the drop can be mined, record the ore position
-            if(tile.block() == Blocks.air && !seq.contains(pos)){
-                seq.add(pos);
-                allOres.increment(drop);
-            }else{
-                //otherwise, it likely became blocked, remove it (even if it wasn't there)
+            if(tile.block() == Blocks.air){
+                //add the index if it is a valid new spot to mine at
+                if(!seq.contains(pos)){
+                    seq.add(pos);
+                    allOres.increment(drop);
+                }
+            }else if(seq.contains(pos)){ //otherwise, it likely became blocked, remove it
                 seq.removeValue(pos);
                 allOres.increment(drop, -1);
             }
@@ -286,7 +287,7 @@ public class BlockIndexer{
         //when team data is not initialized, scan through every team. this is terrible
         if(data.isEmpty()){
             for(Team enemy : Team.all){
-                if(enemy == team) continue;
+                if(enemy == team || (enemy == Team.derelict && !state.rules.coreCapture)) continue;
                 var set = getFlagged(enemy)[type.ordinal()];
                 if(set != null){
                     breturnArray.addAll(set);
@@ -295,7 +296,7 @@ public class BlockIndexer{
         }else{
             for(int i = 0; i < data.size; i++){
                 Team enemy = data.items[i].team;
-                if(enemy == team) continue;
+                if(enemy == team || (enemy == Team.derelict && !state.rules.coreCapture)) continue;
                 var set = getFlagged(enemy)[type.ordinal()];
                 if(set != null){
                     breturnArray.addAll(set);
@@ -355,7 +356,7 @@ public class BlockIndexer{
             Team enemy = activeTeams.items[i];
             if(enemy == team || (enemy == Team.derelict && !state.rules.coreCapture)) continue;
 
-            Building candidate = indexer.findTile(enemy, x, y, range, pred, true);
+            Building candidate = indexer.findTile(enemy, x, y, range, b -> pred.get(b) && b.isDiscovered(team), true);
             if(candidate == null) continue;
 
             //if a block has the same priority, the closer one should be targeted

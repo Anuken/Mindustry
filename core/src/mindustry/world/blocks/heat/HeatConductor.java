@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -14,6 +15,7 @@ import mindustry.world.draw.*;
 public class HeatConductor extends Block{
     public float visualMaxHeat = 15f;
     public DrawBlock drawer = new DrawDefault();
+    public boolean splitHeat = false;
 
     public HeatConductor(String name){
         super(name);
@@ -27,7 +29,7 @@ public class HeatConductor extends Block{
         super.setBars();
 
         //TODO show number
-        addBar("heat", (HeatConductorBuild entity) -> new Bar(() -> Core.bundle.format("bar.heatamount", (int)entity.heat), () -> Pal.lightOrange, () -> entity.heat / visualMaxHeat));
+        addBar("heat", (HeatConductorBuild entity) -> new Bar(() -> Core.bundle.format("bar.heatamount", (int)(entity.heat + 0.001f)), () -> Pal.lightOrange, () -> entity.heat / visualMaxHeat));
     }
 
     @Override
@@ -51,6 +53,7 @@ public class HeatConductor extends Block{
         public float heat = 0f;
         public float[] sideHeat = new float[4];
         public IntSet cameFrom = new IntSet();
+        public long lastHeatUpdate = -1;
 
         @Override
         public void draw(){
@@ -75,6 +78,13 @@ public class HeatConductor extends Block{
 
         @Override
         public void updateTile(){
+            updateHeat();
+        }
+
+        public void updateHeat(){
+            if(lastHeatUpdate == Vars.state.updateId) return;
+
+            lastHeatUpdate = Vars.state.updateId;
             heat = calculateHeat(sideHeat, cameFrom);
         }
 
@@ -90,7 +100,7 @@ public class HeatConductor extends Block{
 
         @Override
         public float heatFrac(){
-            return heat / visualMaxHeat;
+            return (heat / visualMaxHeat) / (splitHeat ? 3f : 1);
         }
     }
 }

@@ -25,8 +25,10 @@ public class MissileUnitType extends UnitType{
         envEnabled = Env.any;
         envDisabled = Env.none;
         physics = false;
+        bounded = false;
         trailLength = 7;
         hidden = true;
+        hoverable = false;
         speed = 4f;
         lifetime = 60f * 1.7f;
         rotateSpeed = 2.5f;
@@ -36,6 +38,7 @@ public class MissileUnitType extends UnitType{
         fogRadius = 2f;
         loopSound = Sounds.missileTrail;
         loopSoundVolume = 0.05f;
+        drawMinimap = false;
         //TODO weapon configs, etc?
     }
 }

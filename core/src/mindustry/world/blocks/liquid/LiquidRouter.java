@@ -9,11 +9,10 @@ public class LiquidRouter extends LiquidBlock{
 
     public LiquidRouter(String name){
         super(name);
-
-        underBullets = true;
-        solid = false;
+        solid = true;
         noUpdateDisabled = true;
         canOverdrive = false;
+        floating = true;
     }
 
     @Override
@@ -24,9 +23,7 @@ public class LiquidRouter extends LiquidBlock{
     public class LiquidRouterBuild extends LiquidBuild{
         @Override
         public void updateTile(){
-            if(liquids.currentAmount() > 0.01f){
-                dumpLiquid(liquids.current());
-            }
+            dumpLiquid(liquids.current());
         }
 
         @Override

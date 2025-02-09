@@ -46,7 +46,7 @@ public class ItemAmmoType implements AmmoType{
 
         float range = unit.hitSize + this.range;
 
-        Building build = Units.closestBuilding(unit.team, unit.x, unit.y, range, u -> u.canResupply() && u.items.has(item));
+        Building build = Units.closestBuilding(unit.team, unit.x, unit.y, range, u -> u.canResupply() && u.items != null && u.items.has(item));
 
         if(build != null){
             Fx.itemTransfer.at(build.x, build.y, ammoPerItem / 2f, item.color, unit);

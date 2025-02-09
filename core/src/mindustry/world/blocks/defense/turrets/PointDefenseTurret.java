@@ -14,6 +14,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class PointDefenseTurret extends ReloadTurret{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
@@ -80,8 +82,9 @@ public class PointDefenseTurret extends ReloadTurret{
 
                 //shoot when possible
                 if(Angles.within(rotation, dest, shootCone) && reloadCounter >= reload){
-                    if(target.damage() > bulletDamage){
-                        target.damage(target.damage() - bulletDamage);
+                    float realDamage = bulletDamage * state.rules.blockDamage(team);
+                    if(target.damage() > realDamage){
+                        target.damage(target.damage() - realDamage);
                     }else{
                         target.remove();
                     }

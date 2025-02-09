@@ -22,6 +22,7 @@ public class DrawTurret extends DrawBlock{
     public String basePrefix = "";
     /** Overrides the liquid to draw in the liquid region. */
     public @Nullable Liquid liquidDraw;
+    public float turretLayer = Layer.turret, shadowLayer = Layer.turret - 0.5f, heatLayer = Layer.turretHeat;
     public TextureRegion base, liquid, top, heat, preview, outline;
 
     public DrawTurret(String basePrefix){
@@ -37,9 +38,11 @@ public class DrawTurret extends DrawBlock{
             part.getOutlines(out);
         }
 
-        if(block.region.found() && !(block.outlinedIcon > 0 && block.getGeneratedIcons()[block.outlinedIcon].equals(block.region))){
+        if(block.region.found() && !(block.outlinedIcon > 0 && block.outlinedIcon < block.getGeneratedIcons().length && block.getGeneratedIcons()[block.outlinedIcon].equals(block.region))){
             out.add(block.region);
         }
+
+        block.resetGeneratedIcons();
     }
 
     @Override
@@ -50,11 +53,11 @@ public class DrawTurret extends DrawBlock{
         Draw.rect(base, build.x, build.y);
         Draw.color();
 
-        Draw.z(Layer.turret - 0.5f);
+        Draw.z(shadowLayer);
 
         Drawf.shadow(preview, build.x + tb.recoilOffset.x - turret.elevation, build.y + tb.recoilOffset.y - turret.elevation, tb.drawrot());
 
-        Draw.z(Layer.turret);
+        Draw.z(turretLayer);
 
         drawTurret(turret, tb);
         drawHeat(turret, tb);
@@ -62,9 +65,9 @@ public class DrawTurret extends DrawBlock{
         if(parts.size > 0){
             if(outline.found()){
                 //draw outline under everything when parts are involved
-                Draw.z(Layer.turret - 0.01f);
+                Draw.z(turretLayer - 0.01f);
                 Draw.rect(outline, build.x + tb.recoilOffset.x, build.y + tb.recoilOffset.y, tb.drawrot());
-                Draw.z(Layer.turret);
+                Draw.z(turretLayer);
             }
 
             float progress = tb.progress();
@@ -73,6 +76,7 @@ public class DrawTurret extends DrawBlock{
             var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.curRecoil, tb.charge, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
 
             for(var part : parts){
+                params.setRecoil(part.recoilIndex >= 0 && tb.curRecoils != null ? tb.curRecoils[part.recoilIndex] : tb.curRecoil);
                 part.draw(params);
             }
         }
@@ -96,7 +100,7 @@ public class DrawTurret extends DrawBlock{
     public void drawHeat(Turret block, TurretBuild build){
         if(build.heat <= 0.00001f || !heat.found()) return;
 
-        Drawf.additive(heat, block.heatColor.write(Tmp.c1).a(build.heat), build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot(), Layer.turretHeat);
+        Drawf.additive(heat, block.heatColor.write(Tmp.c1).a(build.heat), build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot(), heatLayer);
     }
 
     /** Load any relevant texture regions. */

@@ -17,17 +17,28 @@ public class DrawHeatOutput extends DrawBlock{
     public Color heatColor = new Color(1f, 0.22f, 0.22f, 0.8f);
     public float heatPulse = 0.3f, heatPulseScl = 10f, glowMult = 1.2f;
 
+    public int rotOffset = 0;
+    public boolean drawGlow = true;
+
+    public DrawHeatOutput(){}
+
+    public DrawHeatOutput(int rotOffset, boolean drawGlow){
+        this.rotOffset = rotOffset;
+        this.drawGlow = drawGlow;
+    }
+
     @Override
     public void draw(Building build){
-        Draw.rect(build.rotation > 1 ? top2 : top1, build.x, build.y, build.rotdeg());
+        float rotdeg = (build.rotation + rotOffset) * 90;
+        Draw.rect(Mathf.mod((build.rotation + rotOffset), 4) > 1 ? top2 : top1, build.x, build.y, rotdeg);
 
         if(build instanceof HeatBlock heater && heater.heat() > 0){
             Draw.z(Layer.blockAdditive);
             Draw.blend(Blending.additive);
             Draw.color(heatColor, heater.heatFrac() * (heatColor.a * (1f - heatPulse + Mathf.absin(heatPulseScl, heatPulse))));
-            if(heat.found()) Draw.rect(heat, build.x, build.y, build.rotdeg());
+            if(heat.found()) Draw.rect(heat, build.x, build.y, rotdeg);
             Draw.color(Draw.getColor().mul(glowMult));
-            if(glow.found()) Draw.rect(glow, build.x, build.y);
+            if(drawGlow && glow.found()) Draw.rect(glow, build.x, build.y);
             Draw.blend();
             Draw.color();
         }
@@ -35,7 +46,7 @@ public class DrawHeatOutput extends DrawBlock{
 
     @Override
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
-        Draw.rect(plan.rotation > 1 ? top2 : top1, plan.drawx(), plan.drawy(), plan.rotation * 90);
+        Draw.rect(Mathf.mod((plan.rotation + rotOffset), 4) > 1 ? top2 : top1, plan.drawx(), plan.drawy(), (plan.rotation + rotOffset) * 90);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package mindustry.world.consumers;
 
+import arc.func.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -13,6 +14,8 @@ public abstract class Consume{
     public boolean booster;
     /** If false, this consumer will still be checked, but it will need to updated manually. */
     public boolean update = true;
+    /** Multiplier for costs. Does not work for power consumers. */
+    public Floatf<Building> multiplier = b -> 1f;
 
     /**
      * Apply extra filters to a block.

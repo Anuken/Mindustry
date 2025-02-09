@@ -16,14 +16,16 @@ import static mindustry.Vars.*;
 
 @Component
 abstract class StatusComp implements Posc, Flyingc{
-    private Seq<StatusEntry> statuses = new Seq<>();
+    private Seq<StatusEntry> statuses = new Seq<>(4);
     private transient Bits applied = new Bits(content.getBy(ContentType.status).size);
 
     //these are considered read-only
-    transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1, buildSpeedMultiplier = 1, dragMultiplier = 1;
+    //note: armor is a special case; it is an override when >= 0, otherwise ignored
+    transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1, buildSpeedMultiplier = 1, dragMultiplier = 1, armorOverride = -1f;
     transient boolean disarmed = false;
 
     @Import UnitType type;
+    @Import float maxHealth;
 
     /** Apply a status effect for 1 tick (for permanent effects) **/
     void apply(StatusEffect effect){
@@ -46,6 +48,7 @@ abstract class StatusComp implements Posc, Flyingc{
                 //extend effect
                 if(entry.effect == effect){
                     entry.time = Math.max(entry.time, duration);
+                    effect.applied(self(), entry.time, true);
                     return;
                 }else if(entry.effect.applyTransition(self(), effect, entry, duration)){ //find reaction
                     //TODO effect may react with multiple other effects
@@ -60,6 +63,7 @@ abstract class StatusComp implements Posc, Flyingc{
             StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
             entry.set(effect, duration);
             statuses.add(entry);
+            effect.applied(self(), duration, false);
         }
     }
 
@@ -69,6 +73,7 @@ abstract class StatusComp implements Posc, Flyingc{
     }
 
     void clearStatuses(){
+        statuses.each(e -> e.effect.onRemoved(self()));
         statuses.clear();
     }
 
@@ -76,6 +81,7 @@ abstract class StatusComp implements Posc, Flyingc{
     void unapply(StatusEffect effect){
         statuses.remove(e -> {
             if(e.effect == effect){
+                e.effect.onRemoved(self());
                 Pools.free(e);
                 return true;
             }
@@ -106,6 +112,62 @@ abstract class StatusComp implements Posc, Flyingc{
         return Tmp.c1.set(r / count, g / count, b / count, 1f);
     }
 
+    /**
+     * Applies a dynamic status effect, with stat multipliers that can be customized.
+     * @return the entry to write multipliers to. If the dynamic status was already applied, returns the previous entry.
+     * */
+    public StatusEntry applyDynamicStatus(){
+        if(hasEffect(StatusEffects.dynamic)){
+            StatusEntry entry = statuses.find(s -> s.effect.dynamic);
+            if(entry != null) return entry;
+        }
+
+        StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
+        entry.set(StatusEffects.dynamic, Float.POSITIVE_INFINITY);
+        statuses.add(entry);
+        entry.effect.applied(self(), entry.time, false);
+        return entry;
+    }
+
+    /** Uses a dynamic status effect to override speed (in tiles/second). */
+    public void statusSpeed(float speed){
+        //type.speed should never be 0
+        applyDynamicStatus().speedMultiplier = speed / (type.speed * 60f / tilesize);
+    }
+
+    /** Uses a dynamic status effect to change damage. */
+    public void statusDamageMultiplier(float damageMultiplier){
+        applyDynamicStatus().damageMultiplier = damageMultiplier;
+    }
+
+    /** Uses a dynamic status effect to change reload. */
+    public void statusReloadMultiplier(float reloadMultiplier){
+        applyDynamicStatus().reloadMultiplier = reloadMultiplier;
+    }
+
+    /** Uses a dynamic status effect to override max health. */
+    public void statusMaxHealth(float health){
+        //maxHealth should never be zero
+        applyDynamicStatus().healthMultiplier = health / maxHealth;
+    }
+
+    /** Uses a dynamic status effect to override build speed. */
+    public void statusBuildSpeed(float buildSpeed){
+        //build speed should never be zero
+        applyDynamicStatus().buildSpeedMultiplier = buildSpeed / type.buildSpeed;
+    }
+
+    /** Uses a dynamic status effect to override drag. */
+    public void statusDrag(float drag){
+        //prevent divide by 0 (drag can be zero, if someone makes a broken unit)
+        applyDynamicStatus().dragMultiplier = type.drag == 0f ? 0f : drag / type.drag;
+    }
+
+    /** Uses a dynamic status effect to override armor. */
+    public void statusArmor(float armor){
+        applyDynamicStatus().armorOverride = armor;
+    }
+
     @Override
     public void update(){
         Floor floor = floorOn();
@@ -115,6 +177,7 @@ abstract class StatusComp implements Posc, Flyingc{
         }
 
         applied.clear();
+        armorOverride = -1f;
         speedMultiplier = damageMultiplier = healthMultiplier = reloadMultiplier = buildSpeedMultiplier = dragMultiplier = 1f;
         disarmed = false;
 
@@ -128,18 +191,34 @@ abstract class StatusComp implements Posc, Flyingc{
             entry.time = Math.max(entry.time - Time.delta, 0);
 
             if(entry.effect == null || (entry.time <= 0 && !entry.effect.permanent)){
+                if(entry.effect != null){
+                    entry.effect.onRemoved(self());
+                }
+
                 Pools.free(entry);
                 index --;
                 statuses.remove(index);
             }else{
                 applied.set(entry.effect.id);
 
-                speedMultiplier *= entry.effect.speedMultiplier;
-                healthMultiplier *= entry.effect.healthMultiplier;
-                damageMultiplier *= entry.effect.damageMultiplier;
-                reloadMultiplier *= entry.effect.reloadMultiplier;
-                buildSpeedMultiplier *= entry.effect.buildSpeedMultiplier;
-                dragMultiplier *= entry.effect.dragMultiplier;
+                //TODO this is very ugly...
+                if(entry.effect.dynamic){
+                    speedMultiplier *= entry.speedMultiplier;
+                    healthMultiplier *= entry.healthMultiplier;
+                    damageMultiplier *= entry.damageMultiplier;
+                    reloadMultiplier *= entry.reloadMultiplier;
+                    buildSpeedMultiplier *= entry.buildSpeedMultiplier;
+                    dragMultiplier *= entry.dragMultiplier;
+                    //armor is a special case; many units have it set it to 0, so an override at values >= 0 is used
+                    if(entry.armorOverride >= 0f) armorOverride = entry.armorOverride;
+                }else{
+                    speedMultiplier *= entry.effect.speedMultiplier;
+                    healthMultiplier *= entry.effect.healthMultiplier;
+                    damageMultiplier *= entry.effect.damageMultiplier;
+                    reloadMultiplier *= entry.effect.reloadMultiplier;
+                    buildSpeedMultiplier *= entry.effect.buildSpeedMultiplier;
+                    dragMultiplier *= entry.effect.dragMultiplier;
+                }
 
                 disarmed |= entry.effect.disarm;
 

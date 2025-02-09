@@ -124,7 +124,7 @@ public class LoadoutDialog extends BaseDialog{
 
     private void reseed(){
         this.stacks = originalStacks.map(ItemStack::copy);
-        this.stacks.addAll(content.items().select(i -> validator.get(i) && !stacks.contains(stack -> stack.item == i)).map(i -> new ItemStack(i, 0)));
+        this.stacks.addAll(content.items().select(i -> validator.get(i) && !i.isHidden() && !stacks.contains(stack -> stack.item == i)).map(i -> new ItemStack(i, 0)));
         this.stacks.sort(Structs.comparingInt(s -> s.item.id));
     }
 

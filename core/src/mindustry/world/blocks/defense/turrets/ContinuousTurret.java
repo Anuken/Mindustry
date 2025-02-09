@@ -15,6 +15,7 @@ public class ContinuousTurret extends Turret{
     public BulletType shootType = Bullets.placeholder;
     /** Speed at which the turret can change its bullet "aim" distance. This is only used for point laser bullets. */
     public float aimChangeSpeed = Float.POSITIVE_INFINITY;
+    public boolean scaleDamageEfficiency = false;
 
     public ContinuousTurret(String name){
         super(name);
@@ -39,6 +40,12 @@ public class ContinuousTurret extends Turret{
         public float lastLength = size * 4f;
 
         @Override
+        public float estimateDps(){
+            if(!hasAmmo()) return 0f;
+            return shootType.damage * 60f / (shootType instanceof ContinuousBulletType c ? c.damageInterval : 5f);
+        }
+
+        @Override
         protected void updateCooling(){
             //TODO how does coolant work here, if at all?
         }
@@ -51,7 +58,6 @@ public class ContinuousTurret extends Turret{
 
         @Override
         public boolean hasAmmo(){
-            //TODO update ammo in unit so it corresponds to liquids
             return canConsume();
         }
 
@@ -81,35 +87,42 @@ public class ContinuousTurret extends Turret{
 
             if(bullets.any()){
                 for(var entry : bullets){
-                    float
-                    bulletX = x + Angles.trnsx(rotation - 90, shootX + entry.x, shootY + entry.y),
-                    bulletY = y + Angles.trnsy(rotation - 90, shootX + entry.x, shootY + entry.y),
-                    angle = rotation + entry.rotation;
-
-                    entry.bullet.rotation(angle);
-                    entry.bullet.set(bulletX, bulletY);
-
-                    //target length of laser
-                    float shootLength = Math.min(dst(targetPos), range);
-                    //current length of laser
-                    float curLength = dst(entry.bullet.aimX, entry.bullet.aimY);
-                    //resulting length of the bullet (smoothed)
-                    float resultLength = Mathf.approachDelta(curLength, shootLength, aimChangeSpeed);
-                    //actual aim end point based on length
-                    Tmp.v1.trns(rotation, lastLength = resultLength).add(x, y);
-
-                    entry.bullet.aimX = Tmp.v1.x;
-                    entry.bullet.aimY = Tmp.v1.y;
-
-                    if(isShooting() && hasAmmo()){
-                        entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * shootWarmup;
-                        entry.bullet.keepAlive = true;
-                    }
+                    updateBullet(entry);
                 }
 
                 wasShooting = true;
                 heat = 1f;
                 curRecoil = recoil;
+            }
+        }
+
+        protected void updateBullet(BulletEntry entry){
+            float
+                bulletX = x + Angles.trnsx(rotation - 90, shootX + entry.x, shootY + entry.y),
+                bulletY = y + Angles.trnsy(rotation - 90, shootX + entry.x, shootY + entry.y),
+                angle = rotation + entry.rotation;
+
+            entry.bullet.rotation(angle);
+            entry.bullet.set(bulletX, bulletY);
+
+            //target length of laser
+            float shootLength = Math.min(dst(targetPos), range);
+            //current length of laser
+            float curLength = dst(entry.bullet.aimX, entry.bullet.aimY);
+            //resulting length of the bullet (smoothed)
+            float resultLength = Mathf.approachDelta(curLength, shootLength, aimChangeSpeed);
+            //actual aim end point based on length
+            Tmp.v1.trns(rotation, lastLength = resultLength).add(x, y);
+
+            entry.bullet.aimX = Tmp.v1.x;
+            entry.bullet.aimY = Tmp.v1.y;
+            if(scaleDamageEfficiency){
+                entry.bullet.damage = entry.bullet.type.damage * Math.min(efficiency, 1f) * entry.bullet.damageMultiplier();
+            }
+
+            if(isShooting() && hasAmmo()){
+                entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * Math.min(shootWarmup, efficiency);
+                entry.bullet.keepAlive = true;
             }
         }
 

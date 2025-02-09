@@ -17,6 +17,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 //TODO visuals!
+/** Do not use this class! */
 public class PayloadAmmoTurret extends Turret{
     public ObjectMap<UnlockableContent, BulletType> ammoTypes = new ObjectMap<>();
 
@@ -169,7 +170,7 @@ public class PayloadAmmoTurret extends Turret{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             payloads.read(read);
-            //TODO remove invalid ammo
+            payloads.removeAll(u -> !ammoTypes.containsKey(u));
         }
     }
 }

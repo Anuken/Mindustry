@@ -5,6 +5,8 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -140,11 +142,21 @@ public class PayloadDeconstructor extends PayloadBlock{
                     float shift = edelta() * deconstructSpeed / deconstructing.buildTime();
                     float realShift = Math.min(shift, 1f - progress);
 
+                    //if began deconstruction...
+                    if(progress == 0f && shift > 0f && deconstructing instanceof BuildPayload pay){
+                        var build = pay.build;
+                        //dump liquid on floor (does not respect block configuration with respect to dumping liquids on floor)
+                        if(build.liquids != null && build.liquids.currentAmount() > 0){
+                            float perCell = build.liquids.currentAmount() / (block.size * block.size) * 2f;
+                            tile.getLinkedTiles(other -> Puddles.deposit(other, build.liquids.current(), perCell));
+                        }
+                    }
+
                     progress += shift;
                     time += edelta();
 
                     for(int i = 0; i < reqs.length; i++){
-                        accum[i] += reqs[i].amount * (payload instanceof BuildPayload ? state.rules.buildCostMultiplier : 1f) * realShift;
+                        accum[i] += reqs[i].amount * (deconstructing instanceof BuildPayload ? state.rules.buildCostMultiplier : state.rules.unitCost(team)) * realShift;
                     }
                 }
 
@@ -188,6 +200,13 @@ public class PayloadDeconstructor extends PayloadBlock{
                 payload = null;
                 progress = 0f;
             }
+        }
+
+        @Override
+        public double sense(Content content){
+            if(deconstructing instanceof UnitPayload up) return up.unit.type == content ? 1 : 0;
+            if(deconstructing instanceof BuildPayload bp) return bp.build.block == content ? 1 : 0;
+            return super.sense(content);
         }
 
         @Override

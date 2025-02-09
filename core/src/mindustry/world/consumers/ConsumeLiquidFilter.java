@@ -33,8 +33,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     public void build(Building build, Table table){
         Seq<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.get(l));
         MultiReqImage image = new MultiReqImage();
-        list.each(liquid -> image.add(new ReqImage(liquid.uiIcon, () ->
-            build.liquids != null && build.liquids.get(liquid) > 0)));
+        list.each(liquid -> image.add(new ReqImage(liquid.uiIcon, () -> getConsumed(build) == liquid)));
 
         table.add(image).size(8 * 4);
     }
@@ -43,7 +42,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     public void update(Building build){
         Liquid liq = getConsumed(build);
         if(liq != null){
-            build.liquids.remove(liq, amount * build.edelta());
+            build.liquids.remove(liq, amount * build.edelta() * multiplier.get(build));
         }
     }
 
@@ -52,9 +51,15 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
         var liq = getConsumed(build);
         float ed = build.edelta();
         if(ed <= 0.00000001f) return 0f;
-        return liq != null ? Math.min(build.liquids.get(liq) / (amount * ed), 1f) : 0f;
+        return liq != null ? Math.min(build.liquids.get(liq) / (amount * ed * multiplier.get(build)), 1f) : 0f;
     }
-    
+
+    @Override
+    public float efficiencyMultiplier(Building build){
+        var liq = getConsumed(build);
+        return liq == null ? 0 : liquidEfficiencyMultiplier(liq);
+    }
+
     public @Nullable Liquid getConsumed(Building build){
         if(filter.get(build.liquids.current()) && build.liquids.currentAmount() > 0){
             return build.liquids.current();
@@ -74,5 +79,14 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     @Override
     public void display(Stats stats){
         stats.add(booster ? Stat.booster : Stat.input, StatValues.liquids(filter, amount * 60f, true));
+    }
+
+    @Override
+    public boolean consumes(Liquid liquid){
+        return filter.get(liquid);
+    }
+
+    public float liquidEfficiencyMultiplier(Liquid liquid){
+        return 1f;
     }
 }

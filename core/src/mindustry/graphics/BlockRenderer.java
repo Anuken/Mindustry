@@ -85,6 +85,10 @@ public class BlockRenderer{
                     updateFloors.add(new UpdateRenderState(tile, tile.floor()));
                 }
 
+                if(tile.overlay().updateRender(tile)){
+                    updateFloors.add(new UpdateRenderState(tile, tile.overlay()));
+                }
+
                 if(tile.build != null && (tile.team() == player.team() || !state.rules.fog || (tile.build.visibleFlags & (1L << player.team().id)) != 0)){
                     tile.build.wasVisible = true;
                 }
@@ -262,7 +266,7 @@ public class BlockRenderer{
     public void drawDestroyed(){
         if(!Core.settings.getBool("destroyedblocks")) return;
 
-        if(control.input.isPlacing() || control.input.isBreaking()){
+        if(control.input.isPlacing() || control.input.isBreaking() || (control.input.isRebuildSelecting() && !scene.hasKeyboard())){
             brokenFade = Mathf.lerpDelta(brokenFade, 1f, 0.1f);
         }else{
             brokenFade = Mathf.lerpDelta(brokenFade, 0f, 0.1f);
@@ -270,7 +274,7 @@ public class BlockRenderer{
 
         if(brokenFade > 0.001f){
             for(BlockPlan block : player.team().data().plans){
-                Block b = content.block(block.block);
+                Block b = block.block;
                 if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset, block.y * tilesize + b.offset))) continue;
 
                 Draw.alpha(0.33f * brokenFade);
@@ -289,6 +293,7 @@ public class BlockRenderer{
             Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
 
             for(Tile tile : shadowEvents){
+                if(tile == null) continue;
                 //draw white/shadow color depending on blend
                 Draw.color((!tile.block().hasShadow || (state.rules.fog && tile.build != null && !tile.build.wasVisible)) ? Color.white : blendShadowColor);
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
@@ -347,7 +352,7 @@ public class BlockRenderer{
         var bounds = camera.bounds(Tmp.r3).grow(tilesize * 2f);
 
         //draw floor lights
-        floorTree.intersect(bounds, tile -> lightview.add(tile));
+        floorTree.intersect(bounds, lightview::add);
 
         blockTree.intersect(bounds, tile -> {
             if(tile.build == null || procLinks.add(tile.build.id)){
@@ -424,12 +429,12 @@ public class BlockRenderer{
 
                 if(build != null){
                     if(visible){
+                        build.visibleFlags |= (1L << pteam.id);
                         if(!build.wasVisible){
+                            build.wasVisible = true;
                             updateShadow(build);
                             renderer.minimap.update(tile);
                         }
-                        build.visibleFlags |= (1L << pteam.id);
-                        build.wasVisible = true;
                     }
 
                     if(build.damaged()){
@@ -485,7 +490,8 @@ public class BlockRenderer{
         }
     }
 
-    void updateShadow(Building build){
+    public void updateShadow(Building build){
+        if(build.tile == null) return;
         int size = build.block.size, of = build.block.sizeOffset, tx = build.tile.x, ty = build.tile.y;
 
         for(int x = 0; x < size; x++){

@@ -5,11 +5,14 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.payloads.PayloadUnloader.*;
+import mindustry.world.blocks.sandbox.*;
 
 import static mindustry.Vars.*;
 
@@ -22,6 +25,8 @@ public class PayloadLoader extends PayloadBlock{
     public int maxBlockSize = 3;
     public float maxPowerConsumption = 40f;
     public boolean loadPowerDynamic = true;
+
+    public @Load("@-over") TextureRegion overRegion;
 
     //initialized in init(), do not touch
     protected float basePowerUse = 0f;
@@ -38,6 +43,7 @@ public class PayloadLoader extends PayloadBlock{
         outputsPayload = true;
         size = 3;
         rotate = true;
+        canOverdrive = false;
     }
 
     @Override
@@ -71,7 +77,7 @@ public class PayloadLoader extends PayloadBlock{
     public void init(){
         if(loadPowerDynamic){
             basePowerUse = consPower != null ? consPower.usage : 0f;
-            consumePowerDynamic((PayloadLoaderBuild loader) -> loader.hasBattery() && !loader.exporting ? maxPowerConsumption + basePowerUse : basePowerUse);
+            consumePowerDynamic(basePowerUse, (PayloadLoaderBuild loader) -> loader.shouldConsume() ? (loader.hasBattery() && !loader.exporting ? maxPowerConsumption + basePowerUse : basePowerUse) : 0f);
         }
 
         super.init();
@@ -102,12 +108,12 @@ public class PayloadLoader extends PayloadBlock{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return items.total() < itemCapacity;
+            return items.total() < itemCapacity && !(source instanceof PayloadUnloaderBuild);
         }
 
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
-            return liquids.current() == liquid || liquids.currentAmount() < 0.2f;
+            return (liquids.current() == liquid || liquids.currentAmount() < 0.2f) && !(source instanceof PayloadUnloaderBuild);
         }
 
         @Override
@@ -131,6 +137,11 @@ public class PayloadLoader extends PayloadBlock{
 
             Draw.z(Layer.blockOver);
             drawPayload();
+
+            if(overRegion.found()){
+                Draw.z(Layer.blockOver + 0.1f);
+                Draw.rect(overRegion, x, y);
+            }
         }
 
         @Override
@@ -142,7 +153,9 @@ public class PayloadLoader extends PayloadBlock{
 
                 //load up items
                 if(payload.block().hasItems && items.any()){
+                    boolean acceptedAny = true;
                     if(efficiency > 0.01f && timer(timerLoad, loadTime / efficiency)){
+                        acceptedAny = false;
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && items.any(); j++){
 
@@ -152,6 +165,7 @@ public class PayloadLoader extends PayloadBlock{
                                     if(payload.build.acceptItem(payload.build, item)){
                                         payload.build.handleItem(payload.build, item);
                                         items.remove(item, 1);
+                                        acceptedAny = true;
                                         break;
                                     }else if(payload.block().separateItemCapacity || payload.block().consumesItem(item)){
                                         exporting = true;
@@ -160,6 +174,9 @@ public class PayloadLoader extends PayloadBlock{
                                 }
                             }
                         }
+                    }
+                    if(!acceptedAny){
+                        exporting = true;
                     }
                 }
 
@@ -170,8 +187,12 @@ public class PayloadLoader extends PayloadBlock{
                     float flow = Math.min(Math.min(liquidsLoaded * edelta(), payload.block().liquidCapacity - payload.build.liquids.get(liq)), total);
                     //TODO potential crash here
                     if(payload.build.acceptLiquid(payload.build, liq)){
-                        payload.build.liquids.add(liq, flow);
+                        if(!(payload.block() instanceof LiquidVoid)){
+                            payload.build.liquids.add(liq, flow);
+                        }
                         liquids.remove(liq, flow);
+                    }else{
+                        exporting = true;
                     }
                 }
 
@@ -213,6 +234,11 @@ public class PayloadLoader extends PayloadBlock{
 
         public boolean hasBattery(){
             return payload != null && payload.block().consPower != null && payload.block().consPower.buffered;
+        }
+
+        @Override
+        public boolean shouldConsume(){
+            return payload != null;
         }
 
         @Override
