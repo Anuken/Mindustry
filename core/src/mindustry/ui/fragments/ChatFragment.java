@@ -202,6 +202,8 @@ public class ChatFragment extends Table{
 
         history.insert(1, message);
 
+        message = UI.formatIcons(message);
+
         Events.fire(new ClientChatEvent(message));
 
         Call.sendChatMessage(message);
