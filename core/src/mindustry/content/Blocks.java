@@ -2412,7 +2412,7 @@ public class Blocks{
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
-            requirements(Category.power, with(Items.lead, 10, Items.silicon, 10));
+            requirements(Category.power, with(Items.lead, 10, Items.silicon, 8));
             powerProduction = 0.12f;
         }};
 
