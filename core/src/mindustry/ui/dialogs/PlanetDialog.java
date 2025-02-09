@@ -809,7 +809,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                 state.otherCamPos = null;
                 //announce new sector
-                newPresets.add(state.planet.sectors.get(state.planet.startSector));
+                if(!state.planet.sectors.isEmpty()){
+                    newPresets.add(state.planet.sectors.get(state.planet.startSector));
+                }
 
             }
         }
