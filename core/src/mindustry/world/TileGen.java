@@ -4,7 +4,7 @@ import mindustry.content.*;
 
 public class TileGen{
     public Block floor;
-    public Block block ;
+    public Block block;
     public Block overlay;
 
     {

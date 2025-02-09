@@ -1,9 +1,0 @@
-- Opraveny některé chyby
-- A některé opraveny nebyly
-- Přidáno 6 nových jednotek, které zaplnily chybějící povýšení na T4/5
-- Přidán obrys jednotek pro vizuálbí čistotu, možná bude později odebráno
-- Přidán povrch typu bláto (příspěvek od ThePlayerA)
-- Přidána cena výzkumu k jednotkám v technologickém stromě
-- Přidána schopnost hry nahradit malé kusy zdí přímo většími 
-- Přidána možnost vybrat si cíl vyslání (jen zběžně testováno)
-- Přidány barvy týmů pro uskladněné bloky (příspěek od Voz-Duh)

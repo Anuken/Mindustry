@@ -1,37 +1,57 @@
 package mindustry.entities.comp;
 
 import arc.math.*;
-import arc.math.geom.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
 @Component
 abstract class BoundedComp implements Velc, Posc, Healthc, Flyingc{
-    static final float warpDst = 180f;
+    static final float warpDst = 30f;
 
+    @Import UnitType type;
     @Import float x, y;
-    @Import Vec2 vel;
+    @Import Team team;
 
     @Override
     public void update(){
+        if(!type.bounded) return;
+        
+        float bot = 0f, left = 0f, top = world.unitHeight(), right = world.unitWidth();
+
+        //TODO hidden map rules only apply to player teams? should they?
+        if(state.rules.limitMapArea && !team.isAI()){
+            bot = state.rules.limitY * tilesize;
+            left = state.rules.limitX * tilesize;
+            top = state.rules.limitHeight * tilesize + bot;
+            right = state.rules.limitWidth * tilesize + left;
+        }
+
         if(!net.client() || isLocal()){
+
+            float dx = 0f, dy = 0f;
+
             //repel unit out of bounds
-            if(x < 0) vel.x += (-x/warpDst);
-            if(y < 0) vel.y += (-y/warpDst);
-            if(x > world.unitWidth()) vel.x -= (x - world.unitWidth())/warpDst;
-            if(y > world.unitHeight()) vel.y -= (y - world.unitHeight())/warpDst;
+            if(x < left) dx += (-(x - left)/warpDst);
+            if(y < bot) dy += (-(y - bot)/warpDst);
+            if(x > right) dx -= (x - right)/warpDst;
+            if(y > top) dy -= (y - top)/warpDst;
+
+            velAddNet(dx * Time.delta, dy * Time.delta);
         }
 
         //clamp position if not flying
         if(isGrounded()){
-            x = Mathf.clamp(x, 0, world.width() * tilesize - tilesize);
-            y = Mathf.clamp(y, 0, world.height() * tilesize - tilesize);
+            x = Mathf.clamp(x, left, right - tilesize);
+            y = Mathf.clamp(y, bot, top - tilesize);
         }
 
         //kill when out of bounds
-        if(x < -finalWorldBounds || y < -finalWorldBounds || x >= world.width() * tilesize + finalWorldBounds || y >= world.height() * tilesize + finalWorldBounds){
+        if(x < -finalWorldBounds + left || y < -finalWorldBounds + bot || x >= right + finalWorldBounds || y >= top + finalWorldBounds){
             kill();
         }
     }

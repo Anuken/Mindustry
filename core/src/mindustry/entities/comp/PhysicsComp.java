@@ -11,7 +11,7 @@ import mindustry.gen.*;
  * Has mass.*/
 @Component
 abstract class PhysicsComp implements Velc, Hitboxc, Flyingc{
-    @Import float hitSize;
+    @Import float hitSize, x, y;
     @Import Vec2 vel;
 
     transient PhysicRef physref;

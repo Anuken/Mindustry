@@ -7,7 +7,6 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 
 @EntityDef(value = LaunchCorec.class, serialize = false)
@@ -43,8 +42,9 @@ abstract class LaunchCoreComp implements Drawc, Timedc{
 
         Draw.z(Layer.weather - 1);
 
-        TextureRegion region = block.icon(Cicon.full);
-        float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
+        TextureRegion region = block.fullIcon;
+        scale *= region.scl();
+        float rw = region.width * scale, rh = region.height * scale;
 
         Draw.alpha(alpha);
         Draw.rect(region, cx, cy, rw, rh, rotation - 45);

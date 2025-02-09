@@ -1,20 +1,25 @@
 package mindustry.maps.filters;
 
 import arc.struct.*;
-import arc.util.*;
 import mindustry.content.*;
+import mindustry.gen.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
 /** Selects X spawns from the spawn pool.*/
 public class EnemySpawnFilter extends GenerateFilter{
-    int amount = 1;
+    public int amount = 1;
 
     @Override
     public FilterOption[] options(){
-        return Structs.arr(
-        new SliderOption("amount", () -> amount, f -> amount = (int)f, 1, 10).display()
-        );
+        return new SliderOption[]{
+            new SliderOption("amount", () -> amount, f -> amount = (int)f, 1, 10).display()
+        };
+    }
+
+    @Override
+    public char icon(){
+        return Iconc.blockSpawn;
     }
 
     @Override

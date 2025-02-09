@@ -2,15 +2,10 @@ package mindustry.annotations;
 
 import arc.files.*;
 import arc.struct.*;
-import arc.util.Log;
-import arc.util.Log.*;
 import arc.util.*;
+import arc.util.Log.*;
 import com.squareup.javapoet.*;
 import com.sun.source.util.*;
-import com.sun.tools.javac.model.*;
-import com.sun.tools.javac.processing.*;
-import com.sun.tools.javac.tree.*;
-import com.sun.tools.javac.util.*;
 import mindustry.annotations.util.*;
 
 import javax.annotation.processing.*;
@@ -22,7 +17,6 @@ import javax.tools.Diagnostic.*;
 import javax.tools.*;
 import java.io.*;
 import java.lang.annotation.*;
-import java.util.List;
 import java.util.*;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -31,18 +25,15 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public static final String packageName = "mindustry.gen";
 
     public static Types typeu;
-    public static JavacElements elementu;
+    public static Elements elementu;
     public static Filer filer;
     public static Messager messager;
     public static Trees trees;
-    public static TreeMaker maker;
 
     protected int round;
     protected int rounds = 1;
     protected RoundEnvironment env;
     protected Fi rootDirectory;
-
-    protected Context context;
 
     public static String getMethodName(Element element){
         return ((TypeElement)element.getEnclosingElement()).getQualifiedName().toString() + "." + element.getSimpleName();
@@ -100,7 +91,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
     }
 
     public static TypeName tname(String pack, String simple){
-        return ClassName.get(pack, simple );
+        return ClassName.get(pack, simple);
     }
 
     public static TypeName tname(String name){
@@ -132,14 +123,21 @@ public abstract class BaseProcessor extends AbstractProcessor{
     }
 
     public static void write(TypeSpec.Builder builder, Seq<String> imports) throws Exception{
+        builder.superinterfaces.sort(Structs.comparing(t -> t.toString()));
+        builder.methodSpecs.sort(Structs.comparing(m -> m.toString()));
+        builder.fieldSpecs.sort(Structs.comparing(f -> f.name));
+
         JavaFile file = JavaFile.builder(packageName, builder.build()).skipJavaLangImports(true).build();
+        String writeString;
 
         if(imports != null){
+            imports = imports.map(m -> Seq.with(m.split("\n")).sort().toString("\n"));
+            imports.sort();
             String rawSource = file.toString();
             Seq<String> result = new Seq<>();
             for(String s : rawSource.split("\n", -1)){
                 result.add(s);
-                if (s.startsWith("package ")){
+                if(s.startsWith("package ")){
                     result.add("");
                     for (String i : imports){
                         result.add(i);
@@ -147,14 +145,15 @@ public abstract class BaseProcessor extends AbstractProcessor{
                 }
             }
 
-            String out = result.toString("\n");
-            JavaFileObject object = filer.createSourceFile(file.packageName + "." + file.typeSpec.name, file.typeSpec.originatingElements.toArray(new Element[0]));
-            OutputStream stream = object.openOutputStream();
-            stream.write(out.getBytes());
-            stream.close();
+            writeString = result.toString("\n");
         }else{
-            file.writeTo(filer);
+            writeString = file.toString();
         }
+
+        JavaFileObject object = filer.createSourceFile(file.packageName + "." + file.typeSpec.name, file.typeSpec.originatingElements.toArray(new Element[0]));
+        Writer stream = object.openWriter();
+        stream.write(writeString);
+        stream.close();
     }
 
     public Seq<Selement> elements(Class<? extends Annotation> type){
@@ -186,7 +185,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         Log.err("[CODEGEN ERROR] " + message + ": " + elem);
     }
 
-    public void err(String message, Selement elem){
+    public static void err(String message, Selement elem){
         err(message, elem.e);
     }
 
@@ -194,15 +193,11 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public synchronized void init(ProcessingEnvironment env){
         super.init(env);
 
-        JavacProcessingEnvironment javacProcessingEnv = (JavacProcessingEnvironment)env;
-
         trees = Trees.instance(env);
         typeu = env.getTypeUtils();
-        elementu = javacProcessingEnv.getElementUtils();
+        elementu = env.getElementUtils();
         filer = env.getFiler();
         messager = env.getMessager();
-        context = ((JavacProcessingEnvironment)env).getContext();
-        maker = TreeMaker.instance(javacProcessingEnv.getContext());
 
         Log.level = LogLevel.info;
 
@@ -219,7 +214,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
                 String path = Fi.get(filer.getResource(StandardLocation.CLASS_OUTPUT, "no", "no")
                 .toUri().toURL().toString().substring(OS.isWindows ? 6 : "file:".length()))
                 .parent().parent().parent().parent().parent().parent().parent().toString().replace("%20", " ");
-                rootDirectory = Fi.get(path);
+                rootDirectory = Fi.get(path).parent();
             }catch(IOException e){
                 throw new RuntimeException(e);
             }

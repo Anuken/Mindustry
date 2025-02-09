@@ -1,9 +1,0 @@
-Mindustry 6.0 is now in beta. This means most mechanics outside of the campaign have been more or less finalized. Any significant new content is unlikely to be added.
-
-- Added Foreshadow turret
-- Added Tsunami turret (initial implementation by Slava0135, sprite by EyeOfDarkness)
-- Added logic unit control system
-- Added space floor block
-- Added button to center map to editor
-- Added rule setting for enemy lights
-- Changed armored conduits to not leak

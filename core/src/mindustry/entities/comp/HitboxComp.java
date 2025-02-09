@@ -5,10 +5,11 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 
 @Component
-abstract class HitboxComp implements Posc, QuadTreeObject{
+abstract class HitboxComp implements Posc, Sized, QuadTreeObject{
     @Import float x, y;
 
     transient float lastX, lastY, deltaX, deltaY, hitSize;
@@ -26,6 +27,11 @@ abstract class HitboxComp implements Posc, QuadTreeObject{
     @Override
     public void afterRead(){
         updateLastPosition();
+    }
+
+    @Override
+    public float hitSize(){
+        return hitSize;
     }
 
     void getCollisions(Cons<QuadTree> consumer){
@@ -62,7 +68,10 @@ abstract class HitboxComp implements Posc, QuadTreeObject{
 
     public void hitboxTile(Rect rect){
         //tile hitboxes are never bigger than a tile, otherwise units get stuck
-        float size = Math.min(hitSize * 0.66f, 7.9f);
+        float size = Math.min(hitSize * 0.66f, 7.8f);
+        //TODO: better / more accurate version is
+        //float size = hitSize * 0.85f;
+        //- for tanks?
         rect.setCentered(x, y, size, size);
     }
 }

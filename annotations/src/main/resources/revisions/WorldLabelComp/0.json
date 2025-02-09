@@ -1,0 +1,1 @@
+{fields:[{name:flags,type:byte},{name:fontSize,type:float},{name:text,type:java.lang.String},{name:x,type:float},{name:y,type:float},{name:z,type:float}]}

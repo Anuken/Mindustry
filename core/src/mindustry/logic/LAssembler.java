@@ -1,41 +1,41 @@
 package mindustry.logic;
 
 import arc.func.*;
+import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
-import mindustry.logic.LStatements.*;
 
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
-    public static final int maxTokenLength = 36;
 
-    private int lastVar;
-    /** Maps names to variable IDs. */
-    public ObjectMap<String, BVar> vars = new ObjectMap<>();
+    private static final int invalidNum = Integer.MIN_VALUE;
+
+    private boolean privileged;
+    /** Maps names to variable. */
+    public OrderedMap<String, LVar> vars = new OrderedMap<>();
     /** All instructions to be executed. */
     public LInstruction[] instructions;
 
     public LAssembler(){
         //instruction counter
-        putVar("@counter").value = 0;
-        //unix timestamp
-        putConst("@time", 0);
+        putVar("@counter").isobj = false;
         //currently controlled unit
         putConst("@unit", null);
         //reference to self
         putConst("@this", null);
     }
 
-    public static LAssembler assemble(String data, int maxInstructions){
+    public static LAssembler assemble(String data, boolean privileged){
         LAssembler asm = new LAssembler();
 
-        Seq<LStatement> st = read(data, maxInstructions);
+        Seq<LStatement> st = read(data, privileged);
 
-        asm.instructions = st.map(l -> l.build(asm)).filter(l -> l != null).toArray(LInstruction.class);
+        asm.privileged = privileged;
+        
+        asm.instructions = st.map(l -> l.build(asm)).retainAll(l -> l != null).toArray(LInstruction.class);
         return asm;
     }
 
@@ -49,183 +49,89 @@ public class LAssembler{
         return out.toString();
     }
 
-    public static Seq<LStatement> read(String data){
-        return read(data, LExecutor.maxInstructions);
+    /** Parses a sequence of statements from a string. */
+    public static Seq<LStatement> read(String text, boolean privileged){
+        //don't waste time parsing null/empty text
+        if(text == null || text.isEmpty()) return new Seq<>();
+        return new LParser(text, privileged).parse();
     }
 
-    public static Seq<LStatement> read(String data, int max){
-        //empty data check
-        if(data == null || data.isEmpty()) return new Seq<>();
-
-        Seq<LStatement> statements = new Seq<>();
-        String[] lines = data.split("\n");
-        int index = 0;
-        for(String line : lines){
-            //comments
-            int commentIdx = line.indexOf('#');
-            if(commentIdx != -1) line = line.substring(0, commentIdx).trim();
-            if(line.isEmpty()) continue;
-            //remove trailing semicolons in case someone adds them in for no reason
-            if(line.endsWith(";")) line = line.substring(0, line.length() - 1);
-
-            if(index++ > max) break;
-
-            line = line.replace("\t", "").trim();
-
-            try{
-                String[] arr;
-
-                //yes, I am aware that this can be split with regex, but that's slow and even more incomprehensible
-                if(line.contains(" ")){
-                    Seq<String> tokens = new Seq<>();
-                    boolean inString = false;
-                    int lastIdx = 0;
-
-                    for(int i = 0; i < line.length() + 1; i++){
-                        char c = i == line.length() ? ' ' : line.charAt(i);
-                        if(c == '"'){
-                            inString = !inString;
-                        }else if(c == ' ' && !inString){
-                            tokens.add(line.substring(lastIdx, Math.min(i, lastIdx + maxTokenLength)));
-                            lastIdx = i + 1;
-                        }
-                    }
-
-                    arr = tokens.toArray(String.class);
-                }else{
-                    arr = new String[]{line};
-                }
-
-                String type = arr[0];
-
-                //legacy stuff
-                if(type.equals("bop")){
-                    arr[0] = "op";
-
-                    //field order for bop used to be op a, b, result, but now it's op result a b
-                    String res = arr[4];
-                    arr[4] = arr[3];
-                    arr[3] = arr[2];
-                    arr[2] = res;
-                }else if(type.equals("uop")){
-                    arr[0] = "op";
-
-                    if(arr[1].equals("negate")){
-                        arr = new String[]{
-                            "op", "mul", arr[3], arr[2], "-1"
-                        };
-                    }else{
-                        //field order for uop used to be op a, result, but now it's op result a
-                        String res = arr[3];
-                        arr[3] = arr[2];
-                        arr[2] = res;
-                    }
-                }
-
-                LStatement st = LogicIO.read(arr);
-
-                if(st != null){
-                    statements.add(st);
-                }else{
-                    //attempt parsing using custom parser if a match is found - this is for mods
-                    String first = arr[0];
-                    if(customParsers.containsKey(first)){
-                        statements.add(customParsers.get(first).get(arr));
-                    }else{
-                        //unparseable statement
-                        statements.add(new InvalidStatement());
-                    }
-                }
-            }catch(Exception parseFailed){
-                parseFailed.printStackTrace();
-                //when parsing fails, add a dummy invalid statement
-                statements.add(new InvalidStatement());
-            }
-        }
-        return statements;
-    }
-
-    /** @return a variable ID by name.
+    /** @return a variable by name.
      * This may be a constant variable referring to a number or object. */
-    public int var(String symbol){
-        int constId = Vars.constants.get(symbol);
-        if(constId > 0){
-            //global constants are *negated* and stored separately
-            return -constId;
-        }
+    public LVar var(String symbol){
+        LVar constVar = Vars.logicVars.get(symbol, privileged);
+        if(constVar != null) return constVar;
 
         symbol = symbol.trim();
 
         //string case
-        if(symbol.startsWith("\"") && symbol.endsWith("\"")){
-            return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n")).id;
+        if(!symbol.isEmpty() && symbol.charAt(0) == '\"' && symbol.charAt(symbol.length() - 1) == '\"'){
+            return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n"));
         }
 
         //remove spaces for non-strings
         symbol = symbol.replace(' ', '_');
 
-        try{
-            double value = parseDouble(symbol);
-            if(Double.isNaN(value) || Double.isInfinite(value)) value = 0;
+        double value = parseDouble(symbol);
 
+        if(value == invalidNum){
+            return putVar(symbol);
+        }else{
             //this creates a hidden const variable with the specified value
-            return putConst("___" + value, value).id;
-        }catch(NumberFormatException e){
-            return putVar(symbol).id;
+            return putConst("___" + value, value);
         }
     }
 
-    double parseDouble(String symbol) throws NumberFormatException{
+    double parseDouble(String symbol){
         //parse hex/binary syntax
-        if(symbol.startsWith("0b")) return Long.parseLong(symbol.substring(2), 2);
-        if(symbol.startsWith("0x")) return Long.parseLong(symbol.substring(2), 16);
+        if(symbol.startsWith("0b")) return Strings.parseLong(symbol, 2, 2, symbol.length(), invalidNum);
+        if(symbol.startsWith("0x")) return Strings.parseLong(symbol, 16, 2, symbol.length(), invalidNum);
+        if(symbol.startsWith("%") && (symbol.length() == 7 || symbol.length() == 9)) return parseColor(symbol);
 
-        return Double.parseDouble(symbol);
+        return Strings.parseDouble(symbol, invalidNum);
+    }
+
+    double parseColor(String symbol){
+        int
+        r = Strings.parseInt(symbol, 16, 0, 1, 3),
+        g = Strings.parseInt(symbol, 16, 0, 3, 5),
+        b = Strings.parseInt(symbol, 16, 0, 5, 7),
+        a = symbol.length() == 9 ? Strings.parseInt(symbol, 16, 0, 7, 9) : 255;
+
+        return Color.toDoubleBits(r, g, b, a);
     }
 
     /** Adds a constant value by name. */
-    public BVar putConst(String name, Object value){
-        BVar var = putVar(name);
+    public LVar putConst(String name, Object value){
+        LVar var = putVar(name);
+        if(value instanceof Number number){
+            var.isobj = false;
+            var.numval = number.doubleValue();
+            var.objval = null;
+        }else{
+            var.isobj = true;
+            var.objval = value;
+        }
         var.constant = true;
-        var.value = value;
         return var;
     }
 
     /** Registers a variable name mapping. */
-    public BVar putVar(String name){
+    public LVar putVar(String name){
         if(vars.containsKey(name)){
             return vars.get(name);
         }else{
-            BVar var = new BVar(lastVar++);
+            //variables are null objects by default
+            LVar var = new LVar(name);
+            var.isobj = true;
             vars.put(name, var);
             return var;
         }
     }
 
     @Nullable
-    public BVar getVar(String name){
+    public LVar getVar(String name){
         return vars.get(name);
     }
 
-    /** A variable "builder". */
-    public static class BVar{
-        public int id;
-        public boolean constant;
-        public Object value;
-
-        public BVar(int id){
-            this.id = id;
-        }
-
-        BVar(){}
-
-        @Override
-        public String toString(){
-            return "BVar{" +
-            "id=" + id +
-            ", constant=" + constant +
-            ", value=" + value +
-            '}';
-        }
-    }
 }

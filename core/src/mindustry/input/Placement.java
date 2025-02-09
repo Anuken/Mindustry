@@ -6,22 +6,24 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.pooling.*;
+import mindustry.entities.units.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 
 public class Placement{
-    private final static Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
+    private static final Seq<BuildPlan> plans1 = new Seq<>();
+    private static final Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
     private static final NormalizeResult result = new NormalizeResult();
     private static final NormalizeDrawResult drawResult = new NormalizeDrawResult();
-    private static Bresenham2 bres = new Bresenham2();
-    private static Seq<Point2> points = new Seq<>();
+    private static final Bresenham2 bres = new Bresenham2();
+    private static final Seq<Point2> points = new Seq<>();
 
     //for pathfinding
-    private static IntFloatMap costs = new IntFloatMap();
-    private static IntIntMap parents = new IntIntMap();
-    private static IntSet closed = new IntSet();
+    private static final IntFloatMap costs = new IntFloatMap();
+    private static final IntIntMap parents = new IntIntMap();
+    private static final IntSet closed = new IntSet();
 
     /** Normalize a diagonal line into points. */
     public static Seq<Point2> pathfindLine(boolean conveyors, int startX, int startY, int endX, int endY){
@@ -56,6 +58,22 @@ public class Placement{
         return points;
     }
 
+    /** Normalize two points into a rectangle. */
+    public static Seq<Point2> normalizeRectangle(int startX, int startY, int endX, int endY, int blockSize){
+        Pools.freeAll(points);
+        points.clear();
+
+        int minX = Math.min(startX, endX), minY = Math.min(startY, endY), maxX = Math.max(startX, endX), maxY = Math.max(startY, endY);
+
+        for(int y = 0; y <= maxY - minY; y += blockSize){
+            for(int x = 0; x <= maxX - minX; x += blockSize){
+                points.add(Pools.obtain(Point2.class, Point2::new).set(startX + x * Mathf.sign(endX - startX), startY + y * Mathf.sign(endY - startY)));
+            }
+        }
+
+        return points;
+    }
+
     public static Seq<Point2> upgradeLine(int startX, int startY, int endX, int endY){
         closed.clear();
         Pools.freeAll(points);
@@ -75,7 +93,7 @@ public class Placement{
         var base = tmpPoints2;
         var result = tmpPoints.clear();
 
-        base.selectFrom(points, p -> p == points.first() || p == points.peek() || Build.validPlace(block, player.team(), p.x, p.y, rotation, false));
+        base.selectFrom(points, p -> p == points.first() || p == points.peek() || Build.validPlace(block, player.team(), p.x, p.y, rotation));
         boolean addedLast = false;
 
         outer:
@@ -100,10 +118,161 @@ public class Placement{
             i ++;
         }
 
-        if(!addedLast) result.add(base.peek());
+        if(!addedLast && !base.isEmpty()) result.add(base.peek());
 
         points.clear();
         points.addAll(result);
+    }
+
+    public static boolean isSidePlace(Seq<BuildPlan> plans){
+        return plans.size > 1 && Mathf.mod(Tile.relativeTo(plans.first().x, plans.first().y, plans.get(1).x, plans.get(1).y) - plans.first().rotation, 2) == 1;
+    }
+
+    public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge){
+        calculateBridges(plans, bridge, t -> false);
+    }
+
+    public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge, Boolf<Block> avoid){
+        if(isSidePlace(plans) || plans.size == 0) return;
+
+        //check for orthogonal placement + unlocked state
+        if(!(plans.first().x == plans.peek().x || plans.first().y == plans.peek().y) || !bridge.unlockedNow()){
+            return;
+        }
+
+        Boolf<BuildPlan> placeable = plan ->
+            (plan.placeable(player.team()) || (plan.tile() != null && plan.tile().block() == plan.block)) &&  //don't count the same block as inaccessible
+           !(plan != plans.first() && plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
+
+        var result = plans1.clear();
+        var rotated = plans.first().tile() != null && plans.first().tile().absoluteRelativeTo(plans.peek().x, plans.peek().y) == Mathf.mod(plans.first().rotation + 2, 4);
+
+        outer:
+        for(int i = 0; i < plans.size;){
+            var cur = plans.get(i);
+            result.add(cur);
+
+            //gap found
+            if(i < plans.size - 1 && placeable.get(cur) && !placeable.get(plans.get(i + 1))){
+                boolean wereSame = true;
+
+                //find the closest valid position within range
+                for(int j = i + 1; j < plans.size; j++){
+                    var other = plans.get(j);
+
+                    //out of range now, set to current position and keep scanning forward for next occurrence
+                    if(!bridge.positionsValid(cur.x, cur.y, other.x, other.y)){
+                        //add 'missed' conveyors
+                        for(int k = i + 1; k < j; k++){
+                            result.add(plans.get(k));
+                        }
+                        i = j;
+                        continue outer;
+                    }else if(placeable.get(other)){
+
+                        if(wereSame){
+                            //the gap is fake, it's just conveyors that can be replaced with junctions
+                            i ++;
+                            continue outer;
+                        }else{
+                            //found a link, assign bridges
+                            cur.block = bridge;
+                            other.block = bridge;
+                            if(rotated){
+                                other.config = new Point2(cur.x - other.x,  cur.y - other.y);
+                            }else{
+                                cur.config = new Point2(other.x - cur.x, other.y - cur.y);
+                            }
+
+                            i = j;
+                            continue outer;
+                        }
+                    }
+
+                    if(other.tile() != null && !avoid.get(other.tile().block())){
+                        wereSame = false;
+                    }
+                }
+
+                //if it got here, that means nothing was found. this likely means there's a bunch of stuff at the end; add it and bail out
+                for(int j = i + 1; j < plans.size; j++){
+                    result.add(plans.get(j));
+                }
+                break;
+            }else{
+                i ++;
+            }
+        }
+
+        plans.set(result);
+    }
+
+    public static void calculateBridges(Seq<BuildPlan> plans, DirectionBridge bridge, boolean hasJunction, Boolf<Block> avoid){
+        if(isSidePlace(plans) || plans.size == 0) return;
+
+        //check for orthogonal placement + unlocked state
+        if(!(plans.first().x == plans.peek().x || plans.first().y == plans.peek().y) || !bridge.unlockedNow()){
+            return;
+        }
+
+        Boolf<BuildPlan> placeable = plan ->
+            (plan.placeable(player.team()) || (plan.tile() != null && plan.tile().block() == plan.block)) &&  //don't count the same block as inaccessible
+            !(plan != plans.first() && plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
+
+        var result = plans1.clear();
+
+        outer:
+        for(int i = 0; i < plans.size;){
+            var cur = plans.get(i);
+            result.add(cur);
+
+            //gap found
+            if(i < plans.size - 1 && placeable.get(cur) && !placeable.get(plans.get(i + 1))){
+                boolean wereSame = true;
+
+                //find the closest valid position within range
+                for(int j = i + 1; j < plans.size; j++){
+                    var other = plans.get(j);
+
+                    //out of range now, set to current position and keep scanning forward for next occurrence
+                    if(!bridge.positionsValid(cur.x, cur.y, other.x, other.y)){
+                        //add 'missed' conveyors
+                        for(int k = i + 1; k < j; k++){
+                            result.add(plans.get(k));
+                        }
+                        i = j;
+                        continue outer;
+                    }else if(placeable.get(other)){
+
+                        if(wereSame && hasJunction){
+                            //the gap is fake, it's just conveyors that can be replaced with junctions
+                            i ++;
+                            continue outer;
+                        }else{
+                            //found a link, assign bridges
+                            cur.block = bridge;
+                            other.block = bridge;
+                            i = j;
+                            continue outer;
+                        }
+                    }
+
+                    if(other.tile() != null && !avoid.get(other.tile().block())){
+                        wereSame = false;
+                    }
+                }
+
+                //if it got here, that means nothing was found. this likely means there's a bunch of stuff at the end; add it and bail out
+                for(int j = i + 1; j < plans.size; j++){
+                    result.add(plans.get(j));
+                }
+                break;
+            }else{
+                i ++;
+            }
+        }
+
+        plans.set(result);
     }
 
     private static float tileHeuristic(Tile tile, Tile other){
@@ -248,12 +417,14 @@ public class Placement{
             }
         }
 
-        if(Math.abs(endx - tilex) > maxLength){
-            endx = Mathf.sign(endx - tilex) * maxLength + tilex;
-        }
+        if(maxLength > 0){
+            if(Math.abs(endx - tilex) > maxLength){
+                endx = Mathf.sign(endx - tilex) * maxLength + tilex;
+            }
 
-        if(Math.abs(endy - tiley) > maxLength){
-            endy = Mathf.sign(endy - tiley) * maxLength + tiley;
+            if(Math.abs(endy - tiley) > maxLength){
+                endy = Mathf.sign(endy - tiley) * maxLength + tiley;
+            }
         }
 
         int dx = endx - tilex, dy = endy - tiley;

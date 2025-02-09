@@ -7,9 +7,11 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.pooling.*;
+import mindustry.*;
+import mindustry.ai.*;
+import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -19,7 +21,6 @@ import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
-import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -32,23 +33,28 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Import float x, y;
 
-    @ReadOnly Unit unit = Nulls.unit;
-    transient private Unit lastReadUnit = Nulls.unit;
+    @ReadOnly @Nullable Unit unit;
     transient @Nullable NetConnection con;
-
     @ReadOnly Team team = Team.sharded;
     @SyncLocal boolean typing, shooting, boosting;
-    boolean admin;
     @SyncLocal float mouseX, mouseY;
-    String name = "noname";
+    /** command the unit had before it was controlled. */
+    @Nullable @NoSync UnitCommand lastCommand;
+    boolean admin;
+    String name = "frog";
     Color color = new Color();
-
+    transient String locale = "en";
     transient float deathTimer;
     transient String lastText = "";
     transient float textFadeTime;
+    transient Ratekeeper itemDepositRate = new Ratekeeper();
+
+    transient private @Nullable Unit lastReadUnit;
+    transient private int wrongReadUnits;
+    transient @Nullable Unit justSwitchFrom, justSwitchTo;
 
     public boolean isBuilder(){
-        return unit.canBuild();
+        return unit != null && unit.canBuild();
     }
 
     public @Nullable CoreBuild closestCore(){
@@ -59,9 +65,15 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return team.core();
     }
 
+    /** @return largest/closest core, with largest cores getting priority */
+    @Nullable
+    public CoreBuild bestCore(){
+        return team.cores().min(Structs.comps(Structs.comparingInt(c -> -c.block.size), Structs.comparingFloat(c -> c.dst(x, y))));
+    }
+
     public TextureRegion icon(){
         //display default icon for dead players
-        if(dead()) return core() == null ? UnitTypes.alpha.icon(Cicon.full) : ((CoreBlock)core().block).unitType.icon(Cicon.full);
+        if(dead()) return core() == null ? UnitTypes.alpha.uiIcon : ((CoreBlock)bestCore().block).unitType.uiIcon;
 
         return unit.icon();
     }
@@ -76,8 +88,8 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         textFadeTime = 0f;
         x = y = 0f;
         if(!dead()){
-            unit.controller(unit.type.createController());
-            unit = Nulls.unit;
+            unit.resetController();
+            unit = null;
         }
     }
 
@@ -86,33 +98,55 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return isAdded();
     }
 
+    @Override
+    public boolean isLogicControllable(){
+        return false;
+    }
+
     @Replace
     public float clipSize(){
-        return unit.isNull() ? 20 : unit.type.hitSize * 2f;
+        return unit == null ? 20 : unit.type.hitSize * 2f;
     }
 
     @Override
     public void afterSync(){
+        //fix rubberbanding:
+        //when the player recs a unit that they JUST transitioned away from, use the new unit instead
+        //reason: we know the server is lying here, essentially skip the unit snapshot because we know the client's information is more recent
+        if(isLocal() && unit == justSwitchFrom && justSwitchFrom != null && justSwitchTo != null){
+            unit = justSwitchTo;
+            //if several snapshots have passed and this unit is still incorrect, something's wrong
+            if(++wrongReadUnits >= 2){
+                justSwitchFrom = null;
+                wrongReadUnits = 0;
+            }
+        }else{
+            justSwitchFrom = null;
+            justSwitchTo = null;
+            wrongReadUnits = 0;
+        }
+
         //simulate a unit change after sync
         Unit set = unit;
         unit = lastReadUnit;
         unit(set);
         lastReadUnit = unit;
-
-        unit.aim(mouseX, mouseY);
-        //this is only necessary when the thing being controlled isn't synced
-        unit.controlWeapons(shooting, shooting);
-        //extra precaution, necessary for non-synced things
-        unit.controller(this);
+        if(unit != null){
+            unit.aim(mouseX, mouseY);
+            //this is only necessary when the thing being controlled isn't synced
+            unit.controlWeapons(shooting, shooting);
+            //extra precaution, necessary for non-synced things
+            unit.controller(this);
+        }
     }
 
     @Override
     public void update(){
-        if(!unit.isValid()){
+        if(unit != null && !unit.isValid()){
             clearUnit();
         }
 
-        CoreBuild core = closestCore();
+        CoreBuild core;
 
         if(!dead()){
             set(unit);
@@ -121,10 +155,9 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
             //update some basic state to sync things
             if(unit.type.canBoost){
-                Tile tile = unit.tileOn();
-                unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f);
+                unit.elevation = Mathf.approachDelta(unit.elevation, unit.onSolid() || boosting || (unit.isFlying() && !unit.canLand()) ? 1f : 0f, unit.type.riseSpeed);
             }
-        }else if(core != null){
+        }else if((core = bestCore()) != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
             //(this is not for balance, it just looks better this way)
             deathTimer += Time.delta;
@@ -139,37 +172,62 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     }
 
+    public void checkSpawn(){
+        CoreBuild core = bestCore();
+        if(core != null){
+            core.requestSpawn(self());
+        }
+    }
+
     @Override
     public void remove(){
         //clear unit upon removal
-        if(!unit.isNull()){
+        if(unit != null){
             clearUnit();
         }
+
+        lastReadUnit = null;
+        justSwitchTo = justSwitchFrom = null;
     }
 
     public void team(Team team){
         this.team = team;
-        unit.team(team);
+        if(unit != null){
+            unit.team(team);
+        }
     }
 
     public void clearUnit(){
-        unit(Nulls.unit);
+        unit(null);
     }
 
-    public Unit unit(){
+    public @Nullable Unit unit(){
         return unit;
     }
 
-    public void unit(Unit unit){
-        if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
+    public void unit(@Nullable Unit unit){
+        //refuse to switch when the unit was just transitioned from
+        if(isLocal() && unit == justSwitchFrom && justSwitchFrom != null && justSwitchTo != null){
+            return;
+        }
+
         if(this.unit == unit) return;
 
-        if(this.unit != Nulls.unit){
+        //save last command this unit had
+        if(unit != null && unit.controller() instanceof CommandAI ai){
+            lastCommand = ai.command;
+        }
+
+        if(this.unit != null){
             //un-control the old unit
-            this.unit.controller(this.unit.type.createController());
+            this.unit.resetController();
+            //restore last command issued before it was controlled
+            if(lastCommand != null && this.unit.controller() instanceof CommandAI ai){
+                ai.command(lastCommand);
+            }
         }
         this.unit = unit;
-        if(unit != Nulls.unit){
+        if(unit != null){
             unit.team(team);
             unit.controller(this);
 
@@ -188,7 +246,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     boolean dead(){
-        return unit.isNull() || !unit.isValid();
+        return unit == null || !unit.isValid();
+    }
+
+    String ip(){
+        return con == null ? "localhost" : con.address;
     }
 
     String uuid(){
@@ -203,20 +265,26 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         con.kick(reason);
     }
 
+    void kick(KickReason reason, long duration){
+        con.kick(reason, duration);
+    }
+
     void kick(String reason){
         con.kick(reason);
     }
 
-    void kick(String reason, int duration){
+    void kick(String reason, long duration){
         con.kick(reason, duration);
     }
 
     @Override
     public void draw(){
+        if(unit == null || name == null || unit.inFogTo(Vars.player.team())) return;
+
         Draw.z(Layer.playerName);
         float z = Drawf.text();
 
-        Font font = Fonts.def;
+        Font font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;
@@ -250,9 +318,9 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
             layout.setText(font, text, Color.white, width, Align.bottom, true);
 
-            Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime <= 0 || lastText == null  ? 1f : visualFadeTime));
-            Fill.rect(unit.x, unit.y + textHeight + layout.height - layout.height/2f, layout.width + 2, layout.height + 3);
-            font.draw(text, unit.x - width/2f, unit.y + textHeight + layout.height, width, Align.center, true);
+            Draw.color(0f, 0f, 0f, 0.3f * (textFadeTime <= 0 || lastText == null ? 1f : visualFadeTime));
+            Fill.rect(unit.x, unit.y + textHeight + layout.height - layout.height / 2f, layout.width + 2, layout.height + 3);
+            font.draw(text, unit.x - width / 2f, unit.y + textHeight + layout.height, width, Align.center, true);
         }
 
         Draw.reset();
@@ -264,28 +332,39 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         Draw.z(z);
     }
 
+    /** @return name with a markup color prefix */
+    String coloredName(){
+        return  "[#" + color.toString().toUpperCase() + "]" + name;
+    }
+
+    String plainName(){
+        return Strings.stripColors(name);
+    }
+
     void sendMessage(String text){
-        if(isLocal()){
-            if(ui != null){
-                ui.chatfrag.addMessage(text, null);
-            }
-        }else{
-            Call.sendMessage(con, text, null, null);
-        }
+        sendMessage(text, null, null);
     }
 
     void sendMessage(String text, Player from){
-        sendMessage(text, from, NetClient.colorizeName(from.id(), from.name));
+        sendMessage(text, from, null);
     }
 
-     void sendMessage(String text, Player from, String fromName){
+    void sendMessage(String text, Player from, String unformatted){
         if(isLocal()){
             if(ui != null){
-                ui.chatfrag.addMessage(text, fromName);
+                ui.chatfrag.addMessage(text);
             }
         }else{
-            Call.sendMessage(con, text, fromName, from);
+            Call.sendMessage(con, text, unformatted, from);
         }
+    }
+
+    void sendUnformatted(String unformatted){
+        sendUnformatted(null, unformatted);
+    }
+
+    void sendUnformatted(Player from, String unformatted){
+        sendMessage(netServer.chatFormatter.format(from, unformatted), from, unformatted);
     }
 
     PlayerInfo getInfo(){

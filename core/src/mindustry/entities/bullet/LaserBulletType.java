@@ -21,19 +21,24 @@ public class LaserBulletType extends BulletType{
     public boolean largeHit = false;
 
     public LaserBulletType(float damage){
-        super(0.01f, damage);
+        this.damage = damage;
+        this.speed = 0f;
 
-        hitEffect = Fx.hitLancer;
+        hitEffect = Fx.hitLaserBlast;
+        hitColor = colors[2];
         despawnEffect = Fx.none;
         shootEffect = Fx.hitLancer;
         smokeEffect = Fx.none;
         hitSize = 4;
         lifetime = 16f;
+        impact = true;
         keepVelocity = false;
         collides = false;
         pierce = true;
         hittable = false;
         absorbable = false;
+        removeAfterPierce = false;
+        delayFrags = true;
     }
 
     public LaserBulletType(){
@@ -54,13 +59,13 @@ public class LaserBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
-        return length;
+    protected float calculateRange(){
+        return Math.max(length, maxRange);
     }
 
     @Override
     public void init(Bullet b){
-        float resultLength = Damage.collideLaser(b, length, largeHit), rot = b.rotation();
+        float resultLength = Damage.collideLaser(b, length, largeHit, laserAbsorb, pierceCap), rot = b.rotation();
 
         laserEffect.at(b.x, b.y, rot, resultLength * 0.75f);
 
@@ -101,7 +106,7 @@ public class LaserBulletType extends BulletType{
             Lines.stroke((cwidth *= lengthFalloff) * b.fout());
             Lines.lineAngle(b.x, b.y, b.rotation(), baseLen, false);
             Tmp.v1.trns(b.rotation(), baseLen);
-            Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, Lines.getStroke() * 1.22f, cwidth * 2f + width / 2f, b.rotation());
+            Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, Lines.getStroke(), cwidth * 2f + width / 2f, b.rotation());
 
             Fill.circle(b.x, b.y, 1f * cwidth * b.fout());
             for(int i : Mathf.signs){
@@ -113,7 +118,7 @@ public class LaserBulletType extends BulletType{
         Draw.reset();
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
-        Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, width * 1.4f * b.fout(), colors[0], 0.6f);
+        Drawf.light(b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, width * 1.4f * b.fout(), colors[0], 0.6f);
     }
 
     @Override

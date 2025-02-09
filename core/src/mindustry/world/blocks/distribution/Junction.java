@@ -16,9 +16,11 @@ public class Junction extends Block{
     public Junction(String name){
         super(name);
         update = true;
-        solid = true;
+        solid = false;
+        underBullets = true;
         group = BlockGroup.transportation;
         unloadable = false;
+        floating = true;
         noUpdateDisabled = true;
     }
 
@@ -78,6 +80,11 @@ public class Junction extends Block{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             buffer.write(write);
@@ -86,7 +93,7 @@ public class Junction extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            buffer.read(read);
+            buffer.read(read, revision == 0);
         }
     }
 }

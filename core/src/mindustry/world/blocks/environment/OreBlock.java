@@ -14,8 +14,8 @@ import static mindustry.Vars.*;
 /**An overlay ore for a specific item type.*/
 public class OreBlock extends OverlayFloor{
 
-    public OreBlock(Item ore){
-        super("ore-" + ore.name);
+    public OreBlock(String name, Item ore){
+        super(name);
         this.localizedName = ore.localizedName;
         this.itemDrop = ore;
         this.variants = 3;
@@ -23,14 +23,19 @@ public class OreBlock extends OverlayFloor{
         this.useColor = true;
     }
 
+    public OreBlock(Item ore){
+        this("ore-" + ore.name, ore);
+    }
+
     /** For mod use only!*/
     public OreBlock(String name){
         super(name);
+        this.useColor = true;
         variants = 3;
     }
 
     public void setup(Item ore){
-        this.localizedName = ore.localizedName;
+        this.localizedName = ore.localizedName + (wallOre ? " " + Core.bundle.get("wallore") : "");
         this.itemDrop = ore;
         this.mapColor.set(ore.color);
     }
@@ -39,24 +44,23 @@ public class OreBlock extends OverlayFloor{
     @OverrideCallSuper
     public void createIcons(MultiPacker packer){
         for(int i = 0; i < variants; i++){
-            Pixmap image = new Pixmap(32, 32);
-            PixmapRegion shadow = Core.atlas.getPixmap(itemDrop.name + (i + 1));
+            //use name (e.g. "ore-copper1"), fallback to "copper1" as per the old naming system
+            PixmapRegion shadow = Core.atlas.has(name + (i + 1)) ?
+                Core.atlas.getPixmap(name + (i + 1)) :
+                Core.atlas.getPixmap(itemDrop.name + (i + 1));
 
-            int offset = image.getWidth() / tilesize - 1;
-            Color color = new Color();
+            Pixmap image = shadow.crop();
 
-            for(int x = 0; x < image.getWidth(); x++){
-                for(int y = offset; y < image.getHeight(); y++){
-                    shadow.getPixel(x, y - offset, color);
+            int offset = image.width / tilesize - 1;
+            int shadowColor = Color.rgba8888(0, 0, 0, 0.3f);
 
-                    if(color.a > 0.001f){
-                        color.set(0, 0, 0, 0.3f);
-                        image.draw(x, y, color);
+            for(int x = 0; x < image.width; x++){
+                for(int y = offset; y < image.height; y++){
+                    if(shadow.getA(x, y) == 0 && shadow.getA(x, y - offset) != 0){
+                        image.setRaw(x, y, shadowColor);
                     }
                 }
             }
-
-            image.draw(shadow);
 
             packer.add(PageType.environment, name + (i + 1), image);
             packer.add(PageType.editor, "editor-" + name + (i + 1), image);
@@ -65,6 +69,8 @@ public class OreBlock extends OverlayFloor{
                 packer.add(PageType.editor, "editor-block-" + name + "-full", image);
                 packer.add(PageType.main, "block-" + name + "-full", image);
             }
+
+            image.dispose();
         }
     }
 

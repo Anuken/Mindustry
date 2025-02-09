@@ -20,11 +20,13 @@ import static mindustry.Vars.*;
 
 public class Door extends Wall{
     protected final static Rect rect = new Rect();
+    protected final static Queue<DoorBuild> doorQueue = new Queue<>();
 
     public final int timerToggle = timers++;
     public Effect openfx = Fx.dooropen;
     public Effect closefx = Fx.doorclose;
     public Sound doorSound = Sounds.door;
+    public boolean chainEffect = false;
     public @Load("@-open") TextureRegion openRegion;
 
     public Door(String name){
@@ -34,29 +36,35 @@ public class Door extends Wall{
         consumesTap = true;
 
         config(Boolean.class, (DoorBuild base, Boolean open) -> {
-            doorSound.at(base);
+            if(!world.isGenerating()){
+                doorSound.at(base);
+                base.effect();
+            }
 
-            for(DoorBuild entity : base.chained){
+            doorQueue.clear();
+            doorQueue.add(base);
+
+            for(DoorBuild entity : base.chained.isEmpty() ? doorQueue : base.chained){
                 //skip doors with things in them
                 if((Units.anyEntities(entity.tile) && !open) || entity.open == open){
                     continue;
                 }
 
+                if(chainEffect) entity.effect();
                 entity.open = open;
-                pathfinder.updateTile(entity.tile());
-                entity.effect();
+                if(!world.isGenerating()) pathfinder.updateTile(entity.tile());
             }
         });
     }
 
     @Override
-    public TextureRegion getRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        return req.config == Boolean.TRUE ? openRegion : region;
+    public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        return plan.config == Boolean.TRUE ? openRegion : region;
     }
 
     public class DoorBuild extends Building{
         public boolean open = false;
-        public ObjectSet<DoorBuild> chained = new ObjectSet<>();
+        public Seq<DoorBuild> chained = new Seq<>();
 
         @Override
         public void onProximityAdded(){
@@ -69,8 +77,8 @@ public class Door extends Wall{
             super.onProximityRemoved();
 
             for(Building b : proximity){
-                if(b instanceof DoorBuild){
-                    ((DoorBuild)b).updateChained();
+                if(b instanceof DoorBuild d){
+                    d.updateChained();
                 }
             }
         }
@@ -99,22 +107,23 @@ public class Door extends Wall{
         }
 
         public void effect(){
-            (open ? closefx : openfx).at(this);
+            (open ? closefx : openfx).at(this, size);
         }
 
         public void updateChained(){
-            chained = new ObjectSet<>();
-            flow(chained);
-        }
+            chained = new Seq<>();
+            doorQueue.clear();
+            doorQueue.add(this);
 
-        public void flow(ObjectSet<DoorBuild> set){
-            if(!set.add(this)) return;
+            while(!doorQueue.isEmpty()){
+                var next = doorQueue.removeLast();
+                chained.add(next);
 
-            this.chained = set;
-
-            for(Building b : proximity){
-                if(b instanceof DoorBuild){
-                    ((DoorBuild)b).flow(set);
+                for(var b : next.proximity){
+                    if(b instanceof DoorBuild d && d.chained != chained){
+                        d.chained = chained;
+                        doorQueue.addFirst(d);
+                    }
                 }
             }
         }
@@ -126,7 +135,7 @@ public class Door extends Wall{
 
         @Override
         public Cursor getCursor(){
-            return SystemCursor.hand;
+            return interactable(player.team()) ? SystemCursor.hand : SystemCursor.arrow;
         }
 
         @Override

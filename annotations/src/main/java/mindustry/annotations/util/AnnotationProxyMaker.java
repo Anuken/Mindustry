@@ -7,6 +7,7 @@ import com.sun.tools.javac.code.Attribute.Enum;
 import com.sun.tools.javac.code.Attribute.Error;
 import com.sun.tools.javac.code.Attribute.Visitor;
 import com.sun.tools.javac.code.Attribute.*;
+import com.sun.tools.javac.code.Scope.*;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Symbol.*;
 import com.sun.tools.javac.code.Type.ArrayType;
@@ -64,36 +65,13 @@ public class AnnotationProxyMaker{
         LinkedHashMap map = new LinkedHashMap();
         ClassSymbol cl = (ClassSymbol)this.anno.type.tsym;
 
-        //try to use Java 8 API for this if possible
-        try{
-            Class entryClass = Class.forName("com.sun.tools.javac.code.Scope$Entry");
-            Object members = cl.members();
-            Field field = members.getClass().getField("elems");
-            Object elems = field.get(members);
-            Field siblingField = entryClass.getField("sibling");
-            Field symField = entryClass.getField("sym");
-            for(Object currEntry = elems; currEntry != null; currEntry = siblingField.get(currEntry)){
-                handleSymbol((Symbol)symField.get(currEntry), map);
-            }
-
-        }catch(Throwable e){
-            //otherwise try other API
-
-            try{
-                Class lookupClass = Class.forName("com.sun.tools.javac.code.Scope$LookupKind");
-                Field nonRecField = lookupClass.getField("NON_RECURSIVE");
-                Object nonRec = nonRecField.get(null);
-                Scope scope = cl.members();
-                Method getSyms = scope.getClass().getMethod("getSymbols", lookupClass);
-                Iterable<Symbol> it = (Iterable<Symbol>)getSyms.invoke(scope, nonRec);
-                Iterator<Symbol> i = it.iterator();
-                while(i.hasNext()){
-                    handleSymbol(i.next(), map);
+        for(Symbol s : cl.members().getSymbols(LookupKind.NON_RECURSIVE)){
+            if(s.getKind() == ElementKind.METHOD){
+                MethodSymbol var4 = (MethodSymbol)s;
+                Attribute var5 = var4.getDefaultValue();
+                if(var5 != null){
+                    map.put(var4, var5);
                 }
-
-            }catch(Throwable death){
-                //I tried
-                throw new RuntimeException(death);
             }
         }
 
@@ -102,17 +80,6 @@ public class AnnotationProxyMaker{
         }
 
         return map;
-    }
-
-    private void handleSymbol(Symbol sym, LinkedHashMap map){
-
-        if(sym.getKind() == ElementKind.METHOD){
-            MethodSymbol var4 = (MethodSymbol)sym;
-            Attribute var5 = var4.getDefaultValue();
-            if(var5 != null){
-                map.put(var4, var5);
-            }
-        }
     }
 
     private Object generateValue(MethodSymbol var1, Attribute var2){

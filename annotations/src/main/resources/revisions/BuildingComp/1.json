@@ -1,0 +1,1 @@
+{version:1,fields:[{name:health,type:float},{name:items,type:mindustry.world.modules.ItemModule},{name:liquids,type:mindustry.world.modules.LiquidModule},{name:power,type:mindustry.world.modules.PowerModule},{name:team,type:mindustry.game.Team},{name:x,type:float},{name:y,type:float}]}

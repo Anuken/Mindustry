@@ -1,7 +1,6 @@
 package mindustry.ai.types;
 
 import arc.math.*;
-import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
@@ -9,19 +8,18 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.world.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class LogicAI extends AIController{
     /** Minimum delay between item transfers. */
-    public static final float transferDelay = 60f * 2f;
+    public static final float transferDelay = 60f * 1.5f;
     /** Time after which the unit resets its controlled and reverts to a normal unit. */
-    public static final float logicControlTimeout = 10f * 60f;
+    public static final float logicControlTimeout = 60f * 10f;
 
-    public LUnitControl control = LUnitControl.stop;
+    public LUnitControl control = LUnitControl.idle;
     public float moveX, moveY, moveRad;
-    public float itemTimer, payTimer, controlTimer = logicControlTimeout, targetTimer;
+    public float controlTimer = logicControlTimeout, targetTimer;
     @Nullable
     public Building controller;
     public BuildPlan plan = new BuildPlan();
@@ -43,11 +41,14 @@ public class LogicAI extends AIController{
 
     private ObjectSet<Object> radars = new ObjectSet<>();
 
+    // LogicAI state should not be reset after reading.
     @Override
-    protected void updateMovement(){
-        if(itemTimer >= 0) itemTimer -= Time.delta;
-        if(payTimer >= 0) payTimer -= Time.delta;
+    public boolean keepState(){
+        return true;
+    }
 
+    @Override
+    public void updateMovement(){
         if(targetTimer > 0f){
             targetTimer -= Time.delta;
         }else{
@@ -68,27 +69,38 @@ public class LogicAI extends AIController{
                 moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
             }
             case approach -> {
-                moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7);
+                moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7, true, null);
             }
             case pathfind -> {
+                if(unit.isFlying()){
+                    moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
+                }else{
+                    if(controlPath.getPathPosition(unit, Tmp.v2.set(moveX, moveY), Tmp.v2, Tmp.v1, null)){
+                        moveTo(Tmp.v1, 1f, Tmp.v2.epsilonEquals(Tmp.v1, 4.1f) ? 30f : 0f);
+                    }
+                }
+            }
+            case autoPathfind -> {
                 Building core = unit.closestEnemyCore();
 
-                if((core == null || !unit.within(core, unit.range() * 0.5f)) && command() == UnitCommand.attack){
+                if((core == null || !unit.within(core, unit.range() * 0.5f))){
                     boolean move = true;
+                    Tile spawner = null;
 
                     if(state.rules.waves && unit.team == state.rules.defaultTeam){
-                        Tile spawner = getClosestSpawner();
+                        spawner = getClosestSpawner();
                         if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
                     }
 
-                    if(move) pathfind(Pathfinder.fieldCore);
-                }
-
-                if(command() == UnitCommand.rally){
-                    Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
-
-                    if(target != null && !unit.within(target, 70f)){
-                        pathfind(Pathfinder.fieldRally);
+                    if(move){
+                        if(unit.isFlying()){
+                            var target = core == null ? spawner : core;
+                            if(target != null){
+                                moveTo(target, unit.range() * 0.5f);
+                            }
+                        }else{
+                            pathfind(Pathfinder.fieldCore);
+                        }
                     }
                 }
             }
@@ -98,13 +110,13 @@ public class LogicAI extends AIController{
         }
 
         if(unit.type.canBoost && !unit.type.flying){
-            unit.elevation = Mathf.approachDelta(unit.elevation, Mathf.num(boost || unit.onSolid()), 0.08f);
+            unit.elevation = Mathf.approachDelta(unit.elevation, Mathf.num(boost || unit.onSolid() || (unit.isFlying() && !unit.canLand())), unit.type.riseSpeed);
         }
 
         //look where moving if there's nothing to aim at
-        if(!shoot){
+        if(!shoot || !unit.type.omniMovement){
             unit.lookAt(unit.prefRotation());
-        }else if(unit.hasWeapons() && unit.mounts.length > 0){ //if there is, look at the object
+        }else if(unit.hasWeapons() && unit.mounts.length > 0 && !unit.mounts[0].weapon.ignoreRotation){ //if there is, look at the object
             unit.lookAt(unit.mounts[0].aimX, unit.mounts[0].aimY);
         }
     }
@@ -114,42 +126,29 @@ public class LogicAI extends AIController{
     }
 
     @Override
-    protected void moveTo(Position target, float circleLength, float smooth){
-        if(target == null) return;
-
-        vec.set(target).sub(unit);
-
-        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
-
-        vec.setLength(unit.realSpeed() * length);
-        if(length < -0.5f){
-            vec.rotate(180f);
-        }else if(length < 0){
-            vec.setZero();
-        }
-
-        unit.approach(vec);
+    public boolean checkTarget(Teamc target, float x, float y, float range){
+        return false;
     }
 
     //always retarget
     @Override
-    protected boolean retarget(){
+    public boolean retarget(){
         return true;
     }
 
     @Override
-    protected boolean invalid(Teamc target){
+    public boolean invalid(Teamc target){
         return false;
     }
 
     @Override
-    protected boolean shouldShoot(){
+    public boolean shouldShoot(){
         return shoot && !(unit.type.canBoost && boost);
     }
 
     //always aim for the main target
     @Override
-    protected Teamc target(float x, float y, float range, boolean air, boolean ground){
+    public Teamc target(float x, float y, float range, boolean air, boolean ground){
         return switch(aimControl){
             case target -> posTarget;
             case targetp -> mainTarget;

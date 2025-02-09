@@ -1,9 +1,9 @@
 package mindustry.world.blocks.campaign;
 
 import arc.*;
-import arc.audio.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -11,29 +11,38 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.consumers.*;
+import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class LaunchPad extends Block{
-    public final int timerLaunch = timers++;
-    /** Time inbetween launches. */
-    public float launchTime;
+    /** Time between launches. */
+    public float launchTime = 1f;
     public Sound launchSound = Sounds.none;
 
     public @Load("@-light") TextureRegion lightRegion;
-    public @Load("launchpod") TextureRegion podRegion;
+    public @Load(value = "@-pod", fallback = "launchpod") TextureRegion podRegion;
     public Color lightColor = Color.valueOf("eab678");
+    public boolean acceptMultipleItems = false;
+
+    public float lightStep = 1f;
+    public int lightSteps = 3;
+
+    public float liquidPad = 2f;
+    public @Nullable Liquid drawLiquid;
+    public Color bottomColor = Pal.darkerMetal;
 
     public LaunchPad(String name){
         super(name);
@@ -41,7 +50,7 @@ public class LaunchPad extends Block{
         solid = true;
         update = true;
         configurable = true;
-        drawDisabled = false;
+        flags = EnumSet.of(BlockFlag.launchPad);
     }
 
     @Override
@@ -55,7 +64,8 @@ public class LaunchPad extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
+        addBar("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
+        addBar("progress", (LaunchPadBuild build) -> new Bar(() -> Core.bundle.get("bar.launchcooldown"), () -> Pal.ammo, () -> Mathf.clamp(build.launchCounter / launchTime)));
     }
 
     @Override
@@ -64,34 +74,44 @@ public class LaunchPad extends Block{
     }
 
     public class LaunchPadBuild extends Building{
+        public float launchCounter;
 
         @Override
         public Cursor getCursor(){
             return !state.isCampaign() || net.client() ? SystemCursor.arrow : super.getCursor();
         }
 
-        //cannot be disabled
         @Override
-        public float efficiency(){
-            return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
+        public boolean shouldConsume(){
+            //TODO add launch costs, maybe legacy version
+            return launchCounter < launchTime;
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return Mathf.clamp(launchCounter / launchTime);
+            return super.sense(sensor);
         }
 
         @Override
         public void draw(){
-            super.draw();
+            if(hasLiquids && drawLiquid != null){
+                Draw.color(bottomColor);
+                Fill.square(x, y, size * tilesize/2f - liquidPad);
+                Draw.color();
+                LiquidBlock.drawTiledFrames(block.size, x, y, liquidPad, liquidPad, liquidPad, liquidPad, drawLiquid, liquids.get(drawLiquid) / liquidCapacity);
+            }
 
-            if(!state.isCampaign()) return;
+            super.draw();
 
             if(lightRegion.found()){
                 Draw.color(lightColor);
-                float progress = Math.min((float)items.total() / itemCapacity, timer.getTime(timerLaunch) / (launchTime / timeScale));
-                int steps = 3;
-                float step = 1f;
+                float progress = Math.min((float)items.total() / itemCapacity, launchCounter / launchTime);
 
                 for(int i = 0; i < 4; i++){
-                    for(int j = 0; j < steps; j++){
-                        float alpha = Mathf.curve(progress, (float)j / steps, (j+1f) / steps);
-                        float offset = -(j - 1f) * step;
+                    for(int j = 0; j < lightSteps; j++){
+                        float alpha = Mathf.curve(progress, (float)j / lightSteps, (j+1f) / lightSteps);
+                        float offset = -(j - 1f) * lightStep;
 
                         Draw.color(Pal.metalGrayDark, lightColor, alpha);
                         Draw.rect(lightRegion, x + Geometry.d8edge(i).x * offset, y + Geometry.d8edge(i).y * offset, i * 90);
@@ -101,10 +121,7 @@ public class LaunchPad extends Block{
                 Draw.reset();
             }
 
-            float cooldown = Mathf.clamp(timer.getTime(timerLaunch) / (90f / timeScale));
-
-            Draw.mixcol(lightColor, 1f - cooldown);
-
+            Drawf.shadow(x, y, size * tilesize);
             Draw.rect(podRegion, x, y);
 
             Draw.reset();
@@ -112,15 +129,16 @@ public class LaunchPad extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return items.total() < itemCapacity;
+            return items.total() < itemCapacity && (acceptMultipleItems || items.total() == 0 || items.first() == item);
         }
 
         @Override
         public void updateTile(){
-            if(!state.isCampaign()) return;
 
-            //launch when full and base conditions are met
-            if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime / timeScale)){
+            //increment launchCounter then launch when full and base conditions are met
+            if((launchCounter += edelta()) >= launchTime && items.total() >= itemCapacity){
+                //if there are item requirements, use those.
+                consume();
                 launchSound.at(x, y);
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
@@ -131,6 +149,7 @@ public class LaunchPad extends Block{
                 Fx.launchPod.at(this);
                 items.clear();
                 Effect.shake(3f, 3f, this);
+                launchCounter = 0f;
             }
         }
 
@@ -138,16 +157,21 @@ public class LaunchPad extends Block{
         public void display(Table table){
             super.display(table);
 
-            if(!state.isCampaign()) return;
+            if(!state.isCampaign() || net.client() || team != player.team()) return;
 
             table.row();
             table.label(() -> {
-                Sector dest = state.rules.sector == null ? null : state.rules.sector.info.getRealDestination();
+                Sector dest = state.rules.sector == null ? null : state.rules.sector.info.destination;
 
                 return Core.bundle.format("launch.destination",
-                    dest == null ? Core.bundle.get("sectors.nonelaunch") :
+                    dest == null || !dest.hasBase() ? Core.bundle.get("sectors.nonelaunch") :
                     "[accent]" + dest.name());
             }).pad(4).wrap().width(200f).left();
+        }
+
+        @Override
+        public boolean shouldShowConfigure(Player player){
+            return state.isCampaign();
         }
 
         @Override
@@ -157,14 +181,37 @@ public class LaunchPad extends Block{
                 return;
             }
 
-            table.button(Icon.upOpen, Styles.clearTransi, () -> {
+            table.button(Icon.upOpen, Styles.cleari, () -> {
                 ui.planet.showSelect(state.rules.sector, other -> {
-                    if(state.isCampaign()){
+                    if(state.isCampaign() && other.planet == state.rules.sector.planet){
+                        var prev = state.rules.sector.info.destination;
                         state.rules.sector.info.destination = other;
+                        if(prev != null){
+                            prev.info.refreshImportRates(state.getPlanet());
+                        }
                     }
                 });
                 deselect();
             }).size(40f);
+        }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.f(launchCounter);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            if(revision >= 1){
+                launchCounter = read.f();
+            }
         }
     }
 
@@ -200,8 +247,9 @@ public class LaunchPad extends Block{
 
             Draw.z(Layer.weather - 1);
 
-            TextureRegion region = Core.atlas.find("launchpod");
-            float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
+            TextureRegion region = blockOn() instanceof mindustry.world.blocks.campaign.LaunchPad p ? p.podRegion : Core.atlas.find("launchpod");
+            scale *= region.scl();
+            float rw = region.width * scale, rh = region.height * scale;
 
             Draw.alpha(alpha);
             Draw.rect(region, cx, cy, rw, rh, rotation);
@@ -233,26 +281,24 @@ public class LaunchPad extends Block{
 
         @Override
         public void remove(){
-            if(!state.isCampaign()) return;
+            if(!state.isCampaign() || net.client()) return;
 
-            Sector destsec = state.rules.sector.info.getRealDestination();
+            Sector destsec = state.rules.sector.info.destination;
 
             //actually launch the items upon removal
-            if(team() == state.rules.defaultTeam){
-                if(destsec != null && (destsec != state.rules.sector || net.client())){
-                    ItemSeq dest = new ItemSeq();
+            if(team() == state.rules.defaultTeam && destsec != null && destsec != state.rules.sector){
+                ItemSeq dest = new ItemSeq();
 
-                    for(ItemStack stack : stacks){
-                        dest.add(stack);
+                for(ItemStack stack : stacks){
+                    dest.add(stack);
 
-                        //update export
-                        state.rules.sector.info.handleItemExport(stack);
-                        Events.fire(new LaunchItemEvent(stack));
-                    }
+                    //update export statistics
+                    state.rules.sector.info.handleItemExport(stack);
+                    Events.fire(new LaunchItemEvent(stack));
+                }
 
-                    if(!net.client()){
-                        destsec.addItems(dest);
-                    }
+                if(state.getPlanet().campaignRules.legacyLaunchPads){
+                    destsec.addItems(dest);
                 }
             }
         }

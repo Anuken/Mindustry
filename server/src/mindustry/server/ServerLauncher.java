@@ -2,7 +2,6 @@ package mindustry.server;
 
 import arc.*;
 import arc.backend.headless.*;
-import arc.files.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -12,6 +11,7 @@ import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.Net;
 import mindustry.net.*;
+import mindustry.ui.*;
 
 import java.time.*;
 
@@ -32,9 +32,9 @@ public class ServerLauncher implements ApplicationListener{
                 String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level1.ordinal()] + " " + text + "&fr");
                 System.out.println(result);
             };
-            new HeadlessApplication(new ServerLauncher(), throwable -> CrashSender.send(throwable, f -> {}));
+            new HeadlessApplication(new ServerLauncher(), throwable -> CrashHandler.handle(throwable, f -> {}));
         }catch(Throwable t){
-            CrashSender.send(t, f -> {});
+            CrashHandler.handle(t, f -> {});
         }
     }
 
@@ -44,21 +44,17 @@ public class ServerLauncher implements ApplicationListener{
         loadLocales = false;
         headless = true;
 
-        Fi plugins = Core.settings.getDataDirectory().child("plugins");
-        if(plugins.isDirectory() && plugins.list().length > 0 && !plugins.sibling("mods").exists()){
-            warn("[IMPORTANT NOTICE] &lrPlugins have been detected.&ly Automatically moving all contents of the plugin folder into the 'mods' folder. The original folder will not be removed; please do so manually.");
-            plugins.sibling("mods").mkdirs();
-            for(Fi file : plugins.list()){
-                file.copyTo(plugins.sibling("mods"));
-            }
-        }
-
         Vars.loadSettings();
         Vars.init();
+
+        UI.loadColors();
+        Fonts.loadContentIconsHeadless();
+
         content.createBaseContent();
         mods.loadScripts();
         content.createModContent();
         content.init();
+
         if(mods.hasContentErrors()){
             err("Error occurred loading mod content:");
             for(LoadedMod mod : mods.list()){

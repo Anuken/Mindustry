@@ -23,16 +23,18 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
-    protected static boolean returnValue = false;
     protected static BuildPlan otherReq;
-
+    protected static int returnInt = 0;
     protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
-    protected final static Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
+    /** The maximum range of all power nodes on the map */
+    protected static float maxRange;
 
-    public @Load("laser") TextureRegion laser;
-    public @Load("laser-end") TextureRegion laserEnd;
+    public @Load(value = "@-laser", fallback = "laser") TextureRegion laser;
+    public @Load(value = "@-laser-end", fallback = "laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
     public int maxNodes = 3;
+    public boolean autolink = true, drawRange = true;
+    public float laserScale = 0.25f;
     public Color laserColor1 = Color.white;
     public Color laserColor2 = Pal.powerLight;
 
@@ -43,6 +45,13 @@ public class PowerNode extends PowerBlock{
         outputsPower = false;
         canOverdrive = false;
         swapDiagonalPlacement = true;
+        schematicPriority = -10;
+        drawDisabled = false;
+        envEnabled |= Env.space;
+        destructible = true;
+
+        //nodes do not even need to update
+        update = false;
 
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;
@@ -67,15 +76,10 @@ public class PowerNode extends PowerBlock{
                 }
             }else if(linkValid(entity, other) && valid && power.links.size < maxNodes){
 
-                if(!power.links.contains(other.pos())){
-                    power.links.add(other.pos());
-                }
+                power.links.addUnique(other.pos());
 
                 if(other.team == entity.team){
-
-                    if(!other.power.links.contains(entity.pos())){
-                        other.power.links.add(entity.pos());
-                    }
+                    other.power.links.addUnique(entity.pos());
                 }
 
                 power.graph.addGraph(other.power.graph);
@@ -83,20 +87,16 @@ public class PowerNode extends PowerBlock{
         });
 
         config(Point2[].class, (tile, value) -> {
-            tile.power.links.clear();
-
             IntSeq old = new IntSeq(tile.power.links);
 
             //clear old
             for(int i = 0; i < old.size; i++){
-                int cur = old.get(i);
-                configurations.get(Integer.class).get(tile, cur);
+                configurations.get(Integer.class).get(tile, old.get(i));
             }
 
             //set new
             for(Point2 p : value){
-                int newPos = Point2.pack(p.x + tile.tileX(), p.y + tile.tileY());
-                configurations.get(Integer.class).get(tile, newPos);
+                configurations.get(Integer.class).get(tile, Point2.pack(p.x + tile.tileX(), p.y + tile.tileY()));
             }
         });
     }
@@ -104,23 +104,32 @@ public class PowerNode extends PowerBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("power", entity -> new Bar(() ->
-        Core.bundle.format("bar.powerbalance",
-            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + Strings.fixed(entity.power.graph.getPowerBalance() * 60, 1))),
-            () -> Pal.powerBar,
-            () -> Mathf.clamp(entity.power.graph.getLastPowerProduced() / entity.power.graph.getLastPowerNeeded())));
+        addBar("power", makePowerBalance());
+        addBar("batteries", makeBatteryBalance());
 
-        bars.add("batteries", entity -> new Bar(() ->
-        Core.bundle.format("bar.powerstored",
-            (UI.formatAmount((int)entity.power.graph.getLastPowerStored())), UI.formatAmount((int)entity.power.graph.getLastCapacity())),
-            () -> Pal.powerBar,
-            () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getLastCapacity())));
-
-        bars.add("connections", entity -> new Bar(() ->
+        addBar("connections", entity -> new Bar(() ->
         Core.bundle.format("bar.powerlines", entity.power.links.size, maxNodes),
             () -> Pal.items,
             () -> (float)entity.power.links.size / (float)maxNodes
         ));
+    }
+
+    public static Func<Building, Bar> makePowerBalance(){
+        return entity -> new Bar(() ->
+        Core.bundle.format("bar.powerbalance",
+            ((entity.power.graph.getPowerBalance() >= 0 ? "+" : "") + UI.formatAmount((long)(entity.power.graph.getPowerBalance() * 60)))),
+            () -> Pal.powerBar,
+            () -> Mathf.clamp(entity.power.graph.getLastPowerProduced() / entity.power.graph.getLastPowerNeeded())
+        );
+    }
+
+    public static Func<Building, Bar> makeBatteryBalance(){
+        return entity -> new Bar(() ->
+        Core.bundle.format("bar.powerstored",
+            (UI.formatAmount((long)entity.power.graph.getLastPowerStored())), UI.formatAmount((long)entity.power.graph.getLastCapacity())),
+            () -> Pal.powerBar,
+            () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getLastCapacity())
+        );
     }
 
     @Override
@@ -132,21 +141,27 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
+    public void init(){
+        super.init();
+
+        clipSize = Math.max(clipSize, laserRange * tilesize);
+    }
+
+    @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Tile tile = world.tile(x, y);
 
-        if(tile == null) return;
+        if(tile == null || !autolink) return;
 
         Lines.stroke(1f);
         Draw.color(Pal.placing);
         Drawf.circles(x * tilesize + offset, y * tilesize + offset, laserRange * tilesize);
 
-        getPotentialLinks(tile, other -> {
-            Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
+        getPotentialLinks(tile, player.team(), other -> {
+            Draw.color(laserColor1, Renderer.laserOpacity * 0.5f);
+            drawLaser(x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
 
-            insulators(tile.x, tile.y, other.tileX(), other.tileY(), cause -> {
-                Drawf.square(cause.x, cause.y, cause.block.size * tilesize / 2f + 2f, Pal.plastanium);
-            });
+            Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
         });
 
         Draw.reset();
@@ -158,16 +173,20 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void setupColor(float satisfaction){
-        Draw.color(laserColor1, laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f));
-        Draw.alpha(Renderer.laserOpacity);
+        Draw.color(Tmp.c1.set(laserColor1).lerp(laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f)).a(Renderer.laserOpacity));
     }
 
-    protected void drawLaser(Team team, float x1, float y1, float x2, float y2, int size1, int size2){
+    public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2){
         float angle1 = Angles.angle(x1, y1, x2, y2),
             vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1),
             len1 = size1 * tilesize / 2f - 1.5f, len2 = size2 * tilesize / 2f - 1.5f;
 
-        Drawf.laser(team, laser, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, 0.25f);
+        Drawf.laser(laser, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, laserScale);
+    }
+
+    protected boolean overlaps(float srcx, float srcy, Tile other, Block otherBlock, float range){
+        return Intersector.overlaps(Tmp.cr1.set(srcx, srcy, range), Tmp.r1.setCentered(other.worldx() + otherBlock.offset, other.worldy() + otherBlock.offset,
+            otherBlock.size * tilesize, otherBlock.size * tilesize));
     }
 
     protected boolean overlaps(float srcx, float srcy, Tile other, float range){
@@ -187,52 +206,131 @@ public class PowerNode extends PowerBlock{
         return Intersector.overlaps(Tmp.cr1.set(src.worldx() + offset, src.worldy() + offset, laserRange * tilesize), Tmp.r1.setSize(size * tilesize).setCenter(other.worldx() + offset, other.worldy() + offset));
     }
 
-    protected void getPotentialLinks(Tile tile, Cons<Building> others){
-        Boolf<Building> valid = other -> other != null && other.tile() != tile && other.power != null &&
-            (other.block.outputsPower || other.block.consumesPower || other.block instanceof PowerNode) &&
-            overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && other.team == player.team()
-            && !other.proximity.contains(e -> e.tile == tile) && !graphs.contains(other.power.graph);
+    protected void getPotentialLinks(Tile tile, Team team, Cons<Building> others){
+        if(!autolink) return;
 
-        tempTileEnts.clear();
+        Boolf<Building> valid = other -> other != null && other.tile() != tile && other.block.connectedPower && other.power != null &&
+            (other.block.outputsPower || other.block.consumesPower || other.block instanceof PowerNode) &&
+            overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && other.team == team &&
+            !graphs.contains(other.power.graph) &&
+            !PowerNode.insulated(tile, other.tile) &&
+            !(other instanceof PowerNodeBuild obuild && obuild.power.links.size >= ((PowerNode)obuild.block).maxNodes) &&
+            !Structs.contains(Edges.getEdges(size), p -> { //do not link to adjacent buildings
+                var t = world.tile(tile.x + p.x, tile.y + p.y);
+                return t != null && t.build == other;
+            });
+
+        tempBuilds.clear();
         graphs.clear();
+
+        //add conducting graphs to prevent double link
+        for(var p : Edges.getEdges(size)){
+            Tile other = tile.nearby(p);
+            if(other != null && other.team() == team && other.build != null && other.build.power != null){
+                graphs.add(other.build.power.graph);
+            }
+        }
+
         if(tile.build != null && tile.build.power != null){
             graphs.add(tile.build.power.graph);
         }
 
-        Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
-            Building other = world.build(x, y);
-            if(valid.get(other) && !tempTileEnts.contains(other)){
-                tempTileEnts.add(other);
-            }
-        });
+        var worldRange = laserRange * tilesize;
+        var tree = team.data().buildingTree;
+        if(tree != null){
+            tree.intersect(tile.worldx() - worldRange, tile.worldy() - worldRange, worldRange * 2, worldRange * 2, build -> {
+                if(valid.get(build) && !tempBuilds.contains(build)){
+                    tempBuilds.add(build);
+                }
+            });
+        }
 
-        tempTileEnts.sort((a, b) -> {
+        tempBuilds.sort((a, b) -> {
             int type = -Boolean.compare(a.block instanceof PowerNode, b.block instanceof PowerNode);
             if(type != 0) return type;
             return Float.compare(a.dst2(tile), b.dst2(tile));
         });
 
-        tempTileEnts.each(valid, t -> {
+        returnInt = 0;
+
+        tempBuilds.each(valid, t -> {
+            if(returnInt ++ < maxNodes){
+                graphs.add(t.power.graph);
+                others.get(t);
+            }
+        });
+    }
+
+    //TODO code duplication w/ method above?
+    /** Iterates through linked nodes of a block at a tile. All returned buildings are power nodes. */
+    public static void getNodeLinks(Tile tile, Block block, Team team, Cons<Building> others){
+        Boolf<Building> valid = other -> other != null && other.tile() != tile && other.block instanceof PowerNode node &&
+        node.autolink &&
+        other.power.links.size < node.maxNodes &&
+        node.overlaps(other.x, other.y, tile, block, node.laserRange * tilesize) && other.team == team
+        && !graphs.contains(other.power.graph) &&
+        !PowerNode.insulated(tile, other.tile) &&
+        !Structs.contains(Edges.getEdges(block.size), p -> { //do not link to adjacent buildings
+            var t = world.tile(tile.x + p.x, tile.y + p.y);
+            return t != null && t.build == other;
+        });
+
+        tempBuilds.clear();
+        graphs.clear();
+
+        //add conducting graphs to prevent double link
+        for(var p : Edges.getEdges(block.size)){
+            Tile other = tile.nearby(p);
+            if(other != null && other.team() == team && other.build != null && other.build.power != null
+                && !(block.consumesPower && other.block().consumesPower && !block.outputsPower && !other.block().outputsPower)){
+                graphs.add(other.build.power.graph);
+            }
+        }
+
+        if(tile.build != null && tile.build.power != null){
+            graphs.add(tile.build.power.graph);
+        }
+
+        var rangeWorld = maxRange * tilesize;
+        var tree = team.data().buildingTree;
+        if(tree != null){
+            tree.intersect(tile.worldx() - rangeWorld, tile.worldy() - rangeWorld, rangeWorld * 2, rangeWorld * 2, build -> {
+                if(valid.get(build) && !tempBuilds.contains(build)){
+                    tempBuilds.add(build);
+                }
+            });
+        }
+
+        tempBuilds.sort((a, b) -> {
+            int type = -Boolean.compare(a.block instanceof PowerNode, b.block instanceof PowerNode);
+            if(type != 0) return type;
+            return Float.compare(a.dst2(tile), b.dst2(tile));
+        });
+
+        tempBuilds.each(valid, t -> {
             graphs.add(t.power.graph);
             others.get(t);
         });
     }
 
     @Override
-    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
-        if(req.config instanceof Point2[]){
+    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+        if(plan.config instanceof Point2[] ps){
             setupColor(1f);
-            for(Point2 point : (Point2[])req.config){
+            for(Point2 point : ps){
+                int px = plan.x + point.x, py = plan.y + point.y;
                 otherReq = null;
                 list.each(other -> {
-                    if((other.x == req.x + point.x && other.y == req.y + point.y) && other != req){
+                    if(other.block != null
+                        && (px >= other.x - ((other.block.size-1)/2) && py >= other.y - ((other.block.size-1)/2) && px <= other.x + other.block.size/2 && py <= other.y + other.block.size/2)
+                        && other != plan && other.block.hasPower){
                         otherReq = other;
                     }
                 });
 
-                if(otherReq == null || otherReq.block == null) return;
+                if(otherReq == null || otherReq.block == null) continue;
 
-                drawLaser(player == null ? Team.sharded : player.team(), req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size);
+                drawLaser(plan.drawx(), plan.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size);
             }
             Draw.color();
         }
@@ -243,11 +341,11 @@ public class PowerNode extends PowerBlock{
     }
 
     public boolean linkValid(Building tile, Building link, boolean checkMaxNodes){
-        if(tile == link || link == null || !link.block.hasPower || tile.team != link.team) return false;
+        if(tile == link || link == null || !link.block.hasPower || !link.block.connectedPower || tile.team != link.team) return false;
 
-        if(overlaps(tile, link, laserRange * tilesize) || (link.block instanceof PowerNode && overlaps(link, tile, ((PowerNode)link.block).laserRange * tilesize))){
-            if(checkMaxNodes && link.block instanceof PowerNode){
-                return link.power.links.size < ((PowerNode)link.block).maxNodes || link.power.links.contains(tile.pos());
+        if(overlaps(tile, link, laserRange * tilesize) || (link.block instanceof PowerNode node && overlaps(link, tile, node.laserRange * tilesize))){
+            if(checkMaxNodes && link.block instanceof PowerNode node){
+                return link.power.links.size < node.maxNodes || link.power.links.contains(tile.pos());
             }
             return true;
         }
@@ -263,49 +361,27 @@ public class PowerNode extends PowerBlock{
     }
 
     public static boolean insulated(int x, int y, int x2, int y2){
-        returnValue = false;
-        insulators(x, y, x2, y2, cause -> returnValue = true);
-        return returnValue;
-    }
-
-    public static void insulators(int x, int y, int x2, int y2, Cons<Building> iterator){
-        world.raycastEach(x, y, x2, y2, (wx, wy) -> {
-
+        return World.raycast(x, y, x2, y2, (wx, wy) -> {
             Building tile = world.build(wx, wy);
-            if(tile != null && tile.block.insulated){
-                iterator.get(tile);
-            }
-
-            return false;
+            return tile != null && tile.isInsulated();
         });
     }
 
     public class PowerNodeBuild extends Building{
 
         @Override
+        public void created(){ // Called when one is placed/loaded in the world
+            if(autolink && laserRange > maxRange) maxRange = laserRange;
+
+            super.created();
+        }
+
+
+        @Override
         public void placed(){
-            if(net.client()) return;
+            if(net.client() || power.links.size > 0) return;
 
-            Boolf<Building> valid = other -> other != null && other != this &&
-                (other.block.outputsPower || other.block.consumesPower || other.block instanceof PowerNode) && linkValid(this, other)
-                && !other.proximity().contains(this) && other.power.graph != power.graph;
-
-            tempTileEnts.clear();
-            Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
-                Building other = world.build(x, y);
-                if(valid.get(other)){
-                    if(!insulated(this, other)){
-                        tempTileEnts.add(other);
-                    }
-                }
-            });
-
-            tempTileEnts.sort((a, b) -> {
-                int type = -Boolean.compare(a.block instanceof PowerNode, b.block instanceof PowerNode);
-                if(type != 0) return type;
-                return Float.compare(a.dst2(tile), b.dst2(tile));
-            });
-            tempTileEnts.each(valid, other -> {
+            getPotentialLinks(tile, team, other -> {
                 if(!power.links.contains(other.pos())){
                     configureAny(other.pos());
                 }
@@ -317,34 +393,27 @@ public class PowerNode extends PowerBlock{
         @Override
         public void dropped(){
             power.links.clear();
-            //create new power graph to manually unlink (this may be redundant)
-            new PowerGraph().add(this);
+            updatePowerGraph();
         }
 
         @Override
-        public void updateTile(){
-            power.graph.update();
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
+        public boolean onConfigureBuildTapped(Building other){
             if(linkValid(this, other)){
                 configure(other.pos());
                 return false;
             }
 
-            if(this == other){
-                if(other.power.links.size == 0){
-                    int[] total = {0};
-                    getPotentialLinks(tile, link -> {
-                        if(!insulated(this, link) && total[0]++ < maxNodes){
-                            configure(link.pos());
+            if(this == other){ //double tapped
+                if(other.power.links.size == 0){ //find links
+                    Seq<Point2> points = new Seq<>();
+                    getPotentialLinks(tile, team, link -> {
+                        if(!insulated(this, link) && points.size < maxNodes){
+                            points.add(new Point2(link.tileX() - tile.x, link.tileY() - tile.y));
                         }
                     });
-                }else{
-                    while(power.links.size > 0){
-                        configure(power.links.get(0));
-                    }
+                    configure(points.toArray(Point2.class));
+                }else{ //clear links
+                    configure(new Point2[0]);
                 }
                 deselect();
                 return false;
@@ -357,6 +426,8 @@ public class PowerNode extends PowerBlock{
         public void drawSelect(){
             super.drawSelect();
 
+            if(!drawRange) return;
+
             Lines.stroke(1f);
 
             Draw.color(Pal.accent);
@@ -368,30 +439,40 @@ public class PowerNode extends PowerBlock{
         public void drawConfigure(){
 
             Drawf.circles(x, y, tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time, 4f, 1f));
-            Drawf.circles(x, y, laserRange * tilesize);
 
-            for(int x = (int)(tile.x - laserRange - 2); x <= tile.x + laserRange + 2; x++){
-                for(int y = (int)(tile.y - laserRange - 2); y <= tile.y + laserRange + 2; y++){
-                    Building link = world.build(x, y);
+            if(drawRange){
+                Drawf.circles(x, y, laserRange * tilesize);
 
-                    if(link != this && linkValid(this, link, false)){
-                        boolean linked = linked(link);
+                for(int x = (int)(tile.x - laserRange - 2); x <= tile.x + laserRange + 2; x++){
+                    for(int y = (int)(tile.y - laserRange - 2); y <= tile.y + laserRange + 2; y++){
+                        Building link = world.build(x, y);
 
-                        if(linked){
-                            Drawf.square(link.x, link.y, link.block.size * tilesize / 2f + 1f, Pal.place);
+                        if(link != this && linkValid(this, link, false)){
+                            boolean linked = linked(link);
+
+                            if(linked){
+                                Drawf.square(link.x, link.y, link.block.size * tilesize / 2f + 1f, Pal.place);
+                            }
                         }
                     }
                 }
-            }
 
-            Draw.reset();
+                Draw.reset();
+            }else{
+                power.links.each(i -> {
+                    var link = world.build(i);
+                    if(link != null && linkValid(this, link, false)){
+                        Drawf.square(link.x, link.y, link.block.size * tilesize / 2f + 1f, Pal.place);
+                    }
+                });
+            }
         }
 
         @Override
         public void draw(){
             super.draw();
 
-            if(Mathf.zero(Renderer.laserOpacity)) return;
+            if(Mathf.zero(Renderer.laserOpacity) || isPayload() || team == Team.derelict) return;
 
             Draw.z(Layer.power);
             setupColor(power.graph.getSatisfaction());
@@ -403,7 +484,7 @@ public class PowerNode extends PowerBlock{
 
                 if(link.block instanceof PowerNode && link.id >= id) continue;
 
-                drawLaser(team, x, y, link.x, link.y, size, link.block.size);
+                drawLaser(x, y, link.x, link.y, size, link.block.size);
             }
 
             Draw.reset();

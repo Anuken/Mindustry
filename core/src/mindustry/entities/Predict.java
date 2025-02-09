@@ -9,8 +9,8 @@ import mindustry.gen.*;
  * Class for predicting shoot angles based on velocities of targets.
  */
 public class Predict{
-    private static Vec2 vec = new Vec2();
-    private static Vec2 vresult = new Vec2();
+    private static final Vec2 vec = new Vec2();
+    private static final Vec2 vresult = new Vec2();
 
     /**
      * Calculates of intercept of a stationary and moving target. Do not call from multiple threads!
@@ -52,6 +52,10 @@ public class Predict{
     }
 
     public static Vec2 intercept(Position src, Position dst, float v){
+        return intercept(src, dst, 0, 0, v);
+    }
+
+    public static Vec2 intercept(Position src, Position dst, float offsetx, float offsety, float v){
         float ddx = 0, ddy = 0;
         if(dst instanceof Hitboxc h){
             ddx += h.deltaX();
@@ -61,7 +65,7 @@ public class Predict{
             ddx -= h.deltaX();
             ddy -= h.deltaY();
         }
-        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), ddx, ddy, v);
+        return intercept(src.getX(), src.getY(), dst.getX() + offsetx, dst.getY() + offsety, ddx, ddy, v);
     }
 
     /**

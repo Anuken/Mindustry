@@ -1,23 +1,25 @@
 "use strict";
 
-function log(context, obj){
-    Vars.mods.scripts.log(context, String(obj))
-}
-
-const readString = path => Vars.mods.scripts.readString(path)
-const readBytes = path => Vars.mods.scripts.readBytes(path)
-const loadMusic = path => Vars.mods.scripts.loadMusic(path)
-const loadSound = path => Vars.mods.scripts.loadSound(path)
-
-const readFile = (purpose, ext, cons) => Vars.mods.scripts.readFile(purpose, ext, cons);
-const readBinFile = (purpose, ext, cons) => Vars.mods.scripts.readBinFile(purpose, ext, cons);
-const writeFile = (purpose, ext, str) => Vars.mods.scripts.writeFile(purpose, ext, str);
-const writeBinFile = (purpose, ext, bytes) => Vars.mods.scripts.writeBinFile(purpose, ext, bytes);
-
 let scriptName = "base.js"
 let modName = "none"
 
-const print = text => log(modName + "/" + scriptName, text);
+const log = (context, obj) => Vars.mods.scripts.log(context, String(obj))
+const print = text => log(modName + "/" + scriptName, text)
+
+const newFloats = cap => Vars.mods.getScripts().newFloats(cap);
+
+//these are not strictly necessary, but are kept for edge cases
+const run = method => new java.lang.Runnable(){run: method}
+const boolf = method => new Boolf(){get: method}
+const boolp = method => new Boolp(){get: method}
+const floatf = method => new Floatf(){get: method}
+const floatp = method => new Floatp(){get: method}
+const cons = method => new Cons(){get: method}
+const prov = method => new Prov(){get: method}
+const func = method => new Func(){get: method}
+
+const newEffect = (lifetime, renderer) => new Effect.Effect(lifetime, new Effect.EffectRenderer({render: renderer}))
+Call = Packages.mindustry.gen.Call
 
 //js 'extend(Base, ..., {})' = java 'new Base(...) {}'
 function extend(/*Base, ..., def*/){
@@ -36,19 +38,3 @@ function extend(/*Base, ..., def*/){
     }
     return instance
 }
-
-//For backwards compatibility, use extend instead
-const extendContent = extend;
-
-//these are not strictly necessary, but are kept for edge cases
-const run = method => new java.lang.Runnable(){run: method}
-const boolf = method => new Boolf(){get: method}
-const boolp = method => new Boolp(){get: method}
-const floatf = method => new Floatf(){get: method}
-const floatp = method => new Floatp(){get: method}
-const cons = method => new Cons(){get: method}
-const prov = method => new Prov(){get: method}
-const func = method => new Func(){get: method}
-
-const newEffect = (lifetime, renderer) => new Effect.Effect(lifetime, new Effect.EffectRenderer({render: renderer}))
-Call = Packages.mindustry.gen.Call

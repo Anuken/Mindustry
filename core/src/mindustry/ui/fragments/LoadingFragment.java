@@ -12,13 +12,13 @@ import arc.scene.ui.layout.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
-public class LoadingFragment extends Fragment{
+public class LoadingFragment{
     private Table table;
     private TextButton button;
     private Bar bar;
     private Label nameLabel;
+    private float progValue;
 
-    @Override
     public void build(Group parent){
         parent.fill(t -> {
             //rect must fill screen completely.
@@ -38,17 +38,32 @@ public class LoadingFragment extends Fragment{
 
             text("@loading");
 
-            bar = t.add(new Bar()).pad(3).size(500f, 40f).visible(false).get();
+            bar = t.add(new Bar()).pad(3).padTop(6).size(500f, 40f).visible(false).get();
             t.row();
             button = t.button("@cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
             table = t;
         });
     }
 
+    public void toFront(){
+        table.toFront();
+    }
+
     public void setProgress(Floatp progress){
         bar.reset(0f);
         bar.visible = true;
         bar.set(() -> ((int)(progress.get() * 100) + "%"), progress, Pal.accent);
+    }
+
+    public void snapProgress(){
+        bar.snap();
+    }
+
+    public void setProgress(float progress){
+        progValue = progress;
+        if(!bar.visible){
+            setProgress(() -> progValue);
+        }
     }
 
     public void setButton(Runnable listener){
@@ -67,6 +82,7 @@ public class LoadingFragment extends Fragment{
     }
 
     public void show(String text){
+        button.visible = false;
         nameLabel.setColor(Color.white);
         bar.visible = false;
         table.clearActions();

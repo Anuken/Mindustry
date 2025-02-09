@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 
 /** Controls playback of multiple audio tracks.*/
 public class SoundControl{
-    protected static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.6f, musicWaveChance = 0.46f;
+    public float finTime = 120f, foutTime = 120f, musicInterval = 3f * Time.toMinutes, musicChance = 0.8f, musicWaveChance = 0.46f;
 
     /** normal, ambient music, plays at any time */
     public Seq<Music> ambientMusic = Seq.with();
@@ -28,6 +28,7 @@ public class SoundControl{
 
     protected Music lastRandomPlayed;
     protected Interval timer = new Interval(4);
+    protected long lastPlayed;
     protected @Nullable Music current;
     protected float fade;
     protected boolean silenced;
@@ -55,6 +56,10 @@ public class SoundControl{
         }));
 
         setupFilters();
+
+        Events.on(ResetEvent.class, e -> {
+            lastPlayed = Time.millis();
+        });
     }
 
     protected void setupFilters(){
@@ -65,7 +70,7 @@ public class SoundControl{
     protected void reload(){
         current = null;
         fade = 0f;
-        ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game6, Musics.game8, Musics.game9);
+        ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game6, Musics.game8, Musics.game9, Musics.fine);
         darkMusic = Seq.with(Musics.game2, Musics.game5, Musics.game7, Musics.game4);
         bossMusic = Seq.with(Musics.boss1, Musics.boss2, Musics.game2, Musics.game5);
 
@@ -76,6 +81,8 @@ public class SoundControl{
                 sound.setBus(uiBus);
             }
         }
+
+        Events.fire(new MusicRegisterEvent());
     }
 
     public void loop(Sound sound, float volume){
@@ -130,14 +137,21 @@ public class SoundControl{
                 Core.audio.soundBus.play();
                 setupFilters();
             }else{
+                //stopping a single audio bus stops everything else, yay!
                 Core.audio.soundBus.stop();
+                //play music bus again, as it was stopped above
+                Core.audio.musicBus.play();
+
+                Core.audio.soundBus.play();
             }
         }
+
+        Core.audio.setPaused(Core.audio.soundBus.id, state.isPaused());
 
         if(state.isMenu()){
             silenced = false;
             if(ui.planet.isShown()){
-                play(Musics.launch);
+                play(ui.planet.state.planet.launchMusic);
             }else if(ui.editor.isShown()){
                 play(Musics.editor);
             }else{
@@ -150,10 +164,14 @@ public class SoundControl{
             //this just fades out the last track to make way for ingame music
             silence();
 
-            //play music at intervals
-            if(timer.get(musicInterval)){
+            if(Core.settings.getBool("alwaysmusic")){
+                if(current == null){
+                    playRandom();
+                }
+            }else if(Time.timeSinceMillis(lastPlayed) > 1000 * musicInterval / 60f){
                 //chance to play it per interval
                 if(Mathf.chance(musicChance)){
+                    lastPlayed = Time.millis();
                     playRandom();
                 }
             }
@@ -172,7 +190,7 @@ public class SoundControl{
         float avol = Core.settings.getInt("ambientvol", 100) / 100f;
 
         sounds.each((sound, data) -> {
-            data.curVolume = Mathf.lerpDelta(data.curVolume, data.volume * avol, 0.2f);
+            data.curVolume = Mathf.lerpDelta(data.curVolume, data.volume * avol, 0.11f);
 
             boolean play = data.curVolume > 0.01f;
             float pan = Mathf.zero(data.total, 0.0001f) ? 0f : sound.calcPan(data.sum.x / data.total, data.sum.y / data.total);
@@ -198,7 +216,9 @@ public class SoundControl{
 
     /** Plays a random track.*/
     public void playRandom(){
-        if(isDark()){
+        if(state.boss() != null){
+            playOnce(bossMusic.random(lastRandomPlayed));
+        }else if(isDark()){
             playOnce(darkMusic.random(lastRandomPlayed));
         }else{
             playOnce(ambientMusic.random(lastRandomPlayed));
@@ -207,7 +227,7 @@ public class SoundControl{
 
     /** Whether to play dark music.*/
     protected boolean isDark(){
-        if(state.teams.get(player.team()).hasCore() && state.teams.get(player.team()).core().healthf() < 0.85f){
+        if(player.team().data().hasCore() && player.team().data().core().healthf() < 0.85f){
             //core damaged -> dark
             return true;
         }

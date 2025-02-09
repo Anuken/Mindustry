@@ -1,5 +1,0 @@
-- Fixed research not using resources
-- Fixed capturing other sectors in campaign counting as a capture in current sector
-- Fixed incorrect shots/sec for turrets
-- Fixed resources being unlocked in custom games
-- Made campaign co-op games automatically send maps upon switching sectors instead of disconnecting

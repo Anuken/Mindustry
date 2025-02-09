@@ -4,12 +4,12 @@ import mindustry.net.Packets.*;
 
 import java.io.*;
 
-public class Streamable implements Packet{
+public class Streamable extends Packet{
     public transient ByteArrayInputStream stream;
 
     @Override
-    public boolean isImportant(){
-        return true;
+    public int getPriority(){
+        return priorityHigh;
     }
 
     public static class StreamBuilder{
@@ -37,7 +37,7 @@ public class Streamable implements Packet{
         }
 
         public Streamable build(){
-            Streamable s = (Streamable)Registrator.getByID(type).constructor.get();
+            Streamable s = Net.newPacket(type);
             s.stream = new ByteArrayInputStream(stream.toByteArray());
             return s;
         }

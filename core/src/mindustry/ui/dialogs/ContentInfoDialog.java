@@ -1,13 +1,19 @@
 package mindustry.ui.dialogs;
 
+import arc.*;
+import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.ui.*;
+import mindustry.input.*;
 import mindustry.world.meta.*;
+
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 public class ContentInfoDialog extends BaseDialog{
 
@@ -15,6 +21,12 @@ public class ContentInfoDialog extends BaseDialog{
         super("@info.title");
 
         addCloseButton();
+
+        keyDown(key -> {
+            if(key == keybinds.get(Binding.block_info).key){
+                Core.app.post(this::hide);
+            }
+        });
     }
 
     public void show(UnlockableContent content){
@@ -27,10 +39,8 @@ public class ContentInfoDialog extends BaseDialog{
         content.checkStats();
 
         table.table(title1 -> {
-            int size = 8 * 6;
-
-            title1.image(content.icon(Cicon.xlarge)).size(size).scaling(Scaling.fit);
-            title1.add("[accent]" + content.localizedName).padLeft(5);
+            title1.image(content.uiIcon).size(iconXLarge).scaling(Scaling.fit);
+            title1.add("[accent]" + content.localizedName + (settings.getBool("console") ? "\n[gray]" + content.name : "")).padLeft(5);
         });
 
         table.row();
@@ -59,36 +69,43 @@ public class ContentInfoDialog extends BaseDialog{
 
             if(map.size == 0) continue;
 
-            //TODO check
             if(stats.useCategories){
-                table.add("@category." + cat.name()).color(Pal.accent).fillX();
+                table.add("@category." + cat.name).color(Pal.accent).fillX();
                 table.row();
             }
 
             for(Stat stat : map.keys()){
                 table.table(inset -> {
                     inset.left();
-                    inset.add("[lightgray]" + stat.localized() + ":[] ").left();
+                    inset.add("[lightgray]" + stat.localized() + ":[] ").left().top();
                     Seq<StatValue> arr = map.get(stat);
                     for(StatValue value : arr){
                         value.display(inset);
                         inset.add().size(10f);
                     }
-
                 }).fillX().padLeft(10);
                 table.row();
             }
         }
 
         if(content.details != null){
-            table.add("[gray]" + content.details).pad(6).padTop(20).width(400f).wrap().fillX();
+            table.add("[gray]" + (content.unlocked() || !content.hideDetails ? content.details : Iconc.lock + " " + Core.bundle.get("unlock.incampaign"))).pad(6).padTop(20).width(400f).wrap().fillX();
             table.row();
         }
 
+        content.displayExtra(table);
+
         ScrollPane pane = new ScrollPane(table);
+        table.marginRight(30f);
+        //TODO: some things (e.g. reconstructor requirements) are too long and screw up the layout
+        //pane.setScrollingDisabled(true, false);
         cont.add(pane);
 
-        show();
+        if(isShown()){
+            show(scene, Actions.fadeIn(0f));
+        }else{
+            show();
+        }
     }
 
 }

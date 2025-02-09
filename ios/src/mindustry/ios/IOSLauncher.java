@@ -16,7 +16,6 @@ import mindustry.net.*;
 import mindustry.ui.*;
 import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
-import org.robovm.apple.glkit.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
 
@@ -25,8 +24,10 @@ import java.util.*;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
-import static org.robovm.apple.foundation.NSPathUtilities.getDocumentsDirectory;
+import static org.robovm.apple.foundation.NSPathUtilities.*;
 
+//warnings for deprecated functions related to multi-window applications are not applicable here
+@SuppressWarnings("deprecation")
 public class IOSLauncher extends IOSApplication.Delegate{
     private boolean forced;
 
@@ -74,7 +75,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 class ChooserDelegate extends NSObject implements UIDocumentBrowserViewControllerDelegate{
                     @Override
                     public void didPickDocumentURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
-
                     }
 
                     @Override
@@ -141,11 +141,12 @@ public class IOSLauncher extends IOSApplication.Delegate{
             public void shareFile(Fi file){
                 try{
                     Log.info("Attempting to share file " + file);
-                    Fi to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
-                    file.copyTo(to);
+                    List<Object> list = new ArrayList<>();
 
-                    NSURL url = new NSURL(to.file());
-                    UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
+                    //better choice?
+                    list.add(new NSURL(file.file()));
+
+                    UIActivityViewController p = new UIActivityViewController(list, null);
                     UIViewController rootVc = UIApplication.getSharedApplication().getKeyWindow().getRootViewController();
                     if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
                         // Set up the pop-over for iPad
@@ -156,7 +157,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                         pop.setSourceRect(targetRect);
                         pop.setPermittedArrowDirections(UIPopoverArrowDirection.None);
                     }
-                    rootVc.presentViewController(p, true, () -> Log.info("Success! Presented @", to));
+                    rootVc.presentViewController(p, true, () -> Log.info("Success! Presented @", file));
                 }catch(Throwable t){
                     ui.showException(t);
                 }
@@ -174,7 +175,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
         }, new IOSApplicationConfiguration(){{
-            stencilFormat = GLKViewDrawableStencilFormat._8;
+            useGL30 = true;
         }});
     }
 
@@ -198,19 +199,15 @@ public class IOSLauncher extends IOSApplication.Delegate{
             openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
         }
 
-        Events.on(ClientLoadEvent.class, e -> {
-            Core.app.post(() -> Core.app.post(() -> {
-                Core.scene.table(Styles.black9, t -> {
-                    t.visible(() -> {
-                        if(!forced) return false;
-                        t.toFront();
-                        UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
-                        return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
-                    });
-                    t.add("Rotate the device to landscape orientation to use the editor.").wrap().grow();
-                });
-            }));
-        });
+        Events.on(ClientLoadEvent.class, e -> Core.app.post(() -> Core.app.post(() -> Core.scene.table(Styles.black9, t -> {
+            t.visible(() -> {
+                if(!forced) return false;
+                t.toFront();
+                UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
+                return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
+            });
+            t.add("Rotate the device to landscape orientation to use the editor.").wrap().grow();
+        }))));
 
         return b;
     }
@@ -223,9 +220,9 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
             if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
 
-                if(SaveIO.isSaveValid(file)){
-                    try{
-                        SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.DEFAULT_BUFFER_SIZE))));
+                try{
+                    if(SaveIO.isSaveValid(file)){
+                        SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.defaultBufferSize))));
                         if(meta.tags.containsKey("name")){
                             //is map
                             if(!ui.editor.isShown()){
@@ -237,13 +234,12 @@ public class IOSLauncher extends IOSApplication.Delegate{
                             SaveSlot slot = control.saves.importSave(file);
                             ui.load.runLoadSave(slot);
                         }
-                    }catch(IOException e){
-                        ui.showException("@save.import.fail", e);
+                    }else{
+                        ui.showErrorMessage("@save.import.invalid");
                     }
-                }else{
-                    ui.showErrorMessage("@save.import.invalid");
+                }catch(Throwable e){
+                    ui.showException("@save.import.fail", e);
                 }
-
             }
         }));
     }
@@ -254,7 +250,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
             UIApplication.main(argv, null, IOSLauncher.class);
         }catch(Throwable t){
             //attempt to log the exception
-            CrashSender.log(t);
+            CrashHandler.log(t);
             Log.err(t);
             //rethrow the exception so it actually crashes
             throw t;

@@ -1,10 +1,9 @@
 package mindustry.graphics.g3d;
 
 import arc.graphics.*;
-import arc.graphics.VertexAttributes.*;
-import arc.graphics.gl.*;
 import arc.math.geom.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.maps.generators.*;
 
 public class MeshBuilder{
     private static final Vec3 v1 = new Vec3(), v2 = new Vec3(), v3 = new Vec3(), v4 = new Vec3();
@@ -12,7 +11,7 @@ public class MeshBuilder{
     private static Mesh mesh;
 
     public static Mesh buildIcosphere(int divisions, float radius, Color color){
-        begin(20 * (2 << (2 * divisions - 1)) * 7 * 3);
+        begin(20 * (2 << (2 * divisions - 1)) * 3);
 
         MeshResult result = Icosphere.create(divisions);
         for(int i = 0; i < result.indices.size; i+= 3){
@@ -28,6 +27,27 @@ public class MeshBuilder{
 
     public static Mesh buildIcosphere(int divisions, float radius){
         return buildIcosphere(divisions, radius, Color.white);
+    }
+
+    public static Mesh buildPlanetGrid(PlanetGrid grid, Color color, float scale){
+        int total = 0;
+        for(Ptile tile : grid.tiles){
+            total += tile.corners.length * 2;
+        }
+
+        begin(total);
+        for(Ptile tile : grid.tiles){
+            Corner[] c = tile.corners;
+            for(int i = 0; i < c.length; i++){
+                Vec3 a = v1.set(c[i].v).scl(scale);
+                Vec3 b = v2.set(c[(i + 1) % c.length].v).scl(scale);
+
+                vert(a, Vec3.Z, color);
+                vert(b, Vec3.Z, color);
+            }
+        }
+
+        return end();
     }
 
     public static Mesh buildHex(Color color, int divisions, boolean lines, float radius){
@@ -47,9 +67,16 @@ public class MeshBuilder{
     public static Mesh buildHex(HexMesher mesher, int divisions, boolean lines, float radius, float intensity){
         PlanetGrid grid = PlanetGrid.create(divisions);
 
-        begin(grid.tiles.length * 12 * (3 + 3 + 1));
+        if(mesher instanceof PlanetGenerator generator){
+            generator.seed = generator.baseSeed;
+        }
+
+        begin(grid.tiles.length * 12);
 
         for(Ptile tile : grid.tiles){
+            if(mesher.skip(tile.v)){
+                continue;
+            }
 
             Corner[] c = tile.corners;
 
@@ -92,12 +119,12 @@ public class MeshBuilder{
 
     private static void begin(int count){
         mesh = new Mesh(true, count, 0,
-        new VertexAttribute(Usage.position, 3, Shader.positionAttribute),
-        new VertexAttribute(Usage.normal, 3, Shader.normalAttribute),
-        new VertexAttribute(Usage.colorPacked, 4, Shader.colorAttribute)
+        VertexAttribute.position3,
+        VertexAttribute.normal,
+        VertexAttribute.color
         );
 
-        mesh.getVerticesBuffer().limit(mesh.getMaxVertices());
+        mesh.getVerticesBuffer().limit(mesh.getVerticesBuffer().capacity());
         mesh.getVerticesBuffer().position(0);
     }
 

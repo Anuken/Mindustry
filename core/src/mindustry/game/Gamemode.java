@@ -2,9 +2,8 @@ package mindustry.game;
 
 import arc.*;
 import arc.func.*;
+import arc.util.*;
 import mindustry.maps.*;
-
-import static mindustry.Vars.*;
 
 /** Defines preset rule sets. */
 public enum Gamemode{
@@ -14,31 +13,32 @@ public enum Gamemode{
     }, map -> map.spawns > 0),
     sandbox(rules -> {
         rules.infiniteResources = true;
+        rules.allowEditRules = true;
         rules.waves = true;
         rules.waveTimer = false;
     }),
     attack(rules -> {
         rules.attackMode = true;
-        rules.waves = true;
+        //TODO waves is now a bad idea
+        //rules.waves = true;
         rules.waveTimer = true;
 
-        rules.waveSpacing /= 2f;
-        rules.teams.get(rules.waveTeam).infiniteResources = true;
-    }, map -> map.teams.contains(state.rules.waveTeam.id)),
+        rules.waveSpacing = 2f * Time.toMinutes;
+        rules.waveTeam.rules().infiniteResources = true;
+    }, map -> map.teams.size > 1),
     pvp(rules -> {
         rules.pvp = true;
         rules.enemyCoreBuildRadius = 600f;
         rules.buildCostMultiplier = 1f;
         rules.buildSpeedMultiplier = 1f;
         rules.unitBuildSpeedMultiplier = 2f;
-        rules.unitHealthMultiplier = 3f;
         rules.attackMode = true;
     }, map -> map.teams.size > 1),
     editor(true, rules -> {
         rules.infiniteResources = true;
+        rules.instantBuild = true;
         rules.editor = true;
         rules.waves = false;
-        rules.enemyCoreBuildRadius = 0f;
         rules.waveTimer = false;
     });
 
