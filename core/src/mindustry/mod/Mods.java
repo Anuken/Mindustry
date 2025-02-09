@@ -208,10 +208,7 @@ public class Mods implements Loadable{
             regionName = baseName.contains(".") ? baseName.substring(0, baseName.indexOf(".")) : baseName;
 
             if(!prefix && !Core.atlas.has(regionName)){
-                Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite. Ignoring.", regionName, mod.name);
-                continue;
-
-                //(horrible code below)
+                Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite.", regionName, mod.name);
             }
 
             //read and bleed pixmaps in parallel
