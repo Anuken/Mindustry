@@ -147,6 +147,8 @@ public class BulletType extends Content implements Cloneable{
     public float extraRangeMargin = 0f;
     /** Range initialized in init(). */
     public float range = 0f;
+    /** When used in a turret with multiple ammoo types, this can be set to a non-zero value to influence minRange */
+    public float minRangeChange = 0f;
     /** % of block health healed **/
     public float healPercent = 0f;
     /** flat amount of block health healed */
