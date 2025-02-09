@@ -279,18 +279,18 @@ public class MobileInput extends InputHandler implements GestureListener{
         group.fill(t -> {
             t.visible(this::showCancel);
             t.bottom().left();
-            t.button("@cancel", Icon.cancel, () -> {
+            t.button("@cancel", Icon.cancel, Styles.clearTogglet, () -> {
                 if(!player.dead()){
                     player.unit().clearBuilding();
                 }
                 selectPlans.clear();
                 mode = none;
                 block = null;
-            }).width(155f).height(50f).margin(12f);
+            }).width(155f).checked(b -> false).height(50f).margin(12f);
         });
 
         group.fill(t -> {
-            t.visible(() -> !showCancel() && block == null && !hasSchematic() && !state.rules.editor);
+            t.visible(() -> !hasSchematic() && !state.rules.editor);
             t.bottom().left();
 
             t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
@@ -299,7 +299,14 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             t.button("@command", Icon.units, Styles.clearTogglet, () -> {
                 commandMode = !commandMode;
-            }).width(155f).height(48f).margin(12f).checked(b -> commandMode);
+                if(commandMode){
+                    block = null;
+                    rebuildMode = false;
+                    mode = none;
+                }
+            }).width(155f).height(48f).margin(12f).checked(b -> commandMode).row();
+
+            t.spacerY(() -> showCancel() ? 50f : 0f).row();
 
             //for better looking insets
             t.rect((x, y, w, h) -> {
@@ -516,7 +523,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(cursor == null || Core.scene.hasMouse(screenX, screenY)) return false;
 
         //only begin selecting if the tapped block is a plan
-        selecting = hasPlan(cursor);
+        selecting = hasPlan(cursor) && !commandMode;
 
         //call tap events
         if(pointer == 0 && !selecting){
@@ -678,7 +685,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //remove if plan present
-        if(hasPlan(cursor)){
+        if(hasPlan(cursor) && !commandMode){
             removePlan(getPlan(cursor));
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
@@ -757,7 +764,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             payloadTarget = null;
         }
 
-        if(locked || block != null || scene.hasField() || hasSchematic() || selectPlans.size > 0){
+        if(locked || block != null || scene.hasField() || hasSchematic()){
             commandMode = false;
         }
 

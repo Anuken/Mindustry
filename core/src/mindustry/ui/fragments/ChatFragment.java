@@ -14,6 +14,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
@@ -125,7 +126,8 @@ public class ChatFragment extends Table{
             if(index >= 0 && index < cursor){
                 String text = chatfield.getText().substring(index + 1, cursor - 1);
                 String uni = Fonts.getUnicodeStr(text);
-                if(uni != null && uni.length() > 0){
+                if((uni == null || uni.isEmpty()) && Iconc.codes.containsKey(text)) uni = Character.toString((char)Iconc.codes.get(text));
+                if(uni != null && !uni.isEmpty()){
                     chatfield.setText(chatfield.getText().substring(0, index) + uni + chatfield.getText().substring(cursor));
                     chatfield.setCursorPosition(index + uni.length());
                 }
@@ -161,14 +163,15 @@ public class ChatFragment extends Table{
 
         float theight = offsety + spacing + getMarginBottom() + scene.marginBottom;
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || shown); i++){
+            String message = messages.get(i);
 
-            layout.setText(font, messages.get(i), Color.white, textWidth, Align.bottomLeft, true);
+            layout.setText(font, message, Color.white, textWidth, Align.bottomLeft, true);
             theight += layout.height + textspacing;
             if(i - scrollPos == 0) theight -= textspacing + 1;
 
             font.getCache().clear();
             font.getCache().setColor(Color.white);
-            font.getCache().addText(messages.get(i), fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
+            font.getCache().addText(message, fontoffsetx + offsetx, offsety + theight, textWidth, Align.bottomLeft, true);
 
             if(!shown && fadetime - i < 1f && fadetime - i >= 0f){
                 font.getCache().setAlphas((fadetime - i) * opacity);
@@ -199,6 +202,8 @@ public class ChatFragment extends Table{
         if(message.isEmpty() || (message.startsWith(mode.prefix) && message.substring(mode.prefix.length()).isEmpty())) return;
 
         history.insert(1, message);
+
+        message = UI.formatIcons(message);
 
         Events.fire(new ClientChatEvent(message));
 

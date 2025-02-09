@@ -342,6 +342,8 @@ public class LandingPad extends Block{
         @Override
         public void drawSelect(){
             if(config != null){
+                drawItemSelection(config);
+
                 float dx = x - size * tilesize/2f, dy = y + size * tilesize/2f, s = iconSmall / 4f;
                 Draw.mixcol(Color.darkGray, 1f);
                 Draw.rect(config.fullIcon, dx, dy - 1, s, s);
