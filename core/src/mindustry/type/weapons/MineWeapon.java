@@ -60,7 +60,7 @@ public class MineWeapon extends Weapon{
                 px = wx + Angles.trnsx(weaponRotation, shootX, sY),
                 py = wy + Angles.trnsy(weaponRotation, shootX, sY);
 
-            unit.type.drawMiningBeam(px, py);
+            unit.type.drawMiningBeam(unit, px, py);
             Draw.z(z);
         }
     }
