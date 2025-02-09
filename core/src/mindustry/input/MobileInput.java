@@ -286,7 +286,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 selectPlans.clear();
                 mode = none;
                 block = null;
-            }).width(155f).height(50f).margin(12f);
+            }).width(155f).checked(b -> false).height(50f).margin(12f);
         });
 
         group.fill(t -> {
