@@ -16,6 +16,7 @@ public class Prop extends Block{
         breakable = true;
         alwaysReplace = true;
         instantDeconstruct = true;
+        unitMoveBreakable = true;
         breakEffect = Fx.breakProp;
         breakSound = Sounds.rockBreak;
     }

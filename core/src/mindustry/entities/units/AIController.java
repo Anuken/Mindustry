@@ -28,8 +28,12 @@ public class AIController implements UnitController{
     protected Teamc target;
 
     {
-        timer.reset(0, Mathf.random(40f));
-        timer.reset(1, Mathf.random(60f));
+        resetTimers();
+    }
+
+    protected void resetTimers(){
+        timer.reset(timerTarget, Mathf.random(40f));
+        timer.reset(timerTarget2, Mathf.random(60f));
     }
 
     @Override

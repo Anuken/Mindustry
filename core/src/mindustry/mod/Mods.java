@@ -432,7 +432,9 @@ public class Mods implements Loadable{
         }
         mods.remove(mod);
         mod.dispose();
-        requiresReload = true;
+        if(mod.state != ModState.disabled){
+            requiresReload = true;
+        }
     }
 
     public Scripts getScripts(){
@@ -474,13 +476,7 @@ public class Mods implements Loadable{
             ModMeta meta = null;
 
             try{
-                Fi zip = file.isDirectory() ? file : new ZipFi(file);
-
-                if(zip.list().length == 1 && zip.list()[0].isDirectory()){
-                    zip = zip.list()[0];
-                }
-
-                meta = findMeta(zip);
+                meta = findMeta(resolveRoot(file.isDirectory() ? file : new ZipFi(file)));
             }catch(Throwable ignored){
             }
 
@@ -505,7 +501,7 @@ public class Mods implements Loadable{
                 if(steam) mod.addSteamID(file.name());
             }catch(Throwable e){
                 if(e instanceof ClassNotFoundException && e.getMessage().contains("mindustry.plugin.Plugin")){
-                    Log.info("Plugin '@' is outdated and needs to be ported to 6.0! Update its main class to inherit from 'mindustry.mod.Plugin'. See https://mindustrygame.github.io/wiki/modding/6-migrationv6/", file.name());
+                    Log.warn("Plugin '@' is outdated and needs to be ported to v7! Update its main class to inherit from 'mindustry.mod.Plugin'.", file.name());
                 }else if(steam){
                     Log.err("Failed to load mod workshop file @. Skipping.", file);
                     Log.err(e);
@@ -795,6 +791,8 @@ public class Mods implements Loadable{
 
         //this finishes parsing content fields
         parser.finishParsing();
+
+        Events.fire(new ModContentLoadEvent());
     }
 
     public void handleContentError(Content content, Throwable error){
@@ -931,10 +929,10 @@ public class Mods implements Loadable{
         return true;
     }
 
-    /** Loads a mod file+meta, but does not add it to the list.
-     * Note that directories can be loaded as mods. */
-    private LoadedMod loadMod(Fi sourceFile) throws Exception{
-        return loadMod(sourceFile, false, true);
+    private Fi resolveRoot(Fi fi){
+        if(OS.isMac && (!(fi instanceof ZipFi))) fi.child(".DS_Store").delete();
+        Fi[] files = fi.list();
+        return files.length == 1 && files[0].isDirectory() ? files[0] : fi;
     }
 
     /** Loads a mod file+meta, but does not add it to the list.
@@ -945,10 +943,7 @@ public class Mods implements Loadable{
         ZipFi rootZip = null;
 
         try{
-            Fi zip = sourceFile.isDirectory() ? sourceFile : (rootZip = new ZipFi(sourceFile));
-            if(zip.list().length == 1 && zip.list()[0].isDirectory()){
-                zip = zip.list()[0];
-            }
+            Fi zip = resolveRoot(sourceFile.isDirectory() ? sourceFile : (rootZip = new ZipFi(sourceFile)));
 
             ModMeta meta = findMeta(zip);
 

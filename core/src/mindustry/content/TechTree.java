@@ -99,6 +99,7 @@ public class TechTree{
         public TechNode(@Nullable TechNode parent, UnlockableContent content, ItemStack[] requirements){
             if(parent != null){
                 parent.children.add(this);
+                planet = parent.planet;
                 researchCostMultipliers = parent.researchCostMultipliers;
             }else if(researchCostMultipliers == null){
                 researchCostMultipliers = new ObjectFloatMap<>();

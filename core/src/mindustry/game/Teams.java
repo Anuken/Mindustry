@@ -56,6 +56,19 @@ public class Teams{
         return Geometry.findClosest(x, y, get(team).cores);
     }
 
+    public boolean anyEnemyCoresWithinBuildRadius(Team team, float x, float y){
+        for(TeamData data : active){
+            if(team != data.team){
+                for(CoreBuild tile : data.cores){
+                    if(tile.within(x, y, state.rules.buildRadius(tile.team) + tilesize)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public boolean anyEnemyCoresWithin(Team team, float x, float y, float radius){
         for(TeamData data : active){
             if(team != data.team){
@@ -435,11 +448,12 @@ public class Teams{
     /** Represents a block made by this team that was destroyed somewhere on the map.
      * This does not include deconstructed blocks.*/
     public static class BlockPlan{
-        public final short x, y, rotation, block;
+        public final short x, y, rotation;
+        public final Block block;
         public final Object config;
         public boolean removed;
 
-        public BlockPlan(int x, int y, short rotation, short block, Object config){
+        public BlockPlan(int x, int y, short rotation, Block block, Object config){
             this.x = (short)x;
             this.y = (short)y;
             this.rotation = rotation;

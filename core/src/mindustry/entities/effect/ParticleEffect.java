@@ -34,6 +34,8 @@ public class ParticleEffect extends Effect{
     public float spin = 0f;
     /** Controls the initial and final sprite sizes. */
     public float sizeFrom = 2f, sizeTo = 0f;
+    /** Controls the amount of ticks the effect waits before changing size. */
+    public float sizeChangeStart = 0f;
     /** Whether the rotation adds with the parent */
     public boolean useRotation = true;
     /** Rotation offset. */
@@ -51,6 +53,7 @@ public class ParticleEffect extends Effect{
     @Override
     public void init(){
         clip = Math.max(clip, length + Math.max(sizeFrom, sizeTo));
+        sizeChangeStart = Mathf.clamp(sizeChangeStart, 0f, lifetime);
         if(sizeInterp == null) sizeInterp = interp;
     }
 
@@ -62,7 +65,7 @@ public class ParticleEffect extends Effect{
         int flip = casingFlip ? -Mathf.sign(e.rotation) : 1;
         float rawfin = e.fin();
         float fin = e.fin(interp);
-        float rad = sizeInterp.apply(sizeFrom, sizeTo, rawfin) * 2;
+        float rad = sizeInterp.apply(sizeFrom, sizeTo, Mathf.curve(rawfin, sizeChangeStart / lifetime, 1f)) * 2;
         float ox = e.x + Angles.trnsx(realRotation, offsetX * flip, offsetY), oy = e.y + Angles.trnsy(realRotation, offsetX * flip, offsetY);
 
         Draw.color(colorFrom, colorTo, fin);

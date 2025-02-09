@@ -69,8 +69,50 @@ public class StatValues{
         return number(value, unit, false);
     }
 
+    public static StatValue multiplierModifier(float value, StatUnit unit, boolean merge){
+        return table -> {
+            String l1 = (unit.icon == null ? "" : unit.icon + " ") + multStat(value), l2 = (unit.space ? " " : "") + unit.localized();
+
+            if(merge){
+                table.add(l1 + l2).left();
+            }else{
+                table.add(l1).left();
+                table.add(l2).left();
+            }
+        };
+    }
+
+    public static StatValue multiplierModifier(float value, StatUnit unit){
+        return multiplierModifier(value, unit, true);
+    }
+
+    public static StatValue multiplierModifier(float value){
+        return multiplierModifier(value, StatUnit.multiplier);
+    }
+
+    public static StatValue percentModifier(float value, StatUnit unit, boolean merge){
+        return table -> {
+            String l1 = (unit.icon == null ? "" : unit.icon + " ") + ammoStat((value - 1) * 100), l2 = (unit.space ? " " : "") + unit.localized();
+
+            if(merge){
+                table.add(l1 + l2).left();
+            }else{
+                table.add(l1).left();
+                table.add(l2).left();
+            }
+        };
+    }
+
+    public static StatValue percentModifier(float value, StatUnit unit){
+        return percentModifier(value, unit, true);
+    }
+
+    public static StatValue percentModifier(float value){
+        return percentModifier(value, StatUnit.percent);
+    }
+
     public static StatValue liquid(Liquid liquid, float amount, boolean perSecond){
-        return table -> table.add(displayLiquid(liquid, amount, perSecond));
+        return table -> table.add(displayLiquid(liquid, amount, perSecond)).left();
     }
 
     public static StatValue liquids(Boolf<Liquid> filter, float amount, boolean perSecond){
@@ -150,7 +192,7 @@ public class StatValues{
                 t.add(Strings.autoFixed(amount, 2)).style(Styles.outlineLabel);
                 add(t);
             }
-        }}).size(iconMed).padRight(3  + (amount != 0 && Strings.autoFixed(amount, 2).length() > 2 ? 8 : 0)).with(s -> withTooltip(s, liquid, false));
+        }}).size(iconMed).padRight(3  + (amount != 0 ? (Strings.autoFixed(amount, 2).length() - 1) * 10 : 0)).with(s -> withTooltip(s, liquid, false));
 
         if(perSecond && amount != 0){
             t.add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.lightGray).style(Styles.outlineLabel);
@@ -417,6 +459,44 @@ public class StatValues{
         };
     }
 
+    public static StatValue itemEffMultiplier(Floatf<Item> efficiency, float timePeriod, Boolf<Item> filter){
+        return itemEffMultiplier(efficiency, timePeriod, filter, null);
+    }
+
+    public static StatValue itemEffMultiplier(Floatf<Item> efficiency, float timePeriod, Boolf<Item> filter, @Nullable ObjectFloatMap<Item> itemDurationMultipliers){
+        return table -> {
+            table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
+            table.row();
+            table.table(c -> {
+                for(Item item : content.items().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden())){
+                    float timeMultiplier = itemDurationMultipliers == null ? 1f : itemDurationMultipliers.get(item, 1f);
+                    float time = 1f / (timePeriod * timeMultiplier / 60f);
+
+                    c.table(Styles.grayPanel, b -> {
+                        b.image(item.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        b.add(item.localizedName + (timePeriod > 0 ? "\n[lightgray]" + (time < 0.01f ? Strings.fixed(time, 3) : Strings.autoFixed(time, 2)) + StatUnit.perSecond.localized() : "")).left().grow();
+                        b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(item) * 100f))).right().pad(10f).padRight(15f);
+                    }).growX().pad(5).row();
+                }
+            }).growX().colspan(table.getColumns()).row();
+        };
+    }
+
+    public static StatValue liquidEffMultiplier(Floatf<Liquid> efficiency, float amount, Boolf<Liquid> filter){
+        return table -> {
+            table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
+            table.row();
+            table.table(c -> {
+                for(Liquid liquid : content.liquids().select(l -> filter.get(l) && l.unlockedNow() && !l.isHidden())){
+                    c.table(Styles.grayPanel, b -> {
+                        b.add(displayLiquid(liquid, amount, true)).pad(10f).left().grow();
+                        b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(liquid) * 100f))).right().pad(10f).padRight(15f);
+                    }).growX().pad(5).row();
+                }
+            }).growX().colspan(table.getColumns()).row();
+        };
+    }
+
     public static StatValue speedBoosters(String unit, float amount, float speed, boolean strength, Boolf<Liquid> filter){
         return table -> {
             table.row();
@@ -442,30 +522,28 @@ public class StatValues{
         };
     }
 
-    public static StatValue itemBoosters(String unit, float timePeriod, float speedBoost, float rangeBoost, ItemStack[] items, Boolf<Item> filter){
+    public static StatValue itemBoosters(String unit, float timePeriod, float speedBoost, float rangeBoost, ItemStack[] items){
         return table -> {
             table.row();
             table.table(c -> {
-                for(Item item : content.items()){
-                    if(!filter.get(item)) continue;
-
-                    c.table(Styles.grayPanel, b -> {
+                c.table(Styles.grayPanel, b -> {
+                    b.table(it -> {
                         for(ItemStack stack : items){
                             if(timePeriod < 0){
-                                b.add(displayItem(stack.item, stack.amount, true)).pad(20f).left();
+                                it.add(displayItem(stack.item, stack.amount, true)).pad(10f).padLeft(15f).left();
                             }else{
-                                b.add(displayItem(stack.item, stack.amount, timePeriod, true)).pad(20f).left();
+                                it.add(displayItem(stack.item, stack.amount, timePeriod, true)).pad(10f).padLeft(15f).left();
                             }
-                            if(items.length > 1) b.row();
+                            it.row();
                         }
+                    }).left();
 
-                        b.table(bt -> {
-                            bt.right().defaults().padRight(3).left();
-                            if(rangeBoost != 0) bt.add("[lightgray]+[stat]" + Strings.autoFixed(rangeBoost / tilesize, 2) + "[lightgray] " + StatUnit.blocks.localized()).row();
-                            if(speedBoost != 0) bt.add("[lightgray]" + unit.replace("{0}", "[stat]" + Strings.autoFixed(speedBoost, 2) + "[lightgray]"));
-                        }).right().grow().pad(10f).padRight(15f);
-                    }).growX().pad(5).padBottom(-5).row();
-                }
+                    b.table(bt -> {
+                        bt.right().defaults().padRight(3).left();
+                        if(rangeBoost != 0) bt.add("[lightgray]+[stat]" + Strings.autoFixed(rangeBoost / tilesize, 2) + "[lightgray] " + StatUnit.blocks.localized()).row();
+                        if(speedBoost != 0) bt.add("[lightgray]" + unit.replace("{0}", "[stat]" + Strings.autoFixed(speedBoost, 2) + "[lightgray]"));
+                    }).right().top().grow().pad(10f).padRight(15f);
+                }).growX().pad(5).padBottom(-5).row();
             }).growX().colspan(table.getColumns());
             table.row();
         };
@@ -520,14 +598,14 @@ public class StatValues{
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map){
-        return ammo(map, 0, false);
+        return ammo(map, false, false);
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit){
-        return ammo(map, 0, showUnit);
+        return ammo(map, false, showUnit);
     }
 
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, int indent, boolean showUnit){
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean nested, boolean showUnit){
         return table -> {
 
             table.row();
@@ -536,12 +614,12 @@ public class StatValues{
             orderedKeys.sort();
 
             for(T t : orderedKeys){
-                boolean compact = t instanceof UnitType && !showUnit || indent > 0;
+                boolean compact = t instanceof UnitType && !showUnit || nested;
 
                 BulletType type = map.get(t);
 
                 if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
-                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), indent, false).display(table);
+                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false).display(table);
                     continue;
                 }
 
@@ -565,12 +643,15 @@ public class StatValues{
                     }
 
                     if(type.buildingDamageMultiplier != 1){
-                        int val = (int)(type.buildingDamageMultiplier * 100 - 100);
-                        sep(bt, Core.bundle.format("bullet.buildingdamage", ammoStat(val)));
+                        sep(bt, Core.bundle.format("bullet.buildingdamage", ammoStat((int)(type.buildingDamageMultiplier * 100 - 100))));
                     }
 
                     if(type.rangeChange != 0 && !compact){
                         sep(bt, Core.bundle.format("bullet.range", ammoStat(type.rangeChange / tilesize)));
+                    }
+
+                    if(type.shieldDamageMultiplier != 1){
+                        sep(bt, Core.bundle.format("bullet.shielddamage", ammoStat((int)(type.shieldDamageMultiplier * 100 - 100))));
                     }
 
                     if(type.splashDamage > 0){
@@ -619,7 +700,7 @@ public class StatValues{
                     }
 
                     if(type.maxDamageFraction > 0){
-                        sep(bt, Core.bundle.format("bullet.maxdamagefraction", (int)(type.maxDamageFraction * 100))); 
+                        sep(bt, Core.bundle.format("bullet.maxdamagefraction", (int)(type.maxDamageFraction * 100)));
                     }
 
                     if(type.suppressionRange > 0){
@@ -631,11 +712,19 @@ public class StatValues{
                             ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds"))).with(c -> withTooltip(c, type.status));
                     }
 
+                    if(!type.targetMissiles){
+                        sep(bt, "@bullet.notargetsmissiles");
+                    }
+
+                    if(!type.targetBlocks){
+                        sep(bt, "@bullet.notargetsbuildings");
+                    }
+
                     if(type.intervalBullet != null){
                         bt.row();
 
                         Table ic = new Table();
-                        ammo(ObjectMap.of(t, type.intervalBullet), indent + 1, false).display(ic);
+                        ammo(ObjectMap.of(t, type.intervalBullet), true, false).display(ic);
                         Collapser coll = new Collapser(ic, true);
                         coll.setDuration(0.1f);
 
@@ -653,7 +742,7 @@ public class StatValues{
                         bt.row();
 
                         Table fc = new Table();
-                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(fc);
+                        ammo(ObjectMap.of(t, type.fragBullet), true, false).display(fc);
                         Collapser coll = new Collapser(fc, true);
                         coll.setDuration(0.1f);
 
@@ -666,7 +755,7 @@ public class StatValues{
                         bt.row();
                         bt.add(coll);
                     }
-                }).padLeft(indent * 5).padTop(5).padBottom(compact ? 0 : 5).growX().margin(compact ? 0 : 10);
+                }).padLeft(5).padTop(5).padBottom(compact ? 0 : 5).growX().margin(compact ? 0 : 10);
                 table.row();
             }
         };
@@ -681,6 +770,10 @@ public class StatValues{
     //for AmmoListValue
     private static String ammoStat(float val){
         return (val > 0 ? "[stat]+" : "[negstat]") + Strings.autoFixed(val, 1);
+    }
+
+    private static String multStat(float val){
+        return (val >= 1 ? "[stat]" : "[negstat]") + Strings.autoFixed(val, 2);
     }
 
     private static TextureRegion icon(UnlockableContent t){

@@ -22,6 +22,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
         this(null, 0f);
     }
 
+
     @Override
     public void apply(Block block){
         super.apply(block);
@@ -49,5 +50,10 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
     @Override
     public void display(Stats stats){
         stats.add(booster ? Stat.booster : Stat.input, liquid, amount * 60f, true);
+    }
+
+    @Override
+    public boolean consumes(Liquid liquid){
+        return liquid == this.liquid;
     }
 }

@@ -8,12 +8,13 @@ import arc.util.*;
 import mindustry.game.Rules.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
-public class Team implements Comparable<Team>{
+public class Team implements Comparable<Team>, Senseable{
     public final int id;
     public final Color color;
     public final Color[] palette;
@@ -138,7 +139,7 @@ public class Team implements Comparable<Team>{
     public String localized(){
         return Core.bundle.get("team." + name + ".name", name);
     }
-    
+
     public String coloredName(){
         return emoji + "[#" + color + "]" + localized() + "[]";
     }
@@ -151,5 +152,11 @@ public class Team implements Comparable<Team>{
     @Override
     public String toString(){
         return name;
+    }
+
+    @Override
+    public double sense(LAccess sensor){
+        if(sensor == LAccess.id) return id;
+        return 0;
     }
 }
