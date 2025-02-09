@@ -158,6 +158,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
                 lastZoom = zoom;
             }
+
+            @Override
+            public void tap(InputEvent event, float x, float y, int count, KeyCode button){
+                var hovered = getHoverPlanet(x, y);
+                if(hovered != null){
+                    viewPlanet(hovered, false);
+                }
+            }
         });
 
         shown(this::setup);
@@ -656,16 +664,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 for(Planet planet : content.planets()){
                     if(planet.solarSystem == star && selectable(planet)){
                         Button planetButton = planetTable.button(planet.localizedName, Icon.icons.get(planet.icon + "Small", Icon.icons.get(planet.icon, Icon.commandRallySmall)), Styles.flatTogglet, () -> {
-                            selected = null;
-                            if(state.planet != planet){
-                                newPresets.clear();
-                                state.planet = planet;
-
-                                selected = null;
-                                updateSelected();
-                                rebuildExpand();
-                            }
-                            settings.put("lastplanet", planet.name);
+                            viewPlanet(planet, false);
                         }).width(200).height(40).update(bb -> bb.setChecked(state.planet == planet)).with(w -> w.marginLeft(10f)).get();
                         planetButton.getChildren().get(1).setColor(planet.iconColor);
                         planetButton.setColor(planet.iconColor);
@@ -772,6 +771,44 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             readd[0].run();
         }).grow().scrollX(false);
+    }
+
+    public Planet getHoverPlanet(float mouseX, float mouseY){
+        // do not hover over things indefinitely
+        Planet hoverPlanet = null;
+        // get nearest planet (DO NOT SELECT THROUGH selected planet)
+        float nearest = Float.POSITIVE_INFINITY;
+
+        for(Planet planet : content.planets()){
+            Ray r = planets.cam.getPickRay(mouseX, mouseY);
+
+            // get planet we're hovering over
+            Vec3 intersect = planet.intersect(r, outlineRad * planet.radius);
+
+            if(intersect != null && selectable(planet) && intersect.dst(r.origin) < nearest){
+                nearest = intersect.dst(r.origin);
+                hoverPlanet = planet;
+            }
+        }
+
+        return hoverPlanet;
+    }
+
+    public void viewPlanet(Planet planet, boolean pan){
+        if(state.planet != planet){
+            selected = null;
+            if(pan){
+                state.otherCamPos = state.planet.position;
+                state.otherCamAlpha = 0;
+            }
+            newPresets.clear();
+            state.planet = planet;
+
+            selected = null;
+            updateSelected();
+            rebuildExpand();
+            settings.put("lastplanet", planet.name);
+        }
     }
 
     @Override
