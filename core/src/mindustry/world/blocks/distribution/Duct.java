@@ -30,6 +30,8 @@ public class Duct extends Block implements Autotiler{
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
 
+    public @Nullable Block bridgeReplacement;
+
     public Duct(String name){
         super(name);
 
@@ -57,6 +59,13 @@ public class Duct extends Block implements Autotiler{
     }
 
     @Override
+    public void init(){
+        super.init();
+
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof DuctBridge)) bridgeReplacement = Blocks.ductBridge;
+    }
+
+    @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         int[] bits = getTiling(plan, list);
 
@@ -73,10 +82,10 @@ public class Duct extends Block implements Autotiler{
     @Override
     public boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
-            || ((!otherblock.rotatedOutput(otherx, othery) && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
+            || ((!otherblock.rotatedOutput(otherx, othery, tile) && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
             Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) ||
 
-            ((otherblock.rotatedOutput(otherx, othery)) && (otherblock.isDuct) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
+            ((otherblock.rotatedOutput(otherx, othery, tile)) && (otherblock.isDuct) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
     @Override
@@ -96,7 +105,9 @@ public class Duct extends Block implements Autotiler{
 
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
-        Placement.calculateBridges(plans, (DuctBridge)Blocks.ductBridge, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
+        if(bridgeReplacement == null) return;
+
+        Placement.calculateBridges(plans, (DuctBridge)bridgeReplacement, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
     }
 
     public class DuctBuild extends Building{

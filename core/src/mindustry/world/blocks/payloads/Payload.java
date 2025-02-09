@@ -54,6 +54,8 @@ public interface Payload extends Position{
         return 0f;
     }
 
+    default void destroyed(){};
+
     /** writes the payload for saving. */
     void write(Writes write);
 
@@ -72,6 +74,8 @@ public interface Payload extends Position{
     default float getY(){
         return y();
     }
+
+    default void remove(){}
 
     static void write(@Nullable Payload payload, Writes write){
         if(payload == null){

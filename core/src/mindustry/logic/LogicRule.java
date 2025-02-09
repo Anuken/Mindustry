@@ -13,12 +13,18 @@ public enum LogicRule{
     unitCap,
     mapArea,
     lighting,
+    canGameOver,
     ambientLight,
     solarMultiplier,
+    dragMultiplier,
+    ban,
+    unban,
 
     //team specific
     buildSpeed,
+    unitHealth,
     unitBuildSpeed,
+    unitMineSpeed,
     unitCost,
     unitDamage,
     blockHealth,

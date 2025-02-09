@@ -16,6 +16,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.net.Administration.*;
@@ -128,6 +129,9 @@ public class TypeIO{
             for(Object obj : objs){
                 writeObject(write, obj);
             }
+        }else if(object instanceof UnitCommand command){
+            write.b(23);
+            write.s(command.id);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -200,6 +204,7 @@ public class TypeIO{
                 for(int i = 0; i < objlen; i++) objs[i] = readObjectBoxed(read, box);
                 yield objs;
             }
+            case 23 -> content.unitCommand(read.us());
             default -> throw new IllegalArgumentException("Unknown object type: " + type);
         };
     }
@@ -241,7 +246,7 @@ public class TypeIO{
 
     //this is irrelevant.
     static final WeaponMount[] noMounts = {};
-    
+
     public static WeaponMount[] readMounts(Reads read){
         read.skip(read.b() * (1 + 4 + 4));
 
@@ -274,7 +279,7 @@ public class TypeIO{
     }
 
     public static void writeUnit(Writes write, Unit unit){
-        write.b(unit == null || unit.isNull() ? 0 : unit instanceof BlockUnitc ? 1 : 2);
+        write.b(unit == null ? 0 : unit instanceof BlockUnitc ? 1 : 2);
 
         //block units are special
         if(unit instanceof BlockUnitc){
@@ -290,23 +295,33 @@ public class TypeIO{
         byte type = read.b();
         int id = read.i();
         //nothing
-        if(type == 0) return Nulls.unit;
+        if(type == 0) return null;
         if(type == 2){ //standard unit
-            Unit unit = Groups.unit.getByID(id);
-            return unit == null ? Nulls.unit : unit;
+            return Groups.unit.getByID(id);
         }else if(type == 1){ //block
             Building tile = world.build(id);
-            return tile instanceof ControlBlock cont ? cont.unit() : Nulls.unit;
+            return tile instanceof ControlBlock cont ? cont.unit() : null;
         }
-        return Nulls.unit;
+        return null;
     }
 
-    public static void writeCommand(Writes write, UnitCommand command){
-        write.b(command.id);
+    public static void writeCommand(Writes write, @Nullable UnitCommand command){
+        write.b(command == null ? 255 : command.id);
     }
 
-    public static UnitCommand readCommand(Reads read){
-        return UnitCommand.all.get(read.ub());
+    public static @Nullable UnitCommand readCommand(Reads read){
+        int val = read.ub();
+        return val == 255 ? null : content.unitCommand(val);
+    }
+
+    public static void writeStance(Writes write, @Nullable UnitStance stance){
+        write.b(stance == null ? 255 : stance.id);
+    }
+
+    public static UnitStance readStance(Reads read){
+        int val = read.ub();
+        //never returns null
+        return val == 255 || val >= content.unitStances().size ? UnitStance.shoot : content.unitStance(val);
     }
 
     public static void writeEntity(Writes write, Entityc entity){
@@ -467,7 +482,7 @@ public class TypeIO{
             write.b(3);
             write.i(logic.controller.pos());
         }else if(control instanceof CommandAI ai){
-            write.b(6);
+            write.b(8);
             write.bool(ai.attackTarget != null);
             write.bool(ai.targetPos != null);
 
@@ -484,6 +499,26 @@ public class TypeIO{
                 }
             }
             write.b(ai.command == null ? -1 : ai.command.id);
+
+            write.b(ai.commandQueue.size);
+            for(var pos : ai.commandQueue){
+                if(pos instanceof Building b){
+                    write.b(0);
+                    write.i(b.pos());
+                }else if(pos instanceof Unit u){
+                    write.b(1);
+                    write.i(u.id);
+                }else if(pos instanceof Vec2 v){
+                    write.b(2);
+                    write.f(v.x);
+                    write.f(v.y);
+                }else{
+                    //who put garbage in the command queue??
+                    write.b(3);
+                }
+            }
+
+            writeStance(write, ai.stance);
         }else if(control instanceof AssemblerAI){  //hate
             write.b(5);
         }else{
@@ -515,8 +550,8 @@ public class TypeIO{
                 out.controller = world.build(pos);
                 return out;
             }
-            //type 4 is the old CommandAI with no commandIndex, type 6 is the new one with the index as a single byte.
-        }else if(type == 4 || type == 6){
+            //type 4 is the old CommandAI with no commandIndex, type 6 is the new one with the index as a single byte, type 7 is the one with the command queue, 8 adds a stance
+        }else if(type == 4 || type == 6 || type == 7 || type == 8){
             CommandAI ai = prev instanceof CommandAI pai ? pai : new CommandAI();
 
             boolean hasAttack = read.bool(), hasPos = read.bool();
@@ -527,21 +562,50 @@ public class TypeIO{
                 ai.targetPos = null;
             }
             ai.setupLastPos();
+            ai.readAttackTarget = -1;
 
             if(hasAttack){
                 byte entityType = read.b();
                 if(entityType == 1){
                     ai.attackTarget = world.build(read.i());
                 }else{
-                    ai.attackTarget = Groups.unit.getByID(read.i());
+                    ai.attackTarget = Groups.unit.getByID(ai.readAttackTarget = read.i());
                 }
             }else{
                 ai.attackTarget = null;
             }
 
-            if(type == 6){
+            if(type == 6 || type == 7 || type == 8){
                 byte id = read.b();
-                ai.command = id < 0 ? null : UnitCommand.all.get(id);
+                ai.command = id < 0 ? null : content.unitCommand(id);
+                if(ai.command == null) ai.command = UnitCommand.moveCommand;
+            }
+
+            //command queue only in type 7/8
+            if(type == 7 || type == 8){
+                ai.commandQueue.clear();
+                int length = read.ub();
+                for(int i = 0; i < length; i++){
+                    int commandType = read.b();
+                    switch(commandType){
+                        case 0 -> {
+                            var build = world.build(read.i());
+                            if(build != null) ai.commandQueue.add(build);
+                        }
+                        case 1 -> {
+                            var unit = Groups.unit.getByID(read.i());
+                            if(unit != null) ai.commandQueue.add(unit);
+                        }
+                        case 2 -> {
+                            ai.commandQueue.add(new Vec2(read.f(), read.f()));
+                        }
+                        //otherwise disregard
+                    }
+                }
+            }
+
+            if(type == 8){
+                ai.stance = readStance(read);
             }
 
             return ai;
@@ -563,7 +627,15 @@ public class TypeIO{
     }
 
     public static KickReason readKick(Reads read){
-        return KickReason.values()[read.b()];
+        return KickReason.all[read.b()];
+    }
+
+    public static void writeMarkerControl(Writes write, LMarkerControl reason){
+        write.b((byte)reason.ordinal());
+    }
+
+    public static LMarkerControl readMarkerControl(Reads read){
+        return LMarkerControl.all[read.ub()];
     }
 
     public static void writeRules(Writes write, Rules rules){
@@ -590,6 +662,19 @@ public class TypeIO{
         int length = read.i();
         String string = new String(read.b(new byte[length]), charset);
         return JsonIO.read(MapObjectives.class, string);
+    }
+
+    public static void writeObjectiveMarker(Writes write, ObjectiveMarker marker){
+        String string = JsonIO.json.toJson(marker, MapObjectives.ObjectiveMarker.class);
+        byte[] bytes = string.getBytes(charset);
+        write.i(bytes.length);
+        write.b(bytes);
+    }
+
+    public static ObjectiveMarker readObjectiveMarker(Reads read){
+        int length = read.i();
+        String string = new String(read.b(new byte[length]), charset);
+        return JsonIO.read(MapObjectives.ObjectiveMarker.class, string);
     }
 
     public static void writeVecNullable(Writes write, @Nullable Vec2 v){
@@ -628,10 +713,50 @@ public class TypeIO{
     public static void writeStatus(Writes write, StatusEntry entry){
         write.s(entry.effect.id);
         write.f(entry.time);
+
+        //write dynamic fields
+        if(entry.effect.dynamic){
+            //write a byte with bits set based on which field is actually used
+            write.b(
+            (entry.damageMultiplier != 1f ?     (1 << 0) : 0) |
+            (entry.healthMultiplier != 1f ?     (1 << 1) : 0) |
+            (entry.speedMultiplier != 1f ?      (1 << 2) : 0) |
+            (entry.reloadMultiplier != 1f ?     (1 << 3) : 0) |
+            (entry.buildSpeedMultiplier != 1f ? (1 << 4) : 0) |
+            (entry.dragMultiplier != 1f ?       (1 << 5) : 0) |
+            (entry.armorOverride >= 0f ?        (1 << 6) : 0)
+            );
+
+            if(entry.damageMultiplier != 1f) write.f(entry.damageMultiplier);
+            if(entry.healthMultiplier != 1f) write.f(entry.healthMultiplier);
+            if(entry.speedMultiplier != 1f) write.f(entry.speedMultiplier);
+            if(entry.reloadMultiplier != 1f) write.f(entry.reloadMultiplier);
+            if(entry.buildSpeedMultiplier != 1f) write.f(entry.buildSpeedMultiplier);
+            if(entry.dragMultiplier != 1f) write.f(entry.dragMultiplier);
+            if(entry.armorOverride >= 0f) write.f(entry.armorOverride);
+        }
     }
 
     public static StatusEntry readStatus(Reads read){
-        return new StatusEntry().set(content.getByID(ContentType.status, read.s()), read.f());
+        short id = read.s();
+        float time = read.f();
+
+        StatusEntry result = new StatusEntry().set(content.getByID(ContentType.status, id), time);
+
+        if(result.effect.dynamic){
+            //read flags that store which fields are set
+            int flags = read.ub();
+
+            if((flags & (1 << 0)) != 0) result.damageMultiplier = read.f();
+            if((flags & (1 << 1)) != 0) result.healthMultiplier = read.f();
+            if((flags & (1 << 2)) != 0) result.speedMultiplier = read.f();
+            if((flags & (1 << 3)) != 0) result.reloadMultiplier = read.f();
+            if((flags & (1 << 4)) != 0) result.buildSpeedMultiplier = read.f();
+            if((flags & (1 << 5)) != 0) result.dragMultiplier = read.f();
+            if((flags & (1 << 6)) != 0) result.armorOverride = read.f();
+        }
+
+        return result;
     }
 
     public static void writeItems(Writes write, ItemStack stack){
@@ -647,8 +772,8 @@ public class TypeIO{
         return new ItemStack(readItem(read), read.i());
     }
 
-    public static void writeTeam(Writes write, Team reason){
-        write.b(reason.id);
+    public static void writeTeam(Writes write, Team team){
+        write.b(team == null ? 0 : team.id);
     }
 
     public static Team readTeam(Reads read){
@@ -660,7 +785,7 @@ public class TypeIO{
     }
 
     public static AdminAction readAction(Reads read){
-        return AdminAction.values()[read.b()];
+        return AdminAction.all[read.b()];
     }
 
     public static void writeUnitType(Writes write, UnitType effect){
@@ -830,17 +955,45 @@ public class TypeIO{
     public static void writeTraceInfo(Writes write, TraceInfo trace){
         writeString(write, trace.ip);
         writeString(write, trace.uuid);
+        writeString(write, trace.locale);
         write.b(trace.modded ? (byte)1 : 0);
         write.b(trace.mobile ? (byte)1 : 0);
         write.i(trace.timesJoined);
         write.i(trace.timesKicked);
+        //there is a cap to prevent TCP packet size overrun
+        writeStrings(write, trace.ips, 12);
+        writeStrings(write, trace.names, 12);
     }
 
     public static TraceInfo readTraceInfo(Reads read){
-        return new TraceInfo(readString(read), readString(read), read.b() == 1, read.b() == 1, read.i(), read.i());
+        return new TraceInfo(readString(read), readString(read), readString(read), read.b() == 1, read.b() == 1, read.i(), read.i(), readStrings(read), readStrings(read));
     }
 
-    public static void writeStrings(Writes write, String[][] strings){
+    public static void writeStrings(Writes write, String[] strings, int maxLen){
+        write.b(Math.min(strings.length, maxLen));
+        for(int i = 0; i < Math.min(strings.length, maxLen); i++){
+            writeString(write, strings[i]);
+        }
+    }
+
+    public static void writeStrings(Writes write, String[] strings){
+        write.b(strings.length);
+        for(String s : strings){
+            writeString(write, s);
+        }
+    }
+
+    public static String[] readStrings(Reads read){
+        int length = read.ub();
+        var result = new String[length];
+        for(int j = 0; j < length; j++){
+            result[j] = readString(read);
+        }
+        return result;
+    }
+
+
+    public static void writeStringArray(Writes write, String[][] strings){
         write.b(strings.length);
         for(String[] string : strings){
             write.b(string.length);
@@ -850,7 +1003,7 @@ public class TypeIO{
         }
     }
 
-    public static String[][] readStrings(Reads read){
+    public static String[][] readStringArray(Reads read){
         int rows = read.ub();
 
         String[][] strings = new String[rows][];
@@ -885,14 +1038,19 @@ public class TypeIO{
         }
     }
 
+    public interface Boxed<T> {
+        T unbox();
+    }
+
     /** Represents a building that has not been resolved yet. */
-    public static class BuildingBox{
+    public static class BuildingBox implements Boxed<Building>{
         public int pos;
 
         public BuildingBox(int pos){
             this.pos = pos;
         }
 
+        @Override
         public Building unbox(){
             return world.build(pos);
         }
@@ -906,13 +1064,14 @@ public class TypeIO{
     }
 
     /** Represents a unit that has not been resolved yet. TODO unimplemented / unused*/
-    public static class UnitBox{
+    public static class UnitBox implements Boxed<Unit>{
         public int id;
 
         public UnitBox(int id){
             this.id = id;
         }
 
+        @Override
         public Unit unbox(){
             return Groups.unit.getByID(id);
         }

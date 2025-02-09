@@ -1,0 +1,1 @@
+Egy nyílt végű gyártás-menedzselős játék Toronyvédő és RTS elemekkel.

@@ -8,12 +8,13 @@ import arc.util.*;
 import mindustry.game.Rules.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
-public class Team implements Comparable<Team>{
+public class Team implements Comparable<Team>, Senseable{
     public final int id;
     public final Color color;
     public final Color[] palette;
@@ -31,7 +32,7 @@ public class Team implements Comparable<Team>{
         derelict = new Team(0, "derelict", Color.valueOf("4d4e58")),
         sharded = new Team(1, "sharded", Pal.accent.cpy(), Color.valueOf("ffd37f"), Color.valueOf("eab678"), Color.valueOf("d4816b")),
         crux = new Team(2, "crux", Color.valueOf("f25555"), Color.valueOf("fc8e6c"), Color.valueOf("f25555"), Color.valueOf("a04553")),
-        malis = new Team(3, "malis", Color.valueOf("a27ce5"), Color.valueOf("c195fb"), Color.valueOf("665c9f"), Color.valueOf("484988")),
+        malis = new Team(3, "malis", Color.valueOf("a27ce5"), Color.valueOf("c7a4f5"), Color.valueOf("896fd6"), Color.valueOf("504cba")),
 
         //TODO temporarily no palettes for these teams.
         green = new Team(4, "green", Color.valueOf("54d67d")),//Color.valueOf("96f58c"), Color.valueOf("54d67d"), Color.valueOf("28785c")),
@@ -40,8 +41,12 @@ public class Team implements Comparable<Team>{
 
     static{
         Mathf.rand.setSeed(8);
+        //fix random seed shift caused by new team
+        for(int i = 0; i < 3; i++){
+            Mathf.random();
+        }
         //create the whole 256 placeholder teams
-        for(int i = 6; i < all.length; i++){
+        for(int i = 7; i < all.length; i++){
             new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.4f, 1f), 100f * Mathf.random(0.6f, 1f), 1f));
         }
         Mathf.rand.setSeed(new Rand().nextLong());
@@ -121,6 +126,8 @@ public class Team implements Comparable<Team>{
         return isAI() && !rules().rtsAi;
     }
 
+    /** @deprecated There is absolutely no reason to use this. */
+    @Deprecated
     public boolean isEnemy(Team other){
         return this != other;
     }
@@ -133,6 +140,10 @@ public class Team implements Comparable<Team>{
         return Core.bundle.get("team." + name + ".name", name);
     }
 
+    public String coloredName(){
+        return emoji + "[#" + color + "]" + localized() + "[]";
+    }
+
     @Override
     public int compareTo(Team team){
         return Integer.compare(id, team.id);
@@ -141,5 +152,11 @@ public class Team implements Comparable<Team>{
     @Override
     public String toString(){
         return name;
+    }
+
+    @Override
+    public double sense(LAccess sensor){
+        if(sensor == LAccess.id) return id;
+        return 0;
     }
 }

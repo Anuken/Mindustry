@@ -173,8 +173,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void setupColor(float satisfaction){
-        Draw.color(laserColor1, laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f));
-        Draw.alpha(Renderer.laserOpacity);
+        Draw.color(Tmp.c1.set(laserColor1).lerp(laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f)).a(Renderer.laserOpacity));
     }
 
     public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2){
@@ -405,17 +404,16 @@ public class PowerNode extends PowerBlock{
             }
 
             if(this == other){ //double tapped
-                if(other.power.links.size == 0 || Core.input.shift()){ //find links
-                    int[] total = {0};
+                if(other.power.links.size == 0){ //find links
+                    Seq<Point2> points = new Seq<>();
                     getPotentialLinks(tile, team, link -> {
-                        if(!insulated(this, link) && total[0]++ < maxNodes){
-                            configure(link.pos());
+                        if(!insulated(this, link) && points.size < maxNodes){
+                            points.add(new Point2(link.tileX() - tile.x, link.tileY() - tile.y));
                         }
                     });
+                    configure(points.toArray(Point2.class));
                 }else{ //clear links
-                    while(power.links.size > 0){
-                        configure(power.links.get(0));
-                    }
+                    configure(new Point2[0]);
                 }
                 deselect();
                 return false;
@@ -474,7 +472,7 @@ public class PowerNode extends PowerBlock{
         public void draw(){
             super.draw();
 
-            if(Mathf.zero(Renderer.laserOpacity) || isPayload()) return;
+            if(Mathf.zero(Renderer.laserOpacity) || isPayload() || team == Team.derelict) return;
 
             Draw.z(Layer.power);
             setupColor(power.graph.getSatisfaction());

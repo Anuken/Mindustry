@@ -24,6 +24,7 @@ public class BuildWeapon extends Weapon{
         predictTarget = false;
         display = false;
         bullet = new BulletType();
+        useAttackRange = false;
     }
 
     @Override
@@ -37,7 +38,7 @@ public class BuildWeapon extends Weapon{
             mount.aimY = unit.buildPlan().drawy();
         }else{
             //aim for front
-            float weaponRotation = unit.rotation - 90;
+            float weaponRotation = unit.rotation - 90 + baseRotation;
             mount.aimX = unit.x + Angles.trnsx(unit.rotation - 90, x, y) + Angles.trnsx(weaponRotation, this.shootX, this.shootY);
             mount.aimY = unit.y + Angles.trnsy(unit.rotation - 90, x, y) + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
         }

@@ -2,11 +2,11 @@ package mindustry.ai;
 
 import arc.*;
 import arc.func.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -17,6 +17,7 @@ import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
+import static mindustry.world.meta.BlockFlag.*;
 
 public class Pathfinder implements Runnable{
     private static final long maxUpdate = Time.millisToNanos(8);
@@ -38,7 +39,8 @@ public class Pathfinder implements Runnable{
     public static final int
         costGround = 0,
         costLegs = 1,
-        costNaval = 2;
+        costNaval = 2,
+        costHover = 3;
 
     public static final Seq<PathCost> costTypes = Seq.with(
         //ground
@@ -58,10 +60,17 @@ public class Pathfinder implements Runnable{
 
         //water
         (team, tile) ->
-            (PathTile.solid(tile) || !PathTile.liquid(tile) ? 6000 : 1) +
+            (!PathTile.liquid(tile) ? 6000 : 1) +
+            PathTile.health(tile) * 5 +
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
             (PathTile.deep(tile) ? 0 : 1) +
-            (PathTile.damages(tile) ? 35 : 0)
+            (PathTile.damages(tile) ? 35 : 0),
+
+        //hover
+        (team, tile) ->
+            (((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
+            PathTile.health(tile) * 5 +
+            (PathTile.nearSolid(tile) ? 2 : 0)
     );
 
     /** tile data, see PathTileStruct - kept as a separate array for threading reasons */
@@ -152,18 +161,19 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     public int packTile(Tile tile){
-        boolean nearLiquid = false, nearSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep();
+        boolean nearLiquid = false, nearSolid = false, nearLegSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep();
 
         for(int i = 0; i < 4; i++){
             Tile other = tile.nearby(i);
             if(other != null){
                 Floor floor = other.floor();
                 boolean osolid = other.solid();
-                if(floor.isLiquid) nearLiquid = true;
+                if(floor.isLiquid && floor.isDeep()) nearLiquid = true;
                 //TODO potentially strange behavior when teamPassable is false for other teams?
                 if(osolid && !other.block().teamPassable) nearSolid = true;
                 if(!floor.isLiquid) nearGround = true;
                 if(!floor.isDeep()) allDeep = false;
+                if(other.legSolid()) nearLegSolid = true;
 
                 //other tile is now near solid
                 if(solid && !tile.block().teamPassable){
@@ -179,10 +189,11 @@ public class Pathfinder implements Runnable{
             tid == 0 && tile.build != null && state.rules.coreCapture ? 255 : tid, //use teamid = 255 when core capture is enabled to mark out derelict structures
             solid,
             tile.floor().isLiquid,
-            tile.staticDarkness() >= 2 || (tile.floor().solid && tile.block() == Blocks.air),
+            tile.legSolid(),
             nearLiquid,
             nearGround,
             nearSolid,
+            nearLegSolid,
             tile.floor().isDeep(),
             tile.floor().damageTaken > 0.00001f,
             allDeep,
@@ -241,6 +252,8 @@ public class Pathfinder implements Runnable{
                 data.dirty = true;
             }
         });
+
+        controlPath.updateTile(tile);
     }
 
     /** Thread implementation. */
@@ -450,8 +463,34 @@ public class Pathfinder implements Runnable{
     }
 
     public static class EnemyCoreField extends Flowfield{
+        private final static BlockFlag[] randomTargets = {storage, generator, launchPad, factory, repair, battery, reactor, drill};
+        private Rand rand = new Rand();
+
         @Override
         protected void getPositions(IntSeq out){
+            if(state.rules.randomWaveAI && team == state.rules.waveTeam){
+                rand.setSeed(state.rules.waves ? state.wave : (int)(state.tick / (5400)) + hashCode());
+
+                //maximum amount of different target flag types they will attack
+                int max = 1;
+
+                for(int attempt = 0; attempt < 5 && max > 0; attempt++){
+                    var targets = indexer.getEnemy(team, randomTargets[rand.random(randomTargets.length - 1)]);
+                    if(!targets.isEmpty()){
+                        boolean any = false;
+                        for(Building other : targets){
+                            if((other.items != null && other.items.any()) || other.status() != BlockStatus.noInput){
+                                out.add(other.tile.array());
+                                any = true;
+                            }
+                        }
+                        if(any){
+                            max --;
+                        }
+                    }
+                }
+            }
+
             for(Building other : indexer.getEnemy(team, BlockFlag.core)){
                 out.add(other.tile.array());
             }
@@ -521,13 +560,19 @@ public class Pathfinder implements Runnable{
             this.initialized = true;
         }
 
+        public boolean hasCompleteWeights(){
+            return hasComplete && completeWeights != null;
+        }
+
         public void updateTargetPositions(){
             targets.clear();
             getPositions(targets);
         }
 
         protected boolean passable(int pos){
-            return cost.getCost(team.id, pathfinder.tiles[pos]) != impassable;
+            int amount = cost.getCost(team.id, pathfinder.tiles[pos]);
+            //edge case: naval reports costs of 6000+ for non-liquids, even though they are not technically passable
+            return amount != impassable && !(cost == costTypes.get(costNaval) && amount >= 6000);
         }
 
         /** Gets targets to pathfind towards. This must run on the main thread. */
@@ -557,6 +602,8 @@ public class Pathfinder implements Runnable{
         boolean nearGround;
         //whether this block is near a solid object
         boolean nearSolid;
+        //whether this block is near a block that is solid for legged units
+        boolean nearLegSolid;
         //whether this block is deep / drownable
         boolean deep;
         //whether the floor damages

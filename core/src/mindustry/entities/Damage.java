@@ -2,6 +2,7 @@ package mindustry.entities;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -15,6 +16,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -24,7 +27,6 @@ public class Damage{
     private static final Rect rect = new Rect();
     private static final Rect hitrect = new Rect();
     private static final Vec2 vec = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
-    private static final Seq<Unit> units = new Seq<>();
     private static final IntSet collidedBlocks = new IntSet();
     private static final IntFloatMap damages = new IntFloatMap();
     private static final Seq<Collided> collided = new Seq<>();
@@ -38,10 +40,14 @@ public class Damage{
     private static Unit tmpUnit;
 
     public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source){
+        applySuppression(team, x, y, range, reload, maxDelay, applyParticleChance, source, Pal.sapBullet);
+    }
+
+    public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source, Color effectColor){
         builds.clear();
         indexer.eachBlock(null, x, y, range, build -> build.team != team, build -> {
             float prev = build.healSuppressionTime;
-            build.applyHealSuppression(reload + 1f);
+            build.applyHealSuppression(reload + 1f, effectColor);
 
             //TODO maybe should be block field instead of instanceof check
             if(build.wasRecentlyHealed(60f * 12f) || build.block.suppressable){
@@ -58,7 +64,7 @@ public class Damage{
         for(var build : builds){
             if(Mathf.chance(scaledChance)){
                 Time.run(Mathf.random(maxDelay), () -> {
-                    Fx.regenSuppressSeek.at(build.x + Mathf.range(build.block.size * tilesize / 2f), build.y + Mathf.range(build.block.size * tilesize / 2f), 0f, source);
+                    Fx.regenSuppressSeek.at(build.x + Mathf.range(build.block.size * tilesize / 2f), build.y + Mathf.range(build.block.size * tilesize / 2f), 0f, effectColor, source);
                 });
             }
         }
@@ -94,11 +100,16 @@ public class Damage{
             }
 
             int waves = explosiveness <= 2 ? 0 : Mathf.clamp((int)(explosiveness / 11), 1, 25);
+            float damagePerWave = explosiveness / 2f;
 
             for(int i = 0; i < waves; i++){
+                var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
                 int f = i;
                 Time.run(i * 2f, () -> {
-                    damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f, false);
+                    if(shields == null || shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, damagePerWave))){
+                        damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
+                    }
+
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
                 });
             }
@@ -137,6 +148,16 @@ public class Damage{
         return found ? tmpBuilding : null;
     }
 
+    public static float findLength(Bullet b, float length, boolean laser, int pierceCap){
+        if(pierceCap > 0){
+            length = findPierceLength(b, pierceCap, laser, length);
+        }else if(laser){
+            length = findLaserLength(b, length);
+        }
+
+        return length;
+    }
+
     public static float findLaserLength(Bullet b, float length){
         vec.trnsExact(b.rotation(), length);
 
@@ -149,6 +170,10 @@ public class Damage{
     }
 
     public static float findPierceLength(Bullet b, int pierceCap, float length){
+        return findPierceLength(b, pierceCap, b.type.laserAbsorb, length);
+    }
+
+    public static float findPierceLength(Bullet b, int pierceCap, boolean laser, float length){
         vec.trnsExact(b.rotation(), length);
         rect.setPosition(b.x, b.y).setSize(vec.x, vec.y).normalize().grow(3f);
 
@@ -156,21 +181,23 @@ public class Damage{
 
         distances.clear();
 
-        World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
-            //add distance to list so it can be processed
-            var build = world.build(x, y);
+        if(b.type.collidesGround && b.type.collidesTiles){
+            World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
+                //add distance to list so it can be processed
+                var build = world.build(x, y);
 
-            if(build != null && build.team != b.team && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
-                distances.add(b.dst(build));
+                if(build != null && build.team != b.team && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
+                    distances.add(b.dst(build));
 
-                if(b.type.laserAbsorb && build.absorbLasers()){
-                    maxDst = Math.min(maxDst, b.dst(build));
-                    return true;
+                    if(laser && build.absorbLasers()){
+                        maxDst = Math.min(maxDst, b.dst(build));
+                        return true;
+                    }
                 }
-            }
 
-            return false;
-        });
+                return false;
+            });
+        }
 
         Units.nearbyEnemies(b.team, rect, u -> {
             u.hitbox(hitrect);
@@ -189,7 +216,7 @@ public class Damage{
 
     /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
     public static float collideLaser(Bullet b, float length, boolean large, boolean laser, int pierceCap){
-        float resultLength = findPierceLength(b, pierceCap, length);
+        float resultLength = findPierceLength(b, pierceCap, laser, length);
 
         collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
 
@@ -223,16 +250,13 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
-        if(laser){
-            length = findLaserLength(hitter, length);
-        }else if(pierceCap > 0){
-            length = findPierceLength(hitter, pierceCap, length);
-        }
+        length = findLength(hitter, length, laser, pierceCap);
+        hitter.fdata = length;
 
         collidedBlocks.clear();
         vec.trnsExact(angle, length);
 
-        if(hitter.type.collidesGround){
+        if(hitter.type.collidesGround && hitter.type.collidesTiles){
             seg1.set(x, y);
             seg2.set(seg1).add(vec);
             World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
@@ -278,7 +302,6 @@ public class Damage{
         collided.each(c -> {
             if(hitter.damage > 0 && (pierceCap <= 0 || collideCount[0] < pierceCap)){
                 if(c.target instanceof Unit u){
-                    effect.at(c.x, c.y);
                     u.collision(hitter, c.x, c.y);
                     hitter.collision(u, c.x, c.y);
                     collideCount[0]++;
@@ -329,7 +352,6 @@ public class Damage{
 
         Units.nearbyEnemies(team, rect.setCentered(x, y, 1f), u -> {
             if(u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround) && u.hittable()){
-                effect.at(x, y);
                 u.collision(hitter, x, y);
                 hitter.collision(u, x, y);
             }
@@ -342,7 +364,7 @@ public class Damage{
      */
     public static Healthc linecast(Bullet hitter, float x, float y, float angle, float length){
         vec.trns(angle, length);
-        
+
         tmpBuilding = null;
 
         if(hitter.type.collidesGround){
@@ -600,7 +622,7 @@ public class Damage{
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
-                if(tile != null && tile.build != null && (team == null ||team.isEnemy(tile.team())) && dx*dx + dy*dy <= trad*trad){
+                if(tile != null && tile.build != null && (team == null || team != tile.team()) && dx*dx + dy*dy <= trad*trad){
                     tile.build.damage(team, damage);
                 }
             }
@@ -628,7 +650,7 @@ public class Damage{
             this.target = target;
             return this;
         }
-        
+
         @Override
         public void reset(){
             target = null;

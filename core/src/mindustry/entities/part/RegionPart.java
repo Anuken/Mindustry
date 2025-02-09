@@ -15,7 +15,7 @@ public class RegionPart extends DrawPart{
     public String suffix = "";
     /** Overrides suffix if set. */
     public @Nullable String name;
-    public TextureRegion heat;
+    public TextureRegion heat, light;
     public TextureRegion[] regions = {};
     public TextureRegion[] outlines = {};
 
@@ -27,6 +27,8 @@ public class RegionPart extends DrawPart{
     public boolean drawRegion = true;
     /** If true, the heat region produces light. */
     public boolean heatLight = false;
+    /** Whether to clamp progress to (0-1). If false, allows usage of interps that go past the range, but may have unwanted visual bugs depending on values. */
+    public boolean clampProgress = true;
     /** Progress function for determining position/rotation. */
     public PartProgress progress = PartProgress.warmup;
     /** Progress function for scaling. */
@@ -67,19 +69,19 @@ public class RegionPart extends DrawPart{
         Draw.z(Draw.z() + layerOffset);
 
         float prevZ = Draw.z();
-        float prog = progress.getClamp(params), sclProg = growProgress.getClamp(params);
+        float prog = progress.getClamp(params, clampProgress), sclProg = growProgress.getClamp(params, clampProgress);
         float mx = moveX * prog, my = moveY * prog, mr = moveRot * prog + rotation,
             gx = growX * sclProg, gy = growY * sclProg;
 
         if(moves.size > 0){
             for(int i = 0; i < moves.size; i++){
                 var move = moves.get(i);
-                float p = move.progress.getClamp(params);
+                float p = move.progress.getClamp(params, clampProgress);
                 mx += move.x * p;
                 my += move.y * p;
                 mr += move.rot * p;
-                gx += move.gx;
-                gy += move.gy;
+                gx += move.gx * p;
+                gy += move.gy * p;
             }
         }
 
@@ -95,7 +97,7 @@ public class RegionPart extends DrawPart{
             //can be null
             var region = drawRegion ? regions[Math.min(i, regions.length - 1)] : null;
             float sign = (i == 0 ? 1 : -1) * params.sideMultiplier;
-            Tmp.v1.set((x + mx) * sign * Draw.xscl, (y + my) * Draw.yscl).rotateRadExact((params.rotation - 90) * Mathf.degRad);
+            Tmp.v1.set((x + mx) * sign, y + my).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
             float
                 rx = params.x + Tmp.v1.x,
@@ -130,10 +132,10 @@ public class RegionPart extends DrawPart{
             }
 
             if(heat.found()){
-                float hprog = heatProgress.getClamp(params);
+                float hprog = heatProgress.getClamp(params, clampProgress);
                 heatColor.write(Tmp.c1).a(hprog * heatColor.a);
                 Drawf.additive(heat, Tmp.c1, rx, ry, rot, turretShading ? turretHeatLayer : Draw.z() + heatLayerOffset);
-                if(heatLight) Drawf.light(rx, ry, heat, rot, Tmp.c1, heatLightOpacity * hprog);
+                if(heatLight) Drawf.light(rx, ry, light.found() ? light : heat, rot, Tmp.c1, heatLightOpacity * hprog);
             }
 
             Draw.xscl *= sign;
@@ -152,7 +154,7 @@ public class RegionPart extends DrawPart{
                 float sign = (i == 1 ? -1 : 1) * params.sideMultiplier;
                 Tmp.v1.set((x + mx) * sign, y + my).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
-                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + mr * sign + params.rotation);
+                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + Tmp.v1.x, params.y + Tmp.v1.y, mr * sign + params.rotation);
                 childParam.sideMultiplier = params.sideMultiplier;
                 childParam.life = params.life;
                 childParam.sideOverride = i;
@@ -187,6 +189,7 @@ public class RegionPart extends DrawPart{
         }
 
         heat = Core.atlas.find(realName + "-heat");
+        light = Core.atlas.find(realName + "-light");
         for(var child : children){
             child.turretShading = turretShading;
             child.load(name);

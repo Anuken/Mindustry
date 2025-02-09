@@ -51,6 +51,12 @@ public class UnitCargoUnloadPoint extends Block{
         }
 
         @Override
+        public void drawSelect(){
+            super.drawSelect();
+            drawItemSelection(item);
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
 

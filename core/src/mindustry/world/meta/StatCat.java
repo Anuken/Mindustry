@@ -31,6 +31,11 @@ public class StatCat implements Comparable<StatCat>{
     }
 
     @Override
+    public String toString(){
+        return name;
+    }
+
+    @Override
     public int compareTo(StatCat o){
         return id - o.id;
     }

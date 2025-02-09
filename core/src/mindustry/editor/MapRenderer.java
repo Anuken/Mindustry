@@ -100,6 +100,7 @@ public class MapRenderer implements Disposable{
 
     private void render(int wx, int wy){
         int x = wx / chunkSize, y = wy / chunkSize;
+        if(x >= chunks.length || y >= chunks[0].length) return;
         IndexedRenderer mesh = chunks[x][y];
         Tile tile = editor.tiles().getn(wx, wy);
 
@@ -138,12 +139,16 @@ public class MapRenderer implements Disposable{
             mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
         }
 
-        float offsetX = -(wall.size / 3) * tilesize, offsetY = -(wall.size / 3) * tilesize;
+        float offsetX = -((wall.size + 1) / 3) * tilesize, offsetY = -((wall.size + 1) / 3) * tilesize;
 
         //draw non-synthetic wall or ore
         if((wall.update || wall.destructible) && center){
             mesh.setColor(team.color);
             region = Core.atlas.find("block-border-editor");
+            if(wall.size == 2){
+                offsetX += tilesize;
+                offsetY += tilesize;
+            }
         }else if(!useSyntheticWall && wall != Blocks.air && center){
             region = getIcon(wall, idxWall);
 

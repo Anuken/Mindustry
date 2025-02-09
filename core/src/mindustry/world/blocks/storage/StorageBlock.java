@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -98,6 +99,12 @@ public class StorageBlock extends Block{
             if(linkedCore != null){
                 linkedCore.drawSelect();
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.itemCapacity && linkedCore != null) return linkedCore.sense(sensor);
+            return super.sense(sensor);
         }
 
         @Override

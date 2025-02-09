@@ -86,10 +86,12 @@ public class Stat implements Comparable<Stat>{
     targetsGround = new Stat("targetsGround", StatCat.function),
     damage = new Stat("damage", StatCat.function),
     ammo = new Stat("ammo", StatCat.function),
+    ammoCapacity = new Stat("ammoCapacity", StatCat.function),
     ammoUse = new Stat("ammoUse", StatCat.function),
     shieldHealth = new Stat("shieldHealth", StatCat.function),
     cooldownTime = new Stat("cooldownTime", StatCat.function),
     moduleTier = new Stat("moduletier", StatCat.function),
+    unitType = new Stat("unittype", StatCat.function),
 
     booster = new Stat("booster", StatCat.optional),
     boostEffect = new Stat("boostEffect", StatCat.optional),
@@ -113,6 +115,11 @@ public class Stat implements Comparable<Stat>{
 
     public String localized(){
         return Core.bundle.get("stat." + name.toLowerCase(Locale.ROOT));
+    }
+
+    @Override
+    public String toString(){
+        return name;
     }
 
     @Override

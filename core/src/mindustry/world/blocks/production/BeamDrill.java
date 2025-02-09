@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -44,6 +45,10 @@ public class BeamDrill extends Block{
 
     /** Multipliers of drill speed for each item. Defaults to 1. */
     public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
+    /** Special exemption item that this drill can't mine. */
+    public @Nullable Item blockedItem;
+    /** Special exemption items that this drill can't mine. */
+    public @Nullable Seq<Item> blockedItems;
 
     public Color sparkColor = Color.valueOf("fd9e81"), glowColor = Color.white;
     public float glowIntensity = 0.2f, pulseIntensity = 0.07f;
@@ -75,6 +80,9 @@ public class BeamDrill extends Block{
     public void init(){
         updateClipRadius((range + 2) * tilesize);
         super.init();
+        if(blockedItems == null && blockedItem != null){
+            blockedItems = Seq.with(blockedItem);
+        }
     }
 
     @Override
@@ -110,11 +118,20 @@ public class BeamDrill extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.drillTier, StatValues.blocks(b -> (b instanceof Floor f && f.wallOre && f.itemDrop != null && f.itemDrop.hardness <= tier) || (b instanceof StaticWall w && w.itemDrop != null && w.itemDrop.hardness <= tier)));
+        stats.add(Stat.drillTier, StatValues.drillables(drillTime, 0f, size, drillMultipliers, b ->
+            (b instanceof Floor f && f.wallOre && f.itemDrop != null && f.itemDrop.hardness <= tier && (blockedItems == null || !blockedItems.contains(f.itemDrop))) ||
+            (b instanceof StaticWall w && w.itemDrop != null && w.itemDrop.hardness <= tier && (blockedItems == null || !blockedItems.contains(w.itemDrop)))
+        ));
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size, StatUnit.itemsSecond);
-        if(optionalBoostIntensity != 1){
-            stats.add(Stat.boostEffect, optionalBoostIntensity, StatUnit.timesSpeed);
+
+        if(optionalBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
+            stats.remove(Stat.booster);
+            stats.add(Stat.booster,
+                StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
+                consBase.amount, optionalBoostIntensity, false,
+                l -> (consumesLiquid(l) && (findConsumer(f -> f instanceof ConsumeLiquid).booster || ((ConsumeLiquid)findConsumer(f -> f instanceof ConsumeLiquid)).liquid != l)))
+            );
         }
     }
 
@@ -135,7 +152,7 @@ public class BeamDrill extends Block{
                 if(other != null && other.solid()){
                     Item drop = other.wallDrop();
                     if(drop != null){
-                        if(drop.hardness <= tier){
+                        if(drop.hardness <= tier && (blockedItems == null || !blockedItems.contains(drop))){
                             found = drop;
                             count++;
                         }else{
@@ -186,7 +203,7 @@ public class BeamDrill extends Block{
                 Tile other = world.tile(Tmp.p1.x + Geometry.d4x(rotation)*j, Tmp.p1.y + Geometry.d4y(rotation)*j);
                 if(other != null && other.solid()){
                     Item drop = other.wallDrop();
-                    if(drop != null && drop.hardness <= tier){
+                    if(drop != null && drop.hardness <= tier && (blockedItems == null || !blockedItems.contains(drop))){
                         return true;
                     }
                     break;
@@ -258,7 +275,7 @@ public class BeamDrill extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return items.total() < itemCapacity && lastItem != null && enabled;
+            return items.total() < itemCapacity && facingAmount > 0 && enabled;
         }
 
         @Override
@@ -372,7 +389,7 @@ public class BeamDrill extends Block{
                     if(other != null){
                         if(other.solid()){
                             Item drop = other.wallDrop();
-                            if(drop != null && drop.hardness <= tier){
+                            if(drop != null && drop.hardness <= tier && (blockedItems == null || !blockedItems.contains(drop))){
                                 facingAmount ++;
                                 if(lastItem != drop && lastItem != null){
                                     multiple = true;

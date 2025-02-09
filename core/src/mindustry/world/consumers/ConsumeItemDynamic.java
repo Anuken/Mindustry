@@ -6,6 +6,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class ConsumeItemDynamic extends Consume{
     public final Func<Building, ItemStack[]> items;
@@ -42,7 +43,7 @@ public class ConsumeItemDynamic extends Consume{
         int i = 0;
 
         for(ItemStack stack : items.get(build)){
-            table.add(new ReqImage(new ItemImage(stack.item.uiIcon, Math.round(stack.amount * multiplier.get(build))),
+            table.add(new ReqImage(StatValues.stack(stack.item, Math.round(stack.amount * multiplier.get(build))),
             () -> build.items != null && build.items.has(stack.item, Math.round(stack.amount * multiplier.get(build))))).padRight(8).left();
             if(++i % 4 == 0) table.row();
         }
