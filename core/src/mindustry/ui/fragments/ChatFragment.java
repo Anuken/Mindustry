@@ -162,7 +162,7 @@ public class ChatFragment extends Table{
 
         float theight = offsety + spacing + getMarginBottom() + scene.marginBottom;
         for(int i = scrollPos; i < messages.size && i < messagesShown + scrollPos && (i < fadetime || shown); i++){
-            String message = UI.formatIcons(messages.get(i));
+            String message = messages.get(i);
 
             layout.setText(font, message, Color.white, textWidth, Align.bottomLeft, true);
             theight += layout.height + textspacing;

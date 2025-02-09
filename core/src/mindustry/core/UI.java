@@ -33,9 +33,9 @@ import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
 public class UI implements ApplicationListener, Loadable{
-    public static String billions, millions, thousands;
 
-    public static StringBuilder buffer = new StringBuilder();
+    private static final StringBuilder buffer = new StringBuilder();
+    public static String billions, millions, thousands;
 
     public static PixmapPacker packer;
 
