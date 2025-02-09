@@ -1350,7 +1350,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
             float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
 
-            drawMiningBeam(px, py);
+            drawMiningBeam(unit, px, py);
         }
     }
 
