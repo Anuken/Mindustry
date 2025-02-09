@@ -72,23 +72,13 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
     }
 
     @Override
-    public float currentLength(Bullet b){
-        float lenScl = Mathf.clamp(
-            b.time < growTime ? (b.time / growTime) :
-            b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime :
-            1f
-        );
-        return length * lenScl;
-    }
-
-    @Override
     public void drawLight(Bullet b){
         //no light drawn here
     }
 
     @Override
     public float currentLength(Bullet b){
-        float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
+        float fout = Mathf.curve(b.time, 0, growTime) - Mathf.curve(b.time, b.lifetime - fadeTime, b.lifetime);
         return length * fout;
     }
 }
