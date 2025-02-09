@@ -62,7 +62,7 @@ public class LExecutor{
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
     protected static IntFloatMap unitTimeouts = new IntFloatMap();
     //lookup variable by name, lazy init.
-    protected ObjectIntMap<String> nameMap;
+    protected @Nullable ObjectIntMap<String> nameMap;
 
     static{
         Events.on(ResetEvent.class, e -> unitTimeouts.clear());
@@ -571,7 +571,7 @@ public class LExecutor{
 
             if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
                 output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
-            }else if(from instanceof LogicBuild logic && (exec.privileged || from.team == exec.team) && position.isobj && position.objval instanceof String name){
+            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
                 LVar fromVar = logic.executor.optionalVar(name);
                 if(fromVar != null && !output.constant){
                     output.objval = fromVar.objval;
@@ -601,10 +601,7 @@ public class LExecutor{
 
             if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
                 mem.memory[address] = value.num();
-            }else if(from instanceof LogicBuild logic && (exec.privileged || from.team == exec.team) && position.isobj && position.objval instanceof String name){
-                //limit write, need target processor set writable.
-                LVar writable = logic.executor.optionalVar("@writable");
-                if(writable == null || !writable.bool()) return;
+            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
                 LVar toVar = logic.executor.optionalVar(name);
                 if(toVar != null && !toVar.constant){
                     toVar.objval = value.objval;
