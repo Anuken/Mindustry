@@ -64,7 +64,7 @@ public class BuildPayload implements Payload{
 
     @Override
     public float buildTime(){
-        return build.block.buildCost;
+        return build.block.buildTime;
     }
 
     @Override

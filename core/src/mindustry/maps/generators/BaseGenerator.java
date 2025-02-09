@@ -35,7 +35,7 @@ public class BaseGenerator{
             && !b.insulated && b.buildVisibility == BuildVisibility.shown
             && !(b instanceof Door)
             && b.isOnPlanet(state.getPlanet()));
-        wallsSmall.sort(b -> b.buildCost);
+        wallsSmall.sort(b -> b.buildTime);
         return wallsSmall.getFrac(difficulty * 0.91f);
     }
 

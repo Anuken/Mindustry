@@ -2094,7 +2094,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.silicon, 80, Items.surgeAlloy, 50, Items.oxide, 20));
 
             size = 3;
-            buildTime = 60f * 8f;
+            unitBuildTime = 60f * 8f;
 
             consumePower(8f / 60f);
 
