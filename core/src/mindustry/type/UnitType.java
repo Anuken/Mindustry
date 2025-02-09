@@ -1232,7 +1232,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(unit.inFogTo(Vars.player.team())) return;
 
         unit.drawBuilding();
-        unit.drawMining();
+        drawMining(unit);
 
         boolean isPayload = !unit.isAdded();
 
@@ -1344,9 +1344,36 @@ public class UnitType extends UnlockableContent implements Senseable{
         return shieldColor == null ? unit.team.color : shieldColor;
     }
 
-    @Deprecated
     public void drawMining(Unit unit){
-        unit.drawMining();
+        if(drawMineBeam){
+            float focusLen = mineBeamOffset + Mathf.absin(Time.time, 1.1f, 0.5f);
+            float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
+            float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
+
+            drawMiningBeam(px, py);
+        }
+    }
+
+    public void drawMiningBeam(Unit unit, float px, float py){
+        if(!unit.mining()) return;
+        float swingScl = 12f, swingMag = tilesize / 8f;
+        float flashScl = 0.3f;
+
+        float ex = unit.mineTile.worldx() + Mathf.sin(Time.time + 48, swingScl, swingMag);
+        float ey = unit.mineTile.worldy() + Mathf.sin(Time.time + 48, swingScl + 2f, swingMag);
+
+        Draw.z(Layer.flyingUnit + 0.1f);
+
+        Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time, 0.5f, flashScl));
+
+        Drawf.laser(Core.atlas.find("minelaser"), Core.atlas.find("minelaser-end"), px, py, ex, ey, 0.75f);
+
+        if(unit.isLocal()){
+            Lines.stroke(1f, Pal.accent);
+            Lines.poly(unit.mineTile.worldx(), unit.mineTile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Time.time);
+        }
+
+        Draw.color();
     }
 
     public <T extends Unit & Payloadc> void drawPayload(T unit){
