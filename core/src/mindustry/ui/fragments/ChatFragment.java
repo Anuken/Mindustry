@@ -126,7 +126,8 @@ public class ChatFragment extends Table{
             if(index >= 0 && index < cursor){
                 String text = chatfield.getText().substring(index + 1, cursor - 1);
                 String uni = Fonts.getUnicodeStr(text);
-                if(uni != null && uni.length() > 0){
+                if((uni == null || uni.isEmpty()) && Iconc.codes.containsKey(text)) uni = Character.toString((char)Iconc.codes.get(text));
+                if(uni != null && !uni.isEmpty()){
                     chatfield.setText(chatfield.getText().substring(0, index) + uni + chatfield.getText().substring(cursor));
                     chatfield.setCursorPosition(index + uni.length());
                 }
