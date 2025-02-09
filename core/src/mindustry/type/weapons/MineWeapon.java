@@ -2,19 +2,18 @@ package mindustry.type.weapons;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
-/** Purely visual turret. Does not shoot anything. */
-public class BuildWeapon extends Weapon{
-
-    public BuildWeapon(){
+public class MineWeapon extends Weapon{
+    public MineWeapon(){
         super();
     }
 
-    public BuildWeapon(String name){
+    public MineWeapon(String name){
         super(name);
     }
 
@@ -33,9 +32,9 @@ public class BuildWeapon extends Weapon{
         mount.rotate = true;
 
         //always aim at build plan
-        if(unit.activelyBuilding()){
-            mount.aimX = unit.buildPlan().drawx();
-            mount.aimY = unit.buildPlan().drawy();
+        if(unit.mining()){
+            mount.aimX = unit.mineTile().drawx();
+            mount.aimY = unit.mineTile().drawy();
         }else{
             //aim for front
             float weaponRotation = unit.rotation - 90 + baseRotation;
@@ -50,17 +49,18 @@ public class BuildWeapon extends Weapon{
     public void draw(Unit unit, WeaponMount mount){
         super.draw(unit, mount);
 
-        if(unit.activelyBuilding()){
+        if(unit.mining()){
             float
-            z = Draw.z(),
-            rotation = unit.rotation - 90,
-            weaponRotation  = rotation + (rotate ? mount.rotation : 0),
-            wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
-            wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -mount.recoil),
-            px = wx + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
-            py = wy + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
+                z = Draw.z(),
+                rotation = unit.rotation - 90,
+                weaponRotation  = rotation + (rotate ? mount.rotation : 0),
+                wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
+                wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -mount.recoil),
+                sY = shootY + Mathf.absin(Time.time, 1.1f, 0.5f),
+                px = wx + Angles.trnsx(weaponRotation, shootX, sY),
+                py = wy + Angles.trnsy(weaponRotation, shootX, sY);
 
-            unit.drawBuildingBeam(px, py);
+            unit.type.drawMiningBeam(unit, px, py);
             Draw.z(z);
         }
     }
