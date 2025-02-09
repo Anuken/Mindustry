@@ -115,7 +115,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     aimDst = -1f,
     /** Visual offset of the build beam from the front. */
     buildBeamOffset = 3.8f,
-    /** Visual offset of the mining beam from the front. */
+    /** Visual offset of the mining beam from the front. Defaults to half the hitsize. */
     mineBeamOffset = Float.NEGATIVE_INFINITY,
     /** WIP: Units of low priority will always be ignored in favor of those with higher priority, regardless of distance. */
     targetPriority = 0f,
