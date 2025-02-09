@@ -84,6 +84,8 @@ public class BulletType extends Content implements Cloneable{
     public float reloadMultiplier = 1f;
     /** Multiplier of how much base damage is done to tiles. */
     public float buildingDamageMultiplier = 1f;
+    /** Multiplier of how much base damage is done to force shields. */
+    public float shieldDamageMultiplier = 1f;
     /** Recoil from shooter entities. */
     public float recoil;
     /** Whether to kill the shooter when this is shot. For suicide bombers. */
@@ -102,6 +104,10 @@ public class BulletType extends Content implements Cloneable{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
     public float statusDuration = 60 * 8f;
+    /** Turret only. If false, blocks will not be targeted. */
+    public boolean targetBlocks = true;
+    /** Turret only. If false, missiles will not be targeted. */
+    public boolean targetMissiles = true;
     /** Whether this bullet type collides with tiles. */
     public boolean collidesTiles = true;
     /** Whether this bullet type collides with tiles that are of the same team. */
@@ -137,8 +143,12 @@ public class BulletType extends Content implements Cloneable{
     public float rangeOverride = -1f;
     /** When used in a turret with multiple ammo types, this can be set to a non-zero value to influence range. */
     public float rangeChange = 0f;
+    /** When used in turrets with limitRange() applied, this adds extra range to the bullets that extends past targeting range. Only particularly relevant in vanilla. */
+    public float extraRangeMargin = 0f;
     /** Range initialized in init(). */
     public float range = 0f;
+    /** When used in a turret with multiple ammoo types, this can be set to a non-zero value to influence minRange */
+    public float minRangeChange = 0f;
     /** % of block health healed **/
     public float healPercent = 0f;
     /** flat amount of block health healed */
@@ -346,7 +356,7 @@ public class BulletType extends Content implements Cloneable{
             return spawnUnit.estimateDps();
         }
 
-        float sum = damage * (pierce ? pierceCap == -1 ? 2 : Mathf.clamp(pierceCap, 1, 2) : 1f) * splashDamage*0.75f;
+        float sum = (damage + splashDamage*0.75f) * (pierce ? pierceCap == -1 ? 2 : Mathf.clamp(pierceCap, 1, 2) : 1f);
         if(fragBullet != null && fragBullet != this){
             sum += fragBullet.estimateDPS() * fragBullets / 2f;
         }
@@ -521,7 +531,7 @@ public class BulletType extends Content implements Cloneable{
         if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && !(b.frags >= pierceFragCap && pierceFragCap > 0)){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(fragOffsetMin, fragOffsetMax);
-                float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
+                float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + fragSpread * i - (fragBullets - 1) * fragSpread / 2f;
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
             b.frags++;
@@ -549,7 +559,7 @@ public class BulletType extends Content implements Cloneable{
         if(!fragOnHit){
             createFrags(b, b.x, b.y);
         }
-        
+
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         despawnSound.at(b);
 
@@ -561,6 +571,14 @@ public class BulletType extends Content implements Cloneable{
         if(trailLength > 0 && b.trail != null && b.trail.size() > 0){
             Fx.trailFade.at(b.x, b.y, trailWidth, trailColor, b.trail.copy());
         }
+    }
+
+    public float buildingDamage(Bullet b){
+        return b.damage() * buildingDamageMultiplier;
+    }
+
+    public float shieldDamage(Bullet b){
+        return b.damage() * shieldDamageMultiplier;
     }
 
     public void draw(Bullet b){
@@ -675,7 +693,7 @@ public class BulletType extends Content implements Cloneable{
             }
         }
     }
-    
+
     public void updateTrail(Bullet b){
         if(!headless && trailLength > 0){
             if(b.trail == null){
@@ -710,13 +728,16 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(lightningType == null){
-            lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
+            lightningType =
+                !collidesAir ? Bullets.damageLightningGround :
+                !collidesGround ? Bullets.damageLightningAir :
+                Bullets.damageLightning;
         }
 
         if(lightRadius <= -1){
             lightRadius = Math.max(18, hitSize * 5f);
         }
-        
+
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
         range = calculateRange();
     }
@@ -748,15 +769,15 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public @Nullable Bullet create(Bullet parent, float x, float y, float angle){
-        return create(parent.owner, parent.team, x, y, angle);
+        return create(parent.owner, parent.shooter, parent.team, x, y, angle, -1, 1f, 1f, null, null, -1f, -1f);
     }
 
     public @Nullable Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
-        return create(parent.owner, parent.team, x, y, angle, velocityScl, lifeScale);
+        return create(parent.owner, parent.shooter, parent.team, x, y, angle, -1, velocityScl, lifeScale, null, null, -1f, -1f);
     }
 
     public @Nullable Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
-        return create(parent.owner(), parent.team, x, y, angle, velocityScl);
+        return create(parent.owner, parent.shooter, parent.team, x, y, angle, -1, velocityScl, 1f, null, null, -1f, -1f);
     }
 
     public @Nullable Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
@@ -772,6 +793,13 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public @Nullable Bullet create(@Nullable Entityc owner, @Nullable Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY){
+        return create(owner, shooter, team, x, y, angle, damage, velocityScl, lifetimeScl, data, mover, aimX, aimY, null);
+    }
+
+    public @Nullable Bullet create(
+        @Nullable Entityc owner, @Nullable Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl,
+        float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY, @Nullable Teamc target
+    ){
         if(!Mathf.chance(createChance)) return null;
         if(ignoreSpawnAngle) angle = 0;
         if(spawnUnit != null){
@@ -807,12 +835,13 @@ public class BulletType extends Content implements Cloneable{
         Bullet bullet = Bullet.create();
         bullet.type = this;
         bullet.owner = owner;
+        bullet.shooter = (shooter == null ? owner : shooter);
         bullet.team = team;
         bullet.time = 0f;
         bullet.originX = x;
         bullet.originY = y;
         if(!(aimX == -1f && aimY == -1f)){
-            bullet.aimTile = world.tileWorld(aimX, aimY);
+            bullet.aimTile = target instanceof Building b ? b.tile : world.tileWorld(aimX, aimY);
         }
         bullet.aimX = aimX;
         bullet.aimY = aimY;

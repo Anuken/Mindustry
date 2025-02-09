@@ -25,8 +25,10 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
@@ -239,6 +241,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     controller instanceof CommandAI command && command.hasCommand() ? ctrlCommand :
                     0;
             case payloadCount -> ((Object)this) instanceof Payloadc pay ? pay.payloads().size : 0;
+            case totalPayload -> ((Object)this) instanceof Payloadc pay ? pay.payloadUsed() : 0;
+            case payloadCapacity -> type.payloadCapacity / tilePayload;
             case size -> hitSize / tilesize;
             case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
             default -> Float.NaN;
@@ -263,6 +267,16 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public double sense(Content content){
         if(content == stack().item) return stack().amount;
+        if(content instanceof UnitType u){
+            return ((Object)this) instanceof Payloadc pay ?
+                    (pay.payloads().isEmpty() ? 0 :
+                    pay.payloads().count(p -> p instanceof UnitPayload up && up.unit.type == u)) : 0;
+        }
+        if(content instanceof Block b){
+            return ((Object)this) instanceof Payloadc pay ?
+                    (pay.payloads().isEmpty() ? 0 :
+                    pay.payloads().count(p -> p instanceof BuildPayload bp && bp.build.block == b)) : 0;
+        }
         return Float.NaN;
     }
 
@@ -441,6 +455,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }else{
             throw new IllegalArgumentException("Unit cannot be commanded - check isCommandable() first.");
         }
+    }
+
+    public boolean isMissile(){
+        return this instanceof TimedKillc;
     }
 
     public int count(){
@@ -689,7 +707,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             type.deathExplosionEffect.at(x, y, bounds() / 2f / 8f);
         }
 
-        float shake = hitSize / 3f;
+        float shake = type.deathShake < 0 ? hitSize / 3f : type.deathShake;
 
         if(type.createScorch){
             Effect.scorch(x, y, (int)(hitSize / 5));
@@ -713,7 +731,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //if this unit crash landed (was flying), damage stuff in a radius
         if(type.flying && !spawnedByCore && type.createWreck && state.rules.unitCrashDamage(team) > 0){
-            Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f * state.rules.unitCrashDamage(team), true, false, true);
+            var shields = indexer.getEnemy(team, BlockFlag.shield);
+            float crashDamage = Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f * state.rules.unitCrashDamage(team);
+            if(shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, crashDamage))){
+                Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, crashDamage, true, false, true);
+            }
         }
 
         if(!headless && type.createScorch){

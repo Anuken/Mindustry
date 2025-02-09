@@ -173,7 +173,18 @@ public class ConsoleFragment extends Table{
         history.insert(1, message);
 
         addMessage("[lightgray]> " + message.replace("[", "[["));
-        addMessage(mods.getScripts().runConsole(message).replace("[", "[["));
+        addMessage(mods.getScripts().runConsole(injectConsoleVariables() + message).replace("[", "[["));
+    }
+
+    public String injectConsoleVariables(){
+        return
+        "var unit = Vars.player.unit();" +
+        "var team = Vars.player.team();" +
+        "var core = Vars.player.core();" +
+        "var items = Vars.player.team().items();" +
+        "var build = Vars.world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
+        "var cursor = Vars.world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
+        "\n";
     }
 
     public void toggle(){

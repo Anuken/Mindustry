@@ -27,6 +27,7 @@ import static mindustry.Vars.*;
 public class ContentLoader{
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.all.length];
     private Seq<Content>[] contentMap = new Seq[ContentType.all.length];
+    private ObjectMap<String, MappableContent> nameMap = new ObjectMap<>();
     private MappableContent[][] temporaryMapper;
     private @Nullable LoadedMod currentMod;
     private @Nullable Content lastAdded;
@@ -81,13 +82,14 @@ public class ContentLoader{
         for(int k = 0; k < contentMap.length; k++){
             Log.debug("[@]: loaded @", ContentType.all[k].name(), contentMap[k].size);
         }
-        Log.debug("Total content loaded: @", Seq.with(ContentType.all).mapInt(c -> contentMap[c.ordinal()].size).sum());
+        Log.debug("Total content loaded: @", Seq.with(ContentType.all).sum(c -> contentMap[c.ordinal()].size));
         Log.debug("-------------------");
     }
 
     /** Calls Content#init() on everything. Use only after all modules have been created. */
     public void init(){
         initialize(Content::init);
+        initialize(Content::postInit);
         if(logicVars != null) logicVars.init();
         Events.fire(new ContentInitEvent());
     }
@@ -187,10 +189,16 @@ public class ContentLoader{
             }
         }
         contentNameMap[content.getContentType().ordinal()].put(content.name, content);
+        nameMap.put(content.name, content);
     }
 
     public void setTemporaryMapper(MappableContent[][] temporaryMapper){
         this.temporaryMapper = temporaryMapper;
+    }
+
+    /** @return the last registered content with the specified name. Note that the content loader makes no attempt to resolve name conflicts. This method can be unreliable. */
+    public @Nullable MappableContent byName(String name){
+        return nameMap.get(name);
     }
 
     public Seq<Content>[] getContentMap(){

@@ -22,7 +22,8 @@ import static mindustry.Vars.*;
 /** Stores global logic variables for logic processors. */
 public class GlobalVars{
     public static final int ctrlProcessor = 1, ctrlPlayer = 2, ctrlCommand = 3;
-    public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid};
+    public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid, ContentType.team};
+    public static final ContentType[] writableLookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid};
     /** Global random state. */
     public static final Rand rand = new Rand();
 
@@ -34,9 +35,9 @@ public class GlobalVars{
     private ObjectSet<String> privilegedNames = new ObjectSet<>();
     private UnlockableContent[][] logicIdToContent;
     private int[][] contentIdToLogicId;
-    
+
     public static final Seq<String> soundNames = new Seq<>();
-    
+
     public void init(){
         putEntryOnly("sectionProcessor");
 
@@ -91,7 +92,7 @@ public class GlobalVars{
         put("@ctrlProcessor", ctrlProcessor);
         put("@ctrlPlayer", ctrlPlayer);
         put("@ctrlCommand", ctrlCommand);
-        
+
         //sounds
         if(Core.assets != null){
             for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
@@ -132,7 +133,9 @@ public class GlobalVars{
         }
 
         for(UnitType type : Vars.content.units()){
-            put("@" + type.name, type);
+            if(!type.internal){
+                put("@" + type.name, type);
+            }
         }
 
         for(Weather weather : Vars.content.weathers()){
@@ -153,7 +156,7 @@ public class GlobalVars{
         if(ids.exists()){
             //read logic ID mapping data (generated in ImagePacker)
             try(DataInputStream in = new DataInputStream(ids.readByteStream())){
-                for(ContentType ctype : lookableContent){
+                for(ContentType ctype : writableLookableContent){
                     short amount = in.readShort();
                     logicIdToContent[ctype.ordinal()] = new UnlockableContent[amount];
                     contentIdToLogicId[ctype.ordinal()] = new int[Vars.content.getBy(ctype).size];
@@ -201,7 +204,7 @@ public class GlobalVars{
         varClient.numval = net.client() ? 1 : 0;
 
         //client
-        if(!net.server() && player != null){
+        if(player != null){
             varClientLocale.objval = player.locale();
             varClientUnit.objval = player.unit();
             varClientName.objval = player.name();
@@ -218,8 +221,13 @@ public class GlobalVars{
         return varEntries;
     }
 
-    /** @return a piece of content based on its logic ID. This is not equivalent to content ID. */
-    public @Nullable Content lookupContent(ContentType type, int id){
+    /** @return a piece of content based on its logic ID. This is not equivalent to content ID. In the case of teams, the return value may not be Content. */
+    public @Nullable Object lookupContent(ContentType type, int id){
+        //teams are a special case; they are not technically content, but can be looked up
+        if(type == ContentType.team){
+            return id >= 0 && id < 256 ? Team.all[id] : null;
+        }
+
         var arr = logicIdToContent[type.ordinal()];
         return arr != null && id >= 0 && id < arr.length ? arr[id] : null;
     }

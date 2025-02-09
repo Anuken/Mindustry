@@ -30,6 +30,9 @@ public class SectorInfo{
     public ObjectMap<Item, ExportStat> rawProduction = new ObjectMap<>();
     /** Export statistics. */
     public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
+    //TODO: there is an obvious exploit with launch pad redirection here; pads can be redirected after leaving a sector, which doesn't update calculations.
+    /** Import statistics, based on what launch pads are actually receiving. */
+    public ObjectMap<Item, ExportStat> imports = new ObjectMap<>();
     /** Items stored in all cores. */
     public ItemSeq items = new ItemSeq();
     /** The best available core type. */
@@ -38,6 +41,8 @@ public class SectorInfo{
     public int storageCapacity = 0;
     /** Whether a core is available here. */
     public boolean hasCore = true;
+    /** Whether a world processor is on this map - implies that the map will get cleared. */
+    public boolean hasWorldProcessor;
     /** Whether this sector was ever fully captured. */
     public boolean wasCaptured = false;
     /** Sector that was launched from. */
@@ -78,13 +83,17 @@ public class SectorInfo{
     public int waveVersion = -1;
     /** Whether this sector was indicated to the player or not. */
     public boolean shown = false;
-    /** Temporary seq for last imported items. Do not use. */
-    public transient ItemSeq lastImported = new ItemSeq();
 
     /** Special variables for simulation. */
-    public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope, bossHealth, bossDps, curEnemyHealth, curEnemyDps;
+    public float sumHealth, sumRps, sumDps, bossHealth, bossDps, curEnemyHealth, curEnemyDps;
     /** Wave where first boss shows up. */
     public int bossWave = -1;
+
+    public ObjectFloatMap<Item> importCooldownTimers = new ObjectFloatMap<>();
+    public @Nullable transient float[] importRateCache;
+
+    /** Temporary seq for last imported items. Do not use. */
+    public transient ItemSeq lastImported = new ItemSeq();
 
     /** Counter refresh state. */
     private transient Interval time = new Interval();
@@ -105,12 +114,6 @@ public class SectorInfo{
         productionDeltas[item.id] += amount;
     }
 
-    /** @return the real location items go when launched on this sector */
-    public Sector getRealDestination(){
-        //on multiplayer the destination is, by default, the first captured sector (basically random)
-        return !net.client() || destination != null ? destination : state.rules.sector.planet.sectors.find(Sector::hasBase);
-    }
-
     /** Updates export statistics. */
     public void handleItemExport(ItemStack stack){
         handleItemExport(stack.item, stack.amount);
@@ -121,8 +124,41 @@ public class SectorInfo{
         export.get(item, ExportStat::new).counter += amount;
     }
 
+    /** Updates import statistics. */
+    public void handleItemImport(Item item, int amount){
+        imports.get(item, ExportStat::new).counter += amount;
+    }
+
     public float getExport(Item item){
         return export.get(item, ExportStat::new).mean;
+    }
+
+    public boolean hasExport(Item item){
+        var exp = export.get(item);
+        return exp != null && exp.mean > 0f;
+    }
+
+    public void refreshImportRates(Planet planet){
+        if(importRateCache == null || importRateCache.length != content.items().size){
+            importRateCache = new float[content.items().size];
+        }else{
+            Arrays.fill(importRateCache, 0f);
+        }
+        eachImport(planet, sector -> sector.info.export.each((item, stat) -> {
+            importRateCache[item.id] += stat.mean;
+        }));
+    }
+
+    public float[] getImportRates(Planet planet){
+        if(importRateCache == null){
+            refreshImportRates(planet);
+        }
+        return importRateCache;
+    }
+
+    /** @return the import rate of an item as item/second. This is the *raw* max import rate, not what landing pads are actually using. */
+    public float getImportRate(Planet planet, Item item){
+        return getImportRates(planet)[item.id];
     }
 
     /** Write contents of meta into main storage. */
@@ -175,6 +211,7 @@ public class SectorInfo{
             spawnPosition = entity.pos();
         }
 
+        hasWorldProcessor = state.teams.present.contains(t -> t.getBuildings(Blocks.worldProcessor).any());
         waveSpacing = state.rules.waveSpacing;
         wave = state.wave;
         winWave = state.rules.winWave;
@@ -218,19 +255,8 @@ public class SectorInfo{
         //refresh throughput
         if(time.get(refreshPeriod)){
 
-            //refresh export
-            export.each((item, stat) -> {
-                //initialize stat after loading
-                if(!stat.loaded){
-                    stat.means.fill(stat.mean);
-                    stat.loaded = true;
-                }
-
-                //add counter, subtract how many items were taken from the core during this time
-                stat.means.add(Math.max(stat.counter, 0));
-                stat.counter = 0;
-                stat.mean = stat.means.rawMean();
-            });
+            updateStats(export);
+            updateStats(imports);
 
             if(coreDeltas == null) coreDeltas = new int[content.items().size];
             if(productionDeltas == null) productionDeltas = new int[content.items().size];
@@ -247,11 +273,30 @@ public class SectorInfo{
                     //export can, at most, be the raw items being produced from factories + the items being taken from the core
                     export.get(item).mean = Math.min(export.get(item).mean, rawProduction.get(item).mean + Math.max(-production.get(item).mean, 0));
                 }
+
+                if(imports.containsKey(item)){
+                    //import can't exceed max import rate
+                    imports.get(item).mean = Math.min(imports.get(item).mean, getImportRate(state.getPlanet(), item));
+                }
             }
 
             Arrays.fill(coreDeltas, 0);
             Arrays.fill(productionDeltas, 0);
         }
+    }
+
+    void updateStats(ObjectMap<Item, ExportStat> map){
+        map.each((item, stat) -> {
+            //initialize stat after loading
+            if(!stat.loaded){
+                stat.means.fill(stat.mean);
+                stat.loaded = true;
+            }
+
+            stat.means.add(Math.max(stat.counter, 0));
+            stat.counter = 0;
+            stat.mean = stat.means.rawMean();
+        });
     }
 
     void updateDelta(Item item, ObjectMap<Item, ExportStat> map, int[] deltas){
@@ -290,7 +335,7 @@ public class SectorInfo{
     /** Iterates through every sector this one imports from. */
     public void eachImport(Planet planet, Cons<Sector> cons){
         for(Sector sector : planet.sectors){
-            Sector dest = sector.info.getRealDestination();
+            Sector dest = sector.info.destination;
             if(sector.hasBase() && sector.info != this && dest != null && dest.info == this && sector.info.anyExports()){
                 cons.get(sector);
             }
