@@ -130,6 +130,12 @@ public class LandingPad extends Block{
         public @Nullable Item arriving;
         public float liquidRemoved;
 
+        @Override
+        public void drawSelect(){
+            super.drawSelect();
+            drawItemSelection(config);
+        }
+
         public void handleLanding(){
             if(config == null) return;
 
