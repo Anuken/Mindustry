@@ -62,8 +62,7 @@ public class BurstDrill extends Drill{
             stats.remove(Stat.booster);
             stats.add(Stat.booster,
                 StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
-                consBase.amount, liquidBoostIntensity, false,
-                l -> (consumesLiquid(l) && (findConsumer(f -> f instanceof ConsumeLiquid).booster || ((ConsumeLiquid)findConsumer(f -> f instanceof ConsumeLiquid)).liquid != l)))
+                consBase.amount, liquidBoostIntensity, false, consBase::consumes)
             );
         }
     }
