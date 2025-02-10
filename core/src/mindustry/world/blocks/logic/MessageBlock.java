@@ -1,6 +1,8 @@
 package mindustry.world.blocks.logic;
 
 import arc.*;
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.Input.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -10,6 +12,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -33,7 +36,7 @@ public class MessageBlock extends Block{
         envEnabled = Env.any;
 
         config(String.class, (MessageBuild tile, String text) -> {
-            if(text.length() > maxTextLength){
+            if(text.length() > maxTextLength || !accessible()){
                 return; //no.
             }
 
@@ -55,12 +58,21 @@ public class MessageBlock extends Block{
         });
     }
 
+    public boolean accessible(){
+        return !privileged || state.rules.editor || state.rules.allowEditWorldProcessors;
+    }
+
+    @Override
+    public boolean canBreak(Tile tile){
+        return accessible();
+    }
+
     public class MessageBuild extends Building{
         public StringBuilder message = new StringBuilder();
 
         @Override
         public void drawSelect(){
-            if(renderer.pixelator.enabled()) return;
+            if(renderer.pixelate) return;
 
             Font font = Fonts.outline;
             GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
@@ -68,7 +80,7 @@ public class MessageBlock extends Block{
             font.getData().setScale(1 / 4f / Scl.scl(1f));
             font.setUseIntegerPositions(false);
 
-            CharSequence text = message == null || message.length() == 0 ? "[lightgray]" + Core.bundle.get("empty") : message;
+            String text = message == null || message.length() == 0 ? "[lightgray]" + Core.bundle.get("empty") : UI.formatIcons(message.toString());
 
             l.setText(font, text, Color.white, 90f, Align.left, true);
             float offset = 1f;
@@ -86,11 +98,17 @@ public class MessageBlock extends Block{
         }
 
         @Override
+        public boolean shouldShowConfigure(Player player){
+            return accessible();
+        }
+
+        @Override
         public void buildConfiguration(Table table){
             table.button(Icon.pencil, Styles.cleari, () -> {
                 if(mobile){
+                    var contents = this.message.toString();
                     Core.input.getTextInput(new TextInput(){{
-                        text = message.toString();
+                        text = contents;
                         multiline = true;
                         maxLength = maxTextLength;
                         accepted = str -> {
@@ -134,12 +152,33 @@ public class MessageBlock extends Block{
 
         @Override
         public boolean onConfigureBuildTapped(Building other){
-            if(this == other){
+            if(this == other || !accessible()){
                 deselect();
                 return false;
             }
 
             return true;
+        }
+
+        @Override
+        public Cursor getCursor(){
+            return !accessible() ? SystemCursor.arrow : super.getCursor();
+        }
+
+        @Override
+        public void damage(float damage){
+            if(privileged) return;
+            super.damage(damage);
+        }
+
+        @Override
+        public boolean canPickup(){
+            return false;
+        }
+
+        @Override
+        public boolean collide(Bullet other){
+            return !privileged;
         }
 
         @Override

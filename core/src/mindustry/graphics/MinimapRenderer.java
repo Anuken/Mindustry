@@ -21,7 +21,8 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class MinimapRenderer{
-    private static final float baseSize = 16f;
+    private static final float baseSize = 16f, updateInterval = 2f;
+
     private final Seq<Unit> units = new Seq<>();
     private Pixmap pixmap;
     private Texture texture;
@@ -31,6 +32,8 @@ public class MinimapRenderer{
 
     private float lastX, lastY, lastW, lastH, lastScl;
     private boolean worldSpace;
+    private IntSet updates = new IntSet();
+    private float updateCounter = 0f;
 
     public MinimapRenderer(){
         Events.on(WorldLoadEvent.class, event -> {
@@ -67,6 +70,26 @@ public class MinimapRenderer{
         Events.on(BuildTeamChangeEvent.class, event -> update(event.build.tile));
     }
 
+    public void update(){
+        //updates are batched to occur every 2 frames
+        if((updateCounter += Time.delta) >= updateInterval){
+            updateCounter %= updateInterval;
+
+            updates.each(pos -> {
+                Tile tile = world.tile(pos);
+                if(tile == null) return;
+
+                int color = colorFor(tile);
+                pixmap.set(tile.x, pixmap.height - 1 - tile.y, color);
+
+                //yes, this calls glTexSubImage2D every time, with a 1x1 region
+                Pixmaps.drawPixel(texture, tile.x, pixmap.height - 1 - tile.y, color);
+            });
+
+            updates.clear();
+        }
+    }
+
     public Pixmap getPixmap(){
         return pixmap;
     }
@@ -89,6 +112,7 @@ public class MinimapRenderer{
     }
 
     public void reset(){
+        updates.clear();
         if(pixmap != null){
             pixmap.dispose();
             texture.dispose();
@@ -99,15 +123,15 @@ public class MinimapRenderer{
         region = new TextureRegion(texture);
     }
 
-    public void drawEntities(float x, float y, float w, float h, float scaling, boolean withLabels){
+    public void drawEntities(float x, float y, float w, float h, float scaling, boolean fullView){
         lastX = x;
         lastY = y;
         lastW = w;
         lastH = h;
         lastScl = scaling;
-        worldSpace = withLabels;
+        worldSpace = fullView;
 
-        if(!withLabels){
+        if(!fullView){
             updateUnitArray();
         }else{
             units.clear();
@@ -122,26 +146,37 @@ public class MinimapRenderer{
 
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
+        Tmp.m2.set(Draw.trans());
+
+        float scaleFactor;
+        var trans = Tmp.m1.idt();
+        trans.translate(lastX, lastY);
+        if(!worldSpace){
+            trans.scl(Tmp.v1.set(scaleFactor = lastW / rect.width, lastH / rect.height));
+            trans.translate(-rect.x, -rect.y);
+        }else{
+            trans.scl(Tmp.v1.set(scaleFactor = lastW / world.unitWidth(), lastH / world.unitHeight()));
+        }
+        trans.translate(tilesize / 2f, tilesize / 2f);
+        Draw.trans(trans);
+
+        scaleFactor = 1f / scaleFactor;
+
         for(Unit unit : units){
             if(unit.inFogTo(player.team()) || !unit.type.drawMinimap) continue;
 
-            float rx = !withLabels ? (unit.x - rect.x) / rect.width * w : unit.x / (world.width() * tilesize) * w;
-            float ry = !withLabels ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
+            float scale = Scl.scl(1f) * tilesize * 3;
+            var region = unit.icon();
 
             Draw.mixcol(unit.team.color, 1f);
-            float scale = Scl.scl(1f) / 2f * scaling * 32f;
-            var region = unit.icon();
-            Draw.rect(region, x + rx, y + ry, scale, scale * (float)region.height / region.width, unit.rotation() - 90);
+            Draw.rect(region, unit.x, unit.y, scale, scale * (float)region.height / region.width, unit.rotation() - 90);
             Draw.reset();
         }
 
-        if(withLabels && net.active()){
+        if(fullView && net.active()){
             for(Player player : Groups.player){
                 if(!player.dead()){
-                    float rx = player.x / (world.width() * tilesize) * w;
-                    float ry = player.y / (world.height() * tilesize) * h;
-
-                    drawLabel(x + rx, y + ry, player.name, player.team().color);
+                    drawLabel(player.x, player.y, player.name, player.color);
                 }
             }
         }
@@ -149,7 +184,7 @@ public class MinimapRenderer{
         Draw.reset();
 
         if(state.rules.fog){
-            if(withLabels){
+            if(fullView){
                 float z = zoom;
                 //max zoom out fixes everything, somehow?
                 setZoom(99999f);
@@ -162,23 +197,22 @@ public class MinimapRenderer{
             //crisp pixels
             dynamicTex.setFilter(TextureFilter.nearest);
 
-            if(worldSpace){
-                region.set(0f, 0f, 1f, 1f);
-            }
-
             Tmp.tr1.set(dynamicTex);
-            Tmp.tr1.set(region.u, 1f - region.v, region.u2, 1f - region.v2);
+            Tmp.tr1.set(0f, 1f, 1f, 0f);
 
-            Draw.color(state.rules.dynamicColor);
-            Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
+            float wf = world.width() * tilesize;
+            float hf = world.height() * tilesize;
+
+            Draw.color(state.rules.dynamicColor, 0.5f);
+            Draw.rect(Tmp.tr1, wf / 2, hf / 2, wf, hf);
 
             if(state.rules.staticFog){
                 staticTex.setFilter(TextureFilter.nearest);
 
                 Tmp.tr1.texture = staticTex;
                 //must be black to fit with borders
-                Draw.color(0f, 0f, 0f, state.rules.staticColor.a);
-                Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
+                Draw.color(0f, 0f, 0f, 1f);
+                Draw.rect(Tmp.tr1, wf / 2, hf / 2, wf, hf);
             }
 
             Draw.color();
@@ -186,16 +220,64 @@ public class MinimapRenderer{
         }
 
         //TODO might be useful in the standard minimap too
-        if(withLabels){
-            drawSpawns(x, y, w, h, scaling);
+        if(fullView){
+            drawSpawns();
+
+            if(!mobile){
+                //draw bounds for camera - not drawn on mobile because you can't shift it by tapping anyway
+                Rect r = Core.camera.bounds(Tmp.r1);
+                Lines.stroke(Scl.scl(3f) * scaleFactor);
+                Draw.color(Pal.accent);
+                Lines.rect(r.x, r.y, r.width, r.height);
+                Draw.reset();
+            }
         }
 
+        LongSeq indicators = control.indicators.list();
+        float fin = ((Time.globalTime / 30f) % 1f);
+        float rad = fin * 5f + tilesize - 2f;
+        Lines.stroke(Scl.scl((1f - fin) * 4f + 0.5f));
+
+        for(int i = 0; i < indicators.size; i++){
+            long ind = indicators.items[i];
+            int
+                pos = Indicator.pos(ind),
+                ix = Point2.x(pos),
+                iy = Point2.y(pos);
+            float time = Indicator.time(ind), offset = 0f;
+
+            //fix multiblock offset - this is suboptimal
+            Building build = world.build(pos);
+            if(build != null){
+                offset = build.block.offset / tilesize;
+            }
+
+            Draw.color(Color.orange, Color.scarlet, Mathf.clamp(time / 70f));
+
+            Lines.square((ix + 0.5f + offset) * tilesize, (iy + 0.5f + offset) * tilesize, rad);
+        }
+
+        Draw.reset();
+
+        //TODO autoscale markers
         state.rules.objectives.eachRunning(obj -> {
-            for(var marker : obj.markers) marker.drawMinimap(this);
+            for(var marker : obj.markers){
+                if(marker.minimap){
+                    marker.draw(1);
+                }
+            }
         });
+
+        for(var marker : state.markers){
+            if(marker.minimap){
+                marker.draw(1);
+            }
+        }
+
+        Draw.trans(Tmp.m2);
     }
 
-    public void drawSpawns(float x, float y, float w, float h, float scaling){
+    public void drawSpawns(){
         if(!state.rules.showSpawns || !state.hasSpawns() || !state.rules.waves) return;
 
         TextureRegion icon = Icon.units.getRegion();
@@ -204,34 +286,19 @@ public class MinimapRenderer{
 
         Draw.color(state.rules.waveTeam.color, Tmp.c2.set(state.rules.waveTeam.color).value(1.2f), Mathf.absin(Time.time, 16f, 1f));
 
-        float rad = scale(state.rules.dropZoneRadius);
+        float rad = state.rules.dropZoneRadius;
         float curve = Mathf.curve(Time.time % 240f, 120f, 240f);
 
         for(Tile tile : spawner.getSpawns()){
-            float tx = ((tile.x + 0.5f) / world.width()) * w;
-            float ty = ((tile.y + 0.5f) / world.height()) * h;
+            float tx = tile.worldx();
+            float ty = tile.worldy();
 
-            Draw.rect(icon, x + tx, y + ty, icon.width, icon.height);
-            Lines.circle(x + tx, y + ty, rad);
-            if(curve > 0f) Lines.circle(x + tx, y + ty, rad * Interp.pow3Out.apply(curve));
+            Draw.rect(icon, tx, ty, icon.width, icon.height);
+            Lines.circle(tx, ty, rad);
+            if(curve > 0f) Lines.circle(tx, ty, rad * Interp.pow3Out.apply(curve));
         }
 
         Draw.reset();
-    }
-
-    //TODO horrible code, everywhere.
-    public Vec2 transform(Vec2 position){
-        if(!worldSpace){
-            position.sub(rect.x, rect.y).scl(lastW / rect.width, lastH / rect.height);
-        }else{
-            position.scl(1f / world.unitWidth(), 1f / world.unitHeight()).scl(lastW, lastH);
-        }
-
-        return position.add(lastX, lastY);
-    }
-
-    public float scale(float radius){
-        return worldSpace ? (radius / (baseSize / 2f)) * 5f * lastScl : lastW / rect.width * radius;
     }
 
     public @Nullable TextureRegion getRegion(){
@@ -278,10 +345,7 @@ public class MinimapRenderer{
     }
 
     void updatePixel(Tile tile){
-        int color = colorFor(tile);
-        pixmap.set(tile.x, pixmap.height - 1 - tile.y, color);
-
-        Pixmaps.drawPixel(texture, tile.x, pixmap.height - 1 - tile.y, color);
+        updates.add(tile.pos());
     }
 
     public void updateUnitArray(){

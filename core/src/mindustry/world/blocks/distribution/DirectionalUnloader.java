@@ -28,6 +28,7 @@ public class DirectionalUnloader extends Block{
     public DirectionalUnloader(String name){
         super(name);
 
+        group = BlockGroup.transportation;
         update = true;
         solid = true;
         hasItems = true;
@@ -125,6 +126,12 @@ public class DirectionalUnloader extends Block{
                 Draw.rect(arrowRegion, x, y, rotdeg());
             }
 
+        }
+
+        @Override
+        public void drawSelect(){
+            super.drawSelect();
+            drawItemSelection(unloadItem);
         }
 
         @Override

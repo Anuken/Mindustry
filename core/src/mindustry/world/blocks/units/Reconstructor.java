@@ -1,13 +1,18 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -35,6 +40,9 @@ public class Reconstructor extends UnitBlock{
         regionRotated2 = 2;
         commandable = true;
         ambientSound = Sounds.respawning;
+        configurable = true;
+        config(UnitCommand.class, (ReconstructorBuild build, UnitCommand command) -> build.command = command);
+        configClear((ReconstructorBuild build) -> build.command = null);
     }
 
     @Override
@@ -59,12 +67,12 @@ public class Reconstructor extends UnitBlock{
         new Bar(
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
                 Core.bundle.format("bar.unitcap",
-                Fonts.getUnicodeStr(e.unit().name),
-                e.team.data().countType(e.unit()),
-                Units.getCap(e.team)
-            ),
+                    Fonts.getUnicodeStr(e.unit().name),
+                    e.team.data().countType(e.unit()),
+                    e.unit() == null || e.unit().useUnitCap ? Units.getStringCap(e.team) : "∞"
+                ),
             () -> Pal.power,
-            () -> e.unit() == null ? 0f : (float)e.team.data().countType(e.unit()) / Units.getCap(e.team)
+            () -> e.unit() == null ? 0f : (e.unit().useUnitCap ? (float)e.team.data().countType(e.unit()) / Units.getCap(e.team) : 1f)
         ));
     }
 
@@ -81,7 +89,7 @@ public class Reconstructor extends UnitBlock{
                     table.table(Styles.grayPanel, t -> {
                         t.left();
 
-                        t.image(upgrade[0].uiIcon).size(40).pad(10f).left();
+                        t.image(upgrade[0].uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> StatValues.withTooltip(i, upgrade[0]));
                         t.table(info -> {
                             info.add(upgrade[0].localizedName).left();
                             info.row();
@@ -96,7 +104,7 @@ public class Reconstructor extends UnitBlock{
                     table.table(Styles.grayPanel, t -> {
                         t.left();
 
-                        t.image(upgrade[1].uiIcon).size(40).pad(10f).right();
+                        t.image(upgrade[1].uiIcon).size(40).pad(10f).right().scaling(Scaling.fit).with(i -> StatValues.withTooltip(i, upgrade[1]));
                         t.table(info -> {
                             info.add(upgrade[1].localizedName).right();
                             info.row();
@@ -121,6 +129,8 @@ public class Reconstructor extends UnitBlock{
             }
         }
 
+        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
+
         super.init();
     }
 
@@ -130,6 +140,7 @@ public class Reconstructor extends UnitBlock{
 
     public class ReconstructorBuild extends UnitBuild{
         public @Nullable Vec2 commandPos;
+        public @Nullable UnitCommand command;
 
         public float fraction(){
             return progress / constructTime;
@@ -153,6 +164,51 @@ public class Reconstructor extends UnitBlock{
         @Override
         public boolean acceptUnitPayload(Unit unit){
             return hasUpgrade(unit.type) && !upgrade(unit.type).isBanned();
+        }
+
+        public boolean canSetCommand(){
+            var output = unit();
+            return output != null && output.commands.size > 1 && output.allowChangeCommands;
+        }
+
+        @Override
+        public Cursor getCursor(){
+            return canSetCommand() ? super.getCursor() : SystemCursor.arrow;
+        }
+
+        @Override
+        public boolean shouldShowConfigure(Player player){
+            return canSetCommand();
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            var unit = unit();
+
+            if(unit == null){
+                deselect();
+                return;
+            }
+
+            var group = new ButtonGroup<ImageButton>();
+            group.setMinCheckCount(0);
+            int i = 0, columns = 4;
+
+            table.background(Styles.black6);
+
+            var list = unit().commands;
+            for(var item : list){
+                ImageButton button = table.button(item.getIcon(), Styles.clearNoneTogglei, 40f, () -> {
+                    configure(item);
+                    deselect();
+                }).tooltip(item.localized()).group(group).get();
+
+                button.update(() -> button.setChecked(command == item || (command == null && unit.defaultCommand == item)));
+
+                if(++i % columns == 0){
+                    table.row();
+                }
+            }
         }
 
         @Override
@@ -183,7 +239,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return capacities[item.id];
+            return Mathf.round(capacities[item.id] * state.rules.unitCost(team));
         }
 
         @Override
@@ -250,9 +306,15 @@ public class Reconstructor extends UnitBlock{
                         //upgrade the unit
                         if(progress >= constructTime){
                             payload.unit = upgrade(payload.unit.type).create(payload.unit.team());
-                            if(commandPos != null && payload.unit.isCommandable()){
-                                payload.unit.command().commandPosition(commandPos);
+
+                            if(payload.unit.isCommandable()){
+                                if(commandPos != null){
+                                    payload.unit.command().commandPosition(commandPos);
+                                }
+                                //this already checks if it is a valid command for the unit type
+                                payload.unit.command().command(command == null && payload.unit.type.defaultCommand != null ? payload.unit.type.defaultCommand : command);
                             }
+
                             progress %= 1f;
                             Effect.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
@@ -270,12 +332,18 @@ public class Reconstructor extends UnitBlock{
         @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.progress) return Mathf.clamp(fraction());
+            if(sensor == LAccess.itemCapacity) return Mathf.round(itemCapacity * state.rules.unitCost(team));
             return super.sense(sensor);
         }
 
         @Override
         public boolean shouldConsume(){
             return constructing() && enabled;
+        }
+
+        @Override
+        public Object config(){
+            return command;
         }
 
         public UnitType unit(){
@@ -301,7 +369,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public byte version(){
-            return 2;
+            return 3;
         }
 
         @Override
@@ -310,6 +378,7 @@ public class Reconstructor extends UnitBlock{
 
             write.f(progress);
             TypeIO.writeVecNullable(write, commandPos);
+            TypeIO.writeCommand(write, command);
         }
 
         @Override
@@ -322,6 +391,10 @@ public class Reconstructor extends UnitBlock{
 
             if(revision >= 2){
                 commandPos = TypeIO.readVecNullable(read);
+            }
+
+            if(revision >= 3){
+                command = TypeIO.readCommand(read);
             }
         }
 

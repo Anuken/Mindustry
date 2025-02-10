@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
-import mindustry.world.consumers.*;
 
 public class PowerGraph{
     private static final Queue<Building> queue = new Queue<>();
@@ -59,6 +58,10 @@ public class PowerGraph{
         return powerBalance.rawMean();
     }
 
+    public boolean hasPowerBalanceSamples(){
+        return powerBalance.hasEnoughData();
+    }
+
     public float getLastPowerNeeded(){
         return lastPowerNeeded;
     }
@@ -105,7 +108,7 @@ public class PowerGraph{
         for(int i = 0; i < consumers.size; i++){
             var consumer = items[i];
             var consumePower = consumer.block.consPower;
-            if(otherConsumersAreValid(consumer, consumePower)){
+            if(consumer.shouldConsumePower){
                 powerNeeded += consumePower.requestedPower(consumer) * consumer.delta();
             }
         }
@@ -197,7 +200,7 @@ public class PowerGraph{
                 }
             }else{
                 //valid consumers get power as usual
-                if(otherConsumersAreValid(consumer, cons)){
+                if(consumer.shouldConsumePower){
                     consumer.power.status = coverage;
                 }else{ //invalid consumers get an estimate, if they were to activate
                     consumer.power.status = Math.min(1, produced / (needed + cons.usage * consumer.delta()));
@@ -255,6 +258,13 @@ public class PowerGraph{
 
     public void addGraph(PowerGraph graph){
         if(graph == this) return;
+
+        //merge into other graph instead.
+        if(graph.all.size > all.size){
+            graph.addGraph(this);
+            return;
+        }
+
         //other entity should be removed as the graph was merged
         if(graph.entity != null) graph.entity.remove();
 
@@ -366,22 +376,8 @@ public class PowerGraph{
         if(entity != null) entity.remove();
     }
 
-    @Deprecated
-    private boolean otherConsumersAreValid(Building build, Consume consumePower){
-        if(!build.enabled) return false;
-
-        float f = build.efficiency;
-        //hack so liquids output positive efficiency values
-        build.efficiency = 1f;
-        for(Consume cons : build.block.nonOptionalConsumers){
-            //TODO fix this properly
-            if(cons != consumePower && cons.efficiency(build) <= 0.0000001f){
-                build.efficiency = f;
-                return false;
-            }
-        }
-        build.efficiency = f;
-        return true;
+    public int getId(){
+        return graphID;
     }
 
     @Override

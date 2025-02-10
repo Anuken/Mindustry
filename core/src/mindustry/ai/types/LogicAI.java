@@ -3,9 +3,13 @@ package mindustry.ai.types;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
+import mindustry.world.*;
+
+import static mindustry.Vars.*;
 
 public class LogicAI extends AIController{
     /** Minimum delay between item transfers. */
@@ -37,9 +41,14 @@ public class LogicAI extends AIController{
 
     private ObjectSet<Object> radars = new ObjectSet<>();
 
+    // LogicAI state should not be reset after reading.
+    @Override
+    public boolean keepState(){
+        return true;
+    }
+
     @Override
     public void updateMovement(){
-
         if(targetTimer > 0f){
             targetTimer -= Time.delta;
         }else{
@@ -61,6 +70,39 @@ public class LogicAI extends AIController{
             }
             case approach -> {
                 moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7, true, null);
+            }
+            case pathfind -> {
+                if(unit.isFlying()){
+                    moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
+                }else{
+                    if(controlPath.getPathPosition(unit, Tmp.v2.set(moveX, moveY), Tmp.v2, Tmp.v1, null)){
+                        moveTo(Tmp.v1, 1f, Tmp.v2.epsilonEquals(Tmp.v1, 4.1f) ? 30f : 0f);
+                    }
+                }
+            }
+            case autoPathfind -> {
+                Building core = unit.closestEnemyCore();
+
+                if((core == null || !unit.within(core, unit.range() * 0.5f))){
+                    boolean move = true;
+                    Tile spawner = null;
+
+                    if(state.rules.waves && unit.team == state.rules.defaultTeam){
+                        spawner = getClosestSpawner();
+                        if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
+                    }
+
+                    if(move){
+                        if(unit.isFlying()){
+                            var target = core == null ? spawner : core;
+                            if(target != null){
+                                moveTo(target, unit.range() * 0.5f);
+                            }
+                        }else{
+                            pathfind(Pathfinder.fieldCore);
+                        }
+                    }
+                }
             }
             case stop -> {
                 unit.clearBuilding();

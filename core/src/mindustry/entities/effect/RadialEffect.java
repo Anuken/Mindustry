@@ -1,5 +1,6 @@
 package mindustry.entities.effect;
 
+import arc.graphics.*;
 import arc.math.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -7,7 +8,7 @@ import mindustry.entities.*;
 /** Renders one particle effect repeatedly at specified angle intervals. */
 public class RadialEffect extends Effect{
     public Effect effect = Fx.none;
-    public float rotationSpacing = 90f, rotationOffset = 0f;
+    public float rotationSpacing = 90f, rotationOffset = 0f, effectRotationOffset = 0f;
     public float lengthOffset = 0f;
     public int amount = 4;
 
@@ -15,35 +16,28 @@ public class RadialEffect extends Effect{
         clip = 100f;
     }
 
-    public RadialEffect(Effect effect, int amount, float spacing, float lengthOffset){
+    public RadialEffect(Effect effect, int amount, float spacing, float lengthOffset, float effectRotationOffset){
         this();
         this.amount = amount;
         this.effect = effect;
+        this.effectRotationOffset = effectRotationOffset;
         this.rotationSpacing = spacing;
         this.lengthOffset = lengthOffset;
     }
 
-    @Override
-    public void init(){
-        effect.init();
-        clip = Math.max(clip, effect.clip);
-        lifetime = effect.lifetime;
+    public RadialEffect(Effect effect, int amount, float spacing, float lengthOffset){
+        this(effect, amount, spacing, lengthOffset, 0f);
     }
 
     @Override
-    public void render(EffectContainer e){
-        float x = e.x, y = e.y;
+    public void create(float x, float y, float rotation, Color color, Object data){
+        if(!shouldCreate()) return;
 
-        e.rotation += rotationOffset;
+        rotation += rotationOffset;
 
         for(int i = 0; i < amount; i++){
-            e.x = x + Angles.trnsx(e.rotation, lengthOffset);
-            e.y = y + Angles.trnsy(e.rotation, lengthOffset);
-            effect.render(e);
-            e.rotation += rotationSpacing;
-            e.id ++;
+            effect.create(x + Angles.trnsx(rotation, lengthOffset), y + Angles.trnsy(rotation, lengthOffset), rotation + effectRotationOffset, color, data);
+            rotation += rotationSpacing;
         }
-
-        clip = Math.max(clip, effect.clip);
     }
 }

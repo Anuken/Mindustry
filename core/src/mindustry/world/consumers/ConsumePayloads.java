@@ -16,12 +16,21 @@ public class ConsumePayloads extends Consume{
 
     @Override
     public float efficiency(Building build){
-        return build.getPayloads().contains(payloads) ? 1f : 0f;
+        float mult = multiplier.get(build);
+        for(PayloadStack stack : payloads){
+            if(!build.getPayloads().contains(stack.item, Math.round(stack.amount * mult))){
+                return 0f;
+            }
+        }
+        return 1f;
     }
 
     @Override
     public void trigger(Building build){
-        build.getPayloads().remove(payloads);
+        float mult = multiplier.get(build);
+        for(PayloadStack stack : payloads){
+            build.getPayloads().remove(stack.item, Math.round(stack.amount * mult));
+        }
     }
 
     @Override
@@ -29,7 +38,7 @@ public class ConsumePayloads extends Consume{
 
         for(var stack : payloads){
             stats.add(Stat.input, t -> {
-                t.add(new ItemImage(stack));
+                t.add(StatValues.stack(stack));
                 t.add(stack.item.localizedName).padLeft(4).padRight(4);
             });
         }
@@ -42,8 +51,8 @@ public class ConsumePayloads extends Consume{
         table.table(c -> {
             int i = 0;
             for(var stack : payloads){
-                c.add(new ReqImage(new ItemImage(stack.item.uiIcon, stack.amount),
-                () -> inv.contains(stack.item, stack.amount))).padRight(8);
+                c.add(new ReqImage(StatValues.stack(stack.item, Math.round(stack.amount * multiplier.get(build))),
+                () -> inv.contains(stack.item, Math.round(stack.amount * multiplier.get(build))))).padRight(8);
                 if(++i % 4 == 0) c.row();
             }
         }).left();

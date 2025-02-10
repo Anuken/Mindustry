@@ -30,6 +30,7 @@ public class Conveyor extends Block implements Autotiler{
 
     public float speed = 0f;
     public float displayedSpeed = 0f;
+    public boolean pushUnits = true;
 
     public @Nullable Block junctionReplacement, bridgeReplacement;
 
@@ -63,7 +64,7 @@ public class Conveyor extends Block implements Autotiler{
         super.init();
 
         if(junctionReplacement == null) junctionReplacement = Blocks.junction;
-        if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.itemBridge;
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge || bridgeReplacement instanceof DuctBridge)) bridgeReplacement = Blocks.itemBridge;
     }
 
     @Override
@@ -73,7 +74,7 @@ public class Conveyor extends Block implements Autotiler{
         if(bits == null) return;
 
         TextureRegion region = regions[bits[0]][0];
-        Draw.rect(region, plan.drawx(), plan.drawy(), region.width * bits[1] * Draw.scl, region.height * bits[2] * Draw.scl, plan.rotation * 90);
+        Draw.rect(region, plan.drawx(), plan.drawy(), region.width * bits[1] * region.scl(), region.height * bits[2] * region.scl(), plan.rotation * 90);
     }
 
     @Override
@@ -91,8 +92,9 @@ public class Conveyor extends Block implements Autotiler{
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
         if(bridgeReplacement == null) return;
-
-        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
+        boolean hasJuntionReplacement = junctionReplacement != null;
+        if(bridgeReplacement instanceof DuctBridge bridge) Placement.calculateBridges(plans, bridge, hasJuntionReplacement, b -> b instanceof Duct || b instanceof Conveyor);
+        if(bridgeReplacement instanceof ItemBridge bridge) Placement.calculateBridges(plans, bridge, hasJuntionReplacement, b -> b instanceof Conveyor);
     }
 
     @Override
@@ -157,22 +159,26 @@ public class Conveyor extends Block implements Autotiler{
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
             Draw.z(Layer.block - 0.1f);
+            float layer = Layer.block - 0.1f, wwidth = world.unitWidth(), wheight = world.unitHeight(), scaling = 0.01f;
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
                 Tmp.v1.trns(rotation * 90, tilesize, 0);
                 Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
-                Draw.rect(item.fullIcon,
-                    (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
-                    (y + Tmp.v1.y * ys[i] + Tmp.v2.y),
-                    itemSize, itemSize);
+                float
+                ix = (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
+                iy = (y + Tmp.v1.y * ys[i] + Tmp.v2.y);
+
+                //keep draw position deterministic.
+                Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
+                Draw.rect(item.fullIcon, ix, iy, itemSize, itemSize);
             }
         }
 
         @Override
         public void payloadDraw(){
-            Draw.rect(block.fullIcon,x, y);
+            Draw.rect(block.fullIcon, x, y);
         }
 
         @Override
@@ -219,7 +225,7 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void unitOn(Unit unit){
 
-            if(clogHeat > 0.5f || !enabled) return;
+            if(!pushUnits || clogHeat > 0.5f || !enabled) return;
 
             noSleep();
 
@@ -249,7 +255,7 @@ public class Conveyor extends Block implements Autotiler{
             mid = 0;
 
             //skip updates if possible
-            if(len == 0){
+            if(len == 0 && Mathf.equal(timeScale, 1f)){
                 clogHeat = 0f;
                 sleep();
                 return;
@@ -346,6 +352,7 @@ public class Conveyor extends Block implements Autotiler{
         public boolean acceptItem(Building source, Item item){
             if(len >= capacity) return false;
             Tile facing = Edges.getFacingEdge(source.tile, tile);
+            if(facing == null) return false;
             int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - rotation);
             return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block.rotate && next == source);
         }
@@ -376,12 +383,19 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.i(len);
 
             for(int i = 0; i < len; i++){
-                write.i(Pack.intBytes((byte)ids[i].id, (byte)(xs[i] * 127), (byte)(ys[i] * 255 - 128), (byte)0));
+                write.s(ids[i].id);
+                write.b((byte)(xs[i] * 127));
+                write.b((byte)(ys[i] * 255 - 128));
             }
         }
 
@@ -392,10 +406,20 @@ public class Conveyor extends Block implements Autotiler{
             len = Math.min(amount, capacity);
 
             for(int i = 0; i < amount; i++){
-                int val = read.i();
-                short id = (short)(((byte)(val >> 24)) & 0xff);
-                float x = (float)((byte)(val >> 16)) / 127f;
-                float y = ((float)((byte)(val >> 8)) + 128f) / 255f;
+                short id;
+                float x, y;
+
+                if(revision == 0){
+                    int val = read.i();
+                    id = (short)(((byte)(val >> 24)) & 0xff);
+                    x = (float)((byte)(val >> 16)) / 127f;
+                    y = ((float)((byte)(val >> 8)) + 128f) / 255f;
+                }else{
+                    id = read.s();
+                    x = (float)read.b() / 127f;
+                    y = ((float)read.b() + 128f) / 255f;
+                }
+
                 if(i < capacity){
                     ids[i] = content.item(id);
                     xs[i] = x;

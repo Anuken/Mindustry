@@ -4,7 +4,6 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -12,6 +11,8 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 
 public class BurstDrill extends Drill{
     public float shake = 2f;
@@ -31,15 +32,11 @@ public class BurstDrill extends Drill{
     public Sound drillSound = Sounds.drillImpact;
     public float drillSoundVolume = 0.6f, drillSoundPitchRand = 0.1f;
 
-    /** Multipliers of drill speed for each item. Defaults to 1. */
-    public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
-
     public BurstDrill(String name){
         super(name);
 
         //does not drill in the traditional sense, so this is not even used
         hardnessDrillMultiplier = 0f;
-        liquidBoostIntensity = 1f;
         //generally at center
         drillEffectRnd = 0f;
         drillEffect = Fx.shockwave;
@@ -55,6 +52,19 @@ public class BurstDrill extends Drill{
     @Override
     public float getDrillTime(Item item){
         return drillTime / drillMultipliers.get(item, 1f);
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        if(liquidBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
+            stats.remove(Stat.booster);
+            stats.add(Stat.booster,
+                StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
+                consBase.amount, liquidBoostIntensity, false, consBase::consumes)
+            );
+        }
     }
 
     public class BurstDrillBuild extends DrillBuild{
@@ -81,7 +91,7 @@ public class BurstDrill extends Drill{
             if(items.total() <= itemCapacity - dominantItems && dominantItems > 0 && efficiency > 0){
                 warmup = Mathf.approachDelta(warmup, progress / drillTime, 0.01f);
 
-                float speed = efficiency;
+                float speed = Mathf.lerp(1f, liquidBoostIntensity, optionalEfficiency) * efficiency;
 
                 timeDrilled += speedCurve.apply(progress / drillTime) * speed;
 

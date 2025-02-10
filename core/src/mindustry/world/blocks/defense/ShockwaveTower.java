@@ -1,18 +1,20 @@
 package mindustry.world.blocks.defense;
 
-import arc.math.*;
-import arc.util.*;
-import arc.struct.*;
+import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.audio.*;
+import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.meta.*;
 import mindustry.world.*;
-import mindustry.entities.*;
-import mindustry.annotations.Annotations.Load;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -29,6 +31,7 @@ public class ShockwaveTower extends Block{
     public Sound shootSound = Sounds.bang;
     public Color waveColor = Pal.accent, heatColor = Pal.turretHeat, shapeColor = Color.valueOf("f29c83");
     public float cooldownMultiplier = 1f;
+    public Effect hitEffect = Fx.hitSquaresColor;
     public Effect waveEffect = Fx.pointShockwave;
 
     //TODO switch to drawers eventually or something
@@ -88,6 +91,11 @@ public class ShockwaveTower extends Block{
                         }else{
                             target.remove();
                         }
+                        hitEffect.at(target.x, target.y, waveColor);
+                    }
+
+                    if(team == state.rules.defaultTeam){
+                        Events.fire(Trigger.shockwaveTowerUse);
                     }
                 }
             }

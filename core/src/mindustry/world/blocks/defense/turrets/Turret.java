@@ -36,6 +36,8 @@ public class Turret extends ReloadTurret{
     public final int timerTarget = timers++;
     /** Ticks between attempt at finding a target. */
     public float targetInterval = 20;
+    /** Target interval for when this turret already has a valid target. -1 = targetInterval */
+    public float newTargetInterval = -1f;
 
     /** Maximum ammo units stored. */
     public int maxAmmo = 30;
@@ -52,20 +54,28 @@ public class Turret extends ReloadTurret{
     public float inaccuracy = 0f;
     /** Fraction of bullet velocity that is random. */
     public float velocityRnd = 0f;
+    /** Fraction of lifetime that is added to bullets with lifeScale. */
+    public float scaleLifetimeOffset = 0f;
     /** Maximum angle difference in degrees at which turret will still try to shoot. */
     public float shootCone = 8f;
     /** Turret shoot point. */
     public float shootX = 0f, shootY = Float.NEGATIVE_INFINITY;
     /** Random spread on the X axis. */
     public float xRand = 0f;
+    /** If true, a range ring is also drawn for minRange. */
+    public boolean drawMinRange;
+    /** Range at which it finds and locks on to the target, but does not shoot. */
+    public float trackingRange = 0f;
     /** Minimum bullet range. Used for artillery only. */
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
     public float minWarmup = 0f;
-    /** If true, this turret will accurately target moving targets with respect to charge time. */
+    /** If true, this turret will accurately target moving targets with respect to shoot.firstShotDelay. */
     public boolean accurateDelay = true;
     /** If false, this turret can't move while charging. */
     public boolean moveWhileCharging = true;
+    /** If false, this turret can't reload while charging */
+    public boolean reloadWhileCharging = true;
     /** How long warmup is maintained even if this turret isn't shooting. */
     public float warmupMaintainTime = 0f;
     /** pattern used for bullets */
@@ -75,18 +85,26 @@ public class Turret extends ReloadTurret{
     public boolean targetAir = true;
     /** If true, this block targets ground units and structures. */
     public boolean targetGround = true;
+    /** If true, this block targets blocks. */
+    public boolean targetBlocks = true;
     /** If true, this block targets friend blocks, to heal them. */
     public boolean targetHealing = false;
     /** If true, this turret can be controlled by players. */
     public boolean playerControllable = true;
     /** If true, this block will display ammo multipliers in its stats (irrelevant for certain types of turrets). */
     public boolean displayAmmoMultiplier = true;
+    /** If false, 'under' blocks like conveyors are not targeted. */
+    public boolean targetUnderBlocks = true;
+    /** If true, the turret will always shoot when it has ammo, regardless of targets in range or any control. */
+    public boolean alwaysShooting = false;
+    /** Whether this turret predicts unit movement. */
+    public boolean predictTarget = true;
     /** Function for choosing which unit to target. */
     public Sortf unitSort = UnitSorts.closest;
     /** Filter for types of units to attack. */
     public Boolf<Unit> unitFilter = u -> true;
     /** Filter for types of buildings to attack. */
-    public Boolf<Building> buildingFilter = b -> !b.block.underBullets;
+    public Boolf<Building> buildingFilter = b -> targetUnderBlocks || !b.block.underBullets;
 
     /** Color of heat region drawn on top (if found) */
     public Color heatColor = Pal.turretHeat;
@@ -110,6 +128,8 @@ public class Turret extends ReloadTurret{
     public boolean linearWarmup = false;
     /** Visual amount by which the turret recoils back per shot. */
     public float recoil = 1f;
+    /** Number of additional counters for recoil. */
+    public int recoils = -1;
     /** ticks taken for turret to return to starting position in ticks. uses reload time by default  */
     public float recoilTime = -1f;
     /** power curve applied to visual recoil */
@@ -129,6 +149,8 @@ public class Turret extends ReloadTurret{
         liquidCapacity = 20f;
         quickRotate = false;
         outlinedIcon = 1;
+        drawLiquidLight = false;
+        sync = true;
     }
 
     @Override
@@ -141,7 +163,7 @@ public class Turret extends ReloadTurret{
         super.setStats();
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(Stat.reload, 60f / (reload) * shoot.shots, StatUnit.perSecond);
+        stats.add(Stat.reload, 60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f)) * shoot.shots, StatUnit.perSecond);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
@@ -167,8 +189,10 @@ public class Turret extends ReloadTurret{
         if(elevation < 0) elevation = size / 2f;
         if(recoilTime < 0f) recoilTime = reload;
         if(cooldownTime < 0f) cooldownTime = reload;
+        if(newTargetInterval <= 0f) newTargetInterval = targetInterval;
 
         super.init();
+        trackingRange = Math.max(range, trackingRange);
     }
 
     @Override
@@ -191,7 +215,16 @@ public class Turret extends ReloadTurret{
     public void limitRange(BulletType bullet, float margin){
         float realRange = bullet.rangeChange + range;
         //doesn't handle drag
-        bullet.lifetime = (realRange + margin) / bullet.speed;
+        bullet.lifetime = (realRange + margin + bullet.extraRangeMargin) / bullet.speed;
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        if(drawMinRange){
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, minRange, Pal.placing);
+        }
     }
 
     public static abstract class AmmoEntry{
@@ -208,8 +241,9 @@ public class Turret extends ReloadTurret{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float curRecoil, heat, logicControlTime = -1;
+        public @Nullable float[] curRecoils;
         public float shootWarmup, charge, warmupHold = 0f;
-        public int totalShots;
+        public int totalShots, barrelCounter;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
@@ -220,10 +254,19 @@ public class Turret extends ReloadTurret{
         public float heatReq;
         public float[] sideHeat = new float[4];
 
+        float lastRangeChange;
+
         @Override
         public float estimateDps(){
             if(!hasAmmo()) return 0f;
             return shoot.shots / reload * 60f * (peekAmmo() == null ? 0f : peekAmmo().estimateDPS()) * potentialEfficiency * timeScale;
+        }
+
+        public float minRange(){
+            if(peekAmmo() != null){
+                return minRange + peekAmmo().minRangeChange;
+            }
+            return minRange;
         }
 
         @Override
@@ -232,6 +275,10 @@ public class Turret extends ReloadTurret{
                 return range + peekAmmo().rangeChange;
             }
             return range;
+        }
+
+        public float trackingRange(){
+            return range() + trackingRange - range;
         }
 
         @Override
@@ -294,12 +341,17 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
+        public float fogRadius(){
+            return (range + (hasAmmo() ? peekAmmo().rangeChange : 0f)) / tilesize * fogRadiusMultiplier;
+        }
+
+        @Override
         public float progress(){
             return Mathf.clamp(reloadCounter / reload);
         }
 
         public boolean isShooting(){
-            return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
+            return alwaysShooting || (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
         }
 
         @Override
@@ -325,11 +377,15 @@ public class Turret extends ReloadTurret{
             var offset = Tmp.v1.setZero();
 
             //when delay is accurate, assume unit has moved by chargeTime already
-            if(accurateDelay && pos instanceof Hitboxc h){
+            if(accurateDelay && !moveWhileCharging && pos instanceof Hitboxc h){
                 offset.set(h.deltaX(), h.deltaY()).scl(shoot.firstShotDelay / Time.delta);
             }
 
-            targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
+            if(predictTarget && bullet.speed >= 0.01f){
+                targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed));
+            }else{
+                targetPos.set(pos);
+            }
 
             if(targetPos.isZero()){
                 targetPos.set(pos);
@@ -342,11 +398,20 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
+        public void drawSelect(){
+            super.drawSelect();
+
+            if(drawMinRange){
+                Drawf.dashCircle(x, y, minRange(), team.color);
+            }
+        }
+
+        @Override
         public void updateTile(){
             if(!validateTarget()) target = null;
 
             float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
-            if(warmupTarget > 0 && shootWarmup >= minWarmup && !isControlled()){
+            if(warmupTarget > 0 && !isControlled()){
                 warmupHold = 1f;
             }
             if(warmupHold > 0f){
@@ -363,6 +428,12 @@ public class Turret extends ReloadTurret{
             wasShooting = false;
 
             curRecoil = Mathf.approachDelta(curRecoil, 0, 1 / recoilTime);
+            if(recoils > 0){
+                if(curRecoils == null) curRecoils = new float[recoils];
+                for(int i = 0; i < recoils; i++){
+                    curRecoils[i] = Mathf.approachDelta(curRecoils[i], 0, 1 / recoilTime);
+                }
+            }
             heat = Mathf.approachDelta(heat, 0, 1 / cooldownTime);
             charge = charging() ? Mathf.approachDelta(charge, 1, 1 / shoot.firstShotDelay) : 0;
 
@@ -380,12 +451,23 @@ public class Turret extends ReloadTurret{
             }
 
             //turret always reloads regardless of whether it's targeting something
-            updateReload();
+            if(reloadWhileCharging || !charging()){
+                updateReload();
+                updateCooling();
+            }
+
+            if(state.rules.fog){
+                float newRange = hasAmmo() ? peekAmmo().rangeChange : 0f;
+                if(newRange != lastRangeChange){
+                    lastRangeChange = newRange;
+                    fogControl.forceUpdate(team, this);
+                }
+            }
 
             if(hasAmmo()){
                 if(Float.isNaN(reloadCounter)) reloadCounter = 0;
 
-                if(timer(timerTarget, targetInterval)){
+                if(timer(timerTarget, target != null ? newTargetInterval : targetInterval)){
                     findTarget();
                 }
 
@@ -401,6 +483,7 @@ public class Turret extends ReloadTurret{
                         targetPosition(target);
 
                         if(Float.isNaN(rotation)) rotation = 0;
+                        canShoot = within(target, range() + (target instanceof Sized hb ? hb.hitSize()/1.9f : 0f));
                     }
 
                     if(!isControlled()){
@@ -414,15 +497,18 @@ public class Turret extends ReloadTurret{
                         turnToTarget(targetRot);
                     }
 
-                    if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
+                    if(!alwaysShooting && Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
                         wasShooting = true;
                         updateShooting();
                     }
+                }else{
+                    target = null;
                 }
-            }
 
-            if(coolant != null){
-                updateCooling();
+                if(alwaysShooting){
+                    wasShooting = true;
+                    updateShooting();
+                }
             }
         }
 
@@ -443,17 +529,29 @@ public class Turret extends ReloadTurret{
             return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().heals();
         }
 
-        protected void findTarget(){
-            float range = range();
-
+        protected Posc findEnemy(float range){
             if(targetAir && !targetGround){
-                target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
+                return Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
             }else{
-                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+                var ammo = peekAmmo();
+                boolean buildings = targetGround && targetBlocks && (ammo == null || ammo.targetBlocks), missiles = ammo == null || ammo.targetMissiles;
+                return Units.bestTarget(team, x, y, range,
+                    e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround) && (missiles || !(e instanceof TimedKillc)),
+                    b -> buildings && buildingFilter.get(b), unitSort);
+            }
+        }
 
-                if(target == null && canHeal()){
-                    target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
-                }
+        protected void findTarget(){
+            float trackRange = trackingRange(), range = range();
+
+            target = findEnemy(range);
+            //find another target within the tracking range, but only if there's nothing else (always prioritize standard target)
+            if(!Mathf.equal(trackRange, range) && target == null){
+                target = findEnemy(trackRange);
+            }
+
+            if(target == null && canHeal()){
+                target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
             }
         }
 
@@ -468,7 +566,7 @@ public class Turret extends ReloadTurret{
         @Override
         public void updateEfficiencyMultiplier(){
             if(heatRequirement > 0){
-                efficiency *= Math.min(heatReq / heatRequirement, maxHeatEfficiency);
+                efficiency *= Math.min(Math.max(heatReq / heatRequirement, cheating() ? 1f : 0f), maxHeatEfficiency);
             }
         }
 
@@ -491,14 +589,15 @@ public class Turret extends ReloadTurret{
 
         /** @return whether the turret has ammo. */
         public boolean hasAmmo(){
-            //used for "side-ammo" like gas in some turrets
-            if(!canConsume()) return false;
-
             //skip first entry if it has less than the required amount of ammo
             if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot && ammo.get(ammo.size - 2).amount >= ammoPerShot){
                 ammo.swap(ammo.size - 1, ammo.size - 2);
             }
-            return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
+
+            //used for "side-ammo" like gas in some turrets
+            if(!canConsume()) return false;
+
+            return ammo.size > 0 && (ammo.peek().amount >= ammoPerShot || cheating());
         }
 
         public boolean charging(){
@@ -506,11 +605,15 @@ public class Turret extends ReloadTurret{
         }
 
         protected void updateReload(){
-            float multiplier = hasAmmo() ? peekAmmo().reloadMultiplier : 1f;
-            reloadCounter += delta() * multiplier * baseReloadSpeed();
+            reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
 
             //cap reload for visual reasons
             reloadCounter = Math.min(reloadCounter, reload);
+        }
+
+        @Override
+        protected float ammoReloadMultiplier(){
+            return hasAmmo() ? peekAmmo().reloadMultiplier : 1f;
         }
 
         protected void updateShooting(){
@@ -534,15 +637,22 @@ public class Turret extends ReloadTurret{
                 type.chargeEffect.at(bulletX, bulletY, rotation);
             }
 
-            shoot.shoot(totalShots, (xOffset, yOffset, angle, delay, mover) -> {
-                queuedBullets ++;
+            shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
+                queuedBullets++;
+                int barrel = barrelCounter;
+
                 if(delay > 0f){
-                    Time.run(delay, () -> bullet(type, xOffset, yOffset, angle, mover));
+                    Time.run(delay, () -> {
+                        //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
+                        int prev = barrelCounter;
+                        barrelCounter = barrel;
+                        bullet(type, xOffset, yOffset, angle, mover);
+                        barrelCounter = prev;
+                    });
                 }else{
                     bullet(type, xOffset, yOffset, angle, mover);
                 }
-                totalShots ++;
-            });
+            }, () -> barrelCounter++);
 
             if(consumeAmmoOnce){
                 useAmmo();
@@ -558,9 +668,9 @@ public class Turret extends ReloadTurret{
             xSpread = Mathf.range(xRand),
             bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
-            shootAngle = rotation + angleOffset + Mathf.range(inaccuracy);
+            shootAngle = rotation + angleOffset + Mathf.range(inaccuracy + type.inaccuracy);
 
-            float lifeScl = type.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
+            float lifeScl = type.scaleLife ? Mathf.clamp((1 + scaleLifetimeOffset) * Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange() / type.range, range() / type.range) : 1f;
 
             //TODO aimX / aimY for multi shot turrets?
             handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, shootAngle - rotation);
@@ -580,7 +690,11 @@ public class Turret extends ReloadTurret{
             }
 
             curRecoil = 1f;
+            if(recoils > 0){
+                curRecoils[barrelCounter % recoils] = 1f;
+            }
             heat = 1f;
+            totalShots++;
 
             if(!consumeAmmoOnce){
                 useAmmo();
@@ -621,6 +735,17 @@ public class Turret extends ReloadTurret{
         @Override
         public byte version(){
             return 1;
+        }
+
+        @Override
+        public void readSync(Reads read, byte revision){
+            //maintain rotation and reload when syncing so clients don't see turrets snapping around
+            float oldRot = rotation, oldReload = reloadCounter;
+
+            readAll(read, revision);
+
+            rotation = oldRot;
+            reloadCounter = oldReload;
         }
     }
 

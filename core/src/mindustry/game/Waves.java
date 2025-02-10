@@ -10,7 +10,7 @@ import mindustry.type.*;
 import static mindustry.content.UnitTypes.*;
 
 public class Waves{
-    public static final int waveVersion = 5;
+    public static final int waveVersion = 7;
 
     private Seq<SpawnGroup> spawns;
 
@@ -303,7 +303,7 @@ public class Waves{
 
         Intc createProgression = start -> {
             //main sequence
-            UnitType[] curSpecies = Structs.random(fspec);
+            UnitType[] curSpecies = Structs.random(rand, fspec);
             int curTier = 0;
 
             for(int i = start; i < cap;){
@@ -348,7 +348,7 @@ public class Waves{
 
                 //small chance to switch species
                 if(rand.chance(0.3)){
-                    curSpecies = Structs.random(fspec);
+                    curSpecies = Structs.random(rand, fspec);
                 }
             }
         };
@@ -368,7 +368,7 @@ public class Waves{
         int bossTier = difficulty < 0.6 ? 3 : 4;
 
         //main boss progression
-        out.add(new SpawnGroup(Structs.random(species)[bossTier]){{
+        out.add(new SpawnGroup(Structs.random(rand, species)[bossTier]){{
             unitAmount = 1;
             begin = bossWave;
             spacing = bossSpacing;
@@ -380,7 +380,7 @@ public class Waves{
         }});
 
         //alt boss progression
-        out.add(new SpawnGroup(Structs.random(species)[bossTier]){{
+        out.add(new SpawnGroup(Structs.random(rand, species)[bossTier]){{
             unitAmount = 1;
             begin = bossWave + rand.random(3, 5) * bossSpacing;
             spacing = bossSpacing;
@@ -394,7 +394,7 @@ public class Waves{
         int finalBossStart = 120 + rand.random(30);
 
         //final boss waves
-        out.add(new SpawnGroup(Structs.random(species)[bossTier]){{
+        out.add(new SpawnGroup(Structs.random(rand, species)[bossTier]){{
             unitAmount = 1;
             begin = finalBossStart;
             spacing = bossSpacing/2;
@@ -406,7 +406,7 @@ public class Waves{
         }});
 
         //final boss waves (alt)
-        out.add(new SpawnGroup(Structs.random(species)[bossTier]){{
+        out.add(new SpawnGroup(Structs.random(rand, species)[bossTier]){{
             unitAmount = 1;
             begin = finalBossStart + 15;
             spacing = bossSpacing/2;
@@ -419,10 +419,10 @@ public class Waves{
 
         //add megas to heal the base.
         if(attack && difficulty >= 0.5){
-            int amount = Mathf.random(1, 3 + (int)(difficulty*2));
+            int amount = rand.random(1, 3 + (int)(difficulty*2));
 
             for(int i = 0; i < amount; i++){
-                int wave = Mathf.random(3, 20);
+                int wave = rand.random(3, 20);
                 out.add(new SpawnGroup(mega){{
                     unitAmount = 1;
                     begin = wave;

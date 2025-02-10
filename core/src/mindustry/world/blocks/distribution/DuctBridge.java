@@ -20,7 +20,7 @@ public class DuctBridge extends DirectionBridge{
 
         @Override
         public void updateTile(){
-            var link = findLink();
+            var link = lastLink = findLink();
             if(link != null){
                 link.occupied[rotation % 4] = this;
                 if(items.any() && link.items.total() < link.block.itemCapacity){
@@ -43,7 +43,7 @@ public class DuctBridge extends DirectionBridge{
             }
 
             for(int i = 0; i < 4; i++){
-                if(occupied[i] == null || occupied[i].rotation != i || !occupied[i].isValid()){
+                if(occupied[i] == null || occupied[i].rotation != i || !occupied[i].isValid() || occupied[i].lastLink != this){
                     occupied[i] = null;
                 }
             }

@@ -22,6 +22,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
         this(null, 0f);
     }
 
+
     @Override
     public void apply(Block block){
         super.apply(block);
@@ -35,7 +36,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public void update(Building build){
-        build.liquids.remove(liquid, amount * build.edelta());
+        build.liquids.remove(liquid, amount * build.edelta() * multiplier.get(build));
     }
 
     @Override
@@ -43,11 +44,16 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
         float ed = build.edelta() * build.efficiencyScale();
         if(ed <= 0.00000001f) return 0f;
         //there can be more liquid than necessary, so cap at 1
-        return Math.min(build.liquids.get(liquid) / (amount * ed), 1f);
+        return Math.min(build.liquids.get(liquid) / (amount * ed * multiplier.get(build)), 1f);
     }
 
     @Override
     public void display(Stats stats){
         stats.add(booster ? Stat.booster : Stat.input, liquid, amount * 60f, true);
+    }
+
+    @Override
+    public boolean consumes(Liquid liquid){
+        return liquid == this.liquid;
     }
 }

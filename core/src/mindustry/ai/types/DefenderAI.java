@@ -28,7 +28,8 @@ public class DefenderAI extends AIController{
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
 
         //Sort by max health and closer target.
-        var result = Units.closest(unit.team, x, y, Math.max(range, 400f), u -> !u.dead() && u.type != unit.type && u.targetable(unit.team), (u, tx, ty) -> -u.maxHealth + Mathf.dst2(u.x, u.y, tx, ty) / 6400f);
+        var result = Units.closest(unit.team, x, y, Math.max(range, 400f), u -> !u.dead() && u.type != unit.type && u.targetable(unit.team) && u.type.playerControllable,
+            (u, tx, ty) -> -u.maxHealth + Mathf.dst2(u.x, u.y, tx, ty) / 6400f);
         if(result != null) return result;
 
         //return core if found

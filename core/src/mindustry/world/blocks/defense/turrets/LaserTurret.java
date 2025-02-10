@@ -54,6 +54,13 @@ public class LaserTurret extends PowerTurret{
         }
 
         @Override
+        public void placed(){
+            super.placed();
+
+            reloadCounter = reload;
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
 
@@ -71,14 +78,13 @@ public class LaserTurret extends PowerTurret{
                     entry.bullet.set(bulletX, bulletY);
                     entry.bullet.time = entry.bullet.type.lifetime * entry.bullet.type.optimalLifeFract;
                     entry.bullet.keepAlive = true;
-                    entry.life -= Time.delta / Math.max(efficiency, 0.00001f);
+                    entry.life -= Time.delta * timeScale / Math.max(efficiency, 0.00001f);
                 }
 
                 wasShooting = true;
                 heat = 1f;
                 curRecoil = 1f;
             }else if(reloadCounter > 0){
-                wasShooting = true;
 
                 if(coolant != null){
                     //TODO does not handle multi liquid req?

@@ -24,6 +24,10 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
     @Nullable Rand rand;
     int seed;
 
+    {
+        defaultLoadout = Loadouts.basicNucleus;
+    }
+
     void asteroid(int ax, int ay, int radius){
         Floor floor = (
             rand.chance(iceChance) ? Blocks.ice :
@@ -149,11 +153,6 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
         state.rules.showSpawns = true;
         //TODO better wavegen, do it by hand even
         state.rules.spawns = Waves.generate(0.5f, rand, false, true, false);
-    }
-
-    @Override
-    public Schematic getDefaultLoadout(){
-        return Loadouts.basicNucleus;
     }
 
     @Override

@@ -33,7 +33,9 @@ public class RepairAI extends AIController{
                 circleAttack(120f);
             }else if(!target.within(unit, unit.type.range * 0.65f)){
                 moveTo(target, unit.type.range * 0.65f);
+            }
 
+            if(!unit.type.circleTarget){
                 unit.lookAt(target);
             }
         }

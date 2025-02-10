@@ -1,10 +1,12 @@
 package mindustry.world.consumers;
 
+import arc.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -34,6 +36,7 @@ public class ConsumeItemExplode extends ConsumeItemFilter{
             if(Vars.state.rules.reactorExplosions && Mathf.chance(build.delta() * baseChance * Mathf.clamp(item.explosiveness - threshold))){
                 build.damage(damage);
                 explodeEffect.at(build.x + Mathf.range(build.block.size * tilesize / 2f), build.y + Mathf.range(build.block.size * tilesize / 2f));
+                Events.fire(Trigger.blastGenerator);
             }
         }
     }

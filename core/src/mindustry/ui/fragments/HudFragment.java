@@ -14,6 +14,7 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -27,6 +28,11 @@ import mindustry.input.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 import static mindustry.gen.Tex.*;
@@ -34,11 +40,11 @@ import static mindustry.gen.Tex.*;
 public class HudFragment{
     private static final float dsize = 65f, pauseHeight = 36f;
 
-    public final PlacementFragment blockfrag = new PlacementFragment();
+    public PlacementFragment blockfrag = new PlacementFragment();
+    public CoreItemsDisplay coreItems = new CoreItemsDisplay();
     public boolean shown = true;
 
     private ImageButton flip;
-    private CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
     private String hudText = "";
     private boolean showHudText;
@@ -47,12 +53,86 @@ public class HudFragment{
     private Table lastUnlockLayout;
     private long lastToast;
 
+    private Seq<Block> blocksOut = new Seq<>();
+
+    private void addBlockSelection(Table cont){
+        Table blockSelection = new Table();
+        var pane = new ScrollPane(blockSelection, Styles.smallPane);
+        pane.setFadeScrollBars(false);
+        Planet[] last = {state.rules.planet};
+        pane.update(() -> {
+            if(pane.hasScroll()){
+                Element result = Core.scene.getHoverElement();
+                if(result == null || !result.isDescendantOf(pane)){
+                    Core.scene.setScrollFocus(null);
+                }
+            }
+
+            if(state.rules.planet != last[0]){
+                last[0] = state.rules.planet;
+                rebuildBlockSelection(blockSelection, "");
+            }
+        });
+
+        cont.table(search -> {
+            search.image(Icon.zoom).padRight(8);
+            search.field("", text -> rebuildBlockSelection(blockSelection, text)).growX()
+            .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
+        }).growX().pad(-2).padLeft(6f);
+        cont.row();
+        cont.add(pane).expandY().top().left();
+
+        rebuildBlockSelection(blockSelection, "");
+    }
+
+    private void rebuildBlockSelection(Table blockSelection, String searchText){
+        blockSelection.clear();
+
+        blocksOut.clear();
+        blocksOut.addAll(Vars.content.blocks());
+        blocksOut.sort((b1, b2) -> {
+            int synth = Boolean.compare(b1.synthetic(), b2.synthetic());
+            if(synth != 0) return synth;
+            int ore = Boolean.compare(b1 instanceof OverlayFloor && b1 != Blocks.removeOre, b2 instanceof OverlayFloor && b2 != Blocks.removeOre);
+            if(ore != 0) return ore;
+            return Integer.compare(b1.id, b2.id);
+        });
+
+        int i = 0;
+
+        for(Block block : blocksOut){
+            TextureRegion region = block.uiIcon;
+
+            if(!Core.atlas.isFound(region)
+            || (!block.inEditor && !(block instanceof RemoveWall) && !(block instanceof RemoveOre))
+            || !block.isOnPlanet(state.rules.planet)
+            || block.buildVisibility == BuildVisibility.debugOnly
+            || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.toLowerCase()))
+            ) continue;
+
+            ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
+            button.getStyle().imageUp = new TextureRegionDrawable(region);
+            button.clicked(() -> control.input.block = block);
+            button.resizeImage(8 * 4f);
+            button.update(() -> button.setChecked(control.input.block == block));
+            blockSelection.add(button).size(48f).tooltip(block.localizedName);
+
+            if(++i % 6 == 0){
+                blockSelection.row();
+            }
+        }
+
+        if(i == 0){
+            blockSelection.add("@none.found").padLeft(54f).padTop(10f);
+        }
+    }
+
     public void build(Group parent){
 
         //warn about guardian/boss waves
         Events.on(WaveEvent.class, e -> {
             int max = 10;
-            int winWave = state.isCampaign() && state.rules.winWave > 0 ? state.rules.winWave : Integer.MAX_VALUE;
+            int winWave = state.rules.winWave > 0 ? state.rules.winWave : Integer.MAX_VALUE;
             outer:
             for(int i = state.wave - 1; i <= Math.min(state.wave + max, winWave - 2); i++){
                 for(SpawnGroup group : state.rules.spawns){
@@ -71,7 +151,11 @@ public class HudFragment{
         });
 
         Events.on(SectorCaptureEvent.class, e -> {
-            showToast(Core.bundle.format("sector.captured", e.sector.isBeingPlayed() ? "" : e.sector.name() + " "));
+            if(e.sector.isBeingPlayed()){
+                ui.announce("@sector.capture.current", 5f);
+            }else{
+                showToast(Core.bundle.format("sector.capture", e.sector.name()));
+            }
         });
 
         Events.on(SectorLoseEvent.class, e -> {
@@ -99,7 +183,7 @@ public class HudFragment{
         //"waiting for players"
         parent.fill(t -> {
             t.name = "waiting";
-            t.visible(() -> netServer.isWaitingForPlayers()).touchable = Touchable.disabled;
+            t.visible(() -> netServer.isWaitingForPlayers() && state.isPaused() && shown).touchable = Touchable.disabled;
             t.table(Styles.black6, top -> top.add("@waiting.players").style(Styles.outlineLabel).pad(18f));
         });
 
@@ -129,6 +213,13 @@ public class HudFragment{
             cont.top().left();
 
             if(mobile){
+                //for better inset visuals
+                cont.rect((x, y, w, h) -> {
+                    if(Core.scene.marginTop > 0){
+                        Tex.paneRight.draw(x, y, w, Core.scene.marginTop);
+                    }
+                }).fillX().row();
+
                 cont.table(select -> {
                     select.name = "mobile buttons";
                     select.left();
@@ -147,14 +238,14 @@ public class HudFragment{
                         if(net.active()){
                             ui.listfrag.toggle();
                         }else{
-                            state.set(state.is(State.paused) ? State.playing : State.paused);
+                            state.set(state.isPaused() ? State.playing : State.paused);
                         }
                     }).name("pause").update(i -> {
                         if(net.active()){
                             i.getStyle().imageUp = Icon.players;
                         }else{
                             i.setDisabled(false);
-                            i.getStyle().imageUp = state.is(State.paused) ? Icon.play : Icon.pause;
+                            i.getStyle().imageUp = state.isPaused() ? Icon.play : Icon.pause;
                         }
                     });
 
@@ -199,8 +290,19 @@ public class HudFragment{
 
             Table wavesMain, editorMain;
 
-            cont.stack(wavesMain = new Table(), editorMain = new Table()).height(wavesMain.getPrefHeight())
-            .name("waves/editor");
+            cont.stack(wavesMain = new Table(), editorMain = new Table(), new Element(){
+                //this may seem insane, but adding an empty element of a specific height to this stack fixes layout issues on mobile.
+
+                {
+                    visible = false;
+                    touchable = Touchable.disabled;
+                }
+
+                @Override
+                public float getPrefHeight(){
+                    return Scl.scl(120f);
+                }
+            }).name("waves/editor");
 
             wavesMain.visible(() -> shown && !state.isEditor());
             wavesMain.top().left().name = "waves";
@@ -221,7 +323,7 @@ public class HudFragment{
                 //table with button to skip wave
                 s.button(Icon.play, rightStyle, 30f, () -> {
                     if(net.client() && player.admin){
-                        Call.adminRequest(player, AdminAction.wave);
+                        Call.adminRequest(player, AdminAction.wave, null);
                     }else{
                         logic.skipWave();
                     }
@@ -234,26 +336,38 @@ public class HudFragment{
 
             editorMain.name = "editor";
             editorMain.table(Tex.buttonEdge4, t -> {
-                //t.margin(0f);
                 t.name = "teams";
-                t.add("@editor.teams").growX().left();
-                t.row();
-                t.table(teams -> {
+
+
+                t.top().table(teams -> {
                     teams.left();
-                    int i = 0;
                     for(Team team : Team.baseTeams){
-                        ImageButton button = teams.button(Tex.whiteui, Styles.clearNoneTogglei, 40f, () -> Call.setPlayerTeamEditor(player, team))
-                        .size(50f).margin(6f).get();
+                        ImageButton button = teams.button(Tex.whiteui, Styles.clearNoneTogglei, 33f, () -> Call.setPlayerTeamEditor(player, team))
+                        .size(45f).margin(6f).get();
                         button.getImageCell().grow();
                         button.getStyle().imageUpColor = team.color;
                         button.update(() -> button.setChecked(player.team() == team));
-
-                        if(++i % 3 == 0){
-                            teams.row();
-                        }
                     }
-                }).left();
-            }).width(dsize * 5 + 4f);
+
+                    teams.button(Icon.downOpen, Styles.emptyi, () -> Core.settings.put("editor-blocks-shown", !Core.settings.getBool("editor-blocks-shown")))
+                    .size(45f).update(m -> m.getStyle().imageUp = (Core.settings.getBool("editor-blocks-shown") ? Icon.upOpen : Icon.downOpen));
+                }).top().left().row();
+
+                t.collapser(this::addBlockSelection, () -> Core.settings.getBool("editor-blocks-shown"));
+
+            }).width(dsize * 5 + 4f).top();
+            if(mobile){
+                editorMain.row().spacerY(() -> {
+                    if(control.input instanceof MobileInput mob && Core.settings.getBool("editor-blocks-shown")){
+                        if(Core.graphics.isPortrait()) return Core.graphics.getHeight() / 2f / Scl.scl(1f);
+                        if(mob.hasSchematic()) return 156f;
+                        if(mob.showCancel()) return 50f;
+                    }
+                    return 0f;
+                });
+            }
+
+            editorMain.row().add().growY();
             editorMain.visible(() -> shown && state.isEditor());
 
             //fps display
@@ -286,6 +400,11 @@ public class HudFragment{
         //core info
         parent.fill(t -> {
             t.top();
+
+            if(Core.settings.getBool("macnotch") ){
+                t.margin(macNotchHeight);
+            }
+
             t.visible(() -> shown);
 
             t.name = "coreinfo";
@@ -568,6 +687,8 @@ public class HudFragment{
         }
     }
 
+    /** @deprecated see {@link CoreBuild#beginLaunch(CoreBlock)} */
+    @Deprecated
     public void showLaunch(){
         float margin = 30f;
 
@@ -586,6 +707,8 @@ public class HudFragment{
         Core.scene.add(image);
     }
 
+    /** @deprecated see {@link CoreBuild#beginLaunch(CoreBlock)} */
+    @Deprecated
     public void showLand(){
         Image image = new Image();
         image.color.a = 1f;
@@ -745,7 +868,7 @@ public class HudFragment{
                 }
             });
 
-            t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
+            t.add(new SideBar(() -> player.dead() ? 0f : player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
                 b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color() : Pal.health);
@@ -774,14 +897,20 @@ public class HudFragment{
 
             builder.setLength(0);
 
+            //mission overrides everything
+            if(state.rules.mission != null && state.rules.mission.length() > 0){
+                builder.append(state.rules.mission);
+                return builder;
+            }
+
             //objectives override mission?
             if(state.rules.objectives.any()){
                 boolean first = true;
                 for(var obj : state.rules.objectives){
-                    if(!obj.qualified()) continue;
+                    if(!obj.qualified() || obj.hidden) continue;
 
                     String text = obj.text();
-                    if(text != null){
+                    if(text != null && !text.isEmpty()){
                         if(!first) builder.append("\n[white]");
                         builder.append(text);
 
@@ -789,13 +918,10 @@ public class HudFragment{
                     }
                 }
 
-                return builder;
-            }
-
-            //mission overrides everything
-            if(state.rules.mission != null){
-                builder.append(state.rules.mission);
-                return builder;
+                //TODO: display standard status when empty objective?
+                if(builder.length() > 0){
+                    return builder;
+                }
             }
 
             if(!state.rules.waves && state.rules.attackMode){
@@ -812,7 +938,7 @@ public class HudFragment{
                 return builder;
             }
 
-            if(state.rules.winWave > 1 && state.rules.winWave >= state.wave && state.isCampaign()){
+            if(state.rules.winWave > 1 && state.rules.winWave >= state.wave){
                 builder.append(wavefc.get(state.wave, state.rules.winWave));
             }else{
                 builder.append(wavef.get(state.wave));
@@ -888,7 +1014,7 @@ public class HudFragment{
 
         table.table().update(t -> {
             t.left();
-            Bits applied = player.unit().statusBits();
+            Bits applied = player.dead() ? null : player.unit().statusBits();
             if(!statuses.equals(applied)){
                 t.clear();
 
@@ -902,6 +1028,8 @@ public class HudFragment{
                     }
 
                     statuses.set(applied);
+                }else{
+                    statuses.clear();
                 }
             }
         }).left();

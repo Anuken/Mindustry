@@ -35,7 +35,7 @@ public class NoiseFilter extends GenerateFilter{
 
         if(noise > threshold && (target == Blocks.air || in.floor == target || in.block == target)){
             if(floor != Blocks.air) in.floor = floor;
-            if(block != Blocks.air && in.block != Blocks.air) in.block = block;
+            if(block != Blocks.air && in.block != Blocks.air && !in.block.breakable) in.block = block;
         }
     }
 }

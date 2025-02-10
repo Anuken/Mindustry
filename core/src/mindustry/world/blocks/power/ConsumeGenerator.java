@@ -1,10 +1,13 @@
 package mindustry.world.blocks.power;
 
+import arc.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
@@ -19,6 +22,7 @@ public class ConsumeGenerator extends PowerGenerator{
     public float effectChance = 0.01f;
     public Effect generateEffect = Fx.none, consumeEffect = Fx.none;
     public float generateEffectRange = 3f;
+    public float baseLightRadius = 65f;
 
     public @Nullable LiquidStack outputLiquid;
     /** If true, this block explodes when outputLiquid exceeds capacity. */
@@ -26,6 +30,8 @@ public class ConsumeGenerator extends PowerGenerator{
 
     public @Nullable ConsumeItemFilter filterItem;
     public @Nullable ConsumeLiquidFilter filterLiquid;
+    /** Multiplies the itemDuration for a given item. */
+    public ObjectFloatMap<Item> itemDurationMultipliers = new ObjectFloatMap<>();
 
     public ConsumeGenerator(String name){
         super(name);
@@ -45,6 +51,11 @@ public class ConsumeGenerator extends PowerGenerator{
         filterItem = findConsumer(c -> c instanceof ConsumeItemFilter);
         filterLiquid = findConsumer(c -> c instanceof ConsumeLiquidFilter);
 
+        //pass along the duration multipliers to the consumer, so it can display them properly
+        if(filterItem instanceof ConsumeItemEfficiency eff){
+            eff.itemDurationMultipliers = itemDurationMultipliers;
+        }
+
         if(outputLiquid != null){
             outputsLiquid = true;
             hasLiquids = true;
@@ -54,14 +65,14 @@ public class ConsumeGenerator extends PowerGenerator{
             explosionPuddleLiquid = outputLiquid.liquid;
         }
 
-        //TODO hardcoded
         emitLight = true;
-        lightRadius = 65f * size;
+        lightRadius = baseLightRadius * size;
         super.init();
     }
 
     @Override
     public void setStats(){
+        stats.timePeriod = itemDuration;
         super.setStats();
 
         if(hasItems){
@@ -74,16 +85,18 @@ public class ConsumeGenerator extends PowerGenerator{
     }
 
     public class ConsumeGeneratorBuild extends GeneratorBuild{
-        public float warmup, totalTime, efficiencyMultiplier = 1f;
+        public float warmup, totalTime, efficiencyMultiplier = 1f, itemDurationMultiplier = 1;
 
         @Override
         public void updateEfficiencyMultiplier(){
+            efficiencyMultiplier = 1f;
             if(filterItem != null){
                 float m = filterItem.efficiencyMultiplier(this);
-                if(m > 0) efficiencyMultiplier = m;
-            }else if(filterLiquid != null){
+                if(m > 0) efficiencyMultiplier *= m;
+            }
+            if(filterLiquid != null){
                 float m = filterLiquid.efficiencyMultiplier(this);
-                if(m > 0) efficiencyMultiplier = m;
+                if(m > 0) efficiencyMultiplier *= m;
             }
         }
 
@@ -101,6 +114,11 @@ public class ConsumeGenerator extends PowerGenerator{
                 generateEffect.at(x + Mathf.range(generateEffectRange), y + Mathf.range(generateEffectRange));
             }
 
+            //make sure the multiplier doesn't change when there is nothing to consume while it's still running
+            if(filterItem != null && valid && itemDurationMultipliers.size > 0 && filterItem.getConsumed(this) != null){
+                itemDurationMultiplier = itemDurationMultipliers.get(filterItem.getConsumed(this), 1);
+            }
+
             //take in items periodically
             if(hasItems && valid && generateTime <= 0f){
                 consume();
@@ -113,13 +131,14 @@ public class ConsumeGenerator extends PowerGenerator{
                 liquids.add(outputLiquid.liquid, added);
                 dumpLiquid(outputLiquid.liquid);
 
-                if(explodeOnFull && liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.0001f){
+                if(explodeOnFull && liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.01f){
                     kill();
+                    Events.fire(new GeneratorPressureExplodeEvent(this));
                 }
             }
 
             //generation time always goes down, but only at the end so consumeTriggerValid doesn't assume fake items
-            generateTime -= delta() / itemDuration;
+            generateTime -= delta() / (itemDuration * itemDurationMultiplier);
         }
 
         @Override

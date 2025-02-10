@@ -11,8 +11,8 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -134,7 +134,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }else if(build != null){
             float result = 0f;
 
-            if(block.hasItems){
+            if(block.hasItems && build.items.total() > 0){
                 result += build.items.sum((item, amount) -> item.flammability * amount) / Math.max(block.itemCapacity, 1) * Mathf.clamp(block.itemCapacity / 2.4f, 1f, 3f);
             }
 
@@ -164,7 +164,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean isDarkened(){
-        return block.solid && ((!block.synthetic() && block.fillsTile) || block.forceDark);
+        return block.solid && ((!block.synthetic() && block.fillsTile) || block.checkForceDark(this));
     }
 
     public Floor floor(){
@@ -293,6 +293,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         if(build != null){
             build.onProximityUpdate();
         }
+        if(!world.isGenerating() && pathfinder != null){
+            pathfinder.updateTile(this);
+        }
     }
 
     public boolean isEditorTile(){
@@ -303,7 +306,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public void setFloorUnder(Floor floor){
         Block overlay = this.overlay;
         setFloor(floor);
-        setOverlay(overlay);
+        if(this.overlay != overlay){
+            setOverlay(overlay);
+        }
     }
 
     /** Sets the block to air. */
@@ -396,6 +401,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.overlay = (Floor)block;
 
         recache();
+        if(!world.isGenerating() && build != null){
+            build.onProximityUpdate();
+        }
     }
 
     /** Sets the overlay without a recache. */
@@ -545,6 +553,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return block.solid && block.fillsTile && !block.synthetic() ? data : 0;
     }
 
+    /** @return whether this tile is solid for legged units */
+    public boolean legSolid(){
+        return staticDarkness() >= 2 || (floor.solid && block == Blocks.air);
+    }
+
     /** @return true if these tiles are right next to each other. */
     public boolean adjacentTo(Tile tile){
         return relativeTo(tile) != -1;
@@ -680,6 +693,42 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     //remote utility methods
 
+    /** Positions are in 'packed position' format - left bits x, right bits y. */
+    @Remote(called = Loc.server)
+    public static void setTileBlocks(Block block, Team team, int[] positions){
+        if(block == null || positions == null) return;
+        for(int pos : positions){
+            Tile tile = world.tile(pos);
+            if(tile != null){
+                tile.setBlock(block, team, 0);
+            }
+        }
+    }
+
+    /** Positions are in 'packed position' format - left bits x, right bits y. */
+    @Remote(called = Loc.server)
+    public static void setTileFloors(Block block, int[] positions){
+        if(positions == null || !(block instanceof Floor floor)) return;
+        for(int pos : positions){
+            Tile tile = world.tile(pos);
+            if(tile != null){
+                tile.setFloor(floor);
+            }
+        }
+    }
+
+    /** Positions are in 'packed position' format - left bits x, right bits y. */
+    @Remote(called = Loc.server)
+    public static void setTileOverlays(Block block, int[] positions){
+        if(positions == null || !(block instanceof OverlayFloor floor)) return;
+        for(int pos : positions){
+            Tile tile = world.tile(pos);
+            if(tile != null){
+                tile.setOverlay(floor);
+            }
+        }
+    }
+
     @Remote(called = Loc.server)
     public static void setFloor(Tile tile, Block floor, Block overlay){
         tile.setFloor(floor.asFloor());
@@ -706,6 +755,17 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public static void setTeam(Building build, Team team){
         if(build != null){
             build.changeTeam(team);
+        }
+    }
+
+    @Remote(called = Loc.server)
+    public static void setTeams(int[] positions, Team team){
+        if(positions == null) return;
+        for(int pos : positions){
+            Tile tile = world.tile(pos);
+            if(tile != null && tile.build != null){
+                tile.build.changeTeam(team);
+            }
         }
     }
 
