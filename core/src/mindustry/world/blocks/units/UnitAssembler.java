@@ -200,7 +200,7 @@ public class UnitAssembler extends PayloadBlock{
                         }).left();
 
                         t.table(req -> {
-                            req.table().grow(); //it refuses to go to the right unless I do this. please help.
+                            req.add().grow(); //it refuses to go to the right unless I do this. please help.
 
                             req.table(solid -> {
                                 int length = 0;
@@ -222,13 +222,13 @@ public class UnitAssembler extends PayloadBlock{
                                     length++;
                                 }
                             }).right();
-                          
+
                             LiquidStack[] stacks = plan.liquidReq;
                             if(stacks != null){
                                 for(int i = 0; i < plan.liquidReq.length; i++){
                                     req.row();
 
-                                    req.table().grow(); //another one.
+                                    req.add().grow(); //another one.
 
                                     req.add(StatValues.displayLiquid(stacks[i].liquid, stacks[i].amount * 60f, true)).right();
                                 }
@@ -561,18 +561,19 @@ public class UnitAssembler extends PayloadBlock{
             var plan = plan();
 
             //draw the unit construction as outline
-            //TODO flashes when no gallium
             Draw.draw(Layer.blockBuilding, () -> {
                 Draw.color(Pal.accent, warmup);
 
                 Shaders.blockbuild.region = plan.unit.fullIcon;
                 Shaders.blockbuild.time = Time.time;
+                Shaders.blockbuild.alpha = warmup;
                 //margin due to units not taking up whole region
                 Shaders.blockbuild.progress = Mathf.clamp(progress + 0.05f);
 
                 Draw.rect(plan.unit.fullIcon, sx, sy, rotdeg() - 90f);
                 Draw.flush();
                 Draw.color();
+                Shaders.blockbuild.alpha = 1f;
             });
 
             Draw.reset();
