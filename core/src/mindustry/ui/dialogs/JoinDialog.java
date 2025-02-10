@@ -408,7 +408,7 @@ public class JoinDialog extends BaseDialog{
             boolean favorite = group.favorite();
             if(group.prioritized){
                 addHeader(groupTable, group, hidden, favorite, false);
-            } else if (favorite) {
+            }else if (favorite){
                 addHeader(groupTable, group, hidden, true, true);//weird behaviour if false?
             }
             //table containing all groups
