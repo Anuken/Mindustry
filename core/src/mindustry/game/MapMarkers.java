@@ -1,37 +1,42 @@
 package mindustry.game;
 
-import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.io.*;
 
 import java.io.*;
+import java.util.*;
 
-public class MapMarkers{
+public class MapMarkers implements Iterable<ObjectiveMarker>{
     /** Maps marker unique ID to marker. */
     private IntMap<ObjectiveMarker> map = new IntMap<>();
-
-    public Seq<ObjectiveMarker> worldMarkers = new Seq<>(false);
-    public Seq<ObjectiveMarker> mapMarkers = new Seq<>(false);
-    public Seq<ObjectiveMarker> lightMarkers = new Seq<>(false);
+    /** Sequential list of markers. This allows for faster iteration than a map. */
+    private Seq<ObjectiveMarker> all = new Seq<>(false);
 
     public void add(int id, ObjectiveMarker marker){
         if(marker == null) return;
-        var prev = map.put(id, marker);
 
-        setMarker(worldMarkers, marker, prev, m -> m.world, (m, i) -> m.world = i);
-        setMarker(mapMarkers, marker, prev, m -> m.minimap, (m, i) -> m.minimap = i);
-        setMarker(lightMarkers, marker, prev, m -> m.light, (m, i) -> m.light = i);
+        var prev = map.put(id, marker);
+        if(prev != null){
+            all.set(prev.arrayIndex, marker);
+        }else{
+            all.add(marker);
+            marker.arrayIndex = all.size - 1;
+        }
     }
 
     public void remove(int id){
         var prev = map.remove(id);
-
         if(prev != null){
-            remove(worldMarkers, prev.world, (m, i) -> m.world = i);
-            remove(mapMarkers, prev.minimap, (m, i) -> m.minimap = i);
-            remove(lightMarkers, prev.light, (m, i) -> m.light = i);
+            if(all.size > prev.arrayIndex + 1){ //there needs to be something above the index to replace it with
+                all.remove(prev.arrayIndex);
+                //update its index
+                all.get(prev.arrayIndex).arrayIndex = prev.arrayIndex;
+            }else{
+                //no sense updating the index of the replaced element when it was not replaced
+                all.remove(prev.arrayIndex);
+            }
         }
     }
 
@@ -44,7 +49,7 @@ public class MapMarkers{
     }
 
     public int size(){
-        return map.size;
+        return all.size;
     }
 
     public void write(DataOutput stream) throws IOException{
@@ -52,64 +57,16 @@ public class MapMarkers{
     }
 
     public void read(DataInput stream) throws IOException{
-        worldMarkers.clear();
-        mapMarkers.clear();
-        lightMarkers.clear();
+        all.clear();
         map = JsonIO.readBytes(IntMap.class, ObjectiveMarker.class, (DataInputStream)stream);
-
         for(var entry : map.entries()){
-            var marker = entry.value;
-
-            if(marker.world != -1) marker.world = worldMarkers.add(marker).size - 1;
-            if(marker.minimap != -1) marker.minimap = mapMarkers.add(marker).size - 1;
-            if(marker.light != -1) marker.light = lightMarkers.add(marker).size - 1;
+            all.add(entry.value);
+            entry.value.arrayIndex = all.size - 1;
         }
     }
 
-    public interface MarkerSetter{
-        void set(ObjectiveMarker marker, int index);
+    @Override
+    public Iterator<ObjectiveMarker> iterator(){
+        return all.iterator();
     }
-
-    public void updateMarker(Seq<ObjectiveMarker> markers, ObjectiveMarker marker, boolean visible, Intf<ObjectiveMarker> getter, MarkerSetter setter){
-        if((getter.get(marker) != -1) == visible) return; // nothing to change
-
-        if(!visible){
-            setter.set(markers.peek(), getter.get(marker));
-            markers.remove(getter.get(marker));
-            setter.set(marker, -1);
-        }else{
-            setter.set(marker, markers.size);
-            markers.add(marker);
-        }
-    }
-
-    private void setMarker(Seq<ObjectiveMarker> markers, ObjectiveMarker curr, ObjectiveMarker prev, Intf<ObjectiveMarker> getter, MarkerSetter setter){
-        int currIndex = getter.get(curr);
-
-        if(prev != null && getter.get(prev) != -1){
-            int prevIndex = getter.get(prev);
-            if(currIndex != -1){
-                // both markers visible, replace previous with current
-                setter.set(curr, prevIndex);
-                markers.set(prevIndex, curr);
-            }else{
-                // previous marker visible but not current
-                setter.set(markers.peek(), prevIndex);
-                markers.remove(prevIndex);
-            }
-        }else{
-            if(currIndex != -1){
-                setter.set(curr, markers.size);
-                markers.add(curr);
-            }
-        }
-    }
-
-    private void remove(Seq<ObjectiveMarker> markers, int index, MarkerSetter setter){
-        if(index != -1){
-            setter.set(markers.peek(), index);
-            markers.remove(index);
-        }
-    }
-
 }
