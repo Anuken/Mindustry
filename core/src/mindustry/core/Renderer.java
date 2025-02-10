@@ -320,37 +320,6 @@ public class Renderer implements ApplicationListener{
             }
         }
 
-        //draw objective markers
-        float scaleFactor = 4f / renderer.getDisplayScale();
-        state.rules.objectives.eachRunning(obj -> {
-            for(var marker : obj.markers){
-                if(marker.world != -1){
-                    marker.draw(marker.autoscale ? scaleFactor : 1);
-                }
-            }
-        });
-
-        for(var marker : state.markers.worldMarkers){
-            marker.draw(marker.autoscale ? scaleFactor : 1);
-        }
-        Draw.reset();
-
-        lights.add(() -> {
-            state.rules.objectives.eachRunning(obj -> {
-                for(var marker : obj.markers){
-                    if(marker.light != -1){
-                        marker.drawLight(marker.autoscale ? scaleFactor : 1);
-                    }
-                }
-            });
-
-            for(var marker : state.markers.lightMarkers){
-                marker.drawLight(marker.autoscale ? scaleFactor : 1);
-            }
-
-            Draw.reset();
-        });
-
         if(state.rules.lighting && drawLight){
             Draw.draw(Layer.light, lights::draw);
         }
@@ -382,6 +351,23 @@ public class Renderer implements ApplicationListener{
                 effectBuffer.end();
                 effectBuffer.blit(Shaders.buildBeam);
             });
+        }
+
+        float scaleFactor = 4f / renderer.getDisplayScale();
+
+        //draw objective markers
+        state.rules.objectives.eachRunning(obj -> {
+            for(var marker : obj.markers){
+                if(marker.world){
+                    marker.draw(marker.autoscale ? scaleFactor : 1);
+                }
+            }
+        });
+
+        for(var marker : state.markers){
+            if(marker.world){
+                marker.draw(marker.autoscale ? scaleFactor : 1);
+            }
         }
 
         Draw.reset();
