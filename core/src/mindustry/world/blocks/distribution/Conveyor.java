@@ -93,8 +93,8 @@ public class Conveyor extends Block implements Autotiler{
     public void handlePlacementLine(Seq<BuildPlan> plans){
         if(bridgeReplacement == null) return;
         boolean hasJuntionReplacement = junctionReplacement != null;
-        if(bridgeReplacement instanceof DuctBridge) Placement.calculateBridges(plans, (DuctBridge)bridgeReplacement, hasJuntionReplacement, b -> b instanceof Duct || b instanceof Conveyor);
-        if(bridgeReplacement instanceof ItemBridge) Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement, hasJuntionReplacement, b -> b instanceof Conveyor);
+        if(bridgeReplacement instanceof DuctBridge bridge) Placement.calculateBridges(plans, bridge, hasJuntionReplacement, b -> b instanceof Duct || b instanceof Conveyor);
+        if(bridgeReplacement instanceof ItemBridge bridge) Placement.calculateBridges(plans, bridge, hasJuntionReplacement, b -> b instanceof Conveyor);
     }
 
     @Override
