@@ -42,8 +42,11 @@ public class Renderer implements ApplicationListener{
     public FrameBuffer effectBuffer = new FrameBuffer();
     public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false;
     public float weatherAlpha;
-    /** minZoom = zooming out, maxZoom = zooming in */
+    /** minZoom = zooming out, maxZoom = zooming in, used by cutscenes */
     public float minZoom = 1.5f, maxZoom = 6f;
+
+    /** minZoom = zooming out, maxZoom = zooming in, used by actual gameplay zoom and regulated by settings **/
+    public float minZoomInGame = 0.5f, maxZoomInGame = 6f;
     public Seq<EnvRenderer> envRenderers = new Seq<>();
     public ObjectMap<String, Runnable> customBackgrounds = new ObjectMap<>();
     public TextureRegion[] bubbles = new TextureRegion[16], splashes = new TextureRegion[12];
@@ -165,6 +168,8 @@ public class Renderer implements ApplicationListener{
         drawStatus = settings.getBool("blockstatus");
         enableEffects = settings.getBool("effects");
         drawDisplays = !settings.getBool("hidedisplays");
+        maxZoomInGame = settings.getFloat("maxzoomingamemultiplier", 1) * maxZoom;
+        minZoomInGame = minZoom / settings.getFloat("minzoomingamemultiplier", 1);
         drawLight = settings.getBool("drawlight", true);
         pixelate = settings.getBool("pixelate");
 
@@ -486,11 +491,13 @@ public class Renderer implements ApplicationListener{
     }
 
     public float minScale(){
-        return Scl.scl(minZoom);
+        if(control.input.logicCutscene) return Scl.scl(minZoom);
+        return Scl.scl(minZoomInGame);
     }
 
     public float maxScale(){
-        return Mathf.round(Scl.scl(maxZoom));
+        if(control.input.logicCutscene) return Mathf.round(Scl.scl(maxZoom));
+        return Mathf.round(Scl.scl(maxZoomInGame));
     }
 
     public float getScale(){
