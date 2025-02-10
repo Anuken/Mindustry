@@ -673,7 +673,7 @@ public class LCanvas extends Table{
             drawCurve(r.x, r.y, t.x, t.y);
 
             float s = button.getWidth();
-            Draw.color(button.color);
+            Draw.color(button.color, parentAlpha);
             Tex.logicNode.draw(t.x + s * 0.75f, t.y - s / 2f, -s, s);
             Draw.reset();
         }
@@ -681,23 +681,31 @@ public class LCanvas extends Table{
         public void drawCurve(float x, float y, float x2, float y2){
             Lines.stroke(Scl.scl(4f), button.color);
             Draw.alpha(parentAlpha);
-            Draw.color(button.color);
 
             // exponential smoothing
             uiHeight = Mathf.lerp(
-                60f + 20f * (float) predHeight,
-               uiHeight,
-               dynamicJumpHeights ? Mathf.pow(0.9f, Time.delta) : 0
+                Scl.scl(Core.graphics.isPortrait() ? 20f : 40f) + Scl.scl(Core.graphics.isPortrait() ? 8f : 10f) * (float) predHeight,
+                uiHeight,
+                dynamicJumpHeights ? Mathf.pow(0.9f, Time.delta) : 0
            );
 
             //trapezoidal jumps
             float dy = (y2 == y ? 0f : y2 > y ? 1f : -1f) * uiHeight * 0.5f;
-            Lines.beginLine();
-            Lines.linePoint(x, y);
-            Lines.linePoint(x + uiHeight, y + dy);
-            Lines.linePoint(x + uiHeight, y2 - dy);
-            Lines.linePoint(x2, y2);
-            Lines.endLine();
+            //there's absolutely a better way to detect invalid trapezoids, but this probably isn't *that* slow and I don't care to fix it right now
+            if(Intersector.intersectSegments(x, y, x + uiHeight, y + dy, x2, y2, x + uiHeight, y2 - dy, Tmp.v3)){
+                Lines.beginLine();
+                Lines.linePoint(x, y);
+                Lines.linePoint(Tmp.v3.x, Tmp.v3.y);
+                Lines.linePoint(x2, y2);
+                Lines.endLine();
+            }else{
+                Lines.beginLine();
+                Lines.linePoint(x, y);
+                Lines.linePoint(x + uiHeight, y + dy);
+                Lines.linePoint(x + uiHeight, y2 - dy);
+                Lines.linePoint(x2, y2);
+                Lines.endLine();
+            }
         }
 
         public void prepareHeight(){
@@ -706,7 +714,7 @@ public class LCanvas extends Table{
                 this.predHeight = 0;
                 this.flipped = false;
                 this.jumpUIBegin = this.jumpUIEnd = invalidJump;
-            } else {
+            }else{
                 this.markedDone = false;
                 int i = this.button.elem.index;
                 int j = this.button.to.get().index;
