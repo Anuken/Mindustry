@@ -225,6 +225,8 @@ public class LogicDialog extends BaseDialog{
         buttons.button("@add", Icon.add, () -> {
             showAddDialog();
         }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
+
+        Core.app.post(canvas::rebuild);
     }
 
     public void showAddDialog(){
