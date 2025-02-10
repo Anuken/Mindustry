@@ -462,7 +462,7 @@ public class Mods implements Loadable{
 
         // Add local mods
         Seq.with(modDirectory.list())
-        .retainAll(f -> f.extEquals("jar") || f.extEquals("zip") || (f.isDirectory() && Structs.contains(metaFiles, meta -> f.child(meta).exists())))
+        .retainAll(f -> f.extEquals("jar") || f.extEquals("zip") || (f.isDirectory() && Structs.contains(metaFiles, meta -> resolveRoot(f).child(meta).exists())))
         .each(candidates::add);
 
         // Add Steam workshop mods
@@ -679,41 +679,44 @@ public class Mods implements Loadable{
             cont.row();
             cont.pane(p -> {
                 toCheck.each(mod -> {
-                    p.add(mod.meta.displayName).wrap().growX().left().labelAlign(Align.left);
+                    p.add(Core.bundle.get("mods.name") + " [accent]" + mod.meta.displayName).wrap().growX().left().labelAlign(Align.left);
                     p.row();
                     p.table(d -> {
                         mod.missingDependencies.each(dep -> {
-                            d.add(dep).wrap().growX().left().labelAlign(Align.left);
+                            d.add("[lightgray] > []" + dep).wrap().growX().left().labelAlign(Align.left);
                             d.row();
                         });
                         if(soft){
                             mod.missingSoftDependencies.each(dep -> {
-                                d.add(dep + " " + Core.bundle.get("mod.dependencies.soft")).wrap().growX().left().labelAlign(Align.left);
+                                d.add("[lightgray] > []" + dep + " [lightgray]" + Core.bundle.get("mod.dependencies.soft")).wrap().growX().left().labelAlign(Align.left);
                                 d.row();
                             });
                         }
-                    }).growX().padBottom(8f).padLeft(12f);
+                    }).growX().padBottom(8f).padLeft(8f);
                     p.row();
                 });
             }).fillX().colspan(span);
 
             cont.row();
 
-            cont.button("@cancel", this::hide).size(150, 50);
-            cont.button(soft ? "@mod.dependencies.downloadreq" : "@mod.dependencies.download", () -> {
+            cont.button("@cancel", Icon.cancel, this::hide).size(160, 50);
+            cont.button(soft ? "@mod.dependencies.downloadreq" : "@mod.dependencies.download", Icon.download, () -> {
                 hide();
                 Seq<String> toImport = new Seq<>();
                 toCheck.each(mod -> mod.missingDependencies.each(toImport::addUnique));
                 downloadDependencies(toImport);
-            }).size(150, 50);
+            }).size(160, 50);
             if(soft){
-                cont.button("@mod.dependencies.downloadall", () -> {
+                if(Core.graphics.isPortrait()){
+                    cont.row();
+                }
+                cont.button("@mod.dependencies.downloadall", Icon.download, () -> {
                     hide();
                     Seq<String> toImport = new Seq<>();
                     toCheck.each(mod -> mod.missingDependencies.each(toImport::addUnique));
                     toCheck.each(mod -> mod.missingSoftDependencies.each(toImport::addUnique));
                     downloadDependencies(toImport);
-                }).size(150, 50);
+                }).size(160, 50);
             }
         }}.show();
     }
@@ -732,39 +735,39 @@ public class Mods implements Loadable{
             setFillParent(true);
             cont.margin(15);
 
-            cont.add("@mod.dependencies.status").center();
+            cont.add("@mod.dependencies.status").color(Pal.accent).center();
             cont.row();
-            cont.image().width(300f).pad(2).height(4f).color(Color.lightGray);
+            cont.image().width(300f).pad(2).height(4f).color(Pal.accent);
             cont.row();
 
             cont.pane(p -> {
                 if(success.any()){
-                    p.add("@mod.dependencies.success").wrap().fillX().left().labelAlign(Align.left);
+                    p.add("@mod.dependencies.success").color(Pal.accent).wrap().fillX().left().labelAlign(Align.left);
                     p.row();
                     p.table(t -> {
                         success.each(d -> {
-                            t.add(d).wrap().growX().left().labelAlign(Align.left);
+                            t.add("[accent] > []" + d).wrap().growX().left().labelAlign(Align.left);
                             t.row();
                         });
-                    }).growX().padBottom(8f).padLeft(12f);
+                    }).growX().padBottom(8f).padLeft(8f);
                     p.row();
                 }
 
                 if(failed.any()){
-                    p.add("@mod.dependencies.failure").wrap().fillX().left().labelAlign(Align.left);
+                    p.add("@mod.dependencies.failure").color(Color.scarlet).wrap().fillX().left().labelAlign(Align.left);
                     p.row();
                     p.table(t -> {
                         failed.each(d -> {
-                            t.add(d).wrap().growX().left().labelAlign(Align.left);
+                            t.add("[scarlet] > []" + d).wrap().growX().left().labelAlign(Align.left);
                             t.row();
                         });
-                    }).growX().padBottom(8f).padLeft(12f);
+                    }).growX().padBottom(8f).padLeft(8f);
                 }
             }).fillX();
             cont.row();
 
             if(success.any()){
-                cont.image().width(300f).pad(2).height(4f).color(Color.lightGray);
+                cont.image().width(300f).pad(2).height(4f).color(Pal.accent);
                 cont.row();
                 cont.add("@mods.reloadexit").center();
                 cont.row();
@@ -800,6 +803,8 @@ public class Mods implements Loadable{
 
     /** This must be run on the main thread! */
     public void loadScripts(){
+        if(skipModCode) return;
+
         Time.mark();
         boolean[] any = {false};
 
@@ -1147,6 +1152,7 @@ public class Mods implements Loadable{
                 Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
                 Version.isAtLeast(meta.minGameVersion) &&
                 (meta.getMinMajor() >= 136 || headless) &&
+                !skipModCode &&
                 initialize
             ){
                 if(ios){

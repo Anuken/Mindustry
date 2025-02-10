@@ -114,6 +114,10 @@ public class ModsDialog extends BaseDialog{
         }
     }
 
+    void getModList(Cons<Seq<ModListing>> listener){
+        getModList(0, listener);
+    }
+
     void getModList(int index, Cons<Seq<ModListing>> listener){
         if(index >= modJsonURLs.length) return;
 
