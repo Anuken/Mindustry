@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.ai.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -21,21 +20,25 @@ public class CommandAI extends AIController{
     protected static final Vec2 vecOut = new Vec2(), vecMovePos = new Vec2();
     protected static final boolean[] noFound = {false};
     protected static final UnitPayload tmpPayload = new UnitPayload(null);
+    protected static final int transferStateNone = 0, transferStateLoad = 1, transferStateUnload = 2;
 
     public Seq<Position> commandQueue = new Seq<>(5);
     public @Nullable Vec2 targetPos;
     public @Nullable Teamc attackTarget;
-    /** Group of units that were all commanded to reach the same point.. */
+    /** Group of units that were all commanded to reach the same point. */
     public @Nullable UnitGroup group;
     public int groupIndex = 0;
     /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
     public IntSeq unreachableBuildings = new IntSeq(8);
+    /** ID of unit read as target. This is set up after reading. Do not access! */
+    public int readAttackTarget = -1;
 
     protected boolean stopAtTarget, stopWhenInRange;
     protected Vec2 lastTargetPos;
-    protected int pathId = -1;
     protected boolean blockingUnit;
     protected float timeSpentBlocked;
+    protected float payloadPickupCooldown;
+    protected int transferState = transferStateNone;
 
     /** Stance, usually related to firing mode. */
     public UnitStance stance = UnitStance.shoot;
@@ -52,7 +55,7 @@ public class CommandAI extends AIController{
 
     /** Attempts to assign a command to this unit. If not supported by the unit type, does nothing. */
     public void command(UnitCommand command){
-        if(Structs.contains(unit.type.commands, command)){
+        if(unit.type.commands.contains(command)){
             //clear old state.
             unit.mineTile = null;
             unit.clearBuilding();
@@ -79,14 +82,23 @@ public class CommandAI extends AIController{
             commandTarget(target, false);
         }
 
+        //pursue the target for patrol, keeping the current position
+        if(stance == UnitStance.patrol && target != null && attackTarget == null){
+            //commanding a target overwrites targetPos, so add it to the queue
+            if(targetPos != null){
+                commandQueue.add(targetPos.cpy());
+            }
+            commandTarget(target, false);
+        }
+
         //remove invalid targets
         if(commandQueue.any()){
             commandQueue.removeAll(e -> e instanceof Healthc h && !h.isValid());
         }
 
         //assign defaults
-        if(command == null && unit.type.commands.length > 0){
-            command = unit.type.defaultCommand == null ? unit.type.commands[0] : unit.type.defaultCommand;
+        if(command == null && unit.type.commands.size > 0){
+            command = unit.type.defaultCommand == null ? unit.type.commands.first() : unit.type.defaultCommand;
         }
 
         //update command controller based on index.
@@ -113,9 +125,26 @@ public class CommandAI extends AIController{
         attackTarget = null;
     }
 
+    void tryPickupUnit(Payloadc pay){
+        Unit target = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u.isAI() && u != unit && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize));
+        if(target != null){
+            Call.pickedUnitPayload(unit, target);
+        }
+    }
+
+    @Override
+    public Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
+        if(!unit.type.autoFindTarget && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
+            return null;
+        }
+        return super.findMainTarget(x, y, range, air, ground);
+    }
+
     public void defaultBehavior(){
 
         if(!net.client() && unit instanceof Payloadc pay){
+            payloadPickupCooldown -= Time.delta;
+
             //auto-drop everything
             if(command == UnitCommand.unloadPayloadCommand && pay.hasPayload()){
                 Call.payloadDropped(unit, unit.x, unit.y);
@@ -123,10 +152,7 @@ public class CommandAI extends AIController{
 
             //try to pick up what's under it
             if(command == UnitCommand.loadUnitsCommand){
-                Unit target = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u.isAI() && u != unit && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize));
-                if(target != null){
-                    Call.pickedUnitPayload(unit, target);
-                }
+                tryPickupUnit(pay);
             }
 
             //try to pick up a block
@@ -155,28 +181,8 @@ public class CommandAI extends AIController{
             }
         }
 
-        //acquiring naval targets isn't supported yet, so use the fallback dumb AI
-        if(unit.team.isAI() && unit.team.rules().rtsAi && unit.type.naval){
-            if(fallback == null) fallback = new GroundAI();
-
-            if(fallback.unit() != unit) fallback.unit(unit);
-            fallback.updateUnit();
-            return;
-        }
-
         updateVisuals();
-        //only autotarget if the unit supports it
-        if((targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range())) || unit.type.autoFindTarget){
-            updateTargeting();
-        }else if(attackTarget == null){
-            //if the unit does not have an attack target, is currently moving, and does not have autotargeting, stop attacking stuff
-            target = null;
-            for(var mount : unit.mounts){
-                if(mount.weapon.controllable){
-                    mount.target = null;
-                }
-            }
-        }
+        updateTargeting();
 
         if(attackTarget != null && invalid(attackTarget)){
             attackTarget = null;
@@ -203,6 +209,11 @@ public class CommandAI extends AIController{
             }
         }
 
+        boolean alwaysArrive = false;
+
+        float engageRange = unit.type.range - 10f;
+        boolean withinAttackRange = attackTarget != null && unit.within(attackTarget, engageRange) && stance != UnitStance.ram;
+
         if(targetPos != null){
             boolean move = true, isFinalPoint = commandQueue.size == 0;
             vecOut.set(targetPos);
@@ -213,12 +224,19 @@ public class CommandAI extends AIController{
                 vecMovePos.add(group.positions[groupIndex * 2], group.positions[groupIndex * 2 + 1]);
             }
 
+            Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
+
             //TODO: should the unit stop when it finds a target?
-            if(stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f)){
+            if(
+                (stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
+                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
+                (command == UnitCommand.loopPayloadCommand && unit.within(targetPos, 10f))
+            ){
                 move = false;
             }
 
             if(unit.isGrounded() && stance != UnitStance.ram){
+                //TODO: blocking enable or disable?
                 if(timer.get(timerTarget3, avoidInterval)){
                     Vec2 dstPos = Tmp.v1.trns(unit.rotation, unit.hitSize/2f);
                     float max = unit.hitSize/2f;
@@ -246,8 +264,25 @@ public class CommandAI extends AIController{
                     timeSpentBlocked = 0f;
                 }
 
-                //if you've spent 3 seconds stuck, something is wrong, move regardless
-                move = Vars.controlPath.getPathPosition(unit, pathId, vecMovePos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                //if the unit is next to the target, stop asking the pathfinder how to get there, it's a waste of CPU
+                //TODO maybe stop moving too?
+                if(withinAttackRange){
+                    move = true;
+                    noFound[0] = false;
+                    vecOut.set(vecMovePos);
+                }else{
+                    move = controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+
+                    //TODO: what to do when there's a target and it can't be reached?
+                    /*
+                    if(noFound[0] && attackTarget != null && attackTarget.within(unit, unit.type.range * 2f)){
+                        move = true;
+                        vecOut.set(targetPos);
+                    }*/
+                }
+
+                //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
+                alwaysArrive = vecOut.epsilonEquals(unit.tileX() * tilesize, unit.tileY() * tilesize);
                 //we've reached the final point if the returned coordinate is equal to the supplied input
                 isFinalPoint &= vecMovePos.epsilonEquals(vecOut, 4.1f);
 
@@ -264,18 +299,16 @@ public class CommandAI extends AIController{
                 vecOut.set(vecMovePos);
             }
 
-            float engageRange = unit.type.range - 10f;
-
             if(move){
                 if(unit.type.circleTarget && attackTarget != null){
                     target = attackTarget;
                     circleAttack(80f);
                 }else{
                     moveTo(vecOut,
-                    attackTarget != null && unit.within(attackTarget, engageRange) && stance != UnitStance.ram ? engageRange :
+                    withinAttackRange ? engageRange :
                     unit.isGrounded() ? 0f :
-                    attackTarget != null && stance != UnitStance.ram ? engageRange :
-                    0f, unit.isFlying() ? 40f : 100f, false, null, isFinalPoint);
+                    attackTarget != null && stance != UnitStance.ram ? engageRange : 0f,
+                    unit.isFlying() ? 40f : 100f, false, null, isFinalPoint || alwaysArrive);
                 }
             }
 
@@ -284,7 +317,7 @@ public class CommandAI extends AIController{
                 attackTarget = null;
             }
 
-            if(unit.isFlying() && move){
+            if(unit.isFlying() && move && (attackTarget == null || !unit.within(attackTarget, unit.type.range))){
                 unit.lookAt(vecMovePos);
             }else{
                 faceTarget();
@@ -307,9 +340,53 @@ public class CommandAI extends AIController{
 
     void finishPath(){
         //the enter payload command never finishes until they are actually accepted
-        if(command == UnitCommand.enterPayloadCommand && commandQueue.size == 0 && targetPos != null && world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y).block.acceptsPayloads){
+        if(command == UnitCommand.enterPayloadCommand && commandQueue.size == 0 && targetPos != null && world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y).block.acceptsUnitPayloads){
             return;
         }
+
+        if(!net.client() && command == UnitCommand.loopPayloadCommand && unit instanceof Payloadc pay){
+
+            if(transferState == transferStateNone){
+                transferState = pay.hasPayload() ? transferStateUnload : transferStateLoad;
+            }
+
+            if(payloadPickupCooldown > 0f) return;
+
+            if(transferState == transferStateUnload){
+                //drop until there's a failure
+                int prev = -1;
+                while(pay.hasPayload() && prev != pay.payloads().size){
+                    prev = pay.payloads().size;
+                    Call.payloadDropped(unit, unit.x, unit.y);
+                }
+
+                //wait for everything to unload before running code below
+                if(pay.hasPayload()){
+                    return;
+                }
+                payloadPickupCooldown = 60f;
+            }else if(transferState == transferStateLoad){
+                //pick up units until there's a failure
+                int prev = -1;
+                while(prev != pay.payloads().size){
+                    prev = pay.payloads().size;
+                    tryPickupUnit(pay);
+                }
+
+                //wait to load things before running code below
+                if(!pay.hasPayload()){
+                    return;
+                }
+                payloadPickupCooldown = 60f;
+            }
+
+            //it will never finish
+            if(commandQueue.size == 0){
+                return;
+            }
+        }
+
+        transferState = transferStateNone;
 
         Vec2 prev = targetPos;
         targetPos = null;
@@ -322,7 +399,7 @@ public class CommandAI extends AIController{
                 commandPosition(position);
             }
 
-            if(prev != null && stance == UnitStance.patrol){
+            if(prev != null && (stance == UnitStance.patrol || command == UnitCommand.loopPayloadCommand)){
                 commandQueue.add(prev.cpy());
             }
 
@@ -337,10 +414,15 @@ public class CommandAI extends AIController{
         }
     }
 
+    @Override
+    public void removed(Unit unit){
+        clearCommands();
+    }
+
     public void commandQueue(Position location){
         if(targetPos == null && attackTarget == null){
-            if(location instanceof Teamc target){
-                commandTarget(target, this.stopAtTarget);
+            if(location instanceof Teamc t){
+                commandTarget(t, this.stopAtTarget);
             }else if(location instanceof Vec2 position){
                 commandPosition(position);
             }
@@ -350,8 +432,11 @@ public class CommandAI extends AIController{
     }
 
     @Override
-    public float prefSpeed(){
-        return group == null ? super.prefSpeed() : Math.min(group.minSpeed, unit.speed());
+    public void afterRead(Unit unit){
+        if(readAttackTarget != -1){
+            attackTarget = Groups.unit.getByID(readAttackTarget);
+            readAttackTarget = -1;
+        }
     }
 
     @Override
@@ -375,7 +460,7 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
-        return !nearAttackTarget(x, y, range) ? super.findTarget(x, y, range, air, ground) : attackTarget;
+        return !nearAttackTarget(x, y, range) ? super.findTarget(x, y, range, air, ground) : Units.isHittable(attackTarget, air, ground) ? attackTarget : null;
     }
 
     public boolean nearAttackTarget(float x, float y, float range){
@@ -412,7 +497,6 @@ public class CommandAI extends AIController{
         //this is an allocation, but it's relatively rarely called anyway, and outside mutations must be prevented
         targetPos = lastTargetPos = pos.cpy();
         attackTarget = null;
-        pathId = Vars.controlPath.nextTargetId();
         this.stopWhenInRange = stopWhenInRange;
     }
 
@@ -427,55 +511,6 @@ public class CommandAI extends AIController{
     public void commandTarget(Teamc moveTo, boolean stopAtTarget){
         attackTarget = moveTo;
         this.stopAtTarget = stopAtTarget;
-        pathId = Vars.controlPath.nextTargetId();
     }
 
-    /*
-
-    //TODO ひどい
-    (does not work)
-
-    public static float cohesionScl = 0.3f;
-    public static float cohesionRad = 3f, separationRad = 1.1f, separationScl = 1f, flockMult = 0.5f;
-
-    Vec2 calculateFlock(){
-        if(local.isEmpty()) return flockVec.setZero();
-
-        flockVec.setZero();
-        separation.setZero();
-        cohesion.setZero();
-        massCenter.set(unit);
-
-        float rad = unit.hitSize;
-        float sepDst = rad * separationRad, cohDst = rad * cohesionRad;
-
-        //"cohesed" isn't even a word smh
-        int separated = 0, cohesed = 1;
-
-        for(var other : local){
-            float dst = other.dst(unit);
-            if(dst < sepDst){
-                separation.add(Tmp.v1.set(unit).sub(other).scl(1f / sepDst));
-                separated ++;
-            }
-
-            if(dst < cohDst){
-                massCenter.add(other);
-                cohesed ++;
-            }
-        }
-
-        if(separated > 0){
-            separation.scl(1f / separated);
-            flockVec.add(separation.scl(separationScl));
-        }
-
-        if(cohesed > 1){
-            massCenter.scl(1f / cohesed);
-            flockVec.add(Tmp.v1.set(massCenter).sub(unit).limit(cohesionScl * unit.type.speed));
-            //seek mass center?
-        }
-
-        return flockVec;
-    }*/
 }

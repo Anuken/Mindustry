@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -53,6 +54,19 @@ public class Teams{
     @Nullable
     public CoreBuild closestCore(float x, float y, Team team){
         return Geometry.findClosest(x, y, get(team).cores);
+    }
+
+    public boolean anyEnemyCoresWithinBuildRadius(Team team, float x, float y){
+        for(TeamData data : active){
+            if(team != data.team){
+                for(CoreBuild tile : data.cores){
+                    if(tile.within(x, y, state.rules.buildRadius(tile.team) + tilesize)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public boolean anyEnemyCoresWithin(Team team, float x, float y, float radius){
@@ -239,6 +253,8 @@ public class Teams{
     }
 
     public static class TeamData{
+        private static final IntSeq derelictBuffer = new IntSeq();
+
         public final Team team;
 
         /** Handles building ""bases"". */
@@ -316,6 +332,8 @@ public class Teams{
                 }
             }
 
+            finishScheduleDerelict();
+
             //kill all units randomly
             units.each(u -> Time.run(Mathf.random(0f, 60f * 5f), () -> {
                 //ensure unit hasn't switched teams for whatever reason
@@ -325,21 +343,7 @@ public class Teams{
             }));
         }
 
-        /** Make all buildings within this range derelict / explode. */
-        public void makeDerelict(float x, float y, float range){
-            var builds = new Seq<Building>();
-            if(buildingTree != null){
-                buildingTree.intersect(x - range, y - range, range * 2f, range * 2f, builds);
-            }
-
-            for(var build : builds){
-                if(build.within(x, y, range) && !build.block.privileged){
-                    scheduleDerelict(build);
-                }
-            }
-        }
-
-        /** Make all buildings within this range explode. */
+        /** Make all buildings within this range derelict/explode. */
         public void timeDestroy(float x, float y, float range){
             var builds = new Seq<Building>();
             if(buildingTree != null){
@@ -347,21 +351,29 @@ public class Teams{
             }
 
             for(var build : builds){
-                if(build.within(x, y, range) && !cores.contains(c -> c.within(x, y, range))){
-                    //TODO GPU driver bugs?
-                    build.kill();
-                    //Time.run(Mathf.random(0f, 60f * 6f), build::kill);
+                if(!build.block.privileged && build.within(x, y, range) && !cores.contains(c -> c.within(build, range))){
+                    scheduleDerelict(build);
                 }
             }
+            finishScheduleDerelict();
         }
 
         private void scheduleDerelict(Building build){
-            //TODO this may cause a lot of packet spam, optimize?
-            Call.setTeam(build, Team.derelict);
+            //queue block to be handled later, avoid packet spam
+            derelictBuffer.add(build.pos());
 
-            if(Mathf.chance(0.25)){
+            if(build.getPayload() instanceof UnitPayload){
+                Call.destroyPayload(build);
+            }
+
+            if(Mathf.chance(0.2)){
                 Time.run(Mathf.random(0f, 60f * 6f), build::kill);
             }
+        }
+
+        private void finishScheduleDerelict(){
+            derelictBuffer.chunked(1000, values -> Call.setTeams(values, Team.derelict));
+            derelictBuffer.clear();
         }
 
         //this is just an alias for consistency
@@ -425,14 +437,23 @@ public class Teams{
         }
     }
 
+    @Remote(called = Loc.server, unreliable = true)
+    public static void destroyPayload(Building build){
+        if(build != null && build.getPayload() instanceof UnitPayload && build.takePayload() instanceof UnitPayload unit){
+            unit.dump();
+            unit.unit.killed();
+        }
+    }
+
     /** Represents a block made by this team that was destroyed somewhere on the map.
      * This does not include deconstructed blocks.*/
     public static class BlockPlan{
-        public final short x, y, rotation, block;
+        public final short x, y, rotation;
+        public final Block block;
         public final Object config;
         public boolean removed;
 
-        public BlockPlan(int x, int y, short rotation, short block, Object config){
+        public BlockPlan(int x, int y, short rotation, Block block, Object config){
             this.x = (short)x;
             this.y = (short)y;
             this.rotation = rotation;

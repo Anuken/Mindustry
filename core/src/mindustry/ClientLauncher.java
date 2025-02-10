@@ -29,12 +29,13 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     private long nextFrame;
     private long beginTime;
+    private long lastTargetFps = -1;
     private boolean finished = false;
     private LoadRenderer loader;
 
     @Override
     public void setup(){
-        String dataDir = OS.env("MINDUSTRY_DATA_DIR");
+        String dataDir = System.getProperty("mindustry.data.dir", OS.env("MINDUSTRY_DATA_DIR"));
         if(dataDir != null){
             Core.settings.setDataDirectory(files.absolute(dataDir));
         }
@@ -54,6 +55,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Log.info("[GL] Version: @", graphics.getGLVersion());
         Log.info("[GL] Max texture size: @", maxTextureSize);
         Log.info("[GL] Using @ context.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
+        if(NvGpuInfo.hasMemoryInfo()){
+            Log.info("[GL] Total available VRAM: @mb", NvGpuInfo.getMaxMemoryKB()/1024);
+        }
         if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
         Log.info("[JAVA] Version: @", OS.javaVersion);
         if(Core.app.isAndroid()){
@@ -61,14 +65,17 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         }
         long ram = Runtime.getRuntime().maxMemory();
         boolean gb = ram >= 1024 * 1024 * 1024;
-        Log.info("[RAM] Available: @ @", Strings.fixed(gb ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gb ? "GB" : "MB");
+        if(!OS.isIos){
+            Log.info("[RAM] Available: @ @", Strings.fixed(gb ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gb ? "GB" : "MB");
+        }
 
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;
-            return (Float.isNaN(result) || Float.isInfinite(result)) ? 1f : Mathf.clamp(result, 0.0001f, 60f / 10f);
+            return (Float.isNaN(result) || Float.isInfinite(result)) ? 1f : Mathf.clamp(result, 0.0001f, maxDeltaClient);
         });
 
-        batch = new SortedSpriteBatch();
+        UI.loadColors();
+        batch = new SpriteBatch();
         assets = new AssetManager();
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
 
@@ -200,9 +207,12 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     @Override
     public void update(){
         int targetfps = Core.settings.getInt("fpscap", 120);
+        boolean changed = lastTargetFps != targetfps && lastTargetFps != -1;
         boolean limitFps = targetfps > 0 && targetfps <= 240;
 
-        if(limitFps){
+        lastTargetFps = targetfps;
+
+        if(limitFps && !changed){
             nextFrame += (1000 * 1000000) / targetfps;
         }else{
             nextFrame = Time.nanos();

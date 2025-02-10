@@ -39,7 +39,7 @@ public class FlyingFollowAI extends FlyingAI{
     @Override
     public void updateVisuals(){
         if(unit.isFlying()){
-            unit.wobble();
+            if(unit.type.wobble) unit.wobble();
 
             if(!shouldFaceTarget()){
                 unit.lookAt(unit.prefRotation());

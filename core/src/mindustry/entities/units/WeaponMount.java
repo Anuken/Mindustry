@@ -40,6 +40,8 @@ public class WeaponMount{
     public int totalShots;
     /** counter for which barrel bullets have been fired from; used for alternating patterns */
     public int barrelCounter;
+    /** Last aim length of weapon. Only used for point lasers. */
+    public float lastLength;
     /** current bullet for continuous weapons */
     public @Nullable Bullet bullet;
     /** sound loop for continuous weapons */

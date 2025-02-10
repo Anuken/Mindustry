@@ -16,9 +16,9 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
-import mindustry.game.*;
 import mindustry.game.Saves.*;
 import mindustry.gen.*;
 import mindustry.input.*;
@@ -53,7 +53,7 @@ public class Control implements ApplicationListener, Loadable{
 
     private Interval timer = new Interval(2);
     private boolean hiscore = false;
-    private boolean wasPaused = false;
+    private boolean wasPaused = false, backgroundPaused = false;
     private Seq<Building> toBePlaced = new Seq<>(false);
 
     public Control(){
@@ -74,6 +74,7 @@ public class Control implements ApplicationListener, Loadable{
                     ui.showInfo("@mods.initfailed");
                 });
             }
+            checkAutoUnlocks();
         });
 
         Events.on(StateChangeEvent.class, event -> {
@@ -191,42 +192,32 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.run(Trigger.newGame, () -> {
             var core = player.bestCore();
-
             if(core == null) return;
 
             camera.position.set(core);
             player.set(core);
 
             float coreDelay = 0f;
-
             if(!settings.getBool("skipcoreanimation") && !state.rules.pvp){
-                coreDelay = coreLandDuration;
+                coreDelay = core.launchDuration();
                 //delay player respawn so animation can play.
-                player.deathTimer = Player.deathDelay - coreLandDuration;
+                player.deathTimer = Player.deathDelay - core.launchDuration();
                 //TODO this sounds pretty bad due to conflict
                 if(settings.getInt("musicvol") > 0){
-                    Musics.land.stop();
-                    Musics.land.play();
-                    Musics.land.setVolume(settings.getInt("musicvol") / 100f);
+                    //TODO what to do if another core with different music is already playing?
+                    Music music = core.landMusic();
+                    music.stop();
+                    music.play();
+                    music.setVolume(settings.getInt("musicvol") / 100f);
                 }
 
-                app.post(() -> ui.hudfrag.showLand());
-                renderer.showLanding();
-
-                Time.run(coreLandDuration, () -> {
-                    Fx.launch.at(core);
-                    Effect.shake(5f, 5f, core);
-                    core.thrusterTime = 1f;
-
-                    if(state.isCampaign() && Vars.showSectorLandInfo && (state.rules.sector.preset == null || state.rules.sector.preset.showSectorLandInfo)){
-                        ui.announce("[accent]" + state.rules.sector.name() + "\n" +
-                        (state.rules.sector.info.resources.any() ? "[lightgray]" + bundle.get("sectors.resources") + "[white] " +
-                        state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
-                    }
-                });
+                renderer.showLanding(core);
             }
 
             if(state.isCampaign()){
+                if(state.rules.sector.info.importRateCache != null){
+                    state.rules.sector.info.refreshImportRates(state.rules.sector.planet);
+                }
 
                 //don't run when hosting, that doesn't really work.
                 if(state.rules.sector.planet.prebuildBase){
@@ -332,6 +323,13 @@ public class Control implements ApplicationListener, Loadable{
     void createPlayer(){
         player = Player.create();
         player.name = Core.settings.getString("name");
+
+        String locale = Core.settings.getString("locale");
+        if(locale.equals("default")){
+            locale = Locale.getDefault().toString();
+        }
+        player.locale = locale;
+
         player.color.set(Core.settings.getInt("color-0"));
 
         if(mobile){
@@ -410,7 +408,7 @@ public class Control implements ApplicationListener, Loadable{
             ui.planet.hide();
             SaveSlot slot = sector.save;
             sector.planet.setLastSector(sector);
-            if(slot != null && !clearSectors && (!sector.planet.clearSectorOnLose || sector.info.hasCore)){
+            if(slot != null && !clearSectors && (!(sector.planet.clearSectorOnLose || sector.info.hasWorldProcessor) || sector.info.hasCore)){
 
                 try{
                     boolean hadNoCore = !sector.info.hasCore;
@@ -423,7 +421,7 @@ public class Control implements ApplicationListener, Loadable{
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty() || hadNoCore){
 
-                        if(sector.planet.clearSectorOnLose){
+                        if(sector.planet.clearSectorOnLose || sector.info.hasWorldProcessor){
                             playNewSector(origin, sector, reloader);
                         }else{
                             //no spawn set -> delete the sector save
@@ -447,6 +445,7 @@ public class Control implements ApplicationListener, Loadable{
                             state.wave = 1;
                             //set up default wave time
                             state.wavetime = state.rules.initialWaveSpacing <= 0f ? (state.rules.waveSpacing * (sector.preset == null ? 2f : sector.preset.startWaveTimeMultiplier)) : state.rules.initialWaveSpacing;
+                            state.wavetime *= sector.planet.campaignRules.difficulty.waveTimeMultiplier;
                             //reset captured state
                             sector.info.wasCaptured = false;
 
@@ -463,7 +462,7 @@ public class Control implements ApplicationListener, Loadable{
                                 for(var plan : state.rules.waveTeam.data().plans){
                                     Tile tile = world.tile(plan.x, plan.y);
                                     if(tile != null){
-                                        tile.setBlock(content.block(plan.block), state.rules.waveTeam, plan.rotation);
+                                        tile.setBlock(plan.block, state.rules.waveTeam, plan.rotation);
                                         if(plan.config != null && tile.build != null){
                                             tile.build.configureAny(plan.config);
                                         }
@@ -551,6 +550,7 @@ public class Control implements ApplicationListener, Loadable{
     @Override
     public void pause(){
         if(settings.getBool("backgroundpause", true) && !net.active()){
+            backgroundPaused = true;
             wasPaused = state.is(State.paused);
             if(state.is(State.playing)) state.set(State.paused);
         }
@@ -561,6 +561,7 @@ public class Control implements ApplicationListener, Loadable{
         if(state.is(State.paused) && !wasPaused && settings.getBool("backgroundpause", true) && !net.active()){
             state.set(State.playing);
         }
+        backgroundPaused = false;
     }
 
     @Override
@@ -650,6 +651,10 @@ public class Control implements ApplicationListener, Loadable{
             var core = state.rules.defaultTeam.core();
             if(!net.client() && core != null && state.isCampaign()){
                 core.items.each((i, a) -> i.unlock());
+            }
+
+            if(backgroundPaused && settings.getBool("backgroundpause") && !net.active()){
+                state.set(State.paused);
             }
 
             //cannot launch while paused

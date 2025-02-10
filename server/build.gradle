@@ -47,6 +47,8 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     exclude("icons/icon.ico")
     exclude("icons/icon_64.png")
 
+    duplicatesStrategy = 'exclude'
+
     manifest{
         attributes 'Main-Class': project.mainClassName
     }

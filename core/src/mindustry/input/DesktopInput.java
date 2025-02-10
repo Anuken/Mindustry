@@ -56,8 +56,10 @@ public class DesktopInput extends InputHandler{
     /** Time of most recent control group selection */
     public long lastCtrlGroupSelectMillis;
 
+    private float buildPlanMouseOffsetX, buildPlanMouseOffsetY;
+
     boolean showHint(){
-        return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() &&
+        return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() && !player.dead() &&
             (!isBuilding && !Core.settings.getBool("buildautopause") || player.unit().isBuilding() || !player.dead() && !player.unit().spawnedByCore());
     }
 
@@ -108,26 +110,27 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void drawTop(){
+        if(cursorType != SystemCursor.arrow && scene.hasMouse()){
+           graphics.cursor(cursorType = SystemCursor.arrow);
+        }
+
         Lines.stroke(1f);
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());
 
         //draw break selection
         if(mode == breaking){
-            drawBreakSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize, false);
+            drawBreakSelection(selectX, selectY, cursorX, cursorY, !(Core.input.keyDown(Binding.schematic_select) && schemX != -1 && schemY != -1) ? maxLength : Vars.maxSchematicSize, false);
         }
 
         if(!Core.scene.hasKeyboard() && mode != breaking){
 
-            if(Core.input.keyDown(Binding.schematic_select)){
+            if(Core.input.keyDown(Binding.schematic_select) && schemX != -1 && schemY != -1){
                 drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
             }else if(Core.input.keyDown(Binding.rebuild_select)){
                 drawRebuildSelection(schemX, schemY, cursorX, cursorY);
             }
         }
-
-
-        drawCommanded();
 
         Draw.reset();
     }
@@ -222,28 +225,46 @@ public class DesktopInput extends InputHandler{
         boolean locked = locked();
         boolean panCam = false;
         float camSpeed = (!Core.input.keyDown(Binding.boost) ? panSpeed : panBoostSpeed) * Time.delta;
+        boolean detached = settings.getBool("detach-camera", false);
 
-        if(input.keyDown(Binding.pan) && !scene.hasField() && !scene.hasDialog()){
-            panCam = true;
-            panning = true;
+        if(!scene.hasField() && !scene.hasDialog()){
+            if(input.keyTap(Binding.detach_camera)){
+                settings.put("detach-camera", detached = !detached);
+                if(!detached){
+                    panning = false;
+                }
+                spectating = null;
+            }
+
+            if(input.keyDown(Binding.pan)){
+                panCam = true;
+                panning = true;
+                spectating = null;
+            }
+
+            if((Math.abs(Core.input.axis(Binding.move_x)) > 0 || Math.abs(Core.input.axis(Binding.move_y)) > 0 || input.keyDown(Binding.mouse_move))){
+                panning = false;
+                spectating = null;
+            }
         }
 
-        if((Math.abs(Core.input.axis(Binding.move_x)) > 0 || Math.abs(Core.input.axis(Binding.move_y)) > 0 || input.keyDown(Binding.mouse_move)) && (!scene.hasField())){
-            panning = false;
-        }
+        panning |= detached;
+
 
         if(!locked){
-            if(((player.dead() || state.isPaused()) && !ui.chatfrag.shown()) && !scene.hasField() && !scene.hasDialog()){
+            if(((player.dead() || state.isPaused() || detached) && !ui.chatfrag.shown()) && !scene.hasField() && !scene.hasDialog()){
                 if(input.keyDown(Binding.mouse_move)){
                     panCam = true;
                 }
 
                 Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(camSpeed));
-            }else if(!player.dead() && !panning){
+            }else if((!player.dead() || spectating != null) && !panning){
                 //TODO do not pan
                 Team corePanTeam = state.won ? state.rules.waveTeam : player.team();
                 Position coreTarget = state.gameOver && !state.rules.pvp && corePanTeam.data().lastCore != null ? corePanTeam.data().lastCore : null;
-                Core.camera.position.lerpDelta(coreTarget != null ? coreTarget : player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
+                Position panTarget = coreTarget != null ? coreTarget : spectating != null ? spectating : player;
+
+                Core.camera.position.lerpDelta(panTarget, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
             }
 
             if(panCam){
@@ -267,7 +288,7 @@ public class DesktopInput extends InputHandler{
         }
 
         //validate commanding units
-        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
+        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid() || u.team != player.team());
 
         if(commandMode && !scene.hasField() && !scene.hasDialog()){
             if(input.keyTap(Binding.select_all_units)){
@@ -446,12 +467,14 @@ public class DesktopInput extends InputHandler{
 
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
+        cursorType = SystemCursor.arrow;
+
         if(cursor != null){
             if(cursor.build != null && cursor.build.interactable(player.team())){
                 cursorType = cursor.build.getCursor();
             }
 
-            if(cursor.build != null && cursor.build.team == Team.derelict && Build.validPlace(cursor.block(), player.team(), cursor.build.tileX(), cursor.build.tileY(), cursor.build.rotation)){
+            if(canRepairDerelict(cursor)){
                 cursorType = ui.repairCursor;
             }
 
@@ -498,9 +521,9 @@ public class DesktopInput extends InputHandler{
 
         if(!Core.scene.hasMouse()){
             Core.graphics.cursor(cursorType);
+        }else{
+            cursorType = SystemCursor.arrow;
         }
-
-        cursorType = SystemCursor.arrow;
     }
 
     @Override
@@ -521,8 +544,6 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void buildPlacementUI(Table table){
-        table.image().color(Pal.gray).height(4f).colspan(4).growX();
-        table.row();
         table.left().margin(0f).defaults().size(48f).left();
 
         table.button(Icon.paste, Styles.clearNonei, () -> {
@@ -568,11 +589,11 @@ public class DesktopInput extends InputHandler{
             schematicY += shiftY;
         }
 
-        if(Core.input.keyTap(Binding.deselect) && !isPlacing() && player.unit().plans.isEmpty() && !commandMode){
+        if(Core.input.keyTap(Binding.deselect) && !ui.minimapfrag.shown() && !isPlacing() && player.unit().plans.isEmpty() && !commandMode){
             player.unit().mineTile = null;
         }
 
-        if(Core.input.keyTap(Binding.clear_building)){
+        if(Core.input.keyTap(Binding.clear_building) && !player.dead()){
             player.unit().clearBuilding();
         }
 
@@ -594,7 +615,7 @@ public class DesktopInput extends InputHandler{
             selectPlans.clear();
         }
 
-        if( !Core.scene.hasKeyboard() && selectX == -1 && selectY == -1 && schemX != -1 && schemY != -1){
+        if(!Core.scene.hasKeyboard() && selectX == -1 && selectY == -1 && schemX != -1 && schemY != -1){
             if(Core.input.keyRelease(Binding.schematic_select)){
                 lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
                 useSchematic(lastSchematic);
@@ -622,11 +643,10 @@ public class DesktopInput extends InputHandler{
         }
 
         if(splan != null){
-            float offset = ((splan.block.size + 2) % 2) * tilesize / 2f;
-            float x = Core.input.mouseWorld().x + offset;
-            float y = Core.input.mouseWorld().y + offset;
-            splan.x = (int)(x / tilesize);
-            splan.y = (int)(y / tilesize);
+            float x = Core.input.mouseWorld().x + buildPlanMouseOffsetX;
+            float y = Core.input.mouseWorld().y + buildPlanMouseOffsetY;
+            splan.x = Math.round(x / tilesize);
+            splan.y = Math.round(y / tilesize);
         }
 
         if(block == null || mode != placing){
@@ -657,6 +677,15 @@ public class DesktopInput extends InputHandler{
             tappedOne = false;
             BuildPlan plan = getPlan(cursorX, cursorY);
 
+            if(plan != null){
+                //move selected to front
+                int index = player.unit().plans.indexOf(plan, true);
+                if(index != -1){
+                    player.unit().plans.removeIndex(index);
+                    player.unit().plans.addFirst(plan);
+                }
+            }
+
             if(Core.input.keyDown(Binding.break_block)){
                 mode = none;
             }else if(!selectPlans.isEmpty()){
@@ -668,8 +697,10 @@ public class DesktopInput extends InputHandler{
                 lastLineY = cursorY;
                 mode = placing;
                 updateLine(selectX, selectY);
-            }else if(plan != null && !plan.breaking && mode == none && !plan.initialized){
+            }else if(plan != null && !plan.breaking && mode == none && !plan.initialized && plan.progress <= 0f){
                 splan = plan;
+                buildPlanMouseOffsetX = splan.x * tilesize - Core.input.mouseWorld().x;
+                buildPlanMouseOffsetY = splan.y * tilesize - Core.input.mouseWorld().y;
             }else if(plan != null && plan.breaking){
                 deleting = true;
             }else if(commandMode){
@@ -754,6 +785,15 @@ public class DesktopInput extends InputHandler{
                 if(getPlan(splan.x, splan.y, splan.block.size, splan) != null){
                     player.unit().plans().remove(splan, true);
                 }
+
+                if(input.ctrl()){
+                    inv.hide();
+                    config.hideConfig();
+                    planConfig.showConfig(splan);
+                }else{
+                    planConfig.hide();
+                }
+
                 splan = null;
             }
 
@@ -853,9 +893,20 @@ public class DesktopInput extends InputHandler{
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
-        movement.set(xa, ya).nor().scl(speed);
-        if(Core.input.keyDown(Binding.mouse_move)){
-            movement.add(input.mouseWorld().sub(player).scl(1f / 25f * speed)).limit(speed);
+        if(settings.getBool("detach-camera")){
+            Vec2 targetPos = camera.position;
+
+            movement.set(targetPos).sub(player).limit(speed);
+
+            if(player.within(targetPos, 15f)){
+                movement.setZero();
+                unit.vel.approachDelta(Vec2.ZERO, unit.speed() * unit.type().accel / 2f);
+            }
+        }else{
+            movement.set(xa, ya).nor().scl(speed);
+            if(Core.input.keyDown(Binding.mouse_move)){
+                movement.add(input.mouseWorld().sub(player).scl(1f / 25f * speed)).limit(speed);
+            }
         }
 
         float mouseAngle = Angles.mouseAngle(unit.x, unit.y);

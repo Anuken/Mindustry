@@ -12,6 +12,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -58,7 +59,7 @@ public class MessageBlock extends Block{
     }
 
     public boolean accessible(){
-        return !privileged || state.rules.editor;
+        return !privileged || state.rules.editor || state.rules.allowEditWorldProcessors;
     }
 
     @Override
@@ -71,7 +72,7 @@ public class MessageBlock extends Block{
 
         @Override
         public void drawSelect(){
-            if(renderer.pixelator.enabled()) return;
+            if(renderer.pixelate) return;
 
             Font font = Fonts.outline;
             GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
@@ -79,7 +80,7 @@ public class MessageBlock extends Block{
             font.getData().setScale(1 / 4f / Scl.scl(1f));
             font.setUseIntegerPositions(false);
 
-            CharSequence text = message == null || message.length() == 0 ? "[lightgray]" + Core.bundle.get("empty") : message;
+            String text = message == null || message.length() == 0 ? "[lightgray]" + Core.bundle.get("empty") : UI.formatIcons(message.toString());
 
             l.setText(font, text, Color.white, 90f, Align.left, true);
             float offset = 1f;

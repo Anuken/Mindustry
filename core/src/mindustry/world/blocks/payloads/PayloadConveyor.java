@@ -21,6 +21,7 @@ public class PayloadConveyor extends Block{
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
     public float payloadLimit = 3f;
+    public boolean pushUnits = true;
 
     public PayloadConveyor(String name){
         super(name);
@@ -30,7 +31,7 @@ public class PayloadConveyor extends Block{
         update = true;
         outputsPayload = true;
         noUpdateDisabled = true;
-        acceptsPayloads = true;
+        acceptsUnitPayloads = true;
         priority = TargetPriority.transport;
         envEnabled |= Env.space | Env.underwater;
         sync = true;
@@ -46,8 +47,10 @@ public class PayloadConveyor extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
+        int ntrns = 1 + size/2;
+
         for(int i = 0; i < 4; i++){
-            Building other = world.build(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
+            Building other = world.build(x + Geometry.d4x[i] * ntrns, y + Geometry.d4y[i] * ntrns);
             if(other != null && other.block.outputsPayload && other.block.size == size){
                 Drawf.selected(other.tileX(), other.tileY(), other.block, other.team.color);
             }
@@ -191,6 +194,12 @@ public class PayloadConveyor extends Block{
         }
 
         @Override
+        public void onDestroyed(){
+            if(item != null) item.destroyed();
+            super.onDestroyed();
+        }
+
+        @Override
         public void draw(){
             super.draw();
 
@@ -251,7 +260,7 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void unitOn(Unit unit){
-            if(!enabled) return;
+            if(!pushUnits || !enabled) return;
 
             //calculate derivative of units moved last frame
             float delta = (curInterp - lastInterp) * size * tilesize;

@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -29,8 +28,12 @@ public class AIController implements UnitController{
     protected Teamc target;
 
     {
-        timer.reset(0, Mathf.random(40f));
-        timer.reset(1, Mathf.random(60f));
+        resetTimers();
+    }
+
+    protected void resetTimers(){
+        timer.reset(timerTarget, Mathf.random(40f));
+        timer.reset(timerTarget2, Mathf.random(60f));
     }
 
     @Override
@@ -56,6 +59,11 @@ public class AIController implements UnitController{
     }
 
     @Override
+    public void afterRead(Unit unit){
+
+    }
+
+    @Override
     public boolean isLogicControllable(){
         return true;
     }
@@ -78,7 +86,7 @@ public class AIController implements UnitController{
 
     public void updateVisuals(){
         if(unit.isFlying()){
-            unit.wobble();
+            if(unit.type.wobble) unit.wobble();
 
             unit.lookAt(unit.prefRotation());
         }
@@ -122,7 +130,7 @@ public class AIController implements UnitController{
         if(tile == null) return;
         Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathTarget));
 
-        if(tile == targetTile || (costType == Pathfinder.costNaval && !targetTile.floor().isLiquid)) return;
+        if(tile == targetTile || !unit.canPass(targetTile.x, targetTile.y)) return;
 
         unit.movePref(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), prefSpeed()));
     }
@@ -222,7 +230,7 @@ public class AIController implements UnitController{
     }
 
     public Teamc target(float x, float y, float range, boolean air, boolean ground){
-        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground);
+        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground && (unit.type.targetUnderBlocks || !t.block.underBullets));
     }
 
     public boolean retarget(){
@@ -272,7 +280,7 @@ public class AIController implements UnitController{
 
         vec.setLength(prefSpeed());
 
-        unit.moveAt(vec);
+        unit.movePref(vec);
     }
 
     public void circle(Position target, float circleLength){
@@ -290,7 +298,7 @@ public class AIController implements UnitController{
 
         vec.setLength(speed);
 
-        unit.moveAt(vec);
+        unit.movePref(vec);
     }
 
     public void moveTo(Position target, float circleLength){
@@ -336,7 +344,7 @@ public class AIController implements UnitController{
             vec.setLength(speed * length);
         }
 
-        //do not move when infinite vectors are used or if its zero.
+        //ignore invalid movement values
         if(vec.isNaN() || vec.isInfinite() || vec.isZero()) return;
 
         if(!unit.type.omniMovement && unit.type.rotateMoveFirst){

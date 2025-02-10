@@ -13,6 +13,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
@@ -24,6 +25,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     @Import float x, y, rotation, speedMultiplier;
     @Import UnitType type;
     @Import Team team;
+    @Import boolean disarmed;
 
     transient Leg[] legs = {};
     transient float totalLength;
@@ -191,8 +193,13 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
                         }
                     }
 
-                    if(type.legSplashDamage > 0){
+                    if(type.legSplashDamage > 0 && !disarmed){
                         Damage.damage(team, l.base.x, l.base.y, type.legSplashRange, type.legSplashDamage * state.rules.unitDamage(team), false, true);
+
+                        var tile = Vars.world.tileWorld(l.base.x, l.base.y);
+                        if(tile != null && tile.block().unitMoveBreakable){
+                            ConstructBlock.deconstructFinish(tile, tile.block(), self());
+                        }
                     }
                 }
 

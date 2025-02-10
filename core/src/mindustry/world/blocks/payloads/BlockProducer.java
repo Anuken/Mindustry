@@ -30,7 +30,7 @@ public abstract class BlockProducer extends PayloadBlock{
         hasItems = true;
         solid = true;
         hasPower = true;
-        acceptsPayloads = false;
+        acceptsUnitPayloads = false;
         rotate = true;
         regionRotated1 = 1;
 
@@ -67,9 +67,9 @@ public abstract class BlockProducer extends PayloadBlock{
     public void setBars(){
         super.setBars();
 
-        addBar("progress", (BlockProducerBuild entity) -> new Bar("bar.progress", Pal.ammo, () -> entity.recipe() == null ? 0f : (entity.progress / entity.recipe().buildCost)));
+        addBar("progress", (BlockProducerBuild entity) -> new Bar("bar.progress", Pal.ammo, () -> entity.recipe() == null ? 0f : (entity.progress / entity.recipe().buildTime)));
     }
-    
+
     public abstract class BlockProducerBuild extends PayloadBlockBuild<BuildPayload>{
         public float progress, time, heat;
 
@@ -108,7 +108,7 @@ public abstract class BlockProducer extends PayloadBlock{
             if(produce){
                 progress += buildSpeed * edelta();
 
-                if(progress >= recipe.buildCost){
+                if(progress >= recipe.buildTime){
                     consume();
                     payload = new BuildPayload(recipe, team);
                     payload.block().placeEffect.at(x, y, payload.size() / tilesize);
@@ -130,14 +130,14 @@ public abstract class BlockProducer extends PayloadBlock{
 
             var recipe = recipe();
             if(recipe != null){
-                Drawf.shadow(x, y, recipe.size * tilesize * 2f, progress / recipe.buildCost);
+                Drawf.shadow(x, y, recipe.size * tilesize * 2f, progress / recipe.buildTime);
                 Draw.draw(Layer.blockBuilding, () -> {
                     Draw.color(Pal.accent);
 
                     for(TextureRegion region : recipe.getGeneratedIcons()){
                         Shaders.blockbuild.region = region;
                         Shaders.blockbuild.time = time;
-                        Shaders.blockbuild.progress = progress / recipe.buildCost;
+                        Shaders.blockbuild.progress = progress / recipe.buildTime;
 
                         Draw.rect(region, x, y, recipe.rotate ? rotdeg() : 0);
                         Draw.flush();

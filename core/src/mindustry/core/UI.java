@@ -33,6 +33,8 @@ import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
 public class UI implements ApplicationListener, Loadable{
+
+    private static final StringBuilder buffer = new StringBuilder();
     public static String billions, millions, thousands;
 
     public static PixmapPacker packer;
@@ -101,8 +103,6 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void loadSync(){
-        loadColors();
-
         Fonts.outline.getData().markupEnabled = true;
         Fonts.def.getData().markupEnabled = true;
         Fonts.def.setOwnsTexture(false);
@@ -160,7 +160,7 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.draw();
 
         if(Core.input.keyTap(KeyCode.mouseLeft) && Core.scene.hasField()){
-            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+            Element e = Core.scene.getHoverElement();
             if(!(e instanceof TextField)){
                 Core.scene.setKeyboardFocus(null);
             }
@@ -281,7 +281,7 @@ public class UI implements ApplicationListener, Loadable{
 
     public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, boolean allowEmpty, Cons<String> confirmed, Runnable closed){
         if(mobile){
-            var description = text;
+            var description = (text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text);
             var empty = allowEmpty;
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);
@@ -630,6 +630,7 @@ public class UI implements ApplicationListener, Loadable{
 
                 int option = 0;
                 for(var optionsRow : options){
+                    if(optionsRow.length == 0) continue;
                     Table buttonRow = table.row().table().get().row();
                     int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
                     int width = fullWidth / optionsRow.length;
@@ -681,6 +682,40 @@ public class UI implements ApplicationListener, Loadable{
     public void hideFollowUpMenu(int menuId) {
         if(!followUpMenus.containsKey(menuId)) return;
         followUpMenus.remove(menuId).hide();
+    }
+
+    /**
+     * Finds all :name: in a string and replaces them with the icon, if such exists.
+     * Based on TextFormatter::simpleFormat
+     */
+    public static String formatIcons(String s){
+        if(!s.contains(":")) return s;
+
+        buffer.setLength(0);
+        boolean changed = false;
+
+        boolean checkIcon = false;
+        String[] tokens = s.split(":");
+        for(String token : tokens){
+            if(checkIcon){
+                if(Iconc.codes.containsKey(token)){
+                    buffer.append((char)Iconc.codes.get(token));
+                    changed = true;
+                    checkIcon = false;
+                }else if(Fonts.hasUnicodeStr(token)){
+                    buffer.append(Fonts.getUnicodeStr(token));
+                    changed = true;
+                    checkIcon = false;
+                }else{
+                    buffer.append(":").append(token);
+                }
+            }else{
+                buffer.append(token);
+                checkIcon = true;
+            }
+        }
+
+        return changed ? buffer.toString() : s;
     }
 
     /** Formats time with hours:minutes:seconds. */

@@ -60,6 +60,18 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
     }
 
+    @Override
+    public void remove(){
+        for(Payload pay : payloads){
+            pay.remove();
+        }
+        payloads.clear();
+    }
+  
+    public void destroy(){
+        if(Vars.state.rules.unitPayloadsExplode) payloads.each(Payload::destroyed);
+    }
+
     float payloadUsed(){
         return payloads.sumf(p -> p.size() * p.size());
     }
@@ -85,6 +97,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     void pickup(Unit unit){
+        if(unit.isAdded()) unit.team.data().updateCount(unit.type, 1);
+
         unit.remove();
         addPayload(new UnitPayload(unit));
         Fx.unitPickup.at(unit);
@@ -124,7 +138,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
 
         //drop off payload on an acceptor if possible
-        if(on != null && on.build != null && on.build.acceptPayload(on.build, payload)){
+        if(on != null && on.build != null && on.build.team == team && on.build.acceptPayload(on.build, payload)){
             Fx.unitDrop.at(on.build);
             on.build.handlePayload(on.build, payload);
             return true;
@@ -141,8 +155,12 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     boolean dropUnit(UnitPayload payload){
         Unit u = payload.unit;
 
+        //add random offset to prevent unit stacking
+        Tmp.v1.rnd(Mathf.random(2f));
+
         //can't drop ground units
-        if(!u.canPass(tileX(), tileY()) || Units.count(x, y, u.physicSize(), o -> o.isGrounded()) > 1){
+        //allow stacking for small units for now - otherwise, unit transfer would get annoying
+        if(!u.canPass(World.toTile(x + Tmp.v1.x), World.toTile(y + Tmp.v1.y)) || Units.count(x, y, u.physicSize(), o -> o.isGrounded() && o.hitSize > 14f) > 1){
             return false;
         }
 
@@ -151,8 +169,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         //clients do not drop payloads
         if(Vars.net.client()) return true;
 
-        u.set(this);
-        u.trns(Tmp.v1.rnd(Mathf.random(2f)));
+        u.set(x + Tmp.v1.x, y + Tmp.v1.y);
         u.rotation(rotation);
         //reset the ID to a new value to make sure it's synced
         u.id = EntityGroup.nextId();

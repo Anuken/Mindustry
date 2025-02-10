@@ -38,7 +38,10 @@ public class EventType{
         teamCoreDamage,
         socketConfigChanged,
         update,
+        beforeGameUpdate,
+        afterGameUpdate,
         unitCommandChange,
+        unitCommandPosition,
         unitCommandAttack,
         importMod,
         draw,
@@ -79,6 +82,8 @@ public class EventType{
     public static class BlockInfoEvent{}
     /** Called *after* all content has been initialized. */
     public static class ContentInitEvent{}
+    /** Called *after* all mod content has been loaded, but before it has been initialized. */
+    public static class ModContentLoadEvent{}
     /** Called when the client game is first loaded. */
     public static class ClientLoadEvent{}
     /** Called after SoundControl registers its music. */

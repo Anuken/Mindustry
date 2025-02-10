@@ -88,6 +88,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     /** Check and assign targets for a specific position. */
     void checkTargets(float x, float y){
+        if(player.dead()) return;
+
         Unit unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead);
 
         if(unit != null && player.unit().type.canAttack){
@@ -126,18 +128,21 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        for(var plan : player.unit().plans()){
-            Tile other = world.tile(plan.x, plan.y);
+        if(!player.dead()){
+            for(var plan : player.unit().plans()){
+                Tile other = world.tile(plan.x, plan.y);
 
-            if(other == null || plan.breaking) continue;
+                if(other == null || plan.breaking) continue;
 
-            r1.setSize(plan.block.size * tilesize);
-            r1.setCenter(other.worldx() + plan.block.offset, other.worldy() + plan.block.offset);
+                r1.setSize(plan.block.size * tilesize);
+                r1.setCenter(other.worldx() + plan.block.offset, other.worldy() + plan.block.offset);
 
-            if(r2.overlaps(r1)){
-                return true;
+                if(r2.overlaps(r1)){
+                    return true;
+                }
             }
         }
+
         return false;
     }
 
@@ -185,8 +190,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void buildPlacementUI(Table table){
-        table.image().color(Pal.gray).height(4f).colspan(4).growX();
-        table.row();
         table.left().margin(0f).defaults().size(48f);
 
         table.button(Icon.hammer, Styles.clearNoneTogglei, () -> {
@@ -231,7 +234,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     //actually place/break all selected blocks
                     if(tile != null){
                         if(!plan.breaking){
-                            if(validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+                            if(validPlace(plan.x, plan.y, plan.block, plan.rotation, null, true)){
                                 BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
                                 BuildPlan copy = plan.copy();
 
@@ -262,11 +265,11 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).name("confirmplace");
     }
 
-    boolean showCancel(){
-        return (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !hasSchem();
+    public boolean showCancel(){
+        return !player.dead() && (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !hasSchematic();
     }
 
-    boolean hasSchem(){
+    public boolean hasSchematic(){
         return lastSchematic != null && !selectPlans.isEmpty();
     }
 
@@ -276,16 +279,18 @@ public class MobileInput extends InputHandler implements GestureListener{
         group.fill(t -> {
             t.visible(this::showCancel);
             t.bottom().left();
-            t.button("@cancel", Icon.cancel, () -> {
-                player.unit().clearBuilding();
+            t.button("@cancel", Icon.cancel, Styles.clearTogglet, () -> {
+                if(!player.dead()){
+                    player.unit().clearBuilding();
+                }
                 selectPlans.clear();
                 mode = none;
                 block = null;
-            }).width(155f).height(50f).margin(12f);
+            }).width(155f).checked(b -> false).height(50f).margin(12f);
         });
 
         group.fill(t -> {
-            t.visible(() -> !showCancel() && block == null && !hasSchem());
+            t.visible(() -> !hasSchematic() && !state.rules.editor);
             t.bottom().left();
 
             t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
@@ -294,7 +299,14 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             t.button("@command", Icon.units, Styles.clearTogglet, () -> {
                 commandMode = !commandMode;
-            }).width(155f).height(48f).margin(12f).checked(b -> commandMode);
+                if(commandMode){
+                    block = null;
+                    rebuildMode = false;
+                    mode = none;
+                }
+            }).width(155f).height(48f).margin(12f).checked(b -> commandMode).row();
+
+            t.spacerY(() -> showCancel() ? 50f : 0f).row();
 
             //for better looking insets
             t.rect((x, y, w, h) -> {
@@ -305,7 +317,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(this::hasSchem);
+            t.visible(this::hasSchematic);
             t.bottom().left();
             t.table(Tex.pane, b -> {
                 b.defaults().size(50f);
@@ -386,8 +398,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == rebuildSelect){
             drawRebuildSelection(lineStartX, lineStartY, lastLineX, lastLineY);
         }
-
-        drawCommanded();
     }
 
     @Override
@@ -513,7 +523,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(cursor == null || Core.scene.hasMouse(screenX, screenY)) return false;
 
         //only begin selecting if the tapped block is a plan
-        selecting = hasPlan(cursor);
+        selecting = hasPlan(cursor) && !commandMode;
 
         //call tap events
         if(pointer == 0 && !selecting){
@@ -675,7 +685,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //remove if plan present
-        if(hasPlan(cursor)){
+        if(hasPlan(cursor) && !commandMode){
             removePlan(getPlan(cursor));
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
@@ -743,18 +753,23 @@ public class MobileInput extends InputHandler implements GestureListener{
             queueCommandMode = false;
         }
 
+        //cannot rebuild and place at the same time
+        if(block != null){
+            rebuildMode = false;
+        }
+
         if(player.dead()){
             mode = none;
             manualShooting = false;
             payloadTarget = null;
         }
 
-        if(locked || block != null || scene.hasField() || hasSchem() || selectPlans.size > 0){
+        if(locked || block != null || scene.hasField() || hasSchematic()){
             commandMode = false;
         }
 
         //validate commanding units
-        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
+        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid() || u.team != player.team());
 
         if(!commandMode){
             commandBuildings.clear();
@@ -762,14 +777,18 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //zoom camera
-        if(!locked && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
+        if(!locked  && !scene.hasKeyboard() && !scene.hasScroll() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
-        if(!Core.settings.getBool("keyboard") && !locked){
+        if(!Core.settings.getBool("keyboard") && !locked && !scene.hasKeyboard()){
             //move camera around
             float camSpeed = 6f;
-            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
+            Vec2 delta = Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed);
+            Core.camera.position.add(delta);
+            if(!delta.isZero()){
+                spectating = null;
+            }
         }
 
         if(Core.settings.getBool("keyboard")){
@@ -859,7 +878,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        if(player.shooting && (player.unit().activelyBuilding() || player.unit().mining())){
+        if(player.shooting && !player.dead() && (player.unit().activelyBuilding() || player.unit().mining())){
             player.shooting = false;
         }
     }
@@ -930,6 +949,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             //pan player
             Core.camera.position.x -= deltaX;
             Core.camera.position.y -= deltaY;
+            spectating = null;
         }
 
         camera.position.clamp(-camera.width/4f, -camera.height/4f, world.unitWidth() + camera.width/4f, world.unitHeight() + camera.height/4f);
@@ -967,7 +987,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         boolean allowHealing = type.canHeal;
         boolean validHealTarget = allowHealing && target instanceof Building b && b.isValid() && target.team() == unit.team && b.damaged() && target.within(unit, type.range);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
-
         //reset target if:
         // - in the editor, or...
         // - it's both an invalid standard target and an invalid heal target
@@ -1033,7 +1052,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         unit.movePref(movement);
 
         //update shooting if not building + not mining
-        if(!player.unit().activelyBuilding() && player.unit().mineTile == null){
+        if(!unit.activelyBuilding() && unit.mineTile == null){
 
             //autofire targeting
             if(manualShooting){
@@ -1042,7 +1061,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }else if(target == null){
                 player.shooting = false;
                 if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
-                    if(player.unit().type.canAttack){
+                    if(unit.type.canAttack){
                         target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround);
                     }
 

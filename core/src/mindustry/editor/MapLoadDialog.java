@@ -39,7 +39,7 @@ public class MapLoadDialog extends BaseDialog{
         ButtonGroup<Button> group = new ButtonGroup<>();
 
         int i = 0;
-        int cols = Math.max((int)(Core.graphics.getWidth() / Scl.scl(250f)), 1);
+        int cols = Math.max((int)(Core.graphics.getWidth() / Scl.scl(300f)), 1);
 
         Table table = new Table();
         table.defaults().size(250f, 90f).pad(4f);
@@ -53,7 +53,7 @@ public class MapLoadDialog extends BaseDialog{
             table.button(b -> {
                 b.add(new BorderImage(map.safeTexture(), 2f).setScaling(Scaling.fit)).padLeft(5f).size(16 * 4f);
                 b.add(map.name()).wrap().grow().labelAlign(Align.center).padLeft(5f);
-            }, Styles.squareTogglet, () -> selected = map).group(group).checked(b -> selected == map);
+            }, Styles.squareTogglet, () -> selected = map).group(group).margin(8f).checked(b -> selected == map);
 
             if(++i % cols == 0) table.row();
         }
