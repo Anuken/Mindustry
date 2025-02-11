@@ -48,8 +48,8 @@ public class TypeIO{
         }else if(object instanceof Float f){
             write.b((byte)3);
             write.f(f);
-        }else if(object instanceof String s){
-            write.b((byte)4);
+        }else if(object instanceof String s) {
+            write.b((byte) 4);
             writeString(write, s);
         }else if(object instanceof Content map){
             write.b((byte)5);
@@ -132,6 +132,9 @@ public class TypeIO{
         }else if(object instanceof UnitCommand command){
             write.b(23);
             write.s(command.id);
+        }else if(object instanceof StringBuilder b) {
+            write.b(24);
+            write.str(b.toString());
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -205,6 +208,7 @@ public class TypeIO{
                 yield objs;
             }
             case 23 -> content.unitCommand(read.us());
+            case 24 -> new StringBuilder(read.str());
             default -> throw new IllegalArgumentException("Unknown object type: " + type);
         };
     }

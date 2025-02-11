@@ -76,7 +76,7 @@ public class LogicDialog extends BaseDialog{
         return color.set(
             !s.isobj ? Pal.place :
             s.objval == null ? Color.darkGray :
-            s.objval instanceof String ? Pal.ammo :
+            s.objval instanceof CharSequence ? Pal.ammo :
             s.objval instanceof Content ? Pal.logicOperations :
             s.objval instanceof Building ? Pal.logicBlocks :
             s.objval instanceof Unit ? Pal.logicUnits :
@@ -90,7 +90,7 @@ public class LogicDialog extends BaseDialog{
         return
             !s.isobj ? "number" :
             s.objval == null ? "null" :
-            s.objval instanceof String ? "string" :
+            s.objval instanceof CharSequence ? "string" :
             s.objval instanceof Content ? "content" :
             s.objval instanceof Building ? "building" :
             s.objval instanceof Team ? "team" :

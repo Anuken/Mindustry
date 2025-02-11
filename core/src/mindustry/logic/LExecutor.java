@@ -46,7 +46,7 @@ public class LExecutor{
     /** Non-constant variables used for network sync */
     public LVar[] vars = {};
 
-    public LVar counter, unit, thisv, ipt;
+    public LVar counter, unit, thisv, ipt, printbuffer;
 
     public int[] binds;
     public boolean yield;
@@ -62,7 +62,7 @@ public class LExecutor{
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
     protected static IntFloatMap unitTimeouts = new IntFloatMap();
     //lookup variable by name, lazy init.
-    protected @Nullable ObjectIntMap<String> nameMap;
+    protected @Nullable ObjectIntMap<CharSequence> nameMap;
 
     static{
         Events.on(ResetEvent.class, e -> unitTimeouts.clear());
@@ -105,12 +105,13 @@ public class LExecutor{
         unit = builder.getVar("@unit");
         thisv = builder.getVar("@this");
         ipt = builder.putConst("@ipt", build != null ? build.ipt : 0);
+        printbuffer = builder.putConst("@printbuffer",textBuffer);
     }
 
     //region utility
 
 
-    public @Nullable LVar optionalVar(String name){
+    public @Nullable LVar optionalVar(CharSequence name){
         if(nameMap == null){
             nameMap = new ObjectIntMap<>();
             for(int i = 0; i < vars.length; i++){
@@ -571,7 +572,7 @@ public class LExecutor{
 
             if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
                 output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
+            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof CharSequence name){
                 LVar fromVar = logic.executor.optionalVar(name);
                 if(fromVar != null && !output.constant){
                     output.objval = fromVar.objval;
@@ -601,7 +602,7 @@ public class LExecutor{
 
             if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
                 mem.memory[address] = value.num();
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
+            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof CharSequence name){
                 LVar toVar = logic.executor.optionalVar(name);
                 if(toVar != null && !toVar.constant){
                     toVar.objval = value.objval;
@@ -989,6 +990,12 @@ public class LExecutor{
 
             //this should avoid any garbage allocation
             if(value.isobj){
+
+                if(value.objval instanceof StringBuilder builder){
+                    exec.textBuffer.append(builder);
+                    return;
+                }
+
                 String strValue = toString(value.objval);
 
                 exec.textBuffer.append(strValue);
@@ -1006,6 +1013,7 @@ public class LExecutor{
             return
                 obj == null ? "null" :
                 obj instanceof String s ? s :
+                obj instanceof StringBuilder ? "[string]" :
                 obj instanceof MappableContent content ? content.name :
                 obj instanceof Content ? "[content]" :
                 obj instanceof Building build ? build.block.name :
