@@ -31,7 +31,6 @@ public class LCanvas extends Table{
 
     public DragLayout statements;
     public ScrollPane pane;
-    public Group jumps; // compatibility
 
     StatementElem dragging;
     StatementElem hovered;
@@ -110,15 +109,14 @@ public class LCanvas extends Table{
         clear();
 
         statements = new DragLayout();
-        jumps = statements.jumps;
 
         pane = pane(t -> {
             t.center();
             t.add(statements).pad(2f).center().width(targetWidth);
             t.addChild(statements.jumps);
 
-            jumps.touchable = Touchable.disabled;
-            jumps.update(()->jumps.setCullingArea(t.getCullingArea()));
+            statements.jumps.touchable = Touchable.disabled;
+            statements.jumps.update(() -> statements.jumps.setCullingArea(t.getCullingArea()));
             statements.jumps.cullable = false;
         }).grow().get();
         pane.setFlickScroll(false);
@@ -604,7 +602,7 @@ public class LCanvas extends Table{
             if(stage == null){
                 curve.remove();
             }else{
-                canvas.jumps.addChild(curve);
+                canvas.statements.jumps.addChild(curve);
             }
         }
     }
@@ -641,7 +639,7 @@ public class LCanvas extends Table{
 
             //MDTX(WayZer, 2024/8/6) Support Cull
             invertedHeight = false;
-            Group desc = canvas.jumps.parent;
+            Group desc = canvas.statements.jumps.parent;
             Vec2 t = Tmp.v1.set(button.getWidth() / 2f, button.getHeight() / 2f);
             button.localToAscendantCoordinates(desc, t);
             setPosition(t.x, t.y);

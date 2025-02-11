@@ -2915,7 +2915,7 @@ public class Blocks{
 
             drillMultipliers.put(Items.beryllium, 1.35f);
             liquidBoostIntensity = 2f;
-            
+
             //TODO different requirements
             consumePower(6f);
             consumeLiquid(Liquids.hydrogen, 4f / 60f);
@@ -4565,7 +4565,7 @@ public class Blocks{
             }},
 
             Items.surgeAlloy, new BasicBulletType(){{
-                reloadMultiplier = 0.5f;
+                reloadMultiplier = 0.75f;
                 damage = 65;
                 rangeChange = 8f * 3f;
                 lightning = 3;
