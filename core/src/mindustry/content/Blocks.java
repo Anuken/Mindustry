@@ -4363,7 +4363,7 @@ public class Blocks{
                 }});
                 smokeEffect = Fx.shootSmokeTitan;
                 hitColor = Pal.surge;
-
+                homingPower = 0.5f;
                 sprite = "large-orb";
                 trailEffect = Fx.missileTrail;
                 trailInterval = 3f;
@@ -4371,9 +4371,9 @@ public class Blocks{
                 pierceCap = 2;
                 buildingDamageMultiplier = 0.5f;
                 fragOnHit = false;
-                speed = 5f;
+                speed = 7f;
                 damage = 180f;
-                lifetime = 80f;
+                lifetime = 57f;
                 width = height = 16f;
                 backColor = Pal.surge;
                 frontColor = Color.white;
@@ -4393,12 +4393,12 @@ public class Blocks{
                 //TODO shoot sound
                 shootSound = Sounds.cannon;
 
-                fragBullet = intervalBullet = new BasicBulletType(3f, 35){{
+                fragBullet = intervalBullet = new BasicBulletType(5f, 35){{
                     width = 9f;
                     hitSize = 5f;
                     height = 15f;
                     pierce = true;
-                    lifetime = 35f;
+                    lifetime = 20f;
                     pierceBuilding = true;
                     hitColor = backColor = trailColor = Pal.surge;
                     frontColor = Color.white;
@@ -4411,7 +4411,7 @@ public class Blocks{
                         lifetime = 10f;
                     }};
                     buildingDamageMultiplier = 0.3f;
-                    homingPower = 0.2f;
+                    
                 }};
 
                 bulletInterval = 3f;
@@ -4449,7 +4449,7 @@ public class Blocks{
                 }});
             }};
 
-            consumePower(5f);
+            consumePower(10f);
             heatRequirement = 10f;
             maxHeatEfficiency = 2f;
 
