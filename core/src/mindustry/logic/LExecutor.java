@@ -105,7 +105,7 @@ public class LExecutor{
         unit = builder.getVar("@unit");
         thisv = builder.getVar("@this");
         ipt = builder.putConst("@ipt", build != null ? build.ipt : 0);
-        printbuffer = builder.putConst("@printbuffer",textBuffer);
+        printbuffer = builder.putConst("@printbuffer", textBuffer);
     }
 
     //region utility
@@ -635,6 +635,11 @@ public class LExecutor{
                 return;
             }
 
+            if(sense == LAccess.type && target instanceof CharSequence){
+                to.setobj(LogicDialog.typeName(from));
+                return;
+            }
+
             //note that remote units/buildings can be sensed as well
             if(target instanceof Senseable se){
                 if(sense instanceof Content co){
@@ -1013,7 +1018,7 @@ public class LExecutor{
             return
                 obj == null ? "null" :
                 obj instanceof String s ? s :
-                obj instanceof StringBuilder ? "[string]" :
+                obj instanceof StringBuilder ? "[dyn-string]" : //Maybe use .toString, but it would allocate memory...
                 obj instanceof MappableContent content ? content.name :
                 obj instanceof Content ? "[content]" :
                 obj instanceof Building build ? build.block.name :
@@ -1081,6 +1086,12 @@ public class LExecutor{
 
             //this should avoid any garbage allocation
             if(value.isobj){
+                //avoid it even more
+                if(value.objval instanceof StringBuilder b){
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex+3, "");
+                    exec.textBuffer.insert(placeholderIndex,b);
+                    return;
+                }
                 String strValue = PrintI.toString(value.objval);
 
                 exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, strValue);

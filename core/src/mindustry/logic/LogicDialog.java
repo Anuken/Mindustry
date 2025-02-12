@@ -90,7 +90,8 @@ public class LogicDialog extends BaseDialog{
         return
             !s.isobj ? "number" :
             s.objval == null ? "null" :
-            s.objval instanceof CharSequence ? "string" :
+            s.objval instanceof String ? "string" :
+            s.objval instanceof StringBuilder ? "dyn-string" :
             s.objval instanceof Content ? "content" :
             s.objval instanceof Building ? "building" :
             s.objval instanceof Team ? "team" :
