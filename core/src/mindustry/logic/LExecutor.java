@@ -809,7 +809,10 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             if(op == LogicOp.strictEqual){
-                dest.setnum(a.isobj == b.isobj && ((a.isobj && Structs.eq(a.objval, b.objval)) || (!a.isobj && a.numval == b.numval)) ? 1 : 0);
+                dest.setnum(a.isobj == b.isobj && (
+                    (a.isobj && a.objval.getClass().equals(b.objval.getClass()) && a.objval instanceof CharSequence sa && b.objval instanceof  CharSequence sb && strEquals(sa, sb)) ||
+                    (a.isobj && Structs.eq(a.objval, b.objval)) ||
+                    (!a.isobj && a.numval == b.numval)) ? 1 : 0);
             }else if(op.unary){
                 dest.setnum(op.function1.get(a.num()));
             }else{
@@ -822,6 +825,25 @@ public class LExecutor{
                 }
 
             }
+        }
+
+        public static boolean strEquals(CharSequence a, CharSequence b){
+            //This should be faster than the other approach
+            if(a instanceof String || b instanceof String){
+                String p = a instanceof String sa ? sa : (String)b;
+                CharSequence s = p == a ? b : a;
+                return(p.contentEquals(s));
+            }
+            if(a.length()!=b.length()) return(false);
+            for(int i = 0; i < a.length(); i++){
+                if(a.charAt(i) != b.charAt(i)) return(false);
+            }
+            return(true);
+        }
+
+        public static boolean equal(Object a, Object b){
+            if(a instanceof CharSequence sa && b instanceof CharSequence sb) return(strEquals(sa, sb));
+            return(Structs.eq(a, b));
         }
     }
 
@@ -1153,7 +1175,10 @@ public class LExecutor{
                 boolean cmp;
 
                 if(op == ConditionOp.strictEqual){
-                    cmp = va.isobj == vb.isobj && ((va.isobj && va.objval == vb.objval) || (!va.isobj && va.numval == vb.numval));
+                    cmp = va.isobj == vb.isobj && (
+                        (va.isobj && va.objval.getClass().equals(vb.objval.getClass()) && va.objval instanceof CharSequence sa && vb.objval instanceof  CharSequence sb && OpI.strEquals(sa, sb)) ||
+                        (va.isobj && Structs.eq(va.objval, vb.objval)) ||
+                        (!va.isobj && va.numval == vb.numval));
                 }else if(op.objFunction != null && va.isobj && vb.isobj){
                     //use object function if both are objects
                     cmp = op.objFunction.get(value.obj(), compare.obj());

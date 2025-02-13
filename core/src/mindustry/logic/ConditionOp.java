@@ -1,10 +1,11 @@
 package mindustry.logic;
 
 import arc.util.*;
+import mindustry.logic.*;
 
 public enum ConditionOp{
-    equal("==", (a, b) -> Math.abs(a - b) < 0.000001, Structs::eq),
-    notEqual("not", (a, b) -> Math.abs(a - b) >= 0.000001, (a, b) -> !Structs.eq(a, b)),
+    equal("==", (a, b) -> Math.abs(a - b) < 0.000001, LExecutor.OpI::equal),
+    notEqual("not", (a, b) -> Math.abs(a - b) >= 0.000001, (a, b) -> !LExecutor.OpI.equal(a, b)),
     lessThan("<", (a, b) -> a < b),
     lessThanEq("<=", (a, b) -> a <= b),
     greaterThan(">", (a, b) -> a > b),
