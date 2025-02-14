@@ -32,6 +32,8 @@ import mindustry.world.blocks.logic.MessageBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
+import java.util.Arrays;
+
 import static mindustry.Vars.*;
 
 public class LExecutor{
@@ -62,7 +64,7 @@ public class LExecutor{
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
     protected static IntFloatMap unitTimeouts = new IntFloatMap();
     //lookup variable by name, lazy init.
-    protected @Nullable ObjectIntMap<CharSequence> nameMap;
+    protected @Nullable ObjectIntMap<String> nameMap;
 
     static{
         Events.on(ResetEvent.class, e -> unitTimeouts.clear());
@@ -118,7 +120,11 @@ public class LExecutor{
                 nameMap.put(vars[i].name, i);
             }
         }
-        return optionalVar(nameMap.get(name, -1));
+        if(name instanceof String s) return optionalVar(nameMap.get(s, -1));
+        for(LVar var : vars){
+            if(OpI.strEquals(var.name, name)) return(var);
+        }
+        return(null);
     }
 
     /** @return a Var from this processor. May be null if out of bounds. */
