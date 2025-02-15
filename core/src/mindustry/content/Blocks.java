@@ -4450,7 +4450,7 @@ public class Blocks{
             }};
 
             consumePower(10f);
-            heatRequirement = 10f;
+            heatRequirement = 12f;
             maxHeatEfficiency = 2f;
 
             newTargetInterval = 40f;
