@@ -4420,7 +4420,7 @@ public class Blocks{
                 intervalAngle = 180f;
                 intervalSpread = 300f;
 
-                fragBullets = 16;
+                fragBullets = 10;
                 fragVelocityMin = 0.5f;
                 fragVelocityMax = 1.5f;
                 fragLifeMin = 0.5f;
