@@ -32,8 +32,6 @@ import mindustry.world.blocks.logic.MessageBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
-import java.util.Arrays;
-
 import static mindustry.Vars.*;
 
 public class LExecutor{
