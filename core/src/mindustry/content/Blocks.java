@@ -4368,11 +4368,11 @@ public class Blocks{
                 trailEffect = Fx.missileTrail;
                 trailInterval = 3f;
                 trailParam = 4f;
-                pierceCap = 2;
+                pierceCap = 3;
                 buildingDamageMultiplier = 0.5f;
                 fragOnHit = false;
                 speed = 7f;
-                damage = 180f;
+                damage = 280f;
                 lifetime = 57f;
                 width = height = 16f;
                 backColor = Pal.surge;
@@ -4393,7 +4393,7 @@ public class Blocks{
                 //TODO shoot sound
                 shootSound = Sounds.cannon;
 
-                fragBullet = intervalBullet = new BasicBulletType(5f, 35){{
+                fragBullet = intervalBullet = new BasicBulletType(5f, 45){{
                     width = 9f;
                     hitSize = 5f;
                     height = 15f;
