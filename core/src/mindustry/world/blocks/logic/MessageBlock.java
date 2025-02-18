@@ -14,6 +14,7 @@ import arc.util.io.*;
 import arc.util.pooling.*;
 import mindustry.core.*;
 import mindustry.gen.*;
+import mindustry.logic.LAccess;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -196,6 +197,12 @@ public class MessageBlock extends Block{
         @Override
         public String config(){
             return message.toString();
+        }
+
+        @Override
+        public Object senseObject(LAccess sense){
+            if(sense != LAccess.config) return(super.senseObject(sense));
+            return(message); //we read messages now :)
         }
 
         @Override
