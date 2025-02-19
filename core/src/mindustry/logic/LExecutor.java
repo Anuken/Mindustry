@@ -40,7 +40,9 @@ public class LExecutor{
     public static final int
     maxGraphicsBuffer = 256,
     maxDisplayBuffer = 1024,
-    maxTextBuffer = 400;
+    maxTextBuffer = 400,
+    //Do not append to the buffer if it would exceeed this limit.
+    maxTextBufferLimit = 800;
 
     public LInstruction[] instructions = {};
     /** Non-constant variables used for network sync */
@@ -1023,12 +1025,15 @@ public class LExecutor{
             if(value.isobj){
 
                 if(value.objval instanceof StringBuilder builder){
+                    //We do not want to infinitely append.
+                    if(builder.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
                     exec.textBuffer.append(builder);
                     return;
                 }
 
                 String strValue = toString(value.objval);
 
+                if(strValue.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
                 exec.textBuffer.append(strValue);
             }else{
                 //display integer version when possible
@@ -1114,11 +1119,14 @@ public class LExecutor{
             if(value.isobj){
                 //avoid it even more
                 if(value.objval instanceof StringBuilder b){
+                    if(b.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
                     exec.textBuffer.replace(placeholderIndex, placeholderIndex+3, "");
                     exec.textBuffer.insert(placeholderIndex,b);
                     return;
                 }
                 String strValue = PrintI.toString(value.objval);
+
+                if(strValue.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
 
                 exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, strValue);
             }else{
