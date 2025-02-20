@@ -311,6 +311,16 @@ public class HudFragment{
                 //wave info button with text
                 s.add(makeStatusTable()).grow().name("status");
 
+                s.update(() -> {
+                    if(Core.input.keyTap(Binding.skip_wave) && canSkipWave()){
+                        if(net.client() && player.admin){
+                            Call.adminRequest(player, AdminAction.wave, null);
+                        }else{
+                            logic.skipWave();
+                        }
+                    }
+                });
+
                 var rightStyle = new ImageButtonStyle(){{
                     over = buttonRightOver;
                     down = buttonRightDown;
