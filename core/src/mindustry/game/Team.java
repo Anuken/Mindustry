@@ -16,8 +16,8 @@ import static mindustry.Vars.*;
 
 public class Team implements Comparable<Team>, Senseable{
     public final int id;
-    public final Color color;
-    public final Color[] palette;
+    public final Color color = new Color();
+    public final Color[] palette = {new Color(), new Color(), new Color()};
     public final int[] palettei = new int[3];
     public String emoji = "";
     public boolean hasPalette;
@@ -58,33 +58,21 @@ public class Team implements Comparable<Team>, Senseable{
 
     protected Team(int id, String name, Color color){
         this.name = name;
-        this.color = color;
+        this.color.set(color);
         this.id = id;
 
         if(id < 6) baseTeams[id] = this;
         all[id] = this;
 
-        palette = new Color[3];
-        palette[0] = color;
-        palette[1] = color.cpy().mul(0.75f);
-        palette[2] = color.cpy().mul(0.5f);
-
-        for(int i = 0; i < 3; i++){
-            palettei[i] = palette[i].rgba();
-        }
+        setPalette(color);
     }
 
     /** Specifies a 3-color team palette. */
     protected Team(int id, String name, Color color, Color pal1, Color pal2, Color pal3){
         this(id, name, color);
 
-        palette[0] = pal1;
-        palette[1] = pal2;
-        palette[2] = pal3;
-        for(int i = 0; i < 3; i++){
-            palettei[i] = palette[i].rgba();
-        }
-        hasPalette = true;
+        setPalette(pal1, pal2, pal3);
+        this.color.set(color);
     }
 
     /** @return the core items for this team, or an empty item module.
@@ -142,6 +130,22 @@ public class Team implements Comparable<Team>, Senseable{
 
     public String coloredName(){
         return emoji + "[#" + color + "]" + localized() + "[]";
+    }
+
+    public void setPalette(Color color){
+        setPalette(color, color.cpy().mul(0.75f), color.cpy().mul(0.5f));
+        hasPalette = false;
+    }
+
+    public void setPalette(Color pal1, Color pal2, Color pal3){
+        color.set(pal1);
+        palette[0].set(pal1);
+        palette[1].set(pal2);
+        palette[2].set(pal3);
+        for(int i = 0; i < 3; i++){
+            palettei[i] = palette[i].rgba();
+        }
+        hasPalette = true;
     }
 
     @Override

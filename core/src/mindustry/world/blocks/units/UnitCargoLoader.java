@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class UnitCargoLoader extends Block{
     public UnitType unitType = UnitTypes.manifold;
-    public float buildTime = 60f * 8f;
+    public float unitBuildTime = 60f * 8f;
 
     public float polyStroke = 1.8f, polyRadius = 8f;
     public int polySides = 6;
@@ -106,7 +106,7 @@ public class UnitCargoLoader extends Block{
             readyness = Mathf.approachDelta(readyness, unit != null ? 1f : 0f, 1f / 60f);
 
             if(unit == null && Units.canCreate(team, unitType)){
-                buildProgress += edelta() / buildTime;
+                buildProgress += edelta() / unitBuildTime;
                 totalProgress += edelta();
 
                 if(buildProgress >= 1f){

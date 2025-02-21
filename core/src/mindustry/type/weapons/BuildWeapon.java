@@ -11,7 +11,7 @@ import mindustry.type.*;
 public class BuildWeapon extends Weapon{
 
     public BuildWeapon(){
-
+        super();
     }
 
     public BuildWeapon(String name){

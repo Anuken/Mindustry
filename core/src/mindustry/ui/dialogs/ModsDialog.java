@@ -94,7 +94,7 @@ public class ModsDialog extends BaseDialog{
 
         hidden(() -> {
             if(mods.requiresReload()){
-                reload();
+                mods.reload();
             }
         });
 
@@ -112,6 +112,10 @@ public class ModsDialog extends BaseDialog{
         }else{
             ui.showException(error);
         }
+    }
+
+    void getModList(Cons<Seq<ModListing>> listener){
+        getModList(0, listener);
     }
 
     void getModList(int index, Cons<Seq<ModListing>> listener){
@@ -376,13 +380,6 @@ public class ModsDialog extends BaseDialog{
             return "@mod.erroredcontent.details";
         }
         return null;
-    }
-
-    private void reload(){
-        ui.showInfoOnHidden("@mods.reloadexit", () -> {
-            Log.info("Exiting to reload mods.");
-            Core.app.exit();
-        });
     }
 
     private void showMod(LoadedMod mod){
@@ -694,6 +691,16 @@ public class ModsDialog extends BaseDialog{
                 }
             }, this::importFail);
         }
+    }
+
+    public void importDependencies(Seq<String> dependencies, Runnable done){
+        getModList(listings -> {
+            listings.each(l -> dependencies.contains(l.internalName), l -> {
+                dependencies.remove(l.internalName);
+                githubImportMod(l.repo, l.hasJava);
+            });
+            done.run();
+        });
     }
 
     private void githubImportJavaMod(String repo, @Nullable String release){

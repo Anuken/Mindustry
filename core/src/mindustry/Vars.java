@@ -49,6 +49,8 @@ public class Vars implements Loadable{
     public static String steamPlayerName = "";
     /** If true, the BE server list is always used. */
     public static boolean forceBeServers = false;
+    /** If true, mod code and scripts do not run. For internal testing only. This WILL break mods if enabled. */
+    public static boolean skipModCode = false;
     /** Default accessible content types used for player-selectable icons. */
     public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
     /** Default rule environment. */

@@ -62,7 +62,7 @@ public class Duct extends Block implements Autotiler{
     public void init(){
         super.init();
 
-        if(bridgeReplacement == null || !(bridgeReplacement instanceof DuctBridge)) bridgeReplacement = Blocks.ductBridge;
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof DuctBridge || bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.ductBridge;
     }
 
     @Override
@@ -106,8 +106,8 @@ public class Duct extends Block implements Autotiler{
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
         if(bridgeReplacement == null) return;
-
-        Placement.calculateBridges(plans, (DuctBridge)bridgeReplacement, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
+        if(bridgeReplacement instanceof ItemBridge bridge) Placement.calculateBridges(plans, bridge, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
+        if(bridgeReplacement instanceof DuctBridge bridge) Placement.calculateBridges(plans, bridge, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
     }
 
     public class DuctBuild extends Building{

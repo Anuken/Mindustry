@@ -47,8 +47,10 @@ public class PayloadConveyor extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
+        int ntrns = 1 + size/2;
+
         for(int i = 0; i < 4; i++){
-            Building other = world.build(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
+            Building other = world.build(x + Geometry.d4x[i] * ntrns, y + Geometry.d4y[i] * ntrns);
             if(other != null && other.block.outputsPayload && other.block.size == size){
                 Drawf.selected(other.tileX(), other.tileY(), other.block, other.team.color);
             }
