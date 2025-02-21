@@ -676,13 +676,14 @@ public class LCanvas extends Table{
             Draw.reset();
         }
 
-        public void drawCurve(float x, float y, float x2, float y2){
+        public void drawCurve(float x, float y, float x2, float y2) {
             Lines.stroke(Scl.scl(4f), button.color);
             Draw.alpha(parentAlpha);
 
             float dist = 100f;
 
             //square jumps
+        }
 
         public void prepareHeight(){
             if(this.button.to.get() == null){
