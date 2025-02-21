@@ -48,6 +48,7 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
+import java.util.Objects;
 
 import static mindustry.Vars.*;
 
@@ -144,7 +145,7 @@ public class ContentParser{
             return result;
         });
         put(MassDriverBolt.class, (type, data) -> {
-            MassDriverBolt result = (MassDriverBolt)make(MassDriverBolt.class);
+            MassDriverBolt result = make(MassDriverBolt.class);
             readFields(result, data);
             return result;
         });
@@ -221,7 +222,7 @@ public class ContentParser{
                         JsonValue op = val.has("operation") ? val.get("operation") :
                             val.has("op") ? val.get("op") : null;
 
-                        base = parseProgressOp(base, op.asString(), val);
+                        base = parseProgressOp(base, Objects.requireNonNull(op).asString(), val);
                         i++;
                     }
                 }
@@ -1245,7 +1246,7 @@ public class ContentParser{
         if((base == null || base.isEmpty()) && def != null) return def;
 
         //return mapped class if found in the global map
-        var out = ClassMap.classes.get(!base.isEmpty() && Character.isLowerCase(base.charAt(0)) ? Strings.capitalize(base) : base);
+        var out = ClassMap.classes.get(!Objects.requireNonNull(base).isEmpty() && Character.isLowerCase(base.charAt(0)) ? Strings.capitalize(base) : base);
         if(out != null) return (Class<T>)out;
 
         //try to resolve it as a raw class name

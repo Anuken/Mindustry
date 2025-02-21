@@ -210,13 +210,7 @@ public class RtsAI{
                 //defendTarget = aggressor;
                 defendPos = new Vec2(aggressor.x, aggressor.y);
                 defendTarget = aggressor;
-            }else if(false){ //TODO currently ignored, no use defending against nothing
-                //should it even go there if there's no aggressor found?
-                Tile closest = defend.findClosestEdge(units.first(), Tile::solid);
-                if(closest != null){
-                    defendPos = new Vec2(closest.worldx(), closest.worldy());
-                }
-            }else{
+            }else {
                 float mindst = Float.MAX_VALUE;
                 Building build = null;
 

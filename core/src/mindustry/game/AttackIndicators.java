@@ -59,6 +59,7 @@ public class AttackIndicators{
     }
 
     @Struct
+    static
     class IndicatorStruct{
         int pos;
         float time;

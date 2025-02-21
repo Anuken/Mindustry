@@ -78,6 +78,7 @@ public class DrawOperation{
     }
 
     @Struct
+    static
     class TileOpStruct{
         short x;
         short y;

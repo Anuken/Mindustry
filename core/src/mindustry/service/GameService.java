@@ -23,10 +23,10 @@ import static mindustry.service.Achievement.*;
 
 /**
  * Interface for handling game service across multiple platforms.
- *
+ * <p>
  * This includes:
  * - Desktop (Steam)
- *
+ * <p>
  * The default implementation does nothing.
  * */
 public class GameService{

@@ -577,19 +577,6 @@ public class LCanvas extends Table{
             float dist = 100f;
 
             //square jumps
-            if(false){
-                float len = Scl.scl(Mathf.randomSeed(hashCode(), 10, 50));
-
-                float maxX = Math.max(x, x2) + len;
-
-                Lines.beginLine();
-                Lines.linePoint(x, y);
-                Lines.linePoint(maxX, y);
-                Lines.linePoint(maxX, y2);
-                Lines.linePoint(x2, y2);
-                Lines.endLine();
-                return;
-            }
 
             Lines.curve(
             x, y,

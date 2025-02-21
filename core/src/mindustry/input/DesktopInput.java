@@ -23,7 +23,8 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
-import static arc.Core.camera;
+import java.util.Objects;
+
 import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
@@ -190,7 +191,7 @@ public class DesktopInput extends InputHandler{
                 linePlans.each(this::drawOverPlan);
             }else if(isPlacing()){
                 int rot = block == null ? rotation : block.planRotation(rotation);
-                if(block.rotate && block.drawArrow){
+                if(Objects.requireNonNull(block).rotate && block.drawArrow){
                     drawArrow(block, cursorX, cursorY, rot);
                 }
                 Draw.color();
@@ -854,13 +855,13 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
-    public float getMouseX(){
-        return Core.input.mouseX();
+    public float getMouseX() {
+        return super.getMouseX();
     }
 
     @Override
-    public float getMouseY(){
-        return Core.input.mouseY();
+    public float getMouseY() {
+        return super.getMouseY();
     }
 
     @Override

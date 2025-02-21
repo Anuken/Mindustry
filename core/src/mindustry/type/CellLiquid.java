@@ -14,6 +14,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
+import java.util.Objects;
+
 import static mindustry.entities.Puddles.*;
 
 /** Liquid that draws cells in its puddle. */
@@ -103,7 +105,7 @@ public class CellLiquid extends Liquid{
     public void drawPuddle(Puddle puddle){
         super.drawPuddle(puddle);
 
-        float baseLayer = puddle.tile != null && puddle.tile.block().solid || puddle.tile.build != null ? Layer.blockOver : Layer.debris - 0.5f;
+        float baseLayer = puddle.tile != null && puddle.tile.block().solid || Objects.requireNonNull(puddle.tile).build != null ? Layer.blockOver : Layer.debris - 0.5f;
 
         int id = puddle.id;
         float amount = puddle.amount, x = puddle.x, y = puddle.y;

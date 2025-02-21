@@ -19,6 +19,7 @@ import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 import java.lang.annotation.*;
+import java.util.Objects;
 
 @SupportedAnnotationTypes({
 "mindustry.annotations.Annotations.EntityDef",
@@ -237,7 +238,7 @@ public class EntityProcess extends BaseProcessor{
 
                 boolean collides = an.collide();
                 groupDefs.add(new GroupDefinition(name,
-                    ClassName.bestGuess(packageName + "." + groupType), types, an.spatial(), an.mapping(), collides));
+                        ClassName.bestGuess(packageName + "." + groupType), types, an.spatial(), an.mapping(), collides));
 
                 TypeSpec.Builder accessor = TypeSpec.interfaceBuilder("IndexableEntity__" + name);
                 accessor.addMethod(MethodSpec.methodBuilder("setIndex__" + name).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).addParameter(int.class, "index").returns(void.class).build());
@@ -266,7 +267,7 @@ public class EntityProcess extends BaseProcessor{
 
                 //get base class type name for extension
                 Stype baseClassType = baseClasses.any() ? baseClasses.first() : null;
-                @Nullable TypeName baseClass = baseClasses.any() ? tname(packageName + "." + baseName(baseClassType)) : null;
+                @Nullable TypeName baseClass = baseClasses.any() ? tname(packageName + "." + baseName(Objects.requireNonNull(baseClassType))) : null;
                 @Nullable TypeSpec.Builder baseClassBuilder = baseClassType == null ? null : this.baseClasses.find(b -> Reflect.<String>get(b, "name").equals(baseName(baseClassType)));
                 boolean addIndexToBase = baseClassBuilder != null && baseClassIndexers.add(baseClassBuilder);
                 //whether the main class is the base itself
@@ -579,11 +580,11 @@ public class EntityProcess extends BaseProcessor{
                     for(FieldSpec spec : allFieldSpecs){
                         @Nullable Svar variable = specVariables.get(spec);
                         if(variable != null && variable.isAny(Modifier.STATIC, Modifier.FINAL)) continue;
-                        String desc = variable.descString();
+                        String desc = Objects.requireNonNull(variable).descString();
 
                         if(spec.type.isPrimitive()){
                             //set to primitive default
-                            resetBuilder.addStatement("$L = $L", spec.name, variable != null && varInitializers.containsKey(desc) ? varInitializers.get(desc) : getDefault(spec.type.toString()));
+                            resetBuilder.addStatement("$L = $L", spec.name, varInitializers.containsKey(desc) ? varInitializers.get(desc) : getDefault(spec.type.toString()));
                         }else{
                             //set to default null
                             if(!varInitializers.containsKey(desc)){
@@ -961,7 +962,7 @@ public class EntityProcess extends BaseProcessor{
         builder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"deprecation\"").build());
     }
 
-    class GroupDefinition{
+    static class GroupDefinition{
         final String name;
         final ClassName baseType;
         final Seq<Stype> components;

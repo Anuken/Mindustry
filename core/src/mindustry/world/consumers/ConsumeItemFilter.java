@@ -38,7 +38,8 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void update(Building build){
+    public void update(Building build) {
+        super.update(build);
     }
 
     @Override

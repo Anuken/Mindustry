@@ -22,7 +22,7 @@ public class LegacyUnitFactory extends LegacyBlock{
         tile.setBlock(replacement, tile.team(), rot);
     }
 
-    public class LegacyUnitFactoryBuild extends Building{
+    public static class LegacyUnitFactoryBuild extends Building{
 
         @Override
         public void read(Reads read, byte revision){

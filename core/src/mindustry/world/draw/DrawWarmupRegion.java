@@ -15,8 +15,9 @@ public class DrawWarmupRegion extends DrawBlock{
     public TextureRegion region;
 
     @Override
-    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list) {
 
+        super.drawPlan(block, plan, list);
     }
 
     @Override

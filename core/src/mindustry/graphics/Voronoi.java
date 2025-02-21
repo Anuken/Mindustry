@@ -165,7 +165,7 @@ public class Voronoi{
                         }
                     }
                 }
-                if(he == ELleftend || (he != ELrightend && right(he, (newsite.coord)))){
+                if(he == ELleftend || (he != ELrightend && right(Objects.requireNonNull(he), (newsite.coord)))){
                     do{
                         he = he.ELright;
                     }while(he != ELrightend && right(he, (newsite.coord)));
@@ -249,7 +249,7 @@ public class Voronoi{
         }
 
         for(lbnd = (ELleftend.ELright); lbnd != ELrightend; lbnd = (lbnd.ELright)){
-            e = lbnd.ELedge;
+            e = Objects.requireNonNull(lbnd).ELedge;
             clipLine(e);
         }
 

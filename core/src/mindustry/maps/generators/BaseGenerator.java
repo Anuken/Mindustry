@@ -87,67 +87,58 @@ public class BaseGenerator{
         }
 
         //replace walls with the correct type (disabled)
-        if(false)
+
+        //small walls
         pass(tile -> {
-            if(tile.block() instanceof Wall && tile.team() == team && tile.block() != wall && tile.block() != wallLarge){
-                tile.setBlock(tile.block().size == 2 ? wallLarge : wall, team);
+
+            if(tile.block().alwaysReplace){
+                boolean any = false;
+
+                for(Point2 p : Geometry.d4){
+                    Tile o = tiles.get(tile.x + p.x, tile.y + p.y);
+
+                    //do not block payloads
+                    if(o != null && (o.block() instanceof PayloadConveyor || o.block() instanceof PayloadBlock)){
+                        return;
+                    }
+                }
+
+                for(Point2 p : Geometry.d8){
+                    if(Angles.angleDist(Angles.angle(p.x, p.y), spawn.angleTo(tile)) > wallAngle){
+                        continue;
+                    }
+
+                    Tile o = tiles.get(tile.x + p.x, tile.y + p.y);
+                    if(o != null && o.team() == team && !(o.block() instanceof Wall) && !(o.block() instanceof ShockMine)){
+                        any = true;
+                        break;
+                    }
+                }
+
+                if(any){
+                    tile.setBlock(wall, team);
+                }
             }
         });
 
-        if(wallAngle > 0){
+        //large walls
+        pass(curr -> {
+            int walls = 0;
+            for(int cx = 0; cx < 2; cx++){
+                for(int cy = 0; cy < 2; cy++){
+                    Tile tile = tiles.get(curr.x + cx, curr.y + cy);
+                    if(tile == null || tile.block().size != 1 || (tile.block() != wall && !tile.block().alwaysReplace)) return;
 
-            //small walls
-            pass(tile -> {
-
-                if(tile.block().alwaysReplace){
-                    boolean any = false;
-
-                    for(Point2 p : Geometry.d4){
-                        Tile o = tiles.get(tile.x + p.x, tile.y + p.y);
-
-                        //do not block payloads
-                        if(o != null && (o.block() instanceof PayloadConveyor || o.block() instanceof PayloadBlock)){
-                            return;
-                        }
-                    }
-
-                    for(Point2 p : Geometry.d8){
-                        if(Angles.angleDist(Angles.angle(p.x, p.y), spawn.angleTo(tile)) > wallAngle){
-                            continue;
-                        }
-
-                        Tile o = tiles.get(tile.x + p.x, tile.y + p.y);
-                        if(o != null && o.team() == team && !(o.block() instanceof Wall) && !(o.block() instanceof ShockMine)){
-                            any = true;
-                            break;
-                        }
-                    }
-
-                    if(any){
-                        tile.setBlock(wall, team);
+                    if(tile.block() == wall){
+                        walls ++;
                     }
                 }
-            });
+            }
 
-            //large walls
-            pass(curr -> {
-                int walls = 0;
-                for(int cx = 0; cx < 2; cx++){
-                    for(int cy = 0; cy < 2; cy++){
-                        Tile tile = tiles.get(curr.x + cx, curr.y + cy);
-                        if(tile == null || tile.block().size != 1 || (tile.block() != wall && !tile.block().alwaysReplace)) return;
-
-                        if(tile.block() == wall){
-                            walls ++;
-                        }
-                    }
-                }
-
-                if(walls >= 3){
-                    curr.setBlock(wallLarge, team);
-                }
-            });
-        }
+            if(walls >= 3){
+                curr.setBlock(wallLarge, team);
+            }
+        });
 
 
         float coreDst = 10f * 8;

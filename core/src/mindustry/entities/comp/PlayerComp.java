@@ -99,7 +99,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     @Override
-    public boolean isLogicControllable(){
+    public boolean isLogicControllable() {
         return false;
     }
 

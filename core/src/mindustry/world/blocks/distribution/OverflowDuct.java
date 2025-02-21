@@ -105,7 +105,7 @@ public class OverflowDuct extends Block{
                     return l;
                 }else if(rc && !lc){
                     return r;
-                }else if(lc && rc){
+                }else if(lc){
                     return cdump == 0 ? l : r;
                 }
             }

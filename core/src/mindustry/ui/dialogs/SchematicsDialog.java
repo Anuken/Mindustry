@@ -440,7 +440,7 @@ public class SchematicsDialog extends BaseDialog{
                         for(UnlockableContent u : all){
                             if(tags.contains(u.emoji())) continue;
                             t.button(new TextureRegionDrawable(u.uiIcon), Styles.flati, iconMed, () -> {
-                                String out = u.emoji() + "";
+                                String out = u.emoji();
 
                                 tags.add(out);
                                 tagsChanged();
@@ -768,7 +768,7 @@ public class SchematicsDialog extends BaseDialog{
                     r.image(s.item.uiIcon).left().size(iconMed);
                     r.label(() -> {
                         Building core = player.core();
-                        if(core == null || state.isMenu() || state.rules.infiniteResources || core.items.has(s.item, s.amount)) return "[lightgray]" + s.amount + "";
+                        if(core == null || state.isMenu() || state.rules.infiniteResources || core.items.has(s.item, s.amount)) return "[lightgray]" + s.amount;
                         return (core.items.has(s.item, s.amount) ? "[lightgray]" : "[scarlet]") + Math.min(core.items.get(s.item), s.amount) + "[lightgray]/" + s.amount;
                     }).padLeft(2).left().padRight(4);
 

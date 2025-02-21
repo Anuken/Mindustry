@@ -70,7 +70,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void updateBoosting(boolean boost){
         if(!type.canBoost || dead) return;
 
-        elevation = Mathf.approachDelta(elevation, type.canBoost ? Mathf.num(boost || onSolid() || (isFlying() && !canLand())) : 0f, type.riseSpeed);
+        elevation = Mathf.approachDelta(elevation, Mathf.num(boost || onSolid() || isFlying() && !canLand()), type.riseSpeed);
     }
 
     /** Move based on preferred unit movement type. */

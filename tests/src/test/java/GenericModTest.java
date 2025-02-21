@@ -25,8 +25,8 @@ public class GenericModTest{
     }
 
     static void checkExistence(String modName){
-        assertNotEquals(Vars.mods, null);
-        assertNotEquals(Vars.mods.list().size, 0, "At least one mod must be loaded.");
+        assertNotEquals(null, Vars.mods);
+        assertNotEquals(0, Vars.mods.list().size, "At least one mod must be loaded.");
         assertEquals(modName, Vars.mods.list().first().name, modName + " must be loaded.");
     }
 }

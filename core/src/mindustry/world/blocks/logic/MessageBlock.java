@@ -135,7 +135,7 @@ public class MessageBlock extends Block{
                     dialog.cont.row();
                     dialog.cont.label(() -> a.getText().length() + " / " + maxTextLength).color(Color.lightGray);
                     dialog.buttons.button("@ok", () -> {
-                        if(!a.getText().equals(message.toString())) configure(a.getText());
+                        if(!a.getText().contentEquals(message)) configure(a.getText());
                         dialog.hide();
                     }).size(130f, 60f);
                     dialog.update(() -> {

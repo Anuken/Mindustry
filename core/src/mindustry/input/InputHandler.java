@@ -334,7 +334,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(anyCommandedTarget){
                 Fx.attackCommand.at(teamTarget);
             }else{
-                Fx.moveCommand.at(posTarget);
+                Fx.moveCommand.at(Objects.requireNonNull(posTarget));
             }
         }
     }
@@ -835,7 +835,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     playerPlans.addLast(plan);
                 }
             }
-            if(lastPlans.size != playerPlans.size || (lastPlans.size > 0 && playerPlans.size > 0 && lastPlans.first() != playerPlans.first())){
+            if(lastPlans.size != playerPlans.size || lastPlans.size > 0 && lastPlans.first() != playerPlans.first()){
                 lastPlans.clear();
                 for(var plan : playerPlans){
                     lastPlans.addLast(plan);
@@ -2065,7 +2065,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Tile tile = world.tile(x, y);
         if(tile != null && tile.build != null) tile = tile.build.tile;
-        player.unit().addBuild(new BuildPlan(tile.x, tile.y));
+        player.unit().addBuild(new BuildPlan(Objects.requireNonNull(tile).x, tile.y));
     }
 
     public void drawArrow(Block block, int x, int y, int rotation){
@@ -2159,7 +2159,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     result = Tile.relativeTo(point.x, point.y, next.x, next.y);
                 }else if(endRotation != -1){
                     result = endRotation;
-                }else if(block.conveyorPlacement && i > 0){
+                }else if(Objects.requireNonNull(block).conveyorPlacement && i > 0){
                     Point2 prev = points.get(i - 1);
                     result = Tile.relativeTo(prev.x, prev.y, point.x, point.y);
                 }

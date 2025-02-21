@@ -17,17 +17,17 @@ import static mindustry.Vars.*;
 
 /**
  * general implementation:
- *
+ * <p>
  * caching:
  * 1. create fixed-size float array for rendering into
  * 2. for each chunk, cache each layer into buffer; record layer boundary indices (alternatively, create mesh per layer for fast recache)
  * 3. create mesh for this chunk based on buffer size, copy buffer into mesh
- *
+ * <p>
  * rendering:
  * 1. iterate through visible chunks
  * 2. activate the shader vertex attributes beforehand
  * 3. bind each mesh individually, draw it
- *
+ * <p>
  * */
 public class FloorRenderer{
     private static final VertexAttribute[] attributes = {VertexAttribute.position, VertexAttribute.color, VertexAttribute.texCoords};

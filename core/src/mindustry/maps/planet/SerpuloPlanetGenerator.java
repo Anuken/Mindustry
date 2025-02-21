@@ -16,6 +16,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
+import java.util.Objects;
+
 import static mindustry.Vars.*;
 
 public class SerpuloPlanetGenerator extends PlanetGenerator{
@@ -306,7 +308,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         }
 
         for(Room room : roomseq){
-            spawn.connect(room);
+            Objects.requireNonNull(spawn).connect(room);
         }
 
         Room fspawn = spawn;
@@ -347,7 +349,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             float value = Ridged.noise3d(2, v.x, v.y, v.z, 1, 1f / 55f) + rr - rawHeight(v) * 0f;
             float rrscl = rr * 44 - 2;
 
-            if(value > 0.17f && !Mathf.within(x, y, fspawn.x, fspawn.y, 12 + rrscl)){
+            if(value > 0.17f && !Mathf.within(x, y, Objects.requireNonNull(fspawn).x, fspawn.y, 12 + rrscl)){
                 boolean deep = value > 0.17f + 0.1f && !Mathf.within(x, y, fspawn.x, fspawn.y, 15 + rrscl);
                 boolean spore = floor != Blocks.sand && floor != Blocks.salt;
                 //do not place rivers on ice, they're frozen
@@ -461,7 +463,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
         median(2);
 
-        inverseFloodFill(tiles.getn(spawn.x, spawn.y));
+        inverseFloodFill(tiles.getn(Objects.requireNonNull(spawn).x, spawn.y));
 
         tech();
 

@@ -278,7 +278,7 @@ public class NetClient implements ApplicationListener{
         //log commands before they are handled
         if(message.startsWith(netServer.clientCommands.getPrefix())){
             //log with brackets
-            Log.info("<&fi@: @&fr>", "&lk" + player.plainName(), "&lw" + message);
+            Log.info("<&fi@: @&fr>", "&lk" + Objects.requireNonNull(player).plainName(), "&lw" + message);
         }
 
         //check if it's a command
@@ -296,7 +296,7 @@ public class NetClient implements ApplicationListener{
             }
 
             //server console logging
-            Log.info("&fi@: @", "&lc" + player.plainName(), "&lw" + message);
+            Log.info("&fi@: @", "&lc" + Objects.requireNonNull(player).plainName(), "&lw" + message);
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
@@ -307,7 +307,7 @@ public class NetClient implements ApplicationListener{
             if(response.type != ResponseType.valid){
                 String text = netServer.invalidHandler.handle(player, response);
                 if(text != null){
-                    player.sendMessage(text);
+                    Objects.requireNonNull(player).sendMessage(text);
                 }
             }
         }
@@ -688,7 +688,7 @@ public class NetClient implements ApplicationListener{
             lastSent++,
             uid,
             dead,
-            dead ? player.x : unit.x, dead ? player.y : unit.y,
+            dead ? player.x : Objects.requireNonNull(unit).x, dead ? player.y : unit.y,
             dead ? 0f : unit.aimX(), dead ? 0f : unit.aimY(),
             unit == null ? 0f : unit.rotation,
             unit instanceof Mechc m ? m.baseRotation() : 0,

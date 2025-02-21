@@ -275,7 +275,7 @@ public class World{
         });
 
         if(saveInfo && state.rules.waves){
-            sector.info.waves = state.rules.waves;
+            sector.info.waves = true;
         }
 
         //postgenerate for bases

@@ -129,10 +129,7 @@ public class TypeIO{
             for(Object obj : objs){
                 writeObject(write, obj);
             }
-        }else if(object instanceof UnitCommand command){
-            write.b(23);
-            write.s(command.id);
-        }else{
+        }else {
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
     }
@@ -718,7 +715,7 @@ public class TypeIO{
         if(entry.effect.dynamic){
             //write a byte with bits set based on which field is actually used
             write.b(
-            (entry.damageMultiplier != 1f ?     (1 << 0) : 0) |
+            (entry.damageMultiplier != 1f ?     (1) : 0) |
             (entry.healthMultiplier != 1f ?     (1 << 1) : 0) |
             (entry.speedMultiplier != 1f ?      (1 << 2) : 0) |
             (entry.reloadMultiplier != 1f ?     (1 << 3) : 0) |
@@ -747,7 +744,7 @@ public class TypeIO{
             //read flags that store which fields are set
             int flags = read.ub();
 
-            if((flags & (1 << 0)) != 0) result.damageMultiplier = read.f();
+            if((flags & (1)) != 0) result.damageMultiplier = read.f();
             if((flags & (1 << 1)) != 0) result.healthMultiplier = read.f();
             if((flags & (1 << 2)) != 0) result.speedMultiplier = read.f();
             if((flags & (1 << 3)) != 0) result.reloadMultiplier = read.f();

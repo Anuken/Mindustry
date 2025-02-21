@@ -10,6 +10,8 @@ import arc.struct.*;
 import mindustry.*;
 import mindustry.gen.*;
 
+import java.util.Objects;
+
 /** Handles files in a modded context. */
 public class FileTree implements FileHandleResolver{
     private ObjectMap<String, Fi> files = new ObjectMap<>();
@@ -34,7 +36,7 @@ public class FileTree implements FileHandleResolver{
         }else if(Core.files == null && !safe){ //headless
             return Fi.get(path);
         }else{
-            return Core.files.internal(path);
+            return Objects.requireNonNull(Core.files).internal(path);
         }
     }
 

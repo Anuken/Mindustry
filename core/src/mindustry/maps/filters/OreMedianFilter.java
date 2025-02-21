@@ -53,8 +53,9 @@ public class OreMedianFilter extends GenerateFilter{
                 if(Mathf.dst2(x, y) > rad*rad) continue;
 
                 Tile tile = in.tile(in.x + x, in.y + y);
-                if(tile.overlay() != Blocks.spawn)
-                blocks.add(tile.overlay().id);
+                if(tile.overlay() != Blocks.spawn) {
+                    blocks.add(tile.overlay().id);
+                }
             }
         }
 

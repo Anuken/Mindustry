@@ -353,7 +353,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
                 returned = maps.saveMap(editor.tags);
                 if(workshop){
-                    returned.workshop = workshop;
+                    returned.workshop = true;
                 }
                 ui.showInfoFade("@editor.saved");
             }

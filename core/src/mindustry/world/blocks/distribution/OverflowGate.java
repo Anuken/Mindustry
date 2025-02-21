@@ -67,7 +67,7 @@ public class OverflowGate extends Block{
 
                 if(ac && !bc){
                     to = a;
-                }else if(bc && !ac){
+                }else if(!ac){
                     to = b;
                 }else{
                     to = (rotation & (1 << from)) == 0 ? a : b;

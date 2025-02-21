@@ -47,7 +47,7 @@ public class ShallowLiquid extends Floor{
                     }
                 }
 
-                String baseName = this.name + "" + (++index);
+                String baseName = this.name + (++index);
                 packer.add(PageType.environment, baseName, res);
                 packer.add(PageType.editor, "editor-" + baseName, res);
 
