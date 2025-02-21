@@ -13,7 +13,9 @@ public enum Difficulty{
     public static final Difficulty[] all = values();
 
     //TODO add more fields
-    public float enemyHealthMultiplier, enemySpawnMultiplier, waveTimeMultiplier;
+    public final float enemyHealthMultiplier;
+    public final float enemySpawnMultiplier;
+    public final float waveTimeMultiplier;
 
     Difficulty(float enemyHealthMultiplier, float enemySpawnMultiplier, float waveTimeMultiplier){
         this.enemySpawnMultiplier = enemySpawnMultiplier;
