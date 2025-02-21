@@ -680,31 +680,9 @@ public class LCanvas extends Table{
             Lines.stroke(Scl.scl(4f), button.color);
             Draw.alpha(parentAlpha);
 
-            // exponential smoothing
-            uiHeight = Mathf.lerp(
-                Scl.scl(Core.graphics.isPortrait() ? 20f : 40f) + Scl.scl(Core.graphics.isPortrait() ? 8f : 10f) * (float) predHeight,
-                uiHeight,
-                dynamicJumpHeights ? Mathf.pow(0.9f, Time.delta) : 0
-           );
+            float dist = 100f;
 
-            //trapezoidal jumps
-            float dy = (y2 == y ? 0f : y2 > y ? 1f : -1f) * uiHeight * 0.5f;
-            //there's absolutely a better way to detect invalid trapezoids, but this probably isn't *that* slow and I don't care to fix it right now
-            if(Intersector.intersectSegments(x, y, x + uiHeight, y + dy, x2, y2, x + uiHeight, y2 - dy, Tmp.v3)){
-                Lines.beginLine();
-                Lines.linePoint(x, y);
-                Lines.linePoint(Tmp.v3.x, Tmp.v3.y);
-                Lines.linePoint(x2, y2);
-                Lines.endLine();
-            }else{
-                Lines.beginLine();
-                Lines.linePoint(x, y);
-                Lines.linePoint(x + uiHeight, y + dy);
-                Lines.linePoint(x + uiHeight, y2 - dy);
-                Lines.linePoint(x2, y2);
-                Lines.endLine();
-            }
-        }
+            //square jumps
 
         public void prepareHeight(){
             if(this.button.to.get() == null){
