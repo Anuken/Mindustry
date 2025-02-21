@@ -172,7 +172,7 @@ public class EntityIO{
         }
     }
 
-    void writeSyncManual(MethodSpec.Builder method, boolean write, Seq<Svar> syncFields) throws Exception{
+    void writeSyncManual(MethodSpec.Builder method, boolean write, Seq<Svar> syncFields) {
         this.method = method;
         this.write = write;
 
@@ -195,7 +195,7 @@ public class EntityIO{
         }
     }
 
-    void writeInterpolate(MethodSpec.Builder method, Seq<Svar> fields) throws Exception{
+    void writeInterpolate(MethodSpec.Builder method, Seq<Svar> fields) {
         this.method = method;
 
         cont("if(lastUpdated != 0 && updateSpacing != 0)");
@@ -221,7 +221,7 @@ public class EntityIO{
         econt();
     }
 
-    private void io(String type, String field, boolean network) throws Exception{
+    private void io(String type, String field, boolean network) {
         type = type.replace("mindustry.gen.", "");
         type = replacements.get(type, type);
 

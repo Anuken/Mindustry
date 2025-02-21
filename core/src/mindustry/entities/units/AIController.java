@@ -59,8 +59,9 @@ public class AIController implements UnitController{
     }
 
     @Override
-    public void afterRead(Unit unit){
+    public void afterRead(Unit unit) {
 
+        UnitController.super.afterRead(unit);
     }
 
     @Override

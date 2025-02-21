@@ -15,7 +15,7 @@ public class ItemVoid extends Block{
         envEnabled = Env.any;
     }
 
-    public class ItemVoidBuild extends Building{
+    public static class ItemVoidBuild extends Building{
         //I need a fake item module, because items can't be added to older blocks (breaks saves)
         public ItemModule flowItems = new ItemModule();
 

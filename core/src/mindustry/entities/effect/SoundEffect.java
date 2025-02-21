@@ -1,14 +1,10 @@
 package mindustry.entities.effect;
 
-import arc.*;
 import arc.audio.*;
-import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
-import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
 /** Plays a sound effect when created and simultaneously renders an effect. */

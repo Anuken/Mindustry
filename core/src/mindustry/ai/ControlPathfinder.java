@@ -524,7 +524,7 @@ public class ControlPathfinder implements Runnable{
 
             //at the end of the loop, close any un-initialized portals; this is copy pasted code
             int previous = clusterSize - 1;
-            if(!prevSolid && previous >= lastPortal){
+            if(!prevSolid){
                 //portals are an inclusive range
                 portals.add(Point2.pack(previous, lastPortal));
             }
@@ -1047,29 +1047,27 @@ public class ControlPathfinder implements Runnable{
             addingFrontier = false; //when it's a new field, there is no need to add to the frontier to merge the flowfield
         }
 
-        if(nodePath != null){
-            int cx = unitX / clusterSize, cy = unitY / clusterSize;
+        int cx = unitX / clusterSize, cy = unitY / clusterSize;
 
-            addFlowCluster(cache, cx, cy, addingFrontier);
+        addFlowCluster(cache, cx, cy, addingFrontier);
 
-            for(int i = -1; i < nodePath.size; i++){
-                int
-                current = i == -1 ? node : nodePath.items[i],
-                cluster = NodeIndex.cluster(current),
-                dir = NodeIndex.dir(current),
-                dx = Geometry.d4[dir].x,
-                dy = Geometry.d4[dir].y,
-                ox = cluster % cwidth + dx,
-                oy = cluster / cwidth + dy;
+        for(int i = -1; i < nodePath.size; i++){
+            int
+            current = i == -1 ? node : nodePath.items[i],
+            cluster = NodeIndex.cluster(current),
+            dir = NodeIndex.dir(current),
+            dx = Geometry.d4[dir].x,
+            dy = Geometry.d4[dir].y,
+            ox = cluster % cwidth + dx,
+            oy = cluster / cwidth + dy;
 
-                addFlowCluster(cache, cluster, addingFrontier);
+            addFlowCluster(cache, cluster, addingFrontier);
 
-                //store directional/flipped version of cluster
-                if(ox >= 0 && oy >= 0 && ox < cwidth && oy < cheight){
-                    int other = ox + oy * cwidth;
+            //store directional/flipped version of cluster
+            if(ox >= 0 && oy >= 0 && ox < cwidth && oy < cheight){
+                int other = ox + oy * cwidth;
 
-                    addFlowCluster(cache, other, addingFrontier);
-                }
+                addFlowCluster(cache, other, addingFrontier);
             }
         }
     }
@@ -1249,7 +1247,7 @@ public class ControlPathfinder implements Runnable{
                     }
 
                     request.lastTargetTile = any ? tileOn : null;
-                    if(showDebug && tileOn != null && Core.graphics.getFrameId() % 30 == 0){
+                    if(showDebug && Core.graphics.getFrameId() % 30 == 0){
                         Fx.placeBlock.at(tileOn.worldx(), tileOn.worldy(), 1);
                     }
                 }

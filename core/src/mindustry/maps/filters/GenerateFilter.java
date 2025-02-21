@@ -175,6 +175,7 @@ public abstract class GenerateFilter implements Cloneable{
     }
 
     @Struct
+    static
     class PackTileStruct{
         short block, floor, overlay;
     }

@@ -242,7 +242,7 @@ public class NetServer implements ApplicationListener{
 
             packet.name = fixName(packet.name);
 
-            if(packet.name.trim().length() <= 0){
+            if(packet.name.trim().isEmpty()){
                 con.kick(KickReason.nameEmpty);
                 return;
             }

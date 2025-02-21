@@ -282,7 +282,7 @@ public class ApplicationTests{
         int bx = 4;
         int by = 4;
         world.tile(bx, by).setBlock(Blocks.coreShard, Team.sharded, 0);
-        assertEquals(world.tile(bx, by).team(), Team.sharded);
+        assertEquals(Team.sharded, world.tile(bx, by).team());
         for(int x = bx - 1; x <= bx + 1; x++){
             for(int y = by - 1; y <= by + 1; y++){
                 assertEquals(world.tile(x, y).block(), Blocks.coreShard);
@@ -297,10 +297,10 @@ public class ApplicationTests{
         Tile tile = world.tile(4, 4);
         tile.build.items.add(Items.coal, 5);
         tile.build.items.add(Items.titanium, 50);
-        assertEquals(tile.build.items.total(), 55);
+        assertEquals(55, tile.build.items.total());
         tile.build.items.remove(Items.phaseFabric, 10);
         tile.build.items.remove(Items.titanium, 10);
-        assertEquals(tile.build.items.total(), 45);
+        assertEquals(45, tile.build.items.total());
     }
 
     @Test
@@ -406,7 +406,7 @@ public class ApplicationTests{
         updateBlocks(10);
 
         assertTrue(world.tile(2, 1).build.liquids.currentAmount() >= 1);
-        assertTrue(world.tile(2, 1).build.liquids.current() == Liquids.water);
+        assertSame(world.tile(2, 1).build.liquids.current(), Liquids.water);
     }
 
     @Test
@@ -429,7 +429,7 @@ public class ApplicationTests{
         updateBlocks(10);
 
         assertTrue(tank.build.liquids.currentAmount() >= 1, "Liquid not moved through junction");
-        assertTrue(tank.build.liquids.current() == Liquids.water, "Tank has no water");
+        assertSame(tank.build.liquids.current(), Liquids.water, "Tank has no water");
     }
 
     @Test
@@ -695,10 +695,10 @@ public class ApplicationTests{
     @Test
     void edges(){
         Point2[] edges = Edges.getEdges(1);
-        assertEquals(edges[0], new Point2(1, 0));
-        assertEquals(edges[1], new Point2(0, 1));
-        assertEquals(edges[2], new Point2(-1, 0));
-        assertEquals(edges[3], new Point2(0, -1));
+        assertEquals(new Point2(1, 0), edges[0]);
+        assertEquals(new Point2(0, 1), edges[1]);
+        assertEquals(new Point2(-1, 0), edges[2]);
+        assertEquals(new Point2(0, -1), edges[3]);
 
         Point2[] edges2 = Edges.getEdges(2);
         assertEquals(8, edges2.length);

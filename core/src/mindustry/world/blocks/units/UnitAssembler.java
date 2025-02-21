@@ -30,6 +30,8 @@ import mindustry.world.blocks.units.UnitAssemblerModule.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import java.util.Objects;
+
 import static mindustry.Vars.*;
 
 public class UnitAssembler extends PayloadBlock{
@@ -451,7 +453,7 @@ public class UnitAssembler extends PayloadBlock{
                 if(unit != null && unit.isCommandable() && commandPos != null){
                     unit.command().commandPosition(commandPos);
                 }
-                unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
+                Objects.requireNonNull(unit).set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
                 unit.rotation = rotdeg();
                 unit.add();
             }

@@ -23,7 +23,7 @@ public class LiquidVoid extends Block{
         removeBar("liquid");
     }
 
-    public class LiquidVoidBuild extends Building{
+    public static class LiquidVoidBuild extends Building{
         @Override
         public void placed(){
             super.placed();

@@ -431,7 +431,7 @@ public class Generators{
                         }
                     }
 
-                    String name = floor.name + "" + (++index);
+                    String name = floor.name + (++index);
                     save(res, "../blocks/environment/" + name);
                     save(res, "../editor/editor-" + name);
 
@@ -486,26 +486,6 @@ public class Generators{
         };
 
         //TODO !!!!! currently just an experiment
-
-        if(false)
-        generate("all-icons", () -> {
-            for(Seq<Content> arr : content.getContentMap()){
-                for(Content cont : arr){
-                    if(cont instanceof UnlockableContent && !(cont instanceof Planet)){
-                        UnlockableContent unlock = (UnlockableContent)cont;
-
-                        if(unlock.generateIcons){
-                            try{
-                                unlock.createIcons(packer);
-                            }catch(IllegalArgumentException e){
-                                Log.err(e);
-                                Log.err("Skip: @", unlock.name);
-                            }
-                        }
-                    }
-                }
-            }
-        });
 
         generate("unit-icons", () -> content.units().each(type -> {
             if(type.internal) return; //internal hidden units don't generate
@@ -609,7 +589,7 @@ public class Generators{
                 if(type.needsBodyOutline()){
                     save(image, type.name + "-outline");
                 }else if(type.segments == 0){
-                    replace(type.name, type.segments > 0 ? get(type.segmentRegions[0]) : outline.get(get(type.region)));
+                    replace(type.name, outline.get(get(type.region)));
                 }
 
                 //draw weapons that are under the base

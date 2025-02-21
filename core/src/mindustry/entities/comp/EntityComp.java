@@ -28,7 +28,7 @@ abstract class EntityComp{
     }
 
     boolean isLocal(){
-        return ((Object)this) == player || ((Object)this) instanceof Unitc u && u.controller() == player;
+        return (Object) this instanceof Unitc u && u.controller() == player;
     }
 
     boolean isRemote(){

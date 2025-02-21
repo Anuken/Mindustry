@@ -32,6 +32,8 @@ import mindustry.world.blocks.logic.MessageBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
+import java.util.Objects;
+
 import static mindustry.Vars.*;
 
 public class LExecutor{
@@ -805,14 +807,14 @@ public class LExecutor{
             if(op == LogicOp.strictEqual){
                 dest.setnum(a.isobj == b.isobj && ((a.isobj && Structs.eq(a.objval, b.objval)) || (!a.isobj && a.numval == b.numval)) ? 1 : 0);
             }else if(op.unary){
-                dest.setnum(op.function1.get(a.num()));
+                dest.setnum(Objects.requireNonNull(op.function1).get(a.num()));
             }else{
                 if(op.objFunction2 != null && a.isobj && b.isobj){
                     //use object function if both are objects
                     dest.setnum(op.objFunction2.get(a.obj(), b.obj()));
                 }else{
                     //otherwise use the numeric function
-                    dest.setnum(op.function2.get(a.num(), b.num()));
+                    dest.setnum(Objects.requireNonNull(op.function2).get(a.num(), b.num()));
                 }
 
             }

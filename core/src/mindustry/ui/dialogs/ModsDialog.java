@@ -270,7 +270,7 @@ public class ModsDialog extends BaseDialog{
                                         (shortDesc.length() > 0 ? "[lightgray]" + shortDesc + "\n" : "")
                                         //so does anybody care about version?
                                         //+ "[gray]v" + Strings.stripColors(trimText(item.meta.version)) + "\n"
-                                        + (item.enabled() || hideDisabled ? "" : Core.bundle.get("mod.disabled") + ""))
+                                        + (item.enabled() || hideDisabled ? "" : Core.bundle.get("mod.disabled")))
                                     .wrap().top().width(300f).growX().left();
 
                                     text.row();

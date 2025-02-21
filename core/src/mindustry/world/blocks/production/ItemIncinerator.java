@@ -33,7 +33,8 @@ public class ItemIncinerator extends Block{
     public class ItemIncineratorBuild extends Building{
 
         @Override
-        public void updateTile(){
+        public void updateTile() {
+            super.updateTile();
         }
 
         @Override

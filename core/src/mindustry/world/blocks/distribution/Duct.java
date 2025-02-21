@@ -184,14 +184,16 @@ public class Duct extends Block implements Autotiler{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return current == null && items.total() == 0 &&
-                (armored ?
-                    //armored acceptance
-                    ((source.block.rotate && source.front() == this && source.block.hasItems && source.block.isDuct) ||
-                    Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation) :
-                    //standard acceptance - do not accept from front
-                    !(source.block.rotate && next == source) && Edges.getFacingEdge(source.tile, tile) != null && Math.abs(Edges.getFacingEdge(source.tile, tile).relativeTo(tile.x, tile.y) - rotation) != 2
-                );
+            if (current != null || items.total() != 0) return false;//armored acceptance
+//standard acceptance - do not accept from front
+            if (armored) {
+                return ((source.block.rotate && source.front() == this && source.block.hasItems && source.block.isDuct) ||
+                        Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation);
+            } else {
+                if (source.block.rotate && next == source) return false;
+                Edges.getFacingEdge(source.tile, tile);
+                return Math.abs(Edges.getFacingEdge(source.tile, tile).relativeTo(tile.x, tile.y) - rotation) != 2;
+            }
         }
 
         @Override

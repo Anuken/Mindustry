@@ -311,7 +311,7 @@ public final class FogControl implements CustomChunk{
 
                     updateStatic();
                     //ignore, don't want to crash this thread
-                }catch(Exception e){}
+                }catch(Exception ignored){}
             }
         }
     }
@@ -552,6 +552,7 @@ public final class FogControl implements CustomChunk{
     }
 
     @Struct
+    static
     class FogEventStruct{
         @StructField(16)
         int x;

@@ -427,7 +427,7 @@ public class MapObjectivesDialog extends BaseDialog{
                     ))) continue;
 
                     var anno = Structs.find(f.getDeclaredAnnotations(), a -> hasInterpreter(a.annotationType(), ft));
-                    getInterpreter(anno == null ? Override.class : anno.annotationType(), ft).build(
+                    getInterpreter(anno.annotationType(), ft).build(
                         t, f.getName(), new TypeInfo(f),
                         f, null, null,
                         () -> Reflect.get(obj, f),

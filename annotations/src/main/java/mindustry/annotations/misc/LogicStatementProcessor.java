@@ -36,7 +36,7 @@ public class LogicStatementProcessor extends BaseProcessor{
             ClassName.get(Seq.class),
             ParameterizedTypeName.get(ClassName.get(Prov.class),
                 tname("mindustry.logic.LStatement"))), "allStatements", Modifier.PUBLIC, Modifier.STATIC)
-            .initializer("Seq.with(" + types.toString(", ", t -> "" + t.toString() + "::new") + ")").build());
+            .initializer("Seq.with(" + types.toString(", ", t -> t.toString() + "::new") + ")").build());
 
         boolean beganWrite = false, beganRead = false;
 

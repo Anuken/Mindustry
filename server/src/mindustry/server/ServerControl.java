@@ -776,22 +776,25 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("ban", "<type-id/name/ip> <username/IP/ID...>", "Ban a person.", arg -> {
-            if(arg[0].equals("id")){
-                netServer.admins.banPlayerID(arg[1]);
-                info("Banned.");
-            }else if(arg[0].equals("name")){
-                Player target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
-                if(target != null){
-                    netServer.admins.banPlayer(target.uuid());
+            switch (arg[0]) {
+                case "id" -> {
+                    netServer.admins.banPlayerID(arg[1]);
                     info("Banned.");
-                }else{
-                    err("No matches found.");
                 }
-            }else if(arg[0].equals("ip")){
-                netServer.admins.banPlayerIP(arg[1]);
-                info("Banned.");
-            }else{
-                err("Invalid type.");
+                case "name" -> {
+                    Player target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+                    if (target != null) {
+                        netServer.admins.banPlayer(target.uuid());
+                        info("Banned.");
+                    } else {
+                        err("No matches found.");
+                    }
+                }
+                case "ip" -> {
+                    netServer.admins.banPlayerIP(arg[1]);
+                    info("Banned.");
+                }
+                default -> err("Invalid type.");
             }
 
             for(Player player : Groups.player){

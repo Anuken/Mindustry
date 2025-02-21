@@ -679,7 +679,7 @@ public class MapLocalesDialog extends BaseDialog{
             i = 0;
             for(UnlockableContent u : all){
                 table.button(new TextureRegionDrawable(u.uiIcon), Styles.flati, iconMed, () -> {
-                    cons.get(u.emoji() + "");
+                    cons.get(u.emoji());
                     dialog.hide();
                 }).tooltip(u.localizedName);
 

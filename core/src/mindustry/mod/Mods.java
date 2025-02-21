@@ -107,7 +107,7 @@ public class Mods implements Loadable{
         //find a name to prevent any name conflicts
         int count = 1;
         while(modDirectory.child(finalName + ".zip").exists()){
-            finalName = baseName + "" + count++;
+            finalName = baseName + count++;
         }
 
         Fi dest = modDirectory.child(finalName + ".zip");

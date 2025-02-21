@@ -4,7 +4,6 @@ import arc.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;

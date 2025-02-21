@@ -88,8 +88,8 @@ public class BuildTurret extends BaseTurret{
         }
 
         @Override
-        public boolean canControl(){
-            return true;
+        public boolean canControl() {
+            return ControlBlock.super.canControl();
         }
 
         @Override

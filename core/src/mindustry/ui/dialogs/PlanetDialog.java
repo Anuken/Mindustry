@@ -37,6 +37,8 @@ import mindustry.ui.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
+import java.util.Objects;
+
 import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.graphics.g3d.PlanetRenderer.*;
@@ -505,7 +507,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     if(planet.campaignRules.sectorInvasion){
                         for(Sector enemy : sec.near()){
                             if(enemy.hasEnemyBase()){
-                                planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Color.clear, 0.24f, 110f, 25);
+                                planets.drawArc(planet, enemy.tile.v, sec.tile.v, Objects.requireNonNull(Team.crux.color).write(Tmp.c2).a(state.uiAlpha), Color.clear, 0.24f, 110f, 25);
                             }
                         }
                     }
@@ -1068,7 +1070,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     void addSurvivedInfo(Sector sector, Table table, boolean wrap){
         if(!wrap){
-            table.add(sector.planet.allowWaveSimulation ? Core.bundle.format("sectors.underattack", (int)(sector.info.damage * 100)) : "@sectors.underattack.nodamage").wrapLabel(wrap).row();
+            table.add(sector.planet.allowWaveSimulation ? Core.bundle.format("sectors.underattack", (int)(sector.info.damage * 100)) : "@sectors.underattack.nodamage").wrapLabel(false).row();
         }
 
         if(sector.planet.allowWaveSimulation && sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){

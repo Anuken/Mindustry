@@ -101,7 +101,7 @@ public class TechTree{
                 parent.children.add(this);
                 planet = parent.planet;
                 researchCostMultipliers = parent.researchCostMultipliers;
-            }else if(researchCostMultipliers == null){
+            }else {
                 researchCostMultipliers = new ObjectFloatMap<>();
             }
 

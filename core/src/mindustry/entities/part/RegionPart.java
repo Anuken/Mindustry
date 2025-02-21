@@ -8,6 +8,8 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.graphics.*;
 
+import java.util.Objects;
+
 public class RegionPart extends DrawPart{
     protected PartParams childParam = new PartParams();
 
@@ -112,7 +114,7 @@ public class RegionPart extends DrawPart{
                 Draw.z(prevZ);
             }
 
-            if(drawRegion && region.found()){
+            if(drawRegion && Objects.requireNonNull(region).found()){
                 if(color != null && colorTo != null){
                     Draw.color(color, colorTo, prog);
                 }else if(color != null){

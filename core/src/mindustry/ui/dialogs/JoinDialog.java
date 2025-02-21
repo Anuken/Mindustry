@@ -22,6 +22,8 @@ import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
 
+import java.util.Objects;
+
 import static mindustry.Vars.*;
 
 public class JoinDialog extends BaseDialog{
@@ -279,7 +281,7 @@ public class JoinDialog extends BaseDialog{
             t.setColor(color);
             t.left();
 
-            if(!host.description.isEmpty() && !isBanned){
+            if(!Objects.requireNonNull(host.description).isEmpty() && !isBanned){
                 //limit newlines.
                 int count = 0;
                 StringBuilder result = new StringBuilder(host.description.length());

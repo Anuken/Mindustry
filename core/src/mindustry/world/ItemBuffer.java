@@ -67,6 +67,7 @@ public class ItemBuffer{
     }
 
     @Struct
+    static
     class TimeItemStruct{
         short data;
         short item;

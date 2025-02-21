@@ -52,7 +52,7 @@ public class MapMarkers implements Iterable<ObjectiveMarker>{
         return all.size;
     }
 
-    public void write(DataOutput stream) throws IOException{
+    public void write(DataOutput stream) {
         JsonIO.writeBytes(map, ObjectiveMarker.class, (DataOutputStream)stream);
     }
 

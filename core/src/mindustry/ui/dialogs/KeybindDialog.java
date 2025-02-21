@@ -14,6 +14,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
+import java.util.Objects;
+
 import static arc.Core.*;
 
 public class KeybindDialog extends Dialog{
@@ -125,7 +127,7 @@ public class KeybindDialog extends Dialog{
             var tstyle = Styles.defaultt;
 
             for(KeyBind keybind : keybinds.getKeybinds()){
-                if(lastCategory != keybind.category() && keybind.category() != null){
+                if(!Objects.equals(lastCategory, keybind.category()) && keybind.category() != null){
                     table.add(bundle.get("category." + keybind.category() + ".name", Strings.capitalize(keybind.category()))).color(Color.gray).colspan(4).pad(10).padBottom(4).row();
                     table.image().color(Color.gray).fillX().height(3).pad(6).colspan(4).padTop(0).padBottom(10).row();
                     lastCategory = keybind.category();
