@@ -1150,9 +1150,9 @@ public class LExecutor{
     }
 
     public static class SetRateI implements LInstruction{
-        public int amount;
+        public LVar amount;
 
-        public SetRateI(int amount){
+        public SetRateI(LVar amount){
             this.amount = amount;
         }
 
