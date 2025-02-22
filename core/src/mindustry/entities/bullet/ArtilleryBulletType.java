@@ -52,7 +52,7 @@ public class ArtilleryBulletType extends BasicBulletType{
         super.update(b);
 
         if(b.timer(0, (3 + b.fslope() * 2f) * trailMult)){
-            trailEffect.at(b.x, b.y, b.fslope() * trailSize, backColor);
+            trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : b.fslope() * trailSize, backColor);
         }
     }
 }

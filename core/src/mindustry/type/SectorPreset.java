@@ -21,6 +21,8 @@ public class SectorPreset extends UnlockableContent{
     public boolean noLighting = false;
     /** If true, this is the last sector in its planetary campaign. */
     public boolean isLastSector;
+    /** If true, this sector must be unlocked before landing is permitted. */
+    public boolean requireUnlock = true;
     public boolean showSectorLandInfo = true;
     /** If true, uses this sector's launch fields instead */
     public boolean overrideLaunchDefaults = false;
@@ -54,7 +56,6 @@ public class SectorPreset extends UnlockableContent{
         this.planet = planet;
         sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector);
-        inlineDescription = false;
 
         planet.preset(sector, this);
     }

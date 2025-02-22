@@ -72,6 +72,7 @@ public class ModsDialog extends BaseDialog{
             browserTable = tablebrow;
         }).scrollX(false);
         browser.addCloseButton();
+        browser.makeButtonOverlay();
 
         browser.onResize(this::rebuildBrowser);
 
@@ -93,7 +94,7 @@ public class ModsDialog extends BaseDialog{
 
         hidden(() -> {
             if(mods.requiresReload()){
-                reload();
+                mods.reload();
             }
         });
 
@@ -106,40 +107,60 @@ public class ModsDialog extends BaseDialog{
             ui.showErrorMessage("@feature.unsupported");
         }else if(error instanceof HttpStatusException st){
             ui.showErrorMessage(Core.bundle.format("connectfail", Strings.capitalize(st.status.toString().toLowerCase())));
+        }else if(error.getMessage() != null && error.getMessage().toLowerCase(Locale.ROOT).contains("writable dex")){
+            ui.showException("@error.moddex", error);
         }else{
             ui.showException(error);
         }
     }
 
     void getModList(Cons<Seq<ModListing>> listener){
-        if(modList == null){
-            Http.get("https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", response -> {
-                String strResult = response.getResultAsString();
+        getModList(0, listener);
+    }
 
+    void getModList(int index, Cons<Seq<ModListing>> listener){
+        if(index >= modJsonURLs.length) return;
+
+        if(modList != null){
+            listener.get(modList);
+            return;
+        }
+
+        Http.get(modJsonURLs[index], response -> {
+            String strResult = response.getResultAsString();
+
+            Core.app.post(() -> {
+                try{
+                    modList = JsonIO.json.fromJson(Seq.class, ModListing.class, strResult);
+
+                    var d = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    Func<String, Date> parser = text -> {
+                        try{
+                            return d.parse(text);
+                        }catch(Exception e){
+                            return new Date();
+                        }
+                    };
+
+                    modList.sortComparing(m -> parser.get(m.lastUpdated)).reverse();
+                    listener.get(modList);
+                }catch(Exception e){
+                    Log.err(e);
+                    ui.showException(e);
+                }
+            });
+        }, error -> {
+            if(index < modJsonURLs.length - 1){
+                getModList(index + 1, listener);
+            }else{
                 Core.app.post(() -> {
-                    try{
-                        modList = JsonIO.json.fromJson(Seq.class, ModListing.class, strResult);
-
-                        var d = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                        Func<String, Date> parser = text -> {
-                            try{
-                                return d.parse(text);
-                            }catch(Exception e){
-                                return new Date();
-                            }
-                        };
-
-                        modList.sortComparing(m -> parser.get(m.lastUpdated)).reverse();
-                        listener.get(modList);
-                    }catch(Exception e){
-                        e.printStackTrace();
-                        ui.showException(e);
+                    modError(error);
+                    if(browser != null){
+                        browser.hide();
                     }
                 });
-            }, error -> Core.app.post(() -> modError(error)));
-        }else{
-            listener.get(modList);
-        }
+            }
+        });
     }
 
     void setup(){
@@ -174,7 +195,7 @@ public class ModsDialog extends BaseDialog{
                                 mods.importMod(file);
                                 setup();
                             }catch(Exception e){
-                                ui.showException(e);
+                                ui.showException(e.getMessage() != null && e.getMessage().toLowerCase(Locale.ROOT).contains("writable dex") ? "@error.moddex" : "", e);
                                 Log.err(e);
                             }
                         }, "zip", "jar");
@@ -361,13 +382,6 @@ public class ModsDialog extends BaseDialog{
         return null;
     }
 
-    private void reload(){
-        ui.showInfoOnHidden("@mods.reloadexit", () -> {
-            Log.info("Exiting to reload mods.");
-            Core.app.exit();
-        });
-    }
-
     private void showMod(LoadedMod mod){
         BaseDialog dialog = new BaseDialog(mod.meta.displayName);
 
@@ -396,6 +410,12 @@ public class ModsDialog extends BaseDialog{
                 desc.add("@editor.author").padRight(10).color(Color.gray);
                 desc.row();
                 desc.add(mod.meta.author).growX().wrap().padTop(2);
+                desc.row();
+            }
+            if(mod.meta.version != null){
+                desc.add("@mod.version").padRight(10).color(Color.gray).top();
+                desc.row();
+                desc.add(mod.meta.version).growX().wrap().padTop(2);
                 desc.row();
             }
             if(mod.meta.description != null){
@@ -455,7 +475,7 @@ public class ModsDialog extends BaseDialog{
 
         int cols = (int)Math.max(Core.graphics.getWidth() / Scl.scl(480), 1);
 
-        getModList(rlistings -> {
+        getModList(0, rlistings -> {
             browserTable.clear();
             int i = 0;
 
@@ -671,6 +691,16 @@ public class ModsDialog extends BaseDialog{
                 }
             }, this::importFail);
         }
+    }
+
+    public void importDependencies(Seq<String> dependencies, Runnable done){
+        getModList(listings -> {
+            listings.each(l -> dependencies.contains(l.internalName), l -> {
+                dependencies.remove(l.internalName);
+                githubImportMod(l.repo, l.hasJava);
+            });
+            done.run();
+        });
     }
 
     private void githubImportJavaMod(String repo, @Nullable String release){

@@ -129,10 +129,10 @@ public class Placement{
     }
 
     public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge){
-        calculateBridges(plans, bridge, t -> false);
+        calculateBridges(plans, bridge, false, t -> false);
     }
 
-    public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge, Boolf<Block> avoid){
+    public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge, boolean hasJunction, Boolf<Block> avoid){
         if(isSidePlace(plans) || plans.size == 0) return;
 
         //check for orthogonal placement + unlocked state
@@ -142,7 +142,7 @@ public class Placement{
 
         Boolf<BuildPlan> placeable = plan ->
             (plan.placeable(player.team()) || (plan.tile() != null && plan.tile().block() == plan.block)) &&  //don't count the same block as inaccessible
-           !(plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
+           !(plan != plans.first() && plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
 
         var result = plans1.clear();
         var rotated = plans.first().tile() != null && plans.first().tile().absoluteRelativeTo(plans.peek().x, plans.peek().y) == Mathf.mod(plans.first().rotation + 2, 4);
@@ -170,7 +170,7 @@ public class Placement{
                         continue outer;
                     }else if(placeable.get(other)){
 
-                        if(wereSame){
+                        if(wereSame && hasJunction){
                             //the gap is fake, it's just conveyors that can be replaced with junctions
                             i ++;
                             continue outer;
@@ -217,7 +217,7 @@ public class Placement{
 
         Boolf<BuildPlan> placeable = plan ->
             (plan.placeable(player.team()) || (plan.tile() != null && plan.tile().block() == plan.block)) &&  //don't count the same block as inaccessible
-            !(plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
+            !(plan != plans.first() && plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
 
         var result = plans1.clear();
 

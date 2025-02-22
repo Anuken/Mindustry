@@ -110,6 +110,8 @@ public class ConstructBlock extends Block{
             if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
         }
 
+        block.placeEnded(tile, builder);
+
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }
 
@@ -358,7 +360,9 @@ public class ConstructBlock extends Block{
                         int target = Mathf.round(requirements[i].amount * state.rules.buildCostMultiplier * state.rules.deconstructRefundMultiplier);
                         int remaining = target - itemsLeft[i];
 
-                        core.items.add(current.requirements[i].item, Mathf.clamp(remaining, 0, core.storageCapacity - core.items.get(current.requirements[i].item)));
+                        if(requirements[i].item.unlockedNowHost()){
+                            core.items.add(requirements[i].item, Mathf.clamp(remaining, 0, core.storageCapacity - core.items.get(requirements[i].item)));
+                        }
                         itemsLeft[i] = target;
                     }
                 }
@@ -418,7 +422,7 @@ public class ConstructBlock extends Block{
             this.wasConstructing = true;
             this.current = block;
             this.previous = previous;
-            this.buildCost = block.buildCost * state.rules.buildCostMultiplier;
+            this.buildCost = block.buildTime * state.rules.buildCostMultiplier;
             this.itemsLeft = new int[block.requirements.length];
             this.accumulator = new float[block.requirements.length];
             this.totalAccumulator = new float[block.requirements.length];
@@ -438,7 +442,7 @@ public class ConstructBlock extends Block{
             this.previous = previous;
             this.progress = 1f;
             this.current = previous;
-            this.buildCost = previous.buildCost * state.rules.buildCostMultiplier;
+            this.buildCost = previous.buildTime * state.rules.buildCostMultiplier;
             this.itemsLeft = new int[previous.requirements.length];
             this.accumulator = new float[previous.requirements.length];
             this.totalAccumulator = new float[previous.requirements.length];
@@ -496,7 +500,7 @@ public class ConstructBlock extends Block{
             if(previous == null) previous = Blocks.air;
             if(current == null) current = Blocks.air;
 
-            buildCost = current.buildCost * state.rules.buildCostMultiplier;
+            buildCost = current.buildTime * state.rules.buildCostMultiplier;
         }
     }
 }

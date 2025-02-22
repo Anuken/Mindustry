@@ -20,15 +20,14 @@ import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.maps.*;
 import mindustry.type.*;
-import mindustry.world.blocks.storage.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.blocks.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class Renderer implements ApplicationListener{
     /** These are global variables, for headless access. Cached. */
-    public static float laserOpacity = 0.5f, bridgeOpacity = 0.75f;
+    public static float laserOpacity = 0.5f, unitLaserOpacity = 1f, bridgeOpacity = 0.75f;
 
     public final BlockRenderer blocks = new BlockRenderer();
     public final FogRenderer fog = new FogRenderer();
@@ -43,16 +42,18 @@ public class Renderer implements ApplicationListener{
     public FrameBuffer effectBuffer = new FrameBuffer();
     public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false;
     public float weatherAlpha;
-    /** minZoom = zooming out, maxZoom = zooming in */
+    /** minZoom = zooming out, maxZoom = zooming in, used by cutscenes */
     public float minZoom = 1.5f, maxZoom = 6f;
+
+    /** minZoom = zooming out, maxZoom = zooming in, used by actual gameplay zoom and regulated by settings **/
+    public float minZoomInGame = 0.5f, maxZoomInGame = 6f;
     public Seq<EnvRenderer> envRenderers = new Seq<>();
     public ObjectMap<String, Runnable> customBackgrounds = new ObjectMap<>();
     public TextureRegion[] bubbles = new TextureRegion[16], splashes = new TextureRegion[12];
     public TextureRegion[][] fluidFrames;
 
     //currently landing core, null if there are no cores or it has finished landing.
-    private @Nullable CoreBuild landCore;
-    private @Nullable CoreBlock launchCoreType;
+    private @Nullable LaunchAnimator launchAnimator;
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
     private float
     //target camera scale that is lerp-ed to
@@ -61,8 +62,6 @@ public class Renderer implements ApplicationListener{
     camerascale = targetscale,
     //starts at coreLandDuration, ends at 0. if positive, core is landing.
     landTime,
-    //timer for core landing particles
-    landPTimer,
     //intensity for screen shake
     shakeIntensity,
     //reduction rate of screen shake
@@ -162,31 +161,34 @@ public class Renderer implements ApplicationListener{
         float dest = Mathf.clamp(Mathf.round(baseTarget, 0.5f), minScale(), maxScale());
         camerascale = Mathf.lerpDelta(camerascale, dest, 0.1f);
         if(Mathf.equal(camerascale, dest, 0.001f)) camerascale = dest;
+        unitLaserOpacity = settings.getInt("unitlaseropacity") / 100f;
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
         animateShields = settings.getBool("animatedshields");
         drawStatus = settings.getBool("blockstatus");
         enableEffects = settings.getBool("effects");
         drawDisplays = !settings.getBool("hidedisplays");
+        maxZoomInGame = settings.getFloat("maxzoomingamemultiplier", 1) * maxZoom;
+        minZoomInGame = minZoom / settings.getFloat("minzoomingamemultiplier", 1);
         drawLight = settings.getBool("drawlight", true);
         pixelate = settings.getBool("pixelate");
 
         //don't bother drawing landing animation if core is null
-        if(landCore == null) landTime = 0f;
+        if(launchAnimator == null) landTime = 0f;
         if(landTime > 0){
-            if(!state.isPaused()) landCore.updateLaunching();
+            if(!state.isPaused()) launchAnimator.updateLaunch();
 
             weatherAlpha = 0f;
-            camerascale = landCore.zoomLaunching();
+            camerascale = launchAnimator.zoomLaunch();
 
             if(!state.isPaused()) landTime -= Time.delta;
         }else{
             weatherAlpha = Mathf.lerpDelta(weatherAlpha, 1f, 0.08f);
         }
 
-        if(landCore != null && landTime <= 0f){
-            landCore.endLaunch();
-            landCore = null;
+        if(launchAnimator != null && landTime <= 0f){
+            launchAnimator.endLaunch();
+            launchAnimator = null;
         }
 
         camera.width = graphics.getWidth() / camerascale;
@@ -339,6 +341,8 @@ public class Renderer implements ApplicationListener{
             Draw.draw(Layer.effect + 0.02f, bloom::render);
         }
 
+        control.input.drawCommanded();
+
         Draw.draw(Layer.plans, overlays::drawBottom);
 
         if(animateShields && Shaders.shield != null){
@@ -376,9 +380,14 @@ public class Renderer implements ApplicationListener{
         Draw.draw(Layer.overlayUI, overlays::drawTop);
         if(state.rules.fog) Draw.draw(Layer.fogOfWar, fog::drawFog);
         Draw.draw(Layer.space, () -> {
-            if(landCore == null || landTime <= 0f) return;
-            landCore.drawLanding(launching && launchCoreType != null ? launchCoreType : (CoreBlock)landCore.block);
+            if(launchAnimator == null || landTime <= 0f) return;
+            launchAnimator.drawLaunch();
         });
+        if(launchAnimator != null){
+            Draw.z(Layer.space);
+            launchAnimator.drawLaunchGlobalZ();
+            Draw.reset();
+        }
 
         Events.fire(Trigger.drawOver);
         blocks.drawBlocks();
@@ -482,11 +491,13 @@ public class Renderer implements ApplicationListener{
     }
 
     public float minScale(){
-        return Scl.scl(minZoom);
+        if(control.input.logicCutscene) return Scl.scl(minZoom);
+        return Scl.scl(minZoomInGame);
     }
 
     public float maxScale(){
-        return Mathf.round(Scl.scl(maxZoom));
+        if(control.input.logicCutscene) return Mathf.round(Scl.scl(maxZoom));
+        return Mathf.round(Scl.scl(maxZoomInGame));
     }
 
     public float getScale(){
@@ -502,65 +513,41 @@ public class Renderer implements ApplicationListener{
         return launching;
     }
 
-    public CoreBlock getLaunchCoreType(){
-        return launchCoreType;
-    }
-
     public float getLandTime(){
         return landTime;
     }
 
     public float getLandTimeIn(){
-        if(landCore == null) return 0f;
-        float fin = landTime / landCore.landDuration();
+        if(launchAnimator == null) return 0f;
+        float fin = landTime / launchAnimator.launchDuration();
         if(!launching) fin = 1f - fin;
         return fin;
     }
 
-    public float getLandPTimer(){
-        return landPTimer;
-    }
-
-    public void setLandPTimer(float landPTimer){
-        this.landPTimer = landPTimer;
-    }
-
-    @Deprecated
-    public void showLanding(){
-        var core = player.bestCore();
-        if(core != null) showLanding(core);
-    }
-
-    public void showLanding(CoreBuild landCore){
-        this.landCore = landCore;
+    public void showLanding(LaunchAnimator landCore){
+        this.launchAnimator = landCore;
         launching = false;
-        landTime = landCore.landDuration();
+        landTime = landCore.launchDuration();
 
-        landCore.beginLaunch(null);
-        camerascale = landCore.zoomLaunching();
+        landCore.beginLaunch(false);
+        camerascale = landCore.zoomLaunch();
     }
 
-    @Deprecated
-    public void showLaunch(CoreBlock coreType){
-        var core = player.team().core();
-        if(core != null) showLaunch(core, coreType);
-    }
-
-    public void showLaunch(CoreBuild landCore, CoreBlock coreType){
+    public void showLaunch(LaunchAnimator landCore){
         control.input.config.hideConfig();
+        control.input.planConfig.hide();
         control.input.inv.hide();
 
-        this.landCore = landCore;
+        this.launchAnimator = landCore;
         launching = true;
-        landTime = landCore.landDuration();
-        launchCoreType = coreType;
+        landTime = landCore.launchDuration();
 
         Music music = landCore.launchMusic();
         music.stop();
         music.play();
         music.setVolume(settings.getInt("musicvol") / 100f);
 
-        landCore.beginLaunch(coreType);
+        landCore.beginLaunch(true);
     }
 
     public void takeMapScreenshot(){

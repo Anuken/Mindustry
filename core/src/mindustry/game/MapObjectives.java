@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
@@ -106,6 +107,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         JsonIO.classTag(name, type);
     }
 
+    public MapObjectives(Seq<MapObjective> all){
+        this.all.addAll(all);
+    }
+
+    public MapObjectives(){
+    }
+
     /** Adds all given objectives to the executor as root objectives. */
     public void add(MapObjective... objectives){
         for(var objective : objectives) flatten(objective);
@@ -164,6 +172,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Base abstract class for any in-map objective. */
     public static abstract class MapObjective{
+        public boolean hidden;
         public @Nullable @Multiline String details;
         public @Unordered String[] flagsAdded = {};
         public @Unordered String[] flagsRemoved = {};
@@ -441,7 +450,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public boolean update(){
-            return (countup += Time.delta) >= duration;
+            return (countup += Time.delta) >= duration * state.rules.objectiveTimerMultiplier;
         }
 
         @Override
@@ -453,7 +462,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             if(text != null){
-                int i = (int)((duration - countup) / 60f);
+                int i = (int)((duration * state.rules.objectiveTimerMultiplier - countup) / 60f);
                 StringBuilder timeString = new StringBuilder();
 
                 int m = i / 60;
@@ -653,17 +662,19 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(text.startsWith("@")){
                 String key = text.substring(1);
 
+                String out;
                 if(mobile){
-                    return state.mapLocales.containsProperty(key + ".mobile") ?
-                    state.mapLocales.getProperty(key + ".mobile") :
-                    Core.bundle.get(key + ".mobile", Core.bundle.get(key));
+                    out = state.mapLocales.containsProperty(key + ".mobile") ?
+                        state.mapLocales.getProperty(key + ".mobile") :
+                        Core.bundle.get(key + ".mobile", Core.bundle.get(key));
                 }else{
-                    return state.mapLocales.containsProperty(key) ?
-                    state.mapLocales.getProperty(key) :
-                    Core.bundle.get(key);
+                    out = state.mapLocales.containsProperty(key) ?
+                        state.mapLocales.getProperty(key) :
+                        Core.bundle.get(key);
                 }
+                return UI.formatIcons(out);
             }else{
-                return text;
+                return UI.formatIcons(text);
             }
         }
     }
@@ -1125,6 +1136,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void setTexture(String textureName){
             this.textureName = textureName;
 
+            if(headless) return;
             if(fetchedRegion == null) fetchedRegion = new TextureRegion();
             lookupRegion(textureName, fetchedRegion);
         }

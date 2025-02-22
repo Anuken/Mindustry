@@ -20,7 +20,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 
@@ -33,14 +32,8 @@ public class Fonts{
     private static IntMap<String> unicodeToName = new IntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
     private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
-    private static TextureRegion[] iconTable;
-    private static int lastCid;
 
     public static Font def, outline, icon, iconLarge, tech, logic;
-
-    public static TextureRegion logicIcon(int id){
-        return iconTable[id];
-    }
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -159,19 +152,6 @@ public class Fonts{
         }
 
         stringIcons.put("alphachan", stringIcons.get("alphaaaa"));
-
-        iconTable = new TextureRegion[512];
-        iconTable[0] = Core.atlas.find("error");
-        lastCid = 1;
-
-        Vars.content.each(c -> {
-            if(c instanceof UnlockableContent u){
-                TextureRegion region = Core.atlas.find(u.name + "-icon-logic");
-                if(region.found()){
-                    iconTable[u.iconId = lastCid++] = region;
-                }
-            }
-        });
 
         for(Team team : Team.baseTeams){
             team.emoji = stringIcons.get(team.name, "");

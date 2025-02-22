@@ -65,7 +65,6 @@ public class Planets{
             clearSectorOnLose = true;
             defaultCore = Blocks.coreBastion;
             iconColor = Color.valueOf("ff9266");
-            hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
             enemyBuildSpeedMultiplier = 0.4f;
 
             //TODO disallowed for now
@@ -86,12 +85,14 @@ public class Planets{
                 r.coreDestroyClear = true;
                 r.onlyDepositCore = true;
             };
+            campaignRuleDefaults.fog = true;
+            campaignRuleDefaults.showSpawns = true;
 
             unlockedOnLand.add(Blocks.coreBastion);
         }};
 
         //TODO names
-        gier = makeAsteroid("gier", erekir, Blocks.ferricStoneWall, Blocks.carbonWall, 0.4f, 7, 1f, gen -> {
+        gier = makeAsteroid("gier", erekir, Blocks.ferricStoneWall, Blocks.carbonWall, -5, 0.4f, 7, 1f, gen -> {
             gen.min = 25;
             gen.max = 35;
             gen.carbonChance = 0.6f;
@@ -99,7 +100,7 @@ public class Planets{
             gen.berylChance = 0.1f;
         });
 
-        notva = makeAsteroid("notva", sun, Blocks.ferricStoneWall, Blocks.beryllicStoneWall, 0.55f, 9, 1.3f, gen -> {
+        notva = makeAsteroid("notva", sun, Blocks.ferricStoneWall, Blocks.beryllicStoneWall, -4, 0.55f, 9, 1.3f, gen -> {
             gen.berylChance = 0.8f;
             gen.iceChance = 0f;
             gen.carbonChance = 0.01f;
@@ -133,6 +134,7 @@ public class Planets{
             launchCapacityMultiplier = 0.5f;
             sectorSeed = 2;
             allowWaves = true;
+            allowLegacyLaunchPads = true;
             allowWaveSimulation = true;
             allowSectorInvasion = true;
             allowLaunchSchematics = true;
@@ -144,6 +146,7 @@ public class Planets{
                 r.waveTeam = Team.crux;
                 r.placeRangeCheck = false;
                 r.showSpawns = false;
+                r.coreDestroyClear = true;
             };
             iconColor = Color.valueOf("7d4dff");
             atmosphereColor = Color.valueOf("3c1b8f");
@@ -151,11 +154,11 @@ public class Planets{
             atmosphereRadOut = 0.3f;
             startSector = 15;
             alwaysUnlocked = true;
+            allowSelfSectorLaunch = true;
             landCloudColor = Pal.spore.cpy().a(0.5f);
-            hiddenItems.addAll(Items.erekirItems).removeAll(Items.serpuloItems);
         }};
 
-        verilus = makeAsteroid("verlius", sun, Blocks.stoneWall, Blocks.iceWall, 0.5f, 12, 2f, gen -> {
+        verilus = makeAsteroid("verlius", sun, Blocks.stoneWall, Blocks.iceWall, -1, 0.5f, 12, 2f, gen -> {
             gen.berylChance = 0f;
             gen.iceChance = 0.6f;
             gen.carbonChance = 0.1f;
@@ -163,7 +166,7 @@ public class Planets{
         });
     }
 
-    private static Planet makeAsteroid(String name, Planet parent, Block base, Block tint, float tintThresh, int pieces, float scale, Cons<AsteroidGenerator> cgen){
+    private static Planet makeAsteroid(String name, Planet parent, Block base, Block tint, int seed, float tintThresh, int pieces, float scale, Cons<AsteroidGenerator> cgen){
         return new Planet(name, parent, 0.12f){{
             hasAtmosphere = false;
             updateLighting = false;
@@ -186,13 +189,13 @@ public class Planets{
                 Rand rand = new Rand(id + 2);
 
                 meshes.add(new NoiseMesh(
-                    this, 0, 2, radius, 2, 0.55f, 0.45f, 14f,
+                    this, seed, 2, radius, 2, 0.55f, 0.45f, 14f,
                     color, tinted, 3, 0.6f, 0.38f, tintThresh
                 ));
 
                 for(int j = 0; j < pieces; j++){
                     meshes.add(new MatMesh(
-                        new NoiseMesh(this, j + 1, 1, 0.022f + rand.random(0.039f) * scale, 2, 0.6f, 0.38f, 20f,
+                        new NoiseMesh(this, seed + j + 1, 1, 0.022f + rand.random(0.039f) * scale, 2, 0.6f, 0.38f, 20f,
                         color, tinted, 3, 0.6f, 0.38f, tintThresh),
                         new Mat3D().setToTranslation(Tmp.v31.setToRandomDirection(rand).setLength(rand.random(0.44f, 1.4f) * scale)))
                     );

@@ -62,7 +62,7 @@ public class Duct extends Block implements Autotiler{
     public void init(){
         super.init();
 
-        if(bridgeReplacement == null || !(bridgeReplacement instanceof DuctBridge)) bridgeReplacement = Blocks.ductBridge;
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof DuctBridge || bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.ductBridge;
     }
 
     @Override
@@ -82,10 +82,10 @@ public class Duct extends Block implements Autotiler{
     @Override
     public boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
-            || ((!otherblock.rotatedOutput(otherx, othery) && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
+            || ((!otherblock.rotatedOutput(otherx, othery, tile) && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
             Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) ||
 
-            ((otherblock.rotatedOutput(otherx, othery)) && (otherblock.isDuct) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
+            ((otherblock.rotatedOutput(otherx, othery, tile)) && (otherblock.isDuct) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
     @Override
@@ -106,8 +106,8 @@ public class Duct extends Block implements Autotiler{
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
         if(bridgeReplacement == null) return;
-
-        Placement.calculateBridges(plans, (DuctBridge)bridgeReplacement, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
+        if(bridgeReplacement instanceof ItemBridge bridge) Placement.calculateBridges(plans, bridge, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
+        if(bridgeReplacement instanceof DuctBridge bridge) Placement.calculateBridges(plans, bridge, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
     }
 
     public class DuctBuild extends Building{

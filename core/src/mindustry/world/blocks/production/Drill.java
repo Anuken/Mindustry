@@ -40,6 +40,8 @@ public class Drill extends Block{
     public float warmupSpeed = 0.015f;
     /** Special exemption item that this drill can't mine. */
     public @Nullable Item blockedItem;
+    /** Special exemption items that this drill can't mine. */
+    public @Nullable Seq<Item> blockedItems;
 
     //return variables for countOre
     protected @Nullable Item returnItem;
@@ -52,7 +54,7 @@ public class Drill extends Block{
     /** Drill effect randomness. Block size by default. */
     public float drillEffectRnd = -1f;
     /** Chance of displaying the effect. Useful for extremely fast drills. */
-    public float drillEffectChance = 1f;
+    public float drillEffectChance = 0.02f;
     /** Speed the drill bit rotates at. */
     public float rotateSpeed = 2f;
     /** Effect randomly played while drilling. */
@@ -89,6 +91,9 @@ public class Drill extends Block{
     @Override
     public void init(){
         super.init();
+        if(blockedItems == null && blockedItem != null){
+            blockedItems = Seq.with(blockedItem);
+        }
         if(drillEffectRnd < 0) drillEffectRnd = size;
     }
 
@@ -155,7 +160,7 @@ public class Drill extends Block{
                 Draw.color();
             }
         }else{
-            Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && (t.drop().hardness > tier || t.drop() == blockedItem));
+            Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && (t.drop().hardness > tier || (blockedItems != null && blockedItems.contains(t.drop()))));
             Item item = to == null ? null : to.drop();
             if(item != null){
                 drawPlaceText(Core.bundle.get("bar.drilltierreq"), x, y, valid);
@@ -172,16 +177,16 @@ public class Drill extends Block{
         super.setStats();
 
         stats.add(Stat.drillTier, StatValues.drillables(drillTime, hardnessDrillMultiplier, size * size, drillMultipliers, b -> b instanceof Floor f && !f.wallOre && f.itemDrop != null &&
-            f.itemDrop.hardness <= tier && f.itemDrop != blockedItem && (indexer.isBlockPresent(f) || state.isMenu())));
+            f.itemDrop.hardness <= tier && (blockedItems == null || !blockedItems.contains(f.itemDrop)) && (indexer.isBlockPresent(f) || state.isMenu())));
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
 
-        if(liquidBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase) instanceof ConsumeLiquidBase consBase){
+        if(liquidBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
             stats.remove(Stat.booster);
             stats.add(Stat.booster,
                 StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
                 consBase.amount,
-                liquidBoostIntensity * liquidBoostIntensity, false, this::consumesLiquid)
+                liquidBoostIntensity * liquidBoostIntensity, false, consBase::consumes)
             );
         }
     }
@@ -227,7 +232,7 @@ public class Drill extends Block{
     public boolean canMine(Tile tile){
         if(tile == null || tile.block().isStatic()) return false;
         Item drops = tile.drop();
-        return drops != null && drops.hardness <= tier && drops != blockedItem;
+        return drops != null && drops.hardness <= tier && (blockedItems == null || !blockedItems.contains(drops));
     }
 
     public class DrillBuild extends Building{
@@ -315,11 +320,14 @@ public class Drill extends Block{
             }
 
             if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
-                offload(dominantItem);
+                int amount = (int)(progress / delay);
+                for(int i = 0; i < amount; i++){
+                    offload(dominantItem);
+                }
 
                 progress %= delay;
 
-                if(wasVisible && Mathf.chanceDelta(updateEffectChance * warmup)) drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
+                if(wasVisible && Mathf.chanceDelta(drillEffectChance * warmup)) drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
             }
         }
 
