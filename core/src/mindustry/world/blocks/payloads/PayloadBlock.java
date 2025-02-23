@@ -254,8 +254,8 @@ public class PayloadBlock extends Block{
 
         @Override
         public double sense(Content content){
-            if(payload instanceof UnitPayload up) return up.unit.type == content ? 1 : 0;
-            if(payload instanceof BuildPayload bp) return bp.build.block == content ? 1 : 0;
+            if(payload instanceof UnitPayload up && up.unit.type == content) return 1;
+            if(payload instanceof BuildPayload bp && bp.build.block == content) return 1;
             return super.sense(content);
         }
 
