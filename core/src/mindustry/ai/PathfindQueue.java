@@ -3,7 +3,6 @@ package mindustry.ai;
 import arc.util.*;
 
 /** A priority queue. */
-@SuppressWarnings("unchecked")
 public class PathfindQueue{
     private static final double CAPACITY_RATIO_LOW = 1.5f;
     private static final double CAPACITY_RATIO_HI = 2f;

@@ -383,7 +383,7 @@ public class MapGenerateDialog extends BaseDialog{
             //ignore errors yay
             try{
                 result.get();
-            }catch(Exception e){}
+            }catch(Exception ignored){}
         }
 
         buffer1 = null;

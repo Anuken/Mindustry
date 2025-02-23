@@ -309,7 +309,7 @@ public final class FogControl implements CustomChunk{
 
                     updateStatic();
                     //ignore, don't want to crash this thread
-                }catch(Exception e){}
+                }catch(Exception ignored){}
             }
         }
     }
