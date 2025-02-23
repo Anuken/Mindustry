@@ -256,9 +256,7 @@ public class LStatements{
 
                         s.button(b -> {
                             b.label(() -> nameToAlign.containsKey(p1) ? p1 : "bottomLeft");
-                            b.clicked(() -> showSelect(b, aligns, p1, t -> {
-                                p1 = t;
-                            }, 2, cell -> cell.size(165, 50)));
+                            b.clicked(() -> showSelect(b, aligns, p1, t -> p1 = t, 2, cell -> cell.size(165, 50)));
                         }, Styles.logict, () -> {}).size(165, 40).color(s.color).left().padLeft(2);
                     }
                     case translate, scale -> {
@@ -539,9 +537,7 @@ public class LStatements{
 
             table.button(b -> {
                 b.label(() -> sort.name());
-                b.clicked(() -> showSelect(b, RadarSort.all, sort, t -> {
-                    sort = t;
-                }, 2, cell -> cell.size(100, 50)));
+                b.clicked(() -> showSelect(b, RadarSort.all, sort, t -> sort = t, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
             table.add(" output ").self(this::param);
@@ -847,9 +843,7 @@ public class LStatements{
 
             table.button(b -> {
                 b.label(() -> type.name());
-                b.clicked(() -> showSelect(b, GlobalVars.lookableContent, type, o -> {
-                    type = o;
-                }));
+                b.clicked(() -> showSelect(b, GlobalVars.lookableContent, type, o -> type = o));
             }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
 
             table.add(" # ");

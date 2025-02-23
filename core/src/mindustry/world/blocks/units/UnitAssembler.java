@@ -332,7 +332,7 @@ public class UnitAssembler extends PayloadBlock{
         }
 
         public void checkTier(){
-            modules.sort(b -> b.tier());
+            modules.sort(UnitAssemblerModuleBuild::tier);
             int max = 0;
             for(int i = 0; i < modules.size; i++){
                 var mod = modules.get(i);
@@ -550,9 +550,7 @@ public class UnitAssembler extends PayloadBlock{
 
             //draw drone construction
             if(droneWarmup > 0.001f){
-                Draw.draw(Layer.blockOver + 0.2f, () -> {
-                    Drawf.construct(this, droneType.fullIcon, Pal.accent, 0f, droneProgress, droneWarmup, totalDroneProgress, 14f);
-                });
+                Draw.draw(Layer.blockOver + 0.2f, () -> Drawf.construct(this, droneType.fullIcon, Pal.accent, 0f, droneProgress, droneWarmup, totalDroneProgress, 14f));
             }
 
             Vec2 spawn = getUnitSpawn();

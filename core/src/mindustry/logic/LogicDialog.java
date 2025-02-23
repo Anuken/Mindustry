@@ -222,9 +222,7 @@ public class LogicDialog extends BaseDialog{
             dialog.show();
         }).name("variables").disabled(b -> executor == null || executor.vars.length == 0 || state.isMenu());
 
-        buttons.button("@add", Icon.add, () -> {
-            showAddDialog();
-        }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
+        buttons.button("@add", Icon.add, this::showAddDialog).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
 
         Core.app.post(canvas::rebuild);
     }
@@ -290,9 +288,7 @@ public class LogicDialog extends BaseDialog{
 
                             t.row();
 
-                            cat = t.table(c -> {
-                                c.top().left();
-                            }).name(category.name).top().left().growX().fillY().get();
+                            cat = t.table(c -> c.top().left()).name(category.name).top().left().growX().fillY().get();
                             t.row();
                         }
 

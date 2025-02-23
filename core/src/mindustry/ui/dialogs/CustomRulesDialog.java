@@ -224,11 +224,9 @@ public class CustomRulesDialog extends BaseDialog{
         if(Core.bundle.get("rules.ambientlight").toLowerCase().contains(ruleSearch)){
             current.button(b -> {
                 b.left();
-                b.table(Tex.pane, in -> {
-                    in.stack(new Image(Tex.alphaBg), new Image(Tex.whiteui){{
-                        update(() -> setColor(rules.ambientLight));
-                    }}).grow();
-                }).margin(4).size(50f).padRight(10);
+                b.table(Tex.pane, in -> in.stack(new Image(Tex.alphaBg), new Image(Tex.whiteui){{
+                    update(() -> setColor(rules.ambientLight));
+                }}).grow()).margin(4).size(50f).padRight(10);
                 b.add("@rules.ambientlight");
             }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
         }
@@ -248,9 +246,7 @@ public class CustomRulesDialog extends BaseDialog{
                 t.defaults().size(140f, 50f);
 
                 for(Planet planet : content.planets().select(p -> p.accessible && p.visible && p.isLandable())){
-                    t.button(planet.localizedName, style, () -> {
-                        planet.applyRules(rules, true);
-                    }).group(group).checked(b -> rules.planet == planet);
+                    t.button(planet.localizedName, style, () -> planet.applyRules(rules, true)).group(group).checked(b -> rules.planet == planet);
 
                     if(t.getChildren().size % 3 == 0){
                         t.row();
@@ -278,9 +274,7 @@ public class CustomRulesDialog extends BaseDialog{
             Table wasCurrent = current;
 
             Table teamRules = new Table(); // just button and collapser in one table
-            teamRules.button(team.coloredName(), Icon.downOpen, Styles.togglet, () -> {
-                shown[0] = !shown[0];
-            }).marginLeft(14f).width(260f).height(55f).update(t -> {
+            teamRules.button(team.coloredName(), Icon.downOpen, Styles.togglet, () -> shown[0] = !shown[0]).marginLeft(14f).width(260f).height(55f).update(t -> {
                 ((Image)t.getChildren().get(1)).setDrawable(shown[0] ? Icon.upOpen : Icon.downOpen);
                 t.setChecked(shown[0]);
             }).left().padBottom(2f).row();
@@ -354,9 +348,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.add(text).left().padRight(5);
 
             for(Team team : Team.baseTeams){
-                t.button(Tex.whiteui, Styles.squareTogglei, 38f, () -> {
-                    cons.get(team);
-                }).pad(1f).checked(b -> prov.get() == team).size(60f).tooltip(team.coloredName()).with(i -> i.getStyle().imageUpColor = team.color);
+                t.button(Tex.whiteui, Styles.squareTogglei, 38f, () -> cons.get(team)).pad(1f).checked(b -> prov.get() == team).size(60f).tooltip(team.coloredName()).with(i -> i.getStyle().imageUpColor = team.color);
             }
         }).padTop(0).row();
     }

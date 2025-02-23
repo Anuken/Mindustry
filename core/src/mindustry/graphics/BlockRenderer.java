@@ -482,9 +482,7 @@ public class BlockRenderer{
             Draw.z(Layer.overlayUI);
             Lines.stroke(1f, Color.green);
 
-            blockTree.intersect(camera.bounds(Tmp.r1), tile -> {
-                Lines.rect(tile.getHitbox(Tmp.r2));
-            });
+            blockTree.intersect(camera.bounds(Tmp.r1), tile -> Lines.rect(tile.getHitbox(Tmp.r2)));
 
             Draw.reset();
         }

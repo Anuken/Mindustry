@@ -45,13 +45,9 @@ public class BlockIndexer{
     public BlockIndexer(){
         clearFlags();
 
-        Events.on(TilePreChangeEvent.class, event -> {
-            removeIndex(event.tile);
-        });
+        Events.on(TilePreChangeEvent.class, event -> removeIndex(event.tile));
 
-        Events.on(TileChangeEvent.class, event -> {
-            addIndex(event.tile);
-        });
+        Events.on(TileChangeEvent.class, event -> addIndex(event.tile));
 
         Events.on(WorldLoadEvent.class, event -> {
             damagedTiles = new Seq[Team.all.length];

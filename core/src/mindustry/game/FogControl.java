@@ -38,9 +38,7 @@ public final class FogControl implements CustomChunk{
     private boolean loadedStatic = false;
 
     public FogControl(){
-        Events.on(ResetEvent.class, e -> {
-            stop();
-        });
+        Events.on(ResetEvent.class, e -> stop());
 
         Events.on(WorldLoadEvent.class, e -> {
             stop();

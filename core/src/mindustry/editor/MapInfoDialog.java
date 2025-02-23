@@ -38,24 +38,18 @@ public class MapInfoDialog extends BaseDialog{
             t.add("@editor.mapname").padRight(8).left();
             t.defaults().padTop(15);
 
-            TextField name = t.field(tags.get("name", ""), text -> {
-                tags.put("name", text);
-            }).size(400, 55f).maxTextLength(50).get();
+            TextField name = t.field(tags.get("name", ""), text -> tags.put("name", text)).size(400, 55f).maxTextLength(50).get();
             name.setMessageText("@unknown");
 
             t.row();
             t.add("@editor.description").padRight(8).left();
 
-            TextArea description = t.area(tags.get("description", ""), Styles.areaField, text -> {
-                tags.put("description", text);
-            }).size(400f, 140f).maxTextLength(1000).get();
+            TextArea description = t.area(tags.get("description", ""), Styles.areaField, text -> tags.put("description", text)).size(400f, 140f).maxTextLength(1000).get();
 
             t.row();
             t.add("@editor.author").padRight(8).left();
 
-            TextField author = t.field(tags.get("author", ""), text -> {
-                tags.put("author", text);
-            }).size(400, 55f).maxTextLength(50).get();
+            TextField author = t.field(tags.get("author", ""), text -> tags.put("author", text)).size(400, 55f).maxTextLength(50).get();
             author.setMessageText("@unknown");
 
             t.row();

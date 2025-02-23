@@ -29,9 +29,7 @@ public class PointBulletType extends BulletType{
             py = b.y + b.lifetime * b.vel.y,
             rot = b.rotation();
 
-        Geometry.iterateLine(0f, b.x, b.y, px, py, trailSpacing, (x, y) -> {
-            trailEffect.at(x, y, rot);
-        });
+        Geometry.iterateLine(0f, b.x, b.y, px, py, trailSpacing, (x, y) -> trailEffect.at(x, y, rot));
 
         b.time = b.lifetime;
         b.set(px, py);

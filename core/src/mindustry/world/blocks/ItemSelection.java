@@ -102,9 +102,7 @@ public class ItemSelection{
 
         if(block != null){
             pane.setScrollYForce(block.selectScroll);
-            pane.update(() -> {
-                block.selectScroll = pane.getScrollY();
-            });
+            pane.update(() -> block.selectScroll = pane.getScrollY());
         }
 
         pane.setOverscroll(false, false);

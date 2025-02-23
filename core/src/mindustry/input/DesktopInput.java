@@ -101,9 +101,7 @@ public class DesktopInput extends InputHandler{
                     Core.keybinds.get(Binding.schematic_flip_x).key.toString(),
                     Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel).visible(() -> Core.settings.getBool("hints"));
                 b.row();
-                b.table(a -> {
-                    a.button("@schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
-                });
+                b.table(a -> a.button("@schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null));
             }).margin(6f);
         });
     }
@@ -546,21 +544,13 @@ public class DesktopInput extends InputHandler{
     public void buildPlacementUI(Table table){
         table.left().margin(0f).defaults().size(48f).left();
 
-        table.button(Icon.paste, Styles.clearNonei, () -> {
-            ui.schematics.show();
-        }).tooltip("@schematics");
+        table.button(Icon.paste, Styles.clearNonei, () -> ui.schematics.show()).tooltip("@schematics");
 
-        table.button(Icon.book, Styles.clearNonei, () -> {
-            ui.database.show();
-        }).tooltip("@database");
+        table.button(Icon.book, Styles.clearNonei, () -> ui.database.show()).tooltip("@database");
 
-        table.button(Icon.tree, Styles.clearNonei, () -> {
-            ui.research.show();
-        }).visible(() -> state.isCampaign()).tooltip("@research");
+        table.button(Icon.tree, Styles.clearNonei, () -> ui.research.show()).visible(() -> state.isCampaign()).tooltip("@research");
 
-        table.button(Icon.map, Styles.clearNonei, () -> {
-            ui.planet.show();
-        }).visible(() -> state.isCampaign()).tooltip("@planetmap");
+        table.button(Icon.map, Styles.clearNonei, () -> ui.planet.show()).visible(() -> state.isCampaign()).tooltip("@planetmap");
     }
 
     void pollInput(){

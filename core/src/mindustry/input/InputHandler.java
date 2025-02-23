@@ -147,9 +147,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         });
 
-        Events.on(WorldLoadEvent.class, e -> {
-            playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
-        });
+        Events.on(WorldLoadEvent.class, e -> playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight())));
 
         Events.on(ResetEvent.class, e -> {
             logicCutscene = false;
@@ -248,9 +246,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void commandUnits(Player player, int[] unitIds, @Nullable Building buildTarget, @Nullable Unit unitTarget, @Nullable Vec2 posTarget, boolean queueCommand, boolean finalBatch){
         if(player == null || unitIds == null) return;
 
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
-            event.unitIDs = unitIds;
-        })){
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> event.unitIDs = unitIds)){
             throw new ValidateException(player, "Player cannot command units.");
         }
 
@@ -343,9 +339,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void setUnitCommand(Player player, int[] unitIds, UnitCommand command){
         if(player == null || unitIds == null || command == null) return;
 
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
-            event.unitIDs = unitIds;
-        })){
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> event.unitIDs = unitIds)){
             throw new ValidateException(player, "Player cannot command units.");
         }
 
@@ -367,9 +361,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void setUnitStance(Player player, int[] unitIds, UnitStance stance){
         if(player == null || unitIds == null || stance == null) return;
 
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
-            event.unitIDs = unitIds;
-        })){
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> event.unitIDs = unitIds)){
             throw new ValidateException(player, "Player cannot command units.");
         }
 
@@ -390,9 +382,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void commandBuilding(Player player, int[] buildings, Vec2 target){
         if(player == null || target == null) return;
 
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandBuilding, event -> {
-            event.buildingPositions = buildings;
-        })){
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandBuilding, event -> event.buildingPositions = buildings)){
             throw new ValidateException(player, "Player cannot command buildings.");
         }
 
@@ -478,9 +468,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(!unit.within(build, tilesize * build.block.size * 1.2f + tilesize * 5f)) return;
 
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.pickupBlock, build.tile, action -> {
-            action.unit = unit;
-        })){
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.pickupBlock, build.tile, action -> action.unit = unit)){
             throw new ValidateException(player, "Player cannot pick up a block.");
         }
 
@@ -540,9 +528,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(pay.payloads().isEmpty()) return;
 
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.dropPayload, player.unit().tileOn(), action -> {
-            action.payload = pay.payloads().peek();
-        })){
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.dropPayload, player.unit().tileOn(), action -> action.payload = pay.payloads().peek())){
             throw new ValidateException(player, "Player cannot drop a payload.");
         }
 
@@ -1065,7 +1051,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
 
             if(commandBuildings.size > 0){
-                Call.commandBuilding(player, commandBuildings.mapInt(b -> b.pos()).toArray(), target);
+                Call.commandBuilding(player, commandBuildings.mapInt(Building::pos).toArray(), target);
             }
         }
     }
@@ -1075,13 +1061,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void drawCommanded(){
-        Draw.draw(Layer.plans, () -> {
-            drawCommanded(true);
-        });
+        Draw.draw(Layer.plans, () -> drawCommanded(true));
 
-        Draw.draw(Layer.groundUnit - 1, () -> {
-            drawCommanded(false);
-        });
+        Draw.draw(Layer.groundUnit - 1, () -> drawCommanded(false));
     }
 
     public void drawCommanded(boolean flying){
@@ -1883,7 +1865,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         tmpUnits.clear();
         float rad = 4f;
         tree.intersect(x - rad/2f, y - rad/2f, rad, rad, tmpUnits);
-        return tmpUnits.min(u -> u.isCommandable(), u -> u.dst(x, y) - u.hitSize/2f);
+        return tmpUnits.min(Unitc::isCommandable, u -> u.dst(x, y) - u.hitSize/2f);
     }
 
     public @Nullable Unit selectedEnemyUnit(float x, float y){

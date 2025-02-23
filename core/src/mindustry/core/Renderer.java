@@ -110,9 +110,7 @@ public class Renderer implements ApplicationListener{
 
         loadFluidFrames();
 
-        Events.on(ClientLoadEvent.class, e -> {
-            loadFluidFrames();
-        });
+        Events.on(ClientLoadEvent.class, e -> loadFluidFrames());
 
         assets.load("sprites/clouds.png", Texture.class).loaded = t -> {
             t.setWrap(TextureWrap.repeat);

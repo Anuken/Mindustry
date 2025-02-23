@@ -42,23 +42,19 @@ public class MenuFragment{
 
         parent.fill((x, y, w, h) -> renderer.render());
 
-        parent.fill(c -> {
-            c.pane(Styles.noBarPane, cont -> {
-                container = cont;
-                cont.name = "menu container";
+        parent.fill(c -> c.pane(Styles.noBarPane, cont -> {
+            container = cont;
+            cont.name = "menu container";
 
-                if(!mobile){
-                    c.left();
-                    buildDesktop();
-                    Events.on(ResizeEvent.class, event -> buildDesktop());
-                }else{
-                    buildMobile();
-                    Events.on(ResizeEvent.class, event -> buildMobile());
-                }
-            }).with(pane -> {
-                pane.setOverscroll(false, false);
-            }).grow();
-        });
+            if(!mobile){
+                c.left();
+                buildDesktop();
+                Events.on(ResizeEvent.class, event -> buildDesktop());
+            }else{
+                buildMobile();
+                Events.on(ResizeEvent.class, event -> buildMobile());
+            }
+        }).with(pane -> pane.setOverscroll(false, false)).grow());
 
         parent.fill(c -> c.bottom().right().button(Icon.discord, new ImageButtonStyle(){{
             up = discordBanner;
@@ -86,9 +82,7 @@ public class MenuFragment{
                         ui.showInfo("@be.noupdates");
                     }
                 });
-            }).size(200, 60).name("becheck").update(t -> {
-                t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
-            }));
+            }).size(200, 60).name("becheck").update(t -> t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white)));
         }
 
         String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[#ffffffba]") + Version.combined();

@@ -59,28 +59,22 @@ public class SectorGenerateDialog extends BaseDialog{
 
         cont.add("@editor.sector").padRight(10f);
 
-        cont.field(sector + "", text -> {
-            sector = Strings.parseInt(text);
-        }).width(200f).valid(text -> planet.sectors.size > Strings.parseInt(text, 99999) && Strings.parseInt(text, 9999) >= 0);
+        cont.field(sector + "", text -> sector = Strings.parseInt(text)).width(200f).valid(text -> planet.sectors.size > Strings.parseInt(text, 99999) && Strings.parseInt(text, 9999) >= 0);
 
         cont.row();
 
         cont.add("@editor.seed").padRight(10f);
 
-        cont.field(seed + "", text -> {
-            seed = Strings.parseInt(text);
-        }).width(200f).valid(Strings::canParseInt);
+        cont.field(seed + "", text -> seed = Strings.parseInt(text)).width(200f).valid(Strings::canParseInt);
 
         cont.row();
 
         cont.label(() -> "[ " + planet.sectors.get(sector).getSize() + "x" + planet.sectors.get(sector).getSize() + " ]").color(Pal.accent).center().labelAlign(Align.center).padTop(5).colspan(2);
 
-        buttons.button("@editor.apply", Icon.ok, () -> {
-            ui.loadAnd(() -> {
-                apply();
-                hide();
-            });
-        });
+        buttons.button("@editor.apply", Icon.ok, () -> ui.loadAnd(() -> {
+            apply();
+            hide();
+        }));
     }
 
     void apply(){

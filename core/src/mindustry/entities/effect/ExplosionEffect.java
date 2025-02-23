@@ -30,9 +30,7 @@ public class ExplosionEffect extends Effect{
             color(smokeColor);
 
             if(smokeSize > 0){
-                randLenVectors(e.id, smokes, 2f + smokeRad * e.finpow(), (x, y) -> {
-                    Fill.circle(e.x + x, e.y + y, e.fout() * smokeSize + smokeSizeBase);
-                });
+                randLenVectors(e.id, smokes, 2f + smokeRad * e.finpow(), (x, y) -> Fill.circle(e.x + x, e.y + y, e.fout() * smokeSize + smokeSizeBase));
             }
 
             color(sparkColor);

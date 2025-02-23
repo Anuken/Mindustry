@@ -22,69 +22,59 @@ public class EditorMapsDialog extends MapListDialog{
 
     @Override
     void buildButtons(){
-        buttons.button("@editor.newmap", Icon.add, () -> {
-            ui.showTextInput("@editor.newmap", "@editor.mapname", "", text -> {
-                Runnable show = () -> ui.loadAnd(() -> {
-                    hide();
-                    ui.editor.show();
-                    editor.tags.put("name", text);
-                    Events.fire(new MapMakeEvent());
-                });
-
-                if(maps.byName(text) != null){
-                    ui.showErrorMessage("@editor.exists");
-                }else{
-                    show.run();
-                }
+        buttons.button("@editor.newmap", Icon.add, () -> ui.showTextInput("@editor.newmap", "@editor.mapname", "", text -> {
+            Runnable show = () -> ui.loadAnd(() -> {
+                hide();
+                ui.editor.show();
+                editor.tags.put("name", text);
+                Events.fire(new MapMakeEvent());
             });
-        }).size(210f, 64f);
 
-        buttons.button("@editor.importmap", Icon.upload, () -> {
-            platform.showFileChooser(true, mapExtension, file -> {
-                ui.loadAnd(() -> {
-                    maps.tryCatchMapError(() -> {
-                        if(MapIO.isImage(file)){
-                            ui.showErrorMessage("@editor.errorimage");
-                            return;
-                        }
+            if(maps.byName(text) != null){
+                ui.showErrorMessage("@editor.exists");
+            }else{
+                show.run();
+            }
+        })).size(210f, 64f);
 
-                        Map map = MapIO.createMap(file, true);
+        buttons.button("@editor.importmap", Icon.upload, () -> platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> maps.tryCatchMapError(() -> {
+            if(MapIO.isImage(file)){
+                ui.showErrorMessage("@editor.errorimage");
+                return;
+            }
 
-                        //when you attempt to import a save, it will have no name, so generate one
-                        String name = map.tags.get("name", () -> {
-                            String result = "unknown";
-                            int number = 0;
-                            while(maps.byName(result + number++) != null) ;
-                            return result + number;
-                        });
+            Map map = MapIO.createMap(file, true);
 
-                        //this will never actually get called, but it remains just in case
-                        if(name == null){
-                            ui.showErrorMessage("@editor.errorname");
-                            return;
-                        }
-
-                        Map conflict = maps.all().find(m -> m.name().equals(name));
-
-                        if(conflict != null && !conflict.custom){
-                            ui.showInfo(Core.bundle.format("editor.import.exists", name));
-                        }else if(conflict != null){
-                            ui.showConfirm("@confirm", Core.bundle.format("editor.overwrite.confirm", map.name()), () -> {
-                                maps.tryCatchMapError(() -> {
-                                    maps.removeMap(conflict);
-                                    maps.importMap(map.file);
-                                    setup();
-                                });
-                            });
-                        }else{
-                            maps.importMap(map.file);
-                            setup();
-                        }
-
-                    });
-                });
+            //when you attempt to import a save, it will have no name, so generate one
+            String name = map.tags.get("name", () -> {
+                String result = "unknown";
+                int number = 0;
+                while(maps.byName(result + number++) != null) ;
+                return result + number;
             });
-        }).size(210f, 64f);
+
+            //this will never actually get called, but it remains just in case
+            if(name == null){
+                ui.showErrorMessage("@editor.errorname");
+                return;
+            }
+
+            Map conflict = maps.all().find(m -> m.name().equals(name));
+
+            if(conflict != null && !conflict.custom){
+                ui.showInfo(Core.bundle.format("editor.import.exists", name));
+            }else if(conflict != null){
+                ui.showConfirm("@confirm", Core.bundle.format("editor.overwrite.confirm", map.name()), () -> maps.tryCatchMapError(() -> {
+                    maps.removeMap(conflict);
+                    maps.importMap(map.file);
+                    setup();
+                }));
+            }else{
+                maps.importMap(map.file);
+                setup();
+            }
+
+        })))).size(210f, 64f);
     }
 
     @Override

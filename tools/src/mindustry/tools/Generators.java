@@ -419,26 +419,24 @@ public class Generators{
             save(colors, "../../../assets/sprites/block_colors");
         });
 
-        generate("shallows", () -> {
-            content.blocks().<ShallowLiquid>each(b -> b instanceof ShallowLiquid, floor -> {
-                Pixmap overlay = get(floor.liquidBase.region);
-                int index = 0;
-                for(TextureRegion region : floor.floorBase.variantRegions()){
-                    Pixmap res = get(region).copy();
-                    for(int x = 0; x < res.width; x++){
-                        for(int y = 0; y < res.height; y++){
-                            res.set(x, y, Pixmap.blend((overlay.getRaw(x, y) & 0xffffff00) | (int)(floor.liquidOpacity * 255), res.getRaw(x, y)));
-                        }
+        generate("shallows", () -> content.blocks().<ShallowLiquid>each(b -> b instanceof ShallowLiquid, floor -> {
+            Pixmap overlay = get(floor.liquidBase.region);
+            int index = 0;
+            for(TextureRegion region : floor.floorBase.variantRegions()){
+                Pixmap res = get(region).copy();
+                for(int x = 0; x < res.width; x++){
+                    for(int y = 0; y < res.height; y++){
+                        res.set(x, y, Pixmap.blend((overlay.getRaw(x, y) & 0xffffff00) | (int)(floor.liquidOpacity * 255), res.getRaw(x, y)));
                     }
-
-                    String name = floor.name + "" + (++index);
-                    save(res, "../blocks/environment/" + name);
-                    save(res, "../editor/editor-" + name);
-
-                    gens.put(floor, res);
                 }
-            });
-        });
+
+                String name = floor.name + "" + (++index);
+                save(res, "../blocks/environment/" + name);
+                save(res, "../editor/editor-" + name);
+
+                gens.put(floor, res);
+            }
+        }));
 
         generate("item-icons", () -> {
             for(UnlockableContent item : Seq.<UnlockableContent>withArrays(content.items(), content.liquids(), content.statusEffects())){
@@ -723,62 +721,58 @@ public class Generators{
 
         }));
 
-        generate("ore-icons", () -> {
-            content.blocks().<OreBlock>each(b -> b instanceof OreBlock, ore -> {
-                int shadowColor = Color.rgba8888(0, 0, 0, 0.3f);
+        generate("ore-icons", () -> content.blocks().<OreBlock>each(b -> b instanceof OreBlock, ore -> {
+            int shadowColor = Color.rgba8888(0, 0, 0, 0.3f);
 
-                for(int i = 0; i < ore.variants; i++){
-                    //get base image to draw on
-                    Pixmap base = get(ore.variantRegions[i]);
-                    Pixmap image = base.copy();
+            for(int i = 0; i < ore.variants; i++){
+                //get base image to draw on
+                Pixmap base = get(ore.variantRegions[i]);
+                Pixmap image = base.copy();
 
-                    int offset = image.width / tilesize - 1;
+                int offset = image.width / tilesize - 1;
 
-                    for(int x = 0; x < image.width; x++){
-                        for(int y = offset; y < image.height; y++){
-                            //draw semi transparent background
-                            if(base.getA(x, y - offset) != 0){
-                                image.setRaw(x, y, Pixmap.blend(shadowColor, base.getRaw(x, y)));
-                            }
+                for(int x = 0; x < image.width; x++){
+                    for(int y = offset; y < image.height; y++){
+                        //draw semi transparent background
+                        if(base.getA(x, y - offset) != 0){
+                            image.setRaw(x, y, Pixmap.blend(shadowColor, base.getRaw(x, y)));
                         }
                     }
-
-                    image.draw(base, true);
-
-                    replace(ore.variantRegions[i], image);
-
-                    save(image, "../blocks/environment/" + ore.name + (i + 1));
-                    save(image, "../editor/editor-" + ore.name + (i + 1));
-
-                    save(image, "block-" + ore.name + "-full");
-                    save(image, "../ui/block-" + ore.name + "-ui");
-                }
-            });
-        });
-
-        generate("edges", () -> {
-            content.blocks().<Floor>each(b -> b instanceof Floor && !(b instanceof OverlayFloor), floor -> {
-
-                if(has(floor.name + "-edge") || floor.blendGroup != floor){
-                    return;
                 }
 
-                try{
-                    Pixmap image = gens.get(floor, get(floor.getGeneratedIcons()[0]));
-                    Pixmap edge = get("edge-stencil");
-                    Pixmap result = new Pixmap(edge.width, edge.height);
+                image.draw(base, true);
 
-                    for(int x = 0; x < edge.width; x++){
-                        for(int y = 0; y < edge.height; y++){
-                            result.set(x, y, Color.muli(edge.getRaw(x, y), image.get(x % image.width, y % image.height)));
-                        }
+                replace(ore.variantRegions[i], image);
+
+                save(image, "../blocks/environment/" + ore.name + (i + 1));
+                save(image, "../editor/editor-" + ore.name + (i + 1));
+
+                save(image, "block-" + ore.name + "-full");
+                save(image, "../ui/block-" + ore.name + "-ui");
+            }
+        }));
+
+        generate("edges", () -> content.blocks().<Floor>each(b -> b instanceof Floor && !(b instanceof OverlayFloor), floor -> {
+
+            if(has(floor.name + "-edge") || floor.blendGroup != floor){
+                return;
+            }
+
+            try{
+                Pixmap image = gens.get(floor, get(floor.getGeneratedIcons()[0]));
+                Pixmap edge = get("edge-stencil");
+                Pixmap result = new Pixmap(edge.width, edge.height);
+
+                for(int x = 0; x < edge.width; x++){
+                    for(int y = 0; y < edge.height; y++){
+                        result.set(x, y, Color.muli(edge.getRaw(x, y), image.get(x % image.width, y % image.height)));
                     }
+                }
 
-                    save(result, "../blocks/environment/" + floor.name + "-edge");
+                save(result, "../blocks/environment/" + floor.name + "-edge");
 
-                }catch(Exception ignored){}
-            });
-        });
+            }catch(Exception ignored){}
+        }));
 
         generate("scorches", () -> {
             for(int size = 0; size < 10; size++){

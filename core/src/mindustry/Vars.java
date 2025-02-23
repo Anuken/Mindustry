@@ -347,9 +347,7 @@ public class Vars implements Loadable{
 
         modDirectory.mkdirs();
 
-        Events.on(ContentInitEvent.class, e -> {
-            emptyTile = new Tile(Short.MAX_VALUE - 20, Short.MAX_VALUE - 20);
-        });
+        Events.on(ContentInitEvent.class, e -> emptyTile = new Tile(Short.MAX_VALUE - 20, Short.MAX_VALUE - 20));
 
         mods.load();
         maps.load();

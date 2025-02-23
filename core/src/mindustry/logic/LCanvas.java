@@ -19,6 +19,8 @@ import mindustry.graphics.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 
+import java.util.Comparator;
+
 public class LCanvas extends Table{
     private static final Seq<JumpCurve> tmpOccupiers1 = new Seq<>();
     private static final Seq<JumpCurve> tmpOccupiers2 = new Seq<>();
@@ -285,7 +287,7 @@ public class LCanvas extends Table{
             });
             processedJumps.add(reprBefore.values().toArray());
             processedJumps.add(reprAfter.values().toArray());
-            processedJumps.sort((a, b) -> a.jumpUIBegin - b.jumpUIBegin);
+            processedJumps.sort(Comparator.comparingInt(a -> a.jumpUIBegin));
 
             Seq<JumpCurve> occupiers = tmpOccupiers1;
             Bits occupied = tmpBits1;

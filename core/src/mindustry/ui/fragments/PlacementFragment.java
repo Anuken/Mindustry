@@ -71,13 +71,11 @@ public class PlacementFragment{
     };
 
     public PlacementFragment(){
-        Events.on(WorldLoadEvent.class, event -> {
-            Core.app.post(() -> {
-                currentCategory = Category.distribution;
-                control.input.block = null;
-                rebuild();
-            });
-        });
+        Events.on(WorldLoadEvent.class, event -> Core.app.post(() -> {
+            currentCategory = Category.distribution;
+            control.input.block = null;
+            rebuild();
+        }));
 
         Events.run(Trigger.unitCommandChange, () -> {
             if(rebuildCommand != null){
@@ -91,9 +89,7 @@ public class PlacementFragment{
             }
         });
 
-        Events.on(ResetEvent.class, event -> {
-            selectedBlocks.clear();
-        });
+        Events.on(ResetEvent.class, event -> selectedBlocks.clear());
 
         Events.run(Trigger.update, () -> {
             //disable flow updating on previous building so it doesn't waste CPU
@@ -539,9 +535,7 @@ public class PlacementFragment{
                                         coms.left();
                                         int scol = 0;
                                         for(var command : commands){
-                                            coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitCommand(player, units.mapInt(un -> un.id).toArray(), command);
-                                            }).checked(i -> currentCommand[0] == command).size(50f).tooltip(command.localized(), true);
+                                            coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> Call.setUnitCommand(player, units.mapInt(un -> un.id).toArray(), command)).checked(i -> currentCommand[0] == command).size(50f).tooltip(command.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
                                         }
@@ -562,9 +556,7 @@ public class PlacementFragment{
                                         int scol = 0;
                                         for(var stance : stances){
 
-                                            coms.button(Icon.icons.get(stance.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitStance(player, units.mapInt(un -> un.id).toArray(), stance);
-                                            }).checked(i -> currentStance[0] == stance).size(50f).tooltip(stance.localized(), true);
+                                            coms.button(Icon.icons.get(stance.icon, Icon.cancel), Styles.clearNoneTogglei, () -> Call.setUnitStance(player, units.mapInt(un -> un.id).toArray(), stance)).checked(i -> currentStance[0] == stance).size(50f).tooltip(stance.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
                                         }

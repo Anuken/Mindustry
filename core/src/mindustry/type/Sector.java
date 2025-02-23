@@ -17,6 +17,8 @@ import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.ui.*;
 import mindustry.world.modules.*;
 
+import java.util.Objects;
+
 import static mindustry.Vars.*;
 
 /** A small section of a planet. */
@@ -101,8 +103,8 @@ public class Sector{
             info.resources.add(Liquids.water);
         }
 
-        if(info.resources.contains(u -> u == null)){
-            info.resources = info.resources.select(u -> u != null);
+        if(info.resources.contains(Objects::isNull)){
+            info.resources = info.resources.select(Objects::nonNull);
         }
     }
 

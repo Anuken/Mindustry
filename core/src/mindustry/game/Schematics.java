@@ -64,9 +64,7 @@ public class Schematics implements Loadable{
 
     public Schematics(){
 
-        Events.on(ClientLoadEvent.class, event -> {
-            errorTexture = new Texture("sprites/error.png");
-        });
+        Events.on(ClientLoadEvent.class, event -> errorTexture = new Texture("sprites/error.png"));
     }
 
     @Override

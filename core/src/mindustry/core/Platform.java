@@ -110,16 +110,14 @@ public interface Platform{
 
     default void export(String name, String extension, FileWriter writer){
         if(!ios){
-            platform.showFileChooser(false, extension, file -> {
-                ui.loadAnd(() -> {
-                    try{
-                        writer.write(file);
-                    }catch(Throwable e){
-                        ui.showException(e);
-                        Log.err(e);
-                    }
-                });
-            });
+            platform.showFileChooser(false, extension, file -> ui.loadAnd(() -> {
+                try{
+                    writer.write(file);
+                }catch(Throwable e){
+                    ui.showException(e);
+                    Log.err(e);
+                }
+            }));
         }else{
             ui.loadAnd(() -> {
                 try{

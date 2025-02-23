@@ -44,12 +44,10 @@ public class ColorPicker extends BaseDialog{
 
         cont.clear();
         cont.pane(t -> {
-            t.table(Tex.pane, i -> {
-                i.stack(new Image(Tex.alphaBg), new Image(){{
-                    setColor(current);
-                    update(() -> setColor(current));
-                }}).size(200f);
-            }).colspan(2).padBottom(5);
+            t.table(Tex.pane, i -> i.stack(new Image(Tex.alphaBg), new Image(){{
+                setColor(current);
+                update(() -> setColor(current));
+            }}).size(200f)).colspan(2).padBottom(5);
 
             t.row();
 

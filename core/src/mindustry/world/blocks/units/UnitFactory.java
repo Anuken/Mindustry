@@ -274,9 +274,7 @@ public class UnitFactory extends UnitBlock{
                         commands.image(Tex.whiteui, Pal.gray).height(4f).growX().colspan(columns).row();
 
                         for(var item : list){
-                            ImageButton button = commands.button(item.getIcon(), Styles.clearNoneTogglei, 40f, () -> {
-                                configure(item);
-                            }).tooltip(item.localized()).group(group).get();
+                            ImageButton button = commands.button(item.getIcon(), Styles.clearNoneTogglei, 40f, () -> configure(item)).tooltip(item.localized()).group(group).get();
 
                             button.update(() -> button.setChecked(command == item || (command == null && unit.defaultCommand == item)));
 

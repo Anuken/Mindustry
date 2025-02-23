@@ -644,9 +644,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             t.top().left();
             ScrollPane pane = new ScrollPane(null, Styles.smallPane);
             t.add(pane).colspan(2).row();
-            t.button("@campaign.difficulty", Icon.bookSmall, () -> {
-                campaignRules.show(state.planet);
-            }).margin(12f).size(208f, 40f).padTop(12f).visible(() -> state.planet.allowCampaignRules && mode != planetLaunch).row();
+            t.button("@campaign.difficulty", Icon.bookSmall, () -> campaignRules.show(state.planet)).margin(12f).size(208f, 40f).padTop(12f).visible(() -> state.planet.allowCampaignRules && mode != planetLaunch).row();
             t.add().height(64f); //padding for close button
             Table starsTable = new Table(Styles.black);
             pane.setWidget(starsTable);
@@ -663,9 +661,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 starsTable.add(planetTable).left().row();
                 for(Planet planet : content.planets()){
                     if(planet.solarSystem == star && selectable(planet)){
-                        Button planetButton = planetTable.button(planet.localizedName, Icon.icons.get(planet.icon + "Small", Icon.icons.get(planet.icon, Icon.commandRallySmall)), Styles.flatTogglet, () -> {
-                            viewPlanet(planet, false);
-                        }).width(200).height(40).update(bb -> bb.setChecked(state.planet == planet)).with(w -> w.marginLeft(10f)).get();
+                        Button planetButton = planetTable.button(planet.localizedName, Icon.icons.get(planet.icon + "Small", Icon.icons.get(planet.icon, Icon.commandRallySmall)), Styles.flatTogglet, () -> viewPlanet(planet, false)).width(200).height(40).update(bb -> bb.setChecked(state.planet == planet)).with(w -> w.marginLeft(10f)).get();
                         planetButton.getChildren().get(1).setColor(planet.iconColor);
                         planetButton.setColor(planet.iconColor);
                         planetTable.background(Tex.pane).row();
@@ -742,9 +738,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 head.left().defaults();
 
                                 if(sec.isAttacked()){
-                                    head.image(Icon.warningSmall).update(i -> {
-                                        i.color.set(Pal.accent).lerp(Pal.remove, Mathf.absin(Time.globalTime, 9f, 1f));
-                                    }).padRight(4f);
+                                    head.image(Icon.warningSmall).update(i -> i.color.set(Pal.accent).lerp(Pal.remove, Mathf.absin(Time.globalTime, 9f, 1f))).padRight(4f);
                                 }
 
                                 String ic = sec.iconChar() == null ? "" : sec.iconChar() + " ";
@@ -1001,12 +995,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             //import
             if(sector.hasBase()){
-                displayItems(c, 1f, sector.info.imports, "@sectors.import", t -> {
-                    sector.info.eachImport(sector.planet, other -> {
-                        String ic = other.iconChar();
-                        t.add(Iconc.rightOpen + " " + (ic == null || ic.isEmpty() ? "" : ic + " ") + other.name()).padLeft(10f).row();
-                    });
-                });
+                displayItems(c, 1f, sector.info.imports, "@sectors.import", t -> sector.info.eachImport(sector.planet, other -> {
+                    String ic = other.iconChar();
+                    t.add(Iconc.rightOpen + " " + (ic == null || ic.isEmpty() ? "" : ic + " ") + other.name()).padLeft(10f).row();
+                }));
             }
 
             ItemSeq items = sector.items();
@@ -1104,13 +1096,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             if(sector.preset == null){
                 title.add().growX();
 
-                title.button(Icon.pencilSmall, Styles.clearNonei, () -> {
-                   ui.showTextInput("@sectors.rename", "@name", 20, sector.name(), v -> {
-                       sector.setName(v);
-                       updateSelected();
-                       rebuildList();
-                   });
-                }).size(40f).padLeft(4);
+                title.button(Icon.pencilSmall, Styles.clearNonei, () -> ui.showTextInput("@sectors.rename", "@name", 20, sector.name(), v -> {
+                    sector.setName(v);
+                    updateSelected();
+                    rebuildList();
+                })).size(40f).padLeft(4);
             }
 
             var icon = sector.info.contentIcon != null ?
@@ -1130,53 +1120,51 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                         rebuildList();
                     };
 
-                    cont.pane(t -> {
-                        resized(true, () -> {
-                            t.clearChildren();
-                            t.marginRight(19f);
-                            t.defaults().size(48f);
+                    cont.pane(t -> resized(true, () -> {
+                        t.clearChildren();
+                        t.marginRight(19f);
+                        t.defaults().size(48f);
 
-                            t.button(Icon.none, Styles.squareTogglei, () -> {
-                                sector.info.icon = null;
+                        t.button(Icon.none, Styles.squareTogglei, () -> {
+                            sector.info.icon = null;
+                            sector.info.contentIcon = null;
+                            refresh.run();
+                        }).checked(sector.info.icon == null && sector.info.contentIcon == null);
+
+                        int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
+
+                        int i = 1;
+                        for(var key : accessibleIcons){
+                            var value = Icon.icons.get(key);
+
+                            t.button(value, Styles.squareTogglei, () -> {
+                                sector.info.icon = key;
                                 sector.info.contentIcon = null;
                                 refresh.run();
-                            }).checked(sector.info.icon == null && sector.info.contentIcon == null);
+                            }).checked(key.equals(sector.info.icon));
 
-                            int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
+                            if(++i % cols == 0) t.row();
+                        }
 
-                            int i = 1;
-                            for(var key : accessibleIcons){
-                                var value = Icon.icons.get(key);
+                        for(ContentType ctype : defaultContentIcons){
+                            t.row();
+                            t.image().colspan(cols).growX().width(Float.NEGATIVE_INFINITY).height(3f).color(Pal.accent);
+                            t.row();
 
-                                t.button(value, Styles.squareTogglei, () -> {
-                                    sector.info.icon = key;
-                                    sector.info.contentIcon = null;
-                                    refresh.run();
-                                }).checked(key.equals(sector.info.icon));
+                            i = 0;
+                            for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
+                                if(!u.isHidden() && u.unlocked()){
+                                    t.button(new TextureRegionDrawable(u.uiIcon), Styles.squareTogglei, iconMed, () -> {
+                                        sector.info.icon = null;
+                                        sector.info.contentIcon = u;
+                                        refresh.run();
+                                    }).checked(sector.info.contentIcon == u);
 
-                                if(++i % cols == 0) t.row();
-                            }
-
-                            for(ContentType ctype : defaultContentIcons){
-                                t.row();
-                                t.image().colspan(cols).growX().width(Float.NEGATIVE_INFINITY).height(3f).color(Pal.accent);
-                                t.row();
-
-                                i = 0;
-                                for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
-                                    if(!u.isHidden() && u.unlocked()){
-                                        t.button(new TextureRegionDrawable(u.uiIcon), Styles.squareTogglei, iconMed, () -> {
-                                            sector.info.icon = null;
-                                            sector.info.contentIcon = u;
-                                            refresh.run();
-                                        }).checked(sector.info.contentIcon == u);
-
-                                        if(++i % cols == 0) t.row();
-                                    }
+                                    if(++i % cols == 0) t.row();
                                 }
                             }
-                        });
-                    });
+                        }
+                    }));
                     buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
                 }}.show();
             }).size(40f).tooltip("@sector.changeicon");
@@ -1264,7 +1252,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(!planet.allowWaveSimulation && !debugSelect){
             //if there are two or more attacked sectors... something went wrong, don't show the dialog to prevent softlock
             Sector attacked = planet.sectors.find(s -> s.isAttacked() && s != sector);
-            if(attacked != null &&  planet.sectors.count(s -> s.isAttacked()) < 2){
+            if(attacked != null &&  planet.sectors.count(Sector::isAttacked) < 2){
                 BaseDialog dialog = new BaseDialog("@sector.noswitch.title");
                 dialog.cont.add(bundle.format("sector.noswitch", attacked.name(), attacked.planet.localizedName)).width(400f).labelAlign(Align.center).center().wrap();
                 dialog.addCloseButton();

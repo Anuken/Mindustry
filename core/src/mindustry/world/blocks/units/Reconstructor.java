@@ -96,10 +96,7 @@ public class Reconstructor extends UnitBlock{
                         }).pad(10).left();
                     }).fill().padTop(5).padBottom(5);
 
-                    table.table(Styles.grayPanel, t -> {
-
-                        t.image(Icon.right).color(Pal.darkishGray).size(40).pad(10f);
-                    }).fill().padTop(5).padBottom(5);
+                    table.table(Styles.grayPanel, t -> t.image(Icon.right).color(Pal.darkishGray).size(40).pad(10f)).fill().padTop(5).padBottom(5);
 
                     table.table(Styles.grayPanel, t -> {
                         t.left();

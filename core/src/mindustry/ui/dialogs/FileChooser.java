@@ -49,9 +49,7 @@ public class FileChooser extends BaseDialog{
             setupWidgets();
         });
 
-        keyDown(KeyCode.enter, () -> {
-            ok.fireClick();
-        });
+        keyDown(KeyCode.enter, () -> ok.fireClick());
 
         addCloseListener();
     }
@@ -75,9 +73,7 @@ public class FileChooser extends BaseDialog{
             hide();
         });
 
-        filefield.changed(() -> {
-            ok.setDisabled(filefield.getText().replace(" ", "").isEmpty());
-        });
+        filefield.changed(() -> ok.setDisabled(filefield.getText().replace(" ", "").isEmpty()));
 
         filefield.change();
 
@@ -231,9 +227,7 @@ public class FileChooser extends BaseDialog{
                 }
             });
 
-            filefield.changed(() -> {
-                button.setChecked(filename.equals(filefield.getText()));
-            });
+            filefield.changed(() -> button.setChecked(filename.equals(filefield.getText())));
 
             Image image = new Image(file.isDirectory() ? Icon.folder : Icon.fileText);
 

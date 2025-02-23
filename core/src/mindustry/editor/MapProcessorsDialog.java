@@ -64,9 +64,7 @@ public class MapProcessorsDialog extends BaseDialog{
             search.setMessageText("@players.search");
         }).width(440f).fillX().padBottom(4).row();
 
-        cont.pane(t -> {
-            list = t;
-        });
+        cont.pane(t -> list = t);
     }
 
     private void rebuild(){
@@ -83,27 +81,21 @@ public class MapProcessorsDialog extends BaseDialog{
             for(var build : processors){
                 if(build instanceof LogicBuild log && (text.isEmpty() || (log.tag != null && log.tag.toLowerCase().contains(text)))){
 
-                    t.button(log.iconTag == 0 ? Styles.none : new TextureRegionDrawable(Fonts.getLargeIcon(Fonts.unicodeToName(log.iconTag))), Styles.graySquarei, iconMed, () -> {
-                        iconSelect.show(ic -> {
-                            log.iconTag = (char)ic;
-                            rebuild();
-                        });
-                    }).size(h);
+                    t.button(log.iconTag == 0 ? Styles.none : new TextureRegionDrawable(Fonts.getLargeIcon(Fonts.unicodeToName(log.iconTag))), Styles.graySquarei, iconMed, () -> iconSelect.show(ic -> {
+                        log.iconTag = (char)ic;
+                        rebuild();
+                    })).size(h);
 
                     t.button((log.tag == null ? "<no name>\n" : "[accent]" + log.tag + "\n") + "[lightgray][[" + log.tile.x + ", " + log.tile.y + "]", Styles.grayt, () -> {
                         //TODO: bug: if you edit name inside of the edit dialog, it won't show up in the list properly
                         log.showEditDialog(true);
-                    }).size(Vars.mobile ? 390f : 450f, h).margin(10f).with(b -> {
-                        b.getLabel().setAlignment(Align.left, Align.left);
-                    });
+                    }).size(Vars.mobile ? 390f : 450f, h).margin(10f).with(b -> b.getLabel().setAlignment(Align.left, Align.left));
 
-                    t.button(Icon.pencil, Styles.graySquarei, Vars.iconMed, () -> {
-                        ui.showTextInput("", "@editor.name", LogicBlock.maxNameLength, log.tag == null ? "" : log.tag, tag -> {
-                            //bypass configuration and set it directly in case privileged checks mess things up
-                            log.tag = tag;
-                            setup();
-                        });
-                    }).size(h);
+                    t.button(Icon.pencil, Styles.graySquarei, Vars.iconMed, () -> ui.showTextInput("", "@editor.name", LogicBlock.maxNameLength, log.tag == null ? "" : log.tag, tag -> {
+                        //bypass configuration and set it directly in case privileged checks mess things up
+                        log.tag = tag;
+                        setup();
+                    })).size(h);
 
                     if(Vars.state.isGame() && state.isEditor()){
                         t.button(Icon.eyeSmall, Styles.graySquarei, Vars.iconMed, () -> {
@@ -113,25 +105,23 @@ public class MapProcessorsDialog extends BaseDialog{
                         }).size(h);
                     }
 
-                    t.button(Icon.trash, Styles.graySquarei, iconMed, () -> {
-                        ui.showConfirm("@editor.worldprocessors.delete.confirm",  () -> {
-                            boolean surrounded = true;
-                            for(int i = 0; i < 4; i++){
-                                Tile other = build.tile.nearby(i);
-                                if(other != null && !(other.block().privileged || other.block().isStatic())){
-                                    surrounded = false;
-                                    break;
-                                }
+                    t.button(Icon.trash, Styles.graySquarei, iconMed, () -> ui.showConfirm("@editor.worldprocessors.delete.confirm",  () -> {
+                        boolean surrounded = true;
+                        for(int i = 0; i < 4; i++){
+                            Tile other = build.tile.nearby(i);
+                            if(other != null && !(other.block().privileged || other.block().isStatic())){
+                                surrounded = false;
+                                break;
                             }
-                            if(surrounded){
-                                build.tile.setNet(build.tile.floor().wall instanceof StaticWall ? build.tile.floor().wall : Blocks.stoneWall);
-                            }else{
-                                build.tile.setNet(Blocks.air);
-                            }
-                            processors.remove(build);
-                            rebuild();
-                        });
-                    }).size(h);
+                        }
+                        if(surrounded){
+                            build.tile.setNet(build.tile.floor().wall instanceof StaticWall ? build.tile.floor().wall : Blocks.stoneWall);
+                        }else{
+                            build.tile.setNet(Blocks.air);
+                        }
+                        processors.remove(build);
+                        rebuild();
+                    })).size(h);
 
                     t.row();
                 }

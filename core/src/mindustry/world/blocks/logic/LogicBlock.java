@@ -594,9 +594,7 @@ public class LogicBlock extends Block{
         public void drawSelect(){
             if(!accessible()) return;
 
-            Groups.unit.each(u -> u.controller() instanceof LogicAI ai && ai.controller == this, unit -> {
-                Drawf.square(unit.x, unit.y, unit.hitSize, unit.rotation + 45);
-            });
+            Groups.unit.each(u -> u.controller() instanceof LogicAI ai && ai.controller == this, unit -> Drawf.square(unit.x, unit.y, unit.hitSize, unit.rotation + 45));
 
             //draw tag over processor (world processor only)
             if(!(renderer.pixelate || !privileged || tag == null || tag.isEmpty())){

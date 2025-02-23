@@ -28,9 +28,7 @@ public class DiscordDialog extends Dialog{
                 img.image().height(5).width(40f).color(color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
             }).expandY();
 
-            t.table(i -> {
-                i.image(Icon.discord);
-            }).size(h).left();
+            t.table(i -> i.image(Icon.discord)).size(h).left();
 
             t.add("@discord").color(Pal.accent).growX().padLeft(10f);
         }).size(520f, h).pad(10f);

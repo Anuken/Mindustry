@@ -70,9 +70,7 @@ public class Control implements ApplicationListener, Loadable{
         //show dialog saying that mod loading was skipped.
         Events.on(ClientLoadEvent.class, e -> {
             if(Vars.mods.skipModLoading() && Vars.mods.list().any()){
-                Time.runTask(4f, () -> {
-                    ui.showInfo("@mods.initfailed");
-                });
+                Time.runTask(4f, () -> ui.showInfo("@mods.initfailed"));
             }
             checkAutoUnlocks();
         });
@@ -102,9 +100,7 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(SaveLoadEvent.class, event -> {
-            input.checkUnit();
-        });
+        Events.on(SaveLoadEvent.class, event -> input.checkUnit());
 
         Events.on(ResetEvent.class, event -> {
             player.reset();
@@ -173,9 +169,7 @@ public class Control implements ApplicationListener, Loadable{
             app.post(this::checkAutoUnlocks);
 
             if(!net.client() && e.sector.preset != null && e.sector.preset.isLastSector && e.initialCapture){
-                Time.run(60f * 2f, () -> {
-                    ui.campaignComplete.show(e.sector.planet);
-                });
+                Time.run(60f * 2f, () -> ui.campaignComplete.show(e.sector.planet));
             }
         });
 
@@ -258,9 +252,7 @@ public class Control implements ApplicationListener, Loadable{
 
                     if(anyBuilds){
                         for(var ccore : state.rules.defaultTeam.data().cores){
-                            Time.run(coreDelay, () -> {
-                                Fx.coreBuildShockwave.at(ccore.x, ccore.y, buildRadius);
-                            });
+                            Time.run(coreDelay, () -> Fx.coreBuildShockwave.at(ccore.x, ccore.y, buildRadius));
                         }
                     }
                 }
@@ -269,9 +261,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(SaveWriteEvent.class, e -> forcePlaceAll());
         Events.on(HostEvent.class, e -> forcePlaceAll());
-        Events.on(HostEvent.class, e -> {
-            state.set(State.playing);
-        });
+        Events.on(HostEvent.class, e -> state.set(State.playing));
     }
 
     private void forcePlaceAll(){

@@ -34,11 +34,11 @@ public class LoadRegionProcessor extends BaseProcessor{
         }
 
         Seq<Stype> entries = Seq.with(fieldMap.keys());
-        entries.sortComparing(e -> e.name());
+        entries.sortComparing(Selement::name);
 
         for(Stype type : entries){
             Seq<Svar> fields = fieldMap.get(type);
-            fields.sortComparing(s -> s.name());
+            fields.sortComparing(Selement::name);
             method.beginControlFlow("if(content instanceof $L)", type.fullName());
 
             for(Svar field : fields){

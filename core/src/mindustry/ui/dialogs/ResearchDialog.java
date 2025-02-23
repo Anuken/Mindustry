@@ -52,9 +52,7 @@ public class ResearchDialog extends BaseDialog{
     public ResearchDialog(){
         super("");
 
-        Events.on(ResetEvent.class, e -> {
-            hide();
-        });
+        Events.on(ResetEvent.class, e -> hide());
 
         Events.on(UnlockEvent.class, e -> {
             if(net.client() && !needsRebuild){
@@ -81,30 +79,26 @@ public class ResearchDialog extends BaseDialog{
             b.label(() -> root.node.localizedName()).color(Pal.accent);
             b.add().growX();
             b.add().size(iconMed);
-        }, () -> {
-            new BaseDialog("@techtree.select"){{
-                cont.pane(t -> {
-                    t.table(Tex.button, in -> {
-                        in.defaults().width(300f).height(60f);
-                        for(TechNode node : TechTree.roots){
-                            if(node.requiresUnlock && !node.content.unlockedHost() && node != getPrefRoot()) continue;
+        }, () -> new BaseDialog("@techtree.select"){{
+            cont.pane(t -> t.table(Tex.button, in -> {
+                in.defaults().width(300f).height(60f);
+                for(TechNode node : TechTree.roots){
+                    if(node.requiresUnlock && !node.content.unlockedHost() && node != getPrefRoot()) continue;
 
-                            //TODO toggle
-                            in.button(node.localizedName(), node.icon(), Styles.flatTogglet, iconMed, () -> {
-                                if(node == lastNode){
-                                    return;
-                                }
-
-                                rebuildTree(node);
-                                hide();
-                            }).marginLeft(12f).checked(node == lastNode).row();
+                    //TODO toggle
+                    in.button(node.localizedName(), node.icon(), Styles.flatTogglet, iconMed, () -> {
+                        if(node == lastNode){
+                            return;
                         }
-                    });
-                });
 
-                addCloseButton();
-            }}.show();
-        }).visible(() -> showTechSelect = TechTree.roots.count(node -> !(node.requiresUnlock && !node.content.unlockedHost())) > 1).minWidth(300f);
+                        rebuildTree(node);
+                        hide();
+                    }).marginLeft(12f).checked(node == lastNode).row();
+                }
+            }));
+
+            addCloseButton();
+        }}.show()).visible(() -> showTechSelect = TechTree.roots.count(node -> !(node.requiresUnlock && !node.content.unlockedHost())) > 1).minWidth(300f);
 
         margin(0f).marginBottom(8);
         cont.stack(titleTable, view = new View(), itemDisplay = new ItemsDisplay()).grow();
@@ -735,7 +729,7 @@ public class ResearchDialog extends BaseDialog{
             addChild(infoTable);
 
             checkMargin();
-            Core.app.post(() -> checkMargin());
+            Core.app.post(ResearchDialog.this::checkMargin);
 
             infoTable.pack();
             infoTable.act(Core.graphics.getDeltaTime());

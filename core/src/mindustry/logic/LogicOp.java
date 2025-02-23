@@ -5,7 +5,7 @@ import arc.util.*;
 import arc.util.noise.*;
 
 public enum LogicOp{
-    add("+", (a, b) -> a + b),
+    add("+", Double::sum),
     sub("-", (a, b) -> a - b),
     mul("*", (a, b) -> a * b),
     div("/", (a, b) -> a / b),
@@ -35,7 +35,7 @@ public enum LogicOp{
     angleDiff("anglediff", true, (x, y) -> Angles.angleDist((float)x, (float)y)),
     len("len", true, (x, y) -> Mathf.dst((float)x, (float)y)),
     noise("noise", true, (x, y) -> Simplex.raw2d(0, x, y)),
-    abs("abs", a -> Math.abs(a)), //not a method reference because it fails to compile for some reason
+    abs("abs", Math::abs), //not a method reference because it fails to compile for some reason
     log("log", Math::log),
     log10("log10", Math::log10),
     floor("floor", Math::floor),

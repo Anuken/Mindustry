@@ -18,9 +18,7 @@ public class EnvRenderers{
         Color waterColor = Color.valueOf("353982");
         Rand rand = new Rand();
 
-        Core.assets.load("sprites/rays.png", Texture.class).loaded = t -> {
-            t.setFilter(TextureFilter.linear);
-        };
+        Core.assets.load("sprites/rays.png", Texture.class).loaded = t -> t.setFilter(TextureFilter.linear);
 
         Color particleColor = Color.valueOf("a7c1fa");
         float windSpeed = 0.03f, windAngle = 45f;
@@ -72,18 +70,16 @@ public class EnvRenderers{
             }
 
             //suspended particles
-            Draw.draw(Layer.weather, () -> {
-                Weather.drawParticles(
-                    Core.atlas.find("particle"), particleColor,
-                    1.4f, 4f, //minmax size
-                    10000f, 1f, 1f, //density
-                    windx, windy, //wind vectors
-                    0.5f, 1f, //minmax alpha
-                    30f, 80f, //sinscl
-                    1f, 7f, //sinmag
-                    false
-                );
-            });
+            Draw.draw(Layer.weather, () -> Weather.drawParticles(
+                Core.atlas.find("particle"), particleColor,
+                1.4f, 4f, //minmax size
+                10000f, 1f, 1f, //density
+                windx, windy, //wind vectors
+                0.5f, 1f, //minmax alpha
+                30f, 80f, //sinscl
+                1f, 7f, //sinmag
+                false
+            ));
 
             Draw.blend();
         });
