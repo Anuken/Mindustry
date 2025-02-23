@@ -79,9 +79,7 @@ public class JoinDialog extends BaseDialog{
         add = new BaseDialog("@joingame.title");
         add.cont.add("@joingame.ip").padRight(5f).left();
 
-        TextField field = add.cont.field(Core.settings.getString("ip"), text -> {
-            Core.settings.put("ip", text);
-        }).size(320f, 54f).maxTextLength(100).get();
+        TextField field = add.cont.field(Core.settings.getString("ip"), text -> Core.settings.put("ip", text)).size(320f, 54f).maxTextLength(100).get();
 
         add.cont.row();
         add.buttons.defaults().size(140f, 60f).pad(4f);
@@ -173,33 +171,23 @@ public class JoinDialog extends BaseDialog{
 
             inner.add("[accent]" + server.displayIP()).left().padLeft(10f).wrap().style(Styles.outlineLabel).growX();
 
-            inner.button(Icon.upOpen, Styles.emptyi, () -> {
-                moveRemote(server, -1);
+            inner.button(Icon.upOpen, Styles.emptyi, () -> moveRemote(server, -1)).margin(3f).padTop(6f).top().right();
 
-            }).margin(3f).padTop(6f).top().right();
+            inner.button(Icon.downOpen, Styles.emptyi, () -> moveRemote(server, +1)).margin(3f).pad(2).padTop(6f).top().right();
 
-            inner.button(Icon.downOpen, Styles.emptyi, () -> {
-                moveRemote(server, +1);
-
-            }).margin(3f).pad(2).padTop(6f).top().right();
-
-            inner.button(Icon.refresh, Styles.emptyi, () -> {
-                refreshServer(server);
-            }).margin(3f).pad(2).padTop(6f).top().right();
+            inner.button(Icon.refresh, Styles.emptyi, () -> refreshServer(server)).margin(3f).pad(2).padTop(6f).top().right();
 
             inner.button(Icon.pencil, Styles.emptyi, () -> {
                 renaming = server;
                 add.show();
             }).margin(3f).pad(2).padTop(6f).top().right();
 
-            inner.button(Icon.trash, Styles.emptyi, () -> {
-                ui.showConfirm("@confirm", "@server.delete", () -> {
-                    servers.remove(server, true);
-                    saveServers();
-                    setupRemote();
-                    refreshRemote();
-                });
-            }).margin(3f).pad(2).pad(6).top().right();
+            inner.button(Icon.trash, Styles.emptyi, () -> ui.showConfirm("@confirm", "@server.delete", () -> {
+                servers.remove(server, true);
+                saveServers();
+                setupRemote();
+                refreshRemote();
+            })).margin(3f).pad(2).pad(6).top().right();
 
             button.row();
 
@@ -337,12 +325,10 @@ public class JoinDialog extends BaseDialog{
                 Core.settings.put("name", text);
             }).grow().pad(8).maxTextLength(maxNameLength);
 
-            ImageButton button = t.button(Tex.whiteui, Styles.squarei, 40, () -> {
-                new PaletteDialog().show(color -> {
-                    player.color().set(color);
-                    Core.settings.put("color-0", color.rgba8888());
-                });
-            }).size(54f).get();
+            ImageButton button = t.button(Tex.whiteui, Styles.squarei, 40, () -> new PaletteDialog().show(color -> {
+                player.color().set(color);
+                Core.settings.put("color-0", color.rgba8888());
+            })).size(54f).get();
             button.update(() -> button.getStyle().imageUpColor = player.color());
         }).width(w).height(70f).pad(4);
         cont.row();
@@ -514,9 +500,7 @@ public class JoinDialog extends BaseDialog{
                 ui.showCustomConfirm("@warning", "@servers.disclaimer", "@ok", "@back", () -> {
                     Core.settings.put("server-disclaimer", true);
                     safeConnect(host.address, host.port, host.version);
-                }, () -> {
-                    Core.settings.put("server-disclaimer", false);
-                });
+                }, () -> Core.settings.put("server-disclaimer", false));
             }else{
                 safeConnect(host.address, host.port, host.version);
             }
@@ -608,14 +592,12 @@ public class JoinDialog extends BaseDialog{
         if(lastIp == null || lastIp.isEmpty()) return;
         ui.loadfrag.show("@reconnecting");
 
-        ping = Timer.schedule(() -> {
-            net.pingHost(lastIp, lastPort, host -> {
-                if(ping == null) return;
-                ping.cancel();
-                ping = null;
-                connect(lastIp, lastPort);
-            }, exception -> {});
-        }, 1, 1);
+        ping = Timer.schedule(() -> net.pingHost(lastIp, lastPort, host -> {
+            if(ping == null) return;
+            ping.cancel();
+            ping = null;
+            connect(lastIp, lastPort);
+        }, exception -> {}), 1, 1);
 
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();

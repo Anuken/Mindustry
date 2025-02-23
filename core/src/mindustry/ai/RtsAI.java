@@ -61,19 +61,15 @@ public class RtsAI{
         //TODO remove: debugging!
 
         if(debug){
-            Events.run(Trigger.draw, () -> {
+            Events.run(Trigger.draw, () -> Draw.draw(Layer.overlayUI, () -> {
 
-                Draw.draw(Layer.overlayUI, () -> {
-
-                    float s = Fonts.outline.getScaleX();
-                    Fonts.outline.getData().setScale(0.5f);
-                    for(var target : weights){
-                        Fonts.outline.draw("[sky]" + Strings.fixed(target.value, 2), target.key.x, target.key.y, Align.center);
-                    }
-                    Fonts.outline.getData().setScale(s);
-                });
-
-            });
+                float s = Fonts.outline.getScaleX();
+                Fonts.outline.getData().setScale(0.5f);
+                for(var target : weights){
+                    Fonts.outline.draw("[sky]" + Strings.fixed(target.value, 2), target.key.x, target.key.y, Align.center);
+                }
+                Fonts.outline.getData().setScale(s);
+            }));
         }
     }
 

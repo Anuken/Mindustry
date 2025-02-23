@@ -34,9 +34,7 @@ public class WaveSpawner{
     @Nullable
     public Tile getFirstSpawn(){
         firstSpawn = null;
-        eachGroundSpawn((cx, cy) -> {
-            firstSpawn = world.tile(cx, cy);
-        });
+        eachGroundSpawn((cx, cy) -> firstSpawn = world.tile(cx, cy));
         return firstSpawn;
     }
 

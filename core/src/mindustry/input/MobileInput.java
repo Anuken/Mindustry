@@ -198,9 +198,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).update(l -> l.setChecked(mode == breaking)).name("breakmode");
 
         //diagonal swap button
-        table.button(Icon.diagonal, Styles.clearNoneTogglei, () -> {
-            Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"));
-        }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
+        table.button(Icon.diagonal, Styles.clearNoneTogglei, () -> Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"))).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
 
         //rotate button
         table.button(Icon.right, Styles.clearNoneTogglei, () -> {
@@ -293,9 +291,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             t.visible(() -> !hasSchematic() && !state.rules.editor);
             t.bottom().left();
 
-            t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
-                queueCommandMode = !queueCommandMode;
-            }).width(155f).height(48f).margin(12f).checked(b -> queueCommandMode).visible(() -> commandMode).row();
+            t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> queueCommandMode = !queueCommandMode).width(155f).height(48f).margin(12f).checked(b -> queueCommandMode).visible(() -> commandMode).row();
 
             t.button("@command", Icon.units, Styles.clearTogglet, () -> {
                 commandMode = !commandMode;

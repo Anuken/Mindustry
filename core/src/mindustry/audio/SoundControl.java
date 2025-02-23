@@ -57,9 +57,7 @@ public class SoundControl{
 
         setupFilters();
 
-        Events.on(ResetEvent.class, e -> {
-            lastPlayed = Time.millis();
-        });
+        Events.on(ResetEvent.class, e -> lastPlayed = Time.millis());
     }
 
     protected void setupFilters(){

@@ -25,50 +25,48 @@ public class IconSelectDialog extends Dialog{
         closeOnBack();
         setFillParent(true);
 
-        cont.pane(t -> {
-            resized(true, () -> {
-                t.clearChildren();
-                t.marginRight(19f);
-                t.defaults().size(48f);
+        cont.pane(t -> resized(true, () -> {
+            t.clearChildren();
+            t.marginRight(19f);
+            t.defaults().size(48f);
 
-                t.button(Icon.none, Styles.flati, () -> {
+            t.button(Icon.none, Styles.flati, () -> {
+                hide();
+                consumer.get(0);
+            });
+
+            int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
+
+            int i = 1;
+            for(var key : accessibleIcons){
+                var value = Icon.icons.get(key);
+
+                t.button(value, Styles.flati, () -> {
                     hide();
-                    consumer.get(0);
+                    consumer.get(Iconc.codes.get(key));
                 });
 
-                int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
+                if(++i % cols == 0) t.row();
+            }
 
-                int i = 1;
-                for(var key : accessibleIcons){
-                    var value = Icon.icons.get(key);
+            for(ContentType ctype : defaultContentIcons){
+                t.row();
+                t.image().colspan(cols).growX().width(Float.NEGATIVE_INFINITY).height(3f).color(Pal.accent);
+                t.row();
 
-                    t.button(value, Styles.flati, () -> {
-                        hide();
-                        consumer.get(Iconc.codes.get(key));
-                    });
+                i = 0;
+                for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
+                    if(!u.isHidden() && (allowLocked || u.unlocked())){
+                        t.button(new TextureRegionDrawable(u.uiIcon), Styles.flati, iconMed, () -> {
+                            hide();
+                            consumer.get(u.emojiChar());
+                        });
 
-                    if(++i % cols == 0) t.row();
-                }
-
-                for(ContentType ctype : defaultContentIcons){
-                    t.row();
-                    t.image().colspan(cols).growX().width(Float.NEGATIVE_INFINITY).height(3f).color(Pal.accent);
-                    t.row();
-
-                    i = 0;
-                    for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
-                        if(!u.isHidden() && (allowLocked || u.unlocked())){
-                            t.button(new TextureRegionDrawable(u.uiIcon), Styles.flati, iconMed, () -> {
-                                hide();
-                                consumer.get(u.emojiChar());
-                            });
-
-                            if(++i % cols == 0) t.row();
-                        }
+                        if(++i % cols == 0) t.row();
                     }
                 }
-            });
-        });
+            }
+        }));
         buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
     }
 

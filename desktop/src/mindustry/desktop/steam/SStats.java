@@ -16,13 +16,11 @@ public class SStats implements SteamUserStatsCallback{
     public SStats(){
         stats.requestCurrentStats();
 
-        Events.on(ClientLoadEvent.class, e -> {
-            Timer.schedule(() -> {
-                if(updated){
-                    stats.storeStats();
-                }
-            }, statSavePeriod * 60, statSavePeriod * 60);
-        });
+        Events.on(ClientLoadEvent.class, e -> Timer.schedule(() -> {
+            if(updated){
+                stats.storeStats();
+            }
+        }, statSavePeriod * 60, statSavePeriod * 60));
     }
 
     public void onUpdate(){

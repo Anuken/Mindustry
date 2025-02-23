@@ -1,7 +1,6 @@
 package mindustry.maps.filters;
 
 import arc.scene.ui.layout.*;
-import mindustry.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.maps.filters.FilterOption.*;
@@ -25,9 +24,7 @@ public class LogicFilter extends GenerateFilter{
                 }
                 @Override
                 public void build(Table table){
-                    table.button(b -> b.image(Icon.pencil).size(iconSmall), () -> {
-                        ui.logic.show(code, null, true, code -> LogicFilter.this.code = code);
-                    }).pad(4).margin(12f);
+                    table.button(b -> b.image(Icon.pencil).size(iconSmall), () -> ui.logic.show(code, null, true, code -> LogicFilter.this.code = code)).pad(4).margin(12f);
 
                     table.add("@filter.option." + name);
                 }

@@ -144,9 +144,7 @@ public class SectorInfo{
         }else{
             Arrays.fill(importRateCache, 0f);
         }
-        eachImport(planet, sector -> sector.info.export.each((item, stat) -> {
-            importRateCache[item.id] += stat.mean;
-        }));
+        eachImport(planet, sector -> sector.info.export.each((item, stat) -> importRateCache[item.id] += stat.mean));
     }
 
     public float[] getImportRates(Planet planet){
@@ -226,9 +224,7 @@ public class SectorInfo{
         hasSpawns = spawner.countSpawns() > 0;
 
         //cap production at raw production.
-        production.each((item, stat) -> {
-            stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
-        });
+        production.each((item, stat) -> stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean));
 
         var pads = indexer.getFlagged(state.rules.defaultTeam, BlockFlag.launchPad);
 

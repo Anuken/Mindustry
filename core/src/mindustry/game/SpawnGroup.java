@@ -5,7 +5,6 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.io.versions.*;
 import mindustry.type.*;
@@ -138,7 +137,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         shieldScaling = data.getFloat("shieldScaling", 0);
         unitAmount = data.getInt("amount", 1);
         spawn = data.getInt("spawn", -1);
-        if(data.has("payloads")) payloads = Seq.with(json.readValue(String[].class, data.get("payloads"))).map(content::unit).removeAll(t -> t == null);
+        if(data.has("payloads")) payloads = Seq.with(json.readValue(String[].class, data.get("payloads"))).map(content::unit).removeAll(Objects::isNull);
         if(data.has("items")) items = json.readValue(ItemStack.class, data.get("items"));
 
 

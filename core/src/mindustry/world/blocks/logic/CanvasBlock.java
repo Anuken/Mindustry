@@ -258,112 +258,110 @@ public class CanvasBlock extends Block{
 
                 dialog.resized(dialog::hide);
 
-                dialog.cont.table(Tex.pane, body -> {
-                    body.add(new Element(){
-                        int lastX, lastY;
-                        IntSeq stack = new IntSeq();
+                dialog.cont.table(Tex.pane, body -> body.add(new Element(){
+                    int lastX, lastY;
+                    IntSeq stack = new IntSeq();
 
-                        int convertX(float ex){
-                            return (int)((ex) / (width / canvasSize));
-                        }
+                    int convertX(float ex){
+                        return (int)((ex) / (width / canvasSize));
+                    }
 
-                        int convertY(float ey){
-                            return pix.height - 1 - (int)((ey) / (height / canvasSize));
-                        }
+                    int convertY(float ey){
+                        return pix.height - 1 - (int)((ey) / (height / canvasSize));
+                    }
 
-                        {
-                            addListener(new InputListener(){
+                    {
+                        addListener(new InputListener(){
 
-                                @Override
-                                public boolean touchDown(InputEvent event, float ex, float ey, int pointer, KeyCode button){
-                                    int cx = convertX(ex), cy = convertY(ey);
-                                    if(fill[0]){
-                                        stack.clear();
-                                        int src = curColor[0];
-                                        int dst = pix.get(cx, cy);
-                                        if(src != dst){
-                                            stack.add(Point2.pack(cx, cy));
-                                            while(!stack.isEmpty()){
-                                                int current = stack.pop();
-                                                int x = Point2.x(current), y = Point2.y(current);
-                                                draw(x, y);
-                                                for(int i = 0; i < 4; i++){
-                                                    int nx = x + Geometry.d4x(i), ny = y + Geometry.d4y(i);
-                                                    if(nx >= 0 && ny >= 0 && nx < pix.width && ny < pix.height && pix.getRaw(nx, ny) == dst){
-                                                        stack.add(Point2.pack(nx, ny));
-                                                    }
+                            @Override
+                            public boolean touchDown(InputEvent event, float ex, float ey, int pointer, KeyCode button){
+                                int cx = convertX(ex), cy = convertY(ey);
+                                if(fill[0]){
+                                    stack.clear();
+                                    int src = curColor[0];
+                                    int dst = pix.get(cx, cy);
+                                    if(src != dst){
+                                        stack.add(Point2.pack(cx, cy));
+                                        while(!stack.isEmpty()){
+                                            int current = stack.pop();
+                                            int x = Point2.x(current), y = Point2.y(current);
+                                            draw(x, y);
+                                            for(int i = 0; i < 4; i++){
+                                                int nx = x + Geometry.d4x(i), ny = y + Geometry.d4y(i);
+                                                if(nx >= 0 && ny >= 0 && nx < pix.width && ny < pix.height && pix.getRaw(nx, ny) == dst){
+                                                    stack.add(Point2.pack(nx, ny));
                                                 }
                                             }
                                         }
-
-                                    }else{
-                                        draw(cx, cy);
-                                        lastX = cx;
-                                        lastY = cy;
                                     }
-                                    return true;
-                                }
 
-                                @Override
-                                public void touchDragged(InputEvent event, float ex, float ey, int pointer){
-                                    if(fill[0]) return;
-                                    int cx = convertX(ex), cy = convertY(ey);
-                                    Bresenham2.line(lastX, lastY, cx, cy, (x, y) -> draw(x, y));
+                                }else{
+                                    draw(cx, cy);
                                     lastX = cx;
                                     lastY = cy;
                                 }
-                            });
-                        }
+                                return true;
+                            }
 
-                        void draw(int x, int y){
-                            if(pix.get(x, y) != curColor[0]){
-                                pix.set(x, y, curColor[0]);
-                                Pixmaps.drawPixel(texture, x, y, curColor[0]);
-                                modified[0] = true;
+                            @Override
+                            public void touchDragged(InputEvent event, float ex, float ey, int pointer){
+                                if(fill[0]) return;
+                                int cx = convertX(ex), cy = convertY(ey);
+                                Bresenham2.line(lastX, lastY, cx, cy, (x, y) -> draw(x, y));
+                                lastX = cx;
+                                lastY = cy;
+                            }
+                        });
+                    }
+
+                    void draw(int x, int y){
+                        if(pix.get(x, y) != curColor[0]){
+                            pix.set(x, y, curColor[0]);
+                            Pixmaps.drawPixel(texture, x, y, curColor[0]);
+                            modified[0] = true;
+                        }
+                    }
+
+                    @Override
+                    public void draw(){
+                        Tmp.tr1.set(texture);
+                        Draw.alpha(parentAlpha);
+                        Draw.rect(Tmp.tr1, x + width/2f, y + height/2f, width, height);
+
+                        //draw grid
+                        {
+                            float xspace = (getWidth() / canvasSize);
+                            float yspace = (getHeight() / canvasSize);
+                            float s = 1f;
+
+                            int minspace = 10;
+
+                            int jumpx = (int)(Math.max(minspace, xspace) / xspace);
+                            int jumpy = (int)(Math.max(minspace, yspace) / yspace);
+
+                            for(int x = 0; x <= canvasSize; x += jumpx){
+                                Fill.crect((int)(this.x + xspace * x - s), y - s, 2, getHeight() + (x == canvasSize ? 1 : 0));
+                            }
+
+                            for(int y = 0; y <= canvasSize; y += jumpy){
+                                Fill.crect(x - s, (int)(this.y + y * yspace - s), getWidth(), 2);
                             }
                         }
 
-                        @Override
-                        public void draw(){
-                            Tmp.tr1.set(texture);
-                            Draw.alpha(parentAlpha);
-                            Draw.rect(Tmp.tr1, x + width/2f, y + height/2f, width, height);
+                        if(!mobile){
+                            Vec2 s = screenToLocalCoordinates(Core.input.mouse());
+                            if(s.x >= 0 && s.y >= 0 && s.x < width && s.y < height){
+                                float sx = Mathf.round(s.x, width / canvasSize), sy = Mathf.round(s.y, height / canvasSize);
 
-                            //draw grid
-                            {
-                                float xspace = (getWidth() / canvasSize);
-                                float yspace = (getHeight() / canvasSize);
-                                float s = 1f;
+                                Lines.stroke(Scl.scl(6f));
+                                Draw.color(Pal.accent);
+                                Lines.rect(sx + x, sy + y, width / canvasSize, height / canvasSize, Lines.getStroke() - 1f);
 
-                                int minspace = 10;
-
-                                int jumpx = (int)(Math.max(minspace, xspace) / xspace);
-                                int jumpy = (int)(Math.max(minspace, yspace) / yspace);
-
-                                for(int x = 0; x <= canvasSize; x += jumpx){
-                                    Fill.crect((int)(this.x + xspace * x - s), y - s, 2, getHeight() + (x == canvasSize ? 1 : 0));
-                                }
-
-                                for(int y = 0; y <= canvasSize; y += jumpy){
-                                    Fill.crect(x - s, (int)(this.y + y * yspace - s), getWidth(), 2);
-                                }
-                            }
-
-                            if(!mobile){
-                                Vec2 s = screenToLocalCoordinates(Core.input.mouse());
-                                if(s.x >= 0 && s.y >= 0 && s.x < width && s.y < height){
-                                    float sx = Mathf.round(s.x, width / canvasSize), sy = Mathf.round(s.y, height / canvasSize);
-
-                                    Lines.stroke(Scl.scl(6f));
-                                    Draw.color(Pal.accent);
-                                    Lines.rect(sx + x, sy + y, width / canvasSize, height / canvasSize, Lines.getStroke() - 1f);
-
-                                    Draw.reset();
-                                }
+                                Draw.reset();
                             }
                         }
-                    }).size(mobile && !Core.graphics.isPortrait() ? Math.min(290f, Core.graphics.getHeight() / Scl.scl(1f) - 75f / Scl.scl(1f)) : 480f);
-                }).colspan(3);
+                    }
+                }).size(mobile && !Core.graphics.isPortrait() ? Math.min(290f, Core.graphics.getHeight() / Scl.scl(1f) - 75f / Scl.scl(1f)) : 480f)).colspan(3);
 
                 dialog.cont.row();
 
@@ -373,18 +371,12 @@ public class CanvasBlock extends Block{
                     for(int i = 0; i < palette.length; i++){
                         int fi = i;
 
-                        var button = p.button(Tex.whiteui, Styles.squareTogglei, 30, () -> {
-                            curColor[0] = palette[fi];
-                        }).size(44).checked(b -> curColor[0] == palette[fi]).get();
+                        var button = p.button(Tex.whiteui, Styles.squareTogglei, 30, () -> curColor[0] = palette[fi]).size(44).checked(b -> curColor[0] == palette[fi]).get();
                         button.getStyle().imageUpColor = new Color(palette[i]);
                     }
                 });
 
-                dialog.cont.table(Tex.button, t -> {
-                    t.button(Icon.fill, Styles.clearNoneTogglei, () -> {
-                        fill[0] = !fill[0];
-                    }).size(44f);
-                });
+                dialog.cont.table(Tex.button, t -> t.button(Icon.fill, Styles.clearNoneTogglei, () -> fill[0] = !fill[0]).size(44f));
 
                 dialog.closeOnBack();
 

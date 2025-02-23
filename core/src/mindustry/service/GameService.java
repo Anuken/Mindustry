@@ -23,10 +23,10 @@ import static mindustry.service.Achievement.*;
 
 /**
  * Interface for handling game service across multiple platforms.
- *
+ * <p>
  * This includes:
  * - Desktop (Steam)
- *
+ * <p>
  * The default implementation does nothing.
  * */
 public class GameService{
@@ -122,7 +122,7 @@ public class GameService{
             captureAllSectors.complete();
         }
 
-        Events.run(Trigger.openConsole, () -> openConsole.complete());
+        Events.run(Trigger.openConsole, openConsole::complete);
 
         Events.run(Trigger.unitCommandAttack, () -> {
             if(campaign()){
@@ -319,9 +319,7 @@ public class GameService{
             }
         });
 
-        Events.on(SchematicCreateEvent.class, e -> {
-            SStat.schematicsCreated.add();
-        });
+        Events.on(SchematicCreateEvent.class, e -> SStat.schematicsCreated.add());
 
         Events.on(BlockDestroyEvent.class, e -> {
             if(campaign() && e.tile.team() != player.team()){
@@ -415,13 +413,9 @@ public class GameService{
             }
         });
 
-        Events.on(SectorLaunchEvent.class, e -> {
-            SStat.timesLaunched.add();
-        });
+        Events.on(SectorLaunchEvent.class, e -> SStat.timesLaunched.add());
 
-        Events.on(LaunchItemEvent.class, e -> {
-            SStat.itemsLaunched.add(e.stack.amount);
-        });
+        Events.on(LaunchItemEvent.class, e -> SStat.itemsLaunched.add(e.stack.amount));
 
         Events.on(WaveEvent.class, e -> {
             if(campaign()){

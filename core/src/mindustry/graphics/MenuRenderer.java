@@ -243,15 +243,11 @@ public class MenuRenderer implements Disposable{
 
         TextureRegion icon = flyerType.fullIcon;
 
-        flyers((x, y) -> {
-            Draw.rect(icon, x - 12f, y - 13f, flyerRot - 90);
-        });
+        flyers((x, y) -> Draw.rect(icon, x - 12f, y - 13f, flyerRot - 90));
 
         float size = Math.max(icon.width, icon.height) * icon.scl() * 1.6f;
 
-        flyers((x, y) -> {
-            Draw.rect("circle-shadow", x, y, size, size);
-        });
+        flyers((x, y) -> Draw.rect("circle-shadow", x, y, size, size));
         Draw.color();
 
         flyers((x, y) -> {

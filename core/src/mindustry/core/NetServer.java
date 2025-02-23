@@ -381,9 +381,7 @@ public class NetServer implements ApplicationListener{
                 StringBuilder builder = new StringBuilder();
                 builder.append("[orange]Players to kick: \n");
 
-                Groups.player.each(p -> !p.admin && p.con != null && p != player, p -> {
-                    builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id()).append(")\n");
-                });
+                Groups.player.each(p -> !p.admin && p.con != null && p != player, p -> builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id()).append(")\n"));
                 player.sendMessage(builder.toString());
             }else if(args.length == 1){
                 player.sendMessage("[orange]You need a valid reason to kick the player. Add a reason after the player name.");
