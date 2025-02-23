@@ -147,14 +147,14 @@ public class StructProcess extends BaseProcessor{
         for(int i = 0; i < offset; i++) builder.append('0');
         for(int i = 0; i < size; i++) builder.append('1');
         for(int i = 0; i < totalSize - size - offset; i++) builder.append('0');
-        return "0b" + builder.reverse().toString() + "L";
+        return "0b" + builder.reverse() + "L";
     }
 
     static String bitString(int size, int totalSize){
         StringBuilder builder = new StringBuilder();
         for(int i = 0; i < size; i++) builder.append('1');
         for(int i = 0; i < totalSize - size; i++) builder.append('0');
-        return "0b" + builder.reverse().toString() + "L";
+        return "0b" + builder.reverse() + "L";
     }
 
     static int varSize(Svar var) throws IllegalArgumentException{

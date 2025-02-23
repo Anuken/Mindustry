@@ -93,7 +93,7 @@ public class DatabaseDialog extends BaseDialog{
 
                 if(++i % 10 == 0) t.row();
             }
-        }).row();;
+        }).row();
 
         for(int j = 0; j < allContent.length; j++){
             ContentType type = ContentType.all[j];

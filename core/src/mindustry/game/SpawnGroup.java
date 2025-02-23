@@ -5,7 +5,6 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.io.versions.*;
 import mindustry.type.*;

@@ -54,7 +54,7 @@ public interface Payload extends Position{
         return 0f;
     }
 
-    default void destroyed(){};
+    default void destroyed(){}
 
     /** writes the payload for saving. */
     void write(Writes write);

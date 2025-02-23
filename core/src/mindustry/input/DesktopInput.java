@@ -23,7 +23,6 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
-import static arc.Core.camera;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;

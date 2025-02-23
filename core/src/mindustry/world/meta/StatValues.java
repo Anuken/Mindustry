@@ -438,7 +438,7 @@ public class StatValues{
                     if(!filter.get(liquid)) continue;
 
                     c.table(Styles.grayPanel, b -> {
-                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));;
+                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));
                         b.table(info -> {
                             info.add(liquid.localizedName).left().row();
                             info.add(Strings.autoFixed(maxUsed * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
@@ -505,7 +505,7 @@ public class StatValues{
                     if(!filter.get(liquid)) continue;
 
                     c.table(Styles.grayPanel, b -> {
-                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));;
+                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));
                         b.table(info -> {
                             info.add(liquid.localizedName).left().row();
                             info.add(Strings.autoFixed(amount * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
@@ -590,7 +590,7 @@ public class StatValues{
                             t.row();
                         }
                     }
-                };
+                }
             });
         };
     }

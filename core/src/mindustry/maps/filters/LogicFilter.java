@@ -1,7 +1,6 @@
 package mindustry.maps.filters;
 
 import arc.scene.ui.layout.*;
-import mindustry.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.maps.filters.FilterOption.*;
