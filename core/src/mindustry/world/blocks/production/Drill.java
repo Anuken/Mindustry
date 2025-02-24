@@ -68,13 +68,19 @@ public class Drill extends Block{
     public DrawBlock drawer = new DrawMulti(new DrawDefault(), new DrawRegion("-rotator"){{
         spinSprite = true;
         rotateSpeed = Drill.this.rotateSpeed;
-    }}, new DrawRegion("-top"));
-
+        layer = Layer.block + 0.2f;
+    }}, new DrawRegion("-top"){{
+        layer = Layer.block + 0.3f;
+    }});
+    /** Draw rim if applicable */
+    public boolean drawRim = false;
     /** Multipliers of drill speed for each item. Defaults to 1. */
     public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
 
     public @Load(value = "@-item", fallback = "drill-item-@size") TextureRegion itemRegion;
-
+    public Color heatColor = Color.valueOf("ff5512");
+    public @Load("@-rim") TextureRegion rimRegion;
+    
     public Drill(String name){
         super(name);
         update = true;
@@ -367,7 +373,15 @@ public class Drill extends Block{
             drawer.draw(this);
             Draw.z(Layer.blockCracks);
             drawDefaultCracks();
-
+            Draw.z(Layer.block + 0.1f);
+            if(drawRim){
+                Draw.color(heatColor);
+                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time, 3f, s)));
+                Draw.blend(Blending.additive);
+                Draw.rect(rimRegion, x, y);
+                Draw.blend();
+                Draw.color();
+            }
             Draw.z(Layer.blockAfterCracks);
 
             if(dominantItem != null && drawMineItem){
