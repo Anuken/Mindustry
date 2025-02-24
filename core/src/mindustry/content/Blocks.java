@@ -2722,9 +2722,9 @@ public class Blocks{
             drawer = new DrawMulti(new DrawDefault(), new DrawGlowRegion("-rim"){{
                 blending = Blending.additive;
                 color = Color.valueOf("ff5512");
-                glowScale = 0.3f;
                 layer = Layer.block;
-                glowIntensity = 6f;
+                glowIntensity = 0.3f;
+                glowScale = 6f;
             }}, new DrawRegion("-rotator"){{
                 spinSprite = true;
                 layer = Layer.block + 0.1f;
