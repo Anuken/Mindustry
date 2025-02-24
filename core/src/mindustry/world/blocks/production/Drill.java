@@ -65,7 +65,11 @@ public class Drill extends Block{
     /** Chance the update effect will appear. */
     public float updateEffectChance = 0.02f;
     /** Basic drawer capabilities */
-    public DrawBlock drawer = new DrawMulti(new DrawDefault(), new DrawRegion("-rotator"){{spinSprite = true;rotateSpeed = Drill.this.rotateSpeed;}}, new DrawRegion("-top"));
+    public DrawBlock drawer = new DrawMulti(new DrawDefault(), new DrawRegion("-rotator"){{
+        spinSprite = true;
+        rotateSpeed = Drill.this.rotateSpeed;
+    }}, new DrawRegion("-top"));
+
     /** Multipliers of drill speed for each item. Defaults to 1. */
     public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
 
