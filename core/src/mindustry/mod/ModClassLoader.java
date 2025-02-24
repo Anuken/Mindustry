@@ -1,6 +1,7 @@
 package mindustry.mod;
 
 import arc.struct.*;
+import mindustry.content.Difficulties;
 
 public class ModClassLoader extends ClassLoader{
     private Seq<ClassLoader> children = new Seq<>();
@@ -21,6 +22,7 @@ public class ModClassLoader extends ClassLoader{
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException{
+
         //a child may try to delegate class loading to its parent, which is *this class loader* - do not let that happen
         if(inChild.get()){
             inChild.set(false);
