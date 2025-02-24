@@ -491,5 +491,6 @@ public class ClassMap{
         classes.put("DrawWarmupRegion", mindustry.world.draw.DrawWarmupRegion.class);
         classes.put("DrawWeave", mindustry.world.draw.DrawWeave.class);
         classes.put("Block", mindustry.world.Block.class);
+        classes.put("Difficulty", mindustry.game.Difficulty.class);
     }
 }

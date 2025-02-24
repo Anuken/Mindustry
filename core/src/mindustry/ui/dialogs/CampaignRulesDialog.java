@@ -10,6 +10,8 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
+import mindustry.content.Difficulties;
+
 public class CampaignRulesDialog extends BaseDialog{
     Planet planet;
     Table current;
@@ -50,14 +52,16 @@ public class CampaignRulesDialog extends BaseDialog{
 
                 t.defaults().size(140f, 50f);
 
-                for(Difficulty diff : Difficulty.all){
+                int extraRowCounter = 0;
+                for(Difficulty diff : Difficulties.getDifficulties()){
                     t.button(diff.localized(), style, () -> {
                         rules.difficulty = diff;
                     }).group(group).checked(b -> rules.difficulty == diff);
 
-                    if(Core.graphics.isPortrait() && diff.ordinal() % 2 == 1){
+                    if(Core.graphics.isPortrait() && extraRowCounter % 2 == 1){
                         t.row();
                     }
+                    extraRowCounter++;
                 }
             }).left().fill(false).expand(false, false).row();
 
