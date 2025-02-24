@@ -65,6 +65,12 @@
     ]
   },
   {
+    "name": "Snowland",
+    "address": [
+      "nixos.world"
+    ]
+  },
+  {
     "name": "XCore",
     "address": [
       "128.140.88.66",
