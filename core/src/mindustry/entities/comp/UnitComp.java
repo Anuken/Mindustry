@@ -732,7 +732,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //if this unit crash landed (was flying), damage stuff in a radius
         if(type.flying && !spawnedByCore && type.createWreck && state.rules.unitCrashDamage(team) > 0){
             var shields = indexer.getEnemy(team, BlockFlag.shield);
-            float crashDamage = Mathf.pow(hitSize, 1.8f) * type.crashDamageMultiplier * state.rules.unitCrashDamage(team) * Math.max(0.2f , (0.4f * maxHealth + health) / maxHealth);
+            float crashDamage = Mathf.pow(hitSize, 1.5f) * type.crashDamageMultiplier * state.rules.unitCrashDamage(team) * Math.max(0.2f , (0.4f * maxHealth + health) / maxHealth);
             if(shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, crashDamage))){
                 Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, crashDamage, true, false, true);
             }
