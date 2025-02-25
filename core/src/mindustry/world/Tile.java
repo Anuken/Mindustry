@@ -421,7 +421,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     /** Whether this block was placed by a player/unit. */
     public boolean synthetic(){
-        return block.update || block.breakable || block.destructible;
+        return block.update || block.destructible || block.breakable;
     }
 
     public boolean solid(){
@@ -429,7 +429,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean breakable(){
-        return  block.breakable || block.update;
+        return block.breakable;
     }
 
     /** @return whether the floor on this tile deals damage or can be drowned on. */
