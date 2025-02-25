@@ -1527,31 +1527,23 @@ public class Blocks{
             requirements(Category.defense, with(Items.copper, 6));
             health = 80 * wallHealthMultiplier;
             researchCostMultiplier = 0.1f;
-            breakable = true;
-            destructible = false;
         }};
 
         copperWallLarge = new Wall("copper-wall-large"){{
             requirements(Category.defense, ItemStack.mult(copperWall.requirements, 4));
             health = 80 * 4 * wallHealthMultiplier;
             size = 2;
-            breakable = false;
-            destructible = true;
         }};
 
         titaniumWall = new Wall("titanium-wall"){{
             requirements(Category.defense, with(Items.titanium, 6));
             health = 110 * wallHealthMultiplier;
-            breakable = false;
-            destructible = false;
         }};
 
         titaniumWallLarge = new Wall("titanium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(titaniumWall.requirements, 4));
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
-            breakable = true;
-            destructible = true;
         }};
 
         plastaniumWall = new Wall("plastanium-wall"){{
