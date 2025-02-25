@@ -416,12 +416,12 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean passable(){
-        return !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible && !block.update)));
+        return !((floor.solid && (block == Blocks.air || block.solidifes)) || (block.solid && (!block.destructible)));
     }
 
     /** Whether this block was placed by a player/unit. */
     public boolean synthetic(){
-        return block.update || block.destructible;
+        return block.update || block.breakable || block.destructible;
     }
 
     public boolean solid(){
@@ -429,7 +429,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean breakable(){
-        return block.destructible || block.breakable || block.update;
+        return  block.breakable || block.update;
     }
 
     /** @return whether the floor on this tile deals damage or can be drowned on. */
