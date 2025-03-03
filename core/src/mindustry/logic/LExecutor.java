@@ -578,6 +578,8 @@ public class LExecutor{
                     output.numval = fromVar.numval;
                     output.isobj = fromVar.isobj;
                 }
+            }else if(from instanceof CharSequence str){
+                output.setnum(address < 0 || address >= str.length() ? 0 : (int)str.charAt(address));
             }
         }
     }
