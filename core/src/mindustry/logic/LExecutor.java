@@ -1033,7 +1033,8 @@ public class LExecutor{
 
                 String strValue = toString(value.objval);
 
-                if(strValue.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
+                //Allow printing long strings, but only once
+                if(exec.textBuffer.length() != 0 && strValue.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
                 exec.textBuffer.append(strValue);
             }else{
                 //display integer version when possible
