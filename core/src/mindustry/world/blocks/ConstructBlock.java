@@ -269,6 +269,8 @@ public class ConstructBlock extends Block{
                 setConstruct(previous, current);
             }
 
+            boolean infinite = team.rules().infiniteResources || state.rules.infiniteResources;
+
             float maxProgress = core == null || team.rules().infiniteResources ? amount : checkRequired(core.items, amount, false);
 
             for(int i = 0; i < current.requirements.length; i++){
@@ -285,7 +287,7 @@ public class ConstructBlock extends Block{
                 boolean canFinish = true;
 
                 //look at leftover resources to consume, get them from the core if necessary, delay building if not
-                if(!state.rules.infiniteResources){
+                if(!infinite){
                     for(int i = 0; i < itemsLeft.length; i++){
                         if(itemsLeft[i] > 0){
                             if(core != null && core.items.has(current.requirements[i].item, itemsLeft[i])){
