@@ -27,6 +27,12 @@
     ]
   },
   {
+    "name": "Tendhost",
+    "address": [
+      "tendhost.ru:7576"
+    ]
+  },
+  {
     "name": "gods field",
     "address": [
       "n2.akiracloud.net:10225",
