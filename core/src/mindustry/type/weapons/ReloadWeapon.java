@@ -69,20 +69,26 @@ public class ReloadWeapon extends TargetWeapon{
             mount.side = !mount.side;
         }
 
-        if( //TODO move to separate method?
-            mount.shoot && //must be shooting
+        if(canShoot(unit, mount, wasFlipped)){
+            shoot(unit, mount, bulletX, bulletY, shootAngle);
+
+            mount.reload = reload;
+        }
+    }
+
+    public boolean canShoot(Unit unit, ReloadWeaponMount mount, boolean wasFlipped){
+        return mount.shoot && //must be shooting
             unit.canShoot() && //must be able to shoot
             (!alternate || wasFlipped == flipSprite) &&
             mount.warmup >= minWarmup && //must be warmed up
             unit.vel.len() >= minShootVelocity && //check velocity requirements
             unit.vel.len() >= minShootVelocity && //check velocity requirements
-            mount.reload <= 0.0001f && //reload has to be 0
-            (alwaysShooting || Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone))
-        ){
-            shoot(unit, mount, bulletX, bulletY, shootAngle);
+            loaded(unit, mount) && //reload has to be 0
+            (alwaysShooting || Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone));
+    }
 
-            mount.reload = reload;
-        }
+    public boolean loaded(Unit unit, ReloadWeaponMount mount){
+        return mount.reload <= 0.0001f;
     }
 
     protected float bulletRotation(Unit unit, ReloadWeaponMount mount, float bulletX, float bulletY){

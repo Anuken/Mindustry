@@ -7,7 +7,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.types.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -17,6 +16,8 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.weapons.*;
 import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 public class Weapon extends ReloadWeapon{
     /** bullet shot */
@@ -80,6 +81,10 @@ public class Weapon extends ReloadWeapon{
             t.row();
             t.add("[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)inaccuracy + " " + StatUnit.degrees.localized());
         }
+        if(reload > 0 && !bullet.killShooter){
+            t.row();
+            t.add("[lightgray]" + Stat.reload.localized() + ": " + (mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / reload * shoot.shots, 2) + " " + StatUnit.perSecond.localized());
+        }
 
         StatValues.ammo(ObjectMap.of(u, bullet)).display(t);
     }
@@ -93,7 +98,9 @@ public class Weapon extends ReloadWeapon{
     }
 
     @Override
-    public void update(Unit unit, BaseWeaponMount m){
+    public void updateReductions(Unit unit, BaseWeaponMount m){
+        super.updateReductions(unit, m);
+
         WeaponMount mount = (WeaponMount)m;
 
         if(recoils > 0){
@@ -102,8 +109,6 @@ public class Weapon extends ReloadWeapon{
                 mount.recoils[i] = Mathf.approachDelta(mount.recoils[i], 0, unit.reloadMultiplier / recoilTime);
             }
         }
-
-        super.update(unit, m);
     }
 
     @Override
@@ -154,6 +159,12 @@ public class Weapon extends ReloadWeapon{
         return Units.invalidateTarget(target, unit.team, x, y, range + Math.abs(shootY));
     }
 
+    @Override
+    public boolean canShoot(Unit unit, ReloadWeaponMount mount, boolean wasFlipped){
+        return super.canShoot(unit, mount, wasFlipped) &&
+            (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo); //check ammo
+    }
+
     protected void shoot(Unit unit, ReloadWeaponMount m, float shootX, float shootY, float rotation){
         WeaponMount mount = (WeaponMount)m;
 
@@ -182,6 +193,11 @@ public class Weapon extends ReloadWeapon{
                 bullet(unit, mount, xOffset, yOffset, angle, mover);
             }
         }, () -> mount.barrelCounter++);
+
+        if(useAmmo){
+            unit.ammo--;
+            if(unit.ammo < 0) unit.ammo = 0;
+        }
     }
 
     protected void bullet(Unit unit, WeaponMount mount, float xOffset, float yOffset, float angleOffset, Mover mover){

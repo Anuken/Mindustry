@@ -41,8 +41,9 @@ public class TargetWeapon extends BaseWeapon{
 
     @Override
     public void update(Unit unit, BaseWeaponMount mount){
+        updateReductions(unit, mount);
         updateTargeting(unit, (TargetWeaponMount)mount);
-        super.update(unit, mount);
+        updateRotation(unit, mount);
     }
 
     public void updateTargeting(Unit unit, TargetWeaponMount mount){

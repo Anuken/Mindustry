@@ -47,9 +47,11 @@ public class ContinuousWeapon extends Weapon{
 
     @Override
     public void update(Unit unit, BaseWeaponMount mount){
-        super.update(unit, mount);
-
+        updateReductions(unit, mount);
+        updateTargeting(unit, (TargetWeaponMount)mount);
+        updateRotation(unit, mount);
         updateContinuous(unit, (WeaponMount)mount);
+        updateShooting(unit, (ReloadWeaponMount)mount);
     }
 
     public void updateContinuous(Unit unit, WeaponMount mount){
@@ -102,6 +104,11 @@ public class ContinuousWeapon extends Weapon{
                 mount.sound.update(bulletX, bulletY, false);
             }
         }
+    }
+
+    @Override
+    public boolean loaded(Unit unit, ReloadWeaponMount mount){
+        return super.loaded(unit, mount) || (alwaysContinuous && ((WeaponMount)mount).bullet == null);
     }
 
     @Override
