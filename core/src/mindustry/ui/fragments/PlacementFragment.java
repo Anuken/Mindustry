@@ -280,20 +280,17 @@ public class PlacementFragment{
                     group.setMinCheckCount(0);
 
                     for(Block block : getUnlockedByCategory(currentCategory)){
-                        if(!unlocked(block)) continue;
                         if(index++ % rowWidth == 0){
                             blockTable.row();
                         }
 
                         ImageButton button = blockTable.button(new TextureRegionDrawable(block.uiIcon), Styles.selecti, () -> {
-                            if(unlocked(block)){
-                                if((Core.input.keyDown(KeyCode.shiftLeft) || Core.input.keyDown(KeyCode.controlLeft)) && Fonts.getUnicode(block.name) != 0){
-                                    Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
-                                    ui.showInfoFade("@copied");
-                                }else{
-                                    control.input.block = control.input.block == block ? null : block;
-                                    selectedBlocks.put(currentCategory, control.input.block);
-                                }
+                            if((Core.input.keyDown(KeyCode.shiftLeft) || Core.input.keyDown(KeyCode.controlLeft)) && Fonts.getUnicode(block.name) != 0){
+                                Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
+                                ui.showInfoFade("@copied");
+                            }else{
+                                control.input.block = control.input.block == block ? null : block;
+                                selectedBlocks.put(currentCategory, control.input.block);
                             }
                         }).size(46f).group(group).name("block-" + block.name).get();
                         button.resizeImage(iconMed);
