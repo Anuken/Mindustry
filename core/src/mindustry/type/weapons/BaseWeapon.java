@@ -209,7 +209,7 @@ public class BaseWeapon implements Cloneable{
     }
 
     public void updateRotation(Unit unit, BaseWeaponMount mount){
-        if(rotate && mount.rotate){
+        if(rotate && (mount.rotate || mount.shoot) && unit.canShoot()){
             float axisX = unit.x + Angles.trnsx(unit.rotation - 90,  x, y),
                 axisY = unit.y + Angles.trnsy(unit.rotation - 90,  x, y);
 
