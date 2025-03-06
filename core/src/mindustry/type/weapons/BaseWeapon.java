@@ -1,11 +1,14 @@
 package mindustry.type.weapons;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -80,14 +83,17 @@ public class BaseWeapon implements Cloneable{
         return display;
     }
 
+    public void addStats(UnitType u, Table w){
+    }
+
     public void draw(Unit unit, BaseWeaponMount mount){
 
         float
             rotation = unit.rotation - 90,
             realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil,
             weaponRotation  = rotation + (rotate ? mount.rotation : baseRotation),
-            wx = unit.x + Angles.trnsx(rotation, x, y),
-            wy = unit.y + Angles.trnsy(rotation, x, y);
+            wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -realRecoil),
+            wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -realRecoil);
 
         drawWeapon(unit, mount, wx, wy, weaponRotation);
     }
@@ -106,6 +112,7 @@ public class BaseWeapon implements Cloneable{
         }
 
         if(parts.size > 0){
+            setPartParams(unit, mount, wx, wy, weaponRotation);
             drawPartsUnder(unit, mount, wx, wy, weaponRotation);
         }
 
@@ -147,10 +154,12 @@ public class BaseWeapon implements Cloneable{
         Draw.xscl = 1f;
     }
 
-    public void drawPartsUnder(Unit unit, BaseWeaponMount mount, float wx, float wy, float weaponRotation){
+    public void setPartParams(Unit unit, BaseWeaponMount mount, float wx, float wy, float weaponRotation){
         DrawPart.params.set(mount.warmup, 0, 0, mount.heat, mount.recoil, 0, wx, wy, weaponRotation + 90);
         DrawPart.params.sideMultiplier = flipSprite ? -1 : 1;
+    }
 
+    public void drawPartsUnder(Unit unit, BaseWeaponMount mount, float wx, float wy, float weaponRotation){
         for(int i = 0; i < parts.size; i++){
             var part = parts.get(i);
             if(part.under){
@@ -203,11 +212,39 @@ public class BaseWeapon implements Cloneable{
         }
     }
 
+    public void flip(){
+        x *= -1;
+        shootX *= -1;
+        baseRotation *= -1f;
+        flipSprite = !flipSprite;
+    }
+
     public BaseWeapon copy(){
         try{
             return (BaseWeapon)clone();
         }catch(CloneNotSupportedException excuseMe){
             throw new RuntimeException("how have you done this", excuseMe);
         }
+    }
+
+    @CallSuper
+    public void init(){
+    }
+
+    public void load(){
+        region = Core.atlas.find(name);
+        heatRegion = Core.atlas.find(name + "-heat");
+        cellRegion = Core.atlas.find(name + "-cell");
+        outlineRegion = Core.atlas.find(name + "-outline");
+
+        for(var part : parts){
+            part.turretShading = false;
+            part.load(name);
+        }
+    }
+
+    @Override
+    public String toString(){
+        return name == null || name.isEmpty() ? "Weapon" : "Weapon: " + name;
     }
 }

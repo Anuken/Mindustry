@@ -5,6 +5,7 @@ import arc.math.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 
+/** A weapon that visually displays the unit's building beam. */
 public class BuildWeaponR extends BaseWeapon{
     public BuildWeaponR(String name){
         super(name);
@@ -29,6 +30,7 @@ public class BuildWeaponR extends BaseWeapon{
             mount.aimX = unit.buildPlan().drawx();
             mount.aimY = unit.buildPlan().drawy();
             mount.shoot = Angles.within(mount.rotation, mount.targetRotation, shootCone);
+            if(mount.shoot) mount.recoil = 1f;
         }else{
             //aim for baseRotation
             float weaponRotation = unit.rotation - 90 + baseRotation;

@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 
+/** A weapon that visually displays the unit's mining beam. */
 public class MineWeaponR extends BaseWeapon{
     public MineWeaponR(String name){
         super(name);
@@ -30,6 +31,7 @@ public class MineWeaponR extends BaseWeapon{
             mount.aimX = unit.mineTile().drawx();
             mount.aimY = unit.mineTile().drawy();
             mount.shoot = Angles.within(mount.rotation, mount.targetRotation, shootCone);
+            if(mount.shoot) mount.recoil = 1f;
         }else{
             //aim for baseRotation
             float weaponRotation = unit.rotation - 90 + baseRotation;
