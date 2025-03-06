@@ -39,7 +39,7 @@ public class BaseWeapon implements Cloneable{
     /** The half-radius of the cone in which shooting will start. */
     public float shootCone = 5f;
     /** offsets of weapon position on unit */
-    public float x = 5f, y = 0f;
+    public float x = 0f, y = 0f;
     /** projectile/effect offsets from center of weapon */
     public float shootX = 0f, shootY = 3f;
     /** radius of shadow drawn under the weapon; <0 to disable */

@@ -127,6 +127,7 @@ public class UnitTypes{
             weapons.add(new Weapon("flamethrower"){{
                 top = false;
                 shootSound = Sounds.flame;
+                x = 5f;
                 shootY = 2f;
                 reload = 11f;
                 recoil = 1f;
