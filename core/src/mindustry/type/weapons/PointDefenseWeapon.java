@@ -7,7 +7,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 public class PointDefenseWeapon extends ReloadWeapon{
     public Color color = Color.white;

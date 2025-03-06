@@ -5,16 +5,13 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ai.types.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
-import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.headless;
+import static mindustry.Vars.*;
 
 public class ContinuousWeapon extends Weapon{
     /** sound used for continuous shooting */
