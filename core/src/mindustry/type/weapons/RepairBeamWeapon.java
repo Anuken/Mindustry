@@ -20,6 +20,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
+/** Rotation must be set to true. Fixed repair points are not supported. */
 public class RepairBeamWeapon extends TargetWeapon{
     public boolean targetBuildings = false, targetUnits = true;
 
