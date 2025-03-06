@@ -72,6 +72,7 @@ public class Weapon extends ReloadWeapon{
 
     {
         mountType = WeaponMount::new;
+        shootEffect = smokeEffect = null;
     }
 
     public void addStats(UnitType u, Table t){
@@ -238,8 +239,8 @@ public class Weapon extends ReloadWeapon{
     @Override
     public void init(){
         range = bullet.range;
-        shootEffect = bullet.shootEffect;
-        smokeEffect = bullet.smokeEffect;
+        if(shootEffect == null) shootEffect = bullet.shootEffect;
+        if(smokeEffect == null) smokeEffect = bullet.smokeEffect;
         targetAir = bullet.collidesAir;
         targetGround = bullet.collidesGround;
     }

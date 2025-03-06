@@ -24,8 +24,8 @@ public class ReloadWeapon extends TargetWeapon{
     public boolean alwaysShooting = false;
     /** sound used for shooting */
     public Sound shootSound = Sounds.pew;
-    public Effect shootEffect = Fx.shootSmall;
-    public Effect smokeEffect = Fx.shootSmallSmoke;
+    public @Nullable Effect shootEffect = Fx.shootSmall;
+    public @Nullable Effect smokeEffect = Fx.shootSmallSmoke;
     /** internal value used for alternation - do not change! */
     public int otherSide = -1;
 
