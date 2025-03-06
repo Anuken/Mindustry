@@ -4103,7 +4103,7 @@ public class UnitTypes{
 
             weapons.add(new RepairBeamWeapon(){{
                 widthSinMag = 0.11f;
-                healEffectInterval = 20f;
+                reload = 20f;
                 range = 60f;
                 x = 0f;
                 y = 6.5f;
@@ -4167,7 +4167,7 @@ public class UnitTypes{
 
             weapons.add(new RepairBeamWeapon(){{
                 widthSinMag = 0.11f;
-                healEffectInterval = 20f;
+                reload = 20f;
                 range = 60f;
                 x = 0f;
                 y = 7.5f;
@@ -4245,7 +4245,7 @@ public class UnitTypes{
 
             weapons.add(new RepairBeamWeapon(){{
                 widthSinMag = 0.11f;
-                healEffectInterval = 20f;
+                reload = 20f;
                 range = 65f;
                 x = 19f/4f;
                 y = 19f/4f;

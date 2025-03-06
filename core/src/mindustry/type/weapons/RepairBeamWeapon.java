@@ -37,7 +37,8 @@ public class RepairBeamWeapon extends TargetWeapon{
     //only for blocks
     public Color healColor = Pal.heal;
     public Effect healEffect = Fx.healBlockFull;
-    public float healEffectInterval = 1f;
+    /** actually controls the interval in which the heal effect is displayed. named as such for json backwards compatibility. */
+    public float reload = 1f;
 
     public RepairBeamWeapon(String name){
         super(name);
@@ -120,7 +121,7 @@ public class RepairBeamWeapon extends TargetWeapon{
         heal.strength = Mathf.lerpDelta(heal.strength, Mathf.num(autoTarget ? heal.target != null : canShoot), 0.2f);
 
         //create heal effect periodically
-        if(canShoot && heal.target instanceof Building b && b.damaged() && (heal.effectTimer += Time.delta) >= healEffectInterval){
+        if(canShoot && heal.target instanceof Building b && b.damaged() && (heal.effectTimer += Time.delta) >= reload){
             healEffect.at(b.x, b.y, 0f, healColor, b.block);
             heal.effectTimer = 0f;
         }
