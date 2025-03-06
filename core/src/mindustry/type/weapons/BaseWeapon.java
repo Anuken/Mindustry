@@ -56,6 +56,8 @@ public class BaseWeapon implements Cloneable{
     public float recoilTime = -1f;
     /** power curve applied to visual recoil */
     public float recoilPow = 1.8f;
+    /** ticks to cool down the heat region */
+    public float cooldownTime = 20f;
     /** displayed region (autoloaded) */
     public TextureRegion region;
     /** heat region, must be same size as region (optional) */
@@ -191,6 +193,7 @@ public class BaseWeapon implements Cloneable{
         }
 
         updateRotation(unit, mount);
+        updateCooldown(unit, mount);
     }
 
     public void updateRotation(Unit unit, BaseWeaponMount mount){
@@ -210,6 +213,10 @@ public class BaseWeapon implements Cloneable{
             mount.rotation = baseRotation;
             mount.targetRotation = unit.angleTo(mount.aimX, mount.aimY);
         }
+    }
+
+    public void updateCooldown(Unit unit, BaseWeaponMount mount){
+        mount.heat = Math.max(mount.heat - Time.delta * unit.reloadMultiplier / cooldownTime, 0);
     }
 
     public void flip(){

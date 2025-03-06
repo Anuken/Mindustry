@@ -2,33 +2,26 @@ package mindustry.type.weapons;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
-import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 
-/** Purely visual turret. Does not shoot anything. */
-public class BuildWeapon extends Weapon{
+/** A weapon that visually displays the unit's building beam. */
+public class BuildWeapon extends BaseWeapon{
+    public BuildWeapon(String name){
+        super(name);
+    }
 
     public BuildWeapon(){
         super();
     }
 
-    public BuildWeapon(String name){
-        super(name);
-    }
-
     {
         rotate = true;
-        noAttack = true;
-        predictTarget = false;
         display = false;
-        bullet = new BulletType();
-        useAttackRange = false;
     }
 
     @Override
-    public void update(Unit unit, WeaponMount mount){
+    public void update(Unit unit, BaseWeaponMount mount){
         mount.shoot = false;
         mount.rotate = true;
 
@@ -36,30 +29,26 @@ public class BuildWeapon extends Weapon{
         if(unit.activelyBuilding()){
             mount.aimX = unit.buildPlan().drawx();
             mount.aimY = unit.buildPlan().drawy();
+            mount.shoot = Angles.within(mount.rotation, mount.targetRotation, shootCone);
+            if(mount.shoot) mount.recoil = mount.heat = 1f;
         }else{
-            //aim for front
+            //aim for baseRotation
             float weaponRotation = unit.rotation - 90 + baseRotation;
-            mount.aimX = unit.x + Angles.trnsx(unit.rotation - 90, x, y) + Angles.trnsx(weaponRotation, this.shootX, this.shootY);
-            mount.aimY = unit.y + Angles.trnsy(unit.rotation - 90, x, y) + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
+            mount.aimX = unit.x + Angles.trnsx(unit.rotation - 90, x, y) + Angles.trnsx(weaponRotation, shootX, shootY);
+            mount.aimY = unit.y + Angles.trnsy(unit.rotation - 90, x, y) + Angles.trnsy(weaponRotation, shootX, shootY);
         }
 
         super.update(unit, mount);
     }
 
     @Override
-    public void draw(Unit unit, WeaponMount mount){
-        super.draw(unit, mount);
+    public void drawWeapon(Unit unit, BaseWeaponMount mount, float wx, float wy, float weaponRotation){
+        super.drawWeapon(unit, mount, wx, wy, weaponRotation);
 
-        if(unit.activelyBuilding()){
-            float
-            z = Draw.z(),
-            rotation = unit.rotation - 90,
-            weaponRotation  = rotation + (rotate ? mount.rotation : 0),
-            wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
-            wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -mount.recoil),
-            px = wx + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
-            py = wy + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
-
+        if(unit.activelyBuilding() && mount.shoot){
+            float z = Draw.z(),
+                px = wx + Angles.trnsx(weaponRotation, shootX, shootY),
+                py = wy + Angles.trnsy(weaponRotation, shootX, shootY);
             unit.drawBuildingBeam(px, py);
             Draw.z(z);
         }

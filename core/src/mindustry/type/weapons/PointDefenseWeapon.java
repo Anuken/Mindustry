@@ -5,36 +5,28 @@ import arc.math.*;
 import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.state;
 
-/**
- * Note that this requires several things:
- * - A bullet with positive maxRange
- * - A bullet with positive damage
- * - Rotation
- * */
-public class PointDefenseWeapon extends Weapon{
+public class PointDefenseWeapon extends ReloadWeapon{
     public Color color = Color.white;
     public Effect beamEffect = Fx.pointBeam;
+    public Effect hitEffect = Fx.hitBulletSmall;
+    public float damage = 10;
 
     public PointDefenseWeapon(String name){
         super(name);
     }
 
     public PointDefenseWeapon(){
+        super();
     }
 
     {
-        predictTarget = false;
         autoTarget = true;
         controllable = false;
         rotate = true;
-        useAmmo = false;
-        useAttackRange = false;
         targetInterval = 10f;
     }
 
@@ -49,11 +41,11 @@ public class PointDefenseWeapon extends Weapon{
     }
 
     @Override
-    protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float rotation){
+    protected void shoot(Unit unit, ReloadWeaponMount mount, float shootX, float shootY, float rotation){
         if(!(mount.target instanceof Bullet target)) return;
 
         // not sure whether it should multiply by the damageMultiplier of the unit
-        float bulletDamage = bullet.damage * unit.damageMultiplier() * state.rules.unitDamage(unit.team);
+        float bulletDamage = damage * unit.damageMultiplier() * state.rules.unitDamage(unit.team);
         if(target.damage() > bulletDamage){
             target.damage(target.damage() - bulletDamage);
         }else{
@@ -61,8 +53,8 @@ public class PointDefenseWeapon extends Weapon{
         }
 
         beamEffect.at(shootX, shootY, rotation, color, new Vec2().set(target));
-        bullet.shootEffect.at(shootX, shootY, rotation, color);
-        bullet.hitEffect.at(target.x, target.y, color);
+        shootEffect.at(shootX, shootY, rotation, color);
+        hitEffect.at(target.x, target.y, color);
         shootSound.at(shootX, shootY, Mathf.random(0.9f, 1.1f));
         mount.recoil = 1f;
         mount.heat = 1f;

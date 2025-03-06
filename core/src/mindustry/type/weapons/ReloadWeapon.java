@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 
 public class ReloadWeapon extends TargetWeapon{
@@ -39,6 +40,12 @@ public class ReloadWeapon extends TargetWeapon{
         mountType = ReloadWeaponMount::new;
     }
 
+    @Override
+    public void update(Unit unit, BaseWeaponMount mount){
+        super.update(unit, mount);
+        updateShooting(unit, (ReloadWeaponMount)mount);
+    }
+
     public void updateShooting(Unit unit, ReloadWeaponMount mount){
         float lastReload = mount.reload;
         mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
@@ -51,6 +58,8 @@ public class ReloadWeapon extends TargetWeapon{
             bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
             bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY),
             shootAngle = bulletRotation(unit, mount, bulletX, bulletY);
+
+        if(alwaysShooting) mount.shoot = true;
 
         boolean wasFlipped = mount.side;
         if(otherSide != -1 && alternate && mount.side == flipSprite && mount.reload <= reload / 2f && lastReload > reload / 2f){
