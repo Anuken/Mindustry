@@ -1,10 +1,12 @@
 package mindustry.type.weapons;
 
+import arc.audio.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.types.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -15,6 +17,8 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.headless;
 
 public class ContinuousWeapon extends Weapon{
+    /** sound used for continuous shooting */
+    public @Nullable Sound loopSound = null;
     /** whether this weapon uses continuous fire without reloading */
     public boolean alwaysContinuous;
     /** Speed at which the turret can change its bullet "aim" distance. This is only used for point laser bullets. */
@@ -67,8 +71,8 @@ public class ContinuousWeapon extends Weapon{
                 mount.reload = reload;
                 mount.recoil = mount.heat = 1f;
                 unit.vel.add(Tmp.v1.trns(mBullet.rotation() + 180f, mBullet.type.recoil * Time.delta));
-                if(shootSound != Sounds.none && !headless){
-                    if(mount.sound == null) mount.sound = new SoundLoop(shootSound, 1f);
+                if(loopSound != Sounds.none && !headless){
+                    if(mount.sound == null) mount.sound = new SoundLoop(loopSound, 1f);
                     mount.sound.update(bulletX, bulletY, true);
                 }
 
@@ -97,6 +101,29 @@ public class ContinuousWeapon extends Weapon{
             if(mount.sound != null){
                 mount.sound.update(bulletX, bulletY, false);
             }
+        }
+    }
+
+    @Override
+    protected void handleBullet(Unit unit, WeaponMount mount, Bullet bullet){
+        float
+            weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
+            mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
+            mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
+            bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
+            bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
+        //make sure the length updates to the last set value
+        Tmp.v1.trns(bulletRotation(unit, mount, bulletX, bulletY), shootY + mount.lastLength).add(bulletX, bulletY);
+        bullet.aimX = Tmp.v1.x;
+        bullet.aimY = Tmp.v1.y;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+        if(loopSound == null){
+            loopSound = shootSound;
+            shootSound = Sounds.none;
         }
     }
 }

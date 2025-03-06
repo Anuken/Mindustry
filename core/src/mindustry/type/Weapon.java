@@ -202,9 +202,7 @@ public class Weapon extends ReloadWeapon{
         mount.bullet = bullet.create(unit, shooter, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY, mount.target);
         handleBullet(unit, mount, mount.bullet);
 
-        if(!continuous){
-            shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
-        }
+        shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
 
         ejectEffect.at(mountX, mountY, angle * Mathf.sign(this.x));
         bullet.shootEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
@@ -221,18 +219,6 @@ public class Weapon extends ReloadWeapon{
 
     //override to do special things to a bullet after spawning
     protected void handleBullet(Unit unit, WeaponMount mount, Bullet bullet){
-        if(continuous){
-            float
-                weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
-                mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
-                mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
-                bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
-                bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
-            //make sure the length updates to the last set value
-            Tmp.v1.trns(bulletRotation(unit, mount, bulletX, bulletY), shootY + mount.lastLength).add(bulletX, bulletY);
-            bullet.aimX = Tmp.v1.x;
-            bullet.aimY = Tmp.v1.y;
-        }
     }
 
     @Override
@@ -249,7 +235,7 @@ public class Weapon extends ReloadWeapon{
         shoot.flip();
     }
 
-    @CallSuper
+    @Override
     public void init(){
         range = bullet.range;
         shootEffect = bullet.shootEffect;
