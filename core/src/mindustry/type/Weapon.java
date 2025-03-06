@@ -26,7 +26,7 @@ public class Weapon extends ReloadWeapon{
     public Effect ejectEffect = Fx.none;
     /** whether to consume ammo when ammo is enabled in rules */
     public boolean useAmmo = true;
-    /** @deprecated use ContinuousWeapon instead. Kept for json parsing. */
+    /** @deprecated use ContinuousWeapon instead. Kept for backward compatibility in json parsing. */
     public boolean continuous;
     /** whether to perform target trajectory prediction */
     public boolean predictTarget = true;
