@@ -42,11 +42,11 @@ public class ContinuousWeapon extends Weapon{
     }
 
     @Override
-    public void update(Unit unit, BaseWeaponMount m){
-        super.update(unit, m);
+    public void update(Unit unit, BaseWeaponMount mount){
+        super.update(unit, mount);
+
+        updateContinuous(unit, (WeaponMount)mount);
     }
-
-
 
     public void updateContinuous(Unit unit, WeaponMount mount){
         float
@@ -65,7 +65,7 @@ public class ContinuousWeapon extends Weapon{
                 mBullet.rotation(weaponRotation + 90);
                 mBullet.set(bulletX, bulletY);
                 mount.reload = reload;
-                mount.recoil = 1f;
+                mount.recoil = mount.heat = 1f;
                 unit.vel.add(Tmp.v1.trns(mBullet.rotation() + 180f, mBullet.type.recoil * Time.delta));
                 if(shootSound != Sounds.none && !headless){
                     if(mount.sound == null) mount.sound = new SoundLoop(shootSound, 1f);
@@ -92,7 +92,7 @@ public class ContinuousWeapon extends Weapon{
                 }
             }
         }else{
-            updateCooldown(unit, mount);
+            mount.heat = Math.max(mount.heat - Time.delta * unit.reloadMultiplier / cooldownTime, 0);
 
             if(mount.sound != null){
                 mount.sound.update(bulletX, bulletY, false);

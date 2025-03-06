@@ -203,9 +203,9 @@ public class BaseWeapon implements Cloneable{
         }else{
             mount.warmup = Mathf.lerpDelta(mount.warmup, warmupTarget, shootWarmupSpeed);
         }
+        mount.heat = Math.max(mount.heat - Time.delta * unit.reloadMultiplier / cooldownTime, 0);
 
         updateRotation(unit, mount);
-        updateCooldown(unit, mount);
     }
 
     public void updateRotation(Unit unit, BaseWeaponMount mount){
@@ -225,10 +225,6 @@ public class BaseWeapon implements Cloneable{
             mount.rotation = baseRotation;
             mount.targetRotation = unit.angleTo(mount.aimX, mount.aimY);
         }
-    }
-
-    public void updateCooldown(Unit unit, BaseWeaponMount mount){
-        mount.heat = Math.max(mount.heat - Time.delta * unit.reloadMultiplier / cooldownTime, 0);
     }
 
     public void flip(){

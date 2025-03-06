@@ -32,7 +32,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     }
 
     void setupWeapons(UnitType def){
-        mounts = new WeaponMount[def.weapons.size];
+        mounts = new BaseWeaponMount[def.weapons.size];
         for(int i = 0; i < mounts.length; i++){
             mounts[i] = def.weapons.get(i).mountType.get(def.weapons.get(i));
         }
