@@ -30,6 +30,7 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
 import mindustry.type.ammo.*;
+import mindustry.type.weapons.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -261,7 +262,9 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** list of "abilities", which are various behaviors that update each frame */
     public Seq<Ability> abilities = new Seq<>();
     /** All weapons that this unit will shoot with. */
-    public Seq<Weapon> weapons = new Seq<>();
+    public Seq<BaseWeapon> weapons = new Seq<>();
+    /** First weapon in the list. */
+    public @Nullable Weapon firstWeapon = null;
     /** None of the status effects in this set can be applied to this unit. */
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
 
@@ -512,6 +515,10 @@ public class UnitType extends UnlockableContent implements Senseable{
         return weapons.size > 0;
     }
 
+    public boolean hasOffensiveWeapons(){
+        return weapons.contains(w -> w instanceof Weapon);
+    }
+
     public boolean targetable(Unit unit, Team targeter){
         return targetable || (vulnerableWithPayloads && unit instanceof Payloadc p && p.hasPayload());
     }
@@ -684,7 +691,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     protected void validateWeapons(){
         for(int i = 0; i < weapons.size; i++){
             var wep = weapons.get(i);
-            if(wep.bullet == Bullets.placeholder || wep.bullet == null){
+            if(wep instanceof Weapon w && (w.bullet == Bullets.placeholder || w.bullet == null)){
                 throw new RuntimeException("Unit: " + name + ": weapon #" + i + " ('" + wep.name + "') does not have a bullet defined. Make sure you have a bullet: (JSON) or `bullet = ` field in your unit definition.");
             }
         }
@@ -733,7 +740,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         //if a status effects slows a unit when firing, don't shoot while moving.
         if(autoFindTarget){
-            autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
+            autoFindTarget = !weapons.contains(weapon -> weapon instanceof Weapon w && w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
         }
 
         if(flyingLayer < 0) flyingLayer = lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit;
@@ -747,27 +754,30 @@ public class UnitType extends UnlockableContent implements Senseable{
         //assume slight range margin
         float margin = 4f;
 
-        boolean skipWeapons = !weapons.contains(w -> !w.useAttackRange);
+        boolean skipWeapons = !weapons.contains(weapon -> weapon instanceof Weapon w && !w.useAttackRange);
 
         //set up default range
         if(range < 0){
             range = Float.MAX_VALUE;
-            for(Weapon weapon : weapons){
-                if(!weapon.useAttackRange && skipWeapons) continue;
+            weapons.each(w -> w instanceof Weapon, w -> {
+                Weapon weapon = (Weapon)w;
+
+                if(!weapon.useAttackRange && skipWeapons) return;
 
                 range = Math.min(range, weapon.range() - margin);
                 maxRange = Math.max(maxRange, weapon.range() - margin);
-            }
+            });
         }
 
         if(maxRange < 0){
             maxRange = Math.max(0f, range);
 
-            for(Weapon weapon : weapons){
-                if(!weapon.useAttackRange && skipWeapons) continue;
+            weapons.each(w -> w instanceof Weapon, w -> {
+                Weapon weapon = (Weapon)w;
+                if(!weapon.useAttackRange && skipWeapons) return;
 
                 maxRange = Math.max(maxRange, weapon.range() - margin);
-            }
+            });
         }
 
         if(fogRadius < 0){
@@ -814,34 +824,39 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
 
         //add mirrored weapon variants
-        Seq<Weapon> mapped = new Seq<>();
-        for(Weapon w : weapons){
-            if(w.recoilTime < 0) w.recoilTime = w.reload;
+        Seq<BaseWeapon> mapped = new Seq<>();
+        for(BaseWeapon w : weapons){
+            ReloadWeapon rw = w instanceof ReloadWeapon r ? r : null;
+            if(rw != null && w.recoilTime < 0) w.recoilTime = rw.reload;
             mapped.add(w);
 
             //mirrors are copies with X values negated
             if(w.mirror){
-                Weapon copy = w.copy();
+                BaseWeapon copy = w.copy();
                 copy.flip();
                 mapped.add(copy);
 
                 //since there are now two weapons, the reload and recoil time must be doubled
                 w.recoilTime *= 2f;
                 copy.recoilTime *= 2f;
-                w.reload *= 2f;
-                copy.reload *= 2f;
+                if(rw != null){
+                    ReloadWeapon rCopy = (ReloadWeapon)copy;
+                    rw.reload *= 2f;
+                    rCopy.reload *= 2f;
 
-                w.otherSide = mapped.size - 1;
-                copy.otherSide = mapped.size - 2;
+                    rw.otherSide = mapped.size - 1;
+                    rCopy.otherSide = mapped.size - 2;
+                }
             }
         }
         this.weapons = mapped;
 
-        weapons.each(Weapon::init);
+        weapons.each(BaseWeapon::init);
+        firstWeapon = (Weapon)weapons.find(w -> w instanceof Weapon);
 
-        canHeal = weapons.contains(w -> w.bullet.heals());
+        canHeal = weapons.contains(weapon -> weapon instanceof Weapon w && w.bullet.heals());
 
-        canAttack = weapons.contains(w -> !w.noAttack);
+        canAttack = weapons.contains(weapon -> weapon instanceof Weapon w && !w.noAttack);
 
         //assign default commands.
         if(commands.size == 0){
@@ -892,7 +907,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         //dynamically create ammo capacity based on firing rate
         if(ammoCapacity < 0){
-            float shotsPerSecond = weapons.sumf(w -> w.useAmmo ? 60f / w.reload : 0f);
+            float shotsPerSecond = weapons.sumf(weapon -> weapon instanceof Weapon w && w.useAmmo ? 60f / w.reload : 0f);
             //duration of continuous fire without reload
             float targetSeconds = 35;
 
@@ -908,10 +923,10 @@ public class UnitType extends UnlockableContent implements Senseable{
     public float estimateDps(){
         //calculate estimated DPS for one target based on weapons
         if(dpsEstimate < 0){
-            dpsEstimate = weapons.sumf(Weapon::dps);
+            dpsEstimate = weapons.sumf(weapon -> weapon instanceof Weapon w ? w.dps() : 0f);
 
             //suicide enemy
-            if(weapons.contains(w -> w.bullet.killShooter)){
+            if(weapons.contains(weapon -> weapon instanceof Weapon w && w.bullet.killShooter)){
                 //scale down DPS to be insignificant
                 dpsEstimate /= 15f;
             }
@@ -928,7 +943,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         for(var part : parts){
             part.load(name);
         }
-        weapons.each(Weapon::load);
+        weapons.each(BaseWeapon::load);
         region = Core.atlas.find(name);
         previewRegion = Core.atlas.find(name + "-preview", name);
         legRegion = Core.atlas.find(name + "-leg");
@@ -980,7 +995,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     public void getRegionsToOutline(Seq<TextureRegion> out){
-        for(Weapon weapon : weapons){
+        for(BaseWeapon weapon : weapons){
             for(var part : weapon.parts){
                 part.getOutlines(out);
             }
@@ -1036,7 +1051,7 @@ public class UnitType extends UnlockableContent implements Senseable{
                 }
             }
 
-            for(Weapon weapon : weapons){
+            for(BaseWeapon weapon : weapons){
                 if(!weapon.name.isEmpty() && (minfo.mod == null || weapon.name.startsWith(minfo.mod.name)) && (weapon.top || !packer.isOutlined(weapon.name) || weapon.parts.contains(p -> p.under))){
                     makeOutline(PageType.main, packer, weapon.region, !weapon.top || weapon.parts.contains(p -> p.under), outlineColor, outlineRadius);
                 }
@@ -1309,9 +1324,9 @@ public class UnitType extends UnlockableContent implements Senseable{
             for(int i = 0; i < parts.size; i++){
                 var part = parts.get(i);
 
-                WeaponMount mount = unit.mounts.length > part.weaponIndex ? unit.mounts[part.weaponIndex] : null;
+                BaseWeaponMount mount = unit.mounts.length > part.weaponIndex ? unit.mounts[part.weaponIndex] : null;
                 if(mount != null){
-                    DrawPart.params.set(mount.warmup, mount.reload / mount.weapon.reload, mount.smoothReload, mount.heat, mount.recoil, mount.charge, unit.x, unit.y, unit.rotation);
+                    mount.weapon.setPartParams(unit, mount, unit.x, unit.y, unit.rotation);
                 }else{
                     DrawPart.params.set(0f, 0f, 0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation);
                 }
@@ -1488,7 +1503,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     public void drawWeapons(Unit unit){
         applyColor(unit);
 
-        for(WeaponMount mount : unit.mounts){
+        for(BaseWeaponMount mount : unit.mounts){
             mount.weapon.draw(unit, mount);
         }
 
@@ -1499,7 +1514,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         applyColor(unit);
         applyOutlineColor(unit);
 
-        for(WeaponMount mount : unit.mounts){
+        for(BaseWeaponMount mount : unit.mounts){
             if(!mount.weapon.top){
                 //apply layer offset, roll it back at the end
                 float z = Draw.z();

@@ -58,6 +58,8 @@ public class BaseWeapon implements Cloneable{
     public float recoilPow = 1.8f;
     /** ticks to cool down the heat region */
     public float cooldownTime = 20f;
+    /** whether shooter rotation is ignored when shooting. */
+    public boolean ignoreRotation = false;
     /** displayed region (autoloaded) */
     public TextureRegion region;
     /** heat region, must be same size as region (optional) */
@@ -89,7 +91,6 @@ public class BaseWeapon implements Cloneable{
     }
 
     public void draw(Unit unit, BaseWeaponMount mount){
-
         float
             rotation = unit.rotation - 90,
             realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil,
@@ -154,6 +155,17 @@ public class BaseWeapon implements Cloneable{
         Draw.xscl = -Mathf.sign(flipSprite);
         Draw.rect(outlineRegion, wx, wy, weaponRotation);
         Draw.xscl = 1f;
+    }
+
+    public void drawOutline(Unit unit, BaseWeaponMount mount){
+        float
+            rotation = unit.rotation - 90,
+            realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil,
+            weaponRotation  = rotation + (rotate ? mount.rotation : baseRotation),
+            wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -realRecoil),
+            wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -realRecoil);
+
+        drawOutline(unit, mount, wx, wy, weaponRotation);
     }
 
     public void setPartParams(Unit unit, BaseWeaponMount mount, float wx, float wy, float weaponRotation){

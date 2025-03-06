@@ -475,7 +475,7 @@ public class UnitTypes{
 
             singleTarget = true;
 
-            weapons.add(new Weapon("vela-weapon"){{
+            weapons.add(new ContinuousWeapon("vela-weapon"){{
                 mirror = false;
                 top = false;
                 shake = 4f;
@@ -489,7 +489,6 @@ public class UnitTypes{
                 recoil = 0f;
                 chargeSound = Sounds.lasercharge2;
                 shootSound = Sounds.beam;
-                continuous = true;
                 cooldownTime = 200f;
 
                 bullet = new ContinuousLaserBulletType(){{
@@ -520,15 +519,12 @@ public class UnitTypes{
             }});
 
             weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
+                range = 120f;
                 x = 44 / 4f;
                 y = -30f / 4f;
                 shootY = 6f;
                 beamWidth = 0.8f;
                 repairSpeed = 1.4f;
-
-                bullet = new BulletType(){{
-                    maxRange = 120f;
-                }};
             }});
         }};
 
@@ -1852,16 +1848,13 @@ public class UnitTypes{
             rotateToBuilding = false;
 
             weapons.add(new RepairBeamWeapon("repair-beam-weapon-center"){{
+                range = 120f;
                 x = 0f;
                 y = -5.5f;
                 shootY = 6f;
                 beamWidth = 0.8f;
                 mirror = false;
                 repairSpeed = 0.75f;
-
-                bullet = new BulletType(){{
-                    maxRange = 120f;
-                }};
             }});
 
             weapons.add(new Weapon("retusa-weapon"){{
@@ -1999,18 +1992,15 @@ public class UnitTypes{
 
             weapons.add(new PointDefenseWeapon("point-defense-mount"){{
                 mirror = false;
+                range = 100f;
                 x = 0f;
                 y = 1f;
                 reload = 9f;
+                damage = 17f;
                 targetInterval = 10f;
                 targetSwitchInterval = 15f;
-
-                bullet = new BulletType(){{
-                    shootEffect = Fx.sparkShoot;
-                    hitEffect = Fx.pointHit;
-                    maxRange = 100f;
-                    damage = 17f;
-                }};
+                shootEffect = Fx.sparkShoot;
+                hitEffect = Fx.pointHit;
             }});
 
         }};
@@ -2035,15 +2025,12 @@ public class UnitTypes{
             rotateToBuilding = false;
 
             weapons.add(new RepairBeamWeapon("repair-beam-weapon-center"){{
+                range = 130f;
                 x = 11f;
                 y = -10f;
                 shootY = 6f;
                 beamWidth = 0.8f;
                 repairSpeed = 0.7f;
-
-                bullet = new BulletType(){{
-                    maxRange = 130f;
-                }};
             }});
 
             weapons.add(new Weapon("plasma-missile-mount"){{
@@ -2185,18 +2172,15 @@ public class UnitTypes{
 
             for(float mountY : new float[]{-18f, 14}){
                 weapons.add(new PointDefenseWeapon("point-defense-mount"){{
+                    range = 180f;
+                    damage = 30f;
                     x = 12.5f;
                     y = mountY;
                     reload = 4f;
                     targetInterval = 8f;
                     targetSwitchInterval = 8f;
-
-                    bullet = new BulletType(){{
-                        shootEffect = Fx.sparkShoot;
-                        hitEffect = Fx.pointHit;
-                        maxRange = 180f;
-                        damage = 30f;
-                    }};
+                    shootEffect = Fx.sparkShoot;
+                    hitEffect = Fx.pointHit;
                 }});
             }
         }};
@@ -2222,7 +2206,7 @@ public class UnitTypes{
 
             for(float mountY : new float[]{-117/4f, 50/4f}){
                 for(float sign : Mathf.signs){
-                    weapons.add(new Weapon("plasma-laser-mount"){{
+                    weapons.add(new ContinuousWeapon("plasma-laser-mount"){{
                         shadow = 20f;
                         controllable = false;
                         autoTarget = true;
@@ -2240,7 +2224,6 @@ public class UnitTypes{
                         reload = 170f;
                         recoil = 1f;
                         shootSound = Sounds.beam;
-                        continuous = true;
                         cooldownTime = reload;
                         immunities.add(StatusEffects.burning);
 
@@ -3128,6 +3111,8 @@ public class UnitTypes{
             }});
 
             weapons.add(new PointDefenseWeapon("cleroi-point-defense"){{
+                range = 100f;
+                damage = 38f;
                 x = 16f / 4f;
                 y = -20f / 4f;
                 reload = 9f;
@@ -3136,13 +3121,9 @@ public class UnitTypes{
                 targetSwitchInterval = 12f;
                 recoil = 0.5f;
 
-                bullet = new BulletType(){{
-                    shootSound = Sounds.lasershoot;
-                    shootEffect = Fx.sparkShoot;
-                    hitEffect = Fx.pointHit;
-                    maxRange = 100f;
-                    damage = 38f;
-                }};
+                shootSound = Sounds.lasershoot;
+                shootEffect = Fx.sparkShoot;
+                hitEffect = Fx.pointHit;
             }});
         }};
 
@@ -4122,7 +4103,8 @@ public class UnitTypes{
 
             weapons.add(new RepairBeamWeapon(){{
                 widthSinMag = 0.11f;
-                reload = 20f;
+                healEffectInterval = 20f;
+                range = 60f;
                 x = 0f;
                 y = 6.5f;
                 rotate = false;
@@ -4140,10 +4122,6 @@ public class UnitTypes{
                 controllable = true;
                 laserColor = Pal.accent;
                 healColor = Pal.accent;
-
-                bullet = new BulletType(){{
-                    maxRange = 60f;
-                }};
             }});
         }};
 
@@ -4189,7 +4167,8 @@ public class UnitTypes{
 
             weapons.add(new RepairBeamWeapon(){{
                 widthSinMag = 0.11f;
-                reload = 20f;
+                healEffectInterval = 20f;
+                range = 60f;
                 x = 0f;
                 y = 7.5f;
                 rotate = false;
@@ -4208,10 +4187,6 @@ public class UnitTypes{
                 controllable = true;
                 laserColor = Pal.accent;
                 healColor = Pal.accent;
-
-                bullet = new BulletType(){{
-                    maxRange = 60f;
-                }};
             }});
 
             drawBuildBeam = false;
@@ -4270,7 +4245,8 @@ public class UnitTypes{
 
             weapons.add(new RepairBeamWeapon(){{
                 widthSinMag = 0.11f;
-                reload = 20f;
+                healEffectInterval = 20f;
+                range = 65f;
                 x = 19f/4f;
                 y = 19f/4f;
                 rotate = false;
@@ -4289,10 +4265,6 @@ public class UnitTypes{
                 controllable = true;
                 laserColor = Pal.accent;
                 healColor = Pal.accent;
-
-                bullet = new BulletType(){{
-                    maxRange = 65f;
-                }};
             }});
         }};
 

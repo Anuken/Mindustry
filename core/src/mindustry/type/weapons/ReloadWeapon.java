@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 
@@ -63,7 +64,8 @@ public class ReloadWeapon extends TargetWeapon{
 
         boolean wasFlipped = mount.side;
         if(otherSide != -1 && alternate && mount.side == flipSprite && mount.reload <= reload / 2f && lastReload > reload / 2f){
-            unit.mounts[otherSide].side = !unit.mounts[otherSide].side;
+            ReloadWeaponMount other = (ReloadWeaponMount)unit.mounts[otherSide];
+            other.side = !other.side;
             mount.side = !mount.side;
         }
 
@@ -88,6 +90,13 @@ public class ReloadWeapon extends TargetWeapon{
     }
 
     protected void shoot(Unit unit, ReloadWeaponMount mount, float shootX, float shootY, float rotation){
+    }
+
+    @Override
+    public void setPartParams(Unit unit, BaseWeaponMount m, float wx, float wy, float weaponRotation){
+        ReloadWeaponMount mount = (ReloadWeaponMount)m;
+        DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, mount.recoil, 0, wx, wy, weaponRotation + 90);
+        DrawPart.params.sideMultiplier = flipSprite ? -1 : 1;
     }
 
     public static class ReloadWeaponMount extends TargetWeaponMount{

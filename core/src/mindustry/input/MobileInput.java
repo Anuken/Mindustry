@@ -78,7 +78,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     {
         Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit != null && e.unit.isPlayer() && e.unit.getPlayer().isLocal() && e.unit.type.weapons.contains(w -> w.bullet.killShooter)){
+            if(e.unit != null && e.unit.isPlayer() && e.unit.getPlayer().isLocal() && e.unit.type.weapons.contains(weapon -> weapon instanceof Weapon w && w.bullet.killShooter)){
                 manualShooting = false;
             }
         });
@@ -999,7 +999,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         float speed = unit.speed();
         float range = unit.hasWeapons() ? unit.range() : 0f;
-        float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
+        float bulletSpeed = unit.hasOffensiveWeapons() ? type.firstWeapon.bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
         boolean aimCursor = omni && player.shooting && type.hasWeapons() && !boosted && type.faceTarget;
 

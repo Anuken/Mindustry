@@ -50,7 +50,7 @@ public class RepairBeamWeapon extends TargetWeapon{
         autoTarget = true;
         controllable = false;
         rotate = true;
-        mountType = HealBeamMountR::new;
+        mountType = HealBeamMount::new;
         recoil = 0f;
     }
 
@@ -64,7 +64,7 @@ public class RepairBeamWeapon extends TargetWeapon{
     public void drawWeapon(Unit unit, BaseWeaponMount mount, float wx, float wy, float weaponRotation){
         super.drawWeapon(unit, mount, wx, wy, weaponRotation);
 
-        HealBeamMountR heal = (HealBeamMountR)mount;
+        HealBeamMount heal = (HealBeamMount)mount;
 
         if(unit.canShoot()){
             float z = Draw.z();
@@ -84,7 +84,7 @@ public class RepairBeamWeapon extends TargetWeapon{
             wx = unit.x + Angles.trnsx(weaponRotation, x, y),
             wy = unit.y + Angles.trnsy(weaponRotation, x, y);
 
-        HealBeamMountR heal = (HealBeamMountR)mount;
+        HealBeamMount heal = (HealBeamMount)mount;
         boolean canShoot = mount.shoot;
 
         if(!autoTarget){
@@ -153,11 +153,11 @@ public class RepairBeamWeapon extends TargetWeapon{
         laserTopEnd = Core.atlas.find("laser-top-end");
     }
 
-    public static class HealBeamMountR extends TargetWeaponMount{
+    public static class HealBeamMount extends TargetWeaponMount{
         public Vec2 offset = new Vec2(), lastEnd = new Vec2();
         public float strength, effectTimer;
 
-        public HealBeamMountR(BaseWeapon weapon){
+        public HealBeamMount(BaseWeapon weapon){
             super(weapon);
         }
     }

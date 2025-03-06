@@ -333,7 +333,7 @@ public class SectorDamage{
             if(unit.team == state.rules.defaultTeam){
                 sumHealth += unit.health*healthMult + unit.shield;
                 sumDps += unit.type.dpsEstimate;
-                sumRps += unit.type.weapons.sumf(w -> w.shotsPerSec() * (w.bullet.healPercent/100f * 20f + w.bullet.healAmount));
+                sumRps += unit.type.weapons.sumf(weapon -> weapon instanceof Weapon w ? w.shotsPerSec() * (w.bullet.healPercent/100f * 20f + w.bullet.healAmount) : 0f);
                 if(unit.controller() instanceof CommandAI ai && ai.command == UnitCommand.rebuildCommand){
                     sumRps += unit.type.buildSpeed * 20f;
                 }

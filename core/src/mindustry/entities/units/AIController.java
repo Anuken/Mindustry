@@ -8,6 +8,7 @@ import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.type.weapons.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
@@ -106,7 +107,7 @@ public class AIController implements UnitController{
     public void faceTarget(){
         if(unit.type.omniMovement || unit instanceof Mechc){
             if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.faceTarget && unit.type.hasWeapons()){
-                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
+                unit.lookAt(Predict.intercept(unit, target, unit.type.firstWeapon != null ? unit.type.firstWeapon.bullet.speed : 0f));
             }else if(unit.moving()){
                 unit.lookAt(unit.vel().angle());
             }
@@ -153,8 +154,10 @@ public class AIController implements UnitController{
 
         unit.isShooting = false;
 
-        for(var mount : unit.mounts){
-            Weapon weapon = mount.weapon;
+        for(var m : unit.mounts){
+            if(!(m instanceof WeaponMount mount)) continue;
+
+            Weapon weapon = (Weapon)mount.weapon;
             float wrange = weapon.range();
 
             //let uncontrollable weapons do their own thing

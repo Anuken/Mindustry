@@ -142,7 +142,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         planConfig = new PlanConfigFragment();
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit != null && e.unit.isPlayer() && e.unit.getPlayer().isLocal() && e.unit.type.weapons.contains(w -> w.bullet.killShooter)){
+            if(e.unit != null && e.unit.isPlayer() && e.unit.getPlayer().isLocal() && e.unit.type.weapons.contains(weapon -> weapon instanceof Weapon w && w.bullet.killShooter)){
                 player.shooting = false;
             }
         });
@@ -860,8 +860,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             player.unit().updateBuilding(isBuilding);
         }
 
-        if(!player.dead() && player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && !player.team().rules().infiniteAmmo && player.unit().ammo <= 0){
-            player.unit().type.weapons.first().noAmmoSound.at(player.unit());
+        if(!player.dead() && player.shooting && !wasShooting && player.unit().hasOffensiveWeapons() && state.rules.unitAmmo && !player.team().rules().infiniteAmmo && player.unit().ammo <= 0){
+            player.unit().type.firstWeapon.noAmmoSound.at(player.unit());
         }
 
         //you don't want selected blocks while locked, looks weird

@@ -1,10 +1,6 @@
 package mindustry.type;
 
-import arc.*;
 import arc.audio.*;
-import arc.func.*;
-import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
@@ -12,7 +8,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -20,11 +15,8 @@ import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.type.weapons.*;
 import mindustry.world.meta.*;
-
-import static mindustry.Vars.*;
 
 public class Weapon extends ReloadWeapon{
     /** bullet shot */
@@ -55,8 +47,6 @@ public class Weapon extends ReloadWeapon{
     public float velocityRnd = 0f;
     /** random sound pitch range */
     public float soundPitchMin = 0.8f, soundPitchMax = 1f;
-    /** whether shooter rotation is ignored when shooting. */
-    public boolean ignoreRotation = false;
     /** If true, this weapon cannot be used to attack targets. */
     public boolean noAttack = false;
     /** should the shoot effects follow the unit (effects need followParent set to true for this to work) */
@@ -243,6 +233,13 @@ public class Weapon extends ReloadWeapon{
             bullet.aimX = Tmp.v1.x;
             bullet.aimY = Tmp.v1.y;
         }
+    }
+
+    @Override
+    public void setPartParams(Unit unit, BaseWeaponMount m, float wx, float wy, float weaponRotation){
+        WeaponMount mount = (WeaponMount)m;
+        DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, mount.recoil, mount.charge, wx, wy, weaponRotation + 90);
+        DrawPart.params.sideMultiplier = flipSprite ? -1 : 1;
     }
 
     @Override

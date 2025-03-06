@@ -226,14 +226,14 @@ public class TypeIO{
         }
     }
 
-    public static WeaponMount[] readMounts(Reads read, WeaponMount[] mounts){
+    public static BaseWeaponMount[] readMounts(Reads read, BaseWeaponMount[] mounts){
         byte len = read.b();
         for(int i = 0; i < len; i++){
             byte state = read.b();
             float ax = read.f(), ay = read.f();
 
             if(i <= mounts.length - 1){
-                WeaponMount m = mounts[i];
+                BaseWeaponMount m = mounts[i];
                 m.aimX = ax;
                 m.aimY = ay;
                 m.shoot = (state & 1) != 0;

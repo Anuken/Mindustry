@@ -6,6 +6,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.type.weapons.*;
 
 @Component
 abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
@@ -14,7 +15,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     @Import UnitType type;
 
     /** weapon mount array, never null */
-    @SyncLocal WeaponMount[] mounts = {};
+    @SyncLocal BaseWeaponMount[] mounts = {};
     @ReadOnly transient boolean isRotate;
     transient float aimX, aimY;
     boolean isShooting;
@@ -25,7 +26,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     }
 
     void setWeaponRotation(float rotation){
-        for(WeaponMount mount : mounts){
+        for(BaseWeaponMount mount : mounts){
             mount.rotation = rotation;
         }
     }
@@ -42,8 +43,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     }
 
     void controlWeapons(boolean rotate, boolean shoot){
-        for(WeaponMount mount : mounts){
-            if(mount.weapon.controllable){
+        for(BaseWeaponMount mount : mounts){
+            if(mount.weapon instanceof TargetWeapon w && w.controllable){
                 mount.rotate = rotate;
                 mount.shoot = shoot;
             }
@@ -64,8 +65,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         x = Tmp.v1.x + this.x;
         y = Tmp.v1.y + this.y;
 
-        for(WeaponMount mount : mounts){
-            if(mount.weapon.controllable){
+        for(BaseWeaponMount mount : mounts){
+            if(mount.weapon instanceof TargetWeapon w && w.controllable){
                 mount.aimX = x;
                 mount.aimY = y;
             }
@@ -81,8 +82,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
     @Override
     public void remove(){
-        for(WeaponMount mount : mounts){
-            if(mount.weapon.continuous && mount.bullet != null && mount.bullet.owner == self()){
+        for(BaseWeaponMount m : mounts){
+            if(!(m instanceof WeaponMount mount)) continue;
+
+            if(mount.weapon instanceof ContinuousWeapon && mount.bullet != null && mount.bullet.owner == self()){
                 mount.bullet.time = mount.bullet.lifetime - 10f;
                 mount.bullet = null;
             }
@@ -96,7 +99,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     /** Update shooting and rotation for this unit. */
     @Override
     public void update(){
-        for(WeaponMount mount : mounts){
+        for(BaseWeaponMount mount : mounts){
             mount.weapon.update(self(), mount);
         }
     }
