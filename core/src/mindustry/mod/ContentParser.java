@@ -304,7 +304,7 @@ public class ContentParser{
             return obj;
         });
         put(BaseWeapon.class, (type, data) -> {
-            //Check if it's a continuous weapon. If so, swap type out with ContinuousWeapon.
+            //Check if it's a Weapon with continuous = true. If so, swap type out with ContinuousWeapon.
             String weaponType = data.getString("type", "");
             if(data.getBoolean("continuous", false) && weaponType.equals("Weapon")){
                 weaponType = "ContinuousWeapon";
