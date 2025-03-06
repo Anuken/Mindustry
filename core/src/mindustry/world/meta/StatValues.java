@@ -21,6 +21,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
 import mindustry.type.*;
+import mindustry.type.weapons.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.*;
@@ -549,11 +550,11 @@ public class StatValues{
         };
     }
 
-    public static StatValue weapons(UnitType unit, Seq<Weapon> weapons){
+    public static StatValue weapons(UnitType unit, Seq<BaseWeapon> weapons){
         return table -> {
             table.row();
             for(int i = 0; i < weapons.size; i++){
-                Weapon weapon = weapons.get(i);
+                BaseWeapon weapon = weapons.get(i);
 
                 if(weapon.flipSprite || !weapon.hasStats(unit)){
                     //flipped weapons are not given stats
@@ -618,8 +619,8 @@ public class StatValues{
 
                 BulletType type = map.get(t);
 
-                if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
-                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false).display(table);
+                if(type.spawnUnit != null && type.spawnUnit.hasOffensiveWeapons()){
+                    ammo(ObjectMap.of(t, type.spawnUnit.firstWeapon.bullet), nested, false).display(table);
                     continue;
                 }
 

@@ -25,9 +25,9 @@ public class ErekirTechTree{
     //TODO remove this
     public static void rebalance(){
         for(var unit : content.units().select(u -> u instanceof ErekirUnitType)){
-            for(var weapon : unit.weapons){
-                rebalanceBullet(weapon.bullet);
-            }
+            unit.weapons.each(w -> w instanceof Weapon, w -> {
+                rebalanceBullet(((Weapon)w).bullet);
+            });
         }
 
         for(var block : content.blocks()){

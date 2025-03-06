@@ -3,31 +3,26 @@ package mindustry.type.weapons;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 
-public class MineWeapon extends Weapon{
-    public MineWeapon(){
-        super();
-    }
-
+/** A weapon that visually displays the unit's mining beam. */
+public class MineWeapon extends BaseWeapon{
     public MineWeapon(String name){
         super(name);
     }
 
+    public MineWeapon(){
+        super();
+    }
+
     {
         rotate = true;
-        noAttack = true;
-        predictTarget = false;
         display = false;
-        bullet = new BulletType();
-        useAttackRange = false;
     }
 
     @Override
-    public void update(Unit unit, WeaponMount mount){
+    public void update(Unit unit, BaseWeaponMount mount){
         mount.shoot = false;
         mount.rotate = true;
 
@@ -35,8 +30,10 @@ public class MineWeapon extends Weapon{
         if(unit.mining()){
             mount.aimX = unit.mineTile().drawx();
             mount.aimY = unit.mineTile().drawy();
+            mount.shoot = Angles.within(mount.rotation, mount.targetRotation, shootCone);
+            if(mount.shoot) mount.recoil = mount.heat = 1f;
         }else{
-            //aim for front
+            //aim for baseRotation
             float weaponRotation = unit.rotation - 90 + baseRotation;
             mount.aimX = unit.x + Angles.trnsx(unit.rotation - 90, x, y) + Angles.trnsx(weaponRotation, this.shootX, this.shootY);
             mount.aimY = unit.y + Angles.trnsy(unit.rotation - 90, x, y) + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
@@ -46,16 +43,11 @@ public class MineWeapon extends Weapon{
     }
 
     @Override
-    public void draw(Unit unit, WeaponMount mount){
-        super.draw(unit, mount);
+    public void drawWeapon(Unit unit, BaseWeaponMount mount, float wx, float wy, float weaponRotation){
+        super.drawWeapon(unit, mount, wx, wy, weaponRotation);
 
-        if(unit.mining()){
-            float
-                z = Draw.z(),
-                rotation = unit.rotation - 90,
-                weaponRotation  = rotation + (rotate ? mount.rotation : 0),
-                wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
-                wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -mount.recoil),
+        if(unit.mining() && mount.shoot){
+            float z = Draw.z(),
                 sY = shootY + Mathf.absin(Time.time, 1.1f, 0.5f),
                 px = wx + Angles.trnsx(weaponRotation, shootX, sY),
                 py = wy + Angles.trnsy(weaponRotation, shootX, sY);
