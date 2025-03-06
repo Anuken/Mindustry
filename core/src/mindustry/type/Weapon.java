@@ -240,6 +240,8 @@ public class Weapon extends ReloadWeapon{
         range = bullet.range;
         shootEffect = bullet.shootEffect;
         smokeEffect = bullet.smokeEffect;
+        targetAir = bullet.collidesAir;
+        targetGround = bullet.collidesGround;
     }
 
 }
