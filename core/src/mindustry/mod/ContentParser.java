@@ -39,6 +39,7 @@ import mindustry.maps.planet.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.type.ammo.*;
+import mindustry.type.weapons.*;
 import mindustry.type.weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.units.*;
@@ -302,10 +303,33 @@ public class ContentParser{
             readFields(obj, data);
             return obj;
         });
-        put(Weapon.class, (type, data) -> {
-            var oc = resolve(data.getString("type", ""), Weapon.class);
+        put(BaseWeapon.class, (type, data) -> {
+            //Check if it's a continuous weapon. If so, swap type out with ContinuousWeapon.
+            String weaponType = data.getString("type", "");
+            if(data.getBoolean("continuous", false) && weaponType.equals("Weapon")){
+                weaponType = "ContinuousWeapon";
+            }
+
+            var oc = resolve(weaponType, BaseWeapon.class);
             data.remove("type");
             var weapon = make(oc);
+
+            //For weapons that used some bullet stats, check if such exists and set accordingly.
+            if(weapon instanceof PointDefenseWeapon || weapon instanceof RepairBeamWeapon){
+                if(data.has("bullet")){
+                    JsonValue bullet = data.get("bullet");
+                    ((TargetWeapon)weapon).range = bullet.getFloat("maxRange", 80f);
+
+                    if(weapon instanceof PointDefenseWeapon pdw){
+                        if(bullet.has("shootEffect")) pdw.shootEffect = (Effect)classParsers.get(Effect.class).parse(Effect.class, bullet.get("shootEffect"));
+                        if(bullet.has("hitEffect")) pdw.hitEffect = (Effect)classParsers.get(Effect.class).parse(Effect.class, bullet.get("hitEffect"));
+                        pdw.damage = bullet.getFloat("damage", 10f);
+                    }
+
+                    data.remove("bullet");
+                }
+            }
+
             readFields(weapon, data);
             weapon.name = currentMod.name + "-" + weapon.name;
             return weapon;
