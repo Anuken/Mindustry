@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
+import static mindustry.net.Administration.Config.logCommands;
 
 public class NetClient implements ApplicationListener{
     private static final long entitySnapshotTimeout = 1000 * 20;
@@ -276,7 +277,7 @@ public class NetClient implements ApplicationListener{
         Events.fire(new PlayerChatEvent(player, message));
 
         //log commands before they are handled
-        if(message.startsWith(netServer.clientCommands.getPrefix())){
+        if(message.startsWith(netServer.clientCommands.getPrefix()) && logCommands.bool()){
             //log with brackets
             Log.info("<&fi@: @&fr>", "&lk" + player.plainName(), "&lw" + message);
         }
