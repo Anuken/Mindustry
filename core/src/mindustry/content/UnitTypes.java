@@ -2712,7 +2712,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 210f){{
+                bullet = new BasicBulletType(8f, 240f){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 13f;
@@ -2865,7 +2865,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(7f, 380f){{
+                bullet = new BasicBulletType(7f, 460f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
@@ -2914,7 +2914,7 @@ public class UnitTypes{
                                 weaveScale = 3f;
                                 weaveMag = 2f;
 
-                                splashDamage = 50f;
+                                splashDamage = 70f;
                                 splashDamageRadius = 40f;
                                 despawnEffect = new ExplosionEffect(){{
                                     lifetime = 30f;
@@ -2931,7 +2931,7 @@ public class UnitTypes{
                                     sparkStroke = 1.5f;
                                 }};
                             }};
-                    bulletInterval = 6f;
+                    bulletInterval = 5f;
                     intervalRandomSpread = 0f;
                     intervalBullets = 2;
                     intervalAngle = 180f;
