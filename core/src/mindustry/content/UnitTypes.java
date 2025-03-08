@@ -2690,7 +2690,7 @@ public class UnitTypes{
             speed = 0.63f;
             rotateSpeed = 1.3f;
             health = 11000;
-            armor = 20f;
+            armor = 26f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
@@ -2759,7 +2759,7 @@ public class UnitTypes{
             for(float f : new float[]{34f / 4f, -36f / 4f}){
                 int fi = i ++;
                 weapons.add(new Weapon("vanquish-point-weapon"){{
-                    reload = 20f;
+                    reload = 15f;
                     x = 48f / 4f;
                     y = f;
                     shootY = 5.5f;
@@ -2869,7 +2869,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(7f, 400f){{
+                bullet = new BasicBulletType(7f, 500f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
@@ -2901,7 +2901,7 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    intervalBullet = new BasicBulletType(1f, 60f){{
+                    intervalBullet = new BasicBulletType(1f, 40f){{
                                 drag = 0.002f;
                                 width = 12f;
                                 height = 11f;
@@ -2918,7 +2918,7 @@ public class UnitTypes{
                                 weaveScale = 3f;
                                 weaveMag = 2f;
 
-                                splashDamage = 65f;
+                                splashDamage = 60f;
                                 splashDamageRadius = 40f;
                                 despawnEffect = new ExplosionEffect(){{
                                     lifetime = 50f;
