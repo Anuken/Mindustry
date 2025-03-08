@@ -2734,7 +2734,7 @@ public class UnitTypes{
                     fragVelocityMin = 1f;
                     despawnSound = Sounds.dullExplosion;
 
-                    fragBullet = new ArtilleryBulletType(4f, 45f){{
+                    fragBullet = new ArtilleryBulletType(3f, 45f){{
                         sprite = "missile-large";
                         width = 8f;
                         height = 12f;
@@ -2745,8 +2745,8 @@ public class UnitTypes{
                         trailWidth = 2.8f;
                         trailLength = 6;
                         hitEffect = despawnEffect = Fx.blastExplosion;
-                        splashDamageRadius = 36f;
-                        splashDamage = 40f;
+                        splashDamageRadius = 32f;
+                        splashDamage = 50f;
                     }};
                 }};
             }});
@@ -2865,7 +2865,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(7f, 420f){{
+                bullet = new BasicBulletType(7f, 380f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
@@ -2883,7 +2883,7 @@ public class UnitTypes{
                     hitEffect = despawnEffect = Fx.massiveExplosion;
 
                     shootEffect = new ExplosionEffect(){{
-                        lifetime = 40f;
+                        lifetime = 32f;
                         waveStroke = 4f;
                         waveColor = sparkColor = trailColor;
                         waveRad = 15f;
@@ -2901,7 +2901,7 @@ public class UnitTypes{
                                 drag = 0.01f;
                                 width = 12f;
                                 height = 11f;
-                                lifetime = 30f;
+                                lifetime = 27f;
                                 weaveRandom = false;
                                 hitSize = 5f;
                                 pierceCap = 2;
@@ -2914,10 +2914,10 @@ public class UnitTypes{
                                 weaveScale = 3f;
                                 weaveMag = 2f;
 
-                                splashDamage = 60f;
+                                splashDamage = 50f;
                                 splashDamageRadius = 40f;
                                 despawnEffect = new ExplosionEffect(){{
-                                    lifetime = 50f;
+                                    lifetime = 30f;
                                     waveStroke = 4f;
                                     waveColor = sparkColor = trailColor;
                                     waveRad = 30f;
@@ -2931,7 +2931,7 @@ public class UnitTypes{
                                     sparkStroke = 1.5f;
                                 }};
                             }};
-                    bulletInterval = 4f;
+                    bulletInterval = 6f;
                     intervalRandomSpread = 0f;
                     intervalBullets = 2;
                     intervalAngle = 180f;
