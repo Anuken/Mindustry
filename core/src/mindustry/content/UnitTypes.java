@@ -2940,8 +2940,7 @@ public class UnitTypes{
                     intervalBullets = 2;
                     intervalAngle = 180f;
                     intervalSpread = 330f;
-                        }
-                    }
+
                 }};
             }});
 
