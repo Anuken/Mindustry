@@ -2712,7 +2712,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 210){{
+                bullet = new BasicBulletType(8f, 210f){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 13f;
@@ -2734,7 +2734,7 @@ public class UnitTypes{
                     fragVelocityMin = 1f;
                     despawnSound = Sounds.dullExplosion;
 
-                    fragBullet = new ArtilleryBulletType(4f, 45){{
+                    fragBullet = new ArtilleryBulletType(4f, 45f){{
                         sprite = "missile-large";
                         width = 8f;
                         height = 12f;
@@ -2897,8 +2897,8 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    intervalBullet = new BasicBulletType(1f, 40f){{
-                                drag = 0.002f;
+                    intervalBullet = new BasicBulletType(2f, 40f){{
+                                drag = 0.01f;
                                 width = 12f;
                                 height = 11f;
                                 lifetime = 30f;
@@ -2931,7 +2931,7 @@ public class UnitTypes{
                                     sparkStroke = 1.5f;
                                 }};
                             }};
-                    bulletInterval = 3f;
+                    bulletInterval = 4f;
                     intervalRandomSpread = 0f;
                     intervalBullets = 2;
                     intervalAngle = 180f;
