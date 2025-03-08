@@ -69,7 +69,7 @@ public class ShockwaveTower extends Block{
 
         @Override
         public void updateTile(){
-            if(potentialEfficiency > 0 && (reloadCounter += Time.delta) >= reload && timer(timerCheck, checkInterval)){
+            if(potentialEfficiency > 0 && (reloadCounter += edelta()) >= reload && timer(timerCheck, checkInterval)){
                 targets.clear();
                 Groups.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
                     if(b.team != team && b.type.hittable){
@@ -110,7 +110,7 @@ public class ShockwaveTower extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return targets.size != 0;
+            return reloadCounter < reload;
         }
 
         @Override
