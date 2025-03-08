@@ -2897,15 +2897,13 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    intervalBullet = new BasicBulletType(2f, 40f){{
+                    intervalBullet = new BasicBulletType(2f, 20f){{
                                 drag = 0.01f;
                                 width = 12f;
                                 height = 11f;
                                 lifetime = 27f;
                                 weaveRandom = false;
                                 hitSize = 5f;
-                                pierceCap = 2;
-                                pierce = true;
                                 collidesTiles = false;
                                 hitColor = backColor = trailColor = Color.valueOf("feb380");
                                 frontColor = Color.white;
@@ -2914,7 +2912,7 @@ public class UnitTypes{
                                 weaveScale = 3f;
                                 weaveMag = 2f;
 
-                                splashDamage = 70f;
+                                splashDamage = 140f;
                                 splashDamageRadius = 40f;
                                 despawnEffect = new ExplosionEffect(){{
                                     lifetime = 30f;
