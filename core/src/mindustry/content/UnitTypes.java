@@ -2712,7 +2712,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 190){{
+                bullet = new BasicBulletType(8f, 210){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 13f;
@@ -2720,25 +2720,21 @@ public class UnitTypes{
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
                     smokeEffect = Fx.shootSmokeTitan;
-                    pierceCap = 2;
-                    pierce = true;
-                    pierceBuilding = true;
                     hitColor = backColor = trailColor = Color.valueOf("feb380");
                     frontColor = Color.white;
                     trailWidth = 3.1f;
                     trailLength = 8;
                     hitEffect = despawnEffect = Fx.blastExplosion;
-                    splashDamageRadius = 20f;
-                    splashDamage = 50f;
+                    splashDamageRadius = 16f;
+                    splashDamage = 80f;
 
-                    fragOnHit = false;
                     fragRandomSpread = 0f;
-                    fragSpread = 10f;
+                    fragSpread = 12f;
                     fragBullets = 5;
                     fragVelocityMin = 1f;
                     despawnSound = Sounds.dullExplosion;
 
-                    fragBullet = new ArtilleryBulletType(4f, 35){{
+                    fragBullet = new ArtilleryBulletType(4f, 45){{
                         sprite = "missile-large";
                         width = 8f;
                         height = 12f;
@@ -2749,7 +2745,7 @@ public class UnitTypes{
                         trailWidth = 2.8f;
                         trailLength = 6;
                         hitEffect = despawnEffect = Fx.blastExplosion;
-                        splashDamageRadius = 32f;
+                        splashDamageRadius = 36f;
                         splashDamage = 40f;
                     }};
                 }};
@@ -2767,7 +2763,7 @@ public class UnitTypes{
                     rotate = true;
                     rotateSpeed = 2.6f;
 
-                    bullet = new BasicBulletType(6f, 36f){{
+                    bullet = new BasicBulletType(6f, 40f){{
                         width = 6.5f;
                         height = 11f;
                         shootEffect = Fx.sparkShoot;
@@ -2869,7 +2865,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(7f, 500f){{
+                bullet = new BasicBulletType(7f, 420f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
@@ -2879,7 +2875,7 @@ public class UnitTypes{
                     smokeEffect = Fx.shootSmokeTitan;
                     pierceCap = 5;
                     pierce = true;
-                    pierceBuilding = true;
+                    collidesTiles = false;
                     hitColor = backColor = trailColor = Color.valueOf("feb380");
                     frontColor = Color.white;
                     trailWidth = 4f;
@@ -2910,7 +2906,7 @@ public class UnitTypes{
                                 hitSize = 5f;
                                 pierceCap = 2;
                                 pierce = true;
-                                pierceBuilding = true;
+                                collidesTiles = false;
                                 hitColor = backColor = trailColor = Color.valueOf("feb380");
                                 frontColor = Color.white;
                                 trailWidth = 2.5f;
