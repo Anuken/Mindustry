@@ -3860,7 +3860,7 @@ public class UnitTypes{
                     width = 9f;
                     height = 12f;
                     trailWidth = 2.5f;
-                    trailLength = 16f;
+                    trailLength = 12;
                     lifetime = 31f;
                     hitSize = 6f;
                     homingPower = 0.08f;
