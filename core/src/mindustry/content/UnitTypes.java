@@ -3816,8 +3816,8 @@ public class UnitTypes{
             speed = 0.95f;
             rotateSpeed = 3.2f;
             accel = 0.1f;
-            health = 5700f;
-            armor = 8f;
+            health = 5600f;
+            armor = 9f;
             hitSize = 36f;
             payloadCapacity = Mathf.sqr(3f) * tilePayload;
             researchCostMultiplier = 0f;
@@ -3926,7 +3926,7 @@ public class UnitTypes{
                 mirror = true;
                 rotate = true;
                 rotateSpeed = 0.8f;
-                reload = 240f;
+                reload = 216f;
                 layerOffset = -20f;
                 recoil = 1f;
                 rotationLimit = 9f;
@@ -3981,8 +3981,8 @@ public class UnitTypes{
                         outlineColor = Pal.darkOutline;
                         health = 240;
                         lifetime = 62f;
-                        homingDelay = 18f;
-                        homingPower = 0.05f;
+                        homingDelay = 20f;
+                        homingPower = 0.04f;
                         lowAltitude = true;
                         engineSize = 3f;
                         engineColor = trailColor = Pal.sapBulletBack;
@@ -4016,7 +4016,7 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
-                            bullet = new ExplosionBulletType(160f, 36f){{
+                            bullet = new ExplosionBulletType(220f, 44f){{
                                 collidesAir = false;
                                 suppressionRange = 140f;
                                 shootEffect = new ExplosionEffect(){{
