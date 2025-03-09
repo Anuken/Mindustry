@@ -3813,7 +3813,7 @@ public class UnitTypes{
             lowAltitude = false;
             flying = true;
             drag = 0.06f;
-            speed = 1.2f;
+            speed = 0.95f;
             rotateSpeed = 3.2f;
             accel = 0.1f;
             health = 5700f;
@@ -3865,8 +3865,8 @@ public class UnitTypes{
                     hitSize = 6f;
                     homingPower = 0.08f;
                     knockback = 1.6f;
-                    splashDamage = 120f;
-                    splashDamageRadius = 32f;
+                    splashDamage = 100f;
+                    splashDamageRadius = 28f;
                 }};
             }});
 
@@ -3883,7 +3883,7 @@ public class UnitTypes{
             lowAltitude = false;
             flying = true;
             drag = 0.07f;
-            speed = 1.2f;
+            speed = 1.1f;
             rotateSpeed = 0.8f;
             accel = 0.1f;
             health = 12000f;
@@ -3926,7 +3926,7 @@ public class UnitTypes{
                 mirror = true;
                 rotate = true;
                 rotateSpeed = 0.8f;
-                reload = 360f;
+                reload = 240f;
                 layerOffset = -20f;
                 recoil = 1f;
                 rotationLimit = 9f;
@@ -3979,10 +3979,10 @@ public class UnitTypes{
                         speed = 6f;
                         maxRange = 5f;
                         outlineColor = Pal.darkOutline;
-                        health = 270;
+                        health = 240;
                         lifetime = 62f;
-                        homingDelay = 12f;
-                        homingPower = 0.07f;
+                        homingDelay = 18f;
+                        homingPower = 0.05f;
                         lowAltitude = true;
                         engineSize = 3f;
                         engineColor = trailColor = Pal.sapBulletBack;
