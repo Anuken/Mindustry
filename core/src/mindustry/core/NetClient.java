@@ -268,7 +268,9 @@ public class NetClient implements ApplicationListener{
         if(message == null) return;
 
         if(message.length() > maxTextLength){
-            throw new ValidateException(player, "Player has sent a message above the text limit.");
+            player.con.kick("You have sent a message above the text limit.", 30000L);
+            Log.warn("@ &fi&lk[&lb@&fi&lk]&fb has sent a message above the text limit.", new Object[]{player.plainName(), player.uuid()});
+            return;
         }
 
         message = message.replace("\n", "");
