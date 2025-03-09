@@ -35,7 +35,7 @@ _Sprite Packing:_ `./gradlew tools:pack`
 ### Server
 
 Server builds are bundled with each released build (in Releases). If you'd rather compile on your own, replace 'desktop' with 'server', e.g. `gradlew server:dist`.
-
+[LICENSE](LICENSE)
 ### Android
 
 1. Install the Android SDK [here.](https://developer.android.com/studio#command-tools) Make sure you're downloading the "Command line tools only", as Android Studio is not required.
