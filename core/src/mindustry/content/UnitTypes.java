@@ -3809,7 +3809,7 @@ public class UnitTypes{
         quell = new ErekirUnitType("quell"){{
             aiController = FlyingFollowAI::new;
             envDisabled = 0;
-
+            fogRadius = 44f;
             lowAltitude = false;
             flying = true;
             drag = 0.06f;
@@ -3879,7 +3879,7 @@ public class UnitTypes{
         disrupt = new ErekirUnitType("disrupt"){{
             aiController = FlyingFollowAI::new;
             envDisabled = 0;
-
+            fogRadius = 60f;    
             lowAltitude = false;
             flying = true;
             drag = 0.07f;
@@ -3980,6 +3980,7 @@ public class UnitTypes{
                         maxRange = 5f;
                         outlineColor = Pal.darkOutline;
                         health = 270;
+                        lifetime = 62f;
                         homingDelay = 12f;
                         homingPower = 0.07f;
                         lowAltitude = true;
@@ -3988,6 +3989,7 @@ public class UnitTypes{
                         engineLayer = Layer.effect;
                         deathExplosionEffect = Fx.none;
                         loopSoundVolume = 0.1f;
+                        fogRadius = 6f;
 
                         parts.add(new ShapePart(){{
                             layer = Layer.effect;
