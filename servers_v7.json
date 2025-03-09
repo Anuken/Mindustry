@@ -1,5 +1,11 @@
 [
   {
+    "name": "Guy250 Hosting",
+    "address": [
+      "138.199.50.99:6567"
+    ]
+  },
+  {
     "name": "EscoCorp",
     "address": [
       "121.127.37.17:6567",
