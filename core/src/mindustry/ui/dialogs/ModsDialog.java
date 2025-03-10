@@ -488,8 +488,7 @@ public class ModsDialog extends BaseDialog{
             for(ModListing mod : listings){
                 if(((mod.hasJava || mod.hasScripts) && Vars.ios) ||
                     (!Strings.matches(searchtxt, mod.name) && !Strings.matches(searchtxt, mod.repo))
-                    //hack, I'm basically testing if 135.10 >= modVersion, which is equivalent to modVersion >= 136
-                    || (Version.isAtLeast(135, 10, mod.minGameVersion))
+                    || (Version.isAtLeast(147, 0, mod.minGameVersion))
                 ) continue;
 
                 float s = 64f;
