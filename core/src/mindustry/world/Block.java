@@ -123,7 +123,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** for static blocks only: if true, tile data() is saved in world data. */
     public boolean saveData;
     /** whether you can break this with rightclick */
-    public boolean breakable;
+    public boolean breakable = true;
     /** if true, this block will be broken by certain units stepping/moving over it */
     public boolean unitMoveBreakable;
     /** whether to add this block to brokenblocks */
