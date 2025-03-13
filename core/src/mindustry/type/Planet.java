@@ -76,7 +76,7 @@ public class Planet extends UnlockableContent{
     public float orbitOffset;
     /** Approx. radius of one sector. */
     public float sectorApproxRadius;
-    /** Whether this planet is tidally locked relative to its parent - see https://en.wikipedia.org/wiki/Tidal_locking */
+    /** Whether this planet is tidally locked relative to its parent - see <a href="https://en.wikipedia.org/wiki/Tidal_locking">...</a> */
     public boolean tidalLock = false;
     /** Whether this planet is listed in the planet access UI. **/
     public boolean accessible = true;

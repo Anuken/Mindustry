@@ -63,9 +63,7 @@ public class Damage{
         float scaledChance = applyParticleChance / builds.size;
         for(var build : builds){
             if(Mathf.chance(scaledChance)){
-                Time.run(Mathf.random(maxDelay), () -> {
-                    Fx.regenSuppressSeek.at(build.x + Mathf.range(build.block.size * tilesize / 2f), build.y + Mathf.range(build.block.size * tilesize / 2f), 0f, effectColor, source);
-                });
+                Time.run(Mathf.random(maxDelay), () -> Fx.regenSuppressSeek.at(build.x + Mathf.range(build.block.size * tilesize / 2f), build.y + Mathf.range(build.block.size * tilesize / 2f), 0f, effectColor, source));
             }
         }
     }

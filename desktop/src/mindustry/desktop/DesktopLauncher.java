@@ -92,9 +92,7 @@ public class DesktopLauncher extends ClientLauncher{
 
             Events.on(ClientLoadEvent.class, event -> {
                 if(steamError != null){
-                    Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> {
-                        ui.showErrorMessage(Core.bundle.format("steam.error", (steamError.getMessage() == null) ? steamError.getClass().getSimpleName() : steamError.getClass().getSimpleName() + ": " + steamError.getMessage()));
-                    })));
+                    Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> ui.showErrorMessage(Core.bundle.format("steam.error", (steamError.getMessage() == null) ? steamError.getClass().getSimpleName() : steamError.getClass().getSimpleName() + ": " + steamError.getMessage())))));
                 }
             });
 

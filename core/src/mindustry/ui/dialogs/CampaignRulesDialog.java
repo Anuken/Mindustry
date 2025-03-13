@@ -30,9 +30,7 @@ public class CampaignRulesDialog extends BaseDialog{
             }
         });
 
-        onResize(() -> {
-            rebuild();
-        });
+        onResize(this::rebuild);
     }
 
     void rebuild(){
@@ -51,9 +49,7 @@ public class CampaignRulesDialog extends BaseDialog{
                 t.defaults().size(140f, 50f);
 
                 for(Difficulty diff : Difficulty.all){
-                    t.button(diff.localized(), style, () -> {
-                        rules.difficulty = diff;
-                    }).group(group).checked(b -> rules.difficulty == diff);
+                    t.button(diff.localized(), style, () -> rules.difficulty = diff).group(group).checked(b -> rules.difficulty == diff);
 
                     if(Core.graphics.isPortrait() && diff.ordinal() % 2 == 1){
                         t.row();

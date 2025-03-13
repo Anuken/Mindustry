@@ -308,9 +308,7 @@ public class ModsDialog extends BaseDialog{
 
                                 if(steam && !item.hasSteamID()){
                                     right.row();
-                                    right.button(Icon.export, Styles.clearNonei, () -> {
-                                        platform.publish(item);
-                                    }).size(50f);
+                                    right.button(Icon.export, Styles.clearNonei, () -> platform.publish(item)).size(50f);
                                 }
                             }).growX().right().padRight(-8f).padTop(-8f);
                         }, Styles.flatBordert, () -> showMod(item)).size(w, h).growX().pad(4f);
@@ -442,9 +440,7 @@ public class ModsDialog extends BaseDialog{
                 d.cont.pane(cs -> {
                     int i = 0;
                     for(UnlockableContent c : all){
-                        cs.button(new TextureRegionDrawable(c.uiIcon), Styles.flati, iconMed, () -> {
-                            ui.content.show(c);
-                        }).size(50f).with(im -> {
+                        cs.button(new TextureRegionDrawable(c.uiIcon), Styles.flati, iconMed, () -> ui.content.show(c)).size(50f).with(im -> {
                             var click = im.getClickListener();
                             im.update(() -> im.getImage().color.lerp(!click.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta));
 
@@ -468,7 +464,7 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void rebuildBrowser(){
-        ObjectSet<String> installed = mods.list().map(m -> m.getRepo()).asSet();
+        ObjectSet<String> installed = mods.list().map(LoadedMod::getRepo).asSet();
 
         browserTable.clear();
         browserTable.add("@loading");
@@ -566,9 +562,7 @@ public class ModsDialog extends BaseDialog{
                         sel.buttons.row();
                     }
 
-                    sel.buttons.button("@mods.github.open", Icon.link, () -> {
-                        Core.app.openURI("https://github.com/" + mod.repo);
-                    });
+                    sel.buttons.button("@mods.github.open", Icon.link, () -> Core.app.openURI("https://github.com/" + mod.repo));
                     sel.buttons.button("@mods.browser.view-releases", Icon.zoom, () -> {
                         BaseDialog load = new BaseDialog("");
                         load.cont.add("[accent]Fetching Releases...");
@@ -730,9 +724,7 @@ public class ModsDialog extends BaseDialog{
                 String zipUrl = Jval.read(res.getResultAsString()).getString("zipball_url");
                 Http.get(zipUrl, loc -> {
                     if(loc.getHeader("Location") != null){
-                        Http.get(loc.getHeader("Location"), result -> {
-                            handleMod(repo, result);
-                        }, this::importFail);
+                        Http.get(loc.getHeader("Location"), result -> handleMod(repo, result), this::importFail);
                     }else{
                         handleMod(repo, loc);
                     }
@@ -741,9 +733,7 @@ public class ModsDialog extends BaseDialog{
         }else{
             Http.get(ghApi + "/repos/" + repo + "/zipball/" + branch, loc -> {
                 if(loc.getHeader("Location") != null){
-                    Http.get(loc.getHeader("Location"), result -> {
-                        handleMod(repo, result);
-                    }, this::importFail);
+                    Http.get(loc.getHeader("Location"), result -> handleMod(repo, result), this::importFail);
                 }else{
                     handleMod(repo, loc);
                 }

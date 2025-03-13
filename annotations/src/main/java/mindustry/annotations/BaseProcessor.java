@@ -123,8 +123,8 @@ public abstract class BaseProcessor extends AbstractProcessor{
     }
 
     public static void write(TypeSpec.Builder builder, Seq<String> imports) throws Exception{
-        builder.superinterfaces.sort(Structs.comparing(t -> t.toString()));
-        builder.methodSpecs.sort(Structs.comparing(m -> m.toString()));
+        builder.superinterfaces.sort(Structs.comparing(TypeName::toString));
+        builder.methodSpecs.sort(Structs.comparing(MethodSpec::toString));
         builder.fieldSpecs.sort(Structs.comparing(f -> f.name));
 
         JavaFile file = JavaFile.builder(packageName, builder.build()).skipJavaLangImports(true).build();

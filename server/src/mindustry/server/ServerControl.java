@@ -211,9 +211,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         //reset autosave on world load
-        Events.on(WorldLoadEvent.class, e -> {
-            autosaveCount.reset(0, Config.autosaveSpacing.num() * 60);
-        });
+        Events.on(WorldLoadEvent.class, e -> autosaveCount.reset(0, Config.autosaveSpacing.num() * 60));
 
         //autosave periodically
         Events.run(Trigger.update, () -> {
@@ -295,14 +293,12 @@ public class ServerControl implements ApplicationListener{
             info("Server loaded. Type @ for help.", "'help'");
         });
 
-        Events.on(SaveLoadEvent.class, e -> {
-            Core.app.post(() -> {
-                if(Config.autoPause.bool() && Groups.player.size() == 0){
-                    state.set(State.paused);
-                    autoPaused = true;
-                }
-            });
-        });
+        Events.on(SaveLoadEvent.class, e -> Core.app.post(() -> {
+            if(Config.autoPause.bool() && Groups.player.size() == 0){
+                state.set(State.paused);
+                autoPaused = true;
+            }
+        }));
 
         Events.on(PlayerJoin.class, e -> {
             if(state.isPaused() && autoPaused && Config.autoPause.bool()){
@@ -505,9 +501,7 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("js", "<script...>", "Run arbitrary Javascript.", arg -> {
-            info("&fi&lw&fb" + mods.getScripts().runConsole(arg[0]));
-        });
+        handler.register("js", "<script...>", "Run arbitrary Javascript.", arg -> info("&fi&lw&fb" + mods.getScripts().runConsole(arg[0])));
 
         handler.register("say", "<message...>", "Send a message to all players.", arg -> {
             if(!state.isGame()){

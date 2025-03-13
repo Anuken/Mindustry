@@ -89,13 +89,11 @@ public class DatabaseDialog extends BaseDialog{
                 t.button(content == Planets.sun ? Icon.eyeSmall : content instanceof Planet p ? Icon.icons.get(p.icon, Icon.commandRally) : new TextureRegionDrawable(content.uiIcon), Styles.clearNoneTogglei, iconMed, () -> {
                     tab = content;
                     rebuild();
-                }).size(50f).checked(b -> tab == content).tooltip(content == Planets.sun ? "@all" : content.localizedName).with(but -> {
-                    but.getStyle().imageUpColor = content instanceof Planet p ? p.iconColor : Color.white.cpy();
-                });
+                }).size(50f).checked(b -> tab == content).tooltip(content == Planets.sun ? "@all" : content.localizedName).with(but -> but.getStyle().imageUpColor = content instanceof Planet p ? p.iconColor : Color.white.cpy());
 
                 if(++i % 10 == 0) t.row();
             }
-        }).row();;
+        }).row();
 
         for(int j = 0; j < allContent.length; j++){
             ContentType type = ContentType.all[j];

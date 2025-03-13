@@ -58,9 +58,7 @@ public class RegenProjector extends Block{
         y += offset;
 
         Drawf.dashSquare(baseColor, x, y, range * tilesize);
-        indexer.eachBlock(player.team(), Tmp.r1.setCentered(x, y, range * tilesize), b -> true, t -> {
-            Drawf.selected(t, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f)));
-        });
+        indexer.eachBlock(player.team(), Tmp.r1.setCentered(x, y, range * tilesize), b -> true, t -> Drawf.selected(t, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
     }
 
     @Override
@@ -133,7 +131,7 @@ public class RegenProjector extends Block{
                 return;
             }
 
-            anyTargets = targets.contains(b -> b.damaged());
+            anyTargets = targets.contains(Building::damaged);
 
             if(efficiency > 0){
                 if((optionalTimer += Time.delta * optionalEfficiency) >= optionalUseTime){

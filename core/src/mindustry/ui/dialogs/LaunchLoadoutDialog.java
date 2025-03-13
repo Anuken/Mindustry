@@ -206,9 +206,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
             cont.label(() -> Core.bundle.format("launch.capacity", lastCapacity)).row();
             cont.row();
         }else if(destination.preset != null && destination.preset.description != null){
-            cont.pane(p -> {
-                p.add(destination.preset.description).grow().wrap().labelAlign(Align.center);
-            }).pad(10f).grow().row();
+            cont.pane(p -> p.add(destination.preset.description).grow().wrap().labelAlign(Align.center)).pad(10f).grow().row();
         }
 
         cont.pane(items);

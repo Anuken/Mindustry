@@ -22,7 +22,7 @@ public class ModTestBM extends GenericModTest{
 
         Block type = Vars.content.blocks().find(u -> u.name.equals("betamindy-piston"));
         assertNotNull(type, "A mod block must be loaded.");
-        assertSame(type.buildVisibility, BuildVisibility.shown, "A mod block must be buildable.");
+        assertSame(BuildVisibility.shown, type.buildVisibility, "A mod block must be buildable.");
 
         world.loadMap(maps.loadInternalMap("groundZero"));
         Tile t = world.tile(3, 3);
