@@ -1413,7 +1413,7 @@ public class UnitTypes{
                 soundPitchMin = 1f;
                 shootSound = Sounds.plasmadrop;
 
-                bullet = new ArtilleryBulletType(0.8f, 60f){{
+                bullet = new ArtilleryBulletType(0.8f, 21f){{
                     sprite = "large-bomb";
                     width = height = 120/4f;
 
@@ -1432,15 +1432,15 @@ public class UnitTypes{
                     spin = 2f;
                     shrinkX = shrinkY = 0.7f;
                     healPercent = 55f;
-                    splashDamage = 100f;
-                    splashDamageRadius = 96f;
+                    splashDamage = 30f;
+                    splashDamageRadius = 72f;
                     status = StatusEffects.electrified;
                     statusDuration = 60f * 4f;
                     fragBullets = 36;
                     fragVelocityMin = 0.3f;
                     fragRandomSpread = 0f;
                     fragSpread = 10f;
-                    fragBullet = new LiquidBulletType(Liquids.water){{
+                    fragBullet = new LiquidBulletType(Liquids.cryofluid){{
                         lifetime = 24f;
                         speed = 0.5f;
                         knockback = 2.3f;
