@@ -48,7 +48,29 @@ public class SteamVent extends Floor{
     public void init(){
         super.init();
 
-        if(offsets == null) offsets = defaultOffsets;
+        if(offsets == null){
+            offsets = defaultOffsets;
+        }else{
+            //Correct offsets. Top-right corner should be (0, 0).
+            int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+            for(Point2 p : offsets){
+                maxX = Math.max(maxX, p.x);
+                maxY = Math.max(maxY, p.y);
+            }
+            for(Point2 p : offsets){
+                p.sub(maxX, maxY);
+            }
+
+            //Check if (0, 0) exists after offset correction.
+            boolean hasOrigin = false;
+            for(Point2 p : offsets){
+                if(p.x == 0 && p.y == 0){
+                    hasOrigin = true;
+                    break;
+                }
+            }
+            if(!hasOrigin) throw new IllegalArgumentException("SteamVent lacks a top-right corner.");
+        }
     }
 
     @Override
