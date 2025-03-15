@@ -1403,48 +1403,44 @@ public class UnitTypes{
 
             ammoType = new PowerAmmoType(3000);
 
-            weapons.add(
-            new Weapon(){{
+            weapons.add(new Weapon("plasma-missile-mount"){{
                 x = y = 0f;
                 mirror = false;
                 reload = 55f;
-                minShootVelocity = 0.01f;
-
+                layerOffset = -0.2f;
+                rotate = true;
+                rotateSpeed = 0.4f;
+                rotationLimit = 30f;
                 soundPitchMin = 1f;
                 shootSound = Sounds.plasmadrop;
 
-                bullet = new ArtilleryBulletType(){{
+                bullet = new ArtilleryBulletType(0.8f, 70f){{
                     sprite = "large-bomb";
                     width = height = 120/4f;
-                    ignoreRotation = true;
 
                     backColor = Pal.heal;
                     frontColor = Color.white;
                     mixColorTo = Color.white;
 
                     hitSound = Sounds.plasmaboom;
-                    shootCone = 180f;
+                    shootCone = 60f;
                     ejectEffect = Fx.none;
                     hitShake = 4f;
-                    collidesAir = false;
                     lifetime = 80f;
                     despawnEffect = Fx.greenBomb;
                     hitEffect = Fx.massiveExplosion;
                     keepVelocity = false;
                     spin = 2f;
                     shrinkX = shrinkY = 0.7f;
-                    speed = 0.8f;
-                    collides = false;
                     healPercent = 55f;
                     splashDamage = 100f;
                     splashDamageRadius = 96f;
-                    damage = splashDamage * 0.7f;
                     status = StatusEffects.electrified;
                     statusDuration = 60f * 4f;
-                    fragBullets = 12;
-                    fragVelocityMin = 1f;
+                    fragBullets = 36;
+                    fragVelocityMin = 0.3f;
                     fragRandomSpread = 0f;
-                    fragSpread = 30f;
+                    fragSpread = 10f;
                     fragBullet = new LiquidBulletType(Liquids.water){{
                         lifetime = 24f;
                         speed = 0.5f;
