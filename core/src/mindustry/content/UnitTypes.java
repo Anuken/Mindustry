@@ -1390,7 +1390,6 @@ public class UnitTypes{
             drag = 0.017f;
             lowAltitude = false;
             flying = true;
-            circleTarget = true;
             engineOffset = 13f;
             engineSize = 7f;
             faceTarget = false;
@@ -1439,7 +1438,7 @@ public class UnitTypes{
                     speed = 0f;
                     collides = false;
                     healPercent = 55f;
-                    splashDamage = 120f;
+                    splashDamage = 100f;
                     splashDamageRadius = 96f;
                     damage = splashDamage * 0.7f;
                     status = StatusEffects.electrified;
@@ -1450,14 +1449,14 @@ public class UnitTypes{
                     fragSpread = 30f;
                     fragBullet = new LiquidBulletType(Liquids.cryofluid){{
                         lifetime = 24f;
-                        speed = 1f;
+                        speed = 0.5f;
                         knockback = 2.3f;
-                        puddleSize = 8f;
+                        puddleSize = 24f;
                         orbSize = 4f;
                         drag = 0.001f;
-                        statusDuration = 60f * 4f;
+                        statusDuration = 60f * 6f;
                         damage = 0f;
-                        splashDamage = 10f;
+                        splashDamage = 2f;
                         splashDamageRadius = 32f;
                     }};   
                 }};
@@ -1487,7 +1486,7 @@ public class UnitTypes{
 
             abilities.add(new ForceFieldAbility(152f, 9f, 20000f, 60f * 6, 8, 0f), new StatusFieldAbility(StatusEffects.overclock, 60f * 4, 60f * 4f, 150f));
             weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
-                x = 23f;
+                x = 25f;
                 y = 15f;
                 shootY = 6f;
                 beamWidth = 1.2f;
@@ -1497,8 +1496,8 @@ public class UnitTypes{
                 }};
             }});
             weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
-                x = 24f;
-                y = -29f;
+                x = 25f;
+                y = -32f;
                 shootY = 6f;
                 beamWidth = 1.2f;
                 repairSpeed = 4f;
