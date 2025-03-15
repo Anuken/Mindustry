@@ -1413,7 +1413,7 @@ public class UnitTypes{
                 soundPitchMin = 1f;
                 shootSound = Sounds.plasmadrop;
 
-                bullet = new ArtilleryBulletType(0.8f, 21f){{
+                bullet = new ArtilleryBulletType(1.2f, 21f){{
                     sprite = "large-bomb";
                     width = height = 120/4f;
 
@@ -1422,7 +1422,7 @@ public class UnitTypes{
                     mixColorTo = Color.white;
 
                     hitSound = Sounds.plasmaboom;
-                    shootCone = 60f;
+                    shootCone = 150f;
                     ejectEffect = Fx.none;
                     hitShake = 4f;
                     lifetime = 80f;
@@ -1431,11 +1431,12 @@ public class UnitTypes{
                     keepVelocity = false;
                     spin = 2f;
                     shrinkX = shrinkY = 0.7f;
-                    healPercent = 55f;
-                    splashDamage = 30f;
+                    healPercent = 50f;
+                    splashDamage = 60f;
                     splashDamageRadius = 72f;
                     status = StatusEffects.electrified;
                     statusDuration = 60f * 4f;
+                    collidesTeam = true;
                     fragBullets = 36;
                     fragVelocityMin = 0.3f;
                     fragRandomSpread = 0f;
@@ -1449,6 +1450,7 @@ public class UnitTypes{
                         drag = 0.001f;
                         statusDuration = 60f * 6f;
                         damage = 0f;
+                        collidesTeam = true;
                         splashDamage = 2f;
                         splashDamageRadius = 24f;
                     }};   
