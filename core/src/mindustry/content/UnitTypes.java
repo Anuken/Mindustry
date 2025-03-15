@@ -1426,38 +1426,47 @@ public class UnitTypes{
                     mixColorTo = Color.white;
 
                     hitSound = Sounds.plasmaboom;
-
                     shootCone = 180f;
                     ejectEffect = Fx.none;
                     hitShake = 4f;
-
                     collidesAir = false;
-
                     lifetime = 70f;
-
                     despawnEffect = Fx.greenBomb;
                     hitEffect = Fx.massiveExplosion;
                     keepVelocity = false;
                     spin = 2f;
-
                     shrinkX = shrinkY = 0.7f;
-
                     speed = 0f;
                     collides = false;
-
-                    healPercent = 15f;
-                    splashDamage = 220f;
-                    splashDamageRadius = 80f;
+                    healPercent = 55f;
+                    splashDamage = 120f;
+                    splashDamageRadius = 96f;
                     damage = splashDamage * 0.7f;
+                    status = StatusEffects.electrified;
+                    statusDuration = 60f * 4f;
+                    fragBullets = 12;
+                    fragVelocityMin = 1f;
+                    fragRandomSpread = 0f;
+                    fragSpread = 30f;
+                    fragBullet = new LiquidBulletType(Liquids.cryofluid){{
+                        lifetime = 30f;
+                        speed = 1f;
+                        knockback = 2.3f;
+                        puddleSize = 8f;
+                        orbSize = 4f;
+                        drag = 0.001f;
+                        statusDuration = 60f * 4f;
+                        damage = 0f;
+                    }};   
                 }};
             }});
         }};
 
         oct = new UnitType("oct"){{
             aiController = DefenderAI::new;
-
+            fogRadius = 36f;
             armor = 16f;
-            health = 24000;
+            health = 16000;
             speed = 0.8f;
             rotateSpeed = 1f;
             accel = 0.04f;
@@ -1474,7 +1483,27 @@ public class UnitTypes{
             buildBeamOffset = 43;
             ammoCapacity = 1;
 
-            abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8, 8, 0f), new RepairFieldAbility(130f, 60f * 2, 140f));
+            abilities.add(new ForceFieldAbility(152f, 9f, 20000f, 60f * 6, 8, 0f), new StatusFieldAbility(StatusEffects.overclock, 60f * 4, 60f * 4f, 150f));
+            weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
+                x = 22f;
+                y = 16f;
+                shootY = 6f;
+                beamWidth = 1.2f;
+                repairSpeed = 4f;
+                bullet = new BulletType(){{
+                    maxRange = 160f;
+                }};
+            }};
+            weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
+                x = 22f;
+                y = -27f;
+                shootY = 6f;
+                beamWidth = 1.2f;
+                repairSpeed = 4f;
+                bullet = new BulletType(){{
+                    maxRange = 160f;
+                }};
+            }};
         }};
 
         //endregion
