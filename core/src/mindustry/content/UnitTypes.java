@@ -1430,7 +1430,7 @@ public class UnitTypes{
                     ejectEffect = Fx.none;
                     hitShake = 4f;
                     collidesAir = false;
-                    lifetime = 70f;
+                    lifetime = 80f;
                     despawnEffect = Fx.greenBomb;
                     hitEffect = Fx.massiveExplosion;
                     keepVelocity = false;
@@ -1449,7 +1449,7 @@ public class UnitTypes{
                     fragRandomSpread = 0f;
                     fragSpread = 30f;
                     fragBullet = new LiquidBulletType(Liquids.cryofluid){{
-                        lifetime = 30f;
+                        lifetime = 24f;
                         speed = 1f;
                         knockback = 2.3f;
                         puddleSize = 8f;
@@ -1457,6 +1457,8 @@ public class UnitTypes{
                         drag = 0.001f;
                         statusDuration = 60f * 4f;
                         damage = 0f;
+                        splashDamage = 10f;
+                        splashDamageRadius = 32f;
                     }};   
                 }};
             }});
@@ -1485,23 +1487,23 @@ public class UnitTypes{
 
             abilities.add(new ForceFieldAbility(152f, 9f, 20000f, 60f * 6, 8, 0f), new StatusFieldAbility(StatusEffects.overclock, 60f * 4, 60f * 4f, 150f));
             weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
-                x = 22f;
-                y = 16f;
+                x = 23f;
+                y = 15f;
                 shootY = 6f;
                 beamWidth = 1.2f;
                 repairSpeed = 4f;
                 bullet = new BulletType(){{
-                    maxRange = 160f;
+                    maxRange = 192f;
                 }};
             }});
             weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
-                x = 22f;
-                y = -27f;
+                x = 24f;
+                y = -29f;
                 shootY = 6f;
                 beamWidth = 1.2f;
                 repairSpeed = 4f;
                 bullet = new BulletType(){{
-                    maxRange = 160f;
+                    maxRange = 192f;
                 }};
             }});
         }};
