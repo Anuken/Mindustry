@@ -1493,7 +1493,7 @@ public class UnitTypes{
                 bullet = new BulletType(){{
                     maxRange = 160f;
                 }};
-            }};
+            }});
             weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
                 x = 22f;
                 y = -27f;
@@ -1503,7 +1503,7 @@ public class UnitTypes{
                 bullet = new BulletType(){{
                     maxRange = 160f;
                 }};
-            }};
+            }});
         }};
 
         //endregion
