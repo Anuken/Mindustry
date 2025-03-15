@@ -1445,12 +1445,12 @@ public class UnitTypes{
                         lifetime = 24f;
                         speed = 0.5f;
                         knockback = 2.3f;
-                        puddleSize = 24f;
+                        puddleSize = 28f;
                         orbSize = 4f;
                         drag = 0.001f;
                         statusDuration = 60f * 6f;
                         damage = 0f;
-                        collidesTeam = true;
+                        collides = false;
                         splashDamage = 2f;
                         splashDamageRadius = 24f;
                     }};   
