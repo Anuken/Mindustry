@@ -1392,7 +1392,6 @@ public class UnitTypes{
             flying = true;
             engineOffset = 13f;
             engineSize = 7f;
-            faceTarget = false;
             hitSize = 36f;
             payloadCapacity = (3 * 3) * tilePayload;
             buildSpeed = 2.5f;
@@ -1400,7 +1399,7 @@ public class UnitTypes{
             range = 140f;
             targetAir = false;
             targetFlags = new BlockFlag[]{BlockFlag.battery, BlockFlag.factory, null};
-
+            fogRadius = 72f;
             ammoType = new PowerAmmoType(3000);
 
             weapons.add(new Weapon("plasma-missile-mount"){{
@@ -1410,11 +1409,11 @@ public class UnitTypes{
                 layerOffset = -0.2f;
                 rotate = true;
                 rotateSpeed = 0.4f;
-                rotationLimit = 30f;
+                rotationLimit = 60f;
                 soundPitchMin = 1f;
                 shootSound = Sounds.plasmadrop;
 
-                bullet = new ArtilleryBulletType(0.8f, 70f){{
+                bullet = new ArtilleryBulletType(0.8f, 60f){{
                     sprite = "large-bomb";
                     width = height = 120/4f;
 
@@ -1459,7 +1458,7 @@ public class UnitTypes{
 
         oct = new UnitType("oct"){{
             aiController = DefenderAI::new;
-            fogRadius = 36f;
+            fogRadius = 96f;
             armor = 16f;
             health = 16000;
             speed = 0.8f;
