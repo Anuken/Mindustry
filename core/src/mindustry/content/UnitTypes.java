@@ -1121,8 +1121,10 @@ public class UnitTypes{
                 splashDamageRadius = 36f;
                 splashDamage = 60f;
                 ammoMultiplier = 4f;
+                homingPower = 0.02f;
                 lifetime = 35f;
-                hitEffect = Fx.blastExplosion;
+                scaleLife = true;
+                hitEffect = Fx.flakExplosion;
                 despawnEffect = Fx.blastExplosion;
                 collidesTiles = false;
                 status = StatusEffects.blasted;
@@ -1142,6 +1144,7 @@ public class UnitTypes{
                 bullet = missiles;
                 shootSound = Sounds.missileLarge;
                 rotate = true;
+                rotationLimit = 60f;
                 shadow = 6f;
             }},
             new Weapon("large-bullet-mount"){{
@@ -1154,6 +1157,7 @@ public class UnitTypes{
                 bullet = missiles;
                 shootSound = Sounds.missileLarge;
                 rotate = true;
+                rotationLimit = 60f;
                 shadow = 6f;
             }}
             );
@@ -1176,14 +1180,15 @@ public class UnitTypes{
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
-            BulletType fragBullet = new BasicBulletType(9f, 45f){{
+            BulletType fragBullet = new BasicBulletType(9f, 50f){{
                 shootEffect = Fx.shootBig;
+                hitEffect = Fx.flakExplosion;
                 width = 9f;
                 height = 16f;
                 hitSize = 6f;
                 ammoMultiplier = 4f;
-                splashDamage = 65f;
-                splashDamageRadius = 25f;
+                splashDamage = 70f;
+                splashDamageRadius = 28f;
                 collidesTiles = false;
                 lifetime = 27f;
                 scaleLife = true;
@@ -1203,7 +1208,7 @@ public class UnitTypes{
                 y = 32f;
                 mirror = false;
                 layerOffset = -0.2f;
-                reload = 210f;
+                reload = 240f;
                 recoil = 4f;
                 chargeSound = Sounds.lasercharge2;
                 shootSound = Sounds.laser;
@@ -1215,12 +1220,13 @@ public class UnitTypes{
                     sprite = "large-orb";
                     chargeEffect = Fx.lancerLaserCharge;
                     hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
+                    hitSound = Sounds.titanExplosion;
                     width = 18f;
                     height = 18f;
                     hitSize = 8f;
                     ammoMultiplier = 4f;
                     splashDamage = 480f;
-                    splashDamageRadius = 64f;
+                    splashDamageRadius = 40f;
                     collidesTiles = false;
                     lifetime = 34f;
                     scaleLife = true;
@@ -1240,7 +1246,7 @@ public class UnitTypes{
                 x = 15f;
                 y = 28f;
                 rotateSpeed = 2f;
-                reload = 15f;
+                reload = 20f;
                 shootSound = Sounds.mediumCannon;
                 shadow = 7f;
                 rotate = true;
@@ -1251,7 +1257,7 @@ public class UnitTypes{
             new Weapon("large-artillery"){{
                 y = 16f;
                 x = -28f;
-                reload = 15f;
+                reload = 20f;
                 ejectEffect = Fx.casing1;
                 rotateSpeed = 2f;
                 shake = 1f;
@@ -1259,7 +1265,7 @@ public class UnitTypes{
                 rotate = true;
                 shadow = 7f;
                 shootY = 7.25f;
-                shoot.firstShotDelay = 7f;
+                shoot.firstShotDelay = 9f;
                 bullet = fragBullet;
             }});
         }};
