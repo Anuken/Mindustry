@@ -1103,7 +1103,7 @@ public class UnitTypes{
             flying = true;
             lowAltitude = true;
             health = 6400;
-            armor = 12f;
+            armor = 16f;
             fogRadius = 48f;
             engineOffset = 21;
             engineSize = 5.3f;
@@ -1170,11 +1170,11 @@ public class UnitTypes{
             rotateSpeed = 1.2f;
             flying = true;
             lowAltitude = true;
-            health = 17000;
+            health = 18000;
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
-            armor = 19f;
+            armor = 22f;
             fogRadius = 72f;
             immunities = ObjectSet.with(StatusEffects.wet, StatusEffects.sapped);
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
@@ -1190,7 +1190,7 @@ public class UnitTypes{
                 splashDamage = 120f;
                 splashDamageRadius = 28f;
                 collidesTiles = false;
-                lifetime = 27f;
+                lifetime = 28f;
                 scaleLife = true;
                 trailEffect = Fx.artilleryTrail;
                 status = StatusEffects.blasted;
@@ -1208,12 +1208,14 @@ public class UnitTypes{
                 y = 30f;
                 mirror = false;
                 layerOffset = -0.2f;
-                reload = 270f;
+                reload = 240f;
                 recoil = 4f;
                 chargeSound = Sounds.lasercharge2;
                 shootSound = Sounds.laser;
                 shadow = 20f;
-                rotate = false;
+                rotate = true;
+                rotateSpeed = 0.8f;
+                rotationLimit = 50f;
                 shoot.firstShotDelay = Fx.lancerLaserCharge.lifetime - 1f;
 
                 bullet = new BasicBulletType(7f, 180f){{
@@ -1227,7 +1229,7 @@ public class UnitTypes{
                     splashDamage = 640f;
                     splashDamageRadius = 40f;
                     collidesTiles = false;
-                    lifetime = 34f;
+                    lifetime = 36f;
                     scaleLife = true;
                     trailLength = 12;
                     trailWidth = 2.2f;
