@@ -1112,14 +1112,14 @@ public class UnitTypes{
             immunities.add(StatusEffects.wet);
             ammoType = new ItemAmmoType(Items.thorium);
 
-            BulletType missiles = new MissileBulletType(6f, 45f){{
+            BulletType missiles = new MissileBulletType(6f, 60f){{
                 sprite = "missile-large";
                 width = 14f;
                 height = 20f;
                 shrinkY = 0f;
                 drag = -0.001f;
                 splashDamageRadius = 36f;
-                splashDamage = 60f;
+                splashDamage = 80f;
                 ammoMultiplier = 4f;
                 homingPower = 0.02f;
                 lifetime = 35f;
@@ -1170,7 +1170,7 @@ public class UnitTypes{
             rotateSpeed = 1.2f;
             flying = true;
             lowAltitude = true;
-            health = 20000;
+            health = 17000;
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
@@ -1180,14 +1180,14 @@ public class UnitTypes{
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
-            BulletType fragBullet = new BasicBulletType(9f, 50f){{
+            BulletType fragBullet = new BasicBulletType(9f, 80f){{
                 shootEffect = Fx.shootBig;
                 hitEffect = Fx.flakExplosion;
                 width = 9f;
                 height = 16f;
                 hitSize = 6f;
                 ammoMultiplier = 4f;
-                splashDamage = 70f;
+                splashDamage = 120f;
                 splashDamageRadius = 28f;
                 collidesTiles = false;
                 lifetime = 27f;
@@ -1205,10 +1205,10 @@ public class UnitTypes{
                 shake = 4f;
                 shootY = 9f;
                 x = 0f;
-                y = 32f;
+                y = 30f;
                 mirror = false;
                 layerOffset = -0.2f;
-                reload = 240f;
+                reload = 270f;
                 recoil = 4f;
                 chargeSound = Sounds.lasercharge2;
                 shootSound = Sounds.laser;
@@ -1221,11 +1221,10 @@ public class UnitTypes{
                     chargeEffect = Fx.lancerLaserCharge;
                     hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                     hitSound = Sounds.titanExplosion;
-                    width = 18f;
-                    height = 18f;
+                    width = height = 20f;
                     hitSize = 8f;
                     ammoMultiplier = 4f;
-                    splashDamage = 480f;
+                    splashDamage = 640f;
                     splashDamageRadius = 40f;
                     collidesTiles = false;
                     lifetime = 34f;
