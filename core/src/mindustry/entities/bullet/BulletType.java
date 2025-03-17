@@ -34,6 +34,8 @@ public class BulletType extends Content implements Cloneable{
     public float speed = 1f;
     /** Direct damage dealt on hit. */
     public float damage = 1f;
+    /** How much this bullet heals the shooter when it hits an enemy**/
+    public float sapStrength = 0;
     /** Hitbox size. */
     public float hitSize = 4;
     /** Clipping hitbox. */
@@ -409,6 +411,10 @@ public class BulletType extends Content implements Cloneable{
         if(entity instanceof Healthc h){
             float damage = b.damage;
             float shield = entity instanceof Shieldc s ? Math.max(s.shield(), 0f) : 0f;
+            if(b.owner instanceof Healthc o){
+                float result = Math.max(Math.min(h.health(), damage), 0);
+                o.heal(result * sapStrength);
+            }
             if(maxDamageFraction > 0){
                 float cap = h.maxHealth() * maxDamageFraction + shield;
                 damage = Math.min(damage, cap);
@@ -422,6 +428,7 @@ public class BulletType extends Content implements Cloneable{
             }else{
                 h.damage(damage);
             }
+
         }
 
         if(entity instanceof Unit unit){
