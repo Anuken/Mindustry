@@ -539,9 +539,11 @@ public class LogicBlock extends Block{
 
                 if(accumulator > maxInstructionScale * ipt) accumulator = maxInstructionScale * ipt;
 
-                for(int i = 0; i < (int)accumulator; i++){
+                //Previously, it was only using half of the accumulator.
+                while(accumulator > 1){
                     executor.runOnce();
-                    accumulator --;
+                    //Router asked for this
+                    accumulator -= 1f;
                     if(executor.yield){
                         executor.yield = false;
                         break;
