@@ -130,6 +130,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.hasWeapons();
     }
 
+    public boolean hasOffensiveWeapons(){
+        return type.hasOffensiveWeapons();
+    }
+
     /** @return speed with boost & floor multipliers factored in. */
     public float speed(){
         float strafePenalty = isGrounded() || !isPlayer() ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(vel().angle(), rotation) / 180f);
@@ -721,8 +725,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             Events.fire(Trigger.suicideBomb);
         }
 
-        for(WeaponMount mount : mounts){
-            if(mount.weapon.shootOnDeath && !(mount.weapon.bullet.killShooter && mount.totalShots > 0)){
+        for(BaseWeaponMount m : mounts){
+            if(!(m instanceof WeaponMount mount)) continue;
+            Weapon weapon = (Weapon)mount.weapon;
+            if(weapon.shootOnDeath && !(weapon.bullet.killShooter && mount.totalShots > 0)){
                 mount.reload = 0f;
                 mount.shoot = true;
                 mount.weapon.update(self(), mount);

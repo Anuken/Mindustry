@@ -7,6 +7,7 @@ import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -20,8 +21,10 @@ public class HugAI extends AIController{
 
         if(core != null && unit.within(core, unit.range() / 1.1f + core.block.size * tilesize / 2f)){
             target = core;
-            for(var mount : unit.mounts){
-                if(mount.weapon.controllable && mount.weapon.bullet.collidesGround){
+            for(var m : unit.mounts){
+                if(!(m instanceof WeaponMount mount)) continue;
+                Weapon w = (Weapon)mount.weapon;
+                if(w.controllable && w.bullet.collidesGround){
                     mount.target = core;
                 }
             }
