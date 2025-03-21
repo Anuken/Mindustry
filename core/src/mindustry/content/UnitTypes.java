@@ -303,8 +303,6 @@ public class UnitTypes{
                     pierce = true;
                     pierceCap = 4;
                     pierceBuilding = true;
-                    frontColor = Pal.lightishOrange;
-                    backColor = Pal.lightOrange;
                     makeFire = true;
                     trailEffect = Fx.incendTrail;
                     hitEffect = Fx.hitMeltdown;
