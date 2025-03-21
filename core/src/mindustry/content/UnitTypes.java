@@ -184,7 +184,7 @@ public class UnitTypes{
         }};
 
         scepter = new UnitType("scepter"){{
-            speed = 0.75f;
+            speed = 0.65f;
             hitSize = 22f;
             rotateSpeed = 2.4f;
             health = 9000;
@@ -197,7 +197,7 @@ public class UnitTypes{
             singleTarget = true;
             drownTimeMultiplier = 4f;
 
-            immunities = ObjectSet.with(StatusEffects.electrified, StatusEffects.melting);
+            immunities = ObjectSet.with(StatusEffects.electrified, StatusEffects.shocked);
 
             weapons.add(
             new Weapon("scepter-weapon"){{
@@ -245,7 +245,7 @@ public class UnitTypes{
             new Weapon("large-artillery"){{
                 reload = 30f;
                 x = 8.5f;
-                y = -2f;
+                y = -3f;
                 rotate = true;
                 rotationLimit = 60f;
                 shootSound = Sounds.artillery;
@@ -260,14 +260,16 @@ public class UnitTypes{
                         hitEffect = Fx.flakExplosion;
                         splashDamage = 70f;
                         splashDamageRadius = 40f;
-                        makeFire = true;
+                        incendChance = 0.2f;
+                        incendSpread = 5f;
+                        incendAmount = 1;
                     }};
             }}
             );
         }};
 
         reign = new UnitType("reign"){{
-            speed = 0.625f;
+            speed = 0.55f;
             hitSize = 30f;
             rotateSpeed = 1.65f;
             health = 24000;
@@ -277,6 +279,7 @@ public class UnitTypes{
             drownTimeMultiplier = 6f;
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
+            immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             ammoType = new ItemAmmoType(Items.thorium);
 
             weapons.add(
@@ -291,8 +294,8 @@ public class UnitTypes{
                 shootSound = Sounds.flame;
 
                 bullet = new LiquidBulletType(Liquids.slag){{
-                    lifetime = 21f;
-                    speed = 12f;
+                    lifetime = 31f;
+                    speed = 8f;
                     puddleSize = 28f;
                     orbSize = 4f;
                     damage = 35f;
@@ -304,79 +307,52 @@ public class UnitTypes{
                     pierceCap = 4;
                     pierceBuilding = true;
                     makeFire = true;
-                    trailEffect = Fx.incendTrail;
+                    trailEffect = Fx.missileTrail;
+                    trailInterval = 2f;
                     hitEffect = Fx.hitMeltdown;
                 }};
             }},
 
             new Weapon("large-bullet-mount"){{
                 reload = 40f;
-                x = 17f;
-                y = -11f;
+                x = 16f;
+                y = -8f;
                 rotate = true;
-                rotationLimit = 60f;
-                shootSound = Sounds.largeCannon;
+                rotationLimit = 30f;
+                shootSound = Sounds.mediumCannon;
                 ejectEffect = Fx.casing3Double;
-                bullet = new ArtilleryBulletType(7f, 20){{
+                bullet = new ArtilleryBulletType(6f, 80f){{
                         width = 14f;
                         height = 24f;
                         absorbable = false;
                         reflectable = false;
-                        lifetime = 36f;
+                        lifetime = 41f;
                         hitColor = backColor = trailColor = Pal.surge;
                         hitEffect = Fx.flakExplosion;
                         splashDamage = 210f;
-                        splashDamageRadius = 48f;
-                        fragBullets = 15;
-                        fragRandomSpread = 0f;
-                        fragSpread = 24f;
-                        fragBullet = new LiquidBulletType(Liquids.oil){{
-                            lifetime = 4f;
-                            speed = 4f;
-                            absorbable = false;
-                            reflectable = false;
-                            collides = false;
-                            puddleSize = 32f;
-                            orbSize = 4f;
-                            statusDuration = 60f * 6f;
-                            damage = 2f;
-                        }};
+                        splashDamageRadius = 48f; 
                     }};
             }},
 
             new Weapon("large-bullet-mount"){{
                 reload = 40f;
-                x = -7f;
-                y = -11f;
+                x = -9f;
+                y = -8f;
                 rotate = true;
-                rotationLimit = 60f;
-                shootSound = Sounds.largeCannon;
+                rotationLimit = 30f;
+                shootSound = Sounds.mediumCannon;
                 shoot.firstShotDelay = 20f;
                 ejectEffect = Fx.casing3Double;
-                bullet = new ArtilleryBulletType(7f, 20){{
+                bullet = new ArtilleryBulletType(6f, 80f){{
                         width = 14f;
                         height = 24f;
                         absorbable = false;
                         reflectable = false;
-                        lifetime = 36f;
+                        lifetime = 41f;
                         hitColor = backColor = trailColor = Pal.surge;
                         hitEffect = Fx.flakExplosion;
-                        splashDamage = 150f;
+                        splashDamage = 210f;
                         splashDamageRadius = 48f;
-                        fragBullets = 15;
-                        fragRandomSpread = 0f;
-                        fragSpread = 24f;
-                        fragBullet = new LiquidBulletType(Liquids.oil){{
-                            lifetime = 4f;
-                            speed = 4f;
-                            absorbable = false;
-                            reflectable = false;
-                            collides = false;
-                            puddleSize = 32f;
-                            orbSize = 4f;
-                            statusDuration = 60f * 6f;
-                            damage = 2f;
-                        }};
                     }};
             }}
             );
