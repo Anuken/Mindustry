@@ -214,10 +214,10 @@ public class UnitTypes{
                 shoot.shots = 3;
                 shoot.shotDelay = 3f;
 
-                bullet = new BasicBulletType(16f, 40){{
-                    width = 12f;
-                    height = 24f;
-                    hitSize = 6;
+                bullet = new BasicBulletType(16f, 35f){{
+                    width = 10f;
+                    height = 18f;
+                    hitSize = 5f;
                     lifetime = 14f;
                     shootEffect = Fx.shootBig;
                     
@@ -242,7 +242,7 @@ public class UnitTypes{
                 }};
             }},
 
-            new Weapon("large-bullet-mount"){{
+            new Weapon("large-artillery"){{
                 reload = 30f;
                 x = 8.5f;
                 y = -2f;
@@ -250,15 +250,15 @@ public class UnitTypes{
                 rotationLimit = 60f;
                 shootSound = Sounds.artillery;
                 ejectEffect = Fx.casing3Double;
-                bullet = new ArtilleryBulletType(7f, 20){{
-                        width = 6f;
-                        height = 14f;
+                bullet = new ArtilleryBulletType(7f, 20f){{
+                        width = 14f;
+                        height = 24f;
                         absorbable = false;
                         reflectable = false;
                         lifetime = 33f;
                         hitColor = backColor = trailColor = Pal.lightPyraFlame;
                         hitEffect = Fx.flakExplosion;
-                        splashDamage = 80f;
+                        splashDamage = 70f;
                         splashDamageRadius = 40f;
                         makeFire = true;
                     }};
@@ -293,8 +293,8 @@ public class UnitTypes{
                 bullet = new LiquidBulletType(Liquids.slag){{
                     lifetime = 21f;
                     speed = 12f;
-                    puddleSize = 24f;
-                    orbSize = 8f;
+                    puddleSize = 28f;
+                    orbSize = 4f;
                     damage = 35f;
                     statusDuration = 60f * 4f;
                     absorbable = false;
@@ -309,44 +309,44 @@ public class UnitTypes{
                 }};
             }},
 
-            new Weapon("artillery"){{
+            new Weapon("large-bullet-mount"){{
                 reload = 40f;
-                x = 15f;
+                x = 17f;
                 y = -11f;
                 rotate = true;
                 rotationLimit = 60f;
                 shootSound = Sounds.largeCannon;
                 ejectEffect = Fx.casing3Double;
                 bullet = new ArtilleryBulletType(7f, 20){{
-                        width = 6f;
-                        height = 14f;
+                        width = 14f;
+                        height = 24f;
                         absorbable = false;
                         reflectable = false;
                         lifetime = 36f;
                         hitColor = backColor = trailColor = Pal.surge;
                         hitEffect = Fx.flakExplosion;
-                        splashDamage = 150f;
+                        splashDamage = 210f;
                         splashDamageRadius = 48f;
                         fragBullets = 15;
                         fragRandomSpread = 0f;
                         fragSpread = 24f;
                         fragBullet = new LiquidBulletType(Liquids.oil){{
-                            lifetime = 2f;
-                            speed = 8f;
+                            lifetime = 4f;
+                            speed = 4f;
                             absorbable = false;
                             reflectable = false;
-                            collidesTiles = false;
+                            collides = false;
                             puddleSize = 32f;
                             orbSize = 4f;
-                            statusDuration = 60f * 4f;
+                            statusDuration = 60f * 6f;
                             damage = 2f;
                         }};
                     }};
             }},
 
-            new Weapon("artillery"){{
+            new Weapon("large-bullet-mount"){{
                 reload = 40f;
-                x = -9f;
+                x = -7f;
                 y = -11f;
                 rotate = true;
                 rotationLimit = 60f;
@@ -354,8 +354,8 @@ public class UnitTypes{
                 shoot.firstShotDelay = 20f;
                 ejectEffect = Fx.casing3Double;
                 bullet = new ArtilleryBulletType(7f, 20){{
-                        width = 6f;
-                        height = 14f;
+                        width = 14f;
+                        height = 24f;
                         absorbable = false;
                         reflectable = false;
                         lifetime = 36f;
@@ -367,14 +367,14 @@ public class UnitTypes{
                         fragRandomSpread = 0f;
                         fragSpread = 24f;
                         fragBullet = new LiquidBulletType(Liquids.oil){{
-                            lifetime = 2f;
-                            speed = 8f;
+                            lifetime = 4f;
+                            speed = 4f;
                             absorbable = false;
                             reflectable = false;
-                            collidesTiles = false;
+                            collides = false;
                             puddleSize = 32f;
                             orbSize = 4f;
-                            statusDuration = 60f * 4f;
+                            statusDuration = 60f * 6f;
                             damage = 2f;
                         }};
                     }};
