@@ -2,26 +2,24 @@ package mindustry.game;
 
 import arc.*;
 
-public enum Difficulty{
-    //TODO these need tweaks
-    casual(0.75f, 0.5f, 2f),
-    easy(1f, 0.75f, 1.5f),
-    normal(1f, 1f, 1f),
-    hard(1.25f, 1.5f, 0.8f),
-    eradication(1.5f, 2f, 0.6f);
+import java.util.List;
 
-    public static final Difficulty[] all = values();
+public class Difficulty{
 
     //TODO add more fields
     public float enemyHealthMultiplier, enemySpawnMultiplier, waveTimeMultiplier;
 
-    Difficulty(float enemyHealthMultiplier, float enemySpawnMultiplier, float waveTimeMultiplier){
+    public String name;
+
+    /* In order for a modder to use this they have to use Difficulties.addDifficullties() */
+    public Difficulty(float enemyHealthMultiplier, float enemySpawnMultiplier, float waveTimeMultiplier, String name){
         this.enemySpawnMultiplier = enemySpawnMultiplier;
         this.waveTimeMultiplier = waveTimeMultiplier;
         this.enemyHealthMultiplier = enemyHealthMultiplier;
+        this.name = name;
     }
 
     public String localized(){
-        return Core.bundle.get("difficulty." + name());
+        return Core.bundle.get("difficulty." + this.name);
     }
 }

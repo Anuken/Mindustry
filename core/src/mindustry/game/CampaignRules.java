@@ -1,9 +1,10 @@
 package mindustry.game;
 
 import mindustry.type.*;
+import mindustry.content.Difficulties;
 
 public class CampaignRules{
-    public Difficulty difficulty = Difficulty.normal;
+    public Difficulty difficulty = Difficulties.normal;
     public boolean fog;
     public boolean showSpawns;
     public boolean sectorInvasion;
