@@ -851,7 +851,7 @@ public class ApplicationTests{
 
         tiles.getn(tiles.width - 2, tiles.height - 2).setBlock(Blocks.coreShard, Team.sharded);
 
-        Seq<Block> blocks = content.blocks().select(b -> b.canBeBuilt());
+        Seq<Block> blocks = content.blocks().select(Block::canBeBuilt);
         for(int i = 0; i < blocks.size; i++){
             int x = (i % ts) * 3 + 1;
             int y = (i / ts) * 3 + 1;

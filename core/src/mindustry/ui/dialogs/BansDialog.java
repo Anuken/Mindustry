@@ -39,12 +39,10 @@ public class BansDialog extends BaseDialog{
 
             res.labelWrap("IP: [lightgray]" + info.lastIP + "\n[]Name: [lightgray]" + info.lastName).width(w - h - 24f);
             res.add().growX();
-            res.button(Icon.cancel, () -> {
-                ui.showConfirm("@confirm", "@confirmunban", () -> {
-                    netServer.admins.unbanPlayerID(info.id);
-                    setup();
-                });
-            }).size(h).pad(-14f);
+            res.button(Icon.cancel, () -> ui.showConfirm("@confirm", "@confirmunban", () -> {
+                netServer.admins.unbanPlayerID(info.id);
+                setup();
+            })).size(h).pad(-14f);
 
             table.add(res).width(w).height(h);
             table.row();

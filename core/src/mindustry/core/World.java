@@ -38,13 +38,9 @@ public class World{
     private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
 
     public World(){
-        Events.on(TileChangeEvent.class, e -> {
-            tileChanges ++;
-        });
+        Events.on(TileChangeEvent.class, e -> tileChanges ++);
 
-        Events.on(WorldLoadEvent.class, e -> {
-            tileChanges = -1;
-        });
+        Events.on(WorldLoadEvent.class, e -> tileChanges = -1);
     }
 
     /** Adds a custom handler function for loading a custom map - usually a generated one. */

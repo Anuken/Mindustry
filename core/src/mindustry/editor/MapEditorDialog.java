@@ -92,15 +92,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
             t.button("@editor.import", Icon.download, () -> createDialog("@editor.import",
                 "@editor.importmap", "@editor.importmap.description", Icon.download, (Runnable)loadDialog::show,
                 "@editor.importfile", "@editor.importfile.description", Icon.file, (Runnable)() ->
-                platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
-                    maps.tryCatchMapError(() -> {
-                        if(MapIO.isImage(file)){
-                            ui.showInfo("@editor.errorimage");
-                        }else{
-                            editor.beginEdit(MapIO.createMap(file, true));
-                        }
-                    });
-                })),
+                platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> maps.tryCatchMapError(() -> {
+                    if(MapIO.isImage(file)){
+                        ui.showInfo("@editor.errorimage");
+                    }else{
+                        editor.beginEdit(MapIO.createMap(file, true));
+                    }
+                }))),
 
                 "@editor.importimage", "@editor.importimage.description", Icon.fileImage, (Runnable)() ->
                 platform.showFileChooser(true, "png", file ->
@@ -187,9 +185,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         resizeDialog = new MapResizeDialog((width, height, shiftX, shiftY) -> {
             if(!(editor.width() == width && editor.height() == height && shiftX == 0 && shiftY == 0)){
-                ui.loadAnd(() -> {
-                    editor.resize(width, height, shiftX, shiftY);
-                });
+                ui.loadAnd(() -> editor.resize(width, height, shiftX, shiftY));
             }
         });
 
@@ -635,16 +631,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 mid.row();
 
                 if(!mobile){
-                    mid.table(t -> {
-                        t.button("@editor.center", Icon.move, Styles.flatt, view::center).growX().margin(9f);
-                    }).growX().top();
+                    mid.table(t -> t.button("@editor.center", Icon.move, Styles.flatt, view::center).growX().margin(9f)).growX().top();
                 }
 
                 mid.row();
 
-                mid.table(t -> {
-                    t.button("@editor.cliffs", Icon.terrain, Styles.flatt, editor::addCliffs).growX().margin(9f);
-                }).growX().top();
+                mid.table(t -> t.button("@editor.cliffs", Icon.terrain, Styles.flatt, editor::addCliffs).growX().margin(9f)).growX().top();
             }).margin(0).left().growY();
 
 

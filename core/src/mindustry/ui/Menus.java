@@ -72,11 +72,7 @@ public class Menus{
         if(message == null) message = "";
         if(def == null) def = "";
 
-        ui.showTextInput(title, message, textLength, def, numeric, allowEmpty, (text) -> {
-            Call.textInputResult(player, textInputId, text);
-        }, () -> {
-            Call.textInputResult(player, textInputId, null);
-        });
+        ui.showTextInput(title, message, textLength, def, numeric, allowEmpty, (text) -> Call.textInputResult(player, textInputId, text), () -> Call.textInputResult(player, textInputId, null));
     }
 
     @Remote(targets = Loc.both, called = Loc.both)

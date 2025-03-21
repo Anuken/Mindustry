@@ -45,9 +45,7 @@ public class SWorkshop implements SteamUGCCallback{
             Achievement.downloadMapWorkshop.complete();
         }
 
-        workshopFiles.each((type, list) -> {
-            Log.info("Fetched content (@): @", type.getSimpleName(), list.size);
-        });
+        workshopFiles.each((type, list) -> Log.info("Fetched content (@): @", type.getSimpleName(), list.size));
     }
 
     public Seq<Fi> getWorkshopFiles(Class<? extends Publishable> type){
@@ -99,35 +97,32 @@ public class SWorkshop implements SteamUGCCallback{
                             dialog.hide();
                         }).size(210f, 64f);
 
-                        dialog.buttons.button("@workshop.update", Icon.up, () -> {
-                            new BaseDialog("@workshop.update"){{
-                                setFillParent(false);
-                                cont.margin(10).add("@changelog").padRight(6f);
-                                cont.row();
-                                TextArea field = cont.area("", t -> {}).size(500f, 160f).get();
-                                field.setMaxLength(400);
-                                cont.row();
+                        dialog.buttons.button("@workshop.update", Icon.up, () -> new BaseDialog("@workshop.update"){{
+                            setFillParent(false);
+                            cont.margin(10).add("@changelog").padRight(6f);
+                            cont.row();
+                            TextArea field = cont.area("", t -> {}).size(500f, 160f).get();
+                            field.setMaxLength(400);
+                            cont.row();
 
-                                boolean[] updatedesc = {false};
+                            boolean[] updatedesc = {false};
 
-                                cont.check("@updatedesc", b -> updatedesc[0] = b).pad(4);
+                            cont.check("@updatedesc", b -> updatedesc[0] = b).pad(4);
 
-                                buttons.defaults().size(120, 54).pad(4);
-                                buttons.button("@ok", () -> {
-                                    if(!p.prePublish()){
-                                        Log.info("Rejecting due to pre-publish.");
-                                        return;
-                                    }
+                            buttons.defaults().size(120, 54).pad(4);
+                            buttons.button("@ok", () -> {
+                                if(!p.prePublish()){
+                                    Log.info("Rejecting due to pre-publish.");
+                                    return;
+                                }
 
-                                    ui.loadfrag.show("@publishing");
-                                    SWorkshop.this.update(p, new SteamPublishedFileID(Strings.parseLong(p.getSteamID(), -1)), field.getText().replace("\r", "\n"), updatedesc[0]);
-                                    dialog.hide();
-                                    hide();
-                                });
-                                buttons.button("@cancel", this::hide);
-                            }}.show();
-
-                        }).size(210f, 64f);
+                                ui.loadfrag.show("@publishing");
+                                SWorkshop.this.update(p, new SteamPublishedFileID(Strings.parseLong(p.getSteamID(), -1)), field.getText().replace("\r", "\n"), updatedesc[0]);
+                                dialog.hide();
+                                hide();
+                            });
+                            buttons.button("@cancel", this::hide);
+                        }}.show()).size(210f, 64f);
                         dialog.show();
                     }else{
                         SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + details.getPublishedFileID().handle());

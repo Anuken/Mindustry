@@ -373,12 +373,12 @@ public class CallGenerator{
 
         //execute the relevant method before the forward
         //if it throws a ValidateException, the method won't be forwarded
-        builder.addStatement("$N." + elem.name() + "(" + params.toString(", ", s -> s.name()) + ")", ((TypeElement)elem.up()).getQualifiedName().toString());
+        builder.addStatement("$N." + elem.name() + "(" + params.toString(", ", Selement::name) + ")", ((TypeElement)elem.up()).getQualifiedName().toString());
 
         //call forwarded method, don't forward on the client reader
         if(ent.forward && ent.where.isServer && !isClient){
             //call forwarded method
-            builder.addStatement("$L.$L.$L__forward(con, $L)", packageName, ent.className, elem.name(), params.toString(", ", s -> s.name()));
+            builder.addStatement("$L.$L.$L__forward(con, $L)", packageName, ent.className, elem.name(), params.toString(", ", Selement::name));
         }
 
         return builder.build();

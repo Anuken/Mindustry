@@ -1,11 +1,9 @@
 package mindustry.entities.bullet;
 
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.content.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.world.blocks.distribution.MassDriver.*;
 
 import static mindustry.Vars.*;

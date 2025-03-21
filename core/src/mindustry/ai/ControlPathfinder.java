@@ -1529,10 +1529,8 @@ public class ControlPathfinder implements Runnable{
                         clustersToInnerUpdate.remove(cluster);
                     });
 
-                    clustersToInnerUpdate.each(cluster -> {
-                        //only recompute the inner links
-                        updateClustersInner(cluster);
-                    });
+                    //only recompute the inner links
+                    clustersToInnerUpdate.each(this::updateClustersInner);
 
                     clustersToInnerUpdate.clear();
                     clustersToUpdate.clear();

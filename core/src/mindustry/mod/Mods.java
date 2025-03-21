@@ -629,30 +629,26 @@ public class Mods implements Loadable{
                 cont.row();
                 cont.add("@mod.errors").wrap().growX().center().labelAlign(Align.center);
                 cont.row();
-                cont.pane(p -> {
-                    mods.each(m -> m.enabled() && m.hasContentErrors(), m -> {
-                        p.add(m.name).color(Pal.accent).left();
-                        p.row();
-                        p.image().fillX().pad(4).color(Pal.accent);
-                        p.row();
-                        p.table(d -> {
-                            d.left().marginLeft(15f);
-                            for(Content c : m.erroredContent){
-                                d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
-                                d.button("@details", Icon.downOpen, Styles.cleart, () -> {
-                                    new Dialog(""){{
-                                        setFillParent(true);
-                                        cont.pane(e -> e.add(c.minfo.error).wrap().grow().labelAlign(Align.center, Align.left)).grow();
-                                        cont.row();
-                                        cont.button("@ok", Icon.left, this::hide).size(240f, 60f);
-                                    }}.show();
-                                }).size(190f, 50f).left().marginLeft(6);
-                                d.row();
-                            }
-                        }).left();
-                        p.row();
-                    });
-                });
+                cont.pane(p -> mods.each(m -> m.enabled() && m.hasContentErrors(), m -> {
+                    p.add(m.name).color(Pal.accent).left();
+                    p.row();
+                    p.image().fillX().pad(4).color(Pal.accent);
+                    p.row();
+                    p.table(d -> {
+                        d.left().marginLeft(15f);
+                        for(Content c : m.erroredContent){
+                            d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
+                            d.button("@details", Icon.downOpen, Styles.cleart, () -> new Dialog(""){{
+                                setFillParent(true);
+                                cont.pane(e -> e.add(c.minfo.error).wrap().grow().labelAlign(Align.center, Align.left)).grow();
+                                cont.row();
+                                cont.button("@ok", Icon.left, this::hide).size(240f, 60f);
+                            }}.show()).size(190f, 50f).left().marginLeft(6);
+                            d.row();
+                        }
+                    }).left();
+                    p.row();
+                }));
 
                 cont.row();
                 cont.button("@ok", this::hide).size(300, 50);
@@ -677,25 +673,23 @@ public class Mods implements Loadable{
             cont.row();
             cont.image().width(300f).colspan(span).pad(2).height(4f).color(Color.scarlet);
             cont.row();
-            cont.pane(p -> {
-                toCheck.each(mod -> {
-                    p.add(Core.bundle.get("mods.name") + " [accent]" + mod.meta.displayName).wrap().growX().left().labelAlign(Align.left);
-                    p.row();
-                    p.table(d -> {
-                        mod.missingDependencies.each(dep -> {
-                            d.add("[lightgray] > []" + dep).wrap().growX().left().labelAlign(Align.left);
+            cont.pane(p -> toCheck.each(mod -> {
+                p.add(Core.bundle.get("mods.name") + " [accent]" + mod.meta.displayName).wrap().growX().left().labelAlign(Align.left);
+                p.row();
+                p.table(d -> {
+                    mod.missingDependencies.each(dep -> {
+                        d.add("[lightgray] > []" + dep).wrap().growX().left().labelAlign(Align.left);
+                        d.row();
+                    });
+                    if(soft){
+                        mod.missingSoftDependencies.each(dep -> {
+                            d.add("[lightgray] > []" + dep + " [lightgray]" + Core.bundle.get("mod.dependencies.soft")).wrap().growX().left().labelAlign(Align.left);
                             d.row();
                         });
-                        if(soft){
-                            mod.missingSoftDependencies.each(dep -> {
-                                d.add("[lightgray] > []" + dep + " [lightgray]" + Core.bundle.get("mod.dependencies.soft")).wrap().growX().left().labelAlign(Align.left);
-                                d.row();
-                            });
-                        }
-                    }).growX().padBottom(8f).padLeft(8f);
-                    p.row();
-                });
-            }).fillX().colspan(span);
+                    }
+                }).growX().padBottom(8f).padLeft(8f);
+                p.row();
+            })).fillX().colspan(span);
 
             cont.row();
 
@@ -744,24 +738,20 @@ public class Mods implements Loadable{
                 if(success.any()){
                     p.add("@mod.dependencies.success").color(Pal.accent).wrap().fillX().left().labelAlign(Align.left);
                     p.row();
-                    p.table(t -> {
-                        success.each(d -> {
-                            t.add("[accent] > []" + d).wrap().growX().left().labelAlign(Align.left);
-                            t.row();
-                        });
-                    }).growX().padBottom(8f).padLeft(8f);
+                    p.table(t -> success.each(d -> {
+                        t.add("[accent] > []" + d).wrap().growX().left().labelAlign(Align.left);
+                        t.row();
+                    })).growX().padBottom(8f).padLeft(8f);
                     p.row();
                 }
 
                 if(failed.any()){
                     p.add("@mod.dependencies.failure").color(Color.scarlet).wrap().fillX().left().labelAlign(Align.left);
                     p.row();
-                    p.table(t -> {
-                        failed.each(d -> {
-                            t.add("[scarlet] > []" + d).wrap().growX().left().labelAlign(Align.left);
-                            t.row();
-                        });
-                    }).growX().padBottom(8f).padLeft(8f);
+                    p.table(t -> failed.each(d -> {
+                        t.add("[scarlet] > []" + d).wrap().growX().left().labelAlign(Align.left);
+                        t.row();
+                    })).growX().padBottom(8f).padLeft(8f);
                 }
             }).fillX();
             cont.row();

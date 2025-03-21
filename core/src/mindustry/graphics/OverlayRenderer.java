@@ -31,13 +31,9 @@ public class OverlayRenderer{
     private boolean updatedCores;
 
     public OverlayRenderer(){
-        Events.on(WorldLoadEvent.class, e -> {
-            updatedCores = true;
-        });
+        Events.on(WorldLoadEvent.class, e -> updatedCores = true);
 
-        Events.on(CoreChangeEvent.class, e -> {
-            updatedCores = true;
-        });
+        Events.on(CoreChangeEvent.class, e -> updatedCores = true);
     }
 
     private void updateCoreEdges(){
