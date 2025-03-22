@@ -209,9 +209,9 @@ public class UnitTypes{
                 recoil = 3f;
                 shake = 1f;
                 ejectEffect = Fx.casing3;
-                shootSound = Sounds.shotgun;
+                shootSound = Sounds.dullExplosion;
                 inaccuracy = 1f;
-                shoot.shots = 4;
+                shoot.shots = 3;
                 shoot.shotDelay = 3f;
 
                 bullet = new BasicBulletType(16f, 50f){{
@@ -231,8 +231,6 @@ public class UnitTypes{
                         absorbable = false;
                         reflectable = false;
                         pierceArmor = true;
-                        pierce = true;
-                        pierceBuilding = true;
                         puddleSize = 16f;
                         orbSize = 4f;
                         damage = 20f;
@@ -257,13 +255,10 @@ public class UnitTypes{
                         lifetime = 58f;
                         hitColor = backColor = trailColor = Pal.lightPyraFlame;
                         hitEffect = Fx.flakExplosion;
-                        pierce = true;
-                        pierceCap = 2;
-                        pierceBuilding = true;
                         lightning = 5;
                         lightningLength = 7;
                         lightningColor = Pal.surge;
-                        lightningDamage = 60;
+                        lightningDamage = 40;
                         lightningCone = 120f;
                         incendChance = 0.2f;
                         incendSpread = 5f;
@@ -294,8 +289,8 @@ public class UnitTypes{
                 x = 21.5f;
                 shootY = 11f;
                 reload = 30f;
-                shoot.shots = 15;
-                velocityRnd = 0.3f;
+                shoot.shots = 12;
+                velocityRnd = 0.2f;
                 shake = 2f;
                 inaccuracy = 7f;
                 shootSound = Sounds.flame;
