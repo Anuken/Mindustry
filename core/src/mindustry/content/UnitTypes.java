@@ -242,28 +242,28 @@ public class UnitTypes{
             }},
 
             new Weapon("large-artillery"){{
-                reload = 48f;
+                reload = 75f;
                 x = 8.5f;
                 y = -3f;
                 rotate = true;
                 rotationLimit = 60f;
                 shootSound = Sounds.artillery;
                 ejectEffect = Fx.casing3Double;
-                bullet = new BasicBulletType(7f, 20f){{
+                bullet = new BasicBulletType(4f, 80f){{
                         width = 14f;
                         height = 24f;
                         absorbable = false;
                         reflectable = false;
-                        lifetime = 33f;
+                        lifetime = 58f;
                         hitColor = backColor = trailColor = Pal.lightPyraFlame;
                         hitEffect = Fx.flakExplosion;
                         pierce = true;
                         pierceCap = 2;
                         pierceBuilding = true;
-                        lightning = 4;
+                        lightning = 5;
                         lightningLength = 7;
                         lightningColor = Pal.surge;
-                        lightningDamage = 40;
+                        lightningDamage = 60;
                         lightningCone = 120f;
                         incendChance = 0.2f;
                         incendSpread = 5f;
@@ -274,7 +274,7 @@ public class UnitTypes{
         }};
 
         reign = new UnitType("reign"){{
-            speed = 0.5f;
+            speed = 0.53f;
             hitSize = 30f;
             rotateSpeed = 1.65f;
             health = 27000;
@@ -294,14 +294,14 @@ public class UnitTypes{
                 x = 21.5f;
                 shootY = 11f;
                 reload = 30f;
-                shoot.shots = 20;
+                shoot.shots = 15;
                 velocityRnd = 0.3f;
                 shake = 2f;
                 inaccuracy = 7f;
                 shootSound = Sounds.flame;
 
                 bullet = new LiquidBulletType(Liquids.slag){{
-                    lifetime = 30f;
+                    lifetime = 32f;
                     scaleLife = true;
                     speed = 8f;
                     puddleSize = 28f;
@@ -335,7 +335,7 @@ public class UnitTypes{
                         height = 24f;
                         absorbable = false;
                         reflectable = false;
-                        lifetime = 40f;
+                        lifetime = 43f;
                         hitColor = backColor = trailColor = Pal.surge;
                         hitEffect = Fx.scatheExplosion;
                         status = StatusEffects.burning;
@@ -359,7 +359,7 @@ public class UnitTypes{
                         height = 24f;
                         absorbable = false;
                         reflectable = false;
-                        lifetime = 40f;
+                        lifetime = 43f;
                         hitColor = backColor = trailColor = Pal.surge;
                         hitEffect = Fx.scatheExplosion;
                         status = StatusEffects.burning;
