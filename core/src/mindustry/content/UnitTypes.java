@@ -214,7 +214,7 @@ public class UnitTypes{
                 shoot.shots = 3;
                 shoot.shotDelay = 3f;
 
-                bullet = new BasicBulletType(16f, 30f){{
+                bullet = new BasicBulletType(16f, 50f){{
                     width = 10f;
                     height = 18f;
                     hitSize = 5f;
@@ -235,7 +235,7 @@ public class UnitTypes{
                         pierceBuilding = true;
                         puddleSize = 16f;
                         orbSize = 4f;
-                        damage = 30f;
+                        damage = 20f;
                         statusDuration = 60f * 4f;
                     }};
                 }};
@@ -263,7 +263,8 @@ public class UnitTypes{
                         lightning = 4;
                         lightningLength = 7;
                         lightningColor = Pal.surge;
-                        lightningDamage = 30;
+                        lightningDamage = 40;
+                        lightningCone = 120f;
                         incendChance = 0.2f;
                         incendSpread = 5f;
                         incendAmount = 1;
@@ -292,7 +293,7 @@ public class UnitTypes{
                 y = 1f;
                 x = 21.5f;
                 shootY = 11f;
-                reload = 20f;
+                reload = 30f;
                 shoot.shots = 30;
                 velocityRnd = 0.3f;
                 shake = 2f;
@@ -329,17 +330,17 @@ public class UnitTypes{
                 rotationLimit = 30f;
                 shootSound = Sounds.mediumCannon;
                 ejectEffect = Fx.casing3Double;
-                bullet = new BasicBulletType(6f, 80f){{
+                bullet = new BasicBulletType(6f, 70f){{
                         width = 14f;
                         height = 24f;
                         absorbable = false;
                         reflectable = false;
                         lifetime = 40f;
                         hitColor = backColor = trailColor = Pal.surge;
-                        hitEffect = Fx.impactReactorExplosion;
+                        hitEffect = Fx.scatheExplosion;
                         status = StatusEffects.burning;
                         statusDuration = 60f * 4f;
-                        splashDamage = 270f;
+                        splashDamage = 210f;
                         splashDamageRadius = 64f; 
                     }};
             }},
@@ -353,17 +354,17 @@ public class UnitTypes{
                 shootSound = Sounds.mediumCannon;
                 shoot.firstShotDelay = 40f;
                 ejectEffect = Fx.casing3Double;
-                bullet = new BasicBulletType(6f, 80f){{
+                bullet = new BasicBulletType(6f, 70f){{
                         width = 14f;
                         height = 24f;
                         absorbable = false;
                         reflectable = false;
                         lifetime = 40f;
                         hitColor = backColor = trailColor = Pal.surge;
-                        hitEffect = Fx.impactReactorExplosion;
+                        hitEffect = Fx.scatheExplosion;
                         status = StatusEffects.burning;
                         statusDuration = 60f * 4f;
-                        splashDamage = 270f;
+                        splashDamage = 210f;
                         splashDamageRadius = 64f;
                     }};
             }}
