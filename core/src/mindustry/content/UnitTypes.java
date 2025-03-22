@@ -187,8 +187,8 @@ public class UnitTypes{
             speed = 0.65f;
             hitSize = 22f;
             rotateSpeed = 2.4f;
-            health = 9000;
-            armor = 18f;
+            health = 9800;
+            armor = 22f;
             mechFrontSway = 1f;
             ammoType = new ItemAmmoType(Items.thorium);
 
@@ -274,11 +274,11 @@ public class UnitTypes{
         }};
 
         reign = new UnitType("reign"){{
-            speed = 0.55f;
+            speed = 0.5f;
             hitSize = 30f;
             rotateSpeed = 1.65f;
-            health = 24000;
-            armor = 30f;
+            health = 27000;
+            armor = 36f;
             mechStepParticles = true;
             stepShake = 0.75f;
             drownTimeMultiplier = 6f;
@@ -306,7 +306,7 @@ public class UnitTypes{
                     speed = 8f;
                     puddleSize = 28f;
                     orbSize = 4f;
-                    damage = 35f;
+                    damage = 55f;
                     statusDuration = 60f * 4f;
                     absorbable = false;
                     reflectable = false;
@@ -330,7 +330,7 @@ public class UnitTypes{
                 rotationLimit = 30f;
                 shootSound = Sounds.mediumCannon;
                 ejectEffect = Fx.casing3Double;
-                bullet = new BasicBulletType(6f, 70f){{
+                bullet = new BasicBulletType(6f, 90f){{
                         width = 14f;
                         height = 24f;
                         absorbable = false;
@@ -340,7 +340,7 @@ public class UnitTypes{
                         hitEffect = Fx.scatheExplosion;
                         status = StatusEffects.burning;
                         statusDuration = 60f * 4f;
-                        splashDamage = 210f;
+                        splashDamage = 360f;
                         splashDamageRadius = 64f; 
                     }};
             }},
@@ -354,7 +354,7 @@ public class UnitTypes{
                 shootSound = Sounds.mediumCannon;
                 shoot.firstShotDelay = 40f;
                 ejectEffect = Fx.casing3Double;
-                bullet = new BasicBulletType(6f, 70f){{
+                bullet = new BasicBulletType(6f, 90f){{
                         width = 14f;
                         height = 24f;
                         absorbable = false;
@@ -364,7 +364,7 @@ public class UnitTypes{
                         hitEffect = Fx.scatheExplosion;
                         status = StatusEffects.burning;
                         statusDuration = 60f * 4f;
-                        splashDamage = 210f;
+                        splashDamage = 360f;
                         splashDamageRadius = 64f;
                     }};
             }}
