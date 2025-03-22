@@ -233,7 +233,7 @@ public class UnitTypes{
                         pierceArmor = true;
                         puddleSize = 16f;
                         orbSize = 4f;
-                        damage = 20f;
+                        damage = 30f;
                         statusDuration = 60f * 4f;
                     }};
                 }};
@@ -255,10 +255,10 @@ public class UnitTypes{
                         lifetime = 58f;
                         hitColor = backColor = trailColor = Pal.lightPyraFlame;
                         hitEffect = Fx.flakExplosion;
-                        lightning = 5;
+                        lightning = 3;
                         lightningLength = 7;
                         lightningColor = Pal.surge;
-                        lightningDamage = 40;
+                        lightningDamage = 50;
                         lightningCone = 120f;
                         incendChance = 0.2f;
                         incendSpread = 5f;
@@ -289,7 +289,7 @@ public class UnitTypes{
                 x = 21.5f;
                 shootY = 11f;
                 reload = 30f;
-                shoot.shots = 12;
+                shoot.shots = 15;
                 velocityRnd = 0.2f;
                 shake = 2f;
                 inaccuracy = 7f;
@@ -301,7 +301,7 @@ public class UnitTypes{
                     speed = 8f;
                     puddleSize = 28f;
                     orbSize = 4f;
-                    damage = 45f;
+                    damage = 60f;
                     statusDuration = 60f * 4f;
                     absorbable = false;
                     reflectable = false;
@@ -336,7 +336,7 @@ public class UnitTypes{
                         status = StatusEffects.burning;
                         statusDuration = 60f * 4f;
                         splashDamage = 300f;
-                        splashDamageRadius = 64f; 
+                        splashDamageRadius = 72f; 
                     }};
             }},
 
@@ -360,7 +360,7 @@ public class UnitTypes{
                         status = StatusEffects.burning;
                         statusDuration = 60f * 4f;
                         splashDamage = 300f;
-                        splashDamageRadius = 64f;
+                        splashDamageRadius = 72f;
                     }};
             }}
             );
