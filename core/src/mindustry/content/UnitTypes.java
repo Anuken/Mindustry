@@ -211,7 +211,7 @@ public class UnitTypes{
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.shotgun;
                 inaccuracy = 1f;
-                shoot.shots = 3;
+                shoot.shots = 4;
                 shoot.shotDelay = 3f;
 
                 bullet = new BasicBulletType(16f, 50f){{
@@ -223,7 +223,7 @@ public class UnitTypes{
                     absorbable = false;
                     reflectable = false;
                     pierceArmor = true;
-                    fragBullets = 2;
+                    fragBullets = 1;
                     fragRandomSpread = 8f;
                     fragBullet = new LiquidBulletType(Liquids.slag){{
                         lifetime = 4f;
@@ -294,7 +294,7 @@ public class UnitTypes{
                 x = 21.5f;
                 shootY = 11f;
                 reload = 30f;
-                shoot.shots = 30;
+                shoot.shots = 20;
                 velocityRnd = 0.3f;
                 shake = 2f;
                 inaccuracy = 7f;
@@ -306,7 +306,7 @@ public class UnitTypes{
                     speed = 8f;
                     puddleSize = 28f;
                     orbSize = 4f;
-                    damage = 55f;
+                    damage = 45f;
                     statusDuration = 60f * 4f;
                     absorbable = false;
                     reflectable = false;
@@ -340,7 +340,7 @@ public class UnitTypes{
                         hitEffect = Fx.scatheExplosion;
                         status = StatusEffects.burning;
                         statusDuration = 60f * 4f;
-                        splashDamage = 360f;
+                        splashDamage = 300f;
                         splashDamageRadius = 64f; 
                     }};
             }},
@@ -364,7 +364,7 @@ public class UnitTypes{
                         hitEffect = Fx.scatheExplosion;
                         status = StatusEffects.burning;
                         statusDuration = 60f * 4f;
-                        splashDamage = 360f;
+                        splashDamage = 300f;
                         splashDamageRadius = 64f;
                     }};
             }}
