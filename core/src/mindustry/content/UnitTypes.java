@@ -221,10 +221,11 @@ public class UnitTypes{
                     lifetime = 14f;
                     shootEffect = Fx.shootBig;
                     absorbable = false;
-                    reflectable = false;
-                    pierceArmor = true;
+                    pierce = true;
+                    pierceCap = 2;
+                    pierceBuilding = true;
                     fragBullets = 1;
-                    fragRandomSpread = 8f;
+                    fragRandomSpread = 0f;
                     fragBullet = new LiquidBulletType(Liquids.slag){{
                         lifetime = 4f;
                         speed = 8f;
@@ -244,7 +245,8 @@ public class UnitTypes{
                 x = 8.5f;
                 y = -3f;
                 rotate = true;
-                rotationLimit = 60f;
+                rotationLimit = 40f;
+                rotateSpeed = 0.7f;
                 shootSound = Sounds.artillery;
                 ejectEffect = Fx.casing3Double;
                 bullet = new BasicBulletType(4f, 80f){{
@@ -256,13 +258,13 @@ public class UnitTypes{
                         hitColor = backColor = trailColor = Pal.lightPyraFlame;
                         hitEffect = Fx.flakExplosion;
                         lightning = 3;
-                        lightningLength = 7;
+                        lightningLength = 11;
                         lightningColor = Pal.surge;
-                        lightningDamage = 50;
+                        lightningDamage = 55;
                         lightningCone = 120f;
-                        incendChance = 0.2f;
+                        incendChance = 0.3f;
                         incendSpread = 5f;
-                        incendAmount = 1;
+                        incendAmount = 2;
                     }};
             }}
             );
@@ -291,8 +293,8 @@ public class UnitTypes{
                 reload = 30f;
                 shoot.shots = 15;
                 velocityRnd = 0.2f;
-                shake = 2f;
-                inaccuracy = 7f;
+                shake = 1f;
+                inaccuracy = 5f;
                 shootSound = Sounds.flame;
 
                 bullet = new LiquidBulletType(Liquids.slag){{
@@ -323,6 +325,7 @@ public class UnitTypes{
                 y = -8f;
                 rotate = true;
                 rotationLimit = 30f;
+                rotateSpeed = 0.7f;
                 shootSound = Sounds.mediumCannon;
                 ejectEffect = Fx.casing3Double;
                 bullet = new BasicBulletType(6f, 90f){{
@@ -346,6 +349,7 @@ public class UnitTypes{
                 y = -8f;
                 rotate = true;
                 rotationLimit = 30f;
+                rotateSpeed = 0.7f;
                 shootSound = Sounds.mediumCannon;
                 shoot.firstShotDelay = 40f;
                 ejectEffect = Fx.casing3Double;
