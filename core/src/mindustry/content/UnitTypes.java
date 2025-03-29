@@ -563,9 +563,9 @@ public class UnitTypes{
                 shake = 1f;
                 shootY = 5f;
                 x = y = 0;
-                reload = 480f;
+                reload = 420f;
                 recoil = 0f;
-                cooldownTime = 480f;
+                cooldownTime = 420f;
                 shoot.shots = 20;
                 shoot.shotDelay = 2f;
                 shootStatusDuration = 60f * 2f;
@@ -575,7 +575,7 @@ public class UnitTypes{
 
                 bullet = new RailBulletType(){{
                     shootEffect = Fx.railShoot;
-                    length = 400;
+                    length = 440;
                     pointEffectSpace = 15f;
                     pierceEffect = new Effect(18f, 200f, e -> {
                         color(Pal.heal);
@@ -591,21 +591,21 @@ public class UnitTypes{
                         Drawf.light(e.x, e.y, 60f * e.fout(), Pal.heal, 0.5f);
                     });
                     hitEffect = Fx.flakExplosion;
-                    damage = 40;
+                    damage = 30;
                     buildingDamageMultiplier = 3f;
                     pierceDamageFactor = 0.8f;
                     chargeEffect = Fx.greenLaserCharge;
                     fragBullets = 1;
                     fragRandomSpread = 0f;
-                    fragBullet = new BasicBulletType(4f, 20f){{
-                        lifetime = 15f; 
+                    fragBullet = new BasicBulletType(4f, 0f){{
+                        lifetime = 3f; 
                         makeFire = true;
                         hittable = false;
                         reflectable = false;
                         absorbable = false;
                         splashDamageRadius = 24f;
                         splashDamage = 20f;
-                        buildingDamageMultiplier = 4f;
+                        buildingDamageMultiplier = 3f;
                         hitColor = backColor = Pal.heal;
                         frontColor = Color.white;
                         hitEffect = Fx.shockwave;
