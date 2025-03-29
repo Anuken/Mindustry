@@ -593,9 +593,21 @@ public class UnitTypes{
                     hitEffect = Fx.flakExplosion;
                     damage = 40;
                     buildingDamageMultiplier = 3f;
-                    makeFire = true;
-                    pierceDamageFactor = 0.6f;
+                    pierceDamageFactor = 0.8f;
                     chargeEffect = Fx.greenLaserCharge;
+                    fragBullets = 1;
+                    fragRandomSpread = 0f;
+                    fragBullet = new BasicBulletType(4f, 10f){{
+                        lifetime = 15f; 
+                        makeFire = true;
+                        hittable = false;
+                        reflectable = false;
+                        absorbable = false;
+                        pierceArmor = true;
+                        hitColor = backColor = Pal.heal;
+                        frontColor = Color.white;
+                        despawnEffect = hitEffect = Fx.hitBulletColor;
+                    }};
                 }};
             }});
         }};
