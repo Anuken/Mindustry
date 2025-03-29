@@ -187,7 +187,7 @@ public class StatusEffects{
 
         blasted = new StatusEffect("blasted"){{
             color = Color.valueOf("ff795e");
-            reloadMultiplier = 0.75f;
+            reloadMultiplier = 0.6f;
             init(() -> {
                 affinity(freezing, (unit, result, time) -> result.set(freezing, result.time + time));
             });
