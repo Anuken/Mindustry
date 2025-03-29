@@ -567,7 +567,7 @@ public class UnitTypes{
                 recoil = 0f;
                 cooldownTime = 480f;
                 shoot.shots = 20;
-                shoot.shotDelay = 3f;
+                shoot.shotDelay = 2f;
                 shootStatusDuration = 60f * 2f;
                 shootStatus = StatusEffects.unmoving;
                 shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
@@ -597,16 +597,19 @@ public class UnitTypes{
                     chargeEffect = Fx.greenLaserCharge;
                     fragBullets = 1;
                     fragRandomSpread = 0f;
-                    fragBullet = new BasicBulletType(4f, 10f){{
+                    fragBullet = new BasicBulletType(4f, 20f){{
                         lifetime = 15f; 
                         makeFire = true;
                         hittable = false;
                         reflectable = false;
                         absorbable = false;
-                        pierceArmor = true;
+                        splashDamageRadius = 24f;
+                        splashDamage = 20f;
+                        buildingDamageMultiplier = 4f;
                         hitColor = backColor = Pal.heal;
                         frontColor = Color.white;
-                        despawnEffect = hitEffect = Fx.hitBulletColor;
+                        hitEffect = Fx.shockwave;
+                        despawnEffect = Fx.hitBulletColor;
                     }};
                 }};
             }});
