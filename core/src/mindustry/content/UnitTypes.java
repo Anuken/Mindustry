@@ -591,13 +591,11 @@ public class UnitTypes{
                         Drawf.light(e.x, e.y, 60f * e.fout(), Pal.heal, 0.5f);
                     });
                     hitEffect = Fx.flakExplosion;
-                    damage = 30;
-                    buildingDamageMultiplier = 2f;
+                    damage = 40;
+                    buildingDamageMultiplier = 3f;
                     makeFire = true;
-                    pierceDamageFactor = 0.2f;
+                    pierceDamageFactor = 0.6f;
                     chargeEffect = Fx.greenLaserCharge;
-                    healPercent = 25f;
-                    collidesTeam = true;
                 }};
             }});
         }};
