@@ -537,7 +537,7 @@ public class UnitTypes{
             health = 18000f;
             armor = 9f;
             stepShake = 1.5f;
-            rotateSpeed = 1.5f;
+            rotateSpeed = 1.8f;
             drownTimeMultiplier = 6f;
 
             legCount = 4;
@@ -591,8 +591,8 @@ public class UnitTypes{
                         Drawf.light(e.x, e.y, 60f * e.fout(), Pal.heal, 0.5f);
                     });
                     hitEffect = Fx.flakExplosion;
-                    damage = 30;
-                    buildingDamageMultiplier = 3f;
+                    damage = 45;
+                    buildingDamageMultiplier = 2f;
                     pierceDamageFactor = 0.8f;
                     chargeEffect = Fx.greenLaserCharge;
                     fragBullets = 1;
@@ -604,8 +604,8 @@ public class UnitTypes{
                         reflectable = false;
                         absorbable = false;
                         splashDamageRadius = 24f;
-                        splashDamage = 20f;
-                        buildingDamageMultiplier = 3f;
+                        splashDamage = 35f;
+                        buildingDamageMultiplier = 2f;
                         hitColor = backColor = Pal.heal;
                         frontColor = Color.white;
                         hitEffect = Fx.shockwave;
