@@ -560,14 +560,14 @@ public class UnitTypes{
                 soundPitchMin = 1f;
                 top = false;
                 mirror = false;
-                shake = 14f;
+                shake = 1f;
                 shootY = 5f;
                 x = y = 0;
                 reload = 480f;
                 recoil = 0f;
                 cooldownTime = 480f;
-                shoot.shots = 9;
-                shoot.shotDelay = 12f;
+                shoot.shots = 20;
+                shoot.shotDelay = 3f;
                 shootStatusDuration = 60f * 2f;
                 shootStatus = StatusEffects.unmoving;
                 shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
@@ -591,7 +591,7 @@ public class UnitTypes{
                         Drawf.light(e.x, e.y, 60f * e.fout(), Pal.heal, 0.5f);
                     });
                     hitEffect = Fx.flakExplosion;
-                    damage = 40;
+                    damage = 30;
                     buildingDamageMultiplier = 2f;
                     makeFire = true;
                     pierceDamageFactor = 0.2f;
