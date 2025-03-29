@@ -550,12 +550,12 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(4000);
             groundLayer = Layer.legUnit;
 
-            speed = 0.3f;
+            speed = 0.4f;
 
             drawShields = false;
 
             weapons.add(new Weapon("corvus-weapon"){{
-                shootSound = Sounds.laserblast;
+                shootSound = Sounds.bolt;
                 chargeSound = Sounds.lasercharge;
                 soundPitchMin = 1f;
                 top = false;
@@ -563,41 +563,41 @@ public class UnitTypes{
                 shake = 14f;
                 shootY = 5f;
                 x = y = 0;
-                reload = 350f;
+                reload = 480f;
                 recoil = 0f;
-
-                cooldownTime = 350f;
-
+                cooldownTime = 480f;
+                shoot.shots = 9;
+                shoot.shotDelay = 12f;
                 shootStatusDuration = 60f * 2f;
                 shootStatus = StatusEffects.unmoving;
                 shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
                 parentizeEffects = true;
 
-                bullet = new LaserBulletType(){{
-                    length = 460f;
-                    damage = 560f;
-                    width = 75f;
-
-                    lifetime = 65f;
-
-                    lightningSpacing = 35f;
-                    lightningLength = 5;
-                    lightningDelay = 1.1f;
-                    lightningLengthRand = 15;
-                    lightningDamage = 50;
-                    lightningAngleRand = 40f;
-                    largeHit = true;
-                    lightColor = lightningColor = Pal.heal;
-
+                bullet = new RailBulletType(){{
+                    shootEffect = Fx.railShoot;
+                    length = 400;
+                    pointEffectSpace = 15f;
+                    pierceEffect = new Effect(18f, 200f, e -> {
+                        color(Pal.heal);
+                        for(int i : Mathf.signs){
+                            Drawf.tri(e.x, e.y, 10f * e.fout(), 60f, e.rotation + 140f * i);
+                        }
+                    });
+                    pointEffect = new Effect(16f, e -> {
+                        color(Pal.heal);
+                        for(int i : Mathf.signs){
+                            Drawf.tri(e.x, e.y, 10f * e.fout(), 24f, e.rotation + 90 + 90f * i);
+                        }
+                        Drawf.light(e.x, e.y, 60f * e.fout(), Pal.heal, 0.5f);
+                    });
+                    hitEffect = Fx.flakExplosion;
+                    damage = 40;
+                    buildingDamageMultiplier = 2f;
+                    makeFire = true;
+                    pierceDamageFactor = 0.2f;
                     chargeEffect = Fx.greenLaserCharge;
-
                     healPercent = 25f;
                     collidesTeam = true;
-
-                    sideAngle = 15f;
-                    sideWidth = 0f;
-                    sideLength = 0f;
-                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
                 }};
             }});
         }};
