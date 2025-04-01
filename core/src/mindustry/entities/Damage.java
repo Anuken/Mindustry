@@ -181,7 +181,7 @@ public class Damage{
 
         distances.clear();
 
-        if(b.type.collidesGround && b.type.collidesTiles){
+        if(b.type.collidesAir && b.type.collidesTiles){
             World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
                 //add distance to list so it can be processed
                 var build = world.build(x, y);
@@ -256,7 +256,7 @@ public class Damage{
         collidedBlocks.clear();
         vec.trnsExact(angle, length);
 
-        if(hitter.type.collidesGround && hitter.type.collidesTiles){
+        if(hitter.type.collidesAir && hitter.type.collidesTiles){
             seg1.set(x, y);
             seg2.set(seg1).add(vec);
             World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
@@ -332,7 +332,7 @@ public class Damage{
      */
     public static void collidePoint(Bullet hitter, Team team, Effect effect, float x, float y){
 
-        if(hitter.type.collidesGround){
+        if(hitter.type.collidesAir){
             Building build = world.build(World.toTile(x), World.toTile(y));
 
             if(build != null && hitter.damage > 0){
@@ -367,7 +367,7 @@ public class Damage{
 
         tmpBuilding = null;
 
-        if(hitter.type.collidesGround){
+        if(hitter.type.collidesAir){
             World.raycastEachWorld(x, y, x + vec.x, y + vec.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
                 if(tile != null && tile.team != hitter.team){
@@ -465,7 +465,7 @@ public class Damage{
     }
 
     /** Applies a status effect to all enemy units in a range. */
-    public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground){
+    public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean ground, boolean air){
         Cons<Unit> cons = entity -> {
             if(entity.team == team || !entity.checkTarget(air, ground) || !entity.hittable() || !entity.within(x, y, radius)){
                 return;
@@ -493,7 +493,7 @@ public class Damage{
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
-    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source){
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean ground, boolean air, boolean scaled, @Nullable Bullet source){
         Cons<Unit> cons = unit -> {
             if(unit.team == team  || !unit.checkTarget(air, ground) || !unit.hittable() || !unit.within(x, y, radius + (scaled ? unit.hitSize / 2f : 0f))){
                 return;
