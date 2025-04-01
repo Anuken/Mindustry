@@ -1,1 +1,0 @@
-An open-ended factory management game with RTS and tower defense elements

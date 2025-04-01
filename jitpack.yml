@@ -1,9 +1,0 @@
-jdk:
-  - openjdk16
-before_install:
-  - wget https://github.com/sormuras/bach/raw/releases/11/install-jdk.sh
-  - source install-jdk.sh --feature 17
-  - jshell --version
-install:
-  - ./gradlew publishToMavenLocal
-  - echo -n > gradle.properties #zero out gradle.properties
