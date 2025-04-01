@@ -269,7 +269,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
 
                 if(teamTarget != null && teamTarget.team() != player.team() &&
-                !(teamTarget instanceof Unit u && !unit.canTarget(u)) && !(teamTarget instanceof Building && !unit.type.targetGround)){
+                !(teamTarget instanceof Unit u && !unit.canTarget(u)) && !(teamTarget instanceof Building && !unit.type.targetAir)){
 
                     anyCommandedTarget = true;
                     if(queueCommand){
