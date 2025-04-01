@@ -319,7 +319,7 @@ public class RtsAI{
         float extraRadius = 50f;
 
         for(var turret : Vars.indexer.getEnemy(data.team, BlockFlag.turret)){
-            if(turret instanceof BaseTurretBuild t && turret.block instanceof Turret tb && ((tb.targetAir && air) || (tb.targetGround && !air)) && Intersector.distanceSegmentPoint(fromX, fromY,  x, y, t.x, t.y) <= t.range() + extraRadius){
+            if(turret instanceof BaseTurretBuild t && turret.block instanceof Turret tb && ((tb.targetGround && air) || (tb.targetAir && !air)) && Intersector.distanceSegmentPoint(fromX, fromY,  x, y, t.x, t.y) <= t.range() + extraRadius){
                 health[0] += t.health;
                 dps[0] += t.estimateDps();
             }

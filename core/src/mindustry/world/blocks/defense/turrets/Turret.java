@@ -164,8 +164,8 @@ public class Turret extends ReloadTurret{
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
         stats.add(Stat.reload, 60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f)) * shoot.shots, StatUnit.perSecond);
-        stats.add(Stat.targetsAir, targetAir);
-        stats.add(Stat.targetsGround, targetGround);
+        stats.add(Stat.targetsAir, targetGround);
+        stats.add(Stat.targetsGround, targetAir);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
         if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
     }
@@ -530,13 +530,13 @@ public class Turret extends ReloadTurret{
         }
 
         protected Posc findEnemy(float range){
-            if(targetAir && !targetGround){
+            if(targetGround && !targetAir){
                 return Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
             }else{
                 var ammo = peekAmmo();
-                boolean buildings = targetGround && targetBlocks && (ammo == null || ammo.targetBlocks), missiles = ammo == null || ammo.targetMissiles;
+                boolean buildings = targetAir && targetBlocks && (ammo == null || ammo.targetBlocks), missiles = ammo == null || ammo.targetMissiles;
                 return Units.bestTarget(team, x, y, range,
-                    e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround) && (missiles || !(e instanceof TimedKillc)),
+                    e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetGround) && (!e.isGrounded() || targetAir) && (missiles || !(e instanceof TimedKillc)),
                     b -> buildings && buildingFilter.get(b), unitSort);
             }
         }
