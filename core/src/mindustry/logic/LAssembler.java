@@ -73,10 +73,10 @@ public class LAssembler{
         //remove spaces for non-strings
         symbol = symbol.replace(' ', '_');
 
-        //handle edge cases of hard to detect sign(in hex or bin numbers)
-        double value = parseDouble(symbol, invalidNumNegative);
+        int usedInvalidNum=symbol.startsWith("-")?invalidNumPositive:invalidNumNegative;//use a positive invalid number if number is negative, else use a negative number
+        double value = parseDouble(symbol, usedInvalidNum);
 
-        if(value == invalidNumNegative && parseDouble(symbol, invalidNumPositive) == invalidNumPositive){
+        if(value == usedInvalidNum){
             return putVar(symbol);
         }else{
             //this creates a hidden const variable with the specified value
