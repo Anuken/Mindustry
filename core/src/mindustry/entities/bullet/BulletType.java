@@ -252,6 +252,8 @@ public class BulletType extends Content implements Cloneable{
     public float splashDamageRadius = -1f;
     /** If true, splash damage pierces through tiles. */
     public boolean splashDamagePierce = false;
+    /** If true, splash damage pierce will ignore buildingDamageMultiplier. */
+    public boolean splashDamagePierceIgnoresBuildingDamageMultiplier = false;
 
     /** Amount of fires attempted around bullet. */
     public int incendAmount = 0;
