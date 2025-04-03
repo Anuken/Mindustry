@@ -73,7 +73,8 @@ public class LAssembler{
         //remove spaces for non-strings
         symbol = symbol.replace(' ', '_');
 
-        int usedInvalidNum=symbol.startsWith("-")?invalidNumPositive:invalidNumNegative;//use a positive invalid number if number is negative, else use a negative number
+        //use a positive invalid number if number might be negative, else use a negative invalid number
+        int usedInvalidNum = symbol.startsWith("-") ? invalidNumPositive : invalidNumNegative;
         double value = parseDouble(symbol, usedInvalidNum);
 
         if(value == usedInvalidNum){
