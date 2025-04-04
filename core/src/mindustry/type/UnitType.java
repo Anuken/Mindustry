@@ -488,6 +488,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public UnitType(String name){
         super(name);
 
+        // Try to immediately resolve the Unit constructor based on EntityMapping entry, if it is set.
+        // This is the default Vanilla behavior - it won't work properly for mods (see comment in `init()`)!
         constructor = EntityMapping.map(this.name);
         selectionSize = 30f;
     }
@@ -761,9 +763,41 @@ public class UnitType extends UnlockableContent implements Senseable{
     public void init(){
         super.init();
 
-        if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
+        if(constructor == null) throw new IllegalArgumentException(Strings.format("""
+            No constructor set up for unit '@': Assign `constructor = [your unit constructor]`. Vanilla defaults are:
+              "flying": UnitEntity::create
+              "mech": MechUnit::create
+              "legs": LegsUnit::create
+              "naval": UnitWaterMove::create
+              "payload": PayloadUnit::create
+              "missile": TimedKillUnit::create
+              "tank": TankUnit::create
+              "hover": ElevationMoveUnit::create
+              "tether": BuildingTetherPayloadUnit::create
+              "crawl": CrawlUnit::create
+            """, name));
+
+        // Often modders improperly only sets `constructor = ...` without mapping. Try to mitigate for that.
+        // In most cases, if the constructor is a Vanilla class, things should work just fine.
+        if(EntityMapping.map(name) == null) EntityMapping.nameMap.put(name, constructor);
 
         Unit example = constructor.get();
+
+        // Sanity checks; this is an EXTREMELY COMMON pitfalls Java modders fall into.
+        int classId = example.classId();
+        if(
+            // Check if `classId()` even points to a valid constructor...
+            EntityMapping.map(classId) == null ||
+            // ...or if the class doesn't register itself and uses the ID of its base class.
+            classId != ((Entityc)EntityMapping.map(classId).get()).classId()
+        ){
+            String type = example.getClass().getSimpleName();
+            throw new IllegalArgumentException(Strings.format("""
+                Invalid class ID for `@` detected (found: @). Fix it by:
+                - Register with `EntityMapping.register("some-unique-name", @::new)` to get an ID, and store it somewhere.
+                - Override `@#classId()` to return that ID.
+                """, type, classId, type, type));
+        }
 
         allowLegStep = example instanceof Legsc || example instanceof Crawlc;
 
