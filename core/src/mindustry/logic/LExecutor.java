@@ -578,6 +578,8 @@ public class LExecutor{
                     output.numval = fromVar.numval;
                     output.isobj = fromVar.isobj;
                 }
+            }else if(target.isobj && target.objval instanceof CharSequence str){
+                output.setnum(address < 0 || address >= str.length() ? 0 : (int)str.charAt(address));
             }
         }
     }
@@ -1431,7 +1433,7 @@ public class LExecutor{
 
             Team t = team.team();
 
-            if(type.obj() instanceof UnitType type && !type.internal && !type.hidden && t != null && Units.canCreate(t, type)){
+            if(type.obj() instanceof UnitType type && !type.internal && Units.canCreate(t, type)){
                 //random offset to prevent stacking
                 var unit = type.spawn(t, World.unconv(x.numf()) + Mathf.range(0.01f), World.unconv(y.numf()) + Mathf.range(0.01f));
                 spawner.spawnEffect(unit);
