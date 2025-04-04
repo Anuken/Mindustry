@@ -582,7 +582,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == rebuildSelect){
             rebuildArea(lineStartX, lineStartY, lastLineX, lastLineY);
             mode = none;
-        }else{
+        }else if(!player.dead()){
             Tile tile = tileAt(screenX, screenY);
 
             tryDropItems(tile == null ? null : tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
