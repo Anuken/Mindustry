@@ -1693,11 +1693,32 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(block.forceTeam != null) team = block.forceTeam;
 
         Team last = this.team;
+
+        if(last == next) return;
+
         boolean was = isValid();
 
         if(was) indexer.removeIndex(tile);
 
         this.team = next;
+
+        if(power != null){
+            for(int i = 0; i < power.links.size; i++){
+                var other = world.build(power.links.items[i]);
+
+                if(other != null && other.team != team && other.power != null){
+                    power.links.removeIndex(i);
+                    other.power.links.removeValue(pos());
+
+                    new PowerGraph().reflow(other);
+
+                    i --;
+                }
+            }
+            new PowerGraph().reflow(self());
+
+            updatePowerGraph();
+        }
 
         if(was){
             indexer.addIndex(tile);
