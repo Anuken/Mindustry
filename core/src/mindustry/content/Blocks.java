@@ -4329,6 +4329,7 @@ public class Blocks{
                 hitSound = Sounds.titanExplosion;
 
                 status = StatusEffects.blasted;
+                statusDuration = 60f * 4f;
 
                 trailLength = 32;
                 trailWidth = 3.35f;
@@ -4362,6 +4363,7 @@ public class Blocks{
                 hitSound = Sounds.titanExplosion;
 
                 status = StatusEffects.blasted;
+                statusDuration = 60f * 4f;
 
                 trailLength = 32;
                 trailWidth = 3.35f;
@@ -4398,6 +4400,7 @@ public class Blocks{
                 hitSound = Sounds.titanExplosion;
 
                 status = StatusEffects.blasted;
+                statusDuration = 60f * 4f;
 
                 trailLength = 32;
                 trailWidth = 3.35f;
