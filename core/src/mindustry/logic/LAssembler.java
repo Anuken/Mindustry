@@ -35,7 +35,7 @@ public class LAssembler{
         Seq<LStatement> st = read(data, privileged);
 
         asm.privileged = privileged;
-        
+
         asm.instructions = st.map(l -> l.build(asm)).retainAll(l -> l != null).toArray(LInstruction.class);
         return asm;
     }
@@ -74,7 +74,7 @@ public class LAssembler{
         symbol = symbol.replace(' ', '_');
 
         //use a positive invalid number if number might be negative, else use a negative invalid number
-        int usedInvalidNum = symbol.startsWith("-") ? invalidNumPositive : invalidNumNegative;
+        int usedInvalidNum = symbol.length() > 0 && symbol.charAt(0) == '-' ? invalidNumPositive : invalidNumNegative;
         double value = parseDouble(symbol, usedInvalidNum);
 
         if(value == usedInvalidNum){

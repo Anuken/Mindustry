@@ -161,6 +161,8 @@ public class BulletType extends Content implements Cloneable{
     public float healPercent = 0f;
     /** flat amount of block health healed */
     public float healAmount = 0f;
+    /** Fraction of bullet damage that heals that shooter. */
+    public float lifesteal = 0f;
     /** Whether to make fire on impact */
     public boolean makeFire = false;
     /** Whether this bullet will always hit blocks under it. */
@@ -449,6 +451,10 @@ public class BulletType extends Content implements Cloneable{
                 health = Math.min(health, cap);
             }else{
                 health += shield;
+            }
+            if(lifesteal > 0f && b.owner instanceof Healthc o){
+                float result = Math.max(Math.min(h.health(), damage), 0);
+                o.heal(result * lifesteal);
             }
             if(pierceArmor){
                 h.damagePierce(damage);
