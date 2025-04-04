@@ -107,7 +107,7 @@ public class LExecutor{
         unit = builder.getVar("@unit");
         thisv = builder.getVar("@this");
         ipt = builder.putConst("@ipt", build != null ? build.ipt : 0);
-        printbuffer = builder.putConst("@printbuffer", textBuffer);
+        printbuffer = builder.putConst("@printbuffer", build != null ? new BuildingStringBuilder(new Point2(build.tileX(),build.tileY())) : null);
     }
 
     //region utility
