@@ -12,7 +12,7 @@ public class ContinuousBulletType extends BulletType{
     public boolean largeHit = false;
     public boolean continuous = true;
     /** If a building fired this, whether to multiply damage by its timescale. */
-    public boolean timescaleDamage = true;
+    public boolean timescaleDamage = false;
 
     {
         removeAfterPierce = false;

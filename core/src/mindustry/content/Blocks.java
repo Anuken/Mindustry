@@ -4010,6 +4010,7 @@ public class Blocks{
                 hitColor = Pal.meltdownHit;
                 status = StatusEffects.melting;
                 drawSize = 420f;
+                timescaleDamage = true;
 
                 incendChance = 0.4f;
                 incendSpread = 5f;
@@ -4281,6 +4282,7 @@ public class Blocks{
                 knockback = 1f;
                 pierceCap = 2;
                 buildingDamageMultiplier = 0.3f;
+                timescaleDamage = true;
 
                 colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
             }},
@@ -4291,6 +4293,7 @@ public class Blocks{
                 knockback = 2f;
                 pierceCap = 3;
                 buildingDamageMultiplier = 0.3f;
+                timescaleDamage = true;
 
                 colors = new Color[]{Color.valueOf("465ab8").a(0.55f), Color.valueOf("66a6d2").a(0.7f), Color.valueOf("89e8b6").a(0.8f), Color.valueOf("cafcbe"), Color.white};
                 flareColor = Color.valueOf("89e8b6");
