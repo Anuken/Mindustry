@@ -758,11 +758,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
     }
 
-    @CallSuper
-    @Override
-    public void init(){
-        super.init();
-
+    protected void checkEntityMapping(){
         if(constructor == null) throw new IllegalArgumentException(Strings.format("""
             No constructor set up for unit '@': Assign `constructor = [your unit constructor]`. Vanilla defaults are:
               "flying": UnitEntity::create
@@ -777,7 +773,7 @@ public class UnitType extends UnlockableContent implements Senseable{
               "crawl": CrawlUnit::create
             """, name));
 
-        // Often modders improperly only sets `constructor = ...` without mapping. Try to mitigate for that.
+        // Often modders improperly only sets `constructor = ...` without mapping. Try to mitigate that.
         // In most cases, if the constructor is a Vanilla class, things should work just fine.
         if(EntityMapping.map(name) == null) EntityMapping.nameMap.put(name, constructor);
 
@@ -787,17 +783,25 @@ public class UnitType extends UnlockableContent implements Senseable{
         int classId = example.classId();
         if(
             // Check if `classId()` even points to a valid constructor...
-            EntityMapping.map(classId) == null ||
-            // ...or if the class doesn't register itself and uses the ID of its base class.
-            classId != ((Entityc)EntityMapping.map(classId).get()).classId()
+        EntityMapping.map(classId) == null ||
+        // ...or if the class doesn't register itself and uses the ID of its base class.
+        classId != ((Entityc)EntityMapping.map(classId).get()).classId()
         ){
             String type = example.getClass().getSimpleName();
             throw new IllegalArgumentException(Strings.format("""
-                Invalid class ID for `@` detected (found: @). Fix it by:
+                Invalid class ID for `@` detected (found: @). Potential fixes:
                 - Register with `EntityMapping.register("some-unique-name", @::new)` to get an ID, and store it somewhere.
                 - Override `@#classId()` to return that ID.
                 """, type, classId, type, type));
         }
+    }
+
+    @CallSuper
+    @Override
+    public void init(){
+        super.init();
+
+        checkEntityMapping();
 
         allowLegStep = example instanceof Legsc || example instanceof Crawlc;
 
