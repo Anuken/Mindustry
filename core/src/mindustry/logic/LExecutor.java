@@ -641,7 +641,7 @@ public class LExecutor{
                 return;
             }
 
-            if(sense == LAccess.type && target instanceof CharSequence){
+            if(sense == LAccess.type && !(target instanceof Senseable)){
                 to.setobj(LogicDialog.typeName(from));
                 return;
             }
@@ -1024,10 +1024,12 @@ public class LExecutor{
             //this should avoid any garbage allocation
             if(value.isobj){
 
-                if(value.objval instanceof StringBuilder builder){
+                if(value.objval instanceof BuildingStringBuilder builder){
                     //We do not want to infinitely append.
                     if(builder.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
-                    exec.textBuffer.append(builder);
+                    @Nullable StringBuilder str = builder.obtainBuilder();
+                    if(str == null) return;
+                    exec.textBuffer.append(str);
                     return;
                 }
 
@@ -1050,7 +1052,7 @@ public class LExecutor{
             return
                 obj == null ? "null" :
                 obj instanceof String s ? s :
-                obj instanceof StringBuilder ? "[dyn-string]" : //Maybe use .toString, but it would allocate memory...
+                obj instanceof BuildingStringBuilder ? "[dyn-string]" : //Maybe use .toString, but it would allocate memory...
                 obj instanceof MappableContent content ? content.name :
                 obj instanceof Content ? "[content]" :
                 obj instanceof Building build ? build.block.name :
@@ -1119,10 +1121,12 @@ public class LExecutor{
             //this should avoid any garbage allocation
             if(value.isobj){
                 //avoid it even more
-                if(value.objval instanceof StringBuilder b){
+                if(value.objval instanceof BuildingStringBuilder b){
                     if(b.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
                     exec.textBuffer.replace(placeholderIndex, placeholderIndex+3, "");
-                    exec.textBuffer.insert(placeholderIndex,b);
+                    @Nullable StringBuilder str = b.obtainBuilder();
+                    if(str == null) return;
+                    exec.textBuffer.insert(placeholderIndex, str);
                     return;
                 }
                 String strValue = PrintI.toString(value.objval);
