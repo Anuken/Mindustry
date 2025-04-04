@@ -23,6 +23,8 @@ public class RegionPart extends DrawPart{
     public boolean mirror = false;
     /** If true, an outline is drawn under the part. */
     public boolean outline = true;
+    /** If true, this part has an outline created 'in-place'. Currently vanilla only, do not use this! */
+    public boolean replaceOutline = false;
     /** If true, the base + outline regions are drawn. Set to false for heat-only regions. */
     public boolean drawRegion = true;
     /** If true, the heat region produces light. */
@@ -38,7 +40,8 @@ public class RegionPart extends DrawPart{
     public Blending blending = Blending.normal;
     public float layer = -1, layerOffset = 0f, heatLayerOffset = 1f, turretHeatLayer = Layer.turretHeat;
     public float outlineLayerOffset = -0.001f;
-    public float x, y, xScl = 1f, yScl = 1f, rotation;
+    //note that origin DOES NOT AFFECT child parts
+    public float x, y, xScl = 1f, yScl = 1f, rotation, originX, originY;
     public float moveX, moveY, growX, growY, moveRot;
     public float heatLightOpacity = 0.3f;
     public @Nullable Color color, colorTo, mixColor, mixColorTo;
@@ -99,16 +102,21 @@ public class RegionPart extends DrawPart{
             float sign = (i == 0 ? 1 : -1) * params.sideMultiplier;
             Tmp.v1.set((x + mx) * sign, y + my).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
+            Draw.xscl *= sign;
+
+            if(originX != 0f || originY != 0f){
+                //correct for offset caused by origin shift
+                Tmp.v1.sub(Tmp.v2.set(-originX * Draw.xscl, -originY * Draw.yscl).rotate(params.rotation - 90f).add(originX * Draw.xscl, originY * Draw.yscl));
+            }
+
             float
                 rx = params.x + Tmp.v1.x,
                 ry = params.y + Tmp.v1.y,
                 rot = mr * sign + params.rotation - 90;
 
-            Draw.xscl *= sign;
-
             if(outline && drawRegion){
                 Draw.z(prevZ + outlineLayerOffset);
-                Draw.rect(outlines[Math.min(i, regions.length - 1)], rx, ry, rot);
+                rect(outlines[Math.min(i, regions.length - 1)], rx, ry, rot);
                 Draw.z(prevZ);
             }
 
@@ -126,7 +134,7 @@ public class RegionPart extends DrawPart{
                 }
 
                 Draw.blend(blending);
-                Draw.rect(region, rx, ry, rot);
+                rect(region, rx, ry, rot);
                 Draw.blend();
                 if(color != null) Draw.color();
             }
@@ -134,7 +142,7 @@ public class RegionPart extends DrawPart{
             if(heat.found()){
                 float hprog = heatProgress.getClamp(params, clampProgress);
                 heatColor.write(Tmp.c1).a(hprog * heatColor.a);
-                Drawf.additive(heat, Tmp.c1, rx, ry, rot, turretShading ? turretHeatLayer : Draw.z() + heatLayerOffset);
+                Drawf.additive(heat, Tmp.c1, 1f, rx, ry, rot, turretShading ? turretHeatLayer : Draw.z() + heatLayerOffset, originX, originY);
                 if(heatLight) Drawf.light(rx, ry, light.found() ? light : heat, rot, Tmp.c1, heatLightOpacity * hprog);
             }
 
@@ -165,6 +173,11 @@ public class RegionPart extends DrawPart{
         }
 
         Draw.scl(preXscl, preYscl);
+    }
+
+    void rect(TextureRegion region, float x, float y, float rotation){
+        float w = region.width * region.scl() * Draw.xscl, h = region.height * region.scl() * Draw.yscl;
+        Draw.rect(region, x, y, w, h, w / 2f + originX * Draw.xscl, h / 2f + originY * Draw.yscl, rotation);
     }
 
     @Override

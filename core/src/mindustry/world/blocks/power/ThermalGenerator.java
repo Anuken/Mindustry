@@ -37,9 +37,10 @@ public class ThermalGenerator extends PowerGenerator{
             outputsLiquid = true;
             hasLiquids = true;
         }
+        emitLight = true;
         super.init();
         //proper light clipping
-        clipSize = Math.max(clipSize, 45f * size * 2f * 2f);
+        lightClipSize = Math.max(lightClipSize, 45f * size * 2f * 2f);
     }
 
     @Override

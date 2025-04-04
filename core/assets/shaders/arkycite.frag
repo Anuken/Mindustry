@@ -46,9 +46,5 @@ void main(){
         color.rgb = S2;
     }
 
-    if(orig.g > 0.01){
-        color = max(S1, color);
-    }
-
-    gl_FragColor = color;
+    gl_FragColor = vec4(max(S1, color).rgb, orig.a);
 }

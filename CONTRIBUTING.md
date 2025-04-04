@@ -13,10 +13,12 @@ If you are submitting a new block, make sure it has a name and description, and 
 
 ### Do not make large changes before discussing them first.
 If you are interested in adding a large mechanic/feature or changing large amounts of code, first contact me (Anuken) via [Discord](https://discord.gg/mindustry) - either via PM or by posting in the `#pulls` channel.
-For most changes, this should not be necessary. I just want to know if you're doing something big so I can offer advice and/or make sure you're not wasting your time on it.
+For most changes, this should not be necessary. I just want to know if you're doing something big, so I can offer advice and/or make sure you're not wasting your time on it.
 
-### Do not make formatting PRs.
+### Do not make formatting or "cleanup" PRs.
 Yes, there are occurrences of trailing spaces, extra newlines, empty indents, and other tiny errors. No, I don't want to merge, view, or get notified by your 1-line PR fixing it. If you're implementing a PR with modification of *actual code*, feel free to fix formatting in the general vicinity of your changes, but please don't waste everyone's time with pointless changes.
+
+I **especially** do not want to see PRs that apply any kind of automated analysis to the source code to "optimize" anything - my IDE can do that already. If the PR doesn't actually change anything useful, I'm not going to review or merge it.
 
 ## Style Guidelines
 
@@ -34,7 +36,7 @@ This means:
 
 Import [this style file](.github/Mindustry-CodeStyle-IJ.xml) into IntelliJ to get correct formatting when developing Mindustry.
 
-### Do not use incompatible Java features (java.util.function, java.awt).
+### Do not use incompatible Java features (java.util.function, java.awt, java.lang.Objects).
 Android and RoboVM (iOS) do not support many of Java 8's features, such as the packages `java.util.function`, `java.util.stream` or `forEach` in collections. Do not use these in your code.  
 If you need to use functional interfaces, use the ones in `arc.func`, which are more or less the same with different naming schemes.
   
@@ -66,7 +68,7 @@ Otherwise, use the `Tmp` variables for things like vector/shape operations, or c
 If using a list, make it a static variable and clear it every time it is used. Re-use as much as possible.
 
 ### Avoid bloated code and unnecessary getters/setters.
-This is situational, but in essence what it means is to avoid using any sort of getters and setters unless absolutely necessary. Public or protected fields should suffice for most things. 
+This is situational, but in essence, what it means is to avoid using any sort of getters and setters unless absolutely necessary. Public or protected fields should suffice for most things. 
 If something needs to be encapsulated in the future, IntelliJ can handle it with a few clicks.
 
 
