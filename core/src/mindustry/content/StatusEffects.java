@@ -187,7 +187,10 @@ public class StatusEffects{
 
         blasted = new StatusEffect("blasted"){{
             color = Color.valueOf("ff795e");
-            reactive = true;
+            reloadMultiplier = 0.8f;
+            init(() -> {
+                affinity(freezing, (unit, result, time) -> result.set(freezing, result.time + time));
+            });
         }};
 
         corroded = new StatusEffect("corroded"){{
