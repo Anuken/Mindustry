@@ -53,6 +53,7 @@ public class DesktopLauncher extends ClientLauncher{
                                 case "height": height = Integer.parseInt(arg[i + 1]); break;
                                 case "gl3": gl30 = true; break;
                                 case "gl2": gl30 = false; break;
+                                case "coreGl": coreProfile = true; break;
                                 case "antialias": samples = 16; break;
                                 case "debug": Log.level = LogLevel.debug; break;
                                 case "maximized": maximized = Boolean.parseBoolean(arg[i + 1]); break;

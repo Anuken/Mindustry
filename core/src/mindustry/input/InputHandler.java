@@ -312,6 +312,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     //only assign a group when this is not a queued command
                     if(ai.commandQueue.size == 0 && unitIds.length > 1){
                         int layer = unit.collisionLayer();
+
+                        if(layer == -1) layer = 0;
+
                         if(groups[layer] == null){
                             groups[layer] = new UnitGroup();
                         }
@@ -418,7 +421,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player == null || build == null || !build.interactable(player.team()) || !player.within(build, itemTransferRange) || player.dead() || amount <= 0) return;
 
         if(net.server() && (!Units.canInteract(player, build) ||
-        !netServer.admins.allowAction(player, ActionType.withdrawItem, build.tile(), action -> {
+        !netServer.admins.allowAction(player, ActionType.withdrawItem, build.tile, action -> {
             action.item = item;
             action.itemAmount = amount;
         }))){
@@ -606,7 +609,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build == null) return;
 
         if(net.server() && (!Units.canInteract(player, build) ||
-        !netServer.admins.allowAction(player, ActionType.rotate, build.tile(), action -> action.rotation = Mathf.mod(build.rotation + Mathf.sign(direction), 4)))){
+        !netServer.admins.allowAction(player, ActionType.rotate, build.tile, action -> action.rotation = Mathf.mod(build.rotation + Mathf.sign(direction), 4)))){
             throw new ValidateException(player, "Player cannot rotate a block.");
         }
 
@@ -693,7 +696,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
-        }else if(unit.isAI() && unit.team == player.team() && !unit.dead && unit.type.playerControllable){
+        }else if(unit.isAI() && unit.team == player.team() && !unit.dead && unit.playerControllable()){
             if(net.client() && player.isLocal()){
                 player.justSwitchFrom = player.unit();
                 player.justSwitchTo = unit;
@@ -878,7 +881,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(controlledType != null && player.dead() && controlledType.playerControllable){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type == controlledType && !u.dead);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type == controlledType && u.playerControllable() && !u.dead);
 
             if(unit != null){
                 //only trying controlling once a second to prevent packet spam
@@ -1853,7 +1856,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public @Nullable Unit selectedUnit(){
-        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI() && u.type.playerControllable);
+        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI() && u.playerControllable());
         if(unit != null){
             unit.hitbox(Tmp.r1);
             Tmp.r1.grow(6f);
@@ -2053,7 +2056,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        return ignoreUnits ? Build.validPlaceIgnoreUnits(type, player.team(), x, y, rotation, true) : Build.validPlace(type, player.team(), x, y, rotation);
+        return ignoreUnits ? Build.validPlaceIgnoreUnits(type, player.team(), x, y, rotation, true, true) : Build.validPlace(type, player.team(), x, y, rotation);
     }
 
     public boolean validBreak(int x, int y){

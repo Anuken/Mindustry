@@ -277,6 +277,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             String className = getClass().getSimpleName().replace("Objective", "");
             return Core.bundle == null ? className : Core.bundle.get("objective." + className.toLowerCase() + ".name", className);
         }
+
+        /** Validate fields after reading to make sure none of them are null. */
+        public void validate(){
+
+        }
     }
 
     /** Research a specific piece of content in the tech tree. */
@@ -298,6 +303,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public String text(){
             return Core.bundle.format("objective.research", content.emoji(), content.localizedName);
         }
+
+        @Override
+        public void validate(){
+            if(content == null) content = Items.copper;
+        }
     }
 
     /** Produce a specific piece of content in the tech tree (essentially research with different text). */
@@ -318,6 +328,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.format("objective.produce", content.emoji(), content.localizedName);
+        }
+
+        @Override
+        public void validate(){
+            if(content == null) content = Items.copper;
         }
     }
 
@@ -342,6 +357,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public String text(){
             return Core.bundle.format("objective.item", state.rules.defaultTeam.items().get(item), amount, item.emoji(), item.localizedName);
         }
+
+        @Override
+        public void validate(){
+            if(item == null) item = Items.copper;
+        }
     }
 
     /** Get a certain item in your core (through a block, not manually.) */
@@ -364,6 +384,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.format("objective.coreitem", state.stats.coreItemCount.get(item), amount, item.emoji(), item.localizedName);
+        }
+
+        @Override
+        public void validate(){
+            if(item == null) item = Items.copper;
         }
     }
 
@@ -388,6 +413,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public String text(){
             return Core.bundle.format("objective.build", count - state.stats.placedBlockCount.get(block, 0), block.emoji(), block.localizedName);
         }
+
+        @Override
+        public void validate(){
+            if(block == null) block = Blocks.conveyor;
+        }
     }
 
     /** Produce a certain amount of a unit. */
@@ -410,6 +440,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.format("objective.buildunit", count - state.rules.defaultTeam.data().countType(unit), unit.emoji(), unit.localizedName);
+        }
+
+        @Override
+        public void validate(){
+            if(unit == null) unit = UnitTypes.dagger;
         }
     }
 
@@ -524,6 +559,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public String text(){
             return Core.bundle.format("objective.destroyblock", block.emoji(), block.localizedName);
         }
+
+        @Override
+        public void validate(){
+            if(block == null) block = Blocks.router;
+        }
     }
 
     public static class DestroyBlocksObjective extends MapObjective{
@@ -558,6 +598,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.format("objective.destroyblocks", progress(), positions.length, block.emoji(), block.localizedName);
+        }
+
+        @Override
+        public void validate(){
+            if(block == null) block = Blocks.router;
         }
     }
 

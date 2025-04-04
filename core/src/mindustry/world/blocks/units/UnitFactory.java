@@ -237,11 +237,6 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
-        public boolean shouldActiveSound(){
-            return shouldConsume();
-        }
-
-        @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.progress) return Mathf.clamp(fraction());
             if(sensor == LAccess.itemCapacity) return Mathf.round(itemCapacity * state.rules.unitCost(team));

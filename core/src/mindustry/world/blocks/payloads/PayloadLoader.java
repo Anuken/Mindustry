@@ -94,7 +94,7 @@ public class PayloadLoader extends PayloadBlock{
                 //item container
                 (build.build.block.hasItems && build.block().unloadable && build.block().itemCapacity >= 10 && build.block().size <= maxBlockSize) ||
                 //liquid container
-                (build.build.block().hasLiquids && build.block().liquidCapacity >= 10f) ||
+                (build.build.block.hasLiquids && build.block().liquidCapacity >= 10f) ||
                 //battery
                 (build.build.block.consPower != null && build.build.block.consPower.buffered)
             );

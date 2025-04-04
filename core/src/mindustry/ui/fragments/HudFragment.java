@@ -687,44 +687,6 @@ public class HudFragment{
         }
     }
 
-    /** @deprecated see {@link CoreBuild#beginLaunch(CoreBlock)} */
-    @Deprecated
-    public void showLaunch(){
-        float margin = 30f;
-
-        Image image = new Image();
-        image.color.a = 0f;
-        image.touchable = Touchable.disabled;
-        image.setFillParent(true);
-        image.actions(Actions.delay((coreLandDuration - margin) / 60f), Actions.fadeIn(margin / 60f, Interp.pow2In), Actions.delay(6f / 60f), Actions.remove());
-        image.update(() -> {
-            image.toFront();
-            ui.loadfrag.toFront();
-            if(state.isMenu()){
-                image.remove();
-            }
-        });
-        Core.scene.add(image);
-    }
-
-    /** @deprecated see {@link CoreBuild#beginLaunch(CoreBlock)} */
-    @Deprecated
-    public void showLand(){
-        Image image = new Image();
-        image.color.a = 1f;
-        image.touchable = Touchable.disabled;
-        image.setFillParent(true);
-        image.actions(Actions.fadeOut(35f / 60f), Actions.remove());
-        image.update(() -> {
-            image.toFront();
-            ui.loadfrag.toFront();
-            if(state.isMenu()){
-                image.remove();
-            }
-        });
-        Core.scene.add(image);
-    }
-
     private void toggleMenus(){
         if(flip != null){
             flip.getStyle().imageUp = shown ? Icon.downOpen : Icon.upOpen;

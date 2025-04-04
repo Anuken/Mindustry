@@ -54,6 +54,8 @@ public class Annotations{
         /** Whether to generate a base class for this components.
          * An entity cannot have two base classes, so only one component can have base be true. */
         boolean base() default false;
+        /** Whether to generate a proper interface for this component class. */
+        boolean genInterface() default true;
     }
 
     /** Indicates that a method is implemented by the annotation processor. */

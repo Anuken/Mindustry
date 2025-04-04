@@ -22,7 +22,7 @@ import static mindustry.world.blocks.payloads.PayloadMassDriver.PayloadDriverSta
 
 public class PayloadMassDriver extends PayloadBlock{
     public float range = 100f;
-    public float rotateSpeed = 2f;
+    public float rotateSpeed = 5f;
     public float length = 89 / 8f;
     public float knockback = 5f;
     public float reload = 30f;
@@ -72,7 +72,7 @@ public class PayloadMassDriver extends PayloadBlock{
     @Override
     public void init(){
         super.init();
-        updateClipRadius(range);
+        updateClipRadius(range + 4f);
     }
 
     @Override
@@ -430,7 +430,7 @@ public class PayloadMassDriver extends PayloadBlock{
 
             if(linkValid()){
                 Building target = world.build(link);
-                Drawf.circles(target.x, target.y, (target.block().size / 2f + 1) * tilesize + sin - 2f, Pal.place);
+                Drawf.circles(target.x, target.y, (target.block.size / 2f + 1) * tilesize + sin - 2f, Pal.place);
                 Drawf.arrow(x, y, target.x, target.y, size * tilesize + sin, 4f + sin);
             }
 

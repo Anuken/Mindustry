@@ -42,21 +42,29 @@ public class FloorRenderer{
     private static final boolean dynamic = false;
 
     private float[] vertices = new float[maxSprites * vertexSize * 4];
-    private short[] indices = new short[maxSprites * 6];
     private int vidx;
     private FloorRenderBatch batch = new FloorRenderBatch();
     private Shader shader;
     private Texture texture;
     private TextureRegion error;
 
-    private Mesh[][][] cache;
+    private IndexData indexData;
+    private ChunkMesh[][][] cache;
     private IntSet drawnLayerSet = new IntSet();
     private IntSet recacheSet = new IntSet();
     private IntSeq drawnLayers = new IntSeq();
     private ObjectSet<CacheLayer> used = new ObjectSet<>();
 
+    private Seq<Runnable> underwaterDraw = new Seq<>(Runnable.class);
+    //alpha value of pixels cannot exceed the alpha of the surface they're being drawn on
+    private Blending underwaterBlend = new Blending(
+    Gl.srcAlpha, Gl.oneMinusSrcAlpha,
+    Gl.dstAlpha, Gl.oneMinusSrcAlpha
+    );
+
     public FloorRenderer(){
         short j = 0;
+        short[] indices = new short[maxSprites * 6];
         for(int i = 0; i < indices.length; i += 6, j += 4){
             indices[i] = j;
             indices[i + 1] = (short)(j + 1);
@@ -65,6 +73,14 @@ public class FloorRenderer{
             indices[i + 4] = (short)(j + 3);
             indices[i + 5] = j;
         }
+
+        indexData = new IndexBufferObject(true, indices.length){
+            @Override
+            public void dispose(){
+                //there is never a need to dispose this index buffer
+            }
+        };
+        indexData.set(indices, 0, indices.length);
 
         shader = new Shader(
         """
@@ -121,6 +137,8 @@ public class FloorRenderer{
         drawnLayers.clear();
         drawnLayerSet.clear();
 
+        Rect bounds = camera.bounds(Tmp.r3);
+
         //preliminary layer check
         for(int x = minx; x <= maxx; x++){
             for(int y = miny; y <= maxy; y++){
@@ -131,11 +149,11 @@ public class FloorRenderer{
                     cacheChunk(x, y);
                 }
 
-                Mesh[] chunk = cache[x][y];
+                ChunkMesh[] chunk = cache[x][y];
 
                 //loop through all layers, and add layer index if it exists
                 for(int i = 0; i < layers; i++){
-                    if(chunk[i] != null && i != CacheLayer.walls.id){
+                    if(chunk[i] != null && i != CacheLayer.walls.id && chunk[i].bounds.overlaps(bounds)){
                         drawnLayerSet.add(i);
                     }
                 }
@@ -149,16 +167,13 @@ public class FloorRenderer{
 
         drawnLayers.sort();
 
-        Draw.flush();
         beginDraw();
 
         for(int i = 0; i < drawnLayers.size; i++){
-            CacheLayer layer = CacheLayer.all[drawnLayers.get(i)];
-
-            drawLayer(layer);
+            drawLayer(CacheLayer.all[drawnLayers.get(i)]);
         }
 
-        endDraw();
+        underwaterDraw.clear();
     }
 
     public void beginc(){
@@ -167,29 +182,6 @@ public class FloorRenderer{
 
         //only ever use the base environment texture
         texture.bind(0);
-
-        //enable all mesh attributes; TODO remove once the attribute cache bug is fixed
-        if(Core.gl30 == null){
-            for(VertexAttribute attribute : attributes){
-                int loc = shader.getAttributeLocation(attribute.alias);
-                if(loc != -1) Gl.enableVertexAttribArray(loc);
-            }
-        }
-
-    }
-
-    public void endc(){
-        //disable all mesh attributes; TODO remove once the attribute cache bug is fixed
-        if(Core.gl30 == null){
-            for(VertexAttribute attribute : attributes){
-                int loc = shader.getAttributeLocation(attribute.alias);
-                if(loc != -1) Gl.disableVertexAttribArray(loc);
-            }
-        }
-
-        //unbind last buffer
-        Gl.bindBuffer(Gl.arrayBuffer, 0);
-        Gl.bindBuffer(Gl.elementArrayBuffer, 0);
     }
 
     public void checkChanges(){
@@ -205,6 +197,10 @@ public class FloorRenderer{
         }
     }
 
+    public void drawUnderwater(Runnable run){
+        underwaterDraw.add(run);
+    }
+
     public void beginDraw(){
         if(cache == null){
             return;
@@ -215,14 +211,6 @@ public class FloorRenderer{
         beginc();
 
         Gl.enable(Gl.blend);
-    }
-
-    public void endDraw(){
-        if(cache == null){
-            return;
-        }
-
-        endc();
     }
 
     public void drawLayer(CacheLayer layer){
@@ -240,6 +228,8 @@ public class FloorRenderer{
 
         layer.begin();
 
+        Rect bounds = camera.bounds(Tmp.r3);
+
         for(int x = minx; x <= maxx; x++){
             for(int y = miny; y <= maxy; y++){
 
@@ -249,31 +239,27 @@ public class FloorRenderer{
 
                 var mesh = cache[x][y][layer.id];
 
-                //this *must* be a vertexbufferobject on gles2, so cast it and render it directly
-                if(mesh != null && mesh.vertices instanceof VertexBufferObject vbo && mesh.indices instanceof IndexBufferObject ibo){
-
-                    //bindi the buffer and update its contents, but do not unnecessarily enable all the attributes again
-                    vbo.bind();
-                    //set up vertex attribute pointers for this specific VBO
-                    int offset = 0;
-                    for(VertexAttribute attribute : attributes){
-                        int location = shader.getAttributeLocation(attribute.alias);
-                        int aoffset = offset;
-                        offset += attribute.size;
-                        if(location < 0) continue;
-
-                        Gl.vertexAttribPointer(location, attribute.components, attribute.type, attribute.normalized, vertexSize * 4, aoffset);
-                    }
-
-                    ibo.bind();
-
-                    mesh.vertices.render(mesh.indices, Gl.triangles, 0, mesh.getNumIndices());
-                }else if(mesh != null){
-                    //TODO this should be the default branch!
-                    mesh.bind(shader);
-                    mesh.render(shader, Gl.triangles);
+                if(mesh != null && mesh.bounds.overlaps(bounds)){
+                    mesh.render(shader, Gl.triangles, 0, mesh.getMaxVertices() * 6 / 4);
                 }
             }
+        }
+
+        //every underwater object needs to be drawn once per cache layer, which sucks.
+        if(layer.liquid && underwaterDraw.size > 0){
+
+            Draw.blend(underwaterBlend);
+
+            var items = underwaterDraw.items;
+            int len = underwaterDraw.size;
+            for(int i = 0; i < len; i++){
+                items[i].run();
+            }
+
+            Draw.flush();
+            Draw.blend(Blending.normal);
+            Blending.normal.apply();
+            beginDraw();
         }
 
         layer.end();
@@ -298,7 +284,7 @@ public class FloorRenderer{
         }
 
         if(cache[cx][cy].length == 0){
-            cache[cx][cy] = new Mesh[CacheLayer.all.length];
+            cache[cx][cy] = new ChunkMesh[CacheLayer.all.length];
         }
 
         var meshes = cache[cx][cy];
@@ -315,7 +301,7 @@ public class FloorRenderer{
         }
     }
 
-    private Mesh cacheChunkLayer(int cx, int cy, CacheLayer layer){
+    private ChunkMesh cacheChunkLayer(int cx, int cy, CacheLayer layer){
         vidx = 0;
 
         Batch current = Core.batch;
@@ -345,13 +331,13 @@ public class FloorRenderer{
         Core.batch = current;
 
         int floats = vidx;
-        //every 4 vertices need 6 indices
-        int vertCount = floats / vertexSize, indCount = vertCount * 6/4;
+        ChunkMesh mesh = new ChunkMesh(true, floats / vertexSize, 0, attributes,
+            cx * tilesize * chunksize - tilesize/2f, cy * tilesize * chunksize - tilesize/2f,
+            (cx+1) * tilesize * chunksize + tilesize/2f, (cy+1) * tilesize * chunksize + tilesize/2f);
 
-        Mesh mesh = new Mesh(true, vertCount, indCount, attributes);
         mesh.setVertices(vertices, 0, vidx);
-        mesh.setAutoBind(false);
-        mesh.setIndices(indices, 0, indCount);
+        //all vertices are shared
+        mesh.indices = indexData;
 
         return mesh;
     }
@@ -372,7 +358,7 @@ public class FloorRenderer{
 
         recacheSet.clear();
         int chunksx = Mathf.ceil((float)(world.width()) / chunksize), chunksy = Mathf.ceil((float)(world.height()) / chunksize);
-        cache = new Mesh[chunksx][chunksy][dynamic ? 0 : CacheLayer.all.length];
+        cache = new ChunkMesh[chunksx][chunksy][dynamic ? 0 : CacheLayer.all.length];
 
         texture = Core.atlas.find("grass1").texture;
         error = Core.atlas.find("env-error");
@@ -391,7 +377,28 @@ public class FloorRenderer{
         }
     }
 
+    static class ChunkMesh extends Mesh{
+        Rect bounds = new Rect();
+
+        ChunkMesh(boolean isStatic, int maxVertices, int maxIndices, VertexAttribute[] attributes, float minX, float minY, float maxX, float maxY){
+            super(isStatic, maxVertices, maxIndices, attributes);
+
+            bounds.set(minX, minY, maxX - minX, maxY - minY);
+        }
+    }
+
     class FloorRenderBatch extends Batch{
+        //TODO: alternate clipping approach, can be more accurate
+        /*
+        float minX, minY, maxX, maxY;
+
+        void reset(){
+            minX = Float.POSITIVE_INFINITY;
+            minY = Float.POSITIVE_INFINITY;
+            maxX = 0f;
+            maxY = 0f;
+        }
+        */
 
         @Override
         protected void draw(TextureRegion region, float x, float y, float originX, float originY, float width, float height, float rotation){

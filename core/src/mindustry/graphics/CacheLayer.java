@@ -17,6 +17,7 @@ public class CacheLayer{
     public static CacheLayer[] all = {};
 
     public int id;
+    public boolean liquid;
 
     /** Registers cache layers that will render before the 'normal' layer. */
     public static void add(CacheLayer... layers){
@@ -66,7 +67,7 @@ public class CacheLayer{
             slag = new ShaderLayer(Shaders.slag),
             arkycite = new ShaderLayer(Shaders.arkycite),
             cryofluid = new ShaderLayer(Shaders.cryofluid),
-            space = new ShaderLayer(Shaders.space),
+            space = new ShaderLayer(Shaders.space, false),
             normal = new CacheLayer(),
             walls = new CacheLayer()
         );
@@ -86,7 +87,11 @@ public class CacheLayer{
         public @Nullable Shader shader;
 
         public ShaderLayer(Shader shader){
-            //shader will be null on headless backend, but that's ok
+            this(shader, true);
+        }
+
+        public ShaderLayer(@Nullable Shader shader, boolean liquid){
+            this.liquid = liquid;
             this.shader = shader;
         }
 
@@ -94,7 +99,6 @@ public class CacheLayer{
         public void begin(){
             if(!Core.settings.getBool("animatedwater")) return;
 
-            renderer.blocks.floor.endc();
             renderer.effectBuffer.begin();
             Core.graphics.clear(Color.clear);
             renderer.blocks.floor.beginc();
@@ -104,11 +108,8 @@ public class CacheLayer{
         public void end(){
             if(!Core.settings.getBool("animatedwater")) return;
 
-            renderer.blocks.floor.endc();
             renderer.effectBuffer.end();
-
             renderer.effectBuffer.blit(shader);
-
             renderer.blocks.floor.beginc();
         }
     }
