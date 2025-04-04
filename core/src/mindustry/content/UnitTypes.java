@@ -594,7 +594,7 @@ public class UnitTypes{
             health = 18000f;
             armor = 9f;
             stepShake = 1.5f;
-            rotateSpeed = 1.5f;
+            rotateSpeed = 1.8f;
             drownTimeMultiplier = 6f;
 
             legCount = 4;
@@ -607,54 +607,67 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(4000);
             groundLayer = Layer.legUnit;
 
-            speed = 0.3f;
+            speed = 0.4f;
 
             drawShields = false;
 
             weapons.add(new Weapon("corvus-weapon"){{
-                shootSound = Sounds.laserblast;
+                shootSound = Sounds.bolt;
                 chargeSound = Sounds.lasercharge;
                 soundPitchMin = 1f;
                 top = false;
                 mirror = false;
-                shake = 14f;
+                shake = 1f;
                 shootY = 5f;
                 x = y = 0;
-                reload = 350f;
+                reload = 420f;
                 recoil = 0f;
-
-                cooldownTime = 350f;
-
+                cooldownTime = 420f;
+                shoot.shots = 20;
+                shoot.shotDelay = 2f;
                 shootStatusDuration = 60f * 2f;
                 shootStatus = StatusEffects.unmoving;
                 shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
                 parentizeEffects = true;
 
-                bullet = new LaserBulletType(){{
-                    length = 460f;
-                    damage = 560f;
-                    width = 75f;
-
-                    lifetime = 65f;
-
-                    lightningSpacing = 35f;
-                    lightningLength = 5;
-                    lightningDelay = 1.1f;
-                    lightningLengthRand = 15;
-                    lightningDamage = 50;
-                    lightningAngleRand = 40f;
-                    largeHit = true;
-                    lightColor = lightningColor = Pal.heal;
-
+                bullet = new RailBulletType(){{
+                    shootEffect = Fx.railShoot;
+                    length = 440;
+                    pointEffectSpace = 15f;
+                    pierceEffect = new Effect(18f, 200f, e -> {
+                        color(Pal.heal);
+                        for(int i : Mathf.signs){
+                            Drawf.tri(e.x, e.y, 10f * e.fout(), 60f, e.rotation + 140f * i);
+                        }
+                    });
+                    pointEffect = new Effect(16f, e -> {
+                        color(Pal.heal);
+                        for(int i : Mathf.signs){
+                            Drawf.tri(e.x, e.y, 10f * e.fout(), 24f, e.rotation + 90 + 90f * i);
+                        }
+                        Drawf.light(e.x, e.y, 60f * e.fout(), Pal.heal, 0.5f);
+                    });
+                    hitEffect = Fx.flakExplosion;
+                    damage = 45;
+                    buildingDamageMultiplier = 2f;
+                    pierceDamageFactor = 0.8f;
                     chargeEffect = Fx.greenLaserCharge;
-
-                    healPercent = 25f;
-                    collidesTeam = true;
-
-                    sideAngle = 15f;
-                    sideWidth = 0f;
-                    sideLength = 0f;
-                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                    fragBullets = 1;
+                    fragRandomSpread = 0f;
+                    fragBullet = new BasicBulletType(4f, 0f){{
+                        lifetime = 3f; 
+                        makeFire = true;
+                        hittable = false;
+                        reflectable = false;
+                        absorbable = false;
+                        splashDamageRadius = 24f;
+                        splashDamage = 35f;
+                        buildingDamageMultiplier = 2f;
+                        hitColor = backColor = Pal.heal;
+                        frontColor = Color.white;
+                        hitEffect = Fx.shockwave;
+                        despawnEffect = Fx.hitBulletColor;
+                    }};
                 }};
             }});
         }};
