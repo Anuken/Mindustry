@@ -3431,7 +3431,7 @@ public class Blocks{
                     despawnEffect = Fx.blastExplosion;
 
                     status = StatusEffects.blasted;
-                    statusDuration = 60f;
+                    statusDuration = 60f * 4f;
                 }},
                 Items.pyratite, new MissileBulletType(3.7f, 12){{
                     frontColor = Pal.lightishOrange;
@@ -3736,6 +3736,7 @@ public class Blocks{
                     frontColor = Pal.missileYellow;
 
                     status = StatusEffects.blasted;
+                    statusDuration = 60f * 4f;
                 }},
                 Items.plastanium, new ArtilleryBulletType(3.4f, 20, "shell"){{
                     hitEffect = Fx.plasticExplosion;
@@ -3814,7 +3815,7 @@ public class Blocks{
                     collidesGround = true;
 
                     status = StatusEffects.blasted;
-                    statusDuration = 60f;
+                    statusDuration = 60f * 4f;
                 }},
                 Items.plastanium, new FlakBulletType(4f, 8){{
                     ammoMultiplier = 4f;
@@ -4328,6 +4329,7 @@ public class Blocks{
                 hitSound = Sounds.titanExplosion;
 
                 status = StatusEffects.blasted;
+                statusDuration = 60f * 4f;
 
                 trailLength = 32;
                 trailWidth = 3.35f;
@@ -4361,6 +4363,7 @@ public class Blocks{
                 hitSound = Sounds.titanExplosion;
 
                 status = StatusEffects.blasted;
+                statusDuration = 60f * 4f;
 
                 trailLength = 32;
                 trailWidth = 3.35f;
@@ -4397,6 +4400,7 @@ public class Blocks{
                 hitSound = Sounds.titanExplosion;
 
                 status = StatusEffects.blasted;
+                statusDuration = 60f * 4f;
 
                 trailLength = 32;
                 trailWidth = 3.35f;
