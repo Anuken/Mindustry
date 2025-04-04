@@ -581,18 +581,14 @@ public class StatValues{
                 int count = 0;
                 for(Ability ability : abilities){
                     if(ability.display){
-                        t.table(Styles.grayPanel, a -> {
-                            a.add("[accent]" + ability.localized()).padBottom(4).center().top().expandX();
-                            a.row();
-                            a.left().top().defaults().left();
-                            ability.addStats(a);
-                        }).pad(5).margin(10).growX().top().uniformX();
+                        ability.display(t);
+
                         if((++count) == 2){
                             count = 0;
                             t.row();
                         }
                     }
-                };
+                }
             });
         };
     }

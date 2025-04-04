@@ -578,6 +578,8 @@ public class LExecutor{
                     output.numval = fromVar.numval;
                     output.isobj = fromVar.isobj;
                 }
+            }else if(target.isobj && target.objval instanceof CharSequence str){
+                output.setnum(address < 0 || address >= str.length() ? 0 : (int)str.charAt(address));
             }
         }
     }
@@ -1451,10 +1453,10 @@ public class LExecutor{
 
             Team t = team.team();
 
-            if(type.obj() instanceof UnitType type && !type.internal && !type.hidden && t != null && Units.canCreate(t, type)){
+            if(type.obj() instanceof UnitType type && !type.internal && Units.canCreate(t, type)){
                 //random offset to prevent stacking
                 var unit = type.spawn(t, World.unconv(x.numf()) + Mathf.range(0.01f), World.unconv(y.numf()) + Mathf.range(0.01f));
-                spawner.spawnEffect(unit, rotation.numf());
+                spawner.spawnEffect(unit);
                 result.setobj(unit);
             }
         }
@@ -1623,11 +1625,12 @@ public class LExecutor{
             }else if(full){
                 //disable the rule, covers the whole map
                 if(set){
+                    int prevX = state.rules.limitX, prevY = state.rules.limitY, prevW = state.rules.limitWidth, prevH = state.rules.limitHeight;
                     state.rules.limitMapArea = false;
                     if(!headless){
                         renderer.updateAllDarkness();
                     }
-                    world.checkMapArea();
+                    world.checkMapArea(prevX, prevY, prevW, prevH);
                     return false;
                 }
             }
@@ -1636,12 +1639,20 @@ public class LExecutor{
         }
 
         if(set){
+            int prevX = state.rules.limitX, prevY = state.rules.limitY, prevW = state.rules.limitWidth, prevH = state.rules.limitHeight;
+            if(!state.rules.limitMapArea){
+                //it was never on in the first place, so the old bounds don't apply
+                prevW = 0;
+                prevH = 0;
+                prevX = -1;
+                prevY = -1;
+            }
             state.rules.limitMapArea = true;
             state.rules.limitX = x;
             state.rules.limitY = y;
             state.rules.limitWidth = w;
             state.rules.limitHeight = h;
-            world.checkMapArea();
+            world.checkMapArea(prevX, prevY, prevW, prevH);
 
             if(!headless){
                 renderer.updateAllDarkness();
@@ -1934,9 +1945,7 @@ public class LExecutor{
                 for(int i = 0; i < spawned; i++){
                     Tmp.v1.rnd(spread);
 
-                    Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
-                    unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
-                    Vars.spawner.spawnEffect(unit);
+                    spawner.spawnUnit(group, spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
                 }
             }
         }

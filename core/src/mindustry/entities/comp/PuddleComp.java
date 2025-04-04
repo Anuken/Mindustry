@@ -23,7 +23,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc, Syncc{
 
     private static Puddle paramPuddle;
     private static Cons<Unit> unitCons = unit -> {
-        if(unit.isGrounded() && !unit.hovering){
+        if(unit.isGrounded() && !unit.type.hovering){
             unit.hitbox(rect2);
             if(rect.overlaps(rect2)){
                 unit.apply(paramPuddle.liquid.effect, 60 * 2);
@@ -104,6 +104,10 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc, Syncc{
             }
 
             updateTime = 40f;
+
+            if(tile.build != null){
+                tile.build.puddleOn(self());
+            }
         }
 
         if(!headless && liquid.particleEffect != Fx.none){

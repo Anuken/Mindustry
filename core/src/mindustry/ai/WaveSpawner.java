@@ -82,9 +82,7 @@ public class WaveSpawner{
 
                 eachFlyerSpawn(group.spawn, (spawnX, spawnY) -> {
                     for(int i = 0; i < spawnedf; i++){
-                        Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
-                        unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
-                        spawnEffect(unit);
+                        spawnUnit(group, spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
                     }
                 });
             }else{
@@ -95,15 +93,18 @@ public class WaveSpawner{
                     for(int i = 0; i < spawnedf; i++){
                         Tmp.v1.rnd(spread);
 
-                        Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
-                        unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
-                        spawnEffect(unit);
+                        spawnUnit(group, spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
                     }
                 });
             }
         }
 
         Time.run(121f, () -> spawning = false);
+    }
+
+    public void spawnUnit(SpawnGroup group, float x, float y){
+        group.createUnit(group.team == null ? state.rules.waveTeam : group.team, x, y,
+            Angles.angle(x, y, world.width()/2f * tilesize, world.height()/2f * tilesize), state.wave - 1, this::spawnEffect);
     }
 
     public void doShockwave(float x, float y){
@@ -217,15 +218,8 @@ public class WaveSpawner{
 
     /** Applies the standard wave spawn effects to a unit - invincibility, unmoving. */
     public void spawnEffect(Unit unit){
-        spawnEffect(unit, unit.angleTo(world.width()/2f * tilesize, world.height()/2f * tilesize));
-    }
-
-    /** Applies the standard wave spawn effects to a unit - invincibility, unmoving. */
-    public void spawnEffect(Unit unit, float rotation){
-        unit.rotation = rotation;
         unit.apply(StatusEffects.unmoving, 30f);
         unit.apply(StatusEffects.invincible, 60f);
-        unit.add();
         unit.unloaded();
 
         Events.fire(new UnitSpawnEvent(unit));

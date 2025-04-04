@@ -48,7 +48,7 @@ public class MinimapFragment{
                 Draw.rect(reg, w/2f + panx*zoom, h/2f + pany*zoom, size, size * ratio);
 
                 Rect bounds = getRectBounds();
-                renderer.minimap.drawEntities(bounds.x, bounds.y, bounds.width, bounds.height, zoom, true);
+                renderer.minimap.drawEntities(bounds.x, bounds.y, bounds.width, bounds.height, true);
             }
 
             Draw.reset();
