@@ -11,7 +11,8 @@ import mindustry.logic.LExecutor.*;
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
 
-    private static final int invalidNum = Integer.MIN_VALUE;
+    private static final int invalidNumNegative = Integer.MIN_VALUE;
+    private static final int invalidNumPositive = Integer.MAX_VALUE;
 
     private boolean privileged;
     /** Maps names to variable. */
@@ -72,9 +73,11 @@ public class LAssembler{
         //remove spaces for non-strings
         symbol = symbol.replace(' ', '_');
 
-        double value = parseDouble(symbol);
+        //use a positive invalid number if number might be negative, else use a negative invalid number
+        int usedInvalidNum = symbol.startsWith("-") ? invalidNumPositive : invalidNumNegative;
+        double value = parseDouble(symbol, usedInvalidNum);
 
-        if(value == invalidNum){
+        if(value == usedInvalidNum){
             return putVar(symbol);
         }else{
             //this creates a hidden const variable with the specified value
@@ -82,10 +85,14 @@ public class LAssembler{
         }
     }
 
-    double parseDouble(String symbol){
+    double parseDouble(String symbol, int invalidNum){
         //parse hex/binary syntax
         if(symbol.startsWith("0b")) return Strings.parseLong(symbol, 2, 2, symbol.length(), invalidNum);
+        if(symbol.startsWith("+0b")) return Strings.parseLong(symbol, 2, 3, symbol.length(), invalidNum);
+        if(symbol.startsWith("-0b")) return -Strings.parseLong(symbol, 2, 3, symbol.length(), invalidNum);//FIXME: breaks with Long.MIN_VALUE
         if(symbol.startsWith("0x")) return Strings.parseLong(symbol, 16, 2, symbol.length(), invalidNum);
+        if(symbol.startsWith("+0x")) return Strings.parseLong(symbol, 16, 3, symbol.length(), invalidNum);
+        if(symbol.startsWith("-0x")) return -Strings.parseLong(symbol, 16, 3, symbol.length(), invalidNum);//FIXME: breaks with Long.MIN_VALUE
         if(symbol.startsWith("%") && (symbol.length() == 7 || symbol.length() == 9)) return parseColor(symbol);
 
         return Strings.parseDouble(symbol, invalidNum);
