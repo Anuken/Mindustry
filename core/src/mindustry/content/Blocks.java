@@ -4010,7 +4010,6 @@ public class Blocks{
                 hitColor = Pal.meltdownHit;
                 status = StatusEffects.melting;
                 drawSize = 420f;
-                timescaleDamage = true;
 
                 incendChance = 0.4f;
                 incendSpread = 5f;
