@@ -463,7 +463,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void requestUnitPayload(Player player, Unit target){
-        if(player == null || !(player.unit() instanceof Payloadc pay)) return;
+        if(player == null || !(player.unit() instanceof Payloadc pay) || target == null) return;
 
         Unit unit = player.unit();
 
