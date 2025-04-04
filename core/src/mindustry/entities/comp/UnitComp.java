@@ -354,7 +354,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 }
             }
             case flag -> flag = value;
-            case speed -> statusSpeed(Math.max((float)value, 0f));
+            case speed -> statusSpeed(Mathf.clamp((float)value, 0f, 1000f));
             case armor -> statusArmor(Math.max((float)value, 0f));
         }
     }

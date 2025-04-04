@@ -62,6 +62,7 @@ abstract class StatusComp implements Posc{
             //otherwise, no opposites found, add direct effect
             StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
             entry.set(effect, duration);
+            applied.set(effect.id);
             statuses.add(entry);
             effect.applied(self(), duration, false);
         }
@@ -127,6 +128,7 @@ abstract class StatusComp implements Posc{
         StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
         entry.set(StatusEffects.dynamic, Float.POSITIVE_INFINITY);
         statuses.add(entry);
+        applied.set(StatusEffects.dynamic.id);
         entry.effect.applied(self(), entry.time, false);
         return entry;
     }
