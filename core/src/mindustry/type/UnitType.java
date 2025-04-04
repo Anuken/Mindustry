@@ -758,7 +758,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
     }
 
-    protected void checkEntityMapping(){
+    protected void checkEntityMapping(Unit example){
         if(constructor == null) throw new IllegalArgumentException(Strings.format("""
             No constructor set up for unit '@': Assign `constructor = [your unit constructor]`. Vanilla defaults are:
               "flying": UnitEntity::create
@@ -776,8 +776,6 @@ public class UnitType extends UnlockableContent implements Senseable{
         // Often modders improperly only sets `constructor = ...` without mapping. Try to mitigate that.
         // In most cases, if the constructor is a Vanilla class, things should work just fine.
         if(EntityMapping.map(name) == null) EntityMapping.nameMap.put(name, constructor);
-
-        Unit example = constructor.get();
 
         // Sanity checks; this is an EXTREMELY COMMON pitfalls Java modders fall into.
         int classId = example.classId();
@@ -801,7 +799,9 @@ public class UnitType extends UnlockableContent implements Senseable{
     public void init(){
         super.init();
 
-        checkEntityMapping();
+        Unit example = constructor.get();
+
+        checkEntityMapping(example);
 
         allowLegStep = example instanceof Legsc || example instanceof Crawlc;
 
