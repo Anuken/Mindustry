@@ -783,7 +783,7 @@ public class UnitTypes{
                 despawnEffect = Fx.none;
                 width = 0.55f;
                 lifetime = 30f;
-                knockback = -2f;
+                knockback = -1.2f;
             }};
 
             weapons.add(
@@ -886,9 +886,10 @@ public class UnitTypes{
                 x = 11f;
                 shootY = 7f;
                 reload = 15;
-                shake = 4f;
-                rotateSpeed = 2f;
+                shake = 2f;
+                rotateSpeed = 3f;
                 ejectEffect = Fx.casing1;
+                shootCone = 60f;
                 shootSound = Sounds.shootBig;
                 rotate = true;
                 shadow = 12f;
@@ -898,7 +899,7 @@ public class UnitTypes{
 
                 bullet = new ShrapnelBulletType(){{
                     length = 90f;
-                    damage = 140f;
+                    damage = 120f;
                     knockback = 2f;
                     width = 25f;
                     pierceArmor = true;
@@ -924,11 +925,13 @@ public class UnitTypes{
                 targetSwitchInterval = 9f;
                 bullet = new PointLaserBulletType(){{
                     damage = 0f;
+                    buildingDamageMultiplier = 0.01f;
+                    sprite = "parallax-laser";
                     status = StatusEffects.slow;
                     statusDuration = 60f * 4;
                     trailColor = Pal.sapBullet;
                     hitColor = Pal.sapBullet;
-                    knockback = -1.5f;
+                    knockback = -1f;
                     maxRange = 240f;
                     }};
                 shootSound = Sounds.sap;
@@ -945,11 +948,13 @@ public class UnitTypes{
                 targetSwitchInterval = 9f;
                 bullet = new PointLaserBulletType(){{
                     damage = 0f;
+                    buildingDamageMultiplier = 0.01f;
+                    sprite = "parallax-laser";
                     status = StatusEffects.slow;
                     statusDuration = 60f * 4;
                     trailColor = Pal.sapBullet;
                     hitColor = Pal.sapBullet;
-                    knockback = -1.5f;
+                    knockback = -1f;
                     maxRange = 240f;
                     }};
                 shootSound = Sounds.sap;
