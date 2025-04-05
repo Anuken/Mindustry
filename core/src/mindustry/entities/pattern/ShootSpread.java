@@ -14,6 +14,10 @@ public class ShootSpread extends ShootPattern{
     public ShootSpread(){
     }
 
+    public static ShootSpread circle(int points){
+        return new ShootSpread(points, 360f / points);
+    }
+
     @Override
     public void shoot(int totalShots, BulletHandler handler, @Nullable Runnable barrelIncrementer){
         for(int i = 0; i < shots; i++){

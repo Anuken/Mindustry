@@ -179,6 +179,7 @@ public class ConsoleFragment extends Table{
     public String injectConsoleVariables(){
         return
         "var unit = Vars.player.unit();" +
+        "var player = Vars.player;" +
         "var team = Vars.player.team();" +
         "var core = Vars.player.core();" +
         "var items = Vars.player.team().items();" +

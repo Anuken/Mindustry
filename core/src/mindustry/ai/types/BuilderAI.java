@@ -118,9 +118,10 @@ public class BuilderAI extends AIController{
                         Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation)));
 
             if(valid){
+                float range = Math.min(unit.type.buildRange - 20f, 100f);
                 //move toward the plan
-                moveTo(req.tile(), unit.type.buildRange - 20f, 20f);
-                moving = !unit.within(req.tile(), unit.type.buildRange - 10f);
+                moveTo(req.tile(), range - 10f, 20f);
+                moving = !unit.within(req.tile(), range);
             }else{
                 //discard invalid plan
                 unit.plans.removeFirst();
