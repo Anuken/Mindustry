@@ -750,7 +750,7 @@ public class UnitTypes{
             speed = 0.85f;
             hitSize = 23f;
             health = 8000;
-            armor = 25f;
+            armor = 20f;
             immunities = ObjectSet.with(StatusEffects.wet, StatusEffects.sapped);
 
             rotateSpeed = 2.7f;
@@ -778,12 +778,13 @@ public class UnitTypes{
             BulletType sapper = new SapBulletType(){{
                 sapStrength = 0.95f;
                 length = 72f;
-                damage = 55;
+                damage = 50;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
                 width = 0.55f;
                 lifetime = 30f;
+                pierceArmor = true;
                 knockback = -1.2f;
             }};
 
@@ -940,8 +941,8 @@ public class UnitTypes{
                 shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
-                x = 13f;
-                y = 3f;
+                x = 15f;
+                y = 2f;
                 rotate = true;
                 rotateSpeed = 3f;
                 autoTarget = true;
@@ -980,7 +981,6 @@ public class UnitTypes{
 
                 bullet = new ArtilleryBulletType(4f, 300){{
                     hitEffect = Fx.sapExplosion;
-                    knockback = 0.8f;
                     lifetime = 60f;
                     width = height = 25f;
                     collidesTiles = collides = true;
@@ -1002,30 +1002,18 @@ public class UnitTypes{
                     statusDuration = 60f * 10;
 
                     fragLifeMin = 0.3f;
-                    fragBullets = 9;
+                    fragBullets = 12;
                     fragRandomSpread = 0f;
-                    fragSpread = 15f;
-
-                    fragBullet = new ArtilleryBulletType(2.3f, 30){{
-                        hitEffect = Fx.sapExplosion;
-                        knockback = 0.8f;
-                        lifetime = 90f;
-                        width = height = 20f;
-                        collidesTiles = false;
-                        splashDamageRadius = 70f;
-                        splashDamage = 40f;
-                        backColor = Pal.sapBulletBack;
-                        frontColor = lightningColor = Pal.sapBullet;
-                        lightning = 2;
-                        lightningLength = 5;
-                        smokeEffect = Fx.shootBigSmoke2;
-                        hitShake = 5f;
-                        lightRadius = 30f;
-                        lightColor = Pal.sap;
-                        lightOpacity = 0.5f;
-
-                        status = StatusEffects.sapped;
-                        statusDuration = 60f * 10;
+                    fragSpread = 14f;
+                    fragBullet = new SapBulletType(){{
+                        sapStrength = 0.9f;
+                        length = 72f;
+                        damage = 30;
+                        shootEffect = Fx.shootSmall;
+                        hitColor = color = Color.valueOf("bf92f9");
+                        despawnEffect = Fx.none;
+                        width = 0.55f;
+                        lifetime = 20f;
                     }};
                 }};
             }});
