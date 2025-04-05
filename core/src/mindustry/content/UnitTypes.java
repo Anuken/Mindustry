@@ -751,6 +751,7 @@ public class UnitTypes{
             hitSize = 23f;
             health = 8000;
             armor = 25f;
+            immunities = ObjectSet.with(StatusEffects.wet, StatusEffects.sapped);
 
             rotateSpeed = 2.7f;
 
@@ -855,6 +856,7 @@ public class UnitTypes{
             hitSize = 26f;
             health = 22000;
             armor = 33f;
+            immunities = ObjectSet.with(StatusEffects.freezing, StatusEffects.melting);
             lightRadius = 140f;
 
             rotateSpeed = 1.9f;
@@ -900,7 +902,6 @@ public class UnitTypes{
                 bullet = new ShrapnelBulletType(){{
                     length = 90f;
                     damage = 60f;
-                    sapStrength = 0.9f;
                     knockback = 2f;
                     width = 25f;
                     pierceArmor = true;
@@ -911,6 +912,8 @@ public class UnitTypes{
                     serrationWidth = 6f;
                     fromColor = Pal.sapBullet;
                     toColor = Pal.sapBulletBack;
+                    status = StatusEffects.sapped;
+                    statusDuration = 60f * 4;
                     shootEffect = smokeEffect = Fx.sparkShoot;
                 }};
             }},
@@ -928,12 +931,11 @@ public class UnitTypes{
                     damage = 0f;
                     buildingDamageMultiplier = 0.01f;
                     sprite = "parallax-laser";
-                    status = StatusEffects.slow;
+                    status = StatusEffects.freezing;
                     statusDuration = 60f * 4;
-                    trailColor = Pal.sapBullet;
                     hitColor = Pal.sapBullet;
                     knockback = -0.6f;
-                    maxRange = 240f;
+                    maxRange = 224f;
                     }};
                 shootSound = Sounds.sap;
             }},
@@ -951,12 +953,11 @@ public class UnitTypes{
                     damage = 0f;
                     buildingDamageMultiplier = 0.01f;
                     sprite = "parallax-laser";
-                    status = StatusEffects.slow;
+                    status = StatusEffects.freezing;
                     statusDuration = 60f * 4;
-                    trailColor = Pal.sapBullet;
                     hitColor = Pal.sapBullet;
                     knockback = -0.6f;
-                    maxRange = 240f;
+                    maxRange = 224f;
                     }};
                 shootSound = Sounds.sap;
             }});
@@ -977,10 +978,10 @@ public class UnitTypes{
 
                 rotationLimit = 80f;
 
-                bullet = new ArtilleryBulletType(3f, 50){{
+                bullet = new ArtilleryBulletType(4f, 300){{
                     hitEffect = Fx.sapExplosion;
                     knockback = 0.8f;
-                    lifetime = 80f;
+                    lifetime = 60f;
                     width = height = 25f;
                     collidesTiles = collides = true;
                     ammoMultiplier = 4f;
