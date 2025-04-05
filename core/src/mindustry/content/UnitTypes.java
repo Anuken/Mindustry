@@ -880,6 +880,20 @@ public class UnitTypes{
             shadowElevation = 0.95f;
             groundLayer = Layer.legUnit;
 
+            BulletType sapBeam = new SapBulletType(){{
+                        sapStrength = 0.9f;
+                        pierceArmor = true;
+                        length = 88f;
+                        damage = 60;
+                        absorbable = false;
+                        hitColor = color = Pal.sapBullet;
+                        despawnEffect = Fx.none;
+                        status = StatusEffects.sapped;
+                        statusDuration = 60f * 9;
+                        width = 0.55f;
+                        lifetime = 50f;
+            }};
+
             weapons.add(
             new Weapon("large-purple-mount"){{
                 y = -7f;
@@ -914,6 +928,10 @@ public class UnitTypes{
                     status = StatusEffects.sapped;
                     statusDuration = 60f * 4;
                     shootEffect = smokeEffect = Fx.sparkShoot;
+                    fragBullets = 1;
+                    fragRandomSpread = 0f;
+                    fragSpread = 0f;
+                    fragBullet = sapBeam;
                 }};
             }},
             new Weapon("spiroct-weapon"){{
@@ -933,7 +951,7 @@ public class UnitTypes{
                     sprite = "parallax-laser";
                     status = StatusEffects.freezing;
                     statusDuration = 60f * 4;
-                    hitEffect = Fx.none;
+                    hitEffect = trailEffect =Fx.none;
                     knockback = -1.6f;
                     maxRange = 256f;
                     }};
@@ -945,7 +963,7 @@ public class UnitTypes{
                 x = 0f;
                 shootY = 22f;
                 mirror = false;
-                reload = 180;
+                reload = 90;
                 shake = 10f;
                 recoil = 4f;
                 rotateSpeed = 3f;
@@ -955,9 +973,9 @@ public class UnitTypes{
                 shadow = 30f;
                 rotationLimit = 80f;
 
-                bullet = new BasicBulletType(6f, 300){{
+                bullet = new BasicBulletType(6f, 120){{
                     hitEffect = Fx.sapExplosion;
-                    lifetime = 40f;
+                    lifetime = 42f;
                     width = height = 25f;
                     ammoMultiplier = 4f;
                     backColor = Pal.sapBulletBack;
@@ -969,22 +987,10 @@ public class UnitTypes{
                     lightRadius = 40f;
                     lightColor = Pal.sap;
                     lightOpacity = 0.6f;
-                    fragLifeMin = 0.3f;
                     fragBullets = 9;
                     fragRandomSpread = 0f;
                     fragSpread = 14f;
-                    fragBullet = new SapBulletType(){{
-                        sapStrength = 0.99f;
-                        pierceArmor = true;
-                        length = 88f;
-                        damage = 95;
-                        hitColor = color = Pal.sapBullet;
-                        despawnEffect = Fx.none;
-                        status = StatusEffects.sapped;
-                        statusDuration = 60f * 9;
-                        width = 0.55f;
-                        lifetime = 50f;
-                    }};
+                    fragBullet = sapBeam;
                 }};
             }});
         }};
