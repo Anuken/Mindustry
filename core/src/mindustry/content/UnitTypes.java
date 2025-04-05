@@ -885,7 +885,7 @@ public class UnitTypes{
             weapons.add(
             new Weapon("large-purple-mount"){{
                 y = -5f;
-                x = 11f;
+                x = 9f;
                 shootY = 7f;
                 reload = 10;
                 shake = 2f;
@@ -901,8 +901,8 @@ public class UnitTypes{
 
                 bullet = new ShrapnelBulletType(){{
                     length = 90f;
-                    damage = 60f;
-                    knockback = 2f;
+                    damage = 50f;
+                    knockback = 1.5f;
                     width = 25f;
                     pierceArmor = true;
                     serrationLenScl = 7f;
@@ -919,7 +919,7 @@ public class UnitTypes{
             }},
             new Weapon("spiroct-weapon"){{
                 x = 5f;
-                y = 2f;
+                y = 1f;
                 rotate = true;
                 rotateSpeed = 3f;
                 autoTarget = true;
@@ -940,8 +940,8 @@ public class UnitTypes{
                 shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
-                x = 24f;
-                y = 8f;
+                x = 13f;
+                y = 3f;
                 rotate = true;
                 rotateSpeed = 3f;
                 autoTarget = true;
