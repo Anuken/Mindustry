@@ -801,7 +801,7 @@ public class UnitTypes{
                 y = 6f;
                 rotate = true;
                 bullet = sapper;
-                shoot.firstShotDelay = 4f;
+                shoot.firstShotDelay = 5f;
                 shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
@@ -810,7 +810,7 @@ public class UnitTypes{
                 y = 0f;
                 rotate = true;
                 bullet = sapper;
-                shoot.firstShotDelay = 8f;
+                shoot.firstShotDelay = 10f;
                 shootSound = Sounds.sap;
             }},
             new Weapon("large-purple-mount"){{
@@ -885,7 +885,7 @@ public class UnitTypes{
                 y = -5f;
                 x = 11f;
                 shootY = 7f;
-                reload = 15;
+                reload = 10;
                 shake = 2f;
                 rotateSpeed = 3f;
                 ejectEffect = Fx.casing1;
@@ -899,7 +899,8 @@ public class UnitTypes{
 
                 bullet = new ShrapnelBulletType(){{
                     length = 90f;
-                    damage = 120f;
+                    damage = 60f;
+                    sapStrength = 0.9f;
                     knockback = 2f;
                     width = 25f;
                     pierceArmor = true;
@@ -914,15 +915,15 @@ public class UnitTypes{
                 }};
             }},
             new Weapon("spiroct-weapon"){{
-                x = 6f;
-                y = -2f;
+                x = 5f;
+                y = 2f;
                 rotate = true;
                 rotateSpeed = 3f;
                 autoTarget = true;
                 controllable = false;
                 predictTarget = false;
-                targetInterval = 6f;
-                targetSwitchInterval = 9f;
+                targetInterval = 15f;
+                targetSwitchInterval = 28f;
                 bullet = new PointLaserBulletType(){{
                     damage = 0f;
                     buildingDamageMultiplier = 0.01f;
@@ -931,21 +932,21 @@ public class UnitTypes{
                     statusDuration = 60f * 4;
                     trailColor = Pal.sapBullet;
                     hitColor = Pal.sapBullet;
-                    knockback = -1f;
+                    knockback = -0.6f;
                     maxRange = 240f;
                     }};
                 shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
-                x = 16f;
-                y = -4f;
+                x = 24f;
+                y = 8f;
                 rotate = true;
                 rotateSpeed = 3f;
                 autoTarget = true;
                 controllable = false;
                 predictTarget = false;
-                targetInterval = 6f;
-                targetSwitchInterval = 9f;
+                targetInterval = 15f;
+                targetSwitchInterval = 28f;
                 bullet = new PointLaserBulletType(){{
                     damage = 0f;
                     buildingDamageMultiplier = 0.01f;
@@ -954,7 +955,7 @@ public class UnitTypes{
                     statusDuration = 60f * 4;
                     trailColor = Pal.sapBullet;
                     hitColor = Pal.sapBullet;
-                    knockback = -1f;
+                    knockback = -0.6f;
                     maxRange = 240f;
                     }};
                 shootSound = Sounds.sap;
