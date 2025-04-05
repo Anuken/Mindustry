@@ -926,7 +926,7 @@ public class UnitTypes{
                     damage = 0f;
                     status = StatusEffects.slow;
                     statusDuration = 60f * 4;
-                    laserColor = Pal.sapBullet;
+                    trailColor = Pal.sapBullet;
                     hitColor = Pal.sapBullet;
                     knockback = -1.5f;
                     maxRange = 240f;
@@ -947,7 +947,7 @@ public class UnitTypes{
                     damage = 0f;
                     status = StatusEffects.slow;
                     statusDuration = 60f * 4;
-                    laserColor = Pal.sapBullet;
+                    trailColor = Pal.sapBullet;
                     hitColor = Pal.sapBullet;
                     knockback = -1.5f;
                     maxRange = 240f;
