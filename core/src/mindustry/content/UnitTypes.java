@@ -828,7 +828,7 @@ public class UnitTypes{
                 recoil = 0f;
                 parentizeEffects = true;
                 shoot = new ShootSpread(3, 5f);
-                shoot.firstShotDelay = 20f;
+                shoot.firstShotDelay = 45f;
                 
                 bullet = new LightningBulletType(){{
                 damage = 85;
@@ -974,11 +974,10 @@ public class UnitTypes{
                 shadow = 30f;
                 rotationLimit = 80f;
 
-                bullet = new BasicBulletType(4f, 300){{
+                bullet = new BasicBulletType(6f, 300){{
                     hitEffect = Fx.sapExplosion;
-                    lifetime = 60f;
+                    lifetime = 40f;
                     width = height = 25f;
-                    collides = false;
                     ammoMultiplier = 4f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
