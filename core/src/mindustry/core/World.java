@@ -44,6 +44,11 @@ public class World{
 
         Events.on(WorldLoadEvent.class, e -> {
             tileChanges = -1;
+
+            //make each building check if it can update in the given map area
+            for(var build : Groups.build){
+                build.checkAllowUpdate();
+            }
         });
     }
 

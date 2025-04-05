@@ -220,11 +220,11 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.fog", b -> rules.fog = b, () -> rules.fog);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
 
-        check("@rules.limitarea", b -> rules.limitMapArea = b, () -> rules.limitMapArea);
-        numberi("x", x -> rules.limitX = x, () -> rules.limitX, () -> rules.limitMapArea, 0, 10000);
-        numberi("y", y -> rules.limitY = y, () -> rules.limitY, () -> rules.limitMapArea, 0, 10000);
-        numberi("w", w -> rules.limitWidth = w, () -> rules.limitWidth, () -> rules.limitMapArea, 0, 10000);
-        numberi("h", h -> rules.limitHeight = h, () -> rules.limitHeight, () -> rules.limitMapArea, 0, 10000);
+        check("@rules.limitarea", b -> rules.limitMapArea = b, () -> rules.limitMapArea, () -> !state.isGame());
+        numberi("x", x -> rules.limitX = x, () -> rules.limitX, () -> rules.limitMapArea && !state.isGame(), 0, 10000);
+        numberi("y", y -> rules.limitY = y, () -> rules.limitY, () -> rules.limitMapArea && !state.isGame(), 0, 10000);
+        numberi("w", w -> rules.limitWidth = w, () -> rules.limitWidth, () -> rules.limitMapArea && !state.isGame(), 0, 10000);
+        numberi("h", h -> rules.limitHeight = h, () -> rules.limitHeight, () -> rules.limitMapArea && !state.isGame(), 0, 10000);
 
         number("@rules.solarmultiplier", f -> rules.solarMultiplier = f, () -> rules.solarMultiplier);
 
