@@ -776,9 +776,9 @@ public class UnitTypes{
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
-                sapStrength = 0.95f;
+                sapStrength = 0.9f;
                 length = 72f;
-                damage = 45;
+                damage = 55;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
@@ -827,11 +827,11 @@ public class UnitTypes{
                 shadow = 8f;
                 recoil = 0f;
                 parentizeEffects = true;
-                shoot = new ShootSpread(3, 11f);
+                shoot = new ShootSpread(3, 5f);
                 shoot.firstShotDelay = 20f;
                 
                 bullet = new LightningBulletType(){{
-                damage = 65;
+                damage = 85;
                 pierceArmor = true;
                 lightningLength = 32;
                 chargeEffect = new MultiEffect(Fx.lancerLaserCharge, Fx.lancerLaserChargeBegin);
@@ -899,7 +899,7 @@ public class UnitTypes{
 
                 bullet = new ShrapnelBulletType(){{
                     length = 90f;
-                    damage = 50f;
+                    damage = 70f;
                     width = 25f;
                     pierceArmor = true;
                     serrationLenScl = 7f;
@@ -974,19 +974,14 @@ public class UnitTypes{
                 shadow = 30f;
                 rotationLimit = 80f;
 
-                bullet = new ArtilleryBulletType(4f, 300){{
+                bullet = new BasicBulletType(4f, 300){{
                     hitEffect = Fx.sapExplosion;
                     lifetime = 60f;
                     width = height = 25f;
-                    collidesTiles = collides = true;
+                    collides = false;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 80f;
-                    splashDamage = 50f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
-                    lightning = 5;
-                    lightningLength = 20;
-                    lightningCone = 50f;
                     smokeEffect = Fx.shootBigSmoke2;
                     hitShake = 10f;
                     lightRadius = 40f;
@@ -1000,9 +995,8 @@ public class UnitTypes{
                         sapStrength = 0.9f;
                         pierceArmor = true;
                         length = 88f;
-                        damage = 25;
-                        shootEffect = Fx.shootSmall;
-                        hitColor = color = Color.valueOf("bf92f9");
+                        damage = 95;
+                        hitColor = color = Pal.sapBullet;
                         despawnEffect = Fx.none;
                         status = StatusEffects.sapped;
                         statusDuration = 60f * 9;
