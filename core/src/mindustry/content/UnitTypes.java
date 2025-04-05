@@ -853,7 +853,7 @@ public class UnitTypes{
             speed = 0.75f;
             hitSize = 26f;
             health = 22000;
-            armor = 33f;
+            armor = 25f;
             immunities = ObjectSet.with(StatusEffects.freezing, StatusEffects.melting);
             lightRadius = 140f;
 
@@ -881,17 +881,17 @@ public class UnitTypes{
             groundLayer = Layer.legUnit;
 
             BulletType sapBeam = new SapBulletType(){{
-                        sapStrength = 0.9f;
+                        sapStrength = 0.8f;
                         pierceArmor = true;
-                        length = 88f;
-                        damage = 60;
+                        length = 96f;
+                        damage = 50;
                         absorbable = false;
                         hitColor = color = Pal.sapBullet;
                         despawnEffect = Fx.none;
                         status = StatusEffects.sapped;
                         statusDuration = 60f * 9;
                         width = 0.55f;
-                        lifetime = 50f;
+                        lifetime = 20f;
             }};
 
             weapons.add(
@@ -899,7 +899,7 @@ public class UnitTypes{
                 y = -7f;
                 x = 9f;
                 shootY = 7f;
-                reload = 10;
+                reload = 15;
                 shake = 2f;
                 rotateSpeed = 3f;
                 ejectEffect = Fx.casing1;
