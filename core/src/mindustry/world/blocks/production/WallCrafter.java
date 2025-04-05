@@ -210,7 +210,7 @@ public class WallCrafter extends Block{
             lastEfficiency = eff * timeScale * efficiency;
 
             if(cons && (time += edelta() * eff) >= drillTime){
-                items.add(output, 1);
+                offload(output);
                 time %= drillTime;
             }
 

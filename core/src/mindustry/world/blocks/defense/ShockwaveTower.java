@@ -13,6 +13,7 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.LAccess;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -78,29 +79,48 @@ public class ShockwaveTower extends Block{
                 });
 
                 if(targets.size > 0){
-                    heat = 1f;
-                    reloadCounter = 0f;
-                    waveEffect.at(x, y, range, waveColor);
-                    shootSound.at(this);
-                    Effect.shake(shake, shake, this);
-                    float waveDamage = Math.min(bulletDamage, bulletDamage * falloffCount / targets.size);
-
-                    for(var target : targets){
-                        if(target.damage > waveDamage){
-                            target.damage -= waveDamage;
-                        }else{
-                            target.remove();
-                        }
-                        hitEffect.at(target.x, target.y, waveColor);
-                    }
-
-                    if(team == state.rules.defaultTeam){
-                        Events.fire(Trigger.shockwaveTowerUse);
-                    }
+                    fire();
                 }
             }
 
             heat = Mathf.clamp(heat - Time.delta / reload * cooldownMultiplier);
+        }
+
+        public void fire() {
+            heat = 1f;
+            reloadCounter = 0f;
+            waveEffect.at(x, y, range, waveColor);
+            shootSound.at(this);
+            Effect.shake(shake, shake, this);
+            float waveDamage = Math.min(bulletDamage, bulletDamage * falloffCount / targets.size);
+
+            for(var target : targets){
+                if(target.damage > waveDamage){
+                    target.damage -= waveDamage;
+                }else{
+                    target.remove();
+                }
+                hitEffect.at(target.x, target.y, waveColor);
+            }
+
+            if(team == state.rules.defaultTeam){
+                Events.fire(Trigger.shockwaveTowerUse);
+            }
+        }
+
+        @Override
+        public double sense(LAccess sensor) {
+            if(sensor == LAccess.progress) return reloadCounter / reload;
+            return super.sense(sensor);
+        }
+
+        @Override
+        public void control(LAccess type, double p1, double p2, double p3, double p4){
+            if(type == LAccess.shoot && !Mathf.zero(p3) && reloadCounter >= reload){
+                fire();
+            }
+
+            super.control(type, p1, p2, p3, p4);
         }
 
         @Override

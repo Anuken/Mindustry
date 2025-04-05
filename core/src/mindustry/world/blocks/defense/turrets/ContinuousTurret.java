@@ -117,7 +117,7 @@ public class ContinuousTurret extends Turret{
             entry.bullet.aimX = Tmp.v1.x;
             entry.bullet.aimY = Tmp.v1.y;
             if(scaleDamageEfficiency){
-                entry.bullet.damage = entry.bullet.type.damage * Math.min(efficiency, 1f) * entry.bullet.damageMultiplier();
+                entry.bullet.damage = entry.bullet.type.damage * Math.min(efficiency, 1f) * timeScale * entry.bullet.damageMultiplier();
             }
 
             if(isShooting() && hasAmmo()){

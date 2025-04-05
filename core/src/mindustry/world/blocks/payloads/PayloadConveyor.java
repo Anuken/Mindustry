@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.ctype.Content;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -283,6 +284,13 @@ public class PayloadConveyor extends Block{
             this.animation = 0;
 
             updatePayload();
+        }
+
+        @Override
+        public double sense(Content content){
+            if(item instanceof UnitPayload up && up.unit.type == content) return 1;
+            if(item instanceof BuildPayload bp && bp.build.block == content) return 1;
+            return super.sense(content);
         }
 
         @Override
