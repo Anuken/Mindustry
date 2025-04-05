@@ -882,7 +882,7 @@ public class UnitTypes{
 
             weapons.add(
             new Weapon("large-purple-mount"){{
-                y = -5f;
+                y = -7f;
                 x = 9f;
                 shootY = 7f;
                 reload = 10;
@@ -891,6 +891,8 @@ public class UnitTypes{
                 ejectEffect = Fx.casing1;
                 shootCone = 90f;
                 shootSound = Sounds.shootBig;
+                targetInterval = 15f;
+                targetSwitchInterval = 28f;
                 rotate = true;
                 shadow = 12f;
                 recoil = 1f;
@@ -898,12 +900,12 @@ public class UnitTypes{
                 shoot = new ShootSpread(3, 9f);
 
                 bullet = new ShrapnelBulletType(){{
-                    length = 90f;
+                    length = 128f;
                     damage = 70f;
                     width = 25f;
                     pierceArmor = true;
                     serrationLenScl = 7f;
-                    serrationSpaceOffset = 60f;
+                    serrationSpaceOffset = 75f;
                     serrationFadeOffset = 0f;
                     serrations = 10;
                     serrationWidth = 6f;
@@ -913,29 +915,6 @@ public class UnitTypes{
                     statusDuration = 60f * 4;
                     shootEffect = smokeEffect = Fx.sparkShoot;
                 }};
-            }},
-            new Weapon("spiroct-weapon"){{
-                x = 5f;
-                y = 1f;
-                rotate = true;
-                rotateSpeed = 3f;
-                autoTarget = true;
-                controllable = false;
-                predictTarget = false;
-                targetInterval = 15f;
-                targetSwitchInterval = 28f;
-                useAttackRange = false;
-                bullet = new PointLaserBulletType(){{
-                    damage = 0f;
-                    buildingDamageMultiplier = 0.01f;
-                    sprite = "parallax-laser";
-                    status = StatusEffects.freezing;
-                    statusDuration = 60f * 4;
-                    hitEffect = Fx.none;
-                    knockback = -0.8f;
-                    maxRange = 256f;
-                    }};
-                shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
                 x = 15f;
@@ -955,7 +934,7 @@ public class UnitTypes{
                     status = StatusEffects.freezing;
                     statusDuration = 60f * 4;
                     hitEffect = Fx.none;
-                    knockback = -0.8f;
+                    knockback = -1.6f;
                     maxRange = 256f;
                     }};
                 shootSound = Sounds.sap;
@@ -984,6 +963,8 @@ public class UnitTypes{
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
                     smokeEffect = Fx.shootBigSmoke2;
+                    pierceCap = 2;
+                    pierce = true;
                     hitShake = 10f;
                     lightRadius = 40f;
                     lightColor = Pal.sap;
@@ -993,7 +974,7 @@ public class UnitTypes{
                     fragRandomSpread = 0f;
                     fragSpread = 14f;
                     fragBullet = new SapBulletType(){{
-                        sapStrength = 0.9f;
+                        sapStrength = 0.99f;
                         pierceArmor = true;
                         length = 88f;
                         damage = 95;
