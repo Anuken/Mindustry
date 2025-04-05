@@ -194,7 +194,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected boolean overlaps(Building src, Building other, float range){
-        return overlaps(src.x, src.y, other.tile(), range);
+        return overlaps(src.x, src.y, other.tile, range);
     }
 
     protected boolean overlaps(Tile src, Tile other, float range){
@@ -209,9 +209,9 @@ public class PowerNode extends PowerBlock{
     protected void getPotentialLinks(Tile tile, Team team, Cons<Building> others){
         if(!autolink) return;
 
-        Boolf<Building> valid = other -> other != null && other.tile() != tile && other.block.connectedPower && other.power != null &&
+        Boolf<Building> valid = other -> other != null && other.tile != tile && other.block.connectedPower && other.power != null &&
             (other.block.outputsPower || other.block.consumesPower || other.block instanceof PowerNode) &&
-            overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && other.team == team &&
+            overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile, laserRange * tilesize) && other.team == team &&
             !graphs.contains(other.power.graph) &&
             !PowerNode.insulated(tile, other.tile) &&
             !(other instanceof PowerNodeBuild obuild && obuild.power.links.size >= ((PowerNode)obuild.block).maxNodes) &&
@@ -264,7 +264,7 @@ public class PowerNode extends PowerBlock{
     //TODO code duplication w/ method above?
     /** Iterates through linked nodes of a block at a tile. All returned buildings are power nodes. */
     public static void getNodeLinks(Tile tile, Block block, Team team, Cons<Building> others){
-        Boolf<Building> valid = other -> other != null && other.tile() != tile && other.block instanceof PowerNode node &&
+        Boolf<Building> valid = other -> other != null && other.tile != tile && other.block instanceof PowerNode node &&
         node.autolink &&
         other.power.links.size < node.maxNodes &&
         node.overlaps(other.x, other.y, tile, block, node.laserRange * tilesize) && other.team == team

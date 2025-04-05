@@ -558,7 +558,7 @@ public class Schematics implements Loadable{
             }
 
             IntMap<Block> blocks = new IntMap<>();
-            byte length = stream.readByte();
+            int length = stream.readUnsignedByte();
             for(int i = 0; i < length; i++){
                 String name = stream.readUTF();
                 Block block = Vars.content.getByName(ContentType.block, SaveFileReader.fallback.get(name, name));

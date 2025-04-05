@@ -1,6 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -30,7 +31,7 @@ public class Duct extends Block implements Autotiler{
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
 
-    public @Nullable Block bridgeReplacement;
+    public @Nullable Block bridgeReplacement, junctionReplacement;
 
     public Duct(String name){
         super(name);
@@ -63,6 +64,7 @@ public class Duct extends Block implements Autotiler{
         super.init();
 
         if(bridgeReplacement == null || !(bridgeReplacement instanceof DuctBridge || bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.ductBridge;
+        //if(junctionReplacement == null) junctionReplacement = Blocks.ductJunction;
     }
 
     @Override
@@ -104,10 +106,23 @@ public class Duct extends Block implements Autotiler{
     }
 
     @Override
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
+        if(junctionReplacement == null || !junctionReplacement.unlockedNow() || junctionReplacement.isHidden()) return this;
+
+        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof Duct || req.block instanceof DuctJunction));
+        return cont.get(Geometry.d4(req.rotation)) &&
+            cont.get(Geometry.d4(req.rotation - 2)) &&
+            req.tile() != null &&
+            req.tile().block() instanceof Duct &&
+            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
+    }
+
+    @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
         if(bridgeReplacement == null) return;
-        if(bridgeReplacement instanceof ItemBridge bridge) Placement.calculateBridges(plans, bridge, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
-        if(bridgeReplacement instanceof DuctBridge bridge) Placement.calculateBridges(plans, bridge, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
+        boolean hasJunction = junctionReplacement != null && junctionReplacement.unlockedNow() && !junctionReplacement.isHidden();
+        if(bridgeReplacement instanceof ItemBridge bridge) Placement.calculateBridges(plans, bridge, hasJunction, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
+        if(bridgeReplacement instanceof DuctBridge bridge) Placement.calculateBridges(plans, bridge, hasJunction, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
     }
 
     public class DuctBuild extends Building{
@@ -137,7 +152,7 @@ public class Duct extends Block implements Autotiler{
                 Draw.z(Layer.blockUnder + 0.1f);
                 Tmp.v1.set(Geometry.d4x(recDir) * tilesize / 2f, Geometry.d4y(recDir) * tilesize / 2f)
                 .lerp(Geometry.d4x(r) * tilesize / 2f, Geometry.d4y(r) * tilesize / 2f,
-                Mathf.clamp((progress + 1f) / 2f));
+                Mathf.clamp((progress + 1f) / (2f - 1f/speed)));
 
                 Draw.rect(current.fullIcon, x + Tmp.v1.x, y + Tmp.v1.y, itemSize, itemSize);
             }
@@ -188,7 +203,7 @@ public class Duct extends Block implements Autotiler{
                 (armored ?
                     //armored acceptance
                     ((source.block.rotate && source.front() == this && source.block.hasItems && source.block.isDuct) ||
-                    Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation) :
+                    Edges.getFacingEdge(source.tile, tile).relativeTo(tile) == rotation) :
                     //standard acceptance - do not accept from front
                     !(source.block.rotate && next == source) && Edges.getFacingEdge(source.tile, tile) != null && Math.abs(Edges.getFacingEdge(source.tile, tile).relativeTo(tile.x, tile.y) - rotation) != 2
                 );

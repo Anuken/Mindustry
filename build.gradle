@@ -26,8 +26,8 @@ buildscript{
 }
 
 plugins{
-    id "org.jetbrains.kotlin.jvm" version "1.6.0"
-    id "org.jetbrains.kotlin.kapt" version "1.6.0"
+    id "org.jetbrains.kotlin.jvm" version "2.1.10"
+    id "org.jetbrains.kotlin.kapt" version "2.1.10"
 }
 
 allprojects{
@@ -37,8 +37,8 @@ allprojects{
     group = 'com.github.Anuken'
 
     ext{
-        versionNumber = '7'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
+        versionNumber = '8'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'beta'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
@@ -366,7 +366,6 @@ project(":core"){
         //these are completely unnecessary
         tasks.kaptGenerateStubsKotlin.onlyIf{ false }
         tasks.compileKotlin.onlyIf{ false }
-        tasks.inspectClassesForKotlinIC.onlyIf{ false }
     }
 
     //comp** classes are only used for code generation

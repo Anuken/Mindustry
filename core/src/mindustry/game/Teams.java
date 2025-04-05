@@ -126,6 +126,15 @@ public class Teams{
         return active;
     }
 
+    public void updateActive(Team team){
+        TeamData data = get(team);
+        //register in active list if needed
+        if(data.active() && !active.contains(data)){
+            active.add(data);
+            updateEnemies();
+        }
+    }
+
     public void registerCore(CoreBuild core){
         TeamData data = get(core.team);
         //add core if not present
@@ -407,11 +416,16 @@ public class Teams{
         }
 
         public boolean active(){
-            return (team == state.rules.waveTeam && state.rules.waves) || cores.size > 0;
+            return (team == state.rules.waveTeam && state.rules.waves) || cores.size > 0 || buildings.size > 0 || (team == Team.neoplastic && units.size > 0);
         }
 
         public boolean hasCore(){
             return cores.size > 0;
+        }
+
+        /** @return whether this team has any cores (standard team), or any hearts (neoplasm). */
+        public boolean isAlive(){
+            return hasCore();
         }
 
         public boolean noCores(){

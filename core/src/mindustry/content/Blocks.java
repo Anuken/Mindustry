@@ -4024,7 +4024,7 @@ public class Blocks{
         }};
 
         breach = new ItemTurret("breach"){{
-            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 250));
+            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 125));
 
             Effect sfe = new MultiEffect(Fx.shootBigColor, Fx.colorSparkBig);
 
@@ -4082,8 +4082,6 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitBulletColor;
                 rangeChange = 7f*8f;
                 buildingDamageMultiplier = 0.3f;
-                //targetBlocks = false;
-                //targetMissiles = false;
                 trailRotation = true;
 
                 fragBullets = 3;
@@ -4130,6 +4128,7 @@ public class Blocks{
             scaledHealth = 180;
             rotateSpeed = 1.5f;
             researchCostMultiplier = 0.05f;
+            buildTime = 60f * 12.5f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange(12f);

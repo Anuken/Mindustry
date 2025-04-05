@@ -16,6 +16,7 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.world.blocks.*;
 
 import java.io.*;
@@ -109,7 +110,7 @@ public class ImagePacker{
         map.each((key, val) -> content2id.put(val.split("\\|")[0], key));
 
         Seq<UnlockableContent> cont = Seq.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids(), Vars.content.units(), Vars.content.statusEffects());
-        cont.removeAll(u -> u instanceof ConstructBlock || u == Blocks.air);
+        cont.removeAll(u -> u instanceof ConstructBlock || u == Blocks.air || (u instanceof UnitType t && t.internal));
 
         int minid = 0xF8FF;
         for(String key : map.keys()){

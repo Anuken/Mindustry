@@ -43,7 +43,7 @@ public class CoreBlock extends StorageBlock{
 
     public @Load(value = "@-thruster1", fallback = "clear-effect") TextureRegion thruster1; //top right
     public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
-    public float thrusterLength = 14f/4f;
+    public float thrusterLength = 14f/4f, thrusterOffset = 0f;
     public boolean isFirstTier;
     /** If true, this core type requires a core zone to upgrade. */
     public boolean requiresCoreZone;
@@ -69,8 +69,6 @@ public class CoreBlock extends StorageBlock{
         priority = TargetPriority.core;
         flags = EnumSet.of(BlockFlag.core);
         unitCapModifier = 10;
-        loopSound = Sounds.respawning;
-        loopSoundVolume = 1f;
         drawDisabled = false;
         canOverdrive = false;
         envEnabled |= Env.space;
@@ -92,6 +90,10 @@ public class CoreBlock extends StorageBlock{
 
         if(!net.client()){
             Unit unit = spawnType.create(tile.team());
+            //reset reload so that the player can't shoot immediately
+            for(var mount : unit.mounts){
+                mount.reload = mount.weapon.reload;
+            }
             unit.set(core);
             unit.rotation(90f);
             unit.impulse(0f, 3f);
@@ -649,24 +651,23 @@ public class CoreBlock extends StorageBlock{
             super.onProximityUpdate();
 
             for(Building other : state.teams.cores(team)){
-                if(other.tile() != tile){
+                if(other.tile != tile){
                     this.items = other.items;
                 }
             }
             state.teams.registerCore(this);
 
-            storageCapacity = itemCapacity + proximity().sum(e -> owns(e) ? e.block.itemCapacity : 0);
+            storageCapacity = itemCapacity + proximity.sum(e -> owns(e) ? e.block.itemCapacity : 0);
             proximity.each(this::owns, t -> {
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });
 
             for(Building other : state.teams.cores(team)){
-                if(other.tile() == tile) continue;
-                storageCapacity += other.block.itemCapacity + other.proximity().sum(e -> owns(other, e) ? e.block.itemCapacity : 0);
+                if(other.tile == tile) continue;
+                storageCapacity += other.block.itemCapacity + other.proximity.sum(e -> owns(other, e) ? e.block.itemCapacity : 0);
             }
 
-            //Team.sharded.core().items.set(Items.surgeAlloy, 12000)
             if(!world.isGenerating()){
                 for(Item item : content.items()){
                     items.set(item, Math.min(items.get(item), storageCapacity));

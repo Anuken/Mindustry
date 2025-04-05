@@ -98,7 +98,7 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
         //reset
         Time.setDeltaProvider(() -> 0.5f);
 
-        assertEquals(expectedEfficiency, build.efficiency(), inputType + " | " + parameterDescription + ": Base input efficiency mismatch.");
+        assertEquals(expectedEfficiency, build.efficiency, inputType + " | " + parameterDescription + ": Base input efficiency mismatch.");
         assertEquals(expectedRemainingLiquidAmount, build.liquids.get(liquid), inputType + " | " + parameterDescription + ": Remaining liquid amount mismatch.");
         assertEquals(expectedOutputEfficiency, build.productionEfficiency, inputType + " | " + parameterDescription + ": Output production efficiency mismatch.");
     }

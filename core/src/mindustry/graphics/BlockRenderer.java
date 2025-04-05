@@ -49,6 +49,7 @@ public class BlockRenderer{
     private IntSet procLinks = new IntSet(), procLights = new IntSet();
 
     private BlockQuadtree blockTree = new BlockQuadtree(new Rect(0, 0, 1, 1));
+    private BlockLightQuadtree blockLightTree = new BlockLightQuadtree(new Rect(0, 0, 1, 1));
     private FloorQuadtree floorTree = new FloorQuadtree(new Rect(0, 0, 1, 1));
 
     public BlockRenderer(){
@@ -64,7 +65,9 @@ public class BlockRenderer{
 
         Events.on(WorldLoadEvent.class, event -> {
             blockTree = new BlockQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+            blockLightTree = new BlockLightQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
             floorTree = new FloorQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+
             shadowEvents.clear();
             updateFloors.clear();
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
@@ -93,7 +96,7 @@ public class BlockRenderer{
                     tile.build.wasVisible = true;
                 }
 
-                if(tile.block().hasShadow && (tile.build == null || tile.build.wasVisible)){
+                if(tile.block().displayShadow(tile) && (tile.build == null || tile.build.wasVisible)){
                     Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                 }
             }
@@ -116,7 +119,10 @@ public class BlockRenderer{
         Events.on(TilePreChangeEvent.class, event -> {
             if(blockTree == null || floorTree == null) return;
 
-            if(indexBlock(event.tile)) blockTree.remove(event.tile);
+            if(indexBlock(event.tile)){
+                blockTree.remove(event.tile);
+                blockLightTree.remove(event.tile);
+            }
             if(indexFloor(event.tile)) floorTree.remove(event.tile);
         });
 
@@ -209,7 +215,10 @@ public class BlockRenderer{
     }
 
     void recordIndex(Tile tile){
-        if(indexBlock(tile)) blockTree.insert(tile);
+        if(indexBlock(tile)){
+            blockTree.insert(tile);
+            blockLightTree.insert(tile);
+        }
         if(indexFloor(tile)) floorTree.insert(tile);
     }
 
@@ -295,7 +304,7 @@ public class BlockRenderer{
             for(Tile tile : shadowEvents){
                 if(tile == null) continue;
                 //draw white/shadow color depending on blend
-                Draw.color((!tile.block().hasShadow || (state.rules.fog && tile.build != null && !tile.build.wasVisible)) ? Color.white : blendShadowColor);
+                Draw.color((!tile.block().displayShadow(tile) || (state.rules.fog && tile.build != null && !tile.build.wasVisible)) ? Color.white : blendShadowColor);
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
             }
 
@@ -354,14 +363,15 @@ public class BlockRenderer{
         //draw floor lights
         floorTree.intersect(bounds, lightview::add);
 
+        blockLightTree.intersect(bounds, tile -> {
+            if(tile.block().emitLight && (tile.build == null || procLights.add(tile.build.pos()))){
+                lightview.add(tile);
+            }
+        });
+
         blockTree.intersect(bounds, tile -> {
             if(tile.build == null || procLinks.add(tile.build.id)){
                 tileview.add(tile);
-            }
-
-            //lights are drawn even in the expanded range
-            if(((tile.build != null && procLights.add(tile.build.pos())) || tile.block().emitLight)){
-                lightview.add(tile);
             }
 
             if(tile.build != null && tile.build.power != null && tile.build.power.links.size > 0){
@@ -519,6 +529,24 @@ public class BlockRenderer{
         }
     }
 
+    static class BlockLightQuadtree extends QuadTree<Tile>{
+
+        public BlockLightQuadtree(Rect bounds){
+            super(bounds);
+        }
+
+        @Override
+        public void hitbox(Tile tile){
+            var block = tile.block();
+            tmp.setCentered(tile.worldx() + block.offset, tile.worldy() + block.offset, block.lightClipSize, block.lightClipSize);
+        }
+
+        @Override
+        protected QuadTree<Tile> newChild(Rect rect){
+            return new BlockLightQuadtree(rect);
+        }
+    }
+
     static class FloorQuadtree extends QuadTree<Tile>{
 
         public FloorQuadtree(Rect bounds){
@@ -528,7 +556,7 @@ public class BlockRenderer{
         @Override
         public void hitbox(Tile tile){
             var floor = tile.floor();
-            tmp.setCentered(tile.worldx(), tile.worldy(), floor.clipSize, floor.clipSize);
+            tmp.setCentered(tile.worldx(), tile.worldy(), floor.lightClipSize, floor.lightClipSize);
         }
 
         @Override

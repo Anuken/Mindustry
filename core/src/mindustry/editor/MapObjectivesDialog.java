@@ -136,6 +136,7 @@ public class MapObjectivesDialog extends BaseDialog{
             name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
                 b -> b.image(Tex.whiteui).size(iconSmall).update(i -> i.setColor(get.get().color)),
+                Styles.squarei,
                 () -> showTeamSelect(set)
             ).fill().pad(4f)).growX().fillY();
         });
@@ -529,6 +530,8 @@ public class MapObjectivesDialog extends BaseDialog{
 
     public void rebuildObjectives(Seq<MapObjective> objectives){
         canvas.clearObjectives();
+        objectives.each(MapObjective::validate);
+
         if(
         objectives.any() && (
         // If the objectives were previously programmatically made...
@@ -592,9 +595,23 @@ public class MapObjectivesDialog extends BaseDialog{
     }
 
     public static void showTeamSelect(Cons<Team> cons){
+        showTeamSelect(false, cons);
+    }
+
+    public static void showTeamSelect(boolean allowNull, Cons<Team> cons){
         BaseDialog dialog = new BaseDialog("");
+
+        dialog.cont.defaults().size(40f).pad(4f);
+
+        if(allowNull){
+            dialog.cont.button(Icon.cancel, Styles.emptyi, () -> {
+                cons.get(null);
+                dialog.hide();
+            }).tooltip("@none");
+        }
+
         for(var team : Team.baseTeams){
-            dialog.cont.image(Tex.whiteui).size(iconMed).color(team.color).pad(4)
+            dialog.cont.image(Tex.whiteui).color(team.color)
                 .with(i -> i.addListener(new HandCursorListener()))
                 .tooltip(team.localized()).get().clicked(() -> {
                     cons.get(team);

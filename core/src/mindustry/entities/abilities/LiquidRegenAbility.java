@@ -13,8 +13,8 @@ import static mindustry.Vars.*;
 
 public class LiquidRegenAbility extends Ability{
     public Liquid liquid;
-    public float slurpSpeed = 9f;
-    public float regenPerSlurp = 2.9f;
+    public float slurpSpeed = 5f;
+    public float regenPerSlurp = 6f;
     public float slurpEffectChance = 0.4f;
     public Effect slurpEffect = Fx.heal;
 
@@ -31,7 +31,7 @@ public class LiquidRegenAbility extends Ability{
         //TODO timer?
 
         //TODO effects?
-        if(unit.damaged()){
+        if(unit.damaged() && !unit.isFlying()){
             boolean healed = false;
             int tx = unit.tileX(), ty = unit.tileY();
             int rad = Math.max((int)(unit.hitSize / tilesize * 0.6f), 1);

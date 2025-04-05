@@ -136,6 +136,8 @@ public class ContentParser{
         put(BulletType.class, (type, data) -> {
             if(data.isString()){
                 return field(Bullets.class, data);
+            }else if(data.isArray()){
+                return new MultiBulletType(parser.readValue(BulletType[].class, data));
             }
             Class<?> bc = resolve(data.getString("type", ""), BasicBulletType.class);
             data.remove("type");

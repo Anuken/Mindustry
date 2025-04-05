@@ -39,6 +39,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     //setting this variable to true prevents lifetime from decreasing for a frame.
     transient boolean keepAlive;
+    /** Unlike the owner, the shooter is the original entity that created this bullet. For a second-stage missile, the shooter would be the turret, but the owner would be the last missile stage.*/
     transient Entityc shooter;
     transient @Nullable Tile aimTile;
     transient float aimX, aimY;
@@ -47,6 +48,9 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     transient boolean absorbed, hit;
     transient @Nullable Trail trail;
     transient int frags;
+
+    transient Posc stickyTarget;
+    transient float stickyX, stickyY, stickyRotation, stickyRotationOffset;
 
     @Override
     public void getCollisions(Cons<QuadTree> consumer){
@@ -106,24 +110,43 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Override
     public boolean collides(Hitboxc other){
         return type.collides && (other instanceof Teamc t && t.team() != team)
-            && !(other instanceof Flyingc f && !f.checkTarget(type.collidesAir, type.collidesGround))
-            && !(type.pierce && hasCollided(other.id())); //prevent multiple collisions
+            && !(other instanceof Unit f && !f.checkTarget(type.collidesAir, type.collidesGround))
+            && !(type.pierce && hasCollided(other.id())) && stickyTarget == null; //prevent multiple collisions
     }
 
     @MethodPriority(100)
     @Override
     public void collision(Hitboxc other, float x, float y){
-        type.hit(self(), x, y);
-
-        //must be last.
-        if(!type.pierce){
-            hit = true;
-            remove();
+        if(type.sticky){
+            if(stickyTarget == null){
+                //tunnel into the target a bit for better visuals
+                this.x = x + vel.x;
+                this.y = y + vel.y;
+                stickTo(other);
+            }
         }else{
-            collided.add(other.id());
-        }
+            type.hit(self(), x, y);
 
-        type.hitEntity(self(), other, other instanceof Healthc h ? h.health() : 0f);
+            //must be last.
+            if(!type.pierce){
+                hit = true;
+                remove();
+            }else{
+                collided.add(other.id());
+            }
+
+            type.hitEntity(self(), other, other instanceof Healthc h ? h.health() : 0f);
+        }
+    }
+
+    public void stickTo(Posc other){
+        lifetime += type.stickyExtraLifetime;
+        //sticky bullets don't actually hit anything.
+        stickyX = this.x - other.x();
+        stickyY = this.y - other.y();
+        stickyTarget = other;
+        stickyRotationOffset = rotation;
+        stickyRotation = (other instanceof Rotc rot ? rot.rotation() : 0f);
     }
 
     @Override
@@ -132,9 +155,21 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
             mover.move(self());
         }
 
+        if(type.accel != 0){
+            vel.setLength(vel.len() + type.accel * Time.delta);
+        }
+
         type.update(self());
 
-        if(type.collidesTiles && type.collides && type.collidesGround){
+        if(stickyTarget != null){
+            //only stick to things that still exist in the world
+            if(stickyTarget instanceof Healthc h && h.isValid()){
+                float rotate = (stickyTarget instanceof Rotc rot ? rot.rotation() - stickyRotation : 0f);
+                set(Tmp.v1.set(stickyX, stickyY).rotate(rotate).add(stickyTarget));
+                this.rotation = rotate + stickyRotationOffset;
+                vel.setAngle(this.rotation);
+            }
+        }else if(type.collidesTiles && type.collides && type.collidesGround){
             tileRaycast(World.toTile(lastX), World.toTile(lastY), tileX(), tileY());
         }
 
@@ -165,6 +200,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
             (!build.block.underBullets ||
             //direct hit on correct tile
             (aimTile != null && aimTile.build == build) ||
+            //bullet type allows hitting under bullets
+            type.hitUnder ||
             //same team has no 'under build' mechanics
             (build.team == team) ||
             //a piercing bullet overshot the aim tile, it's fine to hit things now
@@ -201,31 +238,46 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                 && build.collide(self()) && type.testCollision(self(), build)
                 && !build.dead() && (type.collidesTeam || build.team != team) && !(type.pierceBuilding && hasCollided(build.id))){
 
-                boolean remove = false;
-                float health = build.health;
+                if(type.sticky){
+                    if(build.team != team){
+                        //stick to edge of block
+                        Vec2 hit = Geometry.raycastRect(lastX, lastY, x, y, Tmp.r1.setCentered(x * tilesize, y * tilesize, tilesize, tilesize));
+                        if(hit != null){
+                            this.x = hit.x;
+                            this.y = hit.y;
+                        }
 
-                if(build.team != team){
-                    remove = build.collision(self());
-                }
+                        stickTo(build);
 
-                if(remove || type.collidesTeam){
-                    if(Mathf.dst2(lastX, lastY, x * tilesize, y * tilesize) < Mathf.dst2(lastX, lastY, this.x, this.y)){
-                        this.x = x * tilesize;
-                        this.y = y * tilesize;
+                        return;
+                    }
+                }else{
+                    boolean remove = false;
+                    float health = build.health;
+
+                    if(build.team != team){
+                        remove = build.collision(self());
                     }
 
-                    if(!type.pierceBuilding){
-                        hit = true;
-                        remove();
-                    }else{
-                        collided.add(build.id);
+                    if(remove || type.collidesTeam){
+                        if(Mathf.dst2(lastX, lastY, x * tilesize, y * tilesize) < Mathf.dst2(lastX, lastY, this.x, this.y)){
+                            this.x = x * tilesize;
+                            this.y = y * tilesize;
+                        }
+
+                        if(!type.pierceBuilding){
+                            hit = true;
+                            remove();
+                        }else{
+                            collided.add(build.id);
+                        }
                     }
+
+                    type.hitTile(self(), build, x * tilesize, y * tilesize, health, true);
+
+                    //stop raycasting when building is hit
+                    if(type.pierceBuilding) return;
                 }
-
-                type.hitTile(self(), build, x * tilesize, y * tilesize, health, true);
-
-                //stop raycasting when building is hit
-                if(type.pierceBuilding) return;
             }
 
             if(x == x2 && y == y2) break;
@@ -247,7 +299,11 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     public void draw(){
         Draw.z(type.layer);
 
-        type.draw(self());
+        if(type.underwater){
+            Drawf.underwater(() -> type.draw(self()));
+        }else{
+            type.draw(self());
+        }
         type.drawLight(self());
 
         Draw.reset();

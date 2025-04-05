@@ -119,7 +119,7 @@ public class DatabaseDialog extends BaseDialog{
                 for(int i = 0; i < array.size; i++){
                     UnlockableContent unlock = array.get(i);
 
-                    Image image = unlocked(unlock) ? new Image(unlock.uiIcon).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
+                    Image image = unlocked(unlock) ? new Image(new TextureRegionDrawable(unlock.uiIcon), mobile ? Color.white : Color.lightGray).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
 
                     //banned cross
                     if(state.isGame() && (unlock instanceof UnitType u && u.isBanned() || unlock instanceof Block b && state.rules.isBanned(b))){

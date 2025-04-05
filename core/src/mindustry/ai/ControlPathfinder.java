@@ -1082,21 +1082,6 @@ public class ControlPathfinder implements Runnable{
         return raycast(unit.team().id, unit.type.pathCost, x1, y1, x2, y2);
     }
 
-    @Deprecated
-    public int nextTargetId(){
-        return 0;
-    }
-
-    @Deprecated
-    public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out){
-        return getPathPosition(unit, pathId, destination, out, null);
-    }
-
-    @Deprecated
-    public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out, @Nullable boolean[] noResultFound){
-        return getPathPosition(unit, destination, destination, out, noResultFound);
-    }
-
     public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 out, @Nullable boolean[] noResultFound){
         return getPathPosition(unit, destination, destination, out, noResultFound);
     }

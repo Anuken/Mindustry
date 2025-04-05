@@ -150,6 +150,7 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void update(){
+        PerfCounter.render.begin();
         Color.white.set(1f, 1f, 1f, 1f);
 
         float baseTarget = targetscale;
@@ -220,6 +221,8 @@ public class Renderer implements ApplicationListener{
 
             camera.position.sub(camShakeOffset);
         }
+
+        PerfCounter.render.end();
     }
 
     public void updateAllDarkness(){
@@ -313,7 +316,6 @@ public class Renderer implements ApplicationListener{
         Draw.draw(Layer.block - 0.09f, () -> {
             blocks.floor.beginDraw();
             blocks.floor.drawLayer(CacheLayer.walls);
-            blocks.floor.endDraw();
         });
 
         Draw.drawRange(Layer.blockBuilding, () -> Draw.shader(Shaders.blockbuild, true), Draw::shader);

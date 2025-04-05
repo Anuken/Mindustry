@@ -105,10 +105,37 @@ public class Fonts{
         });
     }
 
-    public static void loadContentIcons(){
-        Seq<Font> fonts = Seq.with(Fonts.def, Fonts.outline);
-        Texture uitex = Core.atlas.find("logo").texture;
+    public static void registerIcon(String name, String regionName, int ch, TextureRegion region){
         int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
+
+        unicodeIcons.put(name, ch);
+        stringIcons.put(name, ((char)ch) + "");
+        unicodeToName.put(ch, regionName);
+
+        Vec2 out = Scaling.fit.apply(region.width, region.height, size, size);
+
+        Glyph glyph = new Glyph();
+        glyph.id = ch;
+        glyph.srcX = 0;
+        glyph.srcY = 0;
+        glyph.width = (int)out.x;
+        glyph.height = (int)out.y;
+        glyph.u = region.u;
+        glyph.v = region.v2;
+        glyph.u2 = region.u2;
+        glyph.v2 = region.v;
+        glyph.xoffset = 0;
+        glyph.yoffset = -size;
+        glyph.xadvance = size;
+        glyph.kerning = null;
+        glyph.fixedWidth = true;
+        glyph.page = 0;
+        Fonts.def.getData().setGlyph(ch, glyph);
+        Fonts.outline.getData().setGlyph(ch, glyph);
+    }
+
+    public static void loadContentIcons(){
+        Texture uitex = Core.atlas.find("logo").texture;
 
         try(var reader = Core.files.internal("icons/icons.properties").reader(Vars.bufferSize)){
             String line;
@@ -123,29 +150,7 @@ public class Fonts{
                     continue;
                 }
 
-                unicodeIcons.put(nametex[0], ch);
-                stringIcons.put(nametex[0], ((char)ch) + "");
-                unicodeToName.put(ch, texture);
-
-                Vec2 out = Scaling.fit.apply(region.width, region.height, size, size);
-
-                Glyph glyph = new Glyph();
-                glyph.id = ch;
-                glyph.srcX = 0;
-                glyph.srcY = 0;
-                glyph.width = (int)out.x;
-                glyph.height = (int)out.y;
-                glyph.u = region.u;
-                glyph.v = region.v2;
-                glyph.u2 = region.u2;
-                glyph.v2 = region.v;
-                glyph.xoffset = 0;
-                glyph.yoffset = -size;
-                glyph.xadvance = size;
-                glyph.kerning = null;
-                glyph.fixedWidth = true;
-                glyph.page = 0;
-                fonts.each(f -> f.getData().setGlyph(ch, glyph));
+                registerIcon(nametex[0], texture, ch, region);
             }
         }catch(IOException e){
             throw new RuntimeException(e);
@@ -153,11 +158,30 @@ public class Fonts{
 
         stringIcons.put("alphachan", stringIcons.get("alphaaaa"));
 
+        //TODO: mod emojis  can't work because most mod icons are not on the UI page!
+        /*
+        if(Vars.mods.list().contains(m -> m.shouldBeEnabled())){
+            ContentType[] types = {ContentType.liquid, ContentType.item, ContentType.block, ContentType.status, ContentType.unit};
+            int startChar = 0xE000 + 1;
+
+            for(var type : types){
+                for(var cont : Vars.content.getBy(type)){
+                    if(!cont.isVanilla() && cont instanceof UnlockableContent u && u.uiIcon.found()){
+                        int id = startChar;
+
+                        registerIcon(u.name, u.uiIcon instanceof AtlasRegion atlas ? atlas.name : u.name, id, u.uiIcon);
+
+                        startChar ++;
+                    }
+                }
+            }
+        }*/
+
         for(Team team : Team.baseTeams){
             team.emoji = stringIcons.get(team.name, "");
         }
     }
-    
+
     public static void loadContentIconsHeadless(){
         try(var reader = Core.files.internal("icons/icons.properties").reader(Vars.bufferSize)){
             String line;

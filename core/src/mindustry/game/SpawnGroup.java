@@ -1,11 +1,11 @@
 package mindustry.game;
 
+import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.io.versions.*;
 import mindustry.type.*;
@@ -48,6 +48,8 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
     public @Nullable StatusEffect effect;
     /** Items this unit spawns with. Null to disable. */
     public @Nullable ItemStack items;
+    /** Team that units spawned use. Null for default wave team. */
+    public @Nullable Team team;
 
     public SpawnGroup(UnitType type){
         this.type = type;
@@ -75,12 +77,9 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         return Math.max(shields + shieldScaling*(wave - begin), 0);
     }
 
-    /**
-     * Creates a unit, and assigns correct values based on this group's data.
-     * This method does not add() the unit.
-     */
-    public Unit createUnit(Team team, int wave){
-        Unit unit = type.create(team);
+    /** Creates a unit, and assigns correct values based on this group's data. */
+    public Unit createUnit(Team team, float x, float y, float rotation, int wave, Cons<Unit> cons){
+        Unit unit = type.spawn(team, x, y, rotation, cons);
 
         if(effect != null){
             unit.apply(effect, 999999f);
@@ -104,6 +103,11 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         return unit;
     }
 
+    /** Creates a unit, and assigns correct values based on this group's data. */
+    public Unit createUnit(Team team, int wave){
+        return createUnit(team, 0f, 0f, 0f, wave, u -> {});
+    }
+
     @Override
     public void write(Json json){
         if(type == null) type = UnitTypes.dagger;
@@ -120,7 +124,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         if(spawn != -1) json.writeValue("spawn", spawn);
         if(payloads != null && payloads.any()) json.writeValue("payloads", payloads.map(u -> u.name).toArray(String.class));
         if(items != null && items.amount > 0) json.writeValue("items", items);
-
+        if(team != null) json.writeValue("team", team.id);
     }
 
     @Override
@@ -140,6 +144,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         spawn = data.getInt("spawn", -1);
         if(data.has("payloads")) payloads = Seq.with(json.readValue(String[].class, data.get("payloads"))).map(content::unit).removeAll(t -> t == null);
         if(data.has("items")) items = json.readValue(ItemStack.class, data.get("items"));
+        if(data.has("team")) team = Team.get(data.getInt("team"));
 
 
         //old boss effect ID

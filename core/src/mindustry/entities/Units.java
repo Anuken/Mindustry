@@ -95,7 +95,7 @@ public class Units{
 
     public static int getCap(Team team){
         //wave team has no cap
-        if((team == state.rules.waveTeam && !state.rules.pvp) || (state.isCampaign() && team == state.rules.waveTeam) || state.rules.disableUnitCap){
+        if((team == state.rules.waveTeam && !state.rules.pvp) || (state.isCampaign() && team == state.rules.waveTeam) || state.rules.disableUnitCap || team.ignoreUnitCap){
             return Integer.MAX_VALUE;
         }
         return Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap);
@@ -197,17 +197,7 @@ public class Units{
 
     /** Returns the nearest enemy tile in a range. */
     public static Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
-        return findEnemyTile(team, x, y, range, false, pred);
-    }
-
-    /** Returns the nearest enemy tile in a range. */
-    public static Building findEnemyTile(Team team, float x, float y, float range, boolean checkUnder, Boolf<Building> pred){
         if(team == Team.derelict) return null;
-
-        if(checkUnder){
-            Building target = indexer.findEnemyTile(team, x, y, range, build -> !build.block.underBullets && pred.get(build));
-            if(target != null) return target;
-        }
 
         return indexer.findEnemyTile(team, x, y, range, pred);
     }
@@ -258,7 +248,7 @@ public class Units{
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, true, tilePred);
+            return findEnemyTile(team, x, y, range, tilePred);
         }
     }
 
@@ -270,7 +260,7 @@ public class Units{
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, true, tilePred);
+            return findEnemyTile(team, x, y, range, tilePred);
         }
     }
 
@@ -409,7 +399,7 @@ public class Units{
 
     /** @return whether any units exist in this rectangle */
     public static boolean any(float x, float y, float width, float height, Boolf<Unit> filter){
-        return count(x, y, width, height, filter) > 0;
+        return Groups.unit.intersect(x, y, width, height, filter);
     }
 
     /** Iterates over all units in a rectangle. */
@@ -493,5 +483,9 @@ public class Units{
 
     public interface Sortf{
         float cost(Unit unit, float x, float y);
+    }
+
+    public interface BuildingPriorityf{
+        float priority(Building build);
     }
 }

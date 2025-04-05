@@ -149,6 +149,7 @@ public class UnitPayload implements Payload{
 
         float e = unit.elevation;
         unit.elevation = 0f;
+        Draw.scl(1f, 1f);
         unit.type.draw(unit);
         unit.elevation = e;
 

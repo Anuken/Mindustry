@@ -164,7 +164,12 @@ public class Build{
 
     /** @return whether a tile can be placed at this location by this team. */
     public static boolean validPlace(Block type, Team team, int x, int y, int rotation, boolean checkVisible){
-        return validPlaceIgnoreUnits(type, team, x, y, rotation, checkVisible) && checkNoUnitOverlap(type, x, y);
+        return validPlace(type, team, x, y, rotation, checkVisible, true);
+    }
+
+    /** @return whether a tile can be placed at this location by this team. */
+    public static boolean validPlace(Block type, Team team, int x, int y, int rotation, boolean checkVisible, boolean ignoreCoreRadius){
+        return validPlaceIgnoreUnits(type, team, x, y, rotation, checkVisible, ignoreCoreRadius) && checkNoUnitOverlap(type, x, y);
     }
 
     /** @return whether a tile can be placed at this location by this team. */
@@ -172,14 +177,14 @@ public class Build{
         return (!type.solid && !type.solidifes) || !Units.anyEntities(x * tilesize + type.offset - type.size * tilesize / 2f, y * tilesize + type.offset - type.size * tilesize / 2f, type.size * tilesize, type.size * tilesize);
     }
 
-    /** Returns whether a tile can be placed at this location by this team. Ignores units at this location. */
-    public static boolean validPlaceIgnoreUnits(Block type, Team team, int x, int y, int rotation, boolean checkVisible){
+    /** @return whether a tile can be placed at this location by this team. Ignores units at this location. */
+    public static boolean validPlaceIgnoreUnits(Block type, Team team, int x, int y, int rotation, boolean checkVisible, boolean checkCoreRadius){
         //the wave team can build whatever they want as long as it's visible - banned blocks are not applicable
         if(type == null || (!state.rules.editor && (checkVisible && (!type.environmentBuildable() || (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible())))))){
             return false;
         }
 
-        if(!state.rules.editor){
+        if(!state.rules.editor && checkCoreRadius){
             //find closest core, if it doesn't match the team, placing is not legal
             if(state.rules.polygonCoreProtection){
                 float mindst = Float.MAX_VALUE;
@@ -240,8 +245,9 @@ public class Build{
                 (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate && !((type == check.block && team != Team.derelict && check.team() == Team.derelict))) || //same block, same rotation
                 !check.interactable(team) || //cannot interact
                 !check.floor().placeableOn && !type.ignoreBuildDarkness || //solid floor
-                (!checkVisible && !check.block().alwaysReplace) || //replacing a block that should be replaced (e.g. payload placement)
-                    !(((type.canReplace(check.block()) || (type == check.block && team != Team.derelict && state.rules.derelictRepair && check.team() == Team.derelict)) || //can replace type OR can replace derelict block of same type
+                //when you have a payload, you cannot place blocks on things, even if normal placement rules allow it. this is a hack that assumes checkVisible = true means it's coming from a payload
+                (!checkVisible && checkCoreRadius && !check.block().alwaysReplace) || //replacing a block that should be replaced (e.g. payload placement)
+                    !(((type.canReplace(check.block()) || (check.build != null && check.build.canBeReplaced(type)) || (type == check.block && team != Team.derelict && state.rules.derelictRepair && check.team() == Team.derelict)) || //can replace type OR can replace derelict block of same type
                         (check.build instanceof ConstructBuild build && build.current == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
                     type.bounds(tile.x, tile.y, Tmp.r1).grow(0.01f).contains(check.block.bounds(check.centerX(), check.centerY(), Tmp.r2))) || //no replacement
                 (type.requiresWater && check.floor().liquidDrop != Liquids.water) //requires water but none found
@@ -249,7 +255,7 @@ public class Build{
             }
         }
 
-        if(state.rules.placeRangeCheck && !state.isEditor() && getEnemyOverlap(type, team, x, y) != null){
+        if(state.rules.placeRangeCheck && checkCoreRadius && !state.isEditor() && getEnemyOverlap(type, team, x, y) != null){
             return false;
         }
 

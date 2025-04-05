@@ -131,7 +131,7 @@ public class OverlayRenderer{
             Building build = (select instanceof BlockUnitc b ? b.tile() : select instanceof Building b ? b : null);
             TextureRegion region = build != null ? build.block.fullIcon : Core.atlas.white();
 
-            if(!(select instanceof Unitc)){
+            if(select instanceof BlockUnitc){
                 Draw.rect(region, select.getX(), select.getY());
             }
 

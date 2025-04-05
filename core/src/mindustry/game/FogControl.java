@@ -36,6 +36,7 @@ public final class FogControl implements CustomChunk{
 
     private boolean justLoaded = false;
     private boolean loadedStatic = false;
+    private int lastEntityUpdateIndex = 0;
 
     public FogControl(){
         Events.on(ResetEvent.class, e -> {
@@ -131,6 +132,7 @@ public final class FogControl implements CustomChunk{
     }
 
     void stop(){
+        lastEntityUpdateIndex = 0;
         fog = null;
         //I don't care whether the fog thread crashes here, it's about to die anyway
         staticEvents.clear();
@@ -213,6 +215,31 @@ public final class FogControl implements CustomChunk{
 
         //clear to prepare for queuing fog radius from units and buildings
         dynamicEventQueue.clear();
+
+        //update fog visibility manually
+        if(state.rules.fog && !headless && Groups.build.size() > 0){
+
+            int size = Groups.build.size();
+            int chunkSize = 5; //fraction of entity list to iterate each frame
+            int chunks = Math.min(chunkSize, size);
+
+            int iterated = Math.max(1, size / chunks);
+            int steps = 0;
+            int i = lastEntityUpdateIndex % size;
+
+            while(steps < iterated){
+                Groups.build.index(i).updateFogVisibility();
+
+                steps ++;
+                i ++;
+
+                if(i >= size){
+                    i = 0;
+                }
+            }
+
+            lastEntityUpdateIndex = i;
+        }
 
         for(var team : state.teams.present){
             //AI teams do not have fog

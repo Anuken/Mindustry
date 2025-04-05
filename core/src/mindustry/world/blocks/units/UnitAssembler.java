@@ -142,7 +142,7 @@ public class UnitAssembler extends PayloadBlock{
 
     @Override
     public void init(){
-        updateClipRadius(areaSize * tilesize);
+        updateClipRadius((areaSize + 1) * tilesize);
 
         consume(consPayload = new ConsumePayloadDynamic((UnitAssemblerBuild build) -> build.plan().requirements));
         consume(consItem = new ConsumeItemDynamic((UnitAssemblerBuild build) -> build.plan().itemReq != null ? build.plan().itemReq : ItemStack.empty));

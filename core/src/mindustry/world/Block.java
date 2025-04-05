@@ -156,6 +156,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean updateInUnits = true;
     /** if true, this block updates in payloads in units regardless of the experimental game rule */
     public boolean alwaysUpdateInUnits = false;
+    /** if true, this block can be picked up in payloads */
+    public boolean canPickup = true;
     /** if false, only incinerable liquids are dropped when deconstructing; otherwise, all liquids are dropped. */
     public boolean deconstructDropAllLiquid = false;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
@@ -174,6 +176,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float armor = 0f;
     /** base block explosiveness */
     public float baseExplosiveness = 0f;
+    /** base value for screen shake upon destruction */
+    public float baseShake = 3f;
     /** bullet that this block spawns when destroyed */
     public @Nullable BulletType destroyBullet = null;
     /** if true, destroyBullet is spawned on the block's team instead of Derelict team */
@@ -194,6 +198,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int sizeOffset = 0;
     /** Clipping size of this block. Should be as large as the block will draw. */
     public float clipSize = -1f;
+    /** Clipping size for lights only. */
+    public float lightClipSize;
     /** When placeRangeCheck is enabled, this is the range checked for enemy blocks. */
     public float placeOverlapRange = 50f;
     /** Multiplier of damage dealt to this block by tanks. Does not apply to crawlers. */
@@ -290,24 +296,19 @@ public class Block extends UnlockableContent implements Senseable{
     public Sound breakSound = Sounds.breaks;
     /** Sounds made when this block is destroyed.*/
     public Sound destroySound = Sounds.boom;
+    /** Range of destroy sound. */
+    public float destroyPitchMin = 1f, destroyPitchMax = 1f;
     /** How reflective this block is. */
     public float albedo = 0f;
     /** Environmental passive light color. */
     public Color lightColor = Color.white.cpy();
-    /**
-     * Whether this environmental block passively emits light.
-     * Does not change behavior for non-environmental blocks, but still updates clipSize. */
+    /** If true, drawLight() will be called for this block. */
     public boolean emitLight = false;
     /** Radius of the light emitted by this block. */
     public float lightRadius = 60f;
 
     /** How much fog this block uncovers, in tiles. Cannot be dynamic. <= 0 to disable. */
     public int fogRadius = -1;
-
-    /** The sound that this block makes while active. One sound loop. Do not overuse. */
-    public Sound loopSound = Sounds.none;
-    /** Active sound base volume. */
-    public float loopSoundVolume = 0.5f;
 
     /** The sound that this block makes while idle. Uses one sound loop for all blocks. */
     public Sound ambientSound = Sounds.none;
@@ -344,6 +345,8 @@ public class Block extends UnlockableContent implements Senseable{
     public ObjectFloatMap<Item> researchCostMultipliers = new ObjectFloatMap<>();
     /** Override for research cost. Uses multipliers above and building requirements if not set. */
     public @Nullable ItemStack[] researchCost;
+    /** If set, all blocks will be forced to be this team. */
+    public @Nullable Team forceTeam;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     /** Whether you can rotate this block after it is placed. */
@@ -434,6 +437,18 @@ public class Block extends UnlockableContent implements Senseable{
         drawOverlay(x * tilesize + offset, y * tilesize + offset, rotation);
     }
 
+    /** Draws a region to overlay a specific side of this block. This method makes sure it is placed at the edge of the side. */
+    public void drawSideRegion(TextureRegion region, float x, float y, int rotation){
+        var p = Geometry.d4[Mathf.mod(rotation, 4)];
+        float s = size * tilesize/2f;
+
+        Draw.rect(region,
+        x + p.x * (s - region.width/2f * region.scl()),
+        y + p.y * (s - region.width/2f * region.scl()),
+        rotation * 90f
+        );
+    }
+
     public void drawPotentialLinks(int x, int y){
         if((consumesPower || outputsPower) && hasPower && connectedPower){
             Tile tile = world.tile(x, y);
@@ -490,6 +505,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     /** Drawn when placing and when hovering over. */
     public void drawOverlay(float x, float y, int rotation){
+    }
+
+    public boolean displayShadow(Tile tile){
+        return hasShadow;
     }
 
     public float sumAttribute(@Nullable Attribute attr, int x, int y){
@@ -887,8 +906,8 @@ public class Block extends UnlockableContent implements Senseable{
         return buildType.get();
     }
 
-    public void updateClipRadius(float size){
-        clipSize = Math.max(clipSize, size * tilesize + size * 2f);
+    public void updateClipRadius(float radiusInWorldUnits){
+        clipSize = Math.max(clipSize, this.size * tilesize + radiusInWorldUnits * 2f);
     }
 
     public Rect bounds(int x, int y, Rect rect){
@@ -1196,6 +1215,10 @@ public class Block extends UnlockableContent implements Senseable{
             hasShadow = false;
         }
 
+        if(underBullets){
+            priority = TargetPriority.under;
+        }
+
         if(fogRadius > 0){
             flags = flags.with(BlockFlag.hasFogRadius);
         }
@@ -1222,12 +1245,15 @@ public class Block extends UnlockableContent implements Senseable{
 
         clipSize = Math.max(clipSize, size * tilesize);
 
+        lightClipSize = Math.max(lightClipSize, clipSize);
+
         if(hasLiquids && drawLiquidLight){
-            clipSize = Math.max(size * 30f * 2f, clipSize);
+            emitLight = true;
+            lightClipSize = Math.max(lightClipSize, size * 30f * 2f);
         }
 
         if(emitLight){
-            clipSize = Math.max(clipSize, lightRadius * 2f);
+            lightClipSize = Math.max(lightClipSize, lightRadius * 2f);
         }
 
         if(group == BlockGroup.transportation || category == Category.distribution){

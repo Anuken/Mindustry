@@ -70,23 +70,27 @@ public class Damage{
         }
     }
 
-    /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage){
         dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null, Fx.dynamicExplosion);
     }
 
-    /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, Effect explosionFx){
         dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null, explosionFx);
     }
 
-    /** Creates a dynamic explosion based on specified parameters. */
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, Effect explosionFx, float baseShake){
+        dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null, explosionFx, baseShake);
+    }
+
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam){
         dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, fire, ignoreTeam, Fx.dynamicExplosion);
     }
 
-    /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam, Effect explosionFx){
+        dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, fire, ignoreTeam, explosionFx, 3f);
+    }
+
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam, Effect explosionFx, float baseShake){
         if(damage){
             for(int i = 0; i < Mathf.clamp(power / 700, 0, 8); i++){
                 int length = 5 + Mathf.clamp((int)(Mathf.pow(power, 0.98f) / 500), 1, 18);
@@ -123,7 +127,7 @@ public class Damage{
             Fx.bigShockwave.at(x, y);
         }
 
-        float shake = Math.min(explosiveness / 4f + 3f, 9f);
+        float shake = Math.min(explosiveness / 4f + baseShake, 9f);
         Effect.shake(shake, shake, x, y);
         explosionFx.at(x, y, radius / 8f);
     }
@@ -532,7 +536,7 @@ public class Damage{
             if(!complete){
                 tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage * (source == null ? 1f : source.type.buildingDamageMultiplier), source);
             }else{
-                completeDamage(team, x, y, radius, damage);
+                completeDamage(team, x, y, radius, damage * (source == null ? 1f : source.type.buildingDamageMultiplier));
             }
         }
     }
@@ -549,7 +553,12 @@ public class Damage{
             //this needs to be compensated
             if(in != null && in.team != team && in.block.size > 1 && in.health > damage){
                 //deal the damage of an entire side, to be equivalent with maximum 'standard' damage
-                in.damage(team, damage * Math.min((in.block.size), baseRadius * 0.4f));
+                float d = damage * Math.min((in.block.size), baseRadius * 0.4f);
+                if(source != null){
+                    in.damage(source, team, d);
+                }else{
+                    in.damage(team, d);
+                }
                 //no need to continue with the explosion
                 return;
             }

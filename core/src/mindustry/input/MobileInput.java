@@ -582,7 +582,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == rebuildSelect){
             rebuildArea(lineStartX, lineStartY, lastLineX, lastLineY);
             mode = none;
-        }else{
+        }else if(!player.dead()){
             Tile tile = tileAt(screenX, screenY);
 
             tryDropItems(tile == null ? null : tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
@@ -706,7 +706,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 payloadTarget = null;
 
                 //control a unit/block detected on first tap of double-tap
-                if(unitTapped != null && state.rules.possessionAllowed && unitTapped.isAI() && unitTapped.team == player.team() && !unitTapped.dead && unitTapped.type.playerControllable){
+                if(unitTapped != null && state.rules.possessionAllowed && unitTapped.isAI() && unitTapped.team == player.team() && !unitTapped.dead && unitTapped.playerControllable()){
                     Call.unitControl(player, unitTapped);
                     recentRespawnTimer = 1f;
                 }else if(buildingTapped != null && state.rules.possessionAllowed){

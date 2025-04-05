@@ -85,7 +85,7 @@ public class RepairTurret extends Block{
         }
 
         consumePowerCond(powerUse, (RepairPointBuild entity) -> entity.target != null);
-        updateClipRadius(repairRadius);
+        updateClipRadius(repairRadius + tilesize);
         super.init();
     }
 

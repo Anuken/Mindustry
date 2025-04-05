@@ -3,7 +3,6 @@ package mindustry.ai;
 import arc.*;
 import arc.func.*;
 import arc.scene.style.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.ctype.*;
@@ -13,10 +12,6 @@ import mindustry.input.*;
 
 /** Defines a pattern of behavior that an RTS-controlled unit should follow. Shows up in the command UI. */
 public class UnitCommand extends MappableContent{
-    /** @deprecated now a content type, use the methods in Vars.content instead */
-    @Deprecated
-    public static final Seq<UnitCommand> all = new Seq<>();
-
     public static UnitCommand moveCommand, repairCommand, rebuildCommand, assistCommand, mineCommand, boostCommand, enterPayloadCommand, loadUnitsCommand, loadBlocksCommand, unloadPayloadCommand, loopPayloadCommand;
 
     /** Name of UI icon (from Icon class). */
@@ -39,8 +34,6 @@ public class UnitCommand extends MappableContent{
 
         this.icon = icon;
         this.controller = controller == null ? u -> null : controller;
-
-        all.add(this);
     }
 
     public UnitCommand(String name, String icon, Binding keybind, Func<Unit, AIController> controller){

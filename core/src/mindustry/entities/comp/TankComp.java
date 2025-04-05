@@ -17,9 +17,9 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec{
+abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
     @Import float x, y, hitSize, rotation, speedMultiplier;
-    @Import boolean hovering, disarmed;
+    @Import boolean disarmed;
     @Import UnitType type;
     @Import Team team;
 
@@ -27,6 +27,7 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
 
     transient float treadTime;
     transient boolean walked;
+    transient Floor lastDeepFloor;
 
     @Override
     public void update(){
@@ -51,6 +52,9 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
             }
         }
 
+        lastDeepFloor = null;
+        boolean anyNonDeep = false;
+
         //calculate overlapping tiles so it slows down when going "over" walls
         int r = Math.max((int)(hitSize * 0.6f / tilesize), 0);
 
@@ -60,6 +64,12 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
                 Tile t = Vars.world.tileWorld(x + dx*tilesize, y + dy*tilesize);
                 if(t == null || t.solid()){
                     solids ++;
+                }
+
+                if(t.floor().isDeep()){
+                    lastDeepFloor = t.floor();
+                }else{
+                    anyNonDeep = true;
                 }
 
                 //TODO should this apply to the player team(s)? currently PvE due to balancing
@@ -76,6 +86,10 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
             }
         }
 
+        if(anyNonDeep){
+            lastDeepFloor = null;
+        }
+
         lastSlowdown = Mathf.lerp(1f, type.crawlSlowdown, Mathf.clamp((float)solids / total / type.crawlSlowdownFrac));
 
         //trigger animation only when walking manually
@@ -89,7 +103,7 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
     @Override
     @Replace
     public float floorSpeedMultiplier(){
-        Floor on = isFlying() || hovering ? Blocks.air.asFloor() : floorOn();
+        Floor on = isFlying() || type.hovering ? Blocks.air.asFloor() : floorOn();
         //TODO take into account extra blocks
         return on.speedMultiplier * speedMultiplier * lastSlowdown;
     }
@@ -97,17 +111,7 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
     @Replace
     @Override
     public @Nullable Floor drownFloor(){
-        //tanks can only drown when all the nearby floors are deep
-        //TODO implement properly
-        if(hitSize >= 12 && canDrown()){
-            for(Point2 p : Geometry.d8){
-                Floor f = world.floorWorld(x + p.x * tilesize, y + p.y * tilesize);
-                if(!f.isDeep()){
-                    return null;
-                }
-            }
-        }
-        return canDrown() ? floorOn() : null;
+        return canDrown() ? lastDeepFloor : null;
     }
 
     @Override

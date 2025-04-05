@@ -4,6 +4,7 @@ import arc.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 
 public abstract class Ability implements Cloneable{
     protected static final float descriptionWidth = 350f;
@@ -13,11 +14,26 @@ public abstract class Ability implements Cloneable{
     public float data;
 
     public void update(Unit unit){}
+
     public void draw(Unit unit){}
+
     public void death(Unit unit){}
+
     public void created(Unit unit){}
+
     public void init(UnitType type){}
+
     public void displayBars(Unit unit, Table bars){}
+
+    public void display(Table t){
+        t.table(Styles.grayPanel, a -> {
+            a.add("[accent]" + localized()).padBottom(4).center().top().expandX();
+            a.row();
+            a.left().top().defaults().left();
+            addStats(a);
+        }).pad(5).margin(10).growX().top().uniformX();
+    }
+
     public void addStats(Table t){
         if(Core.bundle.has(getBundle() + ".description")){
             t.add(Core.bundle.get(getBundle() + ".description")).wrap().width(descriptionWidth);

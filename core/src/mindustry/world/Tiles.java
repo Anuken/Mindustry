@@ -40,7 +40,6 @@ public class Tiles implements Iterable<Tile>{
         fires[pos] = f;
     }
 
-
     public void each(Intc2 cons){
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){

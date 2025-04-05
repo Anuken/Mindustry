@@ -30,8 +30,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
-import mindustry.world.blocks.storage.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -107,7 +105,7 @@ public class HudFragment{
             || (!block.inEditor && !(block instanceof RemoveWall) && !(block instanceof RemoveOre))
             || !block.isOnPlanet(state.rules.planet)
             || block.buildVisibility == BuildVisibility.debugOnly
-            || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.toLowerCase()))
+            || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.trim().replaceAll(" +", " ").toLowerCase()))
             ) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
@@ -285,6 +283,14 @@ public class HudFragment{
                         ui.announce(Core.bundle.format("showui",  Core.keybinds.get(Binding.toggle_menus).key.toString(), 11));
                     });
                     toggleMenus();
+                }
+
+                if(Core.input.keyTap(Binding.skip_wave) && canSkipWave()){
+                    if(net.client() && player.admin){
+                        Call.adminRequest(player, AdminAction.wave, null);
+                    }else{
+                        logic.skipWave();
+                    }
                 }
             });
 
@@ -685,44 +691,6 @@ public class HudFragment{
 
             lastUnlockLayout.pack();
         }
-    }
-
-    /** @deprecated see {@link CoreBuild#beginLaunch(CoreBlock)} */
-    @Deprecated
-    public void showLaunch(){
-        float margin = 30f;
-
-        Image image = new Image();
-        image.color.a = 0f;
-        image.touchable = Touchable.disabled;
-        image.setFillParent(true);
-        image.actions(Actions.delay((coreLandDuration - margin) / 60f), Actions.fadeIn(margin / 60f, Interp.pow2In), Actions.delay(6f / 60f), Actions.remove());
-        image.update(() -> {
-            image.toFront();
-            ui.loadfrag.toFront();
-            if(state.isMenu()){
-                image.remove();
-            }
-        });
-        Core.scene.add(image);
-    }
-
-    /** @deprecated see {@link CoreBuild#beginLaunch(CoreBlock)} */
-    @Deprecated
-    public void showLand(){
-        Image image = new Image();
-        image.color.a = 1f;
-        image.touchable = Touchable.disabled;
-        image.setFillParent(true);
-        image.actions(Actions.fadeOut(35f / 60f), Actions.remove());
-        image.update(() -> {
-            image.toFront();
-            ui.loadfrag.toFront();
-            if(state.isMenu()){
-                image.remove();
-            }
-        });
-        Core.scene.add(image);
     }
 
     private void toggleMenus(){

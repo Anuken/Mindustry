@@ -4,7 +4,9 @@ package mindustry.entities;
 public class TargetPriority{
     public static final float
     //nobody cares about walls
-    wall = -2f,
+    wall = -3f,
+    //anything that has underBullets gets this priority (it's probably still more important than a wall)
+    under = -2f,
     //transport infrastructure isn't as important as factories
     transport = -1f,
     //most blocks

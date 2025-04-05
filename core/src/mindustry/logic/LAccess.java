@@ -18,6 +18,7 @@ public enum LAccess{
     ammo,
     ammoCapacity,
     currentAmmoType,
+    memoryCapacity,
     health,
     maxHealth,
     heat,

@@ -106,9 +106,10 @@ public class SectorPresets{
             difficulty = 8;
         }};
 
-        frontier = new SectorPreset("frontier", serpulo, 203){{
-            difficulty = 4;
-        }};
+        //TODO: removed for now
+        //frontier = new SectorPreset("frontier", serpulo, 203){{
+        //    difficulty = 4;
+        //}};
 
         fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
             difficulty = 4;

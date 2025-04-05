@@ -26,6 +26,10 @@ public class Drawf{
         }
     }
 
+    public static void underwater(Runnable run){
+        renderer.blocks.floor.drawUnderwater(run);
+    }
+
     //TODO offset unused
     public static void flame(float x, float y, int divisions, float rotation, float length, float width, float pan){
         float len1 = length * pan, len2 = length * (1f - pan);
@@ -130,12 +134,34 @@ public class Drawf{
         additive(region, color, 1f, x, y, rotation, layer);
     }
 
+    public static void additive(TextureRegion region, Color color, float alpha, float x, float y, float width, float height, float layer){
+        float pz = Draw.z();
+        Draw.z(layer);
+        Draw.color(color, alpha * color.a);
+        Draw.blend(Blending.additive);
+        Draw.rect(region, x, y, width, height, 0f);
+        Draw.blend();
+        Draw.color();
+        Draw.z(pz);
+    }
+
     public static void additive(TextureRegion region, Color color, float alpha, float x, float y, float rotation, float layer){
         float pz = Draw.z();
         Draw.z(layer);
         Draw.color(color, alpha * color.a);
         Draw.blend(Blending.additive);
         Draw.rect(region, x, y, rotation);
+        Draw.blend();
+        Draw.color();
+        Draw.z(pz);
+    }
+
+    public static void additive(TextureRegion region, Color color, float alpha, float x, float y, float rotation, float layer, float originX, float originY){
+        float pz = Draw.z(), w = region.width * region.scl() * Draw.xscl, h = region.height * region.scl() * Draw.yscl;
+        Draw.z(layer);
+        Draw.color(color, alpha * color.a);
+        Draw.blend(Blending.additive);
+        Draw.rect(region, x, y, w, h, w / 2f + originX * region.scl() * Draw.xscl, h / 2f + originY * region.scl() * Draw.yscl, rotation);
         Draw.blend();
         Draw.color();
         Draw.z(pz);
@@ -267,7 +293,7 @@ public class Drawf{
     }
 
     public static void selected(Building tile, Color color){
-        selected(tile.tile(), color);
+        selected(tile.tile, color);
     }
 
     public static void selected(Tile tile, Color color){

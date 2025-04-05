@@ -30,8 +30,6 @@ public class MinimapRenderer{
     private Rect rect = new Rect();
     private float zoom = 4;
 
-    private float lastX, lastY, lastW, lastH, lastScl;
-    private boolean worldSpace;
     private IntSet updates = new IntSet();
     private float updateCounter = 0f;
 
@@ -123,13 +121,7 @@ public class MinimapRenderer{
         region = new TextureRegion(texture);
     }
 
-    public void drawEntities(float x, float y, float w, float h, float scaling, boolean fullView){
-        lastX = x;
-        lastY = y;
-        lastW = w;
-        lastH = h;
-        lastScl = scaling;
-        worldSpace = fullView;
+    public void drawEntities(float x, float y, float w, float h, boolean fullView){
 
         if(!fullView){
             updateUnitArray();
@@ -150,12 +142,12 @@ public class MinimapRenderer{
 
         float scaleFactor;
         var trans = Tmp.m1.idt();
-        trans.translate(lastX, lastY);
-        if(!worldSpace){
-            trans.scl(Tmp.v1.set(scaleFactor = lastW / rect.width, lastH / rect.height));
+        trans.translate(x, y);
+        if(!fullView){
+            trans.scl(Tmp.v1.set(scaleFactor = w / rect.width, h / rect.height));
             trans.translate(-rect.x, -rect.y);
         }else{
-            trans.scl(Tmp.v1.set(scaleFactor = lastW / world.unitWidth(), lastH / world.unitHeight()));
+            trans.scl(Tmp.v1.set(scaleFactor = w / world.unitWidth(), h / world.unitHeight()));
         }
         trans.translate(tilesize / 2f, tilesize / 2f);
         Draw.trans(trans);

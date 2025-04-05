@@ -17,7 +17,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
-import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.BaseTurret.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.storage.*;
@@ -35,7 +34,7 @@ public class RtsAI{
     //in order of priority??
     static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery, BlockFlag.drill};
     static final ObjectFloatMap<Building> weights = new ObjectFloatMap<>();
-    static final boolean debug = OS.hasProp("mindustry.debug");
+    static final boolean debug = OS.hasProp("mindustry.debug") && false;
 
     final Interval timer = new Interval(10);
     final TeamData data;
@@ -210,12 +209,12 @@ public class RtsAI{
                 //defendTarget = aggressor;
                 defendPos = new Vec2(aggressor.x, aggressor.y);
                 defendTarget = aggressor;
-            }else if(false){ //TODO currently ignored, no use defending against nothing
+            //}else if(false){ //TODO currently ignored, no use defending against nothing
                 //should it even go there if there's no aggressor found?
-                Tile closest = defend.findClosestEdge(units.first(), Tile::solid);
-                if(closest != null){
-                    defendPos = new Vec2(closest.worldx(), closest.worldy());
-                }
+            //    Tile closest = defend.findClosestEdge(units.first(), Tile::solid);
+            //    if(closest != null){
+            //        defendPos = new Vec2(closest.worldx(), closest.worldy());
+            //    }
             }else{
                 float mindst = Float.MAX_VALUE;
                 Building build = null;
