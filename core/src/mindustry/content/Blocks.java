@@ -3075,17 +3075,26 @@ public class Blocks{
                 Items.graphite, new BasicBulletType(3.5f, 18){{
                     width = 9f;
                     height = 12f;
-                    reloadMultiplier = 0.6f;
                     ammoMultiplier = 4;
                     lifetime = 60f;
+                    rangeChange = 16f;
+
+                    hitColor = backColor = trailColor = Color.valueOf("858a9b");
+                    frontColor = Color.valueOf("dae1ee");
                 }},
                 Items.silicon, new BasicBulletType(3f, 12){{
                     width = 7f;
                     height = 9f;
-                    homingPower = 0.1f;
+                    homingPower = 0.2f;
                     reloadMultiplier = 1.5f;
                     ammoMultiplier = 5;
                     lifetime = 60f;
+
+                    trailLength = 5;
+                    trailWidth = 1.5f;
+
+                    hitColor = backColor = trailColor = Color.valueOf("707594");
+                    frontColor = Color.valueOf("999ba0");
                 }}
             );
 
@@ -3107,7 +3116,7 @@ public class Blocks{
             recoil = 0.5f;
             shootY = 3f;
             reload = 20f;
-            range = 110;
+            range = 160;
             shootCone = 15f;
             ammoUseEffect = Fx.casing1;
             health = 250;
@@ -3116,7 +3125,7 @@ public class Blocks{
             coolant = consumeCoolant(0.1f);
             researchCostMultiplier = 0.05f;
 
-            limitRange();
+            limitRange(5f);
         }};
 
         scatter = new ItemTurret("scatter"){{
