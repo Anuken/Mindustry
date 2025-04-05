@@ -889,13 +889,13 @@ public class UnitTypes{
                 shake = 2f;
                 rotateSpeed = 3f;
                 ejectEffect = Fx.casing1;
-                shootCone = 60f;
+                shootCone = 90f;
                 shootSound = Sounds.shootBig;
                 rotate = true;
                 shadow = 12f;
                 recoil = 1f;
 
-                shoot = new ShootSpread(3, 12f);
+                shoot = new ShootSpread(3, 9f);
 
                 bullet = new ShrapnelBulletType(){{
                     length = 90f;
@@ -924,15 +924,15 @@ public class UnitTypes{
                 predictTarget = false;
                 targetInterval = 15f;
                 targetSwitchInterval = 28f;
+                targetBuildings = false;
                 bullet = new PointLaserBulletType(){{
                     damage = 0f;
-                    buildingDamageMultiplier = 0.01f;
                     sprite = "parallax-laser";
                     status = StatusEffects.freezing;
                     statusDuration = 60f * 4;
-                    hitColor = Pal.sapBullet;
-                    knockback = -0.6f;
-                    maxRange = 224f;
+                    hitEffect = Fx.none;
+                    knockback = -0.8f;
+                    maxRange = 240f;
                     }};
                 shootSound = Sounds.sap;
             }},
@@ -946,15 +946,15 @@ public class UnitTypes{
                 predictTarget = false;
                 targetInterval = 15f;
                 targetSwitchInterval = 28f;
+                targetBuildings = false;
                 bullet = new PointLaserBulletType(){{
                     damage = 0f;
-                    buildingDamageMultiplier = 0.01f;
                     sprite = "parallax-laser";
                     status = StatusEffects.freezing;
                     statusDuration = 60f * 4;
-                    hitColor = Pal.sapBullet;
-                    knockback = -0.6f;
-                    maxRange = 224f;
+                    hitEffect = Fx.none;
+                    knockback = -0.8f;
+                    maxRange = 240f;
                     }};
                 shootSound = Sounds.sap;
             }});
@@ -964,10 +964,10 @@ public class UnitTypes{
                 x = 0f;
                 shootY = 22f;
                 mirror = false;
-                reload = 210;
+                reload = 180;
                 shake = 10f;
-                recoil = 10f;
-                rotateSpeed = 1f;
+                recoil = 4f;
+                rotateSpeed = 3f;
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.artillery;
                 rotate = true;
@@ -987,7 +987,7 @@ public class UnitTypes{
                     lightColor = Pal.sap;
                     lightOpacity = 0.6f;
                     fragLifeMin = 0.3f;
-                    fragBullets = 12;
+                    fragBullets = 9;
                     fragRandomSpread = 0f;
                     fragSpread = 14f;
                     fragBullet = new SapBulletType(){{
