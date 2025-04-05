@@ -747,7 +747,7 @@ public class UnitTypes{
 
         arkyid = new UnitType("arkyid"){{
             drag = 0.1f;
-            speed = 0.8f;
+            speed = 0.85f;
             hitSize = 23f;
             health = 8000;
             armor = 25f;
@@ -777,7 +777,7 @@ public class UnitTypes{
             BulletType sapper = new SapBulletType(){{
                 sapStrength = 0.95f;
                 length = 72f;
-                damage = 40;
+                damage = 55;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
@@ -788,7 +788,7 @@ public class UnitTypes{
 
             weapons.add(
             new Weapon("spiroct-weapon"){{
-                reload = 9f;
+                reload = 12f;
                 x = 4f;
                 y = 8f;
                 rotate = true;
@@ -796,21 +796,21 @@ public class UnitTypes{
                 shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
-                reload = 9f;
+                reload = 12f;
                 x = 9f;
                 y = 6f;
                 rotate = true;
                 bullet = sapper;
-                shoot.firstShotDelay = 3f;
+                shoot.firstShotDelay = 4f;
                 shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
-                reload = 9f;
+                reload = 12f;
                 x = 14f;
                 y = 0f;
                 rotate = true;
                 bullet = sapper;
-                shoot.firstShotDelay = 6f;
+                shoot.firstShotDelay = 8f;
                 shootSound = Sounds.sap;
             }},
             new Weapon("large-purple-mount"){{
@@ -851,7 +851,7 @@ public class UnitTypes{
 
         toxopid = new UnitType("toxopid"){{
             drag = 0.1f;
-            speed = 0.7f;
+            speed = 0.75f;
             hitSize = 26f;
             health = 22000;
             armor = 33f;
@@ -885,22 +885,23 @@ public class UnitTypes{
                 y = -5f;
                 x = 11f;
                 shootY = 7f;
-                reload = 30;
+                reload = 15;
                 shake = 4f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.shootBig;
                 rotate = true;
                 shadow = 12f;
-                recoil = 3f;
+                recoil = 1f;
 
                 shoot = new ShootSpread(3, 12f);
 
                 bullet = new ShrapnelBulletType(){{
                     length = 90f;
-                    damage = 270f;
-                    knockback = 3.5f;
+                    damage = 140f;
+                    knockback = 2f;
                     width = 25f;
+                    pierceArmor = true;
                     serrationLenScl = 7f;
                     serrationSpaceOffset = 60f;
                     serrationFadeOffset = 0f;
@@ -915,14 +916,20 @@ public class UnitTypes{
                 x = 6f;
                 y = -2f;
                 rotate = true;
+                rotateSpeed = 3f;
                 autoTarget = true;
                 controllable = false;
                 predictTarget = false;
+                targetInterval = 6f;
+                targetSwitchInterval = 9f;
                 bullet = new PointLaserBulletType(){{
-                    damage = 1f;
+                    damage = 0f;
+                    status = StatusEffects.slow;
+                    statusDuration = 60f * 4;
+                    laserColor = Pal.sapBullet;
                     hitColor = Pal.sapBullet;
-                    knockback = -3f;
-                    maxRange = 200f;
+                    knockback = -1.5f;
+                    maxRange = 240f;
                     }};
                 shootSound = Sounds.sap;
             }},
@@ -930,14 +937,20 @@ public class UnitTypes{
                 x = 16f;
                 y = -4f;
                 rotate = true;
+                rotateSpeed = 3f;
                 autoTarget = true;
                 controllable = false;
                 predictTarget = false;
+                targetInterval = 6f;
+                targetSwitchInterval = 9f;
                 bullet = new PointLaserBulletType(){{
-                    damage = 1f;
+                    damage = 0f;
+                    status = StatusEffects.slow;
+                    statusDuration = 60f * 4;
+                    laserColor = Pal.sapBullet;
                     hitColor = Pal.sapBullet;
-                    knockback = -3f;
-                    maxRange = 200f;
+                    knockback = -1.5f;
+                    maxRange = 240f;
                     }};
                 shootSound = Sounds.sap;
             }});
