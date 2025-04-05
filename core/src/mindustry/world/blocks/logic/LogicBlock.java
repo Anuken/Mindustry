@@ -711,7 +711,7 @@ public class LogicBlock extends Block{
             if(privileged){
                 write.s(Mathf.clamp(ipt, 1, maxInstructionsPerTick));
             } else {
-                write.s(Mathf.clamp(ipt == instructionsPerTick ? 0 : ipt, 1, instructionsPerTick));
+                write.s(ipt == instructionsPerTick ? 0 : Mathf.clamp(ipt, 1, instructionsPerTick));
             }
 
             TypeIO.writeString(write, tag);
@@ -780,7 +780,7 @@ public class LogicBlock extends Block{
             if(!privileged && revision >= 4){
                 short iptR = read.s();
                 if (iptR != 0) {
-                    ipt = Mathf.clamp(iptR, 1, maxInstructionsPerTick);
+                    ipt = Mathf.clamp(iptR, 1, instructionsPerTick);
                 }
             }
 
