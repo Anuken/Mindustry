@@ -747,10 +747,10 @@ public class UnitTypes{
 
         arkyid = new UnitType("arkyid"){{
             drag = 0.1f;
-            speed = 0.62f;
+            speed = 0.8f;
             hitSize = 23f;
             health = 8000;
-            armor = 6f;
+            armor = 25f;
 
             rotateSpeed = 2.7f;
 
@@ -775,15 +775,15 @@ public class UnitTypes{
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
-                sapStrength = 0.85f;
-                length = 55f;
+                sapStrength = 0.95f;
+                length = 72f;
                 damage = 40;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
                 width = 0.55f;
                 lifetime = 30f;
-                knockback = -1f;
+                knockback = -2f;
             }};
 
             weapons.add(
@@ -796,19 +796,21 @@ public class UnitTypes{
                 shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
-                reload = 14f;
+                reload = 9f;
                 x = 9f;
                 y = 6f;
                 rotate = true;
                 bullet = sapper;
+                shoot.firstShotDelay = 3f;
                 shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
-                reload = 22f;
+                reload = 9f;
                 x = 14f;
                 y = 0f;
                 rotate = true;
                 bullet = sapper;
+                shoot.firstShotDelay = 6f;
                 shootSound = Sounds.sap;
             }},
             new Weapon("large-purple-mount"){{
@@ -837,6 +839,7 @@ public class UnitTypes{
                     frontColor = lightningColor = Pal.sapBullet;
                     lightning = 3;
                     lightningLength = 10;
+                    lightningCone = 90f;
                     smokeEffect = Fx.shootBigSmoke2;
                     shake = 5f;
 
@@ -848,10 +851,10 @@ public class UnitTypes{
 
         toxopid = new UnitType("toxopid"){{
             drag = 0.1f;
-            speed = 0.5f;
+            speed = 0.7f;
             hitSize = 26f;
             health = 22000;
-            armor = 13f;
+            armor = 33f;
             lightRadius = 140f;
 
             rotateSpeed = 1.9f;
@@ -871,6 +874,7 @@ public class UnitTypes{
 
             legSplashDamage = 80;
             legSplashRange = 60;
+            forceMultiTarget = true;
 
             hovering = true;
             shadowElevation = 0.95f;
@@ -890,11 +894,12 @@ public class UnitTypes{
                 shadow = 12f;
                 recoil = 3f;
 
-                shoot = new ShootSpread(2, 17f);
+                shoot = new ShootSpread(3, 12f);
 
                 bullet = new ShrapnelBulletType(){{
                     length = 90f;
-                    damage = 110f;
+                    damage = 270f;
+                    knockback = 3.5f;
                     width = 25f;
                     serrationLenScl = 7f;
                     serrationSpaceOffset = 60f;
@@ -905,6 +910,36 @@ public class UnitTypes{
                     toColor = Pal.sapBulletBack;
                     shootEffect = smokeEffect = Fx.sparkShoot;
                 }};
+            }},
+            new Weapon("spiroct-weapon"){{
+                x = 6f;
+                y = -2f;
+                rotate = true;
+                autoTarget = true;
+                controllable = false;
+                predictTarget = false;
+                bullet = new PointLaserBulletType(){{
+                    damage = 1f;
+                    hitColor = Pal.sapBullet;
+                    knockback = -3f;
+                    maxRange = 200f;
+                    }};
+                shootSound = Sounds.sap;
+            }},
+            new Weapon("spiroct-weapon"){{
+                x = 16f;
+                y = -4f;
+                rotate = true;
+                autoTarget = true;
+                controllable = false;
+                predictTarget = false;
+                bullet = new PointLaserBulletType(){{
+                    damage = 1f;
+                    hitColor = Pal.sapBullet;
+                    knockback = -3f;
+                    maxRange = 200f;
+                    }};
+                shootSound = Sounds.sap;
             }});
 
             weapons.add(new Weapon("toxopid-cannon"){{
@@ -936,6 +971,7 @@ public class UnitTypes{
                     frontColor = lightningColor = Pal.sapBullet;
                     lightning = 5;
                     lightningLength = 20;
+                    lightningCone = 50f;
                     smokeEffect = Fx.shootBigSmoke2;
                     hitShake = 10f;
                     lightRadius = 40f;
@@ -947,6 +983,8 @@ public class UnitTypes{
 
                     fragLifeMin = 0.3f;
                     fragBullets = 9;
+                    fragRandomSpread = 0f;
+                    fragSpread = 15f;
 
                     fragBullet = new ArtilleryBulletType(2.3f, 30){{
                         hitEffect = Fx.sapExplosion;
