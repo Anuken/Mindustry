@@ -44,6 +44,7 @@ public class ContentLoader{
     public void createBaseContent(){
         UnitCommand.loadAll();
         UnitStance.loadAll();
+        Difficulties.load();
         TeamEntries.load();
         Items.load();
         StatusEffects.load();
