@@ -778,7 +778,7 @@ public class UnitTypes{
             BulletType sapper = new SapBulletType(){{
                 sapStrength = 0.95f;
                 length = 72f;
-                damage = 50;
+                damage = 45;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
@@ -819,34 +819,30 @@ public class UnitTypes{
                 y = -7f;
                 x = 9f;
                 shootY = 7f;
-                reload = 45;
-                shake = 3f;
+                reload = 90;
+                shake = 0f;
                 rotateSpeed = 2f;
-                ejectEffect = Fx.casing1;
-                shootSound = Sounds.artillery;
+                shootSound = Sounds.spark;
                 rotate = true;
                 shadow = 8f;
-                recoil = 3f;
-
-                bullet = new ArtilleryBulletType(2f, 12){{
-                    hitEffect = Fx.sapExplosion;
-                    knockback = 0.8f;
-                    lifetime = 70f;
-                    width = height = 19f;
-                    collidesTiles = true;
-                    ammoMultiplier = 4f;
-                    splashDamageRadius = 70f;
-                    splashDamage = 65f;
-                    backColor = Pal.sapBulletBack;
-                    frontColor = lightningColor = Pal.sapBullet;
-                    lightning = 3;
-                    lightningLength = 10;
-                    lightningCone = 90f;
-                    smokeEffect = Fx.shootBigSmoke2;
-                    shake = 5f;
-
-                    status = StatusEffects.sapped;
-                    statusDuration = 60f * 10;
+                recoil = 0f;
+                shoot = new ShootSpread(3, 11f);
+                shoot.firstShotDelay = 20f;
+                
+                bullet = new LightningBulletType(){{
+                damage = 65;
+                pierceArmor = true;
+                lightningLength = 32;
+                chargeEffect = new MultiEffect(Fx.lancerLaserCharge, Fx.lancerLaserChargeBegin);
+                    lightningType = new BulletType(0.0001f, 0f){{
+                        lifetime = Fx.lightning.lifetime;
+                        hitEffect = Fx.hitLancer;
+                        despawnEffect = Fx.none;
+                        status = StatusEffects.shocked;
+                        statusDuration = 10f;
+                        hittable = false;
+                        lightColor = Pal.sapBullet;
+                    }};
                 }};
             }});
         }};
@@ -903,7 +899,6 @@ public class UnitTypes{
                 bullet = new ShrapnelBulletType(){{
                     length = 90f;
                     damage = 50f;
-                    knockback = 1.5f;
                     width = 25f;
                     pierceArmor = true;
                     serrationLenScl = 7f;
@@ -976,7 +971,6 @@ public class UnitTypes{
                 shootSound = Sounds.artillery;
                 rotate = true;
                 shadow = 30f;
-
                 rotationLimit = 80f;
 
                 bullet = new ArtilleryBulletType(4f, 300){{
@@ -986,7 +980,7 @@ public class UnitTypes{
                     collidesTiles = collides = true;
                     ammoMultiplier = 4f;
                     splashDamageRadius = 80f;
-                    splashDamage = 75f;
+                    splashDamage = 50f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
                     lightning = 5;
@@ -997,23 +991,22 @@ public class UnitTypes{
                     lightRadius = 40f;
                     lightColor = Pal.sap;
                     lightOpacity = 0.6f;
-
-                    status = StatusEffects.sapped;
-                    statusDuration = 60f * 10;
-
                     fragLifeMin = 0.3f;
                     fragBullets = 12;
                     fragRandomSpread = 0f;
                     fragSpread = 14f;
                     fragBullet = new SapBulletType(){{
                         sapStrength = 0.9f;
-                        length = 72f;
-                        damage = 30;
+                        pierceArmor = true;
+                        length = 88f;
+                        damage = 25;
                         shootEffect = Fx.shootSmall;
                         hitColor = color = Color.valueOf("bf92f9");
                         despawnEffect = Fx.none;
+                        status = StatusEffects.sapped;
+                        statusDuration = 60f * 9;
                         width = 0.55f;
-                        lifetime = 20f;
+                        lifetime = 50f;
                     }};
                 }};
             }});
