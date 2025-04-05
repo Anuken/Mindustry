@@ -527,11 +527,7 @@ public class LogicBlock extends Block{
             if(changed){
                 updateCode(code, true, null);
             }
-
-            if(!privileged){
-                ipt = instructionsPerTick;
-            }
-
+            
             if(state.rules.disableWorldProcessors && privileged) return;
 
             if(enabled && executor.initialized()){
