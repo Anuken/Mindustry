@@ -826,6 +826,7 @@ public class UnitTypes{
                 rotate = true;
                 shadow = 8f;
                 recoil = 0f;
+                parentizeEffects = true;
                 shoot = new ShootSpread(3, 11f);
                 shoot.firstShotDelay = 20f;
                 
