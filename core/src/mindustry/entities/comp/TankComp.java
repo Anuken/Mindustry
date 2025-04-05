@@ -66,7 +66,7 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
                     solids ++;
                 }
 
-                if(t.floor().isDeep()){
+                if(t != null && t.floor().isDeep()){
                     lastDeepFloor = t.floor();
                 }else{
                     anyNonDeep = true;
