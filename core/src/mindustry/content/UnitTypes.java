@@ -924,15 +924,16 @@ public class UnitTypes{
                 predictTarget = false;
                 targetInterval = 15f;
                 targetSwitchInterval = 28f;
-                targetBuildings = false;
+                useAttackRange = false;
                 bullet = new PointLaserBulletType(){{
                     damage = 0f;
+                    buildingDamageMultiplier = 0.01f;
                     sprite = "parallax-laser";
                     status = StatusEffects.freezing;
                     statusDuration = 60f * 4;
                     hitEffect = Fx.none;
                     knockback = -0.8f;
-                    maxRange = 240f;
+                    maxRange = 256f;
                     }};
                 shootSound = Sounds.sap;
             }},
@@ -946,15 +947,16 @@ public class UnitTypes{
                 predictTarget = false;
                 targetInterval = 15f;
                 targetSwitchInterval = 28f;
-                targetBuildings = false;
+                useAttackRange = false;
                 bullet = new PointLaserBulletType(){{
                     damage = 0f;
+                    buildingDamageMultiplier = 0.01f;
                     sprite = "parallax-laser";
                     status = StatusEffects.freezing;
                     statusDuration = 60f * 4;
                     hitEffect = Fx.none;
                     knockback = -0.8f;
-                    maxRange = 240f;
+                    maxRange = 256f;
                     }};
                 shootSound = Sounds.sap;
             }});
