@@ -467,8 +467,8 @@ public class World{
         for(var build : Groups.build){
             //if the map area contracts, disable the block
             build.checkAllowUpdate();
-            //reset map-area-based disabled blocks that were in the previous map area
-            if(!build.enabled && build.block.autoResetEnabled && Rect.contains(x, y, w, h, build.tile.x, build.tile.y)){
+            //reset map-area-based disabled blocks that were not in the previous map area
+            if(!build.enabled && build.block.autoResetEnabled && !Rect.contains(x, y, w, h, build.tile.x, build.tile.y)){
                 build.enabled = true;
             }
         }
