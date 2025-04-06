@@ -314,16 +314,15 @@
   {
     "name": "ArmyOFUkraine",
     "address": [
-      "194.247.42.131:27512",
       "194.247.42.130:27505",
-      "armyofukraine.duckdns.org:27500",
-      "armyofukraine.duckdns.org:27501",
-      "armyofukraine.duckdns.org:27502",
-      "armyofukraine.duckdns.org:27503",
-      "armyofukraine.duckdns.org:27504",
-      "armyofukraine.duckdns.org:27505",
-      "armyofukraine.duckdns.org:27506",
-      "armyofukraine.duckdns.org:27507"
+      "202.181.188.253:27500",
+      "202.181.188.253:27501",
+      "202.181.188.253:27502",
+      "202.181.188.253:27503",
+      "202.181.188.253:27504",
+      "202.181.188.253:27505",
+      "202.181.188.253:27506",
+      "202.181.188.253:27507"
     ]
   },
   {
