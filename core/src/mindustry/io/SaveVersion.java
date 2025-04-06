@@ -382,6 +382,7 @@ public abstract class SaveVersion extends SaveFileReader{
             writeChunk(stream, true, out -> {
                 out.writeByte(entity.classId());
                 out.writeInt(entity.id());
+                entity.beforeWrite();
                 entity.write(Writes.get(out));
             });
         }
@@ -436,8 +437,6 @@ public abstract class SaveVersion extends SaveFileReader{
         //entityMapping is null in older save versions, so use the default
         var mapping = this.entityMapping == null ? EntityMapping.idMap : this.entityMapping;
 
-        Seq<Entityc> entities = new Seq<>();
-
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
             readChunk(stream, true, in -> {
@@ -450,7 +449,6 @@ public abstract class SaveVersion extends SaveFileReader{
                 int id = in.readInt();
 
                 Entityc entity = (Entityc)mapping[typeid].get();
-                entities.add(entity);
                 EntityGroup.checkNextId(id);
                 entity.id(id);
                 entity.read(Reads.get(in));
@@ -458,9 +456,7 @@ public abstract class SaveVersion extends SaveFileReader{
             });
         }
 
-        for(var e : entities){
-            e.afterAllRead();
-        }
+        Groups.all.each(Entityc::afterReadAll);
     }
 
     public void readEntityMapping(DataInput stream) throws IOException{

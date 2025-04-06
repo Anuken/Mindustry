@@ -152,7 +152,13 @@ public class LParser{
                 }else{
                     //attempt parsing using custom parser if a match is found; this is for mods
                     if(LAssembler.customParsers.containsKey(tokens[0])){
-                        statements.add(LAssembler.customParsers.get(tokens[0]).get(tokens));
+                        var parsed = LAssembler.customParsers.get(tokens[0]).get(tokens);
+
+                        if(!privileged && parsed != null && parsed.privileged()){
+                            statements.add(new InvalidStatement());
+                        }else{
+                            statements.add(parsed);
+                        }
                     }else{
                         //unparseable statement
                         statements.add(new InvalidStatement());
