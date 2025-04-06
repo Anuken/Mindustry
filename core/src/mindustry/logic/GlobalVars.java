@@ -74,7 +74,7 @@ public class GlobalVars{
 
         varMapW = putEntry("@mapw", 0);
         varMapH = putEntry("@maph", 0);
-        varWait = putEntry("@wait", null);
+        varWait = put("@wait", null, true, true);
 
         putEntryOnly("sectionNetwork");
 
