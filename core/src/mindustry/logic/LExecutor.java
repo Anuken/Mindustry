@@ -107,7 +107,7 @@ public class LExecutor{
         unit = builder.getVar("@unit");
         thisv = builder.getVar("@this");
         ipt = builder.putConst("@ipt", build != null ? build.ipt : 0);
-        printbuffer = builder.putConst("@printbuffer", build != null ? new BuildingStringBuilder(new Point2(build.tileX(),build.tileY())) : null);
+        printbuffer = builder.putConst("@printbuffer", build != null ? new BuildingStringBuilder(build.pos()) : null);
     }
 
     //region utility
@@ -122,9 +122,9 @@ public class LExecutor{
         }
         if(name instanceof String s) return optionalVar(nameMap.get(s, -1));
         for(LVar var : vars){
-            if(OpI.strEquals(var.name, name)) return(var);
+            if(OpI.strEquals(var.name, name)) return var;
         }
-        return(null);
+        return null;
     }
 
     /** @return a Var from this processor. May be null if out of bounds. */
@@ -840,16 +840,16 @@ public class LExecutor{
                 CharSequence s = p == a ? b : a;
                 return(p.contentEquals(s));
             }
-            if(a.length()!=b.length()) return(false);
+            if(a.length()!=b.length()) return false;
             for(int i = 0; i < a.length(); i++){
-                if(a.charAt(i) != b.charAt(i)) return(false);
+                if(a.charAt(i) != b.charAt(i)) return false;
             }
-            return(true);
+            return true;
         }
 
         public static boolean equal(Object a, Object b){
-            if(a instanceof CharSequence sa && b instanceof CharSequence sb) return(strEquals(sa, sb));
-            return(Structs.eq(a, b));
+            if(a instanceof CharSequence sa && b instanceof CharSequence sb) return strEquals(sa, sb);
+            return Structs.eq(a, b);
         }
     }
 

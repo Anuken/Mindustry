@@ -203,14 +203,14 @@ public class MessageBlock extends Block{
 
         @Override
         public Object senseObject(LAccess sense){
-            if(sense != LAccess.config) return(super.senseObject(sense));
+            if(sense != LAccess.config) return super.senseObject(sense);
             if(cont == null){
-                cont = new BuildingStringBuilder(new Point2(this.tileX(),this.tileY()));
+                cont = new BuildingStringBuilder(this.pos());
             }
-            if(cont.source.x != this.tileX() || cont.source.y != this.tileY()){ //Incase it moves
-                cont.source.set(this.tileX(),this.tileY());
+            if(cont.source != this.pos()){ //Incase it moves
+                cont.source = this.pos();
             }
-            return(cont); //we read messages now :)
+            return cont; //we read messages now :)
         }
 
         @Override
