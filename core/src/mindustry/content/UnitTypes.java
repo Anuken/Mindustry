@@ -817,10 +817,11 @@ public class UnitTypes{
 
         arkyid = new UnitType("arkyid"){{
             drag = 0.1f;
-            speed = 0.62f;
+            speed = 0.85f;
             hitSize = 23f;
             health = 8000;
-            armor = 6f;
+            armor = 20f;
+            immunities = ObjectSet.with(StatusEffects.wet, StatusEffects.sapped);
 
             rotateSpeed = 2.7f;
 
@@ -845,20 +846,21 @@ public class UnitTypes{
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
-                sapStrength = 0.85f;
-                length = 55f;
-                damage = 40;
+                sapStrength = 0.9f;
+                length = 72f;
+                damage = 55;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
                 width = 0.55f;
                 lifetime = 30f;
-                knockback = -1f;
+                pierceArmor = true;
+                knockback = -1.2f;
             }};
 
             weapons.add(
             new Weapon("spiroct-weapon"){{
-                reload = 9f;
+                reload = 12f;
                 x = 4f;
                 y = 8f;
                 rotate = true;
@@ -866,62 +868,63 @@ public class UnitTypes{
                 shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
-                reload = 14f;
+                reload = 12f;
                 x = 9f;
                 y = 6f;
                 rotate = true;
                 bullet = sapper;
+                shoot.firstShotDelay = 5f;
                 shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
-                reload = 22f;
+                reload = 12f;
                 x = 14f;
                 y = 0f;
                 rotate = true;
                 bullet = sapper;
+                shoot.firstShotDelay = 10f;
                 shootSound = Sounds.sap;
             }},
             new Weapon("large-purple-mount"){{
                 y = -7f;
                 x = 9f;
                 shootY = 7f;
-                reload = 45;
-                shake = 3f;
+                reload = 90;
+                shake = 0f;
                 rotateSpeed = 2f;
-                ejectEffect = Fx.casing1;
-                shootSound = Sounds.artillery;
+                shootSound = Sounds.spark;
                 rotate = true;
                 shadow = 8f;
-                recoil = 3f;
-
-                bullet = new ArtilleryBulletType(2f, 12){{
-                    hitEffect = Fx.sapExplosion;
-                    knockback = 0.8f;
-                    lifetime = 70f;
-                    width = height = 19f;
-                    collidesTiles = true;
-                    ammoMultiplier = 4f;
-                    splashDamageRadius = 70f;
-                    splashDamage = 65f;
-                    backColor = Pal.sapBulletBack;
-                    frontColor = lightningColor = Pal.sapBullet;
-                    lightning = 3;
-                    lightningLength = 10;
-                    smokeEffect = Fx.shootBigSmoke2;
-                    shake = 5f;
-
-                    status = StatusEffects.sapped;
-                    statusDuration = 60f * 10;
+                recoil = 0f;
+                parentizeEffects = true;
+                shoot = new ShootSpread(3, 5f);
+                shoot.firstShotDelay = 45f;
+                
+                bullet = new LightningBulletType(){{
+                damage = 85;
+                pierceArmor = true;
+                lightningLength = 32;
+                chargeEffect = new MultiEffect(Fx.lancerLaserCharge, Fx.lancerLaserChargeBegin);
+                    lightningType = new BulletType(0.0001f, 0f){{
+                        lifetime = Fx.lightning.lifetime;
+                        hitEffect = Fx.hitLancer;
+                        despawnEffect = Fx.none;
+                        status = StatusEffects.shocked;
+                        statusDuration = 10f;
+                        hittable = false;
+                        lightColor = Pal.sapBullet;
+                    }};
                 }};
             }});
         }};
 
         toxopid = new UnitType("toxopid"){{
             drag = 0.1f;
-            speed = 0.5f;
+            speed = 0.75f;
             hitSize = 26f;
             health = 22000;
-            armor = 13f;
+            armor = 25f;
+            immunities = ObjectSet.with(StatusEffects.freezing, StatusEffects.melting);
             lightRadius = 140f;
 
             rotateSpeed = 1.9f;
@@ -941,40 +944,88 @@ public class UnitTypes{
 
             legSplashDamage = 80;
             legSplashRange = 60;
+            forceMultiTarget = true;
 
             hovering = true;
             shadowElevation = 0.95f;
             groundLayer = Layer.legUnit;
 
+            BulletType sapBeam = new SapBulletType(){{
+                        sapStrength = 0.8f;
+                        pierceArmor = true;
+                        length = 96f;
+                        damage = 50;
+                        absorbable = false;
+                        hitColor = color = Pal.sapBullet;
+                        despawnEffect = Fx.none;
+                        status = StatusEffects.sapped;
+                        statusDuration = 60f * 9;
+                        width = 0.55f;
+                        lifetime = 20f;
+            }};
+
             weapons.add(
             new Weapon("large-purple-mount"){{
-                y = -5f;
-                x = 11f;
+                y = -7f;
+                x = 9f;
                 shootY = 7f;
-                reload = 30;
-                shake = 4f;
-                rotateSpeed = 2f;
+                reload = 15;
+                shake = 2f;
+                rotateSpeed = 3f;
                 ejectEffect = Fx.casing1;
+                shootCone = 90f;
                 shootSound = Sounds.shootBig;
+                targetInterval = 15f;
+                targetSwitchInterval = 28f;
                 rotate = true;
                 shadow = 12f;
-                recoil = 3f;
+                recoil = 1f;
 
-                shoot = new ShootSpread(2, 17f);
+                shoot = new ShootSpread(3, 9f);
 
                 bullet = new ShrapnelBulletType(){{
-                    length = 90f;
-                    damage = 110f;
+                    length = 128f;
+                    damage = 70f;
                     width = 25f;
+                    pierceArmor = true;
                     serrationLenScl = 7f;
-                    serrationSpaceOffset = 60f;
+                    serrationSpaceOffset = 75f;
                     serrationFadeOffset = 0f;
                     serrations = 10;
                     serrationWidth = 6f;
                     fromColor = Pal.sapBullet;
                     toColor = Pal.sapBulletBack;
+                    status = StatusEffects.sapped;
+                    statusDuration = 60f * 4;
                     shootEffect = smokeEffect = Fx.sparkShoot;
+                    fragBullets = 1;
+                    fragRandomSpread = 0f;
+                    fragSpread = 0f;
+                    fragBullet = sapBeam;
                 }};
+            }},
+            new Weapon("spiroct-weapon"){{
+                x = 15f;
+                y = 2f;
+                rotate = true;
+                rotateSpeed = 3f;
+                autoTarget = true;
+                controllable = false;
+                predictTarget = false;
+                targetInterval = 15f;
+                targetSwitchInterval = 28f;
+                useAttackRange = false;
+                bullet = new PointLaserBulletType(){{
+                    damage = 0f;
+                    buildingDamageMultiplier = 0.01f;
+                    sprite = "parallax-laser";
+                    status = StatusEffects.freezing;
+                    statusDuration = 60f * 4;
+                    hitEffect = trailEffect =Fx.none;
+                    knockback = -1.6f;
+                    maxRange = 256f;
+                    }};
+                shootSound = Sounds.sap;
             }});
 
             weapons.add(new Weapon("toxopid-cannon"){{
@@ -982,63 +1033,34 @@ public class UnitTypes{
                 x = 0f;
                 shootY = 22f;
                 mirror = false;
-                reload = 210;
+                reload = 90;
                 shake = 10f;
-                recoil = 10f;
-                rotateSpeed = 1f;
+                recoil = 4f;
+                rotateSpeed = 3f;
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.artillery;
                 rotate = true;
                 shadow = 30f;
-
                 rotationLimit = 80f;
 
-                bullet = new ArtilleryBulletType(3f, 50){{
+                bullet = new BasicBulletType(6f, 120){{
                     hitEffect = Fx.sapExplosion;
-                    knockback = 0.8f;
-                    lifetime = 80f;
+                    lifetime = 42f;
                     width = height = 25f;
-                    collidesTiles = collides = true;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 80f;
-                    splashDamage = 75f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
-                    lightning = 5;
-                    lightningLength = 20;
                     smokeEffect = Fx.shootBigSmoke2;
+                    pierceCap = 2;
+                    pierce = true;
                     hitShake = 10f;
                     lightRadius = 40f;
                     lightColor = Pal.sap;
                     lightOpacity = 0.6f;
-
-                    status = StatusEffects.sapped;
-                    statusDuration = 60f * 10;
-
-                    fragLifeMin = 0.3f;
                     fragBullets = 9;
-
-                    fragBullet = new ArtilleryBulletType(2.3f, 30){{
-                        hitEffect = Fx.sapExplosion;
-                        knockback = 0.8f;
-                        lifetime = 90f;
-                        width = height = 20f;
-                        collidesTiles = false;
-                        splashDamageRadius = 70f;
-                        splashDamage = 40f;
-                        backColor = Pal.sapBulletBack;
-                        frontColor = lightningColor = Pal.sapBullet;
-                        lightning = 2;
-                        lightningLength = 5;
-                        smokeEffect = Fx.shootBigSmoke2;
-                        hitShake = 5f;
-                        lightRadius = 30f;
-                        lightColor = Pal.sap;
-                        lightOpacity = 0.5f;
-
-                        status = StatusEffects.sapped;
-                        statusDuration = 60f * 10;
-                    }};
+                    fragRandomSpread = 0f;
+                    fragSpread = 14f;
+                    fragBullet = sapBeam;
                 }};
             }});
         }};
