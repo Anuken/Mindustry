@@ -231,13 +231,7 @@ public class BeamDrill extends Block{
         @Override
         public void drawSelect(){
 
-            if(lastItem != null){
-                float dx = x - size * tilesize/2f, dy = y + size * tilesize/2f, s = iconSmall / 4f;
-                Draw.mixcol(Color.darkGray, 1f);
-                Draw.rect(lastItem.fullIcon, dx, dy - 1, s, s);
-                Draw.reset();
-                Draw.rect(lastItem.fullIcon, dx, dy, s, s);
-            }
+            drawItemSelection(lastItem);
         }
 
         @Override
@@ -247,7 +241,7 @@ public class BeamDrill extends Block{
             if(lasers[0] == null) updateLasers();
 
             warmup = Mathf.approachDelta(warmup, Mathf.num(efficiency > 0), 1f / 60f);
-            
+
             updateFacing();
 
             float multiplier = Mathf.lerp(1f, optionalBoostIntensity, optionalEfficiency);

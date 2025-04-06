@@ -32,6 +32,8 @@ public class LightRenderer{
     public void add(float x, float y, float radius, Color color, float opacity){
         if(!enabled() || radius <= 0f) return;
 
+        //TODO: clipping.
+
         float res = Color.toFloatBits(color.r, color.g, color.b, opacity);
 
         if(circles.size <= circleIndex) circles.add(new CircleLight());

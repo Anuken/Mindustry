@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.async.*;
@@ -34,10 +33,12 @@ import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, Senseable, Settable{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, Senseable, Settable{
+    private static final Vec2 tmp1 = new Vec2(), tmp2 = new Vec2();
+    static final float warpDst = 30f;
 
-    @Import boolean hovering, dead, disarmed;
-    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, shield, ammo, dragMultiplier, armorOverride, speedMultiplier;
+    @Import boolean dead, disarmed;
+    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, ammo, dragMultiplier, armorOverride, speedMultiplier;
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
@@ -61,6 +62,48 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     private transient float resupplyTime = Mathf.random(10f);
     private transient boolean wasPlayer;
     private transient boolean wasHealed;
+
+    @SyncLocal float elevation;
+    private transient boolean wasFlying;
+    transient float drownTime;
+    transient float splashTimer;
+    transient @Nullable Floor lastDrownFloor;
+
+    public boolean checkTarget(boolean targetAir, boolean targetGround){
+        return (isGrounded() && targetGround) || (isFlying() && targetAir);
+    }
+
+    public boolean isGrounded(){
+        return elevation < 0.001f;
+    }
+
+    public boolean isFlying(){
+        return elevation >= 0.09f;
+    }
+
+    public boolean canDrown(){
+        return isGrounded() && type.canDrown;
+    }
+
+    public @Nullable Floor drownFloor(){
+        return floorOn();
+    }
+
+    public void wobble(){
+        x += Mathf.sin(Time.time + (id % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
+        y += Mathf.cos(Time.time + (id % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
+    }
+
+    public void moveAt(Vec2 vector, float acceleration){
+        Vec2 t = tmp1.set(vector); //target vector
+        tmp2.set(t).sub(vel).limit(acceleration * vector.len() * Time.delta); //delta vector
+        vel.add(tmp2);
+    }
+
+    public float floorSpeedMultiplier(){
+        Floor on = isFlying() || type.hovering ? Blocks.air.asFloor() : floorOn();
+        return on.speedMultiplier * speedMultiplier;
+    }
 
     /** Called when this unit was unloaded from a factory or spawn point. */
     public void unloaded(){
@@ -241,7 +284,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     controller instanceof CommandAI command && command.hasCommand() ? ctrlCommand :
                     0;
             case payloadCount -> ((Object)this) instanceof Payloadc pay ? pay.payloads().size : 0;
-            case totalPayload -> ((Object)this) instanceof Payloadc pay ? pay.payloadUsed() : 0;
+            case totalPayload -> ((Object)this) instanceof Payloadc pay ? pay.payloadUsed() / (tilesize * tilesize) : 0;
             case payloadCapacity -> type.payloadCapacity / tilePayload;
             case size -> hitSize / tilesize;
             case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
@@ -311,7 +354,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 }
             }
             case flag -> flag = value;
-            case speed -> statusSpeed(Math.max((float)value, 0f));
+            case speed -> statusSpeed(Mathf.clamp((float)value, 0f, 1000f));
             case armor -> statusArmor(Math.max((float)value, 0f));
         }
     }
@@ -350,12 +393,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             stack.item = item;
             stack.amount = Mathf.clamp((int)value, 0, type.itemCapacity);
         }
-    }
-
-    @Override
-    @Replace
-    public boolean canDrown(){
-        return isGrounded() && !hovering && type.canDrown;
     }
 
     @Override
@@ -420,11 +457,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.allowLegStep && type.legPhysicsLayer ? PhysicsProcess.layerLegs : isGrounded() ? PhysicsProcess.layerGround : PhysicsProcess.layerFlying;
     }
 
-    /** @return pathfinder path type for calculating costs. This is used for wave AI only. (TODO: remove) */
-    public int pathType(){
-        return Pathfinder.costGround;
-    }
-
     public void lookAt(float angle){
         rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta * speedMultiplier());
     }
@@ -445,8 +477,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller instanceof CommandAI;
     }
 
-    public boolean canTarget(Unit other){
-        return other != null && other.checkTarget(type.targetAir, type.targetGround);
+    public boolean canTarget(Teamc other){
+        return other != null && (other instanceof Unit u ? u.checkTarget(type.targetAir, type.targetGround) : (other instanceof Building b && type.targetGround));
     }
 
     public CommandAI command(){
@@ -475,9 +507,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         this.drag = type.drag;
         this.armor = type.armor;
         this.hitSize = type.hitSize;
-        this.hovering = type.hovering;
 
-        if(controller == null) controller(type.createController(self()));
         if(mounts().length != type.weapons.size) setupWeapons(type);
         if(abilities.length != type.abilities.size){
             abilities = new Ability[type.abilities.size];
@@ -485,6 +515,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 abilities[i] = type.abilities.get(i).copy();
             }
         }
+        if(controller == null) controller(type.createController(self()));
+    }
+
+    public boolean playerControllable(){
+        return type.playerControllable;
     }
 
     public boolean targetable(Team targeter){
@@ -504,7 +539,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void afterRead(){
-        afterSync();
+        setType(this.type);
+        controller.unit(self());
         //reset controller state
         if(!(controller instanceof AIController ai && ai.keepState())){
             controller(type.createController(self()));
@@ -512,7 +548,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public void afterAllRead(){
+    public void afterReadAll(){
         controller.afterRead(self());
     }
 
@@ -555,10 +591,97 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
     }
 
+    public void updateDrowning(){
+        Floor floor = drownFloor();
+
+        if(floor != null && floor.isLiquid && floor.drownTime > 0 && canDrown()){
+            lastDrownFloor = floor;
+            drownTime += Time.delta / floor.drownTime / type.drownTimeMultiplier;
+            if(Mathf.chanceDelta(0.05f)){
+                floor.drownUpdateEffect.at(x, y, hitSize, floor.mapColor);
+            }
+
+            if(drownTime >= 0.999f && !net.client()){
+                kill();
+                Events.fire(new UnitDrownEvent(self()));
+            }
+        }else{
+            drownTime -= Time.delta / 50f;
+        }
+
+        drownTime = Mathf.clamp(drownTime);
+    }
+
     @Override
     public void update(){
 
         type.update(self());
+
+        //update bounds
+
+        if(type.bounded){
+            float bot = 0f, left = 0f, top = world.unitHeight(), right = world.unitWidth();
+
+            //TODO hidden map rules only apply to player teams? should they?
+            if(state.rules.limitMapArea && !team.isAI()){
+                bot = state.rules.limitY * tilesize;
+                left = state.rules.limitX * tilesize;
+                top = state.rules.limitHeight * tilesize + bot;
+                right = state.rules.limitWidth * tilesize + left;
+            }
+
+            if(!net.client() || isLocal()){
+
+                float dx = 0f, dy = 0f;
+
+                //repel unit out of bounds
+                if(x < left) dx += (-(x - left)/warpDst);
+                if(y < bot) dy += (-(y - bot)/warpDst);
+                if(x > right) dx -= (x - right)/warpDst;
+                if(y > top) dy -= (y - top)/warpDst;
+
+                velAddNet(dx * Time.delta, dy * Time.delta);
+            }
+
+            //clamp position if not flying
+            if(isGrounded()){
+                x = Mathf.clamp(x, left, right - tilesize);
+                y = Mathf.clamp(y, bot, top - tilesize);
+            }
+
+            //kill when out of bounds
+            if(x < -finalWorldBounds + left || y < -finalWorldBounds + bot || x >= right + finalWorldBounds || y >= top + finalWorldBounds){
+                kill();
+            }
+        }
+
+        //update drown/flying state
+
+        Floor floor = floorOn();
+        Tile tile = tileOn();
+
+        if(isFlying() != wasFlying){
+            if(wasFlying){
+                if(tile != null){
+                    Fx.unitLand.at(x, y, floor.isLiquid ? 1f : 0.5f, tile.floor().mapColor);
+                }
+            }
+
+            wasFlying = isFlying();
+        }
+
+        if(!type.hovering && isGrounded() && type.emitWalkEffect){
+            if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= (7f + hitSize()/8f)){
+                floor.walkEffect.at(x, y, hitSize() / 8f, floor.mapColor);
+                splashTimer = 0f;
+
+                if(type.emitWalkSound){
+                    floor.walkSound.at(x, y, Mathf.random(floor.walkSoundPitchMin, floor.walkSoundPitchMax), floor.walkSoundVolume);
+                }
+            }
+        }
+
+        updateDrowning();
 
         if(wasHealed && healTime <= -1f){
             healTime = 1f;
@@ -647,8 +770,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             }
         }
 
-        Tile tile = tileOn();
-        Floor floor = floorOn();
+        if(tile != null && tile.build != null){
+            tile.build.unitOnAny(self());
+        }
 
         if(tile != null && isGrounded() && !type.hovering){
             //unit block update
@@ -673,7 +797,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //AI only updates on the server
-        if(!net.client() && !dead){
+        if(!net.client() && !dead && shouldUpdateController()){
             controller.updateUnit();
         }
 
@@ -686,6 +810,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(spawnedByCore && !isPlayer() && !dead){
             Call.unitDespawn(self());
         }
+    }
+
+    public boolean shouldUpdateController(){
+        return true;
     }
 
     /** @return a preview UI icon for this unit. */
@@ -768,11 +896,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void display(Table table){
         type.display(self(), table);
-    }
-
-    @Override
-    public boolean isImmune(StatusEffect effect){
-        return type.immunities.contains(effect);
     }
 
     @Override

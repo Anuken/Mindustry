@@ -757,7 +757,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(!Core.atlas.isFound(region) || !block.inEditor
                     || block.buildVisibility == BuildVisibility.debugOnly
-                    || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.toLowerCase()))
+                    || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.trim().replaceAll(" +", " ").toLowerCase()))
             ) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);

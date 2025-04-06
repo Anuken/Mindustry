@@ -56,7 +56,7 @@ public class BannedContentDialog<T extends UnlockableContent> extends BaseDialog
             t.table(s -> {
                 s.label(() -> "@search").padRight(10);
                 var field = s.field(contentSearch, value -> {
-                    contentSearch = value;
+                    contentSearch = value.trim().replaceAll(" +", " ").toLowerCase();
                     rebuildTables();
                 }).get();
                 s.button(Icon.cancel, Styles.emptyi, () -> {

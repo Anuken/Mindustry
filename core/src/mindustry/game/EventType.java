@@ -9,6 +9,7 @@ import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 public class EventType{
@@ -82,6 +83,8 @@ public class EventType{
     public static class BlockInfoEvent{}
     /** Called *after* all content has been initialized. */
     public static class ContentInitEvent{}
+    /** Called *after* all content has been added to the atlas, but before its pixmaps are disposed. */
+    public static class AtlasPackEvent{}
     /** Called *after* all mod content has been loaded, but before it has been initialized. */
     public static class ModContentLoadEvent{}
     /** Called when the client game is first loaded. */
@@ -391,6 +394,22 @@ public class EventType{
 
         public TileChangeEvent set(Tile tile){
             this.tile = tile;
+            return this;
+        }
+    }
+
+    /**
+     * Called when a tile changes its floor. Do not cache or use with a timer.
+     * Do not modify any tiles inside listener code.
+     * */
+    public static class TileFloorChangeEvent{
+        public Tile tile;
+        public Floor previous, floor;
+
+        public TileFloorChangeEvent set(Tile tile, Floor previous, Floor floor){
+            this.tile = tile;
+            this.previous = previous;
+            this.floor = floor;
             return this;
         }
     }
