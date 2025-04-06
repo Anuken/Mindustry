@@ -923,7 +923,7 @@ public class UnitTypes{
             speed = 0.75f;
             hitSize = 26f;
             health = 22000;
-            armor = 21f;
+            armor = 24f;
             immunities = ObjectSet.with(StatusEffects.freezing, StatusEffects.melting);
             lightRadius = 140f;
 
@@ -951,7 +951,7 @@ public class UnitTypes{
             groundLayer = Layer.legUnit;
 
             BulletType sapBeam = new SapBulletType(){{
-                        sapStrength = 0.6f;
+                        sapStrength = 0.75f;
                         pierceArmor = true;
                         length = 96f;
                         damage = 50;
