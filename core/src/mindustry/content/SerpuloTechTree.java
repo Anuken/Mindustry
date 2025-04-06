@@ -459,8 +459,9 @@ public class SerpuloTechTree{
                     new Research(combustionGenerator)
                     ), () -> {
                         node(fungalPass, Seq.with(
-                        new SectorComplete(stainedMountains),
-                        new Research(groundFactory)
+                        new SectorComplete(craters),
+                        new Research(groundFactory),
+                        new Research(dagger)
                         ), () -> {
                             node(frontier, Seq.with(
                             new SectorComplete(biomassFacility),
