@@ -3,8 +3,7 @@ package mindustry.logic;
 import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
-import mindustry.world.blocks.logic.LogicBlock;
-import mindustry.world.blocks.logic.MessageBlock;
+import mindustry.world.blocks.logic.*;
 
 public class BuildingStringBuilder implements CharSequence{
     public int source;

@@ -1123,7 +1123,7 @@ public class LExecutor{
                 //avoid it even more
                 if(value.objval instanceof BuildingStringBuilder b){
                     if(b.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
-                    exec.textBuffer.replace(placeholderIndex, placeholderIndex+3, "");
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, "");
                     @Nullable StringBuilder str = b.obtainBuilder();
                     if(str == null) return;
                     exec.textBuffer.insert(placeholderIndex, str);
