@@ -1413,9 +1413,10 @@ public class UnitTypes{
                 soundPitchMin = 1f;
                 shootSound = Sounds.plasmadrop;
 
-                bullet = new ArtilleryBulletType(1.2f, 21f){{
+                bullet = new ArtilleryBulletType(2f, 21f){{
                     sprite = "large-bomb";
                     width = height = 120/4f;
+                    drag = 0f;
 
                     backColor = Pal.heal;
                     frontColor = Color.white;
@@ -1425,7 +1426,7 @@ public class UnitTypes{
                     shootCone = 150f;
                     ejectEffect = Fx.none;
                     hitShake = 4f;
-                    lifetime = 80f;
+                    lifetime = 48f;
                     despawnEffect = Fx.greenBomb;
                     hitEffect = Fx.massiveExplosion;
                     keepVelocity = false;
@@ -1447,7 +1448,7 @@ public class UnitTypes{
                         knockback = 2.3f;
                         puddleSize = 28f;
                         orbSize = 4f;
-                        drag = 0.001f;
+                        drag = 0f;
                         statusDuration = 60f * 6f;
                         damage = 0f;
                         collides = false;
