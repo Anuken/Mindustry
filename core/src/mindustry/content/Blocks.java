@@ -1329,7 +1329,7 @@ public class Blocks{
         }};
 
         smallHeatRedirector = new HeatConductor("small-heat-redirector"){{
-            requirements(Category.crafting, with(Items.surgeAlloy, 10, Items.graphite, 10));
+            requirements(Category.crafting, with(Items.surgeAlloy, 8, Items.graphite, 8));
 
             researchCostMultiplier = 10f;
 
@@ -2817,7 +2817,7 @@ public class Blocks{
 
         largeCliffCrusher = new WallCrafter("large-cliff-crusher"){{
             requirements(Category.production, with(Items.silicon, 80, Items.surgeAlloy, 15, Items.beryllium, 100, Items.tungsten, 50));
-            consumePower(30 / 60f);
+            consumePower(1f);
 
             drillTime = 48f;
             size = 3;
@@ -2827,11 +2827,11 @@ public class Blocks{
             ambientSound = Sounds.drill;
             ambientSoundVolume = 0.08f;
 
-            consumeLiquid(Liquids.ozone, 1f / 60f);
+            consumeLiquid(Liquids.hydrogen, 1f / 60f);
 
-            itemConsumer = consumeItem(Items.tungsten).boost();
+            itemConsumer = consumeItem(Items.graphite).boost();
             itemCapacity = 20;
-            boostItemUseTime = 60f * 10f;
+            boostItemUseTime = 60f / 0.75f;
 
             //alternatively, boost using nitrogen:
             //consumeLiquid(Liquids.nitrogen, 3f / 60f).boost();
@@ -2882,7 +2882,7 @@ public class Blocks{
             blockedItem = Items.thorium;
             researchCostMultiplier = 0.5f;
 
-            drillMultipliers.put(Items.beryllium, 1.95f);
+            drillMultipliers.put(Items.beryllium, 2f);
             liquidBoostIntensity = 1.75f;
 
             fogRadius = 4;
@@ -2913,13 +2913,13 @@ public class Blocks{
             glowColor.a = 0.6f;
             fogRadius = 5;
 
-            drillMultipliers.put(Items.beryllium, 1.35f);
+            drillMultipliers.put(Items.beryllium, 2f);
             liquidBoostIntensity = 2f;
 
             //TODO different requirements
             consumePower(6f);
             consumeLiquid(Liquids.hydrogen, 4f / 60f);
-            consumeLiquid(Liquids.cyanogen, 3f / 60f).boost();
+            consumeLiquid(Liquids.cyanogen, 0.75f / 60f).boost();
         }};
 
         //endregion
