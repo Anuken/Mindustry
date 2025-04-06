@@ -436,8 +436,8 @@ public class SerpuloTechTree{
                     });
                 });
 
-                node(additiveReconstructor, Seq.with(new SectorComplete(biomassFacility)), () -> {
-                    node(multiplicativeReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
+                node(additiveReconstructor, Seq.with(new SectorComplete(craters)), () -> {
+                    node(multiplicativeReconstructor, Seq.with(new SectorComplete(frontier)), () -> {
                         node(exponentialReconstructor, () -> {
                             node(tetrativeReconstructor, () -> {
 
@@ -475,10 +475,10 @@ public class SerpuloTechTree{
                                 node(overgrowth, Seq.with(
                                 new SectorComplete(frontier),
                                 new SectorComplete(windsweptIslands),
+                                new Research(multiplicativeReconstructor),
+                                new Research(fortress),
                                 new Research(ripple),
                                 new Research(salvo),
-                                new Research(crawler),
-                                new Research(atrax),
                                 new Research(cultivator),
                                 new Research(sporePress)
                                 ), () -> {
