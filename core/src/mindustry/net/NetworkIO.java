@@ -4,7 +4,6 @@ import arc.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -113,12 +112,12 @@ public class NetworkIO{
 
         buffer.put((byte)state.rules.mode().ordinal());
         buffer.putInt(netServer.admins.getPlayerLimit());
-        buffer.putInt(Core.settings.getInt("port", port));
 
         writeString(buffer, description, 100);
         if(state.rules.modeName != null){
             writeString(buffer, state.rules.modeName, 50);
         }
+        buffer.putInt(Core.settings.getInt("port", port));
         return buffer;
     }
 

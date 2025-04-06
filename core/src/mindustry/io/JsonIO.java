@@ -308,6 +308,7 @@ public class JsonIO{
                     }
 
                     exec.all.add(obj);
+                    obj.validate();
                 }
 
                 // Second iteration to map the parents.

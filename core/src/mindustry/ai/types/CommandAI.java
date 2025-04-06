@@ -201,7 +201,7 @@ public class CommandAI extends AIController{
             }
             targetPos.set(attackTarget);
 
-            if(unit.isGrounded() && attackTarget instanceof Building build && build.tile.solid() && unit.pathType() != Pathfinder.costLegs && stance != UnitStance.ram){
+            if(unit.isGrounded() && attackTarget instanceof Building build && build.tile.solid() && unit.type.pathCostId != ControlPathfinder.costIdLegs && stance != UnitStance.ram){
                 Tile best = build.findClosestEdge(unit, Tile::solid);
                 if(best != null){
                     targetPos.set(best);
@@ -470,7 +470,7 @@ public class CommandAI extends AIController{
     @Override
     public boolean retarget(){
         //retarget faster when there is an explicit target
-        return attackTarget != null ? timer.get(timerTarget, 10) : timer.get(timerTarget, 20);
+        return timer.get(timerTarget, attackTarget != null ? 10f : 20f);
     }
 
     public boolean hasCommand(){

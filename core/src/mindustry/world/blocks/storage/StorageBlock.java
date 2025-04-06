@@ -112,7 +112,7 @@ public class StorageBlock extends Block{
             //only add prev items when core is not linked
             if(linkedCore == null){
                 for(Building other : previous){
-                    if(other.items != null && other.items != items){
+                    if(other.items != null && other.items != items && !(other instanceof StorageBuild b && b.linkedCore != null)){
                         items.add(other.items);
                     }
                 }

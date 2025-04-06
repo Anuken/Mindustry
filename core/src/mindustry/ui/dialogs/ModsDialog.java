@@ -365,7 +365,7 @@ public class ModsDialog extends BaseDialog{
 
     private @Nullable String getStateDetails(LoadedMod item){
         if(item.isOutdated()){
-            return "@mod.outdatedv7.details";
+            return Core.bundle.format("mod.outdated.details", item.isJava() ? minJavaModGameVersion : minModGameVersion);
         }else if(item.isBlacklisted()){
             return "@mod.blacklisted.details";
         }else if(!item.isSupported()){
@@ -488,8 +488,6 @@ public class ModsDialog extends BaseDialog{
             for(ModListing mod : listings){
                 if(((mod.hasJava || mod.hasScripts) && Vars.ios) ||
                     (!Strings.matches(searchtxt, mod.name) && !Strings.matches(searchtxt, mod.repo))
-                    //hack, I'm basically testing if 135.10 >= modVersion, which is equivalent to modVersion >= 136
-                    || (Version.isAtLeast(135, 10, mod.minGameVersion))
                 ) continue;
 
                 float s = 64f;
@@ -538,13 +536,16 @@ public class ModsDialog extends BaseDialog{
                         }
                     }).size(s).pad(4f * 2f);
 
-                    con.add(
+                    String infoText =
                     "[accent]" + mod.name.replace("\n", "") +
+
                     (installed.contains(mod.repo) ? "\n[lightgray]" + Core.bundle.get("mod.installed") : "") +
                     "\n[lightgray]\uE809 " + mod.stars +
-                    (Version.isAtLeast(mod.minGameVersion) ?  "" :
-                    "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
-                    .width(358f).wrap().grow().pad(4f, 2f, 4f, 6f).top().left().labelAlign(Align.topLeft);
+
+                    (!Version.isAtLeast(mod.minGameVersion) ? "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion) :
+                    ((mod.hasJava && Strings.parseDouble(mod.minGameVersion, 0) < minJavaModGameVersion) ? "\n" + Core.bundle.get("mod.incompatiblemod") : ""));
+
+                    con.add(infoText).width(358f).wrap().grow().pad(4f, 2f, 4f, 6f).top().left().labelAlign(Align.topLeft);
 
                 }, Styles.flatBordert, () -> {
                     var sel = new BaseDialog(mod.name);
@@ -569,6 +570,7 @@ public class ModsDialog extends BaseDialog{
                     sel.buttons.button("@mods.github.open", Icon.link, () -> {
                         Core.app.openURI("https://github.com/" + mod.repo);
                     });
+
                     sel.buttons.button("@mods.browser.view-releases", Icon.zoom, () -> {
                         BaseDialog load = new BaseDialog("");
                         load.cont.add("[accent]Fetching Releases...");

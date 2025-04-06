@@ -292,7 +292,7 @@ public class Logic implements ApplicationListener{
 
             //if there's a "win" wave and no enemies are present, win automatically
             if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
-                (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
+                (state.rules.attackMode && !state.rules.waveTeam.isAlive())){
 
                 if(state.rules.sector.preset != null && state.rules.sector.preset.attackAfterWaves && !state.rules.attackMode){
                     //activate attack mode to destroy cores after waves are done.
@@ -309,11 +309,11 @@ public class Logic implements ApplicationListener{
                 Events.fire(new GameOverEvent(state.rules.waveTeam));
             }else if(state.rules.attackMode){
                 //count # of teams alive
-                int countAlive = state.teams.getActive().count(t -> t.hasCore() && t.team != Team.derelict);
+                int countAlive = state.teams.getActive().count(t -> t.isAlive() && t.team != Team.derelict);
 
                 if((countAlive <= 1 || (!state.rules.pvp && state.rules.defaultTeam.core() == null)) && !state.gameOver){
                     //find team that won
-                    TeamData left = state.teams.getActive().find(t -> t.hasCore() && t.team != Team.derelict);
+                    TeamData left = state.teams.getActive().find(t -> t.isAlive() && t.team != Team.derelict);
                     Events.fire(new GameOverEvent(left == null ? Team.derelict : left.team));
                     state.gameOver = true;
                 }
@@ -413,6 +413,9 @@ public class Logic implements ApplicationListener{
 
     @Override
     public void update(){
+        PerfCounter.frame.end();
+        PerfCounter.frame.begin();
+
         Events.fire(Trigger.update);
         universe.updateGlobal();
 
@@ -489,7 +492,9 @@ public class Logic implements ApplicationListener{
                 state.envAttrs.add(state.rules.attributes);
                 Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
+                PerfCounter.entityUpdate.begin();
                 Groups.update();
+                PerfCounter.entityUpdate.end();
 
                 Events.fire(Trigger.afterGameUpdate);
             }
