@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 public class Lightning{
     private static final Rand random = new Rand();
     private static final Rect rect = new Rect();
-    private static final Seq<Unitc> entities = new Seq<>();
+    private static final Seq<Unit> entities = new Seq<>();
     private static final IntSet hit = new IntSet();
     private static final int maxChain = 8;
     private static final float hitRange = 30f;
@@ -74,7 +74,7 @@ public class Lightning{
                 });
             }
 
-            Unitc furthest = Geometry.findFurthest(x, y, entities);
+            Unit furthest = Geometry.findFurthest(x, y, entities);
 
             if(furthest != null){
                 hit.add(furthest.id());

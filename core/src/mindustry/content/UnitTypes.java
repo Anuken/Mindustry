@@ -1017,6 +1017,7 @@ public class UnitTypes{
             engineOffset = 7.8f;
             range = 140f;
             faceTarget = false;
+            autoDropBombs = true;
             armor = 3f;
             itemCapacity = 0;
             targetFlags = new BlockFlag[]{BlockFlag.factory, null};
@@ -1390,6 +1391,7 @@ public class UnitTypes{
             drag = 0.017f;
             lowAltitude = false;
             flying = true;
+
             engineOffset = 13f;
             engineSize = 7f;
             hitSize = 36f;
@@ -1934,6 +1936,7 @@ public class UnitTypes{
                     mixColorTo = Color.white;
 
                     hitSound = Sounds.plasmaboom;
+                    underwater = true;
 
                     ejectEffect = Fx.none;
                     hitSize = 22f;
@@ -3306,6 +3309,7 @@ public class UnitTypes{
                         }});
 
                         weapons.add(new Weapon(){{
+                            shootSound = Sounds.none;
                             shootCone = 360f;
                             mirror = false;
                             reload = 1f;
@@ -3327,7 +3331,7 @@ public class UnitTypes{
         tecta = new ErekirUnitType("tecta"){{
             drag = 0.1f;
             speed = 0.6f;
-            hitSize = 23f;
+            hitSize = 30f;
             health = 7300;
             armor = 5f;
 
@@ -3602,6 +3606,7 @@ public class UnitTypes{
 
         elude = new ErekirUnitType("elude"){{
             hovering = true;
+            canDrown = false;
             shadowElevation = 0.1f;
 
             drag = 0.07f;
@@ -3888,6 +3893,7 @@ public class UnitTypes{
                         loopSoundVolume = 0.1f;
 
                         weapons.add(new Weapon(){{
+                            shootSound = Sounds.none;
                             shootCone = 360f;
                             mirror = false;
                             reload = 1f;

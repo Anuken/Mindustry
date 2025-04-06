@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -239,35 +240,17 @@ public class MenuRenderer implements Disposable{
     }
 
     private void drawFlyers(){
-        Draw.color(0f, 0f, 0f, 0.4f);
-
-        TextureRegion icon = flyerType.fullIcon;
-
-        flyers((x, y) -> {
-            Draw.rect(icon, x - 12f, y - 13f, flyerRot - 90);
-        });
-
-        float size = Math.max(icon.width, icon.height) * icon.scl() * 1.6f;
+        flyerType.sample.elevation = 1f;
+        flyerType.sample.team = Team.sharded;
+        flyerType.sample.rotation = flyerRot;
+        flyerType.sample.heal();
 
         flyers((x, y) -> {
-            Draw.rect("circle-shadow", x, y, size, size);
+            flyerType.sample.set(x, y);
+            flyerType.drawShadow(flyerType.sample);
+            flyerType.draw(flyerType.sample);
         });
-        Draw.color();
 
-        flyers((x, y) -> {
-            float engineOffset = flyerType.engineOffset, engineSize = flyerType.engineSize, rotation = flyerRot;
-
-            Draw.color(Pal.engine);
-            Fill.circle(x + Angles.trnsx(rotation + 180, engineOffset), y + Angles.trnsy(rotation + 180, engineOffset),
-            engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f));
-
-            Draw.color(Color.white);
-            Fill.circle(x + Angles.trnsx(rotation + 180, engineOffset - 1f), y + Angles.trnsy(rotation + 180, engineOffset - 1f),
-            (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f);
-            Draw.color();
-
-            Draw.rect(icon, x, y, flyerRot - 90);
-        });
     }
 
     private void flyers(Floatc2 cons){
