@@ -137,7 +137,9 @@ public class AIController implements UnitController{
 
         if((tile == targetTile && stopAtTargetTile) || !unit.canPass(targetTile.x, targetTile.y)) return;
 
-        unit.movePref(alterPathfind(vec.set(targetTile.worldx(), targetTile.worldy()).sub(tile.worldx(), tile.worldy()).setLength(prefSpeed())));
+        //TODO: this may be buggy, figure out if it's the cause of the issue
+        //unit.movePref(alterPathfind(vec.set(targetTile.worldx(), targetTile.worldy()).sub(tile.worldx(), tile.worldy()).setLength(prefSpeed())));
+        unit.movePref(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), prefSpeed()));
     }
 
     public Vec2 alterPathfind(Vec2 vec){

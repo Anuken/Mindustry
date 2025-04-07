@@ -4232,7 +4232,7 @@ public class Blocks{
             scaledHealth = 180;
             rotateSpeed = 1.5f;
             researchCostMultiplier = 0.05f;
-            buildTime = 60f * 12.5f;
+            buildTime = 60f * 9f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange(12f);
