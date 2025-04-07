@@ -166,10 +166,6 @@ public class Planet extends UnlockableContent{
     /** Sets up rules on game load for any sector on this planet. */
     public Cons<Rules> ruleSetter = r -> {};
 
-    /** @deprecated no-op, do not use. */
-    @Deprecated
-    public Seq<Item> itemWhitelist = new Seq<>(), hiddenItems = new Seq<>();
-
 
     public Planet(String name, Planet parent, float radius){
         super(name);

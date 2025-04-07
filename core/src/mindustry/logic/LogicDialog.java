@@ -153,6 +153,12 @@ public class LogicDialog extends BaseDialog{
         if(Core.graphics.isPortrait()) buttons.row();
 
         buttons.button("@variables", Icon.menu, () -> {
+            //in the editor, it should display the global variables only (the button text is different)
+            if(!shouldShowVariables()){
+                globalsDialog.show();
+                return;
+            }
+
             BaseDialog dialog = new BaseDialog("@variables");
             dialog.hidden(() -> {
                 if(!wasPaused && !net.active() && !state.isMenu()){
@@ -167,6 +173,7 @@ public class LogicDialog extends BaseDialog{
             });
 
             dialog.cont.pane(p -> {
+
                 p.margin(10f).marginRight(16f);
                 p.table(Tex.button, t -> {
                     t.defaults().fillX().height(45f);
@@ -220,13 +227,23 @@ public class LogicDialog extends BaseDialog{
             dialog.buttons.button("@logic.globals", Icon.list, () -> globalsDialog.show()).size(210f, 64f);
 
             dialog.show();
-        }).name("variables").disabled(b -> executor == null || executor.vars.length == 0 || state.isMenu());
+        }).name("variables").update(b -> {
+            if(shouldShowVariables()){
+                b.setText("@variables");
+            }else{
+                b.setText("@logic.globals");
+            }
+        });
 
         buttons.button("@add", Icon.add, () -> {
             showAddDialog();
         }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
 
         Core.app.post(canvas::rebuild);
+    }
+
+    public boolean shouldShowVariables(){
+        return executor != null && executor.vars.length > 0 && !state.isMenu();
     }
 
     public void showAddDialog(){

@@ -1174,7 +1174,7 @@ public class Fx{
     artilleryTrail = new Effect(50, e -> {
         color(e.color);
         Fill.circle(e.x, e.y, e.rotation * e.fout());
-    }),
+    }).layer(Layer.bullet - 0.01f),
 
     incendTrail = new Effect(50, e -> {
         color(Pal.lightOrange);
