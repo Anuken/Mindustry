@@ -104,7 +104,7 @@ public class SerpuloTechTree{
                     });
                 });
 
-                node(graphitePress, () -> {
+                node(graphitePress, Seq.with(new OnSector(frozenForest)), () -> {
                     node(pneumaticDrill, Seq.with(new SectorComplete(frozenForest)), () -> {
                         node(cultivator, Seq.with(new SectorComplete(biomassFacility)), () -> {
 

@@ -167,6 +167,8 @@ public class HintsFragment{
         desktopMove(visibleDesktop, () -> Core.input.axis(Binding.move_x) != 0 || Core.input.axis(Binding.move_y) != 0),
         zoom(visibleDesktop, () -> Core.input.axis(KeyCode.scroll) != 0),
         breaking(() -> isTutorial.get() && state.rules.defaultTeam.data().getCount(Blocks.conveyor) > 5, () -> ui.hints.events.contains("break")),
+        distribution(() -> state.rules.defaultTeam.data().getCount(Blocks.mechanicalDrill) > 0 || state.rules.defaultTeam.data().getCount(Blocks.plasmaBore) > 0, () -> ui.hints.events.contains("distribution")),
+        electrolyzer(() -> state.rules.defaultTeam.data().getCount(Blocks.electrolyzer) > 0, () -> ui.hints.events.contains("electrolyzer")),
         desktopShoot(visibleDesktop, () -> isSerpulo() && Vars.state.enemies > 0, () -> player.shooting),
         depositItems(() -> !player.dead() && player.unit().hasItem(), () -> !player.dead() && !player.unit().hasItem()),
         desktopPause(visibleDesktop, () -> isTutorial.get() && !Vars.net.active() && state.wave >= 2, () -> Core.input.keyTap(Binding.pause)),

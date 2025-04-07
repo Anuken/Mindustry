@@ -885,6 +885,7 @@ public class Blocks{
             craftTime = 90f;
             size = 2;
             hasItems = true;
+            researchCost = with(Items.copper, 200, Items.lead, 125);
 
             consumeItem(Items.coal, 2);
         }};
