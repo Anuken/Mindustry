@@ -652,6 +652,10 @@ public class LExecutor{
                     }
                 }
             }else{
+                if(target instanceof CharSequence seq && sense == LAccess.size){
+                    to.setnum(seq.length());
+                    return;
+                }
                 to.setobj(null);
             }
         }
