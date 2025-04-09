@@ -3426,7 +3426,7 @@ public class Blocks{
                     shrinkY = 0f;
                     splashDamageRadius = 30f;
                     splashDamage = 130f;
-                    ammoMultiplier = 5f;
+                    ammoMultiplier = 2f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
 
@@ -3443,7 +3443,7 @@ public class Blocks{
                     splashDamageRadius = 20f;
                     splashDamage = 70f;
                     makeFire = true;
-                    ammoMultiplier = 5f;
+                    ammoMultiplier = 2f;
                     hitEffect = Fx.blastExplosion;
                     status = StatusEffects.burning;
                 }},
@@ -3455,7 +3455,7 @@ public class Blocks{
                     splashDamage = 55f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
-                    ammoMultiplier = 4f;
+                    ammoMultiplier = 2f;
                     lightningDamage = 40;
                     lightning = 2;
                     lightningLength = 10;
@@ -3479,18 +3479,18 @@ public class Blocks{
             }};
 
             shootY = 4.5f;
-            reload = 300f;
+            reload = 360f;
             inaccuracy = 5f;
             range = 240f;
             consumeAmmoOnce = false;
             size = 2;
-            scaledHealth = 300;
+            scaledHealth = 240;
             shootSound = Sounds.missile;
             envEnabled |= Env.space;
 
             limitRange(5f);
             coolant = consumeCoolant(0.3f);
-            coolantMultiplier = 0.4f;
+            coolantMultiplier = 0.6f;
         }};
 
         salvo = new ItemTurret("salvo"){{
