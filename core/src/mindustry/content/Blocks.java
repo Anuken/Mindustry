@@ -3424,9 +3424,9 @@ public class Blocks{
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
-                    splashDamageRadius = 30f;
-                    splashDamage = 130f;
-                    ammoMultiplier = 2f;
+                    splashDamageRadius = 32f;
+                    splashDamage = 200f;
+
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
 
@@ -3443,19 +3443,19 @@ public class Blocks{
                     splashDamageRadius = 20f;
                     splashDamage = 70f;
                     makeFire = true;
-                    ammoMultiplier = 2f;
+
                     hitEffect = Fx.blastExplosion;
                     status = StatusEffects.burning;
                 }},
-                Items.surgeAlloy, new MissileBulletType(3f, 90){{
+                Items.surgeAlloy, new MissileBulletType(3f, 110){{
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
-                    splashDamageRadius = 25f;
-                    splashDamage = 55f;
+                    splashDamageRadius = 24f;
+                    splashDamage = 40f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
-                    ammoMultiplier = 2f;
+
                     lightningDamage = 40;
                     lightning = 2;
                     lightningLength = 10;
@@ -3490,7 +3490,7 @@ public class Blocks{
 
             limitRange(5f);
             coolant = consumeCoolant(0.3f);
-            coolantMultiplier = 0.6f;
+            coolantMultiplier = 0.7f;
         }};
 
         salvo = new ItemTurret("salvo"){{
