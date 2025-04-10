@@ -485,6 +485,7 @@ public class SerpuloTechTree{
                                     node(mycelialBastion, Seq.with(
                                     new Research(atrax),
                                     new Research(spiroct),
+                                    new Research(arkyid),
                                     new Research(multiplicativeReconstructor),
                                     new Research(exponentialReconstructor)
                                     ), () -> {
