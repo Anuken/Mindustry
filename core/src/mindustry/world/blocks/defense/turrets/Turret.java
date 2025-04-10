@@ -196,6 +196,10 @@ public class Turret extends ReloadTurret{
         if(cooldownTime < 0f) cooldownTime = reload;
         if(newTargetInterval <= 0f) newTargetInterval = targetInterval;
 
+        if(!targetGround){
+            disableOverlapCheck = true;
+        }
+
         super.init();
         trackingRange = Math.max(range, trackingRange);
     }
