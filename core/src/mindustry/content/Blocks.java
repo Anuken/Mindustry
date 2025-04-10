@@ -2487,11 +2487,12 @@ public class Blocks{
         }};
 
         beamLink = new LongPowerNode("beam-link"){{
-            requirements(Category.power, BuildVisibility.editorOnly, with());
+            requirements(Category.power, with(Items.beryllium, 250, Items.silicon, 250, Items.oxide, 150, Items.carbide, 75, Items.surgeAlloy, 75, Items.phaseFabric, 75));
             size = 3;
             maxNodes = 1;
-            laserRange = 1000f;
+            laserRange = 500f;
             autolink = false;
+            sameBlockConnection = true;
             laserColor2 = Color.valueOf("ffd9c2");
             laserScale = 0.8f;
             scaledHealth = 130;
