@@ -4,7 +4,7 @@
 	"Tokens"
 	{
 		"NEW_ACHIEVEMENT_20_1_NAME"	"분쇄자"
-		"NEW_ACHIEVEMENT_20_1_DESC"	"적 유닛을 1000기 사살하세요."
+		"NEW_ACHIEVEMENT_20_1_DESC"	"적 유닛을 1,000기 사살하세요."
 		"NEW_ACHIEVEMENT_20_2_NAME"	"숙청"
 		"NEW_ACHIEVEMENT_20_2_DESC"	"적 유닛을 100,000기 사살하세요."
 		"NEW_ACHIEVEMENT_20_5_NAME"	"무한의 배달부"
@@ -174,7 +174,7 @@
 		"NEW_ACHIEVEMENT_29_3_NAME"	"대청소"
 		"NEW_ACHIEVEMENT_29_3_DESC"	"바위 100개를 부수세요."
 		"NEW_ACHIEVEMENT_29_4_NAME"	"광범위한 청소"
-		"NEW_ACHIEVEMENT_29_4_DESC"	"바위 10,00개를 부수세요."
+		"NEW_ACHIEVEMENT_29_4_DESC"	"바위 10,000개를 부수세요."
 		"NEW_ACHIEVEMENT_29_5_NAME"	"중화됨"
 		"NEW_ACHIEVEMENT_29_5_DESC"	"충격파 타워를 사용하여 들어오는 탄막을 흡수하세요."
 		"NEW_ACHIEVEMENT_29_6_NAME"	"안타깝게도요,"
