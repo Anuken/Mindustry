@@ -3456,9 +3456,9 @@ public class Blocks{
             force = 16f;
             scaledForce = 9f;
             range = 300f;
-            damage = 0.5f;
+            damage = 0.1f;
             scaledHealth = 160;
-            rotateSpeed = 12;
+            rotateSpeed = 18;
 
             consumePower(3.3f);
         }};
