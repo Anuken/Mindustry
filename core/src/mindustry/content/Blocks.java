@@ -3420,16 +3420,16 @@ public class Blocks{
         swarmer = new ItemTurret("swarmer"){{
             requirements(Category.turret, with(Items.graphite, 75, Items.titanium, 35, Items.plastanium, 85, Items.silicon, 30));
             ammo(
-                Items.blastCompound, new MissileBulletType(3f, 80){{
+                Items.blastCompound, new MissileBulletType(3f, 240){{
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
-                    splashDamageRadius = 24f;
-                    splashDamage = 140f;
+                    splashDamageRadius = 36f;
+                    splashDamage = 60f;
                     ammoMultiplier = 1f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
-
+                    homingPower = 0.2f;
                     status = StatusEffects.blasted;
                     statusDuration = 60f * 2f;
                 }},
@@ -3439,27 +3439,28 @@ public class Blocks{
                     width = 7f;
                     height = 8f;
                     shrinkY = 0f;
-                    homingPower = 0.08f;
+                    homingPower = 0.1f;
                     splashDamageRadius = 16f;
-                    splashDamage = 50f;
+                    splashDamage = 100f;
                     makeFire = true;
                     ammoMultiplier = 1f;
                     hitEffect = Fx.blastExplosion;
                     status = StatusEffects.burning;
                 }},
-                Items.surgeAlloy, new MissileBulletType(3f, 120){{
+                Items.surgeAlloy, new MissileBulletType(3f, 100){{
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
                     splashDamageRadius = 16f;
-                    splashDamage = 20f;
+                    splashDamage = 40f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
                     ammoMultiplier = 1f;
-                    lightningDamage = 60;
+                    homingPower = 0.2f;
+                    lightningDamage = 120;
                     lightningCone = 30f;
                     lightning = 1;
-                    lightningLength = 10;
+                    lightningLength = 12;
                 }}
             );
 
@@ -3478,7 +3479,7 @@ public class Blocks{
 
             shootY = 4.5f;
             reload = 360f;
-            ammoPerShot = 2;
+            ammoPerShot = 3;
             inaccuracy = 5f;
             range = 240f;
             consumeAmmoOnce = false;
