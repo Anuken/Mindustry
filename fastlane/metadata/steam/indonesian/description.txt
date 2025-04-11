@@ -9,7 +9,7 @@ Mainkan kampanye sendirian atau bersama teman-teman Anda dalam lintas platfrom m
 [list]
 [*] Buat rantai pasokan yang rumit untuk memasukkan amunisi ke menara Anda dan menghasilkan bahan yang digunakan untuk membangun
 [*] Gunakan blok produksi untuk membuat berbagai macam material canggih
-[*] Mendistribusikan cairan dan melawan tantangan konstan, seperti pabrik terbakar atau serangan udara musuh
+[*] Mendistribusikan cairan dan melawan tantangan konstan, seperti bencana kebakaran atau serangan udara musuh
 [*] Dapatkan hasil maksimal dari produksi Anda dengan menyediakan cairan pendingin opsional dan pelumas
 [*] Hasilkan berbagai macam unit untuk otomatis memanajemen markas Anda atau penyerangan ke markas musuh
 [/list]
@@ -53,7 +53,7 @@ Mainkan kampanye sendirian atau bersama teman-teman Anda dalam lintas platfrom m
 [list]
 [*] Gunakan Workshop Steam untuk menelusuri peta dan skematik buatan komunitas
 [*] Bergabunglah dengan server komunitas publik untuk bermain dengan orang lain di berbagai platform
-[*] Mainkan co-op, PvP (Satu lawan Satu) atau sandbox
+[*] Mainkan co-op, PvP (Satu lawan Satu) ataupun sandbox
 [*] Server komunitas mendukung plugin untuk peta kostum dan mode permainan khusus
 [*] Buat server khusus publik Anda, atau undang teman ke sesi pribadi Anda sendiri
 [*] Aturan permainan yang dapat disesuaikan: Ubah biaya blok, statistik musuh, muatan sumber daya, waktu gelombang, dan banyak lagi
