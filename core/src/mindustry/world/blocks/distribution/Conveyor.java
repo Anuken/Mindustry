@@ -447,7 +447,7 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void setProp(UnlockableContent content, double value){
             if(content instanceof Item item && items != null){
-                int amount = (int)value;
+                int amount = Math.min((int)value, capacity);
                 if(items.get(item) != amount){
                     if(items.get(item) < amount){
                         handleStack(item, amount - items.get(item), null);
