@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 public class Units{
     private static final Rect hitrect = new Rect();
     private static Unit result;
-    private static float cdist, cpriority;
+    private static float cdist, cpriority, chealth;
     private static int intResult;
     private static Building buildResult;
 
@@ -299,7 +299,7 @@ public class Units{
             if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.targetable(team) || e.inFogTo(team)) return;
 
             float dst2 = e.dst2(x, y) - (e.hitSize * e.hitSize);
-            if(dst2 < range*range && (result == null || dst2 > cdist || e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority && e.health > chealth && e.status == StatusEffects.none){
+            if(dst2 < range*range && (result == null || dst2 > cdist || e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority && e.health > chealth){
                 result = e;
                 cdist = dst2;
                 chealth = e.health;
