@@ -3459,7 +3459,7 @@ public class Blocks{
             damage = 0.1f;
             scaledHealth = 160;
             rotateSpeed = 18;
-            status = StatusEffects.slow;
+            status = StatusEffects.freezing;
             statusDuration = 60f * 4f;
 
             consumePower(3.3f);
