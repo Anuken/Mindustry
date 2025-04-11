@@ -286,6 +286,28 @@ public class Units{
         return result;
     }
 
+    /** Returns the farthest enemy of this team. Filter by predicate. */
+    public static Unit farthestEnemy(Team team, float x, float y, float range, Boolf<Unit> predicate){
+        if(team == Team.derelict) return null;
+
+        result = null;
+        cdist = 0f;
+        cpriority = -99999f;
+
+        nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
+            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.targetable(team) || e.inFogTo(team)) return;
+
+            float dst2 = e.dst2(x, y) - (e.hitSize * e.hitSize);
+            if(dst2 < range*range && (result == null || dst2 > cdist || e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority){
+                result = e;
+                cdist = dst2;
+                cpriority = e.type.targetPriority;
+            }
+        });
+
+        return result;
+    }
+
     /** Returns the closest enemy of this team using a custom comparison function. Filter by predicate. */
     public static Unit bestEnemy(Team team, float x, float y, float range, Boolf<Unit> predicate, Sortf sort){
         if(team == Team.derelict) return null;
