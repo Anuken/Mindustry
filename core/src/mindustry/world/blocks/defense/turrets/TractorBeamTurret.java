@@ -28,7 +28,7 @@ public class TractorBeamTurret extends BaseTurret{
     public float damage = 0f;
     public boolean targetAir = true, targetGround = false;
     public Color laserColor = Color.white;
-    public StatusEffect status = StatusEffects.slow;
+    public StatusEffect status = StatusEffects.none;
     public float statusDuration = 360;
 
     public Sound shootSound = Sounds.tractorbeam;
