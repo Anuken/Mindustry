@@ -677,8 +677,14 @@ public class LogicBlock extends Block{
         }
 
         @Override
+        public Object senseObject(LAccess sense){
+            if(sense != LAccess.config) return(super.senseObject(sense));
+            return(code); //Just quality of life for logic people :)
+        }
+
+        @Override
         public byte version(){
-            return 3;
+            return 4;
         }
 
         @Override
@@ -718,6 +724,8 @@ public class LogicBlock extends Block{
 
             TypeIO.writeString(write, tag);
             write.s(iconTag);
+
+            TypeIO.writeString(write, executor.textBuffer.toString());
         }
 
         @Override
@@ -784,6 +792,10 @@ public class LogicBlock extends Block{
                 iconTag = (char)read.us();
             }
 
+            if(revision >= 4){
+                executor.textBuffer.setLength(0);
+                executor.textBuffer.append(TypeIO.readString(read));
+            }
         }
     }
 }
