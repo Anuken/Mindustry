@@ -3453,13 +3453,14 @@ public class Blocks{
 
             hasPower = true;
             size = 2;
-            force = 30f;
-            scaledForce = 12f;
+            force = 12f;
+            scaledForce = 3f;
             range = 300f;
-            damage = 0.1f;
+            damage = 0.2f;
             scaledHealth = 160;
             rotateSpeed = 18;
-            status = StatusEffects.freezing;
+            hitEffect = Fx.freezing;
+            status = StatusEffects.slow;
             statusDuration = 60f * 4f;
 
             consumePower(3.3f);
