@@ -227,7 +227,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         table.button(Icon.ok, Styles.clearNoneTogglei, () -> {
             if(schematicMode){
                 rebuildMode = !rebuildMode;
-            }else{
+            }else if(!player.dead()){
                 for(BuildPlan plan : selectPlans){
                     Tile tile = plan.tile();
 
@@ -261,6 +261,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).visible(() -> !selectPlans.isEmpty() || schematicMode || rebuildMode).update(i -> {
             i.getStyle().imageUp = schematicMode || rebuildMode ? Icon.wrench : Icon.ok;
             i.setChecked(rebuildMode);
+            i.setDisabled(() -> player.dead());
 
         }).name("confirmplace");
     }
