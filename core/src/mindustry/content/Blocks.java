@@ -3459,7 +3459,7 @@ public class Blocks{
             damage = 0.2f;
             scaledHealth = 160;
             rotateSpeed = 18;
-            hitEffect = Fx.freezing;
+            
             status = StatusEffects.slow;
             statusDuration = 60f * 4f;
 
