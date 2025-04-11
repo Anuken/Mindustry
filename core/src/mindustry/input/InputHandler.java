@@ -1408,8 +1408,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             return r2.overlaps(r1);
         };
 
-        for(var plan : player.unit().plans()){
-            if(test.get(plan)) return plan;
+        if(!player.dead()){
+            for(var plan : player.unit().plans()){
+                if(test.get(plan)) return plan;
+            }
         }
 
         return selectPlans.find(test);
@@ -1437,9 +1439,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.color(Pal.remove);
         Lines.stroke(1f);
 
-        for(var plan : player.unit().plans()){
-            if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
-                drawBreaking(plan);
+        if(!player.dead()){
+            for(var plan : player.unit().plans()){
+                if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                    drawBreaking(plan);
+                }
             }
         }
 
@@ -1615,21 +1619,23 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //remove build plans
         Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
 
-        Iterator<BuildPlan> it = player.unit().plans().iterator();
-        while(it.hasNext()){
-            var plan = it.next();
-            if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
-                it.remove();
-            }
-        }
-
-        //don't remove plans on desktop, where flushing is false
-        if(flush){
-            it = selectPlans.iterator();
+        if(!player.dead()){
+            Iterator<BuildPlan> it = player.unit().plans().iterator();
             while(it.hasNext()){
                 var plan = it.next();
                 if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
                     it.remove();
+                }
+            }
+
+            //don't remove plans on desktop, where flushing is false
+            if(flush){
+                it = selectPlans.iterator();
+                while(it.hasNext()){
+                    var plan = it.next();
+                    if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                        it.remove();
+                    }
                 }
             }
         }
