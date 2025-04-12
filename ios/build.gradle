@@ -4,7 +4,7 @@ buildscript{
     }
 
     dependencies{
-        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.20"
+        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.23"
     }
 }
 
@@ -53,7 +53,7 @@ task copyAssets(){
         delete{
             delete "assets/"
         }
-    
+
         copy{
             from "../core/assets"
             into "assets/"

@@ -291,7 +291,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(() -> !hasSchematic() && !state.rules.editor);
+            t.visible(() -> !hasSchematic() && !Core.settings.getBool("editor-blocks-shown"));
             t.bottom().left();
 
             t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
