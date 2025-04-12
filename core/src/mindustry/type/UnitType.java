@@ -699,7 +699,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         stats.add(Stat.speed, speed * 60f / tilesize, StatUnit.tilesSecond);
         stats.add(Stat.size, StatValues.squared(hitSize / tilesize, StatUnit.blocks));
         stats.add(Stat.itemCapacity, itemCapacity);
-        stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
+        stats.add(Stat.range, Strings.autoFixed(maxRange / tilesize, 1), StatUnit.blocks);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
 

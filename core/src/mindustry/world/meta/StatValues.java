@@ -465,7 +465,7 @@ public class StatValues{
 
     public static StatValue itemEffMultiplier(Floatf<Item> efficiency, float timePeriod, Boolf<Item> filter, @Nullable ObjectFloatMap<Item> itemDurationMultipliers){
         return table -> {
-            table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
+            if(table.getCells().size > 0) table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
             table.row();
             table.table(c -> {
                 for(Item item : content.items().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden())){
@@ -484,7 +484,7 @@ public class StatValues{
 
     public static StatValue liquidEffMultiplier(Floatf<Liquid> efficiency, float amount, Boolf<Liquid> filter){
         return table -> {
-            table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
+            if(table.getCells().size > 0) table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
             table.row();
             table.table(c -> {
                 for(Liquid liquid : content.liquids().select(l -> filter.get(l) && l.unlockedNow() && !l.isHidden())){

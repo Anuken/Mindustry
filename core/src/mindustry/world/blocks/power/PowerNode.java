@@ -33,7 +33,7 @@ public class PowerNode extends PowerBlock{
     public @Load(value = "@-laser-end", fallback = "laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
     public int maxNodes = 3;
-    public boolean autolink = true, drawRange = true;
+    public boolean autolink = true, drawRange = true, sameBlockConnection = false;
     public float laserScale = 0.25f;
     public Color laserColor1 = Color.white;
     public Color laserColor2 = Pal.powerLight;
@@ -341,7 +341,7 @@ public class PowerNode extends PowerBlock{
     }
 
     public boolean linkValid(Building tile, Building link, boolean checkMaxNodes){
-        if(tile == link || link == null || !link.block.hasPower || !link.block.connectedPower || tile.team != link.team) return false;
+        if(tile == link || link == null || !link.block.hasPower || !link.block.connectedPower || tile.team != link.team || (sameBlockConnection && tile.block != link.block)) return false;
 
         if(overlaps(tile, link, laserRange * tilesize) || (link.block instanceof PowerNode node && overlaps(link, tile, node.laserRange * tilesize))){
             if(checkMaxNodes && link.block instanceof PowerNode node){
