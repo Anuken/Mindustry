@@ -80,7 +80,7 @@ public class TractorBeamTurret extends BaseTurret{
 
             //retarget
             if(timer(timerTarget, retargetTime)){
-                target = Units.farthestEnemy(team, x, y, range, u -> u.checkTarget(targetAir, targetGround));
+                target = Units.nominalEnemy(team, x, y, range, u -> u.checkTarget(targetAir, targetGround));
             }
 
             //consume coolant
