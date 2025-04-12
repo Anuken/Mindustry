@@ -3460,7 +3460,7 @@ public class Blocks{
             scaledHealth = 160;
             rotateSpeed = 18;
             
-            status = StatusEffects.slow;
+            status = StatusEffects.sapped;
             statusDuration = 60f * 6f;
 
             consumePower(6f);
