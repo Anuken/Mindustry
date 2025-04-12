@@ -465,7 +465,7 @@ public class StatValues{
 
     public static StatValue itemEffMultiplier(Floatf<Item> efficiency, float timePeriod, Boolf<Item> filter, @Nullable ObjectFloatMap<Item> itemDurationMultipliers){
         return table -> {
-            table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
+            if(table.getCells().size > 0) table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
             table.row();
             table.table(c -> {
                 for(Item item : content.items().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden())){
@@ -484,7 +484,7 @@ public class StatValues{
 
     public static StatValue liquidEffMultiplier(Floatf<Liquid> efficiency, float amount, Boolf<Liquid> filter){
         return table -> {
-            table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
+            if(table.getCells().size > 0) table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
             table.row();
             table.table(c -> {
                 for(Liquid liquid : content.liquids().select(l -> filter.get(l) && l.unlockedNow() && !l.isHidden())){
@@ -581,18 +581,14 @@ public class StatValues{
                 int count = 0;
                 for(Ability ability : abilities){
                     if(ability.display){
-                        t.table(Styles.grayPanel, a -> {
-                            a.add("[accent]" + ability.localized()).padBottom(4).center().top().expandX();
-                            a.row();
-                            a.left().top().defaults().left();
-                            ability.addStats(a);
-                        }).pad(5).margin(10).growX().top().uniformX();
+                        ability.display(t);
+
                         if((++count) == 2){
                             count = 0;
                             t.row();
                         }
                     }
-                };
+                }
             });
         };
     }

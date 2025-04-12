@@ -52,7 +52,7 @@ public class Door extends Wall{
 
                 if(chainEffect) entity.effect();
                 entity.open = open;
-                if(!world.isGenerating()) pathfinder.updateTile(entity.tile());
+                if(!world.isGenerating()) pathfinder.updateTile(entity.tile);
             }
         });
     }

@@ -22,6 +22,7 @@ import mindustry.type.Weather.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import static arc.Core.*;
 import static arc.util.Time.*;
 import static mindustry.Vars.*;
 
@@ -117,24 +118,30 @@ public class CustomRulesDialog extends BaseDialog{
     }
 
     void setup(){
-        categories.clear();
         cont.clear();
         cont.table(t -> {
             t.add("@search").padRight(10);
             var field = t.field(ruleSearch, text -> {
                 ruleSearch = text.trim().replaceAll(" +", " ").toLowerCase();
-                setup();
+                setupMain();
             }).grow().pad(8).get();
             field.setCursorPosition(ruleSearch.length());
             Core.scene.setKeyboardFocus(field);
             t.button(Icon.cancel, Styles.emptyi, () -> {
                 ruleSearch = "";
-                setup();
+                setupMain();
             }).padLeft(10f).size(35f);
-            t.button(Icon.zoom, Styles.emptyi, this::setup).size(54f);
         }).row();
-        cont.pane(m -> main = m).scrollX(false);
-        main.margin(10f);
+        Cell<ScrollPane> paneCell = cont.pane(m -> main = m);
+
+        setupMain();
+
+        paneCell.scrollX(main.getPrefWidth() + 40f > graphics.getWidth());
+    }
+
+    void setupMain(){
+        categories.clear();
+        main.clear();
         main.left().defaults().fillX().left();
         main.row();
 
@@ -213,11 +220,11 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.fog", b -> rules.fog = b, () -> rules.fog);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
 
-        check("@rules.limitarea", b -> rules.limitMapArea = b, () -> rules.limitMapArea);
-        numberi("x", x -> rules.limitX = x, () -> rules.limitX, () -> rules.limitMapArea, 0, 10000);
-        numberi("y", y -> rules.limitY = y, () -> rules.limitY, () -> rules.limitMapArea, 0, 10000);
-        numberi("w", w -> rules.limitWidth = w, () -> rules.limitWidth, () -> rules.limitMapArea, 0, 10000);
-        numberi("h", h -> rules.limitHeight = h, () -> rules.limitHeight, () -> rules.limitMapArea, 0, 10000);
+        check("@rules.limitarea", b -> rules.limitMapArea = b, () -> rules.limitMapArea, () -> !state.isGame());
+        numberi("x", x -> rules.limitX = x, () -> rules.limitX, () -> rules.limitMapArea && !state.isGame(), 0, 10000);
+        numberi("y", y -> rules.limitY = y, () -> rules.limitY, () -> rules.limitMapArea && !state.isGame(), 0, 10000);
+        numberi("w", w -> rules.limitWidth = w, () -> rules.limitWidth, () -> rules.limitMapArea && !state.isGame(), 0, 10000);
+        numberi("h", h -> rules.limitHeight = h, () -> rules.limitHeight, () -> rules.limitMapArea && !state.isGame(), 0, 10000);
 
         number("@rules.solarmultiplier", f -> rules.solarMultiplier = f, () -> rules.solarMultiplier);
 
@@ -333,7 +340,7 @@ public class CustomRulesDialog extends BaseDialog{
 
     public void category(String name){
         current = new Table();
-        current.left().defaults().fillX().left().pad(5);
+        current.left().defaults().fillX().expandX().left().pad(5);
         currentName = name;
         categories.add(current);
         categoryNames.add(currentName);
@@ -403,7 +410,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.add(text).left().padRight(5)
             .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
             t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
-            .padRight(100f)
+            .padRight(50f)
             .update(a -> a.setDisabled(!condition.get()))
             .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left();
         }).padTop(0);
@@ -429,7 +436,7 @@ public class CustomRulesDialog extends BaseDialog{
                 Table table = new Table();
                 table.add(cell.get()).left().expandX().fillX();
                 cell.clearElement();
-                table.button(Icon.infoSmall, () -> ui.showInfo(text + ".info")).size(32f).padRight(24f).right();
+                table.button(Icon.infoSmall, () -> ui.showInfo(text + ".info")).size(32f).right();
                 cell.setElement(table).left().expandX().fillX();
             }else{
                 cell.tooltip(text + ".info");

@@ -15,7 +15,6 @@ public class HugAI extends AIController{
 
     @Override
     public void updateMovement(){
-
         Building core = unit.closestEnemyCore();
 
         if(core != null && unit.within(core, unit.range() / 1.1f + core.block.size * tilesize / 2f)){
