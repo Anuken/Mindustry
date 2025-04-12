@@ -153,7 +153,8 @@ public class DroneCenter extends Block{
             target = build.target;
 
             //TODO what angle?
-            moveTo(target, build.target.hitSize / 1.8f + droneRange - 10f);
+            movingTo = target;
+            moveTo(build.target.hitSize / 1.8f + droneRange - 10f);
 
             unit.lookAt(target);
 

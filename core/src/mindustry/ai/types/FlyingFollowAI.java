@@ -16,9 +16,11 @@ public class FlyingFollowAI extends FlyingAI{
         unloadPayloads();
 
         if(following != null){
-            moveTo(following, (following instanceof Sized s ? s.hitSize()/2f * 1.1f : 0f) + unit.hitSize/2f + 15f, 50f);
+            movingTo = following;
+            moveTo((following instanceof Sized s ? s.hitSize()/2f * 1.1f : 0f) + unit.hitSize/2f + 15f, 50f);
         }else if(target != null && unit.hasWeapons()){
-            moveTo(target, 80f);
+            movingTo = target;
+            moveTo(80f);
         }
 
         if(shouldFaceTarget()){

@@ -24,6 +24,8 @@ public class AIController implements UnitController{
     protected @Nullable AIController fallback;
     protected float noTargetTime;
 
+    /** The position that unit is moving to. */
+    public @Nullable Position movingTo;
     /** main target that is being faced */
     protected @Nullable Teamc target;
     protected @Nullable Teamc bomberTarget;
@@ -308,14 +310,14 @@ public class AIController implements UnitController{
         unit.movePref(vec);
     }
 
-    public void circle(Position target, float circleLength){
-        circle(target, circleLength, prefSpeed());
+    public void circle(float circleLength){
+        circle(circleLength, prefSpeed());
     }
 
-    public void circle(Position target, float circleLength, float speed){
-        if(target == null) return;
+    public void circle(float circleLength, float speed){
+        if(movingTo == null) return;
 
-        vec.set(target).sub(unit);
+        vec.set(movingTo).sub(unit);
 
         if(vec.len() < circleLength){
             vec.rotate((circleLength - vec.len()) / circleLength * 180f);
@@ -326,31 +328,31 @@ public class AIController implements UnitController{
         unit.movePref(vec);
     }
 
-    public void moveTo(Position target, float circleLength){
-        moveTo(target, circleLength, 100f);
+    public void moveTo(float circleLength){
+        moveTo(circleLength, 100f);
     }
 
-    public void moveTo(Position target, float circleLength, float smooth){
-        moveTo(target, circleLength, smooth, unit.isFlying(), null);
+    public void moveTo(float circleLength, float smooth){
+        moveTo(circleLength, smooth, unit.isFlying(), null);
     }
 
-    public void moveTo(Position target, float circleLength, float smooth, boolean keepDistance, @Nullable Vec2 offset){
-        moveTo(target, circleLength, smooth, keepDistance, offset, false);
+    public void moveTo(float circleLength, float smooth, boolean keepDistance, @Nullable Vec2 offset){
+        moveTo(circleLength, smooth, keepDistance, offset, false);
     }
 
-    public void moveTo(Position target, float circleLength, float smooth, boolean keepDistance, @Nullable Vec2 offset, boolean arrive){
-        if(target == null) return;
+    public void moveTo(float circleLength, float smooth, boolean keepDistance, @Nullable Vec2 offset, boolean arrive){
+        if(movingTo == null) return;
 
         float speed = prefSpeed();
 
-        vec.set(target).sub(unit);
+        vec.set(movingTo).sub(unit);
 
-        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
+        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(movingTo) - circleLength) / smooth, -1f, 1f);
 
         vec.setLength(speed * length);
 
         if(arrive){
-            Tmp.v3.set(-unit.vel.x / unit.type.accel * 2f, -unit.vel.y / unit.type.accel * 2f).add((target.getX() - unit.x), (target.getY() - unit.y));
+            Tmp.v3.set(-unit.vel.x / unit.type.accel * 2f, -unit.vel.y / unit.type.accel * 2f).add((movingTo.getX() - unit.x), (movingTo.getY() - unit.y));
             vec.add(Tmp.v3).limit(speed * length);
         }
 

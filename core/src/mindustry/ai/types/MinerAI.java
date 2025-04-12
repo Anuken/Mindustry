@@ -45,7 +45,8 @@ public class MinerAI extends AIController{
                 }
 
                 if(ore != null){
-                    moveTo(ore, unit.type.mineRange / 2f, 20f);
+                    movingTo = ore;
+                    moveTo(unit.type.mineRange / 2f, 20f);
 
                     if(unit.within(ore, unit.type.mineRange) && unit.validMine(ore)){
                         unit.mineTile = ore;
@@ -69,7 +70,8 @@ public class MinerAI extends AIController{
                 mining = true;
             }
 
-            circle(core, unit.type.range / 1.8f);
+            movingTo = core;
+            circle(unit.type.range / 1.8f);
         }
     }
 }

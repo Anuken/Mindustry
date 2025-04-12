@@ -66,17 +66,21 @@ public class LogicAI extends AIController{
 
         switch(control){
             case move -> {
-                moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
+                movingTo = Tmp.v1.set(moveX, moveY);
+                moveTo(1f, 30f);
             }
             case approach -> {
-                moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7, true, null);
+                movingTo = Tmp.v1.set(moveX, moveY);
+                moveTo(moveRad - 7f, 7, true, null);
             }
             case pathfind -> {
                 if(unit.isFlying()){
-                    moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
+                    movingTo = Tmp.v1.set(moveX, moveY);
+                    moveTo(1f, 30f);
                 }else{
                     if(controlPath.getPathPosition(unit, Tmp.v2.set(moveX, moveY), Tmp.v2, Tmp.v1, null)){
-                        moveTo(Tmp.v1, 1f, Tmp.v2.epsilonEquals(Tmp.v1, 4.1f) ? 30f : 0f);
+                        movingTo = Tmp.v1;
+                        moveTo(1f, Tmp.v2.epsilonEquals(Tmp.v1, 4.1f) ? 30f : 0f);
                     }
                 }
             }
@@ -96,7 +100,8 @@ public class LogicAI extends AIController{
                         if(unit.isFlying()){
                             var target = core == null ? spawner : core;
                             if(target != null){
-                                moveTo(target, unit.range() * 0.5f);
+                                movingTo = target;
+                                moveTo(unit.range() * 0.5f);
                             }
                         }else{
                             pathfind(Pathfinder.fieldCore);

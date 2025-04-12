@@ -117,7 +117,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @MethodPriority(100)
     @Override
     public void collision(Hitboxc other, float x, float y){
-        if(type.sticky){
+        if(Mathf.chance(type.stickyChance)){
             if(stickyTarget == null){
                 //tunnel into the target a bit for better visuals
                 this.x = x + vel.x;
@@ -238,7 +238,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                 && build.collide(self()) && type.testCollision(self(), build)
                 && !build.dead() && (type.collidesTeam || build.team != team) && !(type.pierceBuilding && hasCollided(build.id))){
 
-                if(type.sticky){
+                if(Mathf.chance(type.stickyChance)){
                     if(build.team != team){
                         //stick to edge of block
                         Vec2 hit = Geometry.raycastRect(lastX, lastY, x, y, Tmp.r1.setCentered(x * tilesize, y * tilesize, tilesize, tilesize));

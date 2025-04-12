@@ -304,7 +304,8 @@ public class CommandAI extends AIController{
                     target = attackTarget;
                     circleAttack(80f);
                 }else{
-                    moveTo(vecOut,
+                    movingTo = vecOut;
+                    moveTo(
                     withinAttackRange ? engageRange :
                     unit.isGrounded() ? 0f :
                     attackTarget != null && stance != UnitStance.ram ? engageRange : 0f,

@@ -175,8 +175,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean fragOnAbsorb = true;
     /** If true, unit armor is ignored in damage calculations. */
     public boolean pierceArmor = false;
-    /** If true, the bullet will "stick" to enemies and get deactivated on collision. */
-    public boolean sticky = false;
+    /** Chance for bullet to "stick" to enemies and get deactivated on collision. Disabled when < 0. */
+    public float stickyChance = -1f;
     /** Extra time added to bullet when it sticks to something. */
     public float stickyExtraLifetime = 0f;
     /** Whether status and despawnHit should automatically be set. */

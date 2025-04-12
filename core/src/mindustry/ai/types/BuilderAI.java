@@ -86,7 +86,8 @@ public class BuilderAI extends AIController{
                     unit.clearBuilding();
                     var core = unit.closestCore();
                     if(core != null && !unit.within(core, retreatDst)){
-                        moveTo(core, retreatDst);
+                        movingTo = core;
+                        moveTo(retreatDst);
                         moving = true;
                     }
                 }
@@ -120,7 +121,8 @@ public class BuilderAI extends AIController{
             if(valid){
                 float range = Math.min(unit.type.buildRange - 20f, 100f);
                 //move toward the plan
-                moveTo(req.tile(), range - 10f, 20f);
+                movingTo = req.tile();
+                moveTo(range - 10f, 20f);
                 moving = !unit.within(req.tile(), range);
             }else{
                 //discard invalid plan
@@ -130,7 +132,8 @@ public class BuilderAI extends AIController{
         }else{
 
             if(assistFollowing != null){
-                moveTo(assistFollowing, assistFollowing.type.hitSize + unit.type.hitSize/2f + 60f);
+                movingTo = assistFollowing;
+                moveTo(assistFollowing.type.hitSize + unit.type.hitSize/2f + 60f);
                 moving = !unit.within(assistFollowing, assistFollowing.type.hitSize + unit.type.hitSize/2f + 65f);
             }
 

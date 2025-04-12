@@ -32,7 +32,8 @@ public class RepairAI extends AIController{
             if(unit.type.circleTarget){
                 circleAttack(120f);
             }else if(!target.within(unit, unit.type.range * 0.65f)){
-                moveTo(target, unit.type.range * 0.65f);
+                movingTo = target;
+                moveTo(unit.type.range * 0.65f);
             }
 
             if(!unit.type.circleTarget){
@@ -51,7 +52,8 @@ public class RepairAI extends AIController{
                 if(avoid != null){
                     var core = unit.closestCore();
                     if(core != null && !unit.within(core, retreatDst)){
-                        moveTo(core, retreatDst);
+                        movingTo = core;
+                        moveTo(retreatDst);
                     }
                 }
             }

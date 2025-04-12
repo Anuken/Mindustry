@@ -33,7 +33,8 @@ public class CargoAI extends AIController{
 
         //empty, approach the loader, even if there's nothing to pick up (units hanging around doing nothing looks bad)
         if(!unit.hasItem()){
-            moveTo(build, moveRange, moveSmoothing);
+            movingTo = build;
+            moveTo(moveRange, moveSmoothing);
 
             //check if ready to pick up
             if(build.items.any() && unit.within(build, transferRange)){
@@ -66,7 +67,8 @@ public class CargoAI extends AIController{
                     return;
                 }
 
-                moveTo(unloadTarget, moveRange, moveSmoothing);
+                movingTo = unloadTarget;
+                moveTo(moveRange, moveSmoothing);
 
                 //deposit in bursts, unloading can take a while
                 if(unit.within(unloadTarget, transferRange) && timer.get(timerTarget2, dropSpacing)){

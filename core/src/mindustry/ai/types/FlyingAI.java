@@ -21,13 +21,15 @@ public class FlyingAI extends AIController{
             if(unit.type.circleTarget){
                 circleAttack(120f);
             }else{
-                moveTo(target, unit.type.range * 0.8f);
+                movingTo = target;
+                moveTo(unit.type.range * 0.8f);
                 unit.lookAt(target);
             }
         }
 
         if(target == null && state.rules.waves && unit.team == state.rules.defaultTeam){
-            moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 130f);
+            movingTo = getClosestSpawner();
+            moveTo(state.rules.dropZoneRadius + 130f);
         }
     }
 

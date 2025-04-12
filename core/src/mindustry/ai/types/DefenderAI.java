@@ -14,7 +14,8 @@ public class DefenderAI extends AIController{
         unloadPayloads();
 
         if(target != null){
-            moveTo(target, (target instanceof Sized s ? s.hitSize()/2f * 1.1f : 0f) + unit.hitSize/2f + 15f, 50f);
+            movingTo = target;
+            moveTo((target instanceof Sized s ? s.hitSize()/2f * 1.1f : 0f) + unit.hitSize/2f + 15f, 50f);
             unit.lookAt(target);
         }
     }
