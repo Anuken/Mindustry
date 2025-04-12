@@ -53,7 +53,8 @@ public class CampaignRulesDialog extends BaseDialog{
                 for(Difficulty diff : Difficulty.all){
                     t.button(diff.localized(), style, () -> {
                         rules.difficulty = diff;
-                    }).group(group).checked(b -> rules.difficulty == diff);
+                    }).group(group).checked(b -> rules.difficulty == diff)
+                    .tooltip(diff.info());
 
                     if(Core.graphics.isPortrait() && diff.ordinal() % 2 == 1){
                         t.row();
