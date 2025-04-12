@@ -3453,7 +3453,7 @@ public class Blocks{
 
             hasPower = true;
             size = 2;
-            force = 12f;
+            force = 9f;
             scaledForce = 3f;
             range = 300f;
             damage = 0.2f;
@@ -3461,7 +3461,7 @@ public class Blocks{
             rotateSpeed = 18;
             
             status = StatusEffects.slow;
-            statusDuration = 60f * 4f;
+            statusDuration = 60f * 6f;
 
             consumePower(3.3f);
         }};
