@@ -51,7 +51,7 @@ Mainkan kampanye sendirian atau bersama teman-teman Anda dalam lintas platfrom m
 [h2]Komunitas dan Modding[/h2]
 
 [list]
-[*] Gunakan Workshop Steam untuk menelusuri peta dan skematik buatan komunitas
+[*] Gunakan Steam Workshop untuk menelusuri peta dan skematik buatan komunitas
 [*] Bergabunglah dengan server komunitas publik untuk bermain dengan orang lain di berbagai platform
 [*] Mainkan co-op, PvP (Satu lawan Satu) ataupun sandbox
 [*] Server komunitas mendukung plugin untuk peta kostum dan mode permainan khusus
