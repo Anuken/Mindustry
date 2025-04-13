@@ -20,7 +20,7 @@ You'll need to either hire some moderators, or make use of (currently non-existe
    - Make sure players know where to refer to for server support. It should be fairly clear that the server owner is not me, but you.
    - Try to be professional in your text; use common sense.
 4. **Get some good maps.** *(optional, but highly recommended)*. Add some maps to your server and set the map rotation to custom-only. You can get maps from the Steam workshop by subscribing and exporting them; using the `#maps` channel on Discord is also an option.
-5. **Check your server configuration.** *(optional)* I would recommend adding a message rate limit of 1 second (`config messageRateLimit 1`), and disabling connect/disconnect messages to reduce spam (`config showConnectMessages false`).
+5. **Check your server configuration.** *(optional)* I would recommend adding a message rate limit of 1 second (`config messageRateLimit 2`), and disabling connect/disconnect messages to reduce spam (`config showConnectMessages false`).
 6. Finally, **submit a pull request** to add your server's IP to the list. 
 This should be fairly straightforward: Press the edit button on the [server file](https://github.com/Anuken/Mindustry/blob/master/servers_v7.json), then add a JSON object with the following format:
     ```json
