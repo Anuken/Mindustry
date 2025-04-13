@@ -114,10 +114,11 @@ public class NetworkIO{
         buffer.putInt(netServer.admins.getPlayerLimit());
 
         writeString(buffer, description, 100);
+        buffer.putInt(Core.settings.getInt("port", port));
         if(state.rules.modeName != null){
             writeString(buffer, state.rules.modeName, 50);
         }
-        buffer.putInt(Core.settings.getInt("port", port));
+
         return buffer;
     }
 
@@ -131,9 +132,9 @@ public class NetworkIO{
         Gamemode gamemode = Gamemode.all[buffer.get()];
         int limit = buffer.getInt();
         String description = readString(buffer);
-        String modeName = readString(buffer);
         int hostPort = buffer.getInt();
         hostPort = hostPort != 0 ? hostPort : Vars.port;
+        String modeName = readString(buffer);
 
         return new Host(ping, host, hostAddress, hostPort, map, wave, players, version, vertype, gamemode, limit, description, modeName.isEmpty() ? null : modeName);
     }
