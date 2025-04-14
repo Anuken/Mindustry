@@ -434,7 +434,10 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return ys[len - 1];
+            if(sensor == LAccess.progress){
+                if(len == 0) return 0;
+                return ys[len - 1];
+            }
             return super.sense(sensor);
         }
 
