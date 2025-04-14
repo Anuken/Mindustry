@@ -432,7 +432,7 @@ public class CustomRulesDialog extends BaseDialog{
 
     public void ruleInfo(Cell<?> cell, String text){
         if(Core.bundle.has(text.substring(1) + ".info")){
-            if(mobile){
+            if(mobile && !graphics.isPortrait()){ //disabled in portrait - broken and goes offscreen
                 Table table = new Table();
                 table.add(cell.get()).left().expandX().fillX();
                 cell.clearElement();
