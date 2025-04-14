@@ -1437,7 +1437,7 @@ public class LExecutor{
 
             Team t = team.team();
 
-            if(type.obj() instanceof UnitType type && !type.internal && Units.canCreate(t, type)){
+            if(t != null && type.obj() instanceof UnitType type && !type.internal && Units.canCreate(t, type)){
                 //random offset to prevent stacking
                 var unit = type.spawn(t, World.unconv(x.numf()) + Mathf.range(0.01f), World.unconv(y.numf()) + Mathf.range(0.01f));
                 spawner.spawnEffect(unit);
