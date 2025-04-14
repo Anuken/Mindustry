@@ -1945,13 +1945,12 @@ public class Blocks{
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
-            requirements(Category.distribution, with(Items.lead, 10, Items.copper, 10));
+            requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
             fadeIn = moveArrows = false;
             range = 4;
             speed = 74f;
             arrowSpacing = 6f;
             bufferCapacity = 14;
-            buildCostMultiplier = 2f;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
