@@ -193,8 +193,8 @@ public class ConstructBlock extends Block{
         @Override
         public void tapped(){
             //if the target is constructable, begin constructing
-            if(current.isPlaceable()){
-                if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
+            if(current.isPlaceable() && player.isBuilder()){
+                if(control.input.buildWasAutoPaused && !control.input.isBuilding){
                     control.input.isBuilding = true;
                 }
                 player.unit().addBuild(new BuildPlan(tile.x, tile.y, rotation, current, lastConfig), false);
