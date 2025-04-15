@@ -169,6 +169,7 @@ public class TileableLogicDisplay extends LogicDisplay{
 
         @Override
         public void draw(){
+            //TODO if this is called before draw() on the root display is called, it will wipe it
             if(needsUpdate){
                 needsUpdate = false;
                 linkDisplays(this);
