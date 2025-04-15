@@ -1,4 +1,4 @@
-A Mindustry egy gyárépítő játék Toronyvédő és RTS elemekkel. Készíts bonyolult ellátási láncokat, hogy lőszert juttass a lövegtornyokba, termelj az építkezéshez használható nyersanyagokat, és állíts elő egységeket. Irányítsd az egységeket, hogy elfoglald az ellenséges bázisokat, és bővítsd a termelésedet. Védd meg a támaszpontodat a hullámokban támadó ellenségektől.
+A Mindustry egy gyárépítős játék, Toronyvédő és RTS elemekkel. Készíts bonyolult ellátási láncokat, hogy lőszert juttass a lövegtornyokba, termelj az építkezéshez használható nyersanyagokat, és állíts elő egységeket. Irányítsd az egységeket, hogy elfoglald az ellenséges bázisokat, és bővítsd a termelésedet. Védd meg a támaszpontodat a hullámokban támadó ellenségektől.
 
 Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platformokon átívelő többjátékos módban, vagy hívd ki őket csapat alapú PvP mérkőzésekre
 
