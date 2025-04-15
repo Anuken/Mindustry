@@ -4,13 +4,13 @@ Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platfo
 
 [img]{STEAM_APP_IMAGE}/extras/factory.gif[/img]
 
-[h2]Gyár építés[/h2]
+[h2]Gyárépítés[/h2]
 
 [list]
 [*] Hozz létre bonyolult szállítószalagokból álló ellátási láncokat, hogy lőszert juttass a lövegtornyokba és termelj nyersanyagokat az építkezésekhez
 [*] Használd a gyártóblokkokat a legkülönfélébb fejlett nyersanyagok létrehozásához
-[*] Oszd szét a folyadékokat, és küzdj meg az állandó kihívásokkal, mint például a tűzkitörésekkel, vagy az ellenséges repülőgépek rajtaütéseivel
-[*] Hozd ki a legtöbbet a termelésből az opcionális hűtőfolyadék-ellátással
+[*] Oszd szét a folyadékokat és küzdj meg az állandó kihívásokkal, mint például a tűzkitörésekkel, vagy az ellenséges repülőgépek rajtaütéseivel
+[*] Hozd ki a legtöbbet a termelésből, az épületek hűtőfolyadék-ellátásával
 [*] Egységek széles skáláját állíthatod elő a bázisod automatikus irányításához, és az ellenséges bázisok megtámadásához
 [/list]
 
@@ -42,13 +42,13 @@ Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platfo
 [*] Védd meg az elfoglalt szektorokat az időszakos invázióktól
 [*] Koordináld az erőforrások elosztását a szektorok között az indítóállások felhasználásával
 [*] Fedezz fel új épületeket, gyárakat a fejlődés elősegítése érdekében
-[*] Hívd meg barátaidat, hogy együtt teljesítsék a küldetéseket
-[*] 250+ technológiai épület használatának elsajátítása
-[*] 50+ különböző típusú drón, mech és hajó
-[*] 80+ teljesítendő feladat
+[*] Hívd meg barátaidat, hogy együtt teljesítsétek a küldetéseket
+[*] Sajátítsd el a 250-nél is több technológiai épület használatát
+[*] Használd az 50-nél is több különböző típusú drónt, mechet, hajót, tankot
+[*] Teljesítsd a 80-nál is több feladatot
 [/list]
 
-[h2]Közösség és moddolás[/h2]
+[h2]Közösség és modolás[/h2]
 
 [list]
 [*] Használd a Steam Műhelyt a közösség által készített pályák és vázlatok böngészéséhez.
