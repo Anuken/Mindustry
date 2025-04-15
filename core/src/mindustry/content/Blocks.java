@@ -5100,7 +5100,7 @@ public class Blocks{
                         bullet = new ExplosionBulletType(400f, 120f){{
                             //stats must be mirrored to the bullet that the unit uses
                             reloadMultiplier = 0.8f;
-                            ammoMultiplier = 5f;
+                            ammoMultiplier = 3f;
 
                             hitColor = engineColor;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
