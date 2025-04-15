@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.ctype.Content;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -47,8 +48,10 @@ public class PayloadConveyor extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
+        int ntrns = 1 + size/2;
+
         for(int i = 0; i < 4; i++){
-            Building other = world.build(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
+            Building other = world.build(x + Geometry.d4x[i] * ntrns, y + Geometry.d4y[i] * ntrns);
             if(other != null && other.block.outputsPayload && other.block.size == size){
                 Drawf.selected(other.tileX(), other.tileY(), other.block, other.team.color);
             }
@@ -281,6 +284,13 @@ public class PayloadConveyor extends Block{
             this.animation = 0;
 
             updatePayload();
+        }
+
+        @Override
+        public double sense(Content content){
+            if(item instanceof UnitPayload up && up.unit.type == content) return 1;
+            if(item instanceof BuildPayload bp && bp.build.block == content) return 1;
+            return super.sense(content);
         }
 
         @Override

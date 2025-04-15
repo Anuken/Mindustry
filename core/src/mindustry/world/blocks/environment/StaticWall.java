@@ -17,7 +17,7 @@ public class StaticWall extends Prop{
 
     public StaticWall(String name){
         super(name);
-        breakable = alwaysReplace = false;
+        breakable = alwaysReplace = unitMoveBreakable = false;
         solid = true;
         variants = 2;
         cacheLayer = CacheLayer.walls;

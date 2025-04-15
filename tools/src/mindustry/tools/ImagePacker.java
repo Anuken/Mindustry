@@ -16,6 +16,7 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.world.blocks.*;
 
 import java.io.*;
@@ -109,7 +110,7 @@ public class ImagePacker{
         map.each((key, val) -> content2id.put(val.split("\\|")[0], key));
 
         Seq<UnlockableContent> cont = Seq.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids(), Vars.content.units(), Vars.content.statusEffects());
-        cont.removeAll(u -> u instanceof ConstructBlock || u == Blocks.air);
+        cont.removeAll(u -> u instanceof ConstructBlock || u == Blocks.air || (u instanceof UnitType t && t.internal));
 
         int minid = 0xF8FF;
         for(String key : map.keys()){
@@ -140,7 +141,7 @@ public class ImagePacker{
 
         Seq<UnlockableContent> lookupCont = new Seq<>();
 
-        for(ContentType t : GlobalVars.lookableContent){
+        for(ContentType t : GlobalVars.writableLookableContent){
             lookupCont.addAll(Vars.content.<UnlockableContent>getBy(t).select(UnlockableContent::logicVisible));
         }
 
@@ -154,7 +155,7 @@ public class ImagePacker{
 
         if(logicidfile.exists()){
             try(DataInputStream in = new DataInputStream(logicidfile.readByteStream())){
-                for(ContentType ctype : GlobalVars.lookableContent){
+                for(ContentType ctype : GlobalVars.writableLookableContent){
                     short amount = in.readShort();
                     for(int i = 0; i < amount; i++){
                         String name = in.readUTF();
@@ -189,7 +190,7 @@ public class ImagePacker{
 
         //write the resulting IDs
         try(DataOutputStream out = new DataOutputStream(logicidfile.write(false, 2048))){
-            for(ContentType t : GlobalVars.lookableContent){
+            for(ContentType t : GlobalVars.writableLookableContent){
                 Seq<UnlockableContent> all = idToContent[t.ordinal()].values().toArray().sort(u -> registered[t.ordinal()].get(u));
                 out.writeShort(all.size);
                 for(UnlockableContent u : all){

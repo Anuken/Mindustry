@@ -82,6 +82,15 @@ public class CommandAI extends AIController{
             commandTarget(target, false);
         }
 
+        //pursue the target for patrol, keeping the current position
+        if(stance == UnitStance.patrol && target != null && attackTarget == null){
+            //commanding a target overwrites targetPos, so add it to the queue
+            if(targetPos != null){
+                commandQueue.add(targetPos.cpy());
+            }
+            commandTarget(target, false);
+        }
+
         //remove invalid targets
         if(commandQueue.any()){
             commandQueue.removeAll(e -> e instanceof Healthc h && !h.isValid());
@@ -121,6 +130,14 @@ public class CommandAI extends AIController{
         if(target != null){
             Call.pickedUnitPayload(unit, target);
         }
+    }
+
+    @Override
+    public Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
+        if(!unit.type.autoFindTarget && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
+            return null;
+        }
+        return super.findMainTarget(x, y, range, air, ground);
     }
 
     public void defaultBehavior(){
@@ -164,28 +181,8 @@ public class CommandAI extends AIController{
             }
         }
 
-        //acquiring naval targets isn't supported yet, so use the fallback dumb AI
-        if(unit.team.isAI() && unit.team.rules().rtsAi && unit.type.naval){
-            if(fallback == null) fallback = new GroundAI();
-
-            if(fallback.unit() != unit) fallback.unit(unit);
-            fallback.updateUnit();
-            return;
-        }
-
         updateVisuals();
-        //only autotarget if the unit supports it
-        if((targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range())) || unit.type.autoFindTarget){
-            updateTargeting();
-        }else if(attackTarget == null){
-            //if the unit does not have an attack target, is currently moving, and does not have autotargeting, stop attacking stuff
-            target = null;
-            for(var mount : unit.mounts){
-                if(mount.weapon.controllable){
-                    mount.target = null;
-                }
-            }
-        }
+        updateTargeting();
 
         if(attackTarget != null && invalid(attackTarget)){
             attackTarget = null;
@@ -204,7 +201,7 @@ public class CommandAI extends AIController{
             }
             targetPos.set(attackTarget);
 
-            if(unit.isGrounded() && attackTarget instanceof Building build && build.tile.solid() && unit.pathType() != Pathfinder.costLegs && stance != UnitStance.ram){
+            if(unit.isGrounded() && attackTarget instanceof Building build && build.tile.solid() && unit.type.pathCostId != ControlPathfinder.costIdLegs && stance != UnitStance.ram){
                 Tile best = build.findClosestEdge(unit, Tile::solid);
                 if(best != null){
                     targetPos.set(best);
@@ -473,7 +470,7 @@ public class CommandAI extends AIController{
     @Override
     public boolean retarget(){
         //retarget faster when there is an explicit target
-        return attackTarget != null ? timer.get(timerTarget, 10) : timer.get(timerTarget, 20);
+        return timer.get(timerTarget, attackTarget != null ? 10f : 20f);
     }
 
     public boolean hasCommand(){

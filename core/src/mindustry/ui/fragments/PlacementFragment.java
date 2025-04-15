@@ -265,14 +265,7 @@ public class PlacementFragment{
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;
-            full.bottom().right().visible(() -> {
-                if(state.rules.editor){
-                    //force update the mouse picking, since it otherwise would not happen
-                    updatePick(control.input);
-                }
-
-                return ui.hudfrag.shown && !state.rules.editor;
-            });
+            full.bottom().right().visible(() -> ui.hudfrag.shown);
 
             full.table(frame -> {
 
@@ -339,7 +332,7 @@ public class PlacementFragment{
                 };
 
                 //top table with hover info
-                frame.table(Tex.buttonEdge2,top -> {
+                frame.table(Tex.buttonEdge2, top -> {
                     topTable = top;
                     top.add(new Table()).growX().update(topTable -> {
 
@@ -750,12 +743,10 @@ public class PlacementFragment{
 
     /** @return the thing being hovered over. */
     public @Nullable Displayable hovered(){
-        if(!state.rules.editor){
-            Vec2 v = topTable.stageToLocalCoordinates(Core.input.mouse());
+        Vec2 v = topTable.stageToLocalCoordinates(Core.input.mouse());
 
-            //if the mouse intersects the table or the UI has the mouse, no hovering can occur
-            if(Core.scene.hasMouse() || topTable.hit(v.x, v.y, false) != null) return null;
-        }
+        //if the mouse intersects the table or the UI has the mouse, no hovering can occur
+        if(Core.scene.hasMouse(Core.input.mouseX(), Core.input.mouseY()) || topTable.hit(v.x, v.y, false) != null) return null;
 
         //check for a unit
         Unit unit = Units.closestOverlap(player.team(), Core.input.mouseWorldX(), Core.input.mouseWorldY(), 5f, u -> !u.isLocal() && u.displayable());

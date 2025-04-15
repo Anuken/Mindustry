@@ -213,6 +213,11 @@ public class Floor extends Block{
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
+    /** @return whether to index this floor by flag */
+    public boolean shouldIndex(Tile tile){
+        return true;
+    }
+
     //TODO currently broken for dynamically edited floor tiles
     /** @return true if this floor should be updated in the render loop, e.g. for effects. Do NOT overuse this! */
     public boolean updateRender(Tile tile){
@@ -317,11 +322,6 @@ public class Floor extends Block{
 
     protected TextureRegion edge(int x, int y, int rx, int ry){
         return edges(x, y)[rx][2 - ry];
-    }
-
-    @Deprecated
-    protected TextureRegion[][] edges(){
-        return edges(0, 0);
     }
 
     /** @return whether the edges from {@param other} should be drawn onto this tile **/

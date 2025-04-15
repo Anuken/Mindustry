@@ -54,6 +54,12 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
         return liq != null ? Math.min(build.liquids.get(liq) / (amount * ed * multiplier.get(build)), 1f) : 0f;
     }
 
+    @Override
+    public float efficiencyMultiplier(Building build){
+        var liq = getConsumed(build);
+        return liq == null ? 0 : liquidEfficiencyMultiplier(liq);
+    }
+
     public @Nullable Liquid getConsumed(Building build){
         if(filter.get(build.liquids.current()) && build.liquids.currentAmount() > 0){
             return build.liquids.current();
@@ -78,5 +84,9 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     @Override
     public boolean consumes(Liquid liquid){
         return filter.get(liquid);
+    }
+
+    public float liquidEfficiencyMultiplier(Liquid liquid){
+        return 1f;
     }
 }

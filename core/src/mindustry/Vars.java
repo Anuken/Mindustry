@@ -28,7 +28,6 @@ import mindustry.net.*;
 import mindustry.service.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
@@ -47,8 +46,14 @@ public class Vars implements Loadable{
     public static boolean loadedLogger = false, loadedFileLogger = false;
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
+    /** Min game version for all mods. */
+    public static final int minModGameVersion = 136;
+    /** Min game version for java mods specifically - this is higher, as Java mods have more breaking changes. */
+    public static final int minJavaModGameVersion = 147;
     /** If true, the BE server list is always used. */
     public static boolean forceBeServers = false;
+    /** If true, mod code and scripts do not run. For internal testing only. This WILL break mods if enabled. */
+    public static boolean skipModCode = false;
     /** Default accessible content types used for player-selectable icons. */
     public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
     /** Default rule environment. */
@@ -69,7 +74,7 @@ public class Vars implements Loadable{
     public static final String ghApi = "https://api.github.com";
     /** URL for discord invite. */
     public static final String discordURL = "https://discord.gg/mindustry";
-    /** URL the links to the wiki's modding guide.*/
+    /** Link to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
     /** URLs to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String[] serverJsonBeURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_be.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_be.json"};
@@ -81,6 +86,8 @@ public class Vars implements Loadable{
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<ServerGroup> defaultServers = Seq.with();
+    /** maximum openGL errors logged */
+    public static final int maxGlErrors = 100;
     /** maximum size of any block, do not change unless you know what you're doing */
     public static final int maxBlockSize = 16;
     /** maximum distance between mine and core that supports automatic transferring */
@@ -109,8 +116,6 @@ public class Vars implements Loadable{
     public static final float invasionGracePeriod = 20;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.1f;
-    /** @deprecated see {@link CoreBlock#landDuration} instead! */
-    public static final @Deprecated float coreLandDuration = 160f;
     /** size of tiles in units */
     public static final int tilesize = 8;
     /** size of one tile payload (^2) */
@@ -265,7 +270,7 @@ public class Vars implements Loadable{
     public static NetServer netServer;
     public static NetClient netClient;
 
-    public static Player player;
+    public static @Nullable Player player;
 
     @Override
     public void loadAsync(){
@@ -494,7 +499,11 @@ public class Vars implements Loadable{
 
             //router
             if(locale.toString().equals("router")){
-                bundle.debug("router");
+                I18NBundle defBundle = I18NBundle.createBundle(Core.files.internal("bundles/bundle"));
+                String router = Character.toString(Iconc.blockRouter);
+                for(String s : bundle.getKeys()){
+                    bundle.getProperties().put(s, Strings.stripColors(defBundle.get(s)).replaceAll("\\S", router));
+                }
             }
         }
     }

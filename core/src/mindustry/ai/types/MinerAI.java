@@ -1,6 +1,5 @@
 package mindustry.ai.types;
 
-import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -17,7 +16,7 @@ public class MinerAI extends AIController{
     public void updateMovement(){
         Building core = unit.closestCore();
 
-        if(!(unit.canMine()) || core == null) return;
+        if(!unit.canMine() || core == null) return;
 
         if(!unit.validMine(unit.mineTile)){
             unit.mineTile(null);
@@ -40,18 +39,16 @@ public class MinerAI extends AIController{
                 mining = false;
             }else{
                 if(timer.get(timerTarget3, 60) && targetItem != null){
-                    ore = indexer.findClosestOre(unit, targetItem);
+                    ore = null;
+                    if(unit.type.mineFloor) ore = indexer.findClosestOre(unit, targetItem);
+                    if(ore == null && unit.type.mineWalls) ore = indexer.findClosestWallOre(unit, targetItem);
                 }
 
                 if(ore != null){
                     moveTo(ore, unit.type.mineRange / 2f, 20f);
 
-                    if(ore.block() == Blocks.air && unit.within(ore, unit.type.mineRange)){
+                    if(unit.within(ore, unit.type.mineRange) && unit.validMine(ore)){
                         unit.mineTile = ore;
-                    }
-
-                    if(ore.block() != Blocks.air){
-                        mining = false;
                     }
                 }
             }

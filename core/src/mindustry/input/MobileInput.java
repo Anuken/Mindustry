@@ -227,7 +227,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         table.button(Icon.ok, Styles.clearNoneTogglei, () -> {
             if(schematicMode){
                 rebuildMode = !rebuildMode;
-            }else{
+            }else if(!player.dead()){
                 for(BuildPlan plan : selectPlans){
                     Tile tile = plan.tile();
 
@@ -261,6 +261,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).visible(() -> !selectPlans.isEmpty() || schematicMode || rebuildMode).update(i -> {
             i.getStyle().imageUp = schematicMode || rebuildMode ? Icon.wrench : Icon.ok;
             i.setChecked(rebuildMode);
+            i.setDisabled(() -> player.dead());
 
         }).name("confirmplace");
     }
@@ -279,18 +280,18 @@ public class MobileInput extends InputHandler implements GestureListener{
         group.fill(t -> {
             t.visible(this::showCancel);
             t.bottom().left();
-            t.button("@cancel", Icon.cancel, () -> {
+            t.button("@cancel", Icon.cancel, Styles.clearTogglet, () -> {
                 if(!player.dead()){
                     player.unit().clearBuilding();
                 }
                 selectPlans.clear();
                 mode = none;
                 block = null;
-            }).width(155f).height(50f).margin(12f);
+            }).width(155f).checked(b -> false).height(50f).margin(12f);
         });
 
         group.fill(t -> {
-            t.visible(() -> !showCancel() && block == null && !hasSchematic() && !state.rules.editor);
+            t.visible(() -> !hasSchematic() && !(state.isEditor() && Core.settings.getBool("editor-blocks-shown")));
             t.bottom().left();
 
             t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
@@ -299,7 +300,14 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             t.button("@command", Icon.units, Styles.clearTogglet, () -> {
                 commandMode = !commandMode;
-            }).width(155f).height(48f).margin(12f).checked(b -> commandMode);
+                if(commandMode){
+                    block = null;
+                    rebuildMode = false;
+                    mode = none;
+                }
+            }).width(155f).height(48f).margin(12f).checked(b -> commandMode).row();
+
+            t.spacerY(() -> showCancel() ? 50f : 0f).row();
 
             //for better looking insets
             t.rect((x, y, w, h) -> {
@@ -516,7 +524,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(cursor == null || Core.scene.hasMouse(screenX, screenY)) return false;
 
         //only begin selecting if the tapped block is a plan
-        selecting = hasPlan(cursor);
+        selecting = hasPlan(cursor) && !commandMode;
 
         //call tap events
         if(pointer == 0 && !selecting){
@@ -575,7 +583,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == rebuildSelect){
             rebuildArea(lineStartX, lineStartY, lastLineX, lastLineY);
             mode = none;
-        }else{
+        }else if(!player.dead()){
             Tile tile = tileAt(screenX, screenY);
 
             tryDropItems(tile == null ? null : tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
@@ -678,7 +686,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //remove if plan present
-        if(hasPlan(cursor)){
+        if(hasPlan(cursor) && !commandMode){
             removePlan(getPlan(cursor));
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
@@ -699,7 +707,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 payloadTarget = null;
 
                 //control a unit/block detected on first tap of double-tap
-                if(unitTapped != null && state.rules.possessionAllowed && unitTapped.isAI() && unitTapped.team == player.team() && !unitTapped.dead && unitTapped.type.playerControllable){
+                if(unitTapped != null && state.rules.possessionAllowed && unitTapped.isAI() && unitTapped.team == player.team() && !unitTapped.dead && unitTapped.playerControllable()){
                     Call.unitControl(player, unitTapped);
                     recentRespawnTimer = 1f;
                 }else if(buildingTapped != null && state.rules.possessionAllowed){
@@ -757,12 +765,12 @@ public class MobileInput extends InputHandler implements GestureListener{
             payloadTarget = null;
         }
 
-        if(locked || block != null || scene.hasField() || hasSchematic() || selectPlans.size > 0){
+        if(locked || block != null || scene.hasField() || hasSchematic()){
             commandMode = false;
         }
 
         //validate commanding units
-        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
+        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid() || u.team != player.team());
 
         if(!commandMode){
             commandBuildings.clear();

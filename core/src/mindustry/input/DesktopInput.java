@@ -288,7 +288,7 @@ public class DesktopInput extends InputHandler{
         }
 
         //validate commanding units
-        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
+        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid() || u.team != player.team());
 
         if(commandMode && !scene.hasField() && !scene.hasDialog()){
             if(input.keyTap(Binding.select_all_units)){
@@ -474,7 +474,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = cursor.build.getCursor();
             }
 
-            if(canRepairDerelict(cursor)){
+            if(canRepairDerelict(cursor) && !player.dead() && player.unit().canBuild()){
                 cursorType = ui.repairCursor;
             }
 

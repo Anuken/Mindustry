@@ -8,16 +8,18 @@ import arc.util.*;
 import mindustry.game.Rules.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
-public class Team implements Comparable<Team>{
+public class Team implements Comparable<Team>, Senseable{
     public final int id;
-    public final Color color;
-    public final Color[] palette;
+    public final Color color = new Color();
+    public final Color[] palette = {new Color(), new Color(), new Color()};
     public final int[] palettei = new int[3];
+    public boolean ignoreUnitCap = false;
     public String emoji = "";
     public boolean hasPalette;
     public String name;
@@ -49,6 +51,8 @@ public class Team implements Comparable<Team>{
             new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.4f, 1f), 100f * Mathf.random(0.6f, 1f), 1f));
         }
         Mathf.rand.setSeed(new Rand().nextLong());
+
+        neoplastic.ignoreUnitCap = true;
     }
 
     public static Team get(int id){
@@ -57,33 +61,21 @@ public class Team implements Comparable<Team>{
 
     protected Team(int id, String name, Color color){
         this.name = name;
-        this.color = color;
+        this.color.set(color);
         this.id = id;
 
         if(id < 6) baseTeams[id] = this;
         all[id] = this;
 
-        palette = new Color[3];
-        palette[0] = color;
-        palette[1] = color.cpy().mul(0.75f);
-        palette[2] = color.cpy().mul(0.5f);
-
-        for(int i = 0; i < 3; i++){
-            palettei[i] = palette[i].rgba();
-        }
+        setPalette(color);
     }
 
     /** Specifies a 3-color team palette. */
     protected Team(int id, String name, Color color, Color pal1, Color pal2, Color pal3){
         this(id, name, color);
 
-        palette[0] = pal1;
-        palette[1] = pal2;
-        palette[2] = pal3;
-        for(int i = 0; i < 3; i++){
-            palettei[i] = palette[i].rgba();
-        }
-        hasPalette = true;
+        setPalette(pal1, pal2, pal3);
+        this.color.set(color);
     }
 
     /** @return the core items for this team, or an empty item module.
@@ -106,8 +98,14 @@ public class Team implements Comparable<Team>{
         return data().core();
     }
 
+    /** @return whether this team has any buildings on this map; in waves mode, this is always true for the enemy team. */
     public boolean active(){
         return state.teams.isActive(this);
+    }
+
+    /** @return whether this team has any active cores. Not the same as active()! */
+    public boolean isAlive(){
+        return data().isAlive();
     }
 
     /** @return whether this team is supposed to be AI-controlled. */
@@ -125,12 +123,6 @@ public class Team implements Comparable<Team>{
         return isAI() && !rules().rtsAi;
     }
 
-    /** @deprecated There is absolutely no reason to use this. */
-    @Deprecated
-    public boolean isEnemy(Team other){
-        return this != other;
-    }
-
     public Seq<CoreBuild> cores(){
         return state.teams.cores(this);
     }
@@ -138,9 +130,25 @@ public class Team implements Comparable<Team>{
     public String localized(){
         return Core.bundle.get("team." + name + ".name", name);
     }
-    
+
     public String coloredName(){
         return emoji + "[#" + color + "]" + localized() + "[]";
+    }
+
+    public void setPalette(Color color){
+        setPalette(color, color.cpy().mul(0.75f), color.cpy().mul(0.5f));
+        hasPalette = false;
+    }
+
+    public void setPalette(Color pal1, Color pal2, Color pal3){
+        color.set(pal1);
+        palette[0].set(pal1);
+        palette[1].set(pal2);
+        palette[2].set(pal3);
+        for(int i = 0; i < 3; i++){
+            palettei[i] = palette[i].rgba();
+        }
+        hasPalette = true;
     }
 
     @Override
@@ -151,5 +159,12 @@ public class Team implements Comparable<Team>{
     @Override
     public String toString(){
         return name;
+    }
+
+    @Override
+    public double sense(LAccess sensor){
+        if(sensor == LAccess.id) return id;
+        if(sensor == LAccess.color) return color.toDoubleBits();
+        return Double.NaN;
     }
 }

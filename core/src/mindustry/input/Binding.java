@@ -85,6 +85,7 @@ public enum Binding implements KeyBind{
     menu(Vars.android ? KeyCode.back : KeyCode.escape),
     fullscreen(KeyCode.f11),
     pause(KeyCode.space),
+    skip_wave(KeyCode.unset),
     minimap(KeyCode.m),
     research(KeyCode.j),
     planet_map(KeyCode.n),

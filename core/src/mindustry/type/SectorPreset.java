@@ -1,5 +1,6 @@
 package mindustry.type;
 
+import arc.*;
 import arc.func.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -21,6 +22,8 @@ public class SectorPreset extends UnlockableContent{
     public boolean noLighting = false;
     /** If true, this is the last sector in its planetary campaign. */
     public boolean isLastSector;
+    /** If true, this sector must be unlocked before landing is permitted. */
+    public boolean requireUnlock = true;
     public boolean showSectorLandInfo = true;
     /** If true, uses this sector's launch fields instead */
     public boolean overrideLaunchDefaults = false;
@@ -54,7 +57,6 @@ public class SectorPreset extends UnlockableContent{
         this.planet = planet;
         sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector);
-        inlineDescription = false;
 
         planet.preset(sector, this);
     }
@@ -62,7 +64,7 @@ public class SectorPreset extends UnlockableContent{
     @Override
     public void loadIcon(){
         if(Icon.terrain != null){
-            uiIcon = fullIcon = Icon.terrain.getRegion();
+            uiIcon = fullIcon = Core.atlas.find("sector-" + name, Icon.terrain.getRegion());
         }
     }
 

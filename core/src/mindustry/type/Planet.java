@@ -116,6 +116,8 @@ public class Planet extends UnlockableContent{
     public boolean allowWaveSimulation = false;
     /** Whether to simulate sector invasions from enemy bases. */
     public boolean allowSectorInvasion = false;
+    /** If true, legacy launch pads can be enabled. */
+    public boolean allowLegacyLaunchPads = false;
     /** If true, sectors saves are cleared when lost. */
     public boolean clearSectorOnLose = false;
     /** Multiplier for enemy rebuild speeds; only applied in campaign (not standard rules) */
@@ -144,8 +146,10 @@ public class Planet extends UnlockableContent{
     public Seq<Planet> children = new Seq<>();
     /** Default root node shown when the tech tree is opened here. */
     public @Nullable TechNode techTree;
-    /** TODO remove? Planets that can be launched to from this one. Made mutual in init(). */
+    /** Planets that can be launched to from this one. */
     public Seq<Planet> launchCandidates = new Seq<>();
+    /** Whether interplanetary accelerators can launch to 'any' procedural sector on this planet's surface. */
+    public boolean allowSelfSectorLaunch;
     /** If true, all content in this planet's tech tree will be assigned this planet in their shownPlanets. */
     public boolean autoAssignPlanet = true;
     /** Content (usually planet-specific) that is unlocked upon landing here. */
@@ -161,11 +165,8 @@ public class Planet extends UnlockableContent{
     public CampaignRules campaignRuleDefaults = new CampaignRules();
     /** Sets up rules on game load for any sector on this planet. */
     public Cons<Rules> ruleSetter = r -> {};
-
-    /** @deprecated no-op, do not use. */
-    @Deprecated
-    public Seq<Item> itemWhitelist = new Seq<>(), hiddenItems = new Seq<>();
-
+    /** If true, RTS AI can be customized. */
+    public boolean showRtsAIRule = false;
 
     public Planet(String name, Planet parent, float radius){
         super(name);
@@ -330,7 +331,9 @@ public class Planet extends UnlockableContent{
                 sum += 0.88f;
             }
 
-            sector.threat = sector.preset == null ? Math.min(sum / 5f, 1.2f) : Mathf.clamp(sector.preset.difficulty / 10f);
+            sector.threat = sector.preset == null ?
+                Math.max(Math.min(sum / 5f, 1.2f), 0.3f) : //low threat sectors are pointless
+                Mathf.clamp(sector.preset.difficulty / 10f);
         }
     }
 
@@ -382,18 +385,6 @@ public class Planet extends UnlockableContent{
 
             updateBaseCoverage();
         }
-
-        //make planet launch candidates mutual.
-        var candidates = launchCandidates.copy();
-
-        for(Planet planet : content.planets()){
-            if(planet.launchCandidates.contains(this)){
-                candidates.addUnique(planet);
-            }
-        }
-
-        //TODO currently, mutual launch candidates are simply a nuisance.
-        //launchCandidates = candidates;
 
         clipRadius = Math.max(clipRadius, radius + atmosphereRadOut + 0.5f);
     }

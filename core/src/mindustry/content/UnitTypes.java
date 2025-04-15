@@ -98,6 +98,7 @@ public class UnitTypes{
         //region ground attack
 
         dagger = new UnitType("dagger"){{
+            researchCostMultiplier = 0.5f;
             speed = 0.5f;
             hitSize = 8f;
             health = 150;
@@ -606,11 +607,12 @@ public class UnitTypes{
         //region ground legs
 
         crawler = new UnitType("crawler"){{
+            researchCostMultiplier = 0.5f;
             aiController = SuicideAI::new;
 
             speed = 1f;
             hitSize = 8f;
-            health = 200;
+            health = 150;
             mechSideSway = 0.25f;
             range = 40f;
             ammoType = new ItemAmmoType(Items.coal);
@@ -629,12 +631,12 @@ public class UnitTypes{
                     collides = false;
                     hitSound = Sounds.explosion;
 
-                    rangeOverride = 30f;
+                    rangeOverride = 25f;
                     hitEffect = Fx.pulverize;
                     speed = 0f;
-                    splashDamageRadius = 55f;
+                    splashDamageRadius = 44f;
                     instantDisappear = true;
-                    splashDamage = 90f;
+                    splashDamage = 80f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
@@ -977,6 +979,7 @@ public class UnitTypes{
         //region air attack
 
         flare = new UnitType("flare"){{
+            researchCostMultiplier = 0.5f;
             speed = 2.7f;
             accel = 0.08f;
             drag = 0.04f;
@@ -1017,6 +1020,7 @@ public class UnitTypes{
             engineOffset = 7.8f;
             range = 140f;
             faceTarget = false;
+            autoDropBombs = true;
             armor = 3f;
             itemCapacity = 0;
             targetFlags = new BlockFlag[]{BlockFlag.factory, null};
@@ -1390,6 +1394,7 @@ public class UnitTypes{
             drag = 0.017f;
             lowAltitude = false;
             flying = true;
+            autoDropBombs = true;
             circleTarget = true;
             engineOffset = 13f;
             engineSize = 7f;
@@ -1908,6 +1913,7 @@ public class UnitTypes{
                     mixColorTo = Color.white;
 
                     hitSound = Sounds.plasmaboom;
+                    underwater = true;
 
                     ejectEffect = Fx.none;
                     hitSize = 22f;
@@ -3280,6 +3286,7 @@ public class UnitTypes{
                         }});
 
                         weapons.add(new Weapon(){{
+                            shootSound = Sounds.none;
                             shootCone = 360f;
                             mirror = false;
                             reload = 1f;
@@ -3301,7 +3308,7 @@ public class UnitTypes{
         tecta = new ErekirUnitType("tecta"){{
             drag = 0.1f;
             speed = 0.6f;
-            hitSize = 23f;
+            hitSize = 30f;
             health = 7300;
             armor = 5f;
 
@@ -3576,6 +3583,7 @@ public class UnitTypes{
 
         elude = new ErekirUnitType("elude"){{
             hovering = true;
+            canDrown = false;
             shadowElevation = 0.1f;
 
             drag = 0.07f;
@@ -3862,6 +3870,7 @@ public class UnitTypes{
                         loopSoundVolume = 0.1f;
 
                         weapons.add(new Weapon(){{
+                            shootSound = Sounds.none;
                             shootCone = 360f;
                             mirror = false;
                             reload = 1f;

@@ -30,16 +30,24 @@ public class BulletType extends Content implements Cloneable{
 
     /** Lifetime in ticks. */
     public float lifetime = 40f;
+    /** Min/max multipliers for lifetime applied to this bullet when spawned. */
+    public float lifeScaleRandMin = 1f, lifeScaleRandMax = 1f;
     /** Speed in units/tick. */
     public float speed = 1f;
+    /** Min/max multipliers for velocity applied to this bullet when spawned. */
+    public float velocityScaleRandMin = 1f, velocityScaleRandMax = 1f;
     /** Direct damage dealt on hit. */
     public float damage = 1f;
     /** Hitbox size. */
     public float hitSize = 4;
     /** Clipping hitbox. */
     public float drawSize = 40f;
+    /** Angle offset applied to bullet when spawned each time. */
+    public float angleOffset = 0f, randomAngleOffset = 0f;
     /** Drag as fraction of velocity. */
     public float drag = 0f;
+    /** Acceleration per frame. */
+    public float accel = 0f;
     /** Whether to pierce units. */
     public boolean pierce;
     /** Whether to pierce buildings. */
@@ -84,6 +92,8 @@ public class BulletType extends Content implements Cloneable{
     public float reloadMultiplier = 1f;
     /** Multiplier of how much base damage is done to tiles. */
     public float buildingDamageMultiplier = 1f;
+    /** Multiplier of how much base damage is done to force shields. */
+    public float shieldDamageMultiplier = 1f;
     /** Recoil from shooter entities. */
     public float recoil;
     /** Whether to kill the shooter when this is shot. For suicide bombers. */
@@ -141,14 +151,22 @@ public class BulletType extends Content implements Cloneable{
     public float rangeOverride = -1f;
     /** When used in a turret with multiple ammo types, this can be set to a non-zero value to influence range. */
     public float rangeChange = 0f;
+    /** When used in turrets with limitRange() applied, this adds extra range to the bullets that extends past targeting range. Only particularly relevant in vanilla. */
+    public float extraRangeMargin = 0f;
     /** Range initialized in init(). */
     public float range = 0f;
+    /** When used in a turret with multiple ammoo types, this can be set to a non-zero value to influence minRange */
+    public float minRangeChange = 0f;
     /** % of block health healed **/
     public float healPercent = 0f;
     /** flat amount of block health healed */
     public float healAmount = 0f;
+    /** Fraction of bullet damage that heals that shooter. */
+    public float lifesteal = 0f;
     /** Whether to make fire on impact */
     public boolean makeFire = false;
+    /** Whether this bullet will always hit blocks under it. */
+    public boolean hitUnder = false;
     /** Whether to create hit effects on despawn. Forced to true if this bullet has any special effects like splash damage. */
     public boolean despawnHit = false;
     /** If true, this bullet will create bullets when it hits anything, not just when it despawns. */
@@ -157,6 +175,10 @@ public class BulletType extends Content implements Cloneable{
     public boolean fragOnAbsorb = true;
     /** If true, unit armor is ignored in damage calculations. */
     public boolean pierceArmor = false;
+    /** If true, the bullet will "stick" to enemies and get deactivated on collision. */
+    public boolean sticky = false;
+    /** Extra time added to bullet when it sticks to something. */
+    public float stickyExtraLifetime = 0f;
     /** Whether status and despawnHit should automatically be set. */
     public boolean setDefaults = true;
     /** Amount of shaking produced when this bullet hits something or despawns. */
@@ -189,7 +211,7 @@ public class BulletType extends Content implements Cloneable{
     public float bulletInterval = 20f;
     /** Number of bullet spawned per interval. */
     public int intervalBullets = 1;
-    /** Random spread of interval bullets. */
+    /** Random angle added to interval bullets. */
     public float intervalRandomSpread = 360f;
     /** Angle spread between individual interval bullets. */
     public float intervalSpread = 0f;
@@ -197,6 +219,9 @@ public class BulletType extends Content implements Cloneable{
     public float intervalAngle = 0f;
     /** Use a negative value to disable interval bullet delay. */
     public float intervalDelay = -1f;
+
+    /** If true, this bullet is rendered underwater. Highly experimental! */
+    public boolean underwater = false;
 
     /** Color used for hit/despawn effects. */
     public Color hitColor = Color.white;
@@ -206,6 +231,8 @@ public class BulletType extends Content implements Cloneable{
     public Effect healEffect = Fx.healBlockFull;
     /** Bullets spawned when this bullet is created. Rarely necessary, used for visuals. */
     public Seq<BulletType> spawnBullets = new Seq<>();
+    /** Random angle spread of spawn bullets. */
+    public float spawnBulletRandomSpread = 0f;
     /** Unit spawned _instead of_ this bullet. Useful for missiles. */
     public @Nullable UnitType spawnUnit;
     /** Unit spawned when this bullet hits something or despawns due to it hitting the end of its lifetime. */
@@ -227,8 +254,12 @@ public class BulletType extends Content implements Cloneable{
     public float trailChance = -0.0001f;
     /** Uniform interval in which trail effect is spawned. */
     public float trailInterval = 0f;
+    /** Min velocity required for trail effect to spawn. */
+    public float trailMinVelocity = 0f;
     /** Trail effect that is spawned. */
     public Effect trailEffect = Fx.missileTrail;
+    /** Random offset of trail effect. */
+    public float trailSpread = 0f;
     /** Rotation/size parameter that is passed to trail. Usually, this controls size. */
     public float trailParam =  2f;
     /** Whether the parameter passed to the trail is the bullet rotation, instead of a flat value. */
@@ -241,6 +272,14 @@ public class BulletType extends Content implements Cloneable{
     public float trailWidth = 2f;
     /** If trailSinMag > 0, these values are applied as a sine curve to trail width. */
     public float trailSinMag = 0f, trailSinScl = 3f;
+    /** If true, the bullet will attempt to circle around its shooting entity. */
+    public boolean circleShooter = false;
+    /** Radius that the bullet attempts to circle at. */
+    public float circleShooterRadius = 13f;
+    /** Smooth extra radius value for circling. */
+    public float circleShooterRadiusSmooth = 10f;
+    /** Multiplier of speed that is used to adjust velocity when circling. */
+    public float circleShooterRotateSpeed = 0.3f;
 
     /** Use a negative value to disable splash damage. */
     public float splashDamageRadius = -1f;
@@ -293,6 +332,8 @@ public class BulletType extends Content implements Cloneable{
     public float weaveMag = 0f;
     /** If true, the bullet weave will randomly switch directions on spawn. */
     public boolean weaveRandom = true;
+    /** Rotation speed of the bullet velocity as it travels. */
+    public float rotateSpeed = 0f;
 
     /** Number of individual puddles created. */
     public int puddles;
@@ -392,6 +433,11 @@ public class BulletType extends Content implements Cloneable{
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
         }else if(build.team != b.team && direct){
             hit(b);
+
+            if(lifesteal > 0f && b.owner instanceof Healthc o){
+                float result = Math.max(Math.min(build.health, damage), 0);
+                o.heal(result * lifesteal);
+            }
         }
 
         handlePierce(b, initialHealth, x, y);
@@ -410,6 +456,10 @@ public class BulletType extends Content implements Cloneable{
                 health = Math.min(health, cap);
             }else{
                 health += shield;
+            }
+            if(lifesteal > 0f && b.owner instanceof Healthc o){
+                float result = Math.max(Math.min(h.health(), damage), 0);
+                o.heal(result * lifesteal);
             }
             if(pierceArmor){
                 h.damagePierce(damage);
@@ -525,7 +575,7 @@ public class BulletType extends Content implements Cloneable{
         if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && !(b.frags >= pierceFragCap && pierceFragCap > 0)){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(fragOffsetMin, fragOffsetMax);
-                float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
+                float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + fragSpread * i - (fragBullets - 1) * fragSpread / 2f;
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
             b.frags++;
@@ -565,6 +615,14 @@ public class BulletType extends Content implements Cloneable{
         if(trailLength > 0 && b.trail != null && b.trail.size() > 0){
             Fx.trailFade.at(b.x, b.y, trailWidth, trailColor, b.trail.copy());
         }
+    }
+
+    public float buildingDamage(Bullet b){
+        return b.damage() * buildingDamageMultiplier;
+    }
+
+    public float shieldDamage(Bullet b){
+        return b.damage() * shieldDamageMultiplier;
     }
 
     public void draw(Bullet b){
@@ -610,7 +668,7 @@ public class BulletType extends Content implements Cloneable{
 
         if(spawnBullets.size > 0){
             for(var bullet : spawnBullets){
-                bullet.create(b, b.x, b.y, b.rotation());
+                bullet.create(b, b.x, b.y, b.rotation() + Mathf.range(spawnBulletRandomSpread));
             }
         }
     }
@@ -664,18 +722,40 @@ public class BulletType extends Content implements Cloneable{
         if(weaveMag != 0){
             b.vel.rotateRadExact((float)Math.sin((b.time + Math.PI * weaveScale/2f) / weaveScale) * weaveMag * (weaveRandom ? (Mathf.randomSeed(b.id, 0, 1) == 1 ? -1 : 1) : 1f) * Time.delta * Mathf.degRad);
         }
+
+        if(rotateSpeed != 0){
+            b.vel.rotate(rotateSpeed * Time.delta);
+        }
+
+        if(circleShooter && b.owner instanceof Healthc h && h.isValid()){
+            Tmp.v1.set(h).sub(b);
+            Tmp.v1.rotate(90f * Mathf.lerp(0f, 1f, 1f - Mathf.clamp((Tmp.v1.len() - circleShooterRadius) / circleShooterRadiusSmooth)));
+            b.vel.add(Tmp.v1.limit(speed * circleShooterRotateSpeed * Time.delta)).limit(speed);
+        }
     }
 
     public void updateTrailEffects(Bullet b){
-        if(trailChance > 0){
+        boolean canSpawn = trailMinVelocity <= 0f || b.vel.len2() >= trailMinVelocity * trailMinVelocity;
+
+        if(trailChance > 0 && canSpawn){
             if(Mathf.chanceDelta(trailChance)){
-                trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor);
+                if(trailSpread > 0){
+                    Tmp.v1.rnd(Mathf.random(trailSpread));
+                }else{
+                    Tmp.v1.setZero();
+                }
+                trailEffect.at(b.x + Tmp.v1.x, b.y + Tmp.v1.y, trailRotation ? b.rotation() : trailParam, trailColor);
             }
         }
 
-        if(trailInterval > 0f){
+        if(trailInterval > 0f && canSpawn){
             if(b.timer(0, trailInterval)){
-                trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor);
+                if(trailSpread > 0){
+                    Tmp.v1.rnd(Mathf.random(trailSpread));
+                }else{
+                    Tmp.v1.setZero();
+                }
+                trailEffect.at(b.x + Tmp.v1.x, b.y + Tmp.v1.y, trailRotation ? b.rotation() : trailParam, trailColor);
             }
         }
     }
@@ -714,7 +794,10 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(lightningType == null){
-            lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
+            lightningType =
+                !collidesAir ? Bullets.damageLightningGround :
+                !collidesGround ? Bullets.damageLightningAir :
+                Bullets.damageLightning;
         }
 
         if(lightRadius <= -1){
@@ -752,15 +835,15 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public @Nullable Bullet create(Bullet parent, float x, float y, float angle){
-        return create(parent.owner, parent.team, x, y, angle);
+        return create(parent.owner, parent.shooter, parent.team, x, y, angle, -1, 1f, 1f, null, null, -1f, -1f);
     }
 
     public @Nullable Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
-        return create(parent.owner, parent.team, x, y, angle, velocityScl, lifeScale);
+        return create(parent.owner, parent.shooter, parent.team, x, y, angle, -1, velocityScl, lifeScale, null, null, -1f, -1f);
     }
 
     public @Nullable Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
-        return create(parent.owner(), parent.team, x, y, angle, velocityScl);
+        return create(parent.owner, parent.shooter, parent.team, x, y, angle, -1, velocityScl, 1f, null, null, -1f, -1f);
     }
 
     public @Nullable Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
@@ -783,6 +866,8 @@ public class BulletType extends Content implements Cloneable{
         @Nullable Entityc owner, @Nullable Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl,
         float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY, @Nullable Teamc target
     ){
+        angle += angleOffset + Mathf.range(randomAngleOffset);
+
         if(!Mathf.chance(createChance)) return null;
         if(ignoreSpawnAngle) angle = 0;
         if(spawnUnit != null){
@@ -818,6 +903,7 @@ public class BulletType extends Content implements Cloneable{
         Bullet bullet = Bullet.create();
         bullet.type = this;
         bullet.owner = owner;
+        bullet.shooter = (shooter == null ? owner : shooter);
         bullet.team = team;
         bullet.time = 0f;
         bullet.originX = x;
@@ -828,13 +914,13 @@ public class BulletType extends Content implements Cloneable{
         bullet.aimX = aimX;
         bullet.aimY = aimY;
 
-        bullet.initVel(angle, speed * velocityScl);
+        bullet.initVel(angle, speed * velocityScl * (velocityScaleRandMin != 1f || velocityScaleRandMax != 1f ? Mathf.random(velocityScaleRandMin, velocityScaleRandMax) : 1f));
         if(backMove){
             bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
         }else{
             bullet.set(x, y);
         }
-        bullet.lifetime = lifetime * lifetimeScl;
+        bullet.lifetime = lifetime * lifetimeScl * (lifeScaleRandMin != 1f || lifeScaleRandMax != 1f ? Mathf.random(lifeScaleRandMin, lifeScaleRandMax) : 1f);
         bullet.data = data;
         bullet.drag = drag;
         bullet.hitSize = hitSize;

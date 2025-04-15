@@ -86,7 +86,7 @@ public class DatabaseDialog extends BaseDialog{
         all.table(t -> {
             int i = 0;
             for(var content : allTabs){
-                t.button(content == Planets.sun ? Icon.eyeSmall : content instanceof Planet ? Icon.planet : new TextureRegionDrawable(content.uiIcon), Styles.clearNoneTogglei, iconMed, () -> {
+                t.button(content == Planets.sun ? Icon.eyeSmall : content instanceof Planet p ? Icon.icons.get(p.icon, Icon.commandRally) : new TextureRegionDrawable(content.uiIcon), Styles.clearNoneTogglei, iconMed, () -> {
                     tab = content;
                     rebuild();
                 }).size(50f).checked(b -> tab == content).tooltip(content == Planets.sun ? "@all" : content.localizedName).with(but -> {
@@ -101,7 +101,7 @@ public class DatabaseDialog extends BaseDialog{
             ContentType type = ContentType.all[j];
 
             Seq<UnlockableContent> array = allContent[j]
-                .select(c -> c instanceof UnlockableContent u && !u.isHidden() && (tab == Planets.sun || u.allDatabaseTabs || u.databaseTabs.contains(tab)) &&
+                .select(c -> c instanceof UnlockableContent u && !u.isHidden() && !u.hideDatabase && (tab == Planets.sun || u.allDatabaseTabs || u.databaseTabs.contains(tab)) &&
                     (text.isEmpty() || u.localizedName.toLowerCase().contains(text))).as();
 
             if(array.size == 0) continue;
@@ -119,7 +119,7 @@ public class DatabaseDialog extends BaseDialog{
                 for(int i = 0; i < array.size; i++){
                     UnlockableContent unlock = array.get(i);
 
-                    Image image = unlocked(unlock) ? new Image(unlock.uiIcon).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
+                    Image image = unlocked(unlock) ? new Image(new TextureRegionDrawable(unlock.uiIcon), mobile ? Color.white : Color.lightGray).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
 
                     //banned cross
                     if(state.isGame() && (unlock instanceof UnitType u && u.isBanned() || unlock instanceof Block b && state.rules.isBanned(b))){
