@@ -5098,6 +5098,10 @@ public class Blocks{
                         shootOnDeath = true;
                         shake = 10f;
                         bullet = new ExplosionBulletType(400f, 120f){{
+                            //stats must be mirrored to the bullet that the unit uses
+                            reloadMultiplier = 0.8f;
+                            ammoMultiplier = 5f;
+
                             hitColor = engineColor;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;
@@ -5108,7 +5112,6 @@ public class Blocks{
                             collidesAir = false;
                             buildingDamageMultiplier = 0.1f;
 
-                            ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
                             fragBullets = 7;
                             fragBullet = new ArtilleryBulletType(3.4f, 32){{
@@ -5191,13 +5194,17 @@ public class Blocks{
                         shootOnDeath = true;
                         shake = 10f;
                         bullet = new ExplosionBulletType(300f, 40f){{
+                            //mirror stats
+                            ammoMultiplier = 1f;
+                            rangeChange = -8f*9f;
+                            reloadMultiplier = 0.9f;
+
                             hitColor = engineColor;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosionSmall);
 
                             collidesAir = false;
                             buildingDamageMultiplier = 0.1f;
 
-                            ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
                             fragBullets = 5;
                             fragRandomSpread = 0f;
