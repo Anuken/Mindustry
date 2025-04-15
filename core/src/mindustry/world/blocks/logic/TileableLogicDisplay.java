@@ -18,6 +18,7 @@ import static mindustry.Vars.*;
 public class TileableLogicDisplay extends LogicDisplay{
     protected static final Seq<TileableLogicDisplayBuild> queue = new Seq<>();
     protected static final Seq<TileableLogicDisplayBuild> displays = new Seq<>();
+    protected static final ObjectSet<FrameBuffer> buffers = new ObjectSet<>();
     protected static final IntSet processed = new IntSet();
 
     //in tiles
@@ -84,21 +85,52 @@ public class TileableLogicDisplay extends LogicDisplay{
             }
         }
 
+        if(root.prevBuffers == null){
+            root.prevBuffers = new Seq<>();
+        }
+
+        //add all new buffers
+        buffers.clear();
+        for(var member : displays){
+            if(member.buffer != null && buffers.add(member.buffer)){
+                root.prevBuffers.add(new MergeBuffer(member.buffer, member.originX, member.originY, member.tilesWidth, member.tilesHeight));
+            }
+        }
+
         int tilesWidth = topX - botX + 1, tilesHeight = topY - botY + 1;
 
         //the new root display has been assigned
         for(var member : displays){
+            member.needsUpdate = false;
             member.rootDisplay = root;
             member.tilesWidth = tilesWidth;
             member.tilesHeight = tilesHeight;
             member.originX = botX;
             member.originY = botY;
+            member.buffer = null;
+        }
+    }
 
-            //TODO: preserve buffers later
-            if(member.buffer != null){
-                member.buffer.dispose();
-                member.buffer = null;
-            }
+    static class MergeBuffer{
+        FrameBuffer buffer;
+        int x, y, width, height;
+
+        MergeBuffer(FrameBuffer buffer, int x, int y, int width, int height){
+            this.buffer = buffer;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+
+        @Override
+        public String toString(){
+            return "MergeBuffer{" +
+            "x=" + x +
+            ", y=" + y +
+            ", width=" + width +
+            ", height=" + height +
+            '}';
         }
     }
 
@@ -107,8 +139,10 @@ public class TileableLogicDisplay extends LogicDisplay{
         public TileableLogicDisplayBuild rootDisplay = this;
         //size of display area
         public int tilesWidth = 1, tilesHeight = 1, originX, originY;
+        public @Nullable Seq<MergeBuffer> prevBuffers;
 
         public int bits = 0;
+        public boolean needsUpdate = false;
 
         @Override
         public void display(Table table){
@@ -135,6 +169,11 @@ public class TileableLogicDisplay extends LogicDisplay{
 
         @Override
         public void draw(){
+            if(needsUpdate){
+                needsUpdate = false;
+                linkDisplays(this);
+            }
+
             Draw.rect(backRegion, x, y);
 
             //don't even bother processing anything when displays are off.
@@ -144,9 +183,33 @@ public class TileableLogicDisplay extends LogicDisplay{
                 Draw.draw(Draw.z(), () -> {
                     if(buffer == null && tilesWidth <= maxDisplayDimensions && tilesHeight <= maxDisplayDimensions){
                         buffer = new FrameBuffer(32 * tilesWidth, 32 * tilesHeight);
+
+                        Tmp.m1.set(Draw.proj());
+                        Tmp.m2.set(Draw.trans());
+                        Draw.proj(0, 0, buffer.getWidth(), buffer.getHeight());
+
                         //clear the buffer - some OSs leave garbage in it
                         buffer.begin(Pal.darkerMetal);
+                        if(prevBuffers != null){
+                            for(var other : prevBuffers){
+                                Draw.rect(Draw.wrap(other.buffer.getTexture()), (other.x - originX) * 32 + other.buffer.getWidth()/2f, (other.y - originY) * 32 + other.buffer.getHeight()/2f, other.buffer.getWidth(), -other.buffer.getHeight());
+                                Draw.flush();
+                            }
+                        }
+
                         buffer.end();
+                        Draw.proj(Tmp.m1);
+                        Draw.trans(Tmp.m2);
+                        Draw.reset();
+                    }
+
+                    if(prevBuffers != null){
+                        for(var other : prevBuffers){
+                            if(!other.buffer.isDisposed()){
+                                other.buffer.dispose();
+                            }
+                        }
+                        prevBuffers.clear();
                     }
                 });
 
@@ -195,7 +258,7 @@ public class TileableLogicDisplay extends LogicDisplay{
         public void onProximityAdded(){
             super.onProximityAdded();
 
-            linkDisplays(this);
+            needsUpdate = true;
 
             updateOthers();
         }
@@ -208,7 +271,7 @@ public class TileableLogicDisplay extends LogicDisplay{
 
             for(var other : proximity){
                 if(other instanceof TileableLogicDisplayBuild tl && !processed.contains(tl.id)){
-                    linkDisplays(tl);
+                    tl.needsUpdate = true;
                 }
             }
 
