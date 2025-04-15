@@ -4,11 +4,14 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
@@ -19,6 +22,27 @@ public class TileableLogicDisplay extends LogicDisplay{
 
     //in tiles
     public int maxDisplayDimensions = 12;
+    public @Load(value = "@-#", length = 47) TextureRegion[] tileRegion;
+    public @Load("@-back") TextureRegion backRegion;
+
+    static final int[] bitmasks = {
+    39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
+    38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
+    39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
+    38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
+    3,  4,  3,  4, 15, 40, 15, 20,  3,  4,  3,  4, 15, 40, 15, 20,
+    5, 28,  5, 28, 29, 10, 29, 23,  5, 28,  5, 28, 31, 11, 31, 32,
+    3,  4,  3,  4, 15, 40, 15, 20,  3,  4,  3,  4, 15, 40, 15, 20,
+    2, 30,  2, 30,  9, 46,  9, 22,  2, 30,  2, 30, 14, 44, 14,  6,
+    39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
+    38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
+    39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
+    38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
+    3,  0,  3,  0, 15, 42, 15, 12,  3,  0,  3,  0, 15, 42, 15, 12,
+    5,  8,  5,  8, 29, 35, 29, 33,  5,  8,  5,  8, 31, 34, 31,  7,
+    3,  0,  3,  0, 15, 42, 15, 12,  3,  0,  3,  0, 15, 42, 15, 12,
+    2,  1,  2,  1,  9, 45,  9, 19,  2,  1,  2,  1, 14, 18, 14, 13,
+    };
 
     public TileableLogicDisplay(String name){
         super(name);
@@ -84,6 +108,8 @@ public class TileableLogicDisplay extends LogicDisplay{
         //size of display area
         public int tilesWidth = 1, tilesHeight = 1, originX, originY;
 
+        public int bits = 0;
+
         @Override
         public void display(Table table){
             super.display(table);
@@ -94,8 +120,22 @@ public class TileableLogicDisplay extends LogicDisplay{
         }
 
         @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+
+            bits = 0;
+
+            for(int i = 0; i < 8; i++){
+                Tile other = tile.nearby(Geometry.d8(i));
+                if(other != null && other.block() == block && other.team() == team){
+                    bits |= (1 << i);
+                }
+            }
+        }
+
+        @Override
         public void draw(){
-            Draw.rect(block.region, x, y);
+            Draw.rect(backRegion, x, y);
 
             //don't even bother processing anything when displays are off.
             if(!Vars.renderer.drawDisplays) return;
@@ -113,6 +153,9 @@ public class TileableLogicDisplay extends LogicDisplay{
                 processCommands();
             }
 
+            Draw.z(Layer.block + 0.001f);
+
+            //TODO this is slow, many texture switches
             Draw.blend(Blending.disabled);
             Draw.draw(Draw.z(), () -> {
                 if(rootDisplay.buffer != null){
@@ -124,6 +167,10 @@ public class TileableLogicDisplay extends LogicDisplay{
                 }
             });
             Draw.blend();
+
+            Draw.z(Layer.block + 0.002f);
+
+            Draw.rect(tileRegion[bitmasks[bits]], x, y);
         }
 
         @Override
@@ -135,11 +182,22 @@ public class TileableLogicDisplay extends LogicDisplay{
             }
         }
 
+        public void updateOthers(){
+            for(int i = 0; i < 4; i++){
+                Tile other = tile.nearby(Geometry.d8edge(i));
+                if(other != null && other.block() == block && other.team() == team){
+                    other.build.onProximityUpdate();
+                }
+            }
+        }
+
         @Override
         public void onProximityAdded(){
             super.onProximityAdded();
 
             linkDisplays(this);
+
+            updateOthers();
         }
 
         @Override
@@ -153,6 +211,8 @@ public class TileableLogicDisplay extends LogicDisplay{
                     linkDisplays(tl);
                 }
             }
+
+            updateOthers();
         }
 
         public boolean isRoot(){
