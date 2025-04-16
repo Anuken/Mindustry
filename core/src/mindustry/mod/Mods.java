@@ -366,7 +366,7 @@ public class Mods implements Loadable{
             }
             Log.debug("Time to generate icons: @", Time.elapsed());
 
-            //dispose old atlas data
+            //replace old atlas data
             Core.atlas = packer.flush(filter, new TextureAtlas(){
                 PixmapRegion fake = new PixmapRegion(new Pixmap(1, 1));
                 boolean didWarn = false;
@@ -392,6 +392,8 @@ public class Mods implements Loadable{
             Log.debug("Total pages: @", Core.atlas.getTextures().size);
 
             packer.printStats();
+
+            Events.fire(new AtlasPackEvent());
         }
 
         packer.dispose();
@@ -1151,7 +1153,7 @@ public class Mods implements Loadable{
                 !skipModLoading() &&
                 Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
                 Version.isAtLeast(meta.minGameVersion) &&
-                (meta.getMinMajor() >= 136 || headless) &&
+                (meta.getMinMajor() >= minJavaModGameVersion || headless) &&
                 !skipModCode &&
                 initialize
             ){
@@ -1249,7 +1251,7 @@ public class Mods implements Loadable{
 
         /** @return whether this is a java class mod. */
         public boolean isJava(){
-            return meta.java || main != null;
+            return meta.java || main != null || meta.main != null;
         }
 
         @Nullable
@@ -1292,10 +1294,9 @@ public class Mods implements Loadable{
             return blacklistedMods.contains(name);
         }
 
-        /** @return whether this mod is outdated, e.g. not compatible with v7. */
+        /** @return whether this mod is outdated, i.e. not compatible with v8. */
         public boolean isOutdated(){
-            //must be at least 136 to indicate v7 compat
-            return getMinMajor() < 136;
+            return getMinMajor() < (isJava() ? minJavaModGameVersion : minModGameVersion);
         }
 
         public int getMinMajor(){
@@ -1396,11 +1397,6 @@ public class Mods implements Loadable{
         public boolean pregenerated;
         /** If set, load the mod content in this order by content names */
         public String[] contentOrder;
-
-        public String displayName(){
-            //useless, kept for legacy reasons
-            return displayName;
-        }
 
         public String shortDescription(){
             return Strings.truncate(subtitle == null ? (description == null || description.length() > maxModSubtitleLength ? "" : description) : subtitle, maxModSubtitleLength, "...");

@@ -83,7 +83,7 @@ public class Router extends Block{
             items.add(item, 1);
             lastItem = item;
             time = 0f;
-            lastInput = source.tile();
+            lastInput = source.tile;
         }
 
         @Override

@@ -11,10 +11,11 @@ import mindustry.gen.*;
 
 public class PhysicsProcess implements AsyncProcess{
     public static final int
-    layers = 3,
+    layers = 4,
     layerGround = 0,
     layerLegs = 1,
-    layerFlying = 2;
+    layerFlying = 2,
+    layerUnderwater = 3;
 
     private PhysicsWorld physics;
     private Seq<PhysicRef> refs = new Seq<>(false);
@@ -153,15 +154,15 @@ public class PhysicsProcess implements AsyncProcess{
 
             for(int i = 0; i < bodySize; i++){
                 PhysicsBody body = bodyItems[i];
+                if(body.layer < 0) continue;
                 body.collided = false;
                 trees[body.layer].insert(body);
             }
 
             for(int i = 0; i < bodySize; i++){
                 PhysicsBody body = bodyItems[i];
-
                 //for clients, the only body that collides is the local one; all other physics simulations are handled by the server.
-                if(!body.local) continue;
+                if(!body.local || body.layer < 0) continue;
 
                 body.hitbox(rect);
 

@@ -48,10 +48,6 @@ public class Item extends UnlockableContent implements Senseable{
     public boolean buildable = true;
     public boolean hidden = false;
 
-    /** @deprecated no-op, do not use. */
-    @Deprecated
-    public @Nullable Planet[] hiddenOnPlanets;
-
     public Item(String name, Color color){
         super(name);
         this.color = color;

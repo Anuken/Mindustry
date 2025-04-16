@@ -207,7 +207,7 @@ public class PayloadBlock extends Block{
             payVector.approach(dest, payloadSpeed * delta());
 
             Building front = front();
-            boolean canDump = front == null || !front.tile().solid();
+            boolean canDump = front == null || !front.tile.solid();
             boolean canMove = front != null && (front.block.outputsPayload || front.block.acceptsPayload);
 
             if(canDump && !canMove){

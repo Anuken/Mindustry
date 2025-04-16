@@ -36,7 +36,7 @@ Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platfo
 [h2]Hadjárat[/h2]
 
 [list]
-[*] Játssz végig a két különböző bolygó hadjáratait
+[*] Játszd végig a két különböző bolygó hadjáratait
 [*] Hódítsd meg a Serpulo és az Erekir bolygót, miközben 35 kézzel készített pályán és 250+ procedurálisan előállított szektoron keresztül haladsz
 [*] Foglalj el területeket és építs gyárakat, hogy nyersanyagokat termelhess, miközben más szektorokban játszol
 [*] Védd meg a szektorokat az időszakos invázióktól

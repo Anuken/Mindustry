@@ -49,6 +49,7 @@ public class NuclearReactor extends PowerGenerator{
         hasItems = true;
         hasLiquids = true;
         rebuildable = false;
+        emitLight = true;
         flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
         schematicPriority = -5;
         envEnabled = Env.any;

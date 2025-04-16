@@ -227,7 +227,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         table.button(Icon.ok, Styles.clearNoneTogglei, () -> {
             if(schematicMode){
                 rebuildMode = !rebuildMode;
-            }else{
+            }else if(!player.dead()){
                 for(BuildPlan plan : selectPlans){
                     Tile tile = plan.tile();
 
@@ -261,6 +261,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).visible(() -> !selectPlans.isEmpty() || schematicMode || rebuildMode).update(i -> {
             i.getStyle().imageUp = schematicMode || rebuildMode ? Icon.wrench : Icon.ok;
             i.setChecked(rebuildMode);
+            i.setDisabled(() -> player.dead());
 
         }).name("confirmplace");
     }
@@ -290,7 +291,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(() -> !hasSchematic() && !state.rules.editor);
+            t.visible(() -> !hasSchematic() && !(state.isEditor() && Core.settings.getBool("editor-blocks-shown")));
             t.bottom().left();
 
             t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
@@ -582,7 +583,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == rebuildSelect){
             rebuildArea(lineStartX, lineStartY, lastLineX, lastLineY);
             mode = none;
-        }else{
+        }else if(!player.dead()){
             Tile tile = tileAt(screenX, screenY);
 
             tryDropItems(tile == null ? null : tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
@@ -706,7 +707,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 payloadTarget = null;
 
                 //control a unit/block detected on first tap of double-tap
-                if(unitTapped != null && state.rules.possessionAllowed && unitTapped.isAI() && unitTapped.team == player.team() && !unitTapped.dead && unitTapped.type.playerControllable){
+                if(unitTapped != null && state.rules.possessionAllowed && unitTapped.isAI() && unitTapped.team == player.team() && !unitTapped.dead && unitTapped.playerControllable()){
                     Call.unitControl(player, unitTapped);
                     recentRespawnTimer = 1f;
                 }else if(buildingTapped != null && state.rules.possessionAllowed){
