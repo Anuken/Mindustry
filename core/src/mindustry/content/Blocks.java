@@ -6597,7 +6597,7 @@ public class Blocks{
         }};
 
         logicDisplayTile = new TileableLogicDisplay("tile-logic-display"){{
-            requirements(Category.logic, with(Items.lead, 10, Items.silicon, 10, Items.metaglass, 10, Items.phaseFabric, 6));
+            requirements(Category.logic, with(Items.lead, 8, Items.silicon, 8, Items.metaglass, 8, Items.phaseFabric, 3));
         }};
 
         canvas = new CanvasBlock("canvas"){{
