@@ -4494,7 +4494,7 @@ public class Blocks{
                         splashDamageRadius = 10f;
                         splashDamage = 40f;
                         pierceArmor = true;
-                        backColor = frontColor = Color.valueOf("ab8ec5")
+                        backColor = frontColor = Color.valueOf("ab8ec5");
                         despawnEffect = Fx.hitBulletColor;
                         shootEffect = Fx.massiveExplosion;
                     }};
