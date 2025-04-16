@@ -4642,7 +4642,7 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
             Items.silicon, new BasicBulletType(){{
-                damage = 35;
+                damage = 37;
                 homingPower = 0.045f;
                 speed = 9f;
                 width = height = 16;
