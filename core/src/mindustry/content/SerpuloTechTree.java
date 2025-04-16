@@ -169,12 +169,15 @@ public class SerpuloTechTree{
                             });
                         });
 
-                        //logic disabled until further notice
                         node(microProcessor, () -> {
                             node(switchBlock, () -> {
                                 node(message, () -> {
                                     node(logicDisplay, () -> {
                                         node(largeLogicDisplay, () -> {
+
+                                        });
+
+                                        node(logicDisplayTile, () -> {
 
                                         });
                                     });
