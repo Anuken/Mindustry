@@ -4633,6 +4633,7 @@ public class Blocks{
             Items.thorium, new BasicBulletType(){{
                 damage = 90;
                 reloadMultiplier = 0.85f;
+                rangeChange = -120f;
                 speed = 9.5f;
                 width = height = 16;
                 pierceCap = 2;
@@ -4647,7 +4648,7 @@ public class Blocks{
                 frontColor = Color.white;
                 backColor = trailColor = hitColor = Color.valueOf("e89dbd");
                 trailChance = 0.44f;
-                ammoMultiplier = 2f;
+                ammoMultiplier = 1f;
 
                 lifetime = 34f;
                 rotationOffset = 90f;
@@ -4657,10 +4658,8 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
             Items.silicon, new BasicBulletType(){{
-                damage = 35;
+                damage = 37;
                 homingPower = 0.045f;
-
-                reloadMultiplier = 0.9f;
                 speed = 9f;
                 width = height = 16;
                 shrinkY = 0.3f;
@@ -4673,7 +4672,7 @@ public class Blocks{
                 smokeEffect = Fx.shootSmokeDisperse;
                 frontColor = Pal.graphiteAmmoFront;
                 backColor = trailColor = hitColor = Pal.graphiteAmmoBack;
-                ammoMultiplier = 3f;
+                ammoMultiplier = 4f;
 
                 lifetime = 34f;
                 rotationOffset = 90f;
