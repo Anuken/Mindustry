@@ -4456,8 +4456,9 @@ public class Blocks{
                 height = 19f;
                 width = 17f;
                 splashDamageRadius = 55f;
-                splashDamage = 650f;
+                splashDamage = 700f;
                 rangeChange = 10f*8f;
+                reloadMultiplier = 0.8f;
                 scaledSplashDamage = true;
                 backColor = hitColor = trailColor = Color.valueOf("ab8ec5");
                 frontColor = Color.white;
@@ -4482,6 +4483,21 @@ public class Blocks{
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.2f;
+
+                fragBullets = 15;
+                    fragBullet = new ArtilleryBulletType(2.5f, 15, "shell"){{
+                        width = 10f;
+                        height = 12f;
+                        shrinkY = 1f;
+                        lifetime = 20f;
+                        knockback = 0.5f;
+                        splashDamageRadius = 10f;
+                        splashDamage = 40f;
+                        pierceArmor = true;
+                        backColor = frontColor = Color.valueOf("ab8ec5")
+                        despawnEffect = Fx.hitBulletColor;
+                        shootEffect = Fx.massiveExplosion;
+                    }};
             }},
             Items.oxide, new ArtilleryBulletType(2.5f, 300, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosionLarge, Fx.titanSmokeLarge, Fx.smokeAoeCloud);
@@ -4493,7 +4509,7 @@ public class Blocks{
                 reloadMultiplier = 0.8f;
                 splashDamageRadius = 110f;
                 rangeChange = 8f;
-                splashDamage = 300f;
+                splashDamage = 200f;
                 scaledSplashDamage = true;
                 hitColor = backColor = trailColor = Color.valueOf("a0b380");
                 frontColor = Color.valueOf("e4ffd6");
@@ -4523,7 +4539,7 @@ public class Blocks{
                     lifetime = 60f * 2.5f;
                     bulletInterval = 20f;
                     intervalBullet = new EmptyBulletType(){{
-                        splashDamage = 30f;
+                        splashDamage = 20f;
                         collidesGround = true;
                         collidesAir = false;
                         collides = false;
