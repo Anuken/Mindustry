@@ -4453,9 +4453,10 @@ public class Blocks{
                 despawnEffect = Fx.none;
                 knockback = 3f;
                 lifetime = 140f;
+                speed = 2f;
                 height = 19f;
                 width = 17f;
-                splashDamageRadius = 55f;
+                splashDamageRadius = 28f;
                 splashDamage = 700f;
                 rangeChange = 10f*8f;
                 reloadMultiplier = 0.8f;
@@ -4471,9 +4472,10 @@ public class Blocks{
                 trailWidth = 3.35f;
                 trailSinScl = 2.5f;
                 trailSinMag = 0.5f;
-                trailEffect = Fx.disperseTrail;
+                trailEffect = Fx.none;
                 trailInterval = 2f;
                 despawnShake = 7f;
+                
 
                 shootEffect = Fx.shootTitan;
                 smokeEffect = Fx.shootSmokeTitan;
@@ -4485,13 +4487,13 @@ public class Blocks{
                 buildingDamageMultiplier = 0.2f;
 
                 fragBullets = 15;
-                    fragBullet = new ArtilleryBulletType(2.5f, 15, "shell"){{
+                    fragBullet = new BasicBulletType(2.5f, 15, "shell"){{
                         width = 10f;
                         height = 12f;
                         shrinkY = 1f;
                         lifetime = 20f;
                         knockback = 0.5f;
-                        splashDamageRadius = 10f;
+                        splashDamageRadius = 8f;
                         splashDamage = 40f;
                         pierceArmor = true;
                         backColor = frontColor = Color.valueOf("ab8ec5");
