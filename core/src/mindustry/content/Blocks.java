@@ -4616,7 +4616,7 @@ public class Blocks{
             }},
             Items.thorium, new BasicBulletType(){{
                 damage = 75;
-                reloadMultiplier = 0.85f;
+                reloadMultiplier = 0.80f;
                 speed = 9.5f;
                 width = height = 16;
                 pierceCap = 2;
