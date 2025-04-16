@@ -4615,8 +4615,9 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
             Items.thorium, new BasicBulletType(){{
-                damage = 75;
-                reloadMultiplier = 0.80f;
+                damage = 90;
+                reloadMultiplier = 0.85f;
+                rangeChange = 8f / 15f;
                 speed = 9.5f;
                 width = height = 16;
                 pierceCap = 2;
@@ -4633,7 +4634,7 @@ public class Blocks{
                 trailChance = 0.44f;
                 ammoMultiplier = 1f;
 
-                lifetime = 34f;
+                lifetime = 27f;
                 rotationOffset = 90f;
                 trailRotation = true;
                 trailEffect = Fx.disperseTrail;
