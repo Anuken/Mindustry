@@ -4833,8 +4833,8 @@ public class Blocks{
                     width = 9f;
                     hitSize = 5f;
                     height = 15f;
-                    pierce = true;
-                    lifetime = 35f;
+                    pierceCap = 3;
+                    lifetime = 28f;
                     pierceBuilding = true;
                     hitColor = backColor = trailColor = Pal.surge;
                     frontColor = Color.white;
@@ -4847,7 +4847,7 @@ public class Blocks{
                         lifetime = 10f;
                     }};
                     buildingDamageMultiplier = 0.3f;
-                    homingPower = 0.2f;
+                    homingPower = 0.1f;
                 }};
 
                 bulletInterval = 3f;
