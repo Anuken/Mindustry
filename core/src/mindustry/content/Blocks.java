@@ -2050,7 +2050,7 @@ public class Blocks{
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
-            requirements(Category.distribution, with(Items.beryllium, 20));
+            requirements(Category.distribution, with(Items.beryllium, 15));
             health = 90;
             speed = 4f;
             buildCostMultiplier = 2f;
@@ -4367,6 +4367,7 @@ public class Blocks{
             }};
             outlineColor = Pal.darkOutline;
 
+            liquidCapacity = 50f;
             liquidConsumed = 10f / 60f;
             targetInterval = 5f;
             newTargetInterval = 30f;
