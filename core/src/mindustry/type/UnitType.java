@@ -163,6 +163,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     circleTarget = false,
     /** AI flag: if true, this unit will drop bombs under itself even when it is not next to its 'real' target. used for carpet bombers */
     autoDropBombs = false,
+    /** For the mobile version only: If false, this unit will not auto-target buildings to attach when a player controls it. */
+    targetBuildingsMobile = true,
     /** if true, this unit can boost into the air if a player/processors controls it*/
     canBoost = false,
     /** if true, this unit will always boost when using builder AI */
