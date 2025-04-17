@@ -65,6 +65,13 @@ public class LogicDisplay extends Block{
         stats.add(Stat.displaySize, "@x@", displaySize, displaySize);
     }
 
+    @Override
+    public void init(){
+        super.init();
+
+        clipSize = Math.max(clipSize, scaleFactor * Draw.scl * displaySize);
+    }
+    
     public class LogicDisplayBuild extends Building{
         public @Nullable FrameBuffer buffer;
         public float color = Color.whiteFloatBits;
