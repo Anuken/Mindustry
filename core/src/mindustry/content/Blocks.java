@@ -4448,12 +4448,11 @@ public class Blocks{
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.3f;
             }},
-            Items.carbide, new ArtilleryBulletType(2.5f, 500, "shell"){{
+            Items.carbide, new ArtilleryBulletType(0.5f, 500, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                 despawnEffect = Fx.none;
                 knockback = 3f;
                 lifetime = 140f;
-                speed = 1.5f;
                 height = 22f;
                 width = 15f;
                 splashDamageRadius = 28f;
@@ -4486,8 +4485,8 @@ public class Blocks{
                 buildingDamageMultiplier = 0.2f;
 
                 fragBullets = 15;
-                    fragBullet = new BasicBulletType(2.5f, 30, "shell"){{
-                        hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
+                    fragBullet = new BasicBulletType(0.5f, 30, "shell"){{
+                        hitEffect = Fx.titanExplosion;
                         shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosionSmall);
                         despawnEffect = Fx.hitBulletColor;
                         width = 10f;
