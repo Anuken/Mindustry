@@ -22,7 +22,7 @@ public class TileableLogicDisplay extends LogicDisplay{
     protected static final IntSet processed = new IntSet();
 
     //in tiles
-    public int maxDisplayDimensions = 12;
+    public int maxDisplayDimensions = 16;
     public @Load(value = "@-#", length = 47) TextureRegion[] tileRegion;
     public @Load("@-back") TextureRegion backRegion;
 
@@ -221,6 +221,7 @@ public class TileableLogicDisplay extends LogicDisplay{
 
             Draw.z(Layer.block + offset);
 
+            //TODO: for square regions, this can be optimized to draw only one thing
             Draw.blend(Blending.disabled);
             Draw.draw(Draw.z(), () -> {
                 if(rootDisplay.buffer != null){
