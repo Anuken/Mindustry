@@ -248,6 +248,21 @@ public class ServerControl implements ApplicationListener{
                     }
                 }
             }
+
+            if(state.isGame()){ //run this only if the server's actually hosting
+                if(Config.autoPause.bool()){
+                    if(Groups.player.isEmpty()){
+                        autoPaused = true;
+                        state.set(State.paused);
+                    }else if(autoPaused){
+                        autoPaused = false;
+                        state.set(State.playing);
+                    }
+                }else if(autoPaused && Vars.state.isPaused()){ //unpause when the config is disabled
+                    state.set(State.playing);
+                    autoPaused = false;
+                }
+            }
         });
 
         Events.run(Trigger.socketConfigChanged, () -> {
@@ -257,21 +272,6 @@ public class ServerControl implements ApplicationListener{
 
         Events.on(ResetEvent.class, e -> {
             autoPaused = false;
-        });
-
-        Events.run(Trigger.update, () -> {
-            if(Config.autoPause.bool()){
-                if(Groups.player.isEmpty()){
-                    autoPaused = true;
-                    state.set(State.paused);
-                }else if(autoPaused){
-                    autoPaused = false;
-                    state.set(State.playing);
-                }
-            }else if(autoPaused && Vars.state.isPaused()){ //unpause when the config is disabled
-                state.set(State.playing);
-                autoPaused = false;
-            }
         });
 
         Events.on(PlayEvent.class, e -> {
