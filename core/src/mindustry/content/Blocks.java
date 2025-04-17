@@ -4467,7 +4467,7 @@ public class Blocks{
 
                 status = StatusEffects.blasted;
 
-                trailLength = 30;
+                trailLength = 32;
                 trailWidth = 3.35f;
                 trailSinScl = 2.5f;
                 trailSinMag = 0.5f;
