@@ -4453,9 +4453,9 @@ public class Blocks{
                 despawnEffect = Fx.none;
                 knockback = 3f;
                 lifetime = 140f;
-                speed = 2f;
-                height = 19f;
-                width = 17f;
+                speed = 1.5f;
+                height = 22f;
+                width = 15f;
                 splashDamageRadius = 28f;
                 splashDamage = 700f;
                 rangeChange = 10f*8f;
@@ -4472,10 +4472,9 @@ public class Blocks{
                 trailWidth = 3.35f;
                 trailSinScl = 2.5f;
                 trailSinMag = 0.5f;
-                trailEffect = Fx.none;
+                trailEffect = Fx.disperseTrail;
                 trailInterval = 2f;
                 despawnShake = 7f;
-                
 
                 shootEffect = Fx.shootTitan;
                 smokeEffect = Fx.shootSmokeTitan;
@@ -4487,18 +4486,19 @@ public class Blocks{
                 buildingDamageMultiplier = 0.2f;
 
                 fragBullets = 15;
-                    fragBullet = new BasicBulletType(2.5f, 15, "shell"){{
+                    fragBullet = new BasicBulletType(2.5f, 30, "shell"){{
+                        hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke)
+                        shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosionSmall);
+                        despawnEffect = Fx.hitBulletColor;
                         width = 10f;
                         height = 12f;
                         shrinkY = 1f;
                         lifetime = 20f;
                         knockback = 0.5f;
-                        splashDamageRadius = 8f;
+                        splashDamageRadius = 16f;
                         splashDamage = 40f;
                         pierceArmor = true;
-                        backColor = frontColor = Color.valueOf("ab8ec5");
-                        despawnEffect = Fx.hitBulletColor;
-                        shootEffect = Fx.massiveExplosion;
+                        backColor = frontColor = hitColor = Color.valueOf("ab8ec5");
                     }};
             }},
             Items.oxide, new ArtilleryBulletType(2.5f, 300, "shell"){{
@@ -4511,7 +4511,7 @@ public class Blocks{
                 reloadMultiplier = 0.8f;
                 splashDamageRadius = 110f;
                 rangeChange = 8f;
-                splashDamage = 200f;
+                splashDamage = 250f;
                 scaledSplashDamage = true;
                 hitColor = backColor = trailColor = Color.valueOf("a0b380");
                 frontColor = Color.valueOf("e4ffd6");
@@ -4541,7 +4541,7 @@ public class Blocks{
                     lifetime = 60f * 2.5f;
                     bulletInterval = 20f;
                     intervalBullet = new EmptyBulletType(){{
-                        splashDamage = 20f;
+                        splashDamage = 25f;
                         collidesGround = true;
                         collidesAir = false;
                         collides = false;
