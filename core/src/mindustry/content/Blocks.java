@@ -4487,7 +4487,7 @@ public class Blocks{
 
                 fragBullets = 15;
                     fragBullet = new BasicBulletType(2.5f, 30, "shell"){{
-                        hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke)
+                        hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                         shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosionSmall);
                         despawnEffect = Fx.hitBulletColor;
                         width = 10f;
