@@ -4448,15 +4448,15 @@ public class Blocks{
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.3f;
             }},
-            Items.carbide, new ArtilleryBulletType(0.5f, 500, "shell"){{
-                hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
+            Items.carbide, new ArtilleryBulletType(3.25f, 700, "shell"){{
+                hitEffect = new MultiEffect(Fx.titanExplosionSmall, Fx.titanSmokeSmall);
                 despawnEffect = Fx.none;
                 knockback = 3f;
                 lifetime = 140f;
-                height = 22f;
+                height = 28f;
                 width = 15f;
-                splashDamageRadius = 28f;
-                splashDamage = 700f;
+                splashDamageRadius = 36f;
+                splashDamage = 750f;
                 rangeChange = 10f*8f;
                 reloadMultiplier = 0.8f;
                 scaledSplashDamage = true;
@@ -4467,7 +4467,7 @@ public class Blocks{
 
                 status = StatusEffects.blasted;
 
-                trailLength = 32;
+                trailLength = 30;
                 trailWidth = 3.35f;
                 trailSinScl = 2.5f;
                 trailSinMag = 0.5f;
@@ -4484,20 +4484,27 @@ public class Blocks{
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.2f;
 
-                fragBullets = 15;
-                    fragBullet = new BasicBulletType(0.5f, 30, "shell"){{
-                        hitEffect = Fx.titanExplosion;
-                        shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosionSmall);
+                fragBullets = 12;
+                    fragBullet = new ArtilleryBulletType(0.5f, 50, "shell"){{
+                        hitEffect = new MultiEffect(Fx.titanExplosionFrag, Fx.titanLightSmall, new WaveEffect(){{
+                            lifetime = 8f;
+                            strokeFrom = 1f;
+                            sizeTo = 8f;
+                        }});
+
                         despawnEffect = Fx.hitBulletColor;
-                        width = 10f;
+                        width = 8f;
                         height = 12f;
-                        shrinkY = 1f;
-                        lifetime = 20f;
+                        lifetime = 50f;
                         knockback = 0.5f;
-                        splashDamageRadius = 16f;
-                        splashDamage = 40f;
+                        splashDamageRadius = 22f;
+                        splashDamage = 50f;
+                        scaledSplashDamage = true;
                         pierceArmor = true;
                         backColor = frontColor = hitColor = Color.valueOf("ab8ec5");
+                        frontColor = Color.white;
+                        buildingDamageMultiplier = 0.25f;
+                        shrinkY = 0.3f;
                     }};
             }},
             Items.oxide, new ArtilleryBulletType(2.5f, 300, "shell"){{
@@ -4507,10 +4514,10 @@ public class Blocks{
                 lifetime = 190f;
                 height = 19f;
                 width = 17f;
-                reloadMultiplier = 0.8f;
+                reloadMultiplier = 0.65f;
                 splashDamageRadius = 110f;
                 rangeChange = 8f;
-                splashDamage = 250f;
+                splashDamage = 300f;
                 scaledSplashDamage = true;
                 hitColor = backColor = trailColor = Color.valueOf("a0b380");
                 frontColor = Color.valueOf("e4ffd6");
@@ -4540,7 +4547,7 @@ public class Blocks{
                     lifetime = 60f * 2.5f;
                     bulletInterval = 20f;
                     intervalBullet = new EmptyBulletType(){{
-                        splashDamage = 25f;
+                        splashDamage = 30f;
                         collidesGround = true;
                         collidesAir = false;
                         collides = false;
