@@ -13,6 +13,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -65,7 +66,7 @@ public class LogicDisplay extends Block{
     }
 
     public class LogicDisplayBuild extends Building{
-        public FrameBuffer buffer;
+        public @Nullable FrameBuffer buffer;
         public float color = Color.whiteFloatBits;
         public float stroke = 1f;
         public LongQueue commands = new LongQueue(256);
@@ -87,12 +88,34 @@ public class LogicDisplay extends Block{
                 }
             });
 
+            processCommands();
+
+            Draw.blend(Blending.disabled);
+            Draw.draw(Draw.z(), () -> {
+                if(buffer != null){
+                    Draw.rect(Draw.wrap(buffer.getTexture()), x, y, buffer.getWidth() * scaleFactor * Draw.scl, -buffer.getHeight() * scaleFactor * Draw.scl);
+                }
+            });
+            Draw.blend();
+        }
+
+        public void flushCommands(LongSeq graphicsBuffer){
+            int added = Math.min(graphicsBuffer.size, LExecutor.maxDisplayBuffer - commands.size);
+
+            for(int i = 0; i < added; i++){
+                commands.addLast(graphicsBuffer.items[i]);
+            }
+        }
+
+        public void processCommands(){
             //don't bother processing commands if displays are off
-            if(!commands.isEmpty()){
+            if(!commands.isEmpty() && buffer != null){
                 Draw.draw(Draw.z(), () -> {
+                    if(buffer == null) return;
+
                     Tmp.m1.set(Draw.proj());
                     Tmp.m2.set(Draw.trans());
-                    Draw.proj(0, 0, displaySize, displaySize);
+                    Draw.proj(0, 0, buffer.getWidth(), buffer.getHeight());
                     if(transform != null){
                         Draw.trans(transform);
                     }
@@ -148,14 +171,6 @@ public class LogicDisplay extends Block{
                     Draw.reset();
                 });
             }
-
-            Draw.blend(Blending.disabled);
-            Draw.draw(Draw.z(), () -> {
-                if(buffer != null){
-                    Draw.rect(Draw.wrap(buffer.getTexture()), x, y, buffer.getWidth() * scaleFactor * Draw.scl, -buffer.getHeight() * scaleFactor * Draw.scl);
-                }
-            });
-            Draw.blend();
         }
 
         @Override
