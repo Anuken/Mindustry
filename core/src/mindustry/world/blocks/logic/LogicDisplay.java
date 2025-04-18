@@ -65,6 +65,13 @@ public class LogicDisplay extends Block{
         stats.add(Stat.displaySize, "@x@", displaySize, displaySize);
     }
 
+    @Override
+    public void init(){
+        super.init();
+
+        clipSize = Math.max(clipSize, scaleFactor * Draw.scl * displaySize);
+    }
+
     public class LogicDisplayBuild extends Building{
         public @Nullable FrameBuffer buffer;
         public float color = Color.whiteFloatBits;
@@ -97,6 +104,14 @@ public class LogicDisplay extends Block{
                 }
             });
             Draw.blend();
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case displayWidth, displayHeight -> displaySize;
+                default -> super.sense(sensor);
+            };
         }
 
         public void flushCommands(LongSeq graphicsBuffer){
