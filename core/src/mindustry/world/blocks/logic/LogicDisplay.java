@@ -110,6 +110,7 @@ public class LogicDisplay extends Block{
         public double sense(LAccess sensor){
             return switch(sensor){
                 case displayWidth, displayHeight -> displaySize;
+                case bufferUsage -> commands.size;
                 default -> super.sense(sensor);
             };
         }
