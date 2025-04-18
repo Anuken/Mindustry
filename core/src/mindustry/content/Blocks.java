@@ -4516,7 +4516,7 @@ public class Blocks{
                 lifetime = 190f;
                 height = 19f;
                 width = 17f;
-                reloadMultiplier = 0.65f;
+                reloadMultiplier = 0.75f;
                 splashDamageRadius = 110f;
                 rangeChange = 8f;
                 splashDamage = 300f;
