@@ -4484,6 +4484,7 @@ public class Blocks{
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.2f;
+                fragLifeMin = 1.5f;
 
                 fragBullets = 12;
                     fragBullet = new ArtilleryBulletType(0.5f, 50, "shell"){{

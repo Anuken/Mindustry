@@ -459,17 +459,17 @@ public class Fx{
         }
     }),
     
-    titanExplosionSmall = new Effect(20f, 100f, e -> {
+    titanExplosionSmall = new Effect(22f, 120f, e -> {
         color(e.color);
         stroke(e.fout() * 3f);
-        float circleRad = 6f + e.finpow() * 40f;
+        float circleRad = 6f + e.finpow() * 45f;
         Lines.circle(e.x, e.y, circleRad);
 
         rand.setSeed(e.id);
         for(int i = 0; i < 12; i++){
             float angle = rand.random(360f);
             float lenRand = rand.random(0.5f, 1f);
-            Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 50f * rand.random(1f, 0.6f) + 2f, e.finpow() * 35f * lenRand + 6f);
+            Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 50f * rand.random(1f, 0.6f) + 2f, e.finpow() * 50f * lenRand + 6f);
         }
     }),
 
