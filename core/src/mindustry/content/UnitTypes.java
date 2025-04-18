@@ -98,6 +98,7 @@ public class UnitTypes{
         //region ground attack
 
         dagger = new UnitType("dagger"){{
+            researchCostMultiplier = 0.5f;
             speed = 0.5f;
             hitSize = 8f;
             health = 150;
@@ -606,6 +607,7 @@ public class UnitTypes{
         //region ground legs
 
         crawler = new UnitType("crawler"){{
+            researchCostMultiplier = 0.5f;
             aiController = SuicideAI::new;
 
             speed = 1f;
@@ -977,6 +979,7 @@ public class UnitTypes{
         //region air attack
 
         flare = new UnitType("flare"){{
+            researchCostMultiplier = 0.5f;
             speed = 2.7f;
             accel = 0.08f;
             drag = 0.04f;
@@ -2373,6 +2376,7 @@ public class UnitTypes{
             controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
             isEnemy = false;
 
+            targetBuildingsMobile = false;
             lowAltitude = true;
             flying = true;
             mineSpeed = 6.5f;
@@ -2412,6 +2416,7 @@ public class UnitTypes{
             controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
             isEnemy = false;
 
+            targetBuildingsMobile = false;
             flying = true;
             mineSpeed = 7f;
             mineTier = 1;
@@ -2454,6 +2459,7 @@ public class UnitTypes{
             controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
             isEnemy = false;
 
+            targetBuildingsMobile = false;
             lowAltitude = true;
             flying = true;
             mineSpeed = 8f;

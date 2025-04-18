@@ -169,7 +169,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.disableworldprocessors", b -> rules.disableWorldProcessors = b, () -> rules.disableWorldProcessors);
         number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
         number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.001f, 50f);
-        number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
+        number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources, 0f, 1f);
         number("@rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
 
@@ -432,7 +432,7 @@ public class CustomRulesDialog extends BaseDialog{
 
     public void ruleInfo(Cell<?> cell, String text){
         if(Core.bundle.has(text.substring(1) + ".info")){
-            if(mobile){
+            if(mobile && !graphics.isPortrait()){ //disabled in portrait - broken and goes offscreen
                 Table table = new Table();
                 table.add(cell.get()).left().expandX().fillX();
                 cell.clearElement();

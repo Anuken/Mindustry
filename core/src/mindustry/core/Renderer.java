@@ -71,6 +71,7 @@ public class Renderer implements ApplicationListener{
     //for landTime > 0: if true, core is currently *launching*, otherwise landing.
     private boolean launching;
     private Vec2 camShakeOffset = new Vec2();
+    private int glErrors;
 
     public Renderer(){
         camera = new Camera();
@@ -220,6 +221,24 @@ public class Renderer implements ApplicationListener{
             }
 
             camera.position.sub(camShakeOffset);
+        }
+
+        //glGetError can be expensive, so only check it periodically
+        if(glErrors < maxGlErrors && graphics.getFrameId() % 10 == 0){
+            int error = Gl.getError();
+            if(error != Gl.noError){
+                String message = switch(error){
+                    case Gl.invalidValue -> "invalid value";
+                    case Gl.invalidOperation -> "invalid operation";
+                    case Gl.invalidFramebufferOperation -> "invalid framebuffer operation";
+                    case Gl.invalidEnum -> "invalid enum";
+                    case Gl.outOfMemory -> "out of memory";
+                    default -> "unknown error " + (error);
+                };
+
+                Log.err("[GL] Error: @", message);
+                glErrors ++;
+            }
         }
 
         PerfCounter.render.end();

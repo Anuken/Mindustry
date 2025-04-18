@@ -227,7 +227,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         table.button(Icon.ok, Styles.clearNoneTogglei, () -> {
             if(schematicMode){
                 rebuildMode = !rebuildMode;
-            }else{
+            }else if(!player.dead()){
                 for(BuildPlan plan : selectPlans){
                     Tile tile = plan.tile();
 
@@ -261,6 +261,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).visible(() -> !selectPlans.isEmpty() || schematicMode || rebuildMode).update(i -> {
             i.getStyle().imageUp = schematicMode || rebuildMode ? Icon.wrench : Icon.ok;
             i.setChecked(rebuildMode);
+            i.setDisabled(() -> player.dead());
 
         }).name("confirmplace");
     }
@@ -290,7 +291,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(() -> !hasSchematic() && !state.rules.editor);
+            t.visible(() -> !hasSchematic() && !(state.isEditor() && Core.settings.getBool("editor-blocks-shown")));
             t.bottom().left();
 
             t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
@@ -1062,7 +1063,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 player.shooting = false;
                 if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
                     if(unit.type.canAttack){
-                        target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround);
+                        target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround && type.targetBuildingsMobile);
                     }
 
                     if(allowHealing && target == null){

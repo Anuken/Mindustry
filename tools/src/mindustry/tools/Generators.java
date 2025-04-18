@@ -464,6 +464,20 @@ public class Generators{
             }
         });
 
+        generate("sector-icons", () -> {
+            for(SectorPreset item : content.sectors()){
+                if(!has("sector-" + item.name)){
+                    continue;
+                }
+
+                Pixmap base = get("sector-" + item.name);
+                Pixmap container = new Pixmap(base.width + 10, base.height + 10);
+                container.draw(base, 5, 5, true);
+
+                replace("sector-" + item.name, container.outline(Pal.darkerGray, 5));
+            }
+        });
+
         generate("team-icons", () -> {
             for(Team team : Team.all){
                 if(has("team-" + team.name)){

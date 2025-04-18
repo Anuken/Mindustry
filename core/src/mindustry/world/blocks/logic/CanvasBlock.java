@@ -63,6 +63,8 @@ public class CanvasBlock extends Block{
             colorToIndex.put(palette[i], i);
         }
         bitsPerPixel = Mathf.log2(Mathf.nextPowerOfTwo(palette.length));
+
+        clipSize = Math.max(clipSize, size * 8 - padding);
     }
 
     @Override
