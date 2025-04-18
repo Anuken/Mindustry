@@ -601,6 +601,7 @@ public class ResearchDialog extends BaseDialog{
             infoTable.remove();
             infoTable.clear();
             infoTable.update(null);
+            infoTable.touchable = Touchable.enabled;
 
             if(button == null) return;
 
@@ -609,9 +610,9 @@ public class ResearchDialog extends BaseDialog{
             infoTable.addListener(new InputListener(){
                 @Override
                 public void exit(InputEvent event, float x, float y, int pointer, Element fromActor){
-                    Element e = Core.scene.hit(x, y, true);
+                    Element e = Core.scene.hit(Core.input.mouseX(pointer == -1 ? 0 : pointer), Core.input.mouseY(pointer == -1 ? 0 : pointer), true);
 
-                    if(hoverNode == button && !(e != null && (e.isDescendantOf(infoTable) || e.isDescendantOf(hoverNode))) && (Core.app.isDesktop() || pointer == 0)){
+                    if(hoverNode == button && !(e != null && (e == infoTable || e.isDescendantOf(infoTable) || e == hoverNode || e.isDescendantOf(hoverNode))) && (Core.app.isDesktop() || pointer == 0)){
                         hoverNode = null;
                         rebuild();
                     }

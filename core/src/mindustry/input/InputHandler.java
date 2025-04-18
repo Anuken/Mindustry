@@ -1758,7 +1758,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean canTapPlayer(float x, float y){
-        return player.within(x, y, playerSelectRange) && player.unit().stack.amount > 0;
+        return player.within(x, y, playerSelectRange) && !player.dead() && player.unit().stack.amount > 0;
     }
 
     /** Tries to begin mining a tile, returns true if successful. */
@@ -1788,7 +1788,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean tryRepairDerelict(Tile selected){
-        if(selected != null && !state.rules.editor && player.team() != Team.derelict && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict &&
+        if(!player.dead() && selected != null && !state.rules.editor && player.team() != Team.derelict && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict &&
             Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
 
             player.unit().addBuild(new BuildPlan(selected.build.tileX(), selected.build.tileY(), selected.build.rotation, selected.block(), selected.build.config()));
@@ -1798,12 +1798,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean canRepairDerelict(Tile tile){
-        return tile != null && tile.build != null && !state.rules.editor && player.team() != Team.derelict && tile.build.team == Team.derelict && tile.build.block.unlockedNowHost() &&
+        return tile != null && tile.build != null && !player.dead() && !state.rules.editor && player.team() != Team.derelict && tile.build.team == Team.derelict && tile.build.block.unlockedNowHost() &&
             Build.validPlace(tile.block(), player.team(), tile.build.tileX(), tile.build.tileY(), tile.build.rotation);
     }
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
+        && !player.dead()
         && player.unit().validMine(tile)
         && player.unit().acceptsItem(player.unit().getMineResult(tile))
         && !((!Core.settings.getBool("doubletapmine") && tile.floor().playerUnmineable) && tile.overlay().itemDrop == null);

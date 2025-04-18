@@ -188,7 +188,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             //otherwise, update it.
             if(current.breaking){
                 entity.deconstruct(self(), core, bs);
-            }else{
+            }else if(entity.current != null && entity.current.unlockedNowHost()){ //only allow building unlocked blocks
                 entity.construct(self(), core, bs, current.config);
             }
 

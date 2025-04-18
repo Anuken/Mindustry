@@ -291,7 +291,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(() -> !hasSchematic() && !Core.settings.getBool("editor-blocks-shown"));
+            t.visible(() -> !hasSchematic() && !(state.isEditor() && Core.settings.getBool("editor-blocks-shown")));
             t.bottom().left();
 
             t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
@@ -1063,7 +1063,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 player.shooting = false;
                 if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
                     if(unit.type.canAttack){
-                        target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround);
+                        target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround && type.targetBuildingsMobile);
                     }
 
                     if(allowHealing && target == null){

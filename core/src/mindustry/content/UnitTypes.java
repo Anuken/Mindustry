@@ -2376,6 +2376,7 @@ public class UnitTypes{
             controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
             isEnemy = false;
 
+            targetBuildingsMobile = false;
             lowAltitude = true;
             flying = true;
             mineSpeed = 6.5f;
@@ -2415,6 +2416,7 @@ public class UnitTypes{
             controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
             isEnemy = false;
 
+            targetBuildingsMobile = false;
             flying = true;
             mineSpeed = 7f;
             mineTier = 1;
@@ -2457,6 +2459,7 @@ public class UnitTypes{
             controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
             isEnemy = false;
 
+            targetBuildingsMobile = false;
             lowAltitude = true;
             flying = true;
             mineSpeed = 8f;
