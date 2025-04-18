@@ -16,6 +16,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -262,6 +263,12 @@ public class Duct extends Block implements Autotiler{
                 recDir = read.b();
             }
             current = items.first();
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return progress;
+            return super.sense(sensor);
         }
     }
 }

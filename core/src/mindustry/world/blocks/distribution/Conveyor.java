@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -432,9 +433,32 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress){
+                if(len == 0) return 0;
+                return ys[len - 1];
+            }
+            return super.sense(sensor);
+        }
+
+        @Override
         public Object senseObject(LAccess sensor){
             if(sensor == LAccess.firstItem && len > 0) return ids[len - 1];
             return super.senseObject(sensor);
+        }
+
+        @Override
+        public void setProp(UnlockableContent content, double value){
+            if(content instanceof Item item && items != null){
+                int amount = Math.min((int)value, capacity);
+                if(items.get(item) != amount){
+                    if(items.get(item) < amount){
+                        handleStack(item, amount - items.get(item), null);
+                    }else if(amount >= 0){
+                        removeStack(item, items.get(item) - amount);
+                    }
+                }
+            }else super.setProp(content, value);
         }
 
         public final void add(int o){
