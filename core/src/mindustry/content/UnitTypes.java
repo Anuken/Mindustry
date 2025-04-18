@@ -3836,6 +3836,7 @@ public class UnitTypes{
 
             engineSize = 4.8f;
             engineOffset = 61 / 4f;
+            range = 361.2f;
 
             abilities.add(new SuppressionFieldAbility(){{
                 orbRadius = 5.3f;
@@ -3853,19 +3854,30 @@ public class UnitTypes{
                 recoil = 1f;
                 rotationLimit = 60f;
 
-                bullet = new BulletType(){{
+                bullet = new BasicBulletType(4.3f, 70f, "missile-large"){{
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke2;
                     shake = 1f;
-                    speed = 0f;
+                    lifetime = 60 * 0.58f;
+                    rangeOverride = 361.2f;
+
+                    width = 12f;
+                    height = 22f;
+                    hitSize = 7f;
+                    hitColor = backColor = trailColor = Pal.sapBulletBack;
+                    trailWidth = 3f;
+                    trailLength = 12;
+
                     keepVelocity = false;
+                    collidesGround = true;
                     collidesAir = false;
 
-                    spawnUnit = new MissileUnitType("quell-missile"){{
+                    despawnUnit = new MissileUnitType("quell-missile"){{
                         targetAir = false;
                         speed = 4.3f;
                         maxRange = 6f;
-                        lifetime = 60f * 1.4f;
+                        lifetime = 60f * 0.82f;
+                        homingDelay = 0;
                         outlineColor = Pal.darkOutline;
                         engineColor = trailColor = Pal.sapBulletBack;
                         engineLayer = Layer.effect;
