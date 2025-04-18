@@ -3467,50 +3467,56 @@ public class Blocks{
         }};
 
         swarmer = new ItemTurret("swarmer"){{
-            requirements(Category.turret, with(Items.graphite, 35, Items.titanium, 35, Items.plastanium, 45, Items.silicon, 30));
+            requirements(Category.turret, with(Items.graphite, 75, Items.titanium, 35, Items.plastanium, 85, Items.silicon, 30));
             ammo(
-                Items.blastCompound, new MissileBulletType(3.7f, 10){{
+                Items.blastCompound, new MissileBulletType(3f, 240){{
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
-                    splashDamageRadius = 30f;
-                    splashDamage = 30f * 1.5f;
-                    ammoMultiplier = 5f;
+                    splashDamageRadius = 36f;
+                    splashDamage = 60f;
+                    ammoMultiplier = 1f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
-
+                    homingPower = 0.15f;
+                    collidesTiles = false;
+                    scaleLife = true;
                     status = StatusEffects.blasted;
+                    statusDuration = 60f * 2f;
 
                 }},
-                Items.pyratite, new MissileBulletType(3.7f, 12){{
+                Items.pyratite, new MissileBulletType(3f, 86){{
                     frontColor = Pal.lightishOrange;
                     backColor = Pal.lightOrange;
                     width = 7f;
                     height = 8f;
                     shrinkY = 0f;
-                    homingPower = 0.08f;
-                    splashDamageRadius = 20f;
-                    splashDamage = 30f * 1.5f;
+                    homingPower = 0.1f;
+                    collidesTiles = false;
+                    scaleLife = true;
+                    splashDamageRadius = 16f;
+                    splashDamage = 100f;
                     makeFire = true;
-                    ammoMultiplier = 5f;
+                    ammoMultiplier = 1f;
                     hitEffect = Fx.blastExplosion;
                     status = StatusEffects.burning;
                 }},
-                Items.surgeAlloy, new MissileBulletType(3.7f, 18){{
+                Items.surgeAlloy, new MissileBulletType(3f, 100){{
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
-                    splashDamageRadius = 25f;
-                    splashDamage = 25f * 1.4f;
+                    splashDamageRadius = 16f;
+                    splashDamage = 40f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
-                    ammoMultiplier = 4f;
-                    lightningDamage = 10;
-                    lightning = 2;
-                    lightningLength = 10;
-
-                    hitColor = backColor = trailColor = Pal.surgeAmmoBack;
-                    frontColor = Pal.surgeAmmoFront;
+                    ammoMultiplier = 1f;
+                    homingPower = 0.15f;
+                    collidesTiles = false;
+                    scaleLife = true;
+                    lightningDamage = 120;
+                    lightningCone = 30f;
+                    lightning = 1;
+                    lightningLength = 12;
                 }}
             );
 
@@ -3518,24 +3524,29 @@ public class Blocks{
                 barrels = new float[]{
                     -4, -1.25f, 0,
                     0, 0, 0,
+                    4, -1.25f, 0,
+                    -4, -1.25f, 0,
+                    0, 0, 0,
                     4, -1.25f, 0
                 };
-                shots = 4;
-                shotDelay = 5f;
+                shots = 6;
+                shotDelay = 3f;
             }};
 
             shootY = 4.5f;
-            reload = 30f;
-            inaccuracy = 10f;
+            reload = 360f;
+            ammoPerShot = 3;
+            inaccuracy = 5f;
             range = 240f;
             consumeAmmoOnce = false;
             size = 2;
-            scaledHealth = 300;
+            scaledHealth = 240;
             shootSound = Sounds.missile;
             envEnabled |= Env.space;
 
             limitRange(5f);
             coolant = consumeCoolant(0.3f);
+            coolantMultiplier = 0.7f;
         }};
 
         salvo = new ItemTurret("salvo"){{
@@ -3817,9 +3828,7 @@ public class Blocks{
                     splashDamage = 55f;
 
                     status = StatusEffects.blasted;
-
                     statusDuration = 60f * 2f;
-
                 }},
                 Items.plastanium, new ArtilleryBulletType(3.4f, 20, "shell"){{
                     hitEffect = Fx.plasticExplosion;
@@ -3903,7 +3912,6 @@ public class Blocks{
 
                     status = StatusEffects.blasted;
                     statusDuration = 60f * 2f;
-
                 }},
                 Items.plastanium, new FlakBulletType(4f, 8){{
                     ammoMultiplier = 4f;
