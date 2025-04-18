@@ -94,9 +94,9 @@ public class LAssembler{
         if(symbol.startsWith("0x")) return Strings.parseLong(symbol, 16, 2, symbol.length(), invalidNum);
         if(symbol.startsWith("+0x")) return Strings.parseLong(symbol, 16, 3, symbol.length(), invalidNum);
         if(symbol.startsWith("-0x")) return -Strings.parseLong(symbol, 16, 3, symbol.length(), invalidNum);//FIXME: breaks with Long.MIN_VALUE
-        if(symbol.startsWith("%[") && symbol.endsWith("]") && symbol.length() > 3) {
+        if(symbol.startsWith("%[") && symbol.endsWith("]") && symbol.length() > 3){
             double color = parseNamedColor(symbol);
-            if (color != -1d) {
+            if(color != -1d){
                 return color;
             }
         }
