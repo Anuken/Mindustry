@@ -1408,8 +1408,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             return r2.overlaps(r1);
         };
 
-        for(var plan : player.unit().plans()){
-            if(test.get(plan)) return plan;
+        if(!player.dead()){
+            for(var plan : player.unit().plans()){
+                if(test.get(plan)) return plan;
+            }
         }
 
         return selectPlans.find(test);
@@ -1437,9 +1439,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.color(Pal.remove);
         Lines.stroke(1f);
 
-        for(var plan : player.unit().plans()){
-            if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
-                drawBreaking(plan);
+        if(!player.dead()){
+            for(var plan : player.unit().plans()){
+                if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                    drawBreaking(plan);
+                }
             }
         }
 
@@ -1615,21 +1619,23 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //remove build plans
         Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
 
-        Iterator<BuildPlan> it = player.unit().plans().iterator();
-        while(it.hasNext()){
-            var plan = it.next();
-            if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
-                it.remove();
-            }
-        }
-
-        //don't remove plans on desktop, where flushing is false
-        if(flush){
-            it = selectPlans.iterator();
+        if(!player.dead()){
+            Iterator<BuildPlan> it = player.unit().plans().iterator();
             while(it.hasNext()){
                 var plan = it.next();
                 if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
                     it.remove();
+                }
+            }
+
+            //don't remove plans on desktop, where flushing is false
+            if(flush){
+                it = selectPlans.iterator();
+                while(it.hasNext()){
+                    var plan = it.next();
+                    if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                        it.remove();
+                    }
                 }
             }
         }
@@ -1752,7 +1758,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean canTapPlayer(float x, float y){
-        return player.within(x, y, playerSelectRange) && player.unit().stack.amount > 0;
+        return player.within(x, y, playerSelectRange) && !player.dead() && player.unit().stack.amount > 0;
     }
 
     /** Tries to begin mining a tile, returns true if successful. */
@@ -1782,7 +1788,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean tryRepairDerelict(Tile selected){
-        if(selected != null && !state.rules.editor && player.team() != Team.derelict && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict &&
+        if(!player.dead() && selected != null && !state.rules.editor && player.team() != Team.derelict && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict &&
             Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
 
             player.unit().addBuild(new BuildPlan(selected.build.tileX(), selected.build.tileY(), selected.build.rotation, selected.block(), selected.build.config()));
@@ -1792,12 +1798,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean canRepairDerelict(Tile tile){
-        return tile != null && tile.build != null && !state.rules.editor && player.team() != Team.derelict && tile.build.team == Team.derelict && tile.build.block.unlockedNowHost() &&
+        return tile != null && tile.build != null && !player.dead() && !state.rules.editor && player.team() != Team.derelict && tile.build.team == Team.derelict && tile.build.block.unlockedNowHost() &&
             Build.validPlace(tile.block(), player.team(), tile.build.tileX(), tile.build.tileY(), tile.build.rotation);
     }
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
+        && !player.dead()
         && player.unit().validMine(tile)
         && player.unit().acceptsItem(player.unit().getMineResult(tile))
         && !((!Core.settings.getBool("doubletapmine") && tile.floor().playerUnmineable) && tile.overlay().itemDrop == null);

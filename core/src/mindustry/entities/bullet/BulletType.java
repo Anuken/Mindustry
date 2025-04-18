@@ -433,6 +433,11 @@ public class BulletType extends Content implements Cloneable{
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
         }else if(build.team != b.team && direct){
             hit(b);
+
+            if(lifesteal > 0f && b.owner instanceof Healthc o){
+                float result = Math.max(Math.min(build.health, damage), 0);
+                o.heal(result * lifesteal);
+            }
         }
 
         handlePierce(b, initialHealth, x, y);

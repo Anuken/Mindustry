@@ -4,6 +4,7 @@ import arc.util.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
+/** This class can only be used with PointDefenseBulletWeapon. Attempting to spawn it in outside of that weapon will lead to standard behavior. */
 public class InterceptorBulletType extends BasicBulletType{
 
     public InterceptorBulletType(float speed, float damage){
