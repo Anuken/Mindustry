@@ -11,6 +11,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -22,7 +23,7 @@ public class TileableLogicDisplay extends LogicDisplay{
     protected static final IntSet processed = new IntSet();
 
     //in tiles
-    public int maxDisplayDimensions = 12;
+    public int maxDisplayDimensions = 16;
     public @Load(value = "@-#", length = 47) TextureRegion[] tileRegion;
     public @Load("@-back") TextureRegion backRegion;
 
@@ -145,6 +146,15 @@ public class TileableLogicDisplay extends LogicDisplay{
         public boolean needsUpdate = false;
 
         @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case displayWidth -> tilesWidth * 32f;
+                case displayHeight -> tilesHeight * 32f;
+                default -> super.sense(sensor);
+            };
+        }
+
+        @Override
         public void display(Table table){
             super.display(table);
 
@@ -221,6 +231,7 @@ public class TileableLogicDisplay extends LogicDisplay{
 
             Draw.z(Layer.block + offset);
 
+            //TODO: for square regions, this can be optimized to draw only one thing
             Draw.blend(Blending.disabled);
             Draw.draw(Draw.z(), () -> {
                 if(rootDisplay.buffer != null){
