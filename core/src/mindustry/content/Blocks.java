@@ -3478,7 +3478,9 @@ public class Blocks{
                     ammoMultiplier = 1f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
-                    homingPower = 0.2f;
+                    homingPower = 0.15f;
+                    collidesTiles = false;
+                    scaleLife = true;
                     status = StatusEffects.blasted;
                     statusDuration = 60f * 2f;
 
@@ -3490,6 +3492,8 @@ public class Blocks{
                     height = 8f;
                     shrinkY = 0f;
                     homingPower = 0.1f;
+                    collidesTiles = false;
+                    scaleLife = true;
                     splashDamageRadius = 16f;
                     splashDamage = 100f;
                     makeFire = true;
@@ -3506,7 +3510,9 @@ public class Blocks{
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
                     ammoMultiplier = 1f;
-                    homingPower = 0.2f;
+                    homingPower = 0.15f;
+                    collidesTiles = false;
+                    scaleLife = true;
                     lightningDamage = 120;
                     lightningCone = 30f;
                     lightning = 1;
