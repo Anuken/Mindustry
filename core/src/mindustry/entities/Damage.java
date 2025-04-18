@@ -518,7 +518,7 @@ public class Damage{
             }
             //TODO better velocity displacement
             float dst = vec.set(unit.x - x, unit.y - y).len();
-            unit.vel.add(vec.setLength((1f - dst / radius) * 2f / unit.mass()));
+            unit.vel.add(vec.setLength((radius > 0f ? 1f - dst / radius : 1f) * 2f / unit.mass()));
 
             if(complete && damage >= 9999999f && unit.isPlayer()){
                 Events.fire(Trigger.exclusionDeath);
@@ -640,7 +640,7 @@ public class Damage{
 
     private static float calculateDamage(float dist, float radius, float damage){
         float falloff = 0.4f;
-        float scaled = Mathf.lerp(1f - dist / radius, 1f, falloff);
+        float scaled = radius <= 0.00001f ? 1f : Mathf.lerp(1f - dist / radius, 1f, falloff);
         return damage * scaled;
     }
 

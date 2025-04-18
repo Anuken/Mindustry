@@ -165,7 +165,7 @@ public class ModsDialog extends BaseDialog{
 
     void setup(){
         float h = 110f;
-        float w = Math.min(Core.graphics.getWidth() / Scl.scl(1.05f), 520f);
+        float w = Math.min(Core.graphics.getWidth() / Scl.scl(1.05f) - Scl.scl(28f), 520f);
 
         cont.clear();
         cont.defaults().width(Math.min(Core.graphics.getWidth() / Scl.scl(1.05f), 556f)).pad(4);
