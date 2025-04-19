@@ -1,16 +1,16 @@
-A Mindustry egy gyárépítő játék Toronyvédő és RTS elemekkel. Készíts bonyolult ellátási láncokat, hogy lőszert juttass a lövegtornyokba, termelj az építkezéshez használható nyersanyagokat, és állíts elő egységeket. Irányítsd az egységeket, hogy elfoglald az ellenséges bázisokat, és bővítsd a termelésedet. Védd meg a támaszpontodat a hullámokban támadó ellenségektől.
+A Mindustry egy gyárépítős játék, Toronyvédő és RTS elemekkel. Készíts bonyolult ellátási láncokat, hogy lőszert juttass a lövegtornyokba, termelj az építkezéshez használható nyersanyagokat, és állíts elő egységeket. Irányítsd az egységeket, hogy elfoglald az ellenséges bázisokat, és bővítsd a termelésedet. Védd meg a támaszpontodat a hullámokban támadó ellenségektől.
 
 Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platformokon átívelő többjátékos módban, vagy hívd ki őket csapat alapú PvP mérkőzésekre
 
 [img]{STEAM_APP_IMAGE}/extras/factory.gif[/img]
 
-[h2]Gyár építés[/h2]
+[h2]Gyárépítés[/h2]
 
 [list]
 [*] Hozz létre bonyolult szállítószalagokból álló ellátási láncokat, hogy lőszert juttass a lövegtornyokba és termelj nyersanyagokat az építkezésekhez
-[*] Használd a gyártó-blokkokat a legkülönfélébb fejlett nyersanyagok létrehozásához
-[*] Oszd szét a folyadékokat, és küzdj meg az állandó kihívásokkal, mint például a tűzkitörések, vagy az ellenséges repülőgépek rajtaütéseivel
-[*] Hozd ki a legtöbbet a termelésből az opcionális hűtőfolyadék-ellátással
+[*] Használd a gyártóblokkokat a legkülönfélébb fejlett nyersanyagok létrehozásához
+[*] Oszd szét a folyadékokat és küzdj meg az állandó kihívásokkal, mint például a tűzkitörésekkel, vagy az ellenséges repülőgépek rajtaütéseivel
+[*] Hozd ki a legtöbbet a termelésből, az épületek hűtőfolyadék-ellátásával
 [*] Egységek széles skáláját állíthatod elő a bázisod automatikus irányításához, és az ellenséges bázisok megtámadásához
 [/list]
 
@@ -19,8 +19,8 @@ Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platfo
 [list]
 [*] Védd meg építményeidet a hullámokban támadó ellenségektől
 [*] Stratégiailag helyezd el a lövegtornyokat, hogy elpusztítsd a támadóidat, mielőtt elérnék a támaszpontodat
-[*] Lásd el a lövegtornyokat lőszerrel, hűtőfolyadékkal és energiával
-[*] Erősítsd meg a védelmedet erőpajzs- és foltozó-kivetítőkkel és egyéb támogató épületekkel
+[*] Lásd el a lövegtornyokat lőszerrel, hűtőfolyadékkal és árammal
+[*] Erősítsd meg a védelmedet erőpajzs- és foltozó-kivetítőkkel vagy más támogató épületekkel
 [/list]
 
 [img]{STEAM_APP_IMAGE}/extras/rts3.png[/img]
@@ -39,23 +39,23 @@ Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platfo
 [*] Játszd végig a két különböző bolygó hadjáratait
 [*] Hódítsd meg a Serpulo és az Erekir bolygót, miközben 35 kézzel készített pályán és 250+ procedurálisan előállított szektoron keresztül haladsz
 [*] Foglalj el területeket és építs gyárakat, hogy nyersanyagokat termelhess, miközben más szektorokban játszol
-[*] Védd meg a szektorokat az időszakos invázióktól
+[*] Védd meg az elfoglalt szektorokat az időszakos invázióktól
 [*] Koordináld az erőforrások elosztását a szektorok között az indítóállások felhasználásával
 [*] Fedezz fel új épületeket, gyárakat a fejlődés elősegítése érdekében
-[*] Hívd meg barátaidat, hogy együtt teljesítsék a küldetéseket
-[*] 250+ technológiai épület használatának elsajátítása
-[*] 50+ különböző típusú drón, mech és hajó
-[*] 80+ teljesítendő feladat
+[*] Hívd meg barátaidat, hogy együtt teljesítsétek a küldetéseket
+[*] Sajátítsd el a 250-nél is több technológiai épület használatát
+[*] Használd az 50-nél is több különböző típusú drónt, mechet, hajót, tankot
+[*] Teljesítsd a 80-nál is több feladatot
 [/list]
 
-[h2]Közösség és moddolás[/h2]
+[h2]Közösség és modolás[/h2]
 
 [list]
 [*] Használd a Steam Műhelyt a közösség által készített pályák és vázlatok böngészéséhez.
-[*] Csatlakozz nyilvános és közösségi kiszolgálókhoz, hogy másokkal játszhass platformokon keresztül
-[*] Játssz vállvetve, PvP-ben, vagy homokozóban a barátaiddal
+[*] Csatlakozz nyilvános- és közösségi kiszolgálókhoz, hogy másokkal játszhass platformokon keresztül
+[*] Játssz vállvetve, PvP-ben vagy homokozóban a barátaiddal
 [*] A közösségi kiszolgálók támogatják az egyéni pályák és játékmódok bővítményeit
-[*] Hozz létre nyilvános dedikált kiszolgálót, vagy hívd meg a barátaidat a saját privát munkamenetedre
+[*] Hozz létre nyilvános, dedikált kiszolgálót vagy hívd meg a barátaidat a saját privát munkamenetedre
 [*] Testre szabható játékszabályok: Változtasd meg az épületek építési költségeit, az ellenséges statisztikákat, a kezdő elemeket, a hullámok időzítését, vagy bármi mást
 [*] A beépített pályaszerkesztővel saját pályákat készíthetsz, hogy játszhass másokkal és megoszthasd a közösséggel
 [*] Böngéssz a közösség által készített modok között, hogy még több tartalmat adhass hozzá a játékodhoz, vagy keverj belőlük egy újat
