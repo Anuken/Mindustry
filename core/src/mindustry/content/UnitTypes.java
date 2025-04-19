@@ -881,10 +881,10 @@ public class UnitTypes{
             groundLayer = Layer.legUnit;
 
             BulletType sapBeam = new SapBulletType(){{
-                        sapStrength = 0.75f;
+                        sapStrength = 0.8f;
                         pierceArmor = true;
                         length = 96f;
-                        damage = 50;
+                        damage = 40;
                         absorbable = false;
                         hitColor = color = Pal.sapBullet;
                         despawnEffect = Fx.none;
@@ -915,7 +915,7 @@ public class UnitTypes{
 
                 bullet = new ShrapnelBulletType(){{
                     length = 128f;
-                    damage = 70f;
+                    damage = 60f;
                     width = 25f;
                     pierceArmor = true;
                     serrationLenScl = 7f;
@@ -987,9 +987,9 @@ public class UnitTypes{
                     lightRadius = 40f;
                     lightColor = Pal.sap;
                     lightOpacity = 0.6f;
-                    fragBullets = 7;
+                    fragBullets = 5;
                     fragRandomSpread = 0f;
-                    fragSpread = 14f;
+                    fragSpread = 18f;
                     fragBullet = sapBeam;
                 }};
             }});
