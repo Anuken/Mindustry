@@ -849,9 +849,9 @@ public class UnitTypes{
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
-                sapStrength = 0.9f;
+                sapStrength = 0.8f;
                 length = 72f;
-                damage = 55;
+                damage = 50;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
@@ -904,7 +904,7 @@ public class UnitTypes{
                 shoot.firstShotDelay = 45f;
                 
                 bullet = new LightningBulletType(){{
-                damage = 85;
+                damage = 80;
                 pierceArmor = true;
                 lightningLength = 32;
                 chargeEffect = new MultiEffect(Fx.lancerLaserCharge, Fx.lancerLaserChargeBegin);
@@ -923,7 +923,7 @@ public class UnitTypes{
 
         toxopid = new UnitType("toxopid"){{
             drag = 0.1f;
-            speed = 0.75f;
+            speed = 0.7f;
             hitSize = 26f;
             health = 22000;
             armor = 24f;
@@ -962,7 +962,7 @@ public class UnitTypes{
                         hitColor = color = Pal.sapBullet;
                         despawnEffect = Fx.none;
                         status = StatusEffects.sapped;
-                        statusDuration = 60f * 9;
+                        statusDuration = 60f * 3;
                         width = 0.55f;
                         lifetime = 20f;
             }};
@@ -972,7 +972,7 @@ public class UnitTypes{
                 y = -7f;
                 x = 9f;
                 shootY = 7f;
-                reload = 15;
+                reload = 20;
                 shake = 2f;
                 rotateSpeed = 3f;
                 ejectEffect = Fx.casing1;
@@ -988,7 +988,7 @@ public class UnitTypes{
 
                 bullet = new ShrapnelBulletType(){{
                     length = 128f;
-                    damage = 60f;
+                    damage = 55f;
                     width = 25f;
                     pierceArmor = true;
                     serrationLenScl = 7f;
@@ -999,7 +999,7 @@ public class UnitTypes{
                     fromColor = Pal.sapBullet;
                     toColor = Pal.sapBulletBack;
                     status = StatusEffects.sapped;
-                    statusDuration = 60f * 4;
+                    statusDuration = 60f * 3;
                     shootEffect = smokeEffect = Fx.sparkShoot;
                     fragBullets = 1;
                     fragRandomSpread = 0f;
@@ -1023,7 +1023,7 @@ public class UnitTypes{
                     buildingDamageMultiplier = 0.01f;
                     sprite = "parallax-laser";
                     status = StatusEffects.freezing;
-                    statusDuration = 60f * 4;
+                    statusDuration = 60f * 3;
                     hitEffect = trailEffect =Fx.none;
                     knockback = -1.6f;
                     maxRange = 256f;
