@@ -1,0 +1,34 @@
+Mindustry là một trò chơi xây dựng nhà máy với yếu tố chiến thuật thời gian thực (RTS) và thủ thành. Tạo chuỗi cung cấp xịn xò để cấp đạn cho tháp súng của bạn, sản xuất tài nguyên dùng cho xây dựng, và chế tạo đơn vị. Ra lệnh cho đơn vị chiếm đóng căn cứ kẻ địch, và mở rộng sản xuất. Phòng thủ lõi của bạn khỏi các đợt tấn công của kẻ địch.
+
+<h2>Tính năng lối chơi</h2>
+
+- Dùng các khối sản xuất tạo một biến thể rộng của tài nguyên cao cấp
+- Phòng thủ công trình của bạn khỏi các đợt tấn công của kẻ địch
+- Chơi với bạn bè thông qua trò chơi hợp tác nhiều người chơi đa nền tảng, hoặc thử thách họ với trò chơi PvP chia đội
+- Phân phối chất lỏng và xử lý các tình huống bất ngờ, như cháy lan hoặc không quân kẻ địch tấn công
+- Nhận tối đa mức sản xuất bằng cách cung cấp chất làm mát và bôi trơn
+- Sản xuất nhiều biến thể của đơn vị để quản lý tự động căn cứ của bạn hoặc tấn công căn cứ kẻ địch
+- Thiết lập dây chuyền lắp ráp tạo các đơn vị quân cơ giới
+- Dùng các đơn vị của bạn để bao vây đè bẹp căn cứ đủ chức năng của kẻ địch
+
+
+<h2>Chiến dịch</h2>
+
+- Chinh phục hành tinh Serpulo và Erekir với trải nghiệm qua 35 bản đồ tạo sẵn và 250+ phân khu tạo ngẫu nhiên
+- Chiếm lĩnh vùng đất và thiết lập các nhà máy để sản xuất tài nguyên trong khi bạn chơi các phân khu khác
+- Phòng thủ phân khu của bạn khỏi các cuộc tấn công định kỳ
+- Chuyển tài nguyên qua các phân khu bằng bệ phóng
+- Nghiên cứu các khối mới để lấp đầy tiến trình
+- Mời bạn bè để cùng hoành thành nhiệm vụ
+- 250+ khối công nghệ để làm chủ
+- 50+ kiểu khác nhau của máy bay không người lái, máy móc và phi thuyền
+
+
+<h2>Trò chơi Tùy chỉnh & Nhiều người chơi đa nền tảng</h2>
+
+- 16+ bản đồ có sẵn cho trò chơi tùy chỉnh, cùng với 2 chiến dịch trọn vẹn
+- Chơi hợp tác, đối kháng hoặc tự do
+- Tham gia máy chủ chuyên dụng công khai, hoặc mời bạn bè vào phiên chơi riêng tư của bạn
+- Tùy chỉnh quy tắc trò chơi: Thay đổi phí của khối, thông số kẻ địch, vật phẩm khởi đầu, thời gian đợt và hơn thế nữa
+- Trình chỉnh sửa bản đồ đầy đủ chức năng với hỗ trợ kịch bản
+- Trình duyệt mod sẵn có & hỗ trợ mod
