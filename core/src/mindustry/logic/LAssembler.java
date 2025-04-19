@@ -116,8 +116,6 @@ public class LAssembler{
     }
 
     double parseNamedColor(String symbol){
-        if (symbol.equals("%[stat]") || symbol.equals("%[accent]")) return Pal.stat.toDoubleBits();
-
         Color color = Colors.get(symbol.substring(2, symbol.length() - 1));
 
         return color == null ? -1d : color.toDoubleBits();
