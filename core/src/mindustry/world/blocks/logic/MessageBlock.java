@@ -88,7 +88,7 @@ public class MessageBlock extends Block{
             Draw.color(0f, 0f, 0f, 0.2f);
             Fill.rect(x, y - tilesize/2f - l.height/2f - offset, l.width + offset*2f, l.height + offset*2f);
             Draw.color();
-            font.setColor(Color.white);
+            font.setColor(message.length() == 0 ? Color.lightGray : Color.white);
             font.draw(text, x - l.width/2f, y - tilesize/2f - offset, 90f, Align.left, true);
             font.setUseIntegerPositions(ints);
 

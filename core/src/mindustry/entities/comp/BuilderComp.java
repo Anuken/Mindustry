@@ -136,7 +136,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             }
 
             if(!(tile.build instanceof ConstructBuild cb)){
-                if(!current.initialized && !current.breaking && Build.validPlaceIgnoreUnits(current.block, team, current.x, current.y, current.rotation, true)){
+                if(!current.initialized && !current.breaking && Build.validPlaceIgnoreUnits(current.block, team, current.x, current.y, current.rotation, true, true)){
                     if(Build.checkNoUnitOverlap(current.block, current.x, current.y)){
                         boolean hasAll = infinite || current.isRotation(team) ||
                         //derelict repair
@@ -188,7 +188,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             //otherwise, update it.
             if(current.breaking){
                 entity.deconstruct(self(), core, bs);
-            }else{
+            }else if(entity.current != null && entity.current.unlockedNowHost()){ //only allow building unlocked blocks
                 entity.construct(self(), core, bs, current.config);
             }
 

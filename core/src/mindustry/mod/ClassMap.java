@@ -46,15 +46,18 @@ public class ClassMap{
         classes.put("ContinuousFlameBulletType", mindustry.entities.bullet.ContinuousFlameBulletType.class);
         classes.put("ContinuousLaserBulletType", mindustry.entities.bullet.ContinuousLaserBulletType.class);
         classes.put("EmpBulletType", mindustry.entities.bullet.EmpBulletType.class);
+        classes.put("EmptyBulletType", mindustry.entities.bullet.EmptyBulletType.class);
         classes.put("ExplosionBulletType", mindustry.entities.bullet.ExplosionBulletType.class);
         classes.put("FireBulletType", mindustry.entities.bullet.FireBulletType.class);
         classes.put("FlakBulletType", mindustry.entities.bullet.FlakBulletType.class);
+        classes.put("InterceptorBulletType", mindustry.entities.bullet.InterceptorBulletType.class);
         classes.put("LaserBoltBulletType", mindustry.entities.bullet.LaserBoltBulletType.class);
         classes.put("LaserBulletType", mindustry.entities.bullet.LaserBulletType.class);
         classes.put("LightningBulletType", mindustry.entities.bullet.LightningBulletType.class);
         classes.put("LiquidBulletType", mindustry.entities.bullet.LiquidBulletType.class);
         classes.put("MassDriverBolt", mindustry.entities.bullet.MassDriverBolt.class);
         classes.put("MissileBulletType", mindustry.entities.bullet.MissileBulletType.class);
+        classes.put("MultiBulletType", mindustry.entities.bullet.MultiBulletType.class);
         classes.put("PointBulletType", mindustry.entities.bullet.PointBulletType.class);
         classes.put("PointLaserBulletType", mindustry.entities.bullet.PointLaserBulletType.class);
         classes.put("RailBulletType", mindustry.entities.bullet.RailBulletType.class);
@@ -74,6 +77,7 @@ public class ClassMap{
         classes.put("PartMove", mindustry.entities.part.DrawPart.PartMove.class);
         classes.put("PartParams", mindustry.entities.part.DrawPart.PartParams.class);
         classes.put("PartProgress", mindustry.entities.part.DrawPart.PartProgress.class);
+        classes.put("EffectSpawnerPart", mindustry.entities.part.EffectSpawnerPart.class);
         classes.put("FlarePart", mindustry.entities.part.FlarePart.class);
         classes.put("HaloPart", mindustry.entities.part.HaloPart.class);
         classes.put("HoverPart", mindustry.entities.part.HoverPart.class);
@@ -127,6 +131,8 @@ public class ClassMap{
         classes.put("NeoplasmUnitType", mindustry.type.unit.NeoplasmUnitType.class);
         classes.put("TankUnitType", mindustry.type.unit.TankUnitType.class);
         classes.put("BuildWeapon", mindustry.type.weapons.BuildWeapon.class);
+        classes.put("MineWeapon", mindustry.type.weapons.MineWeapon.class);
+        classes.put("PointDefenseBulletWeapon", mindustry.type.weapons.PointDefenseBulletWeapon.class);
         classes.put("PointDefenseWeapon", mindustry.type.weapons.PointDefenseWeapon.class);
         classes.put("RepairBeamWeapon", mindustry.type.weapons.RepairBeamWeapon.class);
         classes.put("HealBeamMount", mindustry.type.weapons.RepairBeamWeapon.HealBeamMount.class);
@@ -143,10 +149,13 @@ public class ClassMap{
         classes.put("ControlBlock", mindustry.world.blocks.ControlBlock.class);
         classes.put("ExplosionShield", mindustry.world.blocks.ExplosionShield.class);
         classes.put("ItemSelection", mindustry.world.blocks.ItemSelection.class);
+        classes.put("LaunchAnimator", mindustry.world.blocks.LaunchAnimator.class);
         classes.put("RotBlock", mindustry.world.blocks.RotBlock.class);
         classes.put("UnitTetherBlock", mindustry.world.blocks.UnitTetherBlock.class);
         classes.put("Accelerator", mindustry.world.blocks.campaign.Accelerator.class);
         classes.put("AcceleratorBuild", mindustry.world.blocks.campaign.Accelerator.AcceleratorBuild.class);
+        classes.put("LandingPad", mindustry.world.blocks.campaign.LandingPad.class);
+        classes.put("LandingPadBuild", mindustry.world.blocks.campaign.LandingPad.LandingPadBuild.class);
         classes.put("LaunchPad", mindustry.world.blocks.campaign.LaunchPad.class);
         classes.put("LaunchPadBuild", mindustry.world.blocks.campaign.LaunchPad.LaunchPadBuild.class);
         classes.put("AutoDoor", mindustry.world.blocks.defense.AutoDoor.class);
@@ -223,6 +232,8 @@ public class ClassMap{
         classes.put("DuctBuild", mindustry.world.blocks.distribution.Duct.DuctBuild.class);
         classes.put("DuctBridge", mindustry.world.blocks.distribution.DuctBridge.class);
         classes.put("DuctBridgeBuild", mindustry.world.blocks.distribution.DuctBridge.DuctBridgeBuild.class);
+        classes.put("DuctJunction", mindustry.world.blocks.distribution.DuctJunction.class);
+        classes.put("DuctJunctionBuild", mindustry.world.blocks.distribution.DuctJunction.DuctJunctionBuild.class);
         classes.put("DuctRouter", mindustry.world.blocks.distribution.DuctRouter.class);
         classes.put("DuctRouterBuild", mindustry.world.blocks.distribution.DuctRouter.DuctRouterBuild.class);
         classes.put("ItemBridge", mindustry.world.blocks.distribution.ItemBridge.class);
@@ -436,6 +447,7 @@ public class ClassMap{
         classes.put("ConsumeCoolant", mindustry.world.consumers.ConsumeCoolant.class);
         classes.put("ConsumeItemCharged", mindustry.world.consumers.ConsumeItemCharged.class);
         classes.put("ConsumeItemDynamic", mindustry.world.consumers.ConsumeItemDynamic.class);
+        classes.put("ConsumeItemEfficiency", mindustry.world.consumers.ConsumeItemEfficiency.class);
         classes.put("ConsumeItemExplode", mindustry.world.consumers.ConsumeItemExplode.class);
         classes.put("ConsumeItemExplosive", mindustry.world.consumers.ConsumeItemExplosive.class);
         classes.put("ConsumeItemFilter", mindustry.world.consumers.ConsumeItemFilter.class);

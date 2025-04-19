@@ -28,6 +28,10 @@ public class Stype extends Selement<TypeElement>{
         return interfaces().flatMap(s -> s.allInterfaces().add(s)).distinct();
     }
 
+    public boolean isInterface(){
+        return e.getKind() == ElementKind.INTERFACE;
+    }
+
     public Seq<Stype> superclasses(){
         return Seq.with(BaseProcessor.typeu.directSupertypes(mirror())).map(Stype::of);
     }

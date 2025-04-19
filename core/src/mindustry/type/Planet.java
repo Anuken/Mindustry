@@ -165,11 +165,8 @@ public class Planet extends UnlockableContent{
     public CampaignRules campaignRuleDefaults = new CampaignRules();
     /** Sets up rules on game load for any sector on this planet. */
     public Cons<Rules> ruleSetter = r -> {};
-
-    /** @deprecated no-op, do not use. */
-    @Deprecated
-    public Seq<Item> itemWhitelist = new Seq<>(), hiddenItems = new Seq<>();
-
+    /** If true, RTS AI can be customized. */
+    public boolean showRtsAIRule = false;
 
     public Planet(String name, Planet parent, float radius){
         super(name);
@@ -334,7 +331,9 @@ public class Planet extends UnlockableContent{
                 sum += 0.88f;
             }
 
-            sector.threat = sector.preset == null ? Math.min(sum / 5f, 1.2f) : Mathf.clamp(sector.preset.difficulty / 10f);
+            sector.threat = sector.preset == null ?
+                Math.max(Math.min(sum / 5f, 1.2f), 0.3f) : //low threat sectors are pointless
+                Mathf.clamp(sector.preset.difficulty / 10f);
         }
     }
 
