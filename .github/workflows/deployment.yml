@@ -73,7 +73,7 @@ jobs:
         cd ../MindustryBuilds
         echo "Updating version to ${RELEASE_VERSION:1}"
         BNUM=$(($GITHUB_RUN_NUMBER + 1000))
-        echo versionName=7-fdroid-${RELEASE_VERSION:1}$'\n'versionCode=${BNUM} > version_fdroid.txt
+        echo versionName=8-fdroid-${RELEASE_VERSION:1}$'\n'versionCode=${BNUM} > version_fdroid.txt
         git add .
         git commit -m "Updating to build ${RELEASE_VERSION:1}"
         git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/MindustryBuilds

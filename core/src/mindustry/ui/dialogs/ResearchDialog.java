@@ -601,15 +601,21 @@ public class ResearchDialog extends BaseDialog{
             infoTable.remove();
             infoTable.clear();
             infoTable.update(null);
+            infoTable.touchable = Touchable.enabled;
 
             if(button == null) return;
 
             TechNode node = (TechNode)button.userObject;
 
-            infoTable.exited(() -> {
-                if(hoverNode == button && !infoTable.hasMouse() && !hoverNode.hasMouse()){
-                    hoverNode = null;
-                    rebuild();
+            infoTable.addListener(new InputListener(){
+                @Override
+                public void exit(InputEvent event, float x, float y, int pointer, Element fromActor){
+                    Element e = Core.scene.hit(Core.input.mouseX(pointer == -1 ? 0 : pointer), Core.input.mouseY(pointer == -1 ? 0 : pointer), true);
+
+                    if(hoverNode == button && !(e != null && (e == infoTable || e.isDescendantOf(infoTable) || e == hoverNode || e.isDescendantOf(hoverNode))) && (Core.app.isDesktop() || pointer == 0)){
+                        hoverNode = null;
+                        rebuild();
+                    }
                 }
             });
 

@@ -160,7 +160,9 @@ public class ErekirTechTree{
                     });
 
                     node(beamTower, Seq.with(new OnSector(peaks)), () -> {
+                        node(beamLink, Seq.with(new OnSector(crossroads)), () -> {
 
+                        });
                     });
 
 

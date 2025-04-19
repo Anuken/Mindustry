@@ -601,7 +601,7 @@ public class NetServer implements ApplicationListener{
 
     @Remote(targets = Loc.client)
     public static void serverBinaryPacketReliable(Player player, String type, byte[] contents){
-        if(netServer.customPacketHandlers.containsKey(type)){
+        if(netServer.customBinaryPacketHandlers.containsKey(type)){
             for(var c : netServer.customBinaryPacketHandlers.get(type)){
                 c.get(player, contents);
             }
@@ -990,6 +990,7 @@ public class NetServer implements ApplicationListener{
             //write all entities now
             dataStream.writeInt(entity.id()); //write id
             dataStream.writeByte(entity.classId() & 0xFF); //write type ID
+            entity.beforeWrite();
             entity.writeSync(Writes.get(dataStream)); //write entity
 
             sent++;

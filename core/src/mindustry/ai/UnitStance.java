@@ -2,30 +2,23 @@ package mindustry.ai;
 
 import arc.*;
 import arc.scene.style.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 
 public class UnitStance extends MappableContent{
-    /** @deprecated now a content type, use the methods in Vars.content instead */
-    @Deprecated
-    public static final Seq<UnitStance> all = new Seq<>();
-
     public static UnitStance stop, shoot, holdFire, pursueTarget, patrol, ram;
 
     /** Name of UI icon (from Icon class). */
-    public final String icon;
+    public String icon;
     /** Key to press for this stance. */
-    public @Nullable Binding keybind = null;
+    public @Nullable Binding keybind;
 
     public UnitStance(String name, String icon, Binding keybind){
         super(name);
         this.icon = icon;
         this.keybind = keybind;
-
-        all.add(this);
     }
 
     public String localized(){

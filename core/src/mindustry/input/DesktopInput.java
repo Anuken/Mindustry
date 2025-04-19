@@ -474,7 +474,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = cursor.build.getCursor();
             }
 
-            if(canRepairDerelict(cursor)){
+            if(canRepairDerelict(cursor) && !player.dead() && player.unit().canBuild()){
                 cursorType = ui.repairCursor;
             }
 

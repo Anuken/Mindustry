@@ -1,6 +1,5 @@
 package mindustry.world.blocks.payloads;
 
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
@@ -158,13 +157,7 @@ public class PayloadRouter extends PayloadConveyor{
 
         @Override
         public void drawSelect(){
-            if(sorted != null){
-                float dx = x - size * tilesize/2f, dy = y + size * tilesize/2f, s = iconSmall / 4f;
-                Draw.mixcol(Color.darkGray, 1f);
-                Draw.rect(sorted.fullIcon, dx, dy - 1, s, s);
-                Draw.reset();
-                Draw.rect(sorted.fullIcon, dx, dy, s, s);
-            }
+            drawItemSelection(sorted);
         }
 
         @Override

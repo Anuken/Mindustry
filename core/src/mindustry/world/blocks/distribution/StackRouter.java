@@ -85,7 +85,7 @@ public class StackRouter extends DuctRouter{
         @Override
         public boolean acceptItem(Building source, Item item){
             return !unloading && (current == null || item == current) && items.total() < itemCapacity &&
-                (Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation);
+                (Edges.getFacingEdge(source.tile, tile).relativeTo(tile) == rotation);
         }
     }
 }

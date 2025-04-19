@@ -35,7 +35,9 @@ public class EditorTile extends Tile{
         if(floor == type && overlayID() == 0) return;
         if(overlayID() != 0) op(OpType.overlay, overlayID());
         if(floor != type) op(OpType.floor, floor.id);
-        super.setFloor(type);
+
+        this.floor = type;
+        this.overlay = (Floor)Blocks.air;
     }
 
     @Override
@@ -141,14 +143,14 @@ public class EditorTile extends Tile{
 
         if(block == null) block = Blocks.air;
         if(floor == null) floor = (Floor)Blocks.air;
-        
+
         Block block = block();
 
         if(block.hasBuilding()){
             build = entityprov.get().init(this, team, false, rotation);
             if(block.hasItems) build.items = new ItemModule();
-            if(block.hasLiquids) build.liquids(new LiquidModule());
-            if(block.hasPower) build.power(new PowerModule());
+            if(block.hasLiquids) build.liquids = new LiquidModule();
+            if(block.hasPower) build.power = new PowerModule();
         }
     }
 

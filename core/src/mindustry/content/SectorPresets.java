@@ -106,7 +106,7 @@ public class SectorPresets{
             difficulty = 8;
         }};
 
-        frontier = new SectorPreset("frontier", serpulo, 203){{
+        frontier = new SectorPreset("frontier", serpulo, 50){{
             difficulty = 4;
         }};
 
