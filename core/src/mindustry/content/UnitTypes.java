@@ -3872,29 +3872,40 @@ public class UnitTypes{
                     collidesGround = true;
                     collidesAir = false;
 
-                    despawnUnit = new MissileUnitType("quell-missile"){{
-                        targetAir = false;
-                        speed = 4.3f;
-                        maxRange = 6f;
-                        lifetime = 60f * 0.82f;
-                        homingDelay = 0;
-                        outlineColor = Pal.darkOutline;
-                        engineColor = trailColor = Pal.sapBulletBack;
-                        engineLayer = Layer.effect;
-                        health = 45;
-                        loopSoundVolume = 0.1f;
+                    //workaround to get the missile to behave like in spawnUnit while still spawning on death
+                    fragRandomSpread = 0;
+                    fragBullets = 1;
+                    fragVelocityMin = 1f;
+                    fragOffsetMax = 1f;
 
-                        weapons.add(new Weapon(){{
-                            shootSound = Sounds.none;
-                            shootCone = 360f;
-                            mirror = false;
-                            reload = 1f;
-                            shootOnDeath = true;
-                            bullet = new ExplosionBulletType(110f, 25f){{
-                                shootEffect = Fx.massiveExplosion;
-                                collidesAir = false;
-                            }};
-                        }});
+                    fragBullet = new BulletType(){{
+                        speed = 0f;
+                        keepVelocity = false;
+                        collidesAir = false;
+                        spawnUnit = new MissileUnitType("quell-missile"){{
+                            targetAir = false;
+                            rotateSpeed = 2f;
+                            speed = 4.3f;
+                            maxRange = 6f;
+                            lifetime = 60f * 0.82f;
+                            outlineColor = Pal.darkOutline;
+                            engineColor = trailColor = Pal.sapBulletBack;
+                            engineLayer = Layer.effect;
+                            health = 45;
+                            loopSoundVolume = 0.1f;
+
+                            weapons.add(new Weapon() {{
+                                shootSound = Sounds.none;
+                                shootCone = 360f;
+                                mirror = false;
+                                reload = 1f;
+                                shootOnDeath = true;
+                                bullet = new ExplosionBulletType(110f, 25f) {{
+                                    shootEffect = Fx.massiveExplosion;
+                                    collidesAir = false;
+                                }};
+                            }});
+                        }};
                     }};
                 }};
             }});
