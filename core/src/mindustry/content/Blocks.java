@@ -2155,6 +2155,7 @@ public class Blocks{
             requirements(Category.liquid, with(Items.metaglass, 1));
             liquidCapacity = 20f;
             health = 45;
+            explosivenessScale = flammabilityScale = 10f/20f;
         }};
 
         pulseConduit = new Conduit("pulse-conduit"){{
@@ -2162,6 +2163,7 @@ public class Blocks{
             liquidCapacity = 40f;
             liquidPressure = 1.025f;
             health = 90;
+            explosivenessScale = flammabilityScale = 16f/40f;
         }};
 
         platedConduit = new ArmoredConduit("plated-conduit"){{
@@ -2169,6 +2171,7 @@ public class Blocks{
             liquidCapacity = 50f;
             liquidPressure = 1.025f;
             health = 220;
+            explosivenessScale = flammabilityScale = 16f/50f;
         }};
 
         liquidRouter = new LiquidRouter("liquid-router"){{
@@ -2176,6 +2179,8 @@ public class Blocks{
             liquidCapacity = 120f;
             underBullets = true;
             solid = false;
+
+            explosivenessScale = flammabilityScale = 20f/120f;
         }};
 
         liquidContainer = new LiquidRouter("liquid-container"){{
@@ -2205,6 +2210,7 @@ public class Blocks{
             range = 4;
             hasPower = false;
             liquidCapacity = 100f;
+            explosivenessScale = flammabilityScale = 20f/100f;
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
@@ -2215,6 +2221,7 @@ public class Blocks{
             hasPower = true;
             canOverdrive = false;
             pulse = true;
+            explosivenessScale = flammabilityScale = 20f/100f;
             liquidCapacity = 100f;
             consumePower(0.30f);
         }};
@@ -2239,6 +2246,7 @@ public class Blocks{
             health = 250;
             researchCostMultiplier = 3;
             underBullets = true;
+            explosivenessScale = flammabilityScale = 20f/50f;
         }};
 
         reinforcedLiquidJunction = new LiquidJunction("reinforced-liquid-junction"){{
@@ -2259,6 +2267,7 @@ public class Blocks{
             researchCostMultiplier = 1;
             underBullets = true;
             health = 250;
+            explosivenessScale = flammabilityScale = 20f/120f;
 
             ((Conduit)reinforcedConduit).rotBridgeReplacement = this;
         }};
@@ -2271,6 +2280,8 @@ public class Blocks{
             underBullets = true;
             solid = false;
             health = 250;
+
+            explosivenessScale = flammabilityScale = 40f/150f;
         }};
 
         reinforcedLiquidContainer = new LiquidRouter("reinforced-liquid-container"){{
