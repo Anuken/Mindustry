@@ -649,8 +649,8 @@ public class UnitTypes{
                         Drawf.light(e.x, e.y, 60f * e.fout(), Pal.heal, 0.5f);
                     });
                     hitEffect = Fx.flakExplosion;
-                    damage = 45;
-                    buildingDamageMultiplier = 2f;
+                    damage = 55;
+                    buildingDamageMultiplier = 1.6f;
                     pierceDamageFactor = 0.8f;
                     chargeEffect = Fx.greenLaserCharge;
                     fragBullets = 1;
@@ -661,9 +661,10 @@ public class UnitTypes{
                         hittable = false;
                         reflectable = false;
                         absorbable = false;
-                        splashDamageRadius = 24f;
-                        splashDamage = 35f;
-                        buildingDamageMultiplier = 2f;
+
+                        splashDamageRadius = 36f;
+                        splashDamage = 30f;
+                        buildingDamageMultiplier = 1.6f;
                         hitColor = backColor = Pal.heal;
                         frontColor = Color.white;
                         hitEffect = Fx.shockwave;
