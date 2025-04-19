@@ -5,7 +5,6 @@ import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.graphics.*;
 import mindustry.logic.LExecutor.*;
 
 /** "Compiles" a sequence of statements into instructions. */
