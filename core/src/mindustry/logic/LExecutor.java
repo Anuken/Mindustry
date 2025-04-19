@@ -40,13 +40,15 @@ public class LExecutor{
     public static final int
     maxGraphicsBuffer = 256,
     maxDisplayBuffer = 1024,
-    maxTextBuffer = 400;
+    maxTextBuffer = 400,
+    //Do not append to the buffer if it would exceeed this limit.
+    maxTextBufferLimit = 800;
 
     public LInstruction[] instructions = {};
     /** Non-constant variables used for network sync */
     public LVar[] vars = {};
 
-    public LVar counter, unit, thisv, ipt;
+    public LVar counter, unit, thisv, ipt, printbuffer;
 
     public int[] binds;
     public boolean yield;
@@ -105,19 +107,24 @@ public class LExecutor{
         unit = builder.getVar("@unit");
         thisv = builder.getVar("@this");
         ipt = builder.putConst("@ipt", build != null ? build.ipt : 0);
+        printbuffer = builder.putConst("@printbuffer", build != null ? new BuildingStringBuilder(build.pos()) : null);
     }
 
     //region utility
 
 
-    public @Nullable LVar optionalVar(String name){
+    public @Nullable LVar optionalVar(CharSequence name){
         if(nameMap == null){
             nameMap = new ObjectIntMap<>();
             for(int i = 0; i < vars.length; i++){
                 nameMap.put(vars[i].name, i);
             }
         }
-        return optionalVar(nameMap.get(name, -1));
+        if(name instanceof String s) return optionalVar(nameMap.get(s, -1));
+        for(LVar var : vars){
+            if(OpI.strEquals(var.name, name)) return var;
+        }
+        return null;
     }
 
     /** @return a Var from this processor. May be null if out of bounds. */
@@ -571,7 +578,7 @@ public class LExecutor{
 
             if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
                 output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
+            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof CharSequence name){
                 LVar fromVar = logic.executor.optionalVar(name);
                 if(fromVar != null && !output.constant){
                     output.objval = fromVar.objval;
@@ -603,7 +610,7 @@ public class LExecutor{
 
             if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
                 mem.memory[address] = value.num();
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
+            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof CharSequence name){
                 LVar toVar = logic.executor.optionalVar(name);
                 if(toVar != null && !toVar.constant){
                     toVar.objval = value.objval;
@@ -633,6 +640,11 @@ public class LExecutor{
 
             if(target == null && sense == LAccess.dead){
                 to.setnum(1);
+                return;
+            }
+
+            if(sense == LAccess.type && !(target instanceof Senseable)){
+                to.setobj(LogicDialog.typeName(from));
                 return;
             }
 
@@ -809,7 +821,10 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             if(op == LogicOp.strictEqual){
-                dest.setnum(a.isobj == b.isobj && ((a.isobj && Structs.eq(a.objval, b.objval)) || (!a.isobj && a.numval == b.numval)) ? 1 : 0);
+                dest.setnum(a.isobj == b.isobj && (
+                    (a.isobj && a.objval.getClass().equals(b.objval.getClass()) && a.objval instanceof CharSequence sa && b.objval instanceof  CharSequence sb && strEquals(sa, sb)) ||
+                    (a.isobj && Structs.eq(a.objval, b.objval)) ||
+                    (!a.isobj && a.numval == b.numval)) ? 1 : 0);
             }else if(op.unary){
                 dest.setnum(op.function1.get(a.num()));
             }else{
@@ -822,6 +837,25 @@ public class LExecutor{
                 }
 
             }
+        }
+
+        public static boolean strEquals(CharSequence a, CharSequence b){
+            //This should be faster than the other approach
+            if(a instanceof String || b instanceof String){
+                String p = a instanceof String sa ? sa : (String)b;
+                CharSequence s = p == a ? b : a;
+                return(p.contentEquals(s));
+            }
+            if(a.length()!=b.length()) return false;
+            for(int i = 0; i < a.length(); i++){
+                if(a.charAt(i) != b.charAt(i)) return false;
+            }
+            return true;
+        }
+
+        public static boolean equal(Object a, Object b){
+            if(a instanceof CharSequence sa && b instanceof CharSequence sb) return strEquals(sa, sb);
+            return Structs.eq(a, b);
         }
     }
 
@@ -991,8 +1025,20 @@ public class LExecutor{
 
             //this should avoid any garbage allocation
             if(value.isobj){
+
+                if(value.objval instanceof BuildingStringBuilder builder){
+                    //We do not want to infinitely append.
+                    if(builder.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
+                    @Nullable StringBuilder str = builder.obtainBuilder();
+                    if(str == null) return;
+                    exec.textBuffer.append(str);
+                    return;
+                }
+
                 String strValue = toString(value.objval);
 
+                //Allow printing long strings, but only once
+                if(exec.textBuffer.length() != 0 && strValue.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
                 exec.textBuffer.append(strValue);
             }else{
                 //display integer version when possible
@@ -1008,6 +1054,7 @@ public class LExecutor{
             return
                 obj == null ? "null" :
                 obj instanceof String s ? s :
+                obj instanceof BuildingStringBuilder ? "[dyn-string]" : //Maybe use .toString, but it would allocate memory...
                 obj instanceof MappableContent content ? content.name :
                 obj instanceof Content ? "[content]" :
                 obj instanceof Building build ? build.block.name :
@@ -1075,7 +1122,18 @@ public class LExecutor{
 
             //this should avoid any garbage allocation
             if(value.isobj){
+                //avoid it even more
+                if(value.objval instanceof BuildingStringBuilder b){
+                    if(b.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, "");
+                    @Nullable StringBuilder str = b.obtainBuilder();
+                    if(str == null) return;
+                    exec.textBuffer.insert(placeholderIndex, str);
+                    return;
+                }
                 String strValue = PrintI.toString(value.objval);
+
+                if(strValue.length() + exec.textBuffer.length() >= maxTextBufferLimit) return;
 
                 exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, strValue);
             }else{
@@ -1136,7 +1194,10 @@ public class LExecutor{
                 boolean cmp;
 
                 if(op == ConditionOp.strictEqual){
-                    cmp = va.isobj == vb.isobj && ((va.isobj && va.objval == vb.objval) || (!va.isobj && va.numval == vb.numval));
+                    cmp = va.isobj == vb.isobj && (
+                        (va.isobj && va.objval.getClass().equals(vb.objval.getClass()) && va.objval instanceof CharSequence sa && vb.objval instanceof  CharSequence sb && OpI.strEquals(sa, sb)) ||
+                        (va.isobj && Structs.eq(va.objval, vb.objval)) ||
+                        (!va.isobj && va.numval == vb.numval));
                 }else if(op.objFunction != null && va.isobj && vb.isobj){
                     //use object function if both are objects
                     cmp = op.objFunction.get(value.obj(), compare.obj());
