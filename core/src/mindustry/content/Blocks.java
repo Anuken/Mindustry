@@ -4793,17 +4793,17 @@ public class Blocks{
                 }});
                 smokeEffect = Fx.shootSmokeTitan;
                 hitColor = Pal.surge;
-
+                homingPower = 0.5f;
                 sprite = "large-orb";
                 trailEffect = Fx.missileTrail;
                 trailInterval = 3f;
                 trailParam = 4f;
-                pierceCap = 2;
+                pierceCap = 3;
                 buildingDamageMultiplier = 0.5f;
                 fragOnHit = false;
-                speed = 5f;
-                damage = 180f;
-                lifetime = 80f;
+                speed = 7f;
+                damage = 280f;
+                lifetime = 57f;
                 width = height = 16f;
                 backColor = Pal.surge;
                 frontColor = Color.white;
@@ -4823,12 +4823,12 @@ public class Blocks{
                 //TODO shoot sound
                 shootSound = Sounds.cannon;
 
-                fragBullet = intervalBullet = new BasicBulletType(3f, 35){{
+                fragBullet = intervalBullet = new BasicBulletType(5f, 45){{
                     width = 9f;
                     hitSize = 5f;
                     height = 15f;
                     pierce = true;
-                    lifetime = 35f;
+                    lifetime = 20f;
                     pierceBuilding = true;
                     hitColor = backColor = trailColor = Pal.surge;
                     frontColor = Color.white;
@@ -4841,7 +4841,7 @@ public class Blocks{
                         lifetime = 10f;
                     }};
                     buildingDamageMultiplier = 0.3f;
-                    homingPower = 0.2f;
+                    
                 }};
 
                 bulletInterval = 3f;
@@ -4850,7 +4850,7 @@ public class Blocks{
                 intervalAngle = 180f;
                 intervalSpread = 300f;
 
-                fragBullets = 20;
+                fragBullets = 10;
                 fragVelocityMin = 0.5f;
                 fragVelocityMax = 1.5f;
                 fragLifeMin = 0.5f;
@@ -4879,8 +4879,8 @@ public class Blocks{
                 }});
             }};
 
-            consumePower(5f);
-            heatRequirement = 10f;
+            consumePower(10f);
+            heatRequirement = 12f;
             maxHeatEfficiency = 2f;
 
             newTargetInterval = 40f;
