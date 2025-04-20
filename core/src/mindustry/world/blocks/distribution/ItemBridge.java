@@ -26,6 +26,7 @@ public class ItemBridge extends Block{
     public final int timerCheckMoved = timers ++;
 
     public int range;
+    public float itemDelay;
     public float transportTime = 2f;
     public @Load("@-end") TextureRegion endRegion;
     public @Load("@-bridge") TextureRegion bridgeRegion;
@@ -46,7 +47,7 @@ public class ItemBridge extends Block{
         update = true;
         solid = true;
         underBullets = true;
-        hasPower = true;
+        hasPower = false;
         itemCapacity = 10;
         configurable = true;
         hasItems = true;
@@ -188,6 +189,7 @@ public class ItemBridge extends Block{
         public float time = -8f, timeSpeed;
         public boolean wasMoved, moved;
         public float transportCounter;
+        Seq<PendingItems> pendingItem = new Seq<>();
 
         @Override
         public void pickedUp(){
@@ -337,18 +339,41 @@ public class ItemBridge extends Block{
             dumpAccumulate();
         }
 
+        public class PendingItems {
+            Item item;
+            float remainingDelay;
+        
+            PendingItems(Item item, float delay) {
+                this.item = item;
+                this.remainingDelay = delay;
+            }
+        }
+
         public void updateTransport(Building other){
             transportCounter += edelta();
-            while(transportCounter >= transportTime){
+            while (transportCounter >= transportTime) {
                 Item item = items.take();
-                if(item != null && other.acceptItem(this, item)){
-                    other.handleItem(this, item);
-                    moved = true;
-                }else if(item != null){
-                    items.add(item, 1);
-                    items.undoFlow(item);
+                if (item != null) {
+                    pendingItem.add(new PendingItems(item, itemDelay));
                 }
                 transportCounter -= transportTime;
+            }
+            for (int i = 0; i < pendingItem.size; ) {
+                PendingItems pi = pendingItem.get(i);
+                pi.remainingDelay -= edelta();
+        
+                if (pi.remainingDelay <= 0f) {
+                    if (other.acceptItem(this, pi.item)) {
+                        other.handleItem(this, pi.item);
+                        moved = true;
+                    } else {
+                        items.add(pi.item, 1);
+                        items.undoFlow(pi.item);
+                    }
+                    pendingItem.remove(i);
+                } else {
+                    i++;
+                }
             }
         }
 
