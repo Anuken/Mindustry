@@ -176,6 +176,10 @@ public class Block extends UnlockableContent implements Senseable{
     public float armor = 0f;
     /** base block explosiveness */
     public float baseExplosiveness = 0f;
+    /** scaling of explosiveness based on items/liquids */
+    public float explosivenessScale = 1f;
+    /** scaling of explosion flammability based on items/liquids */
+    public float flammabilityScale = 1f;
     /** base value for screen shake upon destruction */
     public float baseShake = 3f;
     /** bullet that this block spawns when destroyed */

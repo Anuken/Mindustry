@@ -664,6 +664,8 @@ public class ContentParser{
             Planet parent = locate(ContentType.planet, value.getString("parent", ""));
             Planet planet = new Planet(mod + "-" + name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
 
+            value.remove("sectorSize");
+
             if(value.has("mesh")){
                 var mesh = value.get("mesh");
                 if(!mesh.isObject() && !mesh.isArray()) throw new RuntimeException("Meshes must be objects.");

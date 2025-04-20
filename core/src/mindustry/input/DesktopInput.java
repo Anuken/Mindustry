@@ -43,7 +43,7 @@ public class DesktopInput extends InputHandler{
     /** Selected build plan for movement. */
     public @Nullable BuildPlan splan;
     /** Whether player is currently deleting removal plans. */
-    public boolean deleting = false, shouldShoot = false, panning = false;
+    public boolean deleting = false, shouldShoot = false, panning = false, movedPlan = false;
     /** Mouse pan speed. */
     public float panScale = 0.005f, panSpeed = 4.5f, panBoostSpeed = 15f;
     /** Delta time between consecutive clicks. */
@@ -643,10 +643,13 @@ public class DesktopInput extends InputHandler{
         }
 
         if(splan != null){
-            float x = Core.input.mouseWorld().x + buildPlanMouseOffsetX;
-            float y = Core.input.mouseWorld().y + buildPlanMouseOffsetY;
-            splan.x = Math.round(x / tilesize);
-            splan.y = Math.round(y / tilesize);
+            int x = Math.round((Core.input.mouseWorld().x + buildPlanMouseOffsetX) / tilesize);
+            int y = Math.round((Core.input.mouseWorld().y + buildPlanMouseOffsetY) / tilesize);
+            if(splan.x != x || splan.y != y){
+                splan.x = x;
+                splan.y = y;
+                movedPlan = true;
+            }
         }
 
         if(block == null || mode != placing){
@@ -673,11 +676,10 @@ public class DesktopInput extends InputHandler{
             selectUnitsRect();
         }
 
-        if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
-            tappedOne = false;
+        if(Core.input.keyRelease(Binding.select) && !Core.scene.hasMouse()){
             BuildPlan plan = getPlan(cursorX, cursorY);
 
-            if(plan != null){
+            if(plan != null && !movedPlan){
                 //move selected to front
                 int index = player.unit().plans.indexOf(plan, true);
                 if(index != -1){
@@ -685,6 +687,11 @@ public class DesktopInput extends InputHandler{
                     player.unit().plans.addFirst(plan);
                 }
             }
+        }
+
+        if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
+            tappedOne = false;
+            BuildPlan plan = getPlan(cursorX, cursorY);
 
             if(Core.input.keyDown(Binding.break_block)){
                 mode = none;
@@ -699,6 +706,7 @@ public class DesktopInput extends InputHandler{
                 updateLine(selectX, selectY);
             }else if(plan != null && !plan.breaking && mode == none && !plan.initialized && plan.progress <= 0f){
                 splan = plan;
+                movedPlan = false;
                 buildPlanMouseOffsetX = splan.x * tilesize - Core.input.mouseWorld().x;
                 buildPlanMouseOffsetY = splan.y * tilesize - Core.input.mouseWorld().y;
             }else if(plan != null && plan.breaking){
