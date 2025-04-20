@@ -1948,7 +1948,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
             fadeIn = moveArrows = false;
             range = 4;
-            transportTime = 60f / 11f;
+            transportTime = 5;
             itemDelay = 74f;
             itemCapacity = 17;
             arrowSpacing = 6f;
