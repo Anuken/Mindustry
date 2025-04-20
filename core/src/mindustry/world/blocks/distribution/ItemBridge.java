@@ -27,7 +27,7 @@ public class ItemBridge extends Block{
 
     public int range;
     public float itemDelay;
-    public float transportTime;
+    public float transportTime = 2f;
     public @Load("@-end") TextureRegion endRegion;
     public @Load("@-bridge") TextureRegion bridgeRegion;
     public @Load("@-arrow") TextureRegion arrowRegion;
