@@ -14,6 +14,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -3838,6 +3839,7 @@ public class UnitTypes{
             engineOffset = 61 / 4f;
 
             abilities.add(new SuppressionFieldAbility(){{
+                reload = 60f * 8f;
                 orbRadius = 5.3f;
                 y = 1f;
             }});
@@ -3916,6 +3918,8 @@ public class UnitTypes{
             int parts = 10;
 
             abilities.add(new SuppressionFieldAbility(){{
+                reload = 60 * 15f;
+                range = 320f;
                 orbRadius = orbRad;
                 particleSize = partRad;
                 y = 10f;
