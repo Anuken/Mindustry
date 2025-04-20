@@ -46,7 +46,7 @@ public class LExecutor{
     /** Non-constant variables used for network sync */
     public LVar[] vars = {};
 
-    public LVar counter, unit, thisv, ipt;
+    public LVar counter, unit, thisv, ipt, unitcap;
 
     public int[] binds;
     public boolean yield;
@@ -104,6 +104,7 @@ public class LExecutor{
         counter = builder.getVar("@counter");
         unit = builder.getVar("@unit");
         thisv = builder.getVar("@this");
+        unitcap = builder.putConst("@unitcap", Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap));
         ipt = builder.putConst("@ipt", build != null ? build.ipt : 0);
     }
 

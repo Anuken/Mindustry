@@ -406,6 +406,7 @@ public class LogicBlock extends Block{
                     asm.getVar("@this").setconst(this);
                     asm.putConst("@thisx", World.conv(x));
                     asm.putConst("@thisy", World.conv(y));
+                    asm.putConst("@unitcap", Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + executor.team.data().unitCap : state.rules.unitCap));
 
                     executor.load(asm);
                     executor.unit.objval = oldUnit;
@@ -471,6 +472,8 @@ public class LogicBlock extends Block{
             }
 
             executor.team = team;
+            executor.unitcap.setconst(Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap));
+            
 
             if(!checkedDuplicates){
                 checkedDuplicates = true;
