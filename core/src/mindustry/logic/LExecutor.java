@@ -45,8 +45,9 @@ public class LExecutor{
     public LInstruction[] instructions = {};
     /** Non-constant variables used for network sync */
     public LVar[] vars = {};
+    public LAssembler assembler;
 
-    public LVar counter, unit, thisv, ipt, unitcap;
+    public LVar counter, unit, thisv, ipt;
 
     public int[] binds;
     public boolean yield;
@@ -94,6 +95,7 @@ public class LExecutor{
 
     /** Loads with a specified assembler. Resets all variables. */
     public void load(LAssembler builder){
+        assembler = builder;
         nameMap = null;
         vars = builder.vars.values().toSeq().retainAll(var -> !var.constant).toArray(LVar.class);
         for(int i = 0; i < vars.length; i++){
@@ -104,7 +106,6 @@ public class LExecutor{
         counter = builder.getVar("@counter");
         unit = builder.getVar("@unit");
         thisv = builder.getVar("@this");
-        unitcap = builder.putConst("@unitcap", Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap));
         ipt = builder.putConst("@ipt", build != null ? build.ipt : 0);
     }
 

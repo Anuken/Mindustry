@@ -472,8 +472,10 @@ public class LogicBlock extends Block{
             }
 
             executor.team = team;
-            executor.unitcap.setconst(Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap));
-            
+            // update unitcap variable
+            if(executor.assembler != null){
+                executor.assembler.getVar("@unitcap").setconst(Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap));
+            }
 
             if(!checkedDuplicates){
                 checkedDuplicates = true;
