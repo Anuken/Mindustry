@@ -3867,6 +3867,7 @@ public class UnitTypes{
                     hitColor = backColor = trailColor = Pal.sapBulletBack;
                     trailWidth = 3f;
                     trailLength = 12;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
 
                     keepVelocity = false;
                     collidesGround = true;
