@@ -3836,7 +3836,7 @@ public class UnitTypes{
 
             engineSize = 4.8f;
             engineOffset = 61 / 4f;
-            range = 361.2f;
+            range = 4.3f * 60f * 1.4f;
 
             abilities.add(new SuppressionFieldAbility(){{
                 orbRadius = 5.3f;
@@ -3858,7 +3858,7 @@ public class UnitTypes{
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke2;
                     shake = 1f;
-                    lifetime = 60 * 0.58f;
+                    lifetime = 60 * 0.496f;
                     rangeOverride = 361.2f;
 
                     width = 12f;
@@ -3887,7 +3887,7 @@ public class UnitTypes{
                             rotateSpeed = 2f;
                             speed = 4.3f;
                             maxRange = 6f;
-                            lifetime = 60f * 0.82f;
+                            lifetime = 60f * (1.4f - 0.496f);
                             outlineColor = Pal.darkOutline;
                             engineColor = trailColor = Pal.sapBulletBack;
                             engineLayer = Layer.effect;
