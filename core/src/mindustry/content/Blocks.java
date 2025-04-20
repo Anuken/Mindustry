@@ -1937,7 +1937,7 @@ public class Blocks{
         }};
 
         junction = new Junction("junction"){{
-            requirements(Category.distribution, with(Items.copper, 2));
+            requirements(Category.distribution, with(Items.copper, 4));
             speed = 26;
             capacity = 6;
             health = 30;
@@ -1948,10 +1948,9 @@ public class Blocks{
             requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
             fadeIn = moveArrows = false;
             range = 4;
-            transportTime = 5f;
-            itemDelay = 74f;
-            itemCapacity = 17;
+            speed = 74f;
             arrowSpacing = 6f;
+            bufferCapacity = 14;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{

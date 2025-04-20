@@ -20,7 +20,6 @@ public class DuctBridge extends DirectionBridge{
     @Override
     public void setStats(){
         super.setStats();
-
         stats.add(Stat.itemsMoved, 60f / speed, StatUnit.itemsSecond);
     }
 
