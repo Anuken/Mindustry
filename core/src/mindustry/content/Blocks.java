@@ -1944,7 +1944,7 @@ public class Blocks{
             buildCostMultiplier = 6f;
         }};
 
-        itemBridge = new ItemBridge("bridge-conveyor"){{
+        itemBridge = new BufferedItemBridge("bridge-conveyor"){{
             requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
             fadeIn = moveArrows = false;
             range = 4;
