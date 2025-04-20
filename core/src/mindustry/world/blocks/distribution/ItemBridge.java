@@ -27,7 +27,7 @@ public class ItemBridge extends Block{
 
     public int range;
     public float itemDelay;
-    public float transportTime = 2f;
+    public float transportTime;
     public @Load("@-end") TextureRegion endRegion;
     public @Load("@-bridge") TextureRegion bridgeRegion;
     public @Load("@-arrow") TextureRegion arrowRegion;
@@ -64,6 +64,15 @@ public class ItemBridge extends Block{
         config(Point2.class, (ItemBridgeBuild tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
         //integer is not
         config(Integer.class, (ItemBridgeBuild tile, Integer i) -> tile.link = i);
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        if(transportTime != 0f){
+            stats.add(Stat.itemsMoved, 60f / transportTime, StatUnit.itemsSecond);
+        }
     }
 
     @Override
@@ -189,7 +198,7 @@ public class ItemBridge extends Block{
         public float time = -8f, timeSpeed;
         public boolean wasMoved, moved;
         public float transportCounter;
-        Seq<PendingItems> pendingItem = new Seq<>();
+        Seq<pendingItems> pendingItem = new Seq<>();
 
         @Override
         public void pickedUp(){
@@ -339,11 +348,11 @@ public class ItemBridge extends Block{
             dumpAccumulate();
         }
 
-        public class PendingItems {
+        public class pendingItems {
             Item item;
             float remainingDelay;
         
-            PendingItems(Item item, float delay) {
+            pendingItems(Item item, float delay) {
                 this.item = item;
                 this.remainingDelay = delay;
             }
@@ -354,12 +363,12 @@ public class ItemBridge extends Block{
             while (transportCounter >= transportTime) {
                 Item item = items.take();
                 if (item != null) {
-                    pendingItem.add(new PendingItems(item, itemDelay));
+                    pendingItem.add(new pendingItems(item, itemDelay));
                 }
                 transportCounter -= transportTime;
             }
             for (int i = 0; i < pendingItem.size; ) {
-                PendingItems pi = pendingItem.get(i);
+                pendingItems pi = pendingItem.get(i);
                 pi.remainingDelay -= edelta();
         
                 if (pi.remainingDelay <= 0f) {

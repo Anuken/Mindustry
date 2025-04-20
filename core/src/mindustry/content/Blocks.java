@@ -1948,7 +1948,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.lead, 6, Items.copper, 6));
             fadeIn = moveArrows = false;
             range = 4;
-            transportTime = 5;
+            transportTime = 5f;
             itemDelay = 74f;
             itemCapacity = 17;
             arrowSpacing = 6f;
@@ -1957,6 +1957,7 @@ public class Blocks{
         phaseConveyor = new ItemBridge("phase-conveyor"){{
             requirements(Category.distribution, with(Items.phaseFabric, 5, Items.silicon, 7, Items.lead, 10, Items.graphite, 10));
             range = 12;
+            transportTime = 2f;
             arrowPeriod = 0.9f;
             arrowTimeScl = 2.75f;
             hasPower = true;
