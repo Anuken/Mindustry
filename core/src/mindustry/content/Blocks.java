@@ -1184,7 +1184,7 @@ public class Blocks{
             ambientSoundVolume = 0.12f;
 
             consumeItems(with(Items.graphite, 1, Items.sand, 4));
-            consumePower(6f);
+            consumePower(5f);
         }};
 
         electrolyzer = new GenericCrafter("electrolyzer"){{
@@ -1448,7 +1448,7 @@ public class Blocks{
 
             consumeItem(Items.silicon, 3);
             consumeLiquid(Liquids.slag, 40f / 60f);
-            consumePower(2f);
+            consumePower(1.5f);
         }};
 
         cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
@@ -2534,8 +2534,8 @@ public class Blocks{
         }};
 
         chemicalCombustionChamber = new ConsumeGenerator("chemical-combustion-chamber"){{
-            requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 40, Items.oxide, 40f, Items.silicon, 30));
-            powerProduction = 10f;
+            requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 20, Items.oxide, 40f, Items.silicon, 30));
+            powerProduction = 550f / 60f;
             researchCost = with(Items.graphite, 2000, Items.tungsten, 1000, Items.oxide, 10, Items.silicon, 1500);
             consumeLiquids(LiquidStack.with(Liquids.ozone, 2f / 60f, Liquids.arkycite, 40f / 60f));
             size = 3;
@@ -2557,7 +2557,7 @@ public class Blocks{
 
         pyrolysisGenerator = new ConsumeGenerator("pyrolysis-generator"){{
             requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 50));
-            powerProduction = 25f;
+            powerProduction = 1250f / 60f;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
                 sinMag = 2.75f;
@@ -2586,8 +2586,8 @@ public class Blocks{
         }};
 
         fluxReactor = new VariableReactor("flux-reactor"){{
-            requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
-            powerProduction = 240f;
+            requirements(Category.power, with(Items.graphite, 300, Items.carbide, 100, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 200));
+            powerProduction = 265f;
             maxHeat = 150f;
 
             consumeLiquid(Liquids.cyanogen, 9f / 60f);
@@ -2622,7 +2622,7 @@ public class Blocks{
         }};
 
         neoplasiaReactor = new HeaterGenerator("neoplasia-reactor"){{
-            requirements(Category.power, with(Items.tungsten, 1000, Items.carbide, 300, Items.oxide, 150, Items.silicon, 500, Items.phaseFabric, 300, Items.surgeAlloy, 200));
+            requirements(Category.power, with(Items.tungsten, 750, Items.carbide, 300, Items.oxide, 150, Items.silicon, 500, Items.phaseFabric, 150, Items.surgeAlloy, 200));
 
             size = 5;
             liquidCapacity = 80f;
@@ -4379,7 +4379,7 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
 
             liquidCapacity = 50f;
-            liquidConsumed = 10f / 60f;
+            liquidConsumed = 15f / 60f;
             targetInterval = 5f;
             newTargetInterval = 30f;
             targetUnderBlocks = false;
@@ -4404,6 +4404,7 @@ public class Blocks{
             Liquids.cyanogen, new ContinuousFlameBulletType(){{
                 damage = 130f;
                 rangeChange = 70f;
+                ammoMultiplier = 1.5f;
                 length = r + rangeChange;
                 knockback = 2f;
                 pierceCap = 3;
@@ -6157,7 +6158,7 @@ public class Blocks{
             researchCost = with(Items.beryllium, 200, Items.graphite, 80, Items.silicon, 80);
             regionSuffix = "-dark";
             fogRadius = 3;
-            consumePower(2f);
+            consumePower(1.5f);
         }};
 
         shipFabricator = new UnitFactory("ship-fabricator"){{
@@ -6169,18 +6170,18 @@ public class Blocks{
             regionSuffix = "-dark";
             fogRadius = 3;
             researchCostMultiplier = 0.5f;
-            consumePower(2f);
+            consumePower(1.5f);
         }};
 
         mechFabricator = new UnitFactory("mech-fabricator"){{
-            requirements(Category.units, with(Items.silicon, 200, Items.graphite, 300, Items.tungsten, 60));
+            requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 250, Items.tungsten, 5));
             size = 3;
             configurable = false;
             plans.add(new UnitPlan(UnitTypes.merui, 60f * 40f, with(Items.beryllium, 50, Items.silicon, 70)));
             regionSuffix = "-dark";
             fogRadius = 3;
             researchCostMultiplier = 0.65f;
-            consumePower(2f);
+            consumePower(1.5f);
         }};
 
         tankRefabricator = new Reconstructor("tank-refabricator"){{
@@ -6201,7 +6202,7 @@ public class Blocks{
         }};
 
         shipRefabricator = new Reconstructor("ship-refabricator"){{
-            requirements(Category.units, with(Items.beryllium, 200, Items.tungsten, 100, Items.silicon, 150, Items.oxide, 40));
+            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150, Items.oxide, 15));
             regionSuffix = "-dark";
 
             size = 3;
@@ -6243,7 +6244,7 @@ public class Blocks{
             researchCostMultipliers.put(Items.thorium, 0.2f);
 
             size = 5;
-            consumePower(5f);
+            consumePower(4.5f);
             consumeLiquid(Liquids.nitrogen, 10f / 60f);
             consumeItems(with(Items.thorium, 80, Items.silicon, 100));
 
