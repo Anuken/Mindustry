@@ -159,7 +159,7 @@ public class Pathfinder implements Runnable{
                         if(!other.solid()){
                             boolean otherNearSolid = false;
                             for(int j = 0; j < 4; j++){
-                                Tile othernear = other.nearby(i);
+                                Tile othernear = other.nearby(j);
                                 if(othernear != null && othernear.solid()){
                                     otherNearSolid = true;
                                     break;
