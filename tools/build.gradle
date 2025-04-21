@@ -289,10 +289,10 @@ task updateBundles{
         IntMap<String> commentAndBlankLines = new IntMap<>()
         var lines = Fi.get("core/assets/bundles/bundle.properties").reader().readLines()
         int offset = 0
-        for (int i = 0; i < lines.size(); i++) {
+        for(int i = 0; i < lines.size(); i++){
             var line = lines.get(i)
-            if (i > 0 && lines.get(i - 1).endsWith("\\")) offset++ //multiline value escaped with \\ at end of line
-            else if (line.isEmpty() || line.startsWith("#")) commentAndBlankLines.put(i - offset, line)
+            if(i > 0 && lines.get(i - 1).endsWith("\\")) offset++ //multiline value escaped with \\ at end of line
+            else if(line.isEmpty() || line.startsWith("#")) commentAndBlankLines.put(i - offset, line)
         }
 
         Log.info("Updating bundles...")
