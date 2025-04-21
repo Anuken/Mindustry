@@ -1937,7 +1937,7 @@ public class Blocks{
         }};
 
         junction = new Junction("junction"){{
-            requirements(Category.distribution, with(Items.copper, 4));
+            requirements(Category.distribution, with(Items.copper, 3));
             speed = 26;
             capacity = 6;
             health = 30;
