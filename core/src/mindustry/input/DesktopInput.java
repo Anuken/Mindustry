@@ -288,14 +288,14 @@ public class DesktopInput extends InputHandler{
         }
 
         //validate commanding units
-        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid() || u.team != player.team());
+        selectedUnits.removeAll(u -> !u.allowCommand() || !u.isValid() || u.team != player.team());
 
         if(commandMode && !scene.hasField() && !scene.hasDialog()){
             if(input.keyTap(Binding.select_all_units)){
                 selectedUnits.clear();
                 commandBuildings.clear();
                 for(var unit : player.team().data().units){
-                    if(unit.isCommandable()){
+                    if(unit.allowCommand()){
                         selectedUnits.add(unit);
                     }
                 }

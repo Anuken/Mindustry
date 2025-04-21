@@ -41,8 +41,7 @@ public class DesktopLauncher extends ClientLauncher{
                 maximized = true;
                 width = 900;
                 height = 700;
-                //request 3.1, which has instancing
-                gl30Minor = 1;
+                gl30Minor = 2;
                 gl30 = true;
                 for(int i = 0; i < arg.length; i++){
                     if(arg[i].charAt(0) == '-'){
