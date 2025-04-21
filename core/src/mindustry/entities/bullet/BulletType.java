@@ -299,6 +299,8 @@ public class BulletType extends Content implements Cloneable{
     public float homingRange = 50f;
     /** Use a negative value to disable homing delay. */
     public float homingDelay = -1f;
+    /** Speed at which bullet rotates to follow cursor. <= 0 to disable. */
+    public float followAimSpeed = 0f;
 
     /** Range of healing block suppression effect. */
     public float suppressionRange = -1f;
@@ -715,6 +717,11 @@ public class BulletType extends Content implements Cloneable{
             if(target != null){
                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), homingPower * Time.delta * 50f));
             }
+        }
+
+        if(followAimSpeed > 0f && b.shooter instanceof Unit u){
+            float angle = b.angleTo(u.aimX, u.aimY);
+            b.vel.setAngle(Angles.moveToward(b.vel.angle(), angle, followAimSpeed * Time.delta));
         }
     }
 
