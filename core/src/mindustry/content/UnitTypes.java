@@ -3860,6 +3860,7 @@ public class UnitTypes{
                     shake = 1f;
                     lifetime = 60 * 0.496f;
                     rangeOverride = 361.2f;
+                    followAimSpeed = 5f;
 
                     width = 12f;
                     height = 22f;
@@ -3885,7 +3886,6 @@ public class UnitTypes{
                         collidesAir = false;
                         spawnUnit = new MissileUnitType("quell-missile"){{
                             targetAir = false;
-                            rotateSpeed = 2f;
                             speed = 4.3f;
                             maxRange = 6f;
                             lifetime = 60f * (1.4f - 0.496f);
