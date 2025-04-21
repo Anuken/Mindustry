@@ -6220,7 +6220,7 @@ public class Blocks{
         }};
 
         mechRefabricator = new Reconstructor("mech-refabricator"){{
-            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
+            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 175, Items.silicon, 150));
             regionSuffix = "-dark";
 
             size = 3;
