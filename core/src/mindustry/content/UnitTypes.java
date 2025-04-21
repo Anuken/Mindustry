@@ -3092,7 +3092,7 @@ public class UnitTypes{
                 shootSound = Sounds.blaster;
                 x = 14f / 4f;
                 y = 33f / 4f;
-                reload = 27f;
+                reload = 33f;
                 layerOffset = -0.002f;
                 alternate = false;
                 heatColor = Color.red;
