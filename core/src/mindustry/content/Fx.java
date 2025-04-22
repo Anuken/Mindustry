@@ -458,6 +458,38 @@ public class Fx{
             Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 50f * rand.random(1f, 0.6f) + 2f, e.finpow() * 100f * lenRand + 6f);
         }
     }),
+    
+    titanExplosionSmall = new Effect(22f, 120f, e -> {
+        color(e.color);
+        stroke(e.fout() * 3f);
+        float circleRad = 6f + e.finpow() * 45f;
+        Lines.circle(e.x, e.y, circleRad);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 12; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 50f * rand.random(1f, 0.6f) + 2f, e.finpow() * 50f * lenRand + 6f);
+        }
+    }),
+
+    titanExplosionFrag = new Effect(20f, 50f, e -> {
+        color(e.color);
+        stroke(e.fout() * 2f);
+        float circleRad = 6f + e.finpow() * 20f;
+        Lines.circle(e.x, e.y, circleRad);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 8; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            Tmp.v1.trns(angle, circleRad);
+
+            for(int s : Mathf.signs){
+                Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.foutpow() * 15f, e.fout() * 20f * lenRand + 6f, angle + 90f + s * 90f);
+            }
+        }
+    }),
 
     titanSmoke = new Effect(300f, 300f, b -> {
         float intensity = 3f;
@@ -498,6 +530,26 @@ public class Fx{
             });
         }
     }),
+    titanSmokeSmall = new Effect(200f, 200f, b -> {
+        float intensity = 2.5f;
+
+        color(b.color, 0.7f);
+        for(int i = 0; i < 4; i++){
+            rand.setSeed(b.id*2 + i);
+            float lenScl = rand.random(0.5f, 1f);
+            int fi = i;
+            b.scaled(b.lifetime * lenScl, e -> {
+                randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 18f * intensity, (x, y, in, out) -> {
+                    float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                    float rad = fout * ((2f + intensity) * 2.35f);
+
+                    Fill.circle(e.x + x, e.y + y, rad);
+                    Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
+                });
+            });
+        }
+    }),
+
 
     smokeAoeCloud = new Effect(60f * 3f, 250f, e -> {
         color(e.color, 0.65f);
@@ -612,6 +664,13 @@ public class Fx{
 
     scatheLightSmall = new Effect(60f, 160f, e -> {
         float circleRad = 6f + e.finpow() * 40f;
+
+        color(e.color, e.foutpow());
+        Fill.circle(e.x, e.y, circleRad);
+    }).layer(Layer.bullet + 2f),
+
+    titanLightSmall = new Effect(40f, 100f, e -> {
+        float circleRad = 6f + e.finpow() * 20f;
 
         color(e.color, e.foutpow());
         Fill.circle(e.x, e.y, circleRad);

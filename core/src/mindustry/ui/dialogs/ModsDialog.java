@@ -686,7 +686,7 @@ public class ModsDialog extends BaseDialog{
 
                 //this is a crude heuristic for class mods; only required for direct github import
                 //TODO make a more reliable way to distinguish java mod repos
-                if(language.equals("Java") || language.equals("Kotlin")){
+                if(language.equals("Java") || language.equals("Kotlin") || language.equals("Groovy") || language.equals("Scala")){
                     githubImportJavaMod(repo, release);
                 }else{
                     githubImportBranch(mainBranch, repo, release);
