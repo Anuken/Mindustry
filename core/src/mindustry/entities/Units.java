@@ -34,6 +34,18 @@ public class Units{
         return false;
     };
 
+    public static void notifyUnitSpawn(Unit unit){
+        if(net.server()){
+            Call.unitSpawn(new UnitContainer(unit));
+        }
+    }
+
+    //syncs a unit spawn so that it appears immediately without waiting for a snapshot
+    @Remote(unreliable = true, priority = PacketPriority.low)
+    public static void unitSpawn(UnitContainer container){
+        //doesn't actually do anything, reading calls add()
+    }
+
     @Remote(called = Loc.server)
     public static void unitCapDeath(Unit unit){
         if(unit != null){
@@ -487,5 +499,16 @@ public class Units{
 
     public interface BuildingPriorityf{
         float priority(Building build);
+    }
+
+    public static class UnitContainer{
+        public Unit unit;
+
+        public UnitContainer(){
+        }
+
+        public UnitContainer(Unit unit){
+            this.unit = unit;
+        }
     }
 }
