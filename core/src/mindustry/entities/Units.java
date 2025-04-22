@@ -36,13 +36,13 @@ public class Units{
 
     public static void notifyUnitSpawn(Unit unit){
         if(net.server()){
-            Call.unitSpawn(new UnitContainer(unit));
+            Call.unitSpawn(new UnitSyncContainer(unit));
         }
     }
 
     //syncs a unit spawn so that it appears immediately without waiting for a snapshot
     @Remote(unreliable = true, priority = PacketPriority.low)
-    public static void unitSpawn(UnitContainer container){
+    public static void unitSpawn(UnitSyncContainer container){
         //doesn't actually do anything, reading calls add()
     }
 
@@ -501,13 +501,13 @@ public class Units{
         float priority(Building build);
     }
 
-    public static class UnitContainer{
+    public static class UnitSyncContainer{
         public Unit unit;
 
-        public UnitContainer(){
+        public UnitSyncContainer(){
         }
 
-        public UnitContainer(Unit unit){
+        public UnitSyncContainer(Unit unit){
             this.unit = unit;
         }
     }

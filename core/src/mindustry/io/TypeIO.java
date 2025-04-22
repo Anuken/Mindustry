@@ -279,14 +279,14 @@ public class TypeIO{
         return noAbilities;
     }
 
-    public static void writeUnitContainer(Writes write, Units.UnitContainer cont){
+    public static void writeUnitContainer(Writes write, UnitSyncContainer cont){
         write.i(cont.unit.id);
         write.b(cont.unit.classId() & 0xFF);
         cont.unit.beforeWrite();
         cont.unit.writeSync(write);
     }
 
-    public static UnitContainer readUnitContainer(Reads read){
+    public static UnitSyncContainer readUnitContainer(Reads read){
         int id = read.i();
         int typeID = read.ub();
 
