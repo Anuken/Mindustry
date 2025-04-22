@@ -201,7 +201,7 @@ public class ChatFragment extends Table{
         //avoid sending prefix-empty messages
         if(message.isEmpty() || (message.startsWith(mode.prefix) && message.substring(mode.prefix.length()).isEmpty())) return;
 
-        history.insert(1, message);
+        if(history.size < 2 || !history.get(1).equals(message)) history.insert(1, message);
 
         message = UI.formatIcons(message);
 
