@@ -585,7 +585,7 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void createUnits(Bullet b, float x, float y){
-        if(despawnUnit != null && Mathf.chance(despawnUnitChance)){
+        if(!net.client() && despawnUnit != null && Mathf.chance(despawnUnitChance)){
             for(int i = 0; i < despawnUnitCount; i++){
                 Tmp.v1.rnd(Mathf.random(despawnUnitRadius));
                 var u = despawnUnit.spawn(b.team, x + Tmp.v1.x, y + Tmp.v1.y);
