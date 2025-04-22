@@ -48,8 +48,10 @@ public class DesktopLauncher extends ClientLauncher{
                         String name = arg[i].substring(1);
                         try{
                             switch(name){
-                                case "width": width = Integer.parseInt(arg[i + 1]); break;
-                                case "height": height = Integer.parseInt(arg[i + 1]); break;
+                                case "width": width = Strings.parseInt(arg[i + 1], width); break;
+                                case "height": height = Strings.parseInt(arg[i + 1], height); break;
+                                case "glMajor": gl30Major = Strings.parseInt(arg[i + 1], gl30Major);
+                                case "glMinor": gl30Minor = Strings.parseInt(arg[i + 1], gl30Minor);
                                 case "gl3": gl30 = true; break;
                                 case "gl2": gl30 = false; break;
                                 case "coreGl": coreProfile = true; break;
