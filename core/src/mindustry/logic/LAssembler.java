@@ -93,6 +93,12 @@ public class LAssembler{
         if(symbol.startsWith("0x")) return Strings.parseLong(symbol, 16, 2, symbol.length(), invalidNum);
         if(symbol.startsWith("+0x")) return Strings.parseLong(symbol, 16, 3, symbol.length(), invalidNum);
         if(symbol.startsWith("-0x")) return -Strings.parseLong(symbol, 16, 3, symbol.length(), invalidNum);//FIXME: breaks with Long.MIN_VALUE
+        if(symbol.startsWith("%[") && symbol.endsWith("]") && symbol.length() > 3){
+            double color = parseNamedColor(symbol);
+            if(color != -1d){
+                return color;
+            }
+        }
         if(symbol.startsWith("%") && (symbol.length() == 7 || symbol.length() == 9)) return parseColor(symbol);
 
         return Strings.parseDouble(symbol, invalidNum);
@@ -106,6 +112,12 @@ public class LAssembler{
         a = symbol.length() == 9 ? Strings.parseInt(symbol, 16, 0, 7, 9) : 255;
 
         return Color.toDoubleBits(r, g, b, a);
+    }
+
+    double parseNamedColor(String symbol){
+        Color color = Colors.get(symbol.substring(2, symbol.length() - 1));
+
+        return color == null ? -1d : color.toDoubleBits();
     }
 
     /** Adds a constant value by name. */
