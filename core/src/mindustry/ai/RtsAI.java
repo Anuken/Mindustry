@@ -25,16 +25,16 @@ import mindustry.world.meta.*;
 
 public class RtsAI{
     static final Seq<Building> targets = new Seq<>();
-    static final Seq<Unit> squad = new Seq<>(false);
+    static final Seq<Unit> squad = new Seq<>(false), stack = new Seq<>();
     static final IntSet used = new IntSet();
     static final IntSet assignedTargets = new IntSet(), invalidTarget = new IntSet();
-    static final float squadRadius = 140f;
+    static final float squadRadius = 50f;
     static final int timeUpdate = 0, timerSpawn = 1, maxTargetsChecked = 15;
 
     //in order of priority??
     static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery, BlockFlag.drill};
     static final ObjectFloatMap<Building> weights = new ObjectFloatMap<>();
-    static final boolean debug = OS.hasProp("mindustry.debug") && false;
+    static final boolean debug = OS.hasProp("mindustry.debug");
 
     final Interval timer = new Interval(10);
     final TeamData data;
@@ -109,21 +109,25 @@ public class RtsAI{
         boolean didDefend = false;
 
         for(var unit : data.units){
-            if(used.add(unit.id) && unit.isCommandable() && !unit.command().hasCommand() && !unit.command().isAttacking()){
+            if(used.add(unit.id) && unit.controller() instanceof CommandAI cai && !cai.hasCommand() && !cai.isAttacking()){
                 squad.clear();
+
+                stack.clear();
+                stack.add(unit);
+
                 float rad = squadRadius + unit.hitSize*1.5f;
-                data.tree().intersect(unit.x - rad/2f, unit.y - rad/2f, rad, rad, squad);
 
-                squad.truncate(data.team.rules().rtsMaxSquad);
+                while(stack.size > 0){
+                    var next = stack.pop();
 
-                //remove overlapping squads
-                squad.removeAll(u -> (u != unit && used.contains(u.id)) || !u.isCommandable() || u.command().hasCommand() || ((u.flag == 0) != (unit.flag == 0)));
-                //mark used so other squads can't steal them
-                for(var item : squad){
-                    used.add(item.id);
+                    data.tree().intersect(next.x - rad/2f, next.y - rad/2f, rad, rad, u -> {
+                        if(u.controller() instanceof CommandAI ai && !ai.hasCommand() && ((u.flag == 0) == (unit.flag == 0)) && used.add(u.id)){
+                            squad.add(u);
+                            stack.add(u);
+                        }
+                    });
                 }
 
-                //TODO flawed, squads
                 if(handleSquad(squad, !didDefend)){
                     didDefend = true;
                 }
@@ -304,7 +308,7 @@ public class RtsAI{
         );
 
         float weight = weights.get(result, 0f);
-        if(checkWeight && weight < data.team.rules().rtsMinWeight && total < Units.getCap(data.team)){
+        if(checkWeight && (weight < data.team.rules().rtsMinWeight && total < data.team.rules().rtsMaxSquad) && total < Units.getCap(data.team)){
             return null;
         }
 

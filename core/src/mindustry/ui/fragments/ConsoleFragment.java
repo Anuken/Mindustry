@@ -170,7 +170,7 @@ public class ConsoleFragment extends Table{
             return;
         }
 
-        history.insert(1, message);
+        if(history.size < 2 || !history.get(1).equals(message)) history.insert(1, message);
 
         addMessage("[lightgray]> " + message.replace("[", "[["));
         addMessage(mods.getScripts().runConsole(injectConsoleVariables() + message).replace("[", "[["));

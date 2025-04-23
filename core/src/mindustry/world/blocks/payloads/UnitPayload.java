@@ -130,6 +130,7 @@ public class UnitPayload implements Payload{
         unit.add();
         unit.unloaded();
         Events.fire(new UnitUnloadEvent(unit));
+        Units.notifyUnitSpawn(unit);
 
         return true;
     }

@@ -533,6 +533,7 @@ public class Control implements ApplicationListener, Loadable{
         if(saves != null && saves.getCurrent() != null && saves.getCurrent().isAutosave() && !net.client() && !state.isMenu() && !state.gameOver){
             try{
                 SaveIO.save(control.saves.getCurrent().file);
+                settings.forceSave();
                 Log.info("Saved on exit.");
             }catch(Throwable t){
                 Log.err(t);
