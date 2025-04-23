@@ -47,10 +47,17 @@ public class BufferedItemBridge extends ItemBridge{
         }
         
         @Override
+        public void doDump(){
+            dump();
+        }
+
+
+        @Override
         public void write(Writes write){
             super.write(write);
             buffer.write(write);
         }
+
 
         @Override
         public void read(Reads read, byte revision){
