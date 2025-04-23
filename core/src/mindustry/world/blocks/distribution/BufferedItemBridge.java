@@ -45,7 +45,7 @@ public class BufferedItemBridge extends ItemBridge{
                 buffer.remove();
             }
         }
-        
+
         @Override
         public void doDump(){
             dump();
