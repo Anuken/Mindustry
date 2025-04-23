@@ -433,6 +433,8 @@ public class BulletType extends Content implements Cloneable{
         if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
             healEffect.at(build.x, build.y, 0f, healColor, build.block);
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
+
+            hit(b);
         }else if(build.team != b.team && direct){
             hit(b);
 
