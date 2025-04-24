@@ -624,11 +624,8 @@ public class CoreBlock extends StorageBlock{
 
                     if(net.server()){
                         //delay so clients don't destroy it afterwards
-                        Core.app.post(() -> {
-                            //make sure the world hasn't reloaded since
-                            if(world.tile(tile.x, tile.y) == tile){
-                                tile.setNet(block, lastDamage, 0);
-                            }
+                        Time.run(0f, () -> {
+                            tile.setNet(block, lastDamage, 0);
                         });
                     }
                 }

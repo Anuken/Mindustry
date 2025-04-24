@@ -518,7 +518,7 @@ public class BulletType extends Content implements Cloneable{
 
         if(fragOnHit){
             if(delayFrags && fragBullet != null && fragBullet.delayFrags){
-                Core.app.post(() -> createFrags(b, x, y));
+                Time.run(0f, () -> createFrags(b, x, y));
             }else{
                 createFrags(b, x, y);
             }
