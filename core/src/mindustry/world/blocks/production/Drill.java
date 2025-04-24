@@ -43,8 +43,6 @@ public class Drill extends Block{
     public @Nullable Item blockedItem;
     /** Special exemption items that this drill can't mine. */
     public @Nullable Seq<Item> blockedItems;
-    /** Interval in-between item consumptions, if applicable. */
-    public float consumeTime = 60f * 5f;
 
     //return variables for countOre
     protected @Nullable Item returnItem;
@@ -420,11 +418,9 @@ public class Drill extends Block{
         @Override
         public float progress() {
             float drillProgress = (dominantItem == null) ? 0f : Mathf.clamp(progress / getDrillTime(dominantItem));
-            float consumeProgress = Mathf.clamp(consTimer / consumeTime);
-
-            return (drillProgress + consumeProgress) / 2f;
+            return drillProgress;
         }
-                @Override
+        @Override
         public float totalProgress(){
             return totalProgress;
         }
