@@ -1256,11 +1256,7 @@ public class UnitTypes{
         //region air support
 
         mono = new UnitType("mono"){{
-            //there's no reason to command monos anywhere. it's just annoying.
-            controller = u -> new MinerAI();
-
             defaultCommand = UnitCommand.mineCommand;
-            allowChangeCommands = false;
 
             flying = true;
             drag = 0.06f;
