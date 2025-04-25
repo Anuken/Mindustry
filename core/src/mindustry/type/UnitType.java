@@ -169,6 +169,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     canBoost = false,
     /** if true, this unit will always boost when using builder AI */
     boostWhenBuilding = true,
+    /** if true, this unit will always boost when using miner AI */
+    boostWhenMining = true,
     /** if false, logic processors cannot control this unit */
     logicControllable = true,
     /** if false, players cannot control this unit */
@@ -973,6 +975,9 @@ public class UnitType extends UnlockableContent implements Senseable{
 
                 if(buildSpeed > 0f){
                     commands.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
+                }
+                if(mineTier > 0){
+                    commands.add(UnitCommand.mineCommand);
                 }
             }
 
