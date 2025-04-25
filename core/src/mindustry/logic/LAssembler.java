@@ -11,8 +11,8 @@ import mindustry.logic.LExecutor.*;
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
 
-    private static final int invalidNumNegative = Integer.MIN_VALUE;
-    private static final int invalidNumPositive = Integer.MAX_VALUE;
+    private static final long invalidNumNegative = Long.MIN_VALUE;
+    private static final long invalidNumPositive = Long.MAX_VALUE;
 
     private boolean privileged;
     /** Maps names to variable. */
@@ -74,7 +74,7 @@ public class LAssembler{
         symbol = symbol.replace(' ', '_');
 
         //use a positive invalid number if number might be negative, else use a negative invalid number
-        int usedInvalidNum = symbol.length() > 0 && symbol.charAt(0) == '-' ? invalidNumPositive : invalidNumNegative;
+        long usedInvalidNum = symbol.length() > 0 && symbol.charAt(0) == '-' ? invalidNumPositive : invalidNumNegative;
         double value = parseDouble(symbol, usedInvalidNum);
 
         if(value == usedInvalidNum){
@@ -85,7 +85,7 @@ public class LAssembler{
         }
     }
 
-    double parseDouble(String symbol, int invalidNum){
+    double parseDouble(String symbol, long invalidNum){
         //parse hex/binary syntax
         if(symbol.startsWith("0b")) return Strings.parseLong(symbol, 2, 2, symbol.length(), invalidNum);
         if(symbol.startsWith("+0b")) return Strings.parseLong(symbol, 2, 3, symbol.length(), invalidNum);
