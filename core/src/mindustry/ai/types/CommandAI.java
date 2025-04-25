@@ -77,6 +77,11 @@ public class CommandAI extends AIController{
         //this should not be possible
         if(stance == UnitStance.stop) stance = UnitStance.shoot;
 
+        //fix incorrect stance when mining
+        if(command == UnitCommand.mineCommand && stance != UnitStance.mineAuto && !(stance instanceof ItemUnitStance)){
+            stance = UnitStance.mineAuto;
+        }
+
         //pursue the target if relevant
         if(stance == UnitStance.pursueTarget && target != null && attackTarget == null && targetPos == null){
             commandTarget(target, false);
