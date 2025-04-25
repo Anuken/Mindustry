@@ -2793,9 +2793,9 @@ public class UnitTypes{
             hitSize = 46f;
             treadPullOffset = 1;
             speed = 0.48f;
-            health = 22000;
+            health = 24000;
             armor = 26f;
-            crushDamage = 25f / 5f;
+            crushDamage = 30f / 5f;
             rotateSpeed = 0.8f;
 
             float xo = 231f/2f, yo = 231f/2f;
@@ -2876,11 +2876,11 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(8f, 360f){{
+                bullet = new BasicBulletType(8f, 450f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
-                    lifetime = 35f;
+                    lifetime = 40f;
                     hitSize = 6f;
 
                     smokeEffect = Fx.shootSmokeTitan;
@@ -2908,7 +2908,7 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    int count = 6;
+                    int count = 8;
                     for(int j = 0; j < count; j++){
                         int s = j;
                         for(int i : Mathf.signs){
