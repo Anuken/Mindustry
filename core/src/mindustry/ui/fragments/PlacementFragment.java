@@ -617,7 +617,7 @@ public class PlacementFragment{
                                 }
 
                                 int size = control.input.selectedUnits.size;
-                                if(curCount[0] != size || (currentCommand[0] != shareCommand && currentCommand[0] != null && (currentCommand[0].refreshOnSelect || shareCommand.refreshOnSelect))){
+                                if(curCount[0] != size || (currentCommand[0] != shareCommand && shareCommand != null && currentCommand[0] != null && (currentCommand[0].refreshOnSelect || shareCommand.refreshOnSelect))){
                                     curCount[0] = size;
                                     rebuildCommand.run();
                                 }
