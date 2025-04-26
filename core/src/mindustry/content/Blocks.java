@@ -5707,7 +5707,7 @@ public class Blocks{
                 lightning = 1;
                 lightningCone = 15f;
                 lightningLength = 20;
-                lightningLengthRand = 30;
+                lightningLengthRand = 5;
                 lightningDamage = 20f;
 
                 homingPower = 0.17f;
