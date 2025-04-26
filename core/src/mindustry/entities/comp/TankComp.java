@@ -56,7 +56,7 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
         boolean anyNonDeep = false;
 
         //calculate overlapping tiles so it slows down when going "over" walls
-        int r = Math.max((int)(hitSize * 0.6f / tilesize), 0);
+        int r = Math.max((int)(hitSize * 0.8f / tilesize), 0);
 
         int solids = 0, total = (r*2+1)*(r*2+1);
         for(int dx = -r; dx <= r; dx++){
