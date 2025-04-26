@@ -1123,26 +1123,29 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 Position lastPos = null;
 
                 if(unit.controller() instanceof CommandAI ai){
+                    var cmd =  ai.currentCommand();
                     lastPos = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
 
-                    if(flying && ai.attackTarget != null && ai.currentCommand().drawTarget){
+                    if(flying && ai.attackTarget != null && cmd.drawTarget){
                         Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
                     }
 
                     if(unit.isFlying() != flying) continue;
 
                     //draw target line
-                    if(ai.targetPos != null && ai.currentCommand().drawTarget){
+                    if(ai.targetPos != null && cmd.drawTarget){
                         Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
                         Drawf.limitLine(unit, lineDest, unit.hitSize / unitSelectRadScl + 1f, lineLimit, color.write(Tmp.c1).a(alpha));
 
                         if(ai.attackTarget == null){
                             Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f, color.write(Tmp.c1).a(alpha));
 
-                            if(ai.currentCommand() == UnitCommand.enterPayloadCommand){
+                            if(cmd == UnitCommand.enterPayloadCommand){
                                 var build = world.buildWorld(lineDest.getX(), lineDest.getY());
                                 if(build != null && build.block.acceptsUnitPayloads && build.team == unit.team){
                                     Drawf.selected(build, color);
+                                }else{
+                                    Drawf.cross(lineDest.getX(), lineDest.getY(), 7f, Pal.remove);
                                 }
                             }
                         }
