@@ -54,6 +54,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Used for dropping items. */
     final static float playerSelectRange = mobile ? 17f : 11f;
     final static float unitSelectRadScl = 1f;
+    final static Seq<UnitStance> stancesOut = new Seq<>();
     final static IntSeq removed = new IntSeq();
     final static IntSet intSet = new IntSet();
     /** Maximum line length. */
@@ -369,6 +370,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     ai.attackTarget = null;
                 }
                 unit.lastCommanded = player.coloredName();
+
+                //make sure its stance is valid
+                stancesOut.clear();
+                unit.type.getUnitStances(unit, stancesOut);
+                if(stancesOut.size > 0 && !stancesOut.contains(ai.stance)){
+                    ai.stance = stancesOut.first();
+                }
             }
         }
     }
