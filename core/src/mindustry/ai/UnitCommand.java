@@ -24,6 +24,8 @@ public class UnitCommand extends MappableContent{
     public boolean drawTarget = false;
     /** Whether to reset targets when switching to or from this command. */
     public boolean resetTarget = true;
+    /** Whether to snap the command destination to ally buildings. */
+    public boolean snapToBuilding = false;
     /** */
     public boolean exactArrival = false;
     /** If true, this command refreshes the list of stances when selected TODO: do not use, this will likely be removed later!*/
@@ -90,6 +92,7 @@ public class UnitCommand extends MappableContent{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
+            snapToBuilding = true;
         }};
         loadUnitsCommand = new UnitCommand("loadUnits", "upload", Binding.unit_command_load_units, null){{
             switchToMove = false;

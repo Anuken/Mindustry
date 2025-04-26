@@ -501,6 +501,12 @@ public class CommandAI extends AIController{
 
         //this is an allocation, but it's relatively rarely called anyway, and outside mutations must be prevented
         targetPos = lastTargetPos = pos.cpy();
+        if(command != null && command.snapToBuilding){
+            var build = world.buildWorld(targetPos.x, targetPos.y);
+            if(build != null && build.team == unit.team){
+                targetPos.set(build);
+            }
+        }
         attackTarget = null;
         this.stopWhenInRange = stopWhenInRange;
     }
