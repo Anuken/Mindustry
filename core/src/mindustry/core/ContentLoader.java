@@ -43,9 +43,9 @@ public class ContentLoader{
     /** Creates all base types. */
     public void createBaseContent(){
         UnitCommand.loadAll();
-        UnitStance.loadAll();
         TeamEntries.load();
         Items.load();
+        UnitStance.loadAll(); //needs to access items
         StatusEffects.load();
         Liquids.load();
         Bullets.load();

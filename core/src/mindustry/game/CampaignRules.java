@@ -21,7 +21,7 @@ public class CampaignRules{
         if(planet.showRtsAIRule && rules.attackMode){
             boolean swapped = rules.teams.get(rules.waveTeam).rtsAi != rtsAI;
             rules.teams.get(rules.waveTeam).rtsAi = rtsAI;
-            rules.teams.get(rules.waveTeam).rtsMinWeight = 1.2f * difficulty.enemyHealthMultiplier;
+            rules.teams.get(rules.waveTeam).rtsMaxSquad = 15;
 
             if(swapped && Vars.state.isGame()){
                 Groups.unit.each(u -> {

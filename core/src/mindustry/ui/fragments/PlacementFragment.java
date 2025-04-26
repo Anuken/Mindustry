@@ -468,17 +468,33 @@ public class PlacementFragment{
                         UnitStance[] currentStance = {null};
                         var stances = new Seq<UnitStance>();
 
+                        var stancesOut = new Seq<UnitStance>();
+
                         rebuildCommand = () -> {
                             u.clearChildren();
                             var units = control.input.selectedUnits;
                             if(units.size > 0){
-                                int[] counts = new int[content.units().size];
-                                for(var unit : units){
-                                    counts[unit.type.id] ++;
-                                }
                                 commands.clear();
                                 stances.clear();
+
                                 boolean firstCommand = false, firstStance = false;
+                                int[] counts = new int[content.units().size];
+
+                                for(var unit : units){
+                                    counts[unit.type.id] ++;
+
+                                    stancesOut.clear();
+                                    unit.type.getUnitStances(unit, stancesOut);
+
+                                    if(!firstStance){
+                                        stances.add(stancesOut);
+                                        firstStance = true;
+                                    }else{
+                                        //remove commands that this next unit type doesn't have
+                                        stances.removeAll(st -> !stancesOut.contains(st));
+                                    }
+                                }
+
                                 Table unitlist = u.table().growX().left().get();
                                 unitlist.left();
 
@@ -520,14 +536,6 @@ public class PlacementFragment{
                                             //remove commands that this next unit type doesn't have
                                             commands.removeAll(com -> !type.commands.contains(com));
                                         }
-
-                                        if(!firstStance){
-                                            stances.add(type.stances);
-                                            firstStance = true;
-                                        }else{
-                                            //remove commands that this next unit type doesn't have
-                                            stances.removeAll(st -> !type.stances.contains(st));
-                                        }
                                     }
                                 }
 
@@ -562,7 +570,7 @@ public class PlacementFragment{
                                         int scol = 0;
                                         for(var stance : stances){
 
-                                            coms.button(Icon.icons.get(stance.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
+                                            coms.button(stance.getIcon(), Styles.clearNoneTogglei, () -> {
                                                 Call.setUnitStance(player, units.mapInt(un -> un.id).toArray(), stance);
                                             }).checked(i -> currentStance[0] == stance).size(50f).tooltip(stance.localized(), true);
 
@@ -608,14 +616,14 @@ public class PlacementFragment{
                                     }
                                 }
 
-                                currentCommand[0] = shareCommand;
-                                currentStance[0] = shareStance;
-
                                 int size = control.input.selectedUnits.size;
-                                if(curCount[0] != size){
+                                if(curCount[0] != size || (currentCommand[0] != shareCommand && shareCommand != null && currentCommand[0] != null && (currentCommand[0].refreshOnSelect || shareCommand.refreshOnSelect))){
                                     curCount[0] = size;
                                     rebuildCommand.run();
                                 }
+
+                                currentCommand[0] = shareCommand;
+                                currentStance[0] = shareStance;
 
                                 //not a huge fan of running input logic here, but it's convenient as the stance arrays are all here...
                                 for(UnitStance stance : stances){

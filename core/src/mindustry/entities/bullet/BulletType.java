@@ -433,6 +433,8 @@ public class BulletType extends Content implements Cloneable{
         if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
             healEffect.at(build.x, build.y, 0f, healColor, build.block);
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
+
+            hit(b);
         }else if(build.team != b.team && direct){
             hit(b);
 
@@ -516,7 +518,7 @@ public class BulletType extends Content implements Cloneable{
 
         if(fragOnHit){
             if(delayFrags && fragBullet != null && fragBullet.delayFrags){
-                Core.app.post(() -> createFrags(b, x, y));
+                Time.run(0f, () -> createFrags(b, x, y));
             }else{
                 createFrags(b, x, y);
             }
@@ -590,6 +592,7 @@ public class BulletType extends Content implements Cloneable{
                 Tmp.v1.rnd(Mathf.random(despawnUnitRadius));
                 var u = despawnUnit.spawn(b.team, x + Tmp.v1.x, y + Tmp.v1.y);
                 u.rotation = faceOutwards ? Tmp.v1.angle() : b.rotation();
+                Units.notifyUnitSpawn(u);
             }
         }
     }
@@ -899,6 +902,7 @@ public class BulletType extends Content implements Cloneable{
 
                 }
                 spawned.add();
+                Units.notifyUnitSpawn(spawned);
             }
             //Since bullet init is never called, handle killing shooter here
             if(killShooter && owner instanceof Healthc h && !h.dead()) h.kill();

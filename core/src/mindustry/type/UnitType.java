@@ -169,6 +169,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     canBoost = false,
     /** if true, this unit will always boost when using builder AI */
     boostWhenBuilding = true,
+    /** if true, this unit will always boost when using miner AI */
+    boostWhenMining = true,
     /** if false, logic processors cannot control this unit */
     logicControllable = true,
     /** if false, players cannot control this unit */
@@ -590,6 +592,24 @@ public class UnitType extends UnlockableContent implements Senseable{
         return hittable || (vulnerableWithPayloads && unit instanceof Payloadc p && p.hasPayload());
     }
 
+    /** Adds all available unit stances based on the unit's current state. This can change based on the command of the unit. */
+    public void getUnitStances(Unit unit, Seq<UnitStance> out){
+        //return mining stances based on present items
+        if(unit.controller() instanceof CommandAI ai && ai.currentCommand() == UnitCommand.mineCommand){
+            out.add(UnitStance.mineAuto);
+            for(Item item : indexer.getAllPresentOres()){
+                if(unit.canMine(item)){
+                    var itemStance = ItemUnitStance.getByItem(item);
+                    if(itemStance != null){
+                        out.add(itemStance);
+                    }
+                }
+            }
+        }else{
+            out.addAll(stances);
+        }
+    }
+
     public void update(Unit unit){
 
     }
@@ -973,6 +993,9 @@ public class UnitType extends UnlockableContent implements Senseable{
 
                 if(buildSpeed > 0f){
                     commands.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
+                }
+                if(mineTier > 0){
+                    commands.add(UnitCommand.mineCommand);
                 }
             }
 

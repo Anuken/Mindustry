@@ -154,6 +154,8 @@ public class UI implements ApplicationListener, Loadable{
     public void update(){
         if(disableUI || Core.scene == null) return;
 
+        PerfCounter.ui.begin();
+
         Events.fire(Trigger.uiDrawBegin);
 
         Core.scene.act();
@@ -167,6 +169,8 @@ public class UI implements ApplicationListener, Loadable{
         }
 
         Events.fire(Trigger.uiDrawEnd);
+
+        PerfCounter.ui.end();
     }
 
     @Override
