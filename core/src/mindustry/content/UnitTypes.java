@@ -14,6 +14,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -2693,10 +2694,13 @@ public class UnitTypes{
             hitSize = 28f;
             treadPullOffset = 4;
             speed = 0.63f;
+            rotateSpeed = 1.2f;
             health = 11000;
-            armor = 20f;
+            armor = 26f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
+            drownTimeMultiplier = 3f;
+            immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
             weapons.add(new Weapon("vanquish-weapon"){{
@@ -2768,7 +2772,7 @@ public class UnitTypes{
                     shootY = 5.5f;
                     recoil = 2f;
                     rotate = true;
-                    rotateSpeed = 2f;
+                    rotateSpeed = 2.6f;
 
                     bullet = new BasicBulletType(4.5f, 25){{
                         width = 6.5f;
@@ -2790,10 +2794,11 @@ public class UnitTypes{
             treadPullOffset = 1;
             speed = 0.48f;
             health = 24000;
-            armor = 26f;
+            armor = 32f;
             crushDamage = 35f / 5f;
-            rotateSpeed = 0.8f;
-
+            drownTimeMultiplier = 6f;
+            immunities.addAll(StatusEffects.burning, StatusEffects.melting);
+            
             float xo = 231f/2f, yo = 231f/2f;
             treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};
 
@@ -2805,7 +2810,7 @@ public class UnitTypes{
                 shake = 5f;
                 recoil = 5f;
                 rotate = true;
-                rotateSpeed = 0.6f;
+                rotateSpeed = 0.8f;
                 mirror = false;
                 x = 0f;
                 y = -2f;
@@ -2872,7 +2877,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(8f, 450f){{
+                bullet = new BasicBulletType(7f, 460f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
@@ -2917,6 +2922,7 @@ public class UnitTypes{
                                 height = 11f;
                                 lifetime = life + 5f;
                                 weaveRandom = false;
+                                collidesTiles = false;
                                 hitSize = 5f;
                                 pierceCap = 2;
                                 pierce = true;
