@@ -2924,7 +2924,6 @@ public class UnitTypes{
                                 height = 11f;
                                 lifetime = life + 5f;
                                 weaveRandom = false;
-                                collidesTiles = false;
                                 hitSize = 5f;
                                 pierceCap = 2;
                                 pierce = true;
