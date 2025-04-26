@@ -2556,8 +2556,8 @@ public class Blocks{
         }};
 
         pyrolysisGenerator = new ConsumeGenerator("pyrolysis-generator"){{
-            requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 50));
-            powerProduction = 1250f / 60f;
+            requirements(Category.power, with(Items.graphite, 100, Items.carbide, 60, Items.oxide, 60f, Items.silicon, 100));
+            powerProduction = 1400f / 60f;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
                 sinMag = 2.75f;
