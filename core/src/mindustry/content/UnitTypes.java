@@ -2700,6 +2700,7 @@ public class UnitTypes{
             itemCapacity = 0;
             crushDamage = 13f / 5f;
             drownTimeMultiplier = 3f;
+            floorMultiplier = 0.8f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
@@ -2797,6 +2798,7 @@ public class UnitTypes{
             armor = 32f;
             crushDamage = 35f / 5f;
             drownTimeMultiplier = 6f;
+            floorMultiplier = 0.5f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             
             float xo = 231f/2f, yo = 231f/2f;

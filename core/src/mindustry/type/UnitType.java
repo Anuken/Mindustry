@@ -56,6 +56,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public float speed = 1.1f,
     /** multiplier for speed when boosting */
     boostMultiplier = 1f,
+    /** speed multiplier applied on floor */
+    floorMultiplier = 1f,
     /** body rotation speed in degrees/t */
     rotateSpeed = 5f,
     /** mech base rotation speed in degrees/t*/

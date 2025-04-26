@@ -29,6 +29,7 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
+import static arc.math.Angles.within;
 import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
@@ -102,7 +103,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public float floorSpeedMultiplier(){
         Floor on = isFlying() || type.hovering ? Blocks.air.asFloor() : floorOn();
-        return on.speedMultiplier * speedMultiplier;
+        return Math.min(on.speedMultiplier / type.floorMultiplier, 1f) * speedMultiplier;
     }
 
     /** Called when this unit was unloaded from a factory or spawn point. */
