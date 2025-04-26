@@ -2791,7 +2791,7 @@ public class UnitTypes{
             speed = 0.48f;
             health = 24000;
             armor = 26f;
-            crushDamage = 30f / 5f;
+            crushDamage = 35f / 5f;
             rotateSpeed = 0.8f;
 
             float xo = 231f/2f, yo = 231f/2f;
