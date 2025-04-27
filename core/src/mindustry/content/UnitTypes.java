@@ -2620,7 +2620,7 @@ public class UnitTypes{
         }};
 
         precept = new TankUnitType("precept"){{
-            hitSize = 26f;
+            hitSize = 24f;
             treadPullOffset = 5;
             speed = 0.64f;
             rotateSpeed = 1.5f;
@@ -2637,7 +2637,7 @@ public class UnitTypes{
                 shootY = 16f;
                 recoil = 3f;
                 rotate = true;
-                rotateSpeed = 1.3f;
+                rotateSpeed = 1.625f;
                 mirror = false;
                 shootCone = 2f;
                 x = 0f;
@@ -3001,7 +3001,7 @@ public class UnitTypes{
                 x = 0f;
                 y = 1f;
                 shootY = 4f;
-                reload = 60f;
+                reload = 63f;
                 cooldownTime = 42f;
                 heatColor = Pal.turretHeat;
 
@@ -3019,7 +3019,7 @@ public class UnitTypes{
                     frontColor = Color.white;
 
                     knockback = 0.8f;
-                    lifetime = 50f;
+                    lifetime = 46f;
                     width = height = 9f;
                     splashDamageRadius = 19f;
                     splashDamage = 30f;
@@ -3046,7 +3046,7 @@ public class UnitTypes{
         }};
 
         cleroi = new ErekirUnitType("cleroi"){{
-            speed = 0.7f;
+            speed = 0.6f;
             drag = 0.1f;
             hitSize = 14f;
             rotateSpeed = 3f;
@@ -3088,7 +3088,7 @@ public class UnitTypes{
                 shootSound = Sounds.blaster;
                 x = 14f / 4f;
                 y = 33f / 4f;
-                reload = 30f;
+                reload = 33f;
                 layerOffset = -0.002f;
                 alternate = false;
                 heatColor = Color.red;
@@ -3650,7 +3650,7 @@ public class UnitTypes{
             flying = true;
             drag = 0.08f;
             speed = 2f;
-            rotateSpeed = 4f;
+            rotateSpeed = 8f;
             accel = 0.09f;
             health = 1100f;
             armor = 3f;
