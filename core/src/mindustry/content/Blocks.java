@@ -998,7 +998,7 @@ public class Blocks{
             craftTime = 120f;
             size = 3;
             hasPower = true;
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPlasma(), new DrawDefault());
+            drawer = new DrawMulti(new DrawRegion("-top"), new DrawPlasma(), new DrawDefault());
             envEnabled |= Env.space;
 
             ambientSound = Sounds.techloop;
