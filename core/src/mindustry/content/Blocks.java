@@ -992,8 +992,8 @@ public class Blocks{
         }};
 
         phaseRoller = new GenericCrafter("phase-roller"){{
-            requirements(Category.crafting, with(Items.metaglass, 100, Items.silicon, 80, Items.graphite, 100, Items.surgeAlloy, 30, Items.plastanium, 50));
-            craftEffect = Fx.smeltsmoke;
+            requirements(Category.crafting, with(Items.metaglass, 80, Items.silicon, 80, Items.graphite, 80, Items.surgeAlloy, 40, Items.plastanium, 40));
+            craftEffect = Fx.formsmoke;
             outputItem = new ItemStack(Items.phaseFabric, 6);
             craftTime = 240f;
             size = 3;
@@ -1001,12 +1001,9 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPlasma(), new DrawDefault());
             envEnabled |= Env.space;
 
-            ambientSound = Sounds.techloop;
-            ambientSoundVolume = 0.02f;
-
-            consumeItems(with(Items.thorium, 6, Items.metaglass, 16, Items.blastCompound, 6));
+            consumeItems(with(Items.thorium, 12, Items.metaglass, 16, Items.blastCompound, 3));
             consumePower(20f);
-            itemCapacity = 45;
+            itemCapacity = 60;
         }};
 
         surgeSmelter = new GenericCrafter("surge-smelter"){{
