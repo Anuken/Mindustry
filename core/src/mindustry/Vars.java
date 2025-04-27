@@ -448,6 +448,8 @@ public class Vars implements Loadable{
             settings.setDataDirectory(Core.files.local("saves/"));
         }
 
+        //needed to make sure binding values are correct
+        Vars.android = app.isAndroid();
         settings.defaults("locale", "default", "blocksync", true);
         keybinds.setDefaults(Binding.values());
         settings.setAutosave(false);

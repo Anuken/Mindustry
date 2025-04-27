@@ -12,7 +12,7 @@ import static mindustry.Vars.*;
 
 public class EntityCollisions{
     //move in 1-unit chunks (can this be made more efficient?)
-    private static final float seg = 1f;
+    private static final float seg = 1f, maxDelta = 1000f;
 
     //tile collisions
     private Vec2 vector = new Vec2(), l1 = new Vec2();
@@ -34,7 +34,11 @@ public class EntityCollisions{
     }
 
     public void move(Hitboxc entity, float deltax, float deltay, SolidPred solidCheck){
-        if(Math.abs(deltax) < 0.0001f & Math.abs(deltay) < 0.0001f) return;
+        //check for NaN
+        if((Math.abs(deltax) < 0.0001f && Math.abs(deltay) < 0.0001f) || deltax != deltax || deltay != deltay) return;
+
+        deltax = Mathf.clamp(deltax, -maxDelta, maxDelta);
+        deltay = Mathf.clamp(deltay, -maxDelta, maxDelta);
 
         boolean movedx = false;
         entity.hitboxTile(r1);
