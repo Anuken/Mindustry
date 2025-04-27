@@ -32,6 +32,7 @@ import mindustry.input.Placement.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -54,6 +55,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Used for dropping items. */
     final static float playerSelectRange = mobile ? 17f : 11f;
     final static float unitSelectRadScl = 1f;
+    final static Seq<UnitStance> stancesOut = new Seq<>();
     final static IntSeq removed = new IntSeq();
     final static IntSet intSet = new IntSet();
     /** Maximum line length. */
@@ -369,6 +371,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     ai.attackTarget = null;
                 }
                 unit.lastCommanded = player.coloredName();
+
+                //make sure its stance is valid
+                stancesOut.clear();
+                unit.type.getUnitStances(unit, stancesOut);
+                if(stancesOut.size > 0 && !stancesOut.contains(ai.stance)){
+                    ai.stance = stancesOut.first();
+                }
             }
         }
     }
@@ -1115,26 +1124,29 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 Position lastPos = null;
 
                 if(unit.controller() instanceof CommandAI ai){
+                    var cmd =  ai.currentCommand();
                     lastPos = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
 
-                    if(flying && ai.attackTarget != null && ai.currentCommand().drawTarget){
+                    if(flying && ai.attackTarget != null && cmd.drawTarget){
                         Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
                     }
 
                     if(unit.isFlying() != flying) continue;
 
                     //draw target line
-                    if(ai.targetPos != null && ai.currentCommand().drawTarget){
+                    if(ai.targetPos != null && cmd.drawTarget){
                         Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
                         Drawf.limitLine(unit, lineDest, unit.hitSize / unitSelectRadScl + 1f, lineLimit, color.write(Tmp.c1).a(alpha));
 
                         if(ai.attackTarget == null){
                             Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f, color.write(Tmp.c1).a(alpha));
 
-                            if(ai.currentCommand() == UnitCommand.enterPayloadCommand){
+                            if(cmd == UnitCommand.enterPayloadCommand){
                                 var build = world.buildWorld(lineDest.getX(), lineDest.getY());
                                 if(build != null && build.block.acceptsUnitPayloads && build.team == unit.team){
                                     Drawf.selected(build, color);
+                                }else{
+                                    Drawf.cross(lineDest.getX(), lineDest.getY(), 7f, Pal.remove);
                                 }
                             }
                         }
@@ -1528,6 +1540,28 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
         Draw.color(col2);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+
+        Font font = Fonts.outline;
+        font.setColor(col2);
+        var ints = font.usesIntegerPositions();
+        font.setUseIntegerPositions(false);
+        var z = Draw.z();
+        Draw.z(Layer.endPixeled);
+        font.getData().setScale(1 / renderer.camerascale);
+        var snapToCursor = Core.settings.getBool("selectionsizeoncursor");
+        var textOffset = Core.settings.getInt("selectionsizeoncursoroffset", 5);
+        int width = (int)((result.x2 - result.x) / 8);
+        int height = (int)((result.y2 - result.y) / 8);
+        int area = width * height;
+        // FINISHME: When not snapping to cursor, perhaps it would be best to choose the corner closest to the cursor that's at least a block away?
+        font.draw(width + "x" + height + " (" + area + ")",
+                snapToCursor ? input.mouseWorldX() + textOffset * (4 / renderer.camerascale) : result.x2,
+                snapToCursor ? input.mouseWorldY() - textOffset * (4 / renderer.camerascale) : result.y
+                );
+        font.setColor(Color.white);
+        font.getData().setScale(1);
+        font.setUseIntegerPositions(ints);
+        Draw.z(z);
     }
 
     protected void flushSelectPlans(Seq<BuildPlan> plans){

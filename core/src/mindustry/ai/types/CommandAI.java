@@ -77,6 +77,11 @@ public class CommandAI extends AIController{
         //this should not be possible
         if(stance == UnitStance.stop) stance = UnitStance.shoot;
 
+        //fix incorrect stance when mining
+        if(command == UnitCommand.mineCommand && stance != UnitStance.mineAuto && !(stance instanceof ItemUnitStance)){
+            stance = UnitStance.mineAuto;
+        }
+
         //pursue the target if relevant
         if(stance == UnitStance.pursueTarget && target != null && attackTarget == null && targetPos == null){
             commandTarget(target, false);
@@ -496,6 +501,12 @@ public class CommandAI extends AIController{
 
         //this is an allocation, but it's relatively rarely called anyway, and outside mutations must be prevented
         targetPos = lastTargetPos = pos.cpy();
+        if(command != null && command.snapToBuilding){
+            var build = world.buildWorld(targetPos.x, targetPos.y);
+            if(build != null && build.team == unit.team){
+                targetPos.set(build);
+            }
+        }
         attackTarget = null;
         this.stopWhenInRange = stopWhenInRange;
     }

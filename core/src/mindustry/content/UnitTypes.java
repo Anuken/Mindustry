@@ -360,7 +360,7 @@ public class UnitTypes{
             riseSpeed = 0.07f;
 
             mineTier = 2;
-            mineSpeed = 5f;
+            mineSpeed = 3f;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = new PowerAmmoType(1300);
@@ -421,7 +421,7 @@ public class UnitTypes{
             speed = 0.4f;
             hitSize = 13f;
 
-            mineSpeed = 6f;
+            mineSpeed = 4f;
             drawShields = false;
 
             abilities.add(new ForceFieldAbility(60f, 0.3f, 400f, 60f * 6));
@@ -1256,11 +1256,7 @@ public class UnitTypes{
         //region air support
 
         mono = new UnitType("mono"){{
-            //there's no reason to command monos anywhere. it's just annoying.
-            controller = u -> new MinerAI();
-
             defaultCommand = UnitCommand.mineCommand;
-            allowChangeCommands = false;
 
             flying = true;
             drag = 0.06f;
