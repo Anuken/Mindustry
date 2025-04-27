@@ -618,15 +618,16 @@ public class CoreBlock extends StorageBlock{
             if(state.rules.coreCapture){
                 if(!net.client()){
                     tile.setBlock(block, lastDamage);
-                }
 
-                //delay so clients don't destroy it afterwards
-                Core.app.post(() -> tile.setNet(block, lastDamage, 0));
-
-                //building does not exist on client yet
-                if(!net.client()){
                     //core is invincible for several seconds to prevent recapture
                     ((CoreBuild)tile.build).iframes = captureInvicibility;
+
+                    if(net.server()){
+                        //delay so clients don't destroy it afterwards
+                        Time.run(0f, () -> {
+                            tile.setNet(block, lastDamage, 0);
+                        });
+                    }
                 }
             }
         }

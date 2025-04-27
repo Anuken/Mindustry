@@ -1937,7 +1937,7 @@ public class Blocks{
         }};
 
         junction = new Junction("junction"){{
-            requirements(Category.distribution, with(Items.copper, 2));
+            requirements(Category.distribution, with(Items.copper, 3));
             speed = 26;
             capacity = 6;
             health = 30;
@@ -1956,6 +1956,7 @@ public class Blocks{
         phaseConveyor = new ItemBridge("phase-conveyor"){{
             requirements(Category.distribution, with(Items.phaseFabric, 5, Items.silicon, 7, Items.lead, 10, Items.graphite, 10));
             range = 12;
+            transportTime = 2f;
             arrowPeriod = 0.9f;
             arrowTimeScl = 2.75f;
             hasPower = true;
@@ -2155,6 +2156,7 @@ public class Blocks{
             requirements(Category.liquid, with(Items.metaglass, 1));
             liquidCapacity = 20f;
             health = 45;
+            explosivenessScale = flammabilityScale = 10f/20f;
         }};
 
         pulseConduit = new Conduit("pulse-conduit"){{
@@ -2162,6 +2164,7 @@ public class Blocks{
             liquidCapacity = 40f;
             liquidPressure = 1.025f;
             health = 90;
+            explosivenessScale = flammabilityScale = 16f/40f;
         }};
 
         platedConduit = new ArmoredConduit("plated-conduit"){{
@@ -2169,6 +2172,7 @@ public class Blocks{
             liquidCapacity = 50f;
             liquidPressure = 1.025f;
             health = 220;
+            explosivenessScale = flammabilityScale = 16f/50f;
         }};
 
         liquidRouter = new LiquidRouter("liquid-router"){{
@@ -2176,6 +2180,8 @@ public class Blocks{
             liquidCapacity = 120f;
             underBullets = true;
             solid = false;
+
+            explosivenessScale = flammabilityScale = 20f/120f;
         }};
 
         liquidContainer = new LiquidRouter("liquid-container"){{
@@ -2205,6 +2211,7 @@ public class Blocks{
             range = 4;
             hasPower = false;
             liquidCapacity = 100f;
+            explosivenessScale = flammabilityScale = 20f/100f;
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
@@ -2215,6 +2222,7 @@ public class Blocks{
             hasPower = true;
             canOverdrive = false;
             pulse = true;
+            explosivenessScale = flammabilityScale = 20f/100f;
             liquidCapacity = 100f;
             consumePower(0.30f);
         }};
@@ -2239,6 +2247,7 @@ public class Blocks{
             health = 250;
             researchCostMultiplier = 3;
             underBullets = true;
+            explosivenessScale = flammabilityScale = 20f/50f;
         }};
 
         reinforcedLiquidJunction = new LiquidJunction("reinforced-liquid-junction"){{
@@ -2259,6 +2268,7 @@ public class Blocks{
             researchCostMultiplier = 1;
             underBullets = true;
             health = 250;
+            explosivenessScale = flammabilityScale = 20f/120f;
 
             ((Conduit)reinforcedConduit).rotBridgeReplacement = this;
         }};
@@ -2271,6 +2281,8 @@ public class Blocks{
             underBullets = true;
             solid = false;
             health = 250;
+
+            explosivenessScale = flammabilityScale = 40f/150f;
         }};
 
         reinforcedLiquidContainer = new LiquidRouter("reinforced-liquid-container"){{
@@ -4454,16 +4466,17 @@ public class Blocks{
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.3f;
             }},
-            Items.carbide, new ArtilleryBulletType(2.5f, 500, "shell"){{
-                hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
+            Items.carbide, new ArtilleryBulletType(3.25f, 700, "shell"){{
+                hitEffect = new MultiEffect(Fx.titanExplosionSmall, Fx.titanSmokeSmall);
                 despawnEffect = Fx.none;
                 knockback = 3f;
                 lifetime = 140f;
-                height = 19f;
-                width = 17f;
-                splashDamageRadius = 55f;
-                splashDamage = 650f;
+                height = 28f;
+                width = 15f;
+                splashDamageRadius = 36f;
+                splashDamage = 750f;
                 rangeChange = 10f*8f;
+                reloadMultiplier = 0.8f;
                 scaledSplashDamage = true;
                 backColor = hitColor = trailColor = Color.valueOf("ab8ec5");
                 frontColor = Color.white;
@@ -4489,6 +4502,30 @@ public class Blocks{
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.2f;
+                fragLifeMin = 1.5f;
+
+                fragBullets = 12;
+                    fragBullet = new ArtilleryBulletType(0.5f, 50, "shell"){{
+                        hitEffect = new MultiEffect(Fx.titanExplosionFrag, Fx.titanLightSmall, new WaveEffect(){{
+                            lifetime = 8f;
+                            strokeFrom = 1f;
+                            sizeTo = 8f;
+                        }});
+
+                        despawnEffect = Fx.hitBulletColor;
+                        width = 8f;
+                        height = 12f;
+                        lifetime = 50f;
+                        knockback = 0.5f;
+                        splashDamageRadius = 22f;
+                        splashDamage = 50f;
+                        scaledSplashDamage = true;
+                        pierceArmor = true;
+                        backColor = frontColor = hitColor = Color.valueOf("ab8ec5");
+                        frontColor = Color.white;
+                        buildingDamageMultiplier = 0.25f;
+                        shrinkY = 0.3f;
+                    }};
             }},
             Items.oxide, new ArtilleryBulletType(2.5f, 300, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosionLarge, Fx.titanSmokeLarge, Fx.smokeAoeCloud);
@@ -4497,7 +4534,7 @@ public class Blocks{
                 lifetime = 190f;
                 height = 19f;
                 width = 17f;
-                reloadMultiplier = 0.8f;
+                reloadMultiplier = 0.65f;
                 splashDamageRadius = 110f;
                 rangeChange = 8f;
                 splashDamage = 300f;
@@ -4779,7 +4816,8 @@ public class Blocks{
 
         afflict = new PowerTurret("afflict"){{
             requirements(Category.turret, with(Items.surgeAlloy, 125, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
-
+            buildCostMultiplier = 1.5f;
+            
             shootType = new BasicBulletType(){{
                 shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{
                     colorTo = Pal.surge;
@@ -4823,8 +4861,8 @@ public class Blocks{
                     width = 9f;
                     hitSize = 5f;
                     height = 15f;
-                    pierce = true;
-                    lifetime = 35f;
+                    pierceCap = 3;
+                    lifetime = 28f;
                     pierceBuilding = true;
                     hitColor = backColor = trailColor = Pal.surge;
                     frontColor = Color.white;
@@ -4837,7 +4875,7 @@ public class Blocks{
                         lifetime = 10f;
                     }};
                     buildingDamageMultiplier = 0.3f;
-                    homingPower = 0.2f;
+                    homingPower = 0.1f;
                 }};
 
                 bulletInterval = 3f;
@@ -5006,7 +5044,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(1500f, 65f){{
+                        bullet = new ExplosionBulletType(1000f, 65f){{
                             hitColor = Pal.redLight;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;
@@ -5030,7 +5068,7 @@ public class Blocks{
                                 width = height = 18f;
                                 collidesTiles = false;
                                 splashDamageRadius = 40f;
-                                splashDamage = 160f;
+                                splashDamage = 100f;
                                 backColor = trailColor = hitColor = Pal.redLight;
                                 frontColor = Color.white;
                                 smokeEffect = Fx.shootBigSmoke2;

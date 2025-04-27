@@ -299,6 +299,8 @@ public class BulletType extends Content implements Cloneable{
     public float homingRange = 50f;
     /** Use a negative value to disable homing delay. */
     public float homingDelay = -1f;
+    /** Speed at which bullet rotates to follow cursor. <= 0 to disable. */
+    public float followAimSpeed = 0f;
 
     /** Range of healing block suppression effect. */
     public float suppressionRange = -1f;
@@ -431,6 +433,8 @@ public class BulletType extends Content implements Cloneable{
         if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
             healEffect.at(build.x, build.y, 0f, healColor, build.block);
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
+
+            hit(b);
         }else if(build.team != b.team && direct){
             hit(b);
 
@@ -514,7 +518,7 @@ public class BulletType extends Content implements Cloneable{
 
         if(fragOnHit){
             if(delayFrags && fragBullet != null && fragBullet.delayFrags){
-                Core.app.post(() -> createFrags(b, x, y));
+                Time.run(0f, () -> createFrags(b, x, y));
             }else{
                 createFrags(b, x, y);
             }
@@ -583,11 +587,12 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void createUnits(Bullet b, float x, float y){
-        if(despawnUnit != null && Mathf.chance(despawnUnitChance)){
+        if(!net.client() && despawnUnit != null && Mathf.chance(despawnUnitChance)){
             for(int i = 0; i < despawnUnitCount; i++){
                 Tmp.v1.rnd(Mathf.random(despawnUnitRadius));
                 var u = despawnUnit.spawn(b.team, x + Tmp.v1.x, y + Tmp.v1.y);
                 u.rotation = faceOutwards ? Tmp.v1.angle() : b.rotation();
+                Units.notifyUnitSpawn(u);
             }
         }
     }
@@ -715,6 +720,11 @@ public class BulletType extends Content implements Cloneable{
             if(target != null){
                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), homingPower * Time.delta * 50f));
             }
+        }
+
+        if(followAimSpeed > 0f && b.shooter instanceof Unit u){
+            float angle = b.angleTo(u.aimX, u.aimY);
+            b.vel.setAngle(Angles.moveToward(b.vel.angle(), angle, followAimSpeed * Time.delta));
         }
     }
 
@@ -892,6 +902,7 @@ public class BulletType extends Content implements Cloneable{
 
                 }
                 spawned.add();
+                Units.notifyUnitSpawn(spawned);
             }
             //Since bullet init is never called, handle killing shooter here
             if(killShooter && owner instanceof Healthc h && !h.dead()) h.kill();

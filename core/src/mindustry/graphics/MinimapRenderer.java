@@ -60,7 +60,7 @@ public class MinimapRenderer{
             if(e.tile.block().solid && e.tile.y > 0){
                 Tile tile = world.tile(e.tile.x, e.tile.y - 1);
                 if(tile.block() == Blocks.air){
-                    Core.app.post(() -> update(tile));
+                    Time.run(0f, () -> update(tile));
                 }
             }
         });

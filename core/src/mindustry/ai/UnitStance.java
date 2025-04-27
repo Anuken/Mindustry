@@ -3,12 +3,14 @@ package mindustry.ai;
 import arc.*;
 import arc.scene.style.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.input.*;
+import mindustry.type.*;
 
 public class UnitStance extends MappableContent{
-    public static UnitStance stop, shoot, holdFire, pursueTarget, patrol, ram;
+    public static UnitStance stop, shoot, holdFire, pursueTarget, patrol, ram, mineAuto;
 
     /** Name of UI icon (from Icon class). */
     public String icon;
@@ -30,7 +32,7 @@ public class UnitStance extends MappableContent{
     }
 
     public char getEmoji() {
-        return (char) Iconc.codes.get(icon, Iconc.cancel);
+        return (char)Iconc.codes.get(icon, Iconc.cancel);
     }
 
     @Override
@@ -50,5 +52,11 @@ public class UnitStance extends MappableContent{
         pursueTarget = new UnitStance("pursuetarget", "right", Binding.unit_stance_pursue_target);
         patrol = new UnitStance("patrol", "refresh", Binding.unit_stance_patrol);
         ram = new UnitStance("ram", "rightOpen", Binding.unit_stance_ram);
+        mineAuto = new UnitStance("mineauto", "settings", null);
+
+        //Only vanilla items are supported for now
+        for(Item item : Vars.content.items()){
+            new ItemUnitStance(item);
+        }
     }
 }
