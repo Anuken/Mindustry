@@ -2695,6 +2695,7 @@ public class UnitTypes{
             crushDamage = 13f / 5f;
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
             hovering = true;
+            canDrown = false;
             
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.mediumCannon;
@@ -2766,6 +2767,7 @@ public class UnitTypes{
                     bullet = new BasicBulletType(6f, 40f){{
                         width = 6.5f;
                         height = 11f;
+                        lifetime = 22f;
                         shootEffect = Fx.sparkShoot;
                         smokeEffect = Fx.shootBigSmoke;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
@@ -2787,6 +2789,7 @@ public class UnitTypes{
             crushDamage = 5f;
             rotateSpeed = 1.1f;
             hovering = true;
+            canDrown = false;
             float xo = 231f/2f, yo = 231f/2f;
             treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};
 
@@ -2865,15 +2868,15 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(7f, 460f){{
+                bullet = new BasicBulletType(8f, 460f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
-                    lifetime = 40f;
+                    lifetime = 35f;
                     hitSize = 6f;
 
                     smokeEffect = Fx.shootSmokeTitan;
-                    pierceCap = 5;
+                    pierceCap = 3;
                     pierce = true;
                     collidesTiles = false;
                     hitColor = backColor = trailColor = Color.valueOf("feb380");
@@ -2912,8 +2915,8 @@ public class UnitTypes{
                                 weaveScale = 3f;
                                 weaveMag = 2f;
 
-                                splashDamage = 140f;
-                                splashDamageRadius = 40f;
+                                splashDamage = 120f;
+                                splashDamageRadius = 36f;
                                 despawnEffect = new ExplosionEffect(){{
                                     lifetime = 30f;
                                     waveStroke = 4f;
