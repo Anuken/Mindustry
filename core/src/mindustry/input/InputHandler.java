@@ -363,7 +363,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
-            if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
+            if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai && unit.type.allowCommand(unit, command)){
                 boolean reset = command.resetTarget || ai.currentCommand().resetTarget;
                 ai.command(command);
                 if(reset){
@@ -372,7 +372,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
                 unit.lastCommanded = player.coloredName();
 
-                //make sure its stance is valid
+                //make sure its current stance is valid with its current command
                 stancesOut.clear();
                 unit.type.getUnitStances(unit, stancesOut);
                 if(stancesOut.size > 0 && !stancesOut.contains(ai.stance)){
@@ -397,7 +397,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
                 if(stance == UnitStance.stop){ //not a real stance, just cancels orders
                     ai.clearCommands();
-                }else{
+                }else if(unit.type.allowStance(unit, stance)){
                     ai.stance = stance;
                 }
                 unit.lastCommanded = player.coloredName();

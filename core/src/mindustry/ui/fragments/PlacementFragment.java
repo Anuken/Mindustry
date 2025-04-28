@@ -13,6 +13,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -460,24 +461,31 @@ public class PlacementFragment{
                     commandTable.add(Core.bundle.get("commandmode.name")).fill().center().labelAlign(Align.center).row();
                     commandTable.image().color(Pal.accent).growX().pad(20f).padTop(0f).padBottom(4f).row();
                     commandTable.table(u -> {
+
+                        Bits activeCommands = new Bits(content.unitCommands().size);
+                        Bits activeStances = new Bits(content.unitStances().size);
+
+                        Bits availableCommands = new Bits(content.unitCommands().size);
+                        Bits availableStances = new Bits(content.unitStances().size);
+
                         u.left();
                         int[] curCount = {0};
-                        UnitCommand[] currentCommand = {null};
+                        Bits usedCommands = new Bits(content.unitCommands().size);
                         var commands = new Seq<UnitCommand>();
 
-                        UnitStance[] currentStance = {null};
+                        Bits usedStances = new Bits(content.unitStances().size);
                         var stances = new Seq<UnitStance>();
-
                         var stancesOut = new Seq<UnitStance>();
 
                         rebuildCommand = () -> {
                             u.clearChildren();
                             var units = control.input.selectedUnits;
                             if(units.size > 0){
+                                usedCommands.clear();
+                                usedStances.clear();
                                 commands.clear();
                                 stances.clear();
 
-                                boolean firstCommand = false, firstStance = false;
                                 int[] counts = new int[content.units().size];
 
                                 for(var unit : units){
@@ -486,12 +494,11 @@ public class PlacementFragment{
                                     stancesOut.clear();
                                     unit.type.getUnitStances(unit, stancesOut);
 
-                                    if(!firstStance){
-                                        stances.add(stancesOut);
-                                        firstStance = true;
-                                    }else{
-                                        //remove commands that this next unit type doesn't have
-                                        stances.removeAll(st -> !stancesOut.contains(st));
+                                    for(var stance : stancesOut){
+                                        if(!usedStances.get(stance.id)){
+                                            stances.add(stance);
+                                            usedStances.set(stance.id);
+                                        }
                                     }
                                 }
 
@@ -529,12 +536,11 @@ public class PlacementFragment{
                                             unitlist.row();
                                         }
 
-                                        if(!firstCommand){
-                                            commands.add(type.commands);
-                                            firstCommand = true;
-                                        }else{
-                                            //remove commands that this next unit type doesn't have
-                                            commands.removeAll(com -> !type.commands.contains(com));
+                                        for(var command : type.commands){
+                                            if(!usedCommands.get(command.id)){
+                                                commands.add(command);
+                                                usedCommands.set(command.id);
+                                            }
                                         }
                                     }
                                 }
@@ -548,8 +554,8 @@ public class PlacementFragment{
                                         int scol = 0;
                                         for(var command : commands){
                                             coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitCommand(player, units.mapInt(un -> un.id).toArray(), command);
-                                            }).checked(i -> currentCommand[0] == command).size(50f).tooltip(command.localized(), true);
+                                                Call.setUnitCommand(player, units.mapInt(un -> un.id, un -> un.type.allowCommand(un, command)).toArray(), command);
+                                            }).checked(i -> activeCommands.get(command.id)).size(50f).tooltip(command.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
                                         }
@@ -571,8 +577,8 @@ public class PlacementFragment{
                                         for(var stance : stances){
 
                                             coms.button(stance.getIcon(), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitStance(player, units.mapInt(un -> un.id).toArray(), stance);
-                                            }).checked(i -> currentStance[0] == stance).size(50f).tooltip(stance.localized(), true);
+                                                Call.setUnitStance(player, units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance);
+                                            }).checked(i -> activeStances.get(stance.id)).size(50f).tooltip(stance.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
                                         }
@@ -585,58 +591,50 @@ public class PlacementFragment{
 
                         u.update(() -> {
                             {
-                                boolean hadCommand = false, hadStance = false;
-                                UnitCommand shareCommand = null;
-                                UnitStance shareStance = null;
+                                activeCommands.clear();
+                                activeStances.clear();
+                                availableCommands.clear();
+                                availableStances.clear();
 
                                 //find the command that all units have, or null if they do not share one
                                 for(var unit : control.input.selectedUnits){
-                                    if(unit.isCommandable()){
-                                        var nextCommand = unit.command().command;
+                                    if(unit.controller() instanceof CommandAI cmd){
+                                        activeCommands.set(cmd.command.id);
+                                        activeStances.set(cmd.stance.id);
 
-                                        if(hadCommand){
-                                            if(shareCommand != nextCommand){
-                                                shareCommand = null;
-                                            }
-                                        }else{
-                                            shareCommand = nextCommand;
-                                            hadCommand = true;
+                                        for(var command : unit.type.commands){
+                                            availableCommands.set(command.id);
                                         }
 
-                                        var nextStance = unit.command().stance;
+                                        stancesOut.clear();
+                                        unit.type.getUnitStances(unit, stancesOut);
 
-                                        if(hadStance){
-                                            if(shareStance != nextStance){
-                                                shareStance = null;
-                                            }
-                                        }else{
-                                            shareStance = nextStance;
-                                            hadStance = true;
+                                        for(var stance : stancesOut){
+                                            availableStances.set(stance.id);
                                         }
                                     }
                                 }
 
                                 int size = control.input.selectedUnits.size;
-                                if(curCount[0] != size || (currentCommand[0] != shareCommand && shareCommand != null && currentCommand[0] != null && (currentCommand[0].refreshOnSelect || shareCommand.refreshOnSelect))){
+                                if(curCount[0] != size || !usedCommands.equals(availableCommands) || !usedStances.equals(availableStances)){
+                                    if(!(curCount[0] + size == 0)){
+                                        rebuildCommand.run();
+                                    }
                                     curCount[0] = size;
-                                    rebuildCommand.run();
                                 }
-
-                                currentCommand[0] = shareCommand;
-                                currentStance[0] = shareStance;
 
                                 //not a huge fan of running input logic here, but it's convenient as the stance arrays are all here...
                                 for(UnitStance stance : stances){
                                     //first stance must always be the stop stance
                                     if(stance.keybind != null && Core.input.keyTap(stance.keybind)){
-                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), stance);
+                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance);
                                     }
                                 }
 
                                 for(UnitCommand command : commands){
                                     //first stance must always be the stop stance
                                     if(command.keybind != null && Core.input.keyTap(command.keybind)){
-                                        Call.setUnitCommand(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), command);
+                                        Call.setUnitCommand(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowCommand(un, command)).toArray(), command);
                                     }
                                 }
                             }
