@@ -4008,7 +4008,7 @@ public class Blocks{
                     pointEffect = Fx.instTrail;
                     despawnEffect = Fx.instBomb;
                     pointEffectSpace = 20f;
-                    damage = 1350;
+                    damage = 1360;
                     buildingDamageMultiplier = 0.2f;
                     maxDamageFraction = 0.6f;
                     pierceDamageFactor = 1f;
@@ -4980,8 +4980,8 @@ public class Blocks{
             shootWarmupSpeed = 0.08f;
             shootCone = 360f;
 
-            aimChangeSpeed = 0.9f;
-            rotateSpeed = 0.9f;
+            aimChangeSpeed = 1.0f;
+            rotateSpeed = 1.0f;
 
             shootY = 0.5f;
             outlineColor = Pal.darkOutline;
@@ -4993,7 +4993,7 @@ public class Blocks{
             unitSort = UnitSorts.strongest;
 
             consumeLiquid(Liquids.nitrogen, 6f / 60f);
-            consumePower(200f / 60f);
+            consumePower(150f / 60f);
         }};
 
         scathe = new ItemTurret("scathe"){{
@@ -5474,7 +5474,7 @@ public class Blocks{
             }});
 
             shootSound = Sounds.shootSmite;
-            minWarmup = 0.99f;
+            minWarmup = 0.95f;
             coolantMultiplier = 15f;
 
             var haloProgress = PartProgress.warmup.delay(0.5f);
@@ -5649,7 +5649,7 @@ public class Blocks{
                 }
             }};
 
-            shootWarmupSpeed = 0.04f;
+            shootWarmupSpeed = 0.05f;
             shootY = 15f;
             outlineColor = Pal.darkOutline;
             size = 5;
