@@ -74,15 +74,24 @@ public class Schematics implements Loadable{
         load();
     }
 
+    private void loadSchematics(Fi directory){
+        for(Fi file : directory.list()){
+            if(file.isDirectory()){
+                loadSchematics(file);
+            }else{
+                loadFile(file);
+            }
+        }
+    }
+    
     /** Load all schematics in the folder immediately.*/
     public void load(){
         all.clear();
 
         loadLoadouts();
 
-        for(Fi file : schematicDirectory.list()){
-            loadFile(file);
-        }
+        loadSchematics(schematicDirectory);
+
 
         platform.getWorkshopContent(Schematic.class).each(this::loadFile);
 
