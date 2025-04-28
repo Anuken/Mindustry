@@ -121,6 +121,24 @@ public class Maps{
         }
     }
 
+    private void loadCustomMaps(Fi directory){
+        for(Fi file : directory.list()){
+            if(file.isDirectory()){
+                loadCustomMaps(file);
+            }else{
+                try{
+                    if(file.extension().equalsIgnoreCase(mapExtension)){
+                        loadMap(file, true);
+                    }
+                }catch(Exception e){
+                    Log.err("Failed to load custom map file '@'!", file);
+                    Log.err(e);
+                }
+            }
+        }
+    }
+
+
     /** Load all maps. Should be called at application start. */
     public void load(){
         //defaults; must work
@@ -134,16 +152,7 @@ public class Maps{
         }
 
         //custom
-        for(Fi file : customMapDirectory.list()){
-            try{
-                if(file.extension().equalsIgnoreCase(mapExtension)){
-                    loadMap(file, true);
-                }
-            }catch(Exception e){
-                Log.err("Failed to load custom map file '@'!", file);
-                Log.err(e);
-            }
-        }
+        loadCustomMaps(customMapDirectory);
 
         //workshop
         for(Fi file : platform.getWorkshopContent(Map.class)){
