@@ -45,21 +45,30 @@ public class Saves{
         });
     }
 
+    private void loadSaves(Fi directory, Seq<Future<SaveSlot>> futures){
+        for(Fi file : directory.list()){
+            if(file.isDirectory()){
+                loadSaves(file, futures);
+            }else{
+                if(!file.name().contains("backup") && SaveIO.isSaveValid(file)){
+                    futures.add(mainExecutor.submit(() -> {
+                        SaveSlot slot = new SaveSlot(file);
+                        slot.meta = SaveIO.getMeta(file);
+                        return slot;
+                    }));
+                }
+            }
+        }
+    }
+
+
     public void load(){
         saves.clear();
 
         //read saves in parallel
         Seq<Future<SaveSlot>> futures = new Seq<>();
 
-        for(Fi file : saveDirectory.list()){
-            if(!file.name().contains("backup") && SaveIO.isSaveValid(file)){
-                futures.add(mainExecutor.submit(() -> {
-                    SaveSlot slot = new SaveSlot(file);
-                    slot.meta = SaveIO.getMeta(file);
-                    return slot;
-                }));
-            }
-        }
+        loadSaves(saveDirectory, futures);
 
         for(var future : futures){
             try{
