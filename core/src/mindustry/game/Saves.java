@@ -62,25 +62,35 @@ public class Saves{
     }
 
 
-    public void load(){
+    public void load() {
         saves.clear();
 
-        //read saves in parallel
+        // read saves in parallel
         Seq<Future<SaveSlot>> futures = new Seq<>();
 
-        loadSaves(saveDirectory, futures);
+        saveDirectory.walk(file -> {
+            if (!file.isDirectory()) {
+                if (!file.name().contains("backup") && SaveIO.isSaveValid(file)) {
+                    futures.add(mainExecutor.submit(() -> {
+                        SaveSlot slot = new SaveSlot(file);
+                        slot.meta = SaveIO.getMeta(file);
+                        return slot;
+                    }));
+                }
+            }
+        });
 
-        for(var future : futures){
-            try{
+        for (var future : futures) {
+            try {
                 saves.add(future.get());
-            }catch(Exception e){
+            } catch (Exception e) {
                 Log.err(e);
             }
         }
 
-        //clear saves from build <130 that had the new naval sectors.
+        // clear saves from build <130 that had the new naval sectors
         saves.removeAll(s -> {
-            if(s.getSector() != null && (s.getSector().id == 108 || s.getSector().id == 216) && s.meta.build <= 130 && s.meta.build > 0){
+            if (s.getSector() != null && (s.getSector().id == 108 || s.getSector().id == 216) && s.meta.build <= 130 && s.meta.build > 0) {
                 s.getSector().clearInfo();
                 s.file.delete();
                 return true;
@@ -90,16 +100,17 @@ public class Saves{
 
         lastSectorSave = saves.find(s -> s.isSector() && s.getName().equals(Core.settings.getString("last-sector-save", "<none>")));
 
-        //automatically assign sector save slots
-        for(SaveSlot slot : saves){
-            if(slot.getSector() != null){
-                if(slot.getSector().save != null){
+        // automatically assign sector save slots
+        for (SaveSlot slot : saves) {
+            if (slot.getSector() != null) {
+                if (slot.getSector().save != null) {
                     Log.warn("Sector @ has two corresponding saves: @ and @", slot.getSector(), slot.getSector().save.file, slot.file);
                 }
                 slot.getSector().save = slot;
             }
         }
     }
+
 
     public @Nullable SaveSlot getLastSector(){
         return lastSectorSave;

@@ -74,28 +74,21 @@ public class Schematics implements Loadable{
         load();
     }
 
-    private void loadSchematics(Fi directory){
-        for(Fi file : directory.list()){
-            if(file.isDirectory()){
-                loadSchematics(file);
-            }else{
-                loadFile(file);
-            }
-        }
-    }
-    
-    /** Load all schematics in the folder immediately.*/
+    /** Load all schematics in the folder immediately. */
     public void load(){
         all.clear();
 
         loadLoadouts();
 
-        loadSchematics(schematicDirectory);
-
+        schematicDirectory.walk(file -> {
+            if(!file.isDirectory()){
+                loadFile(file);
+            }
+        });
 
         platform.getWorkshopContent(Schematic.class).each(this::loadFile);
 
-        //mod-specific schematics, cannot be removed
+        // mod-specific schematics, cannot be removed
         mods.listFiles("schematics", (mod, file) -> {
             Schematic s = loadFile(file);
             if(s != null){

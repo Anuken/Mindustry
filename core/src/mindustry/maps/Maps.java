@@ -121,25 +121,6 @@ public class Maps{
         }
     }
 
-    private void loadCustomMaps(Fi directory){
-        for(Fi file : directory.list()){
-            if(file.isDirectory()){
-                loadCustomMaps(file);
-            }else{
-                try{
-                    if(file.extension().equalsIgnoreCase(mapExtension)){
-                        loadMap(file, true);
-                    }
-                }catch(Exception e){
-                    Log.err("Failed to load custom map file '@'!", file);
-                    Log.err(e);
-                }
-            }
-        }
-    }
-
-
-    /** Load all maps. Should be called at application start. */
     public void load(){
         //defaults; must work
         try{
@@ -152,12 +133,21 @@ public class Maps{
         }
 
         //custom
-        loadCustomMaps(customMapDirectory);
+        customMapDirectory.walk(file -> {
+            if(file.isDirectory()) return; // skip folders
+            try{
+                if(file.extension().equalsIgnoreCase(mapExtension)){
+                    loadMap(file, true);
+                }
+            }catch(Exception e){
+                Log.err("Failed to load custom map file '@'", file);
+                Log.err(e);
+            }
+        });
 
         //workshop
         for(Fi file : platform.getWorkshopContent(Map.class)){
             try{
-                //HACK this achievement isn't completing for some reason
                 Achievement.downloadMapWorkshop.complete();
                 Map map = loadMap(file, false);
                 map.workshop = true;
