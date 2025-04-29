@@ -294,9 +294,30 @@ public class DesktopInput extends InputHandler{
             if(input.keyTap(Binding.selectAllUnits)){
                 selectedUnits.clear();
                 commandBuildings.clear();
-                for(var unit : player.team().data().units){
-                    if(unit.allowCommand()){
-                        selectedUnits.add(unit);
+                if(input.keyDown(Binding.selectAcrossScreen)){
+                    camera.bounds(Tmp.r1);
+                    selectedUnits.set(selectedCommandUnits(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height));
+                }else {
+                    for(var unit : player.team().data().units){
+                        if(unit.allowCommand()){
+                            selectedUnits.add(unit);
+                        }
+                    }
+                }
+
+            }
+
+            if(input.keyTap(Binding.selectAllUnitTransport)){
+                selectedUnits.clear();
+                commandBuildings.clear();
+                if(input.keyDown(Binding.selectAcrossScreen)){
+                    camera.bounds(Tmp.r1);
+                    selectedUnits.set(selectedCommandUnits(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, u -> u instanceof Payloadc));
+                }else {
+                    for(var unit : player.team().data().units){
+                        if(unit.allowCommand() && unit instanceof  Payloadc){
+                            selectedUnits.add(unit);
+                        }
                     }
                 }
             }
@@ -308,6 +329,10 @@ public class DesktopInput extends InputHandler{
                     if(build.block.commandable){
                         commandBuildings.add(build);
                     }
+                }
+                if(input.keyDown(Binding.selectAcrossScreen)){
+                    camera.bounds(Tmp.r1);
+                    commandBuildings.retainAll(b -> Tmp.r1.overlaps(b.x - (b.hitSize() /2), b.y - (b.hitSize() /2), b.hitSize(), b.hitSize()));
                 }
             }
 
