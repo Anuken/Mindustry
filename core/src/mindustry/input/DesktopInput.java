@@ -332,7 +332,7 @@ public class DesktopInput extends InputHandler{
                 }
                 if(input.keyDown(Binding.selectAcrossScreen)){
                     camera.bounds(Tmp.r1);
-                    commandBuildings.retainAll(b -> Tmp.r1.contains(b.x, b.y));
+                    commandBuildings.retainAll(b -> Tmp.r1.overlaps(b.x - (b.hitSize() /2), b.y - (b.hitSize() /2), b.hitSize(), b.hitSize()));
                 }
             }
 
