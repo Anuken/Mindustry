@@ -295,7 +295,17 @@ public class DesktopInput extends InputHandler{
                 selectedUnits.clear();
                 commandBuildings.clear();
                 for(var unit : player.team().data().units){
-                    if(unit.allowCommand()){
+                    if(unit.allowCommand() && (input.keyDown(Binding.selectAcrossMap) || unit.within(camera.position,  Math.max(Core.camera.height, Core.camera.width) / 2f))){
+                        selectedUnits.add(unit);
+                    }
+                }
+            }
+
+            if(input.keyTap(Binding.selectAllUnitTransport)){
+                selectedUnits.clear();
+                commandBuildings.clear();
+                for(var unit : player.team().data().units){
+                    if(unit.allowCommand() && unit instanceof  Payloadc && (input.keyDown(Binding.selectAcrossMap) || unit.within(camera.position,  Math.max(Core.camera.height, Core.camera.width) / 2f))){
                         selectedUnits.add(unit);
                     }
                 }
@@ -305,7 +315,7 @@ public class DesktopInput extends InputHandler{
                 selectedUnits.clear();
                 commandBuildings.clear();
                 for(var build : player.team().data().buildings){
-                    if(build.block.commandable){
+                    if(build.block.commandable && (input.keyDown(Binding.selectAcrossMap) || build.within(camera.position,  Math.max(Core.camera.height, Core.camera.width) / 2f))){
                         commandBuildings.add(build);
                     }
                 }
