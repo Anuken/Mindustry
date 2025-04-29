@@ -1572,9 +1572,11 @@ public class ControlPathfinder implements Runnable{
                     }
 
                     //each update time (not total!) no longer than maxUpdate
-                    for(FieldCache cache : fields.values()){
-                        updateFields(cache, maxUpdate);
-                    }
+                    fields.eachValue(cache -> {
+                        if(cache != null){
+                            updateFields(cache, maxUpdate);
+                        }
+                    });
                 }
 
                 try{
@@ -1584,7 +1586,7 @@ public class ControlPathfinder implements Runnable{
                     return;
                 }
             }catch(Throwable e){
-                e.printStackTrace();
+                Log.err(e);
             }
         }
     }
