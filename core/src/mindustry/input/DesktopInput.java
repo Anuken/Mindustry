@@ -294,19 +294,28 @@ public class DesktopInput extends InputHandler{
             if(input.keyTap(Binding.selectAllUnits)){
                 selectedUnits.clear();
                 commandBuildings.clear();
-                for(var unit : player.team().data().units){
-                    if(unit.allowCommand() && (input.keyDown(Binding.selectAcrossMap) || unit.within(camera.position,  Math.max(Core.camera.height, Core.camera.width) / 2f))){
-                        selectedUnits.add(unit);
+                if(input.keyDown(Binding.selectAcrossScreen)){
+                    selectedUnits.set(selectedCommandUnits(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height));
+                }else {
+                    for(var unit : player.team().data().units){
+                        if(unit.allowCommand()){
+                            selectedUnits.add(unit);
+                        }
                     }
                 }
+
             }
 
             if(input.keyTap(Binding.selectAllUnitTransport)){
                 selectedUnits.clear();
                 commandBuildings.clear();
-                for(var unit : player.team().data().units){
-                    if(unit.allowCommand() && unit instanceof  Payloadc && (input.keyDown(Binding.selectAcrossMap) || unit.within(camera.position,  Math.max(Core.camera.height, Core.camera.width) / 2f))){
-                        selectedUnits.add(unit);
+                if(input.keyDown(Binding.selectAcrossScreen)){
+                    selectedUnits.set(selectedCommandUnits(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, u -> u instanceof Payloadc));
+                }else {
+                    for(var unit : player.team().data().units){
+                        if(unit.allowCommand()){
+                            selectedUnits.add(unit);
+                        }
                     }
                 }
             }
@@ -315,9 +324,13 @@ public class DesktopInput extends InputHandler{
                 selectedUnits.clear();
                 commandBuildings.clear();
                 for(var build : player.team().data().buildings){
-                    if(build.block.commandable && (input.keyDown(Binding.selectAcrossMap) || build.within(camera.position,  Math.max(Core.camera.height, Core.camera.width) / 2f))){
+                    if(build.block.commandable){
                         commandBuildings.add(build);
                     }
+                }
+                if(input.keyDown(Binding.selectAcrossScreen)){
+                    camera.bounds(Tmp.r1);
+                    commandBuildings.retainAll(b -> Tmp.r1.contains(b.x, b.y));
                 }
             }
 

@@ -43,7 +43,7 @@ public class Binding{
     selectAllUnits = KeyBind.add("select_all_units", KeyCode.g),
     selectAllUnitFactories = KeyBind.add("select_all_unit_factories", KeyCode.h),
     selectAllUnitTransport = KeyBind.add("select_all_unit_transport", KeyCode.unset),
-    selectAcrossMap = KeyBind.add("select_across_map", KeyCode.altLeft),
+    selectAcrossScreen = KeyBind.add("select_across_screen", KeyCode.altLeft),
 
     cancelOrders = KeyBind.add("cancel_orders", KeyCode.unset),
 
