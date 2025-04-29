@@ -55,7 +55,7 @@ public class Renderer implements ApplicationListener{
     //currently landing core, null if there are no cores or it has finished landing.
     private @Nullable LaunchAnimator launchAnimator;
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
-    private float
+    public float
     //target camera scale that is lerp-ed to
     targetscale = Scl.scl(4),
     //current actual camera scale
@@ -233,7 +233,7 @@ public class Renderer implements ApplicationListener{
                     case Gl.invalidFramebufferOperation -> "invalid framebuffer operation";
                     case Gl.invalidEnum -> "invalid enum";
                     case Gl.outOfMemory -> "out of memory";
-                    default -> "unknown error " + (error);
+                    default -> "unknown error (" + error + ")";
                 };
 
                 Log.err("[GL] Error: @", message);

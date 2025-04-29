@@ -26,7 +26,7 @@ public class ItemBridge extends Block{
     public final int timerCheckMoved = timers ++;
 
     public int range;
-    public float transportTime = 2f;
+    public float transportTime;
     public @Load("@-end") TextureRegion endRegion;
     public @Load("@-bridge") TextureRegion bridgeRegion;
     public @Load("@-arrow") TextureRegion arrowRegion;
@@ -63,6 +63,14 @@ public class ItemBridge extends Block{
         config(Point2.class, (ItemBridgeBuild tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
         //integer is not
         config(Integer.class, (ItemBridgeBuild tile, Integer i) -> tile.link = i);
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+        if(transportTime != 0f){
+            stats.add(Stat.itemsMoved, 60f / transportTime, StatUnit.itemsSecond);
+        }
     }
 
     @Override

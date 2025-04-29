@@ -186,6 +186,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(power != null) power.write(write);
         if(liquids != null) liquids.write(write);
 
+        //write timescale if relevant
+        if(timeScale != 1f){
+            write.f(timeScale);
+            write.f(timeScaleDuration);
+        }
+
         //efficiency is written as two bytes to save space
         write.b((byte)(Mathf.clamp(efficiency) * 255f));
         write.b((byte)(Mathf.clamp(optionalEfficiency) * 255f));
@@ -218,7 +224,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
             //get which modules should actually be read; this was added in version 2
             if(version >= 2){
-                moduleBits = read.b();
+                moduleBits = read.ub();
             }
             legacy = false;
         }
@@ -226,6 +232,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if((moduleBits & 1) != 0) (items == null ? new ItemModule() : items).read(read, legacy);
         if((moduleBits & 2) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
         if((moduleBits & 4) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
+        if((moduleBits & 16) != 0){
+            timeScale = read.f();
+            timeScaleDuration = read.f();
+        }
 
         //unnecessary consume module read in version 2 and below
         if(version <= 2) read.bool();
@@ -236,14 +246,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             optionalEfficiency = read.ub() / 255f;
         }
 
-        //version 4 (and only 4 at the moment) has visibility flags
+        //version 4 has visibility flags
         if(version == 4){
             visibleFlags = read.l();
         }
     }
 
     public int moduleBitmask(){
-        return (items != null ? 1 : 0) | (power != null ? 2 : 0) | (liquids != null ? 4 : 0) | 8;
+        return (items != null ? 1 : 0) | (power != null ? 2 : 0) | (liquids != null ? 4 : 0) | 8 | (timeScale != 1f ? 16 : 0);
     }
 
     public void writeAll(Writes write){
@@ -1439,7 +1449,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         //cap explosiveness so fluid tanks/vaults don't instakill units
-        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, state.rules.damageExplosions, block.destroyEffect, block.baseShake);
+        Damage.dynamicExplosion(x, y, flammability * block.flammabilityScale, explosiveness * 3.5f * block.explosivenessScale, power, tilesize * block.size / 2f, state.rules.damageExplosions, block.destroyEffect, block.baseShake);
 
         if(block.createRubble && !floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);

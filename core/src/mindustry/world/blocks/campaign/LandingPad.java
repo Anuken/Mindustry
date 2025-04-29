@@ -110,6 +110,13 @@ public class LandingPad extends Block{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.cooldownTime, (cooldownTime+arrivalDuration)/60f, StatUnit.seconds);
+    }
+
+    @Override
     public boolean outputsItems(){
         return true;
     }
