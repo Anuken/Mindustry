@@ -278,14 +278,14 @@ public class HudFragment{
             }
 
             cont.update(() -> {
-                if(Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.shown() && !Core.scene.hasDialog() && !Core.scene.hasField()){
+                if(Core.input.keyTap(Binding.toggleMenus) && !ui.chatfrag.shown() && !Core.scene.hasDialog() && !Core.scene.hasField()){
                     Core.settings.getBoolOnce("ui-hidden", () -> {
-                        ui.announce(Core.bundle.format("showui",  Core.keybinds.get(Binding.toggle_menus).key.toString(), 11));
+                        ui.announce(Core.bundle.format("showui",  Binding.toggleMenus.value.key.toString(), 11));
                     });
                     toggleMenus();
                 }
 
-                if(Core.input.keyTap(Binding.skip_wave) && canSkipWave()){
+                if(Core.input.keyTap(Binding.skipWave) && canSkipWave()){
                     if(net.client() && player.admin){
                         Call.adminRequest(player, AdminAction.wave, null);
                     }else{

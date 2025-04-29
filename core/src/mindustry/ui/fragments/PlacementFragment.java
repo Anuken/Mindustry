@@ -54,21 +54,21 @@ public class PlacementFragment{
     boolean blockSelectEnd, wasCommandMode;
     int blockSelectSeq;
     long blockSelectSeqMillis;
-    Binding[] blockSelect = {
-        Binding.block_select_01,
-        Binding.block_select_02,
-        Binding.block_select_03,
-        Binding.block_select_04,
-        Binding.block_select_05,
-        Binding.block_select_06,
-        Binding.block_select_07,
-        Binding.block_select_08,
-        Binding.block_select_09,
-        Binding.block_select_10,
-        Binding.block_select_left,
-        Binding.block_select_right,
-        Binding.block_select_up,
-        Binding.block_select_down
+    KeyBind[] blockSelect = {
+        Binding.blockSelect01,
+        Binding.blockSelect02,
+        Binding.blockSelect03,
+        Binding.blockSelect04,
+        Binding.blockSelect05,
+        Binding.blockSelect06,
+        Binding.blockSelect07,
+        Binding.blockSelect08,
+        Binding.blockSelect09,
+        Binding.blockSelect10,
+        Binding.blockSelectLeft,
+        Binding.blockSelectRight,
+        Binding.blockSelectUp,
+        Binding.blockSelectDown
     };
 
     public PlacementFragment(){
@@ -230,7 +230,7 @@ public class PlacementFragment{
             }
         }
 
-        if(Core.input.keyTap(Binding.category_prev)){
+        if(Core.input.keyTap(Binding.categoryPrev)){
             int i = 0;
             do{
                 currentCategory = currentCategory.prev();
@@ -240,7 +240,7 @@ public class PlacementFragment{
             return true;
         }
 
-        if(Core.input.keyTap(Binding.category_next)){
+        if(Core.input.keyTap(Binding.categoryNext)){
             int i = 0;
             do{
                 currentCategory = currentCategory.next();
@@ -250,7 +250,7 @@ public class PlacementFragment{
             return true;
         }
 
-        if(Core.input.keyTap(Binding.block_info)){
+        if(Core.input.keyTap(Binding.blockInfo)){
             var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
             Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
@@ -363,9 +363,9 @@ public class PlacementFragment{
                                     Seq<Block> blocks = getByCategory(currentCategory);
                                     for(int i = 0; i < blocks.size; i++){
                                         if(blocks.get(i) == displayBlock && (i + 1) / 10 - 1 < blockSelect.length){
-                                            keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString())
-                                                + (i < 10 ? "" : Core.keybinds.get(blockSelect[(i + 1) / 10 - 1]).key.toString() + ",")
-                                                + Core.keybinds.get(blockSelect[i % 10]).key.toString() + "]";
+                                            keyCombo = Core.bundle.format("placement.blockselectkeys", blockSelect[currentCategory.ordinal()].value.key.toString())
+                                                + (i < 10 ? "" : blockSelect[(i + 1) / 10 - 1].value.key.toString() + ",")
+                                                + blockSelect[i % 10].value.key.toString() + "]";
                                             break;
                                         }
                                     }

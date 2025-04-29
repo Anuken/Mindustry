@@ -778,14 +778,14 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //zoom camera
-        if(!locked  && !scene.hasKeyboard() && !scene.hasScroll() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
+        if(!locked  && !scene.hasKeyboard() && !scene.hasScroll() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotatePlaced) && (Core.input.keyDown(Binding.diagonalPlacement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
         if(!Core.settings.getBool("keyboard") && !locked && !scene.hasKeyboard()){
             //move camera around
             float camSpeed = 6f;
-            Vec2 delta = Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed);
+            Vec2 delta = Tmp.v1.setZero().add(Core.input.axis(Binding.moveX), Core.input.axis(Binding.moveY)).nor().scl(Time.delta * camSpeed);
             Core.camera.position.add(delta);
             if(!delta.isZero()){
                 spectating = null;

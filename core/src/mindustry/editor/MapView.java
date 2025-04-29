@@ -71,7 +71,7 @@ public class MapView extends Element implements GestureListener{
                 if(!mobile && button != KeyCode.mouseLeft && button != KeyCode.mouseMiddle && button != KeyCode.mouseRight){
                     return true;
                 }
-                
+
                 if(button == KeyCode.mouseRight){
                     lastTool = tool;
                     tool = EditorTool.eraser;
@@ -178,8 +178,8 @@ public class MapView extends Element implements GestureListener{
         super.act(delta);
 
         if(Core.scene.getKeyboardFocus() == null || !Core.scene.hasField() && !Core.input.keyDown(KeyCode.controlLeft)){
-            float ax = Core.input.axis(Binding.move_x);
-            float ay = Core.input.axis(Binding.move_y);
+            float ax = Core.input.axis(Binding.moveX);
+            float ay = Core.input.axis(Binding.moveY);
             offsetx -= ax * 15 * Time.delta / zoom;
             offsety -= ay * 15 * Time.delta / zoom;
         }
