@@ -4808,7 +4808,6 @@ public class Blocks{
 
         afflict = new PowerTurret("afflict"){{
             requirements(Category.turret, with(Items.surgeAlloy, 125, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
-            buildCostMultiplier = 1.5f;
             
             shootType = new BasicBulletType(){{
                 shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{
@@ -4878,7 +4877,7 @@ public class Blocks{
 
                 fragBullets = 20;
                 fragVelocityMin = 0.5f;
-                fragVelocityMax = 1.5f;
+                fragVelocityMax = 1.2f;
                 fragLifeMin = 0.5f;
             }};
 
@@ -4920,13 +4919,14 @@ public class Blocks{
             reload = 100f;
             cooldownTime = reload;
             recoil = 3f;
-            range = 350;
+            range = 368;
             shootCone = 20f;
             scaledHealth = 220;
             rotateSpeed = 1.5f;
             researchCostMultiplier = 0.04f;
+            buildCostMultiplier = 1.5f;
 
-            limitRange(9f);
+            limitRange(-55f);
         }};
 
         lustre = new ContinuousTurret("lustre"){{
@@ -5714,7 +5714,7 @@ public class Blocks{
                 homingDelay = 19f;
                 homingRange = 160f;
 
-                explodeRange = 160f;
+                explodeRange = 100f;
                 explodeDelay = 0f;
 
                 flakInterval = 20f;
