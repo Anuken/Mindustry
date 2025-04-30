@@ -233,7 +233,7 @@ public class Renderer implements ApplicationListener{
                     case Gl.invalidFramebufferOperation -> "invalid framebuffer operation";
                     case Gl.invalidEnum -> "invalid enum";
                     case Gl.outOfMemory -> "out of memory";
-                    default -> "unknown error " + (error);
+                    default -> "unknown error (" + error + ")";
                 };
 
                 Log.err("[GL] Error: @", message);

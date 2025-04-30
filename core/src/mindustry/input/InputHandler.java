@@ -62,17 +62,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
     final static Seq<Unit> tmpUnits = new Seq<>(false);
-    final static Binding[] controlGroupBindings = {
-    Binding.block_select_01,
-    Binding.block_select_02,
-    Binding.block_select_03,
-    Binding.block_select_04,
-    Binding.block_select_05,
-    Binding.block_select_06,
-    Binding.block_select_07,
-    Binding.block_select_08,
-    Binding.block_select_09,
-    Binding.block_select_10
+    final static KeyBind[] controlGroupBindings = {
+    Binding.blockSelect01,
+    Binding.blockSelect02,
+    Binding.blockSelect03,
+    Binding.blockSelect04,
+    Binding.blockSelect05,
+    Binding.blockSelect06,
+    Binding.blockSelect07,
+    Binding.blockSelect08,
+    Binding.blockSelect09,
+    Binding.blockSelect10
     };
 
     /** If true, there is a cutscene currently occurring in logic. */
@@ -363,7 +363,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
-            if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
+            if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai && unit.type.allowCommand(unit, command)){
                 boolean reset = command.resetTarget || ai.currentCommand().resetTarget;
                 ai.command(command);
                 if(reset){
@@ -372,7 +372,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
                 unit.lastCommanded = player.coloredName();
 
-                //make sure its stance is valid
+                //make sure its current stance is valid with its current command
                 stancesOut.clear();
                 unit.type.getUnitStances(unit, stancesOut);
                 if(stancesOut.size > 0 && !stancesOut.contains(ai.stance)){
@@ -397,7 +397,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
                 if(stance == UnitStance.stop){ //not a real stance, just cancels orders
                     ai.clearCommands();
-                }else{
+                }else if(unit.type.allowStance(unit, stance)){
                     ai.stance = stance;
                 }
                 unit.lastCommanded = player.coloredName();
@@ -1905,7 +1905,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean isRebuildSelecting(){
-        return input.keyDown(Binding.rebuild_select);
+        return input.keyDown(Binding.rebuildSelect);
     }
 
     public float mouseAngle(float x, float y){
@@ -2161,7 +2161,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){
         Seq<Point2> points;
-        boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
+        boolean diagonal = Core.input.keyDown(Binding.diagonalPlacement);
 
         if(Core.settings.getBool("swapdiagonal") && mobile){
             diagonal = !diagonal;

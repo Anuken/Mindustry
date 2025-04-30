@@ -44,6 +44,7 @@ import static mindustry.Vars.*;
 public class UnitType extends UnlockableContent implements Senseable{
     public static final float shadowTX = -12, shadowTY = -13;
     private static final Vec2 legOffset = new Vec2();
+    private static final Seq<UnitStance> tmpStances = new Seq<>();
 
     /** Environmental flags that are *all* required for this unit to function. 0 = any environment */
     public int envRequired = 0;
@@ -608,6 +609,17 @@ public class UnitType extends UnlockableContent implements Senseable{
         }else{
             out.addAll(stances);
         }
+    }
+
+    public boolean allowStance(Unit unit, UnitStance stance){
+        if(stance == UnitStance.stop) return true;
+        tmpStances.clear();
+        getUnitStances(unit, tmpStances);
+        return tmpStances.contains(stance);
+    }
+
+    public boolean allowCommand(Unit unit, UnitCommand command){
+        return commands.contains(command);
     }
 
     public void update(Unit unit){

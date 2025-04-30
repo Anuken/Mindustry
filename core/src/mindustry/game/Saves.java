@@ -51,7 +51,7 @@ public class Saves{
         //read saves in parallel
         Seq<Future<SaveSlot>> futures = new Seq<>();
 
-        for(Fi file : saveDirectory.list()){
+        saveDirectory.walk(file -> {
             if(!file.name().contains("backup") && SaveIO.isSaveValid(file)){
                 futures.add(mainExecutor.submit(() -> {
                     SaveSlot slot = new SaveSlot(file);
@@ -59,7 +59,7 @@ public class Saves{
                     return slot;
                 }));
             }
-        }
+        });
 
         for(var future : futures){
             try{
