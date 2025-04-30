@@ -3839,6 +3839,7 @@ public class UnitTypes{
             range = 4.3f * 60f * 1.4f;
 
             abilities.add(new SuppressionFieldAbility(){{
+                reload = 60f * 8f;
                 orbRadius = 5.3f;
                 y = 1f;
             }});
@@ -3940,6 +3941,8 @@ public class UnitTypes{
             int parts = 10;
 
             abilities.add(new SuppressionFieldAbility(){{
+                reload = 60 * 15f;
+                range = 320f;
                 orbRadius = orbRad;
                 particleSize = partRad;
                 y = 10f;
