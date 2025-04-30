@@ -69,7 +69,7 @@ public class Pathfinder implements Runnable{
 
     //water
     (team, tile) ->
-    (!PathTile.liquid(tile) ? 6000 : 1) +
+    (!PathTile.liquid(tile) || PathTile.solid(tile) ? 6000 : 1) +
     PathTile.health(tile) * 5 +
     (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
     (PathTile.deep(tile) ? 0 : 1) +
