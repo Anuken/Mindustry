@@ -111,6 +111,7 @@ public class RtsAI{
         for(var unit : data.units){
             if(used.add(unit.id) && unit.controller() instanceof CommandAI cai && !cai.hasCommand() && !cai.isAttacking()){
                 squad.clear();
+                squad.add(unit);
 
                 stack.clear();
                 stack.add(unit);
