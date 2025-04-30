@@ -28,7 +28,7 @@ public class RtsAI{
     static final Seq<Unit> squad = new Seq<>(false), stack = new Seq<>();
     static final IntSet used = new IntSet();
     static final IntSet assignedTargets = new IntSet(), invalidTarget = new IntSet();
-    static final float squadRadius = 50f;
+    static final float squadRadius = 60f;
     static final int timeUpdate = 0, timerSpawn = 1, maxTargetsChecked = 15;
 
     //in order of priority??

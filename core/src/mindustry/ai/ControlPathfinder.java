@@ -24,6 +24,7 @@ import static mindustry.ai.Pathfinder.*;
 public class ControlPathfinder implements Runnable{
     private static final int wallImpassableCap = 1_000_000;
     private static final int solidCap = 7000;
+    private static boolean initialized;
 
     public static boolean showDebug;
 
@@ -213,7 +214,11 @@ public class ControlPathfinder implements Runnable{
         LongSeq[][] portalConnections = new LongSeq[4][];
     }
 
-    static{
+    //this method is not run in a static initializer because it must only happen after Pathfinder registers its events, which means it should happen in the ControlPathfinder constructor
+    static void checkEvents(){
+        if(initialized) return;
+        initialized = true;
+
         Events.on(ResetEvent.class, event -> controlPath.stop());
 
         Events.on(WorldLoadEvent.class, event -> {
@@ -329,6 +334,10 @@ public class ControlPathfinder implements Runnable{
                 Draw.reset();
             });
         }
+    }
+
+    public ControlPathfinder(){
+        checkEvents();
     }
 
     public void updateTile(Tile tile){
@@ -476,6 +485,11 @@ public class ControlPathfinder implements Runnable{
             }else{
                 //share portals with the other cluster
                 portals = cluster.portals[direction] = other.portals[(direction + 2) % 4];
+
+                //apparently this is somehow possible...?
+                if(portals == null){
+                    portals = cluster.portals[direction] = other.portals[(direction + 2) % 4] = new IntSeq();
+                }
 
                 //clear the portals, they're being recalculated now
                 portals.clear();
@@ -1490,7 +1504,7 @@ public class ControlPathfinder implements Runnable{
         long lastInvalidCheck = Time.millis() + invalidateCheckInterval;
 
         while(true){
-            if(net.client()) return;
+            if(net.client() || invalidated) return;
             try{
                 if(state.isPlaying()){
                     queue.run();
@@ -1577,6 +1591,7 @@ public class ControlPathfinder implements Runnable{
                 if(!invalidated){
                     Log.err(e);
                 }else{
+                    //This pathfinder is done, don't bother doing any tasks
                     return;
                 }
             }

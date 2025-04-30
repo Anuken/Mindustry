@@ -1,6 +1,7 @@
 package mindustry.graphics;
 
 import arc.*;
+import arc.assets.loaders.TextureLoader.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -302,11 +303,12 @@ public class Shaders{
         public SpaceShader(String frag){
             super(frag);
 
-            Core.assets.load("sprites/space.png", Texture.class).loaded = t -> {
-                texture = t;
-                texture.setFilter(TextureFilter.linear);
-                texture.setWrap(TextureWrap.mirroredRepeat);
-            };
+            Core.assets.load("sprites/space.png", Texture.class, new TextureParameter(){{
+                magFilter = TextureFilter.linear;
+                minFilter = TextureFilter.mipMapLinearLinear;
+                wrapU = wrapV = TextureWrap.mirroredRepeat;
+                genMipMaps = true;
+            }}).loaded = t -> texture = t;
         }
 
         @Override
