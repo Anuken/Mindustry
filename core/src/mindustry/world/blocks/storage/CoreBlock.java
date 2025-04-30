@@ -600,7 +600,7 @@ public class CoreBlock extends StorageBlock{
             }
 
             //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
-            if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1 && state.rules.sector.planet.enemyCoreSpawnReplace){
+            if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1 && spawner.getSpawns().size == 0 && state.rules.sector.planet.enemyCoreSpawnReplace){
                 //do not recache
                 tile.setOverlayQuiet(Blocks.spawn);
 
@@ -618,15 +618,16 @@ public class CoreBlock extends StorageBlock{
             if(state.rules.coreCapture){
                 if(!net.client()){
                     tile.setBlock(block, lastDamage);
-                }
 
-                //delay so clients don't destroy it afterwards
-                Core.app.post(() -> tile.setNet(block, lastDamage, 0));
-
-                //building does not exist on client yet
-                if(!net.client()){
                     //core is invincible for several seconds to prevent recapture
                     ((CoreBuild)tile.build).iframes = captureInvicibility;
+
+                    if(net.server()){
+                        //delay so clients don't destroy it afterwards
+                        Time.run(0f, () -> {
+                            tile.setNet(block, lastDamage, 0);
+                        });
+                    }
                 }
             }
         }
@@ -643,7 +644,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return state.rules.coreIncinerates ? storageCapacity * 20 : storageCapacity;
+            return state.rules.coreIncinerates ? Integer.MAX_VALUE/2 : storageCapacity;
         }
 
         @Override

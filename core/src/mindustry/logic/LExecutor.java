@@ -579,7 +579,7 @@ public class LExecutor{
                     output.isobj = fromVar.isobj;
                 }
             }else if(target.isobj && target.objval instanceof CharSequence str){
-                output.setnum(address < 0 || address >= str.length() ? 0 : (int)str.charAt(address));
+                output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
             }
         }
     }
@@ -652,6 +652,10 @@ public class LExecutor{
                     }
                 }
             }else{
+                if(target instanceof CharSequence seq && sense == LAccess.size){
+                    to.setnum(seq.length());
+                    return;
+                }
                 to.setobj(null);
             }
         }
@@ -965,11 +969,7 @@ public class LExecutor{
             if(Vars.headless) return;
 
             if(target.building() instanceof LogicDisplayBuild d && (d.team == exec.team || exec.privileged)){
-                if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
-                    for(int i = 0; i < exec.graphicsBuffer.size; i++){
-                        d.commands.addLast(exec.graphicsBuffer.items[i]);
-                    }
-                }
+                d.flushCommands(exec.graphicsBuffer);
                 exec.graphicsBuffer.clear();
             }
         }
@@ -1453,9 +1453,9 @@ public class LExecutor{
 
             Team t = team.team();
 
-            if(type.obj() instanceof UnitType type && !type.internal && Units.canCreate(t, type)){
+            if(t != null && type.obj() instanceof UnitType type && !type.internal && Units.canCreate(t, type)){
                 //random offset to prevent stacking
-                var unit = type.spawn(t, World.unconv(x.numf()) + Mathf.range(0.01f), World.unconv(y.numf()) + Mathf.range(0.01f));
+                var unit = type.spawn(t, World.unconv(x.numf()) + Mathf.range(0.01f), World.unconv(y.numf()) + Mathf.range(0.01f), rotation.numf());
                 spawner.spawnEffect(unit);
                 result.setobj(unit);
             }

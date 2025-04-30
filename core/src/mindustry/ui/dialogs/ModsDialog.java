@@ -165,7 +165,7 @@ public class ModsDialog extends BaseDialog{
 
     void setup(){
         float h = 110f;
-        float w = Math.min(Core.graphics.getWidth() / Scl.scl(1.05f), 520f);
+        float w = Math.min(Core.graphics.getWidth() / Scl.scl(1.05f) - Scl.scl(28f), 520f);
 
         cont.clear();
         cont.defaults().width(Math.min(Core.graphics.getWidth() / Scl.scl(1.05f), 556f)).pad(4);
@@ -488,8 +488,6 @@ public class ModsDialog extends BaseDialog{
             for(ModListing mod : listings){
                 if(((mod.hasJava || mod.hasScripts) && Vars.ios) ||
                     (!Strings.matches(searchtxt, mod.name) && !Strings.matches(searchtxt, mod.repo))
-                    //hack, I'm basically testing if 135.10 >= modVersion, which is equivalent to modVersion >= 136
-                    || (Version.isAtLeast(135, 10, mod.minGameVersion))
                 ) continue;
 
                 float s = 64f;
@@ -538,13 +536,16 @@ public class ModsDialog extends BaseDialog{
                         }
                     }).size(s).pad(4f * 2f);
 
-                    con.add(
+                    String infoText =
                     "[accent]" + mod.name.replace("\n", "") +
+
                     (installed.contains(mod.repo) ? "\n[lightgray]" + Core.bundle.get("mod.installed") : "") +
                     "\n[lightgray]\uE809 " + mod.stars +
-                    (Version.isAtLeast(mod.minGameVersion) ?  "" :
-                    "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
-                    .width(358f).wrap().grow().pad(4f, 2f, 4f, 6f).top().left().labelAlign(Align.topLeft);
+
+                    (!Version.isAtLeast(mod.minGameVersion) ? "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion) :
+                    ((mod.hasJava && Strings.parseDouble(mod.minGameVersion, 0) < minJavaModGameVersion) ? "\n" + Core.bundle.get("mod.incompatiblemod") : ""));
+
+                    con.add(infoText).width(358f).wrap().grow().pad(4f, 2f, 4f, 6f).top().left().labelAlign(Align.topLeft);
 
                 }, Styles.flatBordert, () -> {
                     var sel = new BaseDialog(mod.name);
@@ -569,6 +570,7 @@ public class ModsDialog extends BaseDialog{
                     sel.buttons.button("@mods.github.open", Icon.link, () -> {
                         Core.app.openURI("https://github.com/" + mod.repo);
                     });
+
                     sel.buttons.button("@mods.browser.view-releases", Icon.zoom, () -> {
                         BaseDialog load = new BaseDialog("");
                         load.cont.add("[accent]Fetching Releases...");
@@ -684,7 +686,7 @@ public class ModsDialog extends BaseDialog{
 
                 //this is a crude heuristic for class mods; only required for direct github import
                 //TODO make a more reliable way to distinguish java mod repos
-                if(language.equals("Java") || language.equals("Kotlin")){
+                if(language.equals("Java") || language.equals("Kotlin") || language.equals("Groovy") || language.equals("Scala")){
                     githubImportJavaMod(repo, release);
                 }else{
                     githubImportBranch(mainBranch, repo, release);

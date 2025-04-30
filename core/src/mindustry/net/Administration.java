@@ -25,7 +25,6 @@ public class Administration{
     public ObjectSet<String> dosBlacklist = new ObjectSet<>();
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
 
-
     private boolean modified, loaded;
     /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not modify directly. */
     public ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();

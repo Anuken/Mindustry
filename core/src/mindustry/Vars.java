@@ -4,6 +4,7 @@ import arc.*;
 import arc.assets.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.input.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -86,6 +87,8 @@ public class Vars implements Loadable{
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<ServerGroup> defaultServers = Seq.with();
+    /** maximum openGL errors logged */
+    public static final int maxGlErrors = 100;
     /** maximum size of any block, do not change unless you know what you're doing */
     public static final int maxBlockSize = 16;
     /** maximum distance between mine and core that supports automatic transferring */
@@ -446,10 +449,18 @@ public class Vars implements Loadable{
             settings.setDataDirectory(Core.files.local("saves/"));
         }
 
+        //needed to make sure binding values are correct
+        Vars.android = app.isAndroid();
         settings.defaults("locale", "default", "blocksync", true);
-        keybinds.setDefaults(Binding.values());
         settings.setAutosave(false);
         settings.load();
+
+        //this should not be necessary, but in case Binding is initialized before Settings#load(), do that here
+        for(KeyBind bind : KeyBind.all){
+            bind.load();
+        }
+
+        Binding.init();
 
         //https://github.com/Anuken/Mindustry/issues/8483
         if(settings.getInt("uiscale") == 5){

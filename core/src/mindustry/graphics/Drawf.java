@@ -394,6 +394,16 @@ public class Drawf{
         Draw.reset();
     }
 
+    public static void cross(float x, float y, float radius, Color color){
+        Lines.stroke(3f, Pal.gray.write(Tmp.c3).a(color.a));
+        Lines.lineAngleCenter(x, y, 45f, radius + 1f);
+        Lines.lineAngleCenter(x, y, 135f, radius + 1f);
+        Lines.stroke(1f, color);
+        Lines.lineAngleCenter(x, y, 45f, radius + 1f);
+        Lines.lineAngleCenter(x, y, 135f, radius + 1f);
+        Draw.reset();
+    }
+
     public static void poly(float x, float y, int sides, float radius, float rotation, Color color){
         Lines.stroke(3f, Pal.gray);
         Lines.poly(x, y, sides, radius + 1f, rotation);

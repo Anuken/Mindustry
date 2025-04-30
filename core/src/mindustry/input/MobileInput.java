@@ -227,7 +227,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         table.button(Icon.ok, Styles.clearNoneTogglei, () -> {
             if(schematicMode){
                 rebuildMode = !rebuildMode;
-            }else{
+            }else if(!player.dead()){
                 for(BuildPlan plan : selectPlans){
                     Tile tile = plan.tile();
 
@@ -261,6 +261,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).visible(() -> !selectPlans.isEmpty() || schematicMode || rebuildMode).update(i -> {
             i.getStyle().imageUp = schematicMode || rebuildMode ? Icon.wrench : Icon.ok;
             i.setChecked(rebuildMode);
+            i.setDisabled(() -> player.dead());
 
         }).name("confirmplace");
     }
@@ -290,7 +291,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(() -> !hasSchematic() && !state.rules.editor);
+            t.visible(() -> !hasSchematic() && !(state.isEditor() && Core.settings.getBool("editor-blocks-shown")));
             t.bottom().left();
 
             t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
@@ -769,7 +770,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //validate commanding units
-        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid() || u.team != player.team());
+        selectedUnits.removeAll(u -> !u.allowCommand() || !u.isValid() || u.team != player.team());
 
         if(!commandMode){
             commandBuildings.clear();
@@ -777,14 +778,14 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //zoom camera
-        if(!locked  && !scene.hasKeyboard() && !scene.hasScroll() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
+        if(!locked  && !scene.hasKeyboard() && !scene.hasScroll() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotatePlaced) && (Core.input.keyDown(Binding.diagonalPlacement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
         if(!Core.settings.getBool("keyboard") && !locked && !scene.hasKeyboard()){
             //move camera around
             float camSpeed = 6f;
-            Vec2 delta = Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed);
+            Vec2 delta = Tmp.v1.setZero().add(Core.input.axis(Binding.moveX), Core.input.axis(Binding.moveY)).nor().scl(Time.delta * camSpeed);
             Core.camera.position.add(delta);
             if(!delta.isZero()){
                 spectating = null;
@@ -1062,7 +1063,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 player.shooting = false;
                 if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
                     if(unit.type.canAttack){
-                        target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround);
+                        target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround && type.targetBuildingsMobile);
                     }
 
                     if(allowHealing && target == null){

@@ -13,6 +13,7 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.LAccess;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -102,6 +103,14 @@ public class ShockwaveTower extends Block{
 
             heat = Mathf.clamp(heat - Time.delta / reload * cooldownMultiplier);
         }
+
+
+        @Override
+        public double sense(LAccess sensor) {
+            if(sensor == LAccess.progress) return reloadCounter / reload;
+            return super.sense(sensor);
+        }
+
 
         @Override
         public float warmup(){

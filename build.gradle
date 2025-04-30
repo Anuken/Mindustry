@@ -38,7 +38,7 @@ allprojects{
 
     ext{
         versionNumber = '8'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'beta'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'

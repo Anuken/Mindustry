@@ -134,6 +134,8 @@ public class RegenProjector extends Block{
                 return;
             }
 
+            anyTargets = targets.contains(b -> b.damaged());
+
             if(efficiency > 0){
                 if((optionalTimer += Time.delta * optionalEfficiency) >= optionalUseTime){
                     consume();
@@ -147,7 +149,6 @@ public class RegenProjector extends Block{
                     if(!build.damaged() || build.isHealSuppressed()) continue;
 
                     didRegen = true;
-                    anyTargets = true;
 
                     int pos = build.pos();
                     //TODO periodic effect

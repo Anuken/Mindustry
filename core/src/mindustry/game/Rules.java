@@ -311,8 +311,8 @@ public class Rules{
         public boolean rtsAi;
         /** Minimum size of attack squads. */
         public int rtsMinSquad = 4;
-        /** Maximum size of attack squads. */
-        public int rtsMaxSquad = 1000;
+        /** Maximum size of attack squads. Any groups of units above this size will attack targets regardless of weight. */
+        public int rtsMaxSquad = 50;
         /** Minimum "advantage" needed for a squad to attack. Higher -> more cautious. */
         public float rtsMinWeight = 1.2f;
 

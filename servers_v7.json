@@ -136,7 +136,7 @@
   },
   {
     "name": "OmniCorp Classic",
-    "address": ["omnidustry.ru:6567", "omnidustry.ru:6568", "omnidustry.ru:6569", "omnidustry.ru:6570", "omnidustry.ru:6571", "omnidustry.ru:6572", "omnidustry.ru:6573", "omnidustry.ru:6574", "omnidustry.ru:6575"]
+    "address": ["omnidustry.ru:6567", "omnidustry.ru:6568", "omnidustry.ru:6569", "omnidustry.ru:6570", "omnidustry.ru:6571", "omnidustry.ru:6572", "omnidustry.ru:6573", "omnidustry.ru:6574", "omnidustry.ru:6575", "omnidustry.ru:6576"]
   },
   {
     "name": "The Devil",
@@ -314,23 +314,26 @@
   {
     "name": "ArmyOFUkraine",
     "address": [
-      "194.247.42.131:27512",
       "194.247.42.130:27505",
-      "armyofukraine.duckdns.org:27500",
-      "armyofukraine.duckdns.org:27501",
-      "armyofukraine.duckdns.org:27502",
-      "armyofukraine.duckdns.org:27503",
-      "armyofukraine.duckdns.org:27504",
-      "armyofukraine.duckdns.org:27505",
-      "armyofukraine.duckdns.org:27506",
-      "armyofukraine.duckdns.org:27507"
+      "202.181.188.253:27500",
+      "202.181.188.253:27501",
+      "202.181.188.253:27502",
+      "202.181.188.253:27503",
+      "202.181.188.253:27504",
+      "202.181.188.253:27505",
+      "202.181.188.253:27506",
+      "202.181.188.253:27507"
     ]
   },
   {
-    "name": "VNM",
+    "name": "Mindustry Tool",
     "address": [
-      "server.mindustry-tool.com",
-      "server.mindustry-tool.com:6568"
+      "server.mindustry-tool.com:10000",
+      "server.mindustry-tool.com:10001",
+      "server.mindustry-tool.com:10002",
+      "server.mindustry-tool.com:10003",
+      "server.mindustry-tool.com:10004",
+      "server.mindustry-tool.com:10005"
     ]
   },
   {

@@ -66,13 +66,12 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
                     solids ++;
                 }
 
-                if(t.floor().isDeep()){
+                if(t != null && t.floor().isDeep()){
                     lastDeepFloor = t.floor();
                 }else{
                     anyNonDeep = true;
                 }
 
-                //TODO should this apply to the player team(s)? currently PvE due to balancing
                 if(type.crushDamage > 0 && !disarmed && (walked || deltaLen() >= 0.01f) && t != null
                     //damage radius is 1 tile smaller to prevent it from just touching walls as it passes
                     && Math.max(Math.abs(dx), Math.abs(dy)) <= r - 1){

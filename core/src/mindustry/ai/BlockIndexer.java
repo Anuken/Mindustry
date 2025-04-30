@@ -225,7 +225,7 @@ public class BlockIndexer{
                 }
             }
 
-            if(drop != null && ores != null && ores[drop.id] != null&& ores[drop.id][qx][qy] != null && ores[drop.id][qx][qy].removeValue(pos)){ //floor
+            if(drop != null && ores != null && ores[drop.id] != null && ores[drop.id][qx][qy] != null && ores[drop.id][qx][qy].removeValue(pos)){ //floor
                 int old = allOres.increment(drop, -1);
                 if(old == 1) updatePresentOres();
             }
