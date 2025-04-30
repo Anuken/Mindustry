@@ -1196,7 +1196,7 @@ public class ControlPathfinder implements Runnable{
                                 anyNearSolid = true;
                             }
 
-                            if((value == 0 || otherCost < value) && otherCost != impassable && ((otherCost != 0 && (current == null || otherCost < minCost)) || packed == actualDestPos || packed == destPos) && passable(unit.team.id, cost, packed)){
+                            if((value == 0 || otherCost < value) && otherCost != impassable && ((otherCost != 0 && (current == null || otherCost < minCost)) || packed == actualDestPos || packed == destPos) && passable(team, cost, packed)){
                                 current = other;
                                 minCost = otherCost;
                                 //no need to keep searching.
@@ -1246,7 +1246,7 @@ public class ControlPathfinder implements Runnable{
                     if(showDebug && Core.graphics.getFrameId() % 30 == 0){
                         Fx.breakBlock.at(request.lastTargetTile.worldx(), request.lastTargetTile.worldy(), 1);
                     }
-                    out.set(request.lastTargetTile);
+                    out.set(request.lastTargetTile.worldx(), request.lastTargetTile.worldy());
                     request.lastTile = recalc ? -1 : initialTileOn.pos();
                     return true;
                 }
