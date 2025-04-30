@@ -385,8 +385,7 @@ public class ControlPathfinder implements Runnable{
 
     /** Starts or restarts the pathfinding thread. */
     private void start(){
-        stop();
-        if(net.client()) return;
+        if(net.client() || thread != null) return;
 
         thread = new Thread(this, "Control Pathfinder");
         thread.setPriority(Thread.MIN_PRIORITY);
