@@ -678,8 +678,8 @@ public class LogicBlock extends Block{
 
         @Override
         public Object senseObject(LAccess sense){
-            if(sense != LAccess.config) return(super.senseObject(sense));
-            return(code); //Just quality of life for logic people :)
+            if(sense != LAccess.config) return super.senseObject(sense);
+            return code; //Just quality of life for logic people :)
         }
 
         @Override
