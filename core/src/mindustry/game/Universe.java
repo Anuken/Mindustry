@@ -285,6 +285,7 @@ public class Universe{
                                 state.rules.winWave = waveMax;
                                 state.rules.waves = true;
                                 state.rules.attackMode = false;
+                                planet.campaignRules.apply(planet, state.rules); //enabling waves may force changes in campaign rules
                                 //update rules in multiplayer
                                 if(net.server()){
                                     Call.setRules(state.rules);

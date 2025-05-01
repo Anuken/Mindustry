@@ -129,7 +129,7 @@ public class SerpuloTechTree{
                         });
                     });
 
-                    node(siliconSmelter, () -> {
+                    node(siliconSmelter, Seq.with(new SectorComplete(frozenForest)), () -> {
 
                         node(sporePress, () -> {
                             node(coalCentrifuge, () -> {

@@ -185,6 +185,7 @@ public class ConsoleFragment extends Table{
         "var items = Vars.player.team().items();" +
         "var build = Vars.world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
         "var cursor = Vars.world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
+        "var cursorUnit = Units.closestEnemy(null, Core.input.mouseWorldX(), Core.input.mouseWorldY(), 70, u => true);" +
         "\n";
     }
 
