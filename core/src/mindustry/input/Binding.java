@@ -57,7 +57,7 @@ public class Binding{
     unitCommandRepair = KeyBind.add("unit_command_repair", KeyCode.unset),
     unitCommandRebuild = KeyBind.add("unit_command_rebuild", KeyCode.unset),
     unitCommandAssist = KeyBind.add("unit_command_assist", KeyCode.unset),
-    unitCommandNine = KeyBind.add("unit_command_mine", KeyCode.unset),
+    unitCommandMine = KeyBind.add("unit_command_mine", KeyCode.unset),
     unitCommandBoost = KeyBind.add("unit_command_boost", KeyCode.unset),
     unitCommandEnterPayload = KeyBind.add("unit_command_enter_payload", KeyCode.unset),
     unitCommandLoadUnits = KeyBind.add("unit_command_load_units", KeyCode.unset),
