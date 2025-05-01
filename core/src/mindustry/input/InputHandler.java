@@ -265,12 +265,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Unit unit = Groups.unit.getByID(id);
             if(unit != null && unit.team == player.team()){
 
-                //Units with logic AI can still be controlled, but there currently aren't any mechanisms to do so on the client end unless the processor "steals" units that are already selected (control issue)
-                if(unit.controller() instanceof LogicAI ai && !(ai.controller != null && ai.controller.block.privileged)){
-                    //reset to commandAI if applicable
-                    unit.resetController();
-                }
-
                 if(unit.controller() instanceof CommandAI ai){
                     //implicitly order it to move
                     if(ai.command == null || ai.command.switchToMove){
