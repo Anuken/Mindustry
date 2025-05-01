@@ -5686,7 +5686,7 @@ public class Blocks{
             shootType = new FlakBulletType(8f, 70f){{
                 sprite = "missile-large";
 
-                lifetime = 45f;
+                lifetime = 40f;
                 width = 12f;
                 height = 22f;
 
@@ -5730,7 +5730,7 @@ public class Blocks{
                     sideLength = 40f;
                     lifetime = 22f;
                     drawSize = 400f;
-                    length = 180f;
+                    length = 120f;
                     pierceCap = 2;
                 }};
 
@@ -5992,7 +5992,7 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             envEnabled |= Env.space;
             reload = 7f;
-            range = 380;
+            range = 400;
             trackingRange = range * 1.4f;
             shootCone = 100f;
             scaledHealth = 370;
