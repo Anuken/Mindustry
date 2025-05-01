@@ -1115,7 +1115,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(commandMode){
             //happens sometimes
-            selectedUnits.removeAll(u -> !u.isCommandable());
+            selectedUnits.removeAll(u -> !u.allowCommand());
 
             //draw command overlay UI
             for(Unit unit : selectedUnits){
