@@ -601,17 +601,17 @@ public class PlacementFragment{
                                     if(unit.controller() instanceof CommandAI cmd){
                                         activeCommands.set(cmd.command.id);
                                         activeStances.set(cmd.stance.id);
+                                    }
 
-                                        for(var command : unit.type.commands){
-                                            availableCommands.set(command.id);
-                                        }
+                                    stancesOut.clear();
+                                    unit.type.getUnitStances(unit, stancesOut);
 
-                                        stancesOut.clear();
-                                        unit.type.getUnitStances(unit, stancesOut);
+                                    for(var stance : stancesOut){
+                                        availableStances.set(stance.id);
+                                    }
 
-                                        for(var stance : stancesOut){
-                                            availableStances.set(stance.id);
-                                        }
+                                    for(var command : unit.type.commands){
+                                        availableCommands.set(command.id);
                                     }
                                 }
 

@@ -504,15 +504,6 @@ public class SerpuloTechTree{
                                     });
                                 });
                             });
-
-                            node(taintedWoods, Seq.with(
-                            new SectorComplete(biomassFacility),
-                            new SectorComplete(fungalPass),
-                            new Research(Items.sporePod),
-                            new Research(wave)
-                            ), () -> {
-
-                            });
                         });
 
                         node(ruinousShores, Seq.with(
@@ -528,6 +519,17 @@ public class SerpuloTechTree{
                             new Research(siliconSmelter),
                             new Research(steamGenerator)
                             ), () -> {
+                                node(taintedWoods, Seq.with(
+                                new SectorComplete(biomassFacility),
+                                new SectorComplete(fungalPass),
+                                new SectorComplete(windsweptIslands),
+                                new Research(Items.sporePod),
+                                new Research(Items.plastanium),
+                                new Research(wave)
+                                ), () -> {
+
+                                });
+
                                 node(seaPort, Seq.with(
                                 new SectorComplete(biomassFacility),
                                 new SectorComplete(frontier),

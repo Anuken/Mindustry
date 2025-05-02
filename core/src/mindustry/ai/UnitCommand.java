@@ -81,7 +81,7 @@ public class UnitCommand extends MappableContent{
             ai.onlyAssist = true;
             return ai;
         });
-        mineCommand = new UnitCommand("mine", "production", Binding.unitCommandNine, u -> new MinerAI()){{
+        mineCommand = new UnitCommand("mine", "production", Binding.unitCommandMine, u -> new MinerAI()){{
             refreshOnSelect = true;
         }};
         boostCommand = new UnitCommand("boost", "up", Binding.unitCommandBoost, u -> new BoostAI()){{
