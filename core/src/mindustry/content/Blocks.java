@@ -5930,7 +5930,7 @@ public class Blocks{
             requirements(Category.units, with(Items.metaglass, 2000, Items.silicon, 1500, Items.graphite, 1000, Items.thorium, 1000, Items.plastanium, 400, Items.phaseFabric, 100));
 
             size = 7;
-            consumePower(100f);
+            consumePower(80f);
             consumeItems(with(Items.silicon, 480, Items.titanium, 480, Items.plastanium, 360));
             consumeLiquid(Liquids.cryofluid, 0.4f);
 
@@ -5952,7 +5952,7 @@ public class Blocks{
             requirements(Category.units, with(Items.metaglass, 3000, Items.silicon, 2000, Items.graphite, 2000, Items.plastanium, 500, Items.phaseFabric, 500, Items.surgeAlloy, 500));
 
             size = 9;
-            consumePower(300f);
+            consumePower(200f);
             consumeItems(with(Items.silicon, 720, Items.plastanium, 480, Items.surgeAlloy, 360, Items.phaseFabric, 240));
             consumeLiquid(Liquids.cryofluid, 0.8f);
 
