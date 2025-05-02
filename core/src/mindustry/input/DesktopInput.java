@@ -299,7 +299,7 @@ public class DesktopInput extends InputHandler{
                     selectedUnits.set(selectedCommandUnits(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height));
                 }else {
                     for(var unit : player.team().data().units){
-                        if(unit.allowCommand()){
+                        if(unit.isCommandable()){
                             selectedUnits.add(unit);
                         }
                     }
@@ -315,7 +315,7 @@ public class DesktopInput extends InputHandler{
                     selectedUnits.set(selectedCommandUnits(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, u -> u instanceof Payloadc));
                 }else {
                     for(var unit : player.team().data().units){
-                        if(unit.allowCommand() && unit instanceof  Payloadc){
+                        if(unit.isCommandable() && unit instanceof  Payloadc){
                             selectedUnits.add(unit);
                         }
                     }

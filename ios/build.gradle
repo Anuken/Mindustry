@@ -85,7 +85,7 @@ launchIOSDevice.dependsOn build
 createIPA.dependsOn build
 
 robovm{
-    archs = "thumbv7:arm64"
+    archs = "arm64"
 
     if(project.hasProperty("signIdentity")) println "iOS Sign Identity: " + project.property("signIdentity")
     if(project.hasProperty("provisioningProfile")) println "iOS Provisioning Profile: " + project.property("provisioningProfile")

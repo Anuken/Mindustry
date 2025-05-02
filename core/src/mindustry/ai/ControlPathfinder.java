@@ -24,6 +24,7 @@ import static mindustry.ai.Pathfinder.*;
 public class ControlPathfinder implements Runnable{
     private static final int wallImpassableCap = 1_000_000;
     private static final int solidCap = 7000;
+    private static boolean initialized;
 
     public static boolean showDebug;
 
@@ -213,7 +214,11 @@ public class ControlPathfinder implements Runnable{
         LongSeq[][] portalConnections = new LongSeq[4][];
     }
 
-    static{
+    //this method is not run in a static initializer because it must only happen after Pathfinder registers its events, which means it should happen in the ControlPathfinder constructor
+    static void checkEvents(){
+        if(initialized) return;
+        initialized = true;
+
         Events.on(ResetEvent.class, event -> controlPath.stop());
 
         Events.on(WorldLoadEvent.class, event -> {
@@ -331,6 +336,10 @@ public class ControlPathfinder implements Runnable{
         }
     }
 
+    public ControlPathfinder(){
+        checkEvents();
+    }
+
     public void updateTile(Tile tile){
         tile.getLinkedTiles(this::updateSingleTile);
     }
@@ -376,8 +385,7 @@ public class ControlPathfinder implements Runnable{
 
     /** Starts or restarts the pathfinding thread. */
     private void start(){
-        stop();
-        if(net.client()) return;
+        if(net.client() || thread != null) return;
 
         thread = new Thread(this, "Control Pathfinder");
         thread.setPriority(Thread.MIN_PRIORITY);
@@ -476,6 +484,11 @@ public class ControlPathfinder implements Runnable{
             }else{
                 //share portals with the other cluster
                 portals = cluster.portals[direction] = other.portals[(direction + 2) % 4];
+
+                //apparently this is somehow possible...?
+                if(portals == null){
+                    portals = cluster.portals[direction] = other.portals[(direction + 2) % 4] = new IntSeq();
+                }
 
                 //clear the portals, they're being recalculated now
                 portals.clear();
@@ -1183,7 +1196,7 @@ public class ControlPathfinder implements Runnable{
                                 anyNearSolid = true;
                             }
 
-                            if((value == 0 || otherCost < value) && otherCost != impassable && ((otherCost != 0 && (current == null || otherCost < minCost)) || packed == actualDestPos || packed == destPos) && passable(unit.team.id, cost, packed)){
+                            if((value == 0 || otherCost < value) && otherCost != impassable && ((otherCost != 0 && (current == null || otherCost < minCost)) || packed == actualDestPos || packed == destPos) && passable(team, cost, packed)){
                                 current = other;
                                 minCost = otherCost;
                                 //no need to keep searching.
@@ -1233,7 +1246,7 @@ public class ControlPathfinder implements Runnable{
                     if(showDebug && Core.graphics.getFrameId() % 30 == 0){
                         Fx.breakBlock.at(request.lastTargetTile.worldx(), request.lastTargetTile.worldy(), 1);
                     }
-                    out.set(request.lastTargetTile);
+                    out.set(request.lastTargetTile.worldx(), request.lastTargetTile.worldy());
                     request.lastTile = recalc ? -1 : initialTileOn.pos();
                     return true;
                 }
@@ -1490,7 +1503,7 @@ public class ControlPathfinder implements Runnable{
         long lastInvalidCheck = Time.millis() + invalidateCheckInterval;
 
         while(true){
-            if(net.client()) return;
+            if(net.client() || invalidated) return;
             try{
                 if(state.isPlaying()){
                     queue.run();
@@ -1577,6 +1590,7 @@ public class ControlPathfinder implements Runnable{
                 if(!invalidated){
                     Log.err(e);
                 }else{
+                    //This pathfinder is done, don't bother doing any tasks
                     return;
                 }
             }
