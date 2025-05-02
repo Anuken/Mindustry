@@ -3442,6 +3442,7 @@ public class Blocks{
                     lightColor = Color.white;
                     collidesAir = false;
                     buildingDamageMultiplier = 0.25f;
+                    shieldDamageMultiplier = 0.2f;
                 }};
             }};
             reload = 35f;

@@ -60,8 +60,8 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         out.append("[gray]").append(Iconc.lock).append(" ").append(Core.bundle.get("locked"));
     }
 
-    public TextureRegion getLockedIcon(Sector hovered){
-        return (hovered.preset == null && !hovered.planet.allowLaunchToNumbered ? Fonts.getLargeIcon("cancel") : Fonts.getLargeIcon("lock"));
+    public @Nullable TextureRegion getLockedIcon(Sector hovered){
+        return (hovered.preset == null && !hovered.planet.allowLaunchToNumbered ? null : Fonts.getLargeIcon("lock"));
     }
 
     /** @return whether to allow landing on the specified procedural sector */
