@@ -5706,7 +5706,7 @@ public class Blocks{
                 trailInterval = 3f;
                 lightning = 1;
                 lightningCone = 15f;
-                lightningLength = 20;
+                lightningLength = 80;
                 lightningLengthRand = 5;
                 lightningDamage = 20f;
 
@@ -5732,6 +5732,7 @@ public class Blocks{
                     drawSize = 400f;
                     length = 120f;
                     pierceCap = 2;
+                    optimalLifeFract = 1f;
                 }};
 
                 fragSpread = fragRandomSpread = 0f;
