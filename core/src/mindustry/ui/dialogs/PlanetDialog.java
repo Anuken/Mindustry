@@ -111,9 +111,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             //no multitouch drag
             if(Core.input.getTouches() > 1) return;
 
-            if(showing()){
-                newPresets.clear();
-            }
+            if(showing() && newPresets.peek() != state.planet.getLastSector()) return;
+
+            newPresets.clear();
 
             Vec3 pos = state.camPos;
 
