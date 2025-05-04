@@ -331,7 +331,7 @@ public class Planet extends UnlockableContent{
                 sum += 0.88f;
             }
 
-            sector.threat = sector.preset == null ?
+            sector.threat = sector.preset == null || !sector.preset.requireUnlock ?
                 Math.max(Math.min(sum / 5f, 1.2f), 0.3f) : //low threat sectors are pointless
                 Mathf.clamp(sector.preset.difficulty / 10f);
         }
