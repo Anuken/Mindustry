@@ -3442,6 +3442,7 @@ public class Blocks{
                     lightColor = Color.white;
                     collidesAir = false;
                     buildingDamageMultiplier = 0.25f;
+                    shieldDamageMultiplier = 0.2f;
                 }};
             }};
             reload = 35f;
@@ -4811,7 +4812,7 @@ public class Blocks{
         afflict = new PowerTurret("afflict"){{
             requirements(Category.turret, with(Items.surgeAlloy, 125, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
             buildCostMultiplier = 1.5f;
-            
+
             shootType = new BasicBulletType(){{
                 shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{
                     colorTo = Pal.surge;

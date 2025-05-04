@@ -148,8 +148,8 @@ public class TileableLogicDisplay extends LogicDisplay{
         @Override
         public double sense(LAccess sensor){
             return switch(sensor){
-                case displayWidth -> tilesWidth * 32f;
-                case displayHeight -> tilesHeight * 32f;
+                case displayWidth -> tilesWidth * 32f - 12f;    // accounts for display frame (2 * 6 pixels)
+                case displayHeight -> tilesHeight * 32f - 12f;
                 default -> super.sense(sensor);
             };
         }
@@ -238,7 +238,8 @@ public class TileableLogicDisplay extends LogicDisplay{
 
                     int rtx = (tile.x - originX), rty = (tile.y - originY);
 
-                    Tmp.tr1.set(rootDisplay.buffer.getTexture(), rtx * 32, rty * 32, 32, 32);
+                    // Offset the region to account for display frame (6 pixels)
+                    Tmp.tr1.set(rootDisplay.buffer.getTexture(), rtx * 32 - 6, rty * 32 - 6, 32, 32);
                     Draw.rect(Tmp.tr1, x, y, tilesize, -tilesize);
                 }
             });

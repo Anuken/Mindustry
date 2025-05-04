@@ -69,6 +69,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public Label hoverLabel = new Label("");
 
     private Texture[] planetTextures;
+    private Element mainView;
     private CampaignRulesDialog campaignRules = new CampaignRulesDialog();
 
     public PlanetDialog(){
@@ -110,9 +111,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             //no multitouch drag
             if(Core.input.getTouches() > 1) return;
 
-            if(showing()){
-                newPresets.clear();
-            }
+            if(showing() && newPresets.peek() != state.planet.getLastSector()) return;
+
+            newPresets.clear();
 
             Vec3 pos = state.camPos;
 
@@ -163,7 +164,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             public void tap(InputEvent event, float x, float y, int count, KeyCode button){
                 var hovered = getHoverPlanet(x, y);
                 if(hovered != null){
-                    viewPlanet(hovered, false);
+                    var hit = scene.hit(x, y, true);
+                    if(hit == mainView){
+                        viewPlanet(hovered, false);
+                    }
                 }
             }
         });
@@ -558,7 +562,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 Draw.color(hovered.isAttacked() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(5f, 1f));
                 Draw.alpha(state.uiAlpha);
 
-                var icon = hovered.locked() && !canSelect(hovered) ? Fonts.getLargeIcon("lock") : hovered.isAttacked() ? Fonts.getLargeIcon("warning") : hovered.icon();
+                var icon =
+                    hovered.locked() && !canSelect(hovered) && hovered.planet.generator != null ? hovered.planet.generator.getLockedIcon(hovered) :
+                    hovered.isAttacked() ? Fonts.getLargeIcon("warning") :
+                    hovered.icon();
 
                 if(icon != null){
                     Draw.rect(icon, 0, 0, iw, iw * icon.height / icon.width);
@@ -590,7 +597,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         margin(0f);
 
         stack(
-        new Element(){
+        mainView = new Element(){
             {
                 //add listener to the background rect, so it doesn't get unnecessary touch input
                 addListener(new ElementGestureListener(){
@@ -871,10 +878,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             if(hovered != null){
                 StringBuilder tx = hoverLabel.getText();
                 if(!canSelect(hovered)){
-                    if(mode == planetLaunch){
-                        tx.append("[gray]").append(Iconc.cancel);
-                    }else{
-                        tx.append("[gray]").append(Iconc.lock).append(" ").append(Core.bundle.get("locked"));
+                    if(!(hovered.preset == null && !hovered.planet.allowLaunchToNumbered)){
+                        if(mode == planetLaunch){
+                            tx.append("[gray]").append(Iconc.cancel);
+                        }else if(hovered.planet.generator != null){
+                            hovered.planet.generator.getLockedText(hovered, tx);
+                        }
                     }
                 }else{
                     tx.append("[accent][[ [white]").append(hovered.name()).append("[accent] ]");

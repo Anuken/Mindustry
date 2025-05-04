@@ -265,11 +265,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Unit unit = Groups.unit.getByID(id);
             if(unit != null && unit.team == player.team()){
 
-                if(unit.controller() instanceof LogicAI){
-                    //reset to commandAI if applicable
-                    unit.resetController();
-                }
-
                 if(unit.controller() instanceof CommandAI ai){
                     //implicitly order it to move
                     if(ai.command == null || ai.command.switchToMove){
@@ -1943,7 +1938,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         tmpUnits.clear();
         float rad = 4f;
         tree.intersect(x - rad/2f, y - rad/2f, rad, rad, tmpUnits);
-        return tmpUnits.min(u -> u.allowCommand(), u -> u.dst(x, y) - u.hitSize/2f);
+        return tmpUnits.min(u -> u.isCommandable(), u -> u.dst(x, y) - u.hitSize/2f);
     }
 
     public @Nullable Unit selectedEnemyUnit(float x, float y){
@@ -1965,7 +1960,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         tmpUnits.clear();
         float rad = 4f;
         tree.intersect(Tmp.r1.set(x - rad/2f, y - rad/2f, rad*2f + w, rad*2f + h).normalize(), tmpUnits);
-        tmpUnits.removeAll(u -> !u.allowCommand() || !predicate.get(u));
+        tmpUnits.removeAll(u -> !u.isCommandable() || !predicate.get(u));
         return tmpUnits;
     }
 
