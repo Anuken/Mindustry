@@ -16,6 +16,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -68,23 +70,27 @@ public class Damage{
         }
     }
 
-    /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage){
         dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null, Fx.dynamicExplosion);
     }
 
-    /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, Effect explosionFx){
         dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null, explosionFx);
     }
 
-    /** Creates a dynamic explosion based on specified parameters. */
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, Effect explosionFx, float baseShake){
+        dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null, explosionFx, baseShake);
+    }
+
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam){
         dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, fire, ignoreTeam, Fx.dynamicExplosion);
     }
 
-    /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam, Effect explosionFx){
+        dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, fire, ignoreTeam, explosionFx, 3f);
+    }
+
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam, Effect explosionFx, float baseShake){
         if(damage){
             for(int i = 0; i < Mathf.clamp(power / 700, 0, 8); i++){
                 int length = 5 + Mathf.clamp((int)(Mathf.pow(power, 0.98f) / 500), 1, 18);
@@ -101,9 +107,13 @@ public class Damage{
             float damagePerWave = explosiveness / 2f;
 
             for(int i = 0; i < waves; i++){
+                var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
                 int f = i;
                 Time.run(i * 2f, () -> {
-                    damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
+                    if(shields == null || shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, damagePerWave))){
+                        damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
+                    }
+
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
                 });
             }
@@ -117,7 +127,7 @@ public class Damage{
             Fx.bigShockwave.at(x, y);
         }
 
-        float shake = Math.min(explosiveness / 4f + 3f, 9f);
+        float shake = Math.min(explosiveness / 4f + baseShake, 9f);
         Effect.shake(shake, shake, x, y);
         explosionFx.at(x, y, radius / 8f);
     }
@@ -166,7 +176,7 @@ public class Damage{
     public static float findPierceLength(Bullet b, int pierceCap, float length){
         return findPierceLength(b, pierceCap, b.type.laserAbsorb, length);
     }
-    
+
     public static float findPierceLength(Bullet b, int pierceCap, boolean laser, float length){
         vec.trnsExact(b.rotation(), length);
         rect.setPosition(b.x, b.y).setSize(vec.x, vec.y).normalize().grow(3f);
@@ -358,7 +368,7 @@ public class Damage{
      */
     public static Healthc linecast(Bullet hitter, float x, float y, float angle, float length){
         vec.trns(angle, length);
-        
+
         tmpBuilding = null;
 
         if(hitter.type.collidesGround){
@@ -508,7 +518,7 @@ public class Damage{
             }
             //TODO better velocity displacement
             float dst = vec.set(unit.x - x, unit.y - y).len();
-            unit.vel.add(vec.setLength((1f - dst / radius) * 2f / unit.mass()));
+            unit.vel.add(vec.setLength((radius > 0f ? 1f - dst / radius : 1f) * 2f / unit.mass()));
 
             if(complete && damage >= 9999999f && unit.isPlayer()){
                 Events.fire(Trigger.exclusionDeath);
@@ -526,7 +536,7 @@ public class Damage{
             if(!complete){
                 tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage * (source == null ? 1f : source.type.buildingDamageMultiplier), source);
             }else{
-                completeDamage(team, x, y, radius, damage);
+                completeDamage(team, x, y, radius, damage * (source == null ? 1f : source.type.buildingDamageMultiplier));
             }
         }
     }
@@ -536,14 +546,19 @@ public class Damage{
     }
 
     public static void tileDamage(Team team, int x, int y, float baseRadius, float damage, @Nullable Bullet source){
-        Core.app.post(() -> {
+        Time.run(0f, () -> {
             var in = world.build(x, y);
             //spawned inside a multiblock. this means that damage needs to be dealt directly.
             //why? because otherwise the building would absorb everything in one cell, which means much less damage than a nearby explosion.
             //this needs to be compensated
             if(in != null && in.team != team && in.block.size > 1 && in.health > damage){
                 //deal the damage of an entire side, to be equivalent with maximum 'standard' damage
-                in.damage(team, damage * Math.min((in.block.size), baseRadius * 0.4f));
+                float d = damage * Math.min((in.block.size), baseRadius * 0.4f);
+                if(source != null){
+                    in.damage(source, team, d);
+                }else{
+                    in.damage(team, d);
+                }
                 //no need to continue with the explosion
                 return;
             }
@@ -625,7 +640,7 @@ public class Damage{
 
     private static float calculateDamage(float dist, float radius, float damage){
         float falloff = 0.4f;
-        float scaled = Mathf.lerp(1f - dist / radius, 1f, falloff);
+        float scaled = radius <= 0.00001f ? 1f : Mathf.lerp(1f - dist / radius, 1f, falloff);
         return damage * scaled;
     }
 
@@ -644,7 +659,7 @@ public class Damage{
             this.target = target;
             return this;
         }
-        
+
         @Override
         public void reset(){
             target = null;

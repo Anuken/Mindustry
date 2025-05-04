@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -30,6 +31,7 @@ public class Conveyor extends Block implements Autotiler{
 
     public float speed = 0f;
     public float displayedSpeed = 0f;
+    public boolean pushUnits = true;
 
     public @Nullable Block junctionReplacement, bridgeReplacement;
 
@@ -63,7 +65,7 @@ public class Conveyor extends Block implements Autotiler{
         super.init();
 
         if(junctionReplacement == null) junctionReplacement = Blocks.junction;
-        if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.itemBridge;
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge || bridgeReplacement instanceof DuctBridge)) bridgeReplacement = Blocks.itemBridge;
     }
 
     @Override
@@ -91,8 +93,9 @@ public class Conveyor extends Block implements Autotiler{
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
         if(bridgeReplacement == null) return;
-
-        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement, b -> b instanceof Conveyor);
+        boolean hasJuntionReplacement = junctionReplacement != null;
+        if(bridgeReplacement instanceof DuctBridge bridge) Placement.calculateBridges(plans, bridge, hasJuntionReplacement, b -> b instanceof Duct || b instanceof Conveyor);
+        if(bridgeReplacement instanceof ItemBridge bridge) Placement.calculateBridges(plans, bridge, hasJuntionReplacement, b -> b instanceof Conveyor);
     }
 
     @Override
@@ -223,7 +226,7 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void unitOn(Unit unit){
 
-            if(clogHeat > 0.5f || !enabled) return;
+            if(!pushUnits || clogHeat > 0.5f || !enabled) return;
 
             noSleep();
 
@@ -430,9 +433,32 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress){
+                if(len == 0) return 0;
+                return ys[len - 1];
+            }
+            return super.sense(sensor);
+        }
+
+        @Override
         public Object senseObject(LAccess sensor){
             if(sensor == LAccess.firstItem && len > 0) return ids[len - 1];
             return super.senseObject(sensor);
+        }
+
+        @Override
+        public void setProp(UnlockableContent content, double value){
+            if(content instanceof Item item && items != null){
+                int amount = Math.min((int)value, capacity);
+                if(items.get(item) != amount){
+                    if(items.get(item) < amount){
+                        handleStack(item, amount - items.get(item), null);
+                    }else if(amount >= 0){
+                        removeStack(item, items.get(item) - amount);
+                    }
+                }
+            }else super.setProp(content, value);
         }
 
         public final void add(int o){

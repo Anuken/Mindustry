@@ -8,10 +8,12 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -25,6 +27,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -51,21 +54,21 @@ public class PlacementFragment{
     boolean blockSelectEnd, wasCommandMode;
     int blockSelectSeq;
     long blockSelectSeqMillis;
-    Binding[] blockSelect = {
-        Binding.block_select_01,
-        Binding.block_select_02,
-        Binding.block_select_03,
-        Binding.block_select_04,
-        Binding.block_select_05,
-        Binding.block_select_06,
-        Binding.block_select_07,
-        Binding.block_select_08,
-        Binding.block_select_09,
-        Binding.block_select_10,
-        Binding.block_select_left,
-        Binding.block_select_right,
-        Binding.block_select_up,
-        Binding.block_select_down
+    KeyBind[] blockSelect = {
+        Binding.blockSelect01,
+        Binding.blockSelect02,
+        Binding.blockSelect03,
+        Binding.blockSelect04,
+        Binding.blockSelect05,
+        Binding.blockSelect06,
+        Binding.blockSelect07,
+        Binding.blockSelect08,
+        Binding.blockSelect09,
+        Binding.blockSelect10,
+        Binding.blockSelectLeft,
+        Binding.blockSelectRight,
+        Binding.blockSelectUp,
+        Binding.blockSelectDown
     };
 
     public PlacementFragment(){
@@ -122,9 +125,7 @@ public class PlacementFragment{
         toggler.setZIndex(index);
     }
 
-    boolean gridUpdate(InputHandler input){
-        scrollPositions.put(currentCategory, blockPane.getScrollY());
-
+    boolean updatePick(InputHandler input){
         if(Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
             var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
@@ -144,12 +145,33 @@ public class PlacementFragment{
                 }
             }
 
-            if(tryRecipe != null && tryRecipe.isVisible() && unlocked(tryRecipe)){
+            if(tryRecipe == null && state.rules.editor){
+                var tile = world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+                if(tile != null){
+                    tryRecipe =
+                    tile.block() != Blocks.air ? tile.block() :
+                    tile.overlay() != Blocks.air ? tile.overlay() :
+                    tile.floor() != Blocks.air ? tile.floor() : null;
+                }
+            }
+
+            if(tryRecipe != null && ((tryRecipe.isVisible() && unlocked(tryRecipe)) || state.rules.editor)){
                 input.block = tryRecipe;
                 tryRecipe.lastConfig = tryConfig;
-                currentCategory = input.block.category;
+                if(tryRecipe.isVisible()){
+                    currentCategory = input.block.category;
+                }
                 return true;
             }
+        }
+        return false;
+    }
+
+    boolean gridUpdate(InputHandler input){
+        scrollPositions.put(currentCategory, blockPane.getScrollY());
+
+        if(updatePick(input)){
+            return true;
         }
 
         if(ui.chatfrag.shown() || ui.consolefrag.shown() || Core.scene.hasKeyboard()) return false;
@@ -208,7 +230,7 @@ public class PlacementFragment{
             }
         }
 
-        if(Core.input.keyTap(Binding.category_prev)){
+        if(Core.input.keyTap(Binding.categoryPrev)){
             int i = 0;
             do{
                 currentCategory = currentCategory.prev();
@@ -218,7 +240,7 @@ public class PlacementFragment{
             return true;
         }
 
-        if(Core.input.keyTap(Binding.category_next)){
+        if(Core.input.keyTap(Binding.categoryNext)){
             int i = 0;
             do{
                 currentCategory = currentCategory.next();
@@ -228,7 +250,7 @@ public class PlacementFragment{
             return true;
         }
 
-        if(Core.input.keyTap(Binding.block_info)){
+        if(Core.input.keyTap(Binding.blockInfo)){
             var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
             Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
@@ -311,7 +333,7 @@ public class PlacementFragment{
                 };
 
                 //top table with hover info
-                frame.table(Tex.buttonEdge2,top -> {
+                frame.table(Tex.buttonEdge2, top -> {
                     topTable = top;
                     top.add(new Table()).growX().update(topTable -> {
 
@@ -341,9 +363,9 @@ public class PlacementFragment{
                                     Seq<Block> blocks = getByCategory(currentCategory);
                                     for(int i = 0; i < blocks.size; i++){
                                         if(blocks.get(i) == displayBlock && (i + 1) / 10 - 1 < blockSelect.length){
-                                            keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString())
-                                                + (i < 10 ? "" : Core.keybinds.get(blockSelect[(i + 1) / 10 - 1]).key.toString() + ",")
-                                                + Core.keybinds.get(blockSelect[i % 10]).key.toString() + "]";
+                                            keyCombo = Core.bundle.format("placement.blockselectkeys", blockSelect[currentCategory.ordinal()].value.key.toString())
+                                                + (i < 10 ? "" : blockSelect[(i + 1) / 10 - 1].value.key.toString() + ",")
+                                                + blockSelect[i % 10].value.key.toString() + "]";
                                             break;
                                         }
                                     }
@@ -386,7 +408,7 @@ public class PlacementFragment{
                                 }
                             }).growX().left().margin(3);
 
-                            if(!displayBlock.isPlaceable() || !player.isBuilder()){
+                            if((!displayBlock.isPlaceable() || !player.isBuilder()) && !state.rules.editor){
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
@@ -439,25 +461,47 @@ public class PlacementFragment{
                     commandTable.add(Core.bundle.get("commandmode.name")).fill().center().labelAlign(Align.center).row();
                     commandTable.image().color(Pal.accent).growX().pad(20f).padTop(0f).padBottom(4f).row();
                     commandTable.table(u -> {
+
+                        Bits activeCommands = new Bits(content.unitCommands().size);
+                        Bits activeStances = new Bits(content.unitStances().size);
+
+                        Bits availableCommands = new Bits(content.unitCommands().size);
+                        Bits availableStances = new Bits(content.unitStances().size);
+
                         u.left();
                         int[] curCount = {0};
-                        UnitCommand[] currentCommand = {null};
+                        Bits usedCommands = new Bits(content.unitCommands().size);
                         var commands = new Seq<UnitCommand>();
 
-                        UnitStance[] currentStance = {null};
+                        Bits usedStances = new Bits(content.unitStances().size);
                         var stances = new Seq<UnitStance>();
+                        var stancesOut = new Seq<UnitStance>();
 
                         rebuildCommand = () -> {
                             u.clearChildren();
                             var units = control.input.selectedUnits;
                             if(units.size > 0){
-                                int[] counts = new int[content.units().size];
-                                for(var unit : units){
-                                    counts[unit.type.id] ++;
-                                }
+                                usedCommands.clear();
+                                usedStances.clear();
                                 commands.clear();
                                 stances.clear();
-                                boolean firstCommand = false, firstStance = false;
+
+                                int[] counts = new int[content.units().size];
+
+                                for(var unit : units){
+                                    counts[unit.type.id] ++;
+
+                                    stancesOut.clear();
+                                    unit.type.getUnitStances(unit, stancesOut);
+
+                                    for(var stance : stancesOut){
+                                        if(!usedStances.get(stance.id)){
+                                            stances.add(stance);
+                                            usedStances.set(stance.id);
+                                        }
+                                    }
+                                }
+
                                 Table unitlist = u.table().growX().left().get();
                                 unitlist.left();
 
@@ -465,7 +509,10 @@ public class PlacementFragment{
                                 for(int i = 0; i < counts.length; i++){
                                     if(counts[i] > 0){
                                         var type = content.unit(i);
-                                        unitlist.add(new ItemImage(type.uiIcon, counts[i])).tooltip(type.localizedName).pad(4).with(b -> {
+                                        unitlist.add(StatValues.stack(type, counts[i])).pad(4).with(b -> {
+                                            b.clearListeners();
+                                            b.addListener(Tooltips.getInstance().create(type.localizedName, false));
+
                                             var listener = new ClickListener();
 
                                             //left click -> select
@@ -489,20 +536,11 @@ public class PlacementFragment{
                                             unitlist.row();
                                         }
 
-                                        if(!firstCommand){
-                                            commands.add(type.commands);
-                                            firstCommand = true;
-                                        }else{
-                                            //remove commands that this next unit type doesn't have
-                                            commands.removeAll(com -> !Structs.contains(type.commands, com));
-                                        }
-
-                                        if(!firstStance){
-                                            stances.add(type.stances);
-                                            firstStance = true;
-                                        }else{
-                                            //remove commands that this next unit type doesn't have
-                                            stances.removeAll(st -> !Structs.contains(type.stances, st));
+                                        for(var command : type.commands){
+                                            if(!usedCommands.get(command.id)){
+                                                commands.add(command);
+                                                usedCommands.set(command.id);
+                                            }
                                         }
                                     }
                                 }
@@ -516,8 +554,8 @@ public class PlacementFragment{
                                         int scol = 0;
                                         for(var command : commands){
                                             coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitCommand(player, units.mapInt(un -> un.id).toArray(), command);
-                                            }).checked(i -> currentCommand[0] == command).size(50f).tooltip(command.localized(), true);
+                                                Call.setUnitCommand(player, units.mapInt(un -> un.id, un -> un.type.allowCommand(un, command)).toArray(), command);
+                                            }).checked(i -> activeCommands.get(command.id)).size(50f).tooltip(command.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
                                         }
@@ -529,14 +567,18 @@ public class PlacementFragment{
                                 if(stances.size > 1){
                                     u.row();
 
+                                    if(commands.size > 1){
+                                        u.add(new Image(Tex.whiteui)).height(3f).color(Pal.gray).pad(7f).growX().row();
+                                    }
+
                                     u.table(coms -> {
                                         coms.left();
                                         int scol = 0;
                                         for(var stance : stances){
 
-                                            coms.button(Icon.icons.get(stance.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitStance(player, units.mapInt(un -> un.id).toArray(), stance);
-                                            }).checked(i -> currentStance[0] == stance).size(50f).tooltip(stance.localized(), true);
+                                            coms.button(stance.getIcon(), Styles.clearNoneTogglei, () -> {
+                                                Call.setUnitStance(player, units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance);
+                                            }).checked(i -> activeStances.get(stance.id)).size(50f).tooltip(stance.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
                                         }
@@ -549,58 +591,50 @@ public class PlacementFragment{
 
                         u.update(() -> {
                             {
-                                boolean hadCommand = false, hadStance = false;
-                                UnitCommand shareCommand = null;
-                                UnitStance shareStance = null;
+                                activeCommands.clear();
+                                activeStances.clear();
+                                availableCommands.clear();
+                                availableStances.clear();
 
                                 //find the command that all units have, or null if they do not share one
                                 for(var unit : control.input.selectedUnits){
-                                    if(unit.isCommandable()){
-                                        var nextCommand = unit.command().command;
+                                    if(unit.controller() instanceof CommandAI cmd){
+                                        activeCommands.set(cmd.command.id);
+                                        activeStances.set(cmd.stance.id);
+                                    }
 
-                                        if(hadCommand){
-                                            if(shareCommand != nextCommand){
-                                                shareCommand = null;
-                                            }
-                                        }else{
-                                            shareCommand = nextCommand;
-                                            hadCommand = true;
-                                        }
+                                    stancesOut.clear();
+                                    unit.type.getUnitStances(unit, stancesOut);
 
-                                        var nextStance = unit.command().stance;
+                                    for(var stance : stancesOut){
+                                        availableStances.set(stance.id);
+                                    }
 
-                                        if(hadStance){
-                                            if(shareStance != nextStance){
-                                                shareStance = null;
-                                            }
-                                        }else{
-                                            shareStance = nextStance;
-                                            hadStance = true;
-                                        }
+                                    for(var command : unit.type.commands){
+                                        availableCommands.set(command.id);
                                     }
                                 }
 
-                                currentCommand[0] = shareCommand;
-                                currentStance[0] = shareStance;
-
                                 int size = control.input.selectedUnits.size;
-                                if(curCount[0] != size){
+                                if(curCount[0] != size || !usedCommands.equals(availableCommands) || !usedStances.equals(availableStances)){
+                                    if(!(curCount[0] + size == 0)){
+                                        rebuildCommand.run();
+                                    }
                                     curCount[0] = size;
-                                    rebuildCommand.run();
                                 }
 
                                 //not a huge fan of running input logic here, but it's convenient as the stance arrays are all here...
                                 for(UnitStance stance : stances){
                                     //first stance must always be the stop stance
                                     if(stance.keybind != null && Core.input.keyTap(stance.keybind)){
-                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), stance);
+                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance);
                                     }
                                 }
 
                                 for(UnitCommand command : commands){
                                     //first stance must always be the stop stance
                                     if(command.keybind != null && Core.input.keyTap(command.keybind)){
-                                        Call.setUnitCommand(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), command);
+                                        Call.setUnitCommand(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowCommand(un, command)).toArray(), command);
                                     }
                                 }
                             }
@@ -623,7 +657,11 @@ public class PlacementFragment{
                         }).grow().get();
                         blockPane.setStyle(Styles.smallPane);
                         blocksSelect.row();
-                        blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
+                        blocksSelect.table(t -> {
+                            t.image().color(Pal.gray).height(4f).colspan(4).growX();
+                            t.row();
+                            control.input.buildPlacementUI(t);
+                        }).name("inputTable").growX();
                     }).fillY().bottom().touchable(Touchable.enabled);
                     blockCatTable.table(categories -> {
                         categories.bottom();
@@ -700,8 +738,8 @@ public class PlacementFragment{
     }
 
     boolean unlocked(Block block){
-        return block.unlockedNow() && block.placeablePlayer && block.environmentBuildable() &&
-            block.supportsEnv(state.rules.env); //TODO this hides env unsupported blocks, not always a good thing
+        return block.unlockedNowHost() && block.placeablePlayer && block.environmentBuildable() &&
+            block.supportsEnv(state.rules.env);
     }
 
     boolean hasInfoBox(){
@@ -709,13 +747,12 @@ public class PlacementFragment{
         return control.input.block != null || menuHoverBlock != null || hover != null;
     }
 
-    /** Returns the thing being hovered over. */
-    @Nullable
-    Displayable hovered(){
+    /** @return the thing being hovered over. */
+    public @Nullable Displayable hovered(){
         Vec2 v = topTable.stageToLocalCoordinates(Core.input.mouse());
 
         //if the mouse intersects the table or the UI has the mouse, no hovering can occur
-        if(Core.scene.hasMouse() || topTable.hit(v.x, v.y, false) != null) return null;
+        if(Core.scene.hasMouse(Core.input.mouseX(), Core.input.mouseY()) || topTable.hit(v.x, v.y, false) != null) return null;
 
         //check for a unit
         Unit unit = Units.closestOverlap(player.team(), Core.input.mouseWorldX(), Core.input.mouseWorldY(), 5f, u -> !u.isLocal() && u.displayable());

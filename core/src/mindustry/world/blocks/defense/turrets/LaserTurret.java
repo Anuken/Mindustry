@@ -27,7 +27,9 @@ public class LaserTurret extends PowerTurret{
         super.setStats();
 
         stats.remove(Stat.booster);
-        stats.add(Stat.input, StatValues.boosters(reload, coolant.amount, coolantMultiplier, false, this::consumesLiquid));
+        if(coolant != null){
+            stats.add(Stat.input, StatValues.boosters(reload, coolant.amount, coolantMultiplier, false, this::consumesLiquid));
+        }
     }
 
     @Override
@@ -85,7 +87,6 @@ public class LaserTurret extends PowerTurret{
                 heat = 1f;
                 curRecoil = 1f;
             }else if(reloadCounter > 0){
-                wasShooting = true;
 
                 if(coolant != null){
                     //TODO does not handle multi liquid req?

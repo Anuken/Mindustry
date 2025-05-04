@@ -62,18 +62,18 @@ public class ConsoleFragment extends Table{
             }
 
             if(open){
-                if(input.keyTap(Binding.chat_history_prev) && historyPos < history.size - 1){
+                if(input.keyTap(Binding.chatHistoryPrev) && historyPos < history.size - 1){
                     if(historyPos == 0) history.set(0, chatfield.getText());
                     historyPos++;
                     updateChat();
                 }
-                if(input.keyTap(Binding.chat_history_next) && historyPos > 0){
+                if(input.keyTap(Binding.chatHistoryNext) && historyPos > 0){
                     historyPos--;
                     updateChat();
                 }
             }
 
-            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size));
+            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chatScroll), 0, Math.max(0, messages.size));
         });
 
         history.insert(0, "");
@@ -170,10 +170,23 @@ public class ConsoleFragment extends Table{
             return;
         }
 
-        history.insert(1, message);
+        if(history.size < 2 || !history.get(1).equals(message)) history.insert(1, message);
 
         addMessage("[lightgray]> " + message.replace("[", "[["));
-        addMessage(mods.getScripts().runConsole(message).replace("[", "[["));
+        addMessage(mods.getScripts().runConsole(injectConsoleVariables() + message).replace("[", "[["));
+    }
+
+    public String injectConsoleVariables(){
+        return
+        "var unit = Vars.player.unit();" +
+        "var player = Vars.player;" +
+        "var team = Vars.player.team();" +
+        "var core = Vars.player.core();" +
+        "var items = Vars.player.team().items();" +
+        "var build = Vars.world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
+        "var cursor = Vars.world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
+        "var cursorUnit = Units.closestEnemy(null, Core.input.mouseWorldX(), Core.input.mouseWorldY(), 70, u => true);" +
+        "\n";
     }
 
     public void toggle(){

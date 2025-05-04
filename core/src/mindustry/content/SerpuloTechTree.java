@@ -2,6 +2,7 @@ package mindustry.content;
 
 import arc.struct.*;
 import mindustry.game.Objectives.*;
+import mindustry.type.*;
 
 import static mindustry.content.Blocks.*;
 import static mindustry.content.SectorPresets.craters;
@@ -18,11 +19,12 @@ public class SerpuloTechTree{
 
                 node(junction, () -> {
                     node(router, () -> {
-                        node(launchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
-                            //no longer necessary to beat the campaign
-                            //node(interplanetaryAccelerator, Seq.with(new SectorComplete(planetaryTerminal)), () -> {
+                        node(advancedLaunchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
+                            node(landingPad, () -> {
+                                node(interplanetaryAccelerator, Seq.with(new SectorComplete(planetaryTerminal)), () -> {
 
-                            //});
+                                });
+                            });
                         });
 
                         node(distributor);
@@ -122,12 +124,12 @@ public class SerpuloTechTree{
                     });
 
                     node(pyratiteMixer, () -> {
-                        node(blastMixer, () -> {
+                        node(blastMixer, Seq.with(new SectorComplete(facility32m)), () -> {
 
                         });
                     });
 
-                    node(siliconSmelter, () -> {
+                    node(siliconSmelter, Seq.with(new SectorComplete(frozenForest)), () -> {
 
                         node(sporePress, () -> {
                             node(coalCentrifuge, () -> {
@@ -145,7 +147,7 @@ public class SerpuloTechTree{
                             });
                         });
 
-                        node(kiln, Seq.with(new SectorComplete(craters)), () -> {
+                        node(kiln, Seq.with(new OnSector(craters)), () -> {
                             node(pulverizer, () -> {
                                 node(incinerator, () -> {
                                     node(melter, () -> {
@@ -167,12 +169,15 @@ public class SerpuloTechTree{
                             });
                         });
 
-                        //logic disabled until further notice
                         node(microProcessor, () -> {
                             node(switchBlock, () -> {
                                 node(message, () -> {
                                     node(logicDisplay, () -> {
                                         node(largeLogicDisplay, () -> {
+
+                                        });
+
+                                        node(logicDisplayTile, () -> {
 
                                         });
                                     });
@@ -261,12 +266,21 @@ public class SerpuloTechTree{
             node(duo, () -> {
                 node(copperWall, () -> {
                     node(copperWallLarge, () -> {
+                        node(scrapWall, () -> {
+                            node(scrapWallLarge, () -> {
+                                node(scrapWallHuge, () -> {
+                                    node(scrapWallGigantic);
+                                });
+                            });
+                        });
+
                         node(titaniumWall, () -> {
                             node(titaniumWallLarge);
 
                             node(door, () -> {
                                 node(doorLarge);
                             });
+
                             node(plastaniumWall, () -> {
                                 node(plastaniumWallLarge, () -> {
 
@@ -347,7 +361,7 @@ public class SerpuloTechTree{
                         });
                     });
 
-                    node(nova, () -> {
+                    node(nova, Seq.with(new SectorComplete(fungalPass)), () -> {
                         node(pulsar, () -> {
                             node(quasar, () -> {
                                 node(vela, () -> {
@@ -359,11 +373,12 @@ public class SerpuloTechTree{
                         });
                     });
 
-                    node(crawler, () -> {
+                    //override research requirements to have graphite, not coal
+                    node(crawler, ItemStack.with(Items.silicon, 400, Items.graphite, 400), () -> {
                         node(atrax, () -> {
                             node(spiroct, () -> {
                                 node(arkyid, () -> {
-                                    node(toxopid, () -> {
+                                    node(toxopid, Seq.with(new SectorComplete(mycelialBastion)), () -> {
 
                                     });
                                 });
@@ -397,7 +412,7 @@ public class SerpuloTechTree{
                         });
                     });
 
-                    node(navalFactory, Seq.with(new SectorComplete(ruinousShores)), () -> {
+                    node(navalFactory, Seq.with(new OnSector(windsweptIslands)), () -> {
                         node(risso, () -> {
                             node(minke, () -> {
                                 node(bryde, () -> {
@@ -424,9 +439,9 @@ public class SerpuloTechTree{
                     });
                 });
 
-                node(additiveReconstructor, Seq.with(new SectorComplete(biomassFacility)), () -> {
-                    node(multiplicativeReconstructor, () -> {
-                        node(exponentialReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
+                node(additiveReconstructor, Seq.with(new SectorComplete(fungalPass)), () -> {
+                    node(multiplicativeReconstructor, Seq.with(new SectorComplete(frontier)), () -> {
+                        node(exponentialReconstructor, () -> {
                             node(tetrativeReconstructor, () -> {
 
                             });
@@ -446,6 +461,51 @@ public class SerpuloTechTree{
                     new Research(mender),
                     new Research(combustionGenerator)
                     ), () -> {
+                        node(fungalPass, Seq.with(
+                        new SectorComplete(craters),
+                        new Research(groundFactory),
+                        new Research(dagger)
+                        ), () -> {
+                            node(frontier, Seq.with(
+                            new SectorComplete(biomassFacility),
+                            new SectorComplete(fungalPass),
+                            new Research(groundFactory),
+                            new Research(airFactory),
+                            new Research(additiveReconstructor),
+                            new Research(mace),
+                            new Research(mono)
+                            ), () -> {
+                                node(overgrowth, Seq.with(
+                                new SectorComplete(frontier),
+                                new SectorComplete(windsweptIslands),
+                                new Research(multiplicativeReconstructor),
+                                new Research(fortress),
+                                new Research(ripple),
+                                new Research(salvo),
+                                new Research(cultivator),
+                                new Research(sporePress)
+                                ), () -> {
+                                    node(mycelialBastion, Seq.with(
+                                    new Research(atrax),
+                                    new Research(spiroct),
+                                    new Research(arkyid),
+                                    new Research(multiplicativeReconstructor),
+                                    new Research(exponentialReconstructor)
+                                    ), () -> {
+
+                                    });
+
+                                    node(atolls, Seq.with(
+                                    new SectorComplete(windsweptIslands),
+                                    new Research(multiplicativeReconstructor),
+                                    new Research(mega)
+                                    ), () -> {
+
+                                    });
+                                });
+                            });
+                        });
+
                         node(ruinousShores, Seq.with(
                         new SectorComplete(craters),
                         new Research(graphitePress),
@@ -459,6 +519,31 @@ public class SerpuloTechTree{
                             new Research(siliconSmelter),
                             new Research(steamGenerator)
                             ), () -> {
+                                node(taintedWoods, Seq.with(
+                                new SectorComplete(biomassFacility),
+                                new SectorComplete(fungalPass),
+                                new SectorComplete(windsweptIslands),
+                                new Research(Items.sporePod),
+                                new Research(Items.plastanium),
+                                new Research(wave)
+                                ), () -> {
+
+                                });
+
+                                node(seaPort, Seq.with(
+                                new SectorComplete(biomassFacility),
+                                new SectorComplete(frontier),
+                                new SectorComplete(fungalPass),
+                                new Research(navalFactory),
+                                new Research(risso),
+                                new Research(retusa),
+                                new Research(steamGenerator),
+                                new Research(cultivator),
+                                new Research(coalCentrifuge)
+                                ), () -> {
+
+                                });
+
                                 node(tarFields, Seq.with(
                                 new SectorComplete(windsweptIslands),
                                 new Research(coalCentrifuge),
@@ -487,68 +572,124 @@ public class SerpuloTechTree{
                                             new Research(risso),
                                             new Research(minke),
                                             new Research(bryde),
+                                            new Research(sei),
+                                            new Research(omura),
                                             new Research(spectre),
-                                            new Research(launchPad),
+                                            new Research(advancedLaunchPad),
                                             new Research(massDriver),
                                             new Research(impactReactor),
                                             new Research(additiveReconstructor),
-                                            new Research(exponentialReconstructor)
+                                            new Research(exponentialReconstructor),
+                                            new Research(tetrativeReconstructor)
                                             ), () -> {
+                                                node(geothermalStronghold, Seq.with(
+                                                new Research(omura),
+                                                new Research(navanax),
+                                                new Research(eclipse),
+                                                new Research(oct),
+                                                new Research(reign),
+                                                new Research(corvus),
+                                                new Research(toxopid)
+                                                ), () -> {
 
+                                                });
+
+                                                node(cruxscape, Seq.with(
+                                                new Research(omura),
+                                                new Research(navanax),
+                                                new Research(eclipse),
+                                                new Research(oct),
+                                                new Research(reign),
+                                                new Research(corvus),
+                                                new Research(toxopid)
+                                                ), () -> {
+
+                                                });
                                             });
                                         });
                                     });
                                 });
 
-                                node(extractionOutpost, Seq.with(
-                                new SectorComplete(stainedMountains),
-                                new SectorComplete(windsweptIslands),
-                                new Research(groundFactory),
-                                new Research(nova),
-                                new Research(airFactory),
-                                new Research(mono)
+                                node(facility32m, Seq.with(
+                                new Research(pneumaticDrill),
+                                new SectorComplete(stainedMountains)
                                 ), () -> {
+                                    node(extractionOutpost, Seq.with(
+                                    new SectorComplete(windsweptIslands),
+                                    new SectorComplete(fungalPass),
+                                    new SectorComplete(facility32m),
+                                    new Research(groundFactory),
+                                    new Research(nova),
+                                    new Research(airFactory),
+                                    new Research(mono)
+                                    ), () -> {
+                                        //TODO: removed for now
+                                        /*node(polarAerodrome, Seq.with(
+                                        new SectorComplete(fungalPass),
+                                        new SectorComplete(desolateRift),
+                                        new SectorComplete(overgrowth),
+                                        new Research(multiplicativeReconstructor),
+                                        new Research(zenith),
+                                        new Research(swarmer),
+                                        new Research(cyclone),
+                                        new Research(blastDrill),
+                                        new Research(blastDrill),
+                                        new Research(massDriver)
+                                        ), () -> {
 
+                                        });
+                                        */
+                                    });
                                 });
 
                                 node(saltFlats, Seq.with(
                                 new SectorComplete(windsweptIslands),
+                                new SectorComplete(fungalPass),
+                                new SectorComplete(frontier),
                                 new Research(groundFactory),
                                 new Research(additiveReconstructor),
                                 new Research(airFactory),
                                 new Research(door)
                                 ), () -> {
+                                    node(testingGrounds, Seq.with(
+                                    new Research(cryofluidMixer),
+                                    new Research(Liquids.cryofluid),
+                                    new Research(waterExtractor),
+                                    new Research(ripple)
+                                    ), () -> {
+
+                                    });
+
                                     node(coastline, Seq.with(
                                     new SectorComplete(windsweptIslands),
                                     new SectorComplete(saltFlats),
                                     new Research(navalFactory),
                                     new Research(payloadConveyor)
                                     ), () -> {
+
                                         node(navalFortress, Seq.with(
                                         new SectorComplete(coastline),
                                         new SectorComplete(extractionOutpost),
+                                        new Research(coreNucleus),
+                                        new Research(massDriver),
                                         new Research(oxynoe),
                                         new Research(minke),
+                                        new Research(bryde),
                                         new Research(cyclone),
                                         new Research(ripple)
                                         ), () -> {
+                                            node(weatheredChannels, Seq.with(
+                                            new SectorComplete(impact0078),
+                                            new Research(bryde),
+                                            new Research(surgeSmelter),
+                                            new Research(overdriveProjector)
+                                            ), () -> {
 
+                                            });
                                         });
                                     });
                                 });
                             });
-                        });
-
-                        node(overgrowth, Seq.with(
-                        new SectorComplete(craters),
-                        new SectorComplete(fungalPass),
-                        new Research(cultivator),
-                        new Research(sporePress),
-                        new Research(additiveReconstructor),
-                        new Research(UnitTypes.mace),
-                        new Research(UnitTypes.flare)
-                        ), () -> {
-
                         });
                     });
 
@@ -559,16 +700,23 @@ public class SerpuloTechTree{
                     new Research(scatter),
                     new Research(graphitePress)
                     ), () -> {
+
                         node(stainedMountains, Seq.with(
                         new SectorComplete(biomassFacility),
                         new Research(pneumaticDrill),
                         new Research(siliconSmelter)
                         ), () -> {
-                            node(fungalPass, Seq.with(
-                            new SectorComplete(stainedMountains),
-                            new Research(groundFactory),
-                            new Research(door)
+
+                        //TODO bad order
+                            node(infestedCanyons, Seq.with(
+                            new SectorComplete(fungalPass),
+                            new SectorComplete(frontier),
+                            new Research(navalFactory),
+                            new Research(risso),
+                            new Research(minke),
+                            new Research(additiveReconstructor)
                             ), () -> {
+                                //TODO difficulty jump!
                                 node(nuclearComplex, Seq.with(
                                 new SectorComplete(fungalPass),
                                 new Research(thermalGenerator),
@@ -579,6 +727,8 @@ public class SerpuloTechTree{
 
                                 });
                             });
+
+
                         });
                     });
                 });

@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
@@ -107,6 +108,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         JsonIO.classTag(name, type);
     }
 
+    public MapObjectives(Seq<MapObjective> all){
+        this.all.addAll(all);
+    }
+
+    public MapObjectives(){
+    }
+
     /** Adds all given objectives to the executor as root objectives. */
     public void add(MapObjective... objectives){
         for(var objective : objectives) flatten(objective);
@@ -165,6 +173,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Base abstract class for any in-map objective. */
     public static abstract class MapObjective{
+        public boolean hidden;
         public @Nullable @Multiline String details;
         public @Unordered String[] flagsAdded = {};
         public @Unordered String[] flagsRemoved = {};
@@ -269,6 +278,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             String className = getClass().getSimpleName().replace("Objective", "");
             return Core.bundle == null ? className : Core.bundle.get("objective." + className.toLowerCase() + ".name", className);
         }
+
+        /** Validate fields after reading to make sure none of them are null. */
+        public void validate(){
+
+        }
     }
 
     /** Research a specific piece of content in the tech tree. */
@@ -290,6 +304,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public String text(){
             return Core.bundle.format("objective.research", content.emoji(), content.localizedName);
         }
+
+        @Override
+        public void validate(){
+            if(content == null) content = Items.copper;
+        }
     }
 
     /** Produce a specific piece of content in the tech tree (essentially research with different text). */
@@ -310,6 +329,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.format("objective.produce", content.emoji(), content.localizedName);
+        }
+
+        @Override
+        public void validate(){
+            if(content == null) content = Items.copper;
         }
     }
 
@@ -334,6 +358,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public String text(){
             return Core.bundle.format("objective.item", state.rules.defaultTeam.items().get(item), amount, item.emoji(), item.localizedName);
         }
+
+        @Override
+        public void validate(){
+            if(item == null) item = Items.copper;
+        }
     }
 
     /** Get a certain item in your core (through a block, not manually.) */
@@ -356,6 +385,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.format("objective.coreitem", state.stats.coreItemCount.get(item), amount, item.emoji(), item.localizedName);
+        }
+
+        @Override
+        public void validate(){
+            if(item == null) item = Items.copper;
         }
     }
 
@@ -380,6 +414,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public String text(){
             return Core.bundle.format("objective.build", count - state.stats.placedBlockCount.get(block, 0), block.emoji(), block.localizedName);
         }
+
+        @Override
+        public void validate(){
+            if(block == null) block = Blocks.conveyor;
+        }
     }
 
     /** Produce a certain amount of a unit. */
@@ -402,6 +441,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.format("objective.buildunit", count - state.rules.defaultTeam.data().countType(unit), unit.emoji(), unit.localizedName);
+        }
+
+        @Override
+        public void validate(){
+            if(unit == null) unit = UnitTypes.dagger;
         }
     }
 
@@ -442,7 +486,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public boolean update(){
-            return (countup += Time.delta) >= duration;
+            return (countup += Time.delta) >= duration * state.rules.objectiveTimerMultiplier;
         }
 
         @Override
@@ -454,7 +498,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             if(text != null){
-                int i = (int)((duration - countup) / 60f);
+                int i = (int)((duration * state.rules.objectiveTimerMultiplier - countup) / 60f);
                 StringBuilder timeString = new StringBuilder();
 
                 int m = i / 60;
@@ -516,6 +560,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public String text(){
             return Core.bundle.format("objective.destroyblock", block.emoji(), block.localizedName);
         }
+
+        @Override
+        public void validate(){
+            if(block == null) block = Blocks.router;
+        }
     }
 
     public static class DestroyBlocksObjective extends MapObjective{
@@ -550,6 +599,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.format("objective.destroyblocks", progress(), positions.length, block.emoji(), block.localizedName);
+        }
+
+        @Override
+        public void validate(){
+            if(block == null) block = Blocks.router;
         }
     }
 
@@ -658,17 +712,19 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(text.startsWith("@")){
                 String key = text.substring(1);
 
+                String out;
                 if(mobile){
-                    return state.mapLocales.containsProperty(key + ".mobile") ?
-                    state.mapLocales.getProperty(key + ".mobile") :
-                    Core.bundle.get(key + ".mobile", Core.bundle.get(key));
+                    out = state.mapLocales.containsProperty(key + ".mobile") ?
+                        state.mapLocales.getProperty(key + ".mobile") :
+                        Core.bundle.get(key + ".mobile", Core.bundle.get(key));
                 }else{
-                    return state.mapLocales.containsProperty(key) ?
-                    state.mapLocales.getProperty(key) :
-                    Core.bundle.get(key);
+                    out = state.mapLocales.containsProperty(key) ?
+                        state.mapLocales.getProperty(key) :
+                        Core.bundle.get(key);
                 }
+                return UI.formatIcons(out);
             }else{
-                return text;
+                return UI.formatIcons(text);
             }
         }
     }
@@ -1138,6 +1194,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void setTexture(String textureName){
             this.textureName = textureName;
 
+            if(headless) return;
             if(fetchedRegion == null) fetchedRegion = new TextureRegion();
             lookupRegion(textureName, fetchedRegion);
         }

@@ -12,6 +12,10 @@ public class Version{
     public static String type = "unknown";
     /** Build modifier, e.g. 'alpha' or 'release' */
     public static String modifier = "unknown";
+    /** Git commit hash (short) */
+    public static String commitHash = "unknown";
+    /** Date that this version was built. */
+    public static String buildDate = "unknown";
     /** Number specifying the major version, e.g. '4' */
     public static int number;
     /** Build number, e.g. '43'. set to '-1' for custom builds. */
@@ -32,6 +36,8 @@ public class Version{
         type = map.get("type");
         number = Integer.parseInt(map.get("number", "4"));
         modifier = map.get("modifier");
+        commitHash = map.get("commitHash", "unknown");
+        buildDate = map.get("buildDate", "unknown");
         if(map.get("build").contains(".")){
             String[] split = map.get("build").split("\\.");
             try{
@@ -73,6 +79,6 @@ public class Version{
         if(build == -1){
             return "custom build";
         }
-        return (type.equals("official") ? modifier : type) + " build " + build + (revision == 0 ? "" : "." + revision);
+        return (type.equals("official") ? modifier : type) + " build " + build + (revision == 0 ? "" : "." + revision) + (commitHash.equals("unknown") ? "" : " (" + commitHash + ")");
     }
 }

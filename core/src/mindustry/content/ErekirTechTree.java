@@ -137,6 +137,10 @@ public class ErekirTechTree{
                         node(eruptionDrill, Seq.with(new OnSector(stronghold)), () -> {
 
                         });
+
+                        node(largeCliffCrusher, Seq.with(new OnSector(stronghold)), () -> {
+
+                        });
                     });
                 });
             });
@@ -156,7 +160,9 @@ public class ErekirTechTree{
                     });
 
                     node(beamTower, Seq.with(new OnSector(peaks)), () -> {
+                        node(beamLink, Seq.with(new OnSector(crossroads)), () -> {
 
+                        });
                     });
 
 
@@ -220,7 +226,9 @@ public class ErekirTechTree{
                                         });
 
                                         node(heatRouter, () -> {
+                                            node(smallHeatRedirector, () -> {
 
+                                            });
                                         });
                                     });
                                 });

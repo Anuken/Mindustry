@@ -41,11 +41,14 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     exclude("fonts/**")
     exclude("bundles/**")
     exclude("cubemaps/**")
+    exclude("config/**")
     exclude("cursors/**")
     exclude("shaders/**")
     exclude("icons/icon.icns")
     exclude("icons/icon.ico")
     exclude("icons/icon_64.png")
+
+    duplicatesStrategy = 'exclude'
 
     manifest{
         attributes 'Main-Class': project.mainClassName

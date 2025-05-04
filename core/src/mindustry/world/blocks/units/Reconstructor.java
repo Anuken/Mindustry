@@ -89,7 +89,7 @@ public class Reconstructor extends UnitBlock{
                     table.table(Styles.grayPanel, t -> {
                         t.left();
 
-                        t.image(upgrade[0].uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        t.image(upgrade[0].uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> StatValues.withTooltip(i, upgrade[0]));
                         t.table(info -> {
                             info.add(upgrade[0].localizedName).left();
                             info.row();
@@ -104,7 +104,7 @@ public class Reconstructor extends UnitBlock{
                     table.table(Styles.grayPanel, t -> {
                         t.left();
 
-                        t.image(upgrade[1].uiIcon).size(40).pad(10f).right().scaling(Scaling.fit);
+                        t.image(upgrade[1].uiIcon).size(40).pad(10f).right().scaling(Scaling.fit).with(i -> StatValues.withTooltip(i, upgrade[1]));
                         t.table(info -> {
                             info.add(upgrade[1].localizedName).right();
                             info.row();
@@ -142,13 +142,10 @@ public class Reconstructor extends UnitBlock{
         public @Nullable Vec2 commandPos;
         public @Nullable UnitCommand command;
 
+        boolean constructing;
+
         public float fraction(){
             return progress / constructTime;
-        }
-
-        @Override
-        public boolean shouldActiveSound(){
-            return shouldConsume();
         }
 
         @Override
@@ -168,7 +165,7 @@ public class Reconstructor extends UnitBlock{
 
         public boolean canSetCommand(){
             var output = unit();
-            return output != null && output.commands.length > 1;
+            return output != null && output.commands.size > 1 && output.allowChangeCommands;
         }
 
         @Override
@@ -290,6 +287,8 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public void updateTile(){
+            //cache value to prevent repeated calls and multithreading issues
+            constructing = constructing();
             boolean valid = false;
 
             if(payload != null){
@@ -311,10 +310,8 @@ public class Reconstructor extends UnitBlock{
                                 if(commandPos != null){
                                     payload.unit.command().commandPosition(commandPos);
                                 }
-                                if(command != null){
-                                    //this already checks if it is a valid command for the unit type
-                                    payload.unit.command().command(command);
-                                }
+                                //this already checks if it is a valid command for the unit type
+                                payload.unit.command().command(command == null && payload.unit.type.defaultCommand != null ? payload.unit.type.defaultCommand : command);
                             }
 
                             progress %= 1f;
@@ -340,7 +337,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean shouldConsume(){
-            return constructing() && enabled;
+            return constructing && enabled;
         }
 
         @Override

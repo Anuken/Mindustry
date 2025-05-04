@@ -31,32 +31,27 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
     @Override
     public void setStats(){
         super.setStats();
+        //mirror stats onto each bullet (purely visual)
+        ammoTypes.each((l, b) -> b.statLiquidConsumed = liquidConsumed);
 
-        stats.remove(Stat.ammo);
-        //TODO looks bad
-        stats.add(Stat.ammo, table -> {
-            table.row();
-            StatValues.number(liquidConsumed * 60f, StatUnit.perSecond, true).display(table);
-        });
-        stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
+        stats.replace(Stat.ammo, StatValues.ammo(ammoTypes));
     }
 
     @Override
     public void init(){
-        //TODO display ammoMultiplier.
         consume(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), liquidConsumed){
+
+            {
+                multiplier = b -> {
+                    var ammo = ammoTypes.get(b.liquids.current());
+                    return ammo == null ? 1f : 1f / ammo.ammoMultiplier;
+                };
+            }
 
             @Override
             public void display(Stats stats){
 
             }
-
-            //TODO
-            //@Override
-            //protected float use(Building entity){
-            //    BulletType type = ammoTypes.get(entity.liquids.current());
-            //    return Math.min(amount * entity.edelta(), entity.block.liquidCapacity) / (type == null ? 1f : type.ammoMultiplier);
-            //}
         });
 
         ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));

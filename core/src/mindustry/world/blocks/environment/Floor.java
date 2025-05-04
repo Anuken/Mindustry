@@ -75,7 +75,11 @@ public class Floor extends Block{
     public boolean wallOre = false;
     /** Actual ID used for blend groups. Internal. */
     public int blendId = -1;
+    /** If >0, this floor is drawn as parts of a large texture. */
+    public int tilingVariants = 0;
 
+    protected TextureRegion[][][] tilingRegions;
+    protected int tilingSize;
     protected TextureRegion[][] edges;
     protected Seq<Floor> blenders = new Seq<>();
     protected Bits blended = new Bits(256);
@@ -92,6 +96,7 @@ public class Floor extends Block{
         placeableLiquid = true;
         allowRectanglePlacement = true;
         instantBuild = true;
+        ignoreBuildDarkness = true;
         placeEffect = Fx.rotateBlock;
     }
 
@@ -99,7 +104,24 @@ public class Floor extends Block{
     public void load(){
         super.load();
 
-        //load variant regions for drawing
+        int tsize = (int)(tilesize / Draw.scl);
+
+        if(tilingVariants > 0 && !headless){
+            tilingRegions = new TextureRegion[tilingVariants][][];
+            for(int i = 0; i < tilingVariants; i++){
+                TextureRegion tile = Core.atlas.find(name + "-tile" + (i + 1));
+                tilingRegions[i] = tile.split(tsize, tsize);
+                tilingSize = tilingRegions[i].length;
+            }
+
+            for(int i = 0; i < tilingVariants; i++){
+                if(tilingRegions[i].length != tilingSize || tilingRegions[i][0].length != tilingSize){
+                    Log.warn("Block: @: In order to prevent crashes, tiling regions must all be valid regions with the same size. Tiling has been disabled. Sprite '@' has a width or height inconsistent with other tiles.", name, name + "-tile" + (i + 1));
+                    tilingVariants = 0;
+                }
+            }
+        }
+
         if(variants > 0){
             variantRegions = new TextureRegion[variants];
             for(int i = 0; i < variants; i++){
@@ -109,9 +131,9 @@ public class Floor extends Block{
             variantRegions = new TextureRegion[1];
             variantRegions[0] = Core.atlas.find(name);
         }
-        int size = (int)(tilesize / Draw.scl);
+
         if(Core.atlas.has(name + "-edge")){
-            edges = Core.atlas.find(name + "-edge").split(size, size);
+            edges = Core.atlas.find(name + "-edge").split(tsize, tsize);
         }
         region = variantRegions[0];
         edgeRegion = Core.atlas.find("edge");
@@ -182,8 +204,13 @@ public class Floor extends Block{
 
     @Override
     public void drawBase(Tile tile){
-        Mathf.rand.setSeed(tile.pos());
-        Draw.rect(variantRegions[variant(tile.x, tile.y)], tile.worldx(), tile.worldy());
+        if(tilingVariants > 0){
+            int index = Mathf.randomSeed(Point2.pack(tile.x / tilingSize, tile.y / tilingSize), 0, tilingVariants - 1);
+            TextureRegion[][] regions = tilingRegions[index];
+            Draw.rect(regions[tile.x % tilingSize][tilingSize - 1 - tile.y % tilingSize], tile.worldx(), tile.worldy());
+        }else{
+            Draw.rect(variantRegions[variant(tile.x, tile.y)], tile.worldx(), tile.worldy());
+        }
 
         Draw.alpha(1f);
         drawEdges(tile);
@@ -212,6 +239,11 @@ public class Floor extends Block{
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
+    /** @return whether to index this floor by flag */
+    public boolean shouldIndex(Tile tile){
+        return true;
+    }
+
     //TODO currently broken for dynamically edited floor tiles
     /** @return true if this floor should be updated in the render loop, e.g. for effects. Do NOT overuse this! */
     public boolean updateRender(Tile tile){
@@ -232,8 +264,6 @@ public class Floor extends Block{
     }
 
     public void drawNonLayer(Tile tile, CacheLayer layer){
-        Mathf.rand.setSeed(tile.pos());
-
         Arrays.fill(dirs, 0);
         blenders.clear();
         blended.clear();
@@ -316,11 +346,6 @@ public class Floor extends Block{
 
     protected TextureRegion edge(int x, int y, int rx, int ry){
         return edges(x, y)[rx][2 - ry];
-    }
-
-    @Deprecated
-    protected TextureRegion[][] edges(){
-        return edges(0, 0);
     }
 
     /** @return whether the edges from {@param other} should be drawn onto this tile **/

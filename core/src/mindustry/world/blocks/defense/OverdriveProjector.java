@@ -19,9 +19,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class OverdriveProjector extends Block{
-    @Deprecated
-    public final int timerUse = timers++;
-
     public @Load("@-top") TextureRegion topRegion;
     public float reload = 60f;
     public float range = 80f;
@@ -71,7 +68,7 @@ public class OverdriveProjector extends Block{
 
         if(hasBoost && findConsumer(f -> f instanceof ConsumeItems) instanceof ConsumeItems items){
             stats.remove(Stat.booster);
-            stats.add(Stat.booster, StatValues.itemBoosters("+{0}%", stats.timePeriod, speedBoostPhase * 100f, phaseRangeBoost, items.items, this::consumesItem));
+            stats.add(Stat.booster, StatValues.itemBoosters("+{0}%", stats.timePeriod, speedBoostPhase * 100f, phaseRangeBoost, items.items));
         }
     }
     

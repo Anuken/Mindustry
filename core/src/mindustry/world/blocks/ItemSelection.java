@@ -1,5 +1,6 @@
 package mindustry.world.blocks;
 
+import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.scene.style.*;
@@ -93,6 +94,11 @@ public class ItemSelection{
 
         ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
         pane.setScrollingDisabled(true, false);
+        pane.exited(() -> {
+            if(pane.hasScroll()){
+                Core.scene.setScrollFocus(null);
+            }
+        });
 
         if(block != null){
             pane.setScrollYForce(block.selectScroll);

@@ -75,6 +75,8 @@ public interface Payload extends Position{
         return y();
     }
 
+    default void remove(){}
+
     static void write(@Nullable Payload payload, Writes write){
         if(payload == null){
             write.bool(false);

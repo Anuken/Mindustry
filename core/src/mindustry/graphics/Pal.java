@@ -5,6 +5,7 @@ import arc.graphics.*;
 public class Pal{
     public static Color
 
+    water = Color.valueOf("596ab8"),
     darkOutline = Color.valueOf("2d2f39"),
     thoriumPink = Color.valueOf("f9a3c7"),
     coalBlack = Color.valueOf("272727"),
@@ -58,6 +59,7 @@ public class Pal{
     darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f),
     darkerGray = new Color(0.2f, 0.2f, 0.2f, 1f),
     darkestGray = new Color(0.1f, 0.1f, 0.1f, 1f),
+    darkestestGray = new Color(0.05f, 0.05f, 0.05f, 1f),
     shadow = new Color(0, 0, 0, 0.22f),
     ammo = Color.valueOf("ff8947"),
     rubble = Color.valueOf("1c1817"),
@@ -107,7 +109,7 @@ public class Pal{
     redderDust = Color.valueOf("ff7b69"),
 
     plasticSmoke = Color.valueOf("f1e479"),
-	
+
     adminChat = Color.valueOf("ff4000"),
 
     neoplasmOutline = Color.valueOf("2e191d"),
@@ -115,6 +117,8 @@ public class Pal{
     neoplasm1 = Color.valueOf("f98f4a"),
     neoplasmMid = Color.valueOf("e05438"),
     neoplasm2 = Color.valueOf("9e172c"),
+    neoplasmAcid = Color.valueOf("8ead44"),
+    neoplasmAcidGlow = Color.valueOf("68e43e"),
 
     logicBlocks = Color.valueOf("d4816b"),
     logicControl = Color.valueOf("6bb2b2"),
@@ -135,5 +139,30 @@ public class Pal{
     techBlue = Color.valueOf("8ca9e8"),
 
     vent = Color.valueOf("6b4e4e"),
-    vent2 = Color.valueOf("3b2a2a");
+    vent2 = Color.valueOf("3b2a2a"),
+
+    copperAmmoFront = Color.valueOf("eac1a8"),
+    copperAmmoBack = Color.valueOf("d39169"),
+
+    graphiteAmmoBack = Color.valueOf("7d89d8"),
+    graphiteAmmoFront = Color.valueOf("dae1ee"),
+
+    siliconAmmoBack = Color.valueOf("707594"),
+    siliconAmmoFront = Color.valueOf("999ba0"),
+
+    glassAmmoBack = Color.valueOf("b9c9df"),
+    glassAmmoFront = Color.valueOf("ffffff"),
+
+    scrapAmmoFront = Color.valueOf("f5e0cc"),
+    scrapAmmoBack = Color.valueOf("d8887e"),
+
+    surgeAmmoFront = Color.white.cpy(),
+    surgeAmmoBack = surge.cpy(),
+
+    blastAmmoBack = Color.valueOf("e9665b"),
+    blastAmmoFront = Color.valueOf("eeab89"),
+
+    thoriumAmmoBack = Color.valueOf("f595be"),
+    thoriumAmmoFront = Color.white.cpy()
+    ;
 }

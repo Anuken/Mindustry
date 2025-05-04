@@ -18,6 +18,7 @@ public class MissileUnitType extends UnitType{
         logicControllable = false;
         isEnemy = false;
         useUnitCap = false;
+        drawCell = false;
         allowedInPayloads = false;
         controller = u -> new MissileAI();
         flying = true;

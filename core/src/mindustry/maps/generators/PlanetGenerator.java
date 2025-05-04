@@ -1,5 +1,7 @@
 package mindustry.maps.generators;
 
+import arc.*;
+import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
@@ -8,10 +10,12 @@ import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -20,7 +24,6 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
     public int baseSeed = 0;
     public int seed = 0;
 
-    protected IntSeq ints = new IntSeq();
     protected @Nullable Sector sector;
 
     /** Should generate sector bases for a planet. */
@@ -40,7 +43,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
                 if(sector.planet.getSector(other).id == sector.planet.startSector){
                     return;
                 }
-                
+
                 if(sector.planet.getSector(other).generateEnemyBase){
                     any = false;
                     break;
@@ -53,9 +56,22 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         }
     }
 
+    public void getLockedText(Sector hovered, StringBuilder out){
+        out.append("[gray]").append(Iconc.lock).append(" ").append(Core.bundle.get("locked"));
+    }
+
+    public @Nullable TextureRegion getLockedIcon(Sector hovered){
+        return (hovered.preset == null && !hovered.planet.allowLaunchToNumbered ? null : Fonts.getLargeIcon("lock"));
+    }
+
     /** @return whether to allow landing on the specified procedural sector */
     public boolean allowLanding(Sector sector){
         return sector.planet.allowLaunchToNumbered && (sector.hasBase() || sector.near().contains(Sector::hasBase));
+    }
+
+    /** @return whether to allow landing on the specified procedural sector */
+    public boolean allowAcceleratorLanding(Sector sector){
+        return sector.planet.allowLaunchToNumbered;
     }
 
     public void addWeather(Sector sector, Rules rules){

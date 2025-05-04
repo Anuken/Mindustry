@@ -35,7 +35,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void setup(){
-        String dataDir = OS.env("MINDUSTRY_DATA_DIR");
+        String dataDir = System.getProperty("mindustry.data.dir", OS.env("MINDUSTRY_DATA_DIR"));
         if(dataDir != null){
             Core.settings.setDataDirectory(files.absolute(dataDir));
         }
@@ -55,6 +55,10 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Log.info("[GL] Version: @", graphics.getGLVersion());
         Log.info("[GL] Max texture size: @", maxTextureSize);
         Log.info("[GL] Using @ context.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
+        if(gl30 == null) Log.warn("[GL] Your device or video drivers do not support OpenGL 3. This will cause performance issues.");
+        if(NvGpuInfo.hasMemoryInfo()){
+            Log.info("[GL] Total available VRAM: @mb", NvGpuInfo.getMaxMemoryKB()/1024);
+        }
         if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
         Log.info("[JAVA] Version: @", OS.javaVersion);
         if(Core.app.isAndroid()){
@@ -203,6 +207,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void update(){
+        PerfCounter.update.begin();
+
         int targetfps = Core.settings.getInt("fpscap", 120);
         boolean changed = lastTargetFps != targetfps && lastTargetFps != -1;
         boolean limitFps = targetfps > 0 && targetfps <= 240;
@@ -253,6 +259,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 Threads.sleep(toSleep / 1000000, (int)(toSleep % 1000000));
             }
         }
+
+        PerfCounter.update.end();
     }
 
     @Override

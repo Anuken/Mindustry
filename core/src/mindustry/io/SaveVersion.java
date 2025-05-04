@@ -232,7 +232,8 @@ public abstract class SaveVersion extends SaveFileReader{
             Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
 
-            boolean savedata = tile.block().saveData;
+            boolean savedata = tile.floor().saveData || tile.overlay().saveData || tile.block().saveData;
+
             byte packed = (byte)((tile.build != null ? 1 : 0) | (savedata ? 2 : 0));
 
             //make note of whether there was an entity/rotation here
@@ -367,7 +368,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 stream.writeShort(block.x);
                 stream.writeShort(block.y);
                 stream.writeShort(block.rotation);
-                stream.writeShort(block.block);
+                stream.writeShort(block.block.id);
                 TypeIO.writeObject(Writes.get(stream), block.config);
             }
         }
@@ -381,6 +382,7 @@ public abstract class SaveVersion extends SaveFileReader{
             writeChunk(stream, true, out -> {
                 out.writeByte(entity.classId());
                 out.writeInt(entity.id());
+                entity.beforeWrite();
                 entity.write(Writes.get(out));
             });
         }
@@ -425,7 +427,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 var obj = TypeIO.readObject(reads);
                 //cannot have two in the same position
                 if(set.add(Point2.pack(x, y))){
-                    data.plans.addLast(new BlockPlan(x, y, rot, content.block(bid).id, obj));
+                    data.plans.addLast(new BlockPlan(x, y, rot, content.block(bid), obj));
                 }
             }
         }
@@ -434,8 +436,6 @@ public abstract class SaveVersion extends SaveFileReader{
     public void readWorldEntities(DataInput stream) throws IOException{
         //entityMapping is null in older save versions, so use the default
         var mapping = this.entityMapping == null ? EntityMapping.idMap : this.entityMapping;
-
-        Seq<Entityc> entities = new Seq<>();
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
@@ -449,7 +449,6 @@ public abstract class SaveVersion extends SaveFileReader{
                 int id = in.readInt();
 
                 Entityc entity = (Entityc)mapping[typeid].get();
-                entities.add(entity);
                 EntityGroup.checkNextId(id);
                 entity.id(id);
                 entity.read(Reads.get(in));
@@ -457,9 +456,7 @@ public abstract class SaveVersion extends SaveFileReader{
             });
         }
 
-        for(var e : entities){
-            e.afterAllRead();
-        }
+        Groups.all.each(Entityc::afterReadAll);
     }
 
     public void readEntityMapping(DataInput stream) throws IOException{

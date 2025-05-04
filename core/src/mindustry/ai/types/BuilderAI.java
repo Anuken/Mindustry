@@ -118,9 +118,10 @@ public class BuilderAI extends AIController{
                         Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation)));
 
             if(valid){
+                float range = Math.min(unit.type.buildRange - 20f, 100f);
                 //move toward the plan
-                moveTo(req.tile(), unit.type.buildRange - 20f, 20f);
-                moving = !unit.within(req.tile(), unit.type.buildRange - 10f);
+                moveTo(req.tile(), range - 10f, 20f);
+                moving = !unit.within(req.tile(), range);
             }else{
                 //discard invalid plan
                 unit.plans.removeFirst();
@@ -179,12 +180,12 @@ public class BuilderAI extends AIController{
                 BlockPlan block = blocks.first();
 
                 //check if it's already been placed
-                if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block().id == block.block){
+                if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block() == block.block){
                     blocks.removeFirst();
-                }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation) && (!alwaysFlee || !nearEnemy(block.x, block.y))){ //it's valid
+                }else if(Build.validPlace(block.block, unit.team(), block.x, block.y, block.rotation) && (!alwaysFlee || !nearEnemy(block.x, block.y))){ //it's valid
                     lastPlan = block;
                     //add build plan
-                    unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
+                    unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, block.block, block.config));
                     //shift build plan to tail so next unit builds something else
                     blocks.addLast(blocks.removeFirst());
                 }else{
@@ -195,7 +196,7 @@ public class BuilderAI extends AIController{
         }
 
         if(!unit.type.flying){
-            unit.updateBoosting(moving || unit.floorOn().isDuct || unit.floorOn().damageTaken > 0f);
+            unit.updateBoosting(unit.type.boostWhenBuilding || moving || unit.floorOn().isDuct || unit.floorOn().damageTaken > 0f || unit.floorOn().isDeep());
         }
     }
 

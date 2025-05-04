@@ -74,18 +74,20 @@ public class CargoAI extends AIController{
 
                     //deposit items when it's possible
                     if(max > 0){
-                        noDestTimer = 0f;
                         Call.transferItemTo(unit, unit.item(), max, unit.x, unit.y, unloadTarget);
 
-                        //try the next target later
+                        //reset wait timer if we can't fill the unload point.
                         if(!unit.hasItem()){
-                            targetIndex ++;
+                            noDestTimer = 0f;
                         }
-                    }else if((noDestTimer += dropSpacing) >= emptyWaitTime){
+                    }
+                    //keep the target for at most emptyWaitTime, then we try change if other need.
+                    if((noDestTimer += dropSpacing) >= emptyWaitTime){
                         //oh no, it's out of space - wait for a while, and if nothing changes, try the next destination
 
                         //next targeting attempt will try the next destination point
                         targetIndex = findDropTarget(unit.item(), targetIndex, unloadTarget) + 1;
+                        noDestTimer = 0f;
 
                         //nothing found at all, clear item
                         if(unloadTarget == null){

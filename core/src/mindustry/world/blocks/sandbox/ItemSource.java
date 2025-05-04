@@ -79,6 +79,12 @@ public class ItemSource extends Block{
         }
 
         @Override
+        public void drawSelect(){
+            super.drawSelect();
+            drawItemSelection(outputItem);
+        }
+
+        @Override
         public void updateTile(){
             if(outputItem == null) return;
 
@@ -88,6 +94,7 @@ public class ItemSource extends Block{
             while(counter >= limit){
                 items.set(outputItem, 1);
                 dump(outputItem);
+                produced(outputItem);
                 items.set(outputItem, 0);
                 counter -= limit;
             }

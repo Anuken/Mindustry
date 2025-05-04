@@ -17,7 +17,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
-import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.BaseTurret.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.storage.*;
@@ -26,10 +25,10 @@ import mindustry.world.meta.*;
 
 public class RtsAI{
     static final Seq<Building> targets = new Seq<>();
-    static final Seq<Unit> squad = new Seq<>(false);
+    static final Seq<Unit> squad = new Seq<>(false), stack = new Seq<>();
     static final IntSet used = new IntSet();
     static final IntSet assignedTargets = new IntSet(), invalidTarget = new IntSet();
-    static final float squadRadius = 140f;
+    static final float squadRadius = 60f;
     static final int timeUpdate = 0, timerSpawn = 1, maxTargetsChecked = 15;
 
     //in order of priority??
@@ -110,21 +109,26 @@ public class RtsAI{
         boolean didDefend = false;
 
         for(var unit : data.units){
-            if(used.add(unit.id) && unit.isCommandable() && !unit.command().hasCommand() && !unit.command().isAttacking()){
+            if(used.add(unit.id) && unit.controller() instanceof CommandAI cai && !cai.hasCommand() && !cai.isAttacking()){
                 squad.clear();
+                squad.add(unit);
+
+                stack.clear();
+                stack.add(unit);
+
                 float rad = squadRadius + unit.hitSize*1.5f;
-                data.tree().intersect(unit.x - rad/2f, unit.y - rad/2f, rad, rad, squad);
 
-                squad.truncate(data.team.rules().rtsMaxSquad);
+                while(stack.size > 0){
+                    var next = stack.pop();
 
-                //remove overlapping squads
-                squad.removeAll(u -> (u != unit && used.contains(u.id)) || !u.isCommandable() || u.command().hasCommand() || ((u.flag == 0) != (unit.flag == 0)));
-                //mark used so other squads can't steal them
-                for(var item : squad){
-                    used.add(item.id);
+                    data.tree().intersect(next.x - rad/2f, next.y - rad/2f, rad, rad, u -> {
+                        if(u.controller() instanceof CommandAI ai && !ai.hasCommand() && ((u.flag == 0) == (unit.flag == 0)) && used.add(u.id)){
+                            squad.add(u);
+                            stack.add(u);
+                        }
+                    });
                 }
 
-                //TODO flawed, squads
                 if(handleSquad(squad, !didDefend)){
                     didDefend = true;
                 }
@@ -210,12 +214,12 @@ public class RtsAI{
                 //defendTarget = aggressor;
                 defendPos = new Vec2(aggressor.x, aggressor.y);
                 defendTarget = aggressor;
-            }else if(false){ //TODO currently ignored, no use defending against nothing
+            //}else if(false){ //TODO currently ignored, no use defending against nothing
                 //should it even go there if there's no aggressor found?
-                Tile closest = defend.findClosestEdge(units.first(), Tile::solid);
-                if(closest != null){
-                    defendPos = new Vec2(closest.worldx(), closest.worldy());
-                }
+            //    Tile closest = defend.findClosestEdge(units.first(), Tile::solid);
+            //    if(closest != null){
+            //        defendPos = new Vec2(closest.worldx(), closest.worldy());
+            //    }
             }else{
                 float mindst = Float.MAX_VALUE;
                 Building build = null;
@@ -305,7 +309,7 @@ public class RtsAI{
         );
 
         float weight = weights.get(result, 0f);
-        if(checkWeight && weight < data.team.rules().rtsMinWeight && total < Units.getCap(data.team)){
+        if(checkWeight && (weight < data.team.rules().rtsMinWeight && total < data.team.rules().rtsMaxSquad) && total < Units.getCap(data.team)){
             return null;
         }
 
@@ -343,7 +347,7 @@ public class RtsAI{
         //other can never be destroyed | other destroys self instantly
         if(Float.isInfinite(timeDestroyOther) || Mathf.zero(timeDestroySelf)) return 0f;
         //self can never be destroyed | self destroys other instantly
-        if(Float.isInfinite(timeDestroySelf) || Mathf.zero(timeDestroyOther)) return 1f;
+        if(Float.isInfinite(timeDestroySelf) || Mathf.zero(timeDestroyOther)) return 100000f;
 
         //examples:
         // self 10 sec / other 10 sec -> can destroy target with 100 % losses -> returns 1

@@ -4,12 +4,14 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -41,6 +43,7 @@ public class SteamVent extends Floor{
     public SteamVent(String name){
         super(name);
         variants = 2;
+        flags = EnumSet.of(BlockFlag.steamVent);
     }
 
     @Override
@@ -59,13 +62,24 @@ public class SteamVent extends Floor{
     }
 
     @Override
+    public boolean shouldIndex(Tile tile){
+        return isCenterVent(tile);
+    }
+
+    public boolean isCenterVent(Tile tile){
+        Tile topRight = tile.nearby(1, 1);
+        return topRight != null && topRight.floor() == tile.floor() && checkAdjacent(topRight);
+    }
+
+    @Override
     public void renderUpdate(UpdateRenderState state){
-        if(state.tile.block() == Blocks.air && (state.data += Time.delta) >= effectSpacing){
+        if(state.tile.nearby(-1, -1) != null && state.tile.nearby(-1, -1).block() == Blocks.air && (state.data += Time.delta) >= effectSpacing){
             effect.at(state.tile.x * tilesize - tilesize, state.tile.y * tilesize - tilesize, effectColor);
             state.data = 0f;
         }
     }
 
+    //note that only the top right tile works for this; render order reasons.
     public boolean checkAdjacent(Tile tile){
         for(var point : offsets){
             Tile other = Vars.world.tile(tile.x + point.x, tile.y + point.y);

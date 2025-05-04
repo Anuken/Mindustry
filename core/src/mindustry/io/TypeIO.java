@@ -12,6 +12,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.Units.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
@@ -246,7 +247,7 @@ public class TypeIO{
 
     //this is irrelevant.
     static final WeaponMount[] noMounts = {};
-    
+
     public static WeaponMount[] readMounts(Reads read){
         read.skip(read.b() * (1 + 4 + 4));
 
@@ -276,6 +277,46 @@ public class TypeIO{
     public static Ability[] readAbilities(Reads read){
         read.skip(read.b());
         return noAbilities;
+    }
+
+    public static void writeUnitContainer(Writes write, UnitSyncContainer cont){
+        write.i(cont.unit.id);
+        write.b(cont.unit.classId() & 0xFF);
+        cont.unit.beforeWrite();
+        cont.unit.writeSync(write);
+    }
+
+    public static UnitSyncContainer readUnitContainer(Reads read){
+        int id = read.i();
+        int typeID = read.ub();
+
+        Unit entity = Groups.unit.getByID(id);
+        boolean add = false, created = false;
+
+        if(entity == null){
+            entity = (Unit)EntityMapping.map(typeID & 0xFF).get();
+            entity.id(id);
+
+            if(!netClient.isEntityUsed(entity.id())){
+                add = true;
+            }
+            created = true;
+        }
+
+        //read the entity
+        entity.readSync(read);
+
+        if(created){
+            //snap initial starting position
+            entity.snapSync();
+        }
+
+        if(add){
+            entity.add();
+            netClient.addRemovedEntity(entity.id());
+        }
+
+        return null; //no need to actually return anything
     }
 
     public static void writeUnit(Writes write, Unit unit){
@@ -581,7 +622,7 @@ public class TypeIO{
                 if(ai.command == null) ai.command = UnitCommand.moveCommand;
             }
 
-            //command queue only in type 7
+            //command queue only in type 7/8
             if(type == 7 || type == 8){
                 ai.commandQueue.clear();
                 int length = read.ub();
@@ -955,6 +996,7 @@ public class TypeIO{
     public static void writeTraceInfo(Writes write, TraceInfo trace){
         writeString(write, trace.ip);
         writeString(write, trace.uuid);
+        writeString(write, trace.locale);
         write.b(trace.modded ? (byte)1 : 0);
         write.b(trace.mobile ? (byte)1 : 0);
         write.i(trace.timesJoined);
@@ -965,7 +1007,7 @@ public class TypeIO{
     }
 
     public static TraceInfo readTraceInfo(Reads read){
-        return new TraceInfo(readString(read), readString(read), read.b() == 1, read.b() == 1, read.i(), read.i(), readStrings(read), readStrings(read));
+        return new TraceInfo(readString(read), readString(read), readString(read), read.b() == 1, read.b() == 1, read.i(), read.i(), readStrings(read), readStrings(read));
     }
 
     public static void writeStrings(Writes write, String[] strings, int maxLen){

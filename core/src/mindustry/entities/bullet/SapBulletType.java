@@ -3,6 +3,7 @@ package mindustry.entities.bullet;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -11,10 +12,22 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 
 public class SapBulletType extends BulletType{
-    public float length = 100f;
+    public float length = 100f, lengthRand = 0f;
     public float sapStrength = 0.5f;
     public Color color = Color.white.cpy();
     public float width = 0.4f;
+    public String sprite = "laser";
+
+    public TextureRegion laserRegion;
+    public TextureRegion laserEndRegion;
+
+    @Override
+    public void load(){
+        super.load();
+
+        laserRegion = Core.atlas.find(sprite);
+        laserEndRegion = Core.atlas.find(sprite + "-end");
+    }
 
     public SapBulletType(){
         speed = 0f;
@@ -37,7 +50,7 @@ public class SapBulletType extends BulletType{
             Tmp.v1.set(data).lerp(b, b.fin());
 
             Draw.color(color);
-            Drawf.laser(Core.atlas.find("laser"), Core.atlas.find("laser-end"),
+            Drawf.laser(laserRegion, laserEndRegion,
                 b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * b.fout());
 
             Draw.reset();
@@ -60,7 +73,9 @@ public class SapBulletType extends BulletType{
     public void init(Bullet b){
         super.init(b);
 
-        Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), length);
+        float len = Mathf.random(length, length + lengthRand);
+
+        Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), len);
         b.data = target;
 
         if(target != null){
@@ -80,7 +95,7 @@ public class SapBulletType extends BulletType{
                 hit(b, tile.x, tile.y);
             }
         }else{
-            b.data = new Vec2().trns(b.rotation(), length).add(b.x, b.y);
+            b.data = new Vec2().trns(b.rotation(), len).add(b.x, b.y);
         }
     }
 }

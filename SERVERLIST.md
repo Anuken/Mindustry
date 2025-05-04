@@ -1,3 +1,7 @@
+# Note: The v7 server list is frozen. No new servers will be accepted. All v8 server PRs should be made [here](https://github.com/Anuken/MindustryServerList/blob/main/servers_v8.json).
+
+*PRs to edit addresses of existing servers will still be accepted, although very infrequently.*
+
 ### Adding a server to the list
 
 Mindustry now has a public list of servers that everyone can see and connect to. 

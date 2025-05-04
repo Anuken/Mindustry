@@ -137,7 +137,7 @@ public class Sector{
     }
 
     public String name(){
-        if(preset != null && info.name == null) return preset.localizedName;
+        if(preset != null && info.name == null && preset.requireUnlock) return preset.localizedName;
         //single-sector "planets" use their own name for the sector name.
         if(info.name == null && planet.sectors.size == 1){
             return planet.localizedName;
@@ -163,7 +163,7 @@ public class Sector{
     }
 
     public boolean isCaptured(){
-        if(isBeingPlayed()) return !info.waves && !info.attack;
+        if(isBeingPlayed()) return !state.rules.waves && !state.rules.attackMode;
         return save != null && !info.waves && !info.attack;
     }
 

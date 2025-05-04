@@ -19,6 +19,7 @@ import mindustry.logic.LExecutor.*;
 import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -312,6 +313,46 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("printchar")
+    public static class PrintCharStatement extends LStatement{
+        public String value = "65";
+
+        @Override
+        public void build(Table table){
+            table.add(" char ");
+            TextField field = field(table, value, str -> value = str).get();
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    t.row();
+                    t.table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(char j = 32; j < 127; j++){
+                            final int chr = j;
+                            i.button(String.valueOf(j), Styles.flatt, () -> {
+                                value = Integer.toString(chr);
+                                field.setText(value);
+                                hide.run();
+                            }).size(32f);
+                            if(++c % 8 == 0) i.row();
+                        }
+                    });
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PrintCharI(builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
+        }
+    }
+
     @RegisterStatement("format")
     public static class FormatStatement extends LStatement{
         public String value = "\"frog\"";
@@ -574,6 +615,29 @@ public class LStatements{
                                 if(++c % 6 == 0) i.row();
                             }
                         }),
+                        new Table(i -> {
+                            i.left();
+                            int c = 0;
+                            for(UnitType item : Vars.content.units()){
+                                if(!item.unlockedNow() || item.hidden) continue;
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
+                                    stype("@" + item.name);
+                                    hide.run();
+                                }).size(40f);
+
+                                if(++c % 6 == 0) i.row();
+                            }
+
+                            for(Block item : Vars.content.blocks()){
+                                if(!item.unlockedNow() || item.isHidden()) continue;
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
+                                    stype("@" + item.name);
+                                    hide.run();
+                                }).size(40f);
+
+                                if(++c % 6 == 0) i.row();
+                            }
+                        }),
                         //sensors
                         new Table(i -> {
                             for(LAccess sensor : LAccess.senseable){
@@ -585,7 +649,7 @@ public class LStatements{
                         })
                     };
 
-                    Drawable[] icons = {Icon.box, Icon.liquid, Icon.tree};
+                    Drawable[] icons = {Icon.box, Icon.liquid, Icon.units, Icon.tree};
                     Stack stack = new Stack(tables[selected]);
                     ButtonGroup<Button> group = new ButtonGroup<>();
 
@@ -603,7 +667,7 @@ public class LStatements{
                         }).height(50f).growX().checked(selected == fi).group(group);
                     }
                     t.row();
-                    t.add(stack).colspan(3).width(240f).left();
+                    t.add(stack).colspan(4).width(240f).left();
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
@@ -870,7 +934,7 @@ public class LStatements{
             table.table(this::rebuild);
 
             table.add().growX();
-            table.add(new JumpButton(() -> dest, s -> dest = s)).size(30).right().padLeft(-8);
+            table.add(new JumpButton(() -> dest, s -> dest = s, this.elem)).size(30).right().padLeft(-8);
 
             String name = name();
 
@@ -1324,15 +1388,11 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            rebuild(table);
-        }
-
-        void rebuild(Table table){
             table.clearChildren();
 
             table.button(clear ? "clear" : "apply", Styles.logict, () -> {
                 clear = !clear;
-                rebuild(table);
+                build(table);
             }).size(80f, 40f).pad(4f).color(table.color);
 
             if(statusNames == null){
@@ -1343,10 +1403,9 @@ public class LStatements{
                 b.label(() -> effect).grow().wrap().labelAlign(Align.center).center();
                 b.clicked(() -> showSelect(b, statusNames, effect, o -> {
                     effect = o;
+                    build(table);
                 }, 2, c -> c.size(120f, 38f)));
             }, Styles.logict, () -> {}).size(120f, 40f).pad(4f).color(table.color);
-
-            //TODO effect select
 
             table.add(clear ? " from " : " to ");
 
@@ -1498,11 +1557,11 @@ public class LStatements{
             table.add("natural ");
             fields(table, natural, str -> natural = str);
 
-            table.add("x ").visible(() -> natural.equals("false"));
-            fields(table, x, str -> x = str).visible(() -> natural.equals("false"));
+            table.add("x ").visible(() -> !natural.equals("true"));
+            fields(table, x, str -> x = str).visible(() -> !natural.equals("true"));
 
-            table.add(" y ").visible(() -> natural.equals("false"));
-            fields(table, y, str -> y = str).visible(() -> natural.equals("false"));
+            table.add(" y ").visible(() -> !natural.equals("true"));
+            fields(table, y, str -> y = str).visible(() -> !natural.equals("true"));
         }
 
         @Override
@@ -1552,7 +1611,7 @@ public class LStatements{
                     fields(table, "w", p3, s -> p3 = s);
                     fields(table, "h", p4, s -> p4 = s);
                 }
-                case buildSpeed, unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, rtsMinSquad, rtsMinWeight -> {
+                case buildSpeed, unitHealth, unitBuildSpeed, unitMineSpeed, unitCost, unitDamage, blockHealth, blockDamage, rtsMinSquad, rtsMinWeight -> {
                     if(p1.equals("0")){
                         p1 = "@sharded";
                     }
@@ -2123,69 +2182,69 @@ public class LStatements{
             return LCategory.world;
         }
     }
-    
+
     @RegisterStatement("playsound")
     public static class PlaySoundStatement extends LStatement{
         public boolean positional;
         public String id = "@sfx-pew", volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy", limit = "true";
-        
+
         @Override
         public void build(Table table){
             rebuild(table);
         }
-        
+
         void rebuild(Table table){
             table.clearChildren();
-            
+
             table.button(positional ? "positional" : "global", Styles.logict, () -> {
                 positional = !positional;
                 rebuild(table);
             }).size(160f, 40f).pad(4f).color(table.color);
-            
+
             row(table);
-            
+
             field(table, id, str -> id = str).padRight(0f).get();
-            
+
             table.button(b -> {
                 b.image(Icon.pencilSmall);
-                
+
                 String soundName = id.startsWith("@sfx-") ? id.substring(5) : id;
                 b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), soundName, t -> {
                     id = "@sfx-" + t;
                     rebuild(table);
                 }, 2, cell -> cell.size(160, 50)));
             }, Styles.logict, () -> {}).size(40).color(table.color).left().padLeft(-1);
-            
+
             row(table);
-            
+
             fieldst(table, "volume", volume, str -> volume = str);
             fieldst(table, "pitch", pitch, str -> pitch = str);
-            
+
             table.row();
-            
+
             if(positional){
                 fieldst(table, "x", x, str -> x = str);
-                
+
                 fieldst(table, "y", y, str -> y = str);
             }else{
                 fieldst(table, "pan", pan, str -> pan = str);
             }
-            
+
             table.row();
-            
+
             fieldst(table, "limit", limit, str -> limit = str);
         }
-        
+
         @Override
         public boolean privileged(){
             return true;
         }
-        
+
         @Override
         public LInstruction build(LAssembler builder){
             return new PlaySoundI(positional, builder.var(id), builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y), builder.var(limit));
         }
-        
+
         @Override
         public LCategory category(){
             return LCategory.world;

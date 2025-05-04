@@ -10,8 +10,8 @@ import rhino.*;
 import rhino.module.*;
 import rhino.module.provider.*;
 
-import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
@@ -46,7 +46,18 @@ public class Scripts implements Disposable{
             Object o = context.evaluateString(scope, text, "console.js", 1);
             if(o instanceof NativeJavaObject n) o = n.unwrap();
             if(o == null) o = "null";
+
             else if(o instanceof Undefined) o = "undefined";
+
+            else if(o instanceof Object[] arr) o = Arrays.toString(arr);
+            else if(o instanceof int[] arr) o = Arrays.toString(arr);
+            else if(o instanceof float[] arr) o = Arrays.toString(arr);
+            else if(o instanceof byte[] arr) o = Arrays.toString(arr);
+            else if(o instanceof double[] arr) o = Arrays.toString(arr);
+            else if(o instanceof long[] arr) o = Arrays.toString(arr);
+            else if(o instanceof char[] arr) o = Arrays.toString(arr);
+            else if(o instanceof boolean[] arr) o = Arrays.toString(arr);
+
             var out = o.toString();
             return out == null ? "null" : out;
         }catch(Throwable t){
@@ -73,7 +84,7 @@ public class Scripts implements Disposable{
 
     public void run(LoadedMod mod, Fi file){
         currentMod = mod;
-        run(file.readString(), file.name(), true);
+        run(file.readString(), mod.name + "/" + file.name(), true);
         currentMod = null;
     }
 
@@ -83,15 +94,10 @@ public class Scripts implements Disposable{
                 //inject script info into file
                 context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1);
             }
-            context.evaluateString(scope,
-            wrap ? "(function(){'use strict';\n" + script + "\n})();" : script,
-            file, 0);
+            context.evaluateString(scope, wrap ? "(function(){'use strict';\n" + script + "\n})();" : script, file, 0);
             return true;
         }catch(Throwable t){
-            if(currentMod != null){
-                file = currentMod.name + "/" + file;
-            }
-            log(LogLevel.err, file, "" + getError(t, true));
+            log(LogLevel.err, file, getError(t, true));
             return false;
         }
     }
@@ -111,10 +117,10 @@ public class Scripts implements Disposable{
         @Override
         public ModuleSource loadSource(String moduleId, Scriptable paths, Object validator) throws URISyntaxException{
             if(currentMod == null) return null;
-            return loadSource(moduleId, currentMod.root.child("scripts"), validator);
+            return loadSource(currentMod, moduleId, currentMod.root.child("scripts"), validator);
         }
 
-        private ModuleSource loadSource(String moduleId, Fi root, Object validator) throws URISyntaxException{
+        private ModuleSource loadSource(LoadedMod sourceMod, String moduleId, Fi root, Object validator) throws URISyntaxException{
             Matcher matched = directory.matcher(moduleId);
             if(matched.find()){
                 LoadedMod required = Vars.mods.locateMod(matched.group(1));
@@ -122,18 +128,16 @@ public class Scripts implements Disposable{
                 if(required == null){ // Mod not found, treat it as a folder
                     Fi dir = root.child(matched.group(1));
                     if(!dir.exists()) return null; // Mod and folder not found
-                    return loadSource(script, dir, validator);
+                    return loadSource(sourceMod, script, dir, validator);
                 }
 
                 currentMod = required;
-                return loadSource(script, required.root.child("scripts"), validator);
+                return loadSource(sourceMod, script, required.root.child("scripts"), validator);
             }
 
             Fi module = root.child(moduleId + ".js");
             if(!module.exists() || module.isDirectory()) return null;
-            return new ModuleSource(
-                new InputStreamReader(new ByteArrayInputStream((module.readString()).getBytes())),
-                new URI(moduleId), root.file().toURI(), validator);
+            return new ModuleSource(module.reader(Vars.bufferSize), new URI(sourceMod.name + "/" + moduleId + ".js"), root.file().toURI(), validator);
         }
     }
 }

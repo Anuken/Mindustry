@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -22,15 +21,20 @@ public class AIController implements UnitController{
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
-    protected AIController fallback;
+    protected @Nullable AIController fallback;
     protected float noTargetTime;
 
     /** main target that is being faced */
-    protected Teamc target;
+    protected @Nullable Teamc target;
+    protected @Nullable Teamc bomberTarget;
 
     {
-        timer.reset(0, Mathf.random(40f));
-        timer.reset(1, Mathf.random(60f));
+        resetTimers();
+    }
+
+    protected void resetTimers(){
+        timer.reset(timerTarget, Mathf.random(40f));
+        timer.reset(timerTarget2, Mathf.random(60f));
     }
 
     @Override
@@ -121,15 +125,29 @@ public class AIController implements UnitController{
     }
 
     public void pathfind(int pathTarget){
-        int costType = unit.pathType();
+        pathfind(pathTarget, true);
+    }
+
+    public void pathfind(int pathTarget, boolean stopAtTargetTile){
+        int costType = unit.type.flowfieldPathType;
 
         Tile tile = unit.tileOn();
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathTarget));
+        Tile targetTile = pathfinder.getField(unit.team, costType, pathTarget).getNextTile(tile);
 
-        if(tile == targetTile || (costType == Pathfinder.costNaval && !targetTile.floor().isLiquid)) return;
+        if((tile == targetTile && stopAtTargetTile) || !unit.canPass(targetTile.x, targetTile.y)) return;
 
+        //TODO: this may be buggy, figure out if it's the cause of the issue
+        //unit.movePref(alterPathfind(vec.set(targetTile.worldx(), targetTile.worldy()).sub(tile.worldx(), tile.worldy()).setLength(prefSpeed())));
         unit.movePref(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), prefSpeed()));
+    }
+
+    public Vec2 alterPathfind(Vec2 vec){
+        return vec;
+    }
+
+    public void targetInvalidated(){
+        //TODO: try this for normal units, reset the target timer
     }
 
     public void updateWeapons(){
@@ -143,6 +161,9 @@ public class AIController implements UnitController{
         noTargetTime += Time.delta;
 
         if(invalid(target)){
+            if(target != null && !target.isAdded()){
+                targetInvalidated();
+            }
             target = null;
         }else{
             noTargetTime = 0f;
@@ -181,6 +202,13 @@ public class AIController implements UnitController{
 
             if(mount.target != null){
                 shoot = mount.target.within(mountX, mountY, wrange + (mount.target instanceof Sized s ? s.hitSize()/2f : 0f)) && shouldShoot();
+
+                if(unit.type.autoDropBombs && !shoot){
+                    if(bomberTarget == null || !bomberTarget.isAdded() || !bomberTarget.within(unit, unit.hitSize/2f + ((Sized)bomberTarget).hitSize()/2f)){
+                        bomberTarget = Units.closestTarget(unit.team, unit.x, unit.y, unit.hitSize, u -> !u.isFlying(), t -> true);
+                    }
+                    shoot = bomberTarget != null;
+                }
 
                 Vec2 to = Predict.intercept(unit, mount.target, weapon.bullet.speed);
                 mount.aimX = to.x;
