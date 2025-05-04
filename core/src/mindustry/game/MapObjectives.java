@@ -9,6 +9,8 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.serialization.*;
+import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -665,7 +667,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay.  */
-    public static abstract class ObjectiveMarker{
+    public static abstract class ObjectiveMarker implements JsonSerializable{
         /** Whether to display marker in the world. Do not modify directly if added, use control() instead. */
         public @IndexBool int world = 1;
         /** Whether to display marker on the minimap. Do not modify directly if added, use control() instead. */
@@ -704,6 +706,25 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public String typeName(){
             String className = getClass().getSimpleName().replace("Marker", "");
             return Core.bundle == null ? className : Core.bundle.get("marker." + className.toLowerCase() + ".name", className);
+        }
+
+        @Override
+        public void write(Json json){
+            json.writeFields(this);
+        }
+
+        private void updateField(JsonValue value){
+            if(value != null && value.type() != JsonValue.ValueType.longValue){
+                value.set(value.asBoolean() ? 1 : -1, null);
+            }
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData){
+            updateField(jsonData.get("world"));
+            updateField(jsonData.get("minimap"));
+            updateField(jsonData.get("light"));
+            json.readFields(this, jsonData);
         }
 
         public static String fetchText(String text){
