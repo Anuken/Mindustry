@@ -544,7 +544,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(!Core.scene.hasMouse()){
+        if(!Core.scene.hasMouse() && !ui.minimapfrag.shown()){
             Core.graphics.cursor(cursorType);
         }else{
             cursorType = SystemCursor.arrow;
