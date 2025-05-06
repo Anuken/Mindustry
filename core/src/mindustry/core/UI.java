@@ -598,7 +598,10 @@ public class UI implements ApplicationListener, Loadable{
         Table t = new Table(Styles.black3);
         t.touchable = Touchable.disabled;
         t.margin(8f).add(text).style(Styles.outlineLabel).labelAlign(Align.center);
-        t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
+        t.update(() -> {
+            t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center);
+            t.toFront();
+        });
         t.actions(Actions.fadeOut(duration, Interp.pow4In), Actions.remove());
         t.pack();
         t.act(0.1f);

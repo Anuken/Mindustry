@@ -43,7 +43,7 @@ public class CommandAI extends AIController{
     /** Stance, usually related to firing mode. */
     public UnitStance stance = UnitStance.shoot;
     /** Current command this unit is following. */
-    public UnitCommand command = UnitCommand.moveCommand;
+    public UnitCommand command;
     /** Current controller instance based on command. */
     protected @Nullable AIController commandController;
     /** Last command type assigned. Used for detecting command changes. */
@@ -60,6 +60,14 @@ public class CommandAI extends AIController{
             unit.mineTile = null;
             unit.clearBuilding();
             this.command = command;
+        }
+    }
+
+    @Override
+    public void init(){
+        if(command == null){
+            command = unit.type.defaultCommand == null && unit.type.commands.size > 0 ? unit.type.commands.first() : unit.type.defaultCommand;
+            if(command == null) command = UnitCommand.moveCommand;
         }
     }
 
