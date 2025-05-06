@@ -164,8 +164,6 @@ public class WaveSpawner{
                         cons.accept(core.x + Tmp.v1.x, core.y + Tmp.v1.y, false);
                     }
                 }
-
-
             }
         }
     }
