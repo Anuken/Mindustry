@@ -256,7 +256,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public boolean isCommandable(){
-            return team != state.rules.defaultTeam && state.rules.attackMode;
+            return team != state.rules.defaultTeam && state.rules.editor;
         }
 
         @Override
