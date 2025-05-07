@@ -771,7 +771,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             //move down
             elevation -= type.fallSpeed * Time.delta;
 
-            if(isGrounded() || health <= -maxHealth){
+            if(isGrounded() || health <= -0.4f * maxHealth){
                 Call.unitDestroy(id);
             }
         }
@@ -831,9 +831,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void destroy(){
         if(!isAdded() || !type.killable) return;
 
-        float explosiveness = 2f + item().explosiveness * stack().amount * 1.53f;
-        float flammability = item().flammability * stack().amount / 1.9f;
-        float power = item().charge * Mathf.pow(stack().amount, 1.11f) * 160f;
+        float explosiveness = 2f + item().explosiveness * stack().amount * 1.1f;
+        float flammability = item().flammability * stack().amount * 0.4f;
+        float power = item().charge * Mathf.pow(stack().amount, 1.02f) * 30f;
 
         if(!spawnedByCore){
             Damage.dynamicExplosion(x, y, flammability, explosiveness, power, (bounds() + type.legLength/1.7f) / 2f, state.rules.damageExplosions && state.rules.unitCrashDamage(team) > 0, item().flammability > 1, team, type.deathExplosionEffect);
@@ -866,7 +866,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //if this unit crash landed (was flying), damage stuff in a radius
         if(type.flying && !spawnedByCore && type.createWreck && state.rules.unitCrashDamage(team) > 0){
             var shields = indexer.getEnemy(team, BlockFlag.shield);
-            float crashDamage = Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f * state.rules.unitCrashDamage(team);
+            float crashDamage = Mathf.pow(hitSize, 1.65f) * type.crashDamageMultiplier * state.rules.unitCrashDamage(team) * Math.max(0.2f , (0.4f * maxHealth + health) / maxHealth);
             if(shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, crashDamage))){
                 Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, crashDamage, true, false, true);
             }
