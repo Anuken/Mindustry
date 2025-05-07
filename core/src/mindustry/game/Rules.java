@@ -299,6 +299,8 @@ public class Rules{
         public boolean aiCoreSpawn = true;
         /** If true, blocks don't require power or resources. */
         public boolean cheat;
+        /** If true, the core is always filled to capacity with all items. */
+        public boolean fillItems;
         /** If true, resources are not consumed when building. */
         public boolean infiniteResources;
         /** If true, this team has infinite unit ammo. */

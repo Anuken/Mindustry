@@ -1429,7 +1429,7 @@ public class ControlPathfinder implements Runnable{
 
     private static boolean nearPassable(int initialCost, int team, PathCost cost, int pos){
         int amount = cost.getCost(team, pathfinder.tiles[pos]);
-        return amount != impassable && amount < Math.max(50, initialCost + 1);
+        return amount != impassable && amount < Math.min(Math.max(50, initialCost + 1), solidCap);
     }
 
     private static boolean solid(int team, PathCost type, int x, int y){
