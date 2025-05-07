@@ -57,6 +57,7 @@ public class DesktopInput extends InputHandler{
     public long lastCtrlGroupSelectMillis;
 
     private float buildPlanMouseOffsetX, buildPlanMouseOffsetY;
+    private boolean changedCursor;
 
     boolean showHint(){
         return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() && !player.dead() &&
@@ -546,8 +547,13 @@ public class DesktopInput extends InputHandler{
 
         if(!Core.scene.hasMouse() && !ui.minimapfrag.shown()){
             Core.graphics.cursor(cursorType);
+            changedCursor = cursorType != SystemCursor.arrow;
         }else{
             cursorType = SystemCursor.arrow;
+            if(changedCursor){
+                graphics.cursor(SystemCursor.arrow);
+                changedCursor = false;
+            }
         }
     }
 
