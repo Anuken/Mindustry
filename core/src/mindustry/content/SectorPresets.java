@@ -1,5 +1,6 @@
 package mindustry.content;
 
+import mindustry.*;
 import mindustry.type.*;
 
 import static mindustry.content.Planets.*;
@@ -163,6 +164,21 @@ public class SectorPresets{
             difficulty = 10;
         }};
 
+        //TODO: for wave survival sectors the capture wave is incorrect
+        registerHiddenSectors(serpulo,
+        68, //Winter Forest by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1235654407006322700
+        241,//River Bastion by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1232658317126402050
+        173,//Front Line by stormrider: https://discord.com/channels/391020510269669376/1165421701362897000/1188484967064404061
+        25, //HochuPizzu by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1170279703056228515
+        12, //Salt Outpost by skeledragon: https://discord.com/channels/391020510269669376/1165421701362897000/1193441915459338361
+        82, //Desert Wastes by xaphiro_: https://discord.com/channels/391020510269669376/1165421701362897000/1226498922898264157
+        243,//Port 012 by skeledragon: https://discord.com/channels/391020510269669376/1165421701362897000/1174884280242012262
+        240 //Cold Grove by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1230550892718194742
+        );
+
+        Vars.content.sector("sector-serpulo-173").captureWave = 17;
+        Vars.content.sector("sector-serpulo-240").captureWave = 40;
+
         //endregion
         //region erekir
 
@@ -186,11 +202,11 @@ public class SectorPresets{
             attackAfterWaves = true;
         }};
 
-        atlas = new SectorPreset("atlas", erekir, 14){{ //TODO random sector, pick a better one
+        atlas = new SectorPreset("atlas", erekir, 14){{
             difficulty = 5;
         }};
 
-        split = new SectorPreset("split", erekir, 19){{ //TODO random sector, pick a better one
+        split = new SectorPreset("split", erekir, 19){{
             difficulty = 2;
         }};
 
@@ -243,5 +259,13 @@ public class SectorPresets{
         }};
 
         //endregion
+    }
+
+    static void registerHiddenSectors(Planet planet, int... ids){
+        for(int id : ids){
+            new SectorPreset("sector-" + planet.name + "-" + id, "hidden/" + planet + "-" + id, planet, id){{
+                requireUnlock = false;
+            }};
+        }
     }
 }

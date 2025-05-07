@@ -1315,6 +1315,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    public boolean isCommandable(){
+        return block.commandable;
+    }
+
     /** @return whether this building is in a payload */
     public boolean isPayload(){
         return tile == emptyTile;

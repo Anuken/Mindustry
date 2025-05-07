@@ -134,13 +134,6 @@ public class Logic implements ApplicationListener{
                 state.rules.allowEditWorldProcessors = false;
                 state.rules.waveTeam.rules().infiniteResources = true;
                 state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
-
-                //fill enemy cores by default? TODO decide
-                for(var core : state.rules.waveTeam.cores()){
-                    for(Item item : content.items()){
-                        core.items.set(item, core.block.itemCapacity);
-                    }
-                }
             }
 
             //save settings
@@ -445,6 +438,12 @@ public class Logic implements ApplicationListener{
                 }
 
                 if(state.isCampaign()){
+                    //always fill enemy core with items
+                    if(state.rules.waveTeam.cores().size > 0){
+                        var core = state.rules.waveTeam.core();
+                        content.items().each(i -> core.items.set(i, core.getMaximumAccepted(i)));
+                    }
+
                     state.rules.sector.info.update();
                 }
 

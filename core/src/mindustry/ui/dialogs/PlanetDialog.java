@@ -264,7 +264,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         //announce new presets
         for(SectorPreset preset : content.sectors()){
-            if(preset.unlocked() && !preset.alwaysUnlocked && !preset.sector.info.shown && !preset.sector.hasBase() && preset.planet == state.planet){
+            if(preset.unlocked() && !preset.alwaysUnlocked && !preset.sector.info.shown && preset.requireUnlock && !preset.sector.hasBase() && preset.planet == state.planet){
                 newPresets.add(preset.sector);
                 preset.sector.info.shown = true;
                 preset.sector.saveInfo();
@@ -539,7 +539,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 var preficon = sec.icon();
                 var icon =
                     sec.isAttacked() ? Fonts.getLargeIcon("warning") :
-                    !sec.hasBase() && sec.preset != null && sec.preset.unlocked() && preficon == null ?
+                    !sec.hasBase() && sec.preset != null && sec.preset.requireUnlock && sec.preset.unlocked() && preficon == null ?
                     Fonts.getLargeIcon("terrain") :
                     sec.preset != null && sec.preset.requireUnlock && sec.preset.locked() && sec.preset.techNode != null && (sec.preset.techNode.parent == null || !sec.preset.techNode.parent.content.locked()) ? Fonts.getLargeIcon("lock") :
                     preficon;

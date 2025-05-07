@@ -73,7 +73,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
     @Override
     public void getLockedText(Sector hovered, StringBuilder out){
-        if(hovered.preset == null && hovered.near().contains(Sector::hasBase)){
+        if((hovered.preset == null || !hovered.preset.requireUnlock) && hovered.near().contains(Sector::hasBase)){
             out.append("[red]").append(Iconc.cancel).append("[]").append(Blocks.coreFoundation.emoji()).append(Core.bundle.get("sector.foundationrequired"));
         }else{
             super.getLockedText(hovered, out);
