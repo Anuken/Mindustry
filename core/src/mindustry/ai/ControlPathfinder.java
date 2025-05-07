@@ -1097,6 +1097,7 @@ public class ControlPathfinder implements Runnable{
 
         int costId = unit.type.pathCostId;
         PathCost cost = idToCost(costId);
+        Tile tileOn = unit.tileOn();
 
         int
         team = unit.team.id,
@@ -1108,6 +1109,7 @@ public class ControlPathfinder implements Runnable{
         actualDestX = World.toTile(destination.x),
         actualDestY = World.toTile(destination.y),
         actualDestPos = actualDestX + actualDestY * wwidth,
+        initialCost = tileOn == null ? 0 : cost.getCost(team, pathfinder.tiles[tileOn.array()]),
         destPos = destX + destY * wwidth;
 
         PathRequest request = unitRequests.get(unit);
@@ -1123,7 +1125,7 @@ public class ControlPathfinder implements Runnable{
         if(lastRaycastTile != packedPos){
             //near the destination, standard raycasting tends to break down, so use the more permissive 'near' variant that doesn't take into account edges of walls
             raycastResult = unit.within(destination, tilesize * 2.5f) ?
-                !raycastRect(unit.x, unit.y, destination.x, destination.y, team, cost, tileX, tileY, actualDestX, actualDestY, tileRectSize) :
+                !raycastRect(initialCost, unit.x, unit.y, destination.x, destination.y, team, cost, tileX, tileY, actualDestX, actualDestY, tileRectSize) :
                 !raycast(team, cost, tileX, tileY, actualDestX, actualDestY);
 
             if(request != null){
@@ -1147,7 +1149,7 @@ public class ControlPathfinder implements Runnable{
         if(request != null && request.destination == destPos){
             request.lastUpdateId = state.updateId;
 
-            Tile tileOn = unit.tileOn(), initialTileOn = tileOn;
+            Tile initialTileOn = tileOn;
             //TODO: should fields be accessible from this thread?
             FieldCache fieldCache = null;
             try{
@@ -1209,10 +1211,10 @@ public class ControlPathfinder implements Runnable{
 
                         //TODO raycast spam = extremely slow
                         //...flowfield integration spam is also really slow.
-                        if(!(current == null || (costId == costIdGround && current.dangerous() && !tileOn.dangerous()))){
+                        if(!(current == null || (unit.type.canDrown && current.dangerous() && !tileOn.dangerous()))){
 
                             //when anyNearSolid is false, no solid tiles have been encountered anywhere so far, so raycasting is a waste of time
-                            if(anyNearSolid && !(tileOn.dangerous() && costId == costIdGround) && raycastRect(unit.x, unit.y, current.x * tilesize, current.y * tilesize, team, cost, initialTileOn.x, initialTileOn.y, current.x, current.y, tileRectSize)){
+                            if(anyNearSolid && !(tileOn.dangerous() && costId == costIdGround) && raycastRect(initialCost, unit.x, unit.y, current.x * tilesize, current.y * tilesize, team, cost, initialTileOn.x, initialTileOn.y, current.x, current.y, tileRectSize)){
 
                                 //TODO this may be a mistake
                                 if(tileOn == initialTileOn){
@@ -1222,6 +1224,7 @@ public class ControlPathfinder implements Runnable{
 
                                 break;
                             }else{
+
                                 tileOn = current;
                                 any = true;
 
@@ -1373,15 +1376,15 @@ public class ControlPathfinder implements Runnable{
         return 0;
     }
 
-    private static boolean overlap(int team, PathCost type, int x, int y, float startX, float startY, float endX, float endY, float rectSize){
+    private static boolean overlap(int initialCost, int team, PathCost type, int x, int y, float startX, float startY, float endX, float endY, float rectSize){
         if(x < 0 || y < 0 || x >= wwidth || y >= wheight) return false;
-        if(!nearPassable(team, type, x + y * wwidth)){
+        if(!nearPassable(initialCost, team, type, x + y * wwidth)){
             return Intersector.intersectSegmentRectangleFast(startX, startY, endX, endY, x * tilesize - rectSize/2f, y * tilesize - rectSize/2f, rectSize, rectSize);
         }
         return false;
     }
 
-    private static boolean raycastRect(float startX, float startY, float endX, float endY, int team, PathCost type, int x1, int y1, int x2, int y2, float rectSize){
+    private static boolean raycastRect(int initialCost, float startX, float startY, float endX, float endY, int team, PathCost type, int x1, int y1, int x2, int y2, float rectSize){
         int ww = wwidth, wh = wheight;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
@@ -1389,11 +1392,11 @@ public class ControlPathfinder implements Runnable{
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
             if(
-            !nearPassable(team, type, x + y * wwidth) ||
-            overlap(team, type, x + 1, y, startX, startY, endX, endY, rectSize) ||
-            overlap(team, type, x - 1, y, startX, startY, endX, endY, rectSize) ||
-            overlap(team, type, x, y + 1, startX, startY, endX, endY, rectSize) ||
-            overlap(team, type, x, y - 1, startX, startY, endX, endY, rectSize)
+            !nearPassable(initialCost, team, type, x + y * wwidth) ||
+            overlap(initialCost,team, type, x + 1, y, startX, startY, endX, endY, rectSize) ||
+            overlap(initialCost,team, type, x - 1, y, startX, startY, endX, endY, rectSize) ||
+            overlap(initialCost,team, type, x, y + 1, startX, startY, endX, endY, rectSize) ||
+            overlap(initialCost,team, type, x, y - 1, startX, startY, endX, endY, rectSize)
             ) return true;
 
             if(x == x2 && y == y2) return false;
@@ -1424,9 +1427,9 @@ public class ControlPathfinder implements Runnable{
         return amount != impassable && amount < solidCap;
     }
 
-    private static boolean nearPassable(int team, PathCost cost, int pos){
+    private static boolean nearPassable(int initialCost, int team, PathCost cost, int pos){
         int amount = cost.getCost(team, pathfinder.tiles[pos]);
-        return amount != impassable && amount < 50;
+        return amount != impassable && amount < Math.max(50, initialCost + 1);
     }
 
     private static boolean solid(int team, PathCost type, int x, int y){
