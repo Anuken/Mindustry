@@ -88,6 +88,7 @@ public class LExecutor{
         }
 
         if(counter.numval < instructions.length){
+            counter.isobj = false;
             instructions[(int)(counter.numval++)].run(this);
         }
     }
@@ -605,7 +606,7 @@ public class LExecutor{
                 mem.memory[address] = value.num();
             }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
                 LVar toVar = logic.executor.optionalVar(name);
-                if(toVar != null && !toVar.constant && (toVar != logic.executor.counter || !value.isobj)){
+                if(toVar != null && !toVar.constant){
                     toVar.objval = value.objval;
                     toVar.numval = value.numval;
                     toVar.isobj = value.isobj;
@@ -781,10 +782,8 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(!to.constant){
                 if(from.isobj){
-                    if(to != exec.counter){
-                        to.objval = from.objval;
-                        to.isobj = true;
-                    }
+                    to.objval = from.objval;
+                    to.isobj = true;
                 }else{
                     to.numval = LVar.invalid(from.numval) ? 0 : from.numval;
                     to.isobj = false;
