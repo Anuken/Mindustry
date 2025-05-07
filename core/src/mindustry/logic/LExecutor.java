@@ -605,7 +605,7 @@ public class LExecutor{
                 mem.memory[address] = value.num();
             }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
                 LVar toVar = logic.executor.optionalVar(name);
-                if(toVar != null && !toVar.constant){
+                if(toVar != null && !toVar.constant && (toVar != logic.executor.counter || !value.isobj)){
                     toVar.objval = value.objval;
                     toVar.numval = value.numval;
                     toVar.isobj = value.isobj;
