@@ -34,6 +34,8 @@ public class Rules{
     public boolean waves;
     /** Whether air units spawn at spawns instead of the edge of the map */
     public boolean airUseSpawns = false;
+    /** If true, units spawn at enemy cores in attack maps with waves enabled. */
+    public boolean wavesSpawnAtCores = true;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
     public boolean pvp;
     /** Whether is waiting for players enabled in PvP. */

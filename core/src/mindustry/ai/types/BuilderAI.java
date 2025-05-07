@@ -53,6 +53,9 @@ public class BuilderAI extends AIController{
 
         unit.updateBuilding = true;
 
+        if(assistFollowing != null && !assistFollowing.isValid()) assistFollowing = null;
+        if(following != null && !following.isValid()) following = null;
+
         if(assistFollowing != null && assistFollowing.activelyBuilding()){
             following = assistFollowing;
         }

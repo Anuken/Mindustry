@@ -326,7 +326,7 @@ public class DesktopInput extends InputHandler{
                 selectedUnits.clear();
                 commandBuildings.clear();
                 for(var build : player.team().data().buildings){
-                    if(build.block.commandable){
+                    if(build.isCommandable()){
                         commandBuildings.add(build);
                     }
                 }
@@ -544,7 +544,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(!Core.scene.hasMouse()){
+        if(!Core.scene.hasMouse() && !ui.minimapfrag.shown()){
             Core.graphics.cursor(cursorType);
         }else{
             cursorType = SystemCursor.arrow;

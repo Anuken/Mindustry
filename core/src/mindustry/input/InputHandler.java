@@ -155,6 +155,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Events.on(ResetEvent.class, e -> {
             logicCutscene = false;
+            commandBuildings.clear();
+            selectedUnits.clear();
             itemDepositCooldown = 0f;
             Arrays.fill(controlGroups, null);
             lastUnit = null;
@@ -413,7 +415,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(int pos : buildings){
             var build = world.build(pos);
 
-            if(build == null || build.team() != player.team() || !build.block.commandable) continue;
+            if(build == null || build.team() != player.team() || !build.isCommandable()) continue;
 
             build.onCommand(target);
             build.updateLastAccess(player);
@@ -839,7 +841,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         itemDepositCooldown -= Time.delta / 60f;
 
-        commandBuildings.removeAll(b -> !b.isValid());
+        commandBuildings.removeAll(b -> !b.isValid() || !b.isCommandable() || b.team != player.team());
 
         if(!commandMode){
             commandRect = false;
@@ -1025,7 +1027,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 //deselect
                 selectedUnits.clear();
 
-                if(build != null && build.team == player.team() && build.block.commandable){
+                if(build != null && build.team == player.team() && build.isCommandable()){
                     if(commandBuildings.contains(build)){
                         commandBuildings.remove(build);
                     }else{
@@ -1742,7 +1744,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         boolean consumed = false, showedInventory = false;
 
         //select building for commanding
-        if(build.block.commandable && commandMode){
+        if(build.isCommandable() && commandMode){
             //TODO handled in tap.
             consumed = true;
         }else if(build.block.configurable && build.interactable(player.team())){ //check if tapped block is configurable

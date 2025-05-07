@@ -1,5 +1,6 @@
 package mindustry.content;
 
+import mindustry.*;
 import mindustry.type.*;
 
 import static mindustry.content.Planets.*;
@@ -174,6 +175,9 @@ public class SectorPresets{
         243,//Port 012 by skeledragon: https://discord.com/channels/391020510269669376/1165421701362897000/1174884280242012262
         240 //Cold Grove by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1230550892718194742
         );
+
+        Vars.content.sector("sector-serpulo-173").captureWave = 17;
+        Vars.content.sector("sector-serpulo-240").captureWave = 40;
 
         //endregion
         //region erekir
