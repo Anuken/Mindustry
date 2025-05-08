@@ -1352,7 +1352,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void drawLight(float scaleFactor){
             float rad = radius * tilesize * scaleFactor;
 
-            renderer.lights.add(pos.x, pos.y, radius, color, color.a);
+            renderer.lights.add(pos.x, pos.y, rad, color, color.a);
         }
 
         @Override
