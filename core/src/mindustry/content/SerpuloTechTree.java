@@ -129,7 +129,7 @@ public class SerpuloTechTree{
                         });
                     });
 
-                    node(siliconSmelter, () -> {
+                    node(siliconSmelter, Seq.with(new SectorComplete(frozenForest)), () -> {
 
                         node(sporePress, () -> {
                             node(coalCentrifuge, () -> {
@@ -361,7 +361,7 @@ public class SerpuloTechTree{
                         });
                     });
 
-                    node(nova, () -> {
+                    node(nova, Seq.with(new SectorComplete(fungalPass)), () -> {
                         node(pulsar, () -> {
                             node(quasar, () -> {
                                 node(vela, () -> {
@@ -504,15 +504,6 @@ public class SerpuloTechTree{
                                     });
                                 });
                             });
-
-                            node(taintedWoods, Seq.with(
-                            new SectorComplete(biomassFacility),
-                            new SectorComplete(fungalPass),
-                            new Research(Items.sporePod),
-                            new Research(wave)
-                            ), () -> {
-
-                            });
                         });
 
                         node(ruinousShores, Seq.with(
@@ -528,6 +519,17 @@ public class SerpuloTechTree{
                             new Research(siliconSmelter),
                             new Research(steamGenerator)
                             ), () -> {
+                                node(taintedWoods, Seq.with(
+                                new SectorComplete(biomassFacility),
+                                new SectorComplete(fungalPass),
+                                new SectorComplete(windsweptIslands),
+                                new Research(Items.sporePod),
+                                new Research(Items.plastanium),
+                                new Research(wave)
+                                ), () -> {
+
+                                });
+
                                 node(seaPort, Seq.with(
                                 new SectorComplete(biomassFacility),
                                 new SectorComplete(frontier),
@@ -609,8 +611,10 @@ public class SerpuloTechTree{
                                 });
 
                                 node(facility32m, Seq.with(
-                                new Research(pneumaticDrill),
-                                new SectorComplete(stainedMountains)
+                                new Research(plastaniumCompressor),
+                                new Research(lancer),
+                                new Research(salvo),
+                                new SectorComplete(windsweptIslands)
                                 ), () -> {
                                     node(extractionOutpost, Seq.with(
                                     new SectorComplete(windsweptIslands),
@@ -678,6 +682,7 @@ public class SerpuloTechTree{
                                         ), () -> {
                                             node(weatheredChannels, Seq.with(
                                             new SectorComplete(impact0078),
+                                            new SectorComplete(navalFortress),
                                             new Research(bryde),
                                             new Research(surgeSmelter),
                                             new Research(overdriveProjector)

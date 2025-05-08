@@ -1,5 +1,6 @@
 package mindustry.maps.planet;
 
+import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -10,6 +11,7 @@ import mindustry.ai.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
 import mindustry.type.*;
@@ -61,6 +63,21 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     float rawHeight(Vec3 position){
         position = Tmp.v33.set(position).scl(scl);
         return (Mathf.pow(Simplex.noise3d(seed, 7, 0.5f, 1f/3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
+    }
+
+    @Override
+    public boolean allowLanding(Sector sector){
+        return sector.planet.allowLaunchToNumbered && (sector.hasBase() || sector.near().contains(s -> s.hasBase() &&
+            (s.info.bestCoreType.size >= 4 || s.isBeingPlayed() && state.rules.defaultTeam.cores().contains(b -> b.block.size >= 4))));
+    }
+
+    @Override
+    public void getLockedText(Sector hovered, StringBuilder out){
+        if((hovered.preset == null || !hovered.preset.requireUnlock) && hovered.near().contains(Sector::hasBase)){
+            out.append("[red]").append(Iconc.cancel).append("[]").append(Blocks.coreFoundation.emoji()).append(Core.bundle.get("sector.foundationrequired"));
+        }else{
+            super.getLockedText(hovered, out);
+        }
     }
 
     @Override

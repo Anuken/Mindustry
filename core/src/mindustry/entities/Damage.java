@@ -546,7 +546,7 @@ public class Damage{
     }
 
     public static void tileDamage(Team team, int x, int y, float baseRadius, float damage, @Nullable Bullet source){
-        Core.app.post(() -> {
+        Time.run(0f, () -> {
             var in = world.build(x, y);
             //spawned inside a multiblock. this means that damage needs to be dealt directly.
             //why? because otherwise the building would absorb everything in one cell, which means much less damage than a nearby explosion.

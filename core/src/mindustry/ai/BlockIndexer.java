@@ -132,7 +132,7 @@ public class BlockIndexer{
     }
 
     private void removeFloorIndex(Tile tile, Floor floor){
-        if(floor.flags.size == 0) return;
+        if(floor.flags.size == 0 || floorMap == null) return;
 
         for(var flag : floor.flags.array){
             getFlaggedFloors(flag).remove(tile);
@@ -140,7 +140,7 @@ public class BlockIndexer{
     }
 
     private void addFloorIndex(Tile tile, Floor floor){
-        if(floor.flags.size == 0 || !floor.shouldIndex(tile)) return;
+        if(floor.flags.size == 0 || !floor.shouldIndex(tile) || floorMap == null) return;
 
         for(var flag : floor.flags.array){
             getFlaggedFloors(flag).add(tile);
@@ -225,7 +225,7 @@ public class BlockIndexer{
                 }
             }
 
-            if(drop != null && ores != null && ores[drop.id] != null&& ores[drop.id][qx][qy] != null && ores[drop.id][qx][qy].removeValue(pos)){ //floor
+            if(drop != null && ores != null && ores[drop.id] != null && ores[drop.id][qx][qy] != null && ores[drop.id][qx][qy].removeValue(pos)){ //floor
                 int old = allOres.increment(drop, -1);
                 if(old == 1) updatePresentOres();
             }

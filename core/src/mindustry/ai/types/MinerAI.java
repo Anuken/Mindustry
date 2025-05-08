@@ -1,5 +1,6 @@
 package mindustry.ai.types;
 
+import mindustry.ai.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -22,8 +23,12 @@ public class MinerAI extends AIController{
             unit.mineTile(null);
         }
 
+        Item autoItem = unit.controller() instanceof CommandAI ai && ai.stance instanceof ItemUnitStance stance ? stance.item : null;
+
         if(mining){
-            if(timer.get(timerTarget2, 60 * 4) || targetItem == null){
+            if(autoItem != null){
+                targetItem = autoItem;
+            }else if(timer.get(timerTarget2, 60 * 4) || targetItem == null){
                 targetItem = unit.type.mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
             }
 
@@ -70,6 +75,9 @@ public class MinerAI extends AIController{
             }
 
             circle(core, unit.type.range / 1.8f);
+        }
+        if(!unit.type.flying){
+            unit.updateBoosting(unit.type.boostWhenMining || unit.floorOn().isDuct || unit.floorOn().damageTaken > 0f || unit.floorOn().isDeep());
         }
     }
 }

@@ -517,6 +517,7 @@ public class UnitAssembler extends PayloadBlock{
                 unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
                 unit.rotation = rotdeg();
                 unit.add();
+                Units.notifyUnitSpawn(unit);
             }
 
             progress = 0f;

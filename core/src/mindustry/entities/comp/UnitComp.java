@@ -473,6 +473,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller instanceof AIController;
     }
 
+    /** @return whether the unit *can* be commanded, even if its controller is not currently CommandAI. */
+    public boolean allowCommand(){
+        return controller instanceof CommandAI;
+    }
+
+    /** @return whether the unit has a CommandAI controller */
     public boolean isCommandable(){
         return controller instanceof CommandAI;
     }
@@ -519,7 +525,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public boolean playerControllable(){
-        return type.playerControllable;
+        return type.playerControllable && !(controller instanceof LogicAI ai && ai.controller != null && ai.controller.block.privileged);
     }
 
     public boolean targetable(Team targeter){
