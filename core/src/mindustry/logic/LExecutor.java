@@ -88,6 +88,7 @@ public class LExecutor{
         }
 
         if(counter.numval < instructions.length){
+            counter.isobj = false;
             instructions[(int)(counter.numval++)].run(this);
         }
     }
@@ -781,10 +782,8 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(!to.constant){
                 if(from.isobj){
-                    if(to != exec.counter){
-                        to.objval = from.objval;
-                        to.isobj = true;
-                    }
+                    to.objval = from.objval;
+                    to.isobj = true;
                 }else{
                     to.numval = LVar.invalid(from.numval) ? 0 : from.numval;
                     to.isobj = false;
