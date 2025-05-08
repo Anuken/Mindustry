@@ -3,6 +3,7 @@ package mindustry.core;
 import arc.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
@@ -133,6 +134,7 @@ public class Logic implements ApplicationListener{
                 state.rules.coreIncinerates = true;
                 state.rules.allowEditWorldProcessors = false;
                 state.rules.waveTeam.rules().infiniteResources = true;
+                state.rules.waveTeam.rules().fillItems = true;
                 state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
             }
 
@@ -438,12 +440,6 @@ public class Logic implements ApplicationListener{
                 }
 
                 if(state.isCampaign()){
-                    //always fill enemy core with items
-                    if(state.rules.waveTeam.cores().size > 0){
-                        var core = state.rules.waveTeam.core();
-                        content.items().each(i -> core.items.set(i, core.getMaximumAccepted(i)));
-                    }
-
                     state.rules.sector.info.update();
                 }
 
@@ -459,6 +455,14 @@ public class Logic implements ApplicationListener{
                     updateWeather();
 
                     for(TeamData data : state.teams.getActive()){
+                        if(data.team.rules().fillItems && data.cores.size > 0){
+                            var core = data.cores.first();
+                            content.items().each(i -> {
+                                if(i.isOnPlanet(Vars.state.getPlanet())){
+                                    core.items.set(i, core.getMaximumAccepted(i));
+                                }
+                            });
+                        }
                         //does not work on PvP so built-in attack maps can have it on by default without issues
                         if(data.team.rules().buildAi && !state.rules.pvp){
                             if(data.buildAi == null) data.buildAi = new BaseBuilderAI(data);
