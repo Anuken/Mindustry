@@ -66,9 +66,8 @@ public class Logic implements ApplicationListener{
         Events.on(SaveLoadEvent.class, e -> {
             if(state.isCampaign()){
                 state.rules.coreIncinerates = true;
-
-                //TODO why is this even a thing?
                 state.rules.canGameOver = true;
+                state.rules.allowEditRules = false;
 
                 //fresh map has no sector info
                 if(!e.isMap){
@@ -132,6 +131,7 @@ public class Logic implements ApplicationListener{
                 //enable building AI on campaign unless the preset disables it
 
                 state.rules.coreIncinerates = true;
+                state.rules.allowEditRules = false;
                 state.rules.allowEditWorldProcessors = false;
                 state.rules.waveTeam.rules().infiniteResources = true;
                 state.rules.waveTeam.rules().fillItems = true;

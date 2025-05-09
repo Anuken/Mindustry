@@ -633,6 +633,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             public void act(float delta){
                 if(scene.getDialog() == PlanetDialog.this && (scene.getHoverElement() == null || !scene.getHoverElement().isDescendantOf(e -> e instanceof ScrollPane))){
                     scene.setScrollFocus(PlanetDialog.this);
+
+                    if(debugSectorAttackEdit && input.ctrl() && input.keyTap(KeyCode.c)){
+                        Core.app.setClipboardText(state.planet.writeAttackSectorBits());
+                        Vars.ui.showInfoFade("@copied");
+                    }
                 }
 
                 super.act(delta);
