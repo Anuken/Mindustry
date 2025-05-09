@@ -3,6 +3,7 @@ package mindustry.game;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -1245,7 +1246,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             boolean firstUpdate = fetchedRegion == null;
 
-            if(fetchedRegion == null) fetchedRegion = new TextureRegion();
+            if(firstUpdate) fetchedRegion = new TextureRegion();
             Tmp.tr1.set(fetchedRegion);
 
             lookupRegion(textureName, fetchedRegion);
@@ -1253,19 +1254,20 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(firstUpdate){
                 if(mapRegion){
                     mapRegion = false;
-
-                    // possibly from the editor, we need to clamp the values
                     for(int i = 0; i < 4; i++){
-                        vertices[i * 6 + 3] = Mathf.map(Mathf.clamp(vertices[i * 6 + 3]), fetchedRegion.u, fetchedRegion.u2);
-                        vertices[i * 6 + 4] = Mathf.map(1 - Mathf.clamp(vertices[i * 6 + 4]), fetchedRegion.v, fetchedRegion.v2);
+                        setUv(i, vertices[i * 6 + 3], vertices[i * 6 + 4]);
                     }
                 }
             }else{
                 for(int i = 0; i < 4; i++){
-                    vertices[i * 6 + 3] = Mathf.map(vertices[i * 6 + 3], Tmp.tr1.u, Tmp.tr1.u2, fetchedRegion.u, fetchedRegion.u2);
-                    vertices[i * 6 + 4] = Mathf.map(vertices[i * 6 + 4], Tmp.tr1.v, Tmp.tr1.v2, fetchedRegion.v, fetchedRegion.v2);
+                    setUv(i, unmap(vertices[i * 6 + 3], Tmp.tr1.u, Tmp.tr1.u2), 1 - unmap(vertices[i * 6 + 4], Tmp.tr1.v, Tmp.tr1.v2));
                 }
             }
+        }
+
+        private static float unmap(float x, float from, float to){
+            if (Mathf.equal(from, to))return x;
+            return (x - from) / (to - from);
         }
 
         private void setPos(int i, double x, double y){
@@ -1285,11 +1287,16 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(i >= 0 && i < 4){
                 if(fetchedRegion == null) setTexture(textureName);
 
-                if(!Double.isNaN(u)) vertices[i * 6 + 3] = Mathf.map(Mathf.clamp((float)u), fetchedRegion.u, fetchedRegion.u2);
-                if(!Double.isNaN(v)) vertices[i * 6 + 4] = Mathf.map(1 - Mathf.clamp((float)v), fetchedRegion.v, fetchedRegion.v2);
+                if(!Double.isNaN(u)) {
+                    boolean clampU = fetchedRegion.texture.getUWrap() != TextureWrap.mirroredRepeat && fetchedRegion.texture.getUWrap() != TextureWrap.repeat;
+                    vertices[i * 6 + 3] = Mathf.map(clampU ? Mathf.clamp((float)u) : (float)u, fetchedRegion.u, fetchedRegion.u2);
+                }
+                if(!Double.isNaN(v)) {
+                    boolean clampV = fetchedRegion.texture.getVWrap() != TextureWrap.mirroredRepeat && fetchedRegion.texture.getVWrap() != TextureWrap.repeat;
+                    vertices[i * 6 + 4] = Mathf.map(clampV ? 1 - Mathf.clamp((float)v) : 1 - (float)v, fetchedRegion.v, fetchedRegion.v2);
+                }
             }
         }
-
     }
 
     private static void lookupRegion(String name, TextureRegion out){
