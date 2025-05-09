@@ -99,7 +99,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
     }
 
-    public static void registerLegacyMarker(String name, Prov<? extends ObjectiveMarker> prov) {
+    public static void registerLegacyMarker(String name, Prov<? extends ObjectiveMarker> prov){
         Class<?> type = prov.get().getClass();
 
         markerNameToType.put(name, prov);
@@ -664,7 +664,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
     }
 
-    /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay.  */
+    /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay. */
     public static abstract class ObjectiveMarker{
         /** Internal use only! Do not access. */
         public transient int arrayIndex;
@@ -941,7 +941,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 Lines.poly(pos.x, pos.y, sides, (radius + 1f) * scaleFactor, rotation + startAngle, rotation + endAngle);
             }else{
                 Draw.color(color);
-                if (startAngle < endAngle){
+                if(startAngle < endAngle){
                     Fill.arc(pos.x, pos.y, radius * scaleFactor, (endAngle - startAngle) / 360f, rotation + startAngle, sides);
                 }else{
                     Fill.arc(pos.x, pos.y, radius * scaleFactor, (startAngle - endAngle) / 360f, rotation + endAngle, sides);
@@ -1108,7 +1108,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
 
             if(!Double.isNaN(p1) && !Double.isNaN(p2)){
-                switch (type){
+                switch(type){
                     case posi -> ((int)p1 == 0 ? pos : (int)p1 == 1 ? endPos : Tmp.v1).x = (float)p2 * tilesize;
                     case colori -> ((int)p1 == 0 ? color1 : (int)p1 == 1 ? color2 : Tmp.c1).fromDouble(p2);
                 }
@@ -1196,7 +1196,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         private transient TextureRegion fetchedRegion;
 
-        public QuadMarker() {
+        public QuadMarker(){
             for(int i = 0; i < 4; i++){
                 vertices[i * 6 + 2] = Color.white.toFloatBits();
                 vertices[i * 6 + 5] = Color.clearFloatBits;
@@ -1266,7 +1266,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         private static float unmap(float x, float from, float to){
-            if (Mathf.equal(from, to))return x;
+            if(Mathf.equal(from, to)) return x;
             return (x - from) / (to - from);
         }
 
@@ -1287,11 +1287,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(i >= 0 && i < 4){
                 if(fetchedRegion == null) setTexture(textureName);
 
-                if(!Double.isNaN(u)) {
+                if(!Double.isNaN(u)){
                     boolean clampU = fetchedRegion.texture.getUWrap() != TextureWrap.mirroredRepeat && fetchedRegion.texture.getUWrap() != TextureWrap.repeat;
                     vertices[i * 6 + 3] = Mathf.map(clampU ? Mathf.clamp((float)u) : (float)u, fetchedRegion.u, fetchedRegion.u2);
                 }
-                if(!Double.isNaN(v)) {
+                if(!Double.isNaN(v)){
                     boolean clampV = fetchedRegion.texture.getVWrap() != TextureWrap.mirroredRepeat && fetchedRegion.texture.getVWrap() != TextureWrap.repeat;
                     vertices[i * 6 + 4] = Mathf.map(clampV ? 1 - Mathf.clamp((float)v) : 1 - (float)v, fetchedRegion.v, fetchedRegion.v2);
                 }
