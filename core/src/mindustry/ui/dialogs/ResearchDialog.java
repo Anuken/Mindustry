@@ -613,6 +613,10 @@ public class ResearchDialog extends BaseDialog{
                     Element e = Core.scene.hit(Core.input.mouseX(pointer == -1 ? 0 : pointer), Core.input.mouseY(pointer == -1 ? 0 : pointer), true);
 
                     if(hoverNode == button && !(e != null && (e == infoTable || e.isDescendantOf(infoTable) || e == hoverNode || e.isDescendantOf(hoverNode))) && (Core.app.isDesktop() || pointer == 0)){
+                        if(Core.app.isMobile()){
+                            Log.info("hiding info table {x=@ y=@ mouseX=@ mouseY=@ pointer=@ overElement=@ isInfoTable=@ isDescendantOfInfo=@ isDescendantOfHover=@}", x, y,
+                            Core.input.mouseX(pointer == -1 ? 0 : pointer), Core.input.mouseY(pointer == -1 ? 0 : pointer), pointer, (e != null ? e.getClass() : null), e == infoTable, e != null && e.isDescendantOf(infoTable), e != null && e.isDescendantOf(hoverNode));
+                        }
                         hoverNode = null;
                         rebuild();
                     }
