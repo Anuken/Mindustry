@@ -164,7 +164,6 @@ public class SectorPresets{
             difficulty = 10;
         }};
 
-        //TODO: for wave survival sectors the capture wave is incorrect
         registerHiddenSectors(serpulo,
         68, //Winter Forest by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1235654407006322700
         241,//River Bastion by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1232658317126402050
