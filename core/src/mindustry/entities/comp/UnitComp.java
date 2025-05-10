@@ -303,6 +303,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 (pay.payloads().isEmpty() ? null :
                 pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type :
                 pay.payloads().peek() instanceof BuildPayload p2 ? p2.block() : null) : null;
+            case selectedBlock -> controller instanceof Player p ? p.selectedBlock : null;
             default -> noSensed;
         };
     }

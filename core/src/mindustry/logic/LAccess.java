@@ -62,6 +62,7 @@ public enum LAccess{
     totalPayload,
     payloadCapacity,
     id,
+    selectedBlock,
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access
