@@ -6,8 +6,10 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -16,6 +18,7 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
@@ -455,7 +458,8 @@ public class Logic implements ApplicationListener{
                     updateWeather();
 
                     for(TeamData data : state.teams.getActive()){
-                        if(data.team.rules().fillItems && data.cores.size > 0){
+                        var rules = data.team.rules();
+                        if(rules.fillItems && data.cores.size > 0){
                             var core = data.cores.first();
                             content.items().each(i -> {
                                 if(i.isOnPlanet(Vars.state.getPlanet())){
@@ -464,14 +468,28 @@ public class Logic implements ApplicationListener{
                             });
                         }
                         //does not work on PvP so built-in attack maps can have it on by default without issues
-                        if(data.team.rules().buildAi && !state.rules.pvp){
+                        if(rules.buildAi && !state.rules.pvp){
                             if(data.buildAi == null) data.buildAi = new BaseBuilderAI(data);
                             data.buildAi.update();
                         }
 
-                        if(data.team.rules().rtsAi){
+                        if(rules.rtsAi){
                             if(data.rtsAi == null) data.rtsAi = new RtsAI(data);
                             data.rtsAi.update();
+                        }
+
+                        //spawn units for prebuild AI cores
+                        if(rules.prebuildAi && !state.isEditor()){
+                            for(var core : data.cores){
+                                var units = data.getUnits(((CoreBlock)core.block).unitType);
+                                if(units == null || !units.contains(u -> u.flag == core.pos())){
+                                    Unit unit = ((CoreBlock)core.block).unitType.spawn(core, data.team);
+                                    unit.flag = core.pos();
+                                    unit.add();
+                                    Units.notifyUnitSpawn(unit);
+                                    Fx.spawn.at(unit);
+                                }
+                            }
                         }
                     }
                 }
