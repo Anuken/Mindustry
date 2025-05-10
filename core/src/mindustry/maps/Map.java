@@ -239,7 +239,7 @@ public class Map implements Comparable<Map>, Publishable{
         int modes = Boolean.compare(Gamemode.pvp.valid(this), Gamemode.pvp.valid(map));
         if(modes != 0) return modes;
 
-        return name().compareTo(map.name());
+        return Strings.stripColors(name()).compareTo(Strings.stripColors(map.name()));
     }
 
     @Override
