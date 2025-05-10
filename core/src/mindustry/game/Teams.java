@@ -229,8 +229,10 @@ public class Teams{
             count(unit);
         }
 
-        for(var player : Groups.player){
-            player.team().data().players.add(player);
+        for (var player : Groups.player) {
+            if (player != null && player.team() != null && player.team().data() != null) {
+                player.team().data().players.add(player);
+            }
         }
 
         //update presence of each team.
@@ -445,9 +447,9 @@ public class Teams{
         @Override
         public String toString(){
             return "TeamData{" +
-            "cores=" + cores +
-            ", team=" + team +
-            '}';
+                    "cores=" + cores +
+                    ", team=" + team +
+                    '}';
         }
     }
 
@@ -478,12 +480,12 @@ public class Teams{
         @Override
         public String toString(){
             return "BlockPlan{" +
-            "x=" + x +
-            ", y=" + y +
-            ", rotation=" + rotation +
-            ", block=" + block +
-            ", config=" + config +
-            '}';
+                    "x=" + x +
+                    ", y=" + y +
+                    ", rotation=" + rotation +
+                    ", block=" + block +
+                    ", config=" + config +
+                    '}';
         }
     }
 }
