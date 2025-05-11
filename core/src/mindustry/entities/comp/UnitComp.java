@@ -277,7 +277,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case mineY -> mining() ? mineTile.y : -1;
             case buildX -> isBuilding() ? buildPlan().x : -1;
             case buildY -> isBuilding() ? buildPlan().y : -1;
-            case breaking -> isBuilding() && buildPlan().breaking ? 1 : 0;
             case armor -> armorOverride >= 0f ? armorOverride : armor;
             case flag -> flag;
             case speed -> type.speed * 60f / tilesize * speedMultiplier;
@@ -306,7 +305,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 (pay.payloads().isEmpty() ? null :
                 pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type :
                 pay.payloads().peek() instanceof BuildPayload p2 ? p2.block() : null) : null;
-            case building -> isBuilding() ? buildPlan().tile().build : null;
+            case building -> isBuilding() && !buildPlan().breaking ? buildPlan().tile().build : null;
+            case breaking -> isBuilding() && buildPlan().breaking ? buildPlan().tile().build : null;
             case selectedBlock -> controller instanceof Player p ? p.selectedBlock : null;
             default -> noSensed;
         };
