@@ -1,5 +1,7 @@
 package mindustry.maps.generators;
 
+import arc.*;
+import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
@@ -8,10 +10,12 @@ import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -50,6 +54,14 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         if(any){
             sector.generateEnemyBase = true;
         }
+    }
+
+    public void getLockedText(Sector hovered, StringBuilder out){
+        out.append("[gray]").append(Iconc.lock).append(" ").append(Core.bundle.get("locked"));
+    }
+
+    public @Nullable TextureRegion getLockedIcon(Sector hovered){
+        return (hovered.preset == null && !hovered.planet.allowLaunchToNumbered ? null : Fonts.getLargeIcon("lock"));
     }
 
     /** @return whether to allow landing on the specified procedural sector */

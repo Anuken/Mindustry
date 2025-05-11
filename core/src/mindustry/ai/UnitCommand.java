@@ -2,6 +2,7 @@ package mindustry.ai;
 
 import arc.*;
 import arc.func.*;
+import arc.input.*;
 import arc.scene.style.*;
 import arc.util.*;
 import mindustry.ai.types.*;
@@ -31,7 +32,7 @@ public class UnitCommand extends MappableContent{
     /** If true, this command refreshes the list of stances when selected TODO: do not use, this will likely be removed later!*/
     public boolean refreshOnSelect = false;
     /** Key to press for this command. */
-    public @Nullable Binding keybind = null;
+    public @Nullable KeyBind keybind = null;
 
     public UnitCommand(String name, String icon, Func<Unit, AIController> controller){
         super(name);
@@ -40,7 +41,7 @@ public class UnitCommand extends MappableContent{
         this.controller = controller == null ? u -> null : controller;
     }
 
-    public UnitCommand(String name, String icon, Binding keybind, Func<Unit, AIController> controller){
+    public UnitCommand(String name, String icon, KeyBind keybind, Func<Unit, AIController> controller){
         this(name, icon, controller);
         this.keybind = keybind;
     }
@@ -69,48 +70,48 @@ public class UnitCommand extends MappableContent{
 
     public static void loadAll(){
 
-        moveCommand = new UnitCommand("move", "right", Binding.unit_command_move, null){{
+        moveCommand = new UnitCommand("move", "right", Binding.unitCommandMove, null){{
             drawTarget = true;
             resetTarget = false;
         }};
-        repairCommand = new UnitCommand("repair", "modeSurvival", Binding.unit_command_repair, u -> new RepairAI());
-        rebuildCommand = new UnitCommand("rebuild", "hammer", Binding.unit_command_rebuild, u -> new BuilderAI());
-        assistCommand = new UnitCommand("assist", "players", Binding.unit_command_assist, u -> {
+        repairCommand = new UnitCommand("repair", "modeSurvival", Binding.unitCommandRepair, u -> new RepairAI());
+        rebuildCommand = new UnitCommand("rebuild", "hammer", Binding.unitCommandRebuild, u -> new BuilderAI());
+        assistCommand = new UnitCommand("assist", "players", Binding.unitCommandAssist, u -> {
             var ai = new BuilderAI();
             ai.onlyAssist = true;
             return ai;
         });
-        mineCommand = new UnitCommand("mine", "production", Binding.unit_command_mine, u -> new MinerAI()){{
+        mineCommand = new UnitCommand("mine", "production", Binding.unitCommandMine, u -> new MinerAI()){{
             refreshOnSelect = true;
         }};
-        boostCommand = new UnitCommand("boost", "up", Binding.unit_command_boost, u -> new BoostAI()){{
+        boostCommand = new UnitCommand("boost", "up", Binding.unitCommandBoost, u -> new BoostAI()){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
         }};
-        enterPayloadCommand = new UnitCommand("enterPayload", "downOpen", Binding.unit_command_enter_payload, null){{
+        enterPayloadCommand = new UnitCommand("enterPayload", "downOpen", Binding.unitCommandEnterPayload, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
             snapToBuilding = true;
         }};
-        loadUnitsCommand = new UnitCommand("loadUnits", "upload", Binding.unit_command_load_units, null){{
+        loadUnitsCommand = new UnitCommand("loadUnits", "upload", Binding.unitCommandLoadUnits, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
         }};
-        loadBlocksCommand = new UnitCommand("loadBlocks", "up", Binding.unit_command_load_blocks, null){{
+        loadBlocksCommand = new UnitCommand("loadBlocks", "up", Binding.unitCommandLoadBlocks, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
             exactArrival = true;
         }};
-        unloadPayloadCommand = new UnitCommand("unloadPayload", "download", Binding.unit_command_unload_payload, null){{
+        unloadPayloadCommand = new UnitCommand("unloadPayload", "download", Binding.unitCommandUnloadPayload, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
         }};
-        loopPayloadCommand = new UnitCommand("loopPayload", "resize", Binding.unit_command_loop_payload, null){{
+        loopPayloadCommand = new UnitCommand("loopPayload", "resize", Binding.unitCommandLoopPayload, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;

@@ -1,5 +1,6 @@
 package mindustry.maps.planet;
 
+import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -10,7 +11,7 @@ import mindustry.ai.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
 import mindustry.game.*;
-import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.gen.*;
 import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -64,40 +65,18 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     }
 
     @Override
-    public void generateSector(Sector sector){
+    public boolean allowLanding(Sector sector){
+        return sector.planet.allowLaunchToNumbered && (sector.hasBase() || sector.near().contains(s -> s.hasBase() &&
+            (s.info.bestCoreType.size >= 4 || s.isBeingPlayed() && state.rules.defaultTeam.cores().contains(b -> b.block.size >= 4))));
+    }
 
-        //these always have bases
-        if(sector.id == 154 || sector.id == 0){
-            sector.generateEnemyBase = true;
-            return;
+    @Override
+    public void getLockedText(Sector hovered, StringBuilder out){
+        if((hovered.preset == null || !hovered.preset.requireUnlock) && hovered.near().contains(Sector::hasBase)){
+            out.append("[red]").append(Iconc.cancel).append("[]").append(Blocks.coreFoundation.emoji()).append(Core.bundle.get("sector.foundationrequired"));
+        }else{
+            super.getLockedText(hovered, out);
         }
-
-        Ptile tile = sector.tile;
-
-        boolean any = false;
-        float poles = Math.abs(tile.v.y);
-        float noise = Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.001f, 0.58f);
-
-        if(noise + poles/7.1 > 0.12 && poles > 0.23){
-            any = true;
-        }
-
-        if(noise < 0.16){
-            for(Ptile other : tile.tiles){
-                var osec = sector.planet.getSector(other);
-
-                //no sectors near start sector!
-                if(
-                    osec.id == sector.planet.startSector || //near starting sector
-                    osec.generateEnemyBase && poles < 0.85 || //near other base
-                    (sector.preset != null && noise < 0.11) //near preset
-                ){
-                    return;
-                }
-            }
-        }
-
-        sector.generateEnemyBase = any;
     }
 
     @Override

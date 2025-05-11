@@ -69,7 +69,7 @@ public class Pathfinder implements Runnable{
 
     //water
     (team, tile) ->
-    (!PathTile.liquid(tile) ? 6000 : 1) +
+    (!PathTile.liquid(tile) || PathTile.solid(tile) ? 6000 : 1) +
     PathTile.health(tile) * 5 +
     (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
     (PathTile.deep(tile) ? 0 : 1) +
@@ -209,7 +209,7 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     public int packTile(Tile tile){
-        boolean nearLiquid = false, nearSolid = false, nearLegSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep();
+        boolean nearLiquid = false, nearSolid = false, nearLegSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep(), nearDeep = allDeep;
 
         for(int i = 0; i < 4; i++){
             Tile other = tile.nearby(i);
@@ -220,7 +220,11 @@ public class Pathfinder implements Runnable{
                 //TODO potentially strange behavior when teamPassable is false for other teams?
                 if(osolid && !other.block().teamPassable) nearSolid = true;
                 if(!floor.isLiquid) nearGround = true;
-                if(!floor.isDeep()) allDeep = false;
+                if(!floor.isDeep()){
+                    allDeep = false;
+                }else{
+                    nearDeep = true;
+                }
                 if(other.legSolid()) nearLegSolid = true;
 
                 //other tile is now near solid
@@ -245,6 +249,7 @@ public class Pathfinder implements Runnable{
         tile.floor().isDeep(),
         tile.floor().damageTaken > 0.00001f,
         allDeep,
+        nearDeep,
         tile.block().teamPassable
         );
     }
@@ -699,6 +704,8 @@ public class Pathfinder implements Runnable{
         boolean damages;
         //whether all tiles nearby are deep
         boolean allDeep;
+        //whether it is near deep water
+        boolean nearDeep;
         //block teamPassable is true
         boolean teamPassable;
     }

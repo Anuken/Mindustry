@@ -134,7 +134,7 @@ public class Maps{
         }
 
         //custom
-        for(Fi file : customMapDirectory.list()){
+        customMapDirectory.walk(file -> {
             try{
                 if(file.extension().equalsIgnoreCase(mapExtension)){
                     loadMap(file, true);
@@ -143,7 +143,7 @@ public class Maps{
                 Log.err("Failed to load custom map file '@'!", file);
                 Log.err(e);
             }
-        }
+        });
 
         //workshop
         for(Fi file : platform.getWorkshopContent(Map.class)){

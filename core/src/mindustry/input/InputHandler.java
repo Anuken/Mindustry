@@ -32,6 +32,7 @@ import mindustry.input.Placement.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -61,17 +62,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
     final static Seq<Unit> tmpUnits = new Seq<>(false);
-    final static Binding[] controlGroupBindings = {
-    Binding.block_select_01,
-    Binding.block_select_02,
-    Binding.block_select_03,
-    Binding.block_select_04,
-    Binding.block_select_05,
-    Binding.block_select_06,
-    Binding.block_select_07,
-    Binding.block_select_08,
-    Binding.block_select_09,
-    Binding.block_select_10
+    final static KeyBind[] controlGroupBindings = {
+    Binding.blockSelect01,
+    Binding.blockSelect02,
+    Binding.blockSelect03,
+    Binding.blockSelect04,
+    Binding.blockSelect05,
+    Binding.blockSelect06,
+    Binding.blockSelect07,
+    Binding.blockSelect08,
+    Binding.blockSelect09,
+    Binding.blockSelect10
     };
 
     /** If true, there is a cutscene currently occurring in logic. */
@@ -154,6 +155,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Events.on(ResetEvent.class, e -> {
             logicCutscene = false;
+            commandBuildings.clear();
+            selectedUnits.clear();
             itemDepositCooldown = 0f;
             Arrays.fill(controlGroups, null);
             lastUnit = null;
@@ -264,11 +267,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Unit unit = Groups.unit.getByID(id);
             if(unit != null && unit.team == player.team()){
 
-                if(unit.controller() instanceof LogicAI){
-                    //reset to commandAI if applicable
-                    unit.resetController();
-                }
-
                 if(unit.controller() instanceof CommandAI ai){
                     //implicitly order it to move
                     if(ai.command == null || ai.command.switchToMove){
@@ -362,7 +360,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
-            if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
+            if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai && unit.type.allowCommand(unit, command)){
                 boolean reset = command.resetTarget || ai.currentCommand().resetTarget;
                 ai.command(command);
                 if(reset){
@@ -371,7 +369,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
                 unit.lastCommanded = player.coloredName();
 
-                //make sure its stance is valid
+                //make sure its current stance is valid with its current command
                 stancesOut.clear();
                 unit.type.getUnitStances(unit, stancesOut);
                 if(stancesOut.size > 0 && !stancesOut.contains(ai.stance)){
@@ -396,7 +394,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
                 if(stance == UnitStance.stop){ //not a real stance, just cancels orders
                     ai.clearCommands();
-                }else{
+                }else if(unit.type.allowStance(unit, stance)){
                     ai.stance = stance;
                 }
                 unit.lastCommanded = player.coloredName();
@@ -417,7 +415,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(int pos : buildings){
             var build = world.build(pos);
 
-            if(build == null || build.team() != player.team() || !build.block.commandable) continue;
+            if(build == null || build.team() != player.team() || !build.isCommandable()) continue;
 
             build.onCommand(target);
             build.updateLastAccess(player);
@@ -843,7 +841,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         itemDepositCooldown -= Time.delta / 60f;
 
-        commandBuildings.removeAll(b -> !b.isValid());
+        commandBuildings.removeAll(b -> !b.isValid() || !b.isCommandable() || b.team != player.team());
 
         if(!commandMode){
             commandRect = false;
@@ -1029,7 +1027,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 //deselect
                 selectedUnits.clear();
 
-                if(build != null && build.team == player.team() && build.block.commandable){
+                if(build != null && build.team == player.team() && build.isCommandable()){
                     if(commandBuildings.contains(build)){
                         commandBuildings.remove(build);
                     }else{
@@ -1539,6 +1537,28 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
         Draw.color(col2);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+
+        Font font = Fonts.outline;
+        font.setColor(col2);
+        var ints = font.usesIntegerPositions();
+        font.setUseIntegerPositions(false);
+        var z = Draw.z();
+        Draw.z(Layer.endPixeled);
+        font.getData().setScale(1 / renderer.camerascale);
+        var snapToCursor = Core.settings.getBool("selectionsizeoncursor");
+        var textOffset = Core.settings.getInt("selectionsizeoncursoroffset", 5);
+        int width = (int)((result.x2 - result.x) / 8);
+        int height = (int)((result.y2 - result.y) / 8);
+        int area = width * height;
+        // FINISHME: When not snapping to cursor, perhaps it would be best to choose the corner closest to the cursor that's at least a block away?
+        font.draw(width + "x" + height + " (" + area + ")",
+                snapToCursor ? input.mouseWorldX() + textOffset * (4 / renderer.camerascale) : result.x2,
+                snapToCursor ? input.mouseWorldY() - textOffset * (4 / renderer.camerascale) : result.y
+                );
+        font.setColor(Color.white);
+        font.getData().setScale(1);
+        font.setUseIntegerPositions(ints);
+        Draw.z(z);
     }
 
     protected void flushSelectPlans(Seq<BuildPlan> plans){
@@ -1724,7 +1744,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         boolean consumed = false, showedInventory = false;
 
         //select building for commanding
-        if(build.block.commandable && commandMode){
+        if(build.isCommandable() && commandMode){
             //TODO handled in tap.
             consumed = true;
         }else if(build.block.configurable && build.interactable(player.team())){ //check if tapped block is configurable
@@ -1882,7 +1902,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean isRebuildSelecting(){
-        return input.keyDown(Binding.rebuild_select);
+        return input.keyDown(Binding.rebuildSelect);
     }
 
     public float mouseAngle(float x, float y){
@@ -1920,7 +1940,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         tmpUnits.clear();
         float rad = 4f;
         tree.intersect(x - rad/2f, y - rad/2f, rad, rad, tmpUnits);
-        return tmpUnits.min(u -> u.allowCommand(), u -> u.dst(x, y) - u.hitSize/2f);
+        return tmpUnits.min(u -> u.isCommandable(), u -> u.dst(x, y) - u.hitSize/2f);
     }
 
     public @Nullable Unit selectedEnemyUnit(float x, float y){
@@ -1942,7 +1962,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         tmpUnits.clear();
         float rad = 4f;
         tree.intersect(Tmp.r1.set(x - rad/2f, y - rad/2f, rad*2f + w, rad*2f + h).normalize(), tmpUnits);
-        tmpUnits.removeAll(u -> !u.allowCommand() || !predicate.get(u));
+        tmpUnits.removeAll(u -> !u.isCommandable() || !predicate.get(u));
         return tmpUnits;
     }
 
@@ -2138,7 +2158,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){
         Seq<Point2> points;
-        boolean diagonal = Core.input.keyDown(Binding.diagonal_placement);
+        boolean diagonal = Core.input.keyDown(Binding.diagonalPlacement);
 
         if(Core.settings.getBool("swapdiagonal") && mobile){
             diagonal = !diagonal;

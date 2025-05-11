@@ -11,6 +11,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import arc.util.serialization.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
@@ -152,6 +153,8 @@ public class Planet extends UnlockableContent{
     public boolean allowSelfSectorLaunch;
     /** If true, all content in this planet's tech tree will be assigned this planet in their shownPlanets. */
     public boolean autoAssignPlanet = true;
+    /** Base64 encoded string to use as data for setting generateAttackSector status. See {@link #writeAttackSectorBits()}}*/
+    public @Nullable String attackSectorBitString;
     /** Content (usually planet-specific) that is unlocked upon landing here. */
     public Seq<UnlockableContent> unlockedOnLand = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
@@ -331,7 +334,7 @@ public class Planet extends UnlockableContent{
                 sum += 0.88f;
             }
 
-            sector.threat = sector.preset == null ?
+            sector.threat = sector.preset == null || !sector.preset.requireUnlock ?
                 Math.max(Math.min(sum / 5f, 1.2f), 0.3f) : //low threat sectors are pointless
                 Mathf.clamp(sector.preset.difficulty / 10f);
         }
@@ -381,6 +384,14 @@ public class Planet extends UnlockableContent{
 
             for(Sector sector : sectors){
                 generator.generateSector(sector);
+            }
+
+            if(attackSectorBitString != null){
+                try{
+                    loadAttackBits(attackSectorBitString);
+                }catch(Exception e){
+                    Log.err(e);
+                }
             }
 
             updateBaseCoverage();
@@ -579,5 +590,26 @@ public class Planet extends UnlockableContent{
             //right vector
             Tmp.v31.set(Tmp.v32).rotate(Vec3.Y, -rotation).add(sector.tile.v).rotate(sector.tile.v, 90).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor()
         );
+    }
+
+    public String writeAttackSectorBits(){
+        byte[] bits = new byte[Mathf.ceil(sectors.size / 8f)];
+        for(int i = 0; i < sectors.size; i++){
+            int bit = (i >> 3), mask = (i & 0b111);
+            if(sectors.get(i).generateEnemyBase){
+                bits[bit] |= (1 << mask);
+            }
+        }
+        return new String(Base64Coder.encode(bits));
+    }
+
+    public void loadAttackBits(String str){
+        byte[] bits = Base64Coder.decode(str);
+        for(int i = 0; i < sectors.size; i++){
+            int bit = (i >> 3), mask = (i & 0b111);
+            if(bit < bits.length && (bits[bit] & (1 << mask)) != 0){
+                sectors.get(i).generateEnemyBase = true;
+            }
+        }
     }
 }

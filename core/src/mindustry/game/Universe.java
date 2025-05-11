@@ -274,7 +274,7 @@ public class Universe{
 
                     //queue random invasions
                     if(!sector.isAttacked() && sector.planet.campaignRules.sectorInvasion && sector.info.minutesCaptured > invasionGracePeriod && sector.info.hasSpawns){
-                        int count = sector.near().count(s -> s.hasEnemyBase() && !s.hasBase());
+                        int count = sector.near().count(s -> s.hasEnemyBase() && !s.hasBase() && (s.preset == null || !s.preset.requireUnlock));
 
                         //invasion chance depends on # of nearby bases
                         if(count > 0 && Mathf.chance(baseInvasionChance * (0.8f + (count - 1) * 0.3f))){
@@ -285,6 +285,7 @@ public class Universe{
                                 state.rules.winWave = waveMax;
                                 state.rules.waves = true;
                                 state.rules.attackMode = false;
+                                planet.campaignRules.apply(planet, state.rules); //enabling waves may force changes in campaign rules
                                 //update rules in multiplayer
                                 if(net.server()){
                                     Call.setRules(state.rules);
