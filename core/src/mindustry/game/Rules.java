@@ -305,6 +305,8 @@ public class Rules{
         public boolean infiniteResources;
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
+        /** EXPERIMENTAL, DO NOT USE: Pre-built base AI. Gives the illusion of intelligent design of pre-building an attack base. */
+        public boolean prebuildAi;
 
         /** AI that builds random schematics. */
         public boolean buildAi;
