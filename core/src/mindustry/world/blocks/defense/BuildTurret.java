@@ -270,7 +270,7 @@ public class BuildTurret extends BaseTurret{
         @Override
         public double sense(LAccess sensor){
             return switch(sensor){
-                case buildX, buildY -> unit.sense(sensor);
+                case buildX, buildY, breaking -> unit.sense(sensor);
                 default -> super.sense(sensor);
             };
         }

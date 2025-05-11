@@ -53,6 +53,7 @@ public enum LAccess{
     buildX,
     buildY,
     building,
+    breaking,
     speed,
     team,
     type,
