@@ -475,6 +475,19 @@ public class SerpuloTechTree{
                             new Research(mace),
                             new Research(mono)
                             ), () -> {
+                                node(seaPort, Seq.with(
+                                new SectorComplete(biomassFacility),
+                                new SectorComplete(frontier),
+                                new Research(navalFactory),
+                                new Research(risso),
+                                new Research(retusa),
+                                new Research(steamGenerator),
+                                new Research(cultivator),
+                                new Research(coalCentrifuge)
+                                ), () -> {
+
+                                });
+
                                 node(overgrowth, Seq.with(
                                 new SectorComplete(frontier),
                                 new SectorComplete(windsweptIslands),
@@ -519,30 +532,6 @@ public class SerpuloTechTree{
                             new Research(siliconSmelter),
                             new Research(steamGenerator)
                             ), () -> {
-                                node(taintedWoods, Seq.with(
-                                new SectorComplete(biomassFacility),
-                                new SectorComplete(fungalPass),
-                                new SectorComplete(windsweptIslands),
-                                new Research(Items.sporePod),
-                                new Research(Items.plastanium),
-                                new Research(wave)
-                                ), () -> {
-
-                                });
-
-                                node(seaPort, Seq.with(
-                                new SectorComplete(biomassFacility),
-                                new SectorComplete(frontier),
-                                new SectorComplete(fungalPass),
-                                new Research(navalFactory),
-                                new Research(risso),
-                                new Research(retusa),
-                                new Research(steamGenerator),
-                                new Research(cultivator),
-                                new Research(coalCentrifuge)
-                                ), () -> {
-
-                                });
 
                                 node(tarFields, Seq.with(
                                 new SectorComplete(windsweptIslands),
@@ -726,6 +715,15 @@ public class SerpuloTechTree{
                                 new Research(laserDrill),
                                 new Research(Items.plastanium),
                                 new Research(swarmer)
+                                ), () -> {
+
+                                });
+
+                                node(taintedWoods, Seq.with(
+                                new SectorComplete(infestedCanyons),
+                                new Research(Items.sporePod),
+                                new Research(Items.plastanium),
+                                new Research(wave)
                                 ), () -> {
 
                                 });

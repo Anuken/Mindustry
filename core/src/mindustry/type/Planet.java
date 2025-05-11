@@ -2,6 +2,7 @@ package mindustry.type;
 
 import arc.*;
 import arc.audio.*;
+import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g3d.*;
@@ -11,7 +12,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
-import arc.util.serialization.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
@@ -153,8 +153,6 @@ public class Planet extends UnlockableContent{
     public boolean allowSelfSectorLaunch;
     /** If true, all content in this planet's tech tree will be assigned this planet in their shownPlanets. */
     public boolean autoAssignPlanet = true;
-    /** Base64 encoded string to use as data for setting generateAttackSector status. See {@link #writeAttackSectorBits()}}*/
-    public @Nullable String attackSectorBitString;
     /** Content (usually planet-specific) that is unlocked upon landing here. */
     public Seq<UnlockableContent> unlockedOnLand = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
@@ -170,6 +168,11 @@ public class Planet extends UnlockableContent{
     public Cons<Rules> ruleSetter = r -> {};
     /** If true, RTS AI can be customized. */
     public boolean showRtsAIRule = false;
+
+    /** If true, planet data is loaded as 'planets/{name}.json'. This is only tested/functional in vanilla! */
+    public boolean loadPlanetData = false;
+    /** Data indicating attack sector positions and sector mappings. */
+    public @Nullable PlanetData data;
 
     public Planet(String name, Planet parent, float radius){
         super(name);
@@ -386,18 +389,26 @@ public class Planet extends UnlockableContent{
                 generator.generateSector(sector);
             }
 
-            if(attackSectorBitString != null){
-                try{
-                    loadAttackBits(attackSectorBitString);
-                }catch(Exception e){
-                    Log.err(e);
-                }
-            }
-
             updateBaseCoverage();
         }
 
         clipRadius = Math.max(clipRadius, radius + atmosphereRadOut + 0.5f);
+    }
+
+    public PlanetData getData(){
+        if(loadPlanetData && data == null){
+            Fi file = tree.get("planets/" + name + ".json");
+            if(file.exists()){
+                data = JsonIO.read(PlanetData.class, file.readString());
+                for(int i : data.attackSectors){
+                    if(i >= 0 && i < sectors.size){
+                        sectors.get(i).generateEnemyBase = true;
+                    }
+                }
+            }
+        }
+
+        return data;
     }
 
     /** Gets a sector a tile position. */
@@ -592,24 +603,8 @@ public class Planet extends UnlockableContent{
         );
     }
 
-    public String writeAttackSectorBits(){
-        byte[] bits = new byte[Mathf.ceil(sectors.size / 8f)];
-        for(int i = 0; i < sectors.size; i++){
-            int bit = (i >> 3), mask = (i & 0b111);
-            if(sectors.get(i).generateEnemyBase){
-                bits[bit] |= (1 << mask);
-            }
-        }
-        return new String(Base64Coder.encode(bits));
-    }
-
-    public void loadAttackBits(String str){
-        byte[] bits = Base64Coder.decode(str);
-        for(int i = 0; i < sectors.size; i++){
-            int bit = (i >> 3), mask = (i & 0b111);
-            if(bit < bits.length && (bits[bit] & (1 << mask)) != 0){
-                sectors.get(i).generateEnemyBase = true;
-            }
-        }
+    public static class PlanetData{
+        public ObjectIntMap<String> presets = new ObjectIntMap<>();
+        public int[] attackSectors = {};
     }
 }

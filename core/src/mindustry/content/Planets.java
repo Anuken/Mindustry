@@ -125,7 +125,7 @@ public class Planets{
         }};
 
         serpulo = new Planet("serpulo", sun, 1f, 3){{
-            attackSectorBitString = "YzyZ01aASxvcUBAgAAUMsicEMEQgAFAAAAAEASsOCsEKAg==";
+            loadPlanetData = true;
             generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
             cloudMeshLoader = () -> new MultiMesh(

@@ -1,6 +1,5 @@
 package mindustry.content;
 
-import mindustry.*;
 import mindustry.type.*;
 
 import static mindustry.content.Planets.*;
@@ -40,12 +39,12 @@ public class SectorPresets{
             captureWave = 33;
         }};
 
-        frozenForest = new SectorPreset("frozenForest", serpulo, 86){{
+        frozenForest = new SectorPreset("frozenForest", serpulo, 170){{
             captureWave = 15;
             difficulty = 2;
         }};
 
-        biomassFacility = new SectorPreset("biomassFacility", serpulo, 81){{
+        biomassFacility = new SectorPreset("biomassFacility", serpulo, 63){{
             captureWave = 20;
             difficulty = 3;
         }};
@@ -55,17 +54,17 @@ public class SectorPresets{
             difficulty = 5;
         }};
 
-        craters = new SectorPreset("craters", serpulo, 18){{
+        craters = new SectorPreset("craters", serpulo, 175){{
             captureWave = 20;
             difficulty = 2;
         }};
 
-        ruinousShores = new SectorPreset("ruinousShores", serpulo, 213){{
+        ruinousShores = new SectorPreset("ruinousShores", serpulo, 41){{
             captureWave = 30;
             difficulty = 3;
         }};
 
-        seaPort = new SectorPreset("seaPort", serpulo, 47){{
+        seaPort = new SectorPreset("seaPort", serpulo, 98){{
             difficulty = 4;
         }};
 
@@ -74,7 +73,7 @@ public class SectorPresets{
             difficulty = 4;
         }};
 
-        windsweptIslands = new SectorPreset("windsweptIslands", serpulo, 246){{
+        windsweptIslands = new SectorPreset("windsweptIslands", serpulo, 97){{
             captureWave = 30;
             difficulty = 4;
         }};
@@ -107,11 +106,11 @@ public class SectorPresets{
             difficulty = 8;
         }};
 
-        frontier = new SectorPreset("frontier", serpulo, 50){{
+        frontier = new SectorPreset("frontier", serpulo, 41){{
             difficulty = 4;
         }};
 
-        fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
+        fungalPass = new SectorPreset("fungalPass", serpulo, 219){{
             difficulty = 4;
         }};
 
@@ -119,19 +118,19 @@ public class SectorPresets{
             difficulty = 4;
         }};
 
-        atolls = new SectorPreset("atolls", serpulo, 1){{
+        atolls = new SectorPreset("atolls", serpulo, 40){{
             difficulty = 7;
         }};
 
-        mycelialBastion = new SectorPreset("mycelialBastion", serpulo, 260){{
+        mycelialBastion = new SectorPreset("mycelialBastion", serpulo, 23){{
             difficulty = 8;
         }};
 
-        overgrowth = new SectorPreset("overgrowth", serpulo, 134){{
+        overgrowth = new SectorPreset("overgrowth", serpulo, 220){{
             difficulty = 5;
         }};
 
-        tarFields = new SectorPreset("tarFields", serpulo, 23){{
+        tarFields = new SectorPreset("tarFields", serpulo, 101){{
             captureWave = 40;
             difficulty = 5;
         }};
@@ -164,6 +163,7 @@ public class SectorPresets{
             difficulty = 10;
         }};
 
+        /*
         registerHiddenSectors(serpulo,
         68, //Winter Forest by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1235654407006322700
         241,//River Bastion by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1232658317126402050
@@ -179,7 +179,7 @@ public class SectorPresets{
         Vars.content.sector("sector-serpulo-173").captureWave = 17;
         Vars.content.sector("sector-serpulo-240").captureWave = 40;
         serpulo.sectors.get(173).generateEnemyBase = false;
-        serpulo.sectors.get(240).generateEnemyBase = false;
+        serpulo.sectors.get(240).generateEnemyBase = false;*/
 
         //endregion
         //region erekir

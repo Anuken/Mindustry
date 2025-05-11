@@ -61,6 +61,11 @@ public class SectorPreset extends UnlockableContent{
 
     public void initialize(Planet planet, int sector){
         this.planet = planet;
+        //auto remap based on data
+        var data = planet.getData();
+        if(data != null){
+            sector = data.presets.get(name, sector);
+        }
         sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector);
 
