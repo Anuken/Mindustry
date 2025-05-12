@@ -59,6 +59,7 @@ public class StatusEffects{
 
         slow = new StatusEffect("slow"){{
             color = Pal.lightishGray;
+            effect = Fx.freezing;
             speedMultiplier = 0.4f;
 
             init(() -> opposite(fast));
@@ -187,7 +188,10 @@ public class StatusEffects{
 
         blasted = new StatusEffect("blasted"){{
             color = Color.valueOf("ff795e");
-            reactive = true;
+            reloadMultiplier = 0.8f;
+            init(() -> {
+                affinity(freezing, (unit, result, time) -> result.set(freezing, result.time + time));
+            });
         }};
 
         corroded = new StatusEffect("corroded"){{
