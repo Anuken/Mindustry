@@ -36,6 +36,7 @@ public enum LogicOp{
     len("len", true, (x, y) -> Mathf.dst((float)x, (float)y)),
     noise("noise", true, (x, y) -> Simplex.raw2d(0, x, y)),
     abs("abs", a -> Math.abs(a)), //not a method reference because it fails to compile for some reason
+    sign("sign", Math::signum),
     log("log", Math::log),
     log10("log10", Math::log10),
     floor("floor", Math::floor),

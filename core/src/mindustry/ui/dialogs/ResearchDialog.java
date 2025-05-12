@@ -488,11 +488,17 @@ public class ResearchDialog extends BaseDialog{
             }
 
             if(mobile){
-                tapped(() -> {
-                    Element e = Core.scene.getHoverElement();
-                    if(e == this){
-                        hoverNode = null;
-                        rebuild();
+                addListener(new InputListener(){
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                        if(pointer == -1) return false;
+                        Element e = Core.scene.hit(Core.input.mouseX(pointer), Core.input.mouseY(pointer), true);
+                        if(e == View.this){
+                            hoverNode = null;
+                            rebuild();
+                        }
+
+                        return false;
                     }
                 });
             }

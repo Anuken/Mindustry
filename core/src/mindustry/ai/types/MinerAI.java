@@ -76,6 +76,7 @@ public class MinerAI extends AIController{
 
             circle(core, unit.type.range / 1.8f);
         }
+
         if(!unit.type.flying){
             unit.updateBoosting(unit.type.boostWhenMining || unit.floorOn().isDuct || unit.floorOn().damageTaken > 0f || unit.floorOn().isDeep());
         }
