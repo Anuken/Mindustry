@@ -642,7 +642,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                     });
                                 }
                             }
-
                         }
                     }
                 });
