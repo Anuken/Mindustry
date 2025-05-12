@@ -683,7 +683,7 @@ public class NetServer implements ApplicationListener{
         player.typing = chatting;
         player.shooting = shooting;
         player.boosting = boosting;
-        player.selectedBlock = selectedBlock == null ? Blocks.air : selectedBlock;
+        player.selectedBlock = selectedBlock;
 
         @Nullable var unit = player.unit();
 

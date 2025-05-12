@@ -889,7 +889,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             block = null;
         }
 
-        player.selectedBlock = block == null ? Blocks.air : block;
+        player.selectedBlock = block;
 
         wasShooting = player.shooting;
 
