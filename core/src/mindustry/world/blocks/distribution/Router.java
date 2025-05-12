@@ -1,9 +1,12 @@
 package mindustry.world.blocks.distribution;
 
+import arc.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
+import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -102,12 +105,54 @@ public class Router extends Block{
                 unit.team(team);
                 unit.set(x, y);
 
-                int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
-
                 if(unit.isShooting()){
+
+                    int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
                     Building other = nearby(rotation = angle);
                     if(other != null && other.acceptItem(this, item)){
                         return other;
+                    }
+                }else if((size & 1) != 0){
+                    if(!Vars.headless && Vars.player.unit() == unit){
+                        int xi = (int)Core.input.axis(Binding.moveX);
+                        int yi = (int)Core.input.axis(Binding.moveY);
+                        Building xb = nearby((xi + (xi < 0 ? -size : size)) >> 1, 0);
+                        Building yb = nearby(0, (yi + (yi < 0 ? -size : size)) >> 1);
+                        int xr = 1 - xi;
+                        int yr = (yi + 4) & 3;
+                        if(xi == 0f && yi == 0f) return null;
+                        if(xi == 0f){
+                            if(set) rotation = yr;
+                            return yb != null && yb.acceptItem(this, item) ? yb : null;
+                        }
+                        if(yi == 0f){
+                            if(set) rotation = xr;
+                            return xb != null && xb.acceptItem(this, item) ? xb : null;
+                        }
+                        if((rotation & 1) == 0){
+                            if(xb != null && xb.acceptItem(this, item)){
+                                if(set) rotation = yr;
+                                return xb;
+                            }else if(yb != null && yb.acceptItem(this, item)){
+                                return yb;
+                            }
+                        }else{
+                            if(yb != null && yb.acceptItem(this, item)){
+                                if(set) rotation = xr;
+                                return yb;
+                            }else if(xb != null && xb.acceptItem(this, item)){
+                                return xb;
+                            }
+                        }
+                    }else{
+                        int off = (1 + size) >> 1;
+                        return switch(rotation){
+                            case 0 -> nearby(off, 0);
+                            case 1 -> nearby(0, off);
+                            case 2 -> nearby(-off, 0);
+                            case 3 -> nearby(0, -off);
+                            default -> null;
+                        };
                     }
                 }
 
