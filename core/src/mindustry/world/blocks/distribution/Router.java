@@ -5,8 +5,10 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.input.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -50,6 +52,28 @@ public class Router extends Block{
         @Override
         public boolean shouldAutoTarget(){
             return false;
+        }
+
+        @Override
+        public void control(LAccess type, double p1, double p2, double p3, double p4){
+            if(type == LAccess.config && !(unit != null && isControlled())){
+                rotation = (int)p1;
+            }
+
+            super.control(type, p1, p2, p3, p4);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(unit != null && isControlled()){
+                return switch(sensor){
+                    case shootX -> World.conv(unit.aimX());
+                    case shootY -> World.conv(unit.aimY());
+                    case shooting -> unit.isShooting() ? 1 : 0;
+                    default -> super.sense(sensor);
+                };
+            }
+            return super.sense(sensor);
         }
 
         @Override
