@@ -17,6 +17,7 @@ import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -279,6 +280,14 @@ public class MapObjectivesDialog extends BaseDialog{
                 }
             });
         }));
+
+        setInterpreter(Alignment.class, int.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
+            cont.button(b -> {
+                b.label(() -> LStatement.alignToName.get(get.get(), "center"));
+                b.clicked(() -> LStatement.showAlignSelect(b, align -> set.get(LStatement.nameToAlign.get(align))));
+            }, () -> {});
+        });
 
         // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] from using it.
         for(var obj : MapObjectives.allObjectiveTypes) setInterpreter(obj.get().getClass(), defaultInterpreter());

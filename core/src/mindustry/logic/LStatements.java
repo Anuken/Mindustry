@@ -123,19 +123,6 @@ public class LStatements{
 
     @RegisterStatement("draw")
     public static class DrawStatement extends LStatement{
-        static final String[] aligns = {"center", "top", "bottom", "left", "right", "topLeft", "topRight", "bottomLeft", "bottomRight"};
-        //yes, boxing Integer is gross but this is easier to construct and Integers <128 don't allocate anyway
-        static final ObjectMap<String, Integer> nameToAlign = ObjectMap.of(
-        "center", Align.center,
-        "top", Align.top,
-        "bottom", Align.bottom,
-        "left", Align.left,
-        "right", Align.right,
-        "topLeft", Align.topLeft,
-        "topRight", Align.topRight,
-        "bottomLeft", Align.bottomLeft,
-        "bottomRight", Align.bottomRight
-        );
 
         public GraphicsType type = GraphicsType.clear;
         public String x = "0", y = "0", p1 = "0", p2 = "0", p3 = "0", p4 = "0";
@@ -253,12 +240,12 @@ public class LStatements{
                         row(s);
 
                         s.add("align ");
-
                         s.button(b -> {
                             b.label(() -> nameToAlign.containsKey(p1) ? p1 : "bottomLeft");
-                            b.clicked(() -> showSelect(b, aligns, p1, t -> {
-                                p1 = t;
-                            }, 2, cell -> cell.size(165, 50)));
+                            b.clicked(() -> showAlignSelect(b, str -> {
+                                p1 = str;
+                                rebuild(table);
+                            }));
                         }, Styles.logict, () -> {}).size(165, 40).color(s.color).left().padLeft(2);
                     }
                     case translate, scale -> {
@@ -2343,6 +2330,14 @@ public class LStatements{
                                 }).width(240f).left();
                             }));
                         }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
+                    }else if(type == LMarkerControl.textAlign){
+                        t.button(b -> {
+                            b.image(Icon.pencilSmall);
+                            b.clicked(() -> showAlignSelect(b, str -> {
+                                p1 = "@" + str;
+                                rebuild(table);
+                            }));
+                        }, Styles.logict, () -> {}).size(40f).color(table.color).left().padLeft(-10);
                     }
                 });
 
