@@ -30,7 +30,7 @@ import static mindustry.Vars.*;
 
 public class DesktopLauncher extends ClientLauncher{
     public final static long discordID = 610508934456934412L;
-    public final static String[] args;
+    public final String[] args;
     
     boolean useDiscord = !OS.hasProp("nodiscord"), loadError = false;
     Throwable steamError;
