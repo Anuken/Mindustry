@@ -194,16 +194,26 @@ public abstract class LStatement{
         showSelect(b, values, current, getter, 4, c -> {});
     }
 
-    public static void showAlignSelect(Button b, Intc setter) {
+    protected void fieldAlignSelect(Table t, Prov<String> get, Cons<String> set) {
+        t.button(b -> {
+            b.image(Icon.pencilSmall);
+            b.clicked(() -> {
+                var current = get.get();
+                showAlignSelect(b, current.startsWith("@") ? nameToAlign.get(current.substring(1), -1) : -1, align -> set.get("@" + alignToName.get(align)));
+            });
+        }, Styles.logict, () -> {}).size(40f).color(t.color).left().padLeft(-10);
+    }
+
+    public static void showAlignSelect(Button b, int current, Intc setter) {
         showSelectTable(b, (t, hide) -> {
             t.defaults().size(150f, 40f);
 
             int i = 0;
             for(String align : aligns){
-                t.button(align, Styles.cleart, () -> {
+                t.button(align, Styles.logicTogglet, () -> {
                     setter.get(nameToAlign.get(align));
                     hide.run();
-                }).grow();
+                }).checked(current == nameToAlign.get(align)).grow();
 
                 if (++i % 3 == 0) t.row();
             }

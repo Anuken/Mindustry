@@ -6,7 +6,6 @@ import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -241,13 +240,10 @@ public class LStatements{
 
                         s.add("align ");
                         fields(s, "align", p1, v -> p1 = v);
-                        s.button(b -> {
-                            b.image(Icon.pencilSmall);
-                            b.clicked(() -> showAlignSelect(b, align -> {
-                                p1 = "@" + alignToName.get(align);
-                                rebuild(table);
-                            }));
-                        }, Styles.logict, () -> {}).size(40f).color(table.color).left().padLeft(-10);
+                        fieldAlignSelect(s, () -> p1, v -> {
+                            p1 = v;
+                            rebuild(table);
+                        });
                     }
                     case translate, scale -> {
                         fields(s, "x", x, v -> x = v);
@@ -2335,13 +2331,10 @@ public class LStatements{
                             }));
                         }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
                     }else if(type == LMarkerControl.textAlign){
-                        t.button(b -> {
-                            b.image(Icon.pencilSmall);
-                            b.clicked(() -> showAlignSelect(b, align -> {
-                                p1 = "@" + alignToName.get(align);
-                                rebuild(table);
-                            }));
-                        }, Styles.logict, () -> {}).size(40f).color(table.color).left().padLeft(-10);
+                        fieldAlignSelect(t, () -> p1, v -> {
+                            p1 = v;
+                            rebuild(table);
+                        });
                     }
                 });
 
