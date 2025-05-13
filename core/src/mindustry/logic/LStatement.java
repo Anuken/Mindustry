@@ -194,16 +194,16 @@ public abstract class LStatement{
         showSelect(b, values, current, getter, 4, c -> {});
     }
 
-    public static void showAlignSelect(Button b, Cons<String> setter) {
+    public static void showAlignSelect(Button b, Intc setter) {
         showSelectTable(b, (t, hide) -> {
             t.defaults().size(150f, 40f);
 
             int i = 0;
             for(String align : aligns){
                 t.button(align, Styles.cleart, () -> {
-                    setter.get(align);
+                    setter.get(nameToAlign.get(align));
                     hide.run();
-                }).align(nameToAlign.get(align)).grow();
+                }).grow();
 
                 if (++i % 3 == 0) t.row();
             }

@@ -285,7 +285,7 @@ public class MapObjectivesDialog extends BaseDialog{
             name(cont, name, remover, indexer);
             cont.button(b -> {
                 b.label(() -> LStatement.alignToName.get(get.get(), "center"));
-                b.clicked(() -> LStatement.showAlignSelect(b, align -> set.get(LStatement.nameToAlign.get(align))));
+                b.clicked(() -> LStatement.showAlignSelect(b, set::get));
             }, () -> {});
         });
 

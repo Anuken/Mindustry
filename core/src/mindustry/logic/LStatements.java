@@ -152,7 +152,7 @@ public class LStatements{
                     }
 
                     if(type == GraphicsType.print){
-                        p1 = "bottomLeft";
+                        p1 = "@bottomLeft";
                     }
 
                     rebuild(table);
@@ -240,13 +240,14 @@ public class LStatements{
                         row(s);
 
                         s.add("align ");
+                        fields(s, "align", p1, v -> p1 = v);
                         s.button(b -> {
-                            b.label(() -> nameToAlign.containsKey(p1) ? p1 : "bottomLeft");
-                            b.clicked(() -> showAlignSelect(b, str -> {
-                                p1 = str;
+                            b.image(Icon.pencilSmall);
+                            b.clicked(() -> showAlignSelect(b, align -> {
+                                p1 = "@" + alignToName.get(align);
                                 rebuild(table);
                             }));
-                        }, Styles.logict, () -> {}).size(165, 40).color(s.color).left().padLeft(2);
+                        }, Styles.logict, () -> {}).size(40f).color(table.color).left().padLeft(-10);
                     }
                     case translate, scale -> {
                         fields(s, "x", x, v -> x = v);
@@ -265,12 +266,15 @@ public class LStatements{
             if(type == GraphicsType.color && p2.equals("0")){
                 p2 = "255";
             }
+
+            if(type == GraphicsType.print && nameToAlign.get(p1) != null){
+                p1 = "@" + p1;
+            }
         }
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new DrawI((byte)type.ordinal(), builder.var(x), builder.var(y),
-                type == GraphicsType.print ? new LVar(p1, nameToAlign.get(p1, Align.bottomLeft), true) : builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+            return new DrawI((byte)type.ordinal(), builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
 
         @Override
@@ -2333,8 +2337,8 @@ public class LStatements{
                     }else if(type == LMarkerControl.textAlign){
                         t.button(b -> {
                             b.image(Icon.pencilSmall);
-                            b.clicked(() -> showAlignSelect(b, str -> {
-                                p1 = "@" + str;
+                            b.clicked(() -> showAlignSelect(b, align -> {
+                                p1 = "@" + alignToName.get(align);
                                 rebuild(table);
                             }));
                         }, Styles.logict, () -> {}).size(40f).color(table.color).left().padLeft(-10);
