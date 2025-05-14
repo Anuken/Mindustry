@@ -118,7 +118,7 @@ public abstract class SaveVersion extends SaveFileReader{
     public void writeMeta(DataOutput stream, StringMap tags) throws IOException{
         //prepare campaign data for writing
         if(state.isCampaign()){
-            state.rules.sector.info.prepare();
+            state.rules.sector.info.prepare(state.rules.sector);
             state.rules.sector.saveInfo();
         }
 
