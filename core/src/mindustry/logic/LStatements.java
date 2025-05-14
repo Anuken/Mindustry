@@ -1634,6 +1634,8 @@ public class LStatements{
                 case mapArea -> {
                     table.add(" = ");
 
+                    row(table);
+
                     fields(table, "x", p1, s -> p1 = s);
                     fields(table, "y", p2, s -> p2 = s);
                     row(table);
@@ -1653,7 +1655,7 @@ public class LStatements{
                 case ban, unban -> {
                     table.add(" block/unit ");
 
-                    field(table, value, s -> value = s);
+                    fields(table, value, s -> value = s);
                 }
                 default -> {
                     table.add(" = ");
