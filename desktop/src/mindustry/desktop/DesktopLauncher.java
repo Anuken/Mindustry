@@ -30,6 +30,8 @@ import static mindustry.Vars.*;
 
 public class DesktopLauncher extends ClientLauncher{
     public final static long discordID = 610508934456934412L;
+    public final String[] args;
+    
     boolean useDiscord = !OS.hasProp("nodiscord"), loadError = false;
     Throwable steamError;
 
@@ -72,6 +74,8 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     public DesktopLauncher(String[] args){
+        this.args = args;
+        
         Version.init();
         boolean useSteam = Version.modifier.contains("steam");
         testMobile = Seq.with(args).contains("-testMobile");
