@@ -606,7 +606,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.client, called = Loc.server)
     public static void dropItem(Player player, float angle){
-        if(player == null) return;
+        if(player == null || player.unit() == null) return;
 
         if(net.server() && player.unit().stack.amount <= 0){
             throw new ValidateException(player, "Player cannot drop an item.");
