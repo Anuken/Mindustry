@@ -226,7 +226,7 @@ public class Universe{
                             sector.info.wavesPassed = wavesPassed;
                         }
 
-                        float damage = attacked ? SectorDamage.getDamage(sector.info) : 0f;
+                        float damage = attacked ? SectorDamage.getDamage(sector) : 0f;
 
                         //damage never goes down until the player visits the sector, so use max
                         sector.info.damage = Math.max(sector.info.damage, damage);

@@ -196,7 +196,7 @@ public class SectorInfo{
     }
 
     /** Prepare data for writing to a save. */
-    public void prepare(){
+    public void prepare(Sector sector){
         //update core items
         items.clear();
 
@@ -237,12 +237,10 @@ public class SectorInfo{
             export.clear();
         }
 
-        if(state.rules.sector != null){
-            state.rules.sector.saveInfo();
-        }
+        sector.saveInfo();
 
-        if(state.rules.sector != null && state.rules.sector.planet.allowWaveSimulation){
-            SectorDamage.writeParameters(this);
+        if(sector.planet.allowWaveSimulation){
+            SectorDamage.writeParameters(sector);
         }
     }
 

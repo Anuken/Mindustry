@@ -147,7 +147,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
                         if(hasAll){
                             Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation);
 
-                            if(current.block.instantBuild){
+                            if(!net.client() && current.block.instantBuild){
                                 if(plans.size > 0){
                                     plans.removeFirst();
                                 }
@@ -188,7 +188,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             //otherwise, update it.
             if(current.breaking){
                 entity.deconstruct(self(), core, bs);
-            }else if(entity.current != null && entity.current.unlockedNowHost()){ //only allow building unlocked blocks
+            }else if(entity.current != null && (state.isEditor() || (state.rules.waves && team == state.rules.waveTeam && entity.current.isVisible()) || (entity.current.unlockedNowHost() && entity.current.environmentBuildable() && entity.current.isPlaceable()))){ //only allow building unlocked blocks
                 entity.construct(self(), core, bs, current.config);
             }
 
