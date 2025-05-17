@@ -3,6 +3,7 @@ package mindustry.logic;
 import arc.math.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.logic.*;
 
 public enum LogicOp{
     add("+", (a, b) -> a + b),
@@ -13,8 +14,8 @@ public enum LogicOp{
     mod("%", (a, b) -> a % b),
     pow("^", Math::pow),
 
-    equal("==", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0, (a, b) -> Structs.eq(a, b) ? 1 : 0),
-    notEqual("not", (a, b) -> Math.abs(a - b) < 0.000001 ? 0 : 1, (a, b) -> !Structs.eq(a, b) ? 1 : 0),
+    equal("==", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0, (a, b) -> LExecutor.OpI.equal(a, b) ? 1 : 0),
+    notEqual("not", (a, b) -> Math.abs(a - b) < 0.000001 ? 0 : 1, (a, b) -> !LExecutor.OpI.equal(a, b) ? 1 : 0),
     land("and", (a, b) -> a != 0 && b != 0 ? 1 : 0),
     lessThan("<", (a, b) -> a < b ? 1 : 0),
     lessThanEq("<=", (a, b) -> a <= b ? 1 : 0),
