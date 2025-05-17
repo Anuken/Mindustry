@@ -10,6 +10,8 @@ public abstract class Content implements Comparable<Content>{
     public short id;
     /** Info on which mod this content was loaded from. */
     public ModContentInfo minfo = new ModContentInfo();
+    /** Special field that can storage some extra data for mods. */
+    public ObjectMap<String, Object> modConfig = new ObjectMap<>();
 
     public Content(){
         this.id = (short)Vars.content.getBy(getContentType()).size;
