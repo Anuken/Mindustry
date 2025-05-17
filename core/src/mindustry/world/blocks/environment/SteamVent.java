@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 
 //can't use an overlay for this because it spans multiple tiles
 public class SteamVent extends Floor{
-    public static final Point2[] offsets = {
+    public static final Point2[] defaultOffsets = {
         new Point2(0, 0),
         new Point2(1, 0),
         new Point2(1, 1),
@@ -33,9 +33,10 @@ public class SteamVent extends Floor{
     public Effect effect = Fx.ventSteam;
     public Color effectColor = Pal.vent;
     public float effectSpacing = 15f;
+    public @Nullable Point2[] offsets = null;
 
     static{
-        for(var p : offsets){
+        for(var p : defaultOffsets){
             p.sub(1, 1);
         }
     }
@@ -44,6 +45,35 @@ public class SteamVent extends Floor{
         super(name);
         variants = 2;
         flags = EnumSet.of(BlockFlag.steamVent);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(offsets == null){
+            offsets = defaultOffsets;
+        }else{
+            //Correct offsets. Top-right corner should be (0, 0).
+            int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+            for(Point2 p : offsets){
+                maxX = Math.max(maxX, p.x);
+                maxY = Math.max(maxY, p.y);
+            }
+            for(Point2 p : offsets){
+                p.sub(maxX, maxY);
+            }
+
+            //Check if (0, 0) exists after offset correction.
+            boolean hasOrigin = false;
+            for(Point2 p : offsets){
+                if(p.x == 0 && p.y == 0){
+                    hasOrigin = true;
+                    break;
+                }
+            }
+            if(!hasOrigin) throw new IllegalArgumentException("SteamVent lacks a top-right corner.");
+        }
     }
 
     @Override
