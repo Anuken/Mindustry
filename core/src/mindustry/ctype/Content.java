@@ -1,6 +1,7 @@
 package mindustry.ctype;
 
 import arc.files.*;
+import arc.struct.ObjectMap;
 import arc.util.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
