@@ -39,6 +39,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     @ReadOnly Team team = Team.sharded;
     @SyncLocal boolean typing, shooting, boosting;
     @SyncLocal @Nullable Block selectedBlock;
+    @SyncLocal int selectedRotation;
     @SyncLocal float mouseX, mouseY;
     /** command the unit had before it was controlled. */
     @Nullable @NoSync UnitCommand lastCommand;

@@ -290,6 +290,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case payloadCapacity -> type.payloadCapacity / tilePayload;
             case size -> hitSize / tilesize;
             case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
+            case selectedRotation -> controller instanceof Player p ? p.selectedRotation : 0;
             default -> Float.NaN;
         };
     }

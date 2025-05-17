@@ -890,6 +890,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         player.selectedBlock = block;
+        player.selectedRotation = rotation;
 
         wasShooting = player.shooting;
 
