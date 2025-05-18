@@ -601,7 +601,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(unit.controller() instanceof CommandAI ai && ai.currentCommand() == UnitCommand.mineCommand){
             out.add(UnitStance.mineAuto);
             for(Item item : indexer.getAllPresentOres()){
-                if(unit.canMine(item)){
+                if(unit.canMine(item) && ((mineFloor && indexer.hasOre(item)) || (mineWalls && indexer.hasWallOre(item)))){
                     var itemStance = ItemUnitStance.getByItem(item);
                     if(itemStance != null){
                         out.add(itemStance);
