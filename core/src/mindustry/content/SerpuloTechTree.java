@@ -485,7 +485,13 @@ public class SerpuloTechTree{
                                 new Research(cultivator),
                                 new Research(coalCentrifuge)
                                 ), () -> {
+                                    node(atolls, Seq.with(
+                                    new SectorComplete(seaPort),
+                                    new Research(multiplicativeReconstructor),
+                                    new Research(mega)
+                                    ), () -> {
 
+                                    });
                                 });
 
                                 node(overgrowth, Seq.with(
@@ -504,14 +510,6 @@ public class SerpuloTechTree{
                                     new Research(arkyid),
                                     new Research(multiplicativeReconstructor),
                                     new Research(exponentialReconstructor)
-                                    ), () -> {
-
-                                    });
-
-                                    node(atolls, Seq.with(
-                                    new SectorComplete(windsweptIslands),
-                                    new Research(multiplicativeReconstructor),
-                                    new Research(mega)
                                     ), () -> {
 
                                     });

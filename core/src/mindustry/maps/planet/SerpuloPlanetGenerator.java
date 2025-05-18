@@ -25,7 +25,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
     BaseGenerator basegen = new BaseGenerator();
     float scl = 5f;
-    float waterOffset = 0.07f;
+    float waterOffset = 0.05f;
     boolean genLakes = false;
 
     Block[][] arr =
