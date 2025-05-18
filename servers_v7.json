@@ -349,5 +349,11 @@
       "203.135.99.51:15143",
       "183.131.51.178"
     ]
+  },
+  {
+    "name": "Kalpe Games",
+    "address": [
+      "mindustry.kalpe.games"
+    ]
   }
 ]
