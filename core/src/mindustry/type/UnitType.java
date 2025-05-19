@@ -93,6 +93,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     buildRange = Vars.buildingRange,
     /** multiplier for damage this (flying) unit deals when crashing on enemy things */
     crashDamageMultiplier = 1f,
+    /** multiplier for health that this flying unit has for its wreck, based on its max health. */
+    wreckHealthMultiplier = 0.25f,
     /** a VERY ROUGH estimate of unit DPS; initialized in init() */
     dpsEstimate = -1,
     /** graphics clipping size; <0 to calculate automatically */
@@ -599,7 +601,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(unit.controller() instanceof CommandAI ai && ai.currentCommand() == UnitCommand.mineCommand){
             out.add(UnitStance.mineAuto);
             for(Item item : indexer.getAllPresentOres()){
-                if(unit.canMine(item)){
+                if(unit.canMine(item) && ((mineFloor && indexer.hasOre(item)) || (mineWalls && indexer.hasWallOre(item)))){
                     var itemStance = ItemUnitStance.getByItem(item);
                     if(itemStance != null){
                         out.add(itemStance);

@@ -1,7 +1,6 @@
 package mindustry.ui.fragments;
 
 import arc.*;
-import arc.Graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
@@ -151,8 +150,5 @@ public class MinimapFragment{
         }
 
         shown = !shown;
-        if(shown && Core.app.isDesktop()){
-            Core.graphics.cursor(SystemCursor.arrow);
-        }
     }
 }

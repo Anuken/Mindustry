@@ -611,8 +611,10 @@ public class SerpuloTechTree{
                                 });
 
                                 node(facility32m, Seq.with(
-                                new Research(pneumaticDrill),
-                                new SectorComplete(stainedMountains)
+                                new Research(plastaniumCompressor),
+                                new Research(lancer),
+                                new Research(salvo),
+                                new SectorComplete(windsweptIslands)
                                 ), () -> {
                                     node(extractionOutpost, Seq.with(
                                     new SectorComplete(windsweptIslands),
@@ -680,6 +682,7 @@ public class SerpuloTechTree{
                                         ), () -> {
                                             node(weatheredChannels, Seq.with(
                                             new SectorComplete(impact0078),
+                                            new SectorComplete(navalFortress),
                                             new Research(bryde),
                                             new Research(surgeSmelter),
                                             new Research(overdriveProjector)

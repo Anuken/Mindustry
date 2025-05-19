@@ -377,6 +377,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     public @Nullable Map save(){
         boolean isEditor = state.rules.editor;
         state.rules.editor = false;
+        state.rules.allowEditRules = false;
         state.rules.objectiveFlags.clear();
         state.rules.objectives.each(MapObjective::reset);
         String name = editor.tags.get("name", "").trim();

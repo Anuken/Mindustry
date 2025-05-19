@@ -244,6 +244,10 @@ public abstract class LStatement{
 
     }
 
+    public String typeName(){
+        return getClass().getSimpleName().replace("Statement", "");
+    }
+
     public String name(){
         return Strings.insertSpaces(getClass().getSimpleName().replace("Statement", ""));
     }

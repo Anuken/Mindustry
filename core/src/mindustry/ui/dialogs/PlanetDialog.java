@@ -44,7 +44,7 @@ import static mindustry.ui.dialogs.PlanetDialog.Mode.*;
 
 public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     //if true, enables launching anywhere for testing
-    public static boolean debugSelect = false;
+    public static boolean debugSelect = false, debugSectorAttackEdit;
     public static float sectorShowDuration = 60f * 2.4f;
 
     public final FrameBuffer buffer = new FrameBuffer(2, 2, true);
@@ -603,7 +603,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 addListener(new ElementGestureListener(){
                     @Override
                     public void tap(InputEvent event, float x, float y, int count, KeyCode button){
-                        if(showing()) return;
+                        if(showing() || button != KeyCode.mouseLeft) return;
 
                         if(hovered != null && selected == hovered && count == 2){
                             playSelected();
@@ -617,6 +617,15 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             updateSelected();
                         }
                     }
+
+                    @Override
+                    public void touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                        super.touchDown(event, x, y, pointer, button);
+
+                        if(debugSectorAttackEdit && button == KeyCode.mouseRight && hovered != null){
+                            hovered.generateEnemyBase = !hovered.generateEnemyBase;
+                        }
+                    }
                 });
             }
 
@@ -624,6 +633,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             public void act(float delta){
                 if(scene.getDialog() == PlanetDialog.this && (scene.getHoverElement() == null || !scene.getHoverElement().isDescendantOf(e -> e instanceof ScrollPane))){
                     scene.setScrollFocus(PlanetDialog.this);
+
+                    if(debugSectorAttackEdit && input.ctrl() && input.keyTap(KeyCode.c)){
+                        Core.app.setClipboardText(state.planet.writeAttackSectorBits());
+                        Vars.ui.showInfoFade("@copied");
+                    }
                 }
 
                 super.act(delta);
