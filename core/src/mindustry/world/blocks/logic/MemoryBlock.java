@@ -78,8 +78,7 @@ public class MemoryBlock extends Block{
         /** Block of code to run after load. */
         private @Nullable Runnable loadBlock;
 
-        public MemoryBuild(){
-            super();
+        {
             for(int i = 0; i < memory.length; i++){
                 memory[i] = new MemorySlot();
             }
