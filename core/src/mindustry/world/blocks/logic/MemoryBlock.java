@@ -16,6 +16,7 @@ public class MemoryBlock extends Block{
 
     public MemoryBlock(String name){
         super(name);
+        update = true;
         destructible = true;
         solid = true;
         group = BlockGroup.logic;
