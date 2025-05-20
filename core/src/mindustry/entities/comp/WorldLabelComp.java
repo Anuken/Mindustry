@@ -46,25 +46,29 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
         font.getData().setScale(0.25f / Scl.scl(1f) * fontSize);
         layout.setText(font, text);
 
-        if(Align.isLeft(align)){
-            x += layout.width / 2 + 1;
-        }else if(Align.isRight(align)){
-            x -= layout.width / 2 + 1;
+        if(Align.isBottom(align)){
+            y += layout.height + 1.5f;
+        }else if(Align.isTop(align)){
+            y -= 1.5f;
+        }else{
+            y += layout.height / 2;
         }
-        if(Align.isTop(align)){
-            y -= layout.height / 2 + 1.5f;
-        }else if(Align.isBottom(align)){
-            y += layout.height / 2 + 1.5f;
+
+        float dx = 0;
+        if(Align.isLeft(align)){
+            dx = 1;
+        }else if(Align.isRight(align)){
+            dx = -1;
         }
 
         if((flags & flagBackground) != 0){
             Draw.color(0f, 0f, 0f, 0.3f);
-            Fill.rect(x, y - layout.height / 2, layout.width + 2, layout.height + 3);
+            Fill.rect(x + dx * (layout.width / 2 + 1), y - layout.height / 2, layout.width + 2, layout.height + 3);
             Draw.color();
         }
 
         font.setColor(Color.white);
-        font.draw(text, x, y, 0, Align.center, false);
+        font.draw(text, x + dx, y, 0, Align.isCenterHorizontal(align) ? Align.center : align, false);
 
         Draw.reset();
         Pools.free(layout);
