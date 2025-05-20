@@ -571,7 +571,11 @@ public class LExecutor{
             Building from = target.building();
 
             if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
-                output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
+                if(address < 0 || address >= mem.memory.length){
+                    output.setnum(0);
+                }else{
+                    mem.memory[address].store(output);
+                }
             }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
                 LVar fromVar = logic.executor.optionalVar(name);
                 if(fromVar != null && !output.constant){
@@ -603,7 +607,7 @@ public class LExecutor{
             Building from = target.building();
 
             if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
-                mem.memory[address] = value.num();
+                mem.memory[address].load(value);
             }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
                 LVar toVar = logic.executor.optionalVar(name);
                 if(toVar != null && !toVar.constant){
