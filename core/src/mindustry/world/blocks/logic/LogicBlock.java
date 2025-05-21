@@ -767,6 +767,8 @@ public class LogicBlock extends Block{
                         if(value instanceof Number num){
                             var.numval = num.doubleValue();
                             var.isobj = false;
+
+                            if (var.name.equals("@mapReloads")) var.numval++;
                         }else{
                             var.objval = value;
                             var.isobj = true;

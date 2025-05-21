@@ -27,6 +27,8 @@ public class LAssembler{
         putConst("@unit", null);
         //reference to self
         putConst("@this", null);
+        // number of map reloads since program start
+        putVar("@mapReloads").isobj = false;
     }
 
     public static LAssembler assemble(String data, boolean privileged){
