@@ -395,7 +395,7 @@ public class Planet extends UnlockableContent{
         clipRadius = Math.max(clipRadius, radius + atmosphereRadOut + 0.5f);
     }
 
-    public PlanetData getData(){
+    public @Nullable PlanetData getData(){
         if(loadPlanetData && data == null){
             Fi file = tree.get("planets/" + name + ".json");
             if(file.exists()){

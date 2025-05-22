@@ -39,12 +39,12 @@ public class SectorPresets{
             captureWave = 33;
         }};
 
-        frozenForest = new SectorPreset("frozenForest", serpulo, 170){{
+        frozenForest = new SectorPreset("frozenForest", serpulo, 86){{
             captureWave = 15;
             difficulty = 2;
         }};
 
-        biomassFacility = new SectorPreset("biomassFacility", serpulo, 63){{
+        biomassFacility = new SectorPreset("biomassFacility", serpulo, 81){{
             captureWave = 20;
             difficulty = 3;
         }};
@@ -54,17 +54,17 @@ public class SectorPresets{
             difficulty = 5;
         }};
 
-        craters = new SectorPreset("craters", serpulo, 175){{
+        craters = new SectorPreset("craters", serpulo, 18){{
             captureWave = 20;
             difficulty = 2;
         }};
 
-        ruinousShores = new SectorPreset("ruinousShores", serpulo, 41){{
+        ruinousShores = new SectorPreset("ruinousShores", serpulo, 213){{
             captureWave = 30;
             difficulty = 3;
         }};
 
-        seaPort = new SectorPreset("seaPort", serpulo, 98){{
+        seaPort = new SectorPreset("seaPort", serpulo, 47){{
             difficulty = 4;
         }};
 
@@ -73,7 +73,7 @@ public class SectorPresets{
             difficulty = 4;
         }};
 
-        windsweptIslands = new SectorPreset("windsweptIslands", serpulo, 97){{
+        windsweptIslands = new SectorPreset("windsweptIslands", serpulo, 246){{
             captureWave = 30;
             difficulty = 4;
         }};
@@ -106,11 +106,11 @@ public class SectorPresets{
             difficulty = 8;
         }};
 
-        frontier = new SectorPreset("frontier", serpulo, 41){{
+        frontier = new SectorPreset("frontier", serpulo, 50){{
             difficulty = 4;
         }};
 
-        fungalPass = new SectorPreset("fungalPass", serpulo, 219){{
+        fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
             difficulty = 4;
         }};
 
@@ -118,19 +118,19 @@ public class SectorPresets{
             difficulty = 4;
         }};
 
-        atolls = new SectorPreset("atolls", serpulo, 40){{
+        atolls = new SectorPreset("atolls", serpulo, 1){{
             difficulty = 7;
         }};
 
-        mycelialBastion = new SectorPreset("mycelialBastion", serpulo, 23){{
+        mycelialBastion = new SectorPreset("mycelialBastion", serpulo, 260){{
             difficulty = 8;
         }};
 
-        overgrowth = new SectorPreset("overgrowth", serpulo, 220){{
+        overgrowth = new SectorPreset("overgrowth", serpulo, 134){{
             difficulty = 5;
         }};
 
-        tarFields = new SectorPreset("tarFields", serpulo, 101){{
+        tarFields = new SectorPreset("tarFields", serpulo, 23){{
             captureWave = 40;
             difficulty = 5;
         }};

@@ -712,7 +712,7 @@ public class SerpuloTechTree{
                             new Research(additiveReconstructor)
                             ), () -> {
                                 node(nuclearComplex, Seq.with(
-                                new SectorComplete(fungalPass),
+                                new SectorComplete(infestedCanyons),
                                 new Research(thermalGenerator),
                                 new Research(laserDrill),
                                 new Research(Items.plastanium),
@@ -730,8 +730,6 @@ public class SerpuloTechTree{
 
                                 });
                             });
-
-
                         });
                     });
                 });
