@@ -34,6 +34,8 @@ public class SectorPreset extends UnlockableContent{
     public boolean allowLaunchLoadout = false;
     /** If true, switches to attack mode after waves end. */
     public boolean attackAfterWaves = false;
+    /** The original position of this sector; used for migration. Internal use for vanilla campaign only! */
+    public int originalPosition;
 
     public SectorPreset(String name, Planet planet, int sector){
         this(name, null, planet, sector);
@@ -61,6 +63,7 @@ public class SectorPreset extends UnlockableContent{
 
     public void initialize(Planet planet, int sector){
         this.planet = planet;
+        this.originalPosition = sector;
         //auto remap based on data
         var data = planet.getData();
         if(data != null){
