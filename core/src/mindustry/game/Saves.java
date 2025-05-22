@@ -86,13 +86,13 @@ public class Saves{
                     if(!name.isEmpty()){ //if this save had a preset defined...
                         SectorPreset preset = content.sector(name);
                         //...place it in the right sector according to its preset
-                        if(preset != null && preset.sector != sector){
+                        if(preset != null && preset.sector != sector && preset.requireUnlock){
                             remapTarget = preset.sector;
                         }
                     }
                 }else{ //there was no sector preset in the meta at all, which means this is a legacy save that may need mapping
                     SectorPreset target = content.sectors().find(s -> s.planet == sector.planet && s.originalPosition == sector.id);
-                    if(target != null && target.sector != sector){ //there is indeed a sector preset that used to have this ID, and it needs remapping!
+                    if(target != null && target.sector != sector && target.requireUnlock){ //there is indeed a sector preset that used to have this ID, and it needs remapping!
                         remapTarget = target.sector;
                     }
                 }
@@ -100,8 +100,9 @@ public class Saves{
                 if(remapTarget != null){
                     //if the file name matches the destination of the remap, assume it has already been remapped, and skip the file movement procedure
                     if(!slot.file.equals(getSectorFile(remapTarget))){
-                        Log.info("Remapping sectors: @: @ -> @", sector.id, remapTarget.id);
+                        Log.info("Remapping sector: @ -> @ (@)", sector.id, remapTarget.id, remapTarget.preset);
 
+                        sector.loadInfo();
                         //overwrite the target sector's info with the save's info
                         Core.settings.putJson(remapTarget.planet.name + "-s-" + remapTarget.id + "-info", sector.info);
                         remapTarget.loadInfo();
@@ -113,8 +114,10 @@ public class Saves{
 
                         remapTarget.save = slot;
                         try{
+                            Fi target = getSectorFile(remapTarget);
                             //move over save file
-                            slot.file.moveTo(getSectorFile(remapTarget));
+                            slot.file.moveTo(target);
+                            slot.file = target;
                         }catch(Exception e){
                             Log.err("Failed to move sector files when remapping: " + sector.id + " -> " + remapTarget.id, e);
                         }
@@ -244,7 +247,7 @@ public class Saves{
     }
 
     public class SaveSlot{
-        public final Fi file;
+        public Fi file;
         boolean requestedPreview;
         public SaveMeta meta;
 
