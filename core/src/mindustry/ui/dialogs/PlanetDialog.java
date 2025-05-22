@@ -801,6 +801,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                     head.image(Icon.warningSmall).update(i -> {
                                         i.color.set(Pal.accent).lerp(Pal.remove, Mathf.absin(Time.globalTime, 9f, 1f));
                                     }).padRight(4f);
+                                }else if(sec.preset != null && sec.preset.requireUnlock){
+                                    head.image(sec.preset.uiIcon).size(iconSmall).padRight(4f);
                                 }
 
                                 String ic = sec.iconChar() == null ? "" : sec.iconChar() + " ";
@@ -830,9 +832,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     public Planet getHoverPlanet(float mouseX, float mouseY){
-        // do not hover over things indefinitely
         Planet hoverPlanet = null;
-        // get nearest planet (DO NOT SELECT THROUGH selected planet)
         float nearest = Float.POSITIVE_INFINITY;
 
         for(Planet planet : content.planets()){
@@ -1163,7 +1163,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 title.add().growX();
 
                 title.button(Icon.pencilSmall, Styles.clearNonei, () -> {
-                   ui.showTextInput("@sectors.rename", "@name", 20, sector.name(), v -> {
+                   ui.showTextInput("@sectors.rename", "@name", 32, sector.name(), v -> {
                        sector.setName(v);
                        updateSelected();
                        rebuildList();

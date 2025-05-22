@@ -1492,7 +1492,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawRebuildSelection(int x1, int y1, int x2, int y2){
-        drawSelection(x1, y1, x2, y2, 0, Pal.sapBulletBack, Pal.sapBullet);
+        drawSelection(x1, y1, x2, y2, 0, Pal.sapBulletBack, Pal.sapBullet, false);
 
         NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, 0, 1f);
 
@@ -1525,10 +1525,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength){
-        drawSelection(x1, y1, x2, y2, maxLength, Pal.accentBack, Pal.accent);
+        drawSelection(x1, y1, x2, y2, maxLength, Pal.accentBack, Pal.accent, true);
     }
 
-    protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength, Color col1, Color col2){
+    protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength, Color col1, Color col2, boolean withText){
         NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
 
         Lines.stroke(2f);
@@ -1538,27 +1538,30 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.color(col2);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
 
-        Font font = Fonts.outline;
-        font.setColor(col2);
-        var ints = font.usesIntegerPositions();
-        font.setUseIntegerPositions(false);
-        var z = Draw.z();
-        Draw.z(Layer.endPixeled);
-        font.getData().setScale(1 / renderer.camerascale);
-        var snapToCursor = Core.settings.getBool("selectionsizeoncursor");
-        var textOffset = Core.settings.getInt("selectionsizeoncursoroffset", 5);
-        int width = (int)((result.x2 - result.x) / 8);
-        int height = (int)((result.y2 - result.y) / 8);
-        int area = width * height;
-        // FINISHME: When not snapping to cursor, perhaps it would be best to choose the corner closest to the cursor that's at least a block away?
-        font.draw(width + "x" + height + " (" + area + ")",
-                snapToCursor ? input.mouseWorldX() + textOffset * (4 / renderer.camerascale) : result.x2,
-                snapToCursor ? input.mouseWorldY() - textOffset * (4 / renderer.camerascale) : result.y
-                );
-        font.setColor(Color.white);
-        font.getData().setScale(1);
-        font.setUseIntegerPositions(ints);
-        Draw.z(z);
+        if(withText){
+            Font font = Fonts.outline;
+            font.setColor(col2);
+            var ints = font.usesIntegerPositions();
+            font.setUseIntegerPositions(false);
+            var z = Draw.z();
+            Draw.z(Layer.endPixeled);
+            font.getData().setScale(1 / renderer.camerascale);
+            var snapToCursor = Core.settings.getBool("selectionsizeoncursor");
+            var textOffset = Core.settings.getInt("selectionsizeoncursoroffset", 5);
+            int width = (int)((result.x2 - result.x) / 8);
+            int height = (int)((result.y2 - result.y) / 8);
+            int area = width * height;
+
+            // FINISHME: When not snapping to cursor, perhaps it would be best to choose the corner closest to the cursor that's at least a block away?
+            font.draw(width + "x" + height + " (" + area + ")",
+            snapToCursor ? input.mouseWorldX() + textOffset * (4 / renderer.camerascale) : result.x2,
+            snapToCursor ? input.mouseWorldY() - textOffset * (4 / renderer.camerascale) : result.y
+            );
+            font.setColor(Color.white);
+            font.getData().setScale(1);
+            font.setUseIntegerPositions(ints);
+            Draw.z(z);
+        }
     }
 
     protected void flushSelectPlans(Seq<BuildPlan> plans){

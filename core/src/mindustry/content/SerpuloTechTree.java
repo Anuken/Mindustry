@@ -485,12 +485,40 @@ public class SerpuloTechTree{
                                 new Research(cultivator),
                                 new Research(coalCentrifuge)
                                 ), () -> {
-                                    node(atolls, Seq.with(
-                                    new SectorComplete(seaPort),
-                                    new Research(multiplicativeReconstructor),
-                                    new Research(mega)
-                                    ), () -> {
 
+                                    node(extractionOutpost, Seq.with(
+                                    new SectorComplete(windsweptIslands),
+                                    new SectorComplete(seaPort),
+                                    new SectorComplete(facility32m),
+                                    new Research(groundFactory),
+                                    new Research(nova),
+                                    new Research(airFactory),
+                                    new Research(mono)
+                                    ), () -> {
+                                        node(atolls, Seq.with(
+                                        new SectorComplete(extractionOutpost),
+                                        new Research(multiplicativeReconstructor),
+                                        new Research(mega)
+                                        ), () -> {
+
+                                        });
+
+                                        //TODO: removed for now
+                                        /*node(polarAerodrome, Seq.with(
+                                        new SectorComplete(fungalPass),
+                                        new SectorComplete(desolateRift),
+                                        new SectorComplete(overgrowth),
+                                        new Research(multiplicativeReconstructor),
+                                        new Research(zenith),
+                                        new Research(swarmer),
+                                        new Research(cyclone),
+                                        new Research(blastDrill),
+                                        new Research(blastDrill),
+                                        new Research(massDriver)
+                                        ), () -> {
+
+                                        });
+                                        */
                                     });
                                 });
 
@@ -531,16 +559,17 @@ public class SerpuloTechTree{
                             new Research(steamGenerator)
                             ), () -> {
 
-
-
-                                node(facility32m, Seq.with(
-                                new Research(plastaniumCompressor),
-                                new Research(lancer),
-                                new Research(salvo),
-                                new SectorComplete(windsweptIslands)
+                                node(saltFlats, Seq.with(
+                                new SectorComplete(windsweptIslands),
+                                new SectorComplete(fungalPass),
+                                new SectorComplete(frontier),
+                                new Research(groundFactory),
+                                new Research(additiveReconstructor),
+                                new Research(airFactory),
+                                new Research(door)
                                 ), () -> {
                                     node(tarFields, Seq.with(
-                                    new SectorComplete(facility32m),
+                                    new SectorComplete(saltFlats),
                                     new Research(coalCentrifuge),
                                     new Research(conduit),
                                     new Research(wave)
@@ -605,58 +634,23 @@ public class SerpuloTechTree{
                                         });
                                     });
 
-                                    node(extractionOutpost, Seq.with(
-                                    new SectorComplete(windsweptIslands),
-                                    new SectorComplete(fungalPass),
-                                    new SectorComplete(facility32m),
-                                    new Research(groundFactory),
-                                    new Research(nova),
-                                    new Research(airFactory),
-                                    new Research(mono)
-                                    ), () -> {
-                                        //TODO: removed for now
-                                        /*node(polarAerodrome, Seq.with(
-                                        new SectorComplete(fungalPass),
-                                        new SectorComplete(desolateRift),
-                                        new SectorComplete(overgrowth),
-                                        new Research(multiplicativeReconstructor),
-                                        new Research(zenith),
-                                        new Research(swarmer),
-                                        new Research(cyclone),
-                                        new Research(blastDrill),
-                                        new Research(blastDrill),
-                                        new Research(massDriver)
-                                        ), () -> {
-
-                                        });
-                                        */
-                                    });
-                                });
-
-                                node(saltFlats, Seq.with(
-                                new SectorComplete(windsweptIslands),
-                                new SectorComplete(fungalPass),
-                                new SectorComplete(frontier),
-                                new Research(groundFactory),
-                                new Research(additiveReconstructor),
-                                new Research(airFactory),
-                                new Research(door)
-                                ), () -> {
-                                    node(testingGrounds, Seq.with(
-                                    new Research(cryofluidMixer),
-                                    new Research(Liquids.cryofluid),
-                                    new Research(waterExtractor),
-                                    new Research(ripple)
-                                    ), () -> {
-
-                                    });
-
                                     node(coastline, Seq.with(
                                     new SectorComplete(windsweptIslands),
                                     new SectorComplete(saltFlats),
                                     new Research(navalFactory),
                                     new Research(payloadConveyor)
                                     ), () -> {
+
+
+                                        node(testingGrounds, Seq.with(
+                                        new SectorComplete(coastline),
+                                        new Research(cryofluidMixer),
+                                        new Research(Liquids.cryofluid),
+                                        new Research(waterExtractor),
+                                        new Research(ripple)
+                                        ), () -> {
+
+                                        });
 
                                         node(navalFortress, Seq.with(
                                         new SectorComplete(coastline),
@@ -699,7 +693,16 @@ public class SerpuloTechTree{
                         new Research(siliconSmelter)
                         ), () -> {
 
-                        //TODO bad order
+                            node(facility32m, Seq.with(
+                            new Research(plastaniumCompressor),
+                            new Research(lancer),
+                            new Research(salvo),
+                            new SectorComplete(stainedMountains),
+                            new SectorComplete(windsweptIslands)
+                            ), () -> {
+
+                            });
+
                             node(infestedCanyons, Seq.with(
                             new SectorComplete(fungalPass),
                             new SectorComplete(frontier),
@@ -708,7 +711,6 @@ public class SerpuloTechTree{
                             new Research(minke),
                             new Research(additiveReconstructor)
                             ), () -> {
-                                //TODO difficulty jump!
                                 node(nuclearComplex, Seq.with(
                                 new SectorComplete(fungalPass),
                                 new Research(thermalGenerator),
