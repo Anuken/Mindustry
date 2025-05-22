@@ -543,7 +543,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 var icon =
                     sec.isAttacked() ? Fonts.getLargeIcon("warning") :
                     !sec.hasBase() && sec.preset != null && sec.preset.requireUnlock && sec.preset.unlocked() && preficon == null ?
-                    sec.preset != null ? sec.preset.uiIcon : Fonts.getLargeIcon("terrain") :
+                    (sec.preset != null && sec.preset.requireUnlock && sec.preset.unlocked() ? sec.preset.uiIcon : Fonts.getLargeIcon("terrain")) :
                     sec.preset != null && sec.preset.requireUnlock && sec.preset.locked() && sec.preset.techNode != null && (sec.preset.techNode.parent == null || !sec.preset.techNode.parent.content.locked()) ? Fonts.getLargeIcon("lock") :
                     preficon;
                 var color = sec.isAttacked() ? Team.sharded.color : Color.white;
