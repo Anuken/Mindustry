@@ -25,11 +25,6 @@ public class TantrosPlanetGenerator extends PlanetGenerator{
     }
 
     @Override
-    public void generateSector(Sector sector){
-        //no bases
-    }
-
-    @Override
     public float getHeight(Vec3 position){
         return 0;
     }

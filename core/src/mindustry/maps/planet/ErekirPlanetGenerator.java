@@ -9,7 +9,6 @@ import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.maps.generators.*;
-import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
@@ -32,11 +31,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     {
         baseSeed = 2;
         defaultLoadout = Loadouts.basicBastion;
-    }
-
-    @Override
-    public void generateSector(Sector sector){
-        //no bases right now
     }
 
     @Override

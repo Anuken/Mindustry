@@ -13,6 +13,7 @@ import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.maps.Map;
 import mindustry.type.*;
+import mindustry.world.*;
 
 import java.io.*;
 import java.text.*;
@@ -69,26 +70,74 @@ public class Saves{
             }
         }
 
-        //clear saves from build <130 that had the new naval sectors.
-        saves.removeAll(s -> {
-            if(s.getSector() != null && (s.getSector().id == 108 || s.getSector().id == 216) && s.meta.build <= 130 && s.meta.build > 0){
-                s.getSector().clearInfo();
-                s.file.delete();
-                return true;
-            }
-            return false;
-        });
-
         lastSectorSave = saves.find(s -> s.isSector() && s.getName().equals(Core.settings.getString("last-sector-save", "<none>")));
+
+        ObjectSet<Sector> infoToClear = new ObjectSet<>(), remapped = new ObjectSet<>();
 
         //automatically assign sector save slots
         for(SaveSlot slot : saves){
             if(slot.getSector() != null){
-                if(slot.getSector().save != null){
-                    Log.warn("Sector @ has two corresponding saves: @ and @", slot.getSector(), slot.getSector().save.file, slot.file);
+                Sector sector = slot.getSector();
+
+                String name = slot.meta.tags.get("sectorPreset");
+                Sector remapTarget = null;
+
+                if(name != null){
+                    if(!name.isEmpty()){ //if this save had a preset defined...
+                        SectorPreset preset = content.sector(name);
+                        //...place it in the right sector according to its preset
+                        if(preset != null && preset.sector != sector && preset.requireUnlock){
+                            remapTarget = preset.sector;
+                        }
+                    }
+                }else{ //there was no sector preset in the meta at all, which means this is a legacy save that may need mapping
+                    SectorPreset target = content.sectors().find(s -> s.planet == sector.planet && s.originalPosition == sector.id);
+                    if(target != null && target.sector != sector && target.requireUnlock){ //there is indeed a sector preset that used to have this ID, and it needs remapping!
+                        remapTarget = target.sector;
+                    }
                 }
-                slot.getSector().save = slot;
+
+                if(remapTarget != null){
+                    //if the file name matches the destination of the remap, assume it has already been remapped, and skip the file movement procedure
+                    if(!slot.file.equals(getSectorFile(remapTarget))){
+                        Log.info("Remapping sector: @ -> @ (@)", sector.id, remapTarget.id, remapTarget.preset);
+
+                        sector.loadInfo();
+                        //overwrite the target sector's info with the save's info
+                        Core.settings.putJson(remapTarget.planet.name + "-s-" + remapTarget.id + "-info", sector.info);
+                        remapTarget.loadInfo();
+
+                        //queue a clear of the sector that had its data moved
+                        infoToClear.add(sector);
+                        //add to the remapped list (if it was remapped, don't clear it!)
+                        remapped.add(remapTarget);
+
+                        remapTarget.save = slot;
+                        try{
+                            Fi target = getSectorFile(remapTarget);
+                            //move over save file
+                            slot.file.moveTo(target);
+                            slot.file = target;
+                        }catch(Exception e){
+                            Log.err("Failed to move sector files when remapping: " + sector.id + " -> " + remapTarget.id, e);
+                        }
+                    }
+
+                    remapTarget.save = slot;
+                    slot.meta.rules.sector = remapTarget;
+                }else{
+                    if(sector.save != null){
+                        Log.warn("Sector @ has two corresponding saves: @ and @", sector, sector.save.file, slot.file);
+                    }
+                    sector.save = slot;
+                }
             }
+        }
+
+        for(var sector : infoToClear){
+           if(!remapped.contains(sector)){
+               sector.clearInfo();
+           }
         }
     }
 
@@ -198,7 +247,7 @@ public class Saves{
     }
 
     public class SaveSlot{
-        public final Fi file;
+        public Fi file;
         boolean requestedPreview;
         public SaveMeta meta;
 
@@ -207,8 +256,12 @@ public class Saves{
         }
 
         public void load() throws SaveException{
+            load(world.context);
+        }
+
+        public void load(WorldContext context) throws SaveException{
             try{
-                SaveIO.load(file);
+                SaveIO.load(file, context);
                 meta = SaveIO.getMeta(file);
                 current = this;
                 totalPlaytime = meta.timePlayed;
@@ -313,6 +366,7 @@ public class Saves{
         }
 
         public @Nullable Sector getSector(){
+            //TODO remap sectors
             return meta == null || meta.rules == null ? null : meta.rules.sector;
         }
 

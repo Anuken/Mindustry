@@ -23,7 +23,7 @@ abstract class MechComp implements Posc, Hitboxc, Unitc, Mechc, ElevationMovec{
     @Override
     public void update(){
         //trigger animation only when walking manually
-        if(walked || net.client()){
+        if(walked || net.client() || isRemote()){
             float len = deltaLen();
             baseRotation = Angles.moveToward(baseRotation, deltaAngle(), type().baseRotateSpeed * Mathf.clamp(len / type().speed / Time.delta) * Time.delta);
             walkTime += len;
