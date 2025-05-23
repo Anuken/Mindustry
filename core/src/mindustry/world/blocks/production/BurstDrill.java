@@ -18,6 +18,7 @@ public class BurstDrill extends Drill{
     public float shake = 2f;
     public Interp speedCurve = Interp.pow2In;
 
+    public @Load("@-top") TextureRegion topRegion;
     public @Load("@-top-invert") TextureRegion topInvertRegion;
     public @Load("@-glow") TextureRegion glowRegion;
     public @Load("@-arrow") TextureRegion arrowRegion;
