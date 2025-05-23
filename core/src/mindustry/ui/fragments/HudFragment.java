@@ -991,7 +991,7 @@ public class HudFragment{
                         if(applied.get(effect.id) && !effect.isHidden()){
                             t.image(effect.uiIcon).size(iconMed).get()
                             .addListener(new Tooltip(l -> l.label(() ->
-                                effect.localizedName + " [lightgray]" + UI.formatTime(player.unit().getDuration(effect))).style(Styles.outlineLabel)));
+                                player.dead() ? "" : effect.localizedName + " [lightgray]" + UI.formatTime(player.unit().getDuration(effect))).style(Styles.outlineLabel)));
                         }
                     }
 

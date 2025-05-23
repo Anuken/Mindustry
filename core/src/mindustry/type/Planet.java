@@ -2,6 +2,7 @@ package mindustry.type;
 
 import arc.*;
 import arc.audio.*;
+import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g3d.*;
@@ -167,6 +168,11 @@ public class Planet extends UnlockableContent{
     public Cons<Rules> ruleSetter = r -> {};
     /** If true, RTS AI can be customized. */
     public boolean showRtsAIRule = false;
+
+    /** If true, planet data is loaded as 'planets/{name}.json'. This is only tested/functional in vanilla! */
+    public boolean loadPlanetData = false;
+    /** Data indicating attack sector positions and sector mappings. */
+    public @Nullable PlanetData data;
 
     public Planet(String name, Planet parent, float radius){
         super(name);
@@ -389,6 +395,22 @@ public class Planet extends UnlockableContent{
         clipRadius = Math.max(clipRadius, radius + atmosphereRadOut + 0.5f);
     }
 
+    public @Nullable PlanetData getData(){
+        if(loadPlanetData && data == null){
+            Fi file = tree.get("planets/" + name + ".json");
+            if(file.exists()){
+                data = JsonIO.read(PlanetData.class, file.readString());
+                for(int i : data.attackSectors){
+                    if(i >= 0 && i < sectors.size){
+                        sectors.get(i).generateEnemyBase = true;
+                    }
+                }
+            }
+        }
+
+        return data;
+    }
+
     /** Gets a sector a tile position. */
     public Sector getSector(Ptile tile){
         return sectors.get(tile.id);
@@ -579,5 +601,10 @@ public class Planet extends UnlockableContent{
             //right vector
             Tmp.v31.set(Tmp.v32).rotate(Vec3.Y, -rotation).add(sector.tile.v).rotate(sector.tile.v, 90).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor()
         );
+    }
+
+    public static class PlanetData{
+        public ObjectIntMap<String> presets = new ObjectIntMap<>();
+        public int[] attackSectors = {};
     }
 }

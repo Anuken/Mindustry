@@ -381,24 +381,28 @@ public class ServerControl implements ApplicationListener{
                 }
             }else{
                 result = maps.getShuffleMode().next(preset, state.map);
-                info("Randomized next map to be @.", result.plainName());
+                if(result != null){
+                    info("Randomized next map to be @.", result.plainName());
+                }
             }
 
             info("Loading map...");
 
             logic.reset();
-            lastMode = preset;
-            Core.settings.put("lastServerMode", lastMode.name());
-            try{
-                world.loadMap(result, result.applyRules(lastMode));
-                state.rules = result.applyRules(preset);
-                logic.play();
+            if(result != null){
+                lastMode = preset;
+                Core.settings.put("lastServerMode", lastMode.name());
+                try{
+                    world.loadMap(result, result.applyRules(lastMode));
+                    state.rules = result.applyRules(preset);
+                    logic.play();
 
-                info("Map loaded.");
+                    info("Map loaded.");
 
-                netServer.openServer();
-            }catch(MapException e){
-                err("@: @", e.map.plainName(), e.getMessage());
+                    netServer.openServer();
+                }catch(MapException e){
+                    err("@: @", e.map.plainName(), e.getMessage());
+                }
             }
         });
 

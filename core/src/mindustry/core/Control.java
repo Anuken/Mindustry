@@ -412,7 +412,8 @@ public class Control implements ApplicationListener, Loadable{
                 try{
                     boolean hadNoCore = !sector.info.hasCore;
                     reloader.begin();
-                    slot.load();
+                    //pass in a sector context to make absolutely sure the correct sector is written; it may differ from what's in the meta due to remapping.
+                    slot.load(world.makeSectorContext(sector));
                     slot.setAutosave(true);
                     state.rules.sector = sector;
                     state.rules.cloudColor = sector.planet.landCloudColor;

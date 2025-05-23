@@ -19,7 +19,6 @@ public class MapMarkers{
     public void add(int id, ObjectiveMarker marker){
         if(marker == null) return;
         var prev = map.put(id, marker);
-
         setMarker(worldMarkers, marker, prev, m -> m.world, (m, i) -> m.world = i);
         setMarker(mapMarkers, marker, prev, m -> m.minimap, (m, i) -> m.minimap = i);
         setMarker(lightMarkers, marker, prev, m -> m.light, (m, i) -> m.light = i);

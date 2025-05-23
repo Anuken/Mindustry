@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
@@ -115,6 +116,14 @@ public class BlockIndexer{
             }
 
             updatePresentOres();
+
+            for(Team team : Team.all){
+                var data = state.teams.get(team);
+
+                if(team.rules().prebuildAi && data.hasCore()){
+                    PrebuildAI.sortPlans(data.plans);
+                }
+            }
         });
     }
 
