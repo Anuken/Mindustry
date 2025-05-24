@@ -38,6 +38,7 @@ public enum LogicOp{
     abs("abs", a -> Math.abs(a)), //not a method reference because it fails to compile for some reason
     sign("sign", Math::signum),
     log("log", Math::log),
+	logn("logn", (x, y) -> Math.log(x) / Math.log(y)),
     log10("log10", Math::log10),
     floor("floor", Math::floor),
     ceil("ceil", Math::ceil),
