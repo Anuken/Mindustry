@@ -6421,7 +6421,7 @@ public class Blocks{
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
-            requirements(Category.units, with(Items.graphite, 100, Items.silicon, 140, Items.tungsten, 180));
+            requirements(Category.units, with(Items.graphite, 140, Items.silicon, 220, Items.tungsten, 180));
             regionSuffix = "-dark";
             hasPower = true;
             consumePower(2f);
@@ -6430,7 +6430,7 @@ public class Blocks{
         }};
 
         payloadUnloader = new PayloadUnloader("payload-unloader"){{
-            requirements(Category.units, with(Items.graphite, 60, Items.silicon, 100, Items.tungsten, 90));
+            requirements(Category.units, with(Items.graphite, 80, Items.silicon, 160, Items.tungsten, 90));
             regionSuffix = "-dark";
             hasPower = true;
             consumePower(2f);
