@@ -6356,7 +6356,7 @@ public class Blocks{
         }};
 
         payloadMassDriver = new PayloadMassDriver("payload-mass-driver"){{
-            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.graphite, 50));
+            requirements(Category.units, with(Items.tungsten, 40, Items.silicon, 50, Items.graphite, 20));
             regionSuffix = "-dark";
             size = 3;
             reload = 130f;
@@ -6368,13 +6368,13 @@ public class Blocks{
         }};
 
         largePayloadMassDriver = new PayloadMassDriver("large-payload-mass-driver"){{
-            requirements(Category.units, with(Items.thorium, 200, Items.tungsten, 200, Items.silicon, 200, Items.graphite, 100, Items.oxide, 30));
+            requirements(Category.units, with(Items.phaseFabric, 20, Items.tungsten, 200, Items.silicon, 200, Items.graphite, 100, Items.oxide, 30));
             regionSuffix = "-dark";
             size = 5;
             reload = 130f;
             chargeTime = 100f;
-            range = 1100f;
-            maxPayloadSize = 3.5f;
+            range = 2100f;
+            maxPayloadSize = 5f;
             consumePower(3f);
         }};
 
@@ -6384,24 +6384,24 @@ public class Blocks{
             itemCapacity = 100;
             consumePower(1f);
             size = 3;
-            deconstructSpeed = 1f;
+            deconstructSpeed = 3f;
         }};
 
         deconstructor = new PayloadDeconstructor("deconstructor"){{
-            requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 100, Items.silicon, 250, Items.carbide, 250));
+            requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 100, Items.silicon, 250, Items.carbide, 50));
             regionSuffix = "-dark";
             itemCapacity = 250;
             consumePower(3f);
             size = 5;
-            deconstructSpeed = 2f;
+            deconstructSpeed = 6f;
         }};
 
         constructor = new Constructor("constructor"){{
-            requirements(Category.units, with(Items.silicon, 100, Items.beryllium, 150, Items.tungsten, 80));
+            requirements(Category.units, with(Items.silicon, 50, Items.beryllium, 75, Items.tungsten, 40));
             regionSuffix = "-dark";
             hasPower = true;
             buildSpeed = 0.6f;
-            consumePower(2f);
+            consumePower(2.5f);
             size = 3;
             //TODO expand this list
             filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.carbideWallLarge, Blocks.reinforcedSurgeWallLarge, Blocks.reinforcedLiquidContainer, Blocks.reinforcedContainer, Blocks.beamNode);
@@ -6409,7 +6409,7 @@ public class Blocks{
 
         //yes this block is pretty much useless
         largeConstructor = new Constructor("large-constructor"){{
-            requirements(Category.units, with(Items.silicon, 150, Items.oxide, 150, Items.tungsten, 200, Items.phaseFabric, 40));
+            requirements(Category.units, with(Items.silicon, 150, Items.oxide, 100, Items.tungsten, 200, Items.thorium, 80));
             regionSuffix = "-dark";
             hasPower = true;
             buildSpeed = 0.75f;
@@ -6417,11 +6417,11 @@ public class Blocks{
             minBlockSize = 3;
             size = 5;
 
-            consumePower(2f);
+            consumePower(3f);
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
-            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.tungsten, 80));
+            requirements(Category.units, with(Items.graphite, 100, Items.silicon, 140, Items.tungsten, 180));
             regionSuffix = "-dark";
             hasPower = true;
             consumePower(2f);
@@ -6430,7 +6430,7 @@ public class Blocks{
         }};
 
         payloadUnloader = new PayloadUnloader("payload-unloader"){{
-            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.tungsten, 30));
+            requirements(Category.units, with(Items.graphite, 60, Items.silicon, 100, Items.tungsten, 90));
             regionSuffix = "-dark";
             hasPower = true;
             consumePower(2f);
