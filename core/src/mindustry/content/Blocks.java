@@ -6374,7 +6374,7 @@ public class Blocks{
             reload = 130f;
             chargeTime = 100f;
             range = 2100f;
-            maxPayloadSize = 5f;
+            maxPayloadSize = 4f;
             consumePower(3f);
         }};
 
