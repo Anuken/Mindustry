@@ -437,7 +437,7 @@ public class UnitTypes{
 
                 bullet = new LaserBulletType(){{
                     damage = 45f;
-                    recoil = 1f;
+                    recoil = 0f;
                     sideAngle = 45f;
                     sideWidth = 1f;
                     sideLength = 70f;
