@@ -6260,7 +6260,7 @@ public class Blocks{
         }};
 
         tankAssembler = new UnitAssembler("tank-assembler"){{
-            requirements(Category.units, with(Items.thorium, 500, Items.oxide, 150, Items.carbide, 80, Items.silicon, 500));
+            requirements(Category.units, with(Items.thorium, 500, Items.oxide, 150, Items.carbide, 80, Items.silicon, 650));
             regionSuffix = "-dark";
             size = 5;
             plans.add(
@@ -6270,12 +6270,12 @@ public class Blocks{
             areaSize = 13;
             researchCostMultiplier = 0.4f;
 
-            consumePower(3f);
+            consumePower(2.5f);
             consumeLiquid(Liquids.cyanogen, 9f / 60f);
         }};
 
         shipAssembler = new UnitAssembler("ship-assembler"){{
-            requirements(Category.units, with(Items.carbide, 100, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 800, Items.thorium, 400));
+            requirements(Category.units, with(Items.carbide, 100, Items.oxide, 200, Items.tungsten, 550, Items.silicon, 900, Items.thorium, 400));
             regionSuffix = "-dark";
             size = 5;
             plans.add(
@@ -6284,12 +6284,12 @@ public class Blocks{
             );
             areaSize = 13;
 
-            consumePower(3f);
+            consumePower(2.5f);
             consumeLiquid(Liquids.cyanogen, 12f / 60f);
         }};
 
         mechAssembler = new UnitAssembler("mech-assembler"){{
-            requirements(Category.units, with(Items.carbide, 200, Items.thorium, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
+            requirements(Category.units, with(Items.carbide, 200, Items.thorium, 600, Items.oxide, 200, Items.tungsten, 550, Items.silicon, 1000));
             regionSuffix = "-dark";
             size = 5;
             //TODO different reqs
@@ -6299,14 +6299,14 @@ public class Blocks{
             );
             areaSize = 13;
 
-            consumePower(3.5f);
+            consumePower(3f);
             consumeLiquid(Liquids.cyanogen, 12f / 60f);
         }};
 
         //TODO requirements / only accept inputs
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
-            requirements(Category.units, with(Items.carbide, 300, Items.thorium, 500, Items.oxide, 200, Items.phaseFabric, 400));
-            consumePower(4f);
+            requirements(Category.units, with(Items.carbide, 300, Items.thorium, 500, Items.oxide, 250, Items.phaseFabric, 400));
+            consumePower(3.5f);
             regionSuffix = "-dark";
             researchCostMultiplier = 0.75f;
 
