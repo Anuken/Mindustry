@@ -31,10 +31,10 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
 
     @Override
     public void draw(){
-        drawAt(text, x, y, z, flags, fontSize);
+        drawAt(text, x, y, z, flags, fontSize, Align.center);
     }
 
-    public static void drawAt(String text, float x, float y, float layer, int flags, float fontSize){
+    public static void drawAt(String text, float x, float y, float layer, int flags, float fontSize, int align){
         Draw.z(layer);
         float z = Drawf.text();
 
@@ -46,14 +46,29 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
         font.getData().setScale(0.25f / Scl.scl(1f) * fontSize);
         layout.setText(font, text);
 
+        if(Align.isBottom(align)){
+            y += layout.height + 1.5f;
+        }else if(Align.isTop(align)){
+            y -= 1.5f;
+        }else{
+            y += layout.height / 2;
+        }
+
+        float dx = 0;
+        if(Align.isLeft(align)){
+            dx = 1;
+        }else if(Align.isRight(align)){
+            dx = -1;
+        }
+
         if((flags & flagBackground) != 0){
             Draw.color(0f, 0f, 0f, 0.3f);
-            Fill.rect(x, y - layout.height / 2, layout.width + 2, layout.height + 3);
+            Fill.rect(x + dx * (layout.width / 2 + 1), y - layout.height / 2, layout.width + 2, layout.height + 3);
             Draw.color();
         }
 
         font.setColor(Color.white);
-        font.draw(text, x, y, 0, Align.center, false);
+        font.draw(text, x + dx, y, 0, Align.isCenterHorizontal(align) ? Align.center : align, false);
 
         Draw.reset();
         Pools.free(layout);
