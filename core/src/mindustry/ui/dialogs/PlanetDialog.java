@@ -665,10 +665,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                     data.presets.put(sector.preset.name, sector.id);
                                 }
                             }
+                            Log.info("Saving sectors for @: @ presets, @ procedural attack sectors", state.planet.name, data.presets.size, attack.size);
                             data.attackSectors = attack.toArray();
                             files.local("planets/" + state.planet.name + ".json").writeString(JsonIO.write(data));
 
-                            Vars.ui.showInfoFade("@editor.saved");
+                            ui.showInfoFade("@editor.saved");
                         }catch(Exception e){
                             Log.err(e);
                         }
