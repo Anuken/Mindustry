@@ -1,5 +1,6 @@
 package mindustry.graphics.g3d;
 
+import arc.*;
 import arc.graphics.*;
 import arc.math.geom.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
@@ -7,7 +8,9 @@ import mindustry.maps.generators.*;
 
 public class MeshBuilder{
     private static final Vec3 v1 = new Vec3(), v2 = new Vec3(), v3 = new Vec3(), v4 = new Vec3();
-    private static final float[] floats = new float[3 + 3 + 1];
+    private static final boolean gl30 = Core.gl30 != null;
+    private static final float[] floats = new float[3 + (gl30 ? 1 : 3) + 1];
+    private static float[] tmpHeights = new float[14580]; //highest amount of corners in vanilla
     private static Mesh mesh;
 
     public static Mesh buildIcosphere(int divisions, float radius, Color color){
@@ -73,6 +76,19 @@ public class MeshBuilder{
 
         begin(grid.tiles.length * 12);
 
+        float[] heights;
+
+        if(tmpHeights == null || tmpHeights.length < grid.corners.length){
+            heights = tmpHeights = new float[grid.corners.length];
+        }else{
+            heights = tmpHeights;
+        }
+
+        //cache heights in an array to prevent redundant calls to getHeight
+        for(int i = 0; i < grid.corners.length; i++){
+            heights[i] = mesher.getHeight(grid.corners[i].v);
+        }
+
         for(Ptile tile : grid.tiles){
             if(mesher.skip(tile.v)){
                 continue;
@@ -81,7 +97,7 @@ public class MeshBuilder{
             Corner[] c = tile.corners;
 
             for(Corner corner : c){
-                corner.v.setLength((1f + mesher.getHeight(v2.set(corner.v)) * intensity) * radius);
+                corner.v.scl((1f + heights[corner.id] * intensity) * radius);
             }
 
             Vec3 nor = normal(c[0].v, c[2].v, c[4].v);
@@ -120,7 +136,7 @@ public class MeshBuilder{
     private static void begin(int count){
         mesh = new Mesh(true, count, 0,
         VertexAttribute.position3,
-        VertexAttribute.normal,
+        !gl30 ? VertexAttribute.normal : VertexAttribute.packedNormal,
         VertexAttribute.color
         );
 
@@ -132,6 +148,7 @@ public class MeshBuilder{
         Mesh last = mesh;
         last.getVerticesBuffer().limit(last.getVerticesBuffer().position());
         mesh = null;
+
         return last;
     }
 
@@ -150,11 +167,29 @@ public class MeshBuilder{
         floats[1] = a.y;
         floats[2] = a.z;
 
-        floats[3] = normal.x;
-        floats[4] = normal.y;
-        floats[5] = normal.z;
+        if(gl30){
+            floats[3] = packNormals(normal.x, normal.y, normal.z);
 
-        floats[6] = color.toFloatBits();
+            floats[4] = color.toFloatBits();
+        }else{
+            floats[3] = normal.x;
+            floats[4] = normal.x;
+            floats[5] = normal.x;
+
+            floats[6] = color.toFloatBits();
+        }
+
         mesh.getVerticesBuffer().put(floats);
+    }
+
+    private static float packNormals(float x, float y, float z){
+        int xs = x < 0 ? 1 : 0;
+        int ys = y < 0 ? 1 : 0;
+        int zs = z < 0 ? 1 : 0;
+        int vi =
+        zs << 29 | ((int)(z * 511 + (zs << 9)) & 511) << 20 |
+        ys << 19 | ((int)(y * 511 + (ys << 9)) & 511) << 10 |
+        xs << 9  | ((int)(x * 511 + (xs << 9)) & 511);
+        return Float.intBitsToFloat(vi);
     }
 }

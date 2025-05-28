@@ -58,10 +58,10 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     );
 
     float water = 2f / arr[0].length;
+    Vec3 basePos = new Vec3(0.9341721, 0.0, 0.3568221);
 
     float rawHeight(Vec3 position){
-        position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow(Simplex.noise3d(seed, 7, 0.5f, 1f/3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
+        return (Mathf.pow(Simplex.noise3d(seed, 7, 0.5f, 1f/3f, position.x * scl, position.y * scl, position.z * scl), 2.3f) + waterOffset) / (1f + waterOffset);
     }
 
     @Override
@@ -87,10 +87,25 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
     @Override
     public Color getColor(Vec3 position){
+        float dst = 999f;
+        for(Sector sector : Planets.serpulo.sectors){
+            if(sector.hasEnemyBase() && !sector.isCaptured()){
+                dst = Math.min(dst, position.dst(sector.tile.v));
+            }
+        }
+
+        if(position.dst(basePos) < 0.55f && dst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 5.5f, position.x, position.y + 200f, position.z)*0.08f < 0.06f){
+            return Tmp.c1.set(Team.crux.color).lerp(Team.sharded.color, 0.4f*Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 999f, position.z)).a(packAlpha(0f, 1f));
+        }
+
+        //if(dst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 4f, position.x, position.y + 200f, position.z)*0.14f < 0.09f){
+        //    return Tmp.c1.set(Team.crux.color).lerp(Team.sharded.color, 0.4f*Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 999f, position.z)).a(packAlpha(0f, 1f));
+        //}
+
         Block block = getBlock(position);
         //replace salt with sand color
         if(block == Blocks.salt) return Blocks.sand.mapColor;
-        return Tmp.c1.set(block.mapColor).a(1f - block.albedo);
+        return Tmp.c1.set(block.mapColor).a(packAlpha(block.albedo, 0f));
     }
 
     @Override
@@ -103,10 +118,14 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         }
     }
 
+    public static double metalMag = 0.11, metalScl = 1, metalDstScl = 0.25, metalThresh = 0.1;
+
     Block getBlock(Vec3 position){
+        //float metalDst = position.dst(basePos);
         float height = rawHeight(position);
         Tmp.v31.set(position);
         position = Tmp.v33.set(position).scl(scl);
+
         float rad = scl;
         float temp = Mathf.clamp(Math.abs(position.y * 2f) / (rad));
         float tnoise = Simplex.noise3d(seed, 7, 0.56, 1f/3f, position.x, position.y + 999f, position.z);
@@ -120,6 +139,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         if(tar > 0.5f){
             return tars.get(res, res);
         }else{
+            //TODO: add this later once presets are defined for this side
+            /*
+            if(metalDst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, metalScl, position.x, position.y + 99f, position.z)*metalMag < metalThresh){
+                return Blocks.metalFloor;
+            }*/
             return res;
         }
     }

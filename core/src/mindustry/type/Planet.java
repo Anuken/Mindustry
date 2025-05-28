@@ -43,6 +43,8 @@ public class Planet extends UnlockableContent{
     public @Nullable GenericMesh cloudMesh;
     /** Mesh used for rendering planet grid outlines. Null on server or if {@link #grid} is null. */
     public @Nullable Mesh gridMesh;
+    /** If true, this planet's mesh should be reloaded when it is next shown. */
+    public boolean requiresMeshReload;
     /** Position in global coordinates. Will be 0,0,0 until the Universe updates it. */
     public Vec3 position = new Vec3();
     /** Grid used for the sectors on the planet. Null if this planet can't be landed on. */
@@ -348,8 +350,13 @@ public class Planet extends UnlockableContent{
         return mat.setToTranslation(position).rotate(Vec3.Y, getRotation());
     }
 
-    /** Regenerates the planet mesh. For debugging only. */
+    /** Regenerates the planet mesh. */
     public void reloadMesh(){
+        if(headless) return;
+
+        if(mesh != null){
+            mesh.dispose();
+        }
         mesh = meshLoader.get();
     }
 

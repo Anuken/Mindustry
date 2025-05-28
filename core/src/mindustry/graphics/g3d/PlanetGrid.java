@@ -240,6 +240,14 @@ public class PlanetGrid{
             corners = new Corner[edgeCount];
             edges = new Edge[edgeCount];
         }
+
+        @Override
+        public String toString(){
+            return "Ptile{" +
+            "id=" + id +
+            " " + v +
+            '}';
+        }
     }
 
     public static class Corner{
