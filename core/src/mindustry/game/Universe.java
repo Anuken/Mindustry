@@ -97,6 +97,12 @@ public class Universe{
         }
     }
 
+    public void setSimulationSeconds(int seconds){
+        this.seconds = seconds;
+
+        save();
+    }
+
     public void clearLoadoutInfo(){
         lastLoadout = null;
         lastLaunchResources = new ItemSeq();
