@@ -659,8 +659,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                     if(debugSectorAttackEdit){
                         int timeShift = input.keyDown(KeyCode.rightBracket) ? 1 : input.keyDown(KeyCode.leftBracket) ? -1 : 0;
-                        if(timeShift != -1){
-                            universe.setSeconds(universe.secondsf() + timeShift * Time.delta * 2f);
+                        if(timeShift != 0){
+                            universe.setSeconds(universe.secondsf() + timeShift * Time.delta * 2.5f);
                         }
                     }
 

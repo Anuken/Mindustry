@@ -4,7 +4,6 @@ import arc.*;
 import arc.graphics.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
 
@@ -98,6 +97,7 @@ public class MeshBuilder{
         }, divisions, radius, 0);
     }
 
+    //TODO: make this thread safe
     public static Mesh buildHex(HexMesher mesher, int divisions, float radius, float intensity){
         PlanetGrid grid = PlanetGrid.create(divisions);
 
@@ -201,8 +201,6 @@ public class MeshBuilder{
         }
     }
 
-    static int totalBytes;
-
     private static Mesh end(){
         Mesh last = mesh;
         last.getVerticesBuffer().limit(last.getVerticesBuffer().position());
@@ -210,11 +208,6 @@ public class MeshBuilder{
             last.getIndicesBuffer().limit(last.getIndicesBuffer().position());
         }
         mesh = null;
-
-        totalBytes += last.getVerticesBuffer().capacity() * 4;
-        totalBytes += last.getIndicesBuffer().capacity() * 2;
-
-        Log.info("total memory used: @ mb", totalBytes / 1000f / 1000f);
 
         return last;
     }
