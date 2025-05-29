@@ -114,24 +114,31 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
     @Override
     public Color getEmissiveColor(Vec3 position){
-        float dst = 999f, captureDst = 999f;
+        float dst = 999f, captureDst = 999f, lightScl = 0f;
         for(Sector sector : Planets.serpulo.sectors){
             if(sector.hasEnemyBase() && !sector.isCaptured()){
                 dst = Math.min(dst, position.dst(sector.tile.v) - (sector.preset != null ? sector.preset.difficulty/10f * 0.03f - 0.03f : 0f));
             }else if(sector.hasBase()){
-                captureDst = Math.min(captureDst, position.dst(sector.tile.v));
+                float cdst = position.dst(sector.tile.v);
+                if(cdst < captureDst){
+                    captureDst = cdst;
+                    lightScl = sector.info.lightCoverage;
+                }
             }
         }
+
+        lightScl = Math.min(lightScl / 50000f, 1.3f);
+        if(lightScl < 1f) lightScl = Interp.pow5Out.apply(lightScl);
 
         float freq = 0.05f;
         if(position.dst(basePos) < 0.55f ?
 
             dst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 5.5f, position.x, position.y + 200f, position.z)*0.08f + ((basePos.dst(position) + 0.00f) % freq < freq/2f ? 1f : 0f) * 0.07f < 0.08f :
-            dst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 6f, position.x, position.y + 370f, position.z)*0.06f < 0.045){
+            dst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 9f, position.x, position.y + 370f, position.z)*0.06f < 0.045){
 
             return Tmp.c1.set(Team.crux.color).mul(0.8f + Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 99f, position.z) * 0.4f)
                 .lerp(Team.sharded.color, 0.2f*Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 999f, position.z));
-        }else if(captureDst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 6f, position.x, position.y + 600f, position.z)*0.07f < 0.05){
+        }else if(captureDst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 9f, position.x, position.y + 600f, position.z)*0.07f < 0.05 * lightScl){
             return Tmp.c1.set(Team.sharded.color).mul(0.7f + Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 99f, position.z) * 0.4f)
                 .lerp(Team.crux.color, 0.3f*Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 999f, position.z));
         }

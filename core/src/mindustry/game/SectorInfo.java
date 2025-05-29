@@ -73,6 +73,8 @@ public class SectorInfo{
     public float secondsPassed;
     /** How many minutes this sector has been captured. */
     public float minutesCaptured;
+    /** Light coverage in terms of radius. */
+    public float lightCoverage;
     /** Display name. */
     public @Nullable String name;
     /** Displayed icon. */
@@ -179,6 +181,15 @@ public class SectorInfo{
         if(state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.captureWave > 0 && !state.rules.sector.planet.allowWaves){
             winWave = state.rules.sector.preset.captureWave;
         }
+
+        lightCoverage = 0f;
+        for(var build : state.rules.defaultTeam.data().buildings){
+            if(build.block.emitLight){
+                lightCoverage += build.block.lightRadius * build.efficiency;
+            }
+        }
+
+        lightCoverage += state.rules.defaultTeam.data().units.sumf(u -> u.type.lightRadius/2f);
 
         state.wave = wave;
         state.rules.waves = waves;
