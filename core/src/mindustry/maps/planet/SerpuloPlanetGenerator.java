@@ -159,7 +159,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     public static double metalMag = 0.11, metalScl = 1, metalDstScl = 0.25, metalThresh = 0.1;
 
     Block getBlock(Vec3 position){
-        //float metalDst = position.dst(basePos);
         float height = rawHeight(position);
         float px = position.x * scl, py = position.y * scl, pz = position.z * scl;
 
@@ -176,11 +175,21 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         if(tar > 0.5f){
             return tars.get(res, res);
         }else{
-            //TODO: add this later once presets are defined for this side
-            /*
-            if(metalDst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, metalScl, position.x, position.y + 99f, position.z)*metalMag < metalThresh){
-                return Blocks.metalFloor;
-            }*/
+            if(position.within(basePos, 0.65f)){
+
+                float dst = 999f;
+                for(Sector sector : Planets.serpulo.sectors){
+                    if(sector.hasEnemyBase()){
+                        dst = Math.min(dst, position.dst(sector.tile.v));
+                    }
+                }
+
+                float freq = 0.05f;
+
+                if(dst*0.85f + Simplex.noise3d(seed, 3, 0.4, 5.5f, position.x, position.y + 200f, position.z)*0.015f + ((basePos.dst(position) + 0.00f) % freq < freq/2f ? 1f : 0f) * 0.07f < 0.15f){
+                    return Blocks.metalFloor;
+                }
+            }
             return res;
         }
     }
