@@ -47,7 +47,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //TODO this might be too green
         //if(block == Blocks.beryllicStone) block = Blocks.arkyicStone;
 
-        return Tmp.c1.set(block.mapColor).a(packAlpha(block.albedo, 0f));
+        return Tmp.c1.set(block.mapColor).a(1f - block.albedo);
     }
 
     @Override
@@ -64,17 +64,17 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     }
 
     Block getBlock(Vec3 position){
-        float ice = rawTemp(position);
-        Tmp.v32.set(position);
+        float px = position.x, py = position.y, pz = position.z;
 
+        float ice = rawTemp(position);
         float height = rawHeight(position);
-        Tmp.v31.set(position);
+
         height *= 1.2f;
         height = Mathf.clamp(height);
 
         Block result = terrain[Mathf.clamp((int)(height * terrain.length), 0, terrain.length - 1)];
 
-        if(ice < 0.3 + Math.abs(Ridged.noise3d(seed + crystalSeed, position.x + 4f, position.y + 8f, position.z + 1f, crystalOct, crystalScl)) * crystalMag){
+        if(ice < 0.3 + Math.abs(Ridged.noise3d(seed + crystalSeed, px + 4f, py + 8f, pz + 1f, crystalOct, crystalScl)) * crystalMag){
             return Blocks.crystallineStone;
         }
 
@@ -85,11 +85,9 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             }
         }
 
-        position = Tmp.v32;
-
         //TODO tweak this to make it more natural
         //TODO edge distortion?
-        if(ice < redThresh - noArkThresh && Ridged.noise3d(seed + arkSeed, position.x + 2f, position.y + 8f, position.z + 1f, arkOct, arkScl) > arkThresh){
+        if(ice < redThresh - noArkThresh && Ridged.noise3d(seed + arkSeed, px + 2f, py + 8f, pz + 1f, arkOct, arkScl) > arkThresh){
             //TODO arkyic in middle
             result = Blocks.beryllicStone;
         }

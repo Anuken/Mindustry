@@ -21,7 +21,7 @@ public class NoiseMesh extends HexMesh{
             public Color getColor(Vec3 position){
                 return color;
             }
-        }, divisions, false, radius, 0.2f);
+        }, divisions, radius, 0.2f);
     }
 
     /** Two-color variant. */
@@ -38,6 +38,6 @@ public class NoiseMesh extends HexMesh{
             public Color getColor(Vec3 position){
                 return Simplex.noise3d(8 + seed, coct, cper, cscl, 5f + position.x, 5f + position.y, 5f + position.z) > cthresh ? color2 : color1;
             }
-        }, divisions, false, radius, 0.2f);
+        }, divisions, radius, 0.2f);
     }
 }

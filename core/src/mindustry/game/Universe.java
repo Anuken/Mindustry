@@ -97,12 +97,6 @@ public class Universe{
         }
     }
 
-    public void setSimulationSeconds(int seconds){
-        this.seconds = seconds;
-
-        save();
-    }
-
     public void clearLoadoutInfo(){
         lastLoadout = null;
         lastLaunchResources = new ItemSeq();
@@ -326,6 +320,13 @@ public class Universe{
     public int seconds(){
         //use networked seconds when playing as client
         return net.client() ? netSeconds : seconds;
+    }
+
+    public void setSeconds(float seconds){
+        this.seconds = (int)seconds;
+        this.secondCounter = seconds - this.seconds;
+
+        save();
     }
 
     public float secondsf(){

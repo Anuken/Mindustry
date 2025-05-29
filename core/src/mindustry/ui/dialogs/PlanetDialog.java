@@ -285,6 +285,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             lookAt(state.planet.getLastSector());
         }
 
+        if(state.planet.requiresMeshReload){
+            state.planet.requiresMeshReload = false;
+            state.planet.reloadMesh();
+        }
+
         return super.show();
     }
 
@@ -651,6 +656,13 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             public void act(float delta){
                 if(scene.getDialog() == PlanetDialog.this && (scene.getHoverElement() == null || !scene.getHoverElement().isDescendantOf(e -> e instanceof ScrollPane))){
                     scene.setScrollFocus(PlanetDialog.this);
+
+                    if(debugSectorAttackEdit){
+                        int timeShift = input.keyDown(KeyCode.rightBracket) ? 1 : input.keyDown(KeyCode.leftBracket) ? -1 : 0;
+                        if(timeShift != -1){
+                            universe.setSeconds(universe.secondsf() + timeShift * Time.delta * 2f);
+                        }
+                    }
 
                     if(debugSectorAttackEdit && input.ctrl() && input.keyTap(KeyCode.s)){
                         try{

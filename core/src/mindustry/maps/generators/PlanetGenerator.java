@@ -2,7 +2,6 @@ package mindustry.maps.generators;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
@@ -25,10 +24,6 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
     public int seed = 0;
 
     protected @Nullable Sector sector;
-
-    public static float packAlpha(float albedo, float emissive){
-        return emissive > 0 ? 1f + 1f/255f - 0.5f * Mathf.clamp(emissive) : Mathf.clamp(albedo) * 0.5f;
-    }
 
     /** Should generate sector bases for a planet. */
     public void generateSector(Sector sector){

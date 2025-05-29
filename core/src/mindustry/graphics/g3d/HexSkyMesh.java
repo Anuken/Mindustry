@@ -29,7 +29,7 @@ public class HexSkyMesh extends PlanetMesh{
             public boolean skip(Vec3 position){
                 return Simplex.noise3d(7 + seed, octaves, persistence, scl, position.x, position.y * 3f, position.z) >= thresh;
             }
-        }, divisions, false, planet.radius, radius), Shaders.clouds);
+        }, divisions, planet.radius, radius), Shaders.clouds);
 
         this.speed = speed;
     }

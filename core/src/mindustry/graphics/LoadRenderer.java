@@ -32,7 +32,7 @@ public class LoadRenderer implements Disposable{
     private float testprogress = 0f;
     private StringBuilder assetText = new StringBuilder();
     private Bar[] bars;
-    private Mesh mesh = MeshBuilder.buildHex(colorRed, 2, true, 1f);
+    private Mesh mesh = MeshBuilder.buildLineHex(colorRed, 2);
     private Camera3D cam = new Camera3D();
     private int lastLength = -1;
     private FxProcessor fx;
