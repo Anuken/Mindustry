@@ -46,6 +46,7 @@ public class GlobalVars{
         putEntryOnly("@thisy");
         putEntryOnly("@links");
         putEntryOnly("@ipt");
+        putEntryOnly("@unitcap");
 
         putEntryOnly("sectionGeneral");
 

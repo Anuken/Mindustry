@@ -97,8 +97,14 @@ public class LVar{
     }
 
     public void setconst(Object value){
-        objval = value;
-        isobj = true;
+        if(value instanceof Number number){
+            numval = number.doubleValue();
+            objval = null;
+            isobj = false;
+        }else{
+            objval = value;
+            isobj = true;
+        }
     }
 
     public static boolean invalid(double d){
