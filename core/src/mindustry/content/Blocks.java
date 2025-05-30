@@ -3036,7 +3036,7 @@ public class Blocks{
 
             unitCapModifier = 15;
             researchCostMultipliers.put(Items.silicon, 0.5f);
-            researchCostMultiplier = 0.17f
+            researchCostMultiplier = 0.17f;
             
             lightRadius = 130;
             fogRadius = 61;
