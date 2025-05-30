@@ -18,8 +18,8 @@ public class NoiseMesh extends HexMesh{
             }
 
             @Override
-            public Color getColor(Vec3 position){
-                return color;
+            public void getColor(Vec3 position, Color out){
+                out.set(color);
             }
         }, divisions, radius, 0.2f);
     }
@@ -35,8 +35,8 @@ public class NoiseMesh extends HexMesh{
             }
 
             @Override
-            public Color getColor(Vec3 position){
-                return Simplex.noise3d(8 + seed, coct, cper, cscl, 5f + position.x, 5f + position.y, 5f + position.z) > cthresh ? color2 : color1;
+            public void getColor(Vec3 position, Color out){
+                out.set(Simplex.noise3d(8 + seed, coct, cper, cscl, 5f + position.x, 5f + position.y, 5f + position.z) > cthresh ? color2 : color1);
             }
         }, divisions, radius, 0.2f);
     }

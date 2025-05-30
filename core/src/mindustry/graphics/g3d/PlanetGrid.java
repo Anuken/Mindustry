@@ -47,7 +47,7 @@ public class PlanetGrid{
         }
     }
 
-    public static PlanetGrid create(int size){
+    public static synchronized PlanetGrid create(int size){
         //cache grids between calls, since only ~5 different grids total are needed
         if(size < cache.length && cache[size] != null){
             return cache[size];

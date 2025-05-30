@@ -21,8 +21,8 @@ public class HexSkyMesh extends PlanetMesh{
             }
 
             @Override
-            public Color getColor(Vec3 position){
-                return color;
+            public void getColor(Vec3 position, Color out){
+                out.set(color);
             }
 
             @Override

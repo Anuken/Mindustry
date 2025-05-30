@@ -39,15 +39,13 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     }
 
     @Override
-    public Color getColor(Vec3 position){
+    public void getColor(Vec3 position, Color out){
         Block block = getBlock(position);
 
         //more obvious color
         if(block == Blocks.crystallineStone) block = Blocks.crystalFloor;
-        //TODO this might be too green
-        //if(block == Blocks.beryllicStone) block = Blocks.arkyicStone;
 
-        return Tmp.c1.set(block.mapColor).a(1f - block.albedo);
+        out.set(block.mapColor).a(1f - block.albedo);
     }
 
     @Override
