@@ -74,6 +74,8 @@ public class CoreBlock extends StorageBlock{
         drawDisabled = false;
         canOverdrive = false;
         commandable = true;
+        //On by default to update clipSize internally
+        emitLight = true;
         envEnabled |= Env.space;
 
         //support everything
@@ -144,11 +146,6 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void init(){
-        //assign to update clipSize internally
-        lightRadius = 30f + 20f * size;
-        fogRadius = Math.max(fogRadius, (int)(lightRadius / 8f * 3f) + 13);
-        emitLight = true;
-
         super.init();
     }
 
