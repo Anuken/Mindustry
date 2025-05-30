@@ -5,6 +5,7 @@ public enum CutsceneAction{
     pan,
     zoom,
     stop,
+    shake,
     getHud,
     setHud;
 

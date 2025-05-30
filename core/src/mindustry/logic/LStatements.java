@@ -1772,6 +1772,12 @@ public class LStatements{
                     table.add(" level ");
                     fields(table, p1, str -> p1 = str);
                 }
+                case shake -> {
+                    table.add(" amount ");
+                    fields(table, p1, str -> p1 = str);
+                    table.add(" duration ");
+                    fields(table, p2, str -> p2 = str);
+                }
                 case setHud -> {
                     table.add(" shown ");
                     fields(table, p1, str -> p1 = str);

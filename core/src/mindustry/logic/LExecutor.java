@@ -1278,6 +1278,7 @@ public class LExecutor{
                     control.input.logicCutsceneZoom = Mathf.clamp(p1.numf());
                 }
                 case stop -> control.input.logicCutscene = false;
+                case shake -> renderer.shake(p1.numf(), p2.numf() * 60);
                 case getHud -> p1.setbool(!control.input.logicHideHud);
                 case setHud -> control.input.logicHideHud = !p1.bool();
             }
