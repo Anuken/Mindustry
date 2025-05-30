@@ -2959,6 +2959,9 @@ public class Blocks{
             buildCostMultiplier = 2f;
 
             unitCapModifier = 8;
+
+            lightRadius = 90;
+            fogRadius = 46;
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
@@ -2972,6 +2975,9 @@ public class Blocks{
 
             unitCapModifier = 16;
             researchCostMultiplier = 0.07f;
+            
+            lightRadius = 110;
+            fogRadius = 54;
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
@@ -2985,6 +2991,9 @@ public class Blocks{
 
             unitCapModifier = 24;
             researchCostMultiplier = 0.11f;
+            
+            lightRadius = 130;
+            fogRadius = 61;
         }};
 
         coreBastion = new CoreBlock("core-bastion"){{
@@ -3007,6 +3016,9 @@ public class Blocks{
 
             unitCapModifier = 15;
             researchCostMultiplier = 0.07f;
+            
+            lightRadius = 110;
+            fogRadius = 54;
         }};
 
         coreCitadel = new CoreBlock("core-citadel"){{
@@ -3024,7 +3036,10 @@ public class Blocks{
 
             unitCapModifier = 15;
             researchCostMultipliers.put(Items.silicon, 0.5f);
-            researchCostMultiplier = 0.17f;
+            researchCostMultiplier = 0.17f
+            
+            lightRadius = 130;
+            fogRadius = 61;
         }};
 
         coreAcropolis = new CoreBlock("core-acropolis"){{
@@ -3043,6 +3058,9 @@ public class Blocks{
             unitCapModifier = 15;
             researchCostMultipliers.put(Items.silicon, 0.4f);
             researchCostMultiplier = 0.1f;
+            
+            lightRadius = 150;
+            fogRadius = 69;
         }};
 
         container = new StorageBlock("container"){{
