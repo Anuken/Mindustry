@@ -1,9 +1,12 @@
 package mindustry.logic;
 
 public enum CutsceneAction{
+    active,
     pan,
     zoom,
-    stop;
+    stop,
+    getHud,
+    setHud;
 
     public static final CutsceneAction[] all = values();
 }
