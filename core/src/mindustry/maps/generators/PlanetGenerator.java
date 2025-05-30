@@ -37,6 +37,10 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
 
     }
 
+    public void beforeSaveWrite(Sector sector){
+
+    }
+
     public void getLockedText(Sector hovered, StringBuilder out){
         out.append("[gray]").append(Iconc.lock).append(" ").append(Core.bundle.get("locked"));
     }

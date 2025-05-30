@@ -20,13 +20,14 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class SerpuloPlanetGenerator extends PlanetGenerator{
-    //alternate, less direct generation (wip)
-    public static boolean alt = false;
+    //alternate, less direct generation
+    public static boolean indirectPaths = false;
+    //random water patches
+    public static boolean genLakes = false;
 
     BaseGenerator basegen = new BaseGenerator();
     float scl = 5f;
     float waterOffset = 0.05f;
-    boolean genLakes = false;
 
     Block[][] arr =
     {
@@ -71,6 +72,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
     @Override
     public void onSectorLost(Sector sector){
+        sector.planet.reloadMeshAsync();
+    }
+
+    @Override
+    public void beforeSaveWrite(Sector sector){
         sector.planet.reloadMeshAsync();
     }
 
@@ -234,7 +240,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                 Vec2 midpoint = Tmp.v1.set(to.x, to.y).add(x, y).scl(0.5f);
                 rand.nextFloat();
 
-                if(alt){
+                if(indirectPaths){
                     midpoint.add(Tmp.v2.set(1, 0f).setAngle(Angles.angle(to.x, to.y, x, y) + 90f * (rand.chance(0.5) ? 1f : -1f)).scl(Tmp.v1.dst(x, y) * 2f));
                 }else{
                     //add randomized offset to avoid straight lines

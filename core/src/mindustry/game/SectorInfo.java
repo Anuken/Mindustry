@@ -182,15 +182,6 @@ public class SectorInfo{
             winWave = state.rules.sector.preset.captureWave;
         }
 
-        lightCoverage = 0f;
-        for(var build : state.rules.defaultTeam.data().buildings){
-            if(build.block.emitLight){
-                lightCoverage += build.block.lightRadius * build.efficiency;
-            }
-        }
-
-        lightCoverage += state.rules.defaultTeam.data().units.sumf(u -> u.type.lightRadius/2f);
-
         state.wave = wave;
         state.rules.waves = waves;
         state.rules.waveSpacing = waveSpacing;
@@ -236,6 +227,15 @@ public class SectorInfo{
         damage = 0;
         hasSpawns = spawner.countSpawns() > 0;
 
+        lightCoverage = 0f;
+        for(var build : state.rules.defaultTeam.data().buildings){
+            if(build.block.emitLight){
+                lightCoverage += build.block.lightRadius * build.efficiency;
+            }
+        }
+
+        lightCoverage += state.rules.defaultTeam.data().units.sumf(u -> u.type.lightRadius/2f);
+
         //cap production at raw production.
         production.each((item, stat) -> {
             stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
@@ -252,6 +252,10 @@ public class SectorInfo{
 
         if(sector.planet.allowWaveSimulation){
             SectorDamage.writeParameters(sector);
+        }
+
+        if(sector.planet.generator != null){
+            sector.planet.generator.beforeSaveWrite(sector);
         }
     }
 
