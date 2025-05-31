@@ -2690,10 +2690,14 @@ public class UnitTypes{
             hitSize = 28f;
             treadPullOffset = 4;
             speed = 0.63f;
+            rotateSpeed = 1.2f;
             health = 11000;
-            armor = 20f;
+            armor = 26f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
+            drownTimeMultiplier = 3f;
+            floorMultiplier = 0.8f;
+            immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
             weapons.add(new Weapon("vanquish-weapon"){{
@@ -2765,7 +2769,7 @@ public class UnitTypes{
                     shootY = 5.5f;
                     recoil = 2f;
                     rotate = true;
-                    rotateSpeed = 2f;
+                    rotateSpeed = 2.6f;
 
                     bullet = new BasicBulletType(4.5f, 25){{
                         width = 6.5f;
@@ -2786,11 +2790,13 @@ public class UnitTypes{
             hitSize = 46f;
             treadPullOffset = 1;
             speed = 0.48f;
-            health = 22000;
-            armor = 26f;
-            crushDamage = 25f / 5f;
-            rotateSpeed = 0.8f;
-
+            health = 24000;
+            armor = 32f;
+            crushDamage = 35f / 5f;
+            drownTimeMultiplier = 6f;
+            floorMultiplier = 0.5f;
+            immunities.addAll(StatusEffects.burning, StatusEffects.melting);
+            
             float xo = 231f/2f, yo = 231f/2f;
             treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};
 
@@ -2802,7 +2808,7 @@ public class UnitTypes{
                 shake = 5f;
                 recoil = 5f;
                 rotate = true;
-                rotateSpeed = 0.6f;
+                rotateSpeed = 0.8f;
                 mirror = false;
                 x = 0f;
                 y = -2f;
@@ -2869,11 +2875,11 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(8f, 360f){{
+                bullet = new BasicBulletType(7f, 460f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
-                    lifetime = 35f;
+                    lifetime = 40f;
                     hitSize = 6f;
 
                     smokeEffect = Fx.shootSmokeTitan;
@@ -2901,7 +2907,7 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    int count = 6;
+                    int count = 8;
                     for(int j = 0; j < count; j++){
                         int s = j;
                         for(int i : Mathf.signs){
