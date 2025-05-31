@@ -26,7 +26,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     public static boolean genLakes = false;
 
     BaseGenerator basegen = new BaseGenerator();
-    float heightYOffset = 42.5f;
+    float heightYOffset = 42.7f;
     float scl = 5f;
     float waterOffset = 0.04f;
     float heightScl = 1.01f;
