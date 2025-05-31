@@ -18,6 +18,10 @@ public interface HexMesher{
 
     }
 
+    default boolean isEmissive(){
+        return false;
+    }
+
     default boolean skip(Vec3 position){
         return false;
     }

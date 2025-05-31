@@ -89,9 +89,11 @@ public class MeshBuilder{
             generator.seed = generator.baseSeed;
         }
 
+        boolean emit = mesher.isEmissive();
+
         if(grid.tiles.length * 6 >= 65535) throw new RuntimeException("Due to index size limits, only meshes with a maximum of 65535 vertices are supported. If you want more than that, make your own non-indexed mesh builder.");
 
-        Mesh mesh = begin(grid.tiles.length * 6, grid.tiles.length * 4 * 3, true, true);
+        Mesh mesh = begin(grid.tiles.length * 6, grid.tiles.length * 4 * 3, true, emit);
 
         float[] heights;
 
@@ -103,13 +105,12 @@ public class MeshBuilder{
 
         //cache heights in an array to prevent redundant calls to getHeight
         for(int i = 0; i < grid.corners.length; i++){
-            heights[i] = mesher.getHeight(grid.corners[i].v);
+            heights[i] = (1f + mesher.getHeight(grid.corners[i].v) * intensity) * radius;
         }
-
         int position = 0;
 
         short[] shorts = new short[12];
-        float[] floats = new float[3 + (gl30 ? 1 : 3) + 1 + 1];
+        float[] floats = new float[3 + (gl30 ? 1 : 3) + 1 + (emit ? 1 : 0)];
         Vec3 nor = new Vec3();
 
         Color tmpCol = new Color();
@@ -122,9 +123,9 @@ public class MeshBuilder{
             Corner[] c = tile.corners;
 
             float
-            h1 = (1f + heights[c[0].id] * intensity) * radius,
-            h2 = (1f + heights[c[2].id] * intensity) * radius,
-            h3 = (1f + heights[c[4].id] * intensity) * radius;
+            h1 = heights[c[0].id],
+            h2 = heights[c[2].id],
+            h3 = heights[c[4].id];
 
             Vec3
             v1 = c[0].v,
@@ -140,12 +141,17 @@ public class MeshBuilder{
             tmpCol.set(1f, 1f, 1f, 1f);
             mesher.getColor(tile.v, tmpCol);
             float color = tmpCol.toFloatBits();
-            tmpCol.set(0f, 0f, 0f, 0f);
-            mesher.getEmissiveColor(tile.v, tmpCol);
-            float emissive = tmpCol.toFloatBits();
+
+            float emissive = 0f;
+
+            if(emit){
+                tmpCol.set(0f, 0f, 0f, 0f);
+                mesher.getEmissiveColor(tile.v, tmpCol);
+                emissive = tmpCol.toFloatBits();
+            }
 
             for(var corner : c){
-                float height = (1f + heights[corner.id] * intensity) * radius;
+                float height = heights[corner.id];
 
                 vert(mesh, floats, corner.v.x * height, corner.v.y * height, corner.v.z * height, nor, color, emissive);
             }
@@ -213,21 +219,8 @@ public class MeshBuilder{
         return mesh;
     }
 
-    private static void normal(Vec3 v1, Vec3 v2, Vec3 v3, Vec3 out){
-        float
-        x = v2.x - v1.x,
-        y = v2.y - v1.y,
-        z = v2.z - v1.z,
-        vx = v3.x - v1.x,
-        vy = v3.y - v1.y,
-        vz = v3.z - v1.z;
-
-        float
-        cx = y * vz - z * vy,
-        cy = z * vx - x * vz,
-        cz = x * vy - y * vx;
-
-        out.set(cx, cy, cz).nor();
+    private static Vec3 normal(Vec3 v1, Vec3 v2, Vec3 v3, Vec3 out){
+        return out.set(v2).sub(v1).crs(v3.x - v1.x, v3.y - v1.y, v3.z - v1.z).nor();
     }
 
     private static void normal(float v1x, float v1y, float v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z, Vec3 out){
@@ -256,23 +249,24 @@ public class MeshBuilder{
             floats[3] = packNormals(normal.x, normal.y, normal.z);
 
             floats[4] = color;
-            floats[5] = emissive;
+            if(floats.length > 5) floats[5] = emissive;
         }else{
             floats[3] = normal.x;
             floats[4] = normal.x;
             floats[5] = normal.x;
 
             floats[6] = color;
-            floats[7] = emissive;
+            if(floats.length > 7) floats[7] = emissive;
         }
 
         mesh.getVerticesBuffer().put(floats);
     }
 
     private static float packNormals(float x, float y, float z){
-        int xs = x < 0 ? 1 : 0;
-        int ys = y < 0 ? 1 : 0;
-        int zs = z < 0 ? 1 : 0;
+        int xs = x < -1f/512f ? 1 : 0;
+        int ys = y < -1f/512f ? 1 : 0;
+        int zs = z < -1f/512f ? 1 : 0;
+
         int vi =
         zs << 29 | ((int)(z * 511 + (zs << 9)) & 511) << 20 |
         ys << 19 | ((int)(y * 511 + (ys << 9)) & 511) << 10 |

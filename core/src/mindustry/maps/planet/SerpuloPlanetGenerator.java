@@ -81,6 +81,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     }
 
     @Override
+    public boolean isEmissive(){
+        return true;
+    }
+
+    @Override
     public boolean allowLanding(Sector sector){
         return sector.planet.allowLaunchToNumbered && (sector.hasBase() || sector.near().contains(s -> s.hasBase() &&
             (s.info.bestCoreType.size >= 4 || s.isBeingPlayed() && state.rules.defaultTeam.cores().contains(b -> b.block.size >= 4))));
