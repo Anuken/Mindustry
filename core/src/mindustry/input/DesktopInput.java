@@ -56,6 +56,11 @@ public class DesktopInput extends InputHandler{
     /** Time of most recent control group selection */
     public long lastCtrlGroupSelectMillis;
 
+    /** Time of most recent payload pickup/drop key press*/
+    public long lastPayloadKeyTapMillis;
+    /** Time of most recent payload pickup/drop key hold*/
+    public long lastPayloadKeyHoldMillis;
+
     private float buildPlanMouseOffsetX, buildPlanMouseOffsetY;
     private boolean changedCursor;
 
@@ -970,10 +975,26 @@ public class DesktopInput extends InputHandler{
         if(unit instanceof Payloadc){
             if(Core.input.keyTap(Binding.pickupCargo)){
                 tryPickupPayload();
+                lastPayloadKeyTapMillis = Time.millis();
+            }
+
+            if(Core.input.keyDown(Binding.pickupCargo)
+            && Time.timeSinceMillis(lastPayloadKeyHoldMillis) > 20
+            && Time.timeSinceMillis(lastPayloadKeyTapMillis) > 200){
+                tryPickupPayload();
+                lastPayloadKeyHoldMillis = Time.millis();
             }
 
             if(Core.input.keyTap(Binding.dropCargo)){
                 tryDropPayload();
+                lastPayloadKeyTapMillis = Time.millis();
+            }
+
+            if(Core.input.keyDown(Binding.dropCargo)
+            && Time.timeSinceMillis(lastPayloadKeyHoldMillis) > 20
+            && Time.timeSinceMillis(lastPayloadKeyTapMillis) > 200){
+                tryDropPayload();
+                lastPayloadKeyHoldMillis = Time.millis();
             }
         }
     }
