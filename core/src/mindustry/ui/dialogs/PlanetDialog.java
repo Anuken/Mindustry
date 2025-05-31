@@ -33,7 +33,6 @@ import mindustry.graphics.g3d.*;
 import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.maps.*;
-import mindustry.maps.planet.*;
 import mindustry.type.*;
 import mindustry.type.Planet.*;
 import mindustry.ui.*;

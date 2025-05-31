@@ -26,8 +26,10 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     public static boolean genLakes = false;
 
     BaseGenerator basegen = new BaseGenerator();
+    float heightYOffset = 42.5f;
     float scl = 5f;
-    float waterOffset = 0.05f;
+    float waterOffset = 0.04f;
+    float heightScl = 1.01f;
 
     Block[][] arr =
     {
@@ -62,7 +64,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     Vec3 basePos = new Vec3(0.9341721, 0.0, 0.3568221);
 
     float rawHeight(Vec3 position){
-        return (Mathf.pow(Simplex.noise3d(seed, 7, 0.5f, 1f/3f, position.x * scl, position.y * scl, position.z * scl), 2.3f) + waterOffset) / (1f + waterOffset);
+        return (Mathf.pow(Simplex.noise3d(seed, 7, 0.5f, 1f/3f, position.x * scl, position.y * scl + heightYOffset, position.z * scl) * heightScl, 2.3f) + waterOffset) / (1f + waterOffset);
     }
 
     @Override
@@ -108,10 +110,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
     @Override
     public void getColor(Vec3 position, Color out){
-        //if(dst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 4f, position.x, position.y + 200f, position.z)*0.14f < 0.09f){
-        //    return Tmp.c1.set(Team.crux.color).lerp(Team.sharded.color, 0.4f*Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 999f, position.z)).a(packAlpha(0f, 1f));
-        //}
-
         Block block = getBlock(position);
         //replace salt with sand color
         if(block == Blocks.salt) block = Blocks.sand;
@@ -177,7 +175,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
         float rad = scl;
         float temp = Mathf.clamp(Math.abs(py * 2f) / (rad));
-        float tnoise = Simplex.noise3d(seed, 7, 0.56, 1f/3f, px, py + 999f, pz);
+        float tnoise = Simplex.noise3d(seed, 7, 0.56, 1f/3f, px, py + 999f - 0.1f, pz);
         temp = Mathf.lerp(temp, tnoise, 0.5f);
         height *= 1.2f;
         height = Mathf.clamp(height);

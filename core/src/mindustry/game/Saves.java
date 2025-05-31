@@ -97,6 +97,8 @@ public class Saves{
                     }
                 }
 
+                //TODO: sectors like Ruinous Shores get overwritten first and explode when getting remapped
+
                 if(remapTarget != null){
                     //if the file name matches the destination of the remap, assume it has already been remapped, and skip the file movement procedure
                     if(!slot.file.equals(getSectorFile(remapTarget))){
