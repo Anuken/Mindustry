@@ -13,6 +13,7 @@ import arc.backend.android.*;
 import arc.files.*;
 import arc.func.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import dalvik.system.*;
 import mindustry.*;
@@ -23,6 +24,7 @@ import mindustry.ui.dialogs.*;
 
 import java.io.*;
 import java.lang.Thread.*;
+import java.nio.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
@@ -73,28 +75,59 @@ public class AndroidLauncher extends AndroidApplication{
             @Override
             public ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
                 //Required to load jar files in Android 14: https://developer.android.com/about/versions/14/behavior-changes-14#safer-dynamic-code-loading
-                jar.file().setReadOnly();
-                return new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, parent){
-                    @Override
-                    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException{
-                        //check for loaded state
-                        Class<?> loadedClass = findLoadedClass(name);
-                        if(loadedClass == null){
-                            try{
-                                //try to load own class first
-                                loadedClass = findClass(name);
-                            }catch(ClassNotFoundException | NoClassDefFoundError e){
-                                //use parent if not found
-                                return parent.loadClass(name);
+                try{
+                    jar.file().setReadOnly();
+                    return new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, parent){
+                        @Override
+                        protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException{
+                            //check for loaded state
+                            Class<?> loadedClass = findLoadedClass(name);
+                            if(loadedClass == null){
+                                try{
+                                    //try to load own class first
+                                    loadedClass = findClass(name);
+                                }catch(ClassNotFoundException | NoClassDefFoundError e){
+                                    //use parent if not found
+                                    return parent.loadClass(name);
+                                }
                             }
-                        }
 
-                        if(resolve){
-                            resolveClass(loadedClass);
+                            if(resolve){
+                                resolveClass(loadedClass);
+                            }
+                            return loadedClass;
                         }
-                        return loadedClass;
+                    };
+                }catch(Exception e){
+                    //`setReadOnly` to jar file does not work on some Android 14 device
+                    //This simple method bypasses the security problem
+                    //Notes that the libraries in the jar won't be loaded
+
+                    if(Build.VERSION.SDK_INT < VERSION_CODES.O_MR1){
+                        throw e;
                     }
-                };
+
+                    Log.err(e);
+                    Log.warn("failed to load jar, trying another method.");
+
+                    ZipFi jarZip = new ZipFi(jar);
+                    Seq<ByteBuffer> dexBuffers = new Seq<>();
+                    for(int i = 1; ; i++){
+                        Fi dex = jarZip.child(i == 1 ? "classes.dex" : "classes" + i + ".dex");
+
+                        if(dex.exists()){
+                            dexBuffers.add(ByteBuffer.wrap(dex.readBytes()));
+                        }else{
+                            break;
+                        }
+                    }
+
+                    if(dexBuffers.size == 0){
+                        throw new ArcRuntimeException("empty jar file without any dex files");
+                    }
+                    jarZip.delete(); // close zip
+                    return new InMemoryDexClassLoader(dexBuffers.toArray(ByteBuffer.class), parent);
+                }
             }
 
             @Override
