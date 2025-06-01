@@ -243,7 +243,7 @@ public class LStatements{
                         fieldAlignSelect(s, () -> p1, v -> {
                             p1 = v;
                             rebuild(table);
-                        });
+                        }, true, true);
                     }
                     case translate, scale -> {
                         fields(s, "x", x, v -> x = v);
@@ -2330,11 +2330,11 @@ public class LStatements{
                                 }).width(240f).left();
                             }));
                         }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
-                    }else if(type == LMarkerControl.textAlign){
+                    }else if(type == LMarkerControl.textAlign || type == LMarkerControl.lineAlign){
                         fieldAlignSelect(t, () -> p1, v -> {
                             p1 = v;
                             rebuild(table);
-                        });
+                        }, true, type != LMarkerControl.lineAlign);
                     }
                 });
 

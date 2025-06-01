@@ -18,6 +18,7 @@ public enum LMarkerControl{
     fontSize("size"),
     textHeight("height"),
     textAlign("align"),
+    lineAlign("align"),
     labelFlags("background", "outline"),
     texture("printFlush", "name"),
     textureSize("width", "height"),

@@ -194,24 +194,27 @@ public abstract class LStatement{
         showSelect(b, values, current, getter, 4, c -> {});
     }
 
-    protected void fieldAlignSelect(Table t, Prov<String> get, Cons<String> set) {
+    protected void fieldAlignSelect(Table t, Prov<String> get, Cons<String> set, boolean hor, boolean ver) {
         t.button(b -> {
             b.image(Icon.pencilSmall);
             b.clicked(() -> {
                 var current = get.get();
-                showAlignSelect(b, current.startsWith("@") ? nameToAlign.get(current.substring(1), -1) : -1, align -> set.get("@" + alignToName.get(align)));
+                showAlignSelect(b, current.startsWith("@") ? nameToAlign.get(current.substring(1), -1) : -1, align -> set.get("@" + alignToName.get(align)), hor, ver);
             });
         }, Styles.logict, () -> {}).size(40f).color(t.color).left().padLeft(-10);
     }
 
-    public static void showAlignSelect(Button b, int current, Intc setter) {
+    public static void showAlignSelect(Button b, int current, Intc setter, boolean hor, boolean ver) {
         showSelectTable(b, (t, hide) -> {
             t.defaults().size(150f, 40f);
 
             int i = 0;
             for(String align : aligns){
+                int val = nameToAlign.get(align);
+                if(!hor && !Align.isCenterHorizontal(val)) continue;
+                if(!ver && !Align.isCenterVertical(val)) continue;
                 t.button(align, Styles.logicTogglet, () -> {
-                    setter.get(nameToAlign.get(align));
+                    setter.get(val);
                     hide.run();
                 }).checked(current == nameToAlign.get(align)).grow();
 

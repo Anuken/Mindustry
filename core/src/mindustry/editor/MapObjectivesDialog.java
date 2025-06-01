@@ -282,10 +282,11 @@ public class MapObjectivesDialog extends BaseDialog{
         }));
 
         setInterpreter(Alignment.class, int.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            Alignment align = field.getAnnotation(Alignment.class);
             name(cont, name, remover, indexer);
             cont.button(b -> {
                 b.label(() -> LStatement.alignToName.get(get.get(), "center"));
-                b.clicked(() -> LStatement.showAlignSelect(b, get.get(), set::get));
+                b.clicked(() -> LStatement.showAlignSelect(b, get.get(), set::get, align.hor(), align.ver()));
             }, () -> {});
         });
 

@@ -31,10 +31,10 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
 
     @Override
     public void draw(){
-        drawAt(text, x, y, z, flags, fontSize, Align.center);
+        drawAt(text, x, y, z, flags, fontSize, Align.center, Align.center);
     }
 
-    public static void drawAt(String text, float x, float y, float layer, int flags, float fontSize, int align){
+    public static void drawAt(String text, float x, float y, float layer, int flags, float fontSize, int align, int lineAlign){
         Draw.z(layer);
         float z = Drawf.text();
 
@@ -46,29 +46,32 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
         font.getData().setScale(0.25f / Scl.scl(1f) * fontSize);
         layout.setText(font, text);
 
+        int border = (flags & flagBackground) != 0 ? 1 : 0;
+
         if(Align.isBottom(align)){
-            y += layout.height + 1.5f;
+            y += layout.height + border * 1.5f;
         }else if(Align.isTop(align)){
-            y -= 1.5f;
+            y -= border * 1.5f;
         }else{
             y += layout.height / 2;
         }
 
-        float dx = 0;
         if(Align.isLeft(align)){
-            dx = 1;
+            x += layout.width / 2 + border;
         }else if(Align.isRight(align)){
-            dx = -1;
+            x -= layout.width / 2 + border;
         }
 
         if((flags & flagBackground) != 0){
             Draw.color(0f, 0f, 0f, 0.3f);
-            Fill.rect(x + dx * (layout.width / 2 + 1), y - layout.height / 2, layout.width + 2, layout.height + 3);
+            Fill.rect(x, y - layout.height / 2, layout.width + 2, layout.height + 3);
             Draw.color();
         }
 
+        float tx = Align.isLeft(lineAlign) ? -layout.width * 0.5f : Align.isRight(lineAlign) ? layout.width * 0.5f : 0;
+
         font.setColor(Color.white);
-        font.draw(text, x + dx, y, 0, Align.isCenterHorizontal(align) ? Align.center : align, false);
+        font.draw(text, x + tx, y, 0, lineAlign, false);
 
         Draw.reset();
         Pools.free(layout);
