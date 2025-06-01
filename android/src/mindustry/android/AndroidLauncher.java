@@ -107,14 +107,18 @@ public class AndroidLauncher extends AndroidApplication{
                     Fi cacheDir = new Fi(getCacheDir()).child("mods");
                     cacheDir.mkdirs();
 
-                    if(cacheDir.equals(jar.parent())){
-                        //Should not reach here, just in case
+                    //long file name support
+                    Fi modCacheDir = cacheDir.child(jar.nameWithoutExtension());
+                    Fi modCache = modCacheDir.child(Long.toHexString(jar.lastModified()) + ".zip");
+
+                    if(modCacheDir.equals(jar.parent())){
+                        //should not reach here, just in case
                         throw e;
                     }
 
-                    Fi modCache = cacheDir.child(jar.name());
                     //Cache will be deleted when mod is removed
-                    if(!modCache.exists()){
+                    if(!modCache.exists() || jar.length() != modCache.length()){
+                        modCacheDir.mkdirs();
                         jar.copyTo(modCache);
                     }
                     modCache.file().setReadOnly();

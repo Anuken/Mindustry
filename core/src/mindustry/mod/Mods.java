@@ -419,9 +419,9 @@ public class Mods implements Loadable{
             if(android){
                 //Try to remove cache for Android 14 security problem
                 Fi cacheDir = new Fi(Core.files.getCachePath()).child("mods");
-                Fi modCache = cacheDir.child(mod.file.name());
-                if(modCache.exists()){
-                    deleted = modCache.delete();
+                Fi modCacheDir = cacheDir.child(mod.file.nameWithoutExtension());
+                if(modCacheDir.exists()){
+                    deleted = modCacheDir.deleteDirectory();
                 }
             }else{
                 try{
@@ -1123,6 +1123,11 @@ public class Mods implements Loadable{
                     //close the classloader for jar mods
                     if(!android){
                         ClassLoaderCloser.close(other.loader);
+                    }else if(other.loader != null){
+                        //Try to remove cache for Android 14 security problem
+                        Fi cacheDir = new Fi(Core.files.getCachePath()).child("mods");
+                        Fi modCacheDir = cacheDir.child(other.file.nameWithoutExtension());
+                        modCacheDir.deleteDirectory();
                     }
 
                     //close zip file
