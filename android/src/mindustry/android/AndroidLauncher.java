@@ -107,14 +107,14 @@ public class AndroidLauncher extends AndroidApplication{
                     Fi cacheDir = new Fi(getCacheDir()).child("mods");
                     cacheDir.mkdirs();
 
-                    if (cacheDir.equals(jar.parent())){
+                    if(cacheDir.equals(jar.parent())){
                         //Should not reach here, just in case
                         throw e;
                     }
 
                     Fi modCache = cacheDir.child(jar.name());
                     //Cache will be deleted when mod is removed
-                    if (!modCache.exists()){
+                    if(!modCache.exists()){
                         jar.copyTo(modCache);
                     }
                     modCache.file().setReadOnly();
