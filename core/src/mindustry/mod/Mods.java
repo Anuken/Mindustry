@@ -413,11 +413,22 @@ public class Mods implements Loadable{
 
     /** Removes a mod file and marks it for requiring a restart. */
     public void removeMod(LoadedMod mod){
-        if(!android && mod.loader != null){
-            try{
-                ClassLoaderCloser.close(mod.loader);
-            }catch(Exception e){
-                Log.err(e);
+        boolean deleted = true;
+
+        if(mod.loader != null){
+            if(android){
+                //Try to remove cache for Android 14 security problem
+                Fi cacheDir = new Fi(Core.files.getCachePath()).child("mods");
+                Fi modCache = cacheDir.child(mod.file.name());
+                if(modCache.exists()){
+                    deleted = modCache.delete();
+                }
+            }else{
+                try{
+                    ClassLoaderCloser.close(mod.loader);
+                }catch(Exception e){
+                    Log.err(e);
+                }
             }
         }
 
@@ -425,7 +436,7 @@ public class Mods implements Loadable{
             mod.root.delete();
         }
 
-        boolean deleted = mod.file.isDirectory() ? mod.file.deleteDirectory() : mod.file.delete();
+        deleted &= mod.file.isDirectory() ? mod.file.deleteDirectory() : mod.file.delete();
 
         if(!deleted){
             ui.showErrorMessage("@mod.delete.error");
