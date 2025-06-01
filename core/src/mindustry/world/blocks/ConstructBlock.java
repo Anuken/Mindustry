@@ -337,7 +337,7 @@ public class ConstructBlock extends Block{
 
             for(int i = 0; i < requirements.length; i++){
                 int reqamount = Math.round(state.rules.buildCostMultiplier * requirements[i].amount);
-                accumulator[i] += Math.min(clampedAmount * deconstructMultiplier * reqamount, clampedAmount * reqamount - totalAccumulator[i]); //add scaled amount progressed to the accumulator
+                accumulator[i] += Math.min(clampedAmount * deconstructMultiplier * reqamount, deconstructMultiplier * reqamount - totalAccumulator[i]); //add scaled amount progressed to the accumulator
                 totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * clampedAmount * deconstructMultiplier, reqamount);
 
                 int accumulated = (int)(accumulator[i]); //get amount
@@ -361,7 +361,7 @@ public class ConstructBlock extends Block{
                 //add any leftover items that weren't obtained due to rounding errors
                 if(core != null && !state.rules.infiniteResources){
                     for(int i = 0; i < itemsLeft.length; i++){
-                        int target = Mathf.round(requirements[i].amount * state.rules.buildCostMultiplier * state.rules.deconstructRefundMultiplier);
+                        int target = Mathf.round(requirements[i].amount * state.rules.buildCostMultiplier * progress * state.rules.deconstructRefundMultiplier);
                         int remaining = target - itemsLeft[i];
 
                         if(requirements[i].item.unlockedNowHost()){
