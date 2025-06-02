@@ -116,42 +116,46 @@ public class DatabaseDialog extends BaseDialog{
                 int cols = (int)Mathf.clamp((Core.graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 12), 1, 22);
                 int count = 0;
 
-                for(int i = 0; i < array.size; i++){
-                    UnlockableContent unlock = array.get(i);
+                for (int p = 0; p < 2; p++){
+                    for(int i = 0; i < array.size; i++){
+                        UnlockableContent unlock = array.get(i);
+                        boolean banned = state.isGame() && (unlock instanceof UnitType u && u.isBanned() || unlock instanceof Block b && state.rules.isBanned(b));
+                        if(banned != (p == 1)) continue;
 
-                    Image image = unlocked(unlock) ? new Image(new TextureRegionDrawable(unlock.uiIcon), mobile ? Color.white : Color.lightGray).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
+                        Image image = unlocked(unlock) ? new Image(new TextureRegionDrawable(unlock.uiIcon), mobile ? Color.white : Color.lightGray).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
 
-                    //banned cross
-                    if(state.isGame() && (unlock instanceof UnitType u && u.isBanned() || unlock instanceof Block b && state.rules.isBanned(b))){
-                        list.stack(image, new Image(Icon.cancel){{
-                            setColor(Color.scarlet);
-                            touchable = Touchable.disabled;
-                        }}).size(8 * 4).pad(3);
-                    }else{
-                        list.add(image).size(8 * 4).pad(3);
-                    }
+                        //banned cross
+                        if(p == 1){
+                            list.stack(image, new Image(Icon.cancel){{
+                                setColor(Color.scarlet);
+                                touchable = Touchable.disabled;
+                            }}).size(8 * 4).pad(3);
+                        }else{
+                            list.add(image).size(8 * 4).pad(3);
+                        }
 
-                    ClickListener listener = new ClickListener();
-                    image.addListener(listener);
-                    if(!mobile && unlocked(unlock)){
-                        image.addListener(new HandCursorListener());
-                        image.update(() -> image.color.lerp(!listener.isOver() ? Color.lightGray : Color.white, Mathf.clamp(0.4f * Time.delta)));
-                    }
+                        ClickListener listener = new ClickListener();
+                        image.addListener(listener);
+                        if(!mobile && unlocked(unlock)){
+                            image.addListener(new HandCursorListener());
+                            image.update(() -> image.color.lerp(!listener.isOver() ? Color.lightGray : Color.white, Mathf.clamp(0.4f * Time.delta)));
+                        }
 
-                    if(unlocked(unlock)){
-                        image.clicked(() -> {
-                            if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(unlock.name) != 0){
-                                Core.app.setClipboardText((char)Fonts.getUnicode(unlock.name) + "");
-                                ui.showInfoFade("@copied");
-                            }else{
-                                ui.content.show(unlock);
-                            }
-                        });
-                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName + (settings.getBool("console") ? "\n[gray]" + unlock.name : ""))));
-                    }
+                        if(unlocked(unlock)){
+                            image.clicked(() -> {
+                                if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(unlock.name) != 0){
+                                    Core.app.setClipboardText((char)Fonts.getUnicode(unlock.name) + "");
+                                    ui.showInfoFade("@copied");
+                                }else{
+                                    ui.content.show(unlock);
+                                }
+                            });
+                            image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName + (settings.getBool("console") ? "\n[gray]" + unlock.name : ""))));
+                        }
 
-                    if((++count) % cols == 0){
-                        list.row();
+                        if((++count) % cols == 0){
+                            list.row();
+                        }
                     }
                 }
             }).growX().left().padBottom(10);
