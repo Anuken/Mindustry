@@ -1275,7 +1275,7 @@ public class UnitTypes{
         }};
 
         poly = new UnitType("poly"){{
-            defaultCommand = UnitCommand.rebuildCommand;
+            defaultCommand = UnitCommand.assistCommand;
 
             flying = true;
             drag = 0.05f;
