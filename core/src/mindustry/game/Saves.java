@@ -72,7 +72,32 @@ public class Saves{
 
         lastSectorSave = saves.find(s -> s.isSector() && s.getName().equals(Core.settings.getString("last-sector-save", "<none>")));
 
-        ObjectSet<Sector> infoToClear = new ObjectSet<>(), remapped = new ObjectSet<>();
+        class Remap{
+            //file in the temp folder
+            Fi sourceFile;
+            //slot of source sector to move file for
+            SaveSlot slot;
+            Sector sourceSector;
+            //sector info from source sector to move into
+            SectorInfo sourceInfo;
+
+            //file to copy to
+            Fi destFile;
+            //destination sector to move to
+            Sector destSector;
+
+            Remap(SaveSlot slot, Fi sourceFile, Sector sourceSector, SectorInfo sourceInfo, Fi destFile, Sector destSector){
+                this.slot = slot;
+                this.sourceFile = sourceFile;
+                this.sourceSector = sourceSector;
+                this.sourceInfo = sourceInfo;
+                this.destFile = destFile;
+                this.destSector = destSector;
+            }
+        }
+
+        Seq<Remap> remaps = new Seq<>();
+        ObjectSet<Sector> remapped = new ObjectSet<>();
 
         //automatically assign sector save slots
         for(SaveSlot slot : saves){
@@ -97,29 +122,18 @@ public class Saves{
                     }
                 }
 
-                //TODO: sectors like Ruinous Shores get overwritten first and explode when getting remapped
-
                 if(remapTarget != null){
                     //if the file name matches the destination of the remap, assume it has already been remapped, and skip the file movement procedure
                     if(!slot.file.equals(getSectorFile(remapTarget))){
                         Log.info("Remapping sector: @ -> @ (@)", sector.id, remapTarget.id, remapTarget.preset);
 
-                        sector.loadInfo();
-                        //overwrite the target sector's info with the save's info
-                        Core.settings.putJson(remapTarget.planet.name + "-s-" + remapTarget.id + "-info", sector.info);
-                        remapTarget.loadInfo();
-
-                        //queue a clear of the sector that had its data moved
-                        infoToClear.add(sector);
-                        //add to the remapped list (if it was remapped, don't clear it!)
-                        remapped.add(remapTarget);
-
-                        remapTarget.save = slot;
                         try{
-                            Fi target = getSectorFile(remapTarget);
-                            //move over save file
-                            slot.file.moveTo(target);
-                            slot.file = target;
+                            SectorInfo info = Core.settings.getJson(sector.planet.name + "-s-" + sector.id + "-info", SectorInfo.class, SectorInfo::new);
+                            Fi tmpRemapFile = saveDirectory.child("remap_" + sector.planet.name + "_" + sector.id + "." + saveExtension);
+                            slot.file.moveTo(tmpRemapFile);
+
+                            remaps.add(new Remap(slot, tmpRemapFile, sector, info, getSectorFile(remapTarget), remapTarget));
+                            remapped.add(remapTarget);
                         }catch(Exception e){
                             Log.err("Failed to move sector files when remapping: " + sector.id + " -> " + remapTarget.id, e);
                         }
@@ -127,6 +141,7 @@ public class Saves{
 
                     remapTarget.save = slot;
                     slot.meta.rules.sector = remapTarget;
+
                 }else{
                     if(sector.save != null){
                         Log.warn("Sector @ has two corresponding saves: @ and @", sector, sector.save.file, slot.file);
@@ -136,10 +151,27 @@ public class Saves{
             }
         }
 
-        for(var sector : infoToClear){
-           if(!remapped.contains(sector)){
-               sector.clearInfo();
-           }
+        //process remaps later to allow swaps of sectors
+        for(var remap : remaps){
+            var remapTarget = remap.destSector;
+
+            //overwrite the target sector's info with the save's info
+            Core.settings.putJson(remapTarget.planet.name + "-s-" + remapTarget.id + "-info", remap.sourceInfo);
+            remapTarget.loadInfo();
+
+            remapTarget.save = remap.slot;
+            try{
+                //move file from tmp directory back into the correct location
+                remap.sourceFile.moveTo(remap.destFile);
+                remap.slot.file = remap.destFile;
+            }catch(Exception e){
+                Log.err("Failed to move back sector files when remapping: " + remap.sourceSector.id + " -> " + remapTarget.id, e);
+            }
+
+            //clear the info, assuming it wasn't a sector that got mapped to
+            if(!remapped.contains(remap.sourceSector)){
+                remap.sourceSector.clearInfo();
+            }
         }
     }
 
