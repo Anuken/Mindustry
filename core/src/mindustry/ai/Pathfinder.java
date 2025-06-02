@@ -540,7 +540,7 @@ public class Pathfinder implements Runnable{
                     if(!targets.isEmpty()){
                         boolean any = false;
                         for(Building other : targets){
-                            if((other.items != null && other.items.any()) || other.status() != BlockStatus.noInput){
+                            if(((other.items != null && other.items.any()) || other.status() != BlockStatus.noInput) && other.block.targetable){
                                 out.add(other.tile.array());
                                 any = true;
                             }

@@ -41,7 +41,7 @@ public class FlyingAI extends AIController{
             Building closest = null;
             float cdist = 0f;
             for(Building t : list){
-                if((t.items != null && t.items.any()) || t.status() != BlockStatus.noInput){
+                if(((t.items != null && t.items.any()) || t.status() != BlockStatus.noInput) && t.block.targetable){
                     float dst = t.dst2(x, y);
                     if(closest == null || dst < cdist){
                         closest = t;
