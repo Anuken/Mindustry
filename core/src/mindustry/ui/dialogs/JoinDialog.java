@@ -419,7 +419,7 @@ public class JoinDialog extends BaseDialog{
                 spinner.setAlignment(Align.center);
                 spinner.update(() -> {
                     if (spinner.visible) {
-                        spinner.setText(Core.bundle.get("loading") + Strings.animated(Time.time, 4, 10f, "."));
+                        spinner.setText("[lightgray]" + Core.bundle.get("server.refreshing") + Strings.animated(Time.time, 4, 10f, "."));
                     }
                 });
             }
