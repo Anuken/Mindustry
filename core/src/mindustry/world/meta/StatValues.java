@@ -474,7 +474,7 @@ public class StatValues{
 
                     c.table(Styles.grayPanel, b -> {
                         b.image(item.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
-                        b.add(item.localizedName + (timePeriod > 0 ? "\n[lightgray]" + (time < 0.01f ? Strings.fixed(time, 3) : Strings.autoFixed(time, 2)) + StatUnit.perSecond.localized() : "")).left().grow();
+                        b.add(item.localizedName + (timePeriod > 0 ? "\n[lightgray]" + (time < 0.01f ? Strings.fixed(time, 4) : Strings.autoFixed(time, 2)) + StatUnit.perSecond.localized() : "")).left().grow();
                         b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(item) * 100f))).right().pad(10f).padRight(15f);
                     }).growX().pad(5).row();
                 }

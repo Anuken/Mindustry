@@ -286,7 +286,7 @@ public class Drill extends Block{
 
         @Override
         public void updateTile(){
-            if(timer(timerDump, dumpTime)){
+            if(timer(timerDump, dumpTime / timeScale)){
                 dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
             }
 

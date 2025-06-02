@@ -73,6 +73,8 @@ public class SectorInfo{
     public float secondsPassed;
     /** How many minutes this sector has been captured. */
     public float minutesCaptured;
+    /** Light coverage in terms of radius. */
+    public float lightCoverage;
     /** Display name. */
     public @Nullable String name;
     /** Displayed icon. */
@@ -196,7 +198,7 @@ public class SectorInfo{
     }
 
     /** Prepare data for writing to a save. */
-    public void prepare(){
+    public void prepare(Sector sector){
         //update core items
         items.clear();
 
@@ -225,6 +227,15 @@ public class SectorInfo{
         damage = 0;
         hasSpawns = spawner.countSpawns() > 0;
 
+        lightCoverage = 0f;
+        for(var build : state.rules.defaultTeam.data().buildings){
+            if(build.block.emitLight){
+                lightCoverage += build.block.lightRadius * build.efficiency;
+            }
+        }
+
+        lightCoverage += state.rules.defaultTeam.data().units.sumf(u -> u.type.lightRadius/2f);
+
         //cap production at raw production.
         production.each((item, stat) -> {
             stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
@@ -237,12 +248,14 @@ public class SectorInfo{
             export.clear();
         }
 
-        if(state.rules.sector != null){
-            state.rules.sector.saveInfo();
+        sector.saveInfo();
+
+        if(sector.planet.allowWaveSimulation){
+            SectorDamage.writeParameters(sector);
         }
 
-        if(state.rules.sector != null && state.rules.sector.planet.allowWaveSimulation){
-            SectorDamage.writeParameters(this);
+        if(sector.planet.generator != null){
+            sector.planet.generator.beforeSaveWrite(sector);
         }
     }
 

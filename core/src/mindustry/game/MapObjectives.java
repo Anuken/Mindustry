@@ -709,11 +709,15 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
                 String out;
                 if(mobile){
-                    out = state.mapLocales.containsProperty(key + ".mobile") ?
+                    out =
+                        state.mapLocales.containsProperty(key + ".mobile") ?
                         state.mapLocales.getProperty(key + ".mobile") :
-                        Core.bundle.get(key + ".mobile", Core.bundle.get(key));
+                        state.mapLocales.containsProperty(key) ?
+                        state.mapLocales.getProperty(key) :
+                        Core.bundle.get(key);
                 }else{
-                    out = state.mapLocales.containsProperty(key) ?
+                    out =
+                        state.mapLocales.containsProperty(key) ?
                         state.mapLocales.getProperty(key) :
                         Core.bundle.get(key);
                 }
@@ -1242,6 +1246,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public void setTexture(String textureName){
             this.textureName = textureName;
+            if(headless) return;
 
             boolean firstUpdate = fetchedRegion == null;
 

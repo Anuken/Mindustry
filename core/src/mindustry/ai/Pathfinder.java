@@ -145,10 +145,16 @@ public class Pathfinder implements Runnable{
 
         Events.on(ResetEvent.class, event -> stop());
 
-        Events.on(TileChangeEvent.class, event -> updateTile(event.tile));
+        Events.on(TileChangeEvent.class, event -> {
+            if(state.isEditor()) return;
+
+            updateTile(event.tile);
+        });
 
         //remove nearSolid flag for tiles
         Events.on(TilePreChangeEvent.class, event -> {
+            if(state.isEditor()) return;
+
             Tile tile = event.tile;
 
             if(tile.solid()){
@@ -228,7 +234,7 @@ public class Pathfinder implements Runnable{
                 if(other.legSolid()) nearLegSolid = true;
 
                 //other tile is now near solid
-                if(solid && !tile.block().teamPassable){
+                if(solid && !tile.block().teamPassable && other.array() < tiles.length){
                     tiles[other.array()] |= PathTile.bitMaskNearSolid;
                 }
             }
@@ -534,7 +540,7 @@ public class Pathfinder implements Runnable{
                     if(!targets.isEmpty()){
                         boolean any = false;
                         for(Building other : targets){
-                            if((other.items != null && other.items.any()) || other.status() != BlockStatus.noInput){
+                            if(((other.items != null && other.items.any()) || other.status() != BlockStatus.noInput) && other.block.targetable){
                                 out.add(other.tile.array());
                                 any = true;
                             }

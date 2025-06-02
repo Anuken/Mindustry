@@ -31,7 +31,7 @@ public class PlanetRenderer implements Disposable{
         setThreshold(0.8f);
         blurPasses = 6;
     }};
-    public final Mesh atmosphere = MeshBuilder.buildHex(Color.white, 2, false, 1.5f);
+    public final Mesh atmosphere = MeshBuilder.buildHex(Color.white, 2, 1.5f);
 
     //seed: 8kmfuix03fw
     public final CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));

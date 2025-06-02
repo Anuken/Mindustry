@@ -226,7 +226,7 @@ public class Universe{
                             sector.info.wavesPassed = wavesPassed;
                         }
 
-                        float damage = attacked ? SectorDamage.getDamage(sector.info) : 0f;
+                        float damage = attacked ? SectorDamage.getDamage(sector) : 0f;
 
                         //damage never goes down until the player visits the sector, so use max
                         sector.info.damage = Math.max(sector.info.damage, damage);
@@ -320,6 +320,13 @@ public class Universe{
     public int seconds(){
         //use networked seconds when playing as client
         return net.client() ? netSeconds : seconds;
+    }
+
+    public void setSeconds(float seconds){
+        this.seconds = (int)seconds;
+        this.secondCounter = seconds - this.seconds;
+
+        save();
     }
 
     public float secondsf(){

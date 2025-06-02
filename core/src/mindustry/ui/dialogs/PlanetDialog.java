@@ -31,8 +31,10 @@ import mindustry.graphics.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.graphics.g3d.*;
 import mindustry.input.*;
+import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.type.*;
+import mindustry.type.Planet.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -71,6 +73,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     private Texture[] planetTextures;
     private Element mainView;
     private CampaignRulesDialog campaignRules = new CampaignRulesDialog();
+    private SectorSelectDialog selectDialog = new SectorSelectDialog();
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
@@ -532,7 +535,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     @Override
     public void renderProjections(Planet planet){
-        float iw = 48f/4f;
+        float iw = 64f/4f;
 
         for(Sector sec : planet.sectors){
             if(sec != hovered){
@@ -540,10 +543,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 var icon =
                     sec.isAttacked() ? Fonts.getLargeIcon("warning") :
                     !sec.hasBase() && sec.preset != null && sec.preset.requireUnlock && sec.preset.unlocked() && preficon == null ?
-                    Fonts.getLargeIcon("terrain") :
+                    (sec.preset != null && sec.preset.requireUnlock && sec.preset.unlocked() ? sec.preset.uiIcon : Fonts.getLargeIcon("terrain")) :
                     sec.preset != null && sec.preset.requireUnlock && sec.preset.locked() && sec.preset.techNode != null && (sec.preset.techNode.parent == null || !sec.preset.techNode.parent.content.locked()) ? Fonts.getLargeIcon("lock") :
                     preficon;
-                var color = sec.preset != null && sec.preset.requireUnlock && !sec.hasBase() ? Team.derelict.color : Team.sharded.color;
+                var color = sec.isAttacked() ? Team.sharded.color : Color.white;
 
                 if(icon != null){
                     planets.drawPlane(sec, () -> {
@@ -622,8 +625,23 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     public void touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                         super.touchDown(event, x, y, pointer, button);
 
-                        if(debugSectorAttackEdit && button == KeyCode.mouseRight && hovered != null){
-                            hovered.generateEnemyBase = !hovered.generateEnemyBase;
+                        var hovered = PlanetDialog.this.hovered;
+
+                        if(debugSectorAttackEdit && hovered != null){
+                            if(button == KeyCode.mouseRight){
+                                if(input.shift()){
+                                    hovered.generateEnemyBase = !hovered.generateEnemyBase;
+                                }else{
+                                    selectDialog.show(state.planet, result -> {
+                                        for(var other : state.planet.sectors){
+                                            if(other.preset == result){
+                                                other.preset = null;
+                                            }
+                                        }
+                                        hovered.preset = result;
+                                    });
+                                }
+                            }
                         }
                     }
                 });
@@ -634,9 +652,38 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 if(scene.getDialog() == PlanetDialog.this && (scene.getHoverElement() == null || !scene.getHoverElement().isDescendantOf(e -> e instanceof ScrollPane))){
                     scene.setScrollFocus(PlanetDialog.this);
 
-                    if(debugSectorAttackEdit && input.ctrl() && input.keyTap(KeyCode.c)){
-                        Core.app.setClipboardText(state.planet.writeAttackSectorBits());
-                        Vars.ui.showInfoFade("@copied");
+                    if(debugSectorAttackEdit){
+                        int timeShift = input.keyDown(KeyCode.rightBracket) ? 1 : input.keyDown(KeyCode.leftBracket) ? -1 : 0;
+                        if(timeShift != 0){
+                            universe.setSeconds(universe.secondsf() + timeShift * Time.delta * 2.5f);
+                        }
+
+                        if(input.keyTap(KeyCode.r)){
+                            state.planet.reloadMeshAsync();
+                        }
+                    }
+
+                    if(debugSectorAttackEdit && input.ctrl() && input.keyTap(KeyCode.s)){
+                        try{
+                            PlanetData data = new PlanetData();
+                            IntSeq attack = new IntSeq();
+                            for(var sector : state.planet.sectors){
+                                if(sector.preset == null && sector.generateEnemyBase){
+                                    attack.add(sector.id);
+                                }
+
+                                if(sector.preset != null && sector.preset.requireUnlock){
+                                    data.presets.put(sector.preset.name, sector.id);
+                                }
+                            }
+                            Log.info("Saving sectors for @: @ presets, @ procedural attack sectors", state.planet.name, data.presets.size, attack.size);
+                            data.attackSectors = attack.toArray();
+                            files.local("planets/" + state.planet.name + ".json").writeString(JsonIO.write(data));
+
+                            ui.showInfoFade("@editor.saved");
+                        }catch(Exception e){
+                            Log.err(e);
+                        }
                     }
                 }
 
@@ -766,6 +813,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                     head.image(Icon.warningSmall).update(i -> {
                                         i.color.set(Pal.accent).lerp(Pal.remove, Mathf.absin(Time.globalTime, 9f, 1f));
                                     }).padRight(4f);
+                                }else if(sec.preset != null && sec.preset.requireUnlock){
+                                    head.image(sec.preset.uiIcon).size(iconSmall).padRight(4f);
                                 }
 
                                 String ic = sec.iconChar() == null ? "" : sec.iconChar() + " ";
@@ -795,9 +844,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     public Planet getHoverPlanet(float mouseX, float mouseY){
-        // do not hover over things indefinitely
         Planet hoverPlanet = null;
-        // get nearest planet (DO NOT SELECT THROUGH selected planet)
         float nearest = Float.POSITIVE_INFINITY;
 
         for(Planet planet : content.planets()){
@@ -1123,12 +1170,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.background(Styles.black6);
 
         stable.table(title -> {
-            title.add("[accent]" + sector.name()).padLeft(3);
+            title.add("[accent]" + sector.name() + (debugSelect && (sector.info.name != null || sector.preset != null) ? " [lightgray](" + sector.id + ")" : "")).padLeft(3);
             if(sector.preset == null){
                 title.add().growX();
 
                 title.button(Icon.pencilSmall, Styles.clearNonei, () -> {
-                   ui.showTextInput("@sectors.rename", "@name", 20, sector.name(), v -> {
+                   ui.showTextInput("@sectors.rename", "@name", 32, sector.name(), v -> {
                        sector.setName(v);
                        updateSelected();
                        rebuildList();
