@@ -1732,10 +1732,16 @@ public class LStatements{
 
                     table.add(" speed ");
                     fields(table, p3, str -> p3 = str);
+
+                    table.add(" allow input ");
+                    fields(table, p5, str -> p5 = str)
                 }
                 case zoom -> {
                     table.add(" level ");
                     fields(table, p1, str -> p1 = str);
+
+                    table.add(" allow input ");
+                    fields(table, p5, str -> p5 = str)
                 }
             }
         }

@@ -1228,14 +1228,15 @@ public class LExecutor{
 
     public static class CutsceneI implements LInstruction{
         public CutsceneAction action = CutsceneAction.stop;
-        public LVar p1, p2, p3, p4;
+        public LVar p1, p2, p3, p4, p5;
 
-        public CutsceneI(CutsceneAction action, LVar p1, LVar p2, LVar p3, LVar p4){
+        public CutsceneI(CutsceneAction action, LVar p1, LVar p2, LVar p3, LVar p4, LVar p5){
             this.action = action;
             this.p1 = p1;
             this.p2 = p2;
             this.p3 = p3;
             this.p4 = p4;
+            this.p5 = p5;
         }
 
         public CutsceneI(){
@@ -1248,15 +1249,18 @@ public class LExecutor{
             switch(action){
                 case pan -> {
                     control.input.logicCutscene = true;
+                    control.input.logicCutsceneInteract = p5.bool();
                     control.input.logicCamPan.set(World.unconv(p1.numf()), World.unconv(p2.numf()));
                     control.input.logicCamSpeed = p3.numf();
                 }
                 case zoom -> {
                     control.input.logicCutscene = true;
+                    control.input.logicCutsceneInteract = p5.bool();
                     control.input.logicCutsceneZoom = Mathf.clamp(p1.numf());
                 }
                 case stop -> {
                     control.input.logicCutscene = false;
+                    control.input.logicCutsceneInteract = false;
                 }
             }
         }
