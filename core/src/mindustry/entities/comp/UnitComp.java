@@ -35,7 +35,7 @@ import static mindustry.logic.GlobalVars.*;
 @Component(base = true)
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, Senseable, Settable{
     private static final Vec2 tmp1 = new Vec2(), tmp2 = new Vec2();
-    static final float warpDst = 30f;
+    static final float warpDst = 16f;
 
     @Import boolean dead, disarmed;
     @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, ammo, dragMultiplier, armorOverride, speedMultiplier;
@@ -473,6 +473,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller instanceof AIController;
     }
 
+    /** @return whether the unit *can* be commanded, even if its controller is not currently CommandAI. */
+    public boolean allowCommand(){
+        return controller instanceof CommandAI;
+    }
+
+    /** @return whether the unit has a CommandAI controller */
     public boolean isCommandable(){
         return controller instanceof CommandAI;
     }
@@ -519,7 +525,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public boolean playerControllable(){
-        return type.playerControllable;
+        return type.playerControllable && !(controller instanceof LogicAI ai && ai.controller != null && ai.controller.block.privileged);
     }
 
     public boolean targetable(Team targeter){
@@ -641,6 +647,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 if(y > top) dy -= (y - top)/warpDst;
 
                 velAddNet(dx * Time.delta, dy * Time.delta);
+                float margin = tilesize * 1f;
+                x = Mathf.clamp(x, left - margin, right - tilesize + margin);
+                y = Mathf.clamp(y, bot - margin, top - tilesize + margin);
             }
 
             //clamp position if not flying
@@ -765,7 +774,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             //move down
             elevation -= type.fallSpeed * Time.delta;
 
-            if(isGrounded() || health <= -maxHealth){
+            if(isGrounded() || health <= -maxHealth * type.wreckHealthMultiplier){
                 Call.unitDestroy(id);
             }
         }
@@ -860,7 +869,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //if this unit crash landed (was flying), damage stuff in a radius
         if(type.flying && !spawnedByCore && type.createWreck && state.rules.unitCrashDamage(team) > 0){
             var shields = indexer.getEnemy(team, BlockFlag.shield);
-            float crashDamage = Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f * state.rules.unitCrashDamage(team);
+            float crashDamage = Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 2.5f * state.rules.unitCrashDamage(team);
             if(shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, crashDamage))){
                 Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, crashDamage, true, false, true);
             }

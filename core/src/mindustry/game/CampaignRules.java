@@ -18,10 +18,12 @@ public class CampaignRules{
         rules.showSpawns = showSpawns;
         rules.randomWaveAI = randomWaveAI;
         rules.objectiveTimerMultiplier = difficulty.waveTimeMultiplier;
-        if(planet.showRtsAIRule && rules.attackMode){
-            boolean swapped = rules.teams.get(rules.waveTeam).rtsAi != rtsAI;
-            rules.teams.get(rules.waveTeam).rtsAi = rtsAI;
-            rules.teams.get(rules.waveTeam).rtsMinWeight = 1.2f * difficulty.enemyHealthMultiplier;
+        if(planet.showRtsAIRule){
+            boolean enabled = rtsAI && rules.attackMode; //if attackMode becomes false (waves enabled), turn off RTS AI
+            boolean swapped = rules.teams.get(rules.waveTeam).rtsAi != enabled;
+
+            rules.teams.get(rules.waveTeam).rtsAi = enabled;
+            rules.teams.get(rules.waveTeam).rtsMaxSquad = 15;
 
             if(swapped && Vars.state.isGame()){
                 Groups.unit.each(u -> {

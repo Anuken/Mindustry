@@ -63,7 +63,6 @@ public class Schematics implements Loadable{
     private long lastClearTime;
 
     public Schematics(){
-
         Events.on(ClientLoadEvent.class, event -> {
             errorTexture = new Texture("sprites/error.png");
         });
@@ -80,9 +79,11 @@ public class Schematics implements Loadable{
 
         loadLoadouts();
 
-        for(Fi file : schematicDirectory.list()){
-            loadFile(file);
-        }
+        schematicDirectory.walk(file -> {
+            if(file.extEquals(schematicExtension)){
+                loadFile(file);
+            }
+        });
 
         platform.getWorkshopContent(Schematic.class).each(this::loadFile);
 
@@ -96,7 +97,7 @@ public class Schematics implements Loadable{
 
         all.sort();
 
-        if(shadowBuffer == null){
+        if(shadowBuffer == null && !headless){
             Core.app.post(() -> shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 8, maxSchematicSize + padding + 8));
         }
     }

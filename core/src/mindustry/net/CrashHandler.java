@@ -29,7 +29,8 @@ public class CrashHandler{
         }
 
         return report
-        + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
+        + "Version: " + Version.combined() + (Version.buildDate.equals("unknown") ? "" : " (Built " + Version.buildDate + ")") + (Vars.headless ? " (Server)" : "") + "\n"
+        + "Date: " + new SimpleDateFormat("MMMM d, yyyy HH:mm:ss a", Locale.getDefault()).format(new Date()) + "\n"
         + "OS: " + OS.osName + " x" + (OS.osArchBits) + " (" + OS.osArch + ")\n"
         + ((OS.isAndroid || OS.isIos) && app != null ? "Android API level: " + Core.app.getVersion() + "\n" : "")
         + "Java Version: " + OS.javaVersion + "\n"

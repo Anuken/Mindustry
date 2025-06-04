@@ -474,7 +474,7 @@ public class StatValues{
 
                     c.table(Styles.grayPanel, b -> {
                         b.image(item.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
-                        b.add(item.localizedName + (timePeriod > 0 ? "\n[lightgray]" + (time < 0.01f ? Strings.fixed(time, 3) : Strings.autoFixed(time, 2)) + StatUnit.perSecond.localized() : "")).left().grow();
+                        b.add(item.localizedName + (timePeriod > 0 ? "\n[lightgray]" + (time < 0.01f ? Strings.fixed(time, 4) : Strings.autoFixed(time, 2)) + StatUnit.perSecond.localized() : "")).left().grow();
                         b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(item) * 100f))).right().pad(10f).padRight(15f);
                     }).growX().pad(5).row();
                 }
@@ -625,7 +625,12 @@ public class StatValues{
                     if(!compact && !(t instanceof Turret)){
                         bt.table(title -> {
                             title.image(icon(t)).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top().with(i -> withTooltip(i, t, false));
+
                             title.add(t.localizedName).padRight(10).left().top();
+
+                            if(type.displayAmmoMultiplier && type.statLiquidConsumed > 0f){
+                                title.add("[stat]" + fixValue(type.statLiquidConsumed / type.ammoMultiplier * 60f) + " [lightgray]" + StatUnit.perSecond.localized());
+                            }
                         });
                         bt.row();
                     }
@@ -654,7 +659,7 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                     }
 
-                    if(!compact && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier && (!(t instanceof Turret turret) || turret.displayAmmoMultiplier)){
+                    if(type.statLiquidConsumed <= 0f && !compact && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier && (!(t instanceof Turret turret) || turret.displayAmmoMultiplier)){
                         sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
                     }
 

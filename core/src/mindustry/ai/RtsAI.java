@@ -25,16 +25,16 @@ import mindustry.world.meta.*;
 
 public class RtsAI{
     static final Seq<Building> targets = new Seq<>();
-    static final Seq<Unit> squad = new Seq<>(false);
+    static final Seq<Unit> squad = new Seq<>(false), stack = new Seq<>();
     static final IntSet used = new IntSet();
     static final IntSet assignedTargets = new IntSet(), invalidTarget = new IntSet();
-    static final float squadRadius = 140f;
+    static final float squadRadius = 60f;
     static final int timeUpdate = 0, timerSpawn = 1, maxTargetsChecked = 15;
 
     //in order of priority??
     static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery, BlockFlag.drill};
     static final ObjectFloatMap<Building> weights = new ObjectFloatMap<>();
-    static final boolean debug = OS.hasProp("mindustry.debug") && false;
+    static final boolean debug = OS.hasProp("mindustry.debug");
 
     final Interval timer = new Interval(10);
     final TeamData data;
@@ -109,21 +109,26 @@ public class RtsAI{
         boolean didDefend = false;
 
         for(var unit : data.units){
-            if(used.add(unit.id) && unit.isCommandable() && !unit.command().hasCommand() && !unit.command().isAttacking()){
+            if(used.add(unit.id) && unit.controller() instanceof CommandAI cai && !cai.hasCommand() && !cai.isAttacking()){
                 squad.clear();
+                squad.add(unit);
+
+                stack.clear();
+                stack.add(unit);
+
                 float rad = squadRadius + unit.hitSize*1.5f;
-                data.tree().intersect(unit.x - rad/2f, unit.y - rad/2f, rad, rad, squad);
 
-                squad.truncate(data.team.rules().rtsMaxSquad);
+                while(stack.size > 0){
+                    var next = stack.pop();
 
-                //remove overlapping squads
-                squad.removeAll(u -> (u != unit && used.contains(u.id)) || !u.isCommandable() || u.command().hasCommand() || ((u.flag == 0) != (unit.flag == 0)));
-                //mark used so other squads can't steal them
-                for(var item : squad){
-                    used.add(item.id);
+                    data.tree().intersect(next.x - rad/2f, next.y - rad/2f, rad, rad, u -> {
+                        if(u.controller() instanceof CommandAI ai && !ai.hasCommand() && ((u.flag == 0) == (unit.flag == 0)) && used.add(u.id)){
+                            squad.add(u);
+                            stack.add(u);
+                        }
+                    });
                 }
 
-                //TODO flawed, squads
                 if(handleSquad(squad, !didDefend)){
                     didDefend = true;
                 }
@@ -135,6 +140,8 @@ public class RtsAI{
 
     boolean handleSquad(Seq<Unit> units, boolean noDefenders){
         if(units.isEmpty()) return false;
+
+        boolean naval = units.first() instanceof WaterMovec;
 
         float health = 0f, dps = 0f;
         float ax = 0f, ay = 0f;
@@ -160,7 +167,7 @@ public class RtsAI{
         boolean defendingCore = false;
 
         //there is something to defend, see if it's worth the time
-        if(damaged.size > 0){
+        if(damaged.size > 0 && !naval){
             //TODO do the weights matter at all?
             //for(var build : damaged){
                 //float w = estimateStats(ax, ay, dps, health);
@@ -246,7 +253,7 @@ public class RtsAI{
             }
         }
 
-        var build = anyDefend ? null : findTarget(ax, ay, units.size, dps, health, units.first().flag == 0, units.first().isFlying());
+        var build = anyDefend ? null : findTarget(ax, ay, units.size, dps, health, units.first().flag == 0, units.first().isFlying(), naval);
 
         if(build != null || anyDefend){
             for(var unit : units){
@@ -269,7 +276,7 @@ public class RtsAI{
         return anyDefend;
     }
 
-    @Nullable Building findTarget(float x, float y, int total, float dps, float health, boolean checkWeight, boolean air){
+    @Nullable Building findTarget(float x, float y, int total, float dps, float health, boolean checkWeight, boolean air, boolean naval){
         if(total < data.team.rules().rtsMinSquad) return null;
 
         //flag priority?
@@ -277,8 +284,13 @@ public class RtsAI{
         //2. factory
         //3. core
         targets.clear();
-        for(var flag : flags){
-            targets.addAll(Vars.indexer.getEnemy(data.team, flag));
+        if(naval){
+            //naval units can only target enemy cores, because those are assumed to always be reachable. other blocks may not be!
+            targets.addAll(Vars.indexer.getEnemy(data.team, BlockFlag.core));
+        }else{
+            for(var flag : flags){
+                targets.addAll(Vars.indexer.getEnemy(data.team, flag));
+            }
         }
         targets.removeAll(b -> assignedTargets.contains(b.id) || invalidTarget.contains(b.pos()));
 
@@ -304,7 +316,7 @@ public class RtsAI{
         );
 
         float weight = weights.get(result, 0f);
-        if(checkWeight && weight < data.team.rules().rtsMinWeight && total < Units.getCap(data.team)){
+        if(checkWeight && (weight < data.team.rules().rtsMinWeight && total < data.team.rules().rtsMaxSquad) && total < Units.getCap(data.team)){
             return null;
         }
 

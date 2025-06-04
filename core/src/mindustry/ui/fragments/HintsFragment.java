@@ -164,7 +164,7 @@ public class HintsFragment{
     }
 
     public enum DefaultHint implements Hint{
-        desktopMove(visibleDesktop, () -> Core.input.axis(Binding.move_x) != 0 || Core.input.axis(Binding.move_y) != 0),
+        desktopMove(visibleDesktop, () -> Core.input.axis(Binding.moveX) != 0 || Core.input.axis(Binding.moveY) != 0),
         zoom(visibleDesktop, () -> Core.input.axis(KeyCode.scroll) != 0),
         breaking(() -> isTutorial.get() && state.rules.defaultTeam.data().getCount(Blocks.conveyor) > 5, () -> ui.hints.events.contains("break")),
         desktopShoot(visibleDesktop, () -> isSerpulo() && Vars.state.enemies > 0, () -> player.shooting),
@@ -175,8 +175,8 @@ public class HintsFragment{
             () -> control.input.commandMode && control.input.selectedUnits.size > 0 && control.input.selectedUnits.first().controller() instanceof CommandAI ai && ai.targetPos != null),
         respawn(visibleMobile, () -> !player.dead() && !player.unit().spawnedByCore, () -> !player.dead() && player.unit().spawnedByCore),
         launch(() -> (isTutorial.get() || Vars.state.rules.sector == SectorPresets.onset.sector) && state.rules.sector.isCaptured(), () -> ui.planet.isShown()),
-        schematicSelect(visibleDesktop, () -> ui.hints.placedBlocks.contains(Blocks.router) || ui.hints.placedBlocks.contains(Blocks.ductRouter), () -> Core.input.keyRelease(Binding.schematic_select) || Core.input.keyTap(Binding.pick)),
-        conveyorPathfind(() -> control.input.block == Blocks.titaniumConveyor, () -> Core.input.keyRelease(Binding.diagonal_placement) || (mobile && Core.settings.getBool("swapdiagonal"))),
+        schematicSelect(visibleDesktop, () -> ui.hints.placedBlocks.contains(Blocks.router) || ui.hints.placedBlocks.contains(Blocks.ductRouter), () -> Core.input.keyRelease(Binding.schematicSelect) || Core.input.keyTap(Binding.pick)),
+        conveyorPathfind(() -> control.input.block == Blocks.titaniumConveyor, () -> Core.input.keyRelease(Binding.diagonalPlacement) || (mobile && Core.settings.getBool("swapdiagonal"))),
         boost(visibleDesktop, () -> !player.dead() && player.unit().type.canBoost, () -> Core.input.keyDown(Binding.boost)),
         blockInfo(() -> control.input.block == Blocks.graphitePress, () -> ui.content.isShown()),
         derelict(() -> ui.hints.events.contains("derelictmouse") && !isTutorial.get(), () -> ui.hints.events.contains("derelictbreak")),

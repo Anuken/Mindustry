@@ -19,4 +19,9 @@ public class MatMesh implements GenericMesh{
     public void render(PlanetParams params, Mat3D projection, Mat3D transform){
         mesh.render(params, projection, tmp.set(transform).mul(mat));
     }
+
+    @Override
+    public void dispose(){
+        mesh.dispose();
+    }
 }

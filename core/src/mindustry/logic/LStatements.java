@@ -897,6 +897,35 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("unpackcolor")
+    public static class UnpackColorStatement extends LStatement{
+        public String r = "r", g = "g", b = "b", a = "a", value = "color";
+
+        @Override
+        public void build(Table table){
+            fields(table, r, str -> r = str);
+            fields(table, g, str -> g = str);
+            fields(table, b, str -> b = str);
+            fields(table, a, str -> a = str);
+
+            row(table);
+
+            table.add(" = unpack ");
+
+            fields(table, value, str -> value = str);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new UnpackColorI(builder.var(r), builder.var(g), builder.var(b), builder.var(a), builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.operation;
+        }
+    }
+
     @RegisterStatement("end")
     public static class EndStatement extends LStatement{
         @Override
@@ -1605,6 +1634,8 @@ public class LStatements{
                 case mapArea -> {
                     table.add(" = ");
 
+                    row(table);
+
                     fields(table, "x", p1, s -> p1 = s);
                     fields(table, "y", p2, s -> p2 = s);
                     row(table);
@@ -1624,7 +1655,7 @@ public class LStatements{
                 case ban, unban -> {
                     table.add(" block/unit ");
 
-                    field(table, value, s -> value = s);
+                    fields(table, value, s -> value = s);
                 }
                 default -> {
                     table.add(" = ");

@@ -156,6 +156,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return y * tilesize;
     }
 
+    //TODO: this method is misleading and buggy for non-center tiles
     public float drawx(){
         return block().offset + worldx();
     }
