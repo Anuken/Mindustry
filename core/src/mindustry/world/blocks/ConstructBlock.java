@@ -36,6 +36,7 @@ public class ConstructBlock extends Block{
     private static int pitchSeq = 0;
     private static long lastPlayed;
 
+
     public ConstructBlock(int size){
         super("build" + size);
         this.size = size;
@@ -171,6 +172,7 @@ public class ConstructBlock extends Block{
         private @Nullable float[] accumulator;
         private @Nullable float[] totalAccumulator;
         private @Nullable int[] itemsLeft;
+        private @Nullable int[] refundedItems;
 
         @Override
         public String getDisplayName(){
@@ -328,9 +330,10 @@ public class ConstructBlock extends Block{
             }
 
             ItemStack[] requirements = current.requirements;
-            if(requirements.length != accumulator.length || totalAccumulator.length != requirements.length){
+            if(accumulator.length != requirements.length || totalAccumulator.length != requirements.length){
                 setDeconstruct(current);
             }
+
 
             //make sure you take into account that you can't deconstruct more than there is deconstructed
             float clampedAmount = Math.min(amount, progress);
@@ -349,6 +352,7 @@ public class ConstructBlock extends Block{
                         core.items.add(requirements[i].item, accepting);
                         itemsLeft[i] += accepting;
                         accumulator[i] -= accepting;
+                        refundedItems[i] += accepting;
                     }else{
                         accumulator[i] -= accumulated;
                     }
@@ -361,12 +365,20 @@ public class ConstructBlock extends Block{
                 //add any leftover items that weren't obtained due to rounding errors
                 if(core != null && !state.rules.infiniteResources){
                     for(int i = 0; i < itemsLeft.length; i++){
-                        int target = Mathf.round(requirements[i].amount * state.rules.buildCostMultiplier * state.rules.deconstructRefundMultiplier);
-                        int remaining = target - itemsLeft[i];
-
+                        int totalCost = Mathf.round(requirements[i].amount * state.rules.buildCostMultiplier);
+                        int used = totalCost - itemsLeft[i] + refundedItems[i];
+                        int target = Mathf.round(used * state.rules.deconstructRefundMultiplier);
+                        int remaining = target - refundedItems[i];
                         if(requirements[i].item.unlockedNowHost()){
-                            core.items.add(requirements[i].item, Mathf.clamp(remaining, 0, core.storageCapacity - core.items.get(requirements[i].item)));
+                            if(remaining >= 0){
+                                core.items.add(requirements[i].item, Mathf.clamp(remaining, 0, core.storageCapacity - core.items.get(requirements[i].item)));
+                            } else {
+                                int toRemove = Math.min(-remaining, core.items.get(requirements[i].item));
+                                core.items.remove(requirements[i].item, toRemove);
+                            }
                         }
+
+                        refundedItems[i] = target;
                         itemsLeft[i] = target;
                     }
                 }
@@ -428,6 +440,7 @@ public class ConstructBlock extends Block{
             this.previous = previous;
             this.buildCost = block.buildTime * state.rules.buildCostMultiplier;
             this.itemsLeft = new int[block.requirements.length];
+            this.refundedItems = new int[block.requirements.length];
             this.accumulator = new float[block.requirements.length];
             this.totalAccumulator = new float[block.requirements.length];
 
@@ -448,8 +461,10 @@ public class ConstructBlock extends Block{
             this.current = previous;
             this.buildCost = previous.buildTime * state.rules.buildCostMultiplier;
             this.itemsLeft = new int[previous.requirements.length];
+            this.refundedItems = new int[previous.requirements.length];
             this.accumulator = new float[previous.requirements.length];
             this.totalAccumulator = new float[previous.requirements.length];
+
             pathfinder.updateTile(tile);
         }
 
