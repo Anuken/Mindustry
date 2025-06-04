@@ -251,10 +251,9 @@ public class PlacementFragment{
         }
 
         if(Core.input.keyTap(Binding.blockInfo)){
-            if (hovered() instanceof Unit unit && unit.type.unlockedNow()){
+            if(hovered() instanceof Unit unit && unit.type.unlockedNow()){
                 ui.content.show(unit.type());
-            }
-            else{
+            }else{
                 var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
                 Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
                 Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
