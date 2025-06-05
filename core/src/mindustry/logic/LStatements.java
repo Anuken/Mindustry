@@ -1765,14 +1765,14 @@ public class LStatements{
                     fields(table, p3, str -> p3 = str);
 
                     table.add(" allow input ");
-                    fields(table, p4, str -> p4 = str);
+                    fields(table, "false", p4, str -> p4 = str);
                 }
                 case zoom -> {
                     table.add(" level ");
                     fields(table, p1, str -> p1 = str);
 
                     table.add(" allow input ");
-                    fields(table, "false", str -> p2 = str);
+                    fields(table, "false", p2, str -> p2 = str);
                 }
             }
         }
