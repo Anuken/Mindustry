@@ -50,9 +50,7 @@ public class CanvasBlock extends Block{
 
         config(byte[].class, (CanvasBuild build, byte[] bytes) -> {
             if(build.data.length == bytes.length){
-                for(int i = 0; i < bytes.length; ++i){
-                    build.data[i] = bytes[i];
-                }
+                System.arraycopy(bytes, 0, build.data, 0, bytes.length);
                 build.updateTexture();
             }
         });
