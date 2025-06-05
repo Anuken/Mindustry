@@ -257,7 +257,7 @@ public class DesktopInput extends InputHandler{
         panning |= detached;
 
 
-        if(!locked || !logicCutscene){
+        if(!logicCutscene || !locked){
             if(((player.dead() || state.isPaused() || detached) && !ui.chatfrag.shown()) && !scene.hasField() && !scene.hasDialog()){
                 if(input.keyDown(Binding.mouseMove)){
                     panCam = true;

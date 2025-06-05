@@ -1888,7 +1888,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Forces the camera to a position and enables panning on desktop. */
     public void panCamera(Vec2 position){
-        if(!locked()){
+        if(!locked() && !logicCutscene){
             camera.position.set(position);
         }
     }
