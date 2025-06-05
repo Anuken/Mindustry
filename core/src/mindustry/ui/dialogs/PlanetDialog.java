@@ -1149,7 +1149,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
     }
 
-    void selectSector(Sector sector){
+    public void selectSector(Sector sector){
         selected = sector;
         updateSelected();
     }
