@@ -257,7 +257,7 @@ public class DesktopInput extends InputHandler{
         panning |= detached;
 
 
-        if(!locked){
+        if(!locked || !logicCutscene){
             if(((player.dead() || state.isPaused() || detached) && !ui.chatfrag.shown()) && !scene.hasField() && !scene.hasDialog()){
                 if(input.keyDown(Binding.mouseMove)){
                     panCam = true;
@@ -270,7 +270,7 @@ public class DesktopInput extends InputHandler{
                 Position coreTarget = state.gameOver && !state.rules.pvp && corePanTeam.data().lastCore != null ? corePanTeam.data().lastCore : null;
                 Position panTarget = coreTarget != null ? coreTarget : spectating != null ? spectating : player;
 
-                if(!logicCutscene) Core.camera.position.lerpDelta(panTarget, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
+                Core.camera.position.lerpDelta(panTarget, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
             }
 
             if(panCam){
