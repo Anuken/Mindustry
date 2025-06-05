@@ -152,18 +152,20 @@ public class CanvasBlock extends Block{
         public @Nullable Texture texture;
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
         public int blending;
+        
+        protected boolean updated = false;
 
         public void setPixel(int pos, int index){
             if(pos < canvasSize * canvasSize && pos >= 0 && index >= 0 && index < palette.length){
                 setByte(data, pos * bitsPerPixel, index);
-                updateTexture();
+                updated = true;
             }
         }
 
         public void setPixel(int x, int y, int index){
             if(x >= 0 && y >= 0 && x < canvasSize && y < canvasSize && index >= 0 && index < palette.length){
                 setByte(data, (y * canvasSize + x) * bitsPerPixel, index);
-                updateTexture();
+                updated = true;
             }
         }
 
@@ -242,7 +244,7 @@ public class CanvasBlock extends Block{
                 super.draw();
             }
 
-            if(texture == null){
+            if(texture == null || updated){
                 updateTexture();
             }
             Tmp.tr1.set(texture);
