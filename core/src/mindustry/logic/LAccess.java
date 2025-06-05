@@ -41,6 +41,7 @@ public enum LAccess{
     displayWidth,
     displayHeight,
     bufferUsage,
+    operations,
     size,
     solid,
     dead,
