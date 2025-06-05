@@ -1772,7 +1772,7 @@ public class LStatements{
                     fields(table, p1, str -> p1 = str);
 
                     table.add(" allow input ");
-                    fields(table, p4, str -> p4 = str);
+                    fields(table, "false", str -> p2 = str);
                 }
             }
         }

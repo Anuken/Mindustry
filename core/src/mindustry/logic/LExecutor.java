@@ -1275,7 +1275,7 @@ public class LExecutor{
                 }
                 case zoom -> {
                     control.input.logicCutscene = true;
-                    control.input.logicCutsceneInteract = p4.bool();
+                    control.input.logicCutsceneInteract = p2.bool();
                     control.input.logicCutsceneZoom = Mathf.clamp(p1.numf());
                 }
                 case stop -> {
