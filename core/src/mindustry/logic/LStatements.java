@@ -1734,7 +1734,7 @@ public class LStatements{
     @RegisterStatement("cutscene")
     public static class CutsceneStatement extends LStatement{
         public CutsceneAction action = CutsceneAction.pan;
-        public String p1 = "100", p2 = "100", p3 = "0.06", p4 = "0";
+        public String p1 = "100", p2 = "100", p3 = "0.06", p4 = "0", p5 = "false";
 
         @Override
         public void build(Table table){
@@ -1765,14 +1765,14 @@ public class LStatements{
                     fields(table, p3, str -> p3 = str);
 
                     table.add(" allow input ");
-                    fields(table, p5, str -> p5 = str)
+                    fields(table, p5, str -> p5 = str);
                 }
                 case zoom -> {
                     table.add(" level ");
                     fields(table, p1, str -> p1 = str);
 
                     table.add(" allow input ");
-                    fields(table, p5, str -> p5 = str)
+                    fields(table, p5, str -> p5 = str);
                 }
             }
         }
@@ -1784,7 +1784,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new CutsceneI(action, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+            return new CutsceneI(action, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4), builder.var(p5));
         }
 
         @Override
