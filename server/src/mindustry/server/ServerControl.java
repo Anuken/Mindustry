@@ -1054,27 +1054,27 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("dos-ban", "[add/remove] [ip]", "Add or remove a DOS ban.", args -> {
-            if (args.length == 0){
+        handler.register("dos-ban", "[add/remove] [ip]", "Add or remove a DOS ban.", arg -> {
+            if(arg.length == 0){
                 info("DOS bans: @", netServer.admins.dosBlacklist.isEmpty() ? "<none>" : "");
 
                 netServer.admins.dosBlacklist.forEach(address -> {
                     info("&lw\t" + address);
                 });
                 return;
-            } else if (args.length == 1) {
+            }else if(arg.length == 1){
                 err("Expected either zero or two parameters, but only got one parameter.");
                 return;
             }
 
-            String action = args[0].toLowerCase();
-            String ip = args[1];
+            String action = arg[0].toLowerCase();
+            String ip = arg[1];
 
-            if (action.equals("add")){
+            if(action.equals("add")){
                 netServer.admins.blacklistDos(ip);
                 info("Dos banned: @", ip);
                 return;
-            } else if (action.equals("remove")){
+            }else if(action.equals("remove")){
                 netServer.admins.unBlacklistDos(ip);
                 info("Removed dos ban: @", ip);
                 return;
