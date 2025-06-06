@@ -666,7 +666,7 @@ public class ServerControl implements ApplicationListener{
             if(arg.length == 0){
                 info("Subnets banned: @", netServer.admins.getSubnetBans().isEmpty() ? "<none>" : "");
                 for(String subnet : netServer.admins.getSubnetBans()){
-                    info("&lw  " + subnet);
+                    info("&lw\t" + subnet);
                 }
             }else if(arg.length == 1){
                 err("You must provide a subnet to add or remove.");
