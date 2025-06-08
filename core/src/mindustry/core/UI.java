@@ -71,6 +71,7 @@ public class UI implements ApplicationListener, Loadable{
     public PlanetDialog planet;
     public ResearchDialog research;
     public SchematicsDialog schematics;
+    public BuildingDialog building;
     public ModsDialog mods;
     public ColorPicker picker;
     public EffectsDialog effects;
@@ -215,6 +216,7 @@ public class UI implements ApplicationListener, Loadable{
         research = new ResearchDialog();
         mods = new ModsDialog();
         schematics = new SchematicsDialog();
+        building = new BuildingDialog();
         logic = new LogicDialog();
         fullText = new FullTextDialog();
         campaignComplete = new CampaignCompleteDialog();

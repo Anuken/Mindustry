@@ -729,7 +729,7 @@ public class PlacementFragment{
         return returnArray.selectFrom(content.blocks(), block -> block.category == cat && block.isVisible() && block.environmentBuildable());
     }
 
-    Seq<Block> getUnlockedByCategory(Category cat){
+    public Seq<Block> getUnlockedByCategory(Category cat){
         return returnArray2.selectFrom(content.blocks(), block -> block.category == cat && block.isVisible() && unlocked(block)).sort((b1, b2) -> Boolean.compare(!b1.isPlaceable(), !b2.isPlaceable()));
     }
 

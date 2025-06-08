@@ -646,6 +646,14 @@ public class DesktopInput extends InputHandler{
             }
         }
 
+        if(Core.input.keyTap(Binding.buildingMenu) && !Core.scene.hasKeyboard()){
+            if(ui.building.isShown()){
+                ui.building.hide();
+            }else{
+                ui.building.show();
+            }
+        }
+
         if(Core.input.keyTap(Binding.clearBuilding) || isPlacing()){
             lastSchematic = null;
             selectPlans.clear();
