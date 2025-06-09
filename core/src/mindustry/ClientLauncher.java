@@ -20,6 +20,9 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.ui.*;
+import mindustry.content.Planets;
+import mindustry.content.ErekirTechTree;
+import mindustry.io.SaveIO;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -180,7 +183,11 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         assets.load(schematics);
 
-        assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
+        assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> {
+            content.load();
+            ErekirTechTree.unlockAllRecursive(Planets.erekir.techTree);
+            SaveIO.save(Vars.saveDirectory.child("erekir_unlocked.msav"));
+        });
         assets.loadRun("baseparts", BaseRegistry.class, () -> {}, () -> bases.load());
     }
 

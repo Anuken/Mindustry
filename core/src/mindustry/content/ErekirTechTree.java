@@ -7,6 +7,7 @@ import mindustry.game.Objectives.*;
 import mindustry.type.*;
 import mindustry.type.unit.*;
 import mindustry.world.blocks.defense.turrets.*;
+import mindustry.content.TechTree.TechNode;
 
 import static mindustry.Vars.*;
 import static mindustry.content.Blocks.*;
@@ -466,5 +467,17 @@ public class ErekirTechTree{
                 });
             });
         });
+    }
+
+    public static void unlockAllRecursive(TechNode node){
+        if(node == null){
+            return;
+        }
+
+        node.content.unlock();
+
+        for(TechNode child : node.children){
+            unlockAllRecursive(child);
+        }
     }
 }
