@@ -89,7 +89,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
             unit.addItem(items.item, items.amount);
         }
 
-        unit.shield = getShield(wave);
+        unit.setShield(getShield(wave));
 
         //load up spawn payloads
         if(payloads != null && unit instanceof Payloadc pay){
