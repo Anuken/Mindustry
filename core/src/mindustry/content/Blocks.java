@@ -3437,7 +3437,6 @@ public class Blocks{
                     hitEffect = Fx.hitLancer;
                     despawnEffect = Fx.none;
                     status = StatusEffects.shocked;
-                    statusDuration = 10f;
                     hittable = false;
                     lightColor = Color.white;
                     collidesAir = false;
@@ -3489,7 +3488,6 @@ public class Blocks{
                     despawnEffect = Fx.blastExplosion;
 
                     status = StatusEffects.blasted;
-                    statusDuration = 60f;
 
                     hitColor = backColor = trailColor = Pal.blastAmmoBack;
                     frontColor = Pal.blastAmmoFront;
@@ -3915,7 +3913,6 @@ public class Blocks{
                     collidesGround = true;
 
                     status = StatusEffects.blasted;
-                    statusDuration = 60f;
 
                     backColor = hitColor = trailColor = Pal.blastAmmoBack;
                     frontColor = Pal.blastAmmoFront;
@@ -5455,7 +5452,6 @@ public class Blocks{
                         hitEffect = Fx.hitLancer;
                         despawnEffect = Fx.none;
                         status = StatusEffects.shocked;
-                        statusDuration = 10f;
                         hittable = false;
                         lightColor = Color.white;
                         buildingDamageMultiplier = 0.25f;

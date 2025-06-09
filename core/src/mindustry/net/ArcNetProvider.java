@@ -113,6 +113,8 @@ public class ArcNetProvider implements NetProvider{
 
                 //kill connections above the limit to prevent spam
                 if((playerLimitCache > 0 && server.getConnections().length > playerLimitCache) || netServer.admins.isDosBlacklisted(ip)){
+                    Log.info("Closing connection @ - IP marked as a potential DOS attack.", ip);
+
                     connection.close(DcReason.closed);
                     return;
                 }
