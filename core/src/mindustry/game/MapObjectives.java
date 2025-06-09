@@ -9,6 +9,8 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.serialization.*;
+import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -65,7 +67,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             TextMarker::new,
             LineMarker::new,
             TextureMarker::new,
-            QuadMarker::new
+            QuadMarker::new,
+            LightMarker::new
         );
 
         registerLegacyMarker("Minimap", PointMarker::new);
@@ -664,14 +667,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay.  */
-    public static abstract class ObjectiveMarker{
-        /** Internal use only! Do not access. */
-        public transient int arrayIndex;
-
-        /** Whether to display marker in the world. */
-        public boolean world = true;
-        /** Whether to display marker on minimap. */
-        public boolean minimap = false;
+    public static abstract class ObjectiveMarker implements JsonSerializable{
+        /** Whether to display marker in the world. Do not modify directly if added, use control() instead. */
+        public @IndexBool int world = 1;
+        /** Whether to display marker on the minimap. Do not modify directly if added, use control() instead. */
+        public @IndexBool int minimap = -1;
+        /** Whether to use the marker as light. Do not modify directly if added, use control() instead. */
+        public @IndexBool int light = -1;
         /** Whether to scale marker corresponding to player's zoom level. */
         public boolean autoscale = false;
         /** On which z-sorting layer is marker drawn. */
@@ -679,13 +681,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         public void draw(float scaleFactor){}
 
+        public void drawLight(float scaleFactor){
+            draw(scaleFactor);
+        }
+
         /** Control marker with world processor code. Ignores NaN (null) values. */
         public void control(LMarkerControl type, double p1, double p2, double p3){
             if(Double.isNaN(p1)) return;
 
             switch(type){
-                case world -> world = !Mathf.equal((float)p1, 0f);
-                case minimap -> minimap = !Mathf.equal((float)p1, 0f);
+                case world -> state.markers.updateMarker(state.markers.worldMarkers, this, !Mathf.equal((float)p1, 0f), m -> m.world, (m, i) -> m.world = i);
+                case minimap -> state.markers.updateMarker(state.markers.mapMarkers, this, !Mathf.equal((float)p1, 0f), m -> m.minimap, (m, i) -> m.minimap = i);
+                case light -> state.markers.updateMarker(state.markers.lightMarkers, this, !Mathf.equal((float)p1, 0f), m -> m.light, (m, i) -> m.light = i);
                 case autoscale -> autoscale = !Mathf.equal((float)p1, 0f);
                 case drawLayer -> drawLayer = (float)p1;
             }
@@ -699,6 +706,25 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public String typeName(){
             String className = getClass().getSimpleName().replace("Marker", "");
             return Core.bundle == null ? className : Core.bundle.get("marker." + className.toLowerCase() + ".name", className);
+        }
+
+        @Override
+        public void write(Json json){
+            json.writeFields(this);
+        }
+
+        private void updateField(JsonValue value){
+            if(value != null && value.type() != JsonValue.ValueType.longValue){
+                value.set(value.asBoolean() ? 1 : -1, null);
+            }
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData){
+            updateField(jsonData.get("world"));
+            updateField(jsonData.get("minimap"));
+            updateField(jsonData.get("light"));
+            json.readFields(this, jsonData);
         }
 
         public static String fetchText(String text){
@@ -891,8 +917,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             Draw.z(drawLayer);
             Lines.stroke(Scl.scl((1f - fin) * stroke + 0.1f), color);
             Lines.circle(pos.x, pos.y, rad * fin);
+        }
 
-            Draw.reset();
+        @Override
+        public void drawLight(float scaleFactor){
+            float rad = radius * tilesize * scaleFactor;
+
+            renderer.lights.add(pos.x, pos.y, radius, color, color.a);
         }
 
         @Override
@@ -950,8 +981,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     Fill.arc(pos.x, pos.y, radius * scaleFactor, (startAngle - endAngle) / 360f, rotation + endAngle, sides);
                 }
             }
-
-            Draw.reset();
         }
 
         @Override
@@ -1090,6 +1119,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             Lines.stroke(stroke * scaleFactor, Color.white);
             Lines.line(pos.x, pos.y, color1, endPos.x, endPos.y, color2);
+        }
+
+        @Override
+        public void drawLight(float scaleFactor){
+            renderer.lights.line(pos.x, pos.y, endPos.x, endPos.y, stroke, color1, color1.a);
         }
 
         @Override
@@ -1297,6 +1331,48 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     }
 
+    /** Displays a single point light. */
+    public static class LightMarker extends PosMarker{
+        public float radius = 5f;
+        public Color color = Color.valueOf("ffd37f");
+
+        public LightMarker(int x, int y){
+            this.pos.set(x, y);
+        }
+
+        public LightMarker(int x, int y, Color color){
+            this.pos.set(x, y);
+            this.color = color;
+        }
+
+        public LightMarker(int x, int y, float radius, Color color){
+            this.pos.set(x, y);
+            this.radius = radius;
+            this.color = color;
+        }
+
+        public LightMarker(){}
+
+        @Override
+        public void drawLight(float scaleFactor){
+            float rad = radius * tilesize * scaleFactor;
+
+            renderer.lights.add(pos.x, pos.y, rad, color, color.a);
+        }
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            super.control(type, p1, p2, p3);
+
+            if(!Double.isNaN(p1)){
+                switch(type){
+                    case radius -> radius = (float)p1;
+                    case color -> color.fromDouble(p1);
+                }
+            }
+        }
+    }
+
     private static void lookupRegion(String name, TextureRegion out){
         TextureRegion region = Core.atlas.find(name);
         if(region.found()){
@@ -1324,6 +1400,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     @Target(FIELD)
     @Retention(RUNTIME)
     public @interface Vertices{}
+
+    /** For {@code int}; treats it as a boolean with -1 for false and any other value for true (defaulting to 1) */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface IndexBool{}
 
     /** For {@code byte}; treats it as a world label flag. */
     @Target(FIELD)
