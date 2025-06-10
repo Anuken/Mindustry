@@ -372,7 +372,6 @@ public class ConstructBlock extends Block{
                         int used = totalCost - itemsLeft[i] + refundedItems[i];
                         int target = Mathf.round(used * state.rules.deconstructRefundMultiplier);
                         int remaining = target - refundedItems[i];
-                        Log.err(String.valueOf(remaining));
                         if(requirements[i].item.unlockedNowHost()){
                             core.items.add(requirements[i].item, Mathf.clamp(remaining, 0, core.storageCapacity - core.items.get(requirements[i].item)));
                         }
