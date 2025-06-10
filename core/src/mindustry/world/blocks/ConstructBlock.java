@@ -352,6 +352,9 @@ public class ConstructBlock extends Block{
                         core.items.add(requirements[i].item, accepting);
                         itemsLeft[i] += accepting;
                         accumulator[i] -= accepting;
+                        if (refundedItems == null) {
+                            refundedItems = new int[requirements.length];
+                        }
                         refundedItems[i] += accepting;
                     }else{
                         accumulator[i] -= accumulated;
@@ -484,7 +487,6 @@ public class ConstructBlock extends Block{
                     write.f(accumulator[i]);
                     write.f(totalAccumulator[i]);
                     write.i(itemsLeft[i]);
-                    write.i(refundedItems[i]);
                 }
             }
         }
@@ -501,13 +503,11 @@ public class ConstructBlock extends Block{
                 accumulator = new float[acsize];
                 totalAccumulator = new float[acsize];
                 itemsLeft = new int[acsize];
-                refundedItems = new int[acsize];
                 for(int i = 0; i < acsize; i++){
                     accumulator[i] = read.f();
                     totalAccumulator[i] = read.f();
                     if(revision >= 1){
                         itemsLeft[i] = read.i();
-                        refundedItems[i] = read.i();
                     }
                 }
             }
