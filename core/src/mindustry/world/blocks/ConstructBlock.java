@@ -369,13 +369,9 @@ public class ConstructBlock extends Block{
                         int used = totalCost - itemsLeft[i] + refundedItems[i];
                         int target = Mathf.round(used * state.rules.deconstructRefundMultiplier);
                         int remaining = target - refundedItems[i];
+                        Log.err(String.valueOf(remaining));
                         if(requirements[i].item.unlockedNowHost()){
-                            if(remaining >= 0){
-                                core.items.add(requirements[i].item, Mathf.clamp(remaining, 0, core.storageCapacity - core.items.get(requirements[i].item)));
-                            } else {
-                                int toRemove = Math.min(-remaining, core.items.get(requirements[i].item));
-                                core.items.remove(requirements[i].item, toRemove);
-                            }
+                            core.items.add(requirements[i].item, Mathf.clamp(remaining, 0, core.storageCapacity - core.items.get(requirements[i].item)));
                         }
 
                         refundedItems[i] = target;
@@ -488,6 +484,7 @@ public class ConstructBlock extends Block{
                     write.f(accumulator[i]);
                     write.f(totalAccumulator[i]);
                     write.i(itemsLeft[i]);
+                    write.i(refundedItems[i]);
                 }
             }
         }
@@ -504,11 +501,13 @@ public class ConstructBlock extends Block{
                 accumulator = new float[acsize];
                 totalAccumulator = new float[acsize];
                 itemsLeft = new int[acsize];
+                refundedItems = new int[acsize];
                 for(int i = 0; i < acsize; i++){
                     accumulator[i] = read.f();
                     totalAccumulator[i] = read.f();
                     if(revision >= 1){
                         itemsLeft[i] = read.i();
+                        refundedItems[i] = read.i();
                     }
                 }
             }
