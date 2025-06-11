@@ -210,6 +210,12 @@ public class ConstructBlock extends Block{
         }
 
         @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.buildTo) return current;
+            return super.senseObject(sensor);
+        }
+
+        @Override
         public void onDestroyed(){
             Fx.blockExplosionSmoke.at(tile);
 
