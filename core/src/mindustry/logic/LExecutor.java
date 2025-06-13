@@ -878,7 +878,7 @@ public class LExecutor{
                     int advance = (int)data.spaceXadvance, lineHeight = (int)data.lineHeight;
 
                     int xOffset, yOffset;
-                    int align = p1.id; //p1 is not a variable, it's a raw align value. what a massive hack
+                    int align = p1.numi();
 
                     int maxWidth = 0, lines = 1, lineWidth = 0;
                     for(int i = 0; i < str.length(); i++){
