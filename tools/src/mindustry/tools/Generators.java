@@ -78,7 +78,7 @@ public class Generators{
                     mainExecutor.submit(() -> {
                         try{
                             ImageTileGenerator.generate(basePath, floor.name, new Fi("../../../assets-raw/sprites_out/blocks/environment/" + floor.name));
-                        }catch(Exception e){
+                        }catch(Throwable e){
                             Log.err("Failed to autotile: " + floor.name, e);
                         }finally{
                             //the raw autotile source image must never be included, it isn't useful

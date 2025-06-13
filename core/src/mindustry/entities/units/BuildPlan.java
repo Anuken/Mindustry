@@ -21,8 +21,6 @@ public class BuildPlan implements Position, QuadTreeObject{
     public boolean breaking;
     /** Config int. Not used unless hasConfig is true.*/
     public Object config;
-    /** Original position, only used in schematics.*/
-    public int originalX, originalY, originalWidth, originalHeight;
 
     /** Last progress.*/
     public float progress;
@@ -65,6 +63,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     public BuildPlan(){
 
     }
+
     public boolean placeable(Team team){
         return Build.validPlace(block, team, x, y, rotation);
     }
@@ -111,20 +110,10 @@ public class BuildPlan implements Position, QuadTreeObject{
         copy.block = block;
         copy.breaking = breaking;
         copy.config = config;
-        copy.originalX = originalX;
-        copy.originalY = originalY;
         copy.progress = progress;
         copy.initialized = initialized;
         copy.animScale = animScale;
         return copy;
-    }
-
-    public BuildPlan original(int x, int y, int originalWidth, int originalHeight){
-        originalX = x;
-        originalY = y;
-        this.originalWidth = originalWidth;
-        this.originalHeight = originalHeight;
-        return this;
     }
 
     public Rect bounds(Rect rect){

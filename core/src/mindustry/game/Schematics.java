@@ -275,7 +275,7 @@ public class Schematics implements Loadable{
 
     /** Creates an array of build plans from a schematic's data, centered on the provided x+y coordinates. */
     public Seq<BuildPlan> toPlans(Schematic schem, int x, int y){
-        return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block, t.config).original(t.x, t.y, schem.width, schem.height))
+        return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block, t.config))
             .removeAll(s -> (!s.block.isVisible() && !(s.block instanceof CoreBlock)) || !s.block.unlockedNow()).sort(Structs.comparingInt(s -> -s.block.schematicPriority));
     }
 
