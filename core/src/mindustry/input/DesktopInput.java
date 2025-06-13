@@ -430,10 +430,6 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(Core.input.keyRelease(Binding.select)){
-            player.shooting = false;
-        }
-
         if(state.isGame() && !scene.hasDialog() && !scene.hasField()){
             if(Core.input.keyTap(Binding.minimap)) ui.minimapfrag.toggle();
             if(Core.input.keyTap(Binding.planetMap) && state.isCampaign()) ui.planet.toggle();
@@ -559,6 +555,10 @@ public class DesktopInput extends InputHandler{
                 graphics.cursor(SystemCursor.arrow);
                 changedCursor = false;
             }
+        }
+
+        if(Core.input.keyRelease(Binding.select)){
+            player.shooting = false;
         }
     }
 
