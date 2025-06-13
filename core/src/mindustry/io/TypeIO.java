@@ -133,6 +133,9 @@ public class TypeIO{
         }else if(object instanceof UnitCommand command){
             write.b(23);
             write.s(command.id);
+        }else if(object instanceof BuildingStringBuilder b){
+            write.b(24);
+            write.i(b.source);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -206,6 +209,7 @@ public class TypeIO{
                 yield objs;
             }
             case 23 -> content.unitCommand(read.us());
+            case 24 -> new BuildingStringBuilder(read.i());
             default -> throw new IllegalArgumentException("Unknown object type: " + type);
         };
     }
