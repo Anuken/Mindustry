@@ -53,6 +53,7 @@ public enum LAccess{
     speed,
     team,
     type,
+    buildTo,
     flag,
     controlled,
     controller,
