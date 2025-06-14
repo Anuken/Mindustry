@@ -962,6 +962,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 switch(type){
                     case radius -> radius = (float)p1;
                     case stroke -> stroke = (float)p1;
+                    case outline -> outline = !Mathf.equal((float)p1, 0f);
                     case rotation -> rotation = (float)p1;
                     case color -> color.fromDouble(p1);
                     case shape -> sides = (int)p1;
@@ -1101,6 +1102,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     case endPos -> endPos.x = (float)p1 * tilesize;
                     case stroke -> stroke = (float)p1;
                     case color -> color1.set(color2.fromDouble(p1));
+                    case outline -> outline = !Mathf.equal((float)p1, 0f);
                 }
             }
 
