@@ -297,7 +297,7 @@ public class CanvasBlock extends Block{
                 dialog.hidden(() -> {
                     texture.dispose();
                     pix.dispose();
-                })
+                });
                 
                 dialog.resized(dialog::hide);
 
