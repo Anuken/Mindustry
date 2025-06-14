@@ -11,6 +11,7 @@ public enum LMarkerControl{
     color("color"),
     radius("radius"),
     stroke("stroke"),
+    outline("outline"),
     rotation("rotation"),
     shape("sides", "fill", "outline"),
     arc("start", "end"),
