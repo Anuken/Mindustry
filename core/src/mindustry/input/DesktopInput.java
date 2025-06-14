@@ -733,6 +733,7 @@ public class DesktopInput extends InputHandler{
                 mode = none;
             }else if(!selectPlans.isEmpty()){
                 flushPlans(selectPlans);
+                movedPlan = true;
             }else if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
