@@ -243,6 +243,7 @@ public class CanvasBlock extends Block{
             }
 
             if(texture == null || updated){
+                update = false;
                 updateTexture();
             }
             Tmp.tr1.set(texture);
@@ -429,7 +430,7 @@ public class CanvasBlock extends Block{
                     }).size(44f);
                 });
 
-                dialog.closeOnBack(dialog::hide);
+                dialog.closeOnBack();
 
                 dialog.buttons.defaults().size(150f, 64f);
                 dialog.buttons.button("@cancel", Icon.cancel, dialog::hide);
