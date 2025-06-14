@@ -822,13 +822,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 switch(type){
                     case fontSize -> fontSize = (float)p1;
                     case textHeight -> textHeight = (float)p1;
-                    case labelFlags -> {
-                        if(!Mathf.equal((float)p1, 0f)){
-                            flags |= WorldLabel.flagBackground;
-                        }else{
-                            flags &= ~WorldLabel.flagBackground;
-                        }
-                    }
+                    case outline -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagOutline, !Mathf.equal((float)p1, 0f));
+                    case labelFlags -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagBackground, !Mathf.equal((float)p1, 0f));
                     case radius -> radius = (float)p1;
                     case rotation -> rotation = (float)p1;
                     case color -> color.fromDouble(p1);
@@ -838,13 +833,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             if(!Double.isNaN(p2)){
                 switch(type){
-                    case labelFlags -> {
-                        if(!Mathf.equal((float)p2, 0f)){
-                            flags |= WorldLabel.flagOutline;
-                        }else{
-                            flags &= ~WorldLabel.flagOutline;
-                        }
-                    }
+                    case labelFlags -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagOutline, !Mathf.equal((float)p2, 0f));
                 }
             }
         }
@@ -1026,25 +1015,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(!Double.isNaN(p1)){
                 switch(type){
                     case fontSize -> fontSize = (float)p1;
-                    case labelFlags -> {
-                        if(!Mathf.equal((float)p1, 0f)){
-                            flags |= WorldLabel.flagBackground;
-                        }else{
-                            flags &= ~WorldLabel.flagBackground;
-                        }
-                    }
+                    case outline -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagOutline, !Mathf.equal((float)p1, 0f));
+                    case labelFlags -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagBackground, !Mathf.equal((float)p1, 0f));
                 }
             }
 
             if(!Double.isNaN(p2)){
                 switch(type){
-                    case labelFlags -> {
-                        if(!Mathf.equal((float)p2, 0f)){
-                            flags |= WorldLabel.flagOutline;
-                        }else{
-                            flags &= ~WorldLabel.flagOutline;
-                        }
-                    }
+                    case labelFlags -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagOutline, !Mathf.equal((float)p2, 0f));
                 }
             }
         }
