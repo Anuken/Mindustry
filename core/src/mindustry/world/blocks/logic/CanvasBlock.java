@@ -293,12 +293,13 @@ public class CanvasBlock extends Block{
                 int[] curColor = {palette[0]};
                 boolean[] modified = {false};
                 boolean[] fill = {false};
-
-                dialog.resized(() -> {
+                
+                dialog.hidden(() -> {
                     texture.dispose();
                     pix.dispose();
-                    dialog.hide();
-                });
+                })
+                
+                dialog.resized(dialog::hide);
 
                 dialog.cont.table(Tex.pane, body -> {
                     body.add(new Element(){
@@ -428,24 +429,14 @@ public class CanvasBlock extends Block{
                     }).size(44f);
                 });
 
-                dialog.closeOnBack(() -> {
-                    texture.dispose();
-                    pix.dispose();
-                    dialog.hide();
-                });
+                dialog.closeOnBack(dialog::hide);
 
                 dialog.buttons.defaults().size(150f, 64f);
-                dialog.buttons.button("@cancel", Icon.cancel, () -> {
-                    texture.dispose();
-                    pix.dispose();
-                    dialog.hide();
-                });
+                dialog.buttons.button("@cancel", Icon.cancel, dialog::hide);
                 dialog.buttons.button("@ok", Icon.ok, () -> {
                     if(modified[0]){
                         configure(packPixmap(pix));
                     }
-                    texture.dispose();
-                    pix.dispose();
                     dialog.hide();
                 });
 
