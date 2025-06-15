@@ -215,7 +215,7 @@ public class MassDriver extends Block{
 
         @Override
         public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(1f - reloadCounter / reload);
+            if(sensor == LAccess.progress) return Mathf.clamp(1f - reloadCounter);
             return super.sense(sensor);
         }
 
@@ -305,7 +305,7 @@ public class MassDriver extends Block{
             smokeEffect.at(x + Angles.trnsx(angle, translation), y + Angles.trnsy(angle, translation), angle);
 
             Effect.shake(shake, shake, this);
-            
+
             shootSound.at(tile, Mathf.random(0.9f, 1.1f));
         }
 

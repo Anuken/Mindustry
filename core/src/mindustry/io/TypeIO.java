@@ -1104,7 +1104,7 @@ public class TypeIO{
         }
     }
 
-    /** Represents a unit that has not been resolved yet. TODO unimplemented / unused*/
+    /** Represents a unit that has not been resolved yet. */
     public static class UnitBox implements Boxed<Unit>{
         public int id;
 

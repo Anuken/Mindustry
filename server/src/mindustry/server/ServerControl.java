@@ -666,7 +666,7 @@ public class ServerControl implements ApplicationListener{
             if(arg.length == 0){
                 info("Subnets banned: @", netServer.admins.getSubnetBans().isEmpty() ? "<none>" : "");
                 for(String subnet : netServer.admins.getSubnetBans()){
-                    info("&lw  " + subnet);
+                    info("&lw\t" + subnet);
                 }
             }else if(arg.length == 1){
                 err("You must provide a subnet to add or remove.");
@@ -1052,6 +1052,35 @@ public class ServerControl implements ApplicationListener{
             }else{
                 handleCommandString(suggested);
             }
+        });
+
+        handler.register("dos-ban", "[add/remove] [ip]", "Add or remove a DOS ban.", arg -> {
+            if(arg.length == 0){
+                info("DOS bans: @", netServer.admins.dosBlacklist.isEmpty() ? "<none>" : "");
+
+                netServer.admins.dosBlacklist.forEach(address -> {
+                    info("&lw\t" + address);
+                });
+                return;
+            }else if(arg.length == 1){
+                err("Expected either zero or two parameters, but only got one parameter.");
+                return;
+            }
+
+            String action = arg[0].toLowerCase();
+            String ip = arg[1];
+
+            if(action.equals("add")){
+                netServer.admins.blacklistDos(ip);
+                info("Dos banned: @", ip);
+                return;
+            }else if(action.equals("remove")){
+                netServer.admins.unBlacklistDos(ip);
+                info("Removed dos ban: @", ip);
+                return;
+            }
+
+            err("Unrecognized action: @", action);
         });
 
         mods.eachClass(p -> p.registerServerCommands(handler));

@@ -1331,9 +1331,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         plans.each(plan -> {
             if(plan.breaking) return;
 
+            float off = plan.block.size % 2 == 0 ? -0.5f : 0f;
+
             plan.pointConfig(p -> {
-                int cx = p.x, cy = p.y;
-                int lx = cx;
+                float cx = p.x + off, cy = p.y + off;
+                float lx = cx;
 
                 if(direction >= 0){
                     cx = -cy;
@@ -1342,7 +1344,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     cx = cy;
                     cy = -lx;
                 }
-                p.set(cx, cy);
+                p.set(Mathf.floor(cx - off), Mathf.floor(cy - off));
             });
 
             //rotate actual plan, centered on its multiblock position
@@ -1376,14 +1378,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
 
             plan.pointConfig(p -> {
-                int corigin = x ? plan.originalWidth/2 : plan.originalHeight/2;
-                int nvalue = -(x ? p.x : p.y);
                 if(x){
-                    plan.originalX = -(plan.originalX - corigin) + corigin;
-                    p.x = nvalue;
+                    if(plan.block.size % 2 == 0) p.x --;
+                    p.x = -p.x;
                 }else{
-                    plan.originalY = -(plan.originalY - corigin) + corigin;
-                    p.y = nvalue;
+                    if(plan.block.size % 2 == 0) p.y --;
+                    p.y = -p.y;
                 }
             });
 

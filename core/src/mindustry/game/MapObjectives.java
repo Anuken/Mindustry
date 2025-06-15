@@ -714,7 +714,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                         state.mapLocales.getProperty(key + ".mobile") :
                         state.mapLocales.containsProperty(key) ?
                         state.mapLocales.getProperty(key) :
-                        Core.bundle.get(key);
+                        Core.bundle.get(key + ".mobile", Core.bundle.get(key));
                 }else{
                     out =
                         state.mapLocales.containsProperty(key) ?
