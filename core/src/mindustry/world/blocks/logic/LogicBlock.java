@@ -408,7 +408,6 @@ public class LogicBlock extends Block{
                     asm.putConst("@thisy", World.conv(y));
 
                     executor.load(asm);
-                    executor.operations = 0;
                     executor.unit.objval = oldUnit;
                     executor.unit.isobj = true;
                 }catch(Exception e){
