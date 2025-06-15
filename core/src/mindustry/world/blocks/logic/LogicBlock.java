@@ -408,6 +408,7 @@ public class LogicBlock extends Block{
                     asm.putConst("@thisy", World.conv(y));
 
                     executor.load(asm);
+                    executor.operations = 0;
                     executor.unit.objval = oldUnit;
                     executor.unit.isobj = true;
                 }catch(Exception e){
@@ -553,6 +554,14 @@ public class LogicBlock extends Block{
         @Override
         public byte[] config(){
             return compress(code, relativeConnections());
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case operations -> executor.operations;
+                default -> super.sense(sensor);
+            };
         }
 
         public Seq<LogicLink> relativeConnections(){

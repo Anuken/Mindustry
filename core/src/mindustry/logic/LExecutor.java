@@ -50,6 +50,7 @@ public class LExecutor{
 
     public int[] binds;
     public boolean yield;
+    public long operations;
 
     public LongSeq graphicsBuffer = new LongSeq();
     public StringBuilder textBuffer = new StringBuilder();
@@ -90,6 +91,7 @@ public class LExecutor{
         if(counter.numval < instructions.length){
             counter.isobj = false;
             instructions[(int)(counter.numval++)].run(this);
+            if(!yield) operations++;
         }
     }
 
