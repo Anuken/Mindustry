@@ -35,7 +35,7 @@ import static mindustry.logic.GlobalVars.*;
 @Component(base = true)
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, Senseable, Settable{
     private static final Vec2 tmp1 = new Vec2(), tmp2 = new Vec2();
-    static final float warpDst = 20f;
+    static final float warpDst = 8f;
 
     @Import boolean dead, disarmed;
     @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, ammo, dragMultiplier, armorOverride, speedMultiplier;
@@ -643,11 +643,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 //repel unit out of bounds
                 if(x < left) dx += (-(x - left)/warpDst);
                 if(y < bot) dy += (-(y - bot)/warpDst);
-                if(x > right) dx -= (x - right)/warpDst;
-                if(y > top) dy -= (y - top)/warpDst;
+                if(x > right - tilesize) dx -= (x - (right - tilesize))/warpDst;
+                if(y > top - tilesize) dy -= (y - (top - tilesize))/warpDst;
 
                 velAddNet(dx * Time.delta, dy * Time.delta);
-                float margin = tilesize * 2f;
+                float margin = tilesize * 1f;
                 x = Mathf.clamp(x, left - margin, right - tilesize + margin);
                 y = Mathf.clamp(y, bot - margin, top - tilesize + margin);
             }

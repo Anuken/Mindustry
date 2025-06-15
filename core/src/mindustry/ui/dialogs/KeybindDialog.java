@@ -152,7 +152,6 @@ public class KeybindDialog extends Dialog{
         rebindKey = name;
 
         rebindDialog.titleTable.getCells().first().pad(4);
-
         rebindDialog.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){

@@ -14,7 +14,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class TantrosPlanetGenerator extends PlanetGenerator{
-    Color c1 = Color.valueOf("5057a6"), c2 = Color.valueOf("272766"), out = new Color();
+    Color c1 = Color.valueOf("5057a6"), c2 = Color.valueOf("272766");
 
     Block[][] arr = {
     {Blocks.redmat, Blocks.redmat, Blocks.darksand, Blocks.bluemat, Blocks.bluemat}
@@ -25,19 +25,14 @@ public class TantrosPlanetGenerator extends PlanetGenerator{
     }
 
     @Override
-    public void generateSector(Sector sector){
-        //no bases
-    }
-
-    @Override
     public float getHeight(Vec3 position){
         return 0;
     }
 
     @Override
-    public Color getColor(Vec3 position){
+    public void getColor(Vec3 position, Color out){
         float depth = Simplex.noise3d(seed, 2, 0.56, 1.7f, position.x, position.y, position.z) / 2f;
-        return c1.write(out).lerp(c2, Mathf.clamp(Mathf.round(depth, 0.15f))).a(0.2f);
+        out.set(c1).lerp(c2, Mathf.clamp(Mathf.round(depth, 0.15f))).a(1f - 0.2f).toFloatBits();
     }
 
     @Override
