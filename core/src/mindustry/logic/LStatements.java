@@ -793,6 +793,55 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("select")
+    public static class SelectStatement extends LStatement{
+        public String result = "result";
+        public ConditionOp op = ConditionOp.notEqual;
+        public String comp0 = "x", comp1 = "false", a = "a", b = "b";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        private void rebuild(Table table){
+            table.clearChildren();
+            table.left();
+
+            table.table(t -> {
+                t.setColor(table.color);
+
+                field(t, result, str -> result = str);
+                t.add(" = if ");
+
+                JumpStatement.addOp(this, t, op, o -> {
+                    op = o;
+                    rebuild(table);
+                }, comp0, str -> comp0 = str, comp1, str -> comp1 = str);
+            }).left();
+
+            table.row();
+            table.table(t -> {
+                t.setColor(table.color);
+
+                t.add("then ");
+                field(t, a, str -> a = str);
+                t.add(" else ");
+                field(t, b, str -> b = str);
+            }).left();
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SelectI(op, builder.var(result), builder.var(comp0), builder.var(comp1), builder.var(a), builder.var(b));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.operation;
+        }
+    }
+
     @RegisterStatement("wait")
     public static class WaitStatement extends LStatement{
         public String value = "0.5";
@@ -984,17 +1033,22 @@ public class LStatements{
             table.clearChildren();
             table.setColor(last);
 
-            if(op != ConditionOp.always) field(table, value, str -> value = str);
+            addOp(this, table, op, o -> {
+                op = o;
+                rebuild(table);
+            }, value, str -> value = str, compare, str -> compare = str);
+        }
 
-            table.button(b -> {
-                b.label(() -> op.symbol);
-                b.clicked(() -> showSelect(b, ConditionOp.all, op, o -> {
-                    op = o;
-                    rebuild(table);
-                }));
-            }, Styles.logict, () -> {}).size(op == ConditionOp.always ? 80f : 48f, 40f).pad(4f).color(table.color);
+        public static void addOp(LStatement st, Table t, ConditionOp op, Cons<ConditionOp> getter, String comp0, Cons<String> set0, String comp1, Cons<String> set2){
+            if(op != ConditionOp.always) st.field(t, comp0, set0);
 
-            if(op != ConditionOp.always) field(table, compare, str -> compare = str);
+            t.button(b -> {
+                b.add(op.symbol);
+                b.clicked(() -> st.showSelect(b, ConditionOp.all, op, getter));
+            }, Styles.logict, () -> {
+            }).size(op == ConditionOp.always ? 80f : 48f, 40f).pad(4f).color(t.color);
+
+            if(op != ConditionOp.always) st.field(t, comp1, set2);
         }
 
         //elements need separate conversion logic
