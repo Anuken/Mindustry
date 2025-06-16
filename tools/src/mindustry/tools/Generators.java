@@ -69,6 +69,28 @@ public class Generators{
     public static void run(){
         ObjectMap<Block, Pixmap> gens = new ObjectMap<>();
 
+        generate("autotiles", () -> {
+            for(Floor floor : content.blocks().select(b -> b.isFloor() && b.asFloor().autotile).<Floor>as()){
+                Fi basePath = new Fi("../../../assets-raw/sprites_out/blocks/environment/" + floor.name + "-autotile.png");
+
+                if(basePath.exists()){
+                    //theoretically this might not finish in time, but I doubt that will ever happen
+                    mainExecutor.submit(() -> {
+                        try{
+                            ImageTileGenerator.generate(basePath, floor.name, new Fi("../../../assets-raw/sprites_out/blocks/environment/" + floor.name));
+                        }catch(Throwable e){
+                            Log.err("Failed to autotile: " + floor.name, e);
+                        }finally{
+                            //the raw autotile source image must never be included, it isn't useful
+                            basePath.delete();
+                        }
+                    });
+                }else{
+                    Log.warn("Autotile floor '@' not found: @", floor.name, basePath.absolutePath());
+                }
+            }
+        });
+
         generate("splashes", () -> {
 
             int frames = 12;

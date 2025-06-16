@@ -25,8 +25,19 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
 
     protected @Nullable Sector sector;
 
-    /** Should generate sector bases for a planet. */
     public void generateSector(Sector sector){
+
+    }
+
+    public void onSectorCaptured(Sector sector){
+
+    }
+
+    public void onSectorLost(Sector sector){
+
+    }
+
+    public void beforeSaveWrite(Sector sector){
 
     }
 
