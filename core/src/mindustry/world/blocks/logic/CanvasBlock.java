@@ -243,7 +243,7 @@ public class CanvasBlock extends Block{
             }
 
             if(texture == null || updated){
-                update = false;
+                updated = false;
                 updateTexture();
             }
             Tmp.tr1.set(texture);
