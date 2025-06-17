@@ -1327,36 +1327,25 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void rotatePlans(Seq<BuildPlan> plans, int direction){
         int ox = schemOriginX(), oy = schemOriginY();
-
+        int sign = direction >= 0 ? 1 : -1;
+        boolean dir = direction >= 0;
+        
         plans.each(plan -> {
             if(plan.breaking) return;
 
-            float off = plan.block.size % 2 == 0 ? -0.5f : 0f;
-
+            int off = (plan.block.size & 1) ^ 1; // plan.block.size % 2 == 0 ? 1 : 0
             plan.pointConfig(p -> {
-                float cx = p.x + off, cy = p.y + off;
-                float lx = cx;
-
-                if(direction >= 0){
-                    cx = -cy;
-                    cy = lx;
-                }else{
-                    cx = cy;
-                    cy = -lx;
-                }
-                p.set(Mathf.floor(cx - off), Mathf.floor(cy - off));
+                if(dir) p.set(off - p.y, p.x);
+                else    p.set(p.y, off - p.x);
             });
 
             //rotate actual plan, centered on its multiblock position
             float wx = (plan.x - ox) * tilesize + plan.block.offset, wy = (plan.y - oy) * tilesize + plan.block.offset;
             float x = wx;
-            if(direction >= 0){
-                wx = -wy;
-                wy = x;
-            }else{
-                wx = wy;
-                wy = -x;
-            }
+
+            wx = sign * -wy;
+            wy = sign * x;
+
             plan.x = World.toTile(wx - plan.block.offset) + ox;
             plan.y = World.toTile(wy - plan.block.offset) + oy;
             plan.rotation = plan.block.planRotation(Mathf.mod(plan.rotation + direction, 4));
@@ -1370,21 +1359,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(plan.breaking) return;
 
             float value = -((x ? plan.x : plan.y) * tilesize - origin + plan.block.offset) + origin;
+            int plancoord = (int)((value - plan.block.offset) / tilesize);
 
-            if(x){
-                plan.x = (int)((value - plan.block.offset) / tilesize);
-            }else{
-                plan.y = (int)((value - plan.block.offset) / tilesize);
-            }
+            if(x)   plan.x = plancoord;
+            else    plan.y = plancoord;
 
+            int off = (plan.block.size & 1) ^ 1; // plan.block.size % 2 == 0 ? 1 : 0
             plan.pointConfig(p -> {
-                if(x){
-                    if(plan.block.size % 2 == 0) p.x --;
-                    p.x = -p.x;
-                }else{
-                    if(plan.block.size % 2 == 0) p.y --;
-                    p.y = -p.y;
-                }
+                if(x)   p.x = off - p.x;
+                else    p.y = off - p.y;
             });
 
             //flip rotation
