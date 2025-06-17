@@ -4382,6 +4382,7 @@ public class Blocks{
             targetInterval = 5f;
             newTargetInterval = 30f;
             targetUnderBlocks = false;
+            shootY = 7.5f;
 
             float r = range = 130f;
 
