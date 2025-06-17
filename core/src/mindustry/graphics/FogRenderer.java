@@ -143,15 +143,13 @@ public final class FogRenderer{
         int ww = world.width(), wh = world.height();
 
         var data = fogControl.getDiscovered(player.team());
-        int len = world.width() * world.height();
         if(data != null){
-            for(int i = 0; i < len; i++){
-                if(data.get(i)){
-                    //TODO slow, could do scanlines instead at the very least.
-                    int x = i % ww, y = i / ww;
-
-                    //manually clip with 1 pixel of padding so the borders are never fully revealed
-                    if(x > 0 && y > 0 && x < ww - 1 && y < wh - 1){
+            //manually clip with 1 pixel of padding so the borders are never fully revealed
+            for(int y = 1; y < wh - 1; y++){
+                int yw = y * ww;
+                for(int x = 1; x < ww - 1; x++){
+                    if(data.get(x + yw)){
+                        //TODO slow, could do scanlines instead at the very least.
                         Fill.rect(x + 0.5f, y + 0.5f, 1f, 1f);
                     }
                 }
