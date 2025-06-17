@@ -1333,7 +1333,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         plans.each(plan -> {
             if(plan.breaking) return;
 
-            int off = (plan.block.size & 1) ^ 1; // plan.block.size % 2 == 0 ? 1 : 0
+            int off = (plan.block.size + 1) & 1; // plan.block.size % 2 == 0 ? 1 : 0
             plan.pointConfig(p -> {
                 if(dir) p.set(off - p.y, p.x);
                 else    p.set(p.y, off - p.x);
@@ -1364,7 +1364,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(x)   plan.x = plancoord;
             else    plan.y = plancoord;
 
-            int off = (plan.block.size & 1) ^ 1; // plan.block.size % 2 == 0 ? 1 : 0
+            int off = (plan.block.size + 1) & 1; // plan.block.size % 2 == 0 ? 1 : 0
             plan.pointConfig(p -> {
                 if(x)   p.x = off - p.x;
                 else    p.y = off - p.y;

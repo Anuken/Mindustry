@@ -119,6 +119,10 @@ public class Vars implements Loadable{
     public static final float minArmorDamage = 0.1f;
     /** size of tiles in units */
     public static final int tilesize = 8;
+    /** half size of tiles in units */
+    public static final int halftilesize = tilesize/2;
+    /** double size of tiles in units */
+    public static final int doubletilesize = tilesize*2;
     /** size of one tile payload (^2) */
     public static final float tilePayload = tilesize * tilesize;
     /** icon sizes for UI */
