@@ -58,9 +58,25 @@ public class LightBlock extends Block{
         Placement.calculateNodes(points, this, rotation, (point, other) -> point.dst2(other) <= placeRadius2);
     }
 
+    @Override
+    public int minimapColor(Tile tile){
+        var build = (LightBuild)tile.build;
+        //make sure A is 255
+        return build == null ? 0 : build.color | 0xff;
+    }
+
     public class LightBuild extends Building{
         public int color = Pal.accent.rgba();
         public float smoothTime = 1f;
+
+        @Override
+        public void configured(Unit player, Object value){
+            super.configured(player, value);
+
+            if(!headless){
+                renderer.minimap.update(tile);
+            }
+        }
 
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
