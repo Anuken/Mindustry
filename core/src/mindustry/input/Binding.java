@@ -28,6 +28,7 @@ public class Binding{
     rotatePlaced = KeyBind.add("rotateplaced", KeyCode.r),
     diagonalPlacement = KeyBind.add("diagonal_placement", KeyCode.controlLeft),
     pick = KeyBind.add("pick", KeyCode.mouseMiddle),
+    buildingMenu = KeyBind.add("building_menu", KeyCode.slash),
 
     rebuildSelect = KeyBind.add("rebuild_select", KeyCode.b),
     schematicSelect = KeyBind.add("schematic_select", KeyCode.f),
