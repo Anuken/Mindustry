@@ -4419,7 +4419,6 @@ public class Blocks{
             );
 
             scaledHealth = 210;
-            shootY = 7f;
             size = 3;
 
             researchCost = with(Items.tungsten, 400, Items.silicon, 400, Items.oxide, 80, Items.beryllium, 800);
