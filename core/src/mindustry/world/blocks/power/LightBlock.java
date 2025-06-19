@@ -95,7 +95,7 @@ public class LightBlock extends Block{
         @Override
         public void draw(){
             super.draw();
-            Draw.color(Tmp.c1.set(color), 0.4f);
+            Draw.color(Tmp.c1.set(color).a(0.4f));
             Draw.rect(topRegion, x, y);
             Draw.color();
         }
