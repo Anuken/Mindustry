@@ -615,7 +615,7 @@ public class LExecutor{
                     toVar.isobj = value.isobj;
                 }
             }else if(from instanceof CanvasBuild canvas && (exec.privileged || (from.team == exec.team))){
-		        canvas.setPixel(address, (int)(value.numval));
+		        canvas.setPixel(address, value.numi());
             }
         }
     }

@@ -167,11 +167,11 @@ public class CanvasBlock extends Block{
             }
         }
 
-        public int getPixel(int pos){
+        public double getPixel(int pos){
             if(pos >= 0 && pos < canvasSize * canvasSize){
                 return getByte(data, pos * bitsPerPixel);
             }
-            return 0;
+            return Double.NaN;
         }
 
         public int getPixel(int x, int y){
