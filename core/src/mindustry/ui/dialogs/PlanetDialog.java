@@ -1299,6 +1299,15 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if((sector.hasBase() && mode == look) || canSelect(sector) || (sector.preset != null && sector.preset.alwaysUnlocked) || debugSelect){
+            if(Vars.showSectorSubmissions){
+                String link = SectorSubmissions.getSectorThread(sector);
+                if(link != null){
+                    stable.button("@sectors.viewsubmission", Icon.link, () -> {
+                        Core.app.openURI(link);
+                    }).growX().height(54f).minWidth(170f).padTop(2f).row();
+                }
+            }
+
             stable.button(
                 mode == select ? "@sectors.select" :
                 sector.isBeingPlayed() ? "@sectors.resume" :
