@@ -1,6 +1,5 @@
 package mindustry.world.blocks.power;
 
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -58,14 +57,30 @@ public class LightBlock extends Block{
         Placement.calculateNodes(points, this, rotation, (point, other) -> point.dst2(other) <= placeRadius2);
     }
 
+    @Override
+    public int minimapColor(Tile tile){
+        var build = (LightBuild)tile.build;
+        //make sure A is 255
+        return build == null ? 0 : build.color | 0xff;
+    }
+
     public class LightBuild extends Building{
         public int color = Pal.accent.rgba();
         public float smoothTime = 1f;
 
         @Override
+        public void configured(Unit player, Object value){
+            super.configured(player, value);
+
+            if(!headless) renderer.minimap.update(tile);
+        }
+
+        @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.color){
                 color = Tmp.c1.fromDouble(p1).rgba8888();
+
+                if(!headless) renderer.minimap.update(tile);
             }
 
             super.control(type, p1, p2, p3, p4);
@@ -80,11 +95,9 @@ public class LightBlock extends Block{
         @Override
         public void draw(){
             super.draw();
-            Draw.blend(Blending.additive);
-            Draw.color(Tmp.c1.set(color), efficiency * 0.3f);
+            Draw.color(Tmp.c1.set(color).a(0.4f));
             Draw.rect(topRegion, x, y);
             Draw.color();
-            Draw.blend();
         }
 
         @Override

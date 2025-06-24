@@ -17,6 +17,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -35,7 +36,7 @@ public class CanvasBlock extends Block{
     public @Load("@-corner1") TextureRegion corner1;
     public @Load("@-corner2") TextureRegion corner2;
 
-    protected @Nullable Pixmap previewPixmap;
+    protected @Nullable Pixmap previewPixmap; // please use only for previews
     protected @Nullable Texture previewTexture;
     protected int tempBlend = 0;
 
@@ -49,7 +50,7 @@ public class CanvasBlock extends Block{
 
         config(byte[].class, (CanvasBuild build, byte[] bytes) -> {
             if(build.data.length == bytes.length){
-                build.data = bytes;
+                System.arraycopy(bytes, 0, build.data, 0, bytes.length);
                 build.updateTexture();
             }
         });
@@ -65,13 +66,15 @@ public class CanvasBlock extends Block{
         bitsPerPixel = Mathf.log2(Mathf.nextPowerOfTwo(palette.length));
 
         clipSize = Math.max(clipSize, size * 8 - padding);
+
+        previewPixmap = new Pixmap(canvasSize, canvasSize);
     }
 
     @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         //only draw the preview in schematics, as it lags otherwise
         if(!plan.worldContext && plan.config instanceof byte[] data){
-            Pixmap pix = makePixmap(data);
+            Pixmap pix = makePixmap(data, previewPixmap);
 
             if(previewTexture == null){
                 previewTexture = new Texture(pix);
@@ -123,20 +126,15 @@ public class CanvasBlock extends Block{
         }
     }
 
-    /** returns the same pixmap instance each time, use with care */
-    public Pixmap makePixmap(byte[] data){
-        if(previewPixmap == null){
-            previewPixmap = new Pixmap(canvasSize, canvasSize);
-        }
-
+    public Pixmap makePixmap(byte[] data, Pixmap target){
         int bpp = bitsPerPixel;
         int pixels = canvasSize * canvasSize;
         for(int i = 0; i < pixels; i++){
             int bitOffset = i * bpp;
             int pal = getByte(data, bitOffset);
-            previewPixmap.set(i % canvasSize, i / canvasSize, palette[pal]);
+            target.set(i % canvasSize, i / canvasSize, palette[pal]);
         }
-        return previewPixmap;
+        return target;
     }
 
     protected int getByte(byte[] data, int bitOffset){
@@ -152,11 +150,41 @@ public class CanvasBlock extends Block{
         public @Nullable Texture texture;
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
         public int blending;
+        
+        protected boolean updated = false;
+
+        public void setPixel(int pos, int index){
+            if(pos < canvasSize * canvasSize && pos >= 0 && index >= 0 && index < palette.length){
+                setByte(data, pos * bitsPerPixel, index);
+                updated = true;
+            }
+        }
+
+        public void setPixel(int x, int y, int index){
+            if(x >= 0 && y >= 0 && x < canvasSize && y < canvasSize && index >= 0 && index < palette.length){
+                setByte(data, (y * canvasSize + x) * bitsPerPixel, index);
+                updated = true;
+            }
+        }
+
+        public double getPixel(int pos){
+            if(pos >= 0 && pos < canvasSize * canvasSize){
+                return getByte(data, pos * bitsPerPixel);
+            }
+            return Double.NaN;
+        }
+
+        public int getPixel(int x, int y){
+            if(x >= 0 && y >= 0 && x < canvasSize && y < canvasSize){
+                return getByte(data, (y * canvasSize + x) * bitsPerPixel);
+            }
+            return 0;
+        }
 
         public void updateTexture(){
             if(headless) return;
 
-            Pixmap pix = makePixmap(data);
+            Pixmap pix = makePixmap(data, previewPixmap);
             if(texture != null){
                 texture.draw(pix);
             }else{
@@ -214,7 +242,8 @@ public class CanvasBlock extends Block{
                 super.draw();
             }
 
-            if(texture == null){
+            if(texture == null || updated){
+                updated = false;
                 updateTexture();
             }
             Tmp.tr1.set(texture);
@@ -237,6 +266,14 @@ public class CanvasBlock extends Block{
                 }
             }
         }
+        
+        @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case displayWidth, displayHeight -> canvasSize;
+                default -> super.sense(sensor);
+            };
+        }
 
         @Override
         public void remove(){
@@ -252,12 +289,17 @@ public class CanvasBlock extends Block{
             table.button(Icon.pencil, Styles.cleari, () -> {
                 Dialog dialog = new Dialog();
 
-                Pixmap pix = makePixmap(data);
+                Pixmap pix = makePixmap(data, new Pixmap(canvasSize, canvasSize));
                 Texture texture = new Texture(pix);
                 int[] curColor = {palette[0]};
                 boolean[] modified = {false};
                 boolean[] fill = {false};
-
+                
+                dialog.hidden(() -> {
+                    texture.dispose();
+                    pix.dispose();
+                });
+                
                 dialog.resized(dialog::hide);
 
                 dialog.cont.table(Tex.pane, body -> {
@@ -395,7 +437,6 @@ public class CanvasBlock extends Block{
                 dialog.buttons.button("@ok", Icon.ok, () -> {
                     if(modified[0]){
                         configure(packPixmap(pix));
-                        texture.dispose();
                     }
                     dialog.hide();
                 });
