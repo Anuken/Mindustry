@@ -545,8 +545,10 @@ public class Damage{
         tileDamage(team, x, y, baseRadius, damage, null);
     }
 
-    public static void tileDamage(Team team, int x, int y, float baseRadius, float damage, @Nullable Bullet source){
+    public static void tileDamage(Team team, int tx, int ty, float baseRadius, float damage, @Nullable Bullet source){
         Time.run(0f, () -> {
+            int x = Mathf.clamp(tx, -100, world.width() + 100), y = Mathf.clamp(ty, -100, world.height() + 100);
+
             var in = world.build(x, y);
             //spawned inside a multiblock. this means that damage needs to be dealt directly.
             //why? because otherwise the building would absorb everything in one cell, which means much less damage than a nearby explosion.
