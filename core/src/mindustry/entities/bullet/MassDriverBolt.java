@@ -3,12 +3,11 @@ package mindustry.entities.bullet;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import mindustry.Vars;
 import mindustry.content.*;
-import mindustry.entities.Damage;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.Item;
+import mindustry.type.*;
 import mindustry.world.blocks.distribution.MassDriver.*;
 
 import static mindustry.Vars.*;
@@ -105,5 +104,4 @@ public class MassDriverBolt extends BasicBulletType{
             Damage.dynamicExplosion(b.x, b.y, flammability / 10f, explosiveness / 10f, power, 1f, state.rules.damageExplosions);
         }
     }
-    
 }
