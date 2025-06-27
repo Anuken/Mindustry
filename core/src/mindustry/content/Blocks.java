@@ -11,6 +11,7 @@ import mindustry.entities.effect.*;
 import mindustry.entities.part.DrawPart.*;
 import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -58,7 +59,7 @@ public class Blocks{
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
     arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystalOrbs, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
-    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
+    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal, cruxFloor1,
     pebbles, tendrils,
 
     //ores
@@ -807,6 +808,13 @@ public class Blocks{
         darkPanel6 = new Floor("dark-panel-6", 0);
 
         darkMetal = new StaticWall("dark-metal");
+
+        cruxFloor1 = new Floor("crux-floor-1"){{
+            autotile = true;
+            emitLight = true;
+            lightRadius = 30f;
+            lightColor = Team.crux.color.cpy().a(0.3f);
+        }};
 
         Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)
         .each(b -> b.asFloor().wall = darkMetal);
