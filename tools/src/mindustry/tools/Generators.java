@@ -70,23 +70,32 @@ public class Generators{
         ObjectMap<Block, Pixmap> gens = new ObjectMap<>();
 
         generate("autotiles", () -> {
-            for(Floor floor : content.blocks().select(b -> b.isFloor() && b.asFloor().autotile).<Floor>as()){
-                Fi basePath = new Fi("../../../assets-raw/sprites_out/blocks/environment/" + floor.name + "-autotile.png");
+            for(Block block : content.blocks().select(b -> (b.isFloor() && b.asFloor().autotile) || (b instanceof StaticWall && ((StaticWall)b).autotile))){
+                Fi basePath = new Fi("../../../assets-raw/sprites_out/blocks/environment/" + block.name + "-autotile.png"), iconPath = basePath.parent().child(block.name + ".png");
 
                 if(basePath.exists()){
                     //theoretically this might not finish in time, but I doubt that will ever happen
                     mainExecutor.submit(() -> {
                         try{
-                            ImageTileGenerator.generate(basePath, floor.name, new Fi("../../../assets-raw/sprites_out/blocks/environment/" + floor.name));
+                            ImageTileGenerator.generate(basePath, block.name, new Fi("../../../assets-raw/sprites_out/blocks/environment/" + block.name));
                         }catch(Throwable e){
-                            Log.err("Failed to autotile: " + floor.name, e);
+                            Log.err("Failed to autotile: " + block.name, e);
                         }finally{
                             //the raw autotile source image must never be included, it isn't useful
                             basePath.delete();
                         }
                     });
+
+                    if(!iconPath.exists()){
+                        //save the bottom right region as the "main" sprite for previews
+                        Pixmap out = new Pixmap(basePath);
+                        Pixmap cropped = out.crop(96, 96, 32, 32);
+                        iconPath.writePng(cropped);
+                        out.dispose();
+                        gens.put(block, cropped);
+                    }
                 }else{
-                    Log.warn("Autotile floor '@' not found: @", floor.name, basePath.absolutePath());
+                    Log.warn("Autotile floor '@' not found: @", block.name, basePath.absolutePath());
                 }
             }
         });
@@ -819,14 +828,15 @@ public class Generators{
         });
 
         generate("edges", () -> {
-            content.blocks().<Floor>each(b -> b instanceof Floor && !(b instanceof OverlayFloor), floor -> {
+            content.blocks().<Floor>each(b -> b instanceof Floor && !(b instanceof OverlayFloor) && !b.isAir(), floor -> {
 
                 if(has(floor.name + "-edge") || floor.blendGroup != floor){
                     return;
                 }
 
                 try{
-                    Pixmap image = gens.get(floor, get(floor.getGeneratedIcons()[0]));
+                    Pixmap image = gens.get(floor);
+                    if(image == null) image = get(floor.getGeneratedIcons()[0]);
                     Pixmap edge = get("edge-stencil");
                     Pixmap result = new Pixmap(edge.width, edge.height);
 
@@ -838,7 +848,9 @@ public class Generators{
 
                     save(result, "../blocks/environment/" + floor.name + "-edge");
 
-                }catch(Exception ignored){}
+                }catch(Exception e){
+                    Log.err("Failed to generate edge for " + floor, e);
+                }
             });
         });
 

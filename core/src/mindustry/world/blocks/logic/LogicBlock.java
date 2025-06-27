@@ -32,6 +32,7 @@ import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
     private static final int maxByteLen = 1024 * 100;
+    private static final int maxLinks = 6000;
     public static final int maxNameLength = 32;
 
     public int maxInstructionScale = 5;
@@ -198,7 +199,7 @@ public class LogicBlock extends Block{
                 byte[] bytes = new byte[bytelen];
                 stream.readFully(bytes);
 
-                int total = stream.readInt();
+                int total = Math.min(stream.readInt(), maxLinks);
 
                 Seq<LogicLink> links = new Seq<>();
 
@@ -274,7 +275,7 @@ public class LogicBlock extends Block{
 
                 links.clear();
 
-                int total = stream.readInt();
+                int total = Math.min(stream.readInt(), maxLinks);
 
                 if(version == 0){
                     //old version just had links, ignore those

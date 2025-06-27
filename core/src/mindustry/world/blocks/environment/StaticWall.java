@@ -8,12 +8,17 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
 public class StaticWall extends Prop{
     public @Load("@-large") TextureRegion large;
     public TextureRegion[][] split;
+    /** If true, this wall uses autotiling; variants are not supported. See https://github.com/GglLfr/tile-gen*/
+    public boolean autotile;
+
+    protected TextureRegion[] autotileRegions;
 
     public StaticWall(String name){
         super(name);
@@ -30,15 +35,28 @@ public class StaticWall extends Prop{
 
     @Override
     public void drawBase(Tile tile){
-        int rx = tile.x / 2 * 2;
-        int ry = tile.y / 2 * 2;
+        if(autotile){
+            int bits = 0;
 
-        if(Core.atlas.isFound(large) && eq(rx, ry) && Mathf.randomSeed(Point2.pack(rx, ry)) < 0.5 && split.length >= 2 && split[0].length >= 2){
-            Draw.rect(split[tile.x % 2][1 - tile.y % 2], tile.worldx(), tile.worldy());
-        }else if(variants > 0){
-            Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
+            for(int i = 0; i < 8; i++){
+                Tile other = tile.nearby(Geometry.d8[i]);
+                if(other != null && other.block() == this){
+                    bits |= (1 << i);
+                }
+            }
+
+            Draw.rect(autotileRegions[TileBitmask.values[bits]], tile.worldx(), tile.worldy());
         }else{
-            Draw.rect(region, tile.worldx(), tile.worldy());
+            int rx = tile.x / 2 * 2;
+            int ry = tile.y / 2 * 2;
+
+            if(Core.atlas.isFound(large) && eq(rx, ry) && Mathf.randomSeed(Point2.pack(rx, ry)) < 0.5 && split.length >= 2 && split[0].length >= 2){
+                Draw.rect(split[tile.x % 2][1 - tile.y % 2], tile.worldx(), tile.worldy());
+            }else if(variants > 0){
+                Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
+            }else{
+                Draw.rect(region, tile.worldx(), tile.worldy());
+            }
         }
 
         //draw ore on top
@@ -58,6 +76,10 @@ public class StaticWall extends Prop{
                     reg.scale = region.scale;
                 }
             }
+        }
+
+        if(autotile){
+            autotileRegions = TileBitmask.load(name);
         }
     }
 

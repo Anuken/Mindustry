@@ -141,10 +141,7 @@ public class Floor extends Block{
         }
 
         if(autotile){
-            autotileRegions = new TextureRegion[47];
-            for(int i = 0; i < 47; i++){
-                autotileRegions[i] = Core.atlas.find(name + "-" + i);
-            }
+            autotileRegions = TileBitmask.load(name);
         }
 
         if(Core.atlas.has(name + "-edge")){
