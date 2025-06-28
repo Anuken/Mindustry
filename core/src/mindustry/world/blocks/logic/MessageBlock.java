@@ -14,6 +14,7 @@ import arc.util.io.*;
 import arc.util.pooling.*;
 import mindustry.core.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -69,6 +70,7 @@ public class MessageBlock extends Block{
 
     public class MessageBuild extends Building{
         public StringBuilder message = new StringBuilder();
+        public @Nullable BuildingStringBuilder cont = null;
 
         @Override
         public void drawSelect(){
@@ -196,6 +198,18 @@ public class MessageBlock extends Block{
         @Override
         public String config(){
             return message.toString();
+        }
+
+        @Override
+        public Object senseObject(LAccess sense){
+            if(sense != LAccess.config) return super.senseObject(sense);
+            if(cont == null){
+                cont = new BuildingStringBuilder(this.pos());
+            }
+            if(cont.source != this.pos()){ //Incase it moves
+                cont.source = this.pos();
+            }
+            return cont; //we read messages now :)
         }
 
         @Override
