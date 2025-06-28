@@ -87,18 +87,6 @@
     ]
   },
   {
-    "name": "Chaotic Neutral",
-    "address": [
-      "37.187.73.180:7011",
-      "37.187.73.180:7012",
-      "37.187.73.180:7013",
-      "37.187.73.180:7014",
-      "37.187.73.180:7015",
-      "37.187.73.180:7016",
-      "37.187.73.180:7017"
-    ]
-  },
-  {
     "name": "io",
     "address": [
       "148.251.184.58",
@@ -127,12 +115,6 @@
   {
     "name": "OmniCorp Classic",
     "address": ["omnidustry.ru:6567", "omnidustry.ru:6568", "omnidustry.ru:6569", "omnidustry.ru:6570", "omnidustry.ru:6571", "omnidustry.ru:6572", "omnidustry.ru:6573", "omnidustry.ru:6574", "omnidustry.ru:6575", "omnidustry.ru:6576"]
-  },
-  {
-    "name": "The Devil",
-    "address": [
-      "new.xem8k5.top"
-    ]
   },
   {
     "name": "Eradication Mindustry",
