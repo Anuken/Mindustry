@@ -11,7 +11,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
@@ -348,9 +347,29 @@ public class Planet extends UnlockableContent{
         return mat.setToTranslation(position).rotate(Vec3.Y, getRotation());
     }
 
-    /** Regenerates the planet mesh. For debugging only. */
+    /** Regenerates the planet mesh. */
     public void reloadMesh(){
+        if(headless) return;
+
+        if(mesh != null){
+            mesh.dispose();
+        }
         mesh = meshLoader.get();
+    }
+
+    public void reloadMeshAsync(){
+        if(headless) return;
+
+        mainExecutor.submit(() -> {
+            var newMesh = meshLoader.get();
+
+            Core.app.post(() -> {
+                if(mesh != null){
+                    mesh.dispose();
+                }
+                mesh = newMesh;
+            });
+        });
     }
 
     @Override
@@ -383,7 +402,6 @@ public class Planet extends UnlockableContent{
         }
 
         if(generator != null){
-            Noise.setSeed(sectorSeed < 0 ? id + 1 : sectorSeed);
 
             for(Sector sector : sectors){
                 generator.generateSector(sector);

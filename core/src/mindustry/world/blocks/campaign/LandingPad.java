@@ -383,19 +383,22 @@ public class LandingPad extends Block{
                     t.background(Styles.black6);
 
                     t.button(Icon.downOpen, Styles.clearNonei, 40f, () -> {
-                        if(config != null && state.isCampaign()){
-                            for(Sector sector : state.getPlanet().sectors){
-                                if(sector.hasBase() && sector != state.getSector() && sector.info.destination != state.getSector() && sector.info.hasExport(config)){
-                                    sector.info.destination = state.getSector();
-                                    sector.saveInfo();
-                                }
-                            }
-                            state.getSector().info.refreshImportRates(state.getPlanet());
+                        if(config == null || !state.isCampaign()) return;
+
+                        for(Sector sector : state.getPlanet().sectors){
+                            if(!canRedirectExports(sector)) continue;
+                            sector.info.destination = state.getSector();
+                            sector.saveInfo();
                         }
-                    }).disabled(b -> config == null || !state.isCampaign() || (!state.getPlanet().sectors.contains(s -> s.hasBase() && s.info.hasExport(config) && s.info.destination != state.getSector())))
+                        state.getSector().info.refreshImportRates(state.getPlanet());
+                    }).disabled(button -> config == null || !state.isCampaign() || (!state.getPlanet().sectors.contains(this::canRedirectExports)))
                     .tooltip("@sectors.redirect").get();
                 }).fillX().left();
             }
+        }
+
+        private boolean canRedirectExports(Sector sector){
+            return sector.hasBase() && sector != state.getSector() && sector.info.hasExport(config) && sector.info.destination != state.getSector();
         }
 
         @Override
@@ -416,14 +419,13 @@ public class LandingPad extends Block{
 
                 int sources = 0;
                 float perSecond = 0f;
-                for(var s : state.getPlanet().sectors){
-                    if(s != state.getSector() && s.hasBase() && s.info.destination == state.getSector()){
-                        float amount = s.info.getExport(config);
-                        if(amount > 0){
-                            sources ++;
-                            perSecond += s.info.getExport(config);
-                        }
-                    }
+                for(var otherSector : state.getPlanet().sectors){
+                    if(otherSector == state.getSector() || !otherSector.hasBase() || otherSector.info.destination != state.getSector()) continue;
+
+                    float amount = otherSector.info.getExport(config);
+                    if(amount <= 0) continue;
+                    sources ++;
+                    perSecond += amount;
                 }
 
                 String str = Core.bundle.format("landing.sources", sources == 0 ? Core.bundle.get("none") : sources);

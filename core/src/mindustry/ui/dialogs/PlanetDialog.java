@@ -652,6 +652,17 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 if(scene.getDialog() == PlanetDialog.this && (scene.getHoverElement() == null || !scene.getHoverElement().isDescendantOf(e -> e instanceof ScrollPane))){
                     scene.setScrollFocus(PlanetDialog.this);
 
+                    if(debugSectorAttackEdit){
+                        int timeShift = input.keyDown(KeyCode.rightBracket) ? 1 : input.keyDown(KeyCode.leftBracket) ? -1 : 0;
+                        if(timeShift != 0){
+                            universe.setSeconds(universe.secondsf() + timeShift * Time.delta * 2.5f);
+                        }
+
+                        if(input.keyTap(KeyCode.r)){
+                            state.planet.reloadMeshAsync();
+                        }
+                    }
+
                     if(debugSectorAttackEdit && input.ctrl() && input.keyTap(KeyCode.s)){
                         try{
                             PlanetData data = new PlanetData();
@@ -665,10 +676,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                     data.presets.put(sector.preset.name, sector.id);
                                 }
                             }
+                            Log.info("Saving sectors for @: @ presets, @ procedural attack sectors", state.planet.name, data.presets.size, attack.size);
                             data.attackSectors = attack.toArray();
                             files.local("planets/" + state.planet.name + ".json").writeString(JsonIO.write(data));
 
-                            Vars.ui.showInfoFade("@editor.saved");
+                            ui.showInfoFade("@editor.saved");
                         }catch(Exception e){
                             Log.err(e);
                         }
@@ -1137,7 +1149,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
     }
 
-    void selectSector(Sector sector){
+    public void selectSector(Sector sector){
         selected = sector;
         updateSelected();
     }
@@ -1262,7 +1274,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(sector.isAttacked()){
             addSurvivedInfo(sector, stable, false);
-        }else if(sector.hasBase() && sector.planet.campaignRules.sectorInvasion && sector.near().contains(Sector::hasEnemyBase)){
+        }else if(sector.hasBase() && sector.planet.campaignRules.sectorInvasion && sector.near().contains(s -> s.hasEnemyBase() && (s.preset == null || !s.preset.requireUnlock))){
             stable.add("@sectors.vulnerable");
             stable.row();
         }else if(!sector.hasBase() && sector.hasEnemyBase()){
@@ -1287,6 +1299,15 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if((sector.hasBase() && mode == look) || canSelect(sector) || (sector.preset != null && sector.preset.alwaysUnlocked) || debugSelect){
+            if(Vars.showSectorSubmissions){
+                String link = SectorSubmissions.getSectorThread(sector);
+                if(link != null){
+                    stable.button("@sectors.viewsubmission", Icon.link, () -> {
+                        Core.app.openURI(link);
+                    }).growX().height(54f).minWidth(170f).padTop(2f).row();
+                }
+            }
+
             stable.button(
                 mode == select ? "@sectors.select" :
                 sector.isBeingPlayed() ? "@sectors.resume" :

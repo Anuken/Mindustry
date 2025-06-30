@@ -221,7 +221,7 @@ public class LogicDialog extends BaseDialog{
                             update(() -> setColor(typeColor(s, color)));
                         }}, new Label(() -> " " + typeName(s) + " "){{
                             setStyle(Styles.outlineLabel);
-                        }});
+                        }}).minWidth(120f);
 
                         t.row();
 

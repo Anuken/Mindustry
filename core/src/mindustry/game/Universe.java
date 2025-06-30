@@ -322,6 +322,13 @@ public class Universe{
         return net.client() ? netSeconds : seconds;
     }
 
+    public void setSeconds(float seconds){
+        this.seconds = (int)seconds;
+        this.secondCounter = seconds - this.seconds;
+
+        save();
+    }
+
     public float secondsf(){
         return seconds() + secondCounter;
     }

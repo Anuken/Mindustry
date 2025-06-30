@@ -26,11 +26,18 @@ public abstract class PlanetMesh implements GenericMesh{
 
     @Override
     public void render(PlanetParams params, Mat3D projection, Mat3D transform){
+        if(mesh.isDisposed()) return;
+
         preRender(params);
         shader.bind();
         shader.setUniformMatrix4("u_proj", projection.val);
         shader.setUniformMatrix4("u_trans", transform.val);
         shader.apply();
         mesh.render(shader, Gl.triangles);
+    }
+
+    @Override
+    public void dispose(){
+        mesh.dispose();
     }
 }

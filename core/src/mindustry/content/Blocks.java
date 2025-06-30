@@ -3437,7 +3437,6 @@ public class Blocks{
                     hitEffect = Fx.hitLancer;
                     despawnEffect = Fx.none;
                     status = StatusEffects.shocked;
-                    statusDuration = 10f;
                     hittable = false;
                     lightColor = Color.white;
                     collidesAir = false;
@@ -3489,7 +3488,6 @@ public class Blocks{
                     despawnEffect = Fx.blastExplosion;
 
                     status = StatusEffects.blasted;
-                    statusDuration = 60f;
 
                     hitColor = backColor = trailColor = Pal.blastAmmoBack;
                     frontColor = Pal.blastAmmoFront;
@@ -3915,7 +3913,6 @@ public class Blocks{
                     collidesGround = true;
 
                     status = StatusEffects.blasted;
-                    statusDuration = 60f;
 
                     backColor = hitColor = trailColor = Pal.blastAmmoBack;
                     frontColor = Pal.blastAmmoFront;
@@ -4385,6 +4382,7 @@ public class Blocks{
             targetInterval = 5f;
             newTargetInterval = 30f;
             targetUnderBlocks = false;
+            shootY = 8f;
 
             float r = range = 130f;
 
@@ -4421,7 +4419,6 @@ public class Blocks{
             );
 
             scaledHealth = 210;
-            shootY = 7f;
             size = 3;
 
             researchCost = with(Items.tungsten, 400, Items.silicon, 400, Items.oxide, 80, Items.beryllium, 800);
@@ -5455,7 +5452,6 @@ public class Blocks{
                         hitEffect = Fx.hitLancer;
                         despawnEffect = Fx.none;
                         status = StatusEffects.shocked;
-                        statusDuration = 10f;
                         hittable = false;
                         lightColor = Color.white;
                         buildingDamageMultiplier = 0.25f;
