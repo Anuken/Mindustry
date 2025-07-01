@@ -994,14 +994,14 @@ public class Blocks{
         phaseRoller = new GenericCrafter("phase-roller"){{
             requirements(Category.crafting, with(Items.metaglass, 80, Items.silicon, 80, Items.graphite, 80, Items.surgeAlloy, 40, Items.plastanium, 40));
             craftEffect = Fx.formsmoke;
-            outputItem = new ItemStack(Items.phaseFabric, 6);
+            outputItem = new ItemStack(Items.phaseFabric, 8);
             craftTime = 240f;
             size = 3;
             hasPower = true;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPlasma(), new DrawDefault());
             envEnabled |= Env.space;
 
-            consumeItems(with(Items.thorium, 12, Items.metaglass, 16, Items.blastCompound, 3));
+            consumeItems(with(Items.thorium, 8, Items.metaglass, 16, Items.blastCompound, 3));
             consumePower(20f);
             itemCapacity = 60;
         }};
