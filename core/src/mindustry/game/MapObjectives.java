@@ -3,6 +3,7 @@ package mindustry.game;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -98,7 +99,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
     }
 
-    public static void registerLegacyMarker(String name, Prov<? extends ObjectiveMarker> prov) {
+    public static void registerLegacyMarker(String name, Prov<? extends ObjectiveMarker> prov){
         Class<?> type = prov.get().getClass();
 
         markerNameToType.put(name, prov);
@@ -663,7 +664,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
     }
 
-    /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay.  */
+    /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay. */
     public static abstract class ObjectiveMarker{
         /** Internal use only! Do not access. */
         public transient int arrayIndex;
@@ -709,11 +710,15 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
                 String out;
                 if(mobile){
-                    out = state.mapLocales.containsProperty(key + ".mobile") ?
+                    out =
+                        state.mapLocales.containsProperty(key + ".mobile") ?
                         state.mapLocales.getProperty(key + ".mobile") :
+                        state.mapLocales.containsProperty(key) ?
+                        state.mapLocales.getProperty(key) :
                         Core.bundle.get(key + ".mobile", Core.bundle.get(key));
                 }else{
-                    out = state.mapLocales.containsProperty(key) ?
+                    out =
+                        state.mapLocales.containsProperty(key) ?
                         state.mapLocales.getProperty(key) :
                         Core.bundle.get(key);
                 }
@@ -831,13 +836,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     case textHeight -> textHeight = (float)p1;
                     case textAlign -> textAlign = (int)p1;
                     case lineAlign -> lineAlign = (int)p1;
-                    case labelFlags -> {
-                        if(!Mathf.equal((float)p1, 0f)){
-                            flags |= WorldLabel.flagBackground;
-                        }else{
-                            flags &= ~WorldLabel.flagBackground;
-                        }
-                    }
+                    case outline -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagOutline, !Mathf.equal((float)p1, 0f));
+                    case labelFlags -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagBackground, !Mathf.equal((float)p1, 0f));
                     case radius -> radius = (float)p1;
                     case rotation -> rotation = (float)p1;
                     case color -> color.fromDouble(p1);
@@ -847,13 +847,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             if(!Double.isNaN(p2)){
                 switch(type){
-                    case labelFlags -> {
-                        if(!Mathf.equal((float)p2, 0f)){
-                            flags |= WorldLabel.flagOutline;
-                        }else{
-                            flags &= ~WorldLabel.flagOutline;
-                        }
-                    }
+                    case labelFlags -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagOutline, !Mathf.equal((float)p2, 0f));
                 }
             }
         }
@@ -953,7 +947,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 Lines.poly(pos.x, pos.y, sides, (radius + 1f) * scaleFactor, rotation + startAngle, rotation + endAngle);
             }else{
                 Draw.color(color);
-                if (startAngle < endAngle){
+                if(startAngle < endAngle){
                     Fill.arc(pos.x, pos.y, radius * scaleFactor, (endAngle - startAngle) / 360f, rotation + startAngle, sides);
                 }else{
                     Fill.arc(pos.x, pos.y, radius * scaleFactor, (startAngle - endAngle) / 360f, rotation + endAngle, sides);
@@ -971,6 +965,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 switch(type){
                     case radius -> radius = (float)p1;
                     case stroke -> stroke = (float)p1;
+                    case outline -> outline = !Mathf.equal((float)p1, 0f);
                     case rotation -> rotation = (float)p1;
                     case color -> color.fromDouble(p1);
                     case shape -> sides = (int)p1;
@@ -1039,25 +1034,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     case fontSize -> fontSize = (float)p1;
                     case textAlign -> textAlign = (int)p1;
                     case lineAlign -> lineAlign = (int)p1;
-                    case labelFlags -> {
-                        if(!Mathf.equal((float)p1, 0f)){
-                            flags |= WorldLabel.flagBackground;
-                        }else{
-                            flags &= ~WorldLabel.flagBackground;
-                        }
-                    }
+                    case outline -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagOutline, !Mathf.equal((float)p1, 0f));
+                    case labelFlags -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagBackground, !Mathf.equal((float)p1, 0f));
                 }
             }
 
             if(!Double.isNaN(p2)){
                 switch(type){
-                    case labelFlags -> {
-                        if(!Mathf.equal((float)p2, 0f)){
-                            flags |= WorldLabel.flagOutline;
-                        }else{
-                            flags &= ~WorldLabel.flagOutline;
-                        }
-                    }
+                    case labelFlags -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagOutline, !Mathf.equal((float)p2, 0f));
                 }
             }
         }
@@ -1115,6 +1099,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     case endPos -> endPos.x = (float)p1 * tilesize;
                     case stroke -> stroke = (float)p1;
                     case color -> color1.set(color2.fromDouble(p1));
+                    case outline -> outline = !Mathf.equal((float)p1, 0f);
                 }
             }
 
@@ -1125,7 +1110,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
 
             if(!Double.isNaN(p1) && !Double.isNaN(p2)){
-                switch (type){
+                switch(type){
                     case posi -> ((int)p1 == 0 ? pos : (int)p1 == 1 ? endPos : Tmp.v1).x = (float)p2 * tilesize;
                     case colori -> ((int)p1 == 0 ? color1 : (int)p1 == 1 ? color2 : Tmp.c1).fromDouble(p2);
                 }
@@ -1213,7 +1198,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         private transient TextureRegion fetchedRegion;
 
-        public QuadMarker() {
+        public QuadMarker(){
             for(int i = 0; i < 4; i++){
                 vertices[i * 6 + 2] = Color.white.toFloatBits();
                 vertices[i * 6 + 5] = Color.clearFloatBits;
@@ -1260,10 +1245,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public void setTexture(String textureName){
             this.textureName = textureName;
+            if(headless) return;
 
             boolean firstUpdate = fetchedRegion == null;
 
-            if(fetchedRegion == null) fetchedRegion = new TextureRegion();
+            if(firstUpdate) fetchedRegion = new TextureRegion();
             Tmp.tr1.set(fetchedRegion);
 
             lookupRegion(textureName, fetchedRegion);
@@ -1271,19 +1257,20 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(firstUpdate){
                 if(mapRegion){
                     mapRegion = false;
-
-                    // possibly from the editor, we need to clamp the values
                     for(int i = 0; i < 4; i++){
-                        vertices[i * 6 + 3] = Mathf.map(Mathf.clamp(vertices[i * 6 + 3]), fetchedRegion.u, fetchedRegion.u2);
-                        vertices[i * 6 + 4] = Mathf.map(1 - Mathf.clamp(vertices[i * 6 + 4]), fetchedRegion.v, fetchedRegion.v2);
+                        setUv(i, vertices[i * 6 + 3], vertices[i * 6 + 4]);
                     }
                 }
             }else{
                 for(int i = 0; i < 4; i++){
-                    vertices[i * 6 + 3] = Mathf.map(vertices[i * 6 + 3], Tmp.tr1.u, Tmp.tr1.u2, fetchedRegion.u, fetchedRegion.u2);
-                    vertices[i * 6 + 4] = Mathf.map(vertices[i * 6 + 4], Tmp.tr1.v, Tmp.tr1.v2, fetchedRegion.v, fetchedRegion.v2);
+                    setUv(i, unmap(vertices[i * 6 + 3], Tmp.tr1.u, Tmp.tr1.u2), 1 - unmap(vertices[i * 6 + 4], Tmp.tr1.v, Tmp.tr1.v2));
                 }
             }
+        }
+
+        private static float unmap(float x, float from, float to){
+            if(Mathf.equal(from, to)) return x;
+            return (x - from) / (to - from);
         }
 
         private void setPos(int i, double x, double y){
@@ -1303,11 +1290,16 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(i >= 0 && i < 4){
                 if(fetchedRegion == null) setTexture(textureName);
 
-                if(!Double.isNaN(u)) vertices[i * 6 + 3] = Mathf.map(Mathf.clamp((float)u), fetchedRegion.u, fetchedRegion.u2);
-                if(!Double.isNaN(v)) vertices[i * 6 + 4] = Mathf.map(1 - Mathf.clamp((float)v), fetchedRegion.v, fetchedRegion.v2);
+                if(!Double.isNaN(u)){
+                    boolean clampU = fetchedRegion.texture.getUWrap() != TextureWrap.mirroredRepeat && fetchedRegion.texture.getUWrap() != TextureWrap.repeat;
+                    vertices[i * 6 + 3] = Mathf.map(clampU ? Mathf.clamp((float)u) : (float)u, fetchedRegion.u, fetchedRegion.u2);
+                }
+                if(!Double.isNaN(v)){
+                    boolean clampV = fetchedRegion.texture.getVWrap() != TextureWrap.mirroredRepeat && fetchedRegion.texture.getVWrap() != TextureWrap.repeat;
+                    vertices[i * 6 + 4] = Mathf.map(clampV ? 1 - Mathf.clamp((float)v) : 1 - (float)v, fetchedRegion.v, fetchedRegion.v2);
+                }
             }
         }
-
     }
 
     private static void lookupRegion(String name, TextureRegion out){

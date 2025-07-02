@@ -38,7 +38,7 @@ public class ItemIncinerator extends Block{
 
         @Override
         public BlockStatus status(){
-            return efficiency > 0 ? BlockStatus.active : BlockStatus.noInput;
+            return !enabled ? BlockStatus.logicDisable : efficiency > 0 ? BlockStatus.active : BlockStatus.noInput;
         }
 
         @Override

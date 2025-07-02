@@ -25,6 +25,7 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
+import mindustry.world.blocks.logic.CanvasBlock.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MemoryBlock.*;
@@ -517,12 +518,12 @@ public class LExecutor{
             Object obj = target.obj();
             if(obj instanceof Building b && (exec.privileged || (b.team == exec.team && exec.linkIds.contains(b.id)))){
 
-                if(type == LAccess.enabled && !p1.bool()){
-                    b.lastDisabler = exec.build;
-                }
-
-                if(type == LAccess.enabled && p1.bool()){
-                    b.noSleep();
+                if(type == LAccess.enabled){
+                    if(p1.bool()) {
+                        b.noSleep();
+                    }else{
+                        b.lastDisabler = exec.build;
+                    }
                 }
 
                 if(type.isObj && p1.isobj){
@@ -581,6 +582,8 @@ public class LExecutor{
                 }
             }else if(target.isobj && target.objval instanceof CharSequence str){
                 output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
+            }else if(from instanceof CanvasBuild canvas && (exec.privileged || (from.team == exec.team))){
+                output.setnum(canvas.getPixel(address));
             }
         }
     }
@@ -611,6 +614,8 @@ public class LExecutor{
                     toVar.numval = value.numval;
                     toVar.isobj = value.isobj;
                 }
+            }else if(from instanceof CanvasBuild canvas && (exec.privileged || (from.team == exec.team))){
+		        canvas.setPixel(address, value.numi());
             }
         }
     }

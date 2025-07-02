@@ -57,6 +57,8 @@ public class ConstructBlock extends Block{
 
     @Remote(called = Loc.server)
     public static void deconstructFinish(Tile tile, Block block, Unit builder){
+        if(tile == null) return;
+
         Team team = tile.team();
         if(!headless && fogControl.isVisibleTile(Vars.player.team(), tile.x, tile.y)){
             block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
