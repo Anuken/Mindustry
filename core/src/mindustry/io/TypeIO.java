@@ -362,7 +362,7 @@ public class TypeIO{
     public static UnitStance readStance(Reads read){
         int val = read.ub();
         //never returns null
-        return val == 255 || val >= content.unitStances().size ? UnitStance.shoot : content.unitStance(val);
+        return val == 255 || val >= content.unitStances().size ? UnitStance.stop : content.unitStance(val);
     }
 
     public static void writeEntity(Writes write, Entityc entity){

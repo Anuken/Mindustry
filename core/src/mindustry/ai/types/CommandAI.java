@@ -49,11 +49,6 @@ public class CommandAI extends AIController{
     /** Last command type assigned. Used for detecting command changes. */
     protected @Nullable UnitCommand lastCommand;
 
-    {
-        //TODO: is this necessary when 'hold fire' can be a toggle?
-        setStance(UnitStance.shoot);
-    }
-
     public UnitCommand currentCommand(){
         return command == null ? UnitCommand.moveCommand : command;
     }
@@ -81,6 +76,9 @@ public class CommandAI extends AIController{
     }
 
     public void setStance(UnitStance stance){
+        //this happens when an older save reads the default "shoot" stance, or any other removed stance
+        if(stance == UnitStance.stop) return;
+
         stances.andNot(stance.incompatibleBits);
         stances.set(stance.id);
         stanceChanged();

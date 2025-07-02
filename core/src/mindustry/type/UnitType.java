@@ -1039,7 +1039,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(stances.size == 0){
             if(canAttack){
-                stances.addAll(UnitStance.stop, UnitStance.shoot, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
+                stances.addAll(UnitStance.stop, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
                 if(!flying){
                     stances.add(UnitStance.ram);
                 }

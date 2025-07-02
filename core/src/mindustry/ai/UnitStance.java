@@ -12,7 +12,7 @@ import mindustry.input.*;
 import mindustry.type.*;
 
 public class UnitStance extends MappableContent{
-    public static UnitStance stop, shoot, holdFire, pursueTarget, patrol, ram, mineAuto;
+    public static UnitStance stop, holdFire, pursueTarget, patrol, ram, mineAuto;
 
     /** Name of UI icon (from Icon class). */
     public String icon;
@@ -21,7 +21,7 @@ public class UnitStance extends MappableContent{
     /** Stances that are mutually exclusive to this stance. This is used for convenience, for writing only! */
     public Seq<UnitStance> incompatibleStances = new Seq<>();
     /** Incompatible stances as a bitset for easier operations. This is where incompatibility is actually stored. */
-    public Bits incompatibleBits = new Bits(1);
+    public Bits incompatibleBits = new Bits(32);
     /** If true, this stance can be toggled on or off. */
     public boolean toggle = true;
 
@@ -71,14 +71,11 @@ public class UnitStance extends MappableContent{
 
     public static void loadAll(){
         stop = new UnitStance("stop", "cancel", Binding.cancelOrders, false);
-        shoot = new UnitStance("shoot", "commandAttack", Binding.unitStanceShoot, false);
-        holdFire = new UnitStance("holdfire", "none", Binding.unitStanceHoldFire, false);
+        holdFire = new UnitStance("holdfire", "none", Binding.unitStanceHoldFire);
         pursueTarget = new UnitStance("pursuetarget", "right", Binding.unitStancePursueTarget);
         patrol = new UnitStance("patrol", "refresh", Binding.unitStancePatrol);
         ram = new UnitStance("ram", "rightOpen", Binding.unitStanceRam);
         mineAuto = new UnitStance("mineauto", "settings", null, false);
-
-        shoot.incompatibleStances.add(holdFire);
 
         //Only vanilla items are supported for now
         for(Item item : Vars.content.items()){
