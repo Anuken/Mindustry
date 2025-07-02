@@ -3,6 +3,7 @@ package mindustry.ai;
 import arc.*;
 import arc.input.*;
 import arc.scene.style.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
@@ -17,11 +18,33 @@ public class UnitStance extends MappableContent{
     public String icon;
     /** Key to press for this stance. */
     public @Nullable KeyBind keybind;
+    /** Stances that are mutually exclusive to this stance. This is used for convenience, for writing only! */
+    public Seq<UnitStance> incompatibleStances = new Seq<>();
+    /** Incompatible stances as a bitset for easier operations. This is where incompatibility is actually stored. */
+    public Bits incompatibleBits = new Bits(1);
+    /** If true, this stance can be toggled on or off. */
+    public boolean toggle = true;
 
-    public UnitStance(String name, String icon, KeyBind keybind){
+    public UnitStance(String name, String icon, KeyBind keybind, boolean toggle){
         super(name);
         this.icon = icon;
         this.keybind = keybind;
+        this.toggle = toggle;
+    }
+
+    public UnitStance(String name, String icon, KeyBind keybind){
+        this(name, icon, keybind, true);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        for(var stance : incompatibleStances){
+            if(stance == this) continue;
+            incompatibleBits.set(stance.id);
+            stance.incompatibleBits.set(id);
+        }
     }
 
     public String localized(){
@@ -47,13 +70,15 @@ public class UnitStance extends MappableContent{
     }
 
     public static void loadAll(){
-        stop = new UnitStance("stop", "cancel", Binding.cancelOrders);
-        shoot = new UnitStance("shoot", "commandAttack", Binding.unitStanceShoot);
-        holdFire = new UnitStance("holdfire", "none", Binding.unitStanceHoldFire);
+        stop = new UnitStance("stop", "cancel", Binding.cancelOrders, false);
+        shoot = new UnitStance("shoot", "commandAttack", Binding.unitStanceShoot, false);
+        holdFire = new UnitStance("holdfire", "none", Binding.unitStanceHoldFire, false);
         pursueTarget = new UnitStance("pursuetarget", "right", Binding.unitStancePursueTarget);
         patrol = new UnitStance("patrol", "refresh", Binding.unitStancePatrol);
         ram = new UnitStance("ram", "rightOpen", Binding.unitStanceRam);
-        mineAuto = new UnitStance("mineauto", "settings", null);
+        mineAuto = new UnitStance("mineauto", "settings", null, false);
+
+        shoot.incompatibleStances.add(holdFire);
 
         //Only vanilla items are supported for now
         for(Item item : Vars.content.items()){

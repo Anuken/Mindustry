@@ -51,6 +51,9 @@ public class AIController implements UnitController{
         updateMovement();
     }
 
+    /** Called when the parent CommandAI changes its stance. */
+    public void stanceChanged(){}
+
     /**
      * @return whether controller state should not be reset after reading.
      * Do not override unless you know exactly what you are doing.
