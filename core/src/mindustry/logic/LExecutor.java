@@ -785,15 +785,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(!to.constant){
-                if(from.isobj){
-                    to.objval = from.objval;
-                    to.isobj = true;
-                }else{
-                    to.numval = LVar.invalid(from.numval) ? 0 : from.numval;
-                    to.isobj = false;
-                }
-            }
+            if(!to.constant) to.set(from);
         }
     }
 
@@ -826,6 +818,28 @@ public class LExecutor{
                 }
 
             }
+        }
+    }
+
+    public static class SelectI implements LInstruction{
+        public ConditionOp op = ConditionOp.notEqual;
+        public LVar result, comp0, comp1, a, b;
+
+        public SelectI(ConditionOp op, LVar result, LVar comp0, LVar comp1, LVar a, LVar b){
+            this.op = op;
+            this.result = result;
+            this.comp0 = comp0;
+            this.comp1 = comp1;
+            this.a = a;
+            this.b = b;
+        }
+
+        public SelectI(){}
+
+        @Override
+        public void run(LExecutor exec){
+            if(result.constant) return;
+            result.set(op.test(comp0, comp1) ? a : b);
         }
     }
 
@@ -1134,23 +1148,8 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(address != -1){
-                LVar va = value;
-                LVar vb = compare;
-                boolean cmp;
-
-                if(op == ConditionOp.strictEqual){
-                    cmp = va.isobj == vb.isobj && ((va.isobj && va.objval == vb.objval) || (!va.isobj && va.numval == vb.numval));
-                }else if(op.objFunction != null && va.isobj && vb.isobj){
-                    //use object function if both are objects
-                    cmp = op.objFunction.get(value.obj(), compare.obj());
-                }else{
-                    cmp = op.function.get(value.num(), compare.num());
-                }
-
-                if(cmp){
-                    exec.counter.numval = address;
-                }
+            if(address != -1 && op.test(value, compare)){
+                exec.counter.numval = address;
             }
         }
     }

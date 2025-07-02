@@ -386,9 +386,7 @@ public class LogicBlock extends Block{
                             if(!var.constant){
                                 LVar dest = asm.getVar(var.name);
                                 if(dest != null && !dest.constant){
-                                    dest.isobj = var.isobj;
-                                    dest.objval = var.objval;
-                                    dest.numval = var.numval;
+                                    dest.set(var);
                                 }
                             }
                         }

@@ -28,6 +28,17 @@ public enum ConditionOp{
         this.objFunction = objFunction;
     }
 
+    public boolean test(LVar va, LVar vb){
+        if(this == ConditionOp.strictEqual){
+            return va.isobj == vb.isobj && ((va.isobj && va.objval == vb.objval) || (!va.isobj && va.numval == vb.numval));
+        }
+        if(objFunction != null && va.isobj && vb.isobj){
+            //use object function if both are objects
+            return objFunction.get(va.obj(), vb.obj());
+        }
+        return function.get(va.num(), vb.num());
+    }
+
     @Override
     public String toString(){
         return symbol;
