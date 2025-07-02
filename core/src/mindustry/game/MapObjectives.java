@@ -757,6 +757,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public @Multiline String text = "frog";
         public float fontSize = 1f, textHeight = 7f;
         public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
+        public @Alignment int textAlign = Align.center;
+        public @Alignment(ver = false) int lineAlign = Align.center;
 
         public float radius = 6f, rotation = 0f;
         public int sides = 4;
@@ -791,6 +793,15 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             this.textHeight = textHeight;
         }
 
+        public ShapeTextMarker(String text, float x, float y, float radius, float rotation, float textHeight, int textAlign){
+            this.text = text;
+            this.pos.set(x, y);
+            this.radius = radius;
+            this.rotation = rotation;
+            this.textHeight = textHeight;
+            this.textAlign = textAlign;
+        }
+
         public ShapeTextMarker(){}
 
         @Override
@@ -812,7 +823,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             // font size cannot be 0
             if(Mathf.equal(fontSize, 0f)) return;
 
-            WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius * scaleFactor + textHeight * scaleFactor, drawLayer, flags, fontSize * scaleFactor);
+            WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius * scaleFactor + textHeight * scaleFactor, drawLayer, flags, fontSize * scaleFactor, textAlign, lineAlign);
         }
 
         @Override
@@ -823,6 +834,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 switch(type){
                     case fontSize -> fontSize = (float)p1;
                     case textHeight -> textHeight = (float)p1;
+                    case textAlign -> textAlign = (int)p1;
+                    case lineAlign -> lineAlign = (int)p1;
                     case outline -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagOutline, !Mathf.equal((float)p1, 0f));
                     case labelFlags -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagBackground, !Mathf.equal((float)p1, 0f));
                     case radius -> radius = (float)p1;
@@ -980,6 +993,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public @Multiline String text = "uwu";
         public float fontSize = 1f;
         public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
+        public @Alignment int textAlign = Align.center;
+        public @Alignment(ver = false) int lineAlign = Align.center;
+
         // Cached localized text.
         private transient String fetchedText;
 
@@ -1006,7 +1022,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 fetchedText = fetchText(text);
             }
 
-            WorldLabel.drawAt(fetchedText, pos.x, pos.y, drawLayer, flags, fontSize * scaleFactor);
+            WorldLabel.drawAt(fetchedText, pos.x, pos.y, drawLayer, flags, fontSize * scaleFactor, textAlign, lineAlign);
         }
 
         @Override
@@ -1016,6 +1032,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(!Double.isNaN(p1)){
                 switch(type){
                     case fontSize -> fontSize = (float)p1;
+                    case textAlign -> textAlign = (int)p1;
+                    case lineAlign -> lineAlign = (int)p1;
                     case outline -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagOutline, !Mathf.equal((float)p1, 0f));
                     case labelFlags -> flags = (byte)Pack.bitmask(flags, WorldLabel.flagBackground, !Mathf.equal((float)p1, 0f));
                 }
@@ -1317,6 +1335,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     @Retention(RUNTIME)
     public @interface LabelFlag{}
 
+    /** For {@code int}; treats it as an alignment from {@link Align} */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface Alignment{
+        boolean hor() default true;
+        boolean ver() default true;
+    }
+
     /** For {@link UnlockableContent}; filters all un-researchable content. */
     @Target(FIELD)
     @Retention(RUNTIME)
@@ -1341,4 +1367,5 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     @Target(FIELD)
     @Retention(RUNTIME)
     public @interface TilePos{}
+
 }

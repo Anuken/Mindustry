@@ -6,7 +6,6 @@ import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -123,19 +122,6 @@ public class LStatements{
 
     @RegisterStatement("draw")
     public static class DrawStatement extends LStatement{
-        static final String[] aligns = {"center", "top", "bottom", "left", "right", "topLeft", "topRight", "bottomLeft", "bottomRight"};
-        //yes, boxing Integer is gross but this is easier to construct and Integers <128 don't allocate anyway
-        static final ObjectMap<String, Integer> nameToAlign = ObjectMap.of(
-        "center", Align.center,
-        "top", Align.top,
-        "bottom", Align.bottom,
-        "left", Align.left,
-        "right", Align.right,
-        "topLeft", Align.topLeft,
-        "topRight", Align.topRight,
-        "bottomLeft", Align.bottomLeft,
-        "bottomRight", Align.bottomRight
-        );
 
         public GraphicsType type = GraphicsType.clear;
         public String x = "0", y = "0", p1 = "0", p2 = "0", p3 = "0", p4 = "0";
@@ -165,7 +151,7 @@ public class LStatements{
                     }
 
                     if(type == GraphicsType.print){
-                        p1 = "bottomLeft";
+                        p1 = "@bottomLeft";
                     }
 
                     rebuild(table);
@@ -253,13 +239,11 @@ public class LStatements{
                         row(s);
 
                         s.add("align ");
-
-                        s.button(b -> {
-                            b.label(() -> nameToAlign.containsKey(p1) ? p1 : "bottomLeft");
-                            b.clicked(() -> showSelect(b, aligns, p1, t -> {
-                                p1 = t;
-                            }, 2, cell -> cell.size(165, 50)));
-                        }, Styles.logict, () -> {}).size(165, 40).color(s.color).left().padLeft(2);
+                        fields(s, "align", p1, v -> p1 = v);
+                        fieldAlignSelect(s, () -> p1, v -> {
+                            p1 = v;
+                            rebuild(table);
+                        }, true, true);
                     }
                     case translate, scale -> {
                         fields(s, "x", x, v -> x = v);
@@ -278,12 +262,15 @@ public class LStatements{
             if(type == GraphicsType.color && p2.equals("0")){
                 p2 = "255";
             }
+
+            if(type == GraphicsType.print && nameToAlign.get(p1) != null){
+                p1 = "@" + p1;
+            }
         }
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new DrawI((byte)type.ordinal(), builder.var(x), builder.var(y),
-                type == GraphicsType.print ? new LVar(p1, nameToAlign.get(p1, Align.bottomLeft), true) : builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+            return new DrawI((byte)type.ordinal(), builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
 
         @Override
@@ -2399,6 +2386,11 @@ public class LStatements{
                                 }).width(240f).left();
                             }));
                         }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
+                    }else if(type == LMarkerControl.textAlign || type == LMarkerControl.lineAlign){
+                        fieldAlignSelect(t, () -> p1, v -> {
+                            p1 = v;
+                            rebuild(table);
+                        }, true, type != LMarkerControl.lineAlign);
                     }
                 });
 
