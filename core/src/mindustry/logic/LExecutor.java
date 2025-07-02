@@ -518,12 +518,12 @@ public class LExecutor{
             Object obj = target.obj();
             if(obj instanceof Building b && (exec.privileged || (b.team == exec.team && exec.linkIds.contains(b.id)))){
 
-                if(type == LAccess.enabled && !p1.bool()){
-                    b.lastDisabler = exec.build;
-                }
-
-                if(type == LAccess.enabled && p1.bool()){
-                    b.noSleep();
+                if(type == LAccess.enabled){
+                    if(p1.bool()) {
+                        b.noSleep();
+                    }else{
+                        b.lastDisabler = exec.build;
+                    }
                 }
 
                 if(type.isObj && p1.isobj){
