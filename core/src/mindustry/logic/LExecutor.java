@@ -572,13 +572,15 @@ public class LExecutor{
 
             if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
                 output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
+            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name) {
                 LVar fromVar = logic.executor.optionalVar(name);
-                if(fromVar != null && !output.constant){
+                if (fromVar != null && !output.constant) {
                     output.objval = fromVar.objval;
                     output.numval = fromVar.numval;
                     output.isobj = fromVar.isobj;
                 }
+            }else if(from instanceof MessageBuild msg){
+                output.setnum(address < 0 || address >= msg.message.length() ? Double.NaN : (int)msg.message.charAt(address));
             }else if(target.isobj && target.objval instanceof CharSequence str){
                 output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
             }
