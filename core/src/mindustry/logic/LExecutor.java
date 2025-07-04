@@ -36,7 +36,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class LExecutor{
-    public static final int maxInstructions = 1000;
+    public static final int maxInstructions = 3000000000;
 
     public static final int
     maxGraphicsBuffer = 256,
