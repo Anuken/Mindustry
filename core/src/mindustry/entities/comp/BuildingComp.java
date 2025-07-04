@@ -1215,11 +1215,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void drawItemSelection(@Nullable UnlockableContent selection){
         if(selection != null){
-            float dx = x - block.size * tilesize/2f, dy = y + block.size * tilesize/2f, s = iconSmall / 4f;
+            float dx = x - block.size * tilesize/2f, dy = y + block.size * tilesize/2f, s = iconSmall / 4f * selection.fullIcon.ratio(), h = iconSmall / 4f;
             Draw.mixcol(Color.darkGray, 1f);
-            Draw.rect(selection.fullIcon, dx, dy - 1, s, s);
+            Draw.rect(selection.fullIcon, dx, dy - 1, s, h);
             Draw.reset();
-            Draw.rect(selection.fullIcon, dx, dy, s, s);
+            Draw.rect(selection.fullIcon, dx, dy, s, h);
         }
     }
 
