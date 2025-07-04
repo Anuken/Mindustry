@@ -14,6 +14,7 @@ import arc.util.io.*;
 import arc.util.pooling.*;
 import mindustry.core.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -163,6 +164,14 @@ public class MessageBlock extends Block{
         @Override
         public Cursor getCursor(){
             return !accessible() ? SystemCursor.arrow : super.getCursor();
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case bufferUsage -> message.length();
+                default -> super.sense(sensor);
+            };
         }
 
         @Override

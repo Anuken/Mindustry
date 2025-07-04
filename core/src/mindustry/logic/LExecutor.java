@@ -580,6 +580,8 @@ public class LExecutor{
                     output.numval = fromVar.numval;
                     output.isobj = fromVar.isobj;
                 }
+            }else if(from instanceof MessageBuild msg){
+                output.setnum(address < 0 || address >= msg.message.length() ? Double.NaN : (int)msg.message.charAt(address));
             }else if(target.isobj && target.objval instanceof CharSequence str){
                 output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
             }else if(from instanceof CanvasBuild canvas && (exec.privileged || (from.team == exec.team))){
