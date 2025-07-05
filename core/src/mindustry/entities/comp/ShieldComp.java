@@ -17,7 +17,9 @@ abstract class ShieldComp implements Healthc, Posc{
     @Import UnitType type;
 
     /** Absorbs health damage. */
-    float shield;
+    protected float shield;
+    /** The largest shield this unit has received. */
+    protected float maxShield;
     /** Subtracts an amount from damage. No need to save. */
     transient float armor;
     /** Shield opacity. */
@@ -66,6 +68,16 @@ abstract class ShieldComp implements Healthc, Posc{
                 Fx.unitShieldBreak.at(x, y, 0, type.shieldColor(self()), this);
             }
         }
+    }
+
+    public void setShield(float amount, float limit){
+        shield = Math.min(shield + amount, limit);
+        maxShield = Math.max(maxShield, limit);
+    }
+
+    public void setShield(float amount){
+        shield = Math.max(shield, amount);
+        maxShield = Math.max(maxShield, amount);
     }
 
     @Override
