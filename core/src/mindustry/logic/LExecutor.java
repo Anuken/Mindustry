@@ -516,7 +516,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = target.obj();
-            if(obj instanceof Building b && (exec.privileged || (b.team == exec.team && exec.linkIds.contains(b.id)))){
+            if(obj instanceof Building b && (exec.privileged || (exec.build != null && exec.build.validLink(b)))){
 
                 if(type == LAccess.enabled){
                     if(p1.bool()) {
