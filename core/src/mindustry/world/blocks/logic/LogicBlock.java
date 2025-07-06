@@ -570,7 +570,23 @@ public class LogicBlock extends Block{
         
         @Override
         public boolean writable(LExecutor exec){
-            
+            return exec.privileged || (this.team == exec.team && !this.block.privileged);
+        }
+
+        @Override
+        public void write(LVar adr, double value){
+            if(adr.isobj && adr.objval instanceof String varName){
+                LVar at = executor.optionalVar(varName);
+                if(at != null) at.setnum(value);
+            }
+        }
+
+        @Override
+        public void write(LVar adr, Object value){
+            if(adr.isobj && adr.objval instanceof String varName){
+                LVar at = executor.optionalVar(varName);
+                if(at != null) at.setobj(value);
+            }
         }
 
         @Override

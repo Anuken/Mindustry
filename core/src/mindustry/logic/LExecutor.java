@@ -570,6 +570,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             Object targetObj = target.obj();
             if(targetObj instanceof LReadable read){
+                if(!read.readable(exec)) return;
                 Object objOut = read.readObject(position);
                 if(objOut == Senseable.noSensed){
                     output.setnum(read.read(position));
@@ -582,6 +583,8 @@ public class LExecutor{
                     output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
                 }
             }
+
+
             if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
                 output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
             }else if(from instanceof MessageBuild msg){
@@ -606,18 +609,21 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
+            Object targetObj = target.obj();
+            if(targetObj instanceof LWritable write){
+                if(!write.writable(exec)) return;
+                if(value.isobj){
+                    write.write(position, value.objval);
+                }else{
+                    write.write(position, value.numval);
+                }
+            }
+
             int address = position.numi();
             Building from = target.building();
 
             if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
                 mem.memory[address] = value.num();
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
-                LVar toVar = logic.executor.optionalVar(name);
-                if(toVar != null && !toVar.constant){
-                    toVar.objval = value.objval;
-                    toVar.numval = value.numval;
-                    toVar.isobj = value.isobj;
-                }
             }else if(from instanceof CanvasBuild canvas && (exec.privileged || (from.team == exec.team))){
 		        canvas.setPixel(address, value.numi());
             }
