@@ -415,7 +415,7 @@ public class Renderer implements ApplicationListener{
 
         Groups.draw.draw(Drawc::draw);
 
-        if(drawCollisionDebug){
+        if(drawDebugHitboxes){
             DebugCollisionRenderer.draw();
         }
 

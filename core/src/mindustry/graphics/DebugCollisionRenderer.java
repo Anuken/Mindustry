@@ -14,6 +14,12 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class DebugCollisionRenderer{
+    static final float[] edges = {
+    1, -1,
+    1, 1,
+    -1, 1,
+    -1, -1,
+    };
 
     public static void draw(){
         Rect rect = camera.bounds(new Rect());
@@ -27,7 +33,7 @@ public class DebugCollisionRenderer{
             });
 
             //tile hitboxes for units
-            Lines.stroke(0.3f, Color.magenta);
+            Lines.stroke(0.4f, Color.magenta);
 
             int rx = Mathf.clamp((int)(Core.camera.width / tilesize / 2) + 1, 0, world.width()/2);
             int ry = Mathf.clamp((int)(Core.camera.height / tilesize / 2) + 1, 0, world.height()/2);
@@ -38,8 +44,19 @@ public class DebugCollisionRenderer{
                     int wy = World.toTile(Core.camera.position.y) + y;
                     Tile tile = world.tile(wx, wy);
                     if(tile != null && tile.solid()){
-                        Draw.color(tile.legSolid() ? Color.pink : Color.magenta);
-                        Lines.rect(wx * tilesize - tilesize/2f, wy * tilesize - tilesize/2f, tilesize, tilesize);
+                        for(int i = 0; i < 4; i++){
+                            Tile other = tile.nearby(i);
+                            if(other == null || !other.solid()){
+                                Lines.line(
+                                    wx * tilesize + edges[i*2] * tilesize/2f,
+                                    wy * tilesize + edges[i*2+1] * tilesize/2f,
+                                    wx * tilesize + edges[((i + 1) % 4)*2] * tilesize/2f,
+                                    wy * tilesize + edges[((i + 1) % 4)*2+1] * tilesize/2f
+                                );
+
+                                //Lines.rect(wx * tilesize - tilesize/2f, wy * tilesize - tilesize/2f, tilesize, tilesize);
+                            }
+                        }
                     }
                 }
             }

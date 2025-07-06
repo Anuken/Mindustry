@@ -203,7 +203,7 @@ public class Vars implements Loadable{
      * Do not change unless you know exactly what you are doing.*/
     public static boolean enableDarkness = true;
     /** Whether to draw debug lines for collisions. */
-    public static boolean drawCollisionDebug = false;
+    public static boolean drawDebugHitboxes = false;
     /** application data directory, equivalent to {@link Settings#getDataDirectory()} */
     public static Fi dataDirectory;
     /** data subdirectory used for screenshots */
