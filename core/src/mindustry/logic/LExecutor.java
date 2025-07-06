@@ -568,22 +568,24 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = position.numi();
-            Building from = target.building();
-
+            Object targetObj = target.obj();
+            if(targetObj instanceof LReadable read){
+                Object objOut = read.readObject(position);
+                if(objOut == Senseable.noSensed){
+                    output.setnum(read.read(position));
+                }else{
+                    output.setobj(objOut);
+                }
+            }else{
+                int address = position.numi();
+                if(targetObj instanceof CharSequence str){
+                    output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
+                }
+            }
             if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
                 output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
-                LVar fromVar = logic.executor.optionalVar(name);
-                if(fromVar != null && !output.constant){
-                    output.objval = fromVar.objval;
-                    output.numval = fromVar.numval;
-                    output.isobj = fromVar.isobj;
-                }
             }else if(from instanceof MessageBuild msg){
                 output.setnum(address < 0 || address >= msg.message.length() ? Double.NaN : (int)msg.message.charAt(address));
-            }else if(target.isobj && target.objval instanceof CharSequence str){
-                output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
             }else if(from instanceof CanvasBuild canvas && (exec.privileged || (from.team == exec.team))){
                 output.setnum(canvas.getPixel(address));
             }
@@ -660,7 +662,7 @@ public class LExecutor{
                     }
                 }
             }else{
-                if(target instanceof CharSequence seq && sense == LAccess.size){
+                if(target instanceof CharSequence seq && (sense == LAccess.size || sense == LAccess.bufferUsage)){
                     to.setnum(seq.length());
                     return;
                 }

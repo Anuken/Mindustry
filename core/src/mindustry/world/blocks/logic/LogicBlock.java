@@ -20,6 +20,7 @@ import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
 import mindustry.logic.*;
+import mindustry.logic.LReadable;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -238,7 +239,7 @@ public class LogicBlock extends Block{
         }
     }
 
-    public class LogicBuild extends Building implements Ranged{
+    public class LogicBuild extends Building implements Ranged, LReadable, LWritable{
         /** logic "source code" as list of asm statements */
         public String code = "";
         public LExecutor executor = new LExecutor();
@@ -542,6 +543,34 @@ public class LogicBlock extends Block{
                     }
                 }
             }
+        }
+
+        @Override
+        public boolean readable(LExecutor exec){
+            return exec.privileged || (this.team == exec.team && !this.block.privileged);
+        }
+
+        @Override
+        public double read(LVar adr){
+            if(adr.isobj && adr.objval instanceof String varName){
+                LVar ret = executor.optionalVar(varName);
+                return ret == null ? Double.NaN : ret.num();
+            }
+            return Double.NaN;
+        }
+
+        @Override
+        public Object readObject(LVar adr){
+            if(adr.isobj && adr.objval instanceof String varName){
+                LVar ret = executor.optionalVar(varName);
+                return ret != null && ret.isobj ? ret.num() : Senseable.noSensed;
+            }
+            return Senseable.noSensed;
+        }
+        
+        @Override
+        public boolean writable(LExecutor exec){
+            
         }
 
         @Override
