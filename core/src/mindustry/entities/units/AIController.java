@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.async.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -140,7 +141,7 @@ public class AIController implements UnitController{
 
         Tile tile = unit.tileOn();
         if(tile == null) return;
-        Tile targetTile = pathfinder.getField(unit.team, costType, pathTarget).getNextTile(tile, avoidance ? unit.collisionLayer() : -1, unit.id);
+        Tile targetTile = pathfinder.getField(unit.team, costType, pathTarget).getNextTile(tile, avoidance && unit.collisionLayer() == PhysicsProcess.layerGround ? unit.id : 0);
 
         if((tile == targetTile && stopAtTargetTile) || !unit.canPass(targetTile.x, targetTile.y)) return;
 

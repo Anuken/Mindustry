@@ -56,9 +56,16 @@ public class DebugCollisionRenderer{
                             }
                         }
                     }
+
+                    if(debugDrawAvoidance && tile != null){
+                        int[] avoid = avoidance.getAvoidance();
+                        if(avoid != null && avoid[tile.array()] != 0){
+                            Draw.color(0f, 1f, 1f, 0.25f);
+                            Fill.square(tile.worldx(), tile.worldy(), 4f);
+                        }
+                    }
                 }
             }
-
 
             Groups.draw.each(d -> {
                 if(d instanceof Unit u && rect.overlaps(Tmp.r1.setCentered(u.x, u.y, d.clipSize())) && !u.isFlying()){

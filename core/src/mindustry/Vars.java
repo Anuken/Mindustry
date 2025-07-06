@@ -204,6 +204,8 @@ public class Vars implements Loadable{
     public static boolean enableDarkness = true;
     /** Whether to draw debug lines for collisions. */
     public static boolean drawDebugHitboxes = false;
+    /** Whether to draw avoidance fields. */
+    public static boolean debugDrawAvoidance = false;
     /** application data directory, equivalent to {@link Settings#getDataDirectory()} */
     public static Fi dataDirectory;
     /** data subdirectory used for screenshots */
@@ -257,6 +259,7 @@ public class Vars implements Loadable{
     public static BaseRegistry bases;
     public static GlobalVars logicVars;
     public static MapEditor editor;
+    public static AvoidanceProcess avoidance;
     public static GameService service = new GameService();
 
     public static Universe universe;
