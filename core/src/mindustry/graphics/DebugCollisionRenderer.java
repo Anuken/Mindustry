@@ -53,8 +53,6 @@ public class DebugCollisionRenderer{
                                     wx * tilesize + edges[((i + 1) % 4)*2] * tilesize/2f,
                                     wy * tilesize + edges[((i + 1) % 4)*2+1] * tilesize/2f
                                 );
-
-                                //Lines.rect(wx * tilesize - tilesize/2f, wy * tilesize - tilesize/2f, tilesize, tilesize);
                             }
                         }
                     }
@@ -63,15 +61,15 @@ public class DebugCollisionRenderer{
 
 
             Groups.draw.each(d -> {
-                if(d instanceof Unit u && rect.overlaps(Tmp.r1.setCentered(u.x, u.y, d.clipSize()))){
+                if(d instanceof Unit u && rect.overlaps(Tmp.r1.setCentered(u.x, u.y, d.clipSize())) && !u.isFlying()){
                     u.hitboxTile(Tmp.r1);
 
                     Lines.rect(Tmp.r1);
                 }
             });
 
+            //physics hitboxes
             Lines.stroke(0.5f);
-            //physics
             Draw.color(Color.red, 0.5f);
             Groups.draw.each(d -> {
                 if(d instanceof Unit u && rect.overlaps(Tmp.r1.setCentered(u.x, u.y, u.clipSize()))){
