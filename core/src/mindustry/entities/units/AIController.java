@@ -132,11 +132,15 @@ public class AIController implements UnitController{
     }
 
     public void pathfind(int pathTarget, boolean stopAtTargetTile){
+        pathfind(pathTarget, stopAtTargetTile, false);
+    }
+
+    public void pathfind(int pathTarget, boolean stopAtTargetTile, boolean avoidance){
         int costType = unit.type.flowfieldPathType;
 
         Tile tile = unit.tileOn();
         if(tile == null) return;
-        Tile targetTile = pathfinder.getField(unit.team, costType, pathTarget).getNextTile(tile, unit.collisionLayer(), unit.id);
+        Tile targetTile = pathfinder.getField(unit.team, costType, pathTarget).getNextTile(tile, avoidance ? unit.collisionLayer() : -1, unit.id);
 
         if((tile == targetTile && stopAtTargetTile) || !unit.canPass(targetTile.x, targetTile.y)) return;
 

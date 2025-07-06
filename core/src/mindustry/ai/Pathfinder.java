@@ -163,7 +163,7 @@ public class Pathfinder implements Runnable{
                             for(int dy = -r; dy <= r; dy++){
                                 int x = dx + unit.tileX(), y = dy + unit.tileY();
                                 if(x >= 0 && y >= 0 && x < wwidth && y < wheight && (dx*dx + dy*dy) <= rad2){
-                                    arr[x + y * wwidth] = Math.max(arr[x + y * wwidth], unit.id);
+                                    arr[x + y * wwidth] = Math.max(arr[x + y * wwidth], Integer.MAX_VALUE - unit.id);
                                 }
                             }
                         }
@@ -441,7 +441,7 @@ public class Pathfinder implements Runnable{
             if(other == null) continue;
 
             int packed = dx/res + dy/res * ww;
-            int avoidance = avoid == null || unitId == 0 ? 0 : avoid[packed] > unitId ? 1 : 0;
+            int avoidance = avoid == null || unitId == 0 ? 0 : avoid[packed] > Integer.MAX_VALUE - unitId ? 1 : 0;
             int cost = values[packed] + avoidance;
 
             if(cost < value && avoidance == 0 && (current == null || cost < tl) && path.passable(packed) &&
