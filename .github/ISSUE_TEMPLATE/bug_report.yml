@@ -1,3 +1,4 @@
+need update bud report 
 name: Bug report
 description: The type of device you were playing on
 labels: ["bug"]
@@ -11,6 +12,7 @@ body:
       multiple: false
       options:
         - Android
+        -more and more od needed
         - iOS
         - Mac
         - Windows
