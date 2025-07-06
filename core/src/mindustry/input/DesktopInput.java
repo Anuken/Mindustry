@@ -234,6 +234,10 @@ public class DesktopInput extends InputHandler{
         boolean detached = settings.getBool("detach-camera", false);
 
         if(!scene.hasField() && !scene.hasDialog()){
+            if(input.keyTap(Binding.debugHitboxes)){
+                drawDebugHitboxes = !drawDebugHitboxes;
+            }
+
             if(input.keyTap(Binding.detachCamera)){
                 settings.put("detach-camera", detached = !detached);
                 if(!detached){

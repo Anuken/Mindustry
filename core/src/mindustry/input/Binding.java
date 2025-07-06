@@ -35,7 +35,6 @@ public class Binding{
     schematicFlipY = KeyBind.add("schematic_flip_y", KeyCode.x),
     schematicMenu = KeyBind.add("schematic_menu", KeyCode.t),
 
-
     commandMode = KeyBind.add("command_mode", KeyCode.shiftLeft, "command"),
     commandQueue = KeyBind.add("command_queue", KeyCode.mouseMiddle),
     createControlGroup = KeyBind.add("create_control_group", KeyCode.controlLeft),
@@ -103,7 +102,8 @@ public class Binding{
     chatHistoryNext = KeyBind.add("chat_history_next", KeyCode.down),
     chatScroll = KeyBind.add("chat_scroll", new Axis(KeyCode.scroll)),
     chatMode = KeyBind.add("chat_mode", KeyCode.tab),
-    console = KeyBind.add("console", KeyCode.f8)
+    console = KeyBind.add("console", KeyCode.f8),
+    debugHitboxes = KeyBind.add("debug_hitboxes", KeyCode.unset)
     ;
 
     //dummy static class initializer

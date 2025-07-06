@@ -288,7 +288,7 @@ public class Pathfinder implements Runnable{
         nearSolid,
         nearLegSolid,
         tile.floor().isDeep(),
-        tile.floor().damageTaken > 0.00001f,
+        tile.floor().damages(),
         allDeep,
         nearDeep,
         tile.block().teamPassable
