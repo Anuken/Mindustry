@@ -415,6 +415,10 @@ public class Renderer implements ApplicationListener{
 
         Groups.draw.draw(Drawc::draw);
 
+        if(drawCollisionDebug){
+            DebugCollisionRenderer.draw();
+        }
+
         Draw.reset();
         Draw.flush();
         Draw.sort(false);
