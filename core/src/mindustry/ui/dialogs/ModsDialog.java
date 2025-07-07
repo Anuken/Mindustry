@@ -365,7 +365,7 @@ public class ModsDialog extends BaseDialog{
 
     private @Nullable String getStateDetails(LoadedMod item){
         if(item.isOutdated()){
-            return Core.bundle.format("mod.outdated.details", item.isJava() ? minJavaModGameVersion : minModGameVersion);
+            return "@mod.incompatiblemod.details";
         }else if(item.isBlacklisted()){
             return "@mod.blacklisted.details";
         }else if(!item.isSupported()){

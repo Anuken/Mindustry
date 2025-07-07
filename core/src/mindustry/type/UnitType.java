@@ -93,6 +93,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     buildRange = Vars.buildingRange,
     /** multiplier for damage this (flying) unit deals when crashing on enemy things */
     crashDamageMultiplier = 1f,
+    /** multiplier for health that this flying unit has for its wreck, based on its max health. */
+    wreckHealthMultiplier = 0.25f,
     /** a VERY ROUGH estimate of unit DPS; initialized in init() */
     dpsEstimate = -1,
     /** graphics clipping size; <0 to calculate automatically */
@@ -599,7 +601,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(unit.controller() instanceof CommandAI ai && ai.currentCommand() == UnitCommand.mineCommand){
             out.add(UnitStance.mineAuto);
             for(Item item : indexer.getAllPresentOres()){
-                if(unit.canMine(item)){
+                if(unit.canMine(item) && ((mineFloor && indexer.hasOre(item)) || (mineWalls && indexer.hasWallOre(item)))){
                     var itemStance = ItemUnitStance.getByItem(item);
                     if(itemStance != null){
                         out.add(itemStance);
@@ -698,6 +700,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
     }
 
+    @Override
     public boolean isBanned(){
         return state.rules.isBanned(this);
     }
@@ -1036,7 +1039,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(stances.size == 0){
             if(canAttack){
-                stances.addAll(UnitStance.stop, UnitStance.shoot, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
+                stances.addAll(UnitStance.stop, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
                 if(!flying){
                     stances.add(UnitStance.ram);
                 }

@@ -156,6 +156,16 @@ public class Logic implements ApplicationListener{
             if(!net.client() && e.sector == state.getSector() && e.sector.isBeingPlayed()){
                 state.rules.waveTeam.data().destroyToDerelict();
             }
+
+            if(!net.client() && e.sector.planet.generator != null){
+                e.sector.planet.generator.onSectorCaptured(e.sector);
+            }
+        });
+
+        Events.on(SectorLoseEvent.class, e -> {
+            if(!net.client() && e.sector.planet.generator != null){
+                e.sector.planet.generator.onSectorLost(e.sector);
+            }
         });
 
         Events.on(BlockDestroyEvent.class, e -> {
@@ -462,7 +472,7 @@ public class Logic implements ApplicationListener{
                         if(rules.fillItems && data.cores.size > 0){
                             var core = data.cores.first();
                             content.items().each(i -> {
-                                if(i.isOnPlanet(Vars.state.getPlanet())){
+                                if(i.isOnPlanet(Vars.state.getPlanet()) && !i.isHidden()){
                                     core.items.set(i, core.getMaximumAccepted(i));
                                 }
                             });

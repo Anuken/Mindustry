@@ -474,6 +474,9 @@ public class SettingsMenuDialog extends BaseDialog{
         }
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("smoothcamera", true);
+        if(!mobile){
+            graphics.checkPref("detach-camera", false);
+        }
         graphics.checkPref("position", false);
         if(!mobile){
             graphics.checkPref("mouseposition", false);

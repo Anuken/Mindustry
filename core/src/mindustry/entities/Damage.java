@@ -222,38 +222,38 @@ public class Damage{
     public static float collideLaser(Bullet b, float length, boolean large, boolean laser, int pierceCap){
         float resultLength = findPierceLength(b, pierceCap, laser, length);
 
-        collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
+        collideLine(b, b.team, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
 
         b.fdata = resultLength;
 
         return resultLength;
     }
 
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
-        collideLine(hitter, team, effect, x, y, angle, length, false);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length){
+        collideLine(hitter, team, x, y, angle, length, false);
     }
 
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
-        collideLine(hitter, team, effect, x, y, angle, length, large, true);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large){
+        collideLine(hitter, team, x, y, angle, length, large, true);
     }
 
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser){
-        collideLine(hitter, team, effect, x, y, angle, length, large, laser, -1);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser){
+        collideLine(hitter, team, x, y, angle, length, large, laser, -1);
     }
 
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
         length = findLength(hitter, length, laser, pierceCap);
         hitter.fdata = length;
 
@@ -545,8 +545,10 @@ public class Damage{
         tileDamage(team, x, y, baseRadius, damage, null);
     }
 
-    public static void tileDamage(Team team, int x, int y, float baseRadius, float damage, @Nullable Bullet source){
+    public static void tileDamage(Team team, int tx, int ty, float baseRadius, float damage, @Nullable Bullet source){
         Time.run(0f, () -> {
+            int x = Mathf.clamp(tx, -100, world.width() + 100), y = Mathf.clamp(ty, -100, world.height() + 100);
+
             var in = world.build(x, y);
             //spawned inside a multiblock. this means that damage needs to be dealt directly.
             //why? because otherwise the building would absorb everything in one cell, which means much less damage than a nearby explosion.

@@ -141,6 +141,8 @@ public class RtsAI{
     boolean handleSquad(Seq<Unit> units, boolean noDefenders){
         if(units.isEmpty()) return false;
 
+        boolean naval = units.first() instanceof WaterMovec;
+
         float health = 0f, dps = 0f;
         float ax = 0f, ay = 0f;
         boolean targetAir = true, targetGround = true;
@@ -165,7 +167,7 @@ public class RtsAI{
         boolean defendingCore = false;
 
         //there is something to defend, see if it's worth the time
-        if(damaged.size > 0){
+        if(damaged.size > 0 && !naval){
             //TODO do the weights matter at all?
             //for(var build : damaged){
                 //float w = estimateStats(ax, ay, dps, health);
@@ -251,7 +253,7 @@ public class RtsAI{
             }
         }
 
-        var build = anyDefend ? null : findTarget(ax, ay, units.size, dps, health, units.first().flag == 0, units.first().isFlying());
+        var build = anyDefend ? null : findTarget(ax, ay, units.size, dps, health, units.first().flag == 0, units.first().isFlying(), naval);
 
         if(build != null || anyDefend){
             for(var unit : units){
@@ -274,7 +276,7 @@ public class RtsAI{
         return anyDefend;
     }
 
-    @Nullable Building findTarget(float x, float y, int total, float dps, float health, boolean checkWeight, boolean air){
+    @Nullable Building findTarget(float x, float y, int total, float dps, float health, boolean checkWeight, boolean air, boolean naval){
         if(total < data.team.rules().rtsMinSquad) return null;
 
         //flag priority?
@@ -282,8 +284,13 @@ public class RtsAI{
         //2. factory
         //3. core
         targets.clear();
-        for(var flag : flags){
-            targets.addAll(Vars.indexer.getEnemy(data.team, flag));
+        if(naval){
+            //naval units can only target enemy cores, because those are assumed to always be reachable. other blocks may not be!
+            targets.addAll(Vars.indexer.getEnemy(data.team, BlockFlag.core));
+        }else{
+            for(var flag : flags){
+                targets.addAll(Vars.indexer.getEnemy(data.team, flag));
+            }
         }
         targets.removeAll(b -> assignedTargets.contains(b.id) || invalidTarget.contains(b.pos()));
 
