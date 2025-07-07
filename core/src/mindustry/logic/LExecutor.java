@@ -519,7 +519,7 @@ public class LExecutor{
             if(obj instanceof Building b && (exec.privileged || (exec.build != null && exec.build.validLink(b)))){
 
                 if(type == LAccess.enabled){
-                    if(p1.bool()) {
+                    if(p1.bool()){
                         b.noSleep();
                     }else{
                         b.lastDisabler = exec.build;
