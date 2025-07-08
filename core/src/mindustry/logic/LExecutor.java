@@ -583,11 +583,6 @@ public class LExecutor{
                     output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
                 }
             }
-
-
-            if(from instanceof MessageBuild msg){
-                output.setnum(address < 0 || address >= msg.message.length() ? Double.NaN : (int)msg.message.charAt(address));
-            }
         }
     }
 
