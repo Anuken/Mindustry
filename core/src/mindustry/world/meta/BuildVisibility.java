@@ -16,7 +16,7 @@ public class BuildVisibility{
     sandboxOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.rules.infiniteResources),
     campaignOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.isCampaign()),
     legacyLaunchPadOnly = new BuildVisibility(() -> (Vars.state == null || Vars.state.isCampaign() && Vars.state.getPlanet().campaignRules.legacyLaunchPads) && Blocks.advancedLaunchPad != null && Blocks.advancedLaunchPad.unlocked()),
-    notLegacyLaunchPadOnly = new BuildVisibility(() -> (Vars.state == null || Vars.state.isCampaign() && !Vars.state.getPlanet().campaignRules.legacyLaunchPads)),
+    notLegacyLaunchPadOnly = new BuildVisibility(() -> (Vars.state == null || Vars.state.rules.infiniteResources || Vars.state.isCampaign() && !Vars.state.getPlanet().campaignRules.legacyLaunchPads)),
     lightingOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.rules.lighting || Vars.state.isCampaign()),
     ammoOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.rules.unitAmmo),
     fogOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.rules.fog || Vars.state.rules.editor);

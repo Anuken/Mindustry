@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import java.util.*;
 
@@ -77,8 +78,11 @@ public class Floor extends Block{
     public int blendId = -1;
     /** If >0, this floor is drawn as parts of a large texture. */
     public int tilingVariants = 0;
+    /** If true, this floor uses autotiling; variants are not supported. See https://github.com/GglLfr/tile-gen*/
+    public boolean autotile = false;
 
     protected TextureRegion[][][] tilingRegions;
+    protected TextureRegion[] autotileRegions;
     protected int tilingSize;
     protected TextureRegion[][] edges;
     protected Seq<Floor> blenders = new Seq<>();
@@ -103,6 +107,10 @@ public class Floor extends Block{
     @Override
     public void load(){
         super.load();
+
+        if(autotile){
+            variants = 0;
+        }
 
         int tsize = (int)(tilesize / Draw.scl);
 
@@ -130,6 +138,13 @@ public class Floor extends Block{
         }else{
             variantRegions = new TextureRegion[1];
             variantRegions[0] = Core.atlas.find(name);
+        }
+
+        if(autotile){
+            autotileRegions = new TextureRegion[47];
+            for(int i = 0; i < 47; i++){
+                autotileRegions[i] = Core.atlas.find(name + "-" + i);
+            }
         }
 
         if(Core.atlas.has(name + "-edge")){
@@ -208,6 +223,17 @@ public class Floor extends Block{
             int index = Mathf.randomSeed(Point2.pack(tile.x / tilingSize, tile.y / tilingSize), 0, tilingVariants - 1);
             TextureRegion[][] regions = tilingRegions[index];
             Draw.rect(regions[tile.x % tilingSize][tilingSize - 1 - tile.y % tilingSize], tile.worldx(), tile.worldy());
+        }else if(autotile){
+            int bits = 0;
+
+            for(int i = 0; i < 8; i++){
+                Tile other = tile.nearby(Geometry.d8[i]);
+                if(other != null && other.floor().blendGroup == blendGroup){
+                    bits |= (1 << i);
+                }
+            }
+
+            Draw.rect(autotileRegions[TileBitmask.values[bits]], tile.worldx(), tile.worldy());
         }else{
             Draw.rect(variantRegions[variant(tile.x, tile.y)], tile.worldx(), tile.worldy());
         }
@@ -351,6 +377,11 @@ public class Floor extends Block{
     /** @return whether the edges from {@param other} should be drawn onto this tile **/
     protected boolean doEdge(Tile tile, Tile otherTile, Floor other){
         return (other.realBlendId(otherTile) > realBlendId(tile) || edges(tile.x, tile.y) == null);
+    }
+
+    /** @return whether being on this floor can damage a unit */
+    public boolean damages(){
+        return damageTaken > 0f || (status != null && status.damage > 0f);
     }
 
     public static class UpdateRenderState{
