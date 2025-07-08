@@ -585,12 +585,8 @@ public class LExecutor{
             }
 
 
-            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
-                output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
-            }else if(from instanceof MessageBuild msg){
+            if(from instanceof MessageBuild msg){
                 output.setnum(address < 0 || address >= msg.message.length() ? Double.NaN : (int)msg.message.charAt(address));
-            }else if(from instanceof CanvasBuild canvas && (exec.privileged || (from.team == exec.team))){
-                output.setnum(canvas.getPixel(address));
             }
         }
     }
@@ -617,15 +613,6 @@ public class LExecutor{
                 }else{
                     write.write(position, value.numval);
                 }
-            }
-
-            int address = position.numi();
-            Building from = target.building();
-
-            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
-                mem.memory[address] = value.num();
-            }else if(from instanceof CanvasBuild canvas && (exec.privileged || (from.team == exec.team))){
-		        canvas.setPixel(address, value.numi());
             }
         }
     }

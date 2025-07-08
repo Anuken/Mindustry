@@ -37,7 +37,7 @@ public class MemoryBlock extends Block{
         return accessible();
     }
 
-    public class MemoryBuild extends Building{
+    public class MemoryBuild extends Building implements LReadable, LWritable{
         public double[] memory = new double[memoryCapacity];
 
         //massive byte size means picking up causes sync issues
@@ -54,6 +54,29 @@ public class MemoryBlock extends Block{
         @Override
         public boolean displayable(){
             return accessible();
+        }
+
+        public boolean readable(LExecutor exec){
+            return exec.privileged || (this.team == exec.team && !block.privileged);
+        }
+
+        @Override
+        public double read(LVar adr){
+            int address = adr.numi();
+            //Return null when out of bounds. (instead of 0)
+            return address < 0 || address >= memory.length ? Double.NaN : memory[address];
+        }
+
+        @Override
+        public boolean writable(LExecutor exec){
+            return exec.privileged || (this.team == exec.team && !block.privileged);
+        }
+
+        @Override
+        public void write(LVar adr, double value){
+            int address = adr.numi();
+            if(address < 0 || address >= memory.length) return;
+            memory[address] = value;
         }
 
         @Override

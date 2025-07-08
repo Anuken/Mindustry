@@ -146,7 +146,7 @@ public class CanvasBlock extends Block{
         return result;
     }
 
-    public class CanvasBuild extends Building{
+    public class CanvasBuild extends Building implements LReadable, LWritable{
         public @Nullable Texture texture;
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
         public int blending;
@@ -224,6 +224,25 @@ public class CanvasBlock extends Block{
             for(int i = 0; i < 4; i++){
                 if(blends(world.tile(tile.x + Geometry.d4[i].x * size, tile.y + Geometry.d4[i].y * size))) blending |= (1 << i);
             }
+        }
+
+        public boolean readable(LExecutor exec){
+            return exec.privileged || this.team == exec.team;
+        }
+
+        @Override
+        public double read(LVar adr){
+            return getPixel(adr.numi());
+        }
+
+        @Override
+        public boolean writable(LExecutor exec){
+            return exec.privileged || this.team == exec.team;
+        }
+
+        @Override
+        public void write(LVar adr, double value){
+            setPixel(adr.numi(), (int)value);
         }
 
         boolean blends(Tile other){
