@@ -18,7 +18,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 @EntityDef(value = {Firec.class}, pooled = true)
-@Component(base = true)
+@Component(base = true, genInterface = false)
 abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
     public static final int frames = 40, duration = 90;
 
@@ -88,7 +88,7 @@ abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
         //apply damage to nearby units & building
         if((damageTimer += Time.delta) >= damageDelay){
             damageTimer = 0f;
-            Puddlec p = Puddles.get(tile);
+            Puddle p = Puddles.get(tile);
             puddleFlammability = p != null ? p.getFlammability() / 3f : 0;
 
             if(damage){

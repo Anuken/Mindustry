@@ -12,7 +12,7 @@ import mindustry.ui.*;
 
 /** Component/entity for labels in world space. Useful for servers. Does not save in files - create only on world load. */
 @EntityDef(value = {WorldLabelc.class}, serialize = false)
-@Component(base = true)
+@Component(base = true, genInterface = false)
 public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
     @Import int id;
     @Import float x, y;
