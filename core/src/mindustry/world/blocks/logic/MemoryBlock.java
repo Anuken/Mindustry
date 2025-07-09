@@ -61,10 +61,10 @@ public class MemoryBlock extends Block{
         }
 
         @Override
-        public double read(LVar adr){
-            int address = adr.numi();
+        public void read(LVar position, LVar output){
+            int address = position.numi();
             //Return null when out of bounds. (instead of 0)
-            return address < 0 || address >= memory.length ? Double.NaN : memory[address];
+            output.setnum(address < 0 || address >= memory.length ? Double.NaN : memory[address]);
         }
 
         @Override
@@ -73,10 +73,10 @@ public class MemoryBlock extends Block{
         }
 
         @Override
-        public void write(LVar adr, double value){
-            int address = adr.numi();
+        public void write(LVar position, LVar value){
+            int address = position.numi();
             if(address < 0 || address >= memory.length) return;
-            memory[address] = value;
+            memory[address] = value.num();
         }
 
         @Override

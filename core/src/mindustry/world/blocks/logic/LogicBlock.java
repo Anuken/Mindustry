@@ -550,21 +550,12 @@ public class LogicBlock extends Block{
         }
 
         @Override
-        public double read(LVar adr){
-            if(adr.isobj && adr.objval instanceof String varName){
+        public void read(LVar position, LVar output){
+            if(position.isobj && position.objval instanceof String varName){
                 LVar ret = executor.optionalVar(varName);
-                return ret == null ? Double.NaN : ret.num();
+                if(output.constant) return;
+                output.set(ret);
             }
-            return Double.NaN;
-        }
-
-        @Override
-        public Object readObject(LVar adr){
-            if(adr.isobj && adr.objval instanceof String varName){
-                LVar ret = executor.optionalVar(varName);
-                return ret != null && ret.isobj ? ret.num() : Senseable.noSensed;
-            }
-            return Senseable.noSensed;
         }
         
         @Override
@@ -573,18 +564,11 @@ public class LogicBlock extends Block{
         }
 
         @Override
-        public void write(LVar adr, double value){
-            if(adr.isobj && adr.objval instanceof String varName){
+        public void write(LVar position, LVar value){
+            if(position.isobj && position.objval instanceof String varName){
                 LVar at = executor.optionalVar(varName);
-                if(at != null) at.setnum(value);
-            }
-        }
-
-        @Override
-        public void write(LVar adr, Object value){
-            if(adr.isobj && adr.objval instanceof String varName){
-                LVar at = executor.optionalVar(varName);
-                if(at != null) at.setobj(value);
+                if(at == null || at.constant) return;
+                at.set(value);
             }
         }
 

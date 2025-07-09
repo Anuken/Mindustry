@@ -571,12 +571,7 @@ public class LExecutor{
             Object targetObj = target.obj();
             if(targetObj instanceof LReadable read){
                 if(!read.readable(exec)) return;
-                Object objOut = read.readObject(position);
-                if(objOut == Senseable.noSensed){
-                    output.setnum(read.read(position));
-                }else{
-                    output.setobj(objOut);
-                }
+                read.read(position, output);
             }else{
                 int address = position.numi();
                 if(targetObj instanceof CharSequence str){
@@ -603,11 +598,7 @@ public class LExecutor{
             Object targetObj = target.obj();
             if(targetObj instanceof LWritable write){
                 if(!write.writable(exec)) return;
-                if(value.isobj){
-                    write.write(position, value.objval);
-                }else{
-                    write.write(position, value.numval);
-                }
+                write.write(position, value);
             }
         }
     }

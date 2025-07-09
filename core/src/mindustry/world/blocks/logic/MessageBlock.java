@@ -172,9 +172,10 @@ public class MessageBlock extends Block{
         }
 
         @Override
-        public double read(LVar adr){
-            int address = adr.numi();
-            return address < 0 || address >= message.length() ? Double.NaN : message.charAt(address);
+        public void read(LVar position, LVar output){
+            int address = position.numi();
+            if(address < 0 || address >= message.length()) return;
+            output.setnum(message.charAt(address));
         }
 
         @Override

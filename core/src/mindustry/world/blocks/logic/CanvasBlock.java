@@ -231,8 +231,8 @@ public class CanvasBlock extends Block{
         }
 
         @Override
-        public double read(LVar adr){
-            return getPixel(adr.numi());
+        public void read(LVar position, LVar output){
+            output.setnum(getPixel(position.numi()));
         }
 
         @Override
@@ -241,8 +241,8 @@ public class CanvasBlock extends Block{
         }
 
         @Override
-        public void write(LVar adr, double value){
-            setPixel(adr.numi(), (int)value);
+        public void write(LVar position, LVar value){
+            setPixel(position.numi(), value.numi());
         }
 
         boolean blends(Tile other){
