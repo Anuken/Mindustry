@@ -4558,12 +4558,13 @@ public class Blocks{
                 fragBullet = new EmptyBulletType(){{
                     lifetime = 60f * 2.5f;
                     bulletInterval = 20f;
+                    hitEffect = despawnEffect = Fx.none;
                     intervalBullet = new EmptyBulletType(){{
                         splashDamage = 20f;
                         collidesGround = true;
                         collidesAir = false;
                         collides = false;
-                        hitEffect = Fx.none;
+                        hitEffect = despawnEffect = Fx.none;
                         pierce = true;
                         instantDisappear = true;
                         splashDamageRadius = 90f;
@@ -5703,11 +5704,6 @@ public class Blocks{
                 trailEffect = Fx.colorSpark;
                 trailRotation = true;
                 trailInterval = 3f;
-                lightning = 1;
-                lightningCone = 15f;
-                lightningLength = 80;
-                lightningLengthRand = 5;
-                lightningDamage = 20f;
 
                 homingPower = 0.17f;
                 homingDelay = 19f;
@@ -5718,6 +5714,14 @@ public class Blocks{
 
                 flakInterval = 20f;
                 despawnShake = 3f;
+
+                intervalBullet = new LightningBulletType() {{
+                    lightningColor = circleColor;
+                    lightningCone = 15f;
+                    lightningLength = 35;
+                    lightningLengthRand = 5;
+                    damage = 18f;
+                }};
 
                 fragBullet = new LaserBulletType(65f){{
                     colors = new Color[]{haloColor.cpy().a(0.4f), haloColor, Color.white};
@@ -5733,8 +5737,10 @@ public class Blocks{
                     pierceCap = 2;
                     optimalLifeFract = 1f;
                 }};
-
-                fragSpread = fragRandomSpread = 0f;
+                
+                fragBullets = intervalBullets = 1;
+                fragSpread = fragRandomSpread = intervalRandomSpread = 0f;
+                bulletInterval = 20f;
 
                 splashDamage = 0f;
                 hitEffect = Fx.hitSquaresColor;
