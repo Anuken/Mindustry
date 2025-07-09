@@ -4267,7 +4267,7 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitSquaresColor;
                 buildingDamageMultiplier = 0.2f;
             }},
-            Items.oxide, new BasicBulletType(8f, 120){{
+            Items.oxide, new BasicBulletType(8f, 90){{
                 knockback = 3f;
                 width = 25f;
                 hitSize = 7f;
@@ -4529,7 +4529,6 @@ public class Blocks{
                 width = 17f;
                 reloadMultiplier = 0.65f;
                 splashDamageRadius = 110f;
-                rangeChange = 8f;
                 splashDamage = 300f;
                 scaledSplashDamage = true;
                 hitColor = backColor = trailColor = Color.valueOf("a0b380");
@@ -4560,7 +4559,7 @@ public class Blocks{
                     lifetime = 60f * 2.5f;
                     bulletInterval = 20f;
                     intervalBullet = new EmptyBulletType(){{
-                        splashDamage = 30f;
+                        splashDamage = 20f;
                         collidesGround = true;
                         collidesAir = false;
                         collides = false;
