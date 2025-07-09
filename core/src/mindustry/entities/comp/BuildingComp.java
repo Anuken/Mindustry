@@ -438,17 +438,19 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return heat;
     }
 
+    /** Sets the time scale of the building to the given intensity, unless it's above that value */
     public void applyBoost(float intensity, float duration){
-        //do not refresh time scale when getting a weaker intensity
+        //do not refresh time scale when getting a lower intensity
         if(intensity >= this.timeScale - 0.001f){
             timeScaleDuration = Math.max(timeScaleDuration, duration);
         }
         timeScale = Math.max(timeScale, intensity);
     }
 
+    /** Sets the time scale of the building to the given intensity, unless it's below that value */
     public void applySlowdown(float intensity, float duration){
-        //do not refresh time scale when getting a weaker intensity
-        if(intensity <= this.timeScale - 0.001f){
+        //do not refresh time scale when getting a higher intensity
+        if(intensity <= this.timeScale + 0.001f){
             timeScaleDuration = Math.max(timeScaleDuration, duration);
         }
         timeScale = Math.min(timeScale, intensity);
