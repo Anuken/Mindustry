@@ -553,6 +553,10 @@ public class LogicBlock extends Block{
         public void read(LVar position, LVar output){
             if(position.isobj && position.objval instanceof String varName){
                 LVar ret = executor.optionalVar(varName);
+                if(ret == null){
+                    output.setnum(Double.NaN);
+                    return;
+                }
                 if(output.constant) return;
                 output.set(ret);
             }
