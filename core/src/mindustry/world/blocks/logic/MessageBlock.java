@@ -174,8 +174,7 @@ public class MessageBlock extends Block{
         @Override
         public void read(LVar position, LVar output){
             int address = position.numi();
-            if(address < 0 || address >= message.length()) return;
-            output.setnum(message.charAt(address));
+            output.setnum(address < 0 || address >= message.length() ? Double.NaN : message.charAt(address));
         }
 
         @Override
