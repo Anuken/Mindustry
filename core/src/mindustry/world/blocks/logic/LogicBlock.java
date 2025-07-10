@@ -563,6 +563,7 @@ public class LogicBlock extends Block{
                 int address = position.numi();
                 if(address < 0 || address >= executor.vars.length){
                     output.setnum(Double.NaN);
+                    return;
                 }
                 if(output.constant) return;
                 output.set(executor.vars[address]);
