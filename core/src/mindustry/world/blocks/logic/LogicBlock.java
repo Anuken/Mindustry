@@ -32,6 +32,7 @@ import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
     private static final int maxByteLen = 1024 * 100;
+    private static final int maxLinks = 6000;
     public static final int maxNameLength = 32;
 
     public int maxInstructionScale = 5;
@@ -81,17 +82,11 @@ public class LogicBlock extends Block{
             int x = lbuild.tileX(), y = lbuild.tileY();
 
             LogicLink link = entity.links.find(l -> l.x == x && l.y == y);
-            String bname = getLinkName(lbuild.block);
 
             if(link != null){
-                link.active = !link.active;
-                //find a name when the base name differs (new block type)
-                if(!link.name.startsWith(bname)){
-                    link.name = "";
-                    link.name = entity.findLinkName(lbuild.block);
-                }
+                entity.links.remove(link);
                 //disable when unlinking
-                if(!link.active && lbuild.block.autoResetEnabled && lbuild.lastDisabler == entity){
+                if(lbuild.block.autoResetEnabled && lbuild.lastDisabler == entity){
                     lbuild.enabled = true;
                 }
             }else{
@@ -147,12 +142,8 @@ public class LogicBlock extends Block{
             stream.writeInt(bytes.length);
             stream.write(bytes);
 
-            int actives = links.count(l -> l.active);
-
-            stream.writeInt(actives);
+            stream.writeInt(links.size);
             for(LogicLink link : links){
-                if(!link.active) continue;
-
                 stream.writeUTF(link.name);
                 stream.writeShort(link.x);
                 stream.writeShort(link.y);
@@ -198,7 +189,7 @@ public class LogicBlock extends Block{
                 byte[] bytes = new byte[bytelen];
                 stream.readFully(bytes);
 
-                int total = stream.readInt();
+                int total = Math.min(stream.readInt(), maxLinks);
 
                 Seq<LogicLink> links = new Seq<>();
 
@@ -219,7 +210,7 @@ public class LogicBlock extends Block{
     }
 
     public static class LogicLink{
-        public boolean active = true, valid;
+        public boolean valid;
         public int x, y;
         public String name;
         public Building lastBuild;
@@ -232,9 +223,7 @@ public class LogicBlock extends Block{
         }
 
         public LogicLink copy(){
-            LogicLink out = new LogicLink(x, y, name, valid);
-            out.active = active;
-            return out;
+            return new LogicLink(x, y, name, valid);
         }
     }
 
@@ -270,7 +259,7 @@ public class LogicBlock extends Block{
 
                 links.clear();
 
-                int total = stream.readInt();
+                int total = Math.min(stream.readInt(), maxLinks);
 
                 if(version == 0){
                     //old version just had links, ignore those
@@ -352,18 +341,19 @@ public class LogicBlock extends Block{
 
                     //store connections
                     for(LogicLink link : links){
-                        if(link.active && (link.valid = validLink(world.build(link.x, link.y)))){
+                        link.valid = validLink(world.build(link.x, link.y));
+                        if(link.valid){
                             asm.putConst(link.name, world.build(link.x, link.y));
                         }
                     }
 
                     //store link objects
-                    executor.links = new Building[links.count(l -> l.valid && l.active)];
+                    executor.links = new Building[links.count(l -> l.valid)];
                     executor.linkIds.clear();
 
                     int index = 0;
                     for(LogicLink link : links){
-                        if(link.active && link.valid){
+                        if(link.valid){
                             Building build = world.build(link.x, link.y);
                             executor.links[index ++] = build;
                             if(build != null) executor.linkIds.add(build.id);
@@ -490,8 +480,6 @@ public class LogicBlock extends Block{
                 for(int i = 0; i < links.size; i++){
                     LogicLink l = links.get(i);
 
-                    if(!l.active) continue;
-
                     var cur = world.build(l.x, l.y);
 
                     boolean valid = validLink(cur);
@@ -561,7 +549,7 @@ public class LogicBlock extends Block{
                 output.set(ret);
             }
         }
-        
+
         @Override
         public boolean writable(LExecutor exec){
             return exec.privileged || (this.team == exec.team && !this.block.privileged);
@@ -602,7 +590,7 @@ public class LogicBlock extends Block{
 
             for(LogicLink l : links){
                 Building build = world.build(l.x, l.y);
-                if(l.active && validLink(build)){
+                if(validLink(build)){
                     Drawf.square(build.x, build.y, build.block.size * tilesize / 2f + 1f, Pal.place);
                 }
             }
@@ -610,7 +598,7 @@ public class LogicBlock extends Block{
             //draw top text on separate layer
             for(LogicLink l : links){
                 Building build = world.build(l.x, l.y);
-                if(l.active && validLink(build)){
+                if(validLink(build)){
                     build.block.drawPlaceText(l.name, build.tileX(), build.tileY(), true);
                 }
             }

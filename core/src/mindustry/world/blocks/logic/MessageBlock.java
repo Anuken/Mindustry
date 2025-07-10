@@ -180,7 +180,7 @@ public class MessageBlock extends Block{
         @Override
         public double sense(LAccess sensor){
             return switch(sensor){
-                case bufferUsage -> message.length();
+                case bufferSize -> message.length();
                 default -> super.sense(sensor);
             };
         }

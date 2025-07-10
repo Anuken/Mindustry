@@ -40,7 +40,7 @@ public enum LAccess{
     cameraHeight,
     displayWidth,
     displayHeight,
-    bufferUsage,
+    bufferSize,
     operations,
     size,
     solid,

@@ -25,10 +25,8 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
-import mindustry.world.blocks.logic.CanvasBlock.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
-import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
@@ -641,7 +639,7 @@ public class LExecutor{
                     }
                 }
             }else{
-                if(target instanceof CharSequence seq && (sense == LAccess.size || sense == LAccess.bufferUsage)){
+                if(target instanceof CharSequence seq && (sense == LAccess.size || sense == LAccess.bufferSize)){
                     to.setnum(seq.length());
                     return;
                 }
