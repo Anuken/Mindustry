@@ -141,7 +141,7 @@ public class ForceFieldAbility extends Ability{
 
     @Override
     public void created(Unit unit){
-        unit.shield = max;
+        unit.setShield(max);
     }
 
     public void checkRadius(Unit unit){

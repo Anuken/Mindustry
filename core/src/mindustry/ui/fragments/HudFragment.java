@@ -20,6 +20,7 @@ import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.entities.abilities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -52,6 +53,10 @@ public class HudFragment{
     private long lastToast;
 
     private Seq<Block> blocksOut = new Seq<>();
+
+    private interface Colorp{
+        Color get();
+    }
 
     private void addBlockSelection(Table cont){
         Table blockSelection = new Table();
@@ -839,13 +844,53 @@ public class HudFragment{
             t.add(new SideBar(() -> player.dead() ? 0f : player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
 
-            Boolp playerHasPayloads = () -> player.unit() instanceof Payloadc pay && !pay.payloads().isEmpty();
-            Floatp playerPayloadCapacityUsed = () -> player.unit() instanceof Payloadc pay ? pay.payloadUsed() / player.unit().type().payloadCapacity : 0f;
+            // The ShieldArc ability currently tracks its shield separately from unit shield
+            final Floatp highestShield = () -> Math.max(!player.dead() && Structs.find(player.unit().abilities, a -> a instanceof ShieldArcAbility) != null ? Structs.find(player.unit().abilities, a -> a instanceof ShieldArcAbility).data : 0f, player.unit().shield());
+            final Boolp showAmmoBar = () -> player.displayAmmo();
+            final Boolp showCargoBar = () -> player.unit() instanceof Payloadc pay && !pay.payloads().isEmpty() && (highestShield.get() == 0 || highestShield.get() >= player.unit().maxShield());
+            final Boolp showShieldBar = () -> highestShield.get() > 0;
 
-            t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : playerHasPayloads.get() ? playerPayloadCapacityUsed.get() : player.unit().healthf(), () -> !(player.displayAmmo() || playerHasPayloads.get()), false)).width(bw).growY().padLeft(pad).update(b -> {
-                b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color() : playerHasPayloads.get() ? Pal.items : Pal.health);
-            });
+            Floatp rightBarFraction = () -> {
+                if(player.dead()){
+                    return 0f;
+                }else if(showAmmoBar.get()){
+                    return player.unit().ammof();
+                }else if(showCargoBar.get()){
+                    return player.unit() instanceof Payloadc pay ? pay.payloadUsed() / player.unit().type().payloadCapacity : 0f;
+                }else if(showShieldBar.get()){
+                    return highestShield.get() / player.unit().maxShield();
+                }else{
+                    return player.unit().healthf();
+                }
+            };
 
+            Boolp rightBarFlash = () -> {
+                if(player.dead()){
+                    return false;
+                }else if(showShieldBar.get()){
+                    return true;
+                }else if(showAmmoBar.get() || showCargoBar.get()){
+                    return false;
+                }else{
+                    return true;
+                }
+            };
+
+            Colorp rightBarColor = () -> {
+                if(player.dead()){
+                    return Pal.health;
+                }else if(showAmmoBar.get()){
+                    return Pal.ammo;
+                }else if(showCargoBar.get()){
+                    return Pal.items;
+                }else if(showShieldBar.get()){
+                    return Pal.accent;
+                }else{
+                    return Pal.health;
+                }
+            };
+
+            t.add(new SideBar(rightBarFraction, rightBarFlash, false)).width(bw).growY().padLeft(pad).update(b -> b.setColor(rightBarColor.get()));
             t.getChildren().get(1).toFront();
         })).size(120f, 80).padRight(4);
 
