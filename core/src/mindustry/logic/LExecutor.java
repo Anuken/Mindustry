@@ -25,10 +25,8 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
-import mindustry.world.blocks.logic.CanvasBlock.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
-import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
@@ -568,24 +566,15 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = position.numi();
-            Building from = target.building();
-
-            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
-                output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
-                LVar fromVar = logic.executor.optionalVar(name);
-                if(fromVar != null && !output.constant){
-                    output.objval = fromVar.objval;
-                    output.numval = fromVar.numval;
-                    output.isobj = fromVar.isobj;
+            Object targetObj = target.obj();
+            if(targetObj instanceof LReadable read){
+                if(!read.readable(exec)) return;
+                read.read(position, output);
+            }else{
+                int address = position.numi();
+                if(targetObj instanceof CharSequence str){
+                    output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
                 }
-            }else if(from instanceof MessageBuild msg){
-                output.setnum(address < 0 || address >= msg.message.length() ? Double.NaN : (int)msg.message.charAt(address));
-            }else if(target.isobj && target.objval instanceof CharSequence str){
-                output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
-            }else if(from instanceof CanvasBuild canvas && (exec.privileged || (from.team == exec.team))){
-                output.setnum(canvas.getPixel(address));
             }
         }
     }
@@ -604,20 +593,10 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = position.numi();
-            Building from = target.building();
-
-            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
-                mem.memory[address] = value.num();
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
-                LVar toVar = logic.executor.optionalVar(name);
-                if(toVar != null && !toVar.constant){
-                    toVar.objval = value.objval;
-                    toVar.numval = value.numval;
-                    toVar.isobj = value.isobj;
-                }
-            }else if(from instanceof CanvasBuild canvas && (exec.privileged || (from.team == exec.team))){
-		        canvas.setPixel(address, value.numi());
+            Object targetObj = target.obj();
+            if(targetObj instanceof LWritable write){
+                if(!write.writable(exec)) return;
+                write.write(position, value);
             }
         }
     }
@@ -660,7 +639,7 @@ public class LExecutor{
                     }
                 }
             }else{
-                if(target instanceof CharSequence seq && sense == LAccess.size){
+                if(target instanceof CharSequence seq && (sense == LAccess.size || sense == LAccess.bufferSize)){
                     to.setnum(seq.length());
                     return;
                 }
