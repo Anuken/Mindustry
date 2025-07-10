@@ -376,6 +376,11 @@ public class Floor extends Block{
         return (other.realBlendId(otherTile) > realBlendId(tile) || edges(tile.x, tile.y) == null);
     }
 
+    /** @return whether being on this floor can damage a unit */
+    public boolean damages(){
+        return damageTaken > 0f || (status != null && status.damage > 0f);
+    }
+
     public static class UpdateRenderState{
         public Tile tile;
         public Floor floor;

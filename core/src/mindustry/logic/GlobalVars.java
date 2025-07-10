@@ -147,6 +147,8 @@ public class GlobalVars{
             put("@" + sensor.name(), sensor);
         }
 
+        LStatement.nameToAlign.each((name, align) -> put("@" + name, align));
+
         logicIdToContent = new UnlockableContent[ContentType.all.length][];
         contentIdToLogicId = new int[ContentType.all.length][];
 

@@ -101,6 +101,12 @@ public class LVar{
         isobj = true;
     }
 
+    public void set(LVar other){
+        isobj = other.isobj;
+        objval = other.objval;
+        numval = other.numval;
+    }
+
     public static boolean invalid(double d){
         return Double.isNaN(d) || Double.isInfinite(d);
     }

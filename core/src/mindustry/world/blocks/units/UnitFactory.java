@@ -221,6 +221,14 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
+        public void drawSelect(){
+            super.drawSelect();
+            if(plans.size > 1 && currentPlan != -1 && currentPlan < plans.size){
+                drawItemSelection(plans.get(currentPlan).unit);
+            }
+        }
+
+        @Override
         public Vec2 getCommandPosition(){
             return commandPos;
         }
