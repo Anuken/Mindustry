@@ -80,6 +80,10 @@ public class Floor extends Block{
     public int tilingVariants = 0;
     /** If true, this floor uses autotiling; variants are not supported. See https://github.com/GglLfr/tile-gen*/
     public boolean autotile = false;
+    /** If true (default), this floor will draw edges of other floors on itself. */
+    public boolean drawEdgeIn = true;
+    /** If true (default), this floor will draw its edges onto other floors. */
+    public boolean drawEdgeOut = true;
 
     protected TextureRegion[][][] tilingRegions;
     protected TextureRegion[] autotileRegions;
@@ -236,7 +240,9 @@ public class Floor extends Block{
         }
 
         Draw.alpha(1f);
-        drawEdges(tile);
+        if(drawEdgeIn){
+            drawEdges(tile);
+        }
         drawOverlay(tile);
     }
 
@@ -295,7 +301,7 @@ public class Floor extends Block{
             Point2 point = Geometry.d8[i];
             Tile other = tile.nearby(point);
             //special case: empty is, well, empty, so never draw emptiness on top, as that would just be an incorrect black texture
-            if(other != null && other.floor().cacheLayer == layer && other.floor().edges(tile.x, tile.y) != null && other.floor() != Blocks.empty){
+            if(other != null && other.floor().drawEdgeOut && other.floor().cacheLayer == layer && other.floor().edges(tile.x, tile.y) != null){
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
                     dirs[i] = other.floorID();
@@ -316,7 +322,7 @@ public class Floor extends Block{
             Point2 point = Geometry.d8[i];
             Tile other = tile.nearby(point);
 
-            if(other != null && doEdge(tile, other, other.floor()) && other.floor().cacheLayer == realCache && other.floor().edges(tile.x, tile.y) != null && other.floor() != Blocks.empty){
+            if(other != null && other.floor().drawEdgeOut && doEdge(tile, other, other.floor()) && other.floor().cacheLayer == realCache && other.floor().edges(tile.x, tile.y) != null){
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
                 }
