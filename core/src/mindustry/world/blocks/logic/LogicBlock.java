@@ -238,7 +238,7 @@ public class LogicBlock extends Block{
         }
     }
 
-    public class LogicBuild extends Building implements Ranged{
+    public class LogicBuild extends Building implements Ranged, LReadable, LWritable{
         /** logic "source code" as list of asm statements */
         public String code = "";
         public LExecutor executor = new LExecutor();
@@ -541,6 +541,38 @@ public class LogicBlock extends Block{
                         break;
                     }
                 }
+            }
+        }
+
+        @Override
+        public boolean readable(LExecutor exec){
+            return exec.privileged || (this.team == exec.team && !this.block.privileged);
+        }
+
+        @Override
+        public void read(LVar position, LVar output){
+            if(position.isobj && position.objval instanceof String varName){
+                LVar ret = executor.optionalVar(varName);
+                if(ret == null){
+                    output.setnum(Double.NaN);
+                    return;
+                }
+                if(output.constant) return;
+                output.set(ret);
+            }
+        }
+        
+        @Override
+        public boolean writable(LExecutor exec){
+            return exec.privileged || (this.team == exec.team && !this.block.privileged);
+        }
+
+        @Override
+        public void write(LVar position, LVar value){
+            if(position.isobj && position.objval instanceof String varName){
+                LVar at = executor.optionalVar(varName);
+                if(at == null || at.constant) return;
+                at.set(value);
             }
         }
 
