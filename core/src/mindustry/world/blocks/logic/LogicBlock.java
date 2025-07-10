@@ -559,9 +559,16 @@ public class LogicBlock extends Block{
                 }
                 if(output.constant) return;
                 output.set(ret);
+            }else{
+                int address = position.numi();
+                if(address < 0 || address >= executor.vars.length){
+                    output.setnum(Double.NaN);
+                }
+                if(output.constant) return;
+                output.set(executor.vars[address]);
             }
         }
-        
+
         @Override
         public boolean writable(LExecutor exec){
             return exec.privileged || (this.team == exec.team && !this.block.privileged);
@@ -573,6 +580,11 @@ public class LogicBlock extends Block{
                 LVar at = executor.optionalVar(varName);
                 if(at == null || at.constant) return;
                 at.set(value);
+            }else{
+                int address = position.numi();
+                if(address < 0 || address >= executor.vars.length) return;
+                //Since LExecutor.vars is only nonconstants, there is no check if the target is a constant.
+                executor.vars[address].set(value);
             }
         }
 
