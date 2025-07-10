@@ -5998,7 +5998,7 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             envEnabled |= Env.space;
             reload = 7f;
-            range = 400;
+            range = 410;
             trackingRange = range * 1.4f;
             shootCone = 100f;
             scaledHealth = 370;
