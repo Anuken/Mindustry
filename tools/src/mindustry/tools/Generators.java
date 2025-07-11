@@ -89,8 +89,9 @@ public class Generators{
                     if(!iconPath.exists()){
                         //save the bottom right region as the "main" sprite for previews
                         Pixmap out = new Pixmap(basePath);
-                        Pixmap cropped = out.crop(96, 96, 32, 32);
+                        Pixmap cropped = out.crop(32, 32, 32, 32);
                         iconPath.writePng(cropped);
+                        iconPath.parent().parent().parent().child("editor").child("editor-" + block.name + ".png").writePng(cropped);
                         out.dispose();
                         gens.put(block, cropped);
                     }
@@ -830,7 +831,7 @@ public class Generators{
         generate("edges", () -> {
             content.blocks().<Floor>each(b -> b instanceof Floor && !(b instanceof OverlayFloor) && !b.isAir(), floor -> {
 
-                if(has(floor.name + "-edge") || floor.blendGroup != floor){
+                if(has(floor.name + "-edge") || floor.blendGroup != floor || (!floor.drawEdgeOut)){
                     return;
                 }
 
