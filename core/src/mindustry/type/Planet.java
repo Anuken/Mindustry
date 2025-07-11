@@ -58,6 +58,8 @@ public class Planet extends UnlockableContent{
     public float camRadius;
     /** Minimum camera zoom value. */
     public float minZoom = 0.5f;
+    /** Maximum camera zoom value. */
+    public float maxZoom = 2f;
     /** Whether to draw the orbital circle. */
     public boolean drawOrbit = true;
     /** Atmosphere radius adjustment parameters. */
