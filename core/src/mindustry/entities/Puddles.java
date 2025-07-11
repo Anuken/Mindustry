@@ -110,7 +110,7 @@ public class Puddles{
     }
 
     public static void register(Puddle puddle){
-        world.tiles.setPuddle(puddle.tile().array(), puddle);
+        world.tiles.setPuddle(puddle.tile.array(), puddle);
     }
 
     /** Reacts two liquids together at a location. */

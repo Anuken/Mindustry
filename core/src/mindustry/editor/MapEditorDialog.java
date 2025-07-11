@@ -176,9 +176,66 @@ public class MapEditorDialog extends Dialog implements Disposable{
             menu.hide();
             sectorGenDialog.show();
         }).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
-        menu.cont.row();
 
         menu.cont.row();
+
+        //this is gated behind a property, because it's (1) not useful to most people, (2) confusing and (3) may crash or otherwise bug out
+        if(OS.hasProp("mindustry.editor.simulate.button")){
+
+            menu.cont.button("Simulate", Icon.logic, () -> {
+                menu.hide();
+
+                BaseDialog dialog = new BaseDialog("Simulate");
+
+                int[] seconds = {60 * 1};
+
+                dialog.cont.add("Seconds: ");
+                dialog.cont.field(seconds[0] + "", text -> seconds[0] = Strings.parseInt(text, 1)).valid(s -> Strings.parseInt(s, 9999999) < 10f * 60f);
+
+                dialog.addCloseButton();
+
+                dialog.buttons.button("@ok", Icon.ok, () -> {
+                    ui.loadAnd(() -> {
+
+                        float deltaScl = 2f;
+                        int steps = Mathf.ceil(seconds[0] * 60f / deltaScl);
+                        float oldDelta = Time.delta;
+                        Time.delta = deltaScl;
+
+                        Seq<Building> builds = new Seq<>();
+                        Time.clear();
+
+                        world.tiles.eachTile(t -> {
+                            if(t.build != null && t.isCenter() && t.block().update && t.build.allowUpdate()){
+                                builds.add(t.build);
+                                t.build.updateProximity();
+                            }
+                        });
+
+                        for(int i = 0; i < steps; i++){
+                            Time.update();
+                            for(var build : builds){
+                                build.update();
+                            }
+                            Groups.powerGraph.update();
+                        }
+
+                        //spawned units will cause havoc, so clear them
+                        Groups.unit.clear();
+
+                        Time.clear();
+                        Time.delta = oldDelta;
+                    });
+
+                    dialog.hide();
+                }).size(210f, 64f);
+
+                dialog.show();
+
+            }).size(swidth * 2f + 10, 60f);
+
+            menu.cont.row();
+        }
 
         menu.cont.button("@quit", Icon.exit, () -> {
             tryExit();
@@ -320,6 +377,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     public @Nullable Map save(){
         boolean isEditor = state.rules.editor;
         state.rules.editor = false;
+        state.rules.allowEditRules = false;
         state.rules.objectiveFlags.clear();
         state.rules.objectives.each(MapObjective::reset);
         String name = editor.tags.get("name", "").trim();

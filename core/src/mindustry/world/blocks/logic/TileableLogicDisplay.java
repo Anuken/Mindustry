@@ -13,6 +13,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -26,25 +27,6 @@ public class TileableLogicDisplay extends LogicDisplay{
     public int maxDisplayDimensions = 16;
     public @Load(value = "@-#", length = 47) TextureRegion[] tileRegion;
     public @Load("@-back") TextureRegion backRegion;
-
-    static final int[] bitmasks = {
-    39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
-    38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
-    39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
-    38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
-    3,  4,  3,  4, 15, 40, 15, 20,  3,  4,  3,  4, 15, 40, 15, 20,
-    5, 28,  5, 28, 29, 10, 29, 23,  5, 28,  5, 28, 31, 11, 31, 32,
-    3,  4,  3,  4, 15, 40, 15, 20,  3,  4,  3,  4, 15, 40, 15, 20,
-    2, 30,  2, 30,  9, 46,  9, 22,  2, 30,  2, 30, 14, 44, 14,  6,
-    39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
-    38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
-    39, 36, 39, 36, 27, 16, 27, 24, 39, 36, 39, 36, 27, 16, 27, 24,
-    38, 37, 38, 37, 17, 41, 17, 43, 38, 37, 38, 37, 26, 21, 26, 25,
-    3,  0,  3,  0, 15, 42, 15, 12,  3,  0,  3,  0, 15, 42, 15, 12,
-    5,  8,  5,  8, 29, 35, 29, 33,  5,  8,  5,  8, 31, 34, 31,  7,
-    3,  0,  3,  0, 15, 42, 15, 12,  3,  0,  3,  0, 15, 42, 15, 12,
-    2,  1,  2,  1,  9, 45,  9, 19,  2,  1,  2,  1, 14, 18, 14, 13,
-    };
 
     public TileableLogicDisplay(String name){
         super(name);
@@ -148,8 +130,8 @@ public class TileableLogicDisplay extends LogicDisplay{
         @Override
         public double sense(LAccess sensor){
             return switch(sensor){
-                case displayWidth -> tilesWidth * 32f;
-                case displayHeight -> tilesHeight * 32f;
+                case displayWidth -> tilesWidth * 32f - 12f;    // accounts for display frame (2 * 6 pixels)
+                case displayHeight -> tilesHeight * 32f - 12f;
                 default -> super.sense(sensor);
             };
         }
@@ -238,7 +220,8 @@ public class TileableLogicDisplay extends LogicDisplay{
 
                     int rtx = (tile.x - originX), rty = (tile.y - originY);
 
-                    Tmp.tr1.set(rootDisplay.buffer.getTexture(), rtx * 32, rty * 32, 32, 32);
+                    // Offset the region to account for display frame (6 pixels)
+                    Tmp.tr1.set(rootDisplay.buffer.getTexture(), rtx * 32 - 6, rty * 32 - 6, 32, 32);
                     Draw.rect(Tmp.tr1, x, y, tilesize, -tilesize);
                 }
             });
@@ -246,7 +229,7 @@ public class TileableLogicDisplay extends LogicDisplay{
 
             Draw.z(Layer.block + 0.02f);
 
-            Draw.rect(tileRegion[bitmasks[bits]], x, y);
+            Draw.rect(tileRegion[TileBitmask.values[bits]], x, y);
         }
 
         @Override

@@ -172,7 +172,7 @@ public class MapIO{
         for(Tile tile : tiles){
             //while synthetic blocks are possible, most of their data is lost, so in order to avoid questions like
             //"why is there air under my drill" and "why are all my conveyors facing right", they are disabled
-            int color = tile.block().hasColor && !tile.block().synthetic() ? tile.block().mapColor.rgba() : tile.floor().mapColor.rgba();
+            int color = tile.block().hasColor && !tile.block().hasBuilding() ? tile.block().mapColor.rgba() : tile.floor().mapColor.rgba();
             pix.set(tile.x, tiles.height - 1 - tile.y, color);
         }
         return pix;
@@ -182,6 +182,9 @@ public class MapIO{
         for(Tile tile : tiles){
             int color = pixmap.get(tile.x, pixmap.height - 1 - tile.y);
             Block block = ColorMapper.get(color);
+
+            //ignore buildings; reading images is only intended for environment tiles
+            if(block.hasBuilding()) continue;
 
             if(block.isOverlay()){
                 tile.setOverlay(block.asFloor());
@@ -194,7 +197,6 @@ public class MapIO{
             }
         }
 
-        //guess at floors by grabbing a random adjacent floor
         for(Tile tile : tiles){
             //default to stone floor
             if(tile.floor() == Blocks.air){

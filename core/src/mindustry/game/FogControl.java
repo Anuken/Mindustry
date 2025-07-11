@@ -119,8 +119,7 @@ public final class FogControl implements CustomChunk{
 
         var data = data(team);
         if(data == null) return false;
-        if(x < 0 || y < 0 || x >= ww || y >= wh) return false;
-        return data.read.get(x + y * ww);
+        return data.read.get(Mathf.clamp(x, 0, ww - 1) + Mathf.clamp(y, 0, wh - 1) * ww);
     }
 
     public void resetFog(){

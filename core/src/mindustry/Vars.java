@@ -51,6 +51,8 @@ public class Vars implements Loadable{
     public static final int minModGameVersion = 136;
     /** Min game version for java mods specifically - this is higher, as Java mods have more breaking changes. */
     public static final int minJavaModGameVersion = 147;
+    /** If true, a button to view sector submission threads is shown. */
+    public static boolean showSectorSubmissions = true;
     /** If true, the BE server list is always used. */
     public static boolean forceBeServers = false;
     /** If true, mod code and scripts do not run. For internal testing only. This WILL break mods if enabled. */
@@ -200,6 +202,10 @@ public class Vars implements Loadable{
     /** Whether to draw shadows of blocks at map edges and static blocks.
      * Do not change unless you know exactly what you are doing.*/
     public static boolean enableDarkness = true;
+    /** Whether to draw debug lines for collisions. */
+    public static boolean drawDebugHitboxes = false;
+    /** Whether to draw avoidance fields. */
+    public static boolean debugDrawAvoidance = false;
     /** application data directory, equivalent to {@link Settings#getDataDirectory()} */
     public static Fi dataDirectory;
     /** data subdirectory used for screenshots */
@@ -253,6 +259,7 @@ public class Vars implements Loadable{
     public static BaseRegistry bases;
     public static GlobalVars logicVars;
     public static MapEditor editor;
+    public static AvoidanceProcess avoidance;
     public static GameService service = new GameService();
 
     public static Universe universe;

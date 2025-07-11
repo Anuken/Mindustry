@@ -121,7 +121,6 @@ public class Pathfinder implements Runnable{
             mainList = new Seq<>();
             clearCache();
 
-
             for(int i = 0; i < tiles.length; i++){
                 Tile tile = world.tiles.geti(i);
                 tiles[i] = packTile(tile);
@@ -145,10 +144,16 @@ public class Pathfinder implements Runnable{
 
         Events.on(ResetEvent.class, event -> stop());
 
-        Events.on(TileChangeEvent.class, event -> updateTile(event.tile));
+        Events.on(TileChangeEvent.class, event -> {
+            if(state.isEditor()) return;
+
+            updateTile(event.tile);
+        });
 
         //remove nearSolid flag for tiles
         Events.on(TilePreChangeEvent.class, event -> {
+            if(state.isEditor()) return;
+
             Tile tile = event.tile;
 
             if(tile.solid()){
@@ -209,7 +214,7 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     public int packTile(Tile tile){
-        boolean nearLiquid = false, nearSolid = false, nearLegSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep();
+        boolean nearLiquid = false, nearSolid = false, nearLegSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep(), nearDeep = allDeep;
 
         for(int i = 0; i < 4; i++){
             Tile other = tile.nearby(i);
@@ -220,11 +225,15 @@ public class Pathfinder implements Runnable{
                 //TODO potentially strange behavior when teamPassable is false for other teams?
                 if(osolid && !other.block().teamPassable) nearSolid = true;
                 if(!floor.isLiquid) nearGround = true;
-                if(!floor.isDeep()) allDeep = false;
+                if(!floor.isDeep()){
+                    allDeep = false;
+                }else{
+                    nearDeep = true;
+                }
                 if(other.legSolid()) nearLegSolid = true;
 
                 //other tile is now near solid
-                if(solid && !tile.block().teamPassable){
+                if(solid && !tile.block().teamPassable && other.array() < tiles.length){
                     tiles[other.array()] |= PathTile.bitMaskNearSolid;
                 }
             }
@@ -243,8 +252,9 @@ public class Pathfinder implements Runnable{
         nearSolid,
         nearLegSolid,
         tile.floor().isDeep(),
-        tile.floor().damageTaken > 0.00001f,
+        tile.floor().damages(),
         allDeep,
+        nearDeep,
         tile.block().teamPassable
         );
     }
@@ -348,6 +358,11 @@ public class Pathfinder implements Runnable{
 
     /** Gets next tile to travel to. Main thread only. */
     public @Nullable Tile getTargetTile(Tile tile, Flowfield path, boolean diagonals){
+        return getTargetTile(tile, path, diagonals, 0);
+    }
+
+    /** Gets next tile to travel to. Main thread only. */
+    public @Nullable Tile getTargetTile(Tile tile, Flowfield path, boolean diagonals, int avoidanceId){
         if(tile == null) return null;
 
         //uninitialized flowfields are not applicable
@@ -379,6 +394,7 @@ public class Pathfinder implements Runnable{
         int value = values[apos];
 
         var points = diagonals ? Geometry.d8 : Geometry.d4;
+        int[] avoid = avoidanceId <= 0 ? null : avoidance.getAvoidance();
 
         Tile current = null;
         int tl = 0;
@@ -389,11 +405,13 @@ public class Pathfinder implements Runnable{
             if(other == null) continue;
 
             int packed = dx/res + dy/res * ww;
+            int avoidance = avoid == null ? 0 : avoid[packed] > Integer.MAX_VALUE - avoidanceId ? 1 : 0;
+            int cost = values[packed] + avoidance;
 
-            if(values[packed] < value && (current == null || values[packed] < tl) && path.passable(packed) &&
+            if(cost < value && avoidance == 0 && (current == null || cost < tl) && path.passable(packed) &&
             !(point.x != 0 && point.y != 0 && (!path.passable(((tile.x + point.x)/res + tile.y/res*ww)) || !path.passable((tile.x/res + (tile.y + point.y)/res*ww))))){ //diagonal corner trap
                 current = other;
-                tl = values[packed];
+                tl = cost;
             }
         }
 
@@ -529,7 +547,7 @@ public class Pathfinder implements Runnable{
                     if(!targets.isEmpty()){
                         boolean any = false;
                         for(Building other : targets){
-                            if((other.items != null && other.items.any()) || other.status() != BlockStatus.noInput){
+                            if(((other.items != null && other.items.any()) || other.status() != BlockStatus.noInput) && other.block.targetable){
                                 out.add(other.tile.array());
                                 any = true;
                             }
@@ -644,6 +662,11 @@ public class Pathfinder implements Runnable{
             return pathfinder.getTargetTile(from, this);
         }
 
+        /** @return the next tile to travel to for this flowfield. Main thread only. */
+        public @Nullable Tile getNextTile(Tile from, int unitAvoidanceId){
+            return pathfinder.getTargetTile(from, this, true, unitAvoidanceId);
+        }
+
         public boolean hasCompleteWeights(){
             return hasComplete && completeWeights != null;
         }
@@ -699,6 +722,8 @@ public class Pathfinder implements Runnable{
         boolean damages;
         //whether all tiles nearby are deep
         boolean allDeep;
+        //whether it is near deep water
+        boolean nearDeep;
         //block teamPassable is true
         boolean teamPassable;
     }

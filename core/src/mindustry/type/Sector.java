@@ -137,7 +137,7 @@ public class Sector{
     }
 
     public String name(){
-        if(preset != null && info.name == null) return preset.localizedName;
+        if(preset != null && info.name == null && preset.requireUnlock) return preset.localizedName;
         //single-sector "planets" use their own name for the sector name.
         if(info.name == null && planet.sectors.size == 1){
             return planet.localizedName;
@@ -152,7 +152,7 @@ public class Sector{
 
     @Nullable
     public TextureRegion icon(){
-        return info.contentIcon != null ? info.contentIcon.uiIcon : info.icon == null ? null : Fonts.getLargeIcon(info.icon);
+        return info.contentIcon != null ? info.contentIcon.uiIcon : info.icon == null ? (preset != null && preset.uiIcon.found() && preset.unlocked() ? preset.uiIcon : null) : Fonts.getLargeIcon(info.icon);
     }
 
     @Nullable

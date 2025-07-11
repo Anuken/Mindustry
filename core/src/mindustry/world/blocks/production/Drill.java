@@ -246,7 +246,7 @@ public class Drill extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return items.total() < itemCapacity && enabled;
+            return items.total() < itemCapacity && enabled && dominantItem != null;
         }
 
         @Override
@@ -286,7 +286,7 @@ public class Drill extends Block{
 
         @Override
         public void updateTile(){
-            if(timer(timerDump, dumpTime)){
+            if(timer(timerDump, dumpTime / timeScale)){
                 dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
             }
 

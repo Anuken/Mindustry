@@ -22,6 +22,7 @@ import static mindustry.Vars.*;
 public class Weather extends UnlockableContent{
     /** Global random variable used for rendering. */
     public static final Rand rand = new Rand();
+    private static final float boundMax = 10000 * 8f;
 
     /** Default duration of this weather event in ticks. */
     public float duration = 10f * Time.toMinutes;
@@ -129,8 +130,8 @@ public class Weather extends UnlockableContent{
             float scl = rand.random(0.5f, 1f);
             float scl2 = rand.random(0.5f, 1f);
             float size = rand.random(sizeMin, sizeMax);
-            float x = (rand.random(0f, world.unitWidth()) + Time.time * windx * scl2);
-            float y = (rand.random(0f, world.unitHeight()) + Time.time * windy * scl);
+            float x = (rand.random(0f, boundMax) + Time.time * windx * scl2);
+            float y = (rand.random(0f, boundMax) + Time.time * windy * scl);
             float alpha = rand.random(minAlpha, maxAlpha);
             float rotation = randomParticleRotation ? rand.random(0f, 360f) : 0f;
 
@@ -168,8 +169,8 @@ public class Weather extends UnlockableContent{
             float scl = rand.random(0.5f, 1f);
             float scl2 = rand.random(0.5f, 1f);
             float size = rand.random(sizeMin, sizeMax);
-            float x = (rand.random(0f, world.unitWidth()) + Time.time * xspeed * scl2);
-            float y = (rand.random(0f, world.unitHeight()) - Time.time * yspeed * scl);
+            float x = (rand.random(0f, boundMax) + Time.time * xspeed * scl2);
+            float y = (rand.random(0f, boundMax) - Time.time * yspeed * scl);
             float tint = rand.random(1f) * alpha;
 
             x -= Tmp.r1.x;
@@ -202,8 +203,8 @@ public class Weather extends UnlockableContent{
 
             int pos = (int)((time));
             float life = time % 1f;
-            float x = (rand.random(0f, world.unitWidth()) + pos*953);
-            float y = (rand.random(0f, world.unitHeight()) - pos*453);
+            float x = (rand.random(0f, boundMax) + pos*953);
+            float y = (rand.random(0f, boundMax) - pos*453);
 
             x -= Tmp.r1.x;
             y -= Tmp.r1.y;
