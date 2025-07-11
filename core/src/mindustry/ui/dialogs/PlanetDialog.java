@@ -85,6 +85,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         state.planet = content.getByName(ContentType.planet, Core.settings.getString("lastplanet", "serpulo"));
         if(state.planet == null) state.planet = Planets.serpulo;
 
+        clampZoom();
+
         addListener(new InputListener(){
             @Override
             public boolean keyDown(InputEvent event, KeyCode key){
@@ -140,7 +142,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
                 if(event.targetActor == PlanetDialog.this){
-                    zoom = Mathf.clamp(zoom + amountY / 10f, state.planet.minZoom, 2f);
+                    zoom = Mathf.clamp(zoom + amountY / 10f, state.planet.minZoom, state.planet.maxZoom);
                 }
                 return true;
             }
@@ -155,7 +157,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     lastZoom = zoom;
                 }
 
-                zoom = (Mathf.clamp(initialDistance / distance * lastZoom, state.planet.minZoom, 2f));
+                zoom = (Mathf.clamp(initialDistance / distance * lastZoom, state.planet.minZoom, state.planet.maxZoom));
             }
 
             @Override
@@ -396,11 +398,17 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //TODO should this even set `state.planet`? the other lookAt() doesn't, so...
         state.planet = sector.planet;
         sector.planet.lookAt(sector, state.camPos);
+
+        clampZoom();
     }
 
     public void lookAt(Sector sector, float alpha){
         float len = state.camPos.len();
         state.camPos.slerp(sector.planet.lookAt(sector, Tmp.v33).setLength(len), alpha);
+    }
+
+    void clampZoom(){
+        zoom = Mathf.clamp(zoom, state.planet.minZoom, state.planet.maxZoom);
     }
 
     boolean canSelect(Sector sector){
@@ -871,6 +879,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
             newPresets.clear();
             state.planet = planet;
+
+            clampZoom();
 
             selected = null;
             updateSelected();
