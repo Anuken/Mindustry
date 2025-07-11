@@ -64,6 +64,9 @@ public class DrawOperation{
 
                 Block block = content.block(to);
                 tile.setBlock(block, tile.team(), tile.build == null ? 0 : tile.build.rotation);
+                if(tile.build != null){
+                    tile.build.enabled = true;
+                }
 
                 tile.getLinkedTiles(t -> editor.renderer.updatePoint(t.x, t.y));
             }else if(type == OpType.rotation.ordinal()){

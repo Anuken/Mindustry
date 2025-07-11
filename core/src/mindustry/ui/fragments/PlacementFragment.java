@@ -251,12 +251,16 @@ public class PlacementFragment{
         }
 
         if(Core.input.keyTap(Binding.blockInfo)){
-            var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-            Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
-            Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
-            if(displayBlock != null && displayBlock.unlockedNow()){
-                ui.content.show(displayBlock);
-                Events.fire(new BlockInfoEvent());
+            if(hovered() instanceof Unit unit && unit.type.unlockedNow()){
+                ui.content.show(unit.type());
+            }else{
+                var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+                Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
+                Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
+                if(displayBlock != null && displayBlock.unlockedNow()){
+                    ui.content.show(displayBlock);
+                    Events.fire(new BlockInfoEvent());
+                }
             }
         }
 
@@ -577,7 +581,7 @@ public class PlacementFragment{
                                         for(var stance : stances){
 
                                             coms.button(stance.getIcon(), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitStance(player, units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance);
+                                                Call.setUnitStance(player, units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance, !activeStances.get(stance.id));
                                             }).checked(i -> activeStances.get(stance.id)).size(50f).tooltip(stance.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
@@ -600,7 +604,7 @@ public class PlacementFragment{
                                 for(var unit : control.input.selectedUnits){
                                     if(unit.controller() instanceof CommandAI cmd){
                                         activeCommands.set(cmd.command.id);
-                                        activeStances.set(cmd.stance.id);
+                                        activeStances.set(cmd.stances);
                                     }
 
                                     stancesOut.clear();
@@ -627,7 +631,7 @@ public class PlacementFragment{
                                 for(UnitStance stance : stances){
                                     //first stance must always be the stop stance
                                     if(stance.keybind != null && Core.input.keyTap(stance.keybind)){
-                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance);
+                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance, !activeStances.get(stance.id));
                                     }
                                 }
 

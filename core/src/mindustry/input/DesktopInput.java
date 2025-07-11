@@ -234,6 +234,10 @@ public class DesktopInput extends InputHandler{
         boolean detached = settings.getBool("detach-camera", false);
 
         if(!scene.hasField() && !scene.hasDialog()){
+            if(input.keyTap(Binding.debugHitboxes)){
+                drawDebugHitboxes = !drawDebugHitboxes;
+            }
+
             if(input.keyTap(Binding.detachCamera)){
                 settings.put("detach-camera", detached = !detached);
                 if(!detached){
@@ -430,10 +434,6 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(Core.input.keyRelease(Binding.select)){
-            player.shooting = false;
-        }
-
         if(state.isGame() && !scene.hasDialog() && !scene.hasField()){
             if(Core.input.keyTap(Binding.minimap)) ui.minimapfrag.toggle();
             if(Core.input.keyTap(Binding.planetMap) && state.isCampaign()) ui.planet.toggle();
@@ -559,6 +559,10 @@ public class DesktopInput extends InputHandler{
                 graphics.cursor(SystemCursor.arrow);
                 changedCursor = false;
             }
+        }
+
+        if(Core.input.keyRelease(Binding.select)){
+            player.shooting = false;
         }
     }
 
@@ -741,6 +745,7 @@ public class DesktopInput extends InputHandler{
                 mode = none;
             }else if(!selectPlans.isEmpty()){
                 flushPlans(selectPlans);
+                movedPlan = true;
             }else if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;

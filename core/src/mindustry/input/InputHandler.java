@@ -372,15 +372,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 //make sure its current stance is valid with its current command
                 stancesOut.clear();
                 unit.type.getUnitStances(unit, stancesOut);
-                if(stancesOut.size > 0 && !stancesOut.contains(ai.stance)){
-                    ai.stance = stancesOut.first();
+                for(var stance : content.unitStances()){
+                    //disable stances that the unit does not support anymore (TODO: this is slow!)
+                    if(ai.hasStance(stance) && !stancesOut.contains(stance)){
+                        ai.disableStance(stance);
+                    }
                 }
             }
         }
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
-    public static void setUnitStance(Player player, int[] unitIds, UnitStance stance){
+    public static void setUnitStance(Player player, int[] unitIds, UnitStance stance, boolean enable){
         if(player == null || unitIds == null || stance == null) return;
 
         if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
@@ -395,7 +398,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(stance == UnitStance.stop){ //not a real stance, just cancels orders
                     ai.clearCommands();
                 }else if(unit.type.allowStance(unit, stance)){
-                    ai.stance = stance;
+                    //if toggle is not allowed, the stance will always be set to true when pressed
+                    ai.setStance(stance, !stance.toggle || enable);
                 }
                 unit.lastCommanded = player.coloredName();
             }
@@ -1331,9 +1335,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         plans.each(plan -> {
             if(plan.breaking) return;
 
+            float off = plan.block.size % 2 == 0 ? -0.5f : 0f;
+
             plan.pointConfig(p -> {
-                int cx = p.x, cy = p.y;
-                int lx = cx;
+                float cx = p.x + off, cy = p.y + off;
+                float lx = cx;
 
                 if(direction >= 0){
                     cx = -cy;
@@ -1342,7 +1348,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     cx = cy;
                     cy = -lx;
                 }
-                p.set(cx, cy);
+                p.set(Mathf.floor(cx - off), Mathf.floor(cy - off));
             });
 
             //rotate actual plan, centered on its multiblock position
@@ -1376,14 +1382,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
 
             plan.pointConfig(p -> {
-                int corigin = x ? plan.originalWidth/2 : plan.originalHeight/2;
-                int nvalue = -(x ? p.x : p.y);
                 if(x){
-                    plan.originalX = -(plan.originalX - corigin) + corigin;
-                    p.x = nvalue;
+                    if(plan.block.size % 2 == 0) p.x --;
+                    p.x = -p.x;
                 }else{
-                    plan.originalY = -(plan.originalY - corigin) + corigin;
-                    p.y = nvalue;
+                    if(plan.block.size % 2 == 0) p.y --;
+                    p.y = -p.y;
                 }
             });
 

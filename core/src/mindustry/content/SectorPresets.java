@@ -111,7 +111,7 @@ public class SectorPresets{
         }};
 
         fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
-            difficulty = 4;
+            difficulty = 2;
         }};
 
         infestedCanyons = new SectorPreset("infestedCanyons", serpulo, 210){{

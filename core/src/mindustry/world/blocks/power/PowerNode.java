@@ -328,6 +328,11 @@ public class PowerNode extends PowerBlock{
                     }
                 });
 
+                //uncomment for debugging connection translation issues in schematics
+                //Draw.color(Color.red);
+                //Lines.line(plan.drawx(), plan.drawy(), px * tilesize, py * tilesize);
+                //Draw.color();
+
                 if(otherReq == null || otherReq.block == null) continue;
 
                 drawLaser(plan.drawx(), plan.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size);

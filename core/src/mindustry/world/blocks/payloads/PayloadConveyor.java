@@ -48,12 +48,12 @@ public class PayloadConveyor extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        int ntrns = 1 + size/2;
+        int ntrns = size;
 
         for(int i = 0; i < 4; i++){
-            Building other = world.build(x + Geometry.d4x[i] * ntrns, y + Geometry.d4y[i] * ntrns);
-            if(other != null && other.block.outputsPayload && other.block.size == size){
-                Drawf.selected(other.tileX(), other.tileY(), other.block, other.team.color);
+            Tile tile = world.tile(x + Geometry.d4x[i] * ntrns, y + Geometry.d4y[i] * ntrns);
+            if(tile != null && tile.build != null && tile.isCenter() && tile.build.block.outputsPayload && tile.build.block.size == size && (i == rotation || tile.block().rotate && i == (tile.build.rotation + 2) % 4)){
+                Drawf.selected(tile.x, tile.y, tile.block(), tile.build.team.color);
             }
         }
     }
