@@ -73,7 +73,7 @@ public class BuildingDialog extends BaseDialog{
             });
 
             rebuildPane = () -> {
-                int cols = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
+                int cols = 1;
 
                 t.clear();
                 int i = 0;
@@ -90,22 +90,21 @@ public class BuildingDialog extends BaseDialog{
                 firstBuilding = null;
                 for(Block block : placeableBlocks){
                     //make sure search fits
-                    if(!search.isEmpty() && !ignoreSymbols.matcher(block.name.toLowerCase()).replaceAll("").contains(searchString))
+                    if (!search.isEmpty() && !ignoreSymbols.matcher(block.localizedName.toLowerCase()).replaceAll("").contains(searchString))
                         continue;
                     if(firstBuilding == null) firstBuilding = block;
 
                     Button[] sel = {null};
                     sel[0] = t.button(b -> {
                         b.top();
-                        b.margin(0f);
-                        b.table(building -> {
-                            Label label = building.add(block.name).style(Styles.outlineLabel).color(Color.white).top().growX().maxWidth(200f - 8f).get();
-                            label.setEllipsis(true);
-                            label.setAlignment(Align.center);
-                        }).growX().height(50f);
+                        b.margin(10f);
                         b.row();
-                        b.name = block.name;
-                        b.stack(new Image(block.uiIcon).setScaling(Scaling.fit)).size(200f);
+                        b.name = block.localizedName;
+                        b.stack(new Image(block.uiIcon).setScaling(Scaling.fit)).size(70f).pad(10f);
+
+                        Label label = b.add(block.localizedName).style(Styles.outlineLabel).color(Color.white).top().growX().get();
+                        label.setAlignment(Align.left);
+                        b.stack(label);
                     }, () -> {
                         if(sel[0].childrenPressed()) return;
                         control.input.block = block;
