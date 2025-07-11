@@ -59,7 +59,7 @@ public class Blocks{
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
     arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystalOrbs, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
-    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal, cruxFloor1, cruxFloor2,
+    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal, cruxFloor1, cruxFloor2, cruxFloor3,
     pebbles, tendrils,
 
     //ores
@@ -822,6 +822,13 @@ public class Blocks{
             emitLight = true;
             lightRadius = 30f;
             lightColor = Team.crux.color.cpy().a(0.3f);
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        cruxFloor3 = new Floor("crux-floor-3"){{
+            autotile = true;
+            emitLight = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
