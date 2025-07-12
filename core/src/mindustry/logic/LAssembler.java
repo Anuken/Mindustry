@@ -68,18 +68,17 @@ public class LAssembler{
         //string case
         if(!symbol.isEmpty() && symbol.charAt(0) == '\"' && symbol.charAt(symbol.length() - 1) == '\"'){
             //Parse escape codes, loosely based on C escape codes (with some changes)
-            char[] symbolChars = symbol.substring(1, symbol.length() - 1).toCharArray();
             StringBuilder stringVal = new StringBuilder();
-            for(int i = 0; i < symbolChars.length; i++){
-                if(symbolChars[i] != '\\'){
-                    stringVal.append(symbolChars[i]);
+            for(int i = 1; i < symbol.length() - 1; i++){
+                if(symbol.charAt(i) != '\\'){
+                    stringVal.append(symbol.charAt(i));
                 }else{
-                    stringVal.append(switch(symbolChars[++i]){
+                    stringVal.append(switch(symbol.charAt(++i)){
                         case '\\' -> '\\';
                         case 'n' -> '\n';
                         case '"' -> '"';
                         case 'x' -> {
-                            char chr = symbolChars[++i];
+                            char chr = symbol.charAt(++i);
                             if((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'F') || (chr >= 'a' && chr <= 'f')){
                                 int code = 0;
                                 int bits = 0;
@@ -90,7 +89,7 @@ public class LAssembler{
                                         default -> chr - '0';
                                     };
                                     bits += 4;
-                                    chr = symbolChars[++i];
+                                    chr = symbol.charAt(++i);
                                 }
                                 stringVal.append((char)code);
                                 yield chr;
@@ -99,7 +98,7 @@ public class LAssembler{
                             yield chr;
                         }
                         default -> {
-                            char chr = symbolChars[i];
+                            char chr = symbol.charAt(i);
                             //Octal case, unlike C can use more than 3 digits.
                             if(chr >= '0' && chr < '8'){
                                 int code = 0;
@@ -107,7 +106,7 @@ public class LAssembler{
                                 while(chr >= '0' && chr < '8' && bits < 16){
                                     code = code << 3 | chr - '0';
                                     bits += 3;
-                                    chr = symbolChars[++i];
+                                    chr = symbol.charAt(++i);
                                 }
                                 stringVal.append((char)code);
                                 yield chr;
