@@ -366,7 +366,7 @@ public class LogicBlock extends Block{
                     Object oldUnit = null;
 
                     if(keep){
-                        oldUnit = executor.unit.objval;
+                        if(executor.unit != null) oldUnit = executor.unit.objval;
                         //store any older variables
                         for(LVar var : executor.vars){
                             if(!var.constant){
@@ -396,7 +396,8 @@ public class LogicBlock extends Block{
                     executor.unit.isobj = true;
                 }catch(Exception e){
                     //handle malformed code and replace it with nothing
-                    executor.load(LAssembler.assemble(code = "", privileged));
+                    throw e;
+                    //executor.load(LAssembler.assemble(code = "", privileged));
                 }
             }
         }

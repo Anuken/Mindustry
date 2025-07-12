@@ -67,7 +67,57 @@ public class LAssembler{
 
         //string case
         if(!symbol.isEmpty() && symbol.charAt(0) == '\"' && symbol.charAt(symbol.length() - 1) == '\"'){
-            return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n"));
+            //Parse escape codes, loosely based on C escape codes (with some changes)
+            StringBuilder stringVal = new StringBuilder();
+            for(int i = 1; i < symbol.length() - 1; i++){
+                if(symbol.charAt(i) != '\\'){
+                    stringVal.append(symbol.charAt(i));
+                }else{
+                    stringVal.append(switch(symbol.charAt(++i)){
+                        case '\\' -> '\\';
+                        case 'n' -> '\n';
+                        case '"' -> '"';
+                        case 'x' -> {
+                            char chr = symbol.charAt(++i);
+                            if((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'F') || (chr >= 'a' && chr <= 'f')){
+                                int code = 0;
+                                int bits = 0;
+                                while(((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'F') || (chr >= 'a' && chr <= 'f')) && bits < 16){
+                                    code = code << 4 | switch(chr){
+                                        case 'A', 'B', 'C', 'D', 'E', 'F' -> chr - 'A' + 10;
+                                        case 'a', 'b', 'c', 'd', 'e', 'f' -> chr - 'a' + 10;
+                                        default -> chr - '0';
+                                    };
+                                    bits += 4;
+                                    chr = symbol.charAt(++i);
+                                }
+                                stringVal.append((char)code);
+                                yield chr;
+                            }
+                            stringVal.append("\\x");
+                            yield chr;
+                        }
+                        default -> {
+                            char chr = symbol.charAt(i);
+                            //Octal case, unlike C can use more than 3 digits.
+                            if(chr >= '0' && chr < '8'){
+                                int code = 0;
+                                int bits = 0;
+                                while(chr >= '0' && chr < '8' && bits < 16){
+                                    code = code << 3 | chr - '0';
+                                    bits += 3;
+                                    chr = symbol.charAt(++i);
+                                }
+                                stringVal.append((char)code);
+                                yield chr;
+                            }
+                            stringVal.append('\\');
+                            yield chr;
+                        }
+                    });
+                }
+            }
+            return putConst("___" + symbol, stringVal.toString());
         }
 
         //remove spaces for non-strings
