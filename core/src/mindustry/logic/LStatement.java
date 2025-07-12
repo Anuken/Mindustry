@@ -91,22 +91,24 @@ public abstract class LStatement{
         }else{
             StringBuilder res = new StringBuilder(value.length());
             if(value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"'){
-                res.append('\"');
-                //strip out extra quotes
-                for(int i = 1; i < value.length() - 1; i++){
-                    if(value.charAt(i) == '"'){
-                        res.append('\'');
-                    }else{
-                        res.append(value.charAt(i));
-                    }
+                //Make sure closing '"' is not escaped (unescape it if it is)
+                boolean escaped = false;
+                for(int i = value.length() - 2; i > 0; i--){
+                    if(value.charAt(i) != '\\') break;
+                    escaped = !escaped;
                 }
-                res.append('\"');
+                if(escaped){
+                    res.append(value, 0, value.length() - 1);
+                    res.append("\\\"");
+                }else{
+                    res.append(value);
+                }
             }else{
                 //otherwise, strip out semicolons, spaces and quotes
                 for(int i = 0; i < value.length(); i++){
                     char c = value.charAt(i);
                     res.append(switch(c){
-                        case ';' -> 's';
+                        case ';' -> ';';
                         case '"' -> '\'';
                         case ' ' -> '_';
                         default -> c;

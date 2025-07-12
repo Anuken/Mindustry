@@ -77,6 +77,7 @@ public class LAssembler{
                     stringVal.append(switch(symbolChars[++i]){
                         case '\\' -> '\\';
                         case 'n' -> '\n';
+                        case '"' -> '"';
                         case 'x' -> {
                             char chr = symbolChars[++i];
                             if((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'F') || (chr >= 'a' && chr <= 'f')){

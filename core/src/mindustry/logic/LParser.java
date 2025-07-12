@@ -26,6 +26,13 @@ public class LParser{
         this.chars = text.toCharArray();
     }
 
+    boolean escaped(){
+        boolean escaped = false;
+        int at = pos;
+        while(at > 0 && chars[--at] == '\\') escaped = !escaped;
+        return escaped;
+    }
+
     void comment(){
         //read until \n or eof
         while(pos < chars.length && chars[pos++] != '\n');
@@ -42,7 +49,7 @@ public class LParser{
             var c = chars[pos];
             if(c == '\n'){
                 error("Missing closing quote \" before end of line.");
-            }else if(c == '"'){
+            }else if(c == '"' && !escaped()){
                 break;
             }
         }
@@ -82,7 +89,7 @@ public class LParser{
             if(tok >= tokens.length) error("Line too long; may only contain " + tokens.length + " tokens");
 
             //reached end of line, bail out.
-            if(c == '\n' || c == ';') break;
+            if(c == '\n' || (c == ';' && !escaped())) break;
 
             if(expectNext && c != ' ' && c != '#' && c != '\t'){
                 error("Expected space after string/token.");
