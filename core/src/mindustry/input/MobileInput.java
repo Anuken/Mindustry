@@ -98,7 +98,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Building tile = world.buildWorld(x, y);
 
-            if((tile != null && player.team() != tile.team && (tile.team != Team.derelict || state.rules.coreCapture)) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
+            if((tile != null && (player.team() != tile.team && (tile.team != Team.derelict || state.rules.coreCapture)) && player.unit().type.canAttack) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
                 player.unit().mineTile = null;
                 target = tile;
             }
@@ -1078,7 +1078,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //this may be a bad idea, aiming for a point far in front could work better, test it out
                 unit.aim(Core.input.mouseWorldX(), Core.input.mouseWorldY());
             }else{
-                Vec2 intercept = Predict.intercept(unit, target, bulletSpeed);
+                Vec2 intercept = player.unit().type.weapons.contains(w -> w.predictTarget) ? Predict.intercept(unit, target, bulletSpeed) : Tmp.v1.set(target);
 
                 player.mouseX = intercept.x;
                 player.mouseY = intercept.y;

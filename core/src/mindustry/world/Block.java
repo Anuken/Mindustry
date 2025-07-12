@@ -923,11 +923,16 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean isVisible(){
-        return !isHidden() && (state.rules.editor || (!state.rules.hideBannedBlocks || !state.rules.isBanned(this)));
+        return !isHidden() && (state.rules.editor || (!state.rules.hideBannedBlocks || !isBanned()));
     }
 
     public boolean isPlaceable(){
-        return isVisible() && (!state.rules.isBanned(this) || state.rules.editor) && supportsEnv(state.rules.env);
+        return isVisible() && (!isBanned() || state.rules.editor) && supportsEnv(state.rules.env);
+    }
+
+    @Override
+    public boolean isBanned(){
+        return state.rules.isBanned(this);
     }
 
     /** @return whether this block supports a specific environment. */

@@ -798,7 +798,7 @@ public class Mods implements Loadable{
 
     public void reload(){
         newImports.each(this::updateDependencies);
-        newImports.remove(m -> m.missingDependencies.isEmpty() && m.softDependencies.isEmpty());
+        newImports.removeAll(m -> m.missingDependencies.isEmpty() && m.softDependencies.isEmpty());
 
         if(newImports.any()){
             checkDependencies(newImports, newImports.contains(m -> m.softDependencies.any()));

@@ -472,7 +472,7 @@ public class Logic implements ApplicationListener{
                         if(rules.fillItems && data.cores.size > 0){
                             var core = data.cores.first();
                             content.items().each(i -> {
-                                if(i.isOnPlanet(Vars.state.getPlanet())){
+                                if(i.isOnPlanet(Vars.state.getPlanet()) && !i.isHidden()){
                                     core.items.set(i, core.getMaximumAccepted(i));
                                 }
                             });

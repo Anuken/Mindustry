@@ -581,7 +581,7 @@ public class PlacementFragment{
                                         for(var stance : stances){
 
                                             coms.button(stance.getIcon(), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitStance(player, units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance);
+                                                Call.setUnitStance(player, units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance, !activeStances.get(stance.id));
                                             }).checked(i -> activeStances.get(stance.id)).size(50f).tooltip(stance.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
@@ -604,7 +604,7 @@ public class PlacementFragment{
                                 for(var unit : control.input.selectedUnits){
                                     if(unit.controller() instanceof CommandAI cmd){
                                         activeCommands.set(cmd.command.id);
-                                        activeStances.set(cmd.stance.id);
+                                        activeStances.set(cmd.stances);
                                     }
 
                                     stancesOut.clear();
@@ -631,7 +631,7 @@ public class PlacementFragment{
                                 for(UnitStance stance : stances){
                                     //first stance must always be the stop stance
                                     if(stance.keybind != null && Core.input.keyTap(stance.keybind)){
-                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance);
+                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance, !activeStances.get(stance.id));
                                     }
                                 }
 
