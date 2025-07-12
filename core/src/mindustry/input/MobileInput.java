@@ -305,7 +305,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     rebuildMode = false;
                     mode = none;
                 }
-            }).width(155f).height(48f).margin(12f).checked(b -> commandMode).row();
+            }).width(155f).height(48f).margin(12f).checked(b -> commandMode).visible(() -> !control.input.logicHideHud).row();
 
             t.spacerY(() -> showCancel() ? 50f : 0f).row();
 
