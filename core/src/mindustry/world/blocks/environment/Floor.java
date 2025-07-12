@@ -268,6 +268,9 @@ public class Floor extends Block{
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
+    /** Called when this floor is set on the specified tile. */
+    public void floorChanged(Tile tile){}
+
     /** @return whether to index this floor by flag */
     public boolean shouldIndex(Tile tile){
         return true;

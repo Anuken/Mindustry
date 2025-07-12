@@ -311,6 +311,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         if(!world.isGenerating() && prev != type){
             Events.fire(floorChange.set(this, prev, type));
         }
+
+        if(this.floor != prev){
+            this.floor.floorChanged(this);
+        }
     }
 
     public boolean isEditorTile(){
@@ -562,6 +566,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             block.itemDrop != null ? block.itemDrop :
             overlay.wallOre && !block.synthetic() ? overlay.itemDrop :
             null : null;
+    }
+
+    public boolean shouldSaveData(){
+        return floor.saveData || overlay.saveData || block.saveData;
     }
 
     public int staticDarkness(){

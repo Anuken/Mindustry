@@ -209,7 +209,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
         //floor + overlay
         for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.rawTile(i % world.width(), i / world.width());
+            Tile tile = world.tiles.geti(i);
             stream.writeShort(tile.floorID());
             stream.writeShort(tile.overlayID());
             int consecutives = 0;
@@ -230,10 +230,10 @@ public abstract class SaveVersion extends SaveFileReader{
 
         //blocks
         for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.rawTile(i % world.width(), i / world.width());
+            Tile tile = world.tiles.geti(i);
             stream.writeShort(tile.blockID());
 
-            boolean savedata = tile.floor().saveData || tile.overlay().saveData || tile.block().saveData;
+            boolean savedata = tile.shouldSaveData();
 
             //in the old version, the second bit was set to indicate presence of data, but that approach was flawed - it didn't allow buildings + data on the same tile
             //so now the third bit is used instead
@@ -268,7 +268,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                     Tile nextTile = world.rawTile(j % world.width(), j / world.width());
 
-                    if(nextTile.blockID() != tile.blockID()){
+                    if(nextTile.blockID() != tile.blockID() || savedata != nextTile.shouldSaveData()){
                         break;
                     }
 

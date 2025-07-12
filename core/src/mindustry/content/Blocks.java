@@ -11,7 +11,6 @@ import mindustry.entities.effect.*;
 import mindustry.entities.part.DrawPart.*;
 import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -59,7 +58,7 @@ public class Blocks{
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
     arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystalOrbs, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
-    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal, cruxFloor1, cruxFloor2, cruxFloor3, cruxFloor4,
+    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal, cruxFloor1, cruxFloor2, cruxFloor3, cruxFloor4, coloredFloor,
     pebbles, tendrils,
 
     //ores
@@ -819,23 +818,27 @@ public class Blocks{
 
         cruxFloor2 = new Floor("crux-floor-2"){{
             autotile = true;
-            emitLight = true;
-            lightRadius = 30f;
-            lightColor = Team.crux.color.cpy().a(0.3f);
+            //emitLight = true;
+            //lightRadius = 30f;
+            //lightColor = Team.crux.color.cpy().a(0.3f);
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
 
         cruxFloor3 = new Floor("crux-floor-3"){{
             autotile = true;
-            emitLight = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
 
         cruxFloor4 = new Floor("crux-floor-4"){{
             autotile = true;
-            emitLight = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        coloredFloor = new ColoredFloor("colored-floor"){{
+            autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
