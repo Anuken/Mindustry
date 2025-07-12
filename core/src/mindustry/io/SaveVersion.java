@@ -235,10 +235,20 @@ public abstract class SaveVersion extends SaveFileReader{
 
             boolean savedata = tile.floor().saveData || tile.overlay().saveData || tile.block().saveData;
 
-            byte packed = (byte)((tile.build != null ? 1 : 0) | (savedata ? 2 : 0));
+            //in the old version, the second bit was set to indicate presence of data, but that approach was flawed - it didn't allow buildings + data on the same tile
+            //so now the third bit is used instead
+            byte packed = (byte)((tile.build != null ? 1 : 0) | (savedata ? 4 : 0));
 
-            //make note of whether there was an entity/rotation here
+            //make note of whether there was an entity or custom tile data here
             stream.writeByte(packed);
+
+            if(savedata){
+                //the new 'extra data' format writes 7 bytes of data instead of 1
+                stream.writeByte(tile.data);
+                stream.writeByte(tile.floorData);
+                stream.writeByte(tile.overlayData);
+                stream.writeInt(tile.extraData);
+            }
 
             //only write the entity for multiblocks once - in the center
             if(tile.build != null){
@@ -251,9 +261,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 }else{
                     stream.writeBoolean(false);
                 }
-            }else if(savedata){
-                stream.writeByte(tile.data);
-            }else{
+            }else if(!savedata){ //don't write consecutive blocks when there is custom data
                 //write consecutive non-entity blocks
                 int consecutives = 0;
 
@@ -310,7 +318,16 @@ public abstract class SaveVersion extends SaveFileReader{
                 boolean isCenter = true;
                 byte packedCheck = stream.readByte();
                 boolean hadEntity = (packedCheck & 1) != 0;
-                boolean hadData = (packedCheck & 2) != 0;
+                //old data format (bit 2): 1 byte only if no building is present
+                //new data format (bit 3): 7 bytes (3x block-specific bytes + 1x 4-byte extra data int)
+                boolean hadDataOld = (packedCheck & 2) != 0, hadDataNew = (packedCheck & 4) != 0;
+
+                if(hadDataNew){
+                    tile.data = stream.readByte();
+                    tile.floorData = stream.readByte();
+                    tile.overlayData = stream.readByte();
+                    tile.extraData = stream.readInt();
+                }
 
                 if(hadEntity){
                     isCenter = stream.readBoolean();
@@ -339,9 +356,12 @@ public abstract class SaveVersion extends SaveFileReader{
 
                         context.onReadBuilding();
                     }
-                }else if(hadData){
+                }else if(hadDataOld || hadDataNew){ //never read consecutive blocks if there's any kind of data
                     tile.setBlock(block);
-                    tile.data = stream.readByte();
+                    if(hadDataOld){
+                        //the old data format was only read in the case where there is no building, and only contained a single byte
+                        tile.data = stream.readByte();
+                    }
                 }else{
                     int consecutives = stream.readUnsignedByte();
 

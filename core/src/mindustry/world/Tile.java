@@ -26,8 +26,14 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     private static final TileFloorChangeEvent floorChange = new TileFloorChangeEvent();
     private static final ObjectSet<Building> tileSet = new ObjectSet<>();
 
-    /** Extra data for very specific blocks. */
-    public byte data;
+    /**
+     * Extra data for specific blocks. Only saved if Block#saveData is true.
+     * It is generally recommended that blocks only access data in their own category unless necessary - for example, a floor should not read/write overlay data.
+     * However, one byte may sometimes not be enough to hold enough data, in which case "overlapping" data storage is necessary.
+     * */
+    public byte data, floorData, overlayData;
+    /** Even more data for blocks. Use with caution; any floor/block can access this value. Due to 8-byte alignment of Java objects, this extra 4-byte field can be added with no additional cost.*/
+    public int extraData;
     /** Tile entity, usually null. */
     public @Nullable Building build;
     public short x, y;
