@@ -239,6 +239,17 @@ public class Pathfinder implements Runnable{
             }
         }
 
+        //check diagonals for allDeep
+        if(allDeep){
+            for(int i = 0; i < 4; i++){
+                Tile other = tile.nearby(Geometry.d8edge[i]);
+                if(other != null && !other.floor().isDeep()){
+                    allDeep = false;
+                    break;
+                }
+            }
+        }
+
         int tid = tile.getTeamID();
 
         return PathTile.get(
