@@ -514,7 +514,14 @@ public class FloorRenderer{
 
         @Override
         protected void draw(Texture texture, float[] spriteVertices, int offset, int count){
-            throw new IllegalArgumentException("cache vertices unsupported");
+            if(spriteVertices.length != spriteSize){
+                throw new IllegalArgumentException("cached vertices must be in non-mixcolor format (20 per sprite, 5 per vertex)");
+            }
+
+            float[] verts = vertices;
+            int idx = vidx;
+            System.arraycopy(spriteVertices, offset, verts, idx, spriteSize);
+            vidx += spriteSize;
         }
     }
 }

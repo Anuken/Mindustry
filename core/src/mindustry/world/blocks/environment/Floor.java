@@ -229,7 +229,7 @@ public class Floor extends Block{
 
             for(int i = 0; i < 8; i++){
                 Tile other = tile.nearby(Geometry.d8[i]);
-                if(other != null && other.floor().blendGroup == blendGroup){
+                if(checkAutotileSame(tile, other)){
                     bits |= (1 << i);
                 }
             }
@@ -244,6 +244,10 @@ public class Floor extends Block{
             drawEdges(tile);
         }
         drawOverlay(tile);
+    }
+
+    public boolean checkAutotileSame(Tile tile, @Nullable Tile other){
+        return other != null && other.floor().blendGroup == blendGroup;
     }
 
     public int variant(int x, int y){
