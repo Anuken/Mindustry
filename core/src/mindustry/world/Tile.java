@@ -308,7 +308,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             pathfinder.updateTile(this);
         }
 
-        if(!world.isGenerating() && prev != type){
+        if(!world.isGenerating()){
             Events.fire(floorChange.set(this, prev, type));
         }
 
@@ -404,6 +404,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public void setOverlay(Block block){
+        if(this.overlay == block) return;
+
         this.overlay = (Floor)block;
 
         recache();

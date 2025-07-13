@@ -748,7 +748,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
         //ctrl keys (undo, redo, save)
         if(Core.input.ctrl()){
             if(Core.input.keyTap(KeyCode.z)){
-                editor.undo();
+                if(Core.input.shift()){
+                    editor.redo();
+                }else{
+                    editor.undo();
+                }
             }
 
             if(Core.input.keyTap(KeyCode.y)){

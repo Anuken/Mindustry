@@ -93,7 +93,7 @@ public class EditorTile extends Tile{
         }
 
         if(!floor.hasSurface() && overlay.asFloor().needsSurface && (overlay instanceof OreBlock || !floor.supportsOverlay)) return;
-        if(overlay() == overlay) return;
+        if(this.overlay == overlay) return;
         op(DrawOperation.opOverlay, this.overlay.id);
         super.setOverlay(overlay);
     }
