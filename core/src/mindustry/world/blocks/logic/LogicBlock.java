@@ -396,8 +396,7 @@ public class LogicBlock extends Block{
                     executor.unit.isobj = true;
                 }catch(Exception e){
                     //handle malformed code and replace it with nothing
-                    throw e;
-                    //executor.load(LAssembler.assemble(code = "", privileged));
+                    executor.load(LAssembler.assemble(code = "", privileged));
                 }
             }
         }
