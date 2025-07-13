@@ -275,6 +275,9 @@ public class Floor extends Block{
     /** Called when this floor is set on the specified tile. */
     public void floorChanged(Tile tile){}
 
+    /** Called when this floor or overlay is placed on a tile. The config may be null. */
+    public void placed(Tile tile, @Nullable Object config){}
+
     /** @return whether to index this floor by flag */
     public boolean shouldIndex(Tile tile){
         return true;

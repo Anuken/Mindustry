@@ -10,6 +10,13 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class DrawOperation{
+    static final int
+    opFloor = 0,
+    opBlock = 1,
+    opRotation = 2,
+    opTeam = 3,
+    opOverlay = 4;
+
     private LongSeq array = new LongSeq();
 
     public boolean isEmpty(){
@@ -39,42 +46,44 @@ public class DrawOperation{
     }
 
     short getTile(Tile tile, byte type){
-        if(type == OpType.floor.ordinal()){
-            return tile.floorID();
-        }else if(type == OpType.block.ordinal()){
-            return tile.blockID();
-        }else if(type == OpType.rotation.ordinal()){
-            return tile.build == null ? 0 : (byte)tile.build.rotation;
-        }else if(type == OpType.team.ordinal()){
-            return (byte)tile.getTeamID();
-        }else if(type == OpType.overlay.ordinal()){
-            return tile.overlayID();
-        }
-        throw new IllegalArgumentException("Invalid type.");
+        return switch(type){
+            case opFloor -> tile.floorID();
+            case opOverlay -> tile.overlayID();
+            case opBlock -> tile.blockID();
+            case opRotation -> tile.build == null ? 0 : (byte)tile.build.rotation;
+            case opTeam -> (byte)tile.getTeamID();
+            default -> throw new IllegalArgumentException("Invalid type.");
+        };
     }
 
     void setTile(Tile tile, byte type, short to){
         editor.load(() -> {
-            if(type == OpType.floor.ordinal()){
-                if(content.block(to) instanceof Floor floor){
-                    tile.setFloor(floor);
+            switch(type){
+                case opFloor -> {
+                    if(content.block(to) instanceof Floor floor){
+                        tile.setFloor(floor);
+                    }
                 }
-            }else if(type == OpType.block.ordinal()){
-                tile.getLinkedTiles(t -> editor.renderer.updatePoint(t.x, t.y));
-
-                Block block = content.block(to);
-                tile.setBlock(block, tile.team(), tile.build == null ? 0 : tile.build.rotation);
-                if(tile.build != null){
-                    tile.build.enabled = true;
+                case opOverlay -> {
+                    if(content.block(to) instanceof Floor floor){
+                        tile.setOverlay(floor);
+                    }
                 }
+                case opBlock -> {
+                    tile.getLinkedTiles(t -> editor.renderer.updatePoint(t.x, t.y));
 
-                tile.getLinkedTiles(t -> editor.renderer.updatePoint(t.x, t.y));
-            }else if(type == OpType.rotation.ordinal()){
-                if(tile.build != null) tile.build.rotation = to;
-            }else if(type == OpType.team.ordinal()){
-                tile.setTeam(Team.get(to));
-            }else if(type == OpType.overlay.ordinal()){
-                tile.setOverlayID(to);
+                    Block block = content.block(to);
+                    tile.setBlock(block, tile.team(), tile.build == null ? 0 : tile.build.rotation);
+                    if(tile.build != null){
+                        tile.build.enabled = true;
+                    }
+
+                    tile.getLinkedTiles(t -> editor.renderer.updatePoint(t.x, t.y));
+                }
+                case opRotation -> {
+                    if(tile.build != null) tile.build.rotation = to;
+                }
+                case opTeam -> tile.setTeam(Team.get(to));
             }
         });
         editor.renderer.updatePoint(tile.x, tile.y);
@@ -86,13 +95,5 @@ public class DrawOperation{
         short y;
         byte type;
         short value;
-    }
-
-    public enum OpType{
-        floor,
-        block,
-        rotation,
-        team,
-        overlay
     }
 }

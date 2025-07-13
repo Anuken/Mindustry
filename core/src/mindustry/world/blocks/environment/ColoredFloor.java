@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.entities.units.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
@@ -131,6 +132,22 @@ public class ColoredFloor extends Floor{
     public void floorChanged(Tile tile){
         //reset to white
         tile.extraData = defaultColorRgba;
+    }
+
+    @Override
+    public void placed(Tile tile, @Nullable Object config){
+        //config is assumed to be an integer RGBA color
+        if(config instanceof Integer i){
+            tile.extraData = i;
+        }
+    }
+
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        if(plan.config instanceof Integer i){
+            Draw.tint(Tmp.c1.set(i | 0xff));
+        }
+        drawDefaultPlanRegion(plan, list);
     }
 
     @Override

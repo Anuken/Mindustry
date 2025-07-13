@@ -290,11 +290,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         setBlock(type, Team.derelict, 0);
     }
 
-    /** This resets the overlay! */
     public void setFloor(Floor type){
+        if(this.floor == type) return;
+
         var prev = this.floor;
         this.floor = type;
-        this.overlay = (Floor)Blocks.air;
 
         if(!headless && !world.isGenerating() && !isEditorTile()){
             renderer.blocks.removeFloorIndex(this);
@@ -319,15 +319,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public boolean isEditorTile(){
         return false;
-    }
-
-    /** Sets the floor, preserving overlay.*/
-    public void setFloorUnder(Floor floor){
-        Block overlay = this.overlay;
-        setFloor(floor);
-        if(this.overlay != overlay){
-            setOverlay(overlay);
-        }
     }
 
     /** Sets the block to air. */
@@ -412,10 +403,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return floor.id;
     }
 
-    public void setOverlayID(short ore){
-        setOverlay(content.block(ore));
-    }
-
     public void setOverlay(Block block){
         this.overlay = (Floor)block;
 
@@ -431,7 +418,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public void clearOverlay(){
-        setOverlayID((short)0);
+        setOverlay(Blocks.air);
     }
 
     public boolean passable(){

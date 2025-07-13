@@ -200,7 +200,7 @@ public class MapIO{
         for(Tile tile : tiles){
             //default to stone floor
             if(tile.floor() == Blocks.air){
-                tile.setFloorUnder((Floor)Blocks.stone);
+                tile.setFloor((Floor)Blocks.stone);
             }
         }
     }
