@@ -58,7 +58,7 @@ public class Blocks{
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
     arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystalOrbs, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
-    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal, cruxFloor1, cruxFloor2, cruxFloor3, cruxFloor4, coloredFloor,
+    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal, cruxFloor1, cruxFloor2, cruxFloor3, cruxFloor4, cruxFloor5, cruxFloor6, coloredFloor,
     pebbles, tendrils,
 
     //ores
@@ -837,10 +837,24 @@ public class Blocks{
             drawEdgeIn = false;
         }};
 
+        cruxFloor5 = new Floor("crux-floor-5"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        cruxFloor6 = new Floor("crux-floor-6"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
         coloredFloor = new ColoredFloor("colored-floor"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
+            //there is no proper support for displaying colors or placing with colors
+            inEditor = false;
         }};
 
         Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)

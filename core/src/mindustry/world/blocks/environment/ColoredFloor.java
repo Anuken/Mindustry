@@ -34,7 +34,7 @@ public class ColoredFloor extends Floor{
     public void drawBase(Tile tile){
         //make sure to mask out the alpha channel - it's generally undesirable, and leads to invisible blocks when the data is not initialized
         Draw.color(tile.extraData | 0xff);
-        if((tile.extraData & 0xff) == flagSmoothBlend){
+        if((tile.extraData & 0xff) == flagSmoothBlend && autotile){
             //Only autotiling is supported right now for the sake of simplicity
             int bits = 0;
 
