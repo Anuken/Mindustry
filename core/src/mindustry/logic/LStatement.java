@@ -104,15 +104,14 @@ public abstract class LStatement{
                     res.append(value);
                 }
             }else{
-                //otherwise, strip out semicolons, spaces and quotes
+                //otherwise, escape semicolons, spaces and hashtags
                 for(int i = 0; i < value.length(); i++){
                     char c = value.charAt(i);
-                    res.append(switch(c){
-                        case ';' -> ';';
-                        case '"' -> '"';
-                        case ' ' -> '_';
-                        default -> c;
-                    });
+                    switch(c){
+                        case ';', ' ', '#' -> res.append('\\');
+                        default -> {}
+                    }
+                    res.append(c);
                 }
             }
 

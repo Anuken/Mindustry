@@ -64,70 +64,72 @@ public class LAssembler{
         if(constVar != null) return constVar;
 
         symbol = symbol.trim();
+        boolean string = false;
+        if(!symbol.isEmpty() && symbol.charAt(0) == '"' && symbol.charAt(symbol.length() - 1) == '"'){
+            for(int i = symbol.length() - 2; i > 0; i--){
+                if(symbol.charAt(i) != '\\') break;
+                string = !string;
+            }
+        }
+        //Parse escape codes, loosely based on C escape codes (with some changes)
+        StringBuilder unescapedSymbol = new StringBuilder();
+        for(int i = 0; i < symbol.length() - 1; i++){
+            if(symbol.charAt(i) != '\\'){
+                unescapedSymbol.append(symbol.charAt(i));
+            }else{
+                unescapedSymbol.append(switch(symbol.charAt(++i)){
+                    case '\\', '"', ' ', '#', ';', '\t' -> symbol.charAt(i);
+                    case 'n' -> '\n';
+                    case 'x' -> {
+                        char chr = symbol.charAt(++i);
+                        if((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'F') || (chr >= 'a' && chr <= 'f')){
+                            int code = 0;
+                            int bits = 0;
+                            while(((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'F') || (chr >= 'a' && chr <= 'f')) && bits < 16){
+                                code = code << 4 | switch(chr){
+                                    case 'A', 'B', 'C', 'D', 'E', 'F' -> chr - 'A' + 10;
+                                    case 'a', 'b', 'c', 'd', 'e', 'f' -> chr - 'a' + 10;
+                                    default -> chr - '0';
+                                };
+                                bits += 4;
+                                chr = symbol.charAt(++i);
+                            }
+                            unescapedSymbol.append((char)code);
+                            yield chr;
+                        }
+                        unescapedSymbol.append("\\x");
+                        yield chr;
+                    }
+                    default -> {
+                        char chr = symbol.charAt(i);
+                        //Octal case, unlike C can use more than 3 digits.
+                        if(chr >= '0' && chr < '8'){
+                            int code = 0;
+                            int bits = 0;
+                            while(chr >= '0' && chr < '8' && bits < 16){
+                                code = code << 3 | chr - '0';
+                                bits += 3;
+                                chr = symbol.charAt(++i);
+                            }
+                            unescapedSymbol.append((char)code);
+                            yield chr;
+                        }
+                        unescapedSymbol.append('\\');
+                        yield chr;
+                    }
+                });
+            }
+        }
+        String unescaped = unescapedSymbol.toString();
 
         //string case
-        if(!symbol.isEmpty() && symbol.charAt(0) == '\"' && symbol.charAt(symbol.length() - 1) == '\"'){
-            //Parse escape codes, loosely based on C escape codes (with some changes)
-            StringBuilder stringVal = new StringBuilder();
-            for(int i = 1; i < symbol.length() - 1; i++){
-                if(symbol.charAt(i) != '\\'){
-                    stringVal.append(symbol.charAt(i));
-                }else{
-                    stringVal.append(switch(symbol.charAt(++i)){
-                        case '\\' -> '\\';
-                        case 'n' -> '\n';
-                        case '"' -> '"';
-                        case 'x' -> {
-                            char chr = symbol.charAt(++i);
-                            if((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'F') || (chr >= 'a' && chr <= 'f')){
-                                int code = 0;
-                                int bits = 0;
-                                while(((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'F') || (chr >= 'a' && chr <= 'f')) && bits < 16){
-                                    code = code << 4 | switch(chr){
-                                        case 'A', 'B', 'C', 'D', 'E', 'F' -> chr - 'A' + 10;
-                                        case 'a', 'b', 'c', 'd', 'e', 'f' -> chr - 'a' + 10;
-                                        default -> chr - '0';
-                                    };
-                                    bits += 4;
-                                    chr = symbol.charAt(++i);
-                                }
-                                stringVal.append((char)code);
-                                yield chr;
-                            }
-                            stringVal.append("\\x");
-                            yield chr;
-                        }
-                        default -> {
-                            char chr = symbol.charAt(i);
-                            //Octal case, unlike C can use more than 3 digits.
-                            if(chr >= '0' && chr < '8'){
-                                int code = 0;
-                                int bits = 0;
-                                while(chr >= '0' && chr < '8' && bits < 16){
-                                    code = code << 3 | chr - '0';
-                                    bits += 3;
-                                    chr = symbol.charAt(++i);
-                                }
-                                stringVal.append((char)code);
-                                yield chr;
-                            }
-                            stringVal.append('\\');
-                            yield chr;
-                        }
-                    });
-                }
-            }
-            return putConst("___" + symbol, stringVal.toString());
-        }
-
-        //remove spaces for non-strings
-        symbol = symbol.replace(' ', '_');
+        if(string) return putConst("___" + symbol, unescaped);
 
         //use a positive invalid number if number might be negative, else use a negative invalid number
-        double value = parseDouble(symbol);
+        double value = parseDouble(unescaped);
 
         if(Double.isNaN(value)){
-            return putVar(symbol);
+            return putVar(unescaped);
         }else{
             //this creates a hidden const variable with the specified value
             return putConst("___" + value, value);

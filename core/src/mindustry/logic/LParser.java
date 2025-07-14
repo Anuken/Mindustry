@@ -19,7 +19,7 @@ public class LParser{
     Seq<LStatement> statements = new Seq<>();
     char[] chars;
     int pos, line, tok;
-    boolean privileged, escaped = false;
+    boolean privileged, escaped;
 
     LParser(String text, boolean privileged){
         this.privileged = privileged;
@@ -41,7 +41,10 @@ public class LParser{
         loop: while(++pos < chars.length){
             char c = chars[pos];
             switch(c){
-                case '\n' -> error("Missing closing quote \" before end of line.");
+                case '\n' -> {
+                    pos = from;
+                    return token();
+                }
                 case '"' -> {
                     if(!escaped) break loop;
                 }
@@ -50,7 +53,10 @@ public class LParser{
             escaped = c == '\\' ? !escaped : false;
         }
 
-        if(pos >= chars.length || chars[pos] != '"') error("Missing closing quote \" before end of file.");
+        if(pos >= chars.length || chars[pos] != '"'){
+            pos = from;
+            return token();
+        };
 
         return new String(chars, from, ++pos - from);
     }
@@ -60,7 +66,7 @@ public class LParser{
 
         while(pos < chars.length){
             char c = chars[pos];
-            if(c == '\n' || c == ' ' || c == '\t' || (c == '#' || c == ';' && !escaped)) break;
+            if(c == '\n' || (c == ' ' || c == '\t' || c == '#' || c == ';' && !escaped)) break;
             pos++;
             escaped = c == '\\' ? !escaped : false;
         }
