@@ -83,42 +83,42 @@ public abstract class LStatement{
 
     protected String sanitize(String value){
         if(value.length() == 0){
-            return "";
-        }else if(value.length() == 1){
-            if(value.charAt(0) == '"' || value.charAt(0) == ';' || value.charAt(0) == ' '){
-                return "invalid";
+            //no more shifting by leaving fields empty
+            return "null";
+        }
+        boolean string = false;
+        if(value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"'){
+            for(int i = value.length() - 2; i > 0; i--){
+                if(value.charAt(i) != '\\') break;
+                string = !string;
             }
-        }else{
-            StringBuilder res = new StringBuilder(value.length());
-            if(value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"'){
-                //Make sure closing '"' is not escaped (unescape it if it is)
-                boolean escaped = false;
-                for(int i = value.length() - 2; i > 0; i--){
-                    if(value.charAt(i) != '\\') break;
-                    escaped = !escaped;
-                }
-                if(escaped){
-                    res.append(value, 0, value.length() - 1);
-                    res.append("\\\"");
-                }else{
-                    res.append(value);
-                }
-            }else{
-                //otherwise, escape semicolons, spaces and hashtags
-                for(int i = 0; i < value.length(); i++){
-                    char c = value.charAt(i);
-                    switch(c){
-                        case ';', ' ', '#' -> res.append('\\');
-                        default -> {}
-                    }
-                    res.append(c);
-                }
-            }
-
-            return res.toString();
         }
 
-        return value;
+        StringBuilder res = new StringBuilder(value.length());
+        //Escape everything that might result in undefined behaviour during parsing
+        //Spaces (and tabs), Semicolons, Hashtags, double quotes in the middle of strings
+        boolean escaped = false;
+        for(int i = 0; i < value.length(); i++){
+            char c = value.charAt(i);
+            res.append(switch(c){
+                case ' ', '\t', ';', '#' -> {
+                    if(!escaped && !string){
+                        res.append('\\');
+                    }
+                    yield c;
+                }
+                case '"' -> {
+                    if(string && i > 0 && i < value.length() - 1){
+                        res.append('\\');
+                    }
+                    yield c;
+                }
+                default -> c;
+            });
+            escaped = c == '\\' ? !escaped : false;
+        }
+
+        return res.toString();
     }
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
