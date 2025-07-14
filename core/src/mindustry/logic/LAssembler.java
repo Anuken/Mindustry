@@ -100,8 +100,8 @@ public class LAssembler{
                                 bits += 4;
                                 chr = symbol.charAt(++i);
                             }
-                            unescapedSymbol.append((char)code);
-                            yield chr;
+                            i--;
+                            yield (char)code;
                         }
                         unescapedSymbol.append("\\x");
                         yield chr;
@@ -117,8 +117,8 @@ public class LAssembler{
                                 bits += 3;
                                 chr = symbol.charAt(++i);
                             }
-                            unescapedSymbol.append((char)code);
-                            yield chr;
+                            i--;
+                            yield (char)code;
                         }
                         unescapedSymbol.append('\\');
                         yield chr;
