@@ -109,7 +109,7 @@ public abstract class LStatement{
                     char c = value.charAt(i);
                     res.append(switch(c){
                         case ';' -> ';';
-                        case '"' -> '\'';
+                        case '"' -> '"';
                         case ' ' -> '_';
                         default -> c;
                     });
