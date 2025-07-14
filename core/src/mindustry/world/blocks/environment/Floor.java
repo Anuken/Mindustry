@@ -80,13 +80,15 @@ public class Floor extends Block{
     public int tilingVariants = 0;
     /** If true, this floor uses autotiling; variants are not supported. See https://github.com/GglLfr/tile-gen*/
     public boolean autotile = false;
+    /** If >1, the middle region of the autotile has random variants. */
+    public int autotileMidVariants = 1;
     /** If true (default), this floor will draw edges of other floors on itself. */
     public boolean drawEdgeIn = true;
     /** If true (default), this floor will draw its edges onto other floors. */
     public boolean drawEdgeOut = true;
 
     protected TextureRegion[][][] tilingRegions;
-    protected TextureRegion[] autotileRegions;
+    protected TextureRegion[] autotileRegions, autotileMidRegions;
     protected int tilingSize;
     protected TextureRegion[][] edges;
     protected Seq<Floor> blenders = new Seq<>();
@@ -146,6 +148,12 @@ public class Floor extends Block{
 
         if(autotile){
             autotileRegions = TileBitmask.load(name);
+            if(autotileMidVariants > 1){
+                autotileMidRegions = new TextureRegion[autotileMidVariants];
+                for(int i = 0; i < autotileMidVariants; i++){
+                    autotileMidRegions[i] = Core.atlas.find((i == 0 ? name + "-13" : name + "-mid-" + (i + 1)));
+                }
+            }
         }
 
         if(Core.atlas.has(name + "-edge")){
@@ -234,7 +242,10 @@ public class Floor extends Block{
                 }
             }
 
-            Draw.rect(autotileRegions[TileBitmask.values[bits]], tile.worldx(), tile.worldy());
+            int bit = TileBitmask.values[bits];
+            TextureRegion region = bit == 13 && autotileMidVariants > 1 ? autotileMidRegions[variant(tile.x, tile.y, autotileMidRegions.length)] : autotileRegions[bit];
+
+            Draw.rect(region, tile.worldx(), tile.worldy());
         }else{
             Draw.rect(variantRegions[variant(tile.x, tile.y)], tile.worldx(), tile.worldy());
         }
@@ -251,7 +262,11 @@ public class Floor extends Block{
     }
 
     public int variant(int x, int y){
-        return Mathf.randomSeed(Point2.pack(x, y), 0, Math.max(0, variantRegions.length - 1));
+        return variant(x, y, variantRegions.length);
+    }
+
+    public int variant(int x, int y, int max){
+        return Mathf.randomSeed(Point2.pack(x, y), 0, Math.max(0, max - 1));
     }
 
     public void drawOverlay(Tile tile){

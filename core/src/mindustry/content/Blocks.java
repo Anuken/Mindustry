@@ -854,6 +854,7 @@ public class Blocks{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
+            autotileMidVariants = 9;
         }};
 
         coloredFloor = new ColoredFloor("colored-floor"){{
