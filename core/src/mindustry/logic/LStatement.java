@@ -88,12 +88,14 @@ public abstract class LStatement{
         }
         char tailSpace = value.charAt(value.length() - 1);
         value = value.trim();
-        boolean string = false;
-        if(value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"'){
+        boolean string = true;
+        if(value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"' && value.length() >= 2){
             for(int i = value.length() - 2; i > 0; i--){
                 if(value.charAt(i) != '\\') break;
                 string = !string;
             }
+        }else{
+            string = false;
         }
 
         StringBuilder res = new StringBuilder(value.length());

@@ -128,7 +128,7 @@ public class LAssembler{
         }
         String unescaped = unescapedSymbol.substring(0, unescapedSymbol.length() - Math.max(tailSpaces, 0));
         //Potentially a string
-        string: if(string){
+        string: if(string && unescaped.length() >= 2){
             if(unescaped.charAt(unescaped.length() - 1) != '"') break string;
             boolean escaped = false;
             for(int i = unescaped.length() - 2; i > 1; i--){
