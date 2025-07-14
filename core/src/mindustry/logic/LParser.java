@@ -66,7 +66,7 @@ public class LParser{
 
         while(pos < chars.length){
             char c = chars[pos];
-            if(c == '\n' || (c == ' ' || c == '\t' || c == '#' || c == ';' && !escaped)) break;
+            if(c == '\n' || (c == ' ' || c == '\t' || c == '#' || c == ';') && !escaped) break;
             pos++;
             escaped = c == '\\' ? !escaped : false;
         }
@@ -92,7 +92,7 @@ public class LParser{
             if(tok >= tokens.length) error("Line too long; may only contain " + tokens.length + " tokens");
 
             //reached end of line, bail out.
-            if(c == '\n' || (c == ';' && !escaped)) break;
+            if(c == '\n' || (c == ';') && !escaped) break;
 
             if(expectNext && c != ' ' && c != '#' && c != '\t'){
                 error("Expected space after string/token.");
