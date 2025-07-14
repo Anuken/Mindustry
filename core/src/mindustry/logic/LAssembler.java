@@ -66,7 +66,7 @@ public class LAssembler{
         //Parse escape codes, loosely based on C escape codes (with some changes)
         int tailSpaces = 0;
         boolean string = false, frontTrimmed = false;
-        StringBuilder unescapedSymbol = new StringBuilder();
+        StringBuilder unescapedSymbol = new StringBuilder(symbol.length());
         for(int i = 0; i < symbol.length(); i++){
             if(symbol.charAt(i) <= ' '){
                 if(!frontTrimmed) continue;
