@@ -73,7 +73,7 @@ public class LAssembler{
         }
         //Parse escape codes, loosely based on C escape codes (with some changes)
         StringBuilder unescapedSymbol = new StringBuilder();
-        for(int i = 0; i < symbol.length() - 1; i++){
+        for(int i = 0; i < symbol.length(); i++){
             if(symbol.charAt(i) != '\\'){
                 unescapedSymbol.append(symbol.charAt(i));
             }else{
