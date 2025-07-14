@@ -72,6 +72,7 @@ public class LAssembler{
                 if(!frontTrimmed) continue;
                 tailSpaces++;
             }else{
+                if(!frontTrimmed && symbol.charAt(i) == '"') string = true;
                 frontTrimmed = true;
                 tailSpaces = 0;
             }
@@ -126,9 +127,17 @@ public class LAssembler{
             }
         }
         String unescaped = unescapedSymbol.substring(0, unescapedSymbol.length() - Math.max(tailSpaces, 0));
-
-        //string case
-        if(string) return putConst("___" + symbol, unescaped);
+        //Potentially a string
+        string: if(string){
+            if(unescaped.charAt(unescaped.length() - 1) != '"') break string;
+            boolean escaped = false;
+            for(int i = unescaped.length() - 2; i > 1; i--){
+                if(unescaped.charAt(i) != '\\') break;
+                escaped = !escaped;
+            }
+            if(escaped) break string;
+            return putConst("___" + unescaped, unescaped.substring(1, unescaped.length() - 1));
+        }
 
         //use a positive invalid number if number might be negative, else use a negative invalid number
         double value = parseDouble(unescaped);
