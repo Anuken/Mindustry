@@ -11,6 +11,7 @@ import mindustry.entities.effect.*;
 import mindustry.entities.part.DrawPart.*;
 import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -58,7 +59,7 @@ public class Blocks{
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
     arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystalOrbs, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
-    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal, cruxFloor1, cruxFloor2, cruxFloor3, cruxFloor4, cruxFloor5, cruxFloor6, coloredFloor,
+    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal, cruxFloor1, cruxFloor2, cruxFloor3, cruxFloor4, cruxFloor5, cruxFloor6, cruxFloor7, coloredFloor,
     pebbles, tendrils,
 
     //ores
@@ -811,16 +812,12 @@ public class Blocks{
 
         cruxFloor1 = new Floor("crux-floor-1"){{
             autotile = true;
-            emitLight = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
 
         cruxFloor2 = new Floor("crux-floor-2"){{
             autotile = true;
-            //emitLight = true;
-            //lightRadius = 30f;
-            //lightColor = Team.crux.color.cpy().a(0.3f);
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
@@ -844,6 +841,16 @@ public class Blocks{
         }};
 
         cruxFloor6 = new Floor("crux-floor-6"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+
+            emitLight = true;
+            lightRadius = 30f;
+            lightColor = Team.crux.color.cpy().a(0.3f);
+        }};
+
+        cruxFloor7 = new Floor("crux-floor-7"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
