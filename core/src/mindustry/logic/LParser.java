@@ -46,7 +46,7 @@ public class LParser{
                     return token();
                 }
                 case '"' -> {
-                    if(!escaped) break loop;
+                    if(!escaped && (pos + 1 >= chars.length || chars[pos + 1] == ' ' || chars[pos + 1] == '#' || chars[pos + 1] == '\t')) break loop;
                 }
                 default -> {}
             }

@@ -82,12 +82,12 @@ public abstract class LStatement{
     }
 
     protected String sanitize(String value){
-        if(value.length() == 0){
+        char tailSpace = !value.isEmpty() ? value.charAt(value.length() - 1) : 0;
+        value = value.trim();
+        if(value.isEmpty()){
             //no more shifting by leaving fields empty
             return "null";
         }
-        char tailSpace = value.charAt(value.length() - 1);
-        value = value.trim();
         boolean string = true;
         if(value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"' && value.length() >= 2){
             for(int i = value.length() - 2; i > 0; i--){
