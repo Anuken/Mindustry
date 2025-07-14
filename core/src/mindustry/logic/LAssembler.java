@@ -79,7 +79,7 @@ public class LAssembler{
             if(symbol.charAt(i) != '\\'){
                 if(symbol.charAt(i) == '"') lastQuoteEsc = false;
                 unescapedSymbol.append(symbol.charAt(i));
-            }else{
+            }else if(i < symbol.length() - 1){
                 unescapedSymbol.append(switch(symbol.charAt(++i)){
                     case '\\', '#', ';', '\t' -> symbol.charAt(i);
                     case 'n' -> '\n';
@@ -92,7 +92,7 @@ public class LAssembler{
                         yield ' ';
                     }
                     case 'x' -> {
-                        char chr = symbol.charAt(++i);
+                        char chr = ++i < symbol.length() ? symbol.charAt(i) : 0;
                         if((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'F') || (chr >= 'a' && chr <= 'f')){
                             int code = 0;
                             int bits = 0;
@@ -103,7 +103,7 @@ public class LAssembler{
                                     default -> chr - '0';
                                 };
                                 bits += 4;
-                                chr = symbol.charAt(++i);
+                                chr = ++i < symbol.length() ? symbol.charAt(i) : 0;
                             }
                             i--;
                             yield (char)code;
@@ -120,7 +120,7 @@ public class LAssembler{
                             while(chr >= '0' && chr < '8' && bits < 16){
                                 code = code << 3 | chr - '0';
                                 bits += 3;
-                                chr = symbol.charAt(++i);
+                                chr = ++i < symbol.length() ? symbol.charAt(i) : 0;
                             }
                             i--;
                             yield (char)code;
@@ -129,6 +129,8 @@ public class LAssembler{
                         yield chr;
                     }
                 });
+            }else{
+                unescapedSymbol.append('\\');
             }
         }
         String unescaped = unescapedSymbol.substring(0, unescapedSymbol.length() - Math.max(tailSpaces, 0));
