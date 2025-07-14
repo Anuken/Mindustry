@@ -65,7 +65,7 @@ public class LAssembler{
 
         //Parse escape codes, loosely based on C escape codes (with some changes)
         int tailSpaces = 0;
-        boolean string = false, frontTrimmed = false;
+        boolean string = false, frontTrimmed = false, lastQuoteEsc = false;
         StringBuilder unescapedSymbol = new StringBuilder(symbol.length());
         for(int i = 0; i < symbol.length(); i++){
             if(symbol.charAt(i) <= ' '){
@@ -77,11 +77,16 @@ public class LAssembler{
                 tailSpaces = 0;
             }
             if(symbol.charAt(i) != '\\'){
+                if(symbol.charAt(i) == '"') lastQuoteEsc = false;
                 unescapedSymbol.append(symbol.charAt(i));
             }else{
                 unescapedSymbol.append(switch(symbol.charAt(++i)){
-                    case '\\', '"', '#', ';', '\t' -> symbol.charAt(i);
+                    case '\\', '#', ';', '\t' -> symbol.charAt(i);
                     case 'n' -> '\n';
+                    case '"' -> {
+                        lastQuoteEsc = true;
+                        yield symbol.charAt(i);
+                    }
                     case ' ' -> {
                         tailSpaces--;
                         yield ' ';
@@ -128,7 +133,7 @@ public class LAssembler{
         }
         String unescaped = unescapedSymbol.substring(0, unescapedSymbol.length() - Math.max(tailSpaces, 0));
         //Potentially a string
-        string: if(string && unescaped.length() >= 2){
+        string: if(string && unescaped.length() >= 2 && !lastQuoteEsc){
             if(unescaped.charAt(unescaped.length() - 1) != '"') break string;
             boolean escaped = false;
             for(int i = unescaped.length() - 2; i > 1; i--){
