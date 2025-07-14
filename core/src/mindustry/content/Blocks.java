@@ -3088,15 +3088,13 @@ public class Blocks{
         duo = new ItemTurret("duo"){{
             requirements(Category.turret, with(Items.copper, 35));
             ammo(
-                Items.copper,  new BasicBulletType(2.5f, 9){{
-                    width = 7f;
-                    height = 9f;
+                Items.copper,  new PointLaserBulletType(){{
                     lifetime = 60f;
                     ammoMultiplier = 2;
-
+                                buildingDamageMultiplier = 0.3f;
+                pierceDamageFactor = 1f;
                     hitEffect = despawnEffect = Fx.hitBulletColor;
-                    hitColor = backColor = trailColor = Pal.copperAmmoBack;
-                    frontColor = Pal.copperAmmoFront;
+                    hitColor = trailColor = Pal.copperAmmoBack;
                 }},
                 Items.graphite, new BasicBulletType(3.5f, 18){{
                     width = 9f;
@@ -4936,6 +4934,7 @@ public class Blocks{
             shootType = new PointLaserBulletType(){{
                 damage = 210f;
                 buildingDamageMultiplier = 0.3f;
+                pierceDamageFactor = 1f;
                 hitColor = Color.valueOf("fda981");
             }};
 
