@@ -63,23 +63,28 @@ public class LAssembler{
         LVar constVar = Vars.logicVars.get(symbol, privileged);
         if(constVar != null) return constVar;
 
-        symbol = symbol.trim();
-        boolean string = false;
-        if(!symbol.isEmpty() && symbol.charAt(0) == '"' && symbol.charAt(symbol.length() - 1) == '"'){
-            for(int i = symbol.length() - 2; i > 0; i--){
-                if(symbol.charAt(i) != '\\') break;
-                string = !string;
-            }
-        }
         //Parse escape codes, loosely based on C escape codes (with some changes)
+        int tailSpaces = 0;
+        boolean string = false, frontTrimmed = false;
         StringBuilder unescapedSymbol = new StringBuilder();
         for(int i = 0; i < symbol.length(); i++){
+            if(symbol.charAt(i) <= ' '){
+                if(!frontTrimmed) continue;
+                tailSpaces++;
+            }else{
+                frontTrimmed = true;
+                tailSpaces = 0;
+            }
             if(symbol.charAt(i) != '\\'){
                 unescapedSymbol.append(symbol.charAt(i));
             }else{
                 unescapedSymbol.append(switch(symbol.charAt(++i)){
-                    case '\\', '"', ' ', '#', ';', '\t' -> symbol.charAt(i);
+                    case '\\', '"', '#', ';', '\t' -> symbol.charAt(i);
                     case 'n' -> '\n';
+                    case ' ' -> {
+                        tailSpaces--;
+                        yield ' ';
+                    }
                     case 'x' -> {
                         char chr = symbol.charAt(++i);
                         if((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'F') || (chr >= 'a' && chr <= 'f')){
@@ -120,7 +125,7 @@ public class LAssembler{
                 });
             }
         }
-        String unescaped = unescapedSymbol.toString();
+        String unescaped = unescapedSymbol.substring(0, unescapedSymbol.length() - Math.max(tailSpaces, 0));
 
         //string case
         if(string) return putConst("___" + symbol, unescaped);

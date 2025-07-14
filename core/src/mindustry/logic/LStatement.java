@@ -86,6 +86,8 @@ public abstract class LStatement{
             //no more shifting by leaving fields empty
             return "null";
         }
+        char tailSpace = value.charAt(value.length() - 1);
+        value = value.trim();
         boolean string = false;
         if(value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"'){
             for(int i = value.length() - 2; i > 0; i--){
@@ -95,8 +97,8 @@ public abstract class LStatement{
         }
 
         StringBuilder res = new StringBuilder(value.length());
-        //Escape everything that might result in undefined behaviour during parsing
-        //Spaces (and tabs), Semicolons, Hashtags, double quotes in the middle of strings
+        //Escape everything that might result in undefined behaviour during parsing.
+        //Spaces (and tabs), Semicolons, Hashtags, double quotes in the middle of strings can cause undefined behaviour.
         boolean escaped = false;
         for(int i = 0; i < value.length(); i++){
             char c = value.charAt(i);
@@ -117,6 +119,7 @@ public abstract class LStatement{
             });
             escaped = c == '\\' ? !escaped : false;
         }
+        if(res.charAt(res.length() - 1) == '\\' && escaped) res.append(tailSpace <= ' ' ? tailSpace : '\\');
 
         return res.toString();
     }
