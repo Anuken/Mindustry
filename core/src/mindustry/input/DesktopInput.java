@@ -306,10 +306,10 @@ public class DesktopInput extends InputHandler{
                 commandBuildings.clear();
                 if(input.keyDown(Binding.selectAcrossScreen)){
                     camera.bounds(Tmp.r1);
-                    selectedUnits.set(selectedCommandUnits(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height));
+                    selectedUnits.set(selectedCommandUnits(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height).removeAll(u -> !u.type.controlSelectGlobal));
                 }else {
                     for(var unit : player.team().data().units){
-                        if(unit.isCommandable()){
+                        if(unit.isCommandable() && unit.type.controlSelectGlobal){
                             selectedUnits.add(unit);
                         }
                     }
@@ -325,7 +325,7 @@ public class DesktopInput extends InputHandler{
                     selectedUnits.set(selectedCommandUnits(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, u -> u instanceof Payloadc));
                 }else {
                     for(var unit : player.team().data().units){
-                        if(unit.isCommandable() && unit instanceof  Payloadc){
+                        if(unit.isCommandable() && unit instanceof Payloadc){
                             selectedUnits.add(unit);
                         }
                     }

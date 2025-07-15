@@ -1267,6 +1267,7 @@ public class UnitTypes{
             engineOffset = 5.7f;
             range = 50f;
             isEnemy = false;
+            controlSelectGlobal = false;
 
             ammoType = new PowerAmmoType(500);
 

@@ -178,6 +178,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     logicControllable = true,
     /** if false, players cannot control this unit */
     playerControllable = true,
+    /** If true, the unit can be selected with the global selection hotkey (shift+g). */
+    controlSelectGlobal = true,
     /** if false, this unit cannot be moved into payloads */
     allowedInPayloads = true,
     /** if false, this unit cannot be hit by bullets or explosions*/

@@ -55,8 +55,8 @@ public class MinerAI extends AIController{
             }else{
                 if(timer.get(timerTarget3, 60) && targetItem != null){
                     ore = null;
-                    if(unit.type.mineFloor) ore = indexer.findClosestOre(unit, targetItem);
-                    if(ore == null && unit.type.mineWalls) ore = indexer.findClosestWallOre(unit, targetItem);
+                    if(unit.type.mineFloor) ore = indexer.findClosestOre(core.x, core.y, targetItem);
+                    if(ore == null && unit.type.mineWalls) ore = indexer.findClosestWallOre(core.x, core.y, targetItem);
                 }
 
                 if(ore != null){

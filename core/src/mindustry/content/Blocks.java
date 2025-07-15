@@ -2386,7 +2386,6 @@ public class Blocks{
             requirements(Category.power, with(Items.copper, 2, Items.lead, 6));
             maxNodes = 10;
             laserRange = 6;
-            buildCostMultiplier = 2.5f;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{
