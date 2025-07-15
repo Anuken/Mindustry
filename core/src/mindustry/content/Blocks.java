@@ -59,7 +59,7 @@ public class Blocks{
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
     arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystalOrbs, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
-    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal, cruxFloor1, cruxFloor2, cruxFloor3, cruxFloor4, cruxFloor5, cruxFloor6, cruxFloor7, coloredFloor,
+    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal, cruxFloor1, cruxFloor2, cruxFloor3, cruxFloor4, cruxFloor5, cruxFloor6, cruxFloor7, cruxFloor8, cruxFloor9, coloredFloor,
     pebbles, tendrils,
 
     //ores
@@ -855,6 +855,18 @@ public class Blocks{
             drawEdgeOut = false;
             drawEdgeIn = false;
             autotileMidVariants = 9;
+        }};
+
+        cruxFloor8 = new Floor("crux-floor-8"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        cruxFloor9 = new Floor("crux-floor-9"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
         }};
 
         coloredFloor = new ColoredFloor("colored-floor"){{

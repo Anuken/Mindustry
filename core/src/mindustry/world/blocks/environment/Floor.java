@@ -151,7 +151,7 @@ public class Floor extends Block{
             if(autotileMidVariants > 1){
                 autotileMidRegions = new TextureRegion[autotileMidVariants];
                 for(int i = 0; i < autotileMidVariants; i++){
-                    autotileMidRegions[i] = Core.atlas.find((i == 0 ? name + "-13" : name + "-mid-" + (i + 1)));
+                    autotileMidRegions[i] = Core.atlas.find(i == 0 ? name + "-13" : name + "-mid-" + (i + 1));
                 }
             }
         }
