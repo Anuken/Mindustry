@@ -322,11 +322,14 @@ public abstract class SaveVersion extends SaveFileReader{
                 //new data format (bit 3): 7 bytes (3x block-specific bytes + 1x 4-byte extra data int)
                 boolean hadDataOld = (packedCheck & 2) != 0, hadDataNew = (packedCheck & 4) != 0;
 
+                byte data = 0, floorData = 0, overlayData = 0;
+                int extraData = 0;
+
                 if(hadDataNew){
-                    tile.data = stream.readByte();
-                    tile.floorData = stream.readByte();
-                    tile.overlayData = stream.readByte();
-                    tile.extraData = stream.readInt();
+                    data = stream.readByte();
+                    floorData = stream.readByte();
+                    overlayData = stream.readByte();
+                    extraData = stream.readInt();
                 }
 
                 if(hadEntity){
@@ -336,6 +339,14 @@ public abstract class SaveVersion extends SaveFileReader{
                 //set block only if this is the center; otherwise, it's handled elsewhere
                 if(isCenter){
                     tile.setBlock(block);
+                }
+
+                //must be assigned after setBlock, because that can reset data
+                if(hadDataNew){
+                    tile.data = data;
+                    tile.floorData = floorData;
+                    tile.overlayData = overlayData;
+                    tile.extraData = extraData;
                 }
 
                 if(hadEntity){
@@ -357,8 +368,8 @@ public abstract class SaveVersion extends SaveFileReader{
                         context.onReadBuilding();
                     }
                 }else if(hadDataOld || hadDataNew){ //never read consecutive blocks if there's any kind of data
-                    tile.setBlock(block);
                     if(hadDataOld){
+                        tile.setBlock(block);
                         //the old data format was only read in the case where there is no building, and only contained a single byte
                         tile.data = stream.readByte();
                     }
