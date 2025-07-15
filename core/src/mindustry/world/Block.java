@@ -566,6 +566,11 @@ public class Block extends UnlockableContent implements Senseable{
         return forceDark;
     }
 
+    /** If true, the 'map edge' darkness will be applied to this block. */
+    public boolean isDarkened(Tile tile){
+        return solid && ((!synthetic() && fillsTile) || checkForceDark(tile));
+    }
+
     @Override
     public void setStats(){
         super.setStats();
@@ -940,6 +945,9 @@ public class Block extends UnlockableContent implements Senseable{
         return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
     }
 
+    /** Called when this block is set on the specified tile. */
+    public void blockChanged(Tile tile){}
+
     /** Called when building of this block begins. */
     public void placeBegan(Tile tile, Block previous){
 
@@ -951,7 +959,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     /** Called when building of this block ends. */
-    public void placeEnded(Tile tile, @Nullable Unit builder){
+    public void placeEnded(Tile tile, @Nullable Unit builder, @Nullable Object config){
 
     }
 

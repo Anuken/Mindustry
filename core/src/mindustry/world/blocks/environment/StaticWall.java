@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.graphics.*;
@@ -40,7 +41,7 @@ public class StaticWall extends Prop{
 
             for(int i = 0; i < 8; i++){
                 Tile other = tile.nearby(Geometry.d8[i]);
-                if(other != null && other.block() == this){
+                if(checkAutotileSame(tile, other)){
                     bits |= (1 << i);
                 }
             }
@@ -63,6 +64,10 @@ public class StaticWall extends Prop{
         if(tile.overlay().wallOre){
             tile.overlay().drawBase(tile);
         }
+    }
+
+    public boolean checkAutotileSame(Tile tile, @Nullable Tile other){
+        return other != null && other.block() == this;
     }
 
     @Override

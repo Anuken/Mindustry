@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
@@ -135,7 +136,7 @@ public class ColoredFloor extends Floor{
     }
 
     @Override
-    public void placed(Tile tile, @Nullable Object config){
+    public void placeEnded(Tile tile, @Nullable Unit builder, @Nullable Object config){
         //config is assumed to be an integer RGBA color
         if(config instanceof Integer i){
             tile.extraData = i;

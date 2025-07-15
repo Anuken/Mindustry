@@ -172,7 +172,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean isDarkened(){
-        return block.solid && ((!block.synthetic() && block.fillsTile) || block.checkForceDark(this));
+        return block.isDarkened(this);
     }
 
     public Floor floor(){
@@ -280,6 +280,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
         changed();
         changing = false;
+
+        block.blockChanged(this);
     }
 
     public void setBlock(Block type, Team team){
