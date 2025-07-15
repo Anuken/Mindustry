@@ -31,4 +31,15 @@ public class TileBitmask{
         }
         return regions;
     }
+
+    public static TextureRegion[][] loadVariants(String name, int variants){
+        var regions = new TextureRegion[variants][47];
+        for(int v = 0; v < variants; v++){
+            for(int i = 0; i < 47; i++){
+                regions[v][i] = Core.atlas.find(name + "-" + (v+1) + "-" + i);
+            }
+        }
+
+        return regions;
+    }
 }

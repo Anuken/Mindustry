@@ -60,8 +60,11 @@ public class Blocks{
     arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystalOrbs, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
 
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
+    //old metal floors
+    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
+
     //new metal floors
-    darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal, cruxFloor1, cruxFloor2, cruxFloor3, cruxFloor4, cruxFloor5, cruxFloor6, cruxFloor7, cruxFloor8, cruxFloor9, cruxFloor10,
+    cruxFloor1, cruxFloor2, cruxFloor3, cruxFloor4, cruxFloor5, cruxFloor6, cruxFloor7, cruxFloor8, cruxFloor9, cruxFloor10, cruxFloor11, cruxFloor12,
 
     //colored
     coloredFloor, coloredWall,
@@ -879,6 +882,23 @@ public class Blocks{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
+        }};
+
+        cruxFloor11 = new Floor("crux-floor-11"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+            autotileVariants = 3;
+        }};
+
+        cruxFloor12 = new Floor("crux-floor-12"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+            autotileVariants = 4;
+            emitLight = true;
+            lightRadius = 30f;
+            lightColor = Team.crux.color.cpy().a(0.3f);
         }};
 
         coloredFloor = new ColoredFloor("colored-floor"){{

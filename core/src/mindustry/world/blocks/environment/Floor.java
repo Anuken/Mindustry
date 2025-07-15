@@ -82,6 +82,8 @@ public class Floor extends Block{
     public boolean autotile = false;
     /** If >1, the middle region of the autotile has random variants. */
     public int autotileMidVariants = 1;
+    /** Variants of the main autotile sprite. */
+    public int autotileVariants = 1;
     /** If true (default), this floor will draw edges of other floors on itself. */
     public boolean drawEdgeIn = true;
     /** If true (default), this floor will draw its edges onto other floors. */
@@ -89,6 +91,7 @@ public class Floor extends Block{
 
     protected TextureRegion[][][] tilingRegions;
     protected TextureRegion[] autotileRegions, autotileMidRegions;
+    protected TextureRegion[][] autotileVariantRegions;
     protected int tilingSize;
     protected TextureRegion[][] edges;
     protected Seq<Floor> blenders = new Seq<>();
@@ -148,6 +151,9 @@ public class Floor extends Block{
 
         if(autotile){
             autotileRegions = TileBitmask.load(name);
+            if(autotileVariants > 1){
+                autotileVariantRegions = TileBitmask.loadVariants(name, autotileVariants);
+            }
             if(autotileMidVariants > 1){
                 autotileMidRegions = new TextureRegion[autotileMidVariants];
                 for(int i = 0; i < autotileMidVariants; i++){
@@ -235,6 +241,8 @@ public class Floor extends Block{
         }else if(autotile){
             int bits = 0;
 
+            TextureRegion[] regions = autotileVariants > 1 ? autotileVariantRegions[variant(tile.x, tile.y, autotileVariantRegions.length)] : autotileRegions;
+
             for(int i = 0; i < 8; i++){
                 Tile other = tile.nearby(Geometry.d8[i]);
                 if(checkAutotileSame(tile, other)){
@@ -243,7 +251,7 @@ public class Floor extends Block{
             }
 
             int bit = TileBitmask.values[bits];
-            TextureRegion region = bit == 13 && autotileMidVariants > 1 ? autotileMidRegions[variant(tile.x, tile.y, autotileMidRegions.length)] : autotileRegions[bit];
+            TextureRegion region = bit == 13 && autotileMidVariants > 1 ? autotileMidRegions[variant(tile.x, tile.y, autotileMidRegions.length)] : regions[bit];
 
             Draw.rect(region, tile.worldx(), tile.worldy());
         }else{

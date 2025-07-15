@@ -71,32 +71,36 @@ public class Generators{
 
         generate("autotiles", () -> {
             for(Block block : content.blocks().select(b -> (b.isFloor() && b.asFloor().autotile) || (b instanceof StaticWall && ((StaticWall)b).autotile))){
-                Fi basePath = new Fi("../../../assets-raw/sprites_out/blocks/environment/" + block.name + "-autotile.png"), iconPath = basePath.parent().child(block.name + ".png");
+                int variants = block instanceof Floor f && f.autotileVariants > 1 ? f.autotileVariants : 1;
+                for(int v = 0; v < variants; v++){
+                    Fi basePath = new Fi("../../../assets-raw/sprites_out/blocks/environment/" + block.name + "-autotile" + (variants <= 1 ? "" : "" + (v+1)) + ".png"), iconPath = basePath.parent().child(block.name + ".png");
 
-                if(basePath.exists()){
-                    //theoretically this might not finish in time, but I doubt that will ever happen
-                    mainExecutor.submit(() -> {
-                        try{
-                            ImageTileGenerator.generate(basePath, block.name, new Fi("../../../assets-raw/sprites_out/blocks/environment/" + block.name));
-                        }catch(Throwable e){
-                            Log.err("Failed to autotile: " + block.name, e);
-                        }finally{
-                            //the raw autotile source image must never be included, it isn't useful
-                            basePath.delete();
+                    if(basePath.exists()){
+                        int variant = v;
+                        //theoretically this might not finish in time, but I doubt that will ever happen
+                        mainExecutor.submit(() -> {
+                            try{
+                                ImageTileGenerator.generate(basePath, block.name + (variants <= 1 ? "" : "-" + (variant+1)), new Fi("../../../assets-raw/sprites_out/blocks/environment/" + (block.name + (variants <= 1 ? "" : "-" + (variant+1)))));
+                            }catch(Throwable e){
+                                Log.err("Failed to autotile: " + block.name, e);
+                            }finally{
+                                //the raw autotile source image must never be included, it isn't useful
+                                basePath.delete();
+                            }
+                        });
+
+                        if(!iconPath.exists() && v == 0){
+                            //save the bottom right region as the "main" sprite for previews
+                            Pixmap out = new Pixmap(basePath);
+                            Pixmap cropped = out.crop(32, 32, 32, 32);
+                            iconPath.writePng(cropped);
+                            iconPath.parent().parent().parent().child("editor").child("editor-" + block.name + ".png").writePng(cropped);
+                            out.dispose();
+                            gens.put(block, cropped);
                         }
-                    });
-
-                    if(!iconPath.exists()){
-                        //save the bottom right region as the "main" sprite for previews
-                        Pixmap out = new Pixmap(basePath);
-                        Pixmap cropped = out.crop(32, 32, 32, 32);
-                        iconPath.writePng(cropped);
-                        iconPath.parent().parent().parent().child("editor").child("editor-" + block.name + ".png").writePng(cropped);
-                        out.dispose();
-                        gens.put(block, cropped);
+                    }else{
+                        Log.warn("Autotile floor '@' not found: @", block.name, basePath.absolutePath());
                     }
-                }else{
-                    Log.warn("Autotile floor '@' not found: @", block.name, basePath.absolutePath());
                 }
             }
         });
