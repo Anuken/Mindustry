@@ -217,13 +217,13 @@ public class ResearchDialog extends BaseDialog{
             {
                 //first, find a planets associated with the current tech tree
                 rootPlanets.clear();
-                for (var planet : content.planets()){
-                    if (planet.techTree == lastNode)
+                for(var planet : content.planets()){
+                    if(planet.techTree == lastNode)
                         rootPlanets.add(planet);
                 }
 
                 //if there is no root, fall back to serpulo
-                if (rootPlanets.size == 0){
+                if(rootPlanets.size == 0){
                     rootPlanets.add(Planets.serpulo);
                 }
 
