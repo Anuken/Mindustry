@@ -218,8 +218,9 @@ public class ResearchDialog extends BaseDialog{
                 //first, find a planets associated with the current tech tree
                 rootPlanets.clear();
                 for(var planet : content.planets()){
-                    if(planet.techTree == lastNode)
+                    if(planet.techTree == lastNode){
                         rootPlanets.add(planet);
+                    }
                 }
 
                 //if there is no root, fall back to serpulo
