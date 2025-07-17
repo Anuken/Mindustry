@@ -138,10 +138,6 @@ public class PlacementFragment{
             Block tryBlock = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
             Object tryConfig = build == null || !build.block.copyConfig ? null : build.config();
 
-            if(tryBlock != null && tryBlock.showColorEdit && tryConfig == null){
-                tryConfig = tile.extraData;
-            }
-
             for(BuildPlan req : player.unit().plans()){
                 if(!req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).contains(Core.input.mouseWorld())){
                     tryBlock = req.block;
@@ -155,6 +151,10 @@ public class PlacementFragment{
                     tile.block() != Blocks.air ? tile.block() :
                     tile.overlay() != Blocks.air ? tile.overlay() :
                     tile.floor() != Blocks.air ? tile.floor() : null;
+            }
+
+            if(tryBlock != null && tryBlock.showColorEdit && tryConfig == null){
+                tryConfig = tile.extraData;
             }
 
             if(tryBlock != null && ((tryBlock.isVisible() && unlocked(tryBlock)) || state.rules.editor)){

@@ -841,6 +841,7 @@ public class Blocks{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
+            autotileMidVariants = 2;
         }};
 
         cruxFloor5 = new Floor("crux-floor-5"){{
