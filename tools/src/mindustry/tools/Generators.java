@@ -394,33 +394,37 @@ public class Generators{
                         save(padded, region.name);
                     }
 
-                    if(!regions[0].found()){
+                    Pixmap image;
+
+                    if(regions[0].found()){
+                        image = get(regions[0]);
+
+                        int i = 0;
+                        for(TextureRegion region : regions){
+                            i++;
+                            if(i != regions.length || last == null){
+                                image.draw(get(region), true);
+                            }else{
+                                image.draw(last, true);
+                            }
+
+                            //draw shard (default team top) on top of first sprite
+                            if(region == block.teamRegions[Team.sharded.id] && shardTeamTop != null){
+                                image.draw(shardTeamTop, true);
+                            }
+                        }
+
+                        if(!(regions.length == 1 && regions[0] == Core.atlas.find(block.name) && shardTeamTop == null)){
+                            save(image, "block-" + block.name + "-full");
+                        }
+
+                        save(image, "../editor/" + block.name + "-icon-editor");
+                        saveScaled(image, "../ui/block-" + block.name + "-ui", Math.min(image.width, maxUiIcon));
+                    }else if(gens.containsKey(block)){
+                        image = gens.get(block);
+                    }else{
                         continue;
                     }
-
-                    Pixmap image = get(regions[0]);
-
-                    int i = 0;
-                    for(TextureRegion region : regions){
-                        i++;
-                        if(i != regions.length || last == null){
-                            image.draw(get(region), true);
-                        }else{
-                            image.draw(last, true);
-                        }
-
-                        //draw shard (default team top) on top of first sprite
-                        if(region == block.teamRegions[Team.sharded.id] && shardTeamTop != null){
-                            image.draw(shardTeamTop, true);
-                        }
-                    }
-
-                    if(!(regions.length == 1 && regions[0] == Core.atlas.find(block.name) && shardTeamTop == null)){
-                        save(image, "block-" + block.name + "-full");
-                    }
-
-                    save(image, "../editor/" + block.name + "-icon-editor");
-                    saveScaled(image, "../ui/block-" + block.name + "-ui", Math.min(image.width, maxUiIcon));
 
                     boolean hasEmpty = false;
                     Color average = new Color(), c = new Color();

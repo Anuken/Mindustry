@@ -905,16 +905,10 @@ public class Blocks{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
-            //there is no proper support for displaying colors or placing with colors
-            inEditor = false;
         }};
 
         coloredWall = new ColoredWall("colored-wall"){{
             autotile = true;
-            //there is no proper support for displaying colors or placing with colors
-            inEditor = false;
-            //TODO: should this apply darkness?
-            //fillsTile = false;
         }};
 
         Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)

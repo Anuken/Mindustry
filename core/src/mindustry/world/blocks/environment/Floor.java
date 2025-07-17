@@ -378,19 +378,6 @@ public class Floor extends Block{
         }
     }
 
-    //'new' style of edges with shadows instead of colors, not used currently
-    protected void drawEdgesFlat(Tile tile, boolean sameLayer){
-        for(int i = 0; i < 4; i++){
-            Tile other = tile.nearby(i);
-            if(other != null && doEdge(tile, other, other.floor())){
-                Color color = other.floor().mapColor;
-                Draw.color(color.r, color.g, color.b, 1f);
-                Draw.rect(edgeRegion, tile.worldx(), tile.worldy(), i*90);
-            }
-        }
-        Draw.color();
-    }
-
     public int realBlendId(Tile tile){
         if(tile.floor().isLiquid && !tile.overlay().isAir() && !(tile.overlay() instanceof OreBlock)){
             return -((tile.overlay().blendId) | (tile.floor().blendId << 15));

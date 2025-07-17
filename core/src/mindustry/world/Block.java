@@ -80,6 +80,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean displayFlow = true;
     /** whether this block is visible in the editor */
     public boolean inEditor = true;
+    /** if true, a color picker will be shown for the lastConfig field in the in-game-editor, and will be assigned as an integer. */
+    public boolean showColorEdit;
     /** the last configuration value applied to this block. */
     public @Nullable Object lastConfig;
     /** whether to save the last config and apply it to newly placed blocks */

@@ -134,6 +134,10 @@ public class MapRenderer implements Disposable{
             width, height,
             tile.build == null || !wall.rotate ? 0 : tile.build.rotdeg());
         }else{
+            if(floor instanceof ColoredFloor){
+                mesh.setColor(Tmp.c1.set(tile.extraData | 0xff));
+            }
+
             region = floor.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, floor.editorVariantRegions().length - 1)];
 
             mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
@@ -155,6 +159,8 @@ public class MapRenderer implements Disposable{
             if(wall == Blocks.cliff){
                 mesh.setColor(Tmp.c1.set(floor.mapColor).mul(1.6f));
                 region = ((Cliff)Blocks.cliff).editorCliffs[tile.data & 0xff];
+            }else if(wall instanceof ColoredWall){
+                mesh.setColor(Tmp.c1.set(tile.extraData | 0xff));
             }
 
             offsetX = tilesize / 2f - region.width * region.scl() / 2f;

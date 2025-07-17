@@ -24,12 +24,14 @@ public class ColoredFloor extends Floor{
     public ColoredFloor(String name){
         super(name);
         saveData = true;
+        showColorEdit = true;
+        saveConfig = true;
     }
 
     @Override
     public void init(){
         super.init();
-        defaultColorRgba = defaultColor.rgba();
+        lastConfig = defaultColorRgba = defaultColor.rgba();
     }
 
     @Override
@@ -132,7 +134,9 @@ public class ColoredFloor extends Floor{
     @Override
     public void floorChanged(Tile tile){
         //reset to white
-        tile.extraData = defaultColorRgba;
+        if(tile.extraData == 0){
+            tile.extraData = defaultColorRgba;
+        }
     }
 
     @Override

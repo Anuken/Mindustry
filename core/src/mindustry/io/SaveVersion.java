@@ -347,6 +347,7 @@ public abstract class SaveVersion extends SaveFileReader{
                     tile.floorData = floorData;
                     tile.overlayData = overlayData;
                     tile.extraData = extraData;
+                    context.onReadTileData();
                 }
 
                 if(hadEntity){

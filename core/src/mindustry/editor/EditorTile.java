@@ -36,6 +36,7 @@ public class EditorTile extends Tile{
         op(DrawOperation.opFloor, floor.id);
 
         this.floor = type;
+        type.floorChanged(this);
     }
 
     @Override

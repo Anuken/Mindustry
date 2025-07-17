@@ -19,17 +19,19 @@ public class ColoredWall extends StaticWall{
     public ColoredWall(String name){
         super(name);
         saveData = true;
+        showColorEdit = true;
+        saveConfig = true;
     }
 
     @Override
     public void init(){
         super.init();
-        defaultColorRgba = defaultColor.rgba();
+        lastConfig = defaultColorRgba = defaultColor.rgba();
     }
 
     @Override
     public void drawBase(Tile tile){
-        //make sure to mask out the alpha channel - it's generally undesirable, and leads to invisible blocks when the data is not initialized
+        //make sure to mask out the alpha channel - it's generally undesirable, and leads to invisible blocks when thtoe data is not initialized
         Draw.color(tile.extraData | 0xff);
         super.drawBase(tile);
         Draw.color();
@@ -37,8 +39,10 @@ public class ColoredWall extends StaticWall{
 
     @Override
     public void blockChanged(Tile tile){
-        //reset to white
-        tile.extraData = defaultColorRgba;
+        //reset to white on first placement
+        if(tile.extraData == 0){
+            tile.extraData = defaultColorRgba;
+        }
     }
 
     @Override
@@ -59,12 +63,12 @@ public class ColoredWall extends StaticWall{
 
     @Override
     public boolean checkAutotileSame(Tile tile, @Nullable Tile other){
-        return other != null && other.block() == this && ((tile.extraData & flagIgnoreDifferentColor) != 0 || tile.extraData == other.extraData);
+        return other != null && other.block() == this && ((tile.extraData == flagIgnoreDifferentColor) || tile.extraData == other.extraData);
     }
 
     @Override
     public boolean isDarkened(Tile tile){
-        return (tile.extraData & flagApplyDarkness) != 0;
+        return (tile.extraData == flagApplyDarkness);
     }
 
     @Override

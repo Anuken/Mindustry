@@ -78,6 +78,24 @@ public class HudFragment{
             .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
         }).growX().pad(-2).padLeft(6f);
         cont.row();
+        cont.collapser(t -> {
+            t.button(b -> {
+                b.margin(4f);
+                b.left();
+                b.table(Tex.pane, in -> {
+                    in.image(Tex.whiteui).update(i -> {
+                        if(control.input.block != null && control.input.block.lastConfig instanceof Integer col){
+                            i.color.set(col | 0xff);
+                        }
+                    }).grow();
+                }).margin(4).size(50f).padRight(10);
+                b.add("@color");
+            }, Styles.cleart, () -> ui.picker.show(control.input.block != null && control.input.block.lastConfig instanceof Integer col ? new Color(col | 0xff) : new Color(Color.white), false, col -> {
+                if(control.input.block != null){
+                    control.input.block.lastConfig = col.rgba8888();
+                }
+            })).left().width(250f).pad(3f).row();
+        }, () -> control.input.block != null && control.input.block.showColorEdit).growX().row();
         cont.add(pane).expandY().top().left();
 
         rebuildBlockSelection(blockSelection, "");

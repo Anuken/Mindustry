@@ -31,7 +31,7 @@ import static mindustry.Vars.*;
 public class DesktopLauncher extends ClientLauncher{
     public final static long discordID = 610508934456934412L;
     public final String[] args;
-    
+
     boolean useDiscord = !OS.hasProp("nodiscord"), loadError = false;
     Throwable steamError;
 
@@ -48,21 +48,17 @@ public class DesktopLauncher extends ClientLauncher{
                 for(int i = 0; i < arg.length; i++){
                     if(arg[i].charAt(0) == '-'){
                         String name = arg[i].substring(1);
-                        try{
-                            switch(name){
-                                case "width": width = Strings.parseInt(arg[i + 1], width); break;
-                                case "height": height = Strings.parseInt(arg[i + 1], height); break;
-                                case "glMajor": gl30Major = Strings.parseInt(arg[i + 1], gl30Major);
-                                case "glMinor": gl30Minor = Strings.parseInt(arg[i + 1], gl30Minor);
-                                case "gl3": gl30 = true; break;
-                                case "gl2": gl30 = false; break;
-                                case "coreGl": coreProfile = true; break;
-                                case "antialias": samples = 16; break;
-                                case "debug": Log.level = LogLevel.debug; break;
-                                case "maximized": maximized = Boolean.parseBoolean(arg[i + 1]); break;
-                            }
-                        }catch(NumberFormatException number){
-                            Log.warn("Invalid parameter number value.");
+                        switch(name){
+                            case "width": width = Strings.parseInt(arg[i + 1], width); break;
+                            case "height": height = Strings.parseInt(arg[i + 1], height); break;
+                            case "glMajor": gl30Major = Strings.parseInt(arg[i + 1], gl30Major);
+                            case "glMinor": gl30Minor = Strings.parseInt(arg[i + 1], gl30Minor);
+                            case "gl3": gl30 = true; break;
+                            case "gl2": gl30 = false; break;
+                            case "coreGl": coreProfile = true; break;
+                            case "antialias": samples = 16; break;
+                            case "debug": Log.level = LogLevel.debug; break;
+                            case "maximized": maximized = Boolean.parseBoolean(arg[i + 1]); break;
                         }
                     }
                 }
@@ -75,7 +71,7 @@ public class DesktopLauncher extends ClientLauncher{
 
     public DesktopLauncher(String[] args){
         this.args = args;
-        
+
         Version.init();
         boolean useSteam = Version.modifier.contains("steam");
         testMobile = Seq.with(args).contains("-testMobile");
