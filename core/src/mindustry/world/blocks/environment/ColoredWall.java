@@ -46,7 +46,7 @@ public class ColoredWall extends StaticWall{
     }
 
     @Override
-    public void placeEnded(Tile tile, @Nullable Unit builder, @Nullable Object config){
+    public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
         //config is assumed to be an integer RGBA color
         if(config instanceof Integer i){
             tile.extraData = i;

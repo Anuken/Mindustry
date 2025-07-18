@@ -961,7 +961,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     /** Called when building of this block ends. */
-    public void placeEnded(Tile tile, @Nullable Unit builder, @Nullable Object config){
+    public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
 
     }
 

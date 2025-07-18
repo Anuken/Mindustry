@@ -112,7 +112,7 @@ public class ConstructBlock extends Block{
             if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
         }
 
-        block.placeEnded(tile, builder, config);
+        block.placeEnded(tile, builder, rotation, config);
 
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }

@@ -68,6 +68,7 @@ public class Blocks{
 
     //colored
     coloredFloor, coloredWall,
+    characterOverlay,
 
     pebbles, tendrils,
 
@@ -910,6 +911,10 @@ public class Blocks{
 
         coloredWall = new ColoredWall("colored-wall"){{
             autotile = true;
+        }};
+
+        characterOverlay = new CharacterOverlay("character-overlay"){{
+            color = Pal.metalGrayDark;
         }};
 
         Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)
