@@ -701,10 +701,6 @@ public class Block extends UnlockableContent implements Senseable{
         return liquidFilter[liq.id];
     }
 
-    public boolean canReplace(Tile tile, Block other){
-        return canReplace(other);
-    }
-
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
         if(other.privileged) return false;
