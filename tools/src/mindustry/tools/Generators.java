@@ -80,7 +80,7 @@ public class Generators{
                         //theoretically this might not finish in time, but I doubt that will ever happen
                         mainExecutor.submit(() -> {
                             try{
-                                ImageTileGenerator.generate(basePath, block.name + (variants <= 1 ? "" : "-" + (variant+1)), new Fi("../../../assets-raw/sprites_out/blocks/environment/" + (block.name + (variants <= 1 ? "" : "-" + (variant+1)))));
+                                ImageTileGenerator.generate(basePath, block.name + (variants <= 1 ? "" : "-" + (variant+1)), new Fi("../../../assets-raw/sprites_out/blocks/environment"));
                             }catch(Throwable e){
                                 Log.err("Failed to autotile: " + block.name, e);
                             }finally{
@@ -514,7 +514,7 @@ public class Generators{
                 Pixmap container = new Pixmap(base.width + 10, base.height + 10);
                 container.draw(base, 5, 5, true);
 
-                replace("sector-" + item.name, container.outline(Pal.darkerGray, 5));
+                replace("../ui/sector-" + item.name, "sector-" + item.name, container.outline(Pal.darkerGray, 5));
             }
         });
 
