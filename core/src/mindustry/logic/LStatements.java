@@ -1937,18 +1937,13 @@ public class LStatements{
         }
 
         @Override
-        public boolean privileged(){
-            return true;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new SetRateI(builder.var(amount));
         }
 
         @Override
         public LCategory category(){
-            return LCategory.world;
+            return LCategory.control;
         }
     }
 
