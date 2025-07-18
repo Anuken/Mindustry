@@ -95,7 +95,7 @@ public class HudFragment{
                     control.input.block.lastConfig = col.rgba8888();
                 }
             })).left().width(250f).pad(3f).row();
-        }, () -> control.input.block != null && control.input.block.showColorEdit).growX().row();
+        }, () -> control.input.block != null && control.input.block.showColorEdit).with(c -> c.setEnforceMinSize(true)).growX().row();
         cont.add(pane).expandY().top().left();
 
         rebuildBlockSelection(blockSelection, "");
