@@ -72,6 +72,9 @@ public class HudFragment{
             }
         });
 
+        Table[] configTable = {null};
+        Block[] lastBlock = {null};
+
         cont.table(search -> {
             search.image(Icon.zoom).padRight(8);
             search.field("", text -> rebuildBlockSelection(blockSelection, text)).growX()
@@ -79,23 +82,18 @@ public class HudFragment{
         }).growX().pad(-2).padLeft(6f);
         cont.row();
         cont.collapser(t -> {
-            t.button(b -> {
-                b.margin(4f);
-                b.left();
-                b.table(Tex.pane, in -> {
-                    in.image(Tex.whiteui).update(i -> {
-                        if(control.input.block != null && control.input.block.lastConfig instanceof Integer col){
-                            i.color.set(col | 0xff);
-                        }
-                    }).grow();
-                }).margin(4).size(50f).padRight(10);
-                b.add("@color");
-            }, Styles.cleart, () -> ui.picker.show(control.input.block != null && control.input.block.lastConfig instanceof Integer col ? new Color(col | 0xff) : new Color(Color.white), false, col -> {
+            configTable[0] = t;
+        }, () -> control.input.block != null && control.input.block.editorConfigurable).with(c -> c.setEnforceMinSize(true)).update(col -> {
+
+            if(lastBlock[0] != control.input.block){
+                configTable[0].clear();
                 if(control.input.block != null){
-                    control.input.block.lastConfig = col.rgba8888();
+                    control.input.block.buildEditorConfig(configTable[0]);
+                    col.invalidateHierarchy();
                 }
-            })).left().width(250f).pad(3f).row();
-        }, () -> control.input.block != null && control.input.block.showColorEdit).with(c -> c.setEnforceMinSize(true)).growX().row();
+                lastBlock[0] = control.input.block;
+            }
+        }).growX().row();
         cont.add(pane).expandY().top().left();
 
         rebuildBlockSelection(blockSelection, "");

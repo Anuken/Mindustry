@@ -80,8 +80,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean displayFlow = true;
     /** whether this block is visible in the editor */
     public boolean inEditor = true;
-    /** if true, a color picker will be shown for the lastConfig field in the in-game-editor, and will be assigned as an integer. */
-    public boolean showColorEdit;
+    /** if true, {@link #buildEditorConfig(Table)} will be called for configuring this block in the editor. */
+    public boolean editorConfigurable;
     /** the last configuration value applied to this block. */
     public @Nullable Object lastConfig;
     /** whether to save the last config and apply it to newly placed blocks */
@@ -701,6 +701,10 @@ public class Block extends UnlockableContent implements Senseable{
         return liquidFilter[liq.id];
     }
 
+    public boolean canReplace(Tile tile, Block other){
+        return canReplace(other);
+    }
+
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
         if(other.privileged) return false;
@@ -945,6 +949,18 @@ public class Block extends UnlockableContent implements Senseable{
     /** @return whether this block supports a specific environment. */
     public boolean supportsEnv(int env){
         return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
+    }
+
+    /** Called to set up configuration UI in the editor. {@link #editorConfigurable} must be true.
+     * Config value should be assigned to lastConfig.*/
+    public void buildEditorConfig(Table table){}
+
+    /** Called when the block is picked (middle click). Clientside only! */
+    public void onPicked(Tile tile){}
+
+    /** @return the config value returned when this block is picked on a certain tile. This is only called for non-buildings. */
+    public Object getConfig(Tile tile){
+        return null;
     }
 
     /** Called when this block is set on the specified tile. */

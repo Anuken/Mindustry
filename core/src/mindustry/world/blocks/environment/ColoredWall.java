@@ -2,6 +2,7 @@ package mindustry.world.blocks.environment;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -19,7 +20,7 @@ public class ColoredWall extends StaticWall{
     public ColoredWall(String name){
         super(name);
         saveData = true;
-        showColorEdit = true;
+        editorConfigurable = true;
         saveConfig = true;
     }
 
@@ -27,6 +28,16 @@ public class ColoredWall extends StaticWall{
     public void init(){
         super.init();
         lastConfig = defaultColorRgba = defaultColor.rgba();
+    }
+
+    @Override
+    public Object getConfig(Tile tile){
+        return tile.extraData;
+    }
+
+    @Override
+    public void buildEditorConfig(Table table){
+        ColoredFloor.showColorEdit(table, this);
     }
 
     @Override

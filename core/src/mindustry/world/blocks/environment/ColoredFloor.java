@@ -3,12 +3,16 @@ package mindustry.world.blocks.environment;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+
+import static mindustry.Vars.*;
 
 public class ColoredFloor extends Floor{
     /** If the alpha value of the color is set to this value, different colors are ignored and no border is drawn. */
@@ -24,7 +28,7 @@ public class ColoredFloor extends Floor{
     public ColoredFloor(String name){
         super(name);
         saveData = true;
-        showColorEdit = true;
+        editorConfigurable = true;
         saveConfig = true;
     }
 
@@ -32,6 +36,34 @@ public class ColoredFloor extends Floor{
     public void init(){
         super.init();
         lastConfig = defaultColorRgba = defaultColor.rgba();
+    }
+
+    @Override
+    public void buildEditorConfig(Table table){
+        showColorEdit(table, this);
+    }
+
+    public static void showColorEdit(Table t, Block block){
+        t.button(b -> {
+            b.margin(4f);
+            b.left();
+            b.table(Tex.pane, in -> {
+                in.image(Tex.whiteui).update(i -> {
+                    if(block.lastConfig instanceof Integer col){
+                        i.color.set(col | 0xff);
+                    }
+                }).grow();
+            }).margin(4).size(50f).padRight(10);
+            b.add("@color");
+        }, Styles.cleart, () ->
+            ui.picker.show(
+                block.lastConfig instanceof Integer col ? new Color(col | 0xff) : new Color(Color.white), false,
+                col -> block.lastConfig = col.rgba8888())).left().width(250f).pad(3f).row();
+    }
+
+    @Override
+    public Object getConfig(Tile tile){
+        return tile.extraData;
     }
 
     @Override

@@ -153,8 +153,8 @@ public class PlacementFragment{
                     tile.floor() != Blocks.air ? tile.floor() : null;
             }
 
-            if(tryBlock != null && tryBlock.showColorEdit && tryConfig == null){
-                tryConfig = tile.extraData;
+            if(tryBlock != null && build == null && tryConfig == null){
+                tryConfig = tryBlock.getConfig(tile);
             }
 
             if(tryBlock != null && ((tryBlock.isVisible() && unlocked(tryBlock)) || state.rules.editor)){
@@ -163,6 +163,7 @@ public class PlacementFragment{
                 if(tryBlock.isVisible()){
                     currentCategory = input.block.category;
                 }
+                tryBlock.onPicked(tile);
                 return true;
             }
         }
