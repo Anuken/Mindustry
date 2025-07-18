@@ -39,6 +39,7 @@ public class MapIO{
             SaveIO.readHeader(stream);
             int version = stream.readInt();
             SaveVersion ver = SaveIO.getSaveWriter(version);
+            if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
             StringMap tags = new StringMap();
             ver.region("meta", stream, counter, in -> tags.putAll(ver.readStringMap(in)));
             return new Map(file, tags.getInt("width"), tags.getInt("height"), tags, custom, version, Version.build);
@@ -69,6 +70,7 @@ public class MapIO{
             SaveIO.readHeader(stream);
             int version = stream.readInt();
             SaveVersion ver = SaveIO.getSaveWriter(version);
+            if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
             ver.region("meta", stream, counter, ver::readStringMap);
 
             Pixmap floors = new Pixmap(map.width, map.height);

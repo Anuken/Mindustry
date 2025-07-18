@@ -32,7 +32,7 @@ public class SaveIO{
         return versionArray.peek();
     }
 
-    public static SaveVersion getSaveWriter(int version){
+    public static @Nullable SaveVersion getSaveWriter(int version){
         return versions.get(version);
     }
 
