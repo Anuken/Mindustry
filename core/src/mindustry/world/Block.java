@@ -382,11 +382,10 @@ public class Block extends UnlockableContent implements Senseable{
     protected Seq<Consume> consumeBuilder = new Seq<>();
 
     protected TextureRegion[] generatedIcons;
-    protected TextureRegion[] editorVariantRegions;
 
     /** Regions indexes from icons() that are rotated. If either of these is not -1, other regions won't be rotated in ConstructBlocks. */
     public int regionRotated1 = -1, regionRotated2 = -1;
-    public TextureRegion region, editorIcon;
+    public TextureRegion region;
     public @Load("@-shadow") TextureRegion customShadowRegion;
     public @Load("@-team") TextureRegion teamRegion;
     public TextureRegion[] teamRegions, variantRegions, variantShadowRegions;
@@ -862,24 +861,6 @@ public class Block extends UnlockableContent implements Senseable{
         }else{
             placer.get(x, y);
         }
-    }
-
-    /** Never use outside of the editor! */
-    public TextureRegion editorIcon(){
-        return editorIcon == null ? (editorIcon = Core.atlas.find(name + "-icon-editor")) : editorIcon;
-    }
-
-    /** Never use outside of the editor! */
-    public TextureRegion[] editorVariantRegions(){
-        if(editorVariantRegions == null){
-            variantRegions();
-            editorVariantRegions = new TextureRegion[variantRegions.length];
-            for(int i = 0; i < variantRegions.length; i++){
-                AtlasRegion region = (AtlasRegion)variantRegions[i];
-                editorVariantRegions[i] = Core.atlas.find("editor-" + region.name);
-            }
-        }
-        return editorVariantRegions;
     }
 
     /** @return special icons to outline and save with an -outline variant. Vanilla only. */
@@ -1388,13 +1369,6 @@ public class Block extends UnlockableContent implements Senseable{
             mapColor.set(image.get(image.width/2, image.height/2));
         }
 
-        if(variants > 0){
-            for(int i = 0; i < variants; i++){
-                String rname = name + (i + 1);
-                packer.add(PageType.editor, "editor-" + rname, Core.atlas.getPixmap(rname));
-            }
-        }
-
         Seq<Pixmap> toDispose = new Seq<>();
 
         //generate paletted team regions
@@ -1459,8 +1433,6 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
-        PixmapRegion editorBase;
-
         if(gen.length > 1){
             Pixmap base = Core.atlas.getPixmap(gen[0]).crop();
             for(int i = 1; i < gen.length; i++){
@@ -1472,14 +1444,10 @@ public class Block extends UnlockableContent implements Senseable{
             }
             packer.add(PageType.main, "block-" + name + "-full", base);
 
-            editorBase = new PixmapRegion(base);
             toDispose.add(base);
         }else{
             if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", Core.atlas.getPixmap(gen[0]));
-            editorBase = gen[0] == null ? Core.atlas.getPixmap(fullIcon) : Core.atlas.getPixmap(gen[0]);
         }
-
-        packer.add(PageType.editor, name + "-icon-editor", editorBase);
 
         toDispose.each(Pixmap::dispose);
     }

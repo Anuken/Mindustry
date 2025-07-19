@@ -97,7 +97,7 @@ public class CacheLayer{
 
         @Override
         public void begin(){
-            if(!Core.settings.getBool("animatedwater")) return;
+            if(!renderer.animateWater) return;
 
             renderer.effectBuffer.begin();
             Core.graphics.clear(Color.clear);
@@ -106,7 +106,7 @@ public class CacheLayer{
 
         @Override
         public void end(){
-            if(!Core.settings.getBool("animatedwater")) return;
+            if(!renderer.animateWater) return;
 
             renderer.effectBuffer.end();
             renderer.effectBuffer.blit(shader);

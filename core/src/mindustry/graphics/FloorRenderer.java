@@ -111,10 +111,17 @@ public class FloorRenderer{
         Events.on(WorldLoadEvent.class, event -> clearTiles());
     }
 
+    public IndexData getIndexData(){
+        return indexData;
+    }
+
     /** Queues up a cache change for a tile. Only runs in render loop. */
     public void recacheTile(Tile tile){
-        //recaching all layers may not be necessary
-        recacheSet.add(Point2.pack(tile.x / chunksize, tile.y / chunksize));
+        recacheTile(tile.x, tile.y);
+    }
+
+    public void recacheTile(int x, int y){
+        recacheSet.add(Point2.pack(x / chunksize, y / chunksize));
     }
 
     public void drawFloor(){
@@ -127,10 +134,10 @@ public class FloorRenderer{
         float pad = tilesize/2f;
 
         int
-            minx = (int)((camera.position.x - camera.width/2f - pad) / chunkunits),
-            miny = (int)((camera.position.y - camera.height/2f - pad) / chunkunits),
-            maxx = Mathf.ceil((camera.position.x + camera.width/2f + pad) / chunkunits),
-            maxy = Mathf.ceil((camera.position.y + camera.height/2f + pad) / chunkunits);
+            minx = Math.max((int)((camera.position.x - camera.width/2f - pad) / chunkunits), 0),
+            miny = Math.max((int)((camera.position.y - camera.height/2f - pad) / chunkunits), 0),
+            maxx = Math.min(Mathf.ceil((camera.position.x + camera.width/2f + pad) / chunkunits), cache.length),
+            maxy = Math.min(Mathf.ceil((camera.position.y + camera.height/2f + pad) / chunkunits), cache[0].length);
 
         int layers = CacheLayer.all.length;
 
@@ -221,10 +228,10 @@ public class FloorRenderer{
         Camera camera = Core.camera;
 
         int
-            minx = (int)((camera.position.x - camera.width/2f - pad) / chunkunits),
-            miny = (int)((camera.position.y - camera.height/2f - pad) / chunkunits),
-            maxx = Mathf.ceil((camera.position.x + camera.width/2f + pad) / chunkunits),
-            maxy = Mathf.ceil((camera.position.y + camera.height/2f + pad) / chunkunits);
+            minx = Math.max((int)((camera.position.x - camera.width/2f - pad) / chunkunits), 0),
+            miny = Math.max((int)((camera.position.y - camera.height/2f - pad) / chunkunits), 0),
+            maxx = Math.min(Mathf.ceil((camera.position.x + camera.width/2f + pad) / chunkunits), cache.length),
+            maxy = Math.min(Mathf.ceil((camera.position.y + camera.height/2f + pad) / chunkunits), cache[0].length);
 
         layer.begin();
 

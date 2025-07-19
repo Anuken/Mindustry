@@ -66,10 +66,11 @@ public class EditorTile extends Tile{
             if(build != null) op(DrawOperation.opRotation, (byte)build.rotation);
             if(build != null) op(DrawOperation.opTeam, (byte)build.team.id);
             op(DrawOperation.opBlock, block.id);
-
         }
 
         super.setBlock(type, team, rotation, entityprov);
+
+        renderer.blocks.updateShadowTile(this);
     }
 
     @Override
@@ -151,6 +152,11 @@ public class EditorTile extends Tile{
             if(block.hasLiquids) build.liquids = new LiquidModule();
             if(block.hasPower) build.power = new PowerModule();
         }
+    }
+
+    @Override
+    public boolean isDarkened(){
+        return skip() && super.isDarkened();
     }
 
     private void update(){

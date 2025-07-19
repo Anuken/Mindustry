@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -15,7 +14,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class MapRenderer implements Disposable{
-    private static final int chunkSize = 64;
+    private static final int chunkSize = 62;
     private IndexedRenderer[][] chunks;
     private IntSet updates = new IntSet();
     private IntSet delayedUpdates = new IntSet();
@@ -43,10 +42,56 @@ public class MapRenderer implements Disposable{
         this.width = width;
         this.height = height;
         updateAll();
+
+        renderer.blocks.floor.clearTiles();
+        renderer.blocks.reload();
     }
 
-    public void draw(float tx, float ty, float tw, float th){
+    public void draw(float tx, float ty, float tw, float th, float zoom){
         Draw.flush();
+
+        //TODO properly integrate this later
+        if(true){
+            updates.each(i -> renderer.blocks.floor.recacheTile(i % width, i / width));
+            updates.clear();
+
+            updates.addAll(delayedUpdates);
+            delayedUpdates.clear();
+
+            renderer.blocks.floor.checkChanges();
+
+            boolean prev = renderer.animateWater;
+            renderer.animateWater = false;
+
+            Core.camera.position.set(world.width()/2f * tilesize, world.height()/2f * tilesize);
+            Core.camera.width = 999999f;
+            Core.camera.height = 999999f;
+            Core.camera.mat.set(Draw.proj()).mul(Tmp.m3.setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize)).translate(4f, 4f));
+            renderer.blocks.floor.drawFloor();
+
+            Tmp.m2.set(Draw.proj());
+
+            //this sure is awful!
+            Gl.disable(Gl.scissorTest);
+
+            renderer.blocks.processShadows();
+
+            Gl.enable(Gl.scissorTest);
+
+            Draw.proj(Core.camera.mat);
+
+            Draw.shader(Shaders.darkness);
+            Draw.rect(Draw.wrap(renderer.blocks.getShadowBuffer().getTexture()), world.width() * tilesize/2f - tilesize/2f, world.height() * tilesize/2f - tilesize/2f, world.width() * tilesize, -world.height() * tilesize);
+            Draw.shader();
+
+            Draw.proj(Tmp.m2);
+
+            renderer.blocks.floor.beginDraw();
+            renderer.blocks.floor.drawLayer(CacheLayer.walls);
+            renderer.animateWater = prev;
+            return;
+        }
+
         clearEditor = Core.atlas.find("clear-editor");
 
         updates.each(i -> render(i % width, i / width));
@@ -60,7 +105,7 @@ public class MapRenderer implements Disposable{
             return;
         }
 
-        var texture = Core.atlas.find("clear-editor").texture;
+        var texture = clearEditor.texture;
 
         for(int x = 0; x < chunks.length; x++){
             for(int y = 0; y < chunks[0].length; y++){
@@ -92,10 +137,10 @@ public class MapRenderer implements Disposable{
     }
 
     private TextureRegion getIcon(Block wall, int index){
-        return !wall.editorIcon().found() ?
+        return !wall.fullIcon.found() ?
             clearEditor : wall.variants > 0 ?
-            wall.editorVariantRegions()[Mathf.randomSeed(index, 0, wall.editorVariantRegions().length - 1)] :
-            wall.editorIcon();
+            wall.variantRegions()[Mathf.randomSeed(index, 0, wall.variantRegions().length - 1)] :
+            wall.fullIcon;
     }
 
     private void render(int wx, int wy){
@@ -104,7 +149,6 @@ public class MapRenderer implements Disposable{
         IndexedRenderer mesh = chunks[x][y];
         Tile tile = editor.tiles().getn(wx, wy);
 
-        Team team = tile.team();
         Floor floor = tile.floor();
         Floor overlay = tile.overlay();
         Block wall = tile.block();
@@ -113,12 +157,11 @@ public class MapRenderer implements Disposable{
 
         int idxWall = (wx % chunkSize) + (wy % chunkSize) * chunkSize;
         int idxDecal = (wx % chunkSize) + (wy % chunkSize) * chunkSize + chunkSize * chunkSize;
-        boolean center = tile.isCenter();
-        boolean useSyntheticWall = wall.synthetic() || overlay.wallOre;
+        boolean useSyntheticWall = overlay.wallOre;
 
         //draw synthetic wall or floor OR standard wall if wall ore
         if(wall != Blocks.air && useSyntheticWall){
-            region = !center ? clearEditor : getIcon(wall, idxWall);
+            region = getIcon(wall, idxWall);
 
             float width = region.width * region.scl(), height = region.height * region.scl(), ox = wall.offset + (tilesize - width) / 2f, oy = wall.offset + (tilesize - height) / 2f;
 
@@ -138,7 +181,7 @@ public class MapRenderer implements Disposable{
                 mesh.setColor(Tmp.c1.set(tile.extraData | 0xff));
             }
 
-            region = floor.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, floor.editorVariantRegions().length - 1)];
+            region = floor.variantRegions()[Mathf.randomSeed(idxWall, 0, floor.variantRegions().length - 1)];
 
             mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
         }
@@ -146,14 +189,7 @@ public class MapRenderer implements Disposable{
         float offsetX = -((wall.size + 1) / 3) * tilesize, offsetY = -((wall.size + 1) / 3) * tilesize;
 
         //draw non-synthetic wall or ore
-        if((wall.update || wall.destructible) && center){
-            mesh.setColor(team.color);
-            region = Core.atlas.find("block-border-editor");
-            if(wall.size == 2){
-                offsetX += tilesize;
-                offsetY += tilesize;
-            }
-        }else if(!useSyntheticWall && wall != Blocks.air && center){
+        if(!(wall.update || wall.destructible) && !useSyntheticWall && wall != Blocks.air){
             region = getIcon(wall, idxWall);
 
             if(wall == Blocks.cliff){
@@ -169,7 +205,7 @@ public class MapRenderer implements Disposable{
             if(floor.isLiquid){
                 mesh.setColor(Tmp.c1.set(1f, 1f, 1f, floor.overlayAlpha));
             }
-            region = overlay.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.overlay().editorVariantRegions().length - 1)];
+            region = overlay.variantRegions()[Mathf.randomSeed(idxWall, 0, tile.overlay().variantRegions().length - 1)];
         }else{
             region = clearEditor;
         }

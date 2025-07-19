@@ -94,7 +94,6 @@ public class Generators{
                             Pixmap out = new Pixmap(basePath);
                             Pixmap cropped = out.crop(32, 32, 32, 32);
                             iconPath.writePng(cropped);
-                            iconPath.parent().parent().parent().child("editor").child("editor-" + block.name + ".png").writePng(cropped);
                             out.dispose();
                             gens.put(block, cropped);
                         }
@@ -262,7 +261,6 @@ public class Generators{
 
                     Fi fi = Fi.get("../blocks/environment/cliffmask" + (val & 0xff) + ".png");
                     fi.writePng(result);
-                    fi.copyTo(Fi.get("../editor").child("editor-" + fi.name()));
                 });
             }
 
@@ -323,14 +321,6 @@ public class Generators{
                 block.getRegionsToOutline(toOutline);
 
                 TextureRegion[] regions = block.getGeneratedIcons();
-
-                if(block.variants > 0 || block instanceof Floor){
-                    for(TextureRegion region : block.variantRegions()){
-                        GenRegion gen = (GenRegion)region;
-                        if(gen.path == null) continue;
-                        gen.path.copyTo(Fi.get("../editor/editor-" + gen.path.name()));
-                    }
-                }
 
                 for(TextureRegion region : block.makeIconRegions()){
                     GenRegion gen = (GenRegion)region;
@@ -418,7 +408,6 @@ public class Generators{
                             save(image, "block-" + block.name + "-full");
                         }
 
-                        save(image, "../editor/" + block.name + "-icon-editor");
                         saveScaled(image, "../ui/block-" + block.name + "-ui", Math.min(image.width, maxUiIcon));
                     }else if(gens.containsKey(block)){
                         image = gens.get(block);
@@ -472,9 +461,8 @@ public class Generators{
                         }
                     }
 
-                    String name = floor.name + "" + (++index);
+                    String name = floor.name + (++index);
                     save(res, "../blocks/environment/" + name);
-                    save(res, "../editor/editor-" + name);
 
                     gens.put(floor, res);
                 }
@@ -828,7 +816,6 @@ public class Generators{
                     replace(ore.variantRegions[i], image);
 
                     save(image, "../blocks/environment/" + ore.name + (i + 1));
-                    save(image, "../editor/editor-" + ore.name + (i + 1));
 
                     save(image, "block-" + ore.name + "-full");
                     save(image, "../ui/block-" + ore.name + "-ui");

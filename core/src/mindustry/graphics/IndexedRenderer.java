@@ -5,6 +5,9 @@ import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
+
+import java.nio.*;
 
 public class IndexedRenderer implements Disposable{
     private static final int vsize = 5;
@@ -34,9 +37,10 @@ public class IndexedRenderer implements Disposable{
     }
     """
     );
-    private static final float[] tmpVerts = new float[vsize * 6];
+    private static final float[] tmpVerts = new float[vsize * 4];
 
     private Mesh mesh;
+    private FloatBuffer buffer;
 
     private Mat projMatrix = new Mat();
     private Mat transMatrix = new Mat();
@@ -57,7 +61,7 @@ public class IndexedRenderer implements Disposable{
 
         program.setUniformMatrix4("u_projTrans", combined);
 
-        mesh.render(program, Gl.triangles, 0, mesh.getMaxVertices());
+        mesh.render(program, Gl.triangles, 0, mesh.getMaxVertices() * 6 / 4);
     }
 
     public void setColor(Color color){
@@ -94,26 +98,19 @@ public class IndexedRenderer implements Disposable{
         vertices[idx++] = u2;
         vertices[idx++] = v2;
 
-        //tri2
-        vertices[idx++] = fx2;
-        vertices[idx++] = fy2;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v2;
-
         vertices[idx++] = fx2;
         vertices[idx++] = y;
         vertices[idx++] = color;
         vertices[idx++] = u2;
         vertices[idx++] = v;
 
-        vertices[idx++] = x;
-        vertices[idx++] = y;
-        vertices[idx++] = color;
-        vertices[idx++] = u;
-        vertices[idx++] = v;
+        int dest = index * vsize * 4;
 
-        mesh.updateVertices(index * vsize * 6, vertices);
+        buffer.position(dest);
+        buffer.put(vertices);
+
+        //mark dirty
+        mesh.getVerticesBuffer();
     }
 
     public void draw(int index, TextureRegion region, float x, float y, float w, float h, float rotation){
@@ -166,26 +163,19 @@ public class IndexedRenderer implements Disposable{
         vertices[idx++] = u2;
         vertices[idx++] = v2;
 
-        //tri2
-        vertices[idx++] = x3;
-        vertices[idx++] = y3;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v2;
-
         vertices[idx++] = x4;
         vertices[idx++] = y4;
         vertices[idx++] = color;
         vertices[idx++] = u2;
         vertices[idx++] = v;
 
-        vertices[idx++] = x1;
-        vertices[idx++] = y1;
-        vertices[idx++] = color;
-        vertices[idx++] = u;
-        vertices[idx++] = v;
+        int dest = index * vsize * 4;
 
-        mesh.updateVertices(index * vsize * 6, vertices);
+        buffer.position(dest);
+        buffer.put(vertices);
+
+        //mark dirty
+        mesh.getVerticesBuffer();
     }
 
     public Mat getTransformMatrix(){
@@ -199,13 +189,15 @@ public class IndexedRenderer implements Disposable{
     public void resize(int sprites){
         if(mesh != null) mesh.dispose();
 
-        mesh = new Mesh(true, 6 * sprites, 0,
+        mesh = new Mesh(true, 4 * sprites, 0,
         VertexAttribute.position,
         VertexAttribute.color,
         VertexAttribute.texCoords);
 
-        //TODO why is this the only way to get it working properly? it should not need an array
-        mesh.setVertices(new float[6 * sprites * vsize]);
+        buffer = mesh.getVerticesBuffer();
+        buffer.limit(buffer.capacity());
+
+        mesh.indices = Vars.renderer.blocks.floor.getIndexData();
     }
 
     private void updateMatrix(){
