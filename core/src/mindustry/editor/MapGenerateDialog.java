@@ -185,7 +185,7 @@ public class MapGenerateDialog extends BaseDialog{
         }
 
         //reset undo stack as generation... messes things up
-        editor.renderer.updateAll();
+        editor.renderer.recache();
         editor.clearOp();
     }
 

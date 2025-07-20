@@ -101,7 +101,7 @@ public class CacheLayer{
 
             renderer.effectBuffer.begin();
             Core.graphics.clear(Color.clear);
-            renderer.blocks.floor.beginc();
+            renderer.blocks.floor.beginDraw();
         }
 
         @Override
@@ -110,7 +110,7 @@ public class CacheLayer{
 
             renderer.effectBuffer.end();
             renderer.effectBuffer.blit(shader);
-            renderer.blocks.floor.beginc();
+            renderer.blocks.floor.beginDraw();
         }
     }
 }

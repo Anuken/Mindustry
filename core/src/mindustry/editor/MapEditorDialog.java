@@ -303,7 +303,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         state.rules = (lastSavedRules == null ? new Rules() : lastSavedRules);
         lastSavedRules = null;
         saved = false;
-        editor.renderer.updateAll();
+        editor.renderer.recache();
     }
 
     private void editInGame(){

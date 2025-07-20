@@ -4,6 +4,7 @@ import arc.func.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.modules.*;
@@ -46,13 +47,16 @@ public class EditorTile extends Tile{
 
     @Override
     public void setBlock(Block type, Team team, int rotation, Prov<Building> entityprov){
+        Block prev = this.block;
+        Tile prevCenter = (build == null ? this : build.tile);
+
         if(skip()){
             super.setBlock(type, team, rotation, entityprov);
             return;
         }
 
         if(this.block == type && (build == null || build.rotation == rotation)){
-            update();
+            updateStatic();
             return;
         }
 
@@ -61,7 +65,7 @@ public class EditorTile extends Tile{
             cen.op(DrawOperation.opRotation, (byte)build.rotation);
             cen.op(DrawOperation.opTeam, (byte)build.team.id);
             cen.op(DrawOperation.opBlock, block.id);
-            update();
+            updateStatic();
         }else{
             if(build != null) op(DrawOperation.opRotation, (byte)build.rotation);
             if(build != null) op(DrawOperation.opTeam, (byte)build.team.id);
@@ -70,7 +74,20 @@ public class EditorTile extends Tile{
 
         super.setBlock(type, team, rotation, entityprov);
 
-        renderer.blocks.updateShadowTile(this);
+        if(requiresBlockUpdate(type) || requiresBlockUpdate(prev)){
+            if(prev.size > 1){
+                prevCenter.getLinkedTilesAs(prev, tile -> {
+                    editor.renderer.updateBlock(tile.x, tile.y);
+                    renderer.blocks.updateShadowTile(tile);
+                });
+            }
+            getLinkedTiles(tile -> {
+                editor.renderer.updateBlock(tile.x, tile.y);
+                renderer.blocks.updateShadowTile(tile);
+            });
+        }else{
+            renderer.blocks.updateShadowTile(this);
+        }
     }
 
     @Override
@@ -84,7 +101,7 @@ public class EditorTile extends Tile{
         op(DrawOperation.opTeam, (byte)getTeamID());
         super.setTeam(team);
 
-        getLinkedTiles(t -> editor.renderer.updatePoint(t.x, t.y));
+        getLinkedTiles(t -> editor.renderer.updateStatic(t.x, t.y));
     }
 
     @Override
@@ -105,7 +122,7 @@ public class EditorTile extends Tile{
         if(skip()){
             super.fireChanged();
         }else{
-            update();
+            updateStatic();
         }
     }
 
@@ -114,7 +131,7 @@ public class EditorTile extends Tile{
         if(skip()){
             super.firePreChanged();
         }else{
-            update();
+            updateStatic();
         }
     }
 
@@ -159,8 +176,12 @@ public class EditorTile extends Tile{
         return skip() && super.isDarkened();
     }
 
-    private void update(){
-        editor.renderer.updatePoint(x, y);
+    private boolean requiresBlockUpdate(Block block){
+        return block != Blocks.air && block.cacheLayer == CacheLayer.normal;
+    }
+
+    private void updateStatic(){
+        editor.renderer.updateStatic(x, y);
     }
 
     private boolean skip(){

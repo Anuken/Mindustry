@@ -3,228 +3,178 @@ package mindustry.editor;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
+import arc.graphics.gl.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
 public class MapRenderer implements Disposable{
-    private static final int chunkSize = 62;
-    private IndexedRenderer[][] chunks;
-    private IntSet updates = new IntSet();
-    private IntSet delayedUpdates = new IntSet();
-    private TextureRegion clearEditor;
+    private static final int chunkSize = 60;
+    private EditorSpriteCache[][] chunks;
+    private IntSet recacheChunks = new IntSet();
     private int width, height;
 
+    private Shader shader;
+
     public void resize(int width, int height){
-        updates.clear();
-        delayedUpdates.clear();
-        if(chunks != null){
-            for(int x = 0; x < chunks.length; x++){
-                for(int y = 0; y < chunks[0].length; y++){
-                    chunks[x][y].dispose();
-                }
-            }
-        }
+        dispose();
 
-        chunks = new IndexedRenderer[(int)Math.ceil((float)width / chunkSize)][(int)Math.ceil((float)height / chunkSize)];
+        recacheChunks.clear();
+        chunks = new EditorSpriteCache[(int)Math.ceil((float)width / chunkSize)][(int)Math.ceil((float)height / chunkSize)];
 
-        for(int x = 0; x < chunks.length; x++){
-            for(int y = 0; y < chunks[0].length; y++){
-                chunks[x][y] = new IndexedRenderer(chunkSize * chunkSize * 2);
-            }
-        }
         this.width = width;
         this.height = height;
-        updateAll();
 
-        renderer.blocks.floor.clearTiles();
-        renderer.blocks.reload();
+        recache();
     }
 
-    public void draw(float tx, float ty, float tw, float th, float zoom){
+    public void draw(float tx, float ty, float tw, float th){
+        if(shader == null){
+            shader = new Shader(
+            """
+            attribute vec4 a_position;
+            attribute vec4 a_color;
+            attribute vec2 a_texCoord0;
+            uniform mat4 u_projTrans;
+            varying vec4 v_color;
+            varying vec2 v_texCoords;
+            void main(){
+               v_color = a_color;
+               v_color.a = v_color.a * (255.0/254.0);
+               v_texCoords = a_texCoord0;
+               gl_Position = u_projTrans * a_position;
+            }
+            """,
+
+            """
+            varying lowp vec4 v_color;
+            varying vec2 v_texCoords;
+            uniform sampler2D u_texture;
+        
+            void main(){
+              gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
+            }
+            """
+            );
+        }
+
         Draw.flush();
 
-        //TODO properly integrate this later
-        if(true){
-            updates.each(i -> renderer.blocks.floor.recacheTile(i % width, i / width));
-            updates.clear();
+        renderer.blocks.floor.checkChanges();
 
-            updates.addAll(delayedUpdates);
-            delayedUpdates.clear();
+        boolean prev = renderer.animateWater;
+        renderer.animateWater = false;
 
-            renderer.blocks.floor.checkChanges();
+        Core.camera.position.set(world.width()/2f * tilesize, world.height()/2f * tilesize);
+        Core.camera.width = 999999f;
+        Core.camera.height = 999999f;
+        Core.camera.mat.set(Draw.proj()).mul(Tmp.m3.setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize)).translate(4f, 4f));
+        renderer.blocks.floor.drawFloor();
 
-            boolean prev = renderer.animateWater;
-            renderer.animateWater = false;
+        Tmp.m2.set(Draw.proj());
 
-            Core.camera.position.set(world.width()/2f * tilesize, world.height()/2f * tilesize);
-            Core.camera.width = 999999f;
-            Core.camera.height = 999999f;
-            Core.camera.mat.set(Draw.proj()).mul(Tmp.m3.setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize)).translate(4f, 4f));
-            renderer.blocks.floor.drawFloor();
+        //scissors are always enabled because this is drawn clipped in UI, make sure they don't interfere with drawing shadow events
+        Gl.disable(Gl.scissorTest);
 
-            Tmp.m2.set(Draw.proj());
+        renderer.blocks.processShadows();
 
-            //this sure is awful!
-            Gl.disable(Gl.scissorTest);
+        Gl.enable(Gl.scissorTest);
 
-            renderer.blocks.processShadows();
+        Draw.proj(Core.camera.mat);
 
-            Gl.enable(Gl.scissorTest);
+        Draw.shader(Shaders.darkness);
+        Draw.rect(Draw.wrap(renderer.blocks.getShadowBuffer().getTexture()), world.width() * tilesize/2f - tilesize/2f, world.height() * tilesize/2f - tilesize/2f, world.width() * tilesize, -world.height() * tilesize);
+        Draw.shader();
 
-            Draw.proj(Core.camera.mat);
+        Draw.proj(Tmp.m2);
 
-            Draw.shader(Shaders.darkness);
-            Draw.rect(Draw.wrap(renderer.blocks.getShadowBuffer().getTexture()), world.width() * tilesize/2f - tilesize/2f, world.height() * tilesize/2f - tilesize/2f, world.width() * tilesize, -world.height() * tilesize);
-            Draw.shader();
+        renderer.blocks.floor.beginDraw();
+        renderer.blocks.floor.drawLayer(CacheLayer.walls);
+        renderer.animateWater = prev;
 
-            Draw.proj(Tmp.m2);
+        if(chunks == null) return;
 
-            renderer.blocks.floor.beginDraw();
-            renderer.blocks.floor.drawLayer(CacheLayer.walls);
-            renderer.animateWater = prev;
-            return;
-        }
+        recacheChunks.each(i -> recacheChunk(Point2.x(i), Point2.y(i)));
+        recacheChunks.clear();
 
-        clearEditor = Core.atlas.find("clear-editor");
-
-        updates.each(i -> render(i % width, i / width));
-        updates.clear();
-
-        updates.addAll(delayedUpdates);
-        delayedUpdates.clear();
-
-        //????
-        if(chunks == null){
-            return;
-        }
-
-        var texture = clearEditor.texture;
+        shader.bind();
+        shader.setUniformMatrix4("u_projTrans", Core.camera.mat);
 
         for(int x = 0; x < chunks.length; x++){
             for(int y = 0; y < chunks[0].length; y++){
-                IndexedRenderer mesh = chunks[x][y];
+                EditorSpriteCache mesh = chunks[x][y];
 
-                if(mesh == null){
-                    continue;
+                if(mesh == null) continue;
+
+                mesh.render(shader);
+            }
+        }
+    }
+
+    void updateStatic(int x, int y){
+        renderer.blocks.floor.recacheTile(x, y);
+    }
+
+    void updateBlock(int x, int y){
+        recacheChunks.add(Point2.pack(x / chunkSize, y / chunkSize));
+    }
+
+    void recache(){
+        renderer.blocks.floor.clearTiles();
+        renderer.blocks.reload();
+
+        for(int x = 0; x < chunks.length; x++){
+            for(int y = 0; y < chunks[0].length; y++){
+                recacheChunk(x, y);
+            }
+        }
+    }
+
+    void recacheChunk(int cx, int cy){
+        if(chunks[cx][cy] != null){
+            chunks[cx][cy].dispose();
+            chunks[cx][cy] = null;
+        }
+
+        EditorSpriteCache cache = new EditorSpriteCache(renderer.blocks.floor.getVertexBuffer());
+
+        for(int x = cx * chunkSize; x < (cx + 1) * chunkSize; x++){
+            for(int y = cy * chunkSize; y < (cy + 1) * chunkSize; y++){
+                Tile tile = world.tile(x, y);
+
+                if(tile != null && tile.block() != Blocks.air && tile.block().cacheLayer == CacheLayer.normal && tile.isCenter()){
+                    Block block = tile.block();
+
+                    TextureRegion region = block.fullIcon;
+
+                    float width = region.width * region.scl(), height = region.height * region.scl();
+
+                    cache.draw(block.fullIcon,
+                    x * tilesize + block.offset - width / 2f,
+                    y * tilesize + block.offset - height / 2f,
+                    width/2f, height/2f,
+                    width, height,
+                    tile.build == null || !block.rotate ? 0 : tile.build.rotdeg(),
+                    Color.whiteFloatBits);
                 }
-
-                mesh.getTransformMatrix().setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize));
-                mesh.setProjectionMatrix(Draw.proj());
-
-                mesh.render(texture);
             }
         }
-    }
 
-    public void updatePoint(int x, int y){
-        updates.add(x + y * width);
-    }
-
-    public void updateAll(){
-        clearEditor = Core.atlas.find("clear-editor");
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                render(x, y);
-            }
+        if(!cache.isEmpty()){
+            cache.build(renderer.blocks.floor.getIndexData());
+            chunks[cx][cy] = cache;
         }
-    }
-
-    private TextureRegion getIcon(Block wall, int index){
-        return !wall.fullIcon.found() ?
-            clearEditor : wall.variants > 0 ?
-            wall.variantRegions()[Mathf.randomSeed(index, 0, wall.variantRegions().length - 1)] :
-            wall.fullIcon;
-    }
-
-    private void render(int wx, int wy){
-        int x = wx / chunkSize, y = wy / chunkSize;
-        if(x >= chunks.length || y >= chunks[0].length) return;
-        IndexedRenderer mesh = chunks[x][y];
-        Tile tile = editor.tiles().getn(wx, wy);
-
-        Floor floor = tile.floor();
-        Floor overlay = tile.overlay();
-        Block wall = tile.block();
-
-        TextureRegion region;
-
-        int idxWall = (wx % chunkSize) + (wy % chunkSize) * chunkSize;
-        int idxDecal = (wx % chunkSize) + (wy % chunkSize) * chunkSize + chunkSize * chunkSize;
-        boolean useSyntheticWall = overlay.wallOre;
-
-        //draw synthetic wall or floor OR standard wall if wall ore
-        if(wall != Blocks.air && useSyntheticWall){
-            region = getIcon(wall, idxWall);
-
-            float width = region.width * region.scl(), height = region.height * region.scl(), ox = wall.offset + (tilesize - width) / 2f, oy = wall.offset + (tilesize - height) / 2f;
-
-            //force fit to tile
-            if(overlay.wallOre && !wall.synthetic()){
-                width = height = tilesize;
-                ox = oy = 0f;
-            }
-
-            mesh.draw(idxWall, region,
-            wx * tilesize + ox,
-            wy * tilesize + oy,
-            width, height,
-            tile.build == null || !wall.rotate ? 0 : tile.build.rotdeg());
-        }else{
-            if(floor instanceof ColoredFloor){
-                mesh.setColor(Tmp.c1.set(tile.extraData | 0xff));
-            }
-
-            region = floor.variantRegions()[Mathf.randomSeed(idxWall, 0, floor.variantRegions().length - 1)];
-
-            mesh.draw(idxWall, region, wx * tilesize, wy * tilesize, 8, 8);
-        }
-
-        float offsetX = -((wall.size + 1) / 3) * tilesize, offsetY = -((wall.size + 1) / 3) * tilesize;
-
-        //draw non-synthetic wall or ore
-        if(!(wall.update || wall.destructible) && !useSyntheticWall && wall != Blocks.air){
-            region = getIcon(wall, idxWall);
-
-            if(wall == Blocks.cliff){
-                mesh.setColor(Tmp.c1.set(floor.mapColor).mul(1.6f));
-                region = ((Cliff)Blocks.cliff).editorCliffs[tile.data & 0xff];
-            }else if(wall instanceof ColoredWall){
-                mesh.setColor(Tmp.c1.set(tile.extraData | 0xff));
-            }
-
-            offsetX = tilesize / 2f - region.width * region.scl() / 2f;
-            offsetY = tilesize / 2f - region.height * region.scl() / 2f;
-        }else if((wall == Blocks.air || overlay.wallOre) && !overlay.isAir()){
-            if(floor.isLiquid){
-                mesh.setColor(Tmp.c1.set(1f, 1f, 1f, floor.overlayAlpha));
-            }
-            region = overlay.variantRegions()[Mathf.randomSeed(idxWall, 0, tile.overlay().variantRegions().length - 1)];
-        }else{
-            region = clearEditor;
-        }
-
-        float width = region.width * region.scl(), height = region.height * region.scl();
-        if(!wall.synthetic() && wall != Blocks.air && !wall.isMultiblock()){
-            offsetX = offsetY = 0f;
-            width = height = tilesize;
-        }
-
-        mesh.draw(idxDecal, region, wx * tilesize + offsetX, wy * tilesize + offsetY, width, height);
-        mesh.setColor(Color.white);
     }
 
     @Override
     public void dispose(){
-        if(chunks == null){
-            return;
-        }
+        if(chunks == null) return;
+
         for(int x = 0; x < chunks.length; x++){
             for(int y = 0; y < chunks[0].length; y++){
                 if(chunks[x][y] != null){

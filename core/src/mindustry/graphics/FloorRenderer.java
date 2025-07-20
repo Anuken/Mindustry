@@ -115,6 +115,10 @@ public class FloorRenderer{
         return indexData;
     }
 
+    public float[] getVertexBuffer(){
+        return vertices;
+    }
+
     /** Queues up a cache change for a tile. Only runs in render loop. */
     public void recacheTile(Tile tile){
         recacheTile(tile.x, tile.y);
@@ -183,14 +187,6 @@ public class FloorRenderer{
         underwaterDraw.clear();
     }
 
-    public void beginc(){
-        shader.bind();
-        shader.setUniformMatrix4("u_projectionViewMatrix", Core.camera.mat);
-
-        //only ever use the base environment texture
-        texture.bind(0);
-    }
-
     public void checkChanges(){
         if(recacheSet.size > 0){
             //recache one chunk at a time
@@ -215,7 +211,11 @@ public class FloorRenderer{
 
         Draw.flush();
 
-        beginc();
+        shader.bind();
+        shader.setUniformMatrix4("u_projectionViewMatrix", Core.camera.mat);
+
+        //only ever use the base environment texture
+        texture.bind(0);
 
         Gl.enable(Gl.blend);
     }
@@ -343,7 +343,7 @@ public class FloorRenderer{
             (cx+1) * tilesize * chunksize + tilesize/2f, (cy+1) * tilesize * chunksize + tilesize/2f);
 
         mesh.setVertices(vertices, 0, vidx);
-        //all vertices are shared
+        //all indices are shared and identical
         mesh.indices = indexData;
 
         return mesh;

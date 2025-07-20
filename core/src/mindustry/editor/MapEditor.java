@@ -374,7 +374,7 @@ public class MapEditor{
         if(currentOp == null) currentOp = new DrawOperation();
         currentOp.addOperation(data);
 
-        renderer.updatePoint(TileOp.x(data), TileOp.y(data));
+        renderer.updateStatic(TileOp.x(data), TileOp.y(data));
     }
 
     class Context implements WorldContext{

@@ -70,7 +70,7 @@ public class DrawOperation{
                     }
                 }
                 case opBlock -> {
-                    tile.getLinkedTiles(t -> editor.renderer.updatePoint(t.x, t.y));
+                    tile.getLinkedTiles(t -> editor.renderer.updateStatic(t.x, t.y));
 
                     Block block = content.block(to);
                     tile.setBlock(block, tile.team(), tile.build == null ? 0 : tile.build.rotation);
@@ -78,7 +78,7 @@ public class DrawOperation{
                         tile.build.enabled = true;
                     }
 
-                    tile.getLinkedTiles(t -> editor.renderer.updatePoint(t.x, t.y));
+                    tile.getLinkedTiles(t -> editor.renderer.updateStatic(t.x, t.y));
                 }
                 case opRotation -> {
                     if(tile.build != null) tile.build.rotation = to;
@@ -86,7 +86,7 @@ public class DrawOperation{
                 case opTeam -> tile.setTeam(Team.get(to));
             }
         });
-        editor.renderer.updatePoint(tile.x, tile.y);
+        editor.renderer.updateStatic(tile.x, tile.y);
     }
 
     @Struct
