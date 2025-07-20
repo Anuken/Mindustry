@@ -56,7 +56,6 @@ public class EditorTile extends Tile{
         }
 
         if(this.block == type && (build == null || build.rotation == rotation)){
-            updateStatic();
             return;
         }
 
@@ -76,15 +75,9 @@ public class EditorTile extends Tile{
 
         if(requiresBlockUpdate(type) || requiresBlockUpdate(prev)){
             if(prev.size > 1){
-                prevCenter.getLinkedTilesAs(prev, tile -> {
-                    editor.renderer.updateBlock(tile.x, tile.y);
-                    renderer.blocks.updateShadowTile(tile);
-                });
+                prevCenter.getLinkedTilesAs(prev, tile -> editor.renderer.updateBlock(tile));
             }
-            getLinkedTiles(tile -> {
-                editor.renderer.updateBlock(tile.x, tile.y);
-                renderer.blocks.updateShadowTile(tile);
-            });
+            getLinkedTiles(tile -> editor.renderer.updateBlock(tile));
         }else{
             renderer.blocks.updateShadowTile(this);
         }
@@ -97,11 +90,11 @@ public class EditorTile extends Tile{
             return;
         }
 
-        if(getTeamID() == team.id) return;
+        if(getTeamID() == team.id || !synthetic()) return;
         op(DrawOperation.opTeam, (byte)getTeamID());
         super.setTeam(team);
 
-        getLinkedTiles(t -> editor.renderer.updateStatic(t.x, t.y));
+        getLinkedTiles(t -> editor.renderer.updateBlock(t.x, t.y));
     }
 
     @Override

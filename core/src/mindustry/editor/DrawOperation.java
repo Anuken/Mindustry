@@ -57,6 +57,15 @@ public class DrawOperation{
     }
 
     void setTile(Tile tile, byte type, short to){
+        if(type == opBlock || type == opTeam || type == opRotation){
+            tile.getLinkedTiles(t -> {
+                editor.renderer.updateBlock(t);
+                editor.renderer.updateStatic(t.x, t.y);
+            });
+        }else{
+            editor.renderer.updateStatic(tile.x, tile.y);
+        }
+
         editor.load(() -> {
             switch(type){
                 case opFloor -> {
@@ -70,15 +79,11 @@ public class DrawOperation{
                     }
                 }
                 case opBlock -> {
-                    tile.getLinkedTiles(t -> editor.renderer.updateStatic(t.x, t.y));
-
                     Block block = content.block(to);
                     tile.setBlock(block, tile.team(), tile.build == null ? 0 : tile.build.rotation);
                     if(tile.build != null){
                         tile.build.enabled = true;
                     }
-
-                    tile.getLinkedTiles(t -> editor.renderer.updateStatic(t.x, t.y));
                 }
                 case opRotation -> {
                     if(tile.build != null) tile.build.rotation = to;
@@ -86,7 +91,13 @@ public class DrawOperation{
                 case opTeam -> tile.setTeam(Team.get(to));
             }
         });
-        editor.renderer.updateStatic(tile.x, tile.y);
+
+        if(type == opBlock || type == opTeam || type == opRotation){
+            tile.getLinkedTiles(t -> {
+                editor.renderer.updateBlock(t);
+                editor.renderer.updateStatic(t.x, t.y);
+            });
+        }
     }
 
     @Struct

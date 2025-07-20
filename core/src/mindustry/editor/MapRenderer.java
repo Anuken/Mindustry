@@ -15,6 +15,8 @@ import static mindustry.Vars.*;
 
 public class MapRenderer implements Disposable{
     private static final int chunkSize = 60;
+    private static final Seq<Tile> tmpTiles = new Seq<>();
+
     private EditorSpriteCache[][] chunks;
     private IntSet recacheChunks = new IntSet();
     private int width, height;
@@ -70,6 +72,7 @@ public class MapRenderer implements Disposable{
         boolean prev = renderer.animateWater;
         renderer.animateWater = false;
 
+        Tmp.v3.set(Core.camera.position);
         Core.camera.position.set(world.width()/2f * tilesize, world.height()/2f * tilesize);
         Core.camera.width = 999999f;
         Core.camera.height = 999999f;
@@ -114,10 +117,17 @@ public class MapRenderer implements Disposable{
                 mesh.render(shader);
             }
         }
+
+        Core.camera.position.set(Tmp.v3);
     }
 
     void updateStatic(int x, int y){
         renderer.blocks.floor.recacheTile(x, y);
+    }
+
+    void updateBlock(Tile tile){
+        updateBlock(tile.x, tile.y);
+        renderer.blocks.updateShadowTile(tile);
     }
 
     void updateBlock(int x, int y){
@@ -143,27 +153,50 @@ public class MapRenderer implements Disposable{
 
         EditorSpriteCache cache = new EditorSpriteCache(renderer.blocks.floor.getVertexBuffer());
 
+        TextureRegion teamRegion = Core.atlas.find("block-border");
+
+        tmpTiles.clear();
+
         for(int x = cx * chunkSize; x < (cx + 1) * chunkSize; x++){
             for(int y = cy * chunkSize; y < (cy + 1) * chunkSize; y++){
                 Tile tile = world.tile(x, y);
 
                 if(tile != null && tile.block() != Blocks.air && tile.block().cacheLayer == CacheLayer.normal && tile.isCenter()){
-                    Block block = tile.block();
-
-                    TextureRegion region = block.fullIcon;
-
-                    float width = region.width * region.scl(), height = region.height * region.scl();
-
-                    cache.draw(block.fullIcon,
-                    x * tilesize + block.offset - width / 2f,
-                    y * tilesize + block.offset - height / 2f,
-                    width/2f, height/2f,
-                    width, height,
-                    tile.build == null || !block.rotate ? 0 : tile.build.rotdeg(),
-                    Color.whiteFloatBits);
+                    tmpTiles.add(tile);
                 }
             }
         }
+
+        tmpTiles.sort(Structs.comparingBool(b -> !b.block().synthetic()));
+
+        for(Tile tile : tmpTiles){
+            int x = tile.x, y = tile.y;
+            Block block = tile.block();
+
+            TextureRegion region = block.fullIcon;
+
+            float width = region.width * region.scl(), height = region.height * region.scl();
+
+            cache.draw(block.fullIcon,
+            x * tilesize + block.offset - width / 2f,
+            y * tilesize + block.offset - height / 2f,
+            width/2f, height/2f,
+            width, height,
+            tile.build == null || !block.rotate ? 0 : tile.build.rotdeg(),
+            Color.whiteFloatBits);
+
+            if(tile.build != null){
+                cache.draw(teamRegion,
+                x * tilesize + block.offset - width / 2f,
+                y * tilesize + block.offset - height / 2f,
+                0f, 0f,
+                teamRegion.width * teamRegion.scl(), teamRegion.height * teamRegion.scl(),
+                0f,
+                tile.build.team.color.toFloatBits());
+            }
+        }
+
+        tmpTiles.clear();
 
         if(!cache.isEmpty()){
             cache.build(renderer.blocks.floor.getIndexData());

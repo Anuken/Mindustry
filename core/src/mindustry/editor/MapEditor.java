@@ -148,6 +148,7 @@ public class MapEditor{
             y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
             if(!hasOverlap(x, y)){
                 tile(x, y).setBlock(drawBlock, drawTeam, rotation);
+                addTileOp(TileOp.get((short)x, (short)y, (byte)DrawOperation.opTeam, (byte)drawTeam.id));
             }
         }else{
             boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;
@@ -169,6 +170,10 @@ public class MapEditor{
                     }
 
                     tile.setBlock(drawBlock, drawTeam, rotation);
+
+                    if(drawBlock.synthetic()){
+                        addTileOp(TileOp.get(tile.x, tile.y, (byte)DrawOperation.opTeam, (byte)drawTeam.id));
+                    }
                 }
             };
 
