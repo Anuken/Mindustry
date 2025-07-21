@@ -705,7 +705,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if((cursorX != lastLineX || cursorY != lastLineY) && isPlacing() && mode == placing){
+        if(isPlacing() && mode == placing && (cursorX != lastLineX || cursorY != lastLineY || Core.input.keyTap(Binding.diagonalPlacement) || Core.input.keyRelease(Binding.diagonalPlacement))){
             updateLine(selectX, selectY);
             lastLineX = cursorX;
             lastLineY = cursorY;
