@@ -834,7 +834,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(i == 0) editor.drawBlock = block;
 
-            if(++i % 6 == 0){
+            int cols = mobile ? 4 : 6;
+
+            if(++i % cols == 0){
                 blockSelection.row();
             }
         }

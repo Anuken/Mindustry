@@ -67,7 +67,10 @@ public class MapRenderer implements Disposable{
 
         Draw.flush();
 
-        renderer.blocks.floor.checkChanges();
+        //don't process terrain updates every frame (helps with lag on low end devices)
+        boolean doUpdate = Core.graphics.getFrameId() % 2 == 0;
+
+        if(doUpdate) renderer.blocks.floor.checkChanges();
 
         boolean prev = renderer.animateWater;
         renderer.animateWater = false;
@@ -84,7 +87,7 @@ public class MapRenderer implements Disposable{
         //scissors are always enabled because this is drawn clipped in UI, make sure they don't interfere with drawing shadow events
         Gl.disable(Gl.scissorTest);
 
-        renderer.blocks.processShadows();
+        if(doUpdate) renderer.blocks.processShadows();
 
         Gl.enable(Gl.scissorTest);
 
@@ -102,8 +105,10 @@ public class MapRenderer implements Disposable{
 
         if(chunks == null) return;
 
-        recacheChunks.each(i -> recacheChunk(Point2.x(i), Point2.y(i)));
-        recacheChunks.clear();
+        if(doUpdate){
+            recacheChunks.each(i -> recacheChunk(Point2.x(i), Point2.y(i)));
+            recacheChunks.clear();
+        }
 
         shader.bind();
         shader.setUniformMatrix4("u_projTrans", Core.camera.mat);
