@@ -63,7 +63,7 @@ public class Blocks{
     //old metal floors
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     //new metal floors
-    cruxFloor1, cruxFloor2, cruxFloor3, cruxFloor4, cruxFloor5, cruxFloor6, cruxFloor7, cruxFloor8, cruxFloor9, cruxFloor10, cruxFloor11, cruxFloor12,
+    metalTiles1, metalTiles2, metalTiles3, metalTiles4, metalTiles5, metalTiles6, metalTiles7, metalTiles8, metalTiles9, metalTiles10, metalTiles11, metalTiles12,
 
     //colored
     coloredFloor, coloredWall,
@@ -820,37 +820,37 @@ public class Blocks{
 
         darkMetal = new StaticWall("dark-metal");
 
-        cruxFloor1 = new Floor("crux-floor-1"){{
+        metalTiles1 = new Floor("metal-tiles-1"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
 
-        cruxFloor2 = new Floor("crux-floor-2"){{
+        metalTiles2 = new Floor("metal-tiles-2"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
 
-        cruxFloor3 = new Floor("crux-floor-3"){{
+        metalTiles3 = new Floor("metal-tiles-3"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
 
-        cruxFloor4 = new Floor("crux-floor-4"){{
+        metalTiles4 = new Floor("metal-tiles-4"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
 
-        cruxFloor5 = new Floor("crux-floor-5"){{
+        metalTiles5 = new Floor("metal-tiles-5"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
 
-        cruxFloor6 = new Floor("crux-floor-6"){{
+        metalTiles6 = new Floor("metal-tiles-6"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
@@ -860,40 +860,40 @@ public class Blocks{
             lightColor = Team.crux.color.cpy().a(0.3f);
         }};
 
-        cruxFloor7 = new Floor("crux-floor-7"){{
+        metalTiles7 = new Floor("metal-tiles-7"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
             autotileMidVariants = 9;
         }};
 
-        cruxFloor8 = new Floor("crux-floor-8"){{
+        metalTiles8 = new Floor("metal-tiles-8"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
             autotileMidVariants = 2;
         }};
 
-        cruxFloor9 = new Floor("crux-floor-9"){{
+        metalTiles9 = new Floor("metal-tiles-9"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
 
-        cruxFloor10 = new Floor("crux-floor-10"){{
+        metalTiles10 = new Floor("metal-tiles-10"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
         }};
 
-        cruxFloor11 = new Floor("crux-floor-11"){{
+        metalTiles11 = new Floor("metal-tiles-11"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
             autotileVariants = 3;
         }};
 
-        cruxFloor12 = new Floor("crux-floor-12"){{
+        metalTiles12 = new Floor("metal-tiles-12"){{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
