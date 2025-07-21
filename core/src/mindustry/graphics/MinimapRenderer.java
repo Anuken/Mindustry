@@ -360,6 +360,7 @@ public class MinimapRenderer{
         if(tile == null) return 0;
         Block real = realBlock(tile);
         int bc = real.minimapColor(tile);
+        if(bc == 0 && tile.block() == Blocks.air && tile.overlay() == Blocks.air) bc = tile.floor().minimapColor(tile);
 
         Color color = Tmp.c1.set(bc == 0 ? MapIO.colorFor(real, tile.floor(), tile.overlay(), tile.team()) : bc);
         color.mul(1f - Mathf.clamp(world.getDarkness(tile.x, tile.y) / 4f));

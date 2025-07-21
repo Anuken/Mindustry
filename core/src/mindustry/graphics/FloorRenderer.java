@@ -111,10 +111,21 @@ public class FloorRenderer{
         Events.on(WorldLoadEvent.class, event -> clearTiles());
     }
 
+    public IndexData getIndexData(){
+        return indexData;
+    }
+
+    public float[] getVertexBuffer(){
+        return vertices;
+    }
+
     /** Queues up a cache change for a tile. Only runs in render loop. */
     public void recacheTile(Tile tile){
-        //recaching all layers may not be necessary
-        recacheSet.add(Point2.pack(tile.x / chunksize, tile.y / chunksize));
+        recacheTile(tile.x, tile.y);
+    }
+
+    public void recacheTile(int x, int y){
+        recacheSet.add(Point2.pack(x / chunksize, y / chunksize));
     }
 
     public void drawFloor(){
@@ -127,10 +138,10 @@ public class FloorRenderer{
         float pad = tilesize/2f;
 
         int
-            minx = (int)((camera.position.x - camera.width/2f - pad) / chunkunits),
-            miny = (int)((camera.position.y - camera.height/2f - pad) / chunkunits),
-            maxx = Mathf.ceil((camera.position.x + camera.width/2f + pad) / chunkunits),
-            maxy = Mathf.ceil((camera.position.y + camera.height/2f + pad) / chunkunits);
+            minx = Math.max((int)((camera.position.x - camera.width/2f - pad) / chunkunits), 0),
+            miny = Math.max((int)((camera.position.y - camera.height/2f - pad) / chunkunits), 0),
+            maxx = Math.min(Mathf.ceil((camera.position.x + camera.width/2f + pad) / chunkunits), cache.length),
+            maxy = Math.min(Mathf.ceil((camera.position.y + camera.height/2f + pad) / chunkunits), cache[0].length);
 
         int layers = CacheLayer.all.length;
 
@@ -176,14 +187,6 @@ public class FloorRenderer{
         underwaterDraw.clear();
     }
 
-    public void beginc(){
-        shader.bind();
-        shader.setUniformMatrix4("u_projectionViewMatrix", Core.camera.mat);
-
-        //only ever use the base environment texture
-        texture.bind(0);
-    }
-
     public void checkChanges(){
         if(recacheSet.size > 0){
             //recache one chunk at a time
@@ -208,7 +211,11 @@ public class FloorRenderer{
 
         Draw.flush();
 
-        beginc();
+        shader.bind();
+        shader.setUniformMatrix4("u_projectionViewMatrix", Core.camera.mat);
+
+        //only ever use the base environment texture
+        texture.bind(0);
 
         Gl.enable(Gl.blend);
     }
@@ -221,10 +228,10 @@ public class FloorRenderer{
         Camera camera = Core.camera;
 
         int
-            minx = (int)((camera.position.x - camera.width/2f - pad) / chunkunits),
-            miny = (int)((camera.position.y - camera.height/2f - pad) / chunkunits),
-            maxx = Mathf.ceil((camera.position.x + camera.width/2f + pad) / chunkunits),
-            maxy = Mathf.ceil((camera.position.y + camera.height/2f + pad) / chunkunits);
+            minx = Math.max((int)((camera.position.x - camera.width/2f - pad) / chunkunits), 0),
+            miny = Math.max((int)((camera.position.y - camera.height/2f - pad) / chunkunits), 0),
+            maxx = Math.min(Mathf.ceil((camera.position.x + camera.width/2f + pad) / chunkunits), cache.length),
+            maxy = Math.min(Mathf.ceil((camera.position.y + camera.height/2f + pad) / chunkunits), cache[0].length);
 
         layer.begin();
 
@@ -336,7 +343,7 @@ public class FloorRenderer{
             (cx+1) * tilesize * chunksize + tilesize/2f, (cy+1) * tilesize * chunksize + tilesize/2f);
 
         mesh.setVertices(vertices, 0, vidx);
-        //all vertices are shared
+        //all indices are shared and identical
         mesh.indices = indexData;
 
         return mesh;
@@ -514,7 +521,14 @@ public class FloorRenderer{
 
         @Override
         protected void draw(Texture texture, float[] spriteVertices, int offset, int count){
-            throw new IllegalArgumentException("cache vertices unsupported");
+            if(spriteVertices.length != spriteSize){
+                throw new IllegalArgumentException("cached vertices must be in non-mixcolor format (20 per sprite, 5 per vertex)");
+            }
+
+            float[] verts = vertices;
+            int idx = vidx;
+            System.arraycopy(spriteVertices, offset, verts, idx, spriteSize);
+            vidx += spriteSize;
         }
     }
 }
