@@ -62,7 +62,6 @@ public class Blocks{
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
     //old metal floors
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
-
     //new metal floors
     cruxFloor1, cruxFloor2, cruxFloor3, cruxFloor4, cruxFloor5, cruxFloor6, cruxFloor7, cruxFloor8, cruxFloor9, cruxFloor10, cruxFloor11, cruxFloor12,
 
@@ -843,7 +842,6 @@ public class Blocks{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
-            autotileMidVariants = 2;
         }};
 
         cruxFloor5 = new Floor("crux-floor-5"){{
@@ -873,6 +871,7 @@ public class Blocks{
             autotile = true;
             drawEdgeOut = false;
             drawEdgeIn = false;
+            autotileMidVariants = 2;
         }};
 
         cruxFloor9 = new Floor("crux-floor-9"){{
