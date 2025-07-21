@@ -141,6 +141,23 @@ public class MapIO{
                     }
                     return tile;
                 }
+
+                @Override
+                public void onReadTileData(){
+                    //colored floor/wall tile data will affect the map preview
+
+                    if(!tile.block().synthetic() && tile.block() != Blocks.air){
+                        int color = tile.block().minimapColor(tile);
+                        if(color != 0){
+                            walls.set(tile.x, walls.height - 1 - tile.y, color);
+                        }
+                    }else if(tile.overlay() == Blocks.air && tile.block() == Blocks.air){
+                        int color = tile.floor().minimapColor(tile);
+                        if(color != 0){
+                            floors.set(tile.x, floors.height - 1 - tile.y, color);
+                        }
+                    }
+                }
             }));
 
             floors.draw(walls, true);
@@ -156,7 +173,14 @@ public class MapIO{
         for(int x = 0; x < pixmap.width; x++){
             for(int y = 0; y < pixmap.height; y++){
                 Tile tile = tiles.getn(x, y);
-                pixmap.set(x, pixmap.height - 1 - y, colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team()));
+                int color = 0;
+                if(!tile.block().synthetic() && tile.block() != Blocks.air){
+                    color = tile.block().minimapColor(tile);
+                }else if(tile.overlay() == Blocks.air && tile.block() == Blocks.air){
+                    color = tile.floor().minimapColor(tile);
+                }
+                if(color == 0) color = colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team());
+                pixmap.set(x, pixmap.height - 1 - y, color);
             }
         }
         return pixmap;
@@ -202,7 +226,7 @@ public class MapIO{
         for(Tile tile : tiles){
             //default to stone floor
             if(tile.floor() == Blocks.air){
-                tile.setFloorUnder((Floor)Blocks.stone);
+                tile.setFloor((Floor)Blocks.stone);
             }
         }
     }

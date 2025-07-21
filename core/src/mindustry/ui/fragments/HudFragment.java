@@ -72,12 +72,28 @@ public class HudFragment{
             }
         });
 
+        Table[] configTable = {null};
+        Block[] lastBlock = {null};
+
         cont.table(search -> {
             search.image(Icon.zoom).padRight(8);
             search.field("", text -> rebuildBlockSelection(blockSelection, text)).growX()
             .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
         }).growX().pad(-2).padLeft(6f);
         cont.row();
+        cont.collapser(t -> {
+            configTable[0] = t;
+        }, () -> control.input.block != null && control.input.block.editorConfigurable).with(c -> c.setEnforceMinSize(true)).update(col -> {
+
+            if(lastBlock[0] != control.input.block){
+                configTable[0].clear();
+                if(control.input.block != null){
+                    control.input.block.buildEditorConfig(configTable[0]);
+                    col.invalidateHierarchy();
+                }
+                lastBlock[0] = control.input.block;
+            }
+        }).growX().row();
         cont.add(pane).expandY().top().left();
 
         rebuildBlockSelection(blockSelection, "");

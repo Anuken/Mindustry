@@ -1627,6 +1627,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Draws a placement icon for a specific block. */
     protected void drawPlan(int x, int y, Block block, int rotation){
         bplan.set(x, y, rotation, block);
+        if(block.saveConfig){
+            bplan.config = block.lastConfig;
+        }
         bplan.animScale = 1f;
         block.drawPlan(bplan, allPlans(), validPlace(x, y, block, rotation));
     }
