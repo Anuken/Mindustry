@@ -128,6 +128,10 @@ public class MapRenderer implements Disposable{
 
     void updateStatic(int x, int y){
         renderer.blocks.floor.recacheTile(x, y);
+        if(x > 0) renderer.blocks.floor.recacheTile(x - 1, y);
+        if(y > 0) renderer.blocks.floor.recacheTile(x, y - 1);
+        if(x < world.width() - 1) renderer.blocks.floor.recacheTile(x + 1, y);
+        if(y < world.height() - 1) renderer.blocks.floor.recacheTile(x, y + 1);
     }
 
     void updateBlock(Tile tile){

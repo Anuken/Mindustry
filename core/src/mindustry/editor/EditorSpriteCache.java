@@ -146,7 +146,7 @@ public class EditorSpriteCache implements Disposable{
         index += vertexSize * 4;
     }
 
-    /** Renders the cached mesh. The shader must already have the correct view matrix (usually u_projectionViewMatrix) set as a uniform. */
+    /** Renders the cached mesh. The shader must already have the correct view matrix set as a uniform. */
     public void render(Shader shader){
         if(mesh == null) throw new IllegalStateException("Cache is empty, call build() first.");
 

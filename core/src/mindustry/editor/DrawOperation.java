@@ -10,7 +10,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class DrawOperation{
-    static final int
+    static final byte
     opFloor = 0,
     opBlock = 1,
     opRotation = 2,
