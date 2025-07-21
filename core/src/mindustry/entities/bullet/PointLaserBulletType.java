@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -43,9 +44,6 @@ public class PointLaserBulletType extends BulletType{
         absorbable = false;
         optimalLifeFract = 0.5f;
         shootEffect = smokeEffect = Fx.none;
-        lifetime = 1f;
-        delayFrags = true;
-        pierceCap = 1;
 
         //just make it massive, users of this bullet can adjust as necessary
         drawSize = 1000f;
@@ -84,12 +82,10 @@ public class PointLaserBulletType extends BulletType{
         updateTrail(b);
         updateTrailEffects(b);
         updateBulletInterval(b);
-        
+
         if(b.timer.get(0, damageInterval)){
-            // Recalculate laser length and apply damage
-            Damage.collideLine(b, b.team, b.x, b.y, b.rotation(), length, false, true, pierceCap);
+            Damage.collidePoint(b, b.team, hitEffect, b.aimX, b.aimY);
         }
-        
 
         if(b.timer.get(1, beamEffectInterval)){
             beamEffect.at(b.aimX, b.aimY, beamEffectSize * b.fslope(), hitColor);
