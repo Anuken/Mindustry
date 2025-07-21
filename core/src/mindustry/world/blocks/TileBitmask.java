@@ -1,5 +1,8 @@
 package mindustry.world.blocks;
 
+import arc.*;
+import arc.graphics.g2d.*;
+
 public class TileBitmask{
     /** Autotile bitmasks for 8-directional sprites (see <a href="https://github.com/GglLfr/tile-gen">tile-gen</a>)*/
     public static final int[] values = {
@@ -20,4 +23,23 @@ public class TileBitmask{
     3,  0,  3,  0, 15, 42, 15, 12,  3,  0,  3,  0, 15, 42, 15, 12,
     2,  1,  2,  1,  9, 45,  9, 19,  2,  1,  2,  1, 14, 18, 14, 13,
     };
+
+    public static TextureRegion[] load(String name){
+        var regions = new TextureRegion[47];
+        for(int i = 0; i < 47; i++){
+            regions[i] = Core.atlas.find(name + "-" + i);
+        }
+        return regions;
+    }
+
+    public static TextureRegion[][] loadVariants(String name, int variants){
+        var regions = new TextureRegion[variants][47];
+        for(int v = 0; v < variants; v++){
+            for(int i = 0; i < 47; i++){
+                regions[v][i] = Core.atlas.find(name + "-" + (v+1) + "-" + i);
+            }
+        }
+
+        return regions;
+    }
 }

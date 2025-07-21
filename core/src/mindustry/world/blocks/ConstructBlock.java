@@ -78,7 +78,7 @@ public class ConstructBlock extends Block{
         if(block instanceof OverlayFloor overlay){
             tile.setOverlay(overlay);
         }else if(block instanceof Floor floor){
-            tile.setFloorUnder(floor);
+            tile.setFloor(floor);
         }else{
             tile.setBlock(block, team, rotation);
         }
@@ -112,7 +112,7 @@ public class ConstructBlock extends Block{
             if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
         }
 
-        block.placeEnded(tile, builder);
+        block.placeEnded(tile, builder, rotation, config);
 
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }

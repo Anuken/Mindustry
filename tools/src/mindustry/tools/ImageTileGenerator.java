@@ -56,7 +56,7 @@ public class ImageTileGenerator{
             for(int i = 0; i < 47; i++){
                 int cx = i % 12, cy = i / 12;
                 Pixmap cropped = out.crop(cx * cellSize, cy * cellSize, cellSize, cellSize);
-                outputDir.child(name + "-" + i).writePng(cropped);
+                outputDir.child(name + "-" + i + ".png").writePng(cropped);
                 cropped.dispose();
             }
 

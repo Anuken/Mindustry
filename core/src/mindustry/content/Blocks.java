@@ -11,6 +11,7 @@ import mindustry.entities.effect.*;
 import mindustry.entities.part.DrawPart.*;
 import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -57,8 +58,18 @@ public class Blocks{
     //boulders
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
     arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystalOrbs, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
+
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
+    //old metal floors
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
+    //new metal floors
+    metalTiles1, metalTiles2, metalTiles3, metalTiles4, metalTiles5, metalTiles6, metalTiles7, metalTiles8, metalTiles9, metalTiles10, metalTiles11, metalTiles12,
+
+    //colored
+    coloredFloor, coloredWall,
+    characterOverlayGray,
+    characterOverlayWhite,
+
     pebbles, tendrils,
 
     //ores
@@ -314,6 +325,7 @@ public class Blocks{
             solid = true;
             variants = 0;
             canShadow = false;
+            drawEdgeOut = false;
         }};
 
         empty = new EmptyFloor("empty");
@@ -807,6 +819,107 @@ public class Blocks{
         darkPanel6 = new Floor("dark-panel-6", 0);
 
         darkMetal = new StaticWall("dark-metal");
+
+        metalTiles1 = new Floor("metal-tiles-1"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles2 = new Floor("metal-tiles-2"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles3 = new Floor("metal-tiles-3"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles4 = new Floor("metal-tiles-4"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles5 = new Floor("metal-tiles-5"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles6 = new Floor("metal-tiles-6"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+
+            emitLight = true;
+            lightRadius = 30f;
+            lightColor = Team.crux.color.cpy().a(0.3f);
+        }};
+
+        metalTiles7 = new Floor("metal-tiles-7"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+            autotileMidVariants = 9;
+        }};
+
+        metalTiles8 = new Floor("metal-tiles-8"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+            autotileMidVariants = 2;
+        }};
+
+        metalTiles9 = new Floor("metal-tiles-9"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles10 = new Floor("metal-tiles-10"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles11 = new Floor("metal-tiles-11"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+            autotileVariants = 3;
+        }};
+
+        metalTiles12 = new Floor("metal-tiles-12"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+            autotileVariants = 4;
+            emitLight = true;
+            lightRadius = 30f;
+            lightColor = Team.crux.color.cpy().a(0.3f);
+        }};
+
+        coloredFloor = new ColoredFloor("colored-floor"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        coloredWall = new ColoredWall("colored-wall"){{
+            autotile = true;
+        }};
+
+        characterOverlayGray = new CharacterOverlay("character-overlay"){{
+            color = Pal.metalGrayDark;
+        }};
+
+        characterOverlayWhite = new CharacterOverlay("character-overlay-white"){{
+            color = Color.white;
+        }};
 
         Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)
         .each(b -> b.asFloor().wall = darkMetal);
@@ -2311,7 +2424,7 @@ public class Blocks{
             requirements(Category.power, with(Items.copper, 2, Items.lead, 6));
             maxNodes = 10;
             laserRange = 6;
-            buildCostMultiplier = 2.5f;
+            underBullets = true;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{

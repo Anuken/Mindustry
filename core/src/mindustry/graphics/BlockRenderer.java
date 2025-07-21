@@ -64,48 +64,7 @@ public class BlockRenderer{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            blockTree = new BlockQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
-            blockLightTree = new BlockLightQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
-            floorTree = new FloorQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
-
-            shadowEvents.clear();
-            updateFloors.clear();
-            lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
-            hadMapLimit = state.rules.limitMapArea;
-
-            shadows.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
-            shadows.resize(world.width(), world.height());
-            shadows.begin();
-            Core.graphics.clear(Color.white);
-            Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
-
-            Draw.color(blendShadowColor);
-
-            for(Tile tile : world.tiles){
-                recordIndex(tile);
-
-                if(tile.floor().updateRender(tile)){
-                    updateFloors.add(new UpdateRenderState(tile, tile.floor()));
-                }
-
-                if(tile.overlay().updateRender(tile)){
-                    updateFloors.add(new UpdateRenderState(tile, tile.overlay()));
-                }
-
-                if(tile.build != null && (tile.team() == player.team() || !state.rules.fog || (tile.build.visibleFlags & (1L << player.team().id)) != 0)){
-                    tile.build.wasVisible = true;
-                }
-
-                if(tile.block().displayShadow(tile) && (tile.build == null || tile.build.wasVisible)){
-                    Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
-                }
-            }
-
-            Draw.flush();
-            Draw.color();
-            shadows.end();
-
-            updateDarkness();
+            reload();
         });
 
         //sometimes darkness gets disabled.
@@ -148,6 +107,51 @@ public class BlockRenderer{
             invalidateTile(event.tile);
             recordIndex(event.tile);
         });
+    }
+
+    public void reload(){
+        blockTree = new BlockQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+        blockLightTree = new BlockLightQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+        floorTree = new FloorQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+
+        shadowEvents.clear();
+        updateFloors.clear();
+        lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
+        hadMapLimit = state.rules.limitMapArea;
+
+        shadows.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
+        shadows.resize(world.width(), world.height());
+        shadows.begin();
+        Core.graphics.clear(Color.white);
+        Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
+
+        Draw.color(blendShadowColor);
+
+        for(Tile tile : world.tiles){
+            recordIndex(tile);
+
+            if(tile.floor().updateRender(tile)){
+                updateFloors.add(new UpdateRenderState(tile, tile.floor()));
+            }
+
+            if(tile.overlay().updateRender(tile)){
+                updateFloors.add(new UpdateRenderState(tile, tile.overlay()));
+            }
+
+            if(tile.build != null && (tile.team() == player.team() || !state.rules.fog || (tile.build.visibleFlags & (1L << player.team().id)) != 0)){
+                tile.build.wasVisible = true;
+            }
+
+            if(tile.block().displayShadow(tile) && (tile.build == null || tile.build.wasVisible)){
+                Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+            }
+        }
+
+        Draw.flush();
+        Draw.color();
+        shadows.end();
+
+        updateDarkness();
     }
 
     public void updateDarkness(){
@@ -195,6 +199,10 @@ public class BlockRenderer{
         if(Math.abs(avgx - tile.x) <= rangex && Math.abs(avgy - tile.y) <= rangey){
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
         }
+    }
+
+    public FrameBuffer getShadowBuffer(){
+        return shadows;
     }
 
     public void removeFloorIndex(Tile tile){
@@ -294,7 +302,7 @@ public class BlockRenderer{
         }
     }
 
-    public void drawShadows(){
+    public void processShadows(){
         if(!shadowEvents.isEmpty()){
             Draw.flush();
 
@@ -315,6 +323,10 @@ public class BlockRenderer{
 
             Draw.proj(camera);
         }
+    }
+
+    public void drawShadows(){
+        processShadows();
 
         float ww = world.width() * tilesize, wh = world.height() * tilesize;
         float x = camera.position.x + tilesize / 2f, y = camera.position.y + tilesize / 2f;
@@ -509,6 +521,10 @@ public class BlockRenderer{
                 shadowEvents.add(world.tile(x + tx + of, y + ty + of));
             }
         }
+    }
+
+    public void updateShadowTile(Tile tile){
+        shadowEvents.add(tile);
     }
 
     static class BlockQuadtree extends QuadTree<Tile>{

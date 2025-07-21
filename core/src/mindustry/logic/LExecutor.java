@@ -1392,7 +1392,6 @@ public class LExecutor{
 
             Tile tile = world.tile(x.numi(), y.numi());
             if(tile != null && block.obj() instanceof Block b){
-                //TODO this can be quite laggy...
                 switch(layer){
                     case ore -> {
                         if((b instanceof OverlayFloor || b == Blocks.air) && tile.overlay() != b) tile.setOverlayNet(b);
