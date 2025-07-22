@@ -20,7 +20,7 @@ public class MapEditor{
     public static final float[] brushSizes = {1, 1.5f, 2, 3, 4, 5, 9, 15, 20};
 
     public StringMap tags = new StringMap();
-    public MapRenderer renderer = new MapRenderer();
+    public EditorRenderer renderer = new EditorRenderer();
 
     private final Context context = new Context();
     private OperationStack stack = new OperationStack();

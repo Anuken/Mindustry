@@ -13,13 +13,15 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-public class MapRenderer implements Disposable{
+public class EditorRenderer implements Disposable{
+    private static final float packPad = tilesize * 10f;
     private static final int chunkSize = 60;
     private static final Seq<Tile> tmpTiles = new Seq<>();
 
     private EditorSpriteCache[][] chunks;
     private IntSet recacheChunks = new IntSet();
     private int width, height;
+    private float packWidth, packHeight;
 
     private Shader shader;
 
@@ -31,6 +33,8 @@ public class MapRenderer implements Disposable{
 
         this.width = width;
         this.height = height;
+        packWidth = width * tilesize + packPad * 2;
+        packHeight = height * tilesize + packPad * 2;
 
         recache();
     }
@@ -111,7 +115,7 @@ public class MapRenderer implements Disposable{
         }
 
         shader.bind();
-        shader.setUniformMatrix4("u_projTrans", Core.camera.mat);
+        shader.setUniformMatrix4("u_projTrans", Tmp.m1.set(Core.camera.mat).translate(-packPad, -packPad).scale(packWidth, packHeight));
 
         for(int x = 0; x < chunks.length; x++){
             for(int y = 0; y < chunks[0].length; y++){
@@ -160,7 +164,7 @@ public class MapRenderer implements Disposable{
             chunks[cx][cy] = null;
         }
 
-        EditorSpriteCache cache = new EditorSpriteCache(renderer.blocks.floor.getVertexBuffer());
+        EditorSpriteCache cache = new EditorSpriteCache(renderer.blocks.floor.getVertexBuffer(), packPad, packPad, packWidth, packHeight);
 
         TextureRegion teamRegion = Core.atlas.find("block-border");
 

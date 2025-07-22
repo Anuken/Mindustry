@@ -20,7 +20,8 @@ public class ColoredFloor extends Floor{
     /** If the alpha value of the color is set to this value, colors are interpolated across corners. This is essentially linear filtering for the whole "image". */
     public static final int flagSmoothBlend = 2;
 
-    private static final float[] verts = new float[20];
+    //4x (pos2 color uv2)
+    private static final float[] verts = new float[4 * 5];
 
     public Color defaultColor = Color.white;
     protected int defaultColorRgba;
