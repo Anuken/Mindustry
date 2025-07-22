@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -35,6 +36,16 @@ public class EditorRenderer implements Disposable{
         this.height = height;
         packWidth = width * tilesize + packPad * 2;
         packHeight = height * tilesize + packPad * 2;
+
+        //clear darkness
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                Tile tile = world.tile(x, y);
+                if(tile.block() instanceof StaticWall){
+                    tile.data = 0;
+                }
+            }
+        }
 
         recache();
     }

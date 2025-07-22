@@ -25,6 +25,7 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class JoinDialog extends BaseDialog{
+    Seq<ServerGroup> tmpServers = new Seq<>();
     Seq<Server> servers = new Seq<>();
     Dialog add;
     Server renaming;
@@ -110,10 +111,6 @@ public class JoinDialog extends BaseDialog{
         keyDown(KeyCode.f5, this::refreshAll);
 
         shown(() -> {
-            if(defaultServers.isEmpty()){
-                fetchServers();
-            }
-
             setup();
             refreshAll();
 
@@ -394,7 +391,7 @@ public class JoinDialog extends BaseDialog{
         global.clear();
         global.background(null);
 
-        if(defaultServers.isEmpty()){
+        if(!fetchedServers){
             fetchServers();
         }
 
@@ -406,8 +403,12 @@ public class JoinDialog extends BaseDialog{
             t.button(Icon.zoom, Styles.emptyi, this::refreshCommunity).size(54f);
         }).width((targetWidth() + 5f) * columns()).height(70f).pad(4).row();
 
-        for(int i = 0; i < defaultServers.size; i ++){
-            ServerGroup group = defaultServers.get((i + defaultServers.size/2) % defaultServers.size);
+        //if the servers have been fetched, use the fetched list
+        //otherwise use the cached list + the extra servers that may have been included by mods
+        var servers = fetchedServers ? defaultServers : tmpServers.clear().addAll(cachedServers).addAll(defaultServers);
+
+        for(int i = 0; i < servers.size; i ++){
+            ServerGroup group = servers.get((i + servers.size/2) % servers.size);
             boolean hidden = group.hidden();
             if(hidden && !showHidden){
                 continue;
@@ -661,6 +662,15 @@ public class JoinDialog extends BaseDialog{
         var urls = Version.type.equals("bleeding-edge") || Vars.forceBeServers ? serverJsonBeURLs : serverJsonURLs;
 
         if(Core.settings.getBool("communityservers", true)){
+            try{
+                if(!loadedServerCache && serverCacheFile.exists()){
+                    loadedServerCache = true;
+                    cachedServers.addAll(parseServerString(serverCacheFile.readString()));
+                }
+            }catch(Exception e){
+                Log.err("Failed to load cached server file", e);
+            }
+
             fetchServers(urls, 0);
         }
     }
@@ -678,26 +688,39 @@ public class JoinDialog extends BaseDialog{
             }
         })
         .submit(result -> {
-            Jval val = Jval.read(result.getResultAsString());
-            Seq<ServerGroup> servers = new Seq<>();
-            val.asArray().each(child -> {
-                String name = child.getString("name", "");
-                boolean prioritized = child.getBool("prioritized", false);
-                String[] addresses;
-                if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
-                    addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
-                }else{
-                    addresses = new String[]{child.getString("address", "<invalid>")};
-                }
-                servers.add(new ServerGroup(name, addresses, prioritized));
-            });
+            String text = result.getResultAsString();
+            Seq<ServerGroup> servers = parseServerString(text);
             //modify default servers on main thread
             Core.app.post(() -> {
-                servers.sort(s -> s.name == null ? Integer.MAX_VALUE : s.name.hashCode());
+                //cache the server list to a file, so it can be loaded in case of an outage later
+                try{
+                    serverCacheFile.writeString(text);
+                }catch(Exception e){
+                    Log.err("Failed to write server cache", e);
+                }
                 defaultServers.addAll(servers);
+                fetchedServers = true;
                 Log.info("Fetched @ community servers.", defaultServers.sum(s -> s.addresses.length));
             });
         });
+    }
+
+    private static Seq<ServerGroup> parseServerString(String str){
+        Jval val = Jval.read(str);
+        Seq<ServerGroup> servers = new Seq<>();
+        val.asArray().each(child -> {
+            String name = child.getString("name", "");
+            boolean prioritized = child.getBool("prioritized", false);
+            String[] addresses;
+            if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
+                addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
+            }else{
+                addresses = new String[]{child.getString("address", "<invalid>")};
+            }
+            servers.add(new ServerGroup(name, addresses, prioritized));
+        });
+        servers.sort(s -> s.name == null ? Integer.MAX_VALUE : s.name.hashCode());
+        return servers;
     }
 
     private void saveServers(){
