@@ -110,6 +110,10 @@ public class JoinDialog extends BaseDialog{
         keyDown(KeyCode.f5, this::refreshAll);
 
         shown(() -> {
+            if(defaultServers.isEmpty()){
+                fetchServers();
+            }
+
             setup();
             refreshAll();
 
@@ -119,8 +123,6 @@ public class JoinDialog extends BaseDialog{
         });
 
         onResize(() -> {
-
-
             //only refresh on resize when the minimum dimension is smaller than the maximum preferred width
             //this means that refreshes on resize will only happen for small phones that need the list to fit in portrait mode
             //also resize if number of cols changes
@@ -392,6 +394,10 @@ public class JoinDialog extends BaseDialog{
         global.clear();
         global.background(null);
 
+        if(defaultServers.isEmpty()){
+            fetchServers();
+        }
+
         global.table(t -> {
             t.add("@search").padRight(10);
             t.field(serverSearch, text ->
@@ -412,7 +418,7 @@ public class JoinDialog extends BaseDialog{
             boolean favorite = group.favorite();
             if(group.prioritized){
                 addHeader(groupTable, group, hidden, favorite, false);
-            }else if (favorite){
+            }else if(favorite){
                 addHeader(groupTable, group, hidden, true, true);//weird behaviour if false?
             }
             //table containing all groups
@@ -662,7 +668,6 @@ public class JoinDialog extends BaseDialog{
     private static void fetchServers(String[] urls, int index){
         if(index >= urls.length) return;
 
-        //get servers
         Http.get(urls[index])
         .error(t -> {
             if(index < urls.length - 1){
