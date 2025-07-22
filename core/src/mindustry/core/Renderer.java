@@ -101,7 +101,7 @@ public class Renderer implements ApplicationListener{
     public void init(){
         planets = new PlanetRenderer();
 
-        if(settings.getBool("bloom", !ios)){
+        if(settings.getBool("bloom", true)){
             setupBloom();
         }
 
