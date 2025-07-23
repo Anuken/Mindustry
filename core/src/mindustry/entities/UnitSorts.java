@@ -15,20 +15,12 @@ public class UnitSorts{
     //Fires at roughly the center of a unit cluster.
     grouped = (u, x, y) -> {
         int[] count = {0};
-        float[] avgX = {0f}, avgY = {0f};
-        Groups.unit.each(other -> {
-            if (other.team != u.team && u.dst2(other) <  120) {
+        Groups.unit.intersect(u.x - 140, u.y - 140, 140 * 2f, 140 * 2f, other -> {
+            if (other.team != u.team && u.dst2(other) <= 140) {
                 count[0]++;
-                avgX[0] += other.x;
-                avgY[0] += other.y;
-                }
-            });
-        //No cluster.
-        if (count[0] == 0) return Float.MAX_VALUE;
-        avgX[0] /= count[0];
-        avgY[0] /= count[0];
-        float distToClusterCenter = Mathf.dst2(u.x, u.y, avgX[0], avgY[0]);
-        return distToClusterCenter - count[0] * 100f;
+            }
+        });
+        return -count[0] + Mathf.dst2(u.x, u.y, x, y) / 12800f;
     };
 
     public static BuildingPriorityf
