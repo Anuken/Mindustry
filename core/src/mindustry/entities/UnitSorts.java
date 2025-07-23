@@ -23,7 +23,7 @@ public class UnitSorts{
                 count.set(0, count.get(0) + 1);
             }
         });
-        return count.get(0) + Mathf.dst2(u.x, u.y, x, y) / 6400f;
+        return -count.get(0) + Mathf.dst2(u.x, u.y, x, y) / 10000f;
     };
 
     public static BuildingPriorityf
