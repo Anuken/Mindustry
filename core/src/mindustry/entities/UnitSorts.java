@@ -11,7 +11,25 @@ public class UnitSorts{
     closest = Unit::dst2,
     farthest = (u, x, y) -> -u.dst2(x, y),
     strongest = (u, x, y) -> -u.maxHealth + Mathf.dst2(u.x, u.y, x, y) / 6400f,
-    weakest = (u, x, y) -> u.maxHealth + Mathf.dst2(u.x, u.y, x, y) / 6400f;
+    weakest = (u, x, y) -> u.maxHealth + Mathf.dst2(u.x, u.y, x, y) / 6400f,
+    //Fires at roughly the center of a unit cluster.
+    grouped = (u, x, y) -> {
+        int[] count = {0};
+        float[] avgX = {0f}, avgY = {0f};
+        Groups.unit.each(other -> {
+            if (other.team != u.team && u.dst2(other) <  120) {
+                count[0]++;
+                avgX[0] += other.x;
+                avgY[0] += other.y;
+                }
+            });
+        //No cluster.
+        if (count[0] == 0) return Float.MAX_VALUE;
+        avgX[0] /= count[0];
+        avgY[0] /= count[0];
+        float distToClusterCenter = Mathf.dst2(u.x, u.y, avgX[0], avgY[0]);
+        return distToClusterCenter - count[0] * 100f;
+    };
 
     public static BuildingPriorityf
 

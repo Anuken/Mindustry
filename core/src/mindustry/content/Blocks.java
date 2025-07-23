@@ -3987,6 +3987,7 @@ public class Blocks{
 
             scaledHealth = 130;
             shootSound = Sounds.artillery;
+            unitSort = UnitSorts.grouped;
         }};
 
         cyclone = new ItemTurret("cyclone"){{
