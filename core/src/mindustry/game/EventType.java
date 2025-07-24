@@ -415,6 +415,22 @@ public class EventType{
     }
 
     /**
+     * Called when a tile changes its overlay. Do not cache or use with a timer.
+     * Do not modify any tiles inside listener code.
+     * */
+    public static class TileOverlayChangeEvent{
+        public Tile tile;
+        public Floor previous, overlay;
+
+        public TileOverlayChangeEvent set(Tile tile, Floor previous, Floor overlay){
+            this.tile = tile;
+            this.previous = previous;
+            this.overlay = overlay;
+            return this;
+        }
+    }
+
+    /**
      * Called after a building's team changes.
      * Event object is reused, do not nest!
      * */
