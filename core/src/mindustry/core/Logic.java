@@ -136,6 +136,7 @@ public class Logic implements ApplicationListener{
                 state.rules.coreIncinerates = true;
                 state.rules.allowEditRules = false;
                 state.rules.allowEditWorldProcessors = false;
+                state.rules.unlimitedInstructions = false;
                 state.rules.waveTeam.rules().infiniteResources = true;
                 state.rules.waveTeam.rules().fillItems = true;
                 state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;

@@ -19,6 +19,8 @@ import mindustry.graphics.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 
+import static mindustry.Vars.*;
+
 public class LCanvas extends Table{
     private static final Seq<JumpCurve> tmpOccupiers1 = new Seq<>();
     private static final Seq<JumpCurve> tmpOccupiers2 = new Seq<>();
@@ -142,7 +144,9 @@ public class LCanvas extends Table{
         statements.jumps.clear();
 
         Seq<LStatement> statements = LAssembler.read(asm, privileged);
-        statements.truncate(LExecutor.maxInstructions);
+        if(!state.rules.unlimitedInstructions){
+            statements.truncate(LExecutor.maxInstructions);
+        }
         this.statements.clearChildren();
         for(LStatement st : statements){
             add(st);

@@ -160,6 +160,7 @@ public class CustomRulesDialog extends BaseDialog{
 
         category("resourcesbuilding");
         check("@rules.alloweditworldprocessors", b -> rules.allowEditWorldProcessors = b, () -> rules.allowEditWorldProcessors);
+        check("@rules.unlimitedinstructions", b -> rules.unlimitedInstructions = b, () -> rules.unlimitedInstructions);
         check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
         check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore);
         check("@rules.derelictrepair", b -> rules.derelictRepair = b, () -> rules.derelictRepair);

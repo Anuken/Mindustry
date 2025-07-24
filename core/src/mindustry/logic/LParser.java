@@ -5,6 +5,8 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.logic.LStatements.*;
 
+import static mindustry.Vars.*;
+
 public class LParser{
     private static final String[] tokens = new String[16];
     private static final int maxJumps = 500;
@@ -173,7 +175,8 @@ public class LParser{
         jumps.clear();
         jumpLocations.clear();
 
-        while(pos < chars.length && line < LExecutor.maxInstructions){
+        int maxInstructions = state.rules.unlimitedInstructions ? Integer.MAX_VALUE : LExecutor.maxInstructions;
+        while(pos < chars.length && line < maxInstructions){
             switch(chars[pos]){
                 case '\n', ';', ' ' -> pos ++; //skip newlines and spaces
                 case '\r' -> pos += 2; //skip the newline after the \r

@@ -94,6 +94,8 @@ public class Rules{
     public boolean logicUnitBuild = true;
     /** If true, world processors can be edited and placed on this map. */
     public boolean allowEditWorldProcessors = false;
+    /** If true, the 1000 instruction limit is not enforced. */
+    public boolean unlimitedInstructions = false;
     /** If true, world processors no longer update. Used for testing. */
     public boolean disableWorldProcessors = false;
     /** How much health blocks start with. */
