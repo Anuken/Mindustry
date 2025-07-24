@@ -533,7 +533,7 @@ public class JoinDialog extends BaseDialog{
         inner.setColor(Pal.gray);
 
         button[0].clearChildren();
-        button[0].add(inner).growX();
+        button[0].add(inner).height(45f).growX();
 
         inner.add(host.name + "   " + versionString).left().padLeft(10f).wrap().style(Styles.outlineLabel).growX();
 
