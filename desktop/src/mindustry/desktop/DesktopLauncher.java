@@ -8,6 +8,7 @@ import arc.discord.*;
 import arc.discord.DiscordRPC.*;
 import arc.files.*;
 import arc.math.*;
+import arc.profiling.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -66,6 +67,18 @@ public class DesktopLauncher extends ClientLauncher{
                             case "antialias" -> samples = 16;
                             case "debug" -> Log.level = LogLevel.debug;
                             case "maximized" -> maximized = Boolean.parseBoolean(arg[i + 1]);
+                            case "gltrace" -> {
+                                Events.on(ClientCreateEvent.class, e -> {
+                                    var profiler = new GLProfiler(Core.graphics);
+                                    profiler.enable();
+                                    Core.app.addListener(new ApplicationListener(){
+                                        @Override
+                                        public void update(){
+                                            profiler.reset();
+                                        }
+                                    });
+                                });
+                            }
                         }
                     }
                 }

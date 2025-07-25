@@ -936,7 +936,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             sectorTop.color.a = Mathf.lerpDelta(sectorTop.color.a, 1f, 0.1f);
         }
 
-        if(hovered != null && !mobile && state.planet.hasGrid()){
+        if(hovered != null && state.planet.hasGrid()){
             addChild(hoverLabel);
             hoverLabel.toFront();
             hoverLabel.touchable = Touchable.disabled;
