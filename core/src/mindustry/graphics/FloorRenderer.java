@@ -518,7 +518,7 @@ public class FloorRenderer{
 
         @Override
         protected void draw(Texture texture, float[] spriteVertices, int offset, int count){
-            if(spriteVertices.length != spriteSize){
+            if(spriteVertices.length != 20){
                 throw new IllegalArgumentException("cached vertices must be in non-mixcolor format (20 per sprite, 5 per vertex)");
             }
 
