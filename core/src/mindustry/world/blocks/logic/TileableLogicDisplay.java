@@ -128,6 +128,11 @@ public class TileableLogicDisplay extends LogicDisplay{
         public boolean needsUpdate = false;
 
         @Override
+        public LogicDisplayBuild rootDisplay(){
+            return rootDisplay;
+        }
+
+        @Override
         public double sense(LAccess sensor){
             return switch(sensor){
                 case displayWidth -> tilesWidth * 32f - 12f;    // accounts for display frame (2 * 6 pixels)

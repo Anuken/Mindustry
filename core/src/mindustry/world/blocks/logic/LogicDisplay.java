@@ -107,12 +107,16 @@ public class LogicDisplay extends Block{
             Draw.blend();
         }
 
+        public LogicDisplayBuild rootDisplay(){
+            return this;
+        }
+
         @Override
         public double sense(LAccess sensor){
             return switch(sensor){
                 case displayWidth, displayHeight -> displaySize;
-                case bufferSize -> commands.size;
-                case operations -> operations;
+                case bufferSize -> rootDisplay().commands.size;
+                case operations -> rootDisplay().operations;
                 default -> super.sense(sensor);
             };
         }
