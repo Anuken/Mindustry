@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -46,7 +47,6 @@ public enum EditorTool{
             });
         }
     },
-    //the "under liquid" rendering is too buggy to make public
     pencil(KeyCode.b, "replace", "square", "drawteams", "underliquid"){
         {
             edit = true;
@@ -138,6 +138,21 @@ public enum EditorTool{
                     tester = t -> t.block() == dest;
                     setter = t -> t.setBlock(editor.drawBlock, editor.drawTeam);
                 }
+
+                var oldSetter = setter;
+                setter = t -> {
+                    if(editor.drawBlock.saveData){
+                        editor.addTileOp(TileOp.get(t.x, t.y, DrawOperation.opData, TileOpData.get(t.data, t.floorData, t.overlayData)));
+                        editor.addTileOp(TileOp.get(t.x, t.y, DrawOperation.opDataExtra, t.extraData));
+                    }
+
+                    oldSetter.get(t);
+
+                    if(!editor.drawBlock.synthetic() && editor.drawBlock.saveConfig){
+                        editor.drawBlock.placeEnded(t, null, editor.rotation, editor.drawBlock.lastConfig);
+                        editor.renderer.updateStatic(t.x, t.y);
+                    }
+                };
 
                 //replace only when the mode is 0 using the specified functions
                 fill(x, y, mode == 0, tester, setter);

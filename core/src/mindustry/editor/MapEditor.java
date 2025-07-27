@@ -157,6 +157,11 @@ public class MapEditor{
                 if(!tester.get(tile)) return;
                 boolean changed = false;
 
+                if(drawBlock.saveData){
+                    addTileOp(TileOp.get(tile.x, tile.y, DrawOperation.opData, TileOpData.get(tile.data, tile.floorData, tile.overlayData)));
+                    addTileOp(TileOp.get(tile.x, tile.y, DrawOperation.opDataExtra, tile.extraData));
+                }
+
                 if(isFloor){
                     if(forceOverlay){
                         tile.setOverlay(drawBlock.asFloor());
