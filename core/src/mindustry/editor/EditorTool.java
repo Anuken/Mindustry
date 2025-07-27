@@ -47,7 +47,7 @@ public enum EditorTool{
         }
     },
     //the "under liquid" rendering is too buggy to make public
-    pencil(KeyCode.b, "replace", "square", "drawteams"/*, "underliquid"*/){
+    pencil(KeyCode.b, "replace", "square", "drawteams", "underliquid"){
         {
             edit = true;
             draggable = true;

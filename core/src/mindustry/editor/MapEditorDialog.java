@@ -787,6 +787,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
         });
 
+        Table[] configTable = {null};
+        Block[] lastBlock = {null};
+
         cont.table(search -> {
             search.image(Icon.zoom).padRight(8);
             search.field("", this::rebuildBlockSelection).growX()
@@ -795,6 +798,19 @@ public class MapEditorDialog extends Dialog implements Disposable{
         cont.row();
         cont.table(Tex.underline, extra -> extra.labelWrap(() -> editor.drawBlock.localizedName).width(200f).center()).growX();
         cont.row();
+        cont.collapser(t -> {
+            configTable[0] = t;
+        }, () -> editor.drawBlock != null && editor.drawBlock.editorConfigurable).with(c -> c.setEnforceMinSize(true)).update(col -> {
+
+            if(lastBlock[0] != editor.drawBlock){
+                configTable[0].clear();
+                if(editor.drawBlock != null){
+                    editor.drawBlock.buildEditorConfig(configTable[0]);
+                    col.invalidateHierarchy();
+                }
+                lastBlock[0] = editor.drawBlock;
+            }
+        }).growX().row();
         cont.add(pane).expandY().growX().top().left();
 
         rebuildBlockSelection("");

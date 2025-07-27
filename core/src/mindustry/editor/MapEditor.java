@@ -155,13 +155,16 @@ public class MapEditor{
 
             Cons<Tile> drawer = tile -> {
                 if(!tester.get(tile)) return;
+                boolean changed = false;
 
                 if(isFloor){
                     if(forceOverlay){
                         tile.setOverlay(drawBlock.asFloor());
+                        changed = true;
                     }else{
                         if(!(drawBlock.asFloor().wallOre && !tile.block().solid)){
                             tile.setFloor(drawBlock.asFloor());
+                            changed = true;
                         }
                     }
                 }else if(!(tile.block().isMultiblock() && !drawBlock.isMultiblock())){
@@ -170,10 +173,16 @@ public class MapEditor{
                     }
 
                     tile.setBlock(drawBlock, drawTeam, rotation);
+                    changed = !drawBlock.synthetic();
 
                     if(drawBlock.synthetic()){
                         addTileOp(TileOp.get(tile.x, tile.y, DrawOperation.opTeam, (byte)drawTeam.id));
                     }
+                }
+
+                if(changed && drawBlock.saveConfig){
+                    drawBlock.placeEnded(tile, null, editor.rotation, drawBlock.lastConfig);
+                    renderer.updateStatic(tile.x, tile.y);
                 }
             };
 
