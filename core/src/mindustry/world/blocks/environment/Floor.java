@@ -265,7 +265,7 @@ public class Floor extends Block{
     }
 
     public boolean checkAutotileSame(Tile tile, @Nullable Tile other){
-        return other != null && other.floor().blendGroup == blendGroup;
+        return other != null && (this == tile.floor() ? other.floor() : other.overlay()).blendGroup == blendGroup;
     }
 
     public int variant(int x, int y){

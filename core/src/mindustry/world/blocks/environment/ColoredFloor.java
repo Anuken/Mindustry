@@ -190,7 +190,7 @@ public class ColoredFloor extends Floor{
 
     @Override
     public boolean checkAutotileSame(Tile tile, @Nullable Tile other){
-        return other != null && other.floor().blendGroup == blendGroup && ((tile.extraData & 0xff) == flagIgnoreDifferentColor || tile.extraData == other.extraData);
+        return other != null && (this == tile.floor() ? other.floor() : other.overlay()).blendGroup == blendGroup && ((tile.extraData & 0xff) == flagIgnoreDifferentColor || tile.extraData == other.extraData);
     }
 
     @Override
