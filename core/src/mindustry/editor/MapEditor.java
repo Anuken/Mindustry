@@ -157,7 +157,7 @@ public class MapEditor{
                 if(!tester.get(tile)) return;
                 boolean changed = false;
 
-                if(drawBlock.saveData){
+                if(drawBlock.saveData || tile.shouldSaveData()){
                     addTileOp(TileOp.get(tile.x, tile.y, DrawOperation.opData, TileOpData.get(tile.data, tile.floorData, tile.overlayData)));
                     addTileOp(TileOp.get(tile.x, tile.y, DrawOperation.opDataExtra, tile.extraData));
                 }
@@ -248,6 +248,7 @@ public class MapEditor{
                 tile.setBlock(Blocks.air);
             }
         }
+        editor.flushOp();
     }
 
     public void addFloorCliffs(){
