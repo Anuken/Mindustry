@@ -92,7 +92,7 @@ public enum EditorTool{
             });
         }
     },
-    fill(KeyCode.g, "replaceall", "fillteams", "fillerase"){
+    fill(KeyCode.g, "replaceall", "fillteams", "fillerase", "fillcliffs"){
         {
             edit = true;
         }
@@ -185,6 +185,27 @@ public enum EditorTool{
                 if(setter != null){
                     fill(x, y, false, tester, setter);
                 }
+            }else if(mode == 3){ //cliff fill
+                if(!tile.block().isStatic() || tile.block() == Blocks.cliff) return;
+                Bits wasStatic = new Bits(editor.width() * editor.height());
+                fill(x, y, false, t -> t.block().isStatic() && t.block() != Blocks.cliff, t -> {
+                    int rotation = 0;
+                    for(int i = 0; i < 8; i++){
+                        Tile other = world.tiles.get(t.x + Geometry.d8[i].x, t.y + Geometry.d8[i].y);
+                        if(other != null && !other.block().isStatic() && !wasStatic.get(other.array())){
+                            rotation |= (1 << i);
+                        }
+                    }
+
+                    if(rotation != 0){
+                        t.setBlock(Blocks.cliff);
+                    }else{
+                        t.setBlock(Blocks.air);
+                        wasStatic.set(t.array());
+                    }
+
+                    t.data = (byte)rotation;
+                });
             }
         }
 

@@ -700,12 +700,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         t.button("@editor.center", Icon.move, Styles.flatt, view::center).growX().margin(9f);
                     }).growX().top();
                 }
-
-                mid.row();
-
-                mid.table(t -> {
-                    t.button("@editor.cliffs", Icon.terrain, Styles.flatt, editor::addCliffs).growX().margin(9f);
-                }).growX().top();
             }).margin(0).left().growY();
 
 
