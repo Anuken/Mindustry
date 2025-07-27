@@ -324,7 +324,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                 }
 
                 ventCount ++;
-                for(var pos : SteamVent.offsets){
+                for(var pos : ((SteamVent)Blocks.rhyoliteVent).offsets){
                     Tile other = tiles.get(pos.x + tile.x + 1, pos.y + tile.y + 1);
                     other.setFloor(Blocks.rhyoliteVent.asFloor());
                 }
@@ -381,7 +381,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
 
                     ventCount ++;
-                    for(var pos : SteamVent.offsets){
+                    for(var pos : ((SteamVent)vent).offsets){
                         Tile other = tiles.get(pos.x + tile.x + 1, pos.y + tile.y + 1);
                         other.setFloor(vent.asFloor());
                     }
