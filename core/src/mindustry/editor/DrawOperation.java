@@ -15,12 +15,22 @@ public class DrawOperation{
     opBlock = 1,
     opRotation = 2,
     opTeam = 3,
-    opOverlay = 4;
+    opOverlay = 4,
+    opData = 5, //overlay/floor/data field
+    opDataExtra = 6; //extraData
 
     private LongSeq array = new LongSeq();
 
     public boolean isEmpty(){
         return array.isEmpty();
+    }
+
+    public int size(){
+        return array.size;
+    }
+
+    public void remove(int amount){
+        array.setSize(Math.max(0, array.size - amount));
     }
 
     public void addOperation(long op){
@@ -45,18 +55,20 @@ public class DrawOperation{
         setTile(editor.tile(TileOp.x(l), TileOp.y(l)), TileOp.type(l), TileOp.value(l));
     }
 
-    short getTile(Tile tile, byte type){
+    int getTile(Tile tile, int type){
         return switch(type){
             case opFloor -> tile.floorID();
             case opOverlay -> tile.overlayID();
             case opBlock -> tile.blockID();
             case opRotation -> tile.build == null ? 0 : (byte)tile.build.rotation;
-            case opTeam -> (byte)tile.getTeamID();
+            case opTeam -> tile.getTeamID();
+            case opData -> TileOpData.get(tile.data, tile.floorData, tile.overlayData);
+            case opDataExtra -> tile.extraData;
             default -> throw new IllegalArgumentException("Invalid type.");
         };
     }
 
-    void setTile(Tile tile, byte type, short to){
+    void setTile(Tile tile, int type, int to){
         if(type == opBlock || type == opTeam || type == opRotation){
             tile.getLinkedTiles(t -> {
                 editor.renderer.updateBlock(t);
@@ -89,6 +101,12 @@ public class DrawOperation{
                     if(tile.build != null) tile.build.rotation = to;
                 }
                 case opTeam -> tile.setTeam(Team.get(to));
+                case opData -> {
+                    tile.data = TileOpData.data(to);
+                    tile.floorData = TileOpData.floorData(to);
+                    tile.overlayData = TileOpData.overlayData(to);
+                }
+                case opDataExtra -> tile.extraData = to;
             }
         });
 
@@ -102,9 +120,17 @@ public class DrawOperation{
 
     @Struct
     class TileOpStruct{
-        short x;
-        short y;
-        byte type;
-        short value;
+        @StructField(14)
+        int x;
+        @StructField(14)
+        int y;
+        @StructField(3)
+        int type;
+        int value;
+    }
+
+    @Struct
+    class TileOpDataStruct{
+        byte data, floorData, overlayData;
     }
 }
