@@ -157,10 +157,18 @@ public class MapEditor{
                 if(!tester.get(tile)) return;
                 boolean changed = false;
 
+                boolean didDataOp = false;
+                int oldData1 = 0, oldData2 = 0;
+
                 if(drawBlock.saveData || tile.shouldSaveData()){
                     addTileOp(TileOp.get(tile.x, tile.y, DrawOperation.opData, TileOpData.get(tile.data, tile.floorData, tile.overlayData)));
                     addTileOp(TileOp.get(tile.x, tile.y, DrawOperation.opDataExtra, tile.extraData));
+                    oldData1 = TileOpData.get(tile.data, tile.floorData, tile.overlayData);
+                    oldData2 = tile.extraData;
+                    didDataOp = true;
                 }
+
+                int preDataOps = ops();
 
                 if(isFloor){
                     if(forceOverlay){
@@ -188,6 +196,11 @@ public class MapEditor{
                 if(changed && drawBlock.saveConfig){
                     drawBlock.placeEnded(tile, null, editor.rotation, drawBlock.lastConfig);
                     renderer.updateStatic(tile.x, tile.y);
+                }
+
+                //data and block did not change, undo the data ops
+                if(didDataOp && ops() == preDataOps && oldData1 == TileOpData.get(tile.data, tile.floorData, tile.overlayData) && oldData2 == tile.extraData){
+                    removeLastOps(2);
                 }
             };
 
@@ -395,6 +408,17 @@ public class MapEditor{
         currentOp.addOperation(data);
 
         renderer.updateStatic(TileOp.x(data), TileOp.y(data));
+    }
+
+    public int ops(){
+        if(currentOp == null) return 0;
+        return currentOp.size();
+    }
+
+    public void removeLastOps(int amount){
+        if(currentOp == null || loading) return;
+
+        currentOp.remove(amount);
     }
 
     class Context implements WorldContext{
