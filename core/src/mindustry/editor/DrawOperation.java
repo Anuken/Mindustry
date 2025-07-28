@@ -25,6 +25,14 @@ public class DrawOperation{
         return array.isEmpty();
     }
 
+    public int size(){
+        return array.size;
+    }
+
+    public void remove(int amount){
+        array.setSize(Math.max(0, array.size - amount));
+    }
+
     public void addOperation(long op){
         array.add(op);
     }
