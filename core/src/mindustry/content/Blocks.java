@@ -4361,7 +4361,7 @@ public class Blocks{
             buildTime = 60f * 9f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
-            limitRange(12f);
+            limitRange(20f);
         }};
 
         diffuse = new ItemTurret("diffuse"){{
