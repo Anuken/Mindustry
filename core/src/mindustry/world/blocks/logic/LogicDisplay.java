@@ -73,6 +73,8 @@ public class LogicDisplay extends Block{
     }
 
     public class LogicDisplayBuild extends Building{
+        //The root display (bottom left corner of display for tileable displays)
+        public LogicDisplayBuild rootDisplay = this;
         public @Nullable FrameBuffer buffer;
         public float color = Color.whiteFloatBits;
         public float stroke = 1f;
@@ -111,8 +113,8 @@ public class LogicDisplay extends Block{
         public double sense(LAccess sensor){
             return switch(sensor){
                 case displayWidth, displayHeight -> displaySize;
-                case bufferSize -> commands.size;
-                case operations -> operations;
+                case bufferSize -> rootDisplay.commands.size;
+                case operations -> rootDisplay.operations;
                 default -> super.sense(sensor);
             };
         }
