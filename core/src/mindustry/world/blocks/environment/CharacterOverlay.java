@@ -82,7 +82,7 @@ public class CharacterOverlay extends OverlayFloor{
 
     @Override
     public void picked(Tile tile){
-        lastConfig = CharOverlayData.character(tile.overlayData);
+        lastConfig = (int)CharOverlayData.character(tile.overlayData);
     }
 
     public static byte charToData(char c){
