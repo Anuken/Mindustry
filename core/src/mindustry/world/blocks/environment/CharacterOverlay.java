@@ -81,7 +81,7 @@ public class CharacterOverlay extends OverlayFloor{
     }
 
     @Override
-    public void picked(Tile tile){
+    public void editorPicked(Tile tile){
         lastConfig = (int)CharOverlayData.character(tile.overlayData);
     }
 

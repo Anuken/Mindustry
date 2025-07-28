@@ -964,7 +964,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     /** Called when pick blocked in the editor. */
-    public void picked(Tile tile){
+    public void editorPicked(Tile tile){
 
     }
 

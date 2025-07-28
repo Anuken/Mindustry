@@ -181,7 +181,7 @@ public class ColoredFloor extends Floor{
     }
 
     @Override
-    public void picked(Tile tile){
+    public void editorPicked(Tile tile){
         lastConfig = tile.extraData;
     }
 

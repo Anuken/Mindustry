@@ -65,7 +65,7 @@ public class ColoredWall extends StaticWall{
     }
 
     @Override
-    public void picked(Tile tile){
+    public void editorPicked(Tile tile){
         lastConfig = tile.extraData;
     }
 

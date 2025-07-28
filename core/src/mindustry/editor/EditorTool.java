@@ -22,7 +22,7 @@ public enum EditorTool{
 
             Tile tile = editor.tile(x, y);
             editor.drawBlock = tile.block() == Blocks.air || !tile.block().inEditor ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
-            editor.drawBlock.picked(tile);
+            editor.drawBlock.editorPicked(tile);
         }
     },
     line(KeyCode.l, "replace", "orthogonal"){
