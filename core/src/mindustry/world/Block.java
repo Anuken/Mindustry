@@ -1489,6 +1489,16 @@ public class Block extends UnlockableContent implements Senseable{
 
     @Override
     public double sense(Content content){
+        if(content instanceof Item item){
+            if(state.rules.infiniteResources) return 0;
+
+            for(ItemStack r : requirements){
+                if(r.item == item){
+                    return Math.round(r.amount * state.rules.buildCostMultiplier);
+                }
+            }
+            return 0f;
+        }
         return Double.NaN;
     }
 

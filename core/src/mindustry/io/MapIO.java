@@ -77,6 +77,12 @@ public class MapIO{
             Pixmap walls = new Pixmap(map.width, map.height);
             int black = 255;
             int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
+
+            int width = map.width, height = map.height;
+            int len = width*height;
+            short[] floorIds = new short[len];
+            boolean[] overlays = new boolean[len];
+
             CachedTile tile = new CachedTile(){
                 @Override
                 public void setBlock(Block type){
@@ -139,20 +145,23 @@ public class MapIO{
                     if(content.block(overlayID) == Blocks.spawn){
                         map.spawns ++;
                     }
+                    floorIds[x + y * width] = (short)floorID;
+                    overlays[x + y * width] = overlayID != 0;
                     return tile;
                 }
 
                 @Override
                 public void onReadTileData(){
-                    //colored floor/wall tile data will affect the map preview
+                    Block block = tile.block();
+                    Block floor = content.block(floorIds[tile.x + tile.y*width]);
 
-                    if(!tile.block().synthetic() && tile.block() != Blocks.air){
-                        int color = tile.block().minimapColor(tile);
+                    if(!block.synthetic() && block != Blocks.air){
+                        int color = block.minimapColor(tile);
                         if(color != 0){
                             walls.set(tile.x, walls.height - 1 - tile.y, color);
                         }
-                    }else if(tile.overlay() == Blocks.air && tile.block() == Blocks.air){
-                        int color = tile.floor().minimapColor(tile);
+                    }else if(!overlays[tile.array()] && block == Blocks.air){
+                        int color = floor.minimapColor(tile);
                         if(color != 0){
                             floors.set(tile.x, floors.height - 1 - tile.y, color);
                         }

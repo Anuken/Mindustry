@@ -306,18 +306,15 @@ public class SettingsMenuDialog extends BaseDialog{
 
         if(mobile){
             game.checkPref("autotarget", true);
-            if(!ios){
-                game.checkPref("keyboard", false, val -> {
-                    control.setInput(val ? new DesktopInput() : new MobileInput());
-                    input.setUseKeyboard(val);
-                });
-                if(Core.settings.getBool("keyboard")){
-                    control.setInput(new DesktopInput());
-                    input.setUseKeyboard(true);
-                }
-            }else{
-                Core.settings.put("keyboard", false);
+            game.checkPref("keyboard", false, val -> {
+                control.setInput(val ? new DesktopInput() : new MobileInput());
+                input.setUseKeyboard(val);
+            });
+            if(Core.settings.getBool("keyboard")){
+                control.setInput(new DesktopInput());
+                input.setUseKeyboard(true);
             }
+
         }
         //the issue with touchscreen support on desktop is that:
         //1) I can't test it

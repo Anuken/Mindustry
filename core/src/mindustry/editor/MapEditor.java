@@ -20,7 +20,7 @@ public class MapEditor{
     public static final float[] brushSizes = {1, 1.5f, 2, 3, 4, 5, 9, 15, 20};
 
     public StringMap tags = new StringMap();
-    public MapRenderer renderer = new MapRenderer();
+    public EditorRenderer renderer = new EditorRenderer();
 
     private final Context context = new Context();
     private OperationStack stack = new OperationStack();
@@ -155,13 +155,21 @@ public class MapEditor{
 
             Cons<Tile> drawer = tile -> {
                 if(!tester.get(tile)) return;
+                boolean changed = false;
+
+                if(drawBlock.saveData || tile.shouldSaveData()){
+                    addTileOp(TileOp.get(tile.x, tile.y, DrawOperation.opData, TileOpData.get(tile.data, tile.floorData, tile.overlayData)));
+                    addTileOp(TileOp.get(tile.x, tile.y, DrawOperation.opDataExtra, tile.extraData));
+                }
 
                 if(isFloor){
                     if(forceOverlay){
                         tile.setOverlay(drawBlock.asFloor());
+                        changed = true;
                     }else{
                         if(!(drawBlock.asFloor().wallOre && !tile.block().solid)){
                             tile.setFloor(drawBlock.asFloor());
+                            changed = true;
                         }
                     }
                 }else if(!(tile.block().isMultiblock() && !drawBlock.isMultiblock())){
@@ -170,10 +178,16 @@ public class MapEditor{
                     }
 
                     tile.setBlock(drawBlock, drawTeam, rotation);
+                    changed = !drawBlock.synthetic();
 
                     if(drawBlock.synthetic()){
                         addTileOp(TileOp.get(tile.x, tile.y, DrawOperation.opTeam, (byte)drawTeam.id));
                     }
+                }
+
+                if(changed && drawBlock.saveConfig){
+                    drawBlock.placeEnded(tile, null, editor.rotation, drawBlock.lastConfig);
+                    renderer.updateStatic(tile.x, tile.y);
                 }
             };
 
@@ -234,6 +248,7 @@ public class MapEditor{
                 tile.setBlock(Blocks.air);
             }
         }
+        editor.flushOp();
     }
 
     public void addFloorCliffs(){

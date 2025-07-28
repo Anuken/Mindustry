@@ -118,8 +118,6 @@ public class TileableLogicDisplay extends LogicDisplay{
     }
 
     public class TileableLogicDisplayBuild extends LogicDisplayBuild{
-        //bottom left corner of display
-        public TileableLogicDisplayBuild rootDisplay = this;
         //size of display area
         public int tilesWidth = 1, tilesHeight = 1, originX, originY;
         public @Nullable Seq<MergeBuffer> prevBuffers;

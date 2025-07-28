@@ -114,6 +114,9 @@ public class PlanetRenderer implements Disposable{
 
         if(params.renderer != null){
             params.renderer.renderProjections(params.planet);
+
+            batch.proj().mul(params.planet.getTransform(mat));
+            params.renderer.renderOverProjections(params.planet);
         }
 
         Gl.disable(Gl.cullFace);
@@ -176,6 +179,10 @@ public class PlanetRenderer implements Disposable{
         planet.renderSectors(batch, cam, params);
     }
 
+    public void drawArcLine(Planet planet, Vec3 a, Vec3 b){
+        drawArcLine(planet, a, b, Pal.accent, Tmp.c3.set(Pal.accent).a(0f), 1f, 80f, 25, 0.006f);
+    }
+
     public void drawArc(Planet planet, Vec3 a, Vec3 b){
         drawArc(planet, a, b, Pal.accent, Color.clear, 1f);
     }
@@ -186,6 +193,10 @@ public class PlanetRenderer implements Disposable{
 
     public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount){
         planet.drawArc(batch, a, b, from, to, length, timeScale, pointCount);
+    }
+
+    public void drawArcLine(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount, float stroke){
+        planet.drawArcLine(batch, a, b, from, to, length, timeScale, pointCount, stroke);
     }
 
     public void drawBorders(Sector sector, Color base, float alpha){
@@ -230,5 +241,6 @@ public class PlanetRenderer implements Disposable{
     public interface PlanetInterfaceRenderer{
         void renderSectors(Planet planet);
         void renderProjections(Planet planet);
+        default void renderOverProjections(Planet planet){}
     }
 }
