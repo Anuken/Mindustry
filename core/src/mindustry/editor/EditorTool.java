@@ -10,6 +10,7 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -67,7 +68,7 @@ public enum EditorTool{
             }else if(mode == 2){
                 //draw teams
                 editor.drawCircle(x, y, tile -> tile.setTeam(editor.drawTeam));
-            }else if(mode == 3){
+            }else if(mode == 3 && !(editor.drawBlock instanceof Floor f && f.isLiquid)){
                 editor.drawBlocks(x, y, false, true, tile -> tile.floor().isLiquid);
             }
 
