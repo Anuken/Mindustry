@@ -288,6 +288,8 @@ public class Blocks{
         }};
 
         cryofluid = new Floor("pooled-cryofluid"){{
+            supportsOverlay = true;
+            overlayAlpha = 0.35f;
             drownTime = 150f;
             status = StatusEffects.freezing;
             statusDuration = 240f;
