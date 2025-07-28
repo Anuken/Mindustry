@@ -24,6 +24,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     private static final TileChangeEvent tileChange = new TileChangeEvent();
     private static final TilePreChangeEvent preChange = new TilePreChangeEvent();
     private static final TileFloorChangeEvent floorChange = new TileFloorChangeEvent();
+    private static final TileOverlayChangeEvent overlayChange = new TileOverlayChangeEvent();;
     private static final ObjectSet<Building> tileSet = new ObjectSet<>();
 
     /**
@@ -408,9 +409,16 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public void setOverlay(Block block){
         if(this.overlay == block) return;
 
+        var prev = this.overlay;
+
         this.overlay = (Floor)block;
 
         recache();
+
+        if(!world.isGenerating()){
+            Events.fire(overlayChange.set(this, prev, this.overlay));
+        }
+
         if(!world.isGenerating() && build != null){
             build.onProximityUpdate();
         }

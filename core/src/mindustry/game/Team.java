@@ -173,6 +173,6 @@ public class Team implements Comparable<Team>, Senseable{
     @Override
     public Object senseObject(LAccess sensor){
         if(sensor == LAccess.name) return name;
-        return null;
+        return Senseable.noSensed;
     }
 }

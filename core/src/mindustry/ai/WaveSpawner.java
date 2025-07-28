@@ -23,13 +23,18 @@ public class WaveSpawner{
     private static final float margin = 0f, coreMargin = tilesize * 2f, maxSteps = 30;
 
     private int tmpCount;
-    private Seq<Tile> spawns = new Seq<>();
+    private Seq<Tile> spawns = new Seq<>(false);
     private boolean spawning = false;
     private boolean any = false;
     private Tile firstSpawn = null;
 
     public WaveSpawner(){
         Events.on(WorldLoadEvent.class, e -> reset());
+
+        Events.on(TileOverlayChangeEvent.class, e -> {
+            if(e.previous == Blocks.spawn) spawns.remove(e.tile);
+            if(e.overlay == Blocks.spawn) spawns.add(e.tile);
+        });
     }
 
     @Nullable

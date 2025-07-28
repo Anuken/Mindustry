@@ -288,6 +288,8 @@ public class Blocks{
         }};
 
         cryofluid = new Floor("pooled-cryofluid"){{
+            supportsOverlay = true;
+            overlayAlpha = 0.35f;
             drownTime = 150f;
             status = StatusEffects.freezing;
             statusDuration = 240f;
@@ -1454,7 +1456,8 @@ public class Blocks{
         smallHeatRedirector = new HeatConductor("small-heat-redirector"){{
             requirements(Category.crafting, with(Items.surgeAlloy, 8, Items.graphite, 8));
 
-            researchCostMultiplier = 10f;
+            researchCostMultiplier = 2f;
+            researchCostMultipliers.put(Items.graphite, 7f);
 
             group = BlockGroup.heat;
             size = 2;
@@ -4279,7 +4282,7 @@ public class Blocks{
                 hitSize = 7f;
                 shootEffect = sfe;
                 smokeEffect = Fx.shootBigSmoke;
-                ammoMultiplier = 1;
+                ammoMultiplier = 2;
                 reloadMultiplier = 1f;
                 pierceCap = 4;
                 pierce = true;
