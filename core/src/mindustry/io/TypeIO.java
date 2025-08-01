@@ -138,14 +138,16 @@ public class TypeIO{
         }
     }
 
-    @Nullable
-    public static Object readObject(Reads read){
+    public static @Nullable Object readObject(Reads read){
         return readObjectBoxed(read, false);
     }
 
-    /** Reads an object, but boxes buildings. */
-    @Nullable
-    public static Object readObjectBoxed(Reads read, boolean box){
+    /** Reads an object, but optionally boxes buildings. */
+    public static @Nullable Object readObjectBoxed(Reads read, boolean box){
+        return readObject(read, box, null);
+    }
+
+    public static @Nullable Object readObject(Reads read, boolean box, @Nullable ContentMapper mapper){
         byte type = read.b();
         return switch(type){
             case 0 -> null;
@@ -153,7 +155,7 @@ public class TypeIO{
             case 2 -> read.l();
             case 3 -> read.f();
             case 4 -> readString(read);
-            case 5 -> content.getByID(ContentType.all[read.b()], read.s());
+            case 5 -> mapper == null ? content.getByID(ContentType.all[read.b()], read.s()) : mapper.get(ContentType.all[read.b()], read.s());
             case 6 -> {
                 short length = read.s();
                 IntSeq arr = new IntSeq(length);
@@ -202,7 +204,7 @@ public class TypeIO{
             case 22 -> {
                 int objlen = read.i();
                 Object[] objs = new Object[objlen];
-                for(int i = 0; i < objlen; i++) objs[i] = readObjectBoxed(read, box);
+                for(int i = 0; i < objlen; i++) objs[i] = readObject(read, box, mapper);
                 yield objs;
             }
             case 23 -> content.unitCommand(read.us());
@@ -1091,6 +1093,11 @@ public class TypeIO{
         }else{
             return null;
         }
+    }
+
+    /** Converter of an ID to a content instance. */
+    public interface ContentMapper{
+        Content get(ContentType type, int id);
     }
 
     public interface Boxed<T> {
