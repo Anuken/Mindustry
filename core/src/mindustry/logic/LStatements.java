@@ -801,6 +801,8 @@ public class LStatements{
                 field(t, result, str -> result = str);
                 t.add(" = if ");
 
+                row(t);
+
                 JumpStatement.addOp(this, t, op, o -> {
                     op = o;
                     rebuild(table);
@@ -812,9 +814,9 @@ public class LStatements{
                 t.setColor(table.color);
 
                 t.add("then ");
-                field(t, a, str -> a = str);
+                field(t, a, str -> a = str).width(130f);
                 t.add(" else ");
-                field(t, b, str -> b = str);
+                field(t, b, str -> b = str).width(130f);
             }).left();
         }
 
