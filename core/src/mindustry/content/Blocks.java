@@ -3402,7 +3402,7 @@ public class Blocks{
         }};
 
         hail = new ItemTurret("hail"){{
-            requirements(Category.turret, with(Items.copper, 40, Items.graphite, 17));
+            requirements(Category.turret, with(Items.copper, 40, Items.graphite, 17, Items.silicon, 5));
             ammo(
                 Items.graphite, new ArtilleryBulletType(3f, 20){{
                     knockback = 0.8f;
@@ -3424,7 +3424,7 @@ public class Blocks{
                     splashDamageRadius = 25f * 0.75f;
                     splashDamage = 33f;
                     reloadMultiplier = 1.2f;
-                    ammoMultiplier = 3f;
+                    ammoMultiplier = 2f;
                     homingPower = 0.08f;
                     homingRange = 50f;
 
@@ -3457,11 +3457,14 @@ public class Blocks{
             reload = 60f;
             recoil = 2f;
             range = 235f;
+            velocityRnd = 0.2f;
+            scaleLifetimeOffset = 2f / 9f;
             inaccuracy = 1f;
             shootCone = 10f;
             health = 260;
             shootSound = Sounds.bang;
             coolant = consumeCoolant(0.1f);
+            coolantMultiplier = 10f;
             limitRange(0f);
         }};
 
