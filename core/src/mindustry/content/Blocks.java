@@ -6127,19 +6127,19 @@ public class Blocks{
         //region units
 
         groundFactory = new UnitFactory("ground-factory"){{
-            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
+            requirements(Category.units, with(Items.copper, 50, Items.lead, 70));
             plans = Seq.with(
-                new UnitPlan(UnitTypes.dagger, 60f * 15, with(Items.silicon, 10, Items.lead, 10)),
-                new UnitPlan(UnitTypes.crawler, 60f * 10, with(Items.silicon, 8, Items.coal, 10)),
+                new UnitPlan(UnitTypes.dagger, 60f * 10, with(Items.silicon, 8, Items.lead, 5)),
+                new UnitPlan(UnitTypes.crawler, 60f * 15, with(Items.silicon, 8, Items.coal, 10)),
                 new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20))
             );
             size = 3;
-            consumePower(1.2f);
+            consumePower(1f);
             researchCostMultiplier = 0.5f;
         }};
 
         airFactory = new UnitFactory("air-factory"){{
-            requirements(Category.units, with(Items.copper, 60, Items.lead, 70));
+            requirements(Category.units, with(Items.copper, 40, Items.lead, 50, Items.silicon, 40));
             plans = Seq.with(
                 new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 15)),
                 new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15))
@@ -6165,7 +6165,7 @@ public class Blocks{
 
             size = 3;
             consumePower(3f);
-            consumeItems(with(Items.silicon, 40, Items.graphite, 40));
+            consumeItems(with(Items.silicon, 30, Items.graphite, 30));
 
             constructTime = 60f * 10f;
 
