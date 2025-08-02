@@ -2016,7 +2016,7 @@ public class Fx{
     shootPyraFlame = new Effect(33f, 80f, e -> {
         color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
 
-        randLenVectors(e.id, 10, e.finpow() * 70f, e.rotation, 10f, (x, y) -> {
+        randLenVectors(e.id, 10, e.finpow() * 86f, e.rotation, 10f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f);
         });
     }),

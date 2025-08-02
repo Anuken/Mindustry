@@ -3380,6 +3380,7 @@ public class Blocks{
                     lifetime = 18f;
                     pierce = true;
                     collidesAir = false;
+                    rangeChange = 16f;
                     statusDuration = 60f * 10;
                     shootEffect = Fx.shootPyraFlame;
                     hitEffect = Fx.hitFlameSmall;
