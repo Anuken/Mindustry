@@ -3217,6 +3217,7 @@ public class Blocks{
                     height = 12f;
                     ammoMultiplier = 4;
                     lifetime = 60f;
+                    reloadMultiplier = 0.8f;
                     rangeChange = 16f;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
@@ -3265,6 +3266,7 @@ public class Blocks{
             inaccuracy = 2f;
             rotateSpeed = 10f;
             coolant = consumeCoolant(0.1f);
+            coolantMultiplier = 10f;
             researchCostMultiplier = 0.05f;
 
             limitRange(5f);
