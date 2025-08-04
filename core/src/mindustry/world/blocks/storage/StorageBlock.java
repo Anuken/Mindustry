@@ -20,13 +20,14 @@ public class StorageBlock extends Block{
         super(name);
         hasItems = true;
         solid = true;
-        update = false;
+        update = true;
         destructible = true;
         separateItemCapacity = true;
         group = BlockGroup.transportation;
         flags = EnumSet.of(BlockFlag.storage);
         allowResupply = true;
         envEnabled = Env.any;
+        sync = true;
     }
 
     @Override
