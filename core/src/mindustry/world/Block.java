@@ -1240,6 +1240,10 @@ public class Block extends UnlockableContent implements Senseable{
             flags = flags.with(BlockFlag.hasFogRadius);
         }
 
+        if(sync){
+            flags = flags.with(BlockFlag.synced);
+        }
+
         //initialize default health based on size
         if(health == -1){
             boolean round = false;
