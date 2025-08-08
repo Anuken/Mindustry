@@ -21,6 +21,7 @@ public class StorageBlock extends Block{
         hasItems = true;
         solid = true;
         update = false;
+        sync = true;
         destructible = true;
         separateItemCapacity = true;
         group = BlockGroup.transportation;
