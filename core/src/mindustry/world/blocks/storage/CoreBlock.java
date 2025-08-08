@@ -71,6 +71,7 @@ public class CoreBlock extends StorageBlock{
         priority = TargetPriority.core;
         flags = EnumSet.of(BlockFlag.core);
         unitCapModifier = 10;
+        sync = false; //core items are synced elsewhere
         drawDisabled = false;
         canOverdrive = false;
         commandable = true;

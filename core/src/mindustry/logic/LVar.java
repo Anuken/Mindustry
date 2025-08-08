@@ -107,7 +107,7 @@ public class LVar{
         if(isobj){
             objval = other.objval;
         }else{
-            numval = other.numval;
+            numval = invalid(other.numval) ? 0 : other.numval;
         }
     }
 

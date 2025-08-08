@@ -247,6 +247,7 @@ public class Blocks{
             statusDuration = 140f;
             drownTime = 200f;
             liquidDrop = Liquids.water;
+            liquidMultiplier = 1.5f;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
             albedo = 0.9f;

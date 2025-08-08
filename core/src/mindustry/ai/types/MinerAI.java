@@ -36,9 +36,9 @@ public class MinerAI extends AIController{
         if(mining){
             if(timer.get(timerTarget2, 60 * 4) || targetItem == null){
                 if(ai != null && !ai.hasStance(UnitStance.mineAuto)){
-                    targetItem = content.items().min(i -> indexer.hasOre(i) && unit.canMine(i) && ai.hasStance(ItemUnitStance.getByItem(i)), i -> core.items.get(i));
+                    targetItem = content.items().min(i -> ((unit.type.mineFloor && indexer.hasOre(i)) || (unit.type.mineWalls && indexer.hasWallOre(i))) && unit.canMine(i) && ai.hasStance(ItemUnitStance.getByItem(i)), i -> core.items.get(i));
                 }else{
-                    targetItem = unit.type.mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
+                    targetItem = unit.type.mineItems.min(i -> ((unit.type.mineFloor && indexer.hasOre(i)) || (unit.type.mineWalls && indexer.hasWallOre(i))) && unit.canMine(i), i -> core.items.get(i));
                 }
             }
 
