@@ -72,6 +72,8 @@ public class Turret extends ReloadTurret{
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
     public float minWarmup = 0f;
+    /** How much time to start shooting after placement. */
+    public float activationTime = 0f;
     /** If true, this turret will accurately target moving targets with respect to shoot.firstShotDelay. */
     public boolean accurateDelay = true;
     /** If false, this turret can't move while charging. */
@@ -174,6 +176,7 @@ public class Turret extends ReloadTurret{
         stats.add(Stat.reload, 60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f)) * shoot.shots, StatUnit.perSecond);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
+        if(activationTime > 0) stats.add(Stat.activationTime, activationTime / 60f, StatUnit.seconds);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
         if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
     }
@@ -274,6 +277,7 @@ public class Turret extends ReloadTurret{
         public @Nullable SoundLoop soundLoop = (loopSound == Sounds.none ? null : new SoundLoop(loopSound, loopSoundVolume));
 
         float lastRangeChange;
+        float activationTimer = activationTime;
 
         @Override
         public void placed(){
@@ -416,7 +420,12 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isActive(){
-            return (target != null || wasShooting) && enabled;
+            return (target != null || wasShooting) && enabled && activationTimer <= 0;
+        }
+
+        @Override
+        public BlockStatus status() {
+            return (activationTimer <= 0)? super.status() : BlockStatus.inactive;
         }
 
         public void targetPosition(Posc pos){
@@ -515,6 +524,11 @@ public class Turret extends ReloadTurret{
                     lastRangeChange = newRange;
                     fogControl.forceUpdate(team, this);
                 }
+            }
+
+            if(activationTimer > 0){
+                activationTimer -= delta();
+                return;
             }
 
             if(hasAmmo()){
@@ -771,6 +785,7 @@ public class Turret extends ReloadTurret{
             super.write(write);
             write.f(reloadCounter);
             write.f(rotation);
+            write.f(activationTimer);
         }
 
         @Override
@@ -781,22 +796,26 @@ public class Turret extends ReloadTurret{
                 reloadCounter = read.f();
                 rotation = read.f();
             }
+            if(revision >= 4){
+                activationTimer = read.f();
+            }
         }
 
         @Override
         public byte version(){
-            return 1;
+            return 4;
         }
 
         @Override
         public void readSync(Reads read, byte revision){
             //maintain rotation and reload when syncing so clients don't see turrets snapping around
-            float oldRot = rotation, oldReload = reloadCounter;
+            float oldRot = rotation, oldReload = reloadCounter, oldActTime = activationTimer;
 
             readAll(read, revision);
 
             rotation = oldRot;
             reloadCounter = oldReload;
+            activationTimer = oldActTime;
         }
     }
 

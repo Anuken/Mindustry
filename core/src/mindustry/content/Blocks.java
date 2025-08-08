@@ -3548,6 +3548,7 @@ public class Blocks{
             targetAir = false;
             moveWhileCharging = false;
             accurateDelay = false;
+            activationTime = 5.15f * 60f;
             shootSound = Sounds.laser;
             coolant = consumeCoolant(0.2f);
 
@@ -3603,6 +3604,7 @@ public class Blocks{
             recoil = 1f;
             size = 1;
             health = 260;
+            activationTime = 2.8f * 60f;
             shootSound = Sounds.spark;
             consumePower(3.3f);
             coolant = consumeCoolant(0.1f);
