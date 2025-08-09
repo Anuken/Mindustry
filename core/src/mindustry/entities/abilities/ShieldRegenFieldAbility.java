@@ -48,7 +48,7 @@ public class ShieldRegenFieldAbility extends Ability{
 
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
                 if(other.shield < max){
-                    other.shield = Math.min(other.shield + amount, max);
+                    other.setShield(amount, max);
                     other.shieldAlpha = 1f; //TODO may not be necessary
                     applyEffect.at(other.x, other.y, 0f, other.type.shieldColor(other), parentizeEffects ? other : null);
                     applied = true;
