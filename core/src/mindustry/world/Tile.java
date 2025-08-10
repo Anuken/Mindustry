@@ -683,6 +683,17 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
+    public long getPackedData(){
+        return PackedTileData.get(extraData, data, floorData, overlayData);
+    }
+
+    public void setPackedData(long packed){
+        extraData = PackedTileData.extraData(packed);
+        data = PackedTileData.data(packed);
+        floorData = PackedTileData.floorData(packed);
+        overlayData = PackedTileData.overlayData(packed);
+    }
+
     @Override
     public void display(Table table){
 
@@ -808,5 +819,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                 indexer.notifyHealthChanged(build);
             }
         }
+    }
+
+    @Struct
+    class PackedTileDataStruct{
+        int extraData;
+        byte data, floorData, overlayData;
     }
 }

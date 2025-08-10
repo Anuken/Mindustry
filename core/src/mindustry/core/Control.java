@@ -313,9 +313,12 @@ public class Control implements ApplicationListener, Loadable{
         "lastBuild", 0
         );
 
-        createPlayer();
-
         saves.load();
+    }
+
+    @Override
+    public void loadSync(){
+        createPlayer();
     }
 
     /** Automatically unlocks things with no requirements and no locked parents. */
