@@ -3480,7 +3480,22 @@ public class Blocks{
                 }},
                 Liquids.slag, new LiquidBulletType(Liquids.slag){{
                     damage = 4;
+                    armorMultiplier = 0.4f;
                     drag = 0.01f;
+
+                    fragBullets = 2;
+                    fragRandomSpread = 5f;
+                    fragSpread = 130f;
+                    fragLifeMin = 1f;
+                    fragBullet = new LiquidBulletType(Liquids.slag){{
+                        damage = 4;
+                        armorMultiplier = 0.4f;
+
+                        knockback = 0f;
+                        drag = 0.01f;
+                        lifetime = 12f;
+                        pierce = true;
+                    }};
                 }},
                 Liquids.cryofluid, new LiquidBulletType(Liquids.cryofluid){{
                     drag = 0.01f;
