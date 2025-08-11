@@ -106,32 +106,20 @@ public class CargoAI extends AIController{
 
         if(targets.isEmpty()) return 0;
 
-        UnitCargoUnloadPointBuild lastStale = null;
+        //Search from offset + 1
+        for(int i = 0; i < targets.size; i++){
+            int index = (i + offset + 1) % targets.size;
+            var target = targets.get(index);
 
-        offset %= targets.size;
-
-        int i = 0;
-
-        for(var target : targets){
-            if(i >= offset && target != ignore){
-                if(target.stale){
-                    lastStale = target;
-                }else{
-                    unloadTarget = target;
-                    targets.clear();
-                    return i;
-                }
+            if(!target.stale){
+                unloadTarget = target;
+                targets.clear();
+                return index;
             }
-            i ++;
         }
 
-        //it's still possible that the ignored target may become available at some point, try that, so it doesn't waste items
-        if(ignore != null){
-            unloadTarget = ignore;
-        }else if(lastStale != null){ //a stale target is better than nothing
-            unloadTarget = lastStale;
-        }
-
+        //a stale target is better than nothing
+        unloadTarget = targets.get(0);
         targets.clear();
         return 0;
     }
