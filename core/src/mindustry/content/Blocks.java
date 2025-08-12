@@ -3206,7 +3206,7 @@ public class Blocks{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
-                    ammoMultiplier = 2;
+                    ammoMultiplier = 3;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
                     hitColor = backColor = trailColor = Pal.copperAmmoBack;
@@ -3215,7 +3215,7 @@ public class Blocks{
                 Items.graphite, new BasicBulletType(3.5f, 18){{
                     width = 9f;
                     height = 12f;
-                    ammoMultiplier = 4;
+                    ammoMultiplier = 2;
                     lifetime = 60f;
                     reloadMultiplier = 0.8f;
                     rangeChange = 16f;
@@ -3229,7 +3229,7 @@ public class Blocks{
                     height = 9f;
                     homingPower = 0.2f;
                     reloadMultiplier = 1.5f;
-                    ammoMultiplier = 5;
+                    ammoMultiplier = 3;
                     lifetime = 60f;
 
                     trailLength = 5;
