@@ -995,7 +995,11 @@ public class HudFragment{
                 count[0] = -1;
                 t.clear();
             }
-        }).growX().visible(() -> player.unit() instanceof Payloadc p && p.payloadUsed() > 0).colspan(2);
+        }).growX().visible(() -> {
+            boolean result = player.unit() instanceof Payloadc p && p.payloadUsed() > 0;
+            if(!result) count[0] = -1f;
+            return result;
+        }).colspan(2);
         table.row();
 
         Bits statuses = new Bits();
