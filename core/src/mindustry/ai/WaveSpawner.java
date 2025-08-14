@@ -174,13 +174,11 @@ public class WaveSpawner{
     }
 
     private void eachFlyerSpawn(int filterPos, Floatc2 cons){
-        boolean airUseSpawns = state.rules.airUseSpawns;
 
         for(Tile tile : spawns){
             if(filterPos != -1 && filterPos != tile.pos()) continue;
 
-            if(!airUseSpawns){
-
+            if(!state.rules.airUseSpawns){
                 float angle = Angles.angle(world.width() / 2f, world.height() / 2f, tile.x, tile.y);
                 float trns = Math.max(world.width(), world.height()) * Mathf.sqrt2 * tilesize;
                 float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width() * tilesize + margin);
@@ -191,7 +189,7 @@ public class WaveSpawner{
             }
         }
 
-        if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){
+        if(state.rules.wavesSpawnAtCores && state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){
             for(Building core : state.rules.waveTeam.data().cores){
                 if(filterPos != -1 && filterPos != core.pos()) continue;
 
