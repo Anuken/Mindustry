@@ -659,7 +659,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return items.get(item) < getMaximumAccepted(item);
+            return state.rules.coreIncinerates || items.get(item) < getMaximumAccepted(item);
         }
 
         @Override
