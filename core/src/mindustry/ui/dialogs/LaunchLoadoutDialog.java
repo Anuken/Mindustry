@@ -36,11 +36,31 @@ public class LaunchLoadoutDialog extends BaseDialog{
     public void show(CoreBlock core, Sector sector, Sector destination, Runnable confirm){
         cont.clear();
         buttons.clear();
-
         buttons.defaults().size(160f, 64f);
         buttons.button("@back", Icon.left, this::hide);
-
         addCloseListener();
+
+        selected = universe.getLoadout(core);
+        if(selected == null) selected = schematics.getLoadouts().get((CoreBlock)Blocks.coreShard).first();
+
+        total.clear();
+        selected.requirements().each(total::add);
+        universe.getLaunchResources().each(total::add);
+
+        Planet planet = sector.planet;
+        if (sector.planet == destination.planet && !destination.allowLaunchLoadout()) {
+            // can only launch to numbered if adjacent
+            Seq<Sector> target = destination.preset != null ? destination.planet.sectors : destination.near();
+            Sector st = target.find(u ->
+                u.items().has(total) // Required items for launch
+                        && !destination.allowLaunchSchematics()
+                        && !destination.allowLaunchLoadout()
+                        && u.isCaptured()
+            );
+            if (st != null) {
+                sector = st;
+            }
+        }
 
         ItemSeq sitems = sector.items();
 
@@ -57,7 +77,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         //updates sum requirements
         Runnable update = () -> {
-            int cap = lastCapacity = (int)(sector.planet.launchCapacityMultiplier * selected.findCore().itemCapacity);
+            int cap = lastCapacity = (int)(planet.launchCapacityMultiplier * selected.findCore().itemCapacity);
 
             //cap resources based on core type
             ItemSeq schems = selected.requirements();
@@ -72,7 +92,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 if(destination.preset != null){
                     var rules = destination.preset.generator.map.rules();
                     for(var stack : rules.loadout){
-                        if(stack.item.isOnPlanet(sector.planet)){
+                        if(stack.item.isOnPlanet(planet)){
                             resources.add(stack.item, stack.amount);
                         }
                     }
@@ -86,9 +106,6 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
             universe.updateLaunchResources(resources);
 
-            total.clear();
-            selected.requirements().each(total::add);
-            universe.getLaunchResources().each(total::add);
             valid = sitems.has(total) || PlanetDialog.debugSelect;
         };
 
@@ -136,7 +153,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 ItemSeq realItems = sitems.copy();
                 selected.requirements().each(realItems::remove);
 
-                loadout.show(lastCapacity, realItems, out, i -> i.unlocked() && i.isOnPlanet(sector.planet), out::clear, () -> {}, () -> {
+                loadout.show(lastCapacity, realItems, out, i -> i.unlocked() && i.isOnPlanet(planet), out::clear, () -> {}, () -> {
                     universe.updateLaunchResources(new ItemSeq(out));
                     update.run();
                     rebuildItems.run();
@@ -160,8 +177,6 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         int cols = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
         ButtonGroup<Button> group = new ButtonGroup<>();
-        selected = universe.getLoadout(core);
-        if(selected == null) selected = schematics.getLoadouts().get((CoreBlock)Blocks.coreShard).first();
 
         cont.add(Core.bundle.format("launch.from", sector.name())).row();
 
@@ -170,9 +185,9 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 int[] i = {0};
 
                 Cons<Schematic> handler = s -> {
-                    if(s.tiles.contains(tile -> !tile.block.supportsEnv(sector.planet.defaultEnv) ||
+                    if(s.tiles.contains(tile -> !tile.block.supportsEnv(planet.defaultEnv) ||
                     //make sure block can be built here.
-                    !tile.block.isOnPlanet(sector.planet))){
+                    !tile.block.isOnPlanet(planet))){
                         return;
                     }
 
