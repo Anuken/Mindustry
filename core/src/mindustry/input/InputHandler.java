@@ -78,6 +78,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** If true, there is a cutscene currently occurring in logic. */
     public boolean logicCutscene;
+    public boolean logicHideHud;
     public Vec2 logicCamPan = new Vec2();
     public float logicCamSpeed = 0.1f;
     public float logicCutsceneZoom = -1f;
@@ -156,6 +157,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Events.on(ResetEvent.class, e -> {
             logicCutscene = false;
+            logicHideHud = false;
             commandBuildings.clear();
             selectedUnits.clear();
             itemDepositCooldown = 0f;
