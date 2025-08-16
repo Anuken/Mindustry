@@ -173,7 +173,7 @@ public class LogicDisplay extends Block{
                                 int ctype = packed & 0x1F;
                                 int id = packed >> 5;
                                 if(ctype == 30){
-                                    if(id != index && id < displays.size && displays.get(id).buffer != null) {
+                                    if(id != index && id < displays.size && displays.get(id).buffer != null){
                                         Tmp.tr1.set(displays.get(id).buffer.getTexture());
                                         Draw.rect(Tmp.tr1, x, y, p2, p2, p3 + 90);
                                     }
