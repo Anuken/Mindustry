@@ -41,6 +41,7 @@ public class LanguageDialog extends BaseDialog{
     "cs", "Čeština",
     "be", "Беларуская",
     "bg", "Български",
+    "ka", "ქართული",
     "ru", "Русский",
     "sr", "Српски",
     "uk_UA", "Українська",
