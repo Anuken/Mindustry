@@ -290,6 +290,11 @@ public class MapObjectivesDialog extends BaseDialog{
             }, () -> {});
         });
 
+        setInterpreter(TextureHolder.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
+            cont.field(String.valueOf(get.get().value), s -> get.get().value = s).growX();
+        });
+
         // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] from using it.
         for(var obj : MapObjectives.allObjectiveTypes) setInterpreter(obj.get().getClass(), defaultInterpreter());
         for(var mark : MapObjectives.allMarkerTypes) setInterpreter(mark.get().getClass(), defaultInterpreter());

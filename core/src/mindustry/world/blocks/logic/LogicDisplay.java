@@ -89,15 +89,7 @@ public class LogicDisplay extends Block{
             //don't even bother processing anything when displays are off.
             if(!Vars.renderer.drawDisplays) return;
 
-            Draw.draw(Draw.z(), () -> {
-                if(buffer == null){
-                    buffer = new FrameBuffer(displaySize, displaySize);
-                    //clear the buffer - some OSs leave garbage in it
-                    buffer.begin(Pal.darkerMetal);
-                    buffer.end();
-                }
-            });
-
+            Draw.draw(Draw.z(), this::ensureBuffer);
             processCommands();
 
             Draw.blend(Blending.disabled);
@@ -127,6 +119,15 @@ public class LogicDisplay extends Block{
             }
 
             operations++;
+        }
+
+        public void ensureBuffer() {
+            if(buffer == null){
+                buffer = new FrameBuffer(displaySize, displaySize);
+                //clear the buffer - some OSs leave garbage in it
+                buffer.begin(Pal.darkerMetal);
+                buffer.end();
+            }
         }
 
         public void processCommands(){
