@@ -103,6 +103,7 @@ public class ShieldArcAbility extends Ability{
     @Override
     public void created(Unit unit){
         data = max;
+        unit.setShield(0f, max);
     }
 
     @Override
