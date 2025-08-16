@@ -276,7 +276,7 @@ public class NetClient implements ApplicationListener{
         Events.fire(new PlayerChatEvent(player, message));
 
         //log commands before they are handled
-        if(message.startsWith(netServer.clientCommands.getPrefix())){
+        if(message.startsWith(netServer.clientCommands.getPrefix()) && Config.logCommands.bool()){
             //log with brackets
             Log.info("<&fi@: @&fr>", "&lk" + player.plainName(), "&lw" + message);
         }
@@ -423,6 +423,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.one)
     public static void setPosition(float x, float y){
+        if(player.dead()) return;
         player.unit().set(x, y);
         player.set(x, y);
     }

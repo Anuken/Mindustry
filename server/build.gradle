@@ -41,6 +41,7 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     exclude("fonts/**")
     exclude("bundles/**")
     exclude("cubemaps/**")
+    exclude("config/**")
     exclude("cursors/**")
     exclude("shaders/**")
     exclude("icons/icon.icns")

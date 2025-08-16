@@ -68,7 +68,7 @@ public class RepairTower extends Block{
             if(efficiency > 0){
                 for(var target : targets){
                     if(target.damaged()){
-                        target.heal(healAmount * efficiency);
+                        target.heal(healAmount * edelta());
                         any = true;
                     }
                 }

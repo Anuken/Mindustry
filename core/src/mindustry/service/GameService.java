@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.gen.*;
@@ -198,7 +199,7 @@ public class GameService{
             if(campaign() && e.unit != null && e.unit.isLocal() && !e.breaking){
                 SStat.blocksBuilt.add();
 
-                if(e.tile.block() == Blocks.router && e.tile.build.proximity().contains(t -> t.block == Blocks.router)){
+                if(e.tile.block() == Blocks.router && e.tile.build.proximity.contains(t -> t.block == Blocks.router)){
                     chainRouters.complete();
                 }
 
@@ -393,6 +394,10 @@ public class GameService{
 
                 if(e.unit.type == UnitTypes.eclipse && e.bullet.owner instanceof TurretBuild turret && turret.block == Blocks.duo){
                     killEclipseDuo.complete();
+                }
+
+                if(e.bullet.type instanceof MassDriverBolt){
+                    killMassDriver.complete();
                 }
             }
         });

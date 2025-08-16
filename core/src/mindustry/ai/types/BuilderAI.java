@@ -53,6 +53,9 @@ public class BuilderAI extends AIController{
 
         unit.updateBuilding = true;
 
+        if(assistFollowing != null && !assistFollowing.isValid()) assistFollowing = null;
+        if(following != null && !following.isValid()) following = null;
+
         if(assistFollowing != null && assistFollowing.activelyBuilding()){
             following = assistFollowing;
         }
@@ -118,9 +121,10 @@ public class BuilderAI extends AIController{
                         Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation)));
 
             if(valid){
+                float range = Math.min(unit.type.buildRange - 20f, 100f);
                 //move toward the plan
-                moveTo(req.tile(), unit.type.buildRange - 20f, 20f);
-                moving = !unit.within(req.tile(), unit.type.buildRange - 10f);
+                moveTo(req.tile(), range - 10f, 20f);
+                moving = !unit.within(req.tile(), range);
             }else{
                 //discard invalid plan
                 unit.plans.removeFirst();
@@ -205,11 +209,17 @@ public class BuilderAI extends AIController{
 
     @Override
     public AIController fallback(){
+        if(unit.team.isAI() && unit.team.rules().prebuildAi){
+            return new PrebuildAI();
+        }
         return unit.type.flying ? new FlyingAI() : new GroundAI();
     }
 
     @Override
     public boolean useFallback(){
+        if(unit.team.isAI() && unit.team.rules().prebuildAi){
+            return true;
+        }
         return state.rules.waves && unit.team == state.rules.waveTeam && !unit.team.rules().rtsAi;
     }
 

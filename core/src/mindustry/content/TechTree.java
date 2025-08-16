@@ -42,6 +42,11 @@ public class TechTree{
             node.objectives.addAll(objectives);
         }
 
+        //insert missing sector parent dependencies
+        if(context != null && context.content instanceof SectorPreset preset && !node.objectives.contains(o -> o instanceof SectorComplete sc && sc.preset == preset)){
+            node.objectives.insert(0, new SectorComplete(preset));
+        }
+
         TechNode prev = context;
         context = node;
         children.run();
@@ -99,6 +104,7 @@ public class TechTree{
         public TechNode(@Nullable TechNode parent, UnlockableContent content, ItemStack[] requirements){
             if(parent != null){
                 parent.children.add(this);
+                planet = parent.planet;
                 researchCostMultipliers = parent.researchCostMultipliers;
             }else if(researchCostMultipliers == null){
                 researchCostMultipliers = new ObjectFloatMap<>();

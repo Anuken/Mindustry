@@ -57,6 +57,8 @@ public class ConstructBlock extends Block{
 
     @Remote(called = Loc.server)
     public static void deconstructFinish(Tile tile, Block block, Unit builder){
+        if(tile == null) return;
+
         Team team = tile.team();
         if(!headless && fogControl.isVisibleTile(Vars.player.team(), tile.x, tile.y)){
             block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
@@ -76,7 +78,7 @@ public class ConstructBlock extends Block{
         if(block instanceof OverlayFloor overlay){
             tile.setOverlay(overlay);
         }else if(block instanceof Floor floor){
-            tile.setFloorUnder(floor);
+            tile.setFloor(floor);
         }else{
             tile.setBlock(block, team, rotation);
         }
@@ -110,7 +112,7 @@ public class ConstructBlock extends Block{
             if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
         }
 
-        block.placeEnded(tile, builder);
+        block.placeEnded(tile, builder, rotation, config);
 
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }
@@ -193,8 +195,8 @@ public class ConstructBlock extends Block{
         @Override
         public void tapped(){
             //if the target is constructable, begin constructing
-            if(current.isPlaceable()){
-                if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
+            if(current.isPlaceable() && player.isBuilder()){
+                if(control.input.buildWasAutoPaused && !control.input.isBuilding){
                     control.input.isBuilding = true;
                 }
                 player.unit().addBuild(new BuildPlan(tile.x, tile.y, rotation, current, lastConfig), false);
@@ -256,6 +258,8 @@ public class ConstructBlock extends Block{
         }
 
         public void construct(Unit builder, @Nullable Building core, float amount, Object config){
+            if(accumulator == null || totalAccumulator == null) return;
+
             wasConstructing = true;
             activeDeconstruct = false;
 
@@ -268,6 +272,8 @@ public class ConstructBlock extends Block{
             if(current.requirements.length != accumulator.length || totalAccumulator.length != current.requirements.length){
                 setConstruct(previous, current);
             }
+
+            boolean infinite = team.rules().infiniteResources || state.rules.infiniteResources;
 
             float maxProgress = core == null || team.rules().infiniteResources ? amount : checkRequired(core.items, amount, false);
 
@@ -285,7 +291,7 @@ public class ConstructBlock extends Block{
                 boolean canFinish = true;
 
                 //look at leftover resources to consume, get them from the core if necessary, delay building if not
-                if(!state.rules.infiniteResources){
+                if(!infinite){
                     for(int i = 0; i < itemsLeft.length; i++){
                         if(itemsLeft[i] > 0){
                             if(core != null && core.items.has(current.requirements[i].item, itemsLeft[i])){
@@ -309,6 +315,8 @@ public class ConstructBlock extends Block{
         }
 
         public void deconstruct(Unit builder, @Nullable CoreBuild core, float amount){
+            if(accumulator == null || totalAccumulator == null) return;
+
             //reset accumulated resources when switching modes
             if(wasConstructing){
                 Arrays.fill(accumulator, 0);
@@ -422,7 +430,7 @@ public class ConstructBlock extends Block{
             this.wasConstructing = true;
             this.current = block;
             this.previous = previous;
-            this.buildCost = block.buildCost * state.rules.buildCostMultiplier;
+            this.buildCost = block.buildTime * state.rules.buildCostMultiplier;
             this.itemsLeft = new int[block.requirements.length];
             this.accumulator = new float[block.requirements.length];
             this.totalAccumulator = new float[block.requirements.length];
@@ -442,7 +450,7 @@ public class ConstructBlock extends Block{
             this.previous = previous;
             this.progress = 1f;
             this.current = previous;
-            this.buildCost = previous.buildCost * state.rules.buildCostMultiplier;
+            this.buildCost = previous.buildTime * state.rules.buildCostMultiplier;
             this.itemsLeft = new int[previous.requirements.length];
             this.accumulator = new float[previous.requirements.length];
             this.totalAccumulator = new float[previous.requirements.length];
@@ -500,7 +508,7 @@ public class ConstructBlock extends Block{
             if(previous == null) previous = Blocks.air;
             if(current == null) current = Blocks.air;
 
-            buildCost = current.buildCost * state.rules.buildCostMultiplier;
+            buildCost = current.buildTime * state.rules.buildCostMultiplier;
         }
     }
 }

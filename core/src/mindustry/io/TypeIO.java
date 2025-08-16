@@ -12,6 +12,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.Units.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
@@ -137,14 +138,16 @@ public class TypeIO{
         }
     }
 
-    @Nullable
-    public static Object readObject(Reads read){
+    public static @Nullable Object readObject(Reads read){
         return readObjectBoxed(read, false);
     }
 
-    /** Reads an object, but boxes buildings. */
-    @Nullable
-    public static Object readObjectBoxed(Reads read, boolean box){
+    /** Reads an object, but optionally boxes buildings. */
+    public static @Nullable Object readObjectBoxed(Reads read, boolean box){
+        return readObject(read, box, null);
+    }
+
+    public static @Nullable Object readObject(Reads read, boolean box, @Nullable ContentMapper mapper){
         byte type = read.b();
         return switch(type){
             case 0 -> null;
@@ -152,7 +155,7 @@ public class TypeIO{
             case 2 -> read.l();
             case 3 -> read.f();
             case 4 -> readString(read);
-            case 5 -> content.getByID(ContentType.all[read.b()], read.s());
+            case 5 -> mapper == null ? content.getByID(ContentType.all[read.b()], read.s()) : mapper.get(ContentType.all[read.b()], read.s());
             case 6 -> {
                 short length = read.s();
                 IntSeq arr = new IntSeq(length);
@@ -201,7 +204,7 @@ public class TypeIO{
             case 22 -> {
                 int objlen = read.i();
                 Object[] objs = new Object[objlen];
-                for(int i = 0; i < objlen; i++) objs[i] = readObjectBoxed(read, box);
+                for(int i = 0; i < objlen; i++) objs[i] = readObject(read, box, mapper);
                 yield objs;
             }
             case 23 -> content.unitCommand(read.us());
@@ -278,6 +281,46 @@ public class TypeIO{
         return noAbilities;
     }
 
+    public static void writeUnitContainer(Writes write, UnitSyncContainer cont){
+        write.i(cont.unit.id);
+        write.b(cont.unit.classId() & 0xFF);
+        cont.unit.beforeWrite();
+        cont.unit.writeSync(write);
+    }
+
+    public static UnitSyncContainer readUnitContainer(Reads read){
+        int id = read.i();
+        int typeID = read.ub();
+
+        Unit entity = Groups.unit.getByID(id);
+        boolean add = false, created = false;
+
+        if(entity == null){
+            entity = (Unit)EntityMapping.map(typeID & 0xFF).get();
+            entity.id(id);
+
+            if(!netClient.isEntityUsed(entity.id())){
+                add = true;
+            }
+            created = true;
+        }
+
+        //read the entity
+        entity.readSync(read);
+
+        if(created){
+            //snap initial starting position
+            entity.snapSync();
+        }
+
+        if(add){
+            entity.add();
+            netClient.addRemovedEntity(entity.id());
+        }
+
+        return null; //no need to actually return anything
+    }
+
     public static void writeUnit(Writes write, Unit unit){
         write.b(unit == null ? 0 : unit instanceof BlockUnitc ? 1 : 2);
 
@@ -321,7 +364,7 @@ public class TypeIO{
     public static UnitStance readStance(Reads read){
         int val = read.ub();
         //never returns null
-        return val == 255 || val >= content.unitStances().size ? UnitStance.shoot : content.unitStance(val);
+        return val == 255 || val >= content.unitStances().size ? UnitStance.stop : content.unitStance(val);
     }
 
     public static void writeEntity(Writes write, Entityc entity){
@@ -482,7 +525,7 @@ public class TypeIO{
             write.b(3);
             write.i(logic.controller.pos());
         }else if(control instanceof CommandAI ai){
-            write.b(8);
+            write.b(9);
             write.bool(ai.attackTarget != null);
             write.bool(ai.targetPos != null);
 
@@ -518,7 +561,16 @@ public class TypeIO{
                 }
             }
 
-            writeStance(write, ai.stance);
+            int count = content.unitStances().count(ai::hasStance);
+
+            write.b(count);
+
+            for(var stance : content.unitStances()){
+                if(ai.hasStance(stance)){
+                    writeStance(write, stance);
+                }
+            }
+
         }else if(control instanceof AssemblerAI){  //hate
             write.b(5);
         }else{
@@ -550,8 +602,8 @@ public class TypeIO{
                 out.controller = world.build(pos);
                 return out;
             }
-            //type 4 is the old CommandAI with no commandIndex, type 6 is the new one with the index as a single byte, type 7 is the one with the command queue, 8 adds a stance
-        }else if(type == 4 || type == 6 || type == 7 || type == 8){
+            //type 4 is the old CommandAI with no commandIndex, type 6 is the new one with the index as a single byte, type 7 is the one with the command queue, 8 adds a stance, 9 adds multiple stances
+        }else if(type == 4 || type == 6 || type == 7 || type == 8 || type == 9){
             CommandAI ai = prev instanceof CommandAI pai ? pai : new CommandAI();
 
             boolean hasAttack = read.bool(), hasPos = read.bool();
@@ -575,14 +627,14 @@ public class TypeIO{
                 ai.attackTarget = null;
             }
 
-            if(type == 6 || type == 7 || type == 8){
+            if(type == 6 || type == 7 || type == 8 || type == 9){
                 byte id = read.b();
                 ai.command = id < 0 ? null : content.unitCommand(id);
                 if(ai.command == null) ai.command = UnitCommand.moveCommand;
             }
 
             //command queue only in type 7/8
-            if(type == 7 || type == 8){
+            if(type == 7 || type == 8 || type == 9){
                 ai.commandQueue.clear();
                 int length = read.ub();
                 for(int i = 0; i < length; i++){
@@ -605,7 +657,12 @@ public class TypeIO{
             }
 
             if(type == 8){
-                ai.stance = readStance(read);
+                ai.setStance(readStance(read));
+            }else if(type == 9){
+                int stances = read.ub();
+                for(int i = 0; i < stances; i++){
+                    ai.setStance(readStance(read));
+                }
             }
 
             return ai;
@@ -1038,6 +1095,11 @@ public class TypeIO{
         }
     }
 
+    /** Converter of an ID to a content instance. */
+    public interface ContentMapper{
+        Content get(ContentType type, int id);
+    }
+
     public interface Boxed<T> {
         T unbox();
     }
@@ -1063,7 +1125,7 @@ public class TypeIO{
         }
     }
 
-    /** Represents a unit that has not been resolved yet. TODO unimplemented / unused*/
+    /** Represents a unit that has not been resolved yet. */
     public static class UnitBox implements Boxed<Unit>{
         public int id;
 

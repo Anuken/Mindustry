@@ -36,10 +36,15 @@ public class Door extends Wall{
         consumesTap = true;
 
         config(Boolean.class, (DoorBuild base, Boolean open) -> {
-            doorSound.at(base);
-            base.effect();
+            if(!world.isGenerating()){
+                doorSound.at(base);
+                base.effect();
+            }
 
-            for(DoorBuild entity : base.chained){
+            doorQueue.clear();
+            doorQueue.add(base);
+
+            for(DoorBuild entity : base.chained.isEmpty() ? doorQueue : base.chained){
                 //skip doors with things in them
                 if((Units.anyEntities(entity.tile) && !open) || entity.open == open){
                     continue;
@@ -47,7 +52,7 @@ public class Door extends Wall{
 
                 if(chainEffect) entity.effect();
                 entity.open = open;
-                pathfinder.updateTile(entity.tile());
+                if(!world.isGenerating()) pathfinder.updateTile(entity.tile);
             }
         });
     }

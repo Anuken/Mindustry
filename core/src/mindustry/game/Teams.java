@@ -56,6 +56,19 @@ public class Teams{
         return Geometry.findClosest(x, y, get(team).cores);
     }
 
+    public boolean anyEnemyCoresWithinBuildRadius(Team team, float x, float y){
+        for(TeamData data : active){
+            if(team != data.team){
+                for(CoreBuild tile : data.cores){
+                    if(tile.within(x, y, state.rules.buildRadius(tile.team) + tilesize)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public boolean anyEnemyCoresWithin(Team team, float x, float y, float radius){
         for(TeamData data : active){
             if(team != data.team){
@@ -81,7 +94,12 @@ public class Teams{
 
     /** Returns team data by type. */
     public TeamData get(Team team){
-        return map[team.id] == null ? (map[team.id] = new TeamData(team)) : map[team.id];
+        var data = map[team.id];
+        if(data != null){
+            return data;
+        }else{
+            return map[team.id] = new TeamData(team);
+        }
     }
 
     public @Nullable TeamData getOrNull(Team team){
@@ -111,6 +129,15 @@ public class Teams{
     public Seq<TeamData> getActive(){
         active.removeAll(t -> !t.active());
         return active;
+    }
+
+    public void updateActive(Team team){
+        TeamData data = get(team);
+        //register in active list if needed
+        if(data.active() && !active.contains(data)){
+            active.add(data);
+            updateEnemies();
+        }
     }
 
     public void registerCore(CoreBuild core){
@@ -254,7 +281,7 @@ public class Teams{
         /** Enemies with cores or spawn points. */
         public Team[] coreEnemies = {};
         /** Planned blocks for drones. This is usually only blocks that have been broken. */
-        public Queue<BlockPlan> plans = new Queue<>();
+        public Queue<BlockPlan> plans = new Queue<>(16, BlockPlan.class);
 
         /** List of live cores of this team. */
         public final Seq<CoreBuild> cores = new Seq<>();
@@ -394,11 +421,16 @@ public class Teams{
         }
 
         public boolean active(){
-            return (team == state.rules.waveTeam && state.rules.waves) || cores.size > 0;
+            return (team == state.rules.waveTeam && state.rules.waves) || cores.size > 0 || buildings.size > 0 || (team == Team.neoplastic && units.size > 0);
         }
 
         public boolean hasCore(){
             return cores.size > 0;
+        }
+
+        /** @return whether this team has any cores (standard team), or any hearts (neoplasm). */
+        public boolean isAlive(){
+            return hasCore();
         }
 
         public boolean noCores(){

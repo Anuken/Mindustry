@@ -25,7 +25,6 @@ public class Administration{
     public ObjectSet<String> dosBlacklist = new ObjectSet<>();
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
 
-
     private boolean modified, loaded;
     /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not modify directly. */
     public ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
@@ -90,6 +89,10 @@ public class Administration{
 
     public synchronized void blacklistDos(String address){
         dosBlacklist.add(address);
+    }
+
+    public synchronized void unBlacklistDos(String address){
+        dosBlacklist.remove(address);
     }
 
     public synchronized boolean isDosBlacklisted(String address){
@@ -515,7 +518,8 @@ public class Administration{
         snapshotInterval = new Config("snapshotInterval", "Client entity snapshot interval in ms.", 200),
         autoPause = new Config("autoPause", "Whether the game should pause when nobody is online.", false),
         roundExtraTime = new Config("roundExtraTime", "Time before loading a new map after the gameover, in seconds.", 12),
-        maxLogLength = new Config("maxLogLength", "The Maximum log file size, in bytes.", 1024 * 1024 * 5);
+        maxLogLength = new Config("maxLogLength", "The Maximum log file size, in bytes.", 1024 * 1024 * 5),
+        logCommands = new Config("logCommands", "Whether player commands should be logged.", true);
 
         public final Object defaultValue;
         public final String name, key, description;

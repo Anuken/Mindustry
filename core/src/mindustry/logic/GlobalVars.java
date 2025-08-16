@@ -23,6 +23,7 @@ import static mindustry.Vars.*;
 public class GlobalVars{
     public static final int ctrlProcessor = 1, ctrlPlayer = 2, ctrlCommand = 3;
     public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid, ContentType.team};
+    public static final ContentType[] writableLookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid};
     /** Global random state. */
     public static final Rand rand = new Rand();
 
@@ -73,7 +74,7 @@ public class GlobalVars{
 
         varMapW = putEntry("@mapw", 0);
         varMapH = putEntry("@maph", 0);
-        varWait = putEntry("@wait", null);
+        varWait = put("@wait", null, true, true);
 
         putEntryOnly("sectionNetwork");
 
@@ -146,6 +147,8 @@ public class GlobalVars{
             put("@" + sensor.name(), sensor);
         }
 
+        LStatement.nameToAlign.each((name, align) -> put("@" + name, align));
+
         logicIdToContent = new UnlockableContent[ContentType.all.length][];
         contentIdToLogicId = new int[ContentType.all.length][];
 
@@ -155,7 +158,7 @@ public class GlobalVars{
         if(ids.exists()){
             //read logic ID mapping data (generated in ImagePacker)
             try(DataInputStream in = new DataInputStream(ids.readByteStream())){
-                for(ContentType ctype : lookableContent){
+                for(ContentType ctype : writableLookableContent){
                     short amount = in.readShort();
                     logicIdToContent[ctype.ordinal()] = new UnlockableContent[amount];
                     contentIdToLogicId[ctype.ordinal()] = new int[Vars.content.getBy(ctype).size];

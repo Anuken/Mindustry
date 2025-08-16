@@ -46,7 +46,7 @@ public class Weapon implements Cloneable{
     public boolean rotate = false;
     /** Whether to show the sprite of the weapon in the database. */
     public boolean showStatSprite = true;
-    /** rotation at which this weapon starts at. TODO buggy!*/
+    /** rotation at which this weapon starts at. */
     public float baseRotation = 0f;
     /** whether to draw the outline on top. */
     public boolean top = true;
@@ -92,14 +92,16 @@ public class Weapon implements Cloneable{
     public float shootX = 0f, shootY = 3f;
     /** offsets of weapon position on unit */
     public float x = 5f, y = 0f;
-    /** Random spread on the X axis. */
-    public float xRand = 0f;
+    /** Random spread on the X/Y axis. */
+    public float xRand = 0f, yRand = 0f;
     /** pattern used for bullets */
     public ShootPattern shoot = new ShootPattern();
     /** radius of shadow drawn under the weapon; <0 to disable */
     public float shadow = -1f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
+    /** extra velocity that is added as a fraction */
+    public float extraVelocity = 0f;
     /** The half-radius of the cone in which shooting will start. */
     public float shootCone = 5f;
     /** Cone in which the weapon can rotate relative to its mount. */
@@ -234,7 +236,9 @@ public class Weapon implements Cloneable{
             }
         }
 
-        Draw.xscl = -Mathf.sign(flipSprite);
+        float prev = Draw.xscl;
+
+        Draw.xscl *= -Mathf.sign(flipSprite);
 
         //fix color
         unit.type.applyColor(unit);
@@ -255,7 +259,7 @@ public class Weapon implements Cloneable{
             Draw.color();
         }
 
-        Draw.xscl = 1f;
+        Draw.xscl = prev;
 
         if(parts.size > 0){
             //TODO does it need an outline?
@@ -479,17 +483,18 @@ public class Weapon implements Cloneable{
         mount.charging = false;
         float
         xSpread = Mathf.range(xRand),
+        ySpread = Mathf.range(yRand),
         weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
         mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
         mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
-        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset),
-        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset),
+        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset + ySpread),
+        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset + ySpread),
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
         lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
         angle = shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
 
         Entityc shooter = unit.controller() instanceof MissileAI ai ? ai.shooter : unit; //Pass the missile's shooter down to its bullets
-        mount.bullet = bullet.create(unit, shooter, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY, mount.target);
+        mount.bullet = bullet.create(unit, shooter, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd) + extraVelocity, lifeScl, null, mover, mount.aimX, mount.aimY, mount.target);
         handleBullet(unit, mount, mount.bullet);
 
         if(!continuous){

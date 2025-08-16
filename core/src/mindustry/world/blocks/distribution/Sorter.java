@@ -84,6 +84,12 @@ public class Sorter extends Block{
         }
 
         @Override
+        public void drawSelect(){
+            super.drawSelect();
+            drawItemSelection(sortItem);
+        }
+
+        @Override
         public boolean acceptItem(Building source, Item item){
             Building to = getTileTarget(item, source, false);
 

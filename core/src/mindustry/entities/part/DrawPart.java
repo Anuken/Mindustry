@@ -18,7 +18,7 @@ public abstract class DrawPart{
     public int recoilIndex = -1;
 
     public abstract void draw(PartParams params);
-    public abstract void load(String name);
+    public void load(String name){}
     public void getOutlines(Seq<TextureRegion> out){}
 
     /** Parameters for drawing a part in draw(). */
@@ -88,7 +88,7 @@ public abstract class DrawPart{
         life = p -> p.life,
         /** Current unscaled value of Time.time. */
         time = p -> Time.time;
-        
+
         float get(PartParams p);
 
         static PartProgress constant(float value){
@@ -98,11 +98,11 @@ public abstract class DrawPart{
         default float getClamp(PartParams p){
             return getClamp(p, true);
         }
-        
+
         default float getClamp(PartParams p, boolean clamp){
             return clamp ? Mathf.clamp(get(p)) : get(p);
         }
-        
+
         default PartProgress inv(){
             return p -> 1f - get(p);
         }
@@ -173,11 +173,11 @@ public abstract class DrawPart{
         default PartProgress absin(float scl, float mag){
             return p -> get(p) + Mathf.absin(scl, mag);
         }
-        
+
         default PartProgress mod(float amount){
             return p -> Mathf.mod(get(p), amount);
         }
-        
+
         default PartProgress loop(float time){
             return p -> Mathf.mod(get(p)/time, 1);
         }

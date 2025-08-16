@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 buildscript{
     ext{
         arcHash = property("archash")
@@ -26,8 +28,8 @@ buildscript{
 }
 
 plugins{
-    id "org.jetbrains.kotlin.jvm" version "1.6.0"
-    id "org.jetbrains.kotlin.kapt" version "1.6.0"
+    id "org.jetbrains.kotlin.jvm" version "2.1.10"
+    id "org.jetbrains.kotlin.kapt" version "2.1.10"
 }
 
 allprojects{
@@ -37,8 +39,8 @@ allprojects{
     group = 'com.github.Anuken'
 
     ext{
-        versionNumber = '7'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
+        versionNumber = '8'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'beta'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
@@ -115,7 +117,7 @@ allprojects{
                 output += name.substring("bundle".length() + 1, name.lastIndexOf('.')) + "\n"
             }
             new File(project(':core').projectDir, 'assets/locales').text = output
-            new File(project(':core').projectDir, 'assets/basepartnames').text = new File(project(':core').projectDir, 'assets/baseparts/').list().sort().join("\n")
+            new File(project(':core').projectDir, 'assets/basepartnames').text = new File(project(':core').projectDir, 'assets/baseparts/').list().sort().findAll{f -> f.endsWith(".msch")}.join("\n")
         }
 
         writeVersion = {
@@ -137,6 +139,7 @@ allprojects{
                 props["number"] = versionNumber
                 props["modifier"] = versionModifier
                 props["build"] = buildid
+                props["buildDate"] = new SimpleDateFormat("MMMM d, yyyy HH:mm a", Locale.getDefault()).format(new Date())
                 props["commitHash"] = "unknown"
                 if(project.hasProperty("showCommitHash")){
                     props["commitHash"] = getCommitHash()
@@ -241,6 +244,7 @@ project(":desktop"){
 
     dependencies{
         implementation project(":core")
+        implementation arcModule("extensions:profiling")
         implementation arcModule("extensions:discord")
         implementation arcModule("natives:natives-filedialogs")
         implementation arcModule("natives:natives-desktop")
@@ -366,7 +370,6 @@ project(":core"){
         //these are completely unnecessary
         tasks.kaptGenerateStubsKotlin.onlyIf{ false }
         tasks.compileKotlin.onlyIf{ false }
-        tasks.inspectClassesForKotlinIC.onlyIf{ false }
     }
 
     //comp** classes are only used for code generation

@@ -231,13 +231,7 @@ public class BeamDrill extends Block{
         @Override
         public void drawSelect(){
 
-            if(lastItem != null){
-                float dx = x - size * tilesize/2f, dy = y + size * tilesize/2f, s = iconSmall / 4f;
-                Draw.mixcol(Color.darkGray, 1f);
-                Draw.rect(lastItem.fullIcon, dx, dy - 1, s, s);
-                Draw.reset();
-                Draw.rect(lastItem.fullIcon, dx, dy, s, s);
-            }
+            drawItemSelection(lastItem);
         }
 
         @Override
@@ -247,7 +241,7 @@ public class BeamDrill extends Block{
             if(lasers[0] == null) updateLasers();
 
             warmup = Mathf.approachDelta(warmup, Mathf.num(efficiency > 0), 1f / 60f);
-            
+
             updateFacing();
 
             float multiplier = Mathf.lerp(1f, optionalBoostIntensity, optionalEfficiency);
@@ -268,7 +262,7 @@ public class BeamDrill extends Block{
                 time %= drillTime;
             }
 
-            if(timer(timerDump, dumpTime)){
+            if(timer(timerDump, dumpTime / timeScale)){
                 dump();
             }
         }
@@ -291,6 +285,9 @@ public class BeamDrill extends Block{
             for(int i = 0; i < size; i++){
                 Tile face = facing[i];
                 if(face != null){
+                    Item drop = face.wallDrop();
+
+                    if(drop == null) continue;
                     Point2 p = lasers[i];
                     float lx = face.worldx() - (dir.x/2f)*tilesize, ly = face.worldy() - (dir.y/2f)*tilesize;
 
@@ -331,7 +328,7 @@ public class BeamDrill extends Block{
                     Draw.z(Layer.effect);
                     Lines.stroke(warmup);
                     rand.setState(i, id);
-                    Color col = face.wallDrop().color;
+                    Color col = drop.color;
                     Color spark = Tmp.c3.set(sparkColor).lerp(boostHeatColor, boostWarmup);
                     for(int j = 0; j < sparks; j++){
                         float fin = (Time.time / sparkLife + rand.random(sparkRecurrence + 1f)) % sparkRecurrence;

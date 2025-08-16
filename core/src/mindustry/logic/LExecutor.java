@@ -27,7 +27,6 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
-import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
@@ -35,7 +34,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class LExecutor{
-    public static final int maxInstructions = 1000;
+    public static int maxInstructions = 1000;
 
     public static final int
     maxGraphicsBuffer = 256,
@@ -61,6 +60,8 @@ public class LExecutor{
 
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
     protected static IntFloatMap unitTimeouts = new IntFloatMap();
+    //lookup variable by name, lazy init.
+    protected @Nullable ObjectIntMap<String> nameMap;
 
     static{
         Events.on(ResetEvent.class, e -> unitTimeouts.clear());
@@ -86,12 +87,14 @@ public class LExecutor{
         }
 
         if(counter.numval < instructions.length){
+            counter.isobj = false;
             instructions[(int)(counter.numval++)].run(this);
         }
     }
 
     /** Loads with a specified assembler. Resets all variables. */
     public void load(LAssembler builder){
+        nameMap = null;
         vars = builder.vars.values().toSeq().retainAll(var -> !var.constant).toArray(LVar.class);
         for(int i = 0; i < vars.length; i++){
             vars[i].id = i;
@@ -105,6 +108,17 @@ public class LExecutor{
     }
 
     //region utility
+
+
+    public @Nullable LVar optionalVar(String name){
+        if(nameMap == null){
+            nameMap = new ObjectIntMap<>();
+            for(int i = 0; i < vars.length; i++){
+                nameMap.put(vars[i].name, i);
+            }
+        }
+        return optionalVar(nameMap.get(name, -1));
+    }
 
     /** @return a Var from this processor. May be null if out of bounds. */
     public @Nullable LVar optionalVar(int index){
@@ -227,7 +241,7 @@ public class LExecutor{
                         outFound.setnum(0);
                     }
 
-                    if(res != null && res.build != null && 
+                    if(res != null && res.build != null &&
                         (unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange)) || res.build.team == exec.team)){
                         cache.build = res.build;
                         outBuild.setobj(res.build);
@@ -500,14 +514,14 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = target.obj();
-            if(obj instanceof Building b && (exec.privileged || (b.team == exec.team && exec.linkIds.contains(b.id)))){
+            if(obj instanceof Building b && (exec.privileged || (exec.build != null && exec.build.validLink(b)))){
 
-                if(type == LAccess.enabled && !p1.bool()){
-                    b.lastDisabler = exec.build;
-                }
-
-                if(type == LAccess.enabled && p1.bool()){
-                    b.noSleep();
+                if(type == LAccess.enabled){
+                    if(p1.bool()){
+                        b.noSleep();
+                    }else{
+                        b.lastDisabler = exec.build;
+                    }
                 }
 
                 if(type.isObj && p1.isobj){
@@ -552,11 +566,15 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = position.numi();
-            Building from = target.building();
-
-            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
-                output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
+            Object targetObj = target.obj();
+            if(targetObj instanceof LReadable read){
+                if(!read.readable(exec)) return;
+                read.read(position, output);
+            }else{
+                int address = position.numi();
+                if(targetObj instanceof CharSequence str){
+                    output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
+                }
             }
         }
     }
@@ -575,11 +593,10 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = position.numi();
-            Building from = target.building();
-
-            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
-                mem.memory[address] = value.num();
+            Object targetObj = target.obj();
+            if(targetObj instanceof LWritable write){
+                if(!write.writable(exec)) return;
+                write.write(position, value);
             }
         }
     }
@@ -622,6 +639,10 @@ public class LExecutor{
                     }
                 }
             }else{
+                if(target instanceof CharSequence seq && (sense == LAccess.size || sense == LAccess.bufferSize)){
+                    to.setnum(seq.length());
+                    return;
+                }
                 to.setobj(null);
             }
         }
@@ -745,17 +766,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(!to.constant){
-                if(from.isobj){
-                    if(to != exec.counter){
-                        to.objval = from.objval;
-                        to.isobj = true;
-                    }
-                }else{
-                    to.numval = LVar.invalid(from.numval) ? 0 : from.numval;
-                    to.isobj = false;
-                }
-            }
+            if(!to.constant) to.set(from);
         }
     }
 
@@ -788,6 +799,28 @@ public class LExecutor{
                 }
 
             }
+        }
+    }
+
+    public static class SelectI implements LInstruction{
+        public ConditionOp op = ConditionOp.notEqual;
+        public LVar result, comp0, comp1, a, b;
+
+        public SelectI(ConditionOp op, LVar result, LVar comp0, LVar comp1, LVar a, LVar b){
+            this.op = op;
+            this.result = result;
+            this.comp0 = comp0;
+            this.comp1 = comp1;
+            this.a = a;
+            this.b = b;
+        }
+
+        public SelectI(){}
+
+        @Override
+        public void run(LExecutor exec){
+            if(result.constant) return;
+            result.set(op.test(comp0, comp1) ? a : b);
         }
     }
 
@@ -845,7 +878,7 @@ public class LExecutor{
                     int advance = (int)data.spaceXadvance, lineHeight = (int)data.lineHeight;
 
                     int xOffset, yOffset;
-                    int align = p1.id; //p1 is not a variable, it's a raw align value. what a massive hack
+                    int align = p1.numi();
 
                     int maxWidth = 0, lines = 1, lineWidth = 0;
                     for(int i = 0; i < str.length(); i++){
@@ -934,12 +967,8 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
-            if(target.building() instanceof LogicDisplayBuild d && (d.team == exec.team || exec.privileged)){
-                if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
-                    for(int i = 0; i < exec.graphicsBuffer.size; i++){
-                        d.commands.addLast(exec.graphicsBuffer.items[i]);
-                    }
-                }
+            if(target.building() instanceof LogicDisplayBuild d && d.isValid() && (d.team == exec.team || exec.privileged)){
+                d.flushCommands(exec.graphicsBuffer);
                 exec.graphicsBuffer.clear();
             }
         }
@@ -1072,8 +1101,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(target.building() instanceof MessageBuild d && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
-
+            if(target.building() instanceof MessageBuild d && d.isValid() && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
 
@@ -1100,23 +1128,8 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(address != -1){
-                LVar va = value;
-                LVar vb = compare;
-                boolean cmp;
-
-                if(op == ConditionOp.strictEqual){
-                    cmp = va.isobj == vb.isobj && ((va.isobj && va.objval == vb.objval) || (!va.isobj && va.numval == vb.numval));
-                }else if(op.objFunction != null && va.isobj && vb.isobj){
-                    //use object function if both are objects
-                    cmp = op.objFunction.get(value.obj(), compare.obj());
-                }else{
-                    cmp = op.function.get(value.num(), compare.num());
-                }
-
-                if(cmp){
-                    exec.counter.numval = address;
-                }
+            if(address != -1 && op.test(value, compare)){
+                exec.counter.numval = address;
             }
         }
     }
@@ -1187,12 +1200,34 @@ public class LExecutor{
             this.a = a;
         }
 
-        public PackColorI(){
-        }
+        public PackColorI(){}
 
         @Override
         public void run(LExecutor exec){
             result.setnum(Color.toDoubleBits(Mathf.clamp(r.numf()), Mathf.clamp(g.numf()), Mathf.clamp(b.numf()), Mathf.clamp(a.numf())));
+        }
+    }
+
+    public static class UnpackColorI implements LInstruction{
+        public LVar r, g, b, a, value;
+
+        public UnpackColorI(LVar r, LVar g, LVar b, LVar a, LVar value){
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+            this.value = value;
+        }
+
+        public UnpackColorI(){}
+
+        @Override
+        public void run(LExecutor exec){
+            var color = Tmp.c1.fromDouble(value.num());
+            r.setnum(color.r);
+            g.setnum(color.g);
+            b.setnum(color.b);
+            a.setnum(color.a);
         }
     }
 
@@ -1356,7 +1391,6 @@ public class LExecutor{
 
             Tile tile = world.tile(x.numi(), y.numi());
             if(tile != null && block.obj() instanceof Block b){
-                //TODO this can be quite laggy...
                 switch(layer){
                     case ore -> {
                         if((b instanceof OverlayFloor || b == Blocks.air) && tile.overlay() != b) tile.setOverlayNet(b);
@@ -1403,10 +1437,10 @@ public class LExecutor{
 
             Team t = team.team();
 
-            if(type.obj() instanceof UnitType type && !type.internal && !type.hidden && t != null && Units.canCreate(t, type)){
+            if(t != null && type.obj() instanceof UnitType type && !type.internal && Units.canCreate(t, type)){
                 //random offset to prevent stacking
-                var unit = type.spawn(t, World.unconv(x.numf()) + Mathf.range(0.01f), World.unconv(y.numf()) + Mathf.range(0.01f));
-                spawner.spawnEffect(unit, rotation.numf());
+                var unit = type.spawn(t, World.unconv(x.numf()) + Mathf.range(0.01f), World.unconv(y.numf()) + Mathf.range(0.01f), rotation.numf());
+                spawner.spawnEffect(unit);
                 result.setobj(unit);
             }
         }
@@ -1575,11 +1609,12 @@ public class LExecutor{
             }else if(full){
                 //disable the rule, covers the whole map
                 if(set){
+                    int prevX = state.rules.limitX, prevY = state.rules.limitY, prevW = state.rules.limitWidth, prevH = state.rules.limitHeight;
                     state.rules.limitMapArea = false;
                     if(!headless){
                         renderer.updateAllDarkness();
                     }
-                    world.checkMapArea();
+                    world.checkMapArea(prevX, prevY, prevW, prevH);
                     return false;
                 }
             }
@@ -1588,12 +1623,20 @@ public class LExecutor{
         }
 
         if(set){
+            int prevX = state.rules.limitX, prevY = state.rules.limitY, prevW = state.rules.limitWidth, prevH = state.rules.limitHeight;
+            if(!state.rules.limitMapArea){
+                //it was never on in the first place, so the old bounds don't apply
+                prevW = 0;
+                prevH = 0;
+                prevX = -1;
+                prevY = -1;
+            }
             state.rules.limitMapArea = true;
             state.rules.limitX = x;
             state.rules.limitY = y;
             state.rules.limitWidth = w;
             state.rules.limitHeight = h;
-            world.checkMapArea();
+            world.checkMapArea(prevX, prevY, prevW, prevH);
 
             if(!headless){
                 renderer.updateAllDarkness();
@@ -1905,9 +1948,7 @@ public class LExecutor{
                 for(int i = 0; i < spawned; i++){
                     Tmp.v1.rnd(spread);
 
-                    Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
-                    unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
-                    Vars.spawner.spawnEffect(unit);
+                    spawner.spawnUnit(group, spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
                 }
             }
         }

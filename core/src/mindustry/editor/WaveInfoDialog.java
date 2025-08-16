@@ -289,6 +289,13 @@ public class WaveInfoDialog extends BaseDialog{
                         }).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f).row();
 
                         t.table(a -> {
+                            a.add("@waves.team").padRight(8);
+
+                            a.button(b -> b.image(Tex.whiteui).size(iconSmall).update(i -> i.setColor(group.team == null ? Color.clear : group.team.color)), Styles.squarei,
+                            () -> MapObjectivesDialog.showTeamSelect(true, team -> group.team = team)).size(38f);
+                        }).padTop(0).row();
+
+                        t.table(a -> {
                             a.add("@waves.spawn").padRight(8);
 
                             a.button("", () -> {

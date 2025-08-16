@@ -4,7 +4,7 @@ buildscript{
     }
 
     dependencies{
-        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.19"
+        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.23"
     }
 }
 
@@ -53,7 +53,7 @@ task copyAssets(){
         delete{
             delete "assets/"
         }
-    
+
         copy{
             from "../core/assets"
             into "assets/"
@@ -85,7 +85,7 @@ launchIOSDevice.dependsOn build
 createIPA.dependsOn build
 
 robovm{
-    archs = "thumbv7:arm64"
+    archs = "arm64"
 
     if(project.hasProperty("signIdentity")) println "iOS Sign Identity: " + project.property("signIdentity")
     if(project.hasProperty("provisioningProfile")) println "iOS Provisioning Profile: " + project.property("provisioningProfile")

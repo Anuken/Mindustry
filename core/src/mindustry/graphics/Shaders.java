@@ -1,6 +1,7 @@
 package mindustry.graphics;
 
 import arc.*;
+import arc.assets.loaders.TextureLoader.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -108,6 +109,7 @@ public class Shaders{
         public Color ambientColor = Color.white.cpy();
         public Vec3 camDir = new Vec3();
         public Vec3 camPos = new Vec3();
+        public boolean emissive;
         public Planet planet;
 
         public PlanetShader(){
@@ -122,6 +124,7 @@ public class Shaders{
             setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
             setUniformf("u_camdir", camDir);
             setUniformf("u_campos", renderer.planets.cam.position);
+            setUniformf("u_emissive", emissive ? 1f : 0f);
         }
     }
 
@@ -232,6 +235,8 @@ public class Shaders{
 
     public static class BlockBuildShader extends LoadShader{
         public float progress;
+        //Alpha changes the opacity of *everything*, while the provided batch color only changes the outline
+        public float alpha = 1f;
         public TextureRegion region = new TextureRegion();
         public float time;
 
@@ -243,6 +248,7 @@ public class Shaders{
         public void apply(){
             setUniformf("u_progress", progress);
             setUniformf("u_time", time);
+            setUniformf("u_alpha", alpha);
 
             if(region.texture == null){
                 setUniformf("u_uv", 0f, 0f);
@@ -299,11 +305,12 @@ public class Shaders{
         public SpaceShader(String frag){
             super(frag);
 
-            Core.assets.load("sprites/space.png", Texture.class).loaded = t -> {
-                texture = t;
-                texture.setFilter(TextureFilter.linear);
-                texture.setWrap(TextureWrap.mirroredRepeat);
-            };
+            Core.assets.load("sprites/space.png", Texture.class, new TextureParameter(){{
+                magFilter = TextureFilter.linear;
+                minFilter = TextureFilter.mipMapLinearLinear;
+                wrapU = wrapV = TextureWrap.mirroredRepeat;
+                genMipMaps = true;
+            }}).loaded = t -> texture = t;
         }
 
         @Override

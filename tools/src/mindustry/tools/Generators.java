@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ctype.*;
+import mindustry.entities.part.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -67,6 +68,41 @@ public class Generators{
 
     public static void run(){
         ObjectMap<Block, Pixmap> gens = new ObjectMap<>();
+
+        generate("autotiles", () -> {
+            for(Block block : content.blocks().select(b -> (b.isFloor() && b.asFloor().autotile) || (b instanceof StaticWall && ((StaticWall)b).autotile))){
+                int variants = block instanceof Floor f && f.autotileVariants > 1 ? f.autotileVariants : 1;
+                for(int v = 0; v < variants; v++){
+                    Fi basePath = new Fi("../../../assets-raw/sprites_out/blocks/environment/" + block.name + "-autotile" + (variants <= 1 ? "" : "" + (v+1)) + ".png"), iconPath = basePath.parent().child(block.name + ".png");
+
+                    if(basePath.exists()){
+                        int variant = v;
+                        //theoretically this might not finish in time, but I doubt that will ever happen
+                        mainExecutor.submit(() -> {
+                            try{
+                                ImageTileGenerator.generate(basePath, block.name + (variants <= 1 ? "" : "-" + (variant+1)), new Fi("../../../assets-raw/sprites_out/blocks/environment"));
+                            }catch(Throwable e){
+                                Log.err("Failed to autotile: " + block.name, e);
+                            }finally{
+                                //the raw autotile source image must never be included, it isn't useful
+                                basePath.delete();
+                            }
+                        });
+
+                        if(!iconPath.exists() && v == 0){
+                            //save the bottom right region as the "main" sprite for previews
+                            Pixmap out = new Pixmap(basePath);
+                            Pixmap cropped = out.crop(32, 32, 32, 32);
+                            iconPath.writePng(cropped);
+                            out.dispose();
+                            gens.put(block, cropped);
+                        }
+                    }else{
+                        Log.warn("Autotile floor '@' not found: @", block.name, basePath.absolutePath());
+                    }
+                }
+            }
+        });
 
         generate("splashes", () -> {
 
@@ -225,7 +261,6 @@ public class Generators{
 
                     Fi fi = Fi.get("../blocks/environment/cliffmask" + (val & 0xff) + ".png");
                     fi.writePng(result);
-                    fi.copyTo(Fi.get("../editor").child("editor-" + fi.name()));
                 });
             }
 
@@ -286,14 +321,6 @@ public class Generators{
                 block.getRegionsToOutline(toOutline);
 
                 TextureRegion[] regions = block.getGeneratedIcons();
-
-                if(block.variants > 0 || block instanceof Floor){
-                    for(TextureRegion region : block.variantRegions()){
-                        GenRegion gen = (GenRegion)region;
-                        if(gen.path == null) continue;
-                        gen.path.copyTo(Fi.get("../editor/editor-" + gen.path.name()));
-                    }
-                }
 
                 for(TextureRegion region : block.makeIconRegions()){
                     GenRegion gen = (GenRegion)region;
@@ -357,33 +384,36 @@ public class Generators{
                         save(padded, region.name);
                     }
 
-                    if(!regions[0].found()){
+                    Pixmap image;
+
+                    if(regions[0].found()){
+                        image = get(regions[0]);
+
+                        int i = 0;
+                        for(TextureRegion region : regions){
+                            i++;
+                            if(i != regions.length || last == null){
+                                image.draw(get(region), true);
+                            }else{
+                                image.draw(last, true);
+                            }
+
+                            //draw shard (default team top) on top of first sprite
+                            if(region == block.teamRegions[Team.sharded.id] && shardTeamTop != null){
+                                image.draw(shardTeamTop, true);
+                            }
+                        }
+
+                        if(!(regions.length == 1 && regions[0] == Core.atlas.find(block.name) && shardTeamTop == null)){
+                            save(image, "block-" + block.name + "-full");
+                        }
+
+                        saveScaled(image, "../ui/block-" + block.name + "-ui", Math.min(image.width, maxUiIcon));
+                    }else if(gens.containsKey(block)){
+                        image = gens.get(block);
+                    }else{
                         continue;
                     }
-
-                    Pixmap image = get(regions[0]);
-
-                    int i = 0;
-                    for(TextureRegion region : regions){
-                        i++;
-                        if(i != regions.length || last == null){
-                            image.draw(get(region), true);
-                        }else{
-                            image.draw(last, true);
-                        }
-
-                        //draw shard (default team top) on top of first sprite
-                        if(region == block.teamRegions[Team.sharded.id] && shardTeamTop != null){
-                            image.draw(shardTeamTop, true);
-                        }
-                    }
-
-                    if(!(regions.length == 1 && regions[0] == Core.atlas.find(block.name) && shardTeamTop == null)){
-                        save(image, "block-" + block.name + "-full");
-                    }
-
-                    save(image, "../editor/" + block.name + "-icon-editor");
-                    saveScaled(image, "../ui/block-" + block.name + "-ui", Math.min(image.width, maxUiIcon));
 
                     boolean hasEmpty = false;
                     Color average = new Color(), c = new Color();
@@ -431,9 +461,8 @@ public class Generators{
                         }
                     }
 
-                    String name = floor.name + "" + (++index);
+                    String name = floor.name + (++index);
                     save(res, "../blocks/environment/" + name);
-                    save(res, "../editor/editor-" + name);
 
                     gens.put(floor, res);
                 }
@@ -460,6 +489,20 @@ public class Generators{
                 }
 
                 save(base, "../ui/" + item.getContentType().name() + "-" + item.name + "-ui");
+            }
+        });
+
+        generate("sector-icons", () -> {
+            for(SectorPreset item : content.sectors()){
+                if(!has("sector-" + item.name)){
+                    continue;
+                }
+
+                Pixmap base = get("sector-" + item.name);
+                Pixmap container = new Pixmap(base.width + 10, base.height + 10);
+                container.draw(base, 5, 5, true);
+
+                replace("../ui/sector-" + item.name, "sector-" + item.name, container.outline(Pal.darkerGray, 5));
             }
         });
 
@@ -508,7 +551,7 @@ public class Generators{
         });
 
         generate("unit-icons", () -> content.units().each(type -> {
-            if(type.internal) return; //internal hidden units don't generate
+            if(type.internal && !type.internalGenerateSprites) return; //internal hidden units don't generate
 
             ObjectSet<String> outlined = new ObjectSet<>();
 
@@ -528,6 +571,28 @@ public class Generators{
                 for(TextureRegion region : toOutline){
                     Pixmap pix = get(region).outline(type.outlineColor, type.outlineRadius);
                     save(pix, ((GenRegion)region).name + "-outline");
+                }
+
+                Seq<DrawPart> allParts = new Seq<>();
+
+                //this code is complete trash
+                Cons<Seq<DrawPart>>[] allDrawIter = new Cons[]{null};
+                allDrawIter[0] = seq -> {
+                    for(DrawPart part : seq){
+                        allParts.add(part);
+                        if(part instanceof RegionPart){
+                            allDrawIter[0].get(((RegionPart)part).children);
+                        }
+                    }
+                };
+                allDrawIter[0].get(type.parts);
+
+                for(DrawPart part : allParts){
+                    if(part instanceof RegionPart && ((RegionPart)part).replaceOutline){
+                        for(TextureRegion r : ((RegionPart)part).regions){
+                            outliner.get(r);
+                        }
+                    }
                 }
 
                 Seq<Weapon> weapons = type.weapons;
@@ -580,7 +645,8 @@ public class Generators{
                 if(sample instanceof Legsc) outliner.get(type.legRegion);
                 if(sample instanceof Tankc) outliner.get(type.treadRegion);
 
-                Pixmap image = type.segments > 0 ? get(type.segmentRegions[0]) : outline.get(get(type.previewRegion));
+                //TODO: for drawBody false, an empty pixmap is used; this is a hack
+                Pixmap image = type.segments > 0 ? get(type.segmentRegions[0]) : type.drawBody ? outline.get(get(type.previewRegion)) : new Pixmap(1, 1);
 
                 Func<Weapon, Pixmap> weaponRegion = weapon -> Core.atlas.has(weapon.name + "-preview") ? get(weapon.name + "-preview") : get(weapon.region);
                 Cons2<Weapon, Pixmap> drawWeapon = (weapon, pixmap) ->
@@ -608,7 +674,7 @@ public class Generators{
                 //outline is currently never needed, although it could theoretically be necessary
                 if(type.needsBodyOutline()){
                     save(image, type.name + "-outline");
-                }else if(type.segments == 0){
+                }else if(type.segments == 0 && type.drawBody){
                     replace(type.name, type.segments > 0 ? get(type.segmentRegions[0]) : outline.get(get(type.region)));
                 }
 
@@ -676,7 +742,9 @@ public class Generators{
                 }
 
                 //TODO I can save a LOT of space by not creating a full icon.
-                save(image, "unit-" + type.name + "-full");
+                if(type.generateFullIcon){
+                    save(image, "unit-" + type.name + "-full");
+                }
 
                 Rand rand = new Rand();
                 rand.setSeed(type.name.hashCode());
@@ -748,7 +816,6 @@ public class Generators{
                     replace(ore.variantRegions[i], image);
 
                     save(image, "../blocks/environment/" + ore.name + (i + 1));
-                    save(image, "../editor/editor-" + ore.name + (i + 1));
 
                     save(image, "block-" + ore.name + "-full");
                     save(image, "../ui/block-" + ore.name + "-ui");
@@ -757,14 +824,15 @@ public class Generators{
         });
 
         generate("edges", () -> {
-            content.blocks().<Floor>each(b -> b instanceof Floor && !(b instanceof OverlayFloor), floor -> {
+            content.blocks().<Floor>each(b -> b instanceof Floor && !(b instanceof OverlayFloor) && !b.isAir(), floor -> {
 
-                if(has(floor.name + "-edge") || floor.blendGroup != floor){
+                if(has(floor.name + "-edge") || floor.blendGroup != floor || (!floor.drawEdgeOut)){
                     return;
                 }
 
                 try{
-                    Pixmap image = gens.get(floor, get(floor.getGeneratedIcons()[0]));
+                    Pixmap image = gens.get(floor);
+                    if(image == null) image = get(floor.getGeneratedIcons()[0]);
                     Pixmap edge = get("edge-stencil");
                     Pixmap result = new Pixmap(edge.width, edge.height);
 
@@ -776,7 +844,9 @@ public class Generators{
 
                     save(result, "../blocks/environment/" + floor.name + "-edge");
 
-                }catch(Exception ignored){}
+                }catch(Exception e){
+                    Log.err("Failed to generate edge for " + floor, e);
+                }
             });
         });
 

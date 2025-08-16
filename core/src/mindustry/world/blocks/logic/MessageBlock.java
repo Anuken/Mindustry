@@ -12,7 +12,9 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.*;
+import mindustry.core.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -66,7 +68,7 @@ public class MessageBlock extends Block{
         return accessible();
     }
 
-    public class MessageBuild extends Building{
+    public class MessageBuild extends Building implements LReadable{
         public StringBuilder message = new StringBuilder();
 
         @Override
@@ -79,7 +81,7 @@ public class MessageBlock extends Block{
             font.getData().setScale(1 / 4f / Scl.scl(1f));
             font.setUseIntegerPositions(false);
 
-            CharSequence text = message == null || message.length() == 0 ? "[lightgray]" + Core.bundle.get("empty") : message;
+            String text = message == null || message.length() == 0 ? "[lightgray]" + Core.bundle.get("empty") : UI.formatIcons(message.toString());
 
             l.setText(font, text, Color.white, 90f, Align.left, true);
             float offset = 1f;
@@ -87,7 +89,7 @@ public class MessageBlock extends Block{
             Draw.color(0f, 0f, 0f, 0.2f);
             Fill.rect(x, y - tilesize/2f - l.height/2f - offset, l.width + offset*2f, l.height + offset*2f);
             Draw.color();
-            font.setColor(Color.white);
+            font.setColor(message.length() == 0 ? Color.lightGray : Color.white);
             font.draw(text, x - l.width/2f, y - tilesize/2f - offset, 90f, Align.left, true);
             font.setUseIntegerPositions(ints);
 
@@ -162,6 +164,25 @@ public class MessageBlock extends Block{
         @Override
         public Cursor getCursor(){
             return !accessible() ? SystemCursor.arrow : super.getCursor();
+        }
+
+        @Override
+        public boolean readable(LExecutor exec){
+            return isValid();
+        }
+
+        @Override
+        public void read(LVar position, LVar output){
+            int address = position.numi();
+            output.setnum(address < 0 || address >= message.length() ? Double.NaN : message.charAt(address));
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case bufferSize -> message.length();
+                default -> super.sense(sensor);
+            };
         }
 
         @Override

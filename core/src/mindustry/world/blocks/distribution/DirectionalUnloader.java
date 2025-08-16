@@ -96,8 +96,7 @@ public class DirectionalUnloader extends Block{
                                 front.handleItem(this, item);
                                 back.items.remove(item, 1);
                                 back.itemTaken(item);
-                                offset ++;
-                                offset %= itemc;
+                                offset = item.id + 1;
                                 break;
                             }
                         }
@@ -126,6 +125,12 @@ public class DirectionalUnloader extends Block{
                 Draw.rect(arrowRegion, x, y, rotdeg());
             }
 
+        }
+
+        @Override
+        public void drawSelect(){
+            super.drawSelect();
+            drawItemSelection(unloadItem);
         }
 
         @Override

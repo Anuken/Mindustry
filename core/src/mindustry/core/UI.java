@@ -33,6 +33,8 @@ import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
 public class UI implements ApplicationListener, Loadable{
+
+    private static final StringBuilder buffer = new StringBuilder();
     public static String billions, millions, thousands;
 
     public static PixmapPacker packer;
@@ -152,6 +154,8 @@ public class UI implements ApplicationListener, Loadable{
     public void update(){
         if(disableUI || Core.scene == null) return;
 
+        PerfCounter.ui.begin();
+
         Events.fire(Trigger.uiDrawBegin);
 
         Core.scene.act();
@@ -165,6 +169,8 @@ public class UI implements ApplicationListener, Loadable{
         }
 
         Events.fire(Trigger.uiDrawEnd);
+
+        PerfCounter.ui.end();
     }
 
     @Override
@@ -592,7 +598,10 @@ public class UI implements ApplicationListener, Loadable{
         Table t = new Table(Styles.black3);
         t.touchable = Touchable.disabled;
         t.margin(8f).add(text).style(Styles.outlineLabel).labelAlign(Align.center);
-        t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
+        t.update(() -> {
+            t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center);
+            t.toFront();
+        });
         t.actions(Actions.fadeOut(duration, Interp.pow4In), Actions.remove());
         t.pack();
         t.act(0.1f);
@@ -680,6 +689,40 @@ public class UI implements ApplicationListener, Loadable{
     public void hideFollowUpMenu(int menuId) {
         if(!followUpMenus.containsKey(menuId)) return;
         followUpMenus.remove(menuId).hide();
+    }
+
+    /**
+     * Finds all :name: in a string and replaces them with the icon, if such exists.
+     * Based on TextFormatter::simpleFormat
+     */
+    public static String formatIcons(String s){
+        if(!s.contains(":")) return s;
+
+        buffer.setLength(0);
+        boolean changed = false;
+
+        boolean checkIcon = false;
+        String[] tokens = s.split(":");
+        for(String token : tokens){
+            if(checkIcon){
+                if(Iconc.codes.containsKey(token)){
+                    buffer.append((char)Iconc.codes.get(token));
+                    changed = true;
+                    checkIcon = false;
+                }else if(Fonts.hasUnicodeStr(token)){
+                    buffer.append(Fonts.getUnicodeStr(token));
+                    changed = true;
+                    checkIcon = false;
+                }else{
+                    buffer.append(":").append(token);
+                }
+            }else{
+                buffer.append(token);
+                checkIcon = true;
+            }
+        }
+
+        return changed ? buffer.toString() : s;
     }
 
     /** Formats time with hours:minutes:seconds. */

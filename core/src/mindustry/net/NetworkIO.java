@@ -3,6 +3,7 @@ package mindustry.net;
 import arc.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -113,25 +114,29 @@ public class NetworkIO{
         buffer.putInt(netServer.admins.getPlayerLimit());
 
         writeString(buffer, description, 100);
-        if(state.rules.modeName != null){
-            writeString(buffer, state.rules.modeName, 50);
-        }
+        writeString(buffer, state.rules.modeName == null ? "" : state.rules.modeName, 50);
+        buffer.putShort((short)Core.settings.getInt("port", port));
         return buffer;
     }
 
     public static Host readServerData(int ping, String hostAddress, ByteBuffer buffer){
         String host = readString(buffer);
         String map = readString(buffer);
+
         int players = buffer.getInt();
         int wave = buffer.getInt();
         int version = buffer.getInt();
         String vertype = readString(buffer);
+
         Gamemode gamemode = Gamemode.all[buffer.get()];
         int limit = buffer.getInt();
+
         String description = readString(buffer);
         String modeName = readString(buffer);
+        short port = buffer.getShort();
+        int hostPort = port != 0 ? port : Vars.port;
 
-        return new Host(ping, host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description, modeName.isEmpty() ? null : modeName);
+        return new Host(ping, host, hostAddress, hostPort, map, wave, players, version, vertype, gamemode, limit, description, modeName.isEmpty() ? null : modeName);
     }
 
     private static void writeString(ByteBuffer buffer, String string, int maxlen){

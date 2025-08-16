@@ -18,7 +18,6 @@ public class PointBulletType extends BulletType{
          collides = false;
          reflectable = false;
          keepVelocity = false;
-         backMove = false;
      }
 
     @Override

@@ -117,7 +117,7 @@ public class TractorBeamTurret extends BaseTurret{
                 //shoot when possible
                 if(Angles.within(rotation, dest, shootCone)){
                     if(damage > 0){
-                        target.damageContinuous(damage * eff * state.rules.blockDamage(team));
+                        target.damageContinuous(damage * eff * timeScale * state.rules.blockDamage(team));
                     }
 
                     if(status != StatusEffects.none){
@@ -150,7 +150,7 @@ public class TractorBeamTurret extends BaseTurret{
             Draw.rect(region, x, y, rotation - 90);
 
             //draw laser if applicable
-            if(any){
+            if(any && !isPayload()){
                 Draw.z(Layer.bullet);
                 float ang = angleTo(lastX, lastY);
 

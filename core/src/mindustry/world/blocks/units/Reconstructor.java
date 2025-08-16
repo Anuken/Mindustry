@@ -142,13 +142,10 @@ public class Reconstructor extends UnitBlock{
         public @Nullable Vec2 commandPos;
         public @Nullable UnitCommand command;
 
+        boolean constructing;
+
         public float fraction(){
             return progress / constructTime;
-        }
-
-        @Override
-        public boolean shouldActiveSound(){
-            return shouldConsume();
         }
 
         @Override
@@ -226,6 +223,7 @@ public class Reconstructor extends UnitBlock{
                 if(!upgrade.unlockedNowHost() && !team.isAI()){
                     //flash "not researched"
                     pay.showOverlay(Icon.tree);
+                    Events.fire(Trigger.cannotUpgrade);
                 }
 
                 if(upgrade.isBanned()){
@@ -290,6 +288,8 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public void updateTile(){
+            //cache value to prevent repeated calls and multithreading issues
+            constructing = constructing();
             boolean valid = false;
 
             if(payload != null){
@@ -338,7 +338,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean shouldConsume(){
-            return constructing() && enabled;
+            return constructing && enabled;
         }
 
         @Override

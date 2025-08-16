@@ -17,6 +17,7 @@ import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -136,6 +137,7 @@ public class MapObjectivesDialog extends BaseDialog{
             name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
                 b -> b.image(Tex.whiteui).size(iconSmall).update(i -> i.setColor(get.get().color)),
+                Styles.squarei,
                 () -> showTeamSelect(set)
             ).fill().pad(4f)).growX().fillY();
         });
@@ -278,6 +280,15 @@ public class MapObjectivesDialog extends BaseDialog{
                 }
             });
         }));
+
+        setInterpreter(Alignment.class, int.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            Alignment align = field.getAnnotation(Alignment.class);
+            name(cont, name, remover, indexer);
+            cont.button(b -> {
+                b.label(() -> LStatement.alignToName.get(get.get(), "center"));
+                b.clicked(() -> LStatement.showAlignSelect(b, get.get(), set::get, align.hor(), align.ver()));
+            }, () -> {});
+        });
 
         // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] from using it.
         for(var obj : MapObjectives.allObjectiveTypes) setInterpreter(obj.get().getClass(), defaultInterpreter());
@@ -529,6 +540,8 @@ public class MapObjectivesDialog extends BaseDialog{
 
     public void rebuildObjectives(Seq<MapObjective> objectives){
         canvas.clearObjectives();
+        objectives.each(MapObjective::validate);
+
         if(
         objectives.any() && (
         // If the objectives were previously programmatically made...
@@ -592,9 +605,23 @@ public class MapObjectivesDialog extends BaseDialog{
     }
 
     public static void showTeamSelect(Cons<Team> cons){
+        showTeamSelect(false, cons);
+    }
+
+    public static void showTeamSelect(boolean allowNull, Cons<Team> cons){
         BaseDialog dialog = new BaseDialog("");
+
+        dialog.cont.defaults().size(40f).pad(4f);
+
+        if(allowNull){
+            dialog.cont.button(Icon.cancel, Styles.emptyi, () -> {
+                cons.get(null);
+                dialog.hide();
+            }).tooltip("@none");
+        }
+
         for(var team : Team.baseTeams){
-            dialog.cont.image(Tex.whiteui).size(iconMed).color(team.color).pad(4)
+            dialog.cont.image(Tex.whiteui).color(team.color)
                 .with(i -> i.addListener(new HandCursorListener()))
                 .tooltip(team.localized()).get().clicked(() -> {
                     cons.get(team);

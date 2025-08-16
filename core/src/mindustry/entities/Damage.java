@@ -70,23 +70,27 @@ public class Damage{
         }
     }
 
-    /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage){
         dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null, Fx.dynamicExplosion);
     }
 
-    /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, Effect explosionFx){
         dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null, explosionFx);
     }
 
-    /** Creates a dynamic explosion based on specified parameters. */
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, Effect explosionFx, float baseShake){
+        dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null, explosionFx, baseShake);
+    }
+
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam){
         dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, fire, ignoreTeam, Fx.dynamicExplosion);
     }
 
-    /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam, Effect explosionFx){
+        dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, fire, ignoreTeam, explosionFx, 3f);
+    }
+
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam, Effect explosionFx, float baseShake){
         if(damage){
             for(int i = 0; i < Mathf.clamp(power / 700, 0, 8); i++){
                 int length = 5 + Mathf.clamp((int)(Mathf.pow(power, 0.98f) / 500), 1, 18);
@@ -123,7 +127,7 @@ public class Damage{
             Fx.bigShockwave.at(x, y);
         }
 
-        float shake = Math.min(explosiveness / 4f + 3f, 9f);
+        float shake = Math.min(explosiveness / 4f + baseShake, 9f);
         Effect.shake(shake, shake, x, y);
         explosionFx.at(x, y, radius / 8f);
     }
@@ -218,38 +222,38 @@ public class Damage{
     public static float collideLaser(Bullet b, float length, boolean large, boolean laser, int pierceCap){
         float resultLength = findPierceLength(b, pierceCap, laser, length);
 
-        collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
+        collideLine(b, b.team, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
 
         b.fdata = resultLength;
 
         return resultLength;
     }
 
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
-        collideLine(hitter, team, effect, x, y, angle, length, false);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length){
+        collideLine(hitter, team, x, y, angle, length, false);
     }
 
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
-        collideLine(hitter, team, effect, x, y, angle, length, large, true);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large){
+        collideLine(hitter, team, x, y, angle, length, large, true);
     }
 
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser){
-        collideLine(hitter, team, effect, x, y, angle, length, large, laser, -1);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser){
+        collideLine(hitter, team, x, y, angle, length, large, laser, -1);
     }
 
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
         length = findLength(hitter, length, laser, pierceCap);
         hitter.fdata = length;
 
@@ -514,7 +518,7 @@ public class Damage{
             }
             //TODO better velocity displacement
             float dst = vec.set(unit.x - x, unit.y - y).len();
-            unit.vel.add(vec.setLength((1f - dst / radius) * 2f / unit.mass()));
+            unit.vel.add(vec.setLength((radius > 0f ? 1f - dst / radius : 1f) * 2f / unit.mass()));
 
             if(complete && damage >= 9999999f && unit.isPlayer()){
                 Events.fire(Trigger.exclusionDeath);
@@ -532,7 +536,7 @@ public class Damage{
             if(!complete){
                 tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage * (source == null ? 1f : source.type.buildingDamageMultiplier), source);
             }else{
-                completeDamage(team, x, y, radius, damage);
+                completeDamage(team, x, y, radius, damage * (source == null ? 1f : source.type.buildingDamageMultiplier));
             }
         }
     }
@@ -541,15 +545,22 @@ public class Damage{
         tileDamage(team, x, y, baseRadius, damage, null);
     }
 
-    public static void tileDamage(Team team, int x, int y, float baseRadius, float damage, @Nullable Bullet source){
-        Core.app.post(() -> {
+    public static void tileDamage(Team team, int tx, int ty, float baseRadius, float damage, @Nullable Bullet source){
+        Time.run(0f, () -> {
+            int x = Mathf.clamp(tx, -100, world.width() + 100), y = Mathf.clamp(ty, -100, world.height() + 100);
+
             var in = world.build(x, y);
             //spawned inside a multiblock. this means that damage needs to be dealt directly.
             //why? because otherwise the building would absorb everything in one cell, which means much less damage than a nearby explosion.
             //this needs to be compensated
             if(in != null && in.team != team && in.block.size > 1 && in.health > damage){
                 //deal the damage of an entire side, to be equivalent with maximum 'standard' damage
-                in.damage(team, damage * Math.min((in.block.size), baseRadius * 0.4f));
+                float d = damage * Math.min((in.block.size), baseRadius * 0.4f);
+                if(source != null){
+                    in.damage(source, team, d);
+                }else{
+                    in.damage(team, d);
+                }
                 //no need to continue with the explosion
                 return;
             }
@@ -631,7 +642,7 @@ public class Damage{
 
     private static float calculateDamage(float dist, float radius, float damage){
         float falloff = 0.4f;
-        float scaled = Mathf.lerp(1f - dist / radius, 1f, falloff);
+        float scaled = radius <= 0.00001f ? 1f : Mathf.lerp(1f - dist / radius, 1f, falloff);
         return damage * scaled;
     }
 

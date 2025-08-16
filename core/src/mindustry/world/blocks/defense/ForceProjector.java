@@ -55,7 +55,7 @@ public class ForceProjector extends Block{
             bullet.absorb();
             paramEffect.at(bullet);
             paramEntity.hit = 1f;
-            paramEntity.buildup += bullet.damage;
+            paramEntity.buildup += bullet.type.shieldDamage(bullet);
         }
     };
 
