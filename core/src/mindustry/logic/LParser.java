@@ -19,7 +19,7 @@ public class LParser{
     Seq<LStatement> statements = new Seq<>();
     char[] chars;
     int pos, line, tok;
-    boolean privileged;
+    boolean privileged, escaped;
 
     LParser(String text, boolean privileged){
         this.privileged = privileged;
@@ -38,16 +38,25 @@ public class LParser{
     String string(){
         int from = pos;
 
-        while(++pos < chars.length){
-            var c = chars[pos];
-            if(c == '\n'){
-                error("Missing closing quote \" before end of line.");
-            }else if(c == '"'){
-                break;
+        loop: while(++pos < chars.length){
+            char c = chars[pos];
+            switch(c){
+                case '\n' -> {
+                    pos = from;
+                    return token();
+                }
+                case '"' -> {
+                    if(!escaped && (pos + 1 >= chars.length || chars[pos + 1] == ' ' || chars[pos + 1] == '#' || chars[pos + 1] == '\t' || chars[pos + 1] == '\n')) break loop;
+                }
+                default -> {}
             }
+            escaped = c == '\\' ? !escaped : false;
         }
 
-        if(pos >= chars.length || chars[pos] != '"') error("Missing closing quote \" before end of file.");
+        if(pos >= chars.length || chars[pos] != '"'){
+            pos = from;
+            return token();
+        };
 
         return new String(chars, from, ++pos - from);
     }
@@ -57,8 +66,9 @@ public class LParser{
 
         while(pos < chars.length){
             char c = chars[pos];
-            if(c == '\n' || c == ' ' || c == '#' || c == '\t' || c == ';') break;
-            pos ++;
+            if(c == '\n' || (c == ' ' || c == '\t' || c == '#' || c == ';') && !escaped) break;
+            pos++;
+            escaped = c == '\\' ? !escaped : false;
         }
 
         return new String(chars, from, pos - from);
@@ -82,11 +92,12 @@ public class LParser{
             if(tok >= tokens.length) error("Line too long; may only contain " + tokens.length + " tokens");
 
             //reached end of line, bail out.
-            if(c == '\n' || c == ';') break;
+            if(c == '\n' || (c == ';') && !escaped) break;
 
             if(expectNext && c != ' ' && c != '#' && c != '\t'){
                 error("Expected space after string/token.");
             }
+            escaped = false;
 
             expectNext = false;
 
