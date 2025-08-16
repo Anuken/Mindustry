@@ -683,10 +683,12 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
+    /** @return all extra tile data, packed into a single long for data transfer convenience. */
     public long getPackedData(){
         return PackedTileData.get(extraData, data, floorData, overlayData);
     }
 
+    /** Sets the packed data as obtained from {@link #getPackedData()}*/
     public void setPackedData(long packed){
         extraData = PackedTileData.extraData(packed);
         data = PackedTileData.data(packed);
