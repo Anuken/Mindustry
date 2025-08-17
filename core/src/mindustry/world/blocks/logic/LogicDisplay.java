@@ -134,7 +134,7 @@ public class LogicDisplay extends Block{
             //don't bother processing commands if displays are off
             if(!commands.isEmpty() && buffer != null){
                 Draw.draw(Draw.z(), () -> {
-                    if(buffer == null) return;
+                    if(buffer == null || commands.isEmpty()) return;
 
                     Tmp.m1.set(Draw.proj());
                     Tmp.m2.set(Draw.trans());
