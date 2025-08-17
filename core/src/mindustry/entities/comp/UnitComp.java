@@ -532,12 +532,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.targetable(self(), targeter);
     }
 
-    public boolean hittable(){
-        return type.hittable(self());
+    public boolean killable(){
+        return type.killable(self());
     }
 
-    public boolean killable(){
-        return type.killable;
+    public boolean hittable(){
+        return type.hittable(self());
     }
 
     @Override
