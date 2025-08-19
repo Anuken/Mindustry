@@ -927,7 +927,7 @@ public class Blocks{
         }};
 
         runeOverlay = new RuneOverlay("rune-overlay"){{
-            color = Pal.metalGrayDark;
+            color = Color.valueOf("3f4049");
         }};
 
         cruxRuneOverlay = new RuneOverlay("rune-overlay-crux");
