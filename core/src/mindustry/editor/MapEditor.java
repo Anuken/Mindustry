@@ -356,7 +356,10 @@ public class MapEditor{
                                 }
                             });
                             if(out != config){
+                                boolean prev = state.rules.editor;
+                                state.rules.editor = true;
                                 tile.build.configureAny(out);
+                                state.rules.editor = prev;
                             }
                         }
                     }

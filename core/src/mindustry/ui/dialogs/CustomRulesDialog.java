@@ -463,6 +463,8 @@ public class CustomRulesDialog extends BaseDialog{
                 int cols = Math.max(1, (int)(Core.graphics.getWidth() / Scl.scl(450)));
                 int idx = 0;
 
+                rules.weather.removeAll(w -> w.weather == null);
+
                 for(WeatherEntry entry : rules.weather){
                     base.top();
                     //main container

@@ -258,6 +258,8 @@ public class ConstructBlock extends Block{
         }
 
         public void construct(Unit builder, @Nullable Building core, float amount, Object config){
+            if(accumulator == null || totalAccumulator == null) return;
+
             wasConstructing = true;
             activeDeconstruct = false;
 
@@ -313,6 +315,8 @@ public class ConstructBlock extends Block{
         }
 
         public void deconstruct(Unit builder, @Nullable CoreBuild core, float amount){
+            if(accumulator == null || totalAccumulator == null) return;
+
             //reset accumulated resources when switching modes
             if(wasConstructing){
                 Arrays.fill(accumulator, 0);

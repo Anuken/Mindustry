@@ -958,7 +958,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     if(!(hovered.preset == null && !hovered.planet.allowLaunchToNumbered)){
                         if(mode == planetLaunch){
                             tx.append("[gray]").append(Iconc.cancel);
-                        }else if(hovered.planet.generator != null){
+                        }else if(hovered.planet.generator != null && mode != select){
                             hovered.planet.generator.getLockedText(hovered, tx);
                         }
                     }

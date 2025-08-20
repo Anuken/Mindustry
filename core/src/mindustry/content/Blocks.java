@@ -69,6 +69,8 @@ public class Blocks{
     coloredFloor, coloredWall,
     characterOverlayGray,
     characterOverlayWhite,
+    runeOverlay,
+    cruxRuneOverlay,
 
     pebbles, tendrils,
 
@@ -923,6 +925,12 @@ public class Blocks{
         characterOverlayWhite = new CharacterOverlay("character-overlay-white"){{
             color = Color.white;
         }};
+
+        runeOverlay = new RuneOverlay("rune-overlay"){{
+            color = Color.valueOf("3f4049");
+        }};
+
+        cruxRuneOverlay = new RuneOverlay("rune-overlay-crux");
 
         Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)
         .each(b -> b.asFloor().wall = darkMetal);
