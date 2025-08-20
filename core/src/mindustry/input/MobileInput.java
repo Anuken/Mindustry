@@ -501,9 +501,9 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    public void useSchematic(Schematic schem){
+    public void useSchematic(Schematic schem, boolean checkHidden){
         selectPlans.clear();
-        selectPlans.addAll(schematics.toPlans(schem, World.toTile(Core.camera.position.x), World.toTile(Core.camera.position.y)));
+        selectPlans.addAll(schematics.toPlans(schem, World.toTile(Core.camera.position.x), World.toTile(Core.camera.position.y), checkHidden));
         lastSchematic = schem;
     }
 

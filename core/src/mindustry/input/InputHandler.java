@@ -1317,8 +1317,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void useSchematic(Schematic schem){
-        selectPlans.addAll(schematics.toPlans(schem, player.tileX(), player.tileY()));
+        useSchematic(schem, true);
     }
+
+    public abstract void useSchematic(Schematic schem, boolean checkHidden);
 
     protected void showSchematicSave(){
         if(lastSchematic == null) return;
