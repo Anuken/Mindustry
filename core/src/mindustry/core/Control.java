@@ -313,9 +313,12 @@ public class Control implements ApplicationListener, Loadable{
         "lastBuild", 0
         );
 
-        createPlayer();
-
         saves.load();
+    }
+
+    @Override
+    public void loadSync(){
+        createPlayer();
     }
 
     /** Automatically unlocks things with no requirements and no locked parents. */
@@ -672,8 +675,12 @@ public class Control implements ApplicationListener, Loadable{
                 state.set(State.playing);
             }
 
-            if(!net.client() && Core.input.keyTap(Binding.pause) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            if(!net.client() && Core.input.keyTap(Binding.pause) && !(state.isCampaign() && state.afterGameOver) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.isPaused() ? State.playing : State.paused);
+            }
+
+            if(state.isCampaign() && state.afterGameOver){
+                state.set(State.paused);
             }
 
             if(Core.input.keyTap(Binding.menu) && !ui.restart.isShown() && !ui.minimapfrag.shown()){

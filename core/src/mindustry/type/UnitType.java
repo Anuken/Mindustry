@@ -593,6 +593,10 @@ public class UnitType extends UnlockableContent implements Senseable{
         return targetable || (vulnerableWithPayloads && unit instanceof Payloadc p && p.hasPayload());
     }
 
+    public boolean killable(Unit unit){
+        return killable;
+    }
+
     public boolean hittable(Unit unit){
         return hittable || (vulnerableWithPayloads && unit instanceof Payloadc p && p.hasPayload());
     }
@@ -900,7 +904,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         //assume slight range margin
         float margin = 4f;
 
-        boolean skipWeapons = !weapons.contains(w -> !w.useAttackRange);
+        boolean skipWeapons = weapons.contains(w -> !w.useAttackRange);
 
         //set up default range
         if(range < 0){

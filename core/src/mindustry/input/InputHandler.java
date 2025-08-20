@@ -1826,7 +1826,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean canTapPlayer(float x, float y){
-        return player.within(x, y, playerSelectRange) && !player.dead() && player.unit().stack.amount > 0;
+        return player.within(x, y, playerSelectRange) && !player.dead() && player.unit().stack.amount > 0 && block == null;
     }
 
     /** Tries to begin mining a tile, returns true if successful. */

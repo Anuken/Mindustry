@@ -1890,7 +1890,6 @@ public class UnitTypes{
                 x = y = shootX = shootY = 0f;
                 shootSound = Sounds.mineDeploy;
                 rotateSpeed = 180f;
-                targetAir = false;
 
                 shoot.shots = 3;
                 shoot.shotDelay = 7f;
