@@ -151,7 +151,7 @@ public class CanvasBlock extends Block{
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
         public int blending;
         
-        protected boolean updated = false;
+        public boolean updated = false;
 
         public void setPixel(int pos, int index){
             if(pos < canvasSize * canvasSize && pos >= 0 && index >= 0 && index < palette.length){

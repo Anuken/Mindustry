@@ -24,6 +24,7 @@ import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.logic.CanvasBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 
 import java.io.*;
@@ -1335,6 +1336,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }else if(texture instanceof LogicDisplayBuild d){
             d.ensureBuffer();
             out.set(d.buffer.getTexture());
+        }else if(texture instanceof CanvasBuild c){
+            if(c.texture == null) c.updateTexture();
+            out.set(c.texture);
         }else{
             out.set(Core.atlas.find("error"));
         }
@@ -1346,6 +1350,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 marker.setTexture("error");
             }else{
                 d.processCommands();
+            }
+        }else if(texture instanceof CanvasBuild c){
+            if(c.texture == null || c.texture.isDisposed()){
+                marker.setTexture("error");
+            }else if(c.updated){
+                c.updated = false;
+                c.updateTexture();
             }
         }
     }
