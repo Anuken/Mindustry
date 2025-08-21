@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.content.Blocks;
 import mindustry.game.*;
 import mindustry.logic.*;
 import mindustry.type.*;
@@ -47,7 +48,7 @@ public class Pump extends LiquidBlock{
         Liquid liquidDrop = null;
 
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-            if(canPump(other)){
+            if(canPump(other)&& valid){
                 if(liquidDrop != null && other.floor().liquidDrop != liquidDrop){
                     liquidDrop = null;
                     break;
