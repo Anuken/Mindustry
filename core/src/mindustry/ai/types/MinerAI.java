@@ -36,9 +36,9 @@ public class MinerAI extends AIController{
         if(mining){
             if(timer.get(timerTarget2, 60 * 4) || targetItem == null){
                 if(ai != null && !ai.hasStance(UnitStance.mineAuto)){
-                    targetItem = content.items().min(i -> indexer.hasOre(i) && unit.canMine(i) && ai.hasStance(ItemUnitStance.getByItem(i)), i -> core.items.get(i));
+                    targetItem = content.items().min(i -> ((unit.type.mineFloor && indexer.hasOre(i)) || (unit.type.mineWalls && indexer.hasWallOre(i))) && unit.canMine(i) && ai.hasStance(ItemUnitStance.getByItem(i)), i -> core.items.get(i));
                 }else{
-                    targetItem = unit.type.mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
+                    targetItem = unit.type.mineItems.min(i -> ((unit.type.mineFloor && indexer.hasOre(i)) || (unit.type.mineWalls && indexer.hasWallOre(i))) && unit.canMine(i), i -> core.items.get(i));
                 }
             }
 
@@ -55,8 +55,8 @@ public class MinerAI extends AIController{
             }else{
                 if(timer.get(timerTarget3, 60) && targetItem != null){
                     ore = null;
-                    if(unit.type.mineFloor) ore = indexer.findClosestOre(unit, targetItem);
-                    if(ore == null && unit.type.mineWalls) ore = indexer.findClosestWallOre(unit, targetItem);
+                    if(unit.type.mineFloor) ore = indexer.findClosestOre(core.x, core.y, targetItem);
+                    if(ore == null && unit.type.mineWalls) ore = indexer.findClosestWallOre(core.x, core.y, targetItem);
                 }
 
                 if(ore != null){

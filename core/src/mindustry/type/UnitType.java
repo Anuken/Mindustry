@@ -178,6 +178,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     logicControllable = true,
     /** if false, players cannot control this unit */
     playerControllable = true,
+    /** If true, the unit can be selected with the global selection hotkey (shift+g). */
+    controlSelectGlobal = true,
     /** if false, this unit cannot be moved into payloads */
     allowedInPayloads = true,
     /** if false, this unit cannot be hit by bullets or explosions*/
@@ -591,6 +593,10 @@ public class UnitType extends UnlockableContent implements Senseable{
         return targetable || (vulnerableWithPayloads && unit instanceof Payloadc p && p.hasPayload());
     }
 
+    public boolean killable(Unit unit){
+        return killable;
+    }
+
     public boolean hittable(Unit unit){
         return hittable || (vulnerableWithPayloads && unit instanceof Payloadc p && p.hasPayload());
     }
@@ -898,7 +904,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         //assume slight range margin
         float margin = 4f;
 
-        boolean skipWeapons = !weapons.contains(w -> !w.useAttackRange);
+        boolean skipWeapons = weapons.contains(w -> !w.useAttackRange);
 
         //set up default range
         if(range < 0){

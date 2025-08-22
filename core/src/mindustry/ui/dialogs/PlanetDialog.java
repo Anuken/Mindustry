@@ -483,6 +483,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }
 
+        Sector hoverOrSelect = hovered != null ? hovered : selected;
+        Sector launchFrom = hoverOrSelect != null && !hoverOrSelect.hasBase() ? findLauncher(hoverOrSelect) : null;
+
         Sector current = Vars.state.getSector() != null && Vars.state.getSector().isBeingPlayed() && Vars.state.getSector().planet == state.planet ? Vars.state.getSector() : null;
 
         if(current != null){
@@ -502,25 +505,29 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         planets.batch.flush(Gl.triangles);
+    }
 
-        if(hovered != null && !hovered.hasBase()){
-            Sector launchFrom = findLauncher(hovered);
-            if(launchFrom != null && hovered != launchFrom && canSelect(hovered)){
-                planets.drawArc(planet, launchFrom.tile.v, hovered.tile.v);
-            }
+    @Override
+    public void renderOverProjections(Planet planet){
+        Sector hoverOrSelect = hovered != null ? hovered : selected;
+        Sector launchFrom = hoverOrSelect != null && !hoverOrSelect.hasBase() ? findLauncher(hoverOrSelect) : null;
+
+        if(hoverOrSelect != null && !hoverOrSelect.hasBase() && launchFrom != null && hoverOrSelect != launchFrom && canSelect(hoverOrSelect)){
+            planets.drawArcLine(planet, launchFrom.tile.v, hoverOrSelect.tile.v);
         }
 
         if(mode == planetLaunch && launchSector != null && selected != null && hovered == null){
-            planets.drawArc(planet, launchSector.tile.v, selected.tile.v);
+            planets.drawArcLine(planet, launchSector.tile.v, selected.tile.v);
         }
 
         if(state.uiAlpha > 0.001f){
             for(Sector sec : planet.sectors){
                 if(sec.hasBase()){
+                    //draw vulnerable sector attack arc
                     if(planet.campaignRules.sectorInvasion){
                         for(Sector enemy : sec.near()){
-                            if(enemy.hasEnemyBase()){
-                                planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Color.clear, 0.24f, 110f, 25);
+                            if(enemy.hasEnemyBase() && (enemy.preset == null || !enemy.preset.requireUnlock)){
+                                planets.drawArcLine(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Color.clear, 0.24f, 110f, 25, 0.005f);
                             }
                         }
                     }
@@ -538,7 +545,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
             }
         }
-
     }
 
     @Override
@@ -936,7 +942,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             sectorTop.color.a = Mathf.lerpDelta(sectorTop.color.a, 1f, 0.1f);
         }
 
-        if(hovered != null && !mobile && state.planet.hasGrid()){
+        if(hovered != null && state.planet.hasGrid()){
             addChild(hoverLabel);
             hoverLabel.toFront();
             hoverLabel.touchable = Touchable.disabled;
@@ -952,7 +958,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     if(!(hovered.preset == null && !hovered.planet.allowLaunchToNumbered)){
                         if(mode == planetLaunch){
                             tx.append("[gray]").append(Iconc.cancel);
-                        }else if(hovered.planet.generator != null){
+                        }else if(hovered.planet.generator != null && mode != select){
                             hovered.planet.generator.getLockedText(hovered, tx);
                         }
                     }

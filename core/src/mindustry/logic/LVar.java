@@ -103,8 +103,12 @@ public class LVar{
 
     public void set(LVar other){
         isobj = other.isobj;
-        objval = other.objval;
-        numval = other.numval;
+        // Setting a non-numeric value to @counter must preserve its numeric field
+        if(isobj){
+            objval = other.objval;
+        }else{
+            numval = invalid(other.numval) ? 0 : other.numval;
+        }
     }
 
     public static boolean invalid(double d){

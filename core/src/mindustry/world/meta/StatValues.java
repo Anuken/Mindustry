@@ -41,7 +41,7 @@ public class StatValues{
     }
 
     public static String fixValue(float value){
-        return Strings.autoFixed(value, 2);
+        return Strings.autoFixed(value, 3);
     }
 
     public static StatValue squared(float value, StatUnit unit){
@@ -189,10 +189,10 @@ public class StatValues{
 
             if(amount != 0){
                 Table t = new Table().left().bottom();
-                t.add(Strings.autoFixed(amount, 2)).style(Styles.outlineLabel);
+                t.add(Strings.autoFixed(amount, 3)).style(Styles.outlineLabel);
                 add(t);
             }
-        }}).size(iconMed).padRight(3  + (amount != 0 ? (Strings.autoFixed(amount, 2).length() - 1) * 10 : 0)).with(s -> withTooltip(s, liquid, false));
+        }}).size(iconMed).padRight(3  + (amount != 0 ? (Strings.autoFixed(amount, 3).length() - 1) * 10 : 0)).with(s -> withTooltip(s, liquid, false));
 
         if(perSecond && amount != 0){
             t.add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.lightGray).style(Styles.outlineLabel);
@@ -290,7 +290,7 @@ public class StatValues{
     public static Table displayItem(Item item, int amount, float timePeriod, boolean showName){
         Table t = new Table();
         t.add(stack(item, amount, !showName));
-        t.add((showName ? item.localizedName + "\n" : "") + "[lightgray]" + Strings.autoFixed(amount / (timePeriod / 60f), 2) + StatUnit.perSecond.localized()).padLeft(2).padRight(5).style(Styles.outlineLabel);
+        t.add((showName ? item.localizedName + "\n" : "") + "[lightgray]" + Strings.autoFixed(amount / (timePeriod / 60f), 3) + StatUnit.perSecond.localized()).padLeft(2).padRight(5).style(Styles.outlineLabel);
         return t;
     }
 
@@ -474,7 +474,7 @@ public class StatValues{
 
                     c.table(Styles.grayPanel, b -> {
                         b.image(item.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
-                        b.add(item.localizedName + (timePeriod > 0 ? "\n[lightgray]" + (time < 0.01f ? Strings.fixed(time, 4) : Strings.autoFixed(time, 2)) + StatUnit.perSecond.localized() : "")).left().grow();
+                        b.add(item.localizedName + (timePeriod > 0 ? "\n[lightgray]" + Strings.autoFixed(time, time < 0.01f ? 4 : 2) + StatUnit.perSecond.localized() : "")).left().grow();
                         b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(item) * 100f))).right().pad(10f).padRight(15f);
                     }).growX().pad(5).row();
                 }

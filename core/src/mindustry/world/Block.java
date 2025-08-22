@@ -80,6 +80,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean displayFlow = true;
     /** whether this block is visible in the editor */
     public boolean inEditor = true;
+    /** if true, {@link #buildEditorConfig(Table)} will be called for configuring this block in the editor. */
+    public boolean editorConfigurable;
     /** the last configuration value applied to this block. */
     public @Nullable Object lastConfig;
     /** whether to save the last config and apply it to newly placed blocks */
@@ -380,11 +382,10 @@ public class Block extends UnlockableContent implements Senseable{
     protected Seq<Consume> consumeBuilder = new Seq<>();
 
     protected TextureRegion[] generatedIcons;
-    protected TextureRegion[] editorVariantRegions;
 
     /** Regions indexes from icons() that are rotated. If either of these is not -1, other regions won't be rotated in ConstructBlocks. */
     public int regionRotated1 = -1, regionRotated2 = -1;
-    public TextureRegion region, editorIcon;
+    public TextureRegion region;
     public @Load("@-shadow") TextureRegion customShadowRegion;
     public @Load("@-team") TextureRegion teamRegion;
     public TextureRegion[] teamRegions, variantRegions, variantShadowRegions;
@@ -564,6 +565,11 @@ public class Block extends UnlockableContent implements Senseable{
 
     public boolean checkForceDark(Tile tile){
         return forceDark;
+    }
+
+    /** If true, the 'map edge' darkness will be applied to this block. */
+    public boolean isDarkened(Tile tile){
+        return solid && ((!synthetic() && fillsTile) || checkForceDark(tile));
     }
 
     @Override
@@ -857,24 +863,6 @@ public class Block extends UnlockableContent implements Senseable{
         }
     }
 
-    /** Never use outside of the editor! */
-    public TextureRegion editorIcon(){
-        return editorIcon == null ? (editorIcon = Core.atlas.find(name + "-icon-editor")) : editorIcon;
-    }
-
-    /** Never use outside of the editor! */
-    public TextureRegion[] editorVariantRegions(){
-        if(editorVariantRegions == null){
-            variantRegions();
-            editorVariantRegions = new TextureRegion[variantRegions.length];
-            for(int i = 0; i < variantRegions.length; i++){
-                AtlasRegion region = (AtlasRegion)variantRegions[i];
-                editorVariantRegions[i] = Core.atlas.find("editor-" + region.name);
-            }
-        }
-        return editorVariantRegions;
-    }
-
     /** @return special icons to outline and save with an -outline variant. Vanilla only. */
     public TextureRegion[] makeIconRegions(){
         return new TextureRegion[0];
@@ -940,6 +928,21 @@ public class Block extends UnlockableContent implements Senseable{
         return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
     }
 
+    /** Called to set up configuration UI in the editor. {@link #editorConfigurable} must be true.
+     * Config value should be assigned to lastConfig.*/
+    public void buildEditorConfig(Table table){}
+
+    /** Called when the block is picked (middle click). Clientside only! */
+    public void onPicked(Tile tile){}
+
+    /** @return the config value returned when this block is picked on a certain tile. This is only called for non-buildings. */
+    public Object getConfig(Tile tile){
+        return null;
+    }
+
+    /** Called when this block is set on the specified tile. */
+    public void blockChanged(Tile tile){}
+
     /** Called when building of this block begins. */
     public void placeBegan(Tile tile, Block previous){
 
@@ -951,12 +954,17 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     /** Called when building of this block ends. */
-    public void placeEnded(Tile tile, @Nullable Unit builder){
+    public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
 
     }
 
     /** Called right before building of this block begins. */
     public void beforePlaceBegan(Tile tile, Block previous){
+
+    }
+
+    /** Called when pick blocked in the editor. */
+    public void editorPicked(Tile tile){
 
     }
 
@@ -1232,6 +1240,10 @@ public class Block extends UnlockableContent implements Senseable{
             flags = flags.with(BlockFlag.hasFogRadius);
         }
 
+        if(sync){
+            flags = flags.with(BlockFlag.synced);
+        }
+
         //initialize default health based on size
         if(health == -1){
             boolean round = false;
@@ -1366,13 +1378,6 @@ public class Block extends UnlockableContent implements Senseable{
             mapColor.set(image.get(image.width/2, image.height/2));
         }
 
-        if(variants > 0){
-            for(int i = 0; i < variants; i++){
-                String rname = name + (i + 1);
-                packer.add(PageType.editor, "editor-" + rname, Core.atlas.getPixmap(rname));
-            }
-        }
-
         Seq<Pixmap> toDispose = new Seq<>();
 
         //generate paletted team regions
@@ -1437,8 +1442,6 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
-        PixmapRegion editorBase;
-
         if(gen.length > 1){
             Pixmap base = Core.atlas.getPixmap(gen[0]).crop();
             for(int i = 1; i < gen.length; i++){
@@ -1450,14 +1453,10 @@ public class Block extends UnlockableContent implements Senseable{
             }
             packer.add(PageType.main, "block-" + name + "-full", base);
 
-            editorBase = new PixmapRegion(base);
             toDispose.add(base);
         }else{
             if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", Core.atlas.getPixmap(gen[0]));
-            editorBase = gen[0] == null ? Core.atlas.getPixmap(fullIcon) : Core.atlas.getPixmap(gen[0]);
         }
-
-        packer.add(PageType.editor, name + "-icon-editor", editorBase);
 
         toDispose.each(Pixmap::dispose);
     }
@@ -1499,6 +1498,16 @@ public class Block extends UnlockableContent implements Senseable{
 
     @Override
     public double sense(Content content){
+        if(content instanceof Item item){
+            if(state.rules.infiniteResources) return 0;
+
+            for(ItemStack r : requirements){
+                if(r.item == item){
+                    return Math.round(r.amount * state.rules.buildCostMultiplier);
+                }
+            }
+            return 0f;
+        }
         return Double.NaN;
     }
 

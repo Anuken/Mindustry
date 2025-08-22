@@ -9,7 +9,6 @@ import mindustry.world.*;
 public class Cliff extends Block{
     public float size = 11f;
     public @Load(value = "cliffmask#", length = 256) TextureRegion[] cliffs;
-    public @Load(value = "editor-cliffmask#", length = 256) TextureRegion[] editorCliffs;
 
     public Cliff(String name){
         super(name);
