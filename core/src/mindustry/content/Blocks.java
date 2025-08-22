@@ -4392,7 +4392,7 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitSquaresColor;
                 buildingDamageMultiplier = 0.2f;
             }},
-            Items.oxide, new BasicBulletType(8f, 120){{
+            Items.oxide, new BasicBulletType(8f, 90){{
                 knockback = 3f;
                 width = 25f;
                 hitSize = 7f;
@@ -4655,14 +4655,12 @@ public class Blocks{
                 reloadMultiplier = 0.65f;
                 splashDamageRadius = 110f;
                 rangeChange = 8f;
-                splashDamage = 300f;
+                splashDamage = 150f;
                 scaledSplashDamage = true;
                 hitColor = backColor = trailColor = Color.valueOf("a0b380");
                 frontColor = Color.valueOf("e4ffd6");
                 ammoMultiplier = 1f;
                 hitSound = Sounds.titanExplosion;
-
-                status = StatusEffects.blasted;
 
                 trailLength = 32;
                 trailWidth = 3.35f;
@@ -4679,23 +4677,8 @@ public class Blocks{
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.25f;
-
-                fragBullets = 1;
-                fragBullet = new EmptyBulletType(){{
-                    lifetime = 60f * 2.5f;
-                    bulletInterval = 20f;
-                    intervalBullet = new EmptyBulletType(){{
-                        splashDamage = 30f;
-                        collidesGround = true;
-                        collidesAir = false;
-                        collides = false;
-                        hitEffect = Fx.none;
-                        pierce = true;
-                        instantDisappear = true;
-                        splashDamageRadius = 90f;
-                        buildingDamageMultiplier = 0.2f;
-                    }};
-                }};
+                status = StatusEffects.corroded;
+                statusDuration = 300f;
             }}
             );
 
@@ -4932,8 +4915,8 @@ public class Blocks{
         }};
 
         afflict = new PowerTurret("afflict"){{
-            requirements(Category.turret, with(Items.surgeAlloy, 125, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
-            buildCostMultiplier = 1.5f;
+            requirements(Category.turret, with(Items.surgeAlloy, 100, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
+            buildCostMultiplier = 1f;
 
             shootType = new BasicBulletType(){{
                 shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{
