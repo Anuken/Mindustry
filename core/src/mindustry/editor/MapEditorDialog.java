@@ -29,6 +29,7 @@ import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -303,7 +304,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         state.rules = (lastSavedRules == null ? new Rules() : lastSavedRules);
         lastSavedRules = null;
         saved = false;
-        editor.renderer.updateAll();
+        editor.renderer.recache();
     }
 
     private void editInGame(){
@@ -323,9 +324,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 "width", editor.width(),
                 "height", editor.height()
             ));
+            state.set(State.playing);
             world.endMapLoad();
-            player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
-            Core.camera.position.set(player);
             player.clearUnit();
 
             for(var unit : Groups.unit){
@@ -338,14 +338,17 @@ public class MapEditorDialog extends Dialog implements Disposable{
             Groups.weather.clear();
             logic.play();
 
-            if(player.team().core() == null){
-                player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
-                var unit = (state.rules.hasEnv(Env.scorching) ? UnitTypes.evoke : UnitTypes.alpha).spawn(player.team(), player.x, player.y);
-                unit.spawnedByCore = true;
-                player.unit(unit);
-            }
+            Point2 center = view.project(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f);
 
-            player.checkSpawn();
+            CoreBuild best = player.bestCore();
+
+            player.set(center.x * tilesize, center.y * tilesize);
+            var unit = (best != null ? ((CoreBlock)best.block).unitType : (state.rules.hasEnv(Env.scorching) ? UnitTypes.evoke : UnitTypes.alpha)).spawn(editor.drawTeam, player.x, player.y);
+            unit.spawnedByCore = true;
+            player.unit(unit);
+            player.set(unit);
+
+            Core.camera.position.set(unit.x, unit.y);
         });
     }
 
@@ -697,12 +700,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         t.button("@editor.center", Icon.move, Styles.flatt, view::center).growX().margin(9f);
                     }).growX().top();
                 }
-
-                mid.row();
-
-                mid.table(t -> {
-                    t.button("@editor.cliffs", Icon.terrain, Styles.flatt, editor::addCliffs).growX().margin(9f);
-                }).growX().top();
             }).margin(0).left().growY();
 
 
@@ -748,7 +745,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
         //ctrl keys (undo, redo, save)
         if(Core.input.ctrl()){
             if(Core.input.keyTap(KeyCode.z)){
-                editor.undo();
+                if(Core.input.shift()){
+                    editor.redo();
+                }else{
+                    editor.undo();
+                }
             }
 
             if(Core.input.keyTap(KeyCode.y)){
@@ -780,6 +781,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
         });
 
+        Table[] configTable = {null};
+        Block[] lastBlock = {null};
+
         cont.table(search -> {
             search.image(Icon.zoom).padRight(8);
             search.field("", this::rebuildBlockSelection).growX()
@@ -788,6 +792,19 @@ public class MapEditorDialog extends Dialog implements Disposable{
         cont.row();
         cont.table(Tex.underline, extra -> extra.labelWrap(() -> editor.drawBlock.localizedName).width(200f).center()).growX();
         cont.row();
+        cont.collapser(t -> {
+            configTable[0] = t;
+        }, () -> editor.drawBlock != null && editor.drawBlock.editorConfigurable).with(c -> c.setEnforceMinSize(true)).update(col -> {
+
+            if(lastBlock[0] != editor.drawBlock){
+                configTable[0].clear();
+                if(editor.drawBlock != null){
+                    editor.drawBlock.buildEditorConfig(configTable[0]);
+                    col.invalidateHierarchy();
+                }
+                lastBlock[0] = editor.drawBlock;
+            }
+        }).growX().row();
         cont.add(pane).expandY().growX().top().left();
 
         rebuildBlockSelection("");
@@ -827,7 +844,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(i == 0) editor.drawBlock = block;
 
-            if(++i % 6 == 0){
+            int cols = mobile ? 4 : 6;
+
+            if(++i % cols == 0){
                 blockSelection.row();
             }
         }

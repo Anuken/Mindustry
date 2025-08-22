@@ -11,6 +11,7 @@ import mindustry.entities.effect.*;
 import mindustry.entities.part.DrawPart.*;
 import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -57,8 +58,20 @@ public class Blocks{
     //boulders
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
     arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystalOrbs, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
+
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, basalt, magmarock, hotrock, snowWall, saltWall,
+    //old metal floors
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
+    //new metal floors
+    metalTiles1, metalTiles2, metalTiles3, metalTiles4, metalTiles5, metalTiles6, metalTiles7, metalTiles8, metalTiles9, metalTiles10, metalTiles11, metalTiles12,
+
+    //colored
+    coloredFloor, coloredWall,
+    characterOverlayGray,
+    characterOverlayWhite,
+    runeOverlay,
+    cruxRuneOverlay,
+
     pebbles, tendrils,
 
     //ores
@@ -236,6 +249,7 @@ public class Blocks{
             statusDuration = 140f;
             drownTime = 200f;
             liquidDrop = Liquids.water;
+            liquidMultiplier = 1.5f;
             isLiquid = true;
             cacheLayer = CacheLayer.water;
             albedo = 0.9f;
@@ -277,6 +291,8 @@ public class Blocks{
         }};
 
         cryofluid = new Floor("pooled-cryofluid"){{
+            supportsOverlay = true;
+            overlayAlpha = 0.35f;
             drownTime = 150f;
             status = StatusEffects.freezing;
             statusDuration = 240f;
@@ -314,6 +330,7 @@ public class Blocks{
             solid = true;
             variants = 0;
             canShadow = false;
+            drawEdgeOut = false;
         }};
 
         empty = new EmptyFloor("empty");
@@ -807,6 +824,113 @@ public class Blocks{
         darkPanel6 = new Floor("dark-panel-6", 0);
 
         darkMetal = new StaticWall("dark-metal");
+
+        metalTiles1 = new Floor("metal-tiles-1"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles2 = new Floor("metal-tiles-2"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles3 = new Floor("metal-tiles-3"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles4 = new Floor("metal-tiles-4"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles5 = new Floor("metal-tiles-5"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles6 = new Floor("metal-tiles-6"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+
+            emitLight = true;
+            lightRadius = 30f;
+            lightColor = Team.crux.color.cpy().a(0.3f);
+        }};
+
+        metalTiles7 = new Floor("metal-tiles-7"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+            autotileMidVariants = 9;
+        }};
+
+        metalTiles8 = new Floor("metal-tiles-8"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+            autotileMidVariants = 2;
+        }};
+
+        metalTiles9 = new Floor("metal-tiles-9"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles10 = new Floor("metal-tiles-10"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        metalTiles11 = new Floor("metal-tiles-11"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+            autotileVariants = 3;
+        }};
+
+        metalTiles12 = new Floor("metal-tiles-12"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+            autotileVariants = 4;
+            emitLight = true;
+            lightRadius = 30f;
+            lightColor = Team.crux.color.cpy().a(0.3f);
+        }};
+
+        coloredFloor = new ColoredFloor("colored-floor"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+        }};
+
+        coloredWall = new ColoredWall("colored-wall"){{
+            autotile = true;
+        }};
+
+        characterOverlayGray = new CharacterOverlay("character-overlay"){{
+            color = Pal.metalGrayDark;
+        }};
+
+        characterOverlayWhite = new CharacterOverlay("character-overlay-white"){{
+            color = Color.white;
+        }};
+
+        runeOverlay = new RuneOverlay("rune-overlay"){{
+            color = Color.valueOf("3f4049");
+        }};
+
+        cruxRuneOverlay = new RuneOverlay("rune-overlay-crux");
 
         Seq.with(metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor4, metalFloor5, darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6)
         .each(b -> b.asFloor().wall = darkMetal);
@@ -1341,7 +1465,8 @@ public class Blocks{
         smallHeatRedirector = new HeatConductor("small-heat-redirector"){{
             requirements(Category.crafting, with(Items.surgeAlloy, 8, Items.graphite, 8));
 
-            researchCostMultiplier = 10f;
+            researchCostMultiplier = 2f;
+            researchCostMultipliers.put(Items.graphite, 7f);
 
             group = BlockGroup.heat;
             size = 2;
@@ -2311,7 +2436,7 @@ public class Blocks{
             requirements(Category.power, with(Items.copper, 2, Items.lead, 6));
             maxNodes = 10;
             laserRange = 6;
-            buildCostMultiplier = 2.5f;
+            underBullets = true;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{
@@ -4164,7 +4289,7 @@ public class Blocks{
                 hitSize = 7f;
                 shootEffect = sfe;
                 smokeEffect = Fx.shootBigSmoke;
-                ammoMultiplier = 1;
+                ammoMultiplier = 2;
                 reloadMultiplier = 1f;
                 pierceCap = 4;
                 pierce = true;
@@ -4527,14 +4652,13 @@ public class Blocks{
                 width = 17f;
                 reloadMultiplier = 0.65f;
                 splashDamageRadius = 110f;
-                splashDamage = 300f;
+                rangeChange = 8f;
+                splashDamage = 150f;
                 scaledSplashDamage = true;
                 hitColor = backColor = trailColor = Color.valueOf("a0b380");
                 frontColor = Color.valueOf("e4ffd6");
                 ammoMultiplier = 1f;
                 hitSound = Sounds.titanExplosion;
-
-                status = StatusEffects.blasted;
 
                 trailLength = 32;
                 trailWidth = 3.35f;
@@ -4551,24 +4675,8 @@ public class Blocks{
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.25f;
-
-                fragBullets = 1;
-                fragBullet = new EmptyBulletType(){{
-                    lifetime = 60f * 2.5f;
-                    bulletInterval = 20f;
-                    hitEffect = despawnEffect = Fx.none;
-                    intervalBullet = new EmptyBulletType(){{
-                        splashDamage = 20f;
-                        collidesGround = true;
-                        collidesAir = false;
-                        collides = false;
-                        hitEffect = despawnEffect = Fx.none;
-                        pierce = true;
-                        instantDisappear = true;
-                        splashDamageRadius = 90f;
-                        buildingDamageMultiplier = 0.2f;
-                    }};
-                }};
+                status = StatusEffects.corroded;
+                statusDuration = 300f;
             }}
             );
 
@@ -4806,7 +4914,7 @@ public class Blocks{
 
         afflict = new PowerTurret("afflict"){{
             requirements(Category.turret, with(Items.surgeAlloy, 100, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
-            buildCostMultiplier = 1.5f;
+            buildCostMultiplier = 1f;
 
             shootType = new BasicBulletType(){{
                 shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{

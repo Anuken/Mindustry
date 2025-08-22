@@ -78,7 +78,7 @@ public class ConstructBlock extends Block{
         if(block instanceof OverlayFloor overlay){
             tile.setOverlay(overlay);
         }else if(block instanceof Floor floor){
-            tile.setFloorUnder(floor);
+            tile.setFloor(floor);
         }else{
             tile.setBlock(block, team, rotation);
         }
@@ -112,7 +112,7 @@ public class ConstructBlock extends Block{
             if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
         }
 
-        block.placeEnded(tile, builder);
+        block.placeEnded(tile, builder, rotation, config);
 
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }
@@ -258,6 +258,8 @@ public class ConstructBlock extends Block{
         }
 
         public void construct(Unit builder, @Nullable Building core, float amount, Object config){
+            if(accumulator == null || totalAccumulator == null) return;
+
             wasConstructing = true;
             activeDeconstruct = false;
 
@@ -313,6 +315,8 @@ public class ConstructBlock extends Block{
         }
 
         public void deconstruct(Unit builder, @Nullable CoreBuild core, float amount){
+            if(accumulator == null || totalAccumulator == null) return;
+
             //reset accumulated resources when switching modes
             if(wasConstructing){
                 Arrays.fill(accumulator, 0);

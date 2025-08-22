@@ -1267,6 +1267,7 @@ public class UnitTypes{
             engineOffset = 5.7f;
             range = 50f;
             isEnemy = false;
+            controlSelectGlobal = false;
 
             ammoType = new PowerAmmoType(500);
 
@@ -1889,7 +1890,6 @@ public class UnitTypes{
                 x = y = shootX = shootY = 0f;
                 shootSound = Sounds.mineDeploy;
                 rotateSpeed = 180f;
-                targetAir = false;
 
                 shoot.shots = 3;
                 shoot.shotDelay = 7f;
