@@ -3213,13 +3213,15 @@ public class Blocks{
         duo = new ItemTurret("duo"){{
             requirements(Category.turret, with(Items.copper, 35));
             ammo(
-                Items.copper,  new PointLaserBulletType(){{
+                Items.copper,  new BasicBulletType(2.5f, 9){{
+                    width = 7f;
+                    height = 9f;
                     lifetime = 60f;
                     ammoMultiplier = 2;
-                                buildingDamageMultiplier = 0.3f;
-                pierceDamageFactor = 1f;
+
                     hitEffect = despawnEffect = Fx.hitBulletColor;
-                    hitColor = trailColor = Pal.copperAmmoBack;
+                    hitColor = backColor = trailColor = Pal.copperAmmoBack;
+                    frontColor = Pal.copperAmmoFront;
                 }},
                 Items.graphite, new BasicBulletType(3.5f, 18){{
                     width = 9f;
@@ -4984,7 +4986,7 @@ public class Blocks{
 
                 fragBullets = 20;
                 fragVelocityMin = 0.5f;
-                fragVelocityMax = 1.2f;
+                fragVelocityMax = 1.5f;
                 fragLifeMin = 0.5f;
             }};
 
@@ -5026,14 +5028,14 @@ public class Blocks{
             reload = 100f;
             cooldownTime = reload;
             recoil = 3f;
-            range = 368;
+            range = 350;
             shootCone = 20f;
             scaledHealth = 220;
             rotateSpeed = 1.5f;
             researchCostMultiplier = 0.04f;
             buildCostMultiplier = 1.5f;
 
-            limitRange(-55f);
+            limitRange(9f);
         }};
 
         lustre = new ContinuousTurret("lustre"){{
@@ -5793,7 +5795,7 @@ public class Blocks{
             shootType = new FlakBulletType(8f, 70f){{
                 sprite = "missile-large";
 
-                lifetime = 40f;
+                lifetime = 45f;
                 width = 12f;
                 height = 22f;
 
@@ -5811,24 +5813,21 @@ public class Blocks{
                 trailEffect = Fx.colorSpark;
                 trailRotation = true;
                 trailInterval = 3f;
+                lightning = 1;
+                lightningCone = 15f;
+                lightningLength = 20;
+                lightningLengthRand = 30;
+                lightningDamage = 20f;
 
                 homingPower = 0.17f;
                 homingDelay = 19f;
                 homingRange = 160f;
 
-                explodeRange = 100f;
+                explodeRange = 160f;
                 explodeDelay = 0f;
 
                 flakInterval = 20f;
                 despawnShake = 3f;
-
-                intervalBullet = new LightningBulletType() {{
-                    lightningColor = circleColor;
-                    lightningCone = 15f;
-                    lightningLength = 35;
-                    lightningLengthRand = 5;
-                    damage = 18f;
-                }};
 
                 fragBullet = new LaserBulletType(65f){{
                     colors = new Color[]{haloColor.cpy().a(0.4f), haloColor, Color.white};
@@ -5840,14 +5839,11 @@ public class Blocks{
                     sideLength = 40f;
                     lifetime = 22f;
                     drawSize = 400f;
-                    length = 120f;
+                    length = 180f;
                     pierceCap = 2;
-                    optimalLifeFract = 1f;
                 }};
-                
-                fragBullets = intervalBullets = 1;
-                fragSpread = fragRandomSpread = intervalRandomSpread = 0f;
-                bulletInterval = 20f;
+
+                fragSpread = fragRandomSpread = 0f;
 
                 splashDamage = 0f;
                 hitEffect = Fx.hitSquaresColor;
@@ -6105,7 +6101,7 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             envEnabled |= Env.space;
             reload = 7f;
-            range = 410;
+            range = 380;
             trackingRange = range * 1.4f;
             shootCone = 100f;
             scaledHealth = 370;

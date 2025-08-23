@@ -1,5 +1,6 @@
 package mindustry.entities.abilities;
 
+import arc.audio.Sound;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -17,28 +18,25 @@ public class ShieldArcAbility extends Ability{
     private static Unit paramUnit;
     private static ShieldArcAbility paramField;
     private static Vec2 paramPos = new Vec2();
-    private final Cons<Bullet> shieldConsumer = b -> {
+    private static final Cons<Bullet> shieldConsumer = b -> {
         if(b.team != paramUnit.team && b.type.absorbable && paramField.data > 0 &&
             !(b.within(paramPos, paramField.radius - paramField.width) && paramPos.within(b.x - b.deltaX, b.y - b.deltaY, paramField.radius - paramField.width)) &&
             (Tmp.v1.set(b).add(b.deltaX, b.deltaY).within(paramPos, paramField.radius + paramField.width) || b.within(paramPos, paramField.radius + paramField.width)) &&
             (Angles.within(paramPos.angleTo(b), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(b.x + b.deltaX, b.y + b.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
 
-            // deflect bullets if necessary
-            if (paramField.chanceDeflect > 0f) {
-                // slow bullets are not deflected
-                if (b.vel.len() <= 0.1f || !b.type.reflectable)
+            if(paramField.chanceDeflect > 0f && b.vel.len() >= 0.1f && b.type.reflectable && Mathf.chance(paramField.chanceDeflect / b.damage())){
 
-                // bullet reflection chance depends on bullet damage
-                if (!Mathf.chance(paramField.chanceDeflect / b.damage())) 
+                //make sound
+                paramField.deflectSound.at(paramPos, Mathf.random(0.9f, 1.1f));
 
-                // translate bullet back to where it was upon collision
+                //translate bullet back to where it was upon collision
                 b.trns(-b.vel.x, -b.vel.y);
 
                 float penX = Math.abs(paramPos.x - b.x), penY = Math.abs(paramPos.y - b.y);
 
-                if (penX > penY) {
+                if(penX > penY){
                     b.vel.x *= -1;
-                } else {
+                }else{
                     b.vel.y *= -1;
                 }
 
@@ -46,9 +44,11 @@ public class ShieldArcAbility extends Ability{
                 b.team = paramUnit.team;
                 b.time += 1f;
 
-                // disable bullet collision by returning false
+            }else{
+                b.absorb();
+                Fx.absorb.at(b);
             }
-
+            
             //break shield
             if(paramField.data <= b.damage()){
                 paramField.data -= paramField.cooldown * paramField.regen;
@@ -79,6 +79,8 @@ public class ShieldArcAbility extends Ability{
     public float width = 6f;
     /** Bullet deflection chance. -1 to disable */
     public float chanceDeflect = -1f;
+    /** Deflection sound. */
+    public Sound deflectSound = Sounds.none;
 
     /** Whether to draw the arc line. */
     public boolean drawArc = true;
@@ -100,6 +102,8 @@ public class ShieldArcAbility extends Ability{
         t.add(abilityStat("repairspeed", Strings.autoFixed(regen * 60f, 2)));
         t.row();
         t.add(abilityStat("cooldown", Strings.autoFixed(cooldown / 60f, 2)));
+        t.row();
+        t.add(abilityStat("basedeflectchance", Strings.autoFixed(chanceDeflect, 2)));
     }
 
     @Override

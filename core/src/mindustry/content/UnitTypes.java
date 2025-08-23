@@ -3320,13 +3320,13 @@ public class UnitTypes{
                 region = "tecta-shield";
                 radius = 45f;
                 angle = 82f;
-                regen = 100f;
+                regen = 0.6f;
                 cooldown = 60f * 8f;
                 max = 2000f;
                 y = -20f;
                 width = 8f;
                 whenShooting = false;
-                chanceDeflect = 1f;
+                chanceDeflect = 10f;
             }});
 
             rotateSpeed = 2.1f;
