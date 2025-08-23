@@ -3309,12 +3309,12 @@ public class Blocks{
                     lifetime = 60f;
                     ammoMultiplier = 5f;
                     shootEffect = Fx.shootSmall;
-                    reloadMultiplier = 0.25f;
+                    reloadMultiplier = 0.5f;
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 24f * 1.5f;
-                    splashDamageRadius = 21f;
+                    splashDamage = 10f * 1.5f;
+                    splashDamageRadius = 24f;
                     fragBullets = 6;
                     fragBullet = new BasicBulletType(3f, 8){{
                         width = 5f;
