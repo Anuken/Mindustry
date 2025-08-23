@@ -4916,7 +4916,7 @@ public class Blocks{
 
         afflict = new PowerTurret("afflict"){{
             requirements(Category.turret, with(Items.surgeAlloy, 100, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
-            buildCostMultiplier = 1.5f;
+            buildCostMultiplier = 1;
 
             shootType = new BasicBulletType(){{
                 shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{
@@ -5033,7 +5033,6 @@ public class Blocks{
             scaledHealth = 220;
             rotateSpeed = 1.5f;
             researchCostMultiplier = 0.04f;
-            buildCostMultiplier = 1.5f;
 
             limitRange(9f);
         }};

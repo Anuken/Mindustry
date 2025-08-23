@@ -14,6 +14,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -3487,7 +3488,7 @@ public class UnitTypes{
 
                 bullet = new ArtilleryBulletType(5.5f, 260){{
                     collidesTiles = collides = true;
-                    lifetime = 70f;
+                    lifetime = 60f;
                     shootEffect = Fx.shootBigColor;
                     smokeEffect = Fx.shootSmokeSquareBig;
                     frontColor = Color.white;
@@ -3495,6 +3496,7 @@ public class UnitTypes{
                     hitSound = Sounds.none;
                     width = 18f;
                     height = 24f;
+                    rangeOverride = 385f;
 
                     lightColor = trailColor = hitColor = backColor = Pal.techBlue;
                     lightRadius = 40f;
@@ -3508,10 +3510,10 @@ public class UnitTypes{
                     despawnSound = Sounds.dullExplosion;
 
                     hitEffect = despawnEffect = new ExplosionEffect(){{
-                        lifetime = 34f;
-                        waveStroke = 4f;
+                        lifetime = 50f;
+                        waveStroke = 5f;
                         waveColor = sparkColor = trailColor;
-                        waveRad = 25f;
+                        waveRad = 45f;
                         smokeSize = 0f;
                         smokeSizeBase = 0f;
                         sparks = 10;
@@ -3520,8 +3522,8 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    splashDamage = 85f;
-                    splashDamageRadius = 20f;
+                    splashDamage = 120f;
+                    splashDamageRadius = 32f;
 
                     fragBullets = 15;
                     fragVelocityMin = 0.5f;
@@ -3529,14 +3531,14 @@ public class UnitTypes{
                     fragLifeMin = 0.3f;
                     despawnShake = 5f;
 
-                    fragBullet = new BasicBulletType(5.5f, 50){{
+                    fragBullet = new BasicBulletType(5.5f, 37f){{
                         pierceCap = 2;
                         pierceBuilding = true;
 
                         homingPower = 0.09f;
                         homingRange = 150f;
 
-                        lifetime = 50f;
+                        lifetime = 40f;
                         shootEffect = Fx.shootBigColor;
                         smokeEffect = Fx.shootSmokeSquareBig;
                         frontColor = Color.white;
@@ -3555,7 +3557,7 @@ public class UnitTypes{
                         collidesAir = false;
 
                         despawnEffect = Fx.none;
-                        splashDamage = 46f;
+                        splashDamage = 35f;
                         splashDamageRadius = 30f;
 
                         hitEffect = despawnEffect = new MultiEffect(new ExplosionEffect(){{
