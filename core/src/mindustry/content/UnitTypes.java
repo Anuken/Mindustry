@@ -3318,14 +3318,15 @@ public class UnitTypes{
 
             abilities.add(new ShieldArcAbility(){{
                 region = "tecta-shield";
-                radius = 36f;
+                radius = 45f;
                 angle = 82f;
-                regen = 0.6f;
+                regen = 100f;
                 cooldown = 60f * 8f;
                 max = 2000f;
                 y = -20f;
-                width = 6f;
+                width = 8f;
                 whenShooting = false;
+                chanceDeflect = 1f;
             }});
 
             rotateSpeed = 2.1f;

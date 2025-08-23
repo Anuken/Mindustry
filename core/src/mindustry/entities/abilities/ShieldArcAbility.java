@@ -17,14 +17,37 @@ public class ShieldArcAbility extends Ability{
     private static Unit paramUnit;
     private static ShieldArcAbility paramField;
     private static Vec2 paramPos = new Vec2();
-    private static final Cons<Bullet> shieldConsumer = b -> {
+    private final Cons<Bullet> shieldConsumer = b -> {
         if(b.team != paramUnit.team && b.type.absorbable && paramField.data > 0 &&
-            !(b.within(paramPos, paramField.radius - paramField.width*5f) && paramPos.within(b.x - b.deltaX, b.y - b.deltaY, paramField.radius - paramField.width*5f)) &&
-            (Tmp.v1.set(b).add(b.deltaX, b.deltaY).within(paramPos, paramField.radius + paramField.width*5f) || b.within(paramPos, paramField.radius + paramField.width*5f)) &&
+            !(b.within(paramPos, paramField.radius - paramField.width) && paramPos.within(b.x - b.deltaX, b.y - b.deltaY, paramField.radius - paramField.width)) &&
+            (Tmp.v1.set(b).add(b.deltaX, b.deltaY).within(paramPos, paramField.radius + paramField.width) || b.within(paramPos, paramField.radius + paramField.width)) &&
             (Angles.within(paramPos.angleTo(b), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(b.x + b.deltaX, b.y + b.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
 
-            b.absorb();
-            Fx.absorb.at(b);
+            // deflect bullets if necessary
+            if (paramField.chanceDeflect > 0f) {
+                // slow bullets are not deflected
+                if (b.vel.len() <= 0.1f || !b.type.reflectable)
+
+                // bullet reflection chance depends on bullet damage
+                if (!Mathf.chance(paramField.chanceDeflect / b.damage())) 
+
+                // translate bullet back to where it was upon collision
+                b.trns(-b.vel.x, -b.vel.y);
+
+                float penX = Math.abs(paramPos.x - b.x), penY = Math.abs(paramPos.y - b.y);
+
+                if (penX > penY) {
+                    b.vel.x *= -1;
+                } else {
+                    b.vel.y *= -1;
+                }
+
+                b.owner = paramUnit;
+                b.team = paramUnit.team;
+                b.time += 1f;
+
+                // disable bullet collision by returning false
+            }
 
             //break shield
             if(paramField.data <= b.damage()){
@@ -54,6 +77,8 @@ public class ShieldArcAbility extends Ability{
     public boolean whenShooting = true;
     /** Width of shield line. */
     public float width = 6f;
+    /** Bullet deflection chance. -1 to disable */
+    public float chanceDeflect = -1f;
 
     /** Whether to draw the arc line. */
     public boolean drawArc = true;
@@ -93,7 +118,7 @@ public class ShieldArcAbility extends Ability{
             paramField = this;
             paramPos.set(x, y).rotate(unit.rotation - 90f).add(unit);
 
-            float reach = radius + width * 5f;
+            float reach = radius + width;
             Groups.bullet.intersect(paramPos.x - reach, paramPos.y - reach, reach * 2f, reach * 2f, shieldConsumer);
         }else{
             widthScale = Mathf.lerpDelta(widthScale, 0f, 0.11f);
