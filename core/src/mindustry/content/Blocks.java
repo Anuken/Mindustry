@@ -4780,6 +4780,7 @@ public class Blocks{
                 ammoMultiplier = 1f;
 
                 lifetime = 34f;
+                extraRangeMargin = 32f;
                 rotationOffset = 90f;
                 trailRotation = true;
                 trailEffect = Fx.disperseTrail;
@@ -5384,7 +5385,7 @@ public class Blocks{
 
                                     fogRadius = 6f;
 
-                                    health = 100;
+                                    health = 80;
 
                                     weapons.add(new Weapon(){{
                                         shootCone = 360f;
