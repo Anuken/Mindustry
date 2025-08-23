@@ -274,10 +274,15 @@ public class Schematics implements Loadable{
         return previews.get(schematic);
     }
 
-    /** Creates an array of build plans from a schematic's data, centered on the provided x+y coordinates. */
+    /** Creates an array of build plans from a schematic's data, centered on the provided x,y coordinates. */
     public Seq<BuildPlan> toPlans(Schematic schem, int x, int y){
+        return toPlans(schem, x, y, true);
+    }
+
+    /** Creates an array of build plans from a schematic's data, centered on the provided x,y coordinates. */
+    public Seq<BuildPlan> toPlans(Schematic schem, int x, int y, boolean checkHidden){
         return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block, t.config))
-            .removeAll(s -> (!s.block.isVisible() && !(s.block instanceof CoreBlock)) || !s.block.unlockedNow()).sort(Structs.comparingInt(s -> -s.block.schematicPriority));
+            .removeAll(s -> (checkHidden && !s.block.isVisible() && !(s.block instanceof CoreBlock)) || !s.block.unlockedNow()).sort(Structs.comparingInt(s -> -s.block.schematicPriority));
     }
 
     /** @return all the valid loadouts for a specific core type. */

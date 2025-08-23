@@ -499,13 +499,13 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
-    public void useSchematic(Schematic schem){
+    public void useSchematic(Schematic schem, boolean checkHidden){
         block = null;
         schematicX = tileX(getMouseX());
         schematicY = tileY(getMouseY());
 
         selectPlans.clear();
-        selectPlans.addAll(schematics.toPlans(schem, schematicX, schematicY));
+        selectPlans.addAll(schematics.toPlans(schem, schematicX, schematicY, checkHidden));
         mode = none;
     }
 
