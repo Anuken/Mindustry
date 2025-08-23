@@ -63,7 +63,9 @@ public class Blocks{
     //old metal floors
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     //new metal floors
-    metalTiles1, metalTiles2, metalTiles3, metalTiles4, metalTiles5, metalTiles6, metalTiles7, metalTiles8, metalTiles9, metalTiles10, metalTiles11, metalTiles12,
+    metalTiles1, metalTiles2, metalTiles3, metalTiles4, metalTiles5, metalTiles6, metalTiles7, metalTiles8, metalTiles9, metalTiles10, metalTiles11, metalTiles12, metalTiles13,
+    //new metal walls
+    metalWall1, metalWall2, metalWall3, metalWall4,
 
     //colored
     coloredFloor, coloredWall,
@@ -906,6 +908,26 @@ public class Blocks{
             emitLight = true;
             lightRadius = 30f;
             lightColor = Team.crux.color.cpy().a(0.3f);
+        }};
+
+        metalTiles13 = new Floor("metal-tiles-13"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+            autotileMidVariants = 6;
+        }};
+
+        metalWall1 = new StaticWall("metal-wall-1"){{
+            autotile = true;
+        }};
+
+        metalWall2 = new StaticWall("metal-wall-2"){{
+            autotile = true;
+            autotileMidVariants = 2;
+        }};
+
+        metalWall3 = new StaticWall("metal-wall-3"){{
+            autotile = true;
         }};
 
         coloredFloor = new ColoredFloor("colored-floor"){{

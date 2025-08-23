@@ -57,11 +57,11 @@ public class LExecutor{
     public IntSet linkIds = new IntSet();
     public Team team = Team.derelict;
     public boolean privileged = false;
+    //maps variable name to index in vars; lazily initialized
+    protected @Nullable ObjectIntMap<String> nameMap;
 
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
     protected static IntFloatMap unitTimeouts = new IntFloatMap();
-    //lookup variable by name, lazy init.
-    protected @Nullable ObjectIntMap<String> nameMap;
 
     static{
         Events.on(ResetEvent.class, e -> unitTimeouts.clear());
