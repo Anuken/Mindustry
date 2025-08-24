@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.pooling.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -17,7 +18,7 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
     @Import int id;
     @Import float x, y;
 
-    public static final byte flagBackground = 1, flagOutline = 2;
+    public static final byte flagBackground = 1, flagOutline = 2, flagAlignLeft = 4, flagAlignRight = 8, flagAutoscale = 16;
 
     public String text = "sample text";
     public float fontSize = 1f, z = Layer.playerName + 1;
@@ -31,7 +32,7 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
 
     @Override
     public void draw(){
-        drawAt(text, x, y, z, flags, fontSize, Align.center, Align.center);
+        drawAt(text, x, y, z, flags, fontSize, Align.center, (flags & flagAlignLeft) != 0 ? Align.left : (flags & flagAlignRight) != 0 ? Align.right : Align.center);
     }
 
     public static void drawAt(String text, float x, float y, float layer, int flags, float fontSize, int align, int lineAlign){
@@ -43,7 +44,9 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
 
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
-        font.getData().setScale(0.25f / Scl.scl(1f) * fontSize);
+        // Numbers below are obtained by the method of guessing and comparing results to regular labels.
+        font.getData().setScale(0.25f * fontSize / Scl.scl(1f) /
+            ((flags & flagAutoscale) != 0 ? 0.2f * Vars.renderer.camerascale + 0.05f : 1f));
         layout.setText(font, text);
 
         int border = (flags & flagBackground) != 0 ? 1 : 0;
