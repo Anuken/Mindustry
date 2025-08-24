@@ -11,10 +11,10 @@ fi
 cd "$(realpath "$(dirname "$0")")" || exit 1
 cd .. || exit 1
 
-./gradlew server:dist -Pbuildversion="$1" || exit 1
+./gradlew desktop:dist -Pbuildversion="$buildversion" || exit 1
 
-mkdir -p run/server
-cd run/server || exit 1
+mkdir -p run/Mindustry
+cd run/Mindustry || exit 1
 
 excode=$?
 
@@ -25,8 +25,10 @@ fi
 
 while true; do
 #auto-restart until ctrl-c or exit 0
+#if I forgot some vars, add them here, thanks
 MINDUSTRY_RUNNING_VIA_SCRIPT=1 \
-    java -jar -XX:+HeapDumpOnOutOfMemoryError ../../server/build/libs/server-release.jar
+XDG_DATA_HOME="$(dirname "$(pwd)")" \
+    java -jar -XX:+HeapDumpOnOutOfMemoryError ../../desktop/build/libs/Mindustry.jar
 excode=$?
 if [ $excode -eq 0 ] || [ $excode -eq 130 ]; then
   	exit 0

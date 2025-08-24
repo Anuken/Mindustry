@@ -324,12 +324,18 @@ public class NetClient implements ApplicationListener{
 
     @Remote(targets = Loc.client, priority = PacketPriority.high)
     public static void ping(Player player, long time){
-        Call.pingResponse(player.con, time);
+        Call.pingResponse(player.con, time, Time.millis());
     }
 
-    @Remote(variants = Variant.one)
-    public static void pingResponse(long time){
-        netClient.ping = Time.timeSinceMillis(time);
+    @Remote(targets = Loc.server, priority = PacketPriority.high, variants = Variant.one)
+    public static void pingResponse(long clientTime, long serverTime){
+        netClient.ping = Time.timeSinceMillis(clientTime);
+        Call.pingEnd(serverTime);
+    }
+
+    @Remote(targets = Loc.client, priority = PacketPriority.high)
+    public static void pingEnd(Player player, long time){
+        Log.info("Player ping: " + player.con.ping + "ms");
     }
 
     @Remote(variants = Variant.one)

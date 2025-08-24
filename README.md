@@ -28,8 +28,8 @@ _Sprite Packing:_ `gradlew tools:pack`
 
 ### Linux/Mac OS
 
-_Running:_ `./gradlew desktop:run`  
-_Building:_ `./gradlew desktop:dist`  
+_Running:_ `./server/run-server -1`  
+_Building:_ `./desktop/run-client -1`  
 _Sprite Packing:_ `./gradlew tools:pack`
 
 ### Server
