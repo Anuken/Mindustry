@@ -132,7 +132,7 @@ public class UnitTypes{
                 reload = 11f;
                 recoil = 1f;
                 ejectEffect = Fx.none;
-                bullet = new BulletType(4.2f, 37f){{
+                bullet = new BulletType(4.2f, 37){{
                     ammoMultiplier = 3f;
                     hitSize = 7f;
                     lifetime = 13f;

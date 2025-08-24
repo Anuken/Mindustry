@@ -4917,7 +4917,7 @@ public class Blocks{
 
         afflict = new PowerTurret("afflict"){{
             requirements(Category.turret, with(Items.surgeAlloy, 100, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
-            buildCostMultiplier = 1;
+            buildCostMultiplier = 1f;
 
             shootType = new BasicBulletType(){{
                 shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{
@@ -5044,7 +5044,6 @@ public class Blocks{
             shootType = new PointLaserBulletType(){{
                 damage = 210f;
                 buildingDamageMultiplier = 0.3f;
-                pierceDamageFactor = 1f;
                 hitColor = Color.valueOf("fda981");
             }};
 
