@@ -195,7 +195,9 @@ public class ServerControl implements ApplicationListener{
 
         if(Version.build == -1){
             warn("&lyYour server is running a custom build, which means that client checking is disabled.");
-            warn("&lyIt is highly advised to specify which version you're using by building with gradle args &lb&fb-Pbuildversion=&lr<build>");
+            if(System.getenv("MINDUSTRY_RUNNING_VIA_SCRIPT") == "1"){
+                warn("&lyIt is highly advised to specify which version you're using by building with gradle args &lb&fb-Pbuildversion=&lr<build>");
+            }
         }
 
         //set up default shuffle mode
