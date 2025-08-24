@@ -132,7 +132,7 @@ public class UnitTypes{
                 reload = 11f;
                 recoil = 1f;
                 ejectEffect = Fx.none;
-                bullet = new BulletType(4.2f, 37){{
+                bullet = new BulletType(4.2f, 37f){{
                     ammoMultiplier = 3f;
                     hitSize = 7f;
                     lifetime = 13f;
@@ -3530,7 +3530,7 @@ public class UnitTypes{
                     fragLifeMin = 0.3f;
                     despawnShake = 5f;
 
-                    fragBullet = new BasicBulletType(5.5f, 37f){{
+                    fragBullet = new BasicBulletType(5.5f, 37){{
                         pierceCap = 2;
                         pierceBuilding = true;
 
