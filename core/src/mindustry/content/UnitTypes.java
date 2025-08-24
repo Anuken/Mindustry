@@ -2177,6 +2177,7 @@ public class UnitTypes{
 
             buildSpeed = 3f;
             rotateToBuilding = false;
+            range = maxRange = 180f;
 
             abilities.add(new EnergyFieldAbility(40f, 65f, 180f){{
                 statusDuration = 60f * 6f;
