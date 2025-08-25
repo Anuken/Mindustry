@@ -5868,7 +5868,7 @@ public class Blocks{
                     optimalLifeFract = 1f;
                 }};
                 
-                fragBullets = intervalBullets = 1;
+                intervalBullets = 1;
                 fragSpread = fragRandomSpread = intervalRandomSpread = 0f;
                 bulletInterval = 20f;
 
