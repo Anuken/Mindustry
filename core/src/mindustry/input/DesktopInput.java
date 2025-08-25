@@ -482,6 +482,10 @@ public class DesktopInput extends InputHandler{
             pollInputPlayer();
         }
 
+        if(Core.input.keyRelease(Binding.select)){
+            player.shooting = false;
+        }
+
         if(!Core.scene.hasMouse() && !ui.minimapfrag.shown()){
             Core.graphics.cursor(cursorType);
             changedCursor = cursorType != SystemCursor.arrow;
@@ -495,13 +499,13 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
-    public void useSchematic(Schematic schem){
+    public void useSchematic(Schematic schem, boolean checkHidden){
         block = null;
         schematicX = tileX(getMouseX());
         schematicY = tileY(getMouseY());
 
         selectPlans.clear();
-        selectPlans.addAll(schematics.toPlans(schem, schematicX, schematicY));
+        selectPlans.addAll(schematics.toPlans(schem, schematicX, schematicY, checkHidden));
         mode = none;
     }
 
@@ -859,10 +863,6 @@ public class DesktopInput extends InputHandler{
             if(cursor.build != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotatePlaced) && cursor.block().rotate && cursor.block().quickRotate){
                 Call.rotateBlock(player, cursor.build, Core.input.axisTap(Binding.rotate) > 0);
             }
-        }
-
-        if(Core.input.keyRelease(Binding.select)){
-            player.shooting = false;
         }
     }
 

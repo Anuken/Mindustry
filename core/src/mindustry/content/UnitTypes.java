@@ -1890,7 +1890,6 @@ public class UnitTypes{
                 x = y = shootX = shootY = 0f;
                 shootSound = Sounds.mineDeploy;
                 rotateSpeed = 180f;
-                targetAir = false;
 
                 shoot.shots = 3;
                 shoot.shotDelay = 7f;
@@ -2178,6 +2177,7 @@ public class UnitTypes{
 
             buildSpeed = 3f;
             rotateToBuilding = false;
+            range = maxRange = 180f;
 
             abilities.add(new EnergyFieldAbility(40f, 65f, 180f){{
                 statusDuration = 60f * 6f;

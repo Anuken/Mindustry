@@ -105,11 +105,7 @@
   {
     "name": "Fish",
     "address": [
-      "162.248.101.95",
-      "162.248.100.98",
-      "162.248.100.133",
-      "162.248.101.53",
-      "162.248.102.101"
+      "162.248.101.52"
     ]
   },
   {
@@ -217,7 +213,10 @@
       "meowisland.ru:5001",
       "meowisland.ru:5002",
       "meowisland.ru:5003",
-      "meowisland.ru:5004"
+      "meowisland.ru:5004",
+      "mindustry.purepvp.org:50000",
+      "open.purepvp.org:40000",
+      "proxy.purepvp.org:40000"
     ]
   },
   {

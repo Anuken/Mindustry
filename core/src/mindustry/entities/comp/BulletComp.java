@@ -22,14 +22,14 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Bulletc.class}, pooled = true, serialize = false)
 @Component(base = true)
-abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
+abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Bulletc, Timerc{
     @Import Team team;
     @Import Entityc owner;
     @Import float x, y, damage, lastX, lastY, time, lifetime;
-    @Import Vec2 vel;
 
     IntSeq collided = new IntSeq(6);
     BulletType type;
+    Vec2 vel = new Vec2();
 
     Object data;
     float fdata;
@@ -39,6 +39,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     //setting this variable to true prevents lifetime from decreasing for a frame.
     transient boolean keepAlive;
+    transient boolean justSpawned = true;
     /** Unlike the owner, the shooter is the original entity that created this bullet. For a second-stage missile, the shooter would be the turret, but the owner would be the last missile stage.*/
     transient Entityc shooter;
     transient @Nullable Tile aimTile;
@@ -151,6 +152,15 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void update(){
+        //for one frame, bullets do not move - this is because bullet.update() is called immediately after the weapon updates
+        //if the bullet moved immediately, it would spawn visually offset from the weapon at low FPS values
+        if(!justSpawned){
+            x += vel.x * Time.delta;
+            y += vel.y * Time.delta;
+            vel.scl(Math.max(1f - type.drag * Time.delta, 0));
+        }
+        justSpawned = false;
+
         if(mover != null){
             mover.move(self());
         }
