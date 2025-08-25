@@ -327,13 +327,13 @@ public class NetClient implements ApplicationListener{
         Call.pingResponse(player.con, time, Time.millis());
     }
 
-    @Remote(targets = Loc.server, priority = PacketPriority.high, variants = Variant.one)
+    @Remote(targets = Loc.server, variants = Variant.one)
     public static void pingResponse(long clientTime, long serverTime){
         netClient.ping = Time.timeSinceMillis(clientTime);
         Call.pingEnd(serverTime);
     }
 
-    @Remote(targets = Loc.client, priority = PacketPriority.high)
+    @Remote(targets = Loc.client)
     public static void pingEnd(Player player, long time){
         player.con.ping = Time.timeSinceMillis(time);
     }
