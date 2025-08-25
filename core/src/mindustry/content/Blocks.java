@@ -3364,36 +3364,62 @@ public class Blocks{
                 Items.coal, new BulletType(3.35f, 17f){{
                     ammoMultiplier = 3f;
                     hitSize = 7f;
-                    lifetime = 18f;
+                    lifetime = 20.6f;
                     pierce = true;
                     collidesAir = false;
                     statusDuration = 60f * 4;
-                    shootEffect = Fx.shootSmallFlame;
+                    shootEffect = Fx.shootCoalFlame;
                     hitEffect = Fx.hitFlameSmall;
                     despawnEffect = Fx.none;
                     status = StatusEffects.burning;
                     keepVelocity = false;
                     hittable = false;
                 }},
-                Items.pyratite, new BulletType(4f, 60f){{
+                Items.pyratite, new BulletType(4f, 50f){{
                     ammoMultiplier = 6f;
                     hitSize = 7f;
-                    lifetime = 18f;
+                    lifetime = 17f;
                     pierce = true;
                     collidesAir = false;
-                    rangeChange = 16f;
+                    rangeChange = 52f;
                     statusDuration = 60f * 10;
                     shootEffect = Fx.shootPyraFlame;
-                    hitEffect = Fx.hitFlameSmall;
+                    hitEffect = Fx.none;
                     despawnEffect = Fx.none;
                     status = StatusEffects.burning;
                     hittable = false;
+
+                    spawnBullets.add(new BulletType(4f, 0f){{
+                        hitSize = 7f;
+                        lifetime = 17f;
+                        pierce = true;
+                        collidesAir = false;
+                        hitEffect = Fx.hitHeavyFlame;
+                        despawnEffect = Fx.none;
+                        hittable = false;
+                    }});
+
+                    fragBullets = pierceFragCap = 1;
+                    fragRandomSpread = fragOffsetMin = fragOffsetMax = 0;
+                    fragVelocityMin = 1f;
+                    fragOnHit = true;
+                    fragBullet = new BulletType(4f, 10f){{
+                        hitSize = 14f;
+                        lifetime = 13.5f;
+                        pierce = true;
+                        collidesAir = false;
+                        statusDuration = 60f * 10;
+                        hitEffect = Fx.hitFlameSmall;
+                        despawnEffect = Fx.none;
+                        status = StatusEffects.burning;
+                        hittable = false;
+                    }};
                 }}
             );
             recoil = 0f;
             reload = 6f;
             coolantMultiplier = 1.5f;
-            range = 60f;
+            range = 68f;
             shootY = 3;
             shootCone = 50f;
             targetAir = false;

@@ -46,6 +46,7 @@ public class Pal{
     lightFlame = Color.valueOf("ffdd55"),
     darkFlame = Color.valueOf("db401c"),
 
+    lighterPyraFlame = Color.valueOf("#ffee87"),
     lightPyraFlame = Color.valueOf("ffb855"),
     darkPyraFlame = Color.valueOf("db661c"),
 
