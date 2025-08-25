@@ -10,6 +10,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.entities.Units;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -60,6 +61,26 @@ public class ShieldArcAbility extends Ability{
             paramField.alpha = 1f;
         }
     };
+
+    protected static final Cons<Unit> unitConsumer = unit -> {
+        if(unit.team != paramUnit.team &&
+            !(unit.within(paramPos, paramField.radius - paramField.width) && paramPos.within(unit.x - unit.deltaX, unit.y - unit.deltaY, paramField.radius - paramField.width)) &&
+            (Tmp.v1.set(unit).add(unit.deltaX, unit.deltaY).within(paramPos, paramField.radius + paramField.width) || unit.within(paramPos, paramField.radius + paramField.width)) &&
+            (Angles.within(paramPos.angleTo(unit), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(unit.x + unit.deltaX, unit.y + unit.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
+                
+                float overlapDst = (unit.hitSize/2f + paramField.radius) - unit.dst(paramPos.x,paramPos.y);
+                
+                if(overlapDst>0){
+                // stop
+                unit.vel.setZero();
+                // get out
+                unit.move(Tmp.v1.set(unit).sub(paramUnit).setLength(overlapDst+0.01f));
+
+                if(Mathf.chanceDelta(0.12f*Time.delta)){Fx.circleColorSpark.at(unit.x,unit.y,paramUnit.team.color);
+                }
+            }
+        };
+    };  
 
     /** Shield radius. */
     public float radius = 60f;
@@ -124,6 +145,7 @@ public class ShieldArcAbility extends Ability{
 
             float reach = radius + width;
             Groups.bullet.intersect(paramPos.x - reach, paramPos.y - reach, reach * 2f, reach * 2f, shieldConsumer);
+            Units.nearbyEnemies(paramUnit.team, paramPos.x - reach, paramPos.y - reach, reach * 2f, reach * 2f, unitConsumer);
         }else{
             widthScale = Mathf.lerpDelta(widthScale, 0f, 0.11f);
         }
