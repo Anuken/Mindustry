@@ -46,16 +46,13 @@ public class LaunchLoadoutDialog extends BaseDialog{
         total.clear();
         selected.requirements().each(total::add);
         universe.getLaunchResources().each(total::add);
-
+        
         Planet planet = sector.planet;
-        if (sector.planet == destination.planet && !destination.allowLaunchLoadout()) {
+        if (sector.planet == destination.planet && !destination.allowLaunchLoadout() && !destination.allowLaunchSchematics()) {
             // can only launch to numbered if adjacent
             Seq<Sector> target = destination.preset != null ? destination.planet.sectors : destination.near();
             Sector st = target.find(u ->
-                u.items().has(total) // Required items for launch
-                        && !destination.allowLaunchSchematics()
-                        && !destination.allowLaunchLoadout()
-                        && u.isCaptured()
+                u.items().has(total) && u.isCaptured()
             );
             if (st != null) {
                 sector = st;
