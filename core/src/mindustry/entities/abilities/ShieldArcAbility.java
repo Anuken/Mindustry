@@ -1,6 +1,6 @@
 package mindustry.entities.abilities;
 
-import arc.audio.Sound;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -10,6 +10,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -25,7 +26,7 @@ public class ShieldArcAbility extends Ability{
             (Tmp.v1.set(b).add(b.deltaX, b.deltaY).within(paramPos, paramField.radius + paramField.width) || b.within(paramPos, paramField.radius + paramField.width)) &&
             (Angles.within(paramPos.angleTo(b), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(b.x + b.deltaX, b.y + b.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
 
-            if(paramField.chanceDeflect > 0f && b.vel.len() >= 0.1f && b.type.reflectable && Mathf.chance(paramField.chanceDeflect / b.damage())){
+            if(paramField.chanceDeflect > 0f && b.vel.len() >= 0.1f && b.type.reflectable && Mathf.chance(paramField.chanceDeflect)){
 
                 //make sound
                 paramField.deflectSound.at(paramPos, Mathf.random(0.9f, 1.1f));
@@ -68,19 +69,31 @@ public class ShieldArcAbility extends Ability{
             (Tmp.v1.set(unit).add(unit.deltaX, unit.deltaY).within(paramPos, paramField.radius + paramField.width) || unit.within(paramPos, paramField.radius + paramField.width)) &&
             (Angles.within(paramPos.angleTo(unit), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(unit.x + unit.deltaX, unit.y + unit.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
                 
-                float overlapDst = (unit.hitSize + paramField.radius) - unit.dst(paramPos.x,paramPos.y);
-                
-                if(overlapDst>0){
-                // stop
-                unit.vel.setZero();
-                // get out
-                unit.move(Tmp.v1.set(unit).sub(paramUnit).setLength(overlapDst+0.01f));
+            if(unit.isMissile() && unit.killable() && paramField.missileUnitMultiplier >= 0f){
 
-                if(Mathf.chanceDelta(0.12f*Time.delta)){Fx.circleColorSpark.at(unit.x,unit.y,paramUnit.team.color);
+                paramField.data -= unit.health() * paramField.missileUnitMultiplier * Vars.state.rules.unitDamage(unit.team);
+                paramField.alpha = 1f;
+                unit.remove();
+                unit.type.deathSound.at(unit);
+                unit.type.deathExplosionEffect.at(unit);
+                Fx.absorb.at(unit);
+
+            }else{
+
+                float reach = paramField.radius + paramField.width;
+                float overlapDst = reach - unit.dst(paramPos.x,paramPos.y);
+
+                if(overlapDst>0){
+                    // get out
+                    unit.move(Tmp.v1.set(unit).sub(paramUnit).setLength(overlapDst + 0.01f));
+
+                    if(Mathf.chanceDelta(0.12f*Time.delta)){
+                        Fx.circleColorSpark.at(unit.x,unit.y,paramUnit.team.color);
+                    }
                 }
             }
-        };
-    };  
+        }
+    };
 
     /** Shield radius. */
     public float radius = 60f;
@@ -102,6 +115,8 @@ public class ShieldArcAbility extends Ability{
     public float chanceDeflect = -1f;
     /** Deflection sound. */
     public Sound deflectSound = Sounds.none;
+    /** Multiplier for shield damage taken from missile units. */
+    public float missileUnitMultiplier = 2f;
 
     /** Whether to draw the arc line. */
     public boolean drawArc = true;
@@ -124,7 +139,7 @@ public class ShieldArcAbility extends Ability{
         t.row();
         t.add(abilityStat("cooldown", Strings.autoFixed(cooldown / 60f, 2)));
         t.row();
-        t.add(abilityStat("basedeflectchance", Strings.autoFixed(chanceDeflect, 2)));
+        t.add(abilityStat("deflectchance", Strings.autoFixed(chanceDeflect *100f, 2)));
     }
 
     @Override

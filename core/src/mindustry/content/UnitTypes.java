@@ -3326,7 +3326,7 @@ public class UnitTypes{
                 y = -20f;
                 width = 8f;
                 whenShooting = false;
-                chanceDeflect = 10f;
+                chanceDeflect = 1f;
             }});
 
             rotateSpeed = 2.1f;
