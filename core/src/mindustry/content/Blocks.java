@@ -63,7 +63,9 @@ public class Blocks{
     //old metal floors
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     //new metal floors
-    metalTiles1, metalTiles2, metalTiles3, metalTiles4, metalTiles5, metalTiles6, metalTiles7, metalTiles8, metalTiles9, metalTiles10, metalTiles11, metalTiles12,
+    metalTiles1, metalTiles2, metalTiles3, metalTiles4, metalTiles5, metalTiles6, metalTiles7, metalTiles8, metalTiles9, metalTiles10, metalTiles11, metalTiles12, metalTiles13,
+    //new metal walls
+    metalWall1, metalWall2, metalWall3, metalWall4,
 
     //colored
     coloredFloor, coloredWall,
@@ -906,6 +908,26 @@ public class Blocks{
             emitLight = true;
             lightRadius = 30f;
             lightColor = Team.crux.color.cpy().a(0.3f);
+        }};
+
+        metalTiles13 = new Floor("metal-tiles-13"){{
+            autotile = true;
+            drawEdgeOut = false;
+            drawEdgeIn = false;
+            autotileMidVariants = 6;
+        }};
+
+        metalWall1 = new StaticWall("metal-wall-1"){{
+            autotile = true;
+        }};
+
+        metalWall2 = new StaticWall("metal-wall-2"){{
+            autotile = true;
+            autotileMidVariants = 2;
+        }};
+
+        metalWall3 = new StaticWall("metal-wall-3"){{
+            autotile = true;
         }};
 
         coloredFloor = new ColoredFloor("colored-floor"){{
@@ -4392,7 +4414,7 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitSquaresColor;
                 buildingDamageMultiplier = 0.2f;
             }},
-            Items.oxide, new BasicBulletType(8f, 120){{
+            Items.oxide, new BasicBulletType(8f, 90){{
                 knockback = 3f;
                 width = 25f;
                 hitSize = 7f;
@@ -4655,14 +4677,12 @@ public class Blocks{
                 reloadMultiplier = 0.65f;
                 splashDamageRadius = 110f;
                 rangeChange = 8f;
-                splashDamage = 300f;
+                splashDamage = 150f;
                 scaledSplashDamage = true;
                 hitColor = backColor = trailColor = Color.valueOf("a0b380");
                 frontColor = Color.valueOf("e4ffd6");
                 ammoMultiplier = 1f;
                 hitSound = Sounds.titanExplosion;
-
-                status = StatusEffects.blasted;
 
                 trailLength = 32;
                 trailWidth = 3.35f;
@@ -4679,23 +4699,8 @@ public class Blocks{
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.25f;
-
-                fragBullets = 1;
-                fragBullet = new EmptyBulletType(){{
-                    lifetime = 60f * 2.5f;
-                    bulletInterval = 20f;
-                    intervalBullet = new EmptyBulletType(){{
-                        splashDamage = 30f;
-                        collidesGround = true;
-                        collidesAir = false;
-                        collides = false;
-                        hitEffect = Fx.none;
-                        pierce = true;
-                        instantDisappear = true;
-                        splashDamageRadius = 90f;
-                        buildingDamageMultiplier = 0.2f;
-                    }};
-                }};
+                status = StatusEffects.corroded;
+                statusDuration = 300f;
             }}
             );
 
@@ -4932,8 +4937,8 @@ public class Blocks{
         }};
 
         afflict = new PowerTurret("afflict"){{
-            requirements(Category.turret, with(Items.surgeAlloy, 125, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
-            buildCostMultiplier = 1.5f;
+            requirements(Category.turret, with(Items.surgeAlloy, 100, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
+            buildCostMultiplier = 1f;
 
             shootType = new BasicBulletType(){{
                 shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{
@@ -5003,7 +5008,7 @@ public class Blocks{
 
                 fragBullets = 20;
                 fragVelocityMin = 0.5f;
-                fragVelocityMax = 1.5f;
+                fragVelocityMax = 1.2f;
                 fragLifeMin = 0.5f;
             }};
 
@@ -5045,13 +5050,14 @@ public class Blocks{
             reload = 100f;
             cooldownTime = reload;
             recoil = 3f;
-            range = 350;
+            range = 368;
             shootCone = 20f;
             scaledHealth = 220;
             rotateSpeed = 1.5f;
             researchCostMultiplier = 0.04f;
+            buildCostMultiplier = 1.5f;
 
-            limitRange(9f);
+            limitRange(-55f);
         }};
 
         lustre = new ContinuousTurret("lustre"){{
@@ -5810,7 +5816,7 @@ public class Blocks{
             shootType = new FlakBulletType(8f, 70f){{
                 sprite = "missile-large";
 
-                lifetime = 45f;
+                lifetime = 40f;
                 width = 12f;
                 height = 22f;
 
@@ -5828,21 +5834,24 @@ public class Blocks{
                 trailEffect = Fx.colorSpark;
                 trailRotation = true;
                 trailInterval = 3f;
-                lightning = 1;
-                lightningCone = 15f;
-                lightningLength = 20;
-                lightningLengthRand = 30;
-                lightningDamage = 20f;
 
                 homingPower = 0.17f;
                 homingDelay = 19f;
                 homingRange = 160f;
 
-                explodeRange = 160f;
+                explodeRange = 100f;
                 explodeDelay = 0f;
 
                 flakInterval = 20f;
                 despawnShake = 3f;
+
+                intervalBullet = new LightningBulletType() {{
+                    lightningColor = circleColor;
+                    lightningCone = 15f;
+                    lightningLength = 35;
+                    lightningLengthRand = 5;
+                    damage = 18f;
+                }};
 
                 fragBullet = new LaserBulletType(65f){{
                     colors = new Color[]{haloColor.cpy().a(0.4f), haloColor, Color.white};
@@ -5854,11 +5863,14 @@ public class Blocks{
                     sideLength = 40f;
                     lifetime = 22f;
                     drawSize = 400f;
-                    length = 180f;
+                    length = 120f;
                     pierceCap = 2;
+                    optimalLifeFract = 1f;
                 }};
-
-                fragSpread = fragRandomSpread = 0f;
+                
+                fragBullets = intervalBullets = 1;
+                fragSpread = fragRandomSpread = intervalRandomSpread = 0f;
+                bulletInterval = 20f;
 
                 splashDamage = 0f;
                 hitEffect = Fx.hitSquaresColor;
@@ -6116,7 +6128,7 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             envEnabled |= Env.space;
             reload = 7f;
-            range = 380;
+            range = 410;
             trackingRange = range * 1.4f;
             shootCone = 100f;
             scaledHealth = 370;

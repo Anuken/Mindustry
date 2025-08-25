@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -177,6 +178,9 @@ public class MapEditor{
                     }else{
                         if(!(drawBlock.asFloor().wallOre && !tile.block().solid)){
                             tile.setFloor(drawBlock.asFloor());
+                            if(!(tile.overlay() instanceof OverlayFloor) && !drawBlock.asFloor().supportsOverlay){
+                                tile.setOverlay(Blocks.air);
+                            }
                             changed = true;
                         }
                     }
