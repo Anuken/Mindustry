@@ -94,7 +94,12 @@ public class Teams{
 
     /** Returns team data by type. */
     public TeamData get(Team team){
-        return map[team.id] == null ? (map[team.id] = new TeamData(team)) : map[team.id];
+        var data = map[team.id];
+        if(data != null){
+            return data;
+        }else{
+            return map[team.id] = new TeamData(team);
+        }
     }
 
     public @Nullable TeamData getOrNull(Team team){
@@ -276,7 +281,7 @@ public class Teams{
         /** Enemies with cores or spawn points. */
         public Team[] coreEnemies = {};
         /** Planned blocks for drones. This is usually only blocks that have been broken. */
-        public Queue<BlockPlan> plans = new Queue<>();
+        public Queue<BlockPlan> plans = new Queue<>(16, BlockPlan.class);
 
         /** List of live cores of this team. */
         public final Seq<CoreBuild> cores = new Seq<>();

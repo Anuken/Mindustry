@@ -47,7 +47,7 @@
         </array>
         <key>UIRequiredDeviceCapabilities</key>
         <array>
-            <string>armv7</string>
+            <string>arm64</string>
             <string>opengles-2</string>
         </array>
         <key>UISupportedInterfaceOrientations</key>

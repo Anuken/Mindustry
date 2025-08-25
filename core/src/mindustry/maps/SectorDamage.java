@@ -27,23 +27,24 @@ public class SectorDamage{
     private static final boolean rubble = true;
 
     /** @return calculated capture progress of the enemy */
-    public static float getDamage(SectorInfo info){
-        return getDamage(info, info.wavesPassed);
+    public static float getDamage(Sector sector){
+        return getDamage(sector, sector.info.wavesPassed);
     }
 
     /** @return calculated capture progress of the enemy */
-    public static float getDamage(SectorInfo info, int wavesPassed){
-        return getDamage(info, wavesPassed, false);
+    public static float getDamage(Sector sector, int wavesPassed){
+        return getDamage(sector, wavesPassed, false);
     }
 
     /** @return maximum waves survived, up to maxRetWave. */
-    public static int getWavesSurvived(SectorInfo info){
-        return (int)getDamage(info, maxRetWave, true);
+    public static int getWavesSurvived(Sector sector){
+        return (int)getDamage(sector, maxRetWave, true);
     }
 
     /** @return calculated capture progress of the enemy if retWave is false, otherwise return the maximum waves survived as int.
      * if it survives all the waves, returns maxRetWave. */
-    public static float getDamage(SectorInfo info, int wavesPassed, boolean retWave){
+    public static float getDamage(Sector sector, int wavesPassed, boolean retWave){
+        var info = sector.info;
         float health = info.sumHealth;
         int wave = info.wave;
         float waveSpace = info.waveSpacing;
@@ -64,18 +65,20 @@ public class SectorDamage{
             for(int i = waveBegin; i <= waveEnd; i++){
                 float enemyDps = 0f, enemyHealth = 0f;
 
-                for(SpawnGroup group : state.rules.spawns){
-                    //calculate the amount of spawn points used
-                    //if there's a spawn position override, there is only one potential place they spawn
-                    //assume that all overridden positions are valid, should always be true in properly designed campaign maps
-                    int spawnCount = group.spawn != -1 ? 1 : group.type.flying ? airSpawns : groundSpawns;
+                if(sector.save != null || sector.isBeingPlayed()){
+                    for(SpawnGroup group : (sector.isBeingPlayed() ? state.rules.spawns : sector.save.meta.rules.spawns)){
+                        //calculate the amount of spawn points used
+                        //if there's a spawn position override, there is only one potential place they spawn
+                        //assume that all overridden positions are valid, should always be true in properly designed campaign maps
+                        int spawnCount = group.spawn != -1 ? 1 : group.type.flying ? airSpawns : groundSpawns;
 
-                    float healthMult = 1f + Mathf.clamp(group.type.armor / 20f);
-                    StatusEffect effect = (group.effect == null ? StatusEffects.none : group.effect);
-                    int spawned = group.getSpawned(i) * spawnCount;
-                    if(spawned <= 0) continue;
-                    enemyHealth += spawned * (group.getShield(i) + group.type.health * effect.healthMultiplier * healthMult);
-                    enemyDps += spawned * group.type.dpsEstimate * effect.damageMultiplier;
+                        float healthMult = 1f + Mathf.clamp(group.type.armor / 20f);
+                        StatusEffect effect = (group.effect == null ? StatusEffects.none : group.effect);
+                        int spawned = group.getSpawned(i) * spawnCount;
+                        if(spawned <= 0) continue;
+                        enemyHealth += spawned * (group.getShield(i) + group.type.health * effect.healthMultiplier * healthMult);
+                        enemyDps += spawned * group.type.dpsEstimate * effect.damageMultiplier;
+                    }
                 }
 
                 float efficiency = health / info.sumHealth;
@@ -106,7 +109,7 @@ public class SectorDamage{
                 if(timeDestroyEnemy > timeDestroyBase){
                     health = 0f;
                     //return current wave if simulating
-                    if(retWave) return i - waveBegin;
+                    if(retWave) return Math.max(i - waveBegin - 1, waveBegin);
                     break;
                 }
 
@@ -132,7 +135,7 @@ public class SectorDamage{
     /** Applies wave damage based on sector parameters. */
     public static void applyCalculatedDamage(){
         //calculate base damage fraction
-        float damage = getDamage(state.rules.sector.info);
+        float damage = getDamage(state.rules.sector);
 
         //scaled damage has a power component to make it seem a little more realistic (as systems fail, enemy capturing gets easier and easier)
         float scaled = Mathf.pow(damage, 1.2f);
@@ -187,7 +190,8 @@ public class SectorDamage{
     }
 
     /** Calculates damage simulation parameters before a game is saved. */
-    public static void writeParameters(SectorInfo info){
+    public static void writeParameters(Sector sector){
+        var info = sector.info;
         Building core = state.rules.defaultTeam.core();
         Seq<Tile> spawns = new Seq<>();
         spawner.eachGroundSpawn((x, y) -> spawns.add(world.tile(x, y)));
@@ -370,7 +374,7 @@ public class SectorDamage{
         info.curEnemyDps = curEnemyDps*cmult;
         info.curEnemyHealth = curEnemyHealth*cmult;
 
-        info.wavesSurvived = getWavesSurvived(info);
+        info.wavesSurvived = getWavesSurvived(sector);
     }
 
     public static void apply(float fraction){

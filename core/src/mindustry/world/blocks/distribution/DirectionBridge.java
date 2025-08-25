@@ -88,10 +88,41 @@ public class DirectionBridge extends Block{
 
     public void drawPlace(int x, int y, int rotation, boolean valid, boolean line){
         int length = range;
+
+        if(line){
+            //find input links
+            for(int d = 0; d < 4; d++){
+                if(d == (rotation+2)%4) continue;
+
+                int dx = Geometry.d4x(d), dy = Geometry.d4y(d);
+
+                for(int i = 1; i <= range; i++){
+                    Tile other = world.tile(x - dx * i, y - dy * i);
+
+                    if(other != null && other.build instanceof DirectionBridgeBuild build && build.block == this && build.team == player.team()){
+                        if(build.rotation == d){
+                            var from = other.build;
+
+                            Drawf.dashLine(Pal.place,
+                            from.x + dx * (tilesize / 2f + 2),
+                            from.y + dy * (tilesize / 2f + 2),
+                            from.x + dx * (i) * tilesize,
+                            from.y + dy * (i) * tilesize
+                            );
+
+                            Drawf.square(from.x, from.y, from.block.size * tilesize/2f + 2.5f, 0f, Pal.place);
+                        }
+                        //always stop when a bridge is encountered, as it blocks incoming bridges from this side
+                        break;
+                    }
+                }
+            }
+        }
+
         Building found = null;
         int dx = Geometry.d4x(rotation), dy = Geometry.d4y(rotation);
 
-        //find the link
+        //find the output link
         for(int i = 1; i <= range; i++){
             Tile other = world.tile(x + dx * i, y + dy * i);
 

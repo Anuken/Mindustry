@@ -1,5 +1,7 @@
 package mindustry.maps.generators;
 
+import arc.*;
+import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
@@ -8,10 +10,11 @@ import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.graphics.g3d.*;
-import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -22,34 +25,28 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
 
     protected @Nullable Sector sector;
 
-    /** Should generate sector bases for a planet. */
     public void generateSector(Sector sector){
-        Ptile tile = sector.tile;
 
-        boolean any = false;
-        float noise = Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.001f, 0.5f);
+    }
 
-        if(noise > 0.027){
-            any = true;
-        }
+    public void onSectorCaptured(Sector sector){
 
-        if(noise < 0.15){
-            for(Ptile other : tile.tiles){
-                //no sectors near start sector!
-                if(sector.planet.getSector(other).id == sector.planet.startSector){
-                    return;
-                }
+    }
 
-                if(sector.planet.getSector(other).generateEnemyBase){
-                    any = false;
-                    break;
-                }
-            }
-        }
+    public void onSectorLost(Sector sector){
 
-        if(any){
-            sector.generateEnemyBase = true;
-        }
+    }
+
+    public void beforeSaveWrite(Sector sector){
+
+    }
+
+    public void getLockedText(Sector hovered, StringBuilder out){
+        out.append("[gray]").append(Iconc.lock).append(" ").append(Core.bundle.get("locked"));
+    }
+
+    public @Nullable TextureRegion getLockedIcon(Sector hovered){
+        return (hovered.preset == null && !hovered.planet.allowLaunchToNumbered ? null : Fonts.getLargeIcon("lock"));
     }
 
     /** @return whether to allow landing on the specified procedural sector */

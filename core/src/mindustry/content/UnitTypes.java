@@ -437,7 +437,7 @@ public class UnitTypes{
 
                 bullet = new LaserBulletType(){{
                     damage = 45f;
-                    recoil = 1f;
+                    recoil = 0f;
                     sideAngle = 45f;
                     sideWidth = 1f;
                     sideLength = 70f;
@@ -1267,6 +1267,7 @@ public class UnitTypes{
             engineOffset = 5.7f;
             range = 50f;
             isEnemy = false;
+            controlSelectGlobal = false;
 
             ammoType = new PowerAmmoType(500);
 
@@ -1889,7 +1890,6 @@ public class UnitTypes{
                 x = y = shootX = shootY = 0f;
                 shootSound = Sounds.mineDeploy;
                 rotateSpeed = 180f;
-                targetAir = false;
 
                 shoot.shots = 3;
                 shoot.shotDelay = 7f;
@@ -2177,6 +2177,7 @@ public class UnitTypes{
 
             buildSpeed = 3f;
             rotateToBuilding = false;
+            range = maxRange = 180f;
 
             abilities.add(new EnergyFieldAbility(40f, 65f, 180f){{
                 statusDuration = 60f * 6f;
@@ -2368,8 +2369,7 @@ public class UnitTypes{
         //region core
 
         alpha = new UnitType("alpha"){{
-            aiController = () -> new BuilderAI(true, 400f);
-            controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
+            controller = u -> u.team.isAI() ? new BuilderAI(true, 400f) : new CommandAI();
             isEnemy = false;
 
             targetBuildingsMobile = false;
@@ -2408,8 +2408,7 @@ public class UnitTypes{
         }};
 
         beta = new UnitType("beta"){{
-            aiController = () -> new BuilderAI(true, 400f);
-            controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
+            controller = u -> u.team.isAI() ? new BuilderAI(true, 400f) : new CommandAI();
             isEnemy = false;
 
             targetBuildingsMobile = false;
@@ -2451,8 +2450,7 @@ public class UnitTypes{
         }};
 
         gamma = new UnitType("gamma"){{
-            aiController = () -> new BuilderAI(true, 400f);
-            controller = u -> u.team.isAI() ? aiController.get() : new CommandAI();
+            controller = u -> u.team.isAI() ? new BuilderAI(true, 400f) : new CommandAI();
             isEnemy = false;
 
             targetBuildingsMobile = false;
@@ -2620,7 +2618,7 @@ public class UnitTypes{
         }};
 
         precept = new TankUnitType("precept"){{
-            hitSize = 26f;
+            hitSize = 24f;
             treadPullOffset = 5;
             speed = 0.64f;
             rotateSpeed = 1.5f;
@@ -2637,7 +2635,7 @@ public class UnitTypes{
                 shootY = 16f;
                 recoil = 3f;
                 rotate = true;
-                rotateSpeed = 1.3f;
+                rotateSpeed = 1.625f;
                 mirror = false;
                 shootCone = 2f;
                 x = 0f;
@@ -3007,7 +3005,7 @@ public class UnitTypes{
                 x = 0f;
                 y = 1f;
                 shootY = 4f;
-                reload = 60f;
+                reload = 63f;
                 cooldownTime = 42f;
                 heatColor = Pal.turretHeat;
 
@@ -3025,7 +3023,7 @@ public class UnitTypes{
                     frontColor = Color.white;
 
                     knockback = 0.8f;
-                    lifetime = 50f;
+                    lifetime = 46f;
                     width = height = 9f;
                     splashDamageRadius = 19f;
                     splashDamage = 30f;
@@ -3052,7 +3050,7 @@ public class UnitTypes{
         }};
 
         cleroi = new ErekirUnitType("cleroi"){{
-            speed = 0.7f;
+            speed = 0.6f;
             drag = 0.1f;
             hitSize = 14f;
             rotateSpeed = 3f;
@@ -3094,7 +3092,7 @@ public class UnitTypes{
                 shootSound = Sounds.blaster;
                 x = 14f / 4f;
                 y = 33f / 4f;
-                reload = 30f;
+                reload = 33f;
                 layerOffset = -0.002f;
                 alternate = false;
                 heatColor = Color.red;
@@ -3656,7 +3654,7 @@ public class UnitTypes{
             flying = true;
             drag = 0.08f;
             speed = 2f;
-            rotateSpeed = 4f;
+            rotateSpeed = 8f;
             accel = 0.09f;
             health = 1100f;
             armor = 3f;
@@ -3838,8 +3836,10 @@ public class UnitTypes{
 
             engineSize = 4.8f;
             engineOffset = 61 / 4f;
+            range = 4.3f * 60f * 1.4f;
 
             abilities.add(new SuppressionFieldAbility(){{
+                reload = 60f * 8f;
                 orbRadius = 5.3f;
                 y = 1f;
             }});
@@ -3855,36 +3855,59 @@ public class UnitTypes{
                 recoil = 1f;
                 rotationLimit = 60f;
 
-                bullet = new BulletType(){{
+                bullet = new BasicBulletType(4.3f, 70f, "missile-large"){{
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke2;
                     shake = 1f;
-                    speed = 0f;
+                    lifetime = 60 * 0.496f;
+                    rangeOverride = 361.2f;
+                    followAimSpeed = 5f;
+
+                    width = 12f;
+                    height = 22f;
+                    hitSize = 7f;
+                    hitColor = backColor = trailColor = Pal.sapBulletBack;
+                    trailWidth = 3f;
+                    trailLength = 12;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
+
                     keepVelocity = false;
+                    collidesGround = true;
                     collidesAir = false;
 
-                    spawnUnit = new MissileUnitType("quell-missile"){{
-                        targetAir = false;
-                        speed = 4.3f;
-                        maxRange = 6f;
-                        lifetime = 60f * 1.4f;
-                        outlineColor = Pal.darkOutline;
-                        engineColor = trailColor = Pal.sapBulletBack;
-                        engineLayer = Layer.effect;
-                        health = 45;
-                        loopSoundVolume = 0.1f;
+                    //workaround to get the missile to behave like in spawnUnit while still spawning on death
+                    fragRandomSpread = 0;
+                    fragBullets = 1;
+                    fragVelocityMin = 1f;
+                    fragOffsetMax = 1f;
 
-                        weapons.add(new Weapon(){{
-                            shootSound = Sounds.none;
-                            shootCone = 360f;
-                            mirror = false;
-                            reload = 1f;
-                            shootOnDeath = true;
-                            bullet = new ExplosionBulletType(110f, 25f){{
-                                shootEffect = Fx.massiveExplosion;
-                                collidesAir = false;
-                            }};
-                        }});
+                    fragBullet = new BulletType(){{
+                        speed = 0f;
+                        keepVelocity = false;
+                        collidesAir = false;
+                        spawnUnit = new MissileUnitType("quell-missile"){{
+                            targetAir = false;
+                            speed = 4.3f;
+                            maxRange = 6f;
+                            lifetime = 60f * (1.4f - 0.496f);
+                            outlineColor = Pal.darkOutline;
+                            engineColor = trailColor = Pal.sapBulletBack;
+                            engineLayer = Layer.effect;
+                            health = 45;
+                            loopSoundVolume = 0.1f;
+
+                            weapons.add(new Weapon() {{
+                                shootSound = Sounds.none;
+                                shootCone = 360f;
+                                mirror = false;
+                                reload = 1f;
+                                shootOnDeath = true;
+                                bullet = new ExplosionBulletType(110f, 25f) {{
+                                    shootEffect = Fx.massiveExplosion;
+                                    collidesAir = false;
+                                }};
+                            }});
+                        }};
                     }};
                 }};
             }});
@@ -3918,6 +3941,8 @@ public class UnitTypes{
             int parts = 10;
 
             abilities.add(new SuppressionFieldAbility(){{
+                reload = 60 * 15f;
+                range = 320f;
                 orbRadius = orbRad;
                 particleSize = partRad;
                 y = 10f;

@@ -1,5 +1,6 @@
 package mindustry.maps.planet;
 
+import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -10,7 +11,7 @@ import mindustry.ai.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
 import mindustry.game.*;
-import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.gen.*;
 import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -19,13 +20,16 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class SerpuloPlanetGenerator extends PlanetGenerator{
-    //alternate, less direct generation (wip)
-    public static boolean alt = false;
+    //alternate, less direct generation
+    public static boolean indirectPaths = false;
+    //random water patches
+    public static boolean genLakes = false;
 
     BaseGenerator basegen = new BaseGenerator();
+    float heightYOffset = 42.7f;
     float scl = 5f;
-    float waterOffset = 0.07f;
-    boolean genLakes = false;
+    float waterOffset = 0.04f;
+    float heightScl = 1.01f;
 
     Block[][] arr =
     {
@@ -57,47 +61,45 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     );
 
     float water = 2f / arr[0].length;
+    Vec3 basePos = new Vec3(0.9341721, 0.0, 0.3568221);
 
     float rawHeight(Vec3 position){
-        position = Tmp.v33.set(position).scl(scl);
-        return (Mathf.pow(Simplex.noise3d(seed, 7, 0.5f, 1f/3f, position.x, position.y, position.z), 2.3f) + waterOffset) / (1f + waterOffset);
+        return (Mathf.pow(Simplex.noise3d(seed, 7, 0.5f, 1f/3f, position.x * scl, position.y * scl + heightYOffset, position.z * scl) * heightScl, 2.3f) + waterOffset) / (1f + waterOffset);
     }
 
     @Override
-    public void generateSector(Sector sector){
+    public void onSectorCaptured(Sector sector){
+        sector.planet.reloadMeshAsync();
+    }
 
-        //these always have bases
-        if(sector.id == 154 || sector.id == 0){
-            sector.generateEnemyBase = true;
-            return;
+    @Override
+    public void onSectorLost(Sector sector){
+        sector.planet.reloadMeshAsync();
+    }
+
+    @Override
+    public void beforeSaveWrite(Sector sector){
+        sector.planet.reloadMeshAsync();
+    }
+
+    @Override
+    public boolean isEmissive(){
+        return true;
+    }
+
+    @Override
+    public boolean allowLanding(Sector sector){
+        return sector.planet.allowLaunchToNumbered && (sector.hasBase() || sector.near().contains(s -> s.hasBase() &&
+            (s.info.bestCoreType.size >= 4 || s.isBeingPlayed() && state.rules.defaultTeam.cores().contains(b -> b.block.size >= 4))));
+    }
+
+    @Override
+    public void getLockedText(Sector hovered, StringBuilder out){
+        if((hovered.preset == null || !hovered.preset.requireUnlock) && hovered.near().contains(Sector::hasBase)){
+            out.append("[red]").append(Iconc.cancel).append("[]").append(Blocks.coreFoundation.emoji()).append(Core.bundle.get("sector.foundationrequired"));
+        }else{
+            super.getLockedText(hovered, out);
         }
-
-        Ptile tile = sector.tile;
-
-        boolean any = false;
-        float poles = Math.abs(tile.v.y);
-        float noise = Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.001f, 0.58f);
-
-        if(noise + poles/7.1 > 0.12 && poles > 0.23){
-            any = true;
-        }
-
-        if(noise < 0.16){
-            for(Ptile other : tile.tiles){
-                var osec = sector.planet.getSector(other);
-
-                //no sectors near start sector!
-                if(
-                    osec.id == sector.planet.startSector || //near starting sector
-                    osec.generateEnemyBase && poles < 0.85 || //near other base
-                    (sector.preset != null && noise < 0.11) //near preset
-                ){
-                    return;
-                }
-            }
-        }
-
-        sector.generateEnemyBase = any;
     }
 
     @Override
@@ -107,16 +109,57 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     }
 
     @Override
-    public Color getColor(Vec3 position){
+    public void getColor(Vec3 position, Color out){
         Block block = getBlock(position);
         //replace salt with sand color
-        if(block == Blocks.salt) return Blocks.sand.mapColor;
-        return Tmp.c1.set(block.mapColor).a(1f - block.albedo);
+        if(block == Blocks.salt) block = Blocks.sand;
+        out.set(block.mapColor).a(1f - block.albedo);
+    }
+
+    @Override
+    public void getEmissiveColor(Vec3 position, Color out){
+        float dst = 999f, captureDst = 999f, lightScl = 0f;
+
+        Object[] sectors = Planets.serpulo.sectors.items;
+        int size = Planets.serpulo.sectors.size;
+
+        for(int i = 0; i < size; i ++){
+            var sector = (Sector)sectors[i];
+
+            if(sector.hasEnemyBase() && !sector.isCaptured()){
+                dst = Math.min(dst, position.dst(sector.tile.v) - (sector.preset != null ? sector.preset.difficulty/10f * 0.03f - 0.03f : 0f));
+            }else if(sector.hasBase()){
+                float cdst = position.dst(sector.tile.v);
+                if(cdst < captureDst){
+                    captureDst = cdst;
+                    lightScl = sector.info.lightCoverage;
+                }
+            }
+        }
+
+        lightScl = Math.min(lightScl / 50000f, 1.3f);
+        if(lightScl < 1f) lightScl = Interp.pow5Out.apply(lightScl);
+
+        float freq = 0.05f;
+        if(position.dst(basePos) < 0.55f ?
+
+            dst*metalDstScl + Simplex.noise3d(seed + 1, 3, 0.4, 5.5f, position.x, position.y + 200f, position.z)*0.08f + ((basePos.dst(position) + 0.00f) % freq < freq/2f ? 1f : 0f) * 0.07f < 0.08f/* || dst <= 0.0001f*/ :
+            dst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 9f, position.x, position.y + 370f, position.z)*0.06f < 0.045){
+
+            out.set(Team.crux.color)
+                .mul(0.8f + Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 99f, position.z) * 0.4f)
+                .lerp(Team.sharded.color, 0.2f*Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 999f, position.z)).toFloatBits();
+        }else if(captureDst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 9f, position.x, position.y + 600f, position.z)*0.07f < 0.05 * lightScl){
+            out.set(Team.sharded.color).mul(0.7f + Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 99f, position.z) * 0.4f)
+                .lerp(Team.crux.color, 0.3f*Simplex.noise3d(seed, 1, 1, 9f, position.x, position.y + 999f, position.z)).toFloatBits();
+
+        }
     }
 
     @Override
     public void genTile(Vec3 position, TileGen tile){
         tile.floor = getBlock(position);
+        if(tile.floor == Blocks.darkPanel6) tile.floor = Blocks.darkPanel3;
         tile.block = tile.floor.asFloor().wall;
 
         if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 2, 22) > 0.31){
@@ -124,23 +167,46 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         }
     }
 
+    static double metalDstScl = 0.25;
+
     Block getBlock(Vec3 position){
         float height = rawHeight(position);
-        Tmp.v31.set(position);
-        position = Tmp.v33.set(position).scl(scl);
+        float px = position.x * scl, py = position.y * scl, pz = position.z * scl;
+
         float rad = scl;
-        float temp = Mathf.clamp(Math.abs(position.y * 2f) / (rad));
-        float tnoise = Simplex.noise3d(seed, 7, 0.56, 1f/3f, position.x, position.y + 999f, position.z);
+        float temp = Mathf.clamp(Math.abs(py * 2f) / (rad));
+        float tnoise = Simplex.noise3d(seed, 7, 0.56, 1f/3f, px, py + 999f - 0.1f, pz);
         temp = Mathf.lerp(temp, tnoise, 0.5f);
         height *= 1.2f;
         height = Mathf.clamp(height);
 
-        float tar = Simplex.noise3d(seed, 4, 0.55f, 1f/2f, position.x, position.y + 999f, position.z) * 0.3f + Tmp.v31.dst(0, 0, 1f) * 0.2f;
+        float tar = Simplex.noise3d(seed, 4, 0.55f, 1f/2f, px, py + 999f, pz) * 0.3f + position.dst(0, 0, 1f) * 0.2f;
 
         Block res = arr[Mathf.clamp((int)(temp * arr.length), 0, arr[0].length - 1)][Mathf.clamp((int)(height * arr[0].length), 0, arr[0].length - 1)];
         if(tar > 0.5f){
             return tars.get(res, res);
         }else{
+            if(position.within(basePos, 0.65f)){
+
+                float dst = 999f;
+
+                Object[] sectors = Planets.serpulo.sectors.items;
+                int size = Planets.serpulo.sectors.size;
+
+                for(int i = 0; i < size; i ++){
+                    var sector = (Sector)sectors[i];
+
+                    if(sector.hasEnemyBase()){
+                        dst = Math.min(dst, position.dst(sector.tile.v));
+                    }
+                }
+
+                float freq = 0.05f, freq2 = 0.07f;
+
+                if(dst*0.85f + Simplex.noise3d(seed, 3, 0.4, 5.5f, position.x, position.y + 200f, position.z)*0.015f + ((basePos.dst(position) + 0.00f) % freq < freq/2f ? 1f : 0f) * 0.07f < 0.15f){
+                    return ((basePos.dst(position) + 0.01f) % freq2 < freq2*0.65f) ? Blocks.metalFloor : Blocks.darkPanel6;
+                }
+            }
             return res;
         }
     }
@@ -177,7 +243,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                 Vec2 midpoint = Tmp.v1.set(to.x, to.y).add(x, y).scl(0.5f);
                 rand.nextFloat();
 
-                if(alt){
+                if(indirectPaths){
                     midpoint.add(Tmp.v2.set(1, 0f).setAngle(Angles.angle(to.x, to.y, x, y) + 90f * (rand.chance(0.5) ? 1f : -1f)).scl(Tmp.v1.dst(x, y) * 2f));
                 }else{
                     //add randomized offset to avoid straight lines

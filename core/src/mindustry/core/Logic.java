@@ -3,10 +3,13 @@ package mindustry.core;
 import arc.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -15,6 +18,7 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
@@ -65,9 +69,8 @@ public class Logic implements ApplicationListener{
         Events.on(SaveLoadEvent.class, e -> {
             if(state.isCampaign()){
                 state.rules.coreIncinerates = true;
-
-                //TODO why is this even a thing?
                 state.rules.canGameOver = true;
+                state.rules.allowEditRules = false;
 
                 //fresh map has no sector info
                 if(!e.isMap){
@@ -131,16 +134,11 @@ public class Logic implements ApplicationListener{
                 //enable building AI on campaign unless the preset disables it
 
                 state.rules.coreIncinerates = true;
+                state.rules.allowEditRules = false;
                 state.rules.allowEditWorldProcessors = false;
                 state.rules.waveTeam.rules().infiniteResources = true;
+                state.rules.waveTeam.rules().fillItems = true;
                 state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
-
-                //fill enemy cores by default? TODO decide
-                for(var core : state.rules.waveTeam.cores()){
-                    for(Item item : content.items()){
-                        core.items.set(item, core.block.itemCapacity);
-                    }
-                }
             }
 
             //save settings
@@ -157,6 +155,16 @@ public class Logic implements ApplicationListener{
         Events.on(SectorCaptureEvent.class, e -> {
             if(!net.client() && e.sector == state.getSector() && e.sector.isBeingPlayed()){
                 state.rules.waveTeam.data().destroyToDerelict();
+            }
+
+            if(!net.client() && e.sector.planet.generator != null){
+                e.sector.planet.generator.onSectorCaptured(e.sector);
+            }
+        });
+
+        Events.on(SectorLoseEvent.class, e -> {
+            if(!net.client() && e.sector.planet.generator != null){
+                e.sector.planet.generator.onSectorLost(e.sector);
             }
         });
 
@@ -460,15 +468,38 @@ public class Logic implements ApplicationListener{
                     updateWeather();
 
                     for(TeamData data : state.teams.getActive()){
+                        var rules = data.team.rules();
+                        if(rules.fillItems && data.cores.size > 0){
+                            var core = data.cores.first();
+                            content.items().each(i -> {
+                                if(i.isOnPlanet(Vars.state.getPlanet()) && !i.isHidden()){
+                                    core.items.set(i, core.getMaximumAccepted(i));
+                                }
+                            });
+                        }
                         //does not work on PvP so built-in attack maps can have it on by default without issues
-                        if(data.team.rules().buildAi && !state.rules.pvp){
+                        if(rules.buildAi && !state.rules.pvp){
                             if(data.buildAi == null) data.buildAi = new BaseBuilderAI(data);
                             data.buildAi.update();
                         }
 
-                        if(data.team.rules().rtsAi){
+                        if(rules.rtsAi){
                             if(data.rtsAi == null) data.rtsAi = new RtsAI(data);
                             data.rtsAi.update();
+                        }
+
+                        //spawn units for prebuild AI cores
+                        if(rules.prebuildAi && !state.isEditor()){
+                            for(var core : data.cores){
+                                var units = data.getUnits(((CoreBlock)core.block).unitType);
+                                if(units == null || !units.contains(u -> u.flag == core.pos())){
+                                    Unit unit = ((CoreBlock)core.block).unitType.spawn(core, data.team);
+                                    unit.flag = core.pos();
+                                    unit.add();
+                                    Units.notifyUnitSpawn(unit);
+                                    Fx.spawn.at(unit);
+                                }
+                            }
                         }
                     }
                 }

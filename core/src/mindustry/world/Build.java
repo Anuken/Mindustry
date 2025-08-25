@@ -66,9 +66,9 @@ public class Build{
         Events.fire(new BlockBuildBeginEvent(tile, team, unit, true));
     }
 
-    /** Places a ConstructBlock at this location. */
+    /** Places a ConstructBlock at this location. To preserve bandwidth, a config is only passed in the case of instant-place blocks. */
     @Remote(called = Loc.server)
-    public static void beginPlace(@Nullable Unit unit, Block result, Team team, int x, int y, int rotation){
+    public static void beginPlace(@Nullable Unit unit, Block result, Team team, int x, int y, int rotation, @Nullable Object placeConfig){
         if(!validPlace(result, team, x, y, rotation)){
             return;
         }
@@ -127,7 +127,7 @@ public class Build{
         if(result.instantBuild){
             Events.fire(new BlockBuildBeginEvent(tile, team, unit, false));
             result.placeBegan(tile, tile.block, unit);
-            ConstructBlock.constructFinish(tile, result, unit, (byte)rotation, team, null);
+            ConstructBlock.constructFinish(tile, result, unit, (byte)rotation, team, placeConfig);
             return;
         }
 

@@ -53,6 +53,9 @@ public class BuilderAI extends AIController{
 
         unit.updateBuilding = true;
 
+        if(assistFollowing != null && !assistFollowing.isValid()) assistFollowing = null;
+        if(following != null && !following.isValid()) following = null;
+
         if(assistFollowing != null && assistFollowing.activelyBuilding()){
             following = assistFollowing;
         }
@@ -206,11 +209,17 @@ public class BuilderAI extends AIController{
 
     @Override
     public AIController fallback(){
+        if(unit.team.isAI() && unit.team.rules().prebuildAi){
+            return new PrebuildAI();
+        }
         return unit.type.flying ? new FlyingAI() : new GroundAI();
     }
 
     @Override
     public boolean useFallback(){
+        if(unit.team.isAI() && unit.team.rules().prebuildAi){
+            return true;
+        }
         return state.rules.waves && unit.team == state.rules.waveTeam && !unit.team.rules().rtsAi;
     }
 

@@ -118,7 +118,7 @@ public abstract class SaveVersion extends SaveFileReader{
     public void writeMeta(DataOutput stream, StringMap tags) throws IOException{
         //prepare campaign data for writing
         if(state.isCampaign()){
-            state.rules.sector.info.prepare();
+            state.rules.sector.info.prepare(state.rules.sector);
             state.rules.sector.saveInfo();
         }
 
@@ -140,6 +140,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
             "rules", JsonIO.write(state.rules),
+            "sectorPreset", state.rules.sector != null && state.rules.sector.preset != null ? state.rules.sector.preset.name : "", //empty string is a placeholder for null (null is possible but may be finicky)
             "locales", JsonIO.write(state.mapLocales),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
             "controlGroups", headless || control == null ? "null" : JsonIO.write(control.input.controlGroups),
@@ -208,7 +209,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
         //floor + overlay
         for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.rawTile(i % world.width(), i / world.width());
+            Tile tile = world.tiles.geti(i);
             stream.writeShort(tile.floorID());
             stream.writeShort(tile.overlayID());
             int consecutives = 0;
@@ -229,15 +230,25 @@ public abstract class SaveVersion extends SaveFileReader{
 
         //blocks
         for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.rawTile(i % world.width(), i / world.width());
+            Tile tile = world.tiles.geti(i);
             stream.writeShort(tile.blockID());
 
-            boolean savedata = tile.floor().saveData || tile.overlay().saveData || tile.block().saveData;
+            boolean savedata = tile.shouldSaveData();
 
-            byte packed = (byte)((tile.build != null ? 1 : 0) | (savedata ? 2 : 0));
+            //in the old version, the second bit was set to indicate presence of data, but that approach was flawed - it didn't allow buildings + data on the same tile
+            //so now the third bit is used instead
+            byte packed = (byte)((tile.build != null ? 1 : 0) | (savedata ? 4 : 0));
 
-            //make note of whether there was an entity/rotation here
+            //make note of whether there was an entity or custom tile data here
             stream.writeByte(packed);
+
+            if(savedata){
+                //the new 'extra data' format writes 7 bytes of data instead of 1
+                stream.writeByte(tile.data);
+                stream.writeByte(tile.floorData);
+                stream.writeByte(tile.overlayData);
+                stream.writeInt(tile.extraData);
+            }
 
             //only write the entity for multiblocks once - in the center
             if(tile.build != null){
@@ -250,16 +261,14 @@ public abstract class SaveVersion extends SaveFileReader{
                 }else{
                     stream.writeBoolean(false);
                 }
-            }else if(savedata){
-                stream.writeByte(tile.data);
-            }else{
+            }else if(!savedata){ //don't write consecutive blocks when there is custom data
                 //write consecutive non-entity blocks
                 int consecutives = 0;
 
                 for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
                     Tile nextTile = world.rawTile(j % world.width(), j / world.width());
 
-                    if(nextTile.blockID() != tile.blockID()){
+                    if(nextTile.blockID() != tile.blockID() || savedata != nextTile.shouldSaveData()){
                         break;
                     }
 
@@ -309,7 +318,19 @@ public abstract class SaveVersion extends SaveFileReader{
                 boolean isCenter = true;
                 byte packedCheck = stream.readByte();
                 boolean hadEntity = (packedCheck & 1) != 0;
-                boolean hadData = (packedCheck & 2) != 0;
+                //old data format (bit 2): 1 byte only if no building is present
+                //new data format (bit 3): 7 bytes (3x block-specific bytes + 1x 4-byte extra data int)
+                boolean hadDataOld = (packedCheck & 2) != 0, hadDataNew = (packedCheck & 4) != 0;
+
+                byte data = 0, floorData = 0, overlayData = 0;
+                int extraData = 0;
+
+                if(hadDataNew){
+                    data = stream.readByte();
+                    floorData = stream.readByte();
+                    overlayData = stream.readByte();
+                    extraData = stream.readInt();
+                }
 
                 if(hadEntity){
                     isCenter = stream.readBoolean();
@@ -318,6 +339,15 @@ public abstract class SaveVersion extends SaveFileReader{
                 //set block only if this is the center; otherwise, it's handled elsewhere
                 if(isCenter){
                     tile.setBlock(block);
+                }
+
+                //must be assigned after setBlock, because that can reset data
+                if(hadDataNew){
+                    tile.data = data;
+                    tile.floorData = floorData;
+                    tile.overlayData = overlayData;
+                    tile.extraData = extraData;
+                    context.onReadTileData();
                 }
 
                 if(hadEntity){
@@ -338,9 +368,12 @@ public abstract class SaveVersion extends SaveFileReader{
 
                         context.onReadBuilding();
                     }
-                }else if(hadData){
-                    tile.setBlock(block);
-                    tile.data = stream.readByte();
+                }else if(hadDataOld || hadDataNew){ //never read consecutive blocks if there's any kind of data
+                    if(hadDataOld){
+                        tile.setBlock(block);
+                        //the old data format was only read in the case where there is no building, and only contained a single byte
+                        tile.data = stream.readByte();
+                    }
                 }else{
                     int consecutives = stream.readUnsignedByte();
 

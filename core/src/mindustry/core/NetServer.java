@@ -23,6 +23,7 @@ import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.net.*;
@@ -51,7 +52,7 @@ public class NetServer implements ApplicationListener{
         if(state.rules.pvp){
             //find team with minimum amount of players and auto-assign player to that.
             TeamData re = state.teams.getActive().min(data -> {
-                if((state.rules.waveTeam == data.team && state.rules.waves) || !data.team.active() || data.team == Team.derelict) return Integer.MAX_VALUE;
+                if((state.rules.waveTeam == data.team && state.rules.waves) || !data.hasCore() || data.team == Team.derelict) return Integer.MAX_VALUE;
 
                 int count = 0;
                 for(Player other : players){
@@ -508,7 +509,7 @@ public class NetServer implements ApplicationListener{
         data.stream = new ByteArrayInputStream(stream.toByteArray());
         player.con.sendStream(data);
 
-        debug("Packed @ bytes of world data.", stream.size());
+        debug("Packed @ bytes of world data to @ (@ / @)", stream.size(), player.name, player.con.address, player.uuid());
     }
 
     public void addPacketHandler(String type, Cons2<Player, String> handler){
@@ -931,19 +932,20 @@ public class NetServer implements ApplicationListener{
         syncStream.reset();
 
         short sent = 0;
-        for(Building entity : Groups.build){
-            if(!entity.block.sync) continue;
-            sent++;
+        for(var team : state.teams.present){
+            for(var build : indexer.getFlagged(team.team, BlockFlag.synced)){
+                sent++;
 
-            dataStream.writeInt(entity.pos());
-            dataStream.writeShort(entity.block.id);
-            entity.writeSync(Writes.get(dataStream));
+                dataStream.writeInt(build.pos());
+                dataStream.writeShort(build.block.id);
+                build.writeSync(Writes.get(dataStream));
 
-            if(syncStream.size() > maxSnapshotSize){
-                dataStream.close();
-                Call.blockSnapshot(sent, syncStream.toByteArray());
-                sent = 0;
-                syncStream.reset();
+                if(syncStream.size() > maxSnapshotSize){
+                    dataStream.close();
+                    Call.blockSnapshot(sent, syncStream.toByteArray());
+                    sent = 0;
+                    syncStream.reset();
+                }
             }
         }
 

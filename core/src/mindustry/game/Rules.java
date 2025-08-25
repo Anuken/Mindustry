@@ -34,6 +34,8 @@ public class Rules{
     public boolean waves;
     /** Whether air units spawn at spawns instead of the edge of the map */
     public boolean airUseSpawns = false;
+    /** If true, units spawn at enemy cores in attack maps with waves enabled. */
+    public boolean wavesSpawnAtCores = true;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
     public boolean pvp;
     /** Whether is waiting for players enabled in PvP. */
@@ -297,10 +299,14 @@ public class Rules{
         public boolean aiCoreSpawn = true;
         /** If true, blocks don't require power or resources. */
         public boolean cheat;
+        /** If true, the core is always filled to capacity with all items. */
+        public boolean fillItems;
         /** If true, resources are not consumed when building. */
         public boolean infiniteResources;
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
+        /** EXPERIMENTAL, DO NOT USE: Pre-built base AI. Gives the illusion of intelligent design of pre-building an attack base. */
+        public boolean prebuildAi;
 
         /** AI that builds random schematics. */
         public boolean buildAi;

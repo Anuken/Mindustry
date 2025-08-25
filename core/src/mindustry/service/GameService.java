@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.gen.*;
@@ -393,6 +394,10 @@ public class GameService{
 
                 if(e.unit.type == UnitTypes.eclipse && e.bullet.owner instanceof TurretBuild turret && turret.block == Blocks.duo){
                     killEclipseDuo.complete();
+                }
+
+                if(e.bullet.type instanceof MassDriverBolt){
+                    killMassDriver.complete();
                 }
             }
         });

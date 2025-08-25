@@ -23,7 +23,7 @@ public class ContentInfoDialog extends BaseDialog{
         addCloseButton();
 
         keyDown(key -> {
-            if(key == keybinds.get(Binding.block_info).key){
+            if(key == Binding.blockInfo.value.key){
                 Core.app.post(this::hide);
             }
         });

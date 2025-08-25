@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 buildscript{
     ext{
         arcHash = property("archash")
@@ -115,7 +117,7 @@ allprojects{
                 output += name.substring("bundle".length() + 1, name.lastIndexOf('.')) + "\n"
             }
             new File(project(':core').projectDir, 'assets/locales').text = output
-            new File(project(':core').projectDir, 'assets/basepartnames').text = new File(project(':core').projectDir, 'assets/baseparts/').list().sort().join("\n")
+            new File(project(':core').projectDir, 'assets/basepartnames').text = new File(project(':core').projectDir, 'assets/baseparts/').list().sort().findAll{f -> f.endsWith(".msch")}.join("\n")
         }
 
         writeVersion = {
@@ -137,6 +139,7 @@ allprojects{
                 props["number"] = versionNumber
                 props["modifier"] = versionModifier
                 props["build"] = buildid
+                props["buildDate"] = new SimpleDateFormat("MMMM d, yyyy HH:mm a", Locale.getDefault()).format(new Date())
                 props["commitHash"] = "unknown"
                 if(project.hasProperty("showCommitHash")){
                     props["commitHash"] = getCommitHash()
@@ -241,6 +244,7 @@ project(":desktop"){
 
     dependencies{
         implementation project(":core")
+        implementation arcModule("extensions:profiling")
         implementation arcModule("extensions:discord")
         implementation arcModule("natives:natives-filedialogs")
         implementation arcModule("natives:natives-desktop")

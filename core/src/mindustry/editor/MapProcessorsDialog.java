@@ -41,7 +41,7 @@ public class MapProcessorsDialog extends BaseDialog{
                         foundAny = true;
                         tile.setNet(Blocks.worldProcessor, Team.sharded, 0);
                         if(ui.editor.isShown()){
-                            Vars.editor.renderer.updatePoint(x, y);
+                            Vars.editor.renderer.updateStatic(x, y);
                         }
                         break outer;
                     }

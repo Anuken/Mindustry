@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
@@ -115,6 +116,14 @@ public class BlockIndexer{
             }
 
             updatePresentOres();
+
+            for(Team team : Team.all){
+                var data = state.teams.get(team);
+
+                if(team.rules().prebuildAi && data.hasCore()){
+                    PrebuildAI.sortPlans(data.plans);
+                }
+            }
         });
     }
 
@@ -132,7 +141,7 @@ public class BlockIndexer{
     }
 
     private void removeFloorIndex(Tile tile, Floor floor){
-        if(floor.flags.size == 0) return;
+        if(floor.flags.size == 0 || floorMap == null) return;
 
         for(var flag : floor.flags.array){
             getFlaggedFloors(flag).remove(tile);
@@ -140,7 +149,7 @@ public class BlockIndexer{
     }
 
     private void addFloorIndex(Tile tile, Floor floor){
-        if(floor.flags.size == 0 || !floor.shouldIndex(tile)) return;
+        if(floor.flags.size == 0 || !floor.shouldIndex(tile) || floorMap == null) return;
 
         for(var flag : floor.flags.array){
             getFlaggedFloors(flag).add(tile);
@@ -194,43 +203,44 @@ public class BlockIndexer{
         }
     }
 
-    public void addIndex(Tile tile){
-        process(tile);
+    public void addIndex(Tile base){
+        process(base);
 
-        Item drop = tile.drop(), wallDrop = tile.wallDrop();
-        if(drop == null && wallDrop == null) return;
-        int qx = tile.x / quadrantSize, qy = tile.y / quadrantSize;
-        int pos = tile.pos();
+        base.getLinkedTiles(tile -> {
+            Item drop = tile.drop(), wallDrop = tile.wallDrop();
+            if(drop == null && wallDrop == null) return;
+            int qx = tile.x / quadrantSize, qy = tile.y / quadrantSize;
+            int pos = tile.pos();
 
-        if(tile.block() == Blocks.air){
-            if(drop != null){ //floor
-                if(ores[drop.id] == null) ores[drop.id] = new IntSeq[quadWidth][quadHeight];
-                if(ores[drop.id][qx][qy] == null) ores[drop.id][qx][qy] = new IntSeq(false, 16);
-                if(ores[drop.id][qx][qy].addUnique(pos)){
-                    int old = allOres.increment(drop); //increment ore count only if not already counted
-                    if(old == 0) updatePresentOres();
+            if(tile.block() == Blocks.air){
+                if(drop != null){ //floor
+                    if(ores[drop.id] == null) ores[drop.id] = new IntSeq[quadWidth][quadHeight];
+                    if(ores[drop.id][qx][qy] == null) ores[drop.id][qx][qy] = new IntSeq(false, 16);
+                    if(ores[drop.id][qx][qy].addUnique(pos)){
+                        int old = allOres.increment(drop); //increment ore count only if not already counted
+                        if(old == 0) updatePresentOres();
+                    }
+                }
+                if(wallDrop != null && wallOres != null && wallOres[wallDrop.id] != null && wallOres[wallDrop.id][qx][qy] != null && wallOres[wallDrop.id][qx][qy].removeValue(pos)){ //wall
+                    int old = allWallOres.increment(wallDrop, -1);
+                    if(old == 1) updatePresentOres();
+                }
+            }else{
+                if(wallDrop != null){ //wall
+                    if(wallOres[wallDrop.id] == null) wallOres[wallDrop.id] = new IntSeq[quadWidth][quadHeight];
+                    if(wallOres[wallDrop.id][qx][qy] == null) wallOres[wallDrop.id][qx][qy] = new IntSeq(false, 16);
+                    if(wallOres[wallDrop.id][qx][qy].addUnique(pos)){
+                        int old = allWallOres.increment(wallDrop); //increment ore count only if not already counted
+                        if(old == 0) updatePresentOres();
+                    }
+                }
+
+                if(drop != null && ores != null && ores[drop.id] != null && ores[drop.id][qx][qy] != null && ores[drop.id][qx][qy].removeValue(pos)){ //floor
+                    int old = allOres.increment(drop, -1);
+                    if(old == 1) updatePresentOres();
                 }
             }
-            if(wallDrop != null && wallOres != null && wallOres[wallDrop.id] != null && wallOres[wallDrop.id][qx][qy] != null && wallOres[wallDrop.id][qx][qy].removeValue(pos)){ //wall
-                int old = allWallOres.increment(wallDrop, -1);
-                if(old == 1) updatePresentOres();
-            }
-        }else{
-            if(wallDrop != null){ //wall
-                if(wallOres[wallDrop.id] == null) wallOres[wallDrop.id] = new IntSeq[quadWidth][quadHeight];
-                if(wallOres[wallDrop.id][qx][qy] == null) wallOres[wallDrop.id][qx][qy] = new IntSeq(false, 16);
-                if(wallOres[wallDrop.id][qx][qy].addUnique(pos)){
-                    int old = allWallOres.increment(wallDrop); //increment ore count only if not already counted
-                    if(old == 0) updatePresentOres();
-                }
-            }
-
-            if(drop != null && ores != null && ores[drop.id] != null && ores[drop.id][qx][qy] != null && ores[drop.id][qx][qy].removeValue(pos)){ //floor
-                int old = allOres.increment(drop, -1);
-                if(old == 1) updatePresentOres();
-            }
-        }
-
+        });
     }
 
     /** @return whether a certain block is anywhere on this map. */

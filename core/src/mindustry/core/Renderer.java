@@ -40,7 +40,7 @@ public class Renderer implements ApplicationListener{
     public @Nullable Bloom bloom;
     public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false;
+    public boolean animateShields, animateWater, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false;
     public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in, used by cutscenes */
     public float minZoom = 1.5f, maxZoom = 6f;
@@ -101,7 +101,7 @@ public class Renderer implements ApplicationListener{
     public void init(){
         planets = new PlanetRenderer();
 
-        if(settings.getBool("bloom", !ios)){
+        if(settings.getBool("bloom", true)){
             setupBloom();
         }
 
@@ -167,6 +167,7 @@ public class Renderer implements ApplicationListener{
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
         animateShields = settings.getBool("animatedshields");
+        animateWater = settings.getBool("animatedwater");
         drawStatus = settings.getBool("blockstatus");
         enableEffects = settings.getBool("effects");
         drawDisplays = !settings.getBool("hidedisplays");
@@ -233,7 +234,7 @@ public class Renderer implements ApplicationListener{
                     case Gl.invalidFramebufferOperation -> "invalid framebuffer operation";
                     case Gl.invalidEnum -> "invalid enum";
                     case Gl.outOfMemory -> "out of memory";
-                    default -> "unknown error " + (error);
+                    default -> "unknown error (" + error + ")";
                 };
 
                 Log.err("[GL] Error: @", message);
@@ -310,7 +311,7 @@ public class Renderer implements ApplicationListener{
         graphics.clear(clearColor);
         Draw.reset();
 
-        if(settings.getBool("animatedwater") || animateShields){
+        if(animateWater || animateShields){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
@@ -414,6 +415,10 @@ public class Renderer implements ApplicationListener{
         blocks.drawBlocks();
 
         Groups.draw.draw(Drawc::draw);
+
+        if(drawDebugHitboxes){
+            DebugCollisionRenderer.draw();
+        }
 
         Draw.reset();
         Draw.flush();

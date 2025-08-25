@@ -15,6 +15,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -22,13 +23,18 @@ public class WaveSpawner{
     private static final float margin = 0f, coreMargin = tilesize * 2f, maxSteps = 30;
 
     private int tmpCount;
-    private Seq<Tile> spawns = new Seq<>();
+    private Seq<Tile> spawns = new Seq<>(false);
     private boolean spawning = false;
     private boolean any = false;
     private Tile firstSpawn = null;
 
     public WaveSpawner(){
         Events.on(WorldLoadEvent.class, e -> reset());
+
+        Events.on(TileOverlayChangeEvent.class, e -> {
+            if(e.previous == Blocks.spawn) spawns.remove(e.tile);
+            if(e.overlay == Blocks.spawn) spawns.add(e.tile);
+        });
     }
 
     @Nullable
@@ -125,51 +131,54 @@ public class WaveSpawner{
             }
         }
 
-        if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam) && !state.teams.playerCores().isEmpty()){
+        if(state.rules.wavesSpawnAtCores && state.rules.attackMode && state.teams.isActive(state.rules.waveTeam) && !state.teams.playerCores().isEmpty()){
             Building firstCore = state.teams.playerCores().first();
-            for(Building core : state.rules.waveTeam.cores()){
+            for(CoreBuild core : state.rules.waveTeam.cores()){
                 if(filterPos != -1 && filterPos != core.pos()) continue;
 
-                Tmp.v1.set(firstCore).sub(core).limit(coreMargin + core.block.size * tilesize /2f * Mathf.sqrt2);
+                if(core.commandPos != null){
+                    cons.accept(core.commandPos.x, core.commandPos.y, false);
+                }else{
+                    boolean valid = false;
 
-                boolean valid = false;
-                int steps = 0;
+                    Tmp.v1.set(firstCore).sub(core).limit(coreMargin + core.block.size * tilesize /2f * Mathf.sqrt2);
 
-                //keep moving forward until the max step amount is reached
-                while(steps++ < maxSteps){
-                    int tx = World.toTile(core.x + Tmp.v1.x), ty = World.toTile(core.y + Tmp.v1.y);
-                    any = false;
-                    Geometry.circle(tx, ty, world.width(), world.height(), 3, (x, y) -> {
-                        if(world.solid(x, y)){
-                            any = true;
+                    int steps = 0;
+
+                    //keep moving forward until the max step amount is reached
+                    while(steps++ < maxSteps){
+                        int tx = World.toTile(core.x + Tmp.v1.x), ty = World.toTile(core.y + Tmp.v1.y);
+                        any = false;
+                        Geometry.circle(tx, ty, world.width(), world.height(), 3, (x, y) -> {
+                            if(world.solid(x, y)){
+                                any = true;
+                            }
+                        });
+
+                        //nothing is in the way, spawn it
+                        if(!any){
+                            valid = true;
+                            break;
+                        }else{
+                            //make the vector longer
+                            Tmp.v1.setLength(Tmp.v1.len() + tilesize*1.1f);
                         }
-                    });
-
-                    //nothing is in the way, spawn it
-                    if(!any){
-                        valid = true;
-                        break;
-                    }else{
-                        //make the vector longer
-                        Tmp.v1.setLength(Tmp.v1.len() + tilesize*1.1f);
                     }
-                }
 
-                if(valid){
-                    cons.accept(core.x + Tmp.v1.x, core.y + Tmp.v1.y, false);
+                    if(valid){
+                        cons.accept(core.x + Tmp.v1.x, core.y + Tmp.v1.y, false);
+                    }
                 }
             }
         }
     }
 
     private void eachFlyerSpawn(int filterPos, Floatc2 cons){
-        boolean airUseSpawns = state.rules.airUseSpawns;
 
         for(Tile tile : spawns){
             if(filterPos != -1 && filterPos != tile.pos()) continue;
 
-            if(!airUseSpawns){
-
+            if(!state.rules.airUseSpawns){
                 float angle = Angles.angle(world.width() / 2f, world.height() / 2f, tile.x, tile.y);
                 float trns = Math.max(world.width(), world.height()) * Mathf.sqrt2 * tilesize;
                 float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width() * tilesize + margin);
@@ -180,7 +189,7 @@ public class WaveSpawner{
             }
         }
 
-        if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){
+        if(state.rules.wavesSpawnAtCores && state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){
             for(Building core : state.rules.waveTeam.data().cores){
                 if(filterPos != -1 && filterPos != core.pos()) continue;
 

@@ -2,6 +2,7 @@ package mindustry.type;
 
 import arc.*;
 import arc.audio.*;
+import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g3d.*;
@@ -10,7 +11,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
@@ -35,6 +35,7 @@ public class Planet extends UnlockableContent{
     private static final Mat3D mat = new Mat3D();
     /** drawArc() temp curve points. */
     private static final Seq<Vec3> points = new Seq<>();
+    private static final Vec3 tmpNormal = new Vec3();
 
     /** Mesh used for rendering. Created on load() - will be null on the server! */
     public @Nullable GenericMesh mesh;
@@ -58,6 +59,8 @@ public class Planet extends UnlockableContent{
     public float camRadius;
     /** Minimum camera zoom value. */
     public float minZoom = 0.5f;
+    /** Maximum camera zoom value. */
+    public float maxZoom = 2f;
     /** Whether to draw the orbital circle. */
     public boolean drawOrbit = true;
     /** Atmosphere radius adjustment parameters. */
@@ -167,6 +170,11 @@ public class Planet extends UnlockableContent{
     public Cons<Rules> ruleSetter = r -> {};
     /** If true, RTS AI can be customized. */
     public boolean showRtsAIRule = false;
+
+    /** If true, planet data is loaded as 'planets/{name}.json'. This is only tested/functional in vanilla! */
+    public boolean loadPlanetData = false;
+    /** Data indicating attack sector positions and sector mappings. */
+    public @Nullable PlanetData data;
 
     public Planet(String name, Planet parent, float radius){
         super(name);
@@ -331,7 +339,7 @@ public class Planet extends UnlockableContent{
                 sum += 0.88f;
             }
 
-            sector.threat = sector.preset == null ?
+            sector.threat = sector.preset == null || !sector.preset.requireUnlock ?
                 Math.max(Math.min(sum / 5f, 1.2f), 0.3f) : //low threat sectors are pointless
                 Mathf.clamp(sector.preset.difficulty / 10f);
         }
@@ -342,9 +350,29 @@ public class Planet extends UnlockableContent{
         return mat.setToTranslation(position).rotate(Vec3.Y, getRotation());
     }
 
-    /** Regenerates the planet mesh. For debugging only. */
+    /** Regenerates the planet mesh. */
     public void reloadMesh(){
+        if(headless) return;
+
+        if(mesh != null){
+            mesh.dispose();
+        }
         mesh = meshLoader.get();
+    }
+
+    public void reloadMeshAsync(){
+        if(headless) return;
+
+        mainExecutor.submit(() -> {
+            var newMesh = meshLoader.get();
+
+            Core.app.post(() -> {
+                if(mesh != null){
+                    mesh.dispose();
+                }
+                mesh = newMesh;
+            });
+        });
     }
 
     @Override
@@ -377,7 +405,6 @@ public class Planet extends UnlockableContent{
         }
 
         if(generator != null){
-            Noise.setSeed(sectorSeed < 0 ? id + 1 : sectorSeed);
 
             for(Sector sector : sectors){
                 generator.generateSector(sector);
@@ -387,6 +414,22 @@ public class Planet extends UnlockableContent{
         }
 
         clipRadius = Math.max(clipRadius, radius + atmosphereRadOut + 0.5f);
+    }
+
+    public @Nullable PlanetData getData(){
+        if(loadPlanetData && data == null){
+            Fi file = tree.get("planets/" + name + ".json");
+            if(file.exists()){
+                data = JsonIO.read(PlanetData.class, file.readString());
+                for(int i : data.attackSectors){
+                    if(i >= 0 && i < sectors.size){
+                        sectors.get(i).generateEnemyBase = true;
+                    }
+                }
+            }
+        }
+
+        return data;
     }
 
     /** Gets a sector a tile position. */
@@ -559,6 +602,34 @@ public class Planet extends UnlockableContent{
         batch.flush(Gl.lineStrip);
     }
 
+    /** Draws an arc from one point to another on the planet. Has thickness. */
+    public void drawArcLine(VertexBatch3D batch, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount, float stroke){
+        //increase curve height when on opposite side of planet, so it doesn't tunnel through
+        float scaledOutlineRad = outlineRad * radius;
+        float dot = 1f - (Tmp.v32.set(a).nor().dot(Tmp.v33.set(b).nor()) + 1f)/2f;
+
+        Vec3 avg = Tmp.v31.set(b).add(a).scl(0.5f);
+        avg.setLength(radius * (1f + length) + dot * 1.35f);
+
+        points.clear();
+        points.addAll(Tmp.v33.set(b).setLength(scaledOutlineRad), Tmp.v31, Tmp.v34.set(a).setLength(scaledOutlineRad));
+        Tmp.bz3.set(points);
+
+        Vec3 normal = tmpNormal;
+        Vec3 point1 = points.get(0), point2 = points.get(1), point3 = points.get(2);
+        normal.set(point1).sub(point2).crs(point2.x - point3.x, point2.y - point3.y, point2.z - point3.z).nor();
+
+        for(int i = 0; i < pointCount + 1; i++){
+            float f = i / (float)pointCount;
+            Tmp.c1.set(from).lerp(to, (f + Time.globalTime / timeScale) % 1f);
+            batch.color(Tmp.c1);
+            batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f).add(normal, stroke));
+            batch.color(Tmp.c1);
+            batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f).add(normal, -stroke));
+        }
+        batch.flush(Gl.triangleStrip);
+    }
+
     public Vec3 lookAt(Sector sector, Vec3 out){
         return out.set(sector.tile.v).rotate(Vec3.Y, -getRotation());
     }
@@ -579,5 +650,10 @@ public class Planet extends UnlockableContent{
             //right vector
             Tmp.v31.set(Tmp.v32).rotate(Vec3.Y, -rotation).add(sector.tile.v).rotate(sector.tile.v, 90).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor()
         );
+    }
+
+    public static class PlanetData{
+        public ObjectIntMap<String> presets = new ObjectIntMap<>();
+        public int[] attackSectors = {};
     }
 }

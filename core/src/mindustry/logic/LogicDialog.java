@@ -31,7 +31,7 @@ public class LogicDialog extends BaseDialog{
     boolean privileged;
     @Nullable LExecutor executor;
     GlobalVarsDialog globalsDialog = new GlobalVarsDialog();
-    boolean wasRows, wasPortrait;
+    boolean wasRows, wasPortrait, forceRestart;
 
     public LogicDialog(){
         super("logic");
@@ -142,7 +142,14 @@ public class LogicDialog extends BaseDialog{
                         }catch(Throwable e){
                             ui.showException(e);
                         }
-                    }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
+                    }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null).row();
+
+                    t.button("@logic.restart", Icon.refresh, style, () -> {
+                        forceRestart = true;
+                        dialog.hide();
+                        hide();
+                    }).marginLeft(12f);
+
                 });
             });
 
@@ -214,7 +221,7 @@ public class LogicDialog extends BaseDialog{
                             update(() -> setColor(typeColor(s, color)));
                         }}, new Label(() -> " " + typeName(s) + " "){{
                             setStyle(Styles.outlineLabel);
-                        }});
+                        }}).minWidth(120f);
 
                         t.row();
 
@@ -288,7 +295,8 @@ public class LogicDialog extends BaseDialog{
 
                     for(Prov<LStatement> prov : LogicIO.allStatements){
                         LStatement example = prov.get();
-                        if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged) || (!text.isEmpty() && !example.name().toLowerCase(Locale.ROOT).contains(text))) continue;
+                        if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged) ||
+                            (!text.isEmpty() && !example.name().toLowerCase(Locale.ROOT).contains(text) && !example.typeName().toLowerCase(Locale.ROOT).contains(text))) continue;
 
                         if(matched[0] == null){
                             matched[0] = prov;
@@ -336,6 +344,7 @@ public class LogicDialog extends BaseDialog{
     public void show(String code, LExecutor executor, boolean privileged, Cons<String> modified){
         this.executor = executor;
         this.privileged = privileged;
+        this.forceRestart = false;
         canvas.statements.clearChildren();
         canvas.rebuild();
         canvas.privileged = privileged;
@@ -346,7 +355,7 @@ public class LogicDialog extends BaseDialog{
             canvas.load("");
         }
         this.consumer = result -> {
-            if(!result.equals(code)){
+            if(forceRestart || !result.equals(code)){
                 modified.get(result);
             }
         };

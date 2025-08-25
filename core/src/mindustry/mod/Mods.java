@@ -273,7 +273,6 @@ public class Mods implements Loadable{
             ObjectMap<Texture, PageType> pageTypes = ObjectMap.of(
             Core.atlas.find("white").texture, PageType.main,
             Core.atlas.find("stone1").texture, PageType.environment,
-            Core.atlas.find("clear-editor").texture, PageType.editor,
             Core.atlas.find("whiteui").texture, PageType.ui,
             Core.atlas.find("rubble-1-0").texture, PageType.rubble
             );
@@ -405,7 +404,6 @@ public class Mods implements Loadable{
         String path = file.path();
         return
             path.contains("sprites/blocks/environment") || path.contains("sprites-override/blocks/environment") ? PageType.environment :
-            path.contains("sprites/editor") || path.contains("sprites-override/editor") ? PageType.editor :
             path.contains("sprites/rubble") || path.contains("sprites-override/rubble") ? PageType.rubble :
             path.contains("sprites/ui") || path.contains("sprites-override/ui") ? PageType.ui :
             PageType.main;
@@ -413,11 +411,22 @@ public class Mods implements Loadable{
 
     /** Removes a mod file and marks it for requiring a restart. */
     public void removeMod(LoadedMod mod){
-        if(!android && mod.loader != null){
-            try{
-                ClassLoaderCloser.close(mod.loader);
-            }catch(Exception e){
-                Log.err(e);
+        boolean deleted = true;
+
+        if(mod.loader != null){
+            if(android){
+                //Try to remove cache for Android 14 security problem
+                Fi cacheDir = new Fi(Core.files.getCachePath()).child("mods");
+                Fi modCacheDir = cacheDir.child(mod.file.nameWithoutExtension());
+                if(modCacheDir.exists()){
+                    deleted = modCacheDir.deleteDirectory();
+                }
+            }else{
+                try{
+                    ClassLoaderCloser.close(mod.loader);
+                }catch(Exception e){
+                    Log.err(e);
+                }
             }
         }
 
@@ -425,7 +434,7 @@ public class Mods implements Loadable{
             mod.root.delete();
         }
 
-        boolean deleted = mod.file.isDirectory() ? mod.file.deleteDirectory() : mod.file.delete();
+        deleted &= mod.file.isDirectory() ? mod.file.deleteDirectory() : mod.file.delete();
 
         if(!deleted){
             ui.showErrorMessage("@mod.delete.error");
@@ -787,7 +796,7 @@ public class Mods implements Loadable{
 
     public void reload(){
         newImports.each(this::updateDependencies);
-        newImports.remove(m -> m.missingDependencies.isEmpty() && m.softDependencies.isEmpty());
+        newImports.removeAll(m -> m.missingDependencies.isEmpty() && m.softDependencies.isEmpty());
 
         if(newImports.any()){
             checkDependencies(newImports, newImports.contains(m -> m.softDependencies.any()));
@@ -807,9 +816,6 @@ public class Mods implements Loadable{
     public void loadScripts(){
         if(skipModCode) return;
 
-        Time.mark();
-        boolean[] any = {false};
-
         try{
             eachEnabled(mod -> {
                 if(mod.root.child("scripts").exists()){
@@ -822,7 +828,6 @@ public class Mods implements Loadable{
                             if(scripts == null){
                                 scripts = platform.createScripts();
                             }
-                            any[0] = true;
                             scripts.run(mod, main);
                         }catch(Throwable e){
                             Core.app.post(() -> {
@@ -837,10 +842,6 @@ public class Mods implements Loadable{
             });
         }finally{
             content.setCurrentMod(null);
-        }
-
-        if(any[0]){
-            Log.info("Time to initialize modded scripts: @", Time.elapsed());
         }
     }
 
@@ -1112,6 +1113,11 @@ public class Mods implements Loadable{
                     //close the classloader for jar mods
                     if(!android){
                         ClassLoaderCloser.close(other.loader);
+                    }else if(other.loader != null){
+                        //Try to remove cache for Android 14 security problem
+                        Fi cacheDir = new Fi(Core.files.getCachePath()).child("mods");
+                        Fi modCacheDir = cacheDir.child(other.file.nameWithoutExtension());
+                        modCacheDir.deleteDirectory();
                     }
 
                     //close zip file

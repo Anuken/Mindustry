@@ -20,8 +20,7 @@ public class LogicAI extends AIController{
     public LUnitControl control = LUnitControl.idle;
     public float moveX, moveY, moveRad;
     public float controlTimer = logicControlTimeout, targetTimer;
-    @Nullable
-    public Building controller;
+    public @Nullable Building controller;
     public BuildPlan plan = new BuildPlan();
 
     //special cache for instruction to store data

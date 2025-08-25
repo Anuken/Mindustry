@@ -2,6 +2,7 @@ package mindustry.type;
 
 import arc.*;
 import arc.func.*;
+import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -33,28 +34,41 @@ public class SectorPreset extends UnlockableContent{
     public boolean allowLaunchLoadout = false;
     /** If true, switches to attack mode after waves end. */
     public boolean attackAfterWaves = false;
+    /** The original position of this sector; used for migration. Internal use for vanilla campaign only! */
+    public int originalPosition;
 
     public SectorPreset(String name, Planet planet, int sector){
-        this(name);
+        this(name, null, planet, sector);
+    }
+
+    public SectorPreset(String name, String fileName, Planet planet, int sector){
+        this(name, fileName, null);
         initialize(planet, sector);
     }
 
     /** Internal use only! */
     public SectorPreset(String name, LoadedMod mod){
+        this(name, null, mod);
+    }
+
+    /** Internal use only! */
+    public SectorPreset(String name, @Nullable String fileName, LoadedMod mod){
         super(name);
         if(mod != null){
             this.minfo.mod = mod;
         }
-        this.generator = new FileMapGenerator(this.name, this);
-    }
-
-    /** Internal use only! */
-    public SectorPreset(String name){
-       this(name, null);
+        //this.name can change based on the mod being loaded, so if a fileName is not specified, make sure to use the newly assigned this.name
+        this.generator = new FileMapGenerator(fileName == null ? this.name : fileName, this);
     }
 
     public void initialize(Planet planet, int sector){
         this.planet = planet;
+        this.originalPosition = sector;
+        //auto remap based on data
+        var data = planet.getData();
+        if(data != null){
+            sector = data.presets.get(name, sector);
+        }
         sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector);
 

@@ -75,6 +75,15 @@ public class Control implements ApplicationListener, Loadable{
                 });
             }
             checkAutoUnlocks();
+
+            if((OS.isWindows && !OS.is64Bit && !Core.settings.getBool("nowarn32bit", false))){
+                BaseDialog dialog = new BaseDialog("@warn.32bit.title");
+                dialog.buttons.button("@ok", dialog::hide).size(120f, 64f);
+                dialog.cont.add("@warn.32bit").labelAlign(Align.center, Align.center).wrap().grow().row();
+                dialog.cont.check("@dontshowagain", val -> Core.settings.put("nowarn32bit", val));
+
+                dialog.show();
+            }
         });
 
         Events.on(StateChangeEvent.class, event -> {
@@ -304,9 +313,12 @@ public class Control implements ApplicationListener, Loadable{
         "lastBuild", 0
         );
 
-        createPlayer();
-
         saves.load();
+    }
+
+    @Override
+    public void loadSync(){
+        createPlayer();
     }
 
     /** Automatically unlocks things with no requirements and no locked parents. */
@@ -412,7 +424,8 @@ public class Control implements ApplicationListener, Loadable{
                 try{
                     boolean hadNoCore = !sector.info.hasCore;
                     reloader.begin();
-                    slot.load();
+                    //pass in a sector context to make absolutely sure the correct sector is written; it may differ from what's in the meta due to remapping.
+                    slot.load(world.makeSectorContext(sector));
                     slot.setAutosave(true);
                     state.rules.sector = sector;
                     state.rules.cloudColor = sector.planet.landCloudColor;
@@ -662,8 +675,12 @@ public class Control implements ApplicationListener, Loadable{
                 state.set(State.playing);
             }
 
-            if(!net.client() && Core.input.keyTap(Binding.pause) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            if(!net.client() && Core.input.keyTap(Binding.pause) && !(state.isCampaign() && state.afterGameOver) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.isPaused() ? State.playing : State.paused);
+            }
+
+            if(state.isCampaign() && state.afterGameOver){
+                state.set(State.paused);
             }
 
             if(Core.input.keyTap(Binding.menu) && !ui.restart.isShown() && !ui.minimapfrag.shown()){

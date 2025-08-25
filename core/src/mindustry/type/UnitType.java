@@ -44,6 +44,7 @@ import static mindustry.Vars.*;
 public class UnitType extends UnlockableContent implements Senseable{
     public static final float shadowTX = -12, shadowTY = -13;
     private static final Vec2 legOffset = new Vec2();
+    private static final Seq<UnitStance> tmpStances = new Seq<>();
 
     /** Environmental flags that are *all* required for this unit to function. 0 = any environment */
     public int envRequired = 0;
@@ -94,6 +95,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     buildRange = Vars.buildingRange,
     /** multiplier for damage this (flying) unit deals when crashing on enemy things */
     crashDamageMultiplier = 1f,
+    /** multiplier for health that this flying unit has for its wreck, based on its max health. */
+    wreckHealthMultiplier = 0.25f,
     /** a VERY ROUGH estimate of unit DPS; initialized in init() */
     dpsEstimate = -1,
     /** graphics clipping size; <0 to calculate automatically */
@@ -177,6 +180,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     logicControllable = true,
     /** if false, players cannot control this unit */
     playerControllable = true,
+    /** If true, the unit can be selected with the global selection hotkey (shift+g). */
+    controlSelectGlobal = true,
     /** if false, this unit cannot be moved into payloads */
     allowedInPayloads = true,
     /** if false, this unit cannot be hit by bullets or explosions*/
@@ -590,6 +595,10 @@ public class UnitType extends UnlockableContent implements Senseable{
         return targetable || (vulnerableWithPayloads && unit instanceof Payloadc p && p.hasPayload());
     }
 
+    public boolean killable(Unit unit){
+        return killable;
+    }
+
     public boolean hittable(Unit unit){
         return hittable || (vulnerableWithPayloads && unit instanceof Payloadc p && p.hasPayload());
     }
@@ -600,7 +609,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(unit.controller() instanceof CommandAI ai && ai.currentCommand() == UnitCommand.mineCommand){
             out.add(UnitStance.mineAuto);
             for(Item item : indexer.getAllPresentOres()){
-                if(unit.canMine(item)){
+                if(unit.canMine(item) && ((mineFloor && indexer.hasOre(item)) || (mineWalls && indexer.hasWallOre(item)))){
                     var itemStance = ItemUnitStance.getByItem(item);
                     if(itemStance != null){
                         out.add(itemStance);
@@ -610,6 +619,17 @@ public class UnitType extends UnlockableContent implements Senseable{
         }else{
             out.addAll(stances);
         }
+    }
+
+    public boolean allowStance(Unit unit, UnitStance stance){
+        if(stance == UnitStance.stop) return true;
+        tmpStances.clear();
+        getUnitStances(unit, tmpStances);
+        return tmpStances.contains(stance);
+    }
+
+    public boolean allowCommand(Unit unit, UnitCommand command){
+        return commands.contains(command);
     }
 
     public void update(Unit unit){
@@ -688,6 +708,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
     }
 
+    @Override
     public boolean isBanned(){
         return state.rules.isBanned(this);
     }
@@ -886,13 +907,11 @@ public class UnitType extends UnlockableContent implements Senseable{
         //assume slight range margin
         float margin = 4f;
 
-        boolean skipWeapons = !weapons.contains(w -> !w.useAttackRange);
-
         //set up default range
         if(range < 0){
             range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
-                if(!weapon.useAttackRange && skipWeapons) continue;
+                if(!weapon.useAttackRange) continue;
 
                 range = Math.min(range, weapon.range() - margin);
                 maxRange = Math.max(maxRange, weapon.range() - margin);
@@ -903,7 +922,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             maxRange = Math.max(0f, range);
 
             for(Weapon weapon : weapons){
-                if(!weapon.useAttackRange && skipWeapons) continue;
+                if(!weapon.useAttackRange) continue;
 
                 maxRange = Math.max(maxRange, weapon.range() - margin);
             }
@@ -914,8 +933,9 @@ public class UnitType extends UnlockableContent implements Senseable{
             fogRadius = Math.max(58f * 3f, hitSize * 2f) / 8f;
         }
 
-        if(weapons.isEmpty()){
-            range = maxRange = mineRange;
+        if(!weapons.contains(w -> w.useAttackRange)){
+            if(range < 0 || range == Float.MAX_VALUE) range = mineRange;
+            if(maxRange < 0 || maxRange == Float.MAX_VALUE) maxRange = mineRange;
         }
 
         if(mechStride < 0){
@@ -1027,7 +1047,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(stances.size == 0){
             if(canAttack){
-                stances.addAll(UnitStance.stop, UnitStance.shoot, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
+                stances.addAll(UnitStance.stop, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
                 if(!flying){
                     stances.add(UnitStance.ram);
                 }

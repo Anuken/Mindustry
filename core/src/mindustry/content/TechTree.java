@@ -42,6 +42,11 @@ public class TechTree{
             node.objectives.addAll(objectives);
         }
 
+        //insert missing sector parent dependencies
+        if(context != null && context.content instanceof SectorPreset preset && !node.objectives.contains(o -> o instanceof SectorComplete sc && sc.preset == preset)){
+            node.objectives.insert(0, new SectorComplete(preset));
+        }
+
         TechNode prev = context;
         context = node;
         children.run();

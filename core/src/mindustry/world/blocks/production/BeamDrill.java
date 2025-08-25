@@ -262,7 +262,7 @@ public class BeamDrill extends Block{
                 time %= drillTime;
             }
 
-            if(timer(timerDump, dumpTime)){
+            if(timer(timerDump, dumpTime / timeScale)){
                 dump();
             }
         }
@@ -285,6 +285,9 @@ public class BeamDrill extends Block{
             for(int i = 0; i < size; i++){
                 Tile face = facing[i];
                 if(face != null){
+                    Item drop = face.wallDrop();
+
+                    if(drop == null) continue;
                     Point2 p = lasers[i];
                     float lx = face.worldx() - (dir.x/2f)*tilesize, ly = face.worldy() - (dir.y/2f)*tilesize;
 
@@ -325,7 +328,7 @@ public class BeamDrill extends Block{
                     Draw.z(Layer.effect);
                     Lines.stroke(warmup);
                     rand.setState(i, id);
-                    Color col = face.wallDrop().color;
+                    Color col = drop.color;
                     Color spark = Tmp.c3.set(sparkColor).lerp(boostHeatColor, boostWarmup);
                     for(int j = 0; j < sparks; j++){
                         float fin = (Time.time / sparkLife + rand.random(sparkRecurrence + 1f)) % sparkRecurrence;

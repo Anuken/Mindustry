@@ -27,7 +27,7 @@ import java.io.*;
 
 public class Fonts{
     private static final String mainFont = "fonts/font.woff";
-    private static final ObjectSet<String> unscaled = ObjectSet.with("iconLarge");
+    private static final ObjectSet<String> unscaled = ObjectSet.with("iconLarge", "logic");
     private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
     private static IntMap<String> unicodeToName = new IntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();

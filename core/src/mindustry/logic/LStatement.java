@@ -23,6 +23,25 @@ import static mindustry.logic.LCanvas.*;
  * A statement is an intermediate representation of an instruction, to be used mostly in UI.
  * Contains all relevant variable information. */
 public abstract class LStatement{
+
+    private static final String[] aligns = {"topLeft", "top", "topRight", "left", "center", "right", "bottomLeft", "bottom", "bottomRight"};
+    public static final ObjectMap<String, Integer> nameToAlign = ObjectMap.of(
+    "center", Align.center,
+    "top", Align.top,
+    "bottom", Align.bottom,
+    "left", Align.left,
+    "right", Align.right,
+    "topLeft", Align.topLeft,
+    "topRight", Align.topRight,
+    "bottomLeft", Align.bottomLeft,
+    "bottomRight", Align.bottomRight
+    );
+    public static final IntMap<String> alignToName = new IntMap<>();
+
+    static {
+        nameToAlign.each((k, v) -> alignToName.put(v, k));
+    }
+
     public transient @Nullable StatementElem elem;
 
     public abstract void build(Table table);
@@ -175,7 +194,36 @@ public abstract class LStatement{
         showSelect(b, values, current, getter, 4, c -> {});
     }
 
-    protected void showSelectTable(Button b, Cons2<Table, Runnable> hideCons){
+    protected void fieldAlignSelect(Table t, Prov<String> get, Cons<String> set, boolean hor, boolean ver) {
+        t.button(b -> {
+            b.image(Icon.pencilSmall);
+            b.clicked(() -> {
+                var current = get.get();
+                showAlignSelect(b, current.startsWith("@") ? nameToAlign.get(current.substring(1), -1) : -1, align -> set.get("@" + alignToName.get(align)), hor, ver);
+            });
+        }, Styles.logict, () -> {}).size(40f).color(t.color).left().padLeft(-10);
+    }
+
+    public static void showAlignSelect(Button b, int current, Intc setter, boolean hor, boolean ver) {
+        showSelectTable(b, (t, hide) -> {
+            t.defaults().size(150f, 40f);
+
+            int i = 0;
+            for(String align : aligns){
+                int val = nameToAlign.get(align);
+                if(!hor && !Align.isCenterHorizontal(val)) continue;
+                if(!ver && !Align.isCenterVertical(val)) continue;
+                t.button(align, Styles.logicTogglet, () -> {
+                    setter.get(val);
+                    hide.run();
+                }).checked(current == nameToAlign.get(align)).grow();
+
+                if (++i % 3 == 0) t.row();
+            }
+        });
+    }
+
+    protected static void showSelectTable(Button b, Cons2<Table, Runnable> hideCons){
         Table t = new Table(Tex.paneSolid){
             @Override
             public float getPrefHeight(){
@@ -242,6 +290,10 @@ public abstract class LStatement{
 
     public void saveUI(){
 
+    }
+
+    public String typeName(){
+        return getClass().getSimpleName().replace("Statement", "");
     }
 
     public String name(){

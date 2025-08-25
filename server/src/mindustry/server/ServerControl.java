@@ -381,24 +381,28 @@ public class ServerControl implements ApplicationListener{
                 }
             }else{
                 result = maps.getShuffleMode().next(preset, state.map);
-                info("Randomized next map to be @.", result.plainName());
+                if(result != null){
+                    info("Randomized next map to be @.", result.plainName());
+                }
             }
 
             info("Loading map...");
 
             logic.reset();
-            lastMode = preset;
-            Core.settings.put("lastServerMode", lastMode.name());
-            try{
-                world.loadMap(result, result.applyRules(lastMode));
-                state.rules = result.applyRules(preset);
-                logic.play();
+            if(result != null){
+                lastMode = preset;
+                Core.settings.put("lastServerMode", lastMode.name());
+                try{
+                    world.loadMap(result, result.applyRules(lastMode));
+                    state.rules = result.applyRules(preset);
+                    logic.play();
 
-                info("Map loaded.");
+                    info("Map loaded.");
 
-                netServer.openServer();
-            }catch(MapException e){
-                err("@: @", e.map.plainName(), e.getMessage());
+                    netServer.openServer();
+                }catch(MapException e){
+                    err("@: @", e.map.plainName(), e.getMessage());
+                }
             }
         });
 
@@ -662,7 +666,7 @@ public class ServerControl implements ApplicationListener{
             if(arg.length == 0){
                 info("Subnets banned: @", netServer.admins.getSubnetBans().isEmpty() ? "<none>" : "");
                 for(String subnet : netServer.admins.getSubnetBans()){
-                    info("&lw  " + subnet);
+                    info("&lw\t" + subnet);
                 }
             }else if(arg.length == 1){
                 err("You must provide a subnet to add or remove.");
@@ -1048,6 +1052,35 @@ public class ServerControl implements ApplicationListener{
             }else{
                 handleCommandString(suggested);
             }
+        });
+
+        handler.register("dos-ban", "[add/remove] [ip]", "Add or remove a DOS ban.", arg -> {
+            if(arg.length == 0){
+                info("DOS bans: @", netServer.admins.dosBlacklist.isEmpty() ? "<none>" : "");
+
+                netServer.admins.dosBlacklist.forEach(address -> {
+                    info("&lw\t" + address);
+                });
+                return;
+            }else if(arg.length == 1){
+                err("Expected either zero or two parameters, but only got one parameter.");
+                return;
+            }
+
+            String action = arg[0].toLowerCase();
+            String ip = arg[1];
+
+            if(action.equals("add")){
+                netServer.admins.blacklistDos(ip);
+                info("Dos banned: @", ip);
+                return;
+            }else if(action.equals("remove")){
+                netServer.admins.unBlacklistDos(ip);
+                info("Removed dos ban: @", ip);
+                return;
+            }
+
+            err("Unrecognized action: @", action);
         });
 
         mods.eachClass(p -> p.registerServerCommands(handler));
