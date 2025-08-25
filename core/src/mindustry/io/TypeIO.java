@@ -392,11 +392,12 @@ public class TypeIO{
     }
 
     public static void writeBlock(Writes write, Block block){
-        write.s(block.id);
+        write.s(block == null ? -1 : block.id);
     }
 
     public static Block readBlock(Reads read){
-        return content.block(read.s());
+        short id = read.s();
+        return id == -1 ? null : content.block(id);
     }
 
     /** @return the maximum acceptable amount of plans to send over the network */
