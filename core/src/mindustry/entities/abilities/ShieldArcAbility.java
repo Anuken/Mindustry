@@ -68,7 +68,7 @@ public class ShieldArcAbility extends Ability{
             (Tmp.v1.set(unit).add(unit.deltaX, unit.deltaY).within(paramPos, paramField.radius + paramField.width) || unit.within(paramPos, paramField.radius + paramField.width)) &&
             (Angles.within(paramPos.angleTo(unit), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(unit.x + unit.deltaX, unit.y + unit.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
                 
-                float overlapDst = (unit.hitSize/2f + paramField.radius) - unit.dst(paramPos.x,paramPos.y);
+                float overlapDst = (unit.hitSize + paramField.radius) - unit.dst(paramPos.x,paramPos.y);
                 
                 if(overlapDst>0){
                 // stop
