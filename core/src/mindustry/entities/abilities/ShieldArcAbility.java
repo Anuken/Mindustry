@@ -57,7 +57,8 @@ public class ShieldArcAbility extends Ability{
                 Fx.arcShieldBreak.at(paramPos.x, paramPos.y, 0, paramField.color == null ? paramUnit.type.shieldColor(paramUnit) : paramField.color, paramUnit);
             }
 
-            paramField.data -= b.damage();
+            // for consistency
+            paramField.data -= b.type.shieldDamage(b);
             paramField.alpha = 1f;
         }
     };
@@ -76,6 +77,7 @@ public class ShieldArcAbility extends Ability{
                 unit.type.deathSound.at(unit);
                 unit.type.deathExplosionEffect.at(unit);
                 Fx.absorb.at(unit);
+                Fx.circleColorSpark.at(unit.x, unit.y,paramUnit.team.color);
 
             }else{
 
