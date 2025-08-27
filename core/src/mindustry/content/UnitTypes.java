@@ -14,6 +14,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -2697,9 +2698,8 @@ public class UnitTypes{
             hitSize = 28f;
             treadPullOffset = 4;
             speed = 0.63f;
-            rotateSpeed = 1.2f;
             health = 11000;
-            armor = 26f;
+            armor = 20f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
             drownTimeMultiplier = 3.6f;
@@ -2776,7 +2776,7 @@ public class UnitTypes{
                     shootY = 5.5f;
                     recoil = 2f;
                     rotate = true;
-                    rotateSpeed = 2.6f;
+                    rotateSpeed = 2f;
 
                     bullet = new BasicBulletType(4.5f, 25){{
                         width = 6.5f;
@@ -2797,11 +2797,12 @@ public class UnitTypes{
             hitSize = 46f;
             treadPullOffset = 1;
             speed = 0.48f;
-            health = 24000;
-            armor = 32f;
-            crushDamage = 35f / 5f;
+            health = 23000;
+            armor = 26f;
+            crushDamage = 25f / 5f;
+            rotateSpeed = 0.8f;
             drownTimeMultiplier = 6f;
-            floorMultiplier = 0.3f;
+            floorMultiplier = 1f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             
             float xo = 231f/2f, yo = 231f/2f;
@@ -2815,7 +2816,7 @@ public class UnitTypes{
                 shake = 5f;
                 recoil = 5f;
                 rotate = true;
-                rotateSpeed = 0.8f;
+                rotateSpeed = 0.6f;
                 mirror = false;
                 x = 0f;
                 y = -2f;
@@ -2882,11 +2883,11 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(7f, 460f){{
+                bullet = new BasicBulletType(7f, 360f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
-                    lifetime = 40f;
+                    lifetime = 35f;
                     hitSize = 6f;
 
                     smokeEffect = Fx.shootSmokeTitan;
@@ -2914,7 +2915,7 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    int count = 8;
+                    int count = 6;
                     for(int j = 0; j < count; j++){
                         int s = j;
                         for(int i : Mathf.signs){
