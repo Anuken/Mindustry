@@ -152,7 +152,7 @@ public class Sector{
 
     @Nullable
     public TextureRegion icon(){
-        return info.contentIcon != null ? info.contentIcon.uiIcon : info.icon == null ? (preset != null && preset.uiIcon.found() && preset.unlocked() ? preset.uiIcon : null) : Fonts.getLargeIcon(info.icon);
+        return info.contentIcon != null ? info.contentIcon.uiIcon : info.icon == null ? (preset != null && preset.requireUnlock && preset.uiIcon.found() && preset.unlocked() ? preset.uiIcon : null) : Fonts.getLargeIcon(info.icon);
     }
 
     @Nullable

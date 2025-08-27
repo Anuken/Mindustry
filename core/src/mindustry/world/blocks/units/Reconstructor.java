@@ -223,6 +223,7 @@ public class Reconstructor extends UnitBlock{
                 if(!upgrade.unlockedNowHost() && !team.isAI()){
                     //flash "not researched"
                     pay.showOverlay(Icon.tree);
+                    Events.fire(Trigger.cannotUpgrade);
                 }
 
                 if(upgrade.isBanned()){

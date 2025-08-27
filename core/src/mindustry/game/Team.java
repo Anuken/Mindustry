@@ -163,8 +163,16 @@ public class Team implements Comparable<Team>, Senseable{
 
     @Override
     public double sense(LAccess sensor){
-        if(sensor == LAccess.id) return id;
-        if(sensor == LAccess.color) return color.toDoubleBits();
-        return Double.NaN;
+        return switch(sensor){
+            case id -> id;
+            case color -> color.toDoubleBits();
+            default -> Double.NaN;
+        };
+    }
+
+    @Override
+    public Object senseObject(LAccess sensor){
+        if(sensor == LAccess.name) return name;
+        return Senseable.noSensed;
     }
 }

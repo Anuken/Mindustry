@@ -72,12 +72,28 @@ public class HudFragment{
             }
         });
 
+        Table[] configTable = {null};
+        Block[] lastBlock = {null};
+
         cont.table(search -> {
             search.image(Icon.zoom).padRight(8);
             search.field("", text -> rebuildBlockSelection(blockSelection, text)).growX()
             .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
         }).growX().pad(-2).padLeft(6f);
         cont.row();
+        cont.collapser(t -> {
+            configTable[0] = t;
+        }, () -> control.input.block != null && control.input.block.editorConfigurable).with(c -> c.setEnforceMinSize(true)).update(col -> {
+
+            if(lastBlock[0] != control.input.block){
+                configTable[0].clear();
+                if(control.input.block != null){
+                    control.input.block.buildEditorConfig(configTable[0]);
+                    col.invalidateHierarchy();
+                }
+                lastBlock[0] = control.input.block;
+            }
+        }).growX().row();
         cont.add(pane).expandY().top().left();
 
         rebuildBlockSelection(blockSelection, "");
@@ -902,6 +918,11 @@ public class HudFragment{
                 return builder;
             }
 
+            //do not show status after game over
+            if(state.afterGameOver && state.isCampaign()){
+                return builder;
+            }
+
             if(!state.rules.waves && state.isCampaign()){
                 builder.append("[lightgray]").append(Core.bundle.get("sector.curcapture"));
             }
@@ -972,6 +993,7 @@ public class HudFragment{
         table.table().update(t -> {
             if(player.unit() instanceof Payloadc payload){
                 if(count[0] != payload.payloadUsed()){
+                    t.clear();
                     payload.contentInfo(t, 8 * 2, 275f);
                     count[0] = payload.payloadUsed();
                 }
@@ -979,7 +1001,11 @@ public class HudFragment{
                 count[0] = -1;
                 t.clear();
             }
-        }).growX().visible(() -> player.unit() instanceof Payloadc p && p.payloadUsed() > 0).colspan(2);
+        }).growX().visible(() -> {
+            boolean result = player.unit() instanceof Payloadc p && p.payloadUsed() > 0;
+            if(!result) count[0] = -1f;
+            return result;
+        }).colspan(2);
         table.row();
 
         Bits statuses = new Bits();
