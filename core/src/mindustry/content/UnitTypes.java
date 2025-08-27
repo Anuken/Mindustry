@@ -2801,7 +2801,7 @@ public class UnitTypes{
             armor = 26f;
             crushDamage = 25f / 5f;
             rotateSpeed = 0.8f;
-            drownTimeMultiplier = 6f;
+            drownTimeMultiplier = 5f;
             floorMultiplier = 0.3f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             

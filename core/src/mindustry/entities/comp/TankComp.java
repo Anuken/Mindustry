@@ -104,7 +104,7 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
     public float floorSpeedMultiplier(){
         Floor on = isFlying() || type.hovering ? Blocks.air.asFloor() : floorOn();
         //TODO take into account extra blocks
-        return (speedMultiplier + (1f - speedMultiplier) * type.floorMultiplier) * on.speedMultiplier * lastSlowdown;
+        return (float)Math.pow(on.speedMultiplier, type.floorMultiplier) * speedMultiplier * lastSlowdown;
     }
 
     @Replace
