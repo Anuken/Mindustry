@@ -2797,7 +2797,7 @@ public class UnitTypes{
             hitSize = 46f;
             treadPullOffset = 1;
             speed = 0.48f;
-            health = 23000;
+            health = 22000;
             armor = 26f;
             crushDamage = 25f / 5f;
             rotateSpeed = 0.8f;
@@ -3536,7 +3536,7 @@ public class UnitTypes{
                     }};
 
                     splashDamage = 120f;
-                    splashDamageRadius = 32f;
+                    splashDamageRadius = 36f;
 
                     fragBullets = 15;
                     fragVelocityMin = 0.5f;
