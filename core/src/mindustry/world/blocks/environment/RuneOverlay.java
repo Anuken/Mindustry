@@ -12,6 +12,7 @@ import mindustry.world.*;
 
 public class RuneOverlay extends OverlayFloor{
     public static final int characters = 109;
+    public static final int unicodeOffset = 0x142B;
 
     public @Load(value = "@#", fallback = "rune-overlay#", length = characters) TextureRegion[] letterRegions;
     public Color color = Color.white;
@@ -24,9 +25,26 @@ public class RuneOverlay extends OverlayFloor{
         editorConfigurable = true;
     }
 
+    /** Encodes rune data bytes into a string that can be displayed in the font. */
+    public static String bytesToString(byte[] data){
+        StringBuilder result = new StringBuilder();
+        for(byte b : data){
+            result.append((char)(b & 0xff + unicodeOffset));
+        }
+        return result.toString();
+    }
+
+    /** Converts a displayable string into rune data bytes. Will generate garbage data if the string doesn't contain the right character set. */
+    public static byte[] stringToBytes(String s){
+        byte[] bytes = new byte[s.length()];
+        for(int i = 0; i < s.length(); i++){
+            bytes[i] = (byte)(s.charAt(i) - unicodeOffset);
+        }
+        return bytes;
+    }
+
     @Override
     public void drawBase(Tile tile){
-
         Draw.color(color);
         if((tile.overlayData & 0xff) < characters){
             Draw.rect(letterRegions[tile.overlayData & 0xff], tile.worldx(), tile.worldy());
@@ -38,7 +56,6 @@ public class RuneOverlay extends OverlayFloor{
     public Object getConfig(Tile tile){
         return (int)tile.overlayData;
     }
-
 
     @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
