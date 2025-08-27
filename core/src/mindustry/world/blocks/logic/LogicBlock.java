@@ -703,18 +703,24 @@ public class LogicBlock extends Block{
             write.i(compressed.length);
             write.b(compressed);
 
-            //write only the non-constant variables
-            int count = Structs.count(executor.vars, v -> (!v.constant || v == executor.unit) && !(v.isobj && v.objval == null));
+            boolean writeUnit = executor.unit.objval != null;
+
+            //only write non-null values; constants cannot be contained in executor.vars
+            int count = Structs.count(executor.vars, v -> !(v.isobj && v.objval == null)) + (writeUnit ? 1 : 0);
 
             write.i(count);
+
+            //the unit is technically a constant that isn't the variable pool, so write that separately
+            if(writeUnit){
+                write.str("@unit");
+                TypeIO.writeObject(write, executor.unit.objval);
+            }
+
             for(int i = 0; i < executor.vars.length; i++){
                 LVar v = executor.vars[i];
 
                 //null is the default variable value, so waste no time serializing that
                 if(v.isobj && v.objval == null) continue;
-
-                //skip constants
-                if(v.constant && v != executor.unit) continue;
 
                 //write the name and the object value
                 write.str(v.name);
