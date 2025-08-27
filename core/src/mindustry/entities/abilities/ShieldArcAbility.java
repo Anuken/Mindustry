@@ -50,34 +50,37 @@ public class ShieldArcAbility extends Ability{
                 Fx.absorb.at(b);
             }
             
-            //break shield
+            // break shield
             if(paramField.data <= b.damage()){
                 paramField.data -= paramField.cooldown * paramField.regen;
 
                 Fx.arcShieldBreak.at(paramPos.x, paramPos.y, 0, paramField.color == null ? paramUnit.type.shieldColor(paramUnit) : paramField.color, paramUnit);
             }
 
-            // for consistency
+            // shieldDamage for consistency
             paramField.data -= b.type.shieldDamage(b);
             paramField.alpha = 1f;
         }
     };
 
     protected static final Cons<Unit> unitConsumer = unit -> {
-        if(paramField.data > 0 &&
+        // ignore core units
+        if(paramField.data > 0 && !unit.spawnedByCore &&
             !(unit.within(paramPos, paramField.radius - paramField.width) && paramPos.within(unit.x - unit.deltaX, unit.y - unit.deltaY, paramField.radius - paramField.width)) &&
             (Tmp.v1.set(unit).add(unit.deltaX, unit.deltaY).within(paramPos, paramField.radius + paramField.width) || unit.within(paramPos, paramField.radius + paramField.width)) &&
             (Angles.within(paramPos.angleTo(unit), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(unit.x + unit.deltaX, unit.y + unit.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
                 
             if(unit.isMissile() && unit.killable() && paramField.missileUnitMultiplier >= 0f){
 
-                paramField.data -= unit.health() * paramField.missileUnitMultiplier * Vars.state.rules.unitDamage(unit.team);
-                paramField.alpha = 1f;
                 unit.remove();
                 unit.type.deathSound.at(unit);
                 unit.type.deathExplosionEffect.at(unit);
                 Fx.absorb.at(unit);
                 Fx.circleColorSpark.at(unit.x, unit.y,paramUnit.team.color);
+                
+                // consider missile hp and gamerule to damage the shield
+                paramField.data -= unit.health() * paramField.missileUnitMultiplier * Vars.state.rules.unitDamage(unit.team);
+                paramField.alpha = 1f;
 
             }else{
 
@@ -85,10 +88,12 @@ public class ShieldArcAbility extends Ability{
                 float overlapDst = reach - unit.dst(paramPos.x,paramPos.y);
 
                 if(overlapDst>0){
+                    //stop
+                    unit.vel.setZero();
                     // get out
                     unit.move(Tmp.v1.set(unit).sub(paramUnit).setLength(overlapDst + 0.01f));
 
-                    if(Mathf.chanceDelta(0.12f*Time.delta)){
+                    if(Mathf.chanceDelta(0.5f*Time.delta)){
                         Fx.circleColorSpark.at(unit.x,unit.y,paramUnit.team.color);
                     }
                 }
