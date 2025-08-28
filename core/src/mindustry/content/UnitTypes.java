@@ -323,28 +323,30 @@ public class UnitTypes{
         nova = new UnitType("nova"){{
             canBoost = true;
             boostMultiplier = 1.5f;
-            speed = 0.55f;
+            speed = 0.7f;
+            rotateSpeed = 7f;
             hitSize = 8f;
-            health = 120f;
+            health = 90f;
             buildSpeed = 0.3f;
             armor = 1f;
 
-            abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
+            abilities.add(new RepairFieldAbility(10f, 60f * 4, 90f));
             ammoType = new PowerAmmoType(1000);
 
             weapons.add(new Weapon("heal-weapon"){{
                 top = false;
                 shootY = 2f;
-                reload = 24f;
+                reload = 18f;
                 x = 4.5f;
                 alternate = false;
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 shootSound = Sounds.lasershoot;
 
-                bullet = new LaserBoltBulletType(5.2f, 13){{
+                bullet = new LaserBoltBulletType(5.2f, 12){{
                     lifetime = 30f;
-                    healPercent = 5f;
+                    healPercent = 1f;
+                    healAmount = 10f;
                     collidesTeam = true;
                     backColor = Pal.heal;
                     frontColor = Color.white;
@@ -355,15 +357,15 @@ public class UnitTypes{
         pulsar = new UnitType("pulsar"){{
             canBoost = true;
             boostMultiplier = 1.6f;
-            speed = 0.7f;
+            speed = 0.732f;
             hitSize = 11f;
-            health = 320f;
+            health = 290f;
             buildSpeed = 0.5f;
             armor = 4f;
             riseSpeed = 0.07f;
 
             mineTier = 2;
-            mineSpeed = 3f;
+            mineSpeed = 3.5f;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = new PowerAmmoType(1300);
@@ -387,7 +389,7 @@ public class UnitTypes{
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
-                    damage = 14f;
+                    damage = 13f;
                     lightningLength = 7;
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
@@ -401,7 +403,7 @@ public class UnitTypes{
                         status = StatusEffects.shocked;
                         statusDuration = 10f;
                         hittable = false;
-                        healPercent = 1.6f;
+                        healPercent = 0.75f;
                         collidesTeam = true;
                     }};
                 }};
@@ -410,31 +412,32 @@ public class UnitTypes{
 
         quasar = new UnitType("quasar"){{
             mineTier = 3;
-            boostMultiplier = 2f;
-            health = 640f;
+            boostMultiplier = 1.9f;
+            health = 750f;
             buildSpeed = 1.1f;
             canBoost = true;
-            armor = 9f;
+            armor = 8f;
             mechLandShake = 2f;
             riseSpeed = 0.05f;
 
             mechFrontSway = 0.55f;
             ammoType = new PowerAmmoType(1500);
 
-            speed = 0.4f;
+            speed = 0.535f;
             hitSize = 13f;
+            rotateSpeed = 5f;
 
             mineSpeed = 4f;
             drawShields = false;
 
-            abilities.add(new ForceFieldAbility(60f, 0.3f, 400f, 60f * 6));
+            abilities.add(new ForceFieldAbility(60f, 0.3f, 512f, 180f));
 
             weapons.add(new Weapon("beam-weapon"){{
                 top = false;
                 shake = 2f;
                 shootY = 4f;
                 x = 6.5f;
-                reload = 55f;
+                reload = 37f;
                 recoil = 4f;
                 shootSound = Sounds.laser;
 
@@ -444,7 +447,8 @@ public class UnitTypes{
                     sideAngle = 45f;
                     sideWidth = 1f;
                     sideLength = 70f;
-                    healPercent = 10f;
+                    healPercent = 5f;
+                    healAmount = 35f;
                     collidesTeam = true;
                     length = 135f;
                     colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
@@ -455,7 +459,7 @@ public class UnitTypes{
         vela = new UnitType("vela"){{
             hitSize = 24f;
 
-            rotateSpeed = 1.8f;
+            rotateSpeed = 3.2f;
             mechFrontSway = 1f;
             buildSpeed = 3f;
 
@@ -464,15 +468,15 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(2500);
             drownTimeMultiplier = 4f;
 
-            speed = 0.44f;
-            boostMultiplier = 2.4f;
+            speed = 0.56f;
+            boostMultiplier = 1.6f;
             engineOffset = 12f;
             engineSize = 6f;
             lowAltitude = true;
             riseSpeed = 0.02f;
 
-            health = 8200f;
-            armor = 9f;
+            health = 7800f;
+            armor = 11f;
             canBoost = true;
             mechLandShake = 4f;
             immunities = ObjectSet.with(StatusEffects.burning);
@@ -528,7 +532,7 @@ public class UnitTypes{
                 y = -30f / 4f;
                 shootY = 6f;
                 beamWidth = 0.8f;
-                repairSpeed = 1.4f;
+                repairSpeed = 1.94f;
 
                 bullet = new BulletType(){{
                     maxRange = 120f;
@@ -538,8 +542,8 @@ public class UnitTypes{
 
         corvus = new UnitType("corvus"){{
             hitSize = 29f;
-            health = 18000f;
-            armor = 9f;
+            health = 15000f;
+            armor = 12f;
             stepShake = 1.5f;
             rotateSpeed = 1.5f;
             drownTimeMultiplier = 6f;
@@ -554,7 +558,7 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(4000);
             groundLayer = Layer.legUnit;
 
-            speed = 0.3f;
+            speed = 0.36f;
 
             drawShields = false;
 
@@ -567,7 +571,7 @@ public class UnitTypes{
                 shake = 14f;
                 shootY = 5f;
                 x = y = 0;
-                reload = 350f;
+                reload = 540f;
                 recoil = 0f;
 
                 cooldownTime = 350f;
