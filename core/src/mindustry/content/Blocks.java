@@ -5159,7 +5159,7 @@ public class Blocks{
 
                     fogRadius = 6f;
 
-                    health = 210;
+                    health = 240;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -5352,7 +5352,7 @@ public class Blocks{
 
                     fogRadius = 6f;
 
-                    health = 400;
+                    health = 300;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -5407,7 +5407,7 @@ public class Blocks{
 
                                     fogRadius = 6f;
 
-                                    health = 80;
+                                    health = 50;
 
                                     weapons.add(new Weapon(){{
                                         shootCone = 360f;
