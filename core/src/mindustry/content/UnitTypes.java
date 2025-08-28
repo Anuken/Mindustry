@@ -3319,7 +3319,7 @@ public class UnitTypes{
             drag = 0.1f;
             speed = 0.6f;
             hitSize = 30f;
-            health = 7300;
+            health = 6500;
             armor = 5f;
 
             lockLegBase = true;
@@ -3334,9 +3334,9 @@ public class UnitTypes{
                 region = "tecta-shield";
                 radius = 45f;
                 angle = 82f;
-                regen = 0.6f;
+                regen = 40f / 60f;
                 cooldown = 60f * 8f;
-                max = 2000f;
+                max = 2200f;
                 y = -20f;
                 width = 8f;
                 whenShooting = false;
