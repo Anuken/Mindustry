@@ -703,7 +703,7 @@ public class LogicBlock extends Block{
             write.i(compressed.length);
             write.b(compressed);
 
-            boolean writeUnit = executor.unit.objval != null;
+            boolean writeUnit = executor.unit != null && executor.unit.objval != null;
 
             //only write non-null values; constants cannot be contained in executor.vars
             int count = Structs.count(executor.vars, v -> !(v.isobj && v.objval == null)) + (writeUnit ? 1 : 0);
