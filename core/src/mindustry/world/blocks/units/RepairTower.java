@@ -66,6 +66,7 @@ public class RepairTower extends Block{
             }
 
             if(checkSuppression()){
+                warmup = 0f;
                 return;
             }
 
