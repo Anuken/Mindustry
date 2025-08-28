@@ -28,6 +28,7 @@ public class RepairTower extends Block{
         super(name);
         update = true;
         solid = true;
+        suppressable = true;
     }
 
     @Override
@@ -62,6 +63,10 @@ public class RepairTower extends Block{
                         targets.add(u);
                     }
                 });
+            }
+
+            if(checkSuppression()){
+                return;
             }
 
             boolean any = false;
