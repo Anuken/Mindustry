@@ -346,6 +346,7 @@ public class Blocks{
 
         charr = new Floor("char"){{
             blendGroup = stone;
+            attributes.set(Attribute.water, -0.25f);
         }};
 
         basalt = new Floor("basalt"){{
@@ -5867,7 +5868,7 @@ public class Blocks{
                     pierceCap = 2;
                     optimalLifeFract = 1f;
                 }};
-                
+
                 intervalBullets = 1;
                 fragSpread = fragRandomSpread = intervalRandomSpread = 0f;
                 bulletInterval = 20f;
