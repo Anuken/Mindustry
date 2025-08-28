@@ -99,28 +99,31 @@ public class UnitTypes{
 
         dagger = new UnitType("dagger"){{
             researchCostMultiplier = 0.5f;
-            speed = 0.5f;
+            speed = 0.68f;
             hitSize = 8f;
-            health = 150;
+            rotateSpeed = 7f;
+            health = 120;
+            armor = 2f;
             weapons.add(new Weapon("large-weapon"){{
-                reload = 13f;
+                reload = 20f;
                 x = 4f;
                 y = 2f;
                 top = false;
                 ejectEffect = Fx.casing1;
-                bullet = new BasicBulletType(2.5f, 9){{
+                bullet = new BasicBulletType(2.5f, 12){{
                     width = 7f;
                     height = 9f;
-                    lifetime = 60f;
+                    lifetime = 56.5f;
                 }};
             }});
         }};
 
         mace = new UnitType("mace"){{
-            speed = 0.5f;
+            speed = 0.62f;
             hitSize = 10f;
-            health = 550;
-            armor = 4f;
+            rotateSpeed = 4f;
+            health = 510;
+            armor = 5f;
             ammoType = new ItemAmmoType(Items.coal);
 
             immunities.add(StatusEffects.burning);
@@ -132,7 +135,7 @@ public class UnitTypes{
                 reload = 11f;
                 recoil = 1f;
                 ejectEffect = Fx.none;
-                bullet = new BulletType(4.2f, 37f){{
+                bullet = new BulletType(4.2f, 27f){{
                     ammoMultiplier = 3f;
                     hitSize = 7f;
                     lifetime = 13f;
@@ -151,12 +154,12 @@ public class UnitTypes{
         }};
 
         fortress = new UnitType("fortress"){{
-            speed = 0.43f;
+            speed = 0.51f;
             hitSize = 13f;
-            rotateSpeed = 3f;
+            rotateSpeed = 3.2f;
             targetAir = false;
-            health = 900;
-            armor = 9f;
+            health = 930;
+            armor = 10f;
             mechFrontSway = 0.55f;
             ammoType = new ItemAmmoType(Items.graphite);
 
@@ -169,15 +172,15 @@ public class UnitTypes{
                 shake = 2f;
                 ejectEffect = Fx.casing2;
                 shootSound = Sounds.artillery;
-                bullet = new ArtilleryBulletType(2f, 20, "shell"){{
+                bullet = new ArtilleryBulletType(2.5f, 20, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
-                    lifetime = 120f;
+                    lifetime = 96.5f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
                     splashDamageRadius = 35f;
-                    splashDamage = 80f;
+                    splashDamage = 70f;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
                 }};
@@ -185,11 +188,11 @@ public class UnitTypes{
         }};
 
         scepter = new UnitType("scepter"){{
-            speed = 0.36f;
+            speed = 0.52f;
             hitSize = 22f;
-            rotateSpeed = 2.1f;
-            health = 9000;
-            armor = 10f;
+            rotateSpeed = 3f;
+            health = 9100;
+            armor = 13f;
             mechFrontSway = 1f;
             ammoType = new ItemAmmoType(Items.thorium);
 
@@ -200,10 +203,10 @@ public class UnitTypes{
 
             abilities.add(new ShieldRegenFieldAbility(25f, 250f, 60f * 1, 60f));
 
-            BulletType smallBullet = new BasicBulletType(3f, 10){{
+            BulletType smallBullet = new BasicBulletType(3f, 23){{
                 width = 7f;
                 height = 9f;
-                lifetime = 50f;
+                lifetime = 55f;
             }};
 
             weapons.add(
@@ -222,10 +225,10 @@ public class UnitTypes{
                 shoot.shots = 3;
                 shoot.shotDelay = 4f;
 
-                bullet = new BasicBulletType(8f, 80){{
+                bullet = new BasicBulletType(8f, 70){{
                     width = 11f;
                     height = 20f;
-                    lifetime = 27f;
+                    lifetime = 22f;
                     shootEffect = Fx.shootBig;
                     lightning = 2;
                     lightningLength = 6;
@@ -255,11 +258,11 @@ public class UnitTypes{
         }};
 
         reign = new UnitType("reign"){{
-            speed = 0.4f;
+            speed = 0.4933f;
             hitSize = 30f;
-            rotateSpeed = 1.65f;
+            rotateSpeed = 2.6f;
             health = 24000;
-            armor = 18f;
+            armor = 25f;
             mechStepParticles = true;
             stepShake = 0.75f;
             drownTimeMultiplier = 6f;
@@ -284,7 +287,7 @@ public class UnitTypes{
                     pierceCap = 10;
                     width = 14f;
                     height = 33f;
-                    lifetime = 15f;
+                    lifetime = 17.1f;
                     shootEffect = Fx.shootBig;
                     fragVelocityMin = 0.4f;
 
@@ -303,7 +306,7 @@ public class UnitTypes{
                         pierceBuilding = true;
                         pierceCap = 3;
 
-                        lifetime = 20f;
+                        lifetime = 17f;
                         hitEffect = Fx.flakExplosion;
                         splashDamage = 15f;
                         splashDamageRadius = 10f;
