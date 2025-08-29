@@ -14,7 +14,6 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
-import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -2879,7 +2878,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(7f, 360f){{
+                bullet = new BasicBulletType(8f, 360f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
