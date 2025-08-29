@@ -1502,7 +1502,7 @@ public class UnitTypes{
         //region naval attack
 
         risso = new UnitType("risso"){{
-            speed = 1.03;
+            speed = 1.03f;
             drag = 0.13f;
             hitSize = 10f;
             health = 220;
