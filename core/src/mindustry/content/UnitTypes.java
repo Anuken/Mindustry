@@ -197,7 +197,7 @@ public class UnitTypes{
             mechStepParticles = true;
             stepShake = 0.15f;
             singleTarget = true;
-            drownTimeMultiplier = 4f;
+            drownTimeMultiplier = 1.5f;
 
             abilities.add(new ShieldRegenFieldAbility(25f, 250f, 60f * 1, 60f));
 
@@ -263,7 +263,7 @@ public class UnitTypes{
             armor = 18f;
             mechStepParticles = true;
             stepShake = 0.75f;
-            drownTimeMultiplier = 6f;
+            drownTimeMultiplier = 1.6f;
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
             ammoType = new ItemAmmoType(Items.thorium);
@@ -460,7 +460,7 @@ public class UnitTypes{
             mechStepParticles = true;
             stepShake = 0.15f;
             ammoType = new PowerAmmoType(2500);
-            drownTimeMultiplier = 4f;
+            drownTimeMultiplier = 1.3f;
 
             speed = 0.44f;
             boostMultiplier = 2.4f;
@@ -540,7 +540,7 @@ public class UnitTypes{
             armor = 9f;
             stepShake = 1.5f;
             rotateSpeed = 1.5f;
-            drownTimeMultiplier = 6f;
+            drownTimeMultiplier = 1.6f;
 
             legCount = 4;
             legLength = 14f;
@@ -771,7 +771,6 @@ public class UnitTypes{
 
             legSplashDamage = 32;
             legSplashRange = 30;
-            drownTimeMultiplier = 2f;
 
             hovering = true;
             shadowElevation = 0.65f;
@@ -858,7 +857,6 @@ public class UnitTypes{
             lightRadius = 140f;
 
             rotateSpeed = 1.9f;
-            drownTimeMultiplier = 3f;
 
             legCount = 8;
             legMoveSpace = 0.8f;
@@ -2549,7 +2547,7 @@ public class UnitTypes{
             health = 2100;
             armor = 8f;
             itemCapacity = 0;
-            drownTimeMultiplier = 1.5f;
+            drownTimeMultiplier = 0.5f;
             floorMultiplier = 0.8f;
             treadRects = new Rect[]{new Rect(17 - 96f/2f, 10 - 96f/2f, 19, 76)};
             researchCostMultiplier = 0f;
@@ -2629,7 +2627,7 @@ public class UnitTypes{
             health = 5000;
             armor = 11f;
             itemCapacity = 0;
-            drownTimeMultiplier = 2.5f;
+            drownTimeMultiplier = 0.8f;
             floorMultiplier = 0.65f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
@@ -2702,7 +2700,6 @@ public class UnitTypes{
             armor = 20f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
-            drownTimeMultiplier = 3.6f;
             floorMultiplier = 0.5f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
@@ -2801,7 +2798,6 @@ public class UnitTypes{
             armor = 26f;
             crushDamage = 25f / 5f;
             rotateSpeed = 0.8f;
-            drownTimeMultiplier = 5f;
             floorMultiplier = 0.3f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             
@@ -3358,7 +3354,7 @@ public class UnitTypes{
 
             legSplashDamage = 32;
             legSplashRange = 30;
-            drownTimeMultiplier = 2f;
+            drownTimeMultiplier = 0.5f;
 
             hovering = true;
             shadowElevation = 0.4f;
@@ -3449,7 +3445,7 @@ public class UnitTypes{
 
             legSplashDamage = 32;
             legSplashRange = 32;
-            drownTimeMultiplier = 2f;
+            drownTimeMultiplier = 0.5f;
 
             hovering = true;
             shadowElevation = 0.4f;
@@ -4089,7 +4085,7 @@ public class UnitTypes{
             hitSize = 9f;
             omniMovement = false;
             rotateSpeed = 2.5f;
-            drownTimeMultiplier = 2f;
+            drownTimeMultiplier = 1.75f;
             segments = 3;
             drawBody = false;
             hidden = true;
@@ -4109,7 +4105,6 @@ public class UnitTypes{
             hitSize = 48f;
             omniMovement = false;
             rotateSpeed = 1.7f;
-            drownTimeMultiplier = 4f;
             segments = 4;
             drawBody = false;
             hidden = true;

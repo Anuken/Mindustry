@@ -606,7 +606,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         if(floor != null && floor.isLiquid && floor.drownTime > 0 && canDrown()){
             lastDrownFloor = floor;
-            drownTime += Time.delta / (floor.drownTime * hitSize) / type.drownTimeMultiplier;
+            drownTime += Time.delta / (hitSize / 8f * type.drownTimeMultiplier * floor.drownTime);
             if(Mathf.chanceDelta(0.05f)){
                 floor.drownUpdateEffect.at(x, y, hitSize, floor.mapColor);
             }
