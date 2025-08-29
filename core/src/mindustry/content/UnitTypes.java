@@ -574,32 +574,37 @@ public class UnitTypes{
                 reload = 540f;
                 recoil = 0f;
 
+                shots = 3;
+                shotDelay = 30f;
+                
                 cooldownTime = 350f;
 
-                shootStatusDuration = 60f * 2f;
+                shootStatusDuration = 72f * 2f;
                 shootStatus = StatusEffects.unmoving;
                 shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
                 parentizeEffects = true;
 
                 bullet = new LaserBulletType(){{
-                    length = 460f;
-                    damage = 560f;
+                    length = 415f;
+                    damage = 74f;
                     width = 75f;
 
-                    lifetime = 65f;
+                    lifetime = 47f;
+
+                    buildingDamageMultiplier = 3f;
 
                     lightningSpacing = 35f;
                     lightningLength = 5;
                     lightningDelay = 1.1f;
                     lightningLengthRand = 15;
-                    lightningDamage = 50;
+                    lightningDamage = 17;
                     lightningAngleRand = 40f;
                     largeHit = true;
                     lightColor = lightningColor = Pal.heal;
 
                     chargeEffect = Fx.greenLaserCharge;
 
-                    healPercent = 25f;
+                    healPercent = 18f;
                     collidesTeam = true;
 
                     sideAngle = 15f;
