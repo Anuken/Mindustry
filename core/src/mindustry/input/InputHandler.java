@@ -87,7 +87,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public Interval controlInterval = new Interval();
     public @Nullable Block block;
     public boolean overrideLineRotation;
-    public int rotation;
+    public int rotation = 1;
     public boolean droppingItem;
     public float itemDepositCooldown;
     public Group uiGroup;

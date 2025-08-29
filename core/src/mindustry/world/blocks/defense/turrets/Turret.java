@@ -17,6 +17,7 @@ import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.pattern.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -152,10 +153,12 @@ public class Turret extends ReloadTurret{
     public Turret(String name){
         super(name);
         liquidCapacity = 20f;
-        quickRotate = false;
         outlinedIcon = 1;
         drawLiquidLight = false;
         sync = true;
+        rotate = true;
+        quickRotate = false;
+        drawArrow = false;
     }
 
     @Override
@@ -209,6 +212,11 @@ public class Turret extends ReloadTurret{
         super.load();
 
         drawer.load(this);
+    }
+
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        drawer.drawPlan(this, plan, list);
     }
 
     @Override
@@ -266,6 +274,14 @@ public class Turret extends ReloadTurret{
         public @Nullable SoundLoop soundLoop = (loopSound == Sounds.none ? null : new SoundLoop(loopSound, loopSoundVolume));
 
         float lastRangeChange;
+
+        @Override
+        public void placed(){
+            super.placed();
+            if(rotate){
+                rotation = rotdeg();
+            }
+        }
 
         @Override
         public void remove(){
