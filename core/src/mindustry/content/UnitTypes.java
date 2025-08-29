@@ -2546,7 +2546,6 @@ public class UnitTypes{
             health = 2100;
             armor = 8f;
             itemCapacity = 0;
-            drownTimeMultiplier = 0.5f;
             floorMultiplier = 0.8f;
             treadRects = new Rect[]{new Rect(17 - 96f/2f, 10 - 96f/2f, 19, 76)};
             researchCostMultiplier = 0f;
@@ -2626,7 +2625,6 @@ public class UnitTypes{
             health = 5000;
             armor = 11f;
             itemCapacity = 0;
-            drownTimeMultiplier = 0.8f;
             floorMultiplier = 0.65f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
