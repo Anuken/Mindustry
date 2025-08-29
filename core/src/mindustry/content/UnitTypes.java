@@ -3150,11 +3150,11 @@ public class UnitTypes{
         }};
 
         anthicus = new ErekirUnitType("anthicus"){{
-            speed = 0.65f;
+            speed = 0.6f;
             drag = 0.1f;
             hitSize = 21f;
             rotateSpeed = 3f;
-            health = 2900;
+            health = 2500;
             armor = 7f;
             fogRadius = 40f;
             stepShake = 0f;
@@ -3265,7 +3265,7 @@ public class UnitTypes{
                         trailColor = engineColor = Pal.techBlue;
                         engineSize = 1.75f;
                         engineLayer = Layer.effect;
-                        speed = 3.7f;
+                        speed = 3f;
                         maxRange = 6f;
                         lifetime = 60f * 1.5f;
                         outlineColor = Pal.darkOutline;
