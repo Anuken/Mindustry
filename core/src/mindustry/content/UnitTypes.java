@@ -1196,11 +1196,11 @@ public class UnitTypes{
             rotateSpeed = 2.7f;
             flying = true;
             lowAltitude = true;
-            health = 23000;
+            health = 21000;
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
-            armor = 21f;
+            armor = 22f;
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
@@ -1502,12 +1502,12 @@ public class UnitTypes{
         //region naval attack
 
         risso = new UnitType("risso"){{
-            speed = 1.1f;
+            speed = 1.03;
             drag = 0.13f;
             hitSize = 10f;
-            health = 280;
+            health = 220;
             accel = 0.4f;
-            rotateSpeed = 3.3f;
+            rotateSpeed = 8f;
             faceTarget = false;
 
             armor = 2f;
@@ -1522,7 +1522,7 @@ public class UnitTypes{
                 bullet = new BasicBulletType(2.5f, 9){{
                     width = 7f;
                     height = 9f;
-                    lifetime = 60f;
+                    lifetime = 48f;
                     ammoMultiplier = 2;
                 }};
             }});
@@ -1557,13 +1557,13 @@ public class UnitTypes{
         }};
 
         minke = new UnitType("minke"){{
-            health = 600;
-            speed = 0.9f;
+            health = 370;
+            speed = 0.82f;
             drag = 0.15f;
             hitSize = 13f;
             armor = 4f;
             accel = 0.3f;
-            rotateSpeed = 2.6f;
+            rotateSpeed = 7f;
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
 
@@ -1582,7 +1582,7 @@ public class UnitTypes{
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.shoot;
                 bullet = new FlakBulletType(4.2f, 3){{
-                    lifetime = 60f;
+                    lifetime = 46f;
                     ammoMultiplier = 4f;
                     shootEffect = Fx.shootSmall;
                     width = 6f;
@@ -1606,7 +1606,7 @@ public class UnitTypes{
                 bullet = new ArtilleryBulletType(3f, 20, "shell"){{
                     hitEffect = Fx.flakExplosion;
                     knockback = 0.8f;
-                    lifetime = 80f;
+                    lifetime = 67f;
                     width = height = 11f;
                     collidesTiles = false;
                     splashDamageRadius = 30f * 0.75f;
@@ -1616,13 +1616,13 @@ public class UnitTypes{
         }};
 
         bryde = new UnitType("bryde"){{
-            health = 910;
-            speed = 0.85f;
+            health = 730;
+            speed = 0.78f;
             accel = 0.2f;
-            rotateSpeed = 1.8f;
+            rotateSpeed = 5.5f;
             drag = 0.17f;
             hitSize = 20f;
-            armor = 7f;
+            armor = 9f;
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
 
@@ -1653,7 +1653,7 @@ public class UnitTypes{
                     trailMult = 0.8f;
                     hitEffect = Fx.massiveExplosion;
                     knockback = 1.5f;
-                    lifetime = 84f;
+                    lifetime = 75f;
                     height = 15.5f;
                     width = 15f;
                     collidesTiles = false;
@@ -1713,13 +1713,13 @@ public class UnitTypes{
 
         sei = new UnitType("sei"){{
             health = 11000;
-            armor = 12f;
+            armor = 15f;
 
-            speed = 0.73f;
+            speed = 0.76f;
             drag = 0.17f;
             hitSize = 39f;
             accel = 0.2f;
-            rotateSpeed = 1.3f;
+            rotateSpeed = 3.2f;
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.thorium);
 
@@ -1764,7 +1764,7 @@ public class UnitTypes{
                     keepVelocity = false;
                     splashDamageRadius = 35f;
                     splashDamage = 45f;
-                    lifetime = 62f;
+                    lifetime = 56f;
                     trailColor = Pal.bulletYellowBack;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
@@ -1797,19 +1797,19 @@ public class UnitTypes{
                     width = 13f;
                     height = 19f;
                     shootEffect = Fx.shootBig;
-                    lifetime = 35f;
+                    lifetime = 32f;
                 }};
             }});
         }};
 
         omura = new UnitType("omura"){{
-            health = 22000;
-            speed = 0.62f;
+            health = 21000;
+            speed = 0.53f;
             drag = 0.18f;
             hitSize = 58f;
             armor = 16f;
             accel = 0.19f;
-            rotateSpeed = 0.9f;
+            rotateSpeed = 2.4f;
             faceTarget = false;
             ammoType = new PowerAmmoType(4000);
 
@@ -1840,7 +1840,7 @@ public class UnitTypes{
 
                 bullet = new RailBulletType(){{
                     shootEffect = Fx.railShoot;
-                    length = 500;
+                    length = 410;
                     pointEffectSpace = 60f;
                     pierceEffect = Fx.railHit;
                     pointEffect = Fx.railTrail;
@@ -1860,7 +1860,7 @@ public class UnitTypes{
             hitSize = 11f;
             health = 270;
             accel = 0.4f;
-            rotateSpeed = 5f;
+            rotateSpeed = 9f;
             trailLength = 20;
             waveTrailX = 5f;
             trailScl = 1.3f;
@@ -1966,7 +1966,7 @@ public class UnitTypes{
             hitSize = 14f;
             armor = 4f;
             accel = 0.4f;
-            rotateSpeed = 4f;
+            rotateSpeed = 8f;
             faceTarget = false;
 
             trailLength = 22;
@@ -2022,7 +2022,7 @@ public class UnitTypes{
                 mirror = false;
                 x = 0f;
                 y = 1f;
-                reload = 9f;
+                reload = 16f;
                 targetInterval = 10f;
                 targetSwitchInterval = 15f;
 
@@ -2037,13 +2037,13 @@ public class UnitTypes{
         }};
 
         cyerce = new UnitType("cyerce"){{
-            health = 870;
-            speed = 0.86f;
+            health = 720;
+            speed = 0.775f;
             accel = 0.22f;
-            rotateSpeed = 2.6f;
+            rotateSpeed = 6.5f;
             drag = 0.16f;
             hitSize = 20f;
-            armor = 6f;
+            armor = 8f;
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
 
@@ -2060,7 +2060,7 @@ public class UnitTypes{
                 y = -10f;
                 shootY = 6f;
                 beamWidth = 0.8f;
-                repairSpeed = 0.7f;
+                repairSpeed = 0.57f;
 
                 bullet = new BulletType(){{
                     maxRange = 130f;
@@ -2174,14 +2174,14 @@ public class UnitTypes{
         }};
 
         aegires = new UnitType("aegires"){{
-            health = 12000;
+            health = 9000;
             armor = 12f;
 
-            speed = 0.7f;
+            speed = 0.75f;
             drag = 0.17f;
             hitSize = 44f;
             accel = 0.2f;
-            rotateSpeed = 1.4f;
+            rotateSpeed = 3f;
             faceTarget = false;
             ammoType = new PowerAmmoType(3500);
             ammoCapacity = 40;
@@ -2224,13 +2224,13 @@ public class UnitTypes{
         }};
 
         navanax = new UnitType("navanax"){{
-            health = 20000;
-            speed = 0.65f;
+            health = 27000;
+            speed = 0.74f;
             drag = 0.17f;
             hitSize = 58f;
-            armor = 16f;
+            armor = 23f;
             accel = 0.2f;
-            rotateSpeed = 1.1f;
+            rotateSpeed = 3.3f;
             faceTarget = false;
             ammoType = new PowerAmmoType(4500);
 
@@ -2259,7 +2259,7 @@ public class UnitTypes{
                         targetSwitchInterval = 35f;
 
                         rotateSpeed = 3.5f;
-                        reload = 170f;
+                        reload = 110f;
                         recoil = 1f;
                         shootSound = Sounds.beam;
                         continuous = true;
@@ -2269,7 +2269,7 @@ public class UnitTypes{
                         bullet = new ContinuousLaserBulletType(){{
                             maxRange = 90f;
                             damage = 27f;
-                            length = 95f;
+                            length = 170f;
                             hitEffect = Fx.hitMeltHeal;
                             drawSize = 200f;
                             lifetime = 155f;
@@ -2305,7 +2305,7 @@ public class UnitTypes{
                 x = 70f/4f;
                 y = -26f/4f;
 
-                reload = 65f;
+                reload = 37f;
                 shake = 3f;
                 rotateSpeed = 2f;
                 shadow = 30f;
@@ -2325,24 +2325,24 @@ public class UnitTypes{
                     timeIncrease = 3f;
                     timeDuration = 60f * 20f;
                     powerDamageScl = 3f;
-                    damage = 60;
+                    damage = 70;
                     hitColor = lightColor = Pal.heal;
                     lightRadius = 70f;
                     clipSize = 250f;
                     shootEffect = Fx.hitEmpSpark;
                     smokeEffect = Fx.shootBigSmoke2;
-                    lifetime = 60f;
+                    lifetime = 35f;
                     sprite = "circle-bullet";
                     backColor = Pal.heal;
                     frontColor = Color.white;
                     width = height = 12f;
                     shrinkY = 0f;
-                    speed = 5f;
+                    speed = 9f;
                     trailLength = 20;
                     trailWidth = 6f;
                     trailColor = Pal.heal;
                     trailInterval = 3f;
-                    splashDamage = 70f;
+                    splashDamage = 210f;
                     splashDamageRadius = rad;
                     hitShake = 4f;
                     trailRotation = true;
