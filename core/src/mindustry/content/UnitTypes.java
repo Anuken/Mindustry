@@ -2626,6 +2626,7 @@ public class UnitTypes{
             armor = 11f;
             itemCapacity = 0;
             floorMultiplier = 0.65f;
+            drownTimeMultiplier = 1.2f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
             researchCostMultiplier = 0f;
@@ -2698,6 +2699,7 @@ public class UnitTypes{
             itemCapacity = 0;
             crushDamage = 13f / 5f;
             floorMultiplier = 0.5f;
+            drownTimeMultiplier = 1.25f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
