@@ -330,7 +330,7 @@ public class UnitTypes{
             buildSpeed = 0.3f;
             armor = 1f;
 
-            abilities.add(new RepairFieldAbility(10f, 60f * 4, 90f));
+            abilities.add(new RepairFieldAbility(10f, 90f * 4, 60f));
             ammoType = new PowerAmmoType(1000);
 
             weapons.add(new Weapon("heal-weapon"){{
