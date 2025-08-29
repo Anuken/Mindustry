@@ -1352,7 +1352,7 @@ public class UnitTypes{
             mineSpeed = 4f;
             health = 380;
             armor = 2f;
-            reloadspeed = 7f;
+            rotarespeed = 7f;
             speed = 2.56f;
             accel = 0.06f;
             drag = 0.04f;
