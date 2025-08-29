@@ -574,8 +574,8 @@ public class UnitTypes{
                 reload = 540f;
                 recoil = 0f;
 
-                shots = 3;
-                shotDelay = 30f;
+                shoot.shots = 3;
+                shoot.shotDelay = 30f;
                 
                 cooldownTime = 350f;
 
