@@ -383,6 +383,7 @@ public class Teams{
             if(Mathf.chance(0.2)){
                 Time.run(Mathf.random(0f, 60f * 6f), build::kill);
             }
+            build.addPlan(true, false);
         }
 
         private void finishScheduleDerelict(){
