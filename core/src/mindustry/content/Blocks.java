@@ -4287,7 +4287,7 @@ public class Blocks{
             requirements(Category.turret, with(Items.copper, 1200, Items.lead, 350, Items.graphite, 300, Items.surgeAlloy, 325, Items.silicon, 325));
             shootEffect = Fx.shootBigSmoke2;
             shootCone = 40f;
-            rotateSpeed = 1.3;
+            rotateSpeed = 1.3f;
             recoil = 4f;
             size = 4;
             shake = 2f;
