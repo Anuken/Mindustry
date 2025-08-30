@@ -1536,9 +1536,12 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     public <T extends Unit & Payloadc> void drawPayload(T unit){
         if(unit.hasPayload()){
+            float prev = Draw.z();
+            Draw.z(prev - 0.02f);
             Payload pay = unit.payloads().first();
             pay.set(unit.x, unit.y, unit.rotation);
             pay.draw();
+            Draw.z(prev);
         }
     }
 
