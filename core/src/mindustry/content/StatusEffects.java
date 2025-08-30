@@ -20,8 +20,10 @@ public class StatusEffects{
         burning = new StatusEffect("burning"){{
             color = Color.valueOf("ffc455");
             damage = 0.167f;
+            reloadMultiplier = 0.9f;
+            speedMultiplier = 0.9f;
             effect = Fx.burning;
-            transitionDamage = 8f;
+            transitionDamage = 12f;
 
             init(() -> {
                 opposite(wet, freezing);
@@ -38,7 +40,7 @@ public class StatusEffects{
             speedMultiplier = 0.6f;
             healthMultiplier = 0.8f;
             effect = Fx.freezing;
-            transitionDamage = 18f;
+            transitionDamage = 15f;
 
             init(() -> {
                 opposite(melting, burning);
@@ -76,7 +78,7 @@ public class StatusEffects{
             speedMultiplier = 0.94f;
             effect = Fx.wet;
             effectChance = 0.09f;
-            transitionDamage = 14;
+            transitionDamage = 13;
 
             init(() -> {
                 affinity(shocked, (unit, result, time) -> {
