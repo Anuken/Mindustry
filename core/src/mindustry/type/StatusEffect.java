@@ -106,7 +106,7 @@ public class StatusEffect extends UnlockableContent{
 
         if(intervalDamageTime > 0f && intervalDamage > 0){
             stats.add(Stat.damage, intervalDamage);
-            stats.add(Stat.damage, 60f / intervalDamageTime, StatUnit.perSecond);
+            stats.add(Stat.frequency, 60f / intervalDamageTime, StatUnit.perSecond);
         }
 
         boolean reacts = false;

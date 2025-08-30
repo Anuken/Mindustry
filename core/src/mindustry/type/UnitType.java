@@ -782,22 +782,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
 
         if(immunities.size > 0){
-            var imm = immunities.toSeq().sort();
-            //it's redundant to list wet for naval units
-            if(naval){
-                imm.remove(StatusEffects.wet);
-            }
-            stats.add(Stat.immunities, StatValues.statusEffects(imm));
-        }
-    }
-
-    //never actually called; it turns out certain mods have custom weapons that do not need bullets.
-    protected void validateWeapons(){
-        for(int i = 0; i < weapons.size; i++){
-            var wep = weapons.get(i);
-            if(wep.bullet == Bullets.placeholder || wep.bullet == null){
-                throw new RuntimeException("Unit: " + name + ": weapon #" + i + " ('" + wep.name + "') does not have a bullet defined. Make sure you have a bullet: (JSON) or `bullet = ` field in your unit definition.");
-            }
+            stats.add(Stat.immunities, StatValues.statusEffects(immunities.toSeq().sort()));
         }
     }
 
@@ -1551,9 +1536,12 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     public <T extends Unit & Payloadc> void drawPayload(T unit){
         if(unit.hasPayload()){
+            float prev = Draw.z();
+            Draw.z(prev - 0.02f);
             Payload pay = unit.payloads().first();
             pay.set(unit.x, unit.y, unit.rotation);
             pay.draw();
+            Draw.z(prev);
         }
     }
 
