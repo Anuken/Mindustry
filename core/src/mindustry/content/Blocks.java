@@ -1706,7 +1706,7 @@ public class Blocks{
 
         plastaniumWall = new Wall("plastanium-wall"){{
             requirements(Category.defense, with(Items.plastanium, 5, Items.metaglass, 2));
-            health = 125 * wallHealthMultiplier;
+            health = 160 * wallHealthMultiplier;
             insulated = true;
             absorbLasers = true;
             schematicPriority = 10;
@@ -1714,7 +1714,7 @@ public class Blocks{
 
         plastaniumWallLarge = new Wall("plastanium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(plastaniumWall.requirements, 4));
-            health = 125 * wallHealthMultiplier * 4;
+            health = 160 * wallHealthMultiplier * 4;
             size = 2;
             insulated = true;
             absorbLasers = true;
@@ -1734,14 +1734,14 @@ public class Blocks{
 
         phaseWall = new Wall("phase-wall"){{
             requirements(Category.defense, with(Items.phaseFabric, 6));
-            health = 150 * wallHealthMultiplier;
+            health = 180 * wallHealthMultiplier;
             chanceDeflect = 10f;
             flashHit = true;
         }};
 
         phaseWallLarge = new Wall("phase-wall-large"){{
             requirements(Category.defense, ItemStack.mult(phaseWall.requirements, 4));
-            health = 150 * 4 * wallHealthMultiplier;
+            health = 180 * 4 * wallHealthMultiplier;
             size = 2;
             chanceDeflect = 10f;
             flashHit = true;
@@ -1749,13 +1749,13 @@ public class Blocks{
 
         surgeWall = new Wall("surge-wall"){{
             requirements(Category.defense, with(Items.surgeAlloy, 6));
-            health = 230 * wallHealthMultiplier;
+            health = 245 * wallHealthMultiplier;
             lightningChance = 0.05f;
         }};
 
         surgeWallLarge = new Wall("surge-wall-large"){{
             requirements(Category.defense, ItemStack.mult(surgeWall.requirements, 4));
-            health = 230 * 4 * wallHealthMultiplier;
+            health = 245 * 4 * wallHealthMultiplier;
             size = 2;
             lightningChance = 0.05f;
         }};
@@ -1954,11 +1954,11 @@ public class Blocks{
         shockMine = new ShockMine("shock-mine"){{
             requirements(Category.effect, with(Items.lead, 25, Items.silicon, 12));
             hasShadow = false;
-            health = 50;
-            damage = 25;
+            health = 30;
+            damage = 15;
             tileDamage = 7f;
             length = 10;
-            tendrils = 4;
+            tendrils = 7;
         }};
 
         radar = new Radar("radar"){{
@@ -3101,7 +3101,8 @@ public class Blocks{
 
             isFirstTier = true;
             unitType = UnitTypes.alpha;
-            health = 1100;
+            health = 2000;
+            armor = 3;
             itemCapacity = 4000;
             size = 3;
             buildCostMultiplier = 2f;
@@ -3114,6 +3115,7 @@ public class Blocks{
 
             unitType = UnitTypes.beta;
             health = 3500;
+            armor = 5f;
             itemCapacity = 9000;
             size = 4;
             thrusterLength = 34/4f;
@@ -3126,7 +3128,8 @@ public class Blocks{
             requirements(Category.effect, with(Items.copper, 8000, Items.lead, 8000, Items.silicon, 5000, Items.thorium, 4000));
 
             unitType = UnitTypes.gamma;
-            health = 6000;
+            health = 9000;
+            armor = 8f;
             itemCapacity = 13000;
             size = 5;
             thrusterLength = 40/4f;
@@ -3707,7 +3710,7 @@ public class Blocks{
         }};
 
         salvo = new ItemTurret("salvo"){{
-            requirements(Category.turret, with(Items.copper, 100, Items.graphite, 80, Items.titanium, 50));
+            requirements(Category.turret, with(Items.copper, 120, Items.graphite, 50, Items.titanium, 35));
             ammo(
                 Items.copper,  new BasicBulletType(2.5f, 13){{
                     width = 7f;
@@ -3939,7 +3942,7 @@ public class Blocks{
         }};
 
         ripple = new ItemTurret("ripple"){{
-            requirements(Category.turret, with(Items.copper, 150, Items.graphite, 135, Items.titanium, 60));
+            requirements(Category.turret, with(Items.copper, 175, Items.graphite, 90, Items.titanium, 70));
             ammo(
                 Items.graphite, new ArtilleryBulletType(3f, 20){{
                     knockback = 1.2f;
@@ -6177,11 +6180,11 @@ public class Blocks{
         //region units
 
         groundFactory = new UnitFactory("ground-factory"){{
-            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
+            requirements(Category.units, with(Items.copper, 120, Items.lead, 70, Items.silicon, 80));
             plans = Seq.with(
-                new UnitPlan(UnitTypes.dagger, 60f * 15, with(Items.silicon, 10, Items.lead, 10)),
-                new UnitPlan(UnitTypes.crawler, 60f * 10, with(Items.silicon, 8, Items.coal, 10)),
-                new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20))
+                new UnitPlan(UnitTypes.dagger, 60f * 15, with(Items.silicon, 12, Items.lead, 10)),
+                new UnitPlan(UnitTypes.crawler, 60f * 10, with(Items.silicon, 10, Items.coal, 8)),
+                new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 25, Items.lead, 10, Items.titanium, 15))
             );
             size = 3;
             consumePower(1.2f);
@@ -6189,7 +6192,7 @@ public class Blocks{
         }};
 
         airFactory = new UnitFactory("air-factory"){{
-            requirements(Category.units, with(Items.copper, 60, Items.lead, 70));
+            requirements(Category.units, with(Items.copper, 110, Items.lead, 80, Items.titanium, 35));
             plans = Seq.with(
                 new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 15)),
                 new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15))
@@ -6200,10 +6203,10 @@ public class Blocks{
         }};
 
         navalFactory = new UnitFactory("naval-factory"){{
-            requirements(Category.units, with(Items.copper, 150, Items.lead, 130, Items.metaglass, 120));
+            requirements(Category.units, with(Items.copper, 120, Items.lead, 130, Items.metaglass, 120));
             plans = Seq.with(
                 new UnitPlan(UnitTypes.risso, 60f * 45f, with(Items.silicon, 20, Items.metaglass, 35)),
-                new UnitPlan(UnitTypes.retusa, 60f * 35f, with(Items.silicon, 15, Items.titanium, 20))
+                new UnitPlan(UnitTypes.retusa, 60f * 35f, with(Items.silicon, 15, Items.titanium, 75))
             );
             size = 3;
             consumePower(1.2f);
@@ -6215,7 +6218,7 @@ public class Blocks{
 
             size = 3;
             consumePower(3f);
-            consumeItems(with(Items.silicon, 40, Items.graphite, 40));
+            consumeItems(with(Items.silicon, 30, Items.graphite, 30));
 
             constructTime = 60f * 10f;
 
@@ -6307,7 +6310,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 90, Items.thorium, 80, Items.plastanium, 60));
             size = 2;
             length = 6f;
-            repairSpeed = 3f;
+            repairSpeed = 2f;
             repairRadius = 145f;
             powerUse = 5f;
             beamWidth = 1.1f;
