@@ -196,7 +196,7 @@ public class UnitTypes{
             mechStepParticles = true;
             stepShake = 0.15f;
             singleTarget = true;
-            drownTimeMultiplier = 4f;
+            drownTimeMultiplier = 1.5f;
 
             abilities.add(new ShieldRegenFieldAbility(25f, 250f, 60f * 1, 60f));
 
@@ -262,7 +262,7 @@ public class UnitTypes{
             armor = 18f;
             mechStepParticles = true;
             stepShake = 0.75f;
-            drownTimeMultiplier = 6f;
+            drownTimeMultiplier = 1.6f;
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
             ammoType = new ItemAmmoType(Items.thorium);
@@ -459,7 +459,7 @@ public class UnitTypes{
             mechStepParticles = true;
             stepShake = 0.15f;
             ammoType = new PowerAmmoType(2500);
-            drownTimeMultiplier = 4f;
+            drownTimeMultiplier = 1.3f;
 
             speed = 0.44f;
             boostMultiplier = 2.4f;
@@ -539,7 +539,7 @@ public class UnitTypes{
             armor = 9f;
             stepShake = 1.5f;
             rotateSpeed = 1.5f;
-            drownTimeMultiplier = 6f;
+            drownTimeMultiplier = 1.6f;
 
             legCount = 4;
             legLength = 14f;
@@ -770,7 +770,6 @@ public class UnitTypes{
 
             legSplashDamage = 32;
             legSplashRange = 30;
-            drownTimeMultiplier = 2f;
 
             hovering = true;
             shadowElevation = 0.65f;
@@ -857,7 +856,6 @@ public class UnitTypes{
             lightRadius = 140f;
 
             rotateSpeed = 1.9f;
-            drownTimeMultiplier = 3f;
 
             legCount = 8;
             legMoveSpace = 0.8f;
@@ -2506,6 +2504,7 @@ public class UnitTypes{
             health = 850;
             armor = 6f;
             itemCapacity = 0;
+            floorMultiplier = 0.95f;
             treadRects = new Rect[]{new Rect(12 - 32f, 7 - 32f, 14, 51)};
             researchCostMultiplier = 0f;
 
@@ -2547,6 +2546,7 @@ public class UnitTypes{
             health = 2100;
             armor = 8f;
             itemCapacity = 0;
+            floorMultiplier = 0.8f;
             treadRects = new Rect[]{new Rect(17 - 96f/2f, 10 - 96f/2f, 19, 76)};
             researchCostMultiplier = 0f;
 
@@ -2625,6 +2625,9 @@ public class UnitTypes{
             health = 5000;
             armor = 11f;
             itemCapacity = 0;
+            floorMultiplier = 0.65f;
+            drownTimeMultiplier = 1.2f;
+            immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
             researchCostMultiplier = 0f;
 
@@ -2695,6 +2698,9 @@ public class UnitTypes{
             armor = 20f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
+            floorMultiplier = 0.5f;
+            drownTimeMultiplier = 1.25f;
+            immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
             weapons.add(new Weapon("vanquish-weapon"){{
@@ -2791,7 +2797,9 @@ public class UnitTypes{
             armor = 26f;
             crushDamage = 25f / 5f;
             rotateSpeed = 0.8f;
-
+            floorMultiplier = 0.3f;
+            immunities.addAll(StatusEffects.burning, StatusEffects.melting);
+            
             float xo = 231f/2f, yo = 231f/2f;
             treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};
 
@@ -3306,7 +3314,7 @@ public class UnitTypes{
             drag = 0.1f;
             speed = 0.6f;
             hitSize = 30f;
-            health = 7300;
+            health = 6500;
             armor = 5f;
 
             lockLegBase = true;
@@ -3319,14 +3327,15 @@ public class UnitTypes{
 
             abilities.add(new ShieldArcAbility(){{
                 region = "tecta-shield";
-                radius = 36f;
+                radius = 45f;
                 angle = 82f;
-                regen = 0.6f;
+                regen = 40f / 60f;
                 cooldown = 60f * 8f;
-                max = 2000f;
+                max = 2200f;
                 y = -20f;
-                width = 6f;
+                width = 8f;
                 whenShooting = false;
+                chanceDeflect = 1f;
             }});
 
             rotateSpeed = 2.1f;
@@ -3344,7 +3353,7 @@ public class UnitTypes{
 
             legSplashDamage = 32;
             legSplashRange = 30;
-            drownTimeMultiplier = 2f;
+            drownTimeMultiplier = 0.5f;
 
             hovering = true;
             shadowElevation = 0.4f;
@@ -3435,7 +3444,7 @@ public class UnitTypes{
 
             legSplashDamage = 32;
             legSplashRange = 32;
-            drownTimeMultiplier = 2f;
+            drownTimeMultiplier = 0.5f;
 
             hovering = true;
             shadowElevation = 0.4f;
@@ -3487,7 +3496,7 @@ public class UnitTypes{
 
                 bullet = new ArtilleryBulletType(5.5f, 260){{
                     collidesTiles = collides = true;
-                    lifetime = 70f;
+                    lifetime = 60f;
                     shootEffect = Fx.shootBigColor;
                     smokeEffect = Fx.shootSmokeSquareBig;
                     frontColor = Color.white;
@@ -3495,6 +3504,7 @@ public class UnitTypes{
                     hitSound = Sounds.none;
                     width = 18f;
                     height = 24f;
+                    rangeOverride = 385f;
 
                     lightColor = trailColor = hitColor = backColor = Pal.techBlue;
                     lightRadius = 40f;
@@ -3508,10 +3518,10 @@ public class UnitTypes{
                     despawnSound = Sounds.dullExplosion;
 
                     hitEffect = despawnEffect = new ExplosionEffect(){{
-                        lifetime = 34f;
-                        waveStroke = 4f;
+                        lifetime = 50f;
+                        waveStroke = 5f;
                         waveColor = sparkColor = trailColor;
-                        waveRad = 25f;
+                        waveRad = 45f;
                         smokeSize = 0f;
                         smokeSizeBase = 0f;
                         sparks = 10;
@@ -3520,8 +3530,8 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    splashDamage = 85f;
-                    splashDamageRadius = 20f;
+                    splashDamage = 120f;
+                    splashDamageRadius = 36f;
 
                     fragBullets = 15;
                     fragVelocityMin = 0.5f;
@@ -3529,14 +3539,14 @@ public class UnitTypes{
                     fragLifeMin = 0.3f;
                     despawnShake = 5f;
 
-                    fragBullet = new BasicBulletType(5.5f, 50){{
+                    fragBullet = new BasicBulletType(5.5f, 37){{
                         pierceCap = 2;
                         pierceBuilding = true;
 
                         homingPower = 0.09f;
                         homingRange = 150f;
 
-                        lifetime = 50f;
+                        lifetime = 40f;
                         shootEffect = Fx.shootBigColor;
                         smokeEffect = Fx.shootSmokeSquareBig;
                         frontColor = Color.white;
@@ -3555,7 +3565,7 @@ public class UnitTypes{
                         collidesAir = false;
 
                         despawnEffect = Fx.none;
-                        splashDamage = 46f;
+                        splashDamage = 35f;
                         splashDamageRadius = 30f;
 
                         hitEffect = despawnEffect = new MultiEffect(new ExplosionEffect(){{
@@ -4074,7 +4084,7 @@ public class UnitTypes{
             hitSize = 9f;
             omniMovement = false;
             rotateSpeed = 2.5f;
-            drownTimeMultiplier = 2f;
+            drownTimeMultiplier = 1.75f;
             segments = 3;
             drawBody = false;
             hidden = true;
@@ -4094,7 +4104,6 @@ public class UnitTypes{
             hitSize = 48f;
             omniMovement = false;
             rotateSpeed = 1.7f;
-            drownTimeMultiplier = 4f;
             segments = 4;
             drawBody = false;
             hidden = true;
