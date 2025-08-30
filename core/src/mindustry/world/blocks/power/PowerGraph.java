@@ -169,9 +169,9 @@ public class PowerGraph{
 
     public float chargeBatteries(float excess){
         float capacity = getBatteryCapacity();
+        if(Mathf.equal(capacity, 0f)) return 0f;
         //how much of the missing in each battery % is charged
         float chargedPercent = Math.min(excess/capacity, 1f);
-        if(Mathf.equal(capacity, 0f)) return 0f;
 
         var items = batteries.items;
         for(int i = 0; i < batteries.size; i++){
