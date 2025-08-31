@@ -6398,14 +6398,14 @@ public class Blocks{
             regionSuffix = "-dark";
             size = 5;
             plans.add(
-            new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, PayloadStack.list(UnitTypes.stell, 4, Blocks.tungstenWallLarge, 10)),
+            new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 70f, PayloadStack.list(UnitTypes.stell, 4, Blocks.tungstenWallLarge, 12)),
             new AssemblerUnitPlan(UnitTypes.conquer, 60f * 60f * 3f, PayloadStack.list(UnitTypes.locus, 6, Blocks.carbideWallLarge, 20))
             );
             areaSize = 13;
             researchCostMultiplier = 0.4f;
 
-            consumePower(2.5f);
-            consumeLiquid(Liquids.cyanogen, 9f / 60f);
+            consumePower(3f);
+            consumeLiquid(Liquids.cyanogen, 12f / 60f);
         }};
 
         shipAssembler = new UnitAssembler("ship-assembler"){{
