@@ -14,7 +14,6 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
-import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -2716,7 +2715,6 @@ public class UnitTypes{
                 cooldownTime = 160f;
 
                 bullet = new RailBulletType(){{
-                    setDefaults = false;
                     length = 230f;
                     damage = 150f;
                     lifetime = 18f;
@@ -2730,12 +2728,7 @@ public class UnitTypes{
                     trailWidth = 3.1f;
                     trailLength = 8;
 
-
                     despawnEffect = Fx.blastExplosion;
-                    splashDamageRadius = 20f;
-                    splashDamage = 50f;
-
-                    fragOnHit = false;
                     fragRandomSpread = 0f;
                     fragSpread = 10f;
                     fragBullets = 5;
@@ -2761,12 +2754,10 @@ public class UnitTypes{
                 }};
             }});
 
-            int i = 0;
-            for(float f : new float[]{34f / 4f, -36f / 4f}){
-                int fi = i ++;
+            for(int i = 0; i <= 2; i++){
+                int fi = i;
                 weapons.add(new Weapon("vanquish-point-weapon"){{
-                    mirror = false;
-                    reload = 15f + fi * 5;
+                    reload = 15f;
                     x = 48f / 4f;
                     y = f;
                     shootY = 5.5f;
