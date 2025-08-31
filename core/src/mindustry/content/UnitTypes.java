@@ -14,6 +14,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -2719,16 +2720,70 @@ public class UnitTypes{
                     damage = 150f;
                     lifetime = 18f;
                     hitSize = 6f;
-                    shootEffect = Fx.shootTitan;
-                    smokeEffect = Fx.shootSmokeTitan;
                     pierceCap = 1;
                     pierce = false;
                     pierceBuilding = true;
+                    setDefaults = false;
                     hitColor = trailColor = Color.valueOf("feb380");
-                    trailWidth = 3.1f;
-                    trailLength = 8;
+                    pointEffectSpace = 1f;
+
+                    pointEffect = new MultiEffect(
+                        new Effect(25f, e -> {
+                            Color color = Color.valueOf("feb380");
+                            float stroke = Mathf.lerp(6f, 0f, e.fin());
+                            Draw.color(color);
+                            Lines.stroke(stroke);
+                            Lines.lineAngle(e.x, e.y, e.rotation, 4f);
+                        }),
+                        new Effect(50f, e -> {
+                            Color color = Color.valueOf("fea480");
+                            float stroke = Mathf.lerp(2f, 0f, e.fin());
+                            Draw.color(color);
+                            Lines.stroke(stroke);
+                            Lines.lineAngle(e.x, e.y, e.rotation, 4f);
+                        })
+                    );
+
+                    shootEffect = Fx.shootTitan;
+                    smokeEffect = new MultiEffect(
+                        new Effect(35f, e -> {
+                            Color color = Color.valueOf("fea480");
+                            for(int i = 0; i < 10; i++){
+                                float angle = e.rotation + Mathf.range(10f);
+                                float len = Mathf.lerp(14f, 0f, Interp.pow2Out.apply(e.fin()));
+                                float stroke = Mathf.lerp(2f, 0f, Interp.pow2Out.apply(e.fin()));
+                                Draw.color(color);
+                                Lines.stroke(stroke);
+                                Lines.lineAngle(e.x, e.y, angle, len);
+                            }
+                        }),
+                        new Effect(35f, e -> {
+                            Color color = Color.valueOf("fea480");
+                            for(int i = 0; i < 4; i++){
+                                float angle = e.rotation + Mathf.range(10f);
+                                float len = Mathf.lerp(7f, 0f, Interp.pow2Out.apply(e.fin()));
+                                float stroke = Mathf.lerp(2f, 0f, Interp.pow2Out.apply(e.fin()));
+                                Draw.color(color);
+                                Lines.stroke(stroke);
+                                Lines.lineAngle(e.x, e.y, angle, len);
+                            }
+                        })
+                    );
 
                     despawnEffect = Fx.blastExplosion;
+                    hitEffect = endEffect = new Effect(30f, e -> {
+                        Color colorTo = Color.valueOf("feb380");
+                        float angleStep = 40f / 8f;
+                        for(int i = 0; i < 8; i++){
+                            float angle = e.rotation + (i - 4) * angleStep;
+                            float len = Mathf.lerp(10f, 0f, e.fin());
+                            float stroke = Mathf.lerp(2f, 0f, Interp.pow2Out.apply(e.fin()));
+                            Draw.color(colorTo, e.fin());
+                            Lines.stroke(stroke);
+                            Lines.lineAngle(e.x, e.y, angle, len);
+                        }
+                    });
+
                     fragRandomSpread = 0f;
                     fragSpread = 10f;
                     fragBullets = 5;
@@ -2754,10 +2809,11 @@ public class UnitTypes{
                 }};
             }});
 
-            for(int i = 0; i <= 2; i++){
-                int fi = i;
+            int i = 0;
+            for(float f : new float[] { 34f / 4f, -36f / 4f }){
+                int fi = i ++;
                 weapons.add(new Weapon("vanquish-point-weapon"){{
-                    reload = 15f;
+                    reload = 15f / 2f;
                     x = 48f / 4f;
                     y = f;
                     shootY = 5.5f;
@@ -2766,6 +2822,8 @@ public class UnitTypes{
                     rotateSpeed = 3f;
                     shootCone = 30f;
                     shootSound = Sounds.shoot;
+                    mirror = true;
+                    alternate = true;
 
                     bullet = new BasicBulletType(12f, 50){{
                         sprite = "missile-large";
