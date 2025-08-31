@@ -330,7 +330,7 @@ public class UnitTypes{
             buildSpeed = 0.3f;
             armor = 1f;
 
-            abilities.add(new RepairFieldAbility(10f, 90f * 4, 60f));
+            abilities.add(new RepairFieldAbility(10f, 90f, 60f));
             ammoType = new PowerAmmoType(1000);
 
             weapons.add(new Weapon("heal-weapon"){{
@@ -716,7 +716,7 @@ public class UnitTypes{
 
             weapons.add(new Weapon("spiroct-weapon"){{
                 shootY = 4f;
-                reload = 15f;
+                reload = 14f;
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 rotate = true;
@@ -739,7 +739,7 @@ public class UnitTypes{
             }});
 
             weapons.add(new Weapon("mount-purple-weapon"){{
-                reload = 18f;
+                reload = 15f;
                 rotate = true;
                 x = 4f;
                 y = 3f;
@@ -1129,7 +1129,7 @@ public class UnitTypes{
             targetFlags = new BlockFlag[]{BlockFlag.generator, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
-            BulletType missiles = new MissileBulletType(2.7f, 31){{
+            BulletType missiles = new MissileBulletType(2.7f, 23){{
                 width = 8.5f;
                 height = 8.5f;
                 shrinkY = 0f;
@@ -1204,13 +1204,13 @@ public class UnitTypes{
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
-            BulletType fragBullet = new FlakBulletType(4f, 15){{
+            BulletType fragBullet = new FlakBulletType(4f, 35){{
                 shootEffect = Fx.shootBig;
                 ammoMultiplier = 4f;
                 splashDamage = 65f;
                 splashDamageRadius = 25f;
                 collidesGround = true;
-                lifetime = 47f;
+                lifetime = 65f;
 
                 status = StatusEffects.blasted;
                 statusDuration = 60f;
@@ -1310,7 +1310,7 @@ public class UnitTypes{
             mineTier = 2;
             mineSpeed = 3.5f;
 
-            abilities.add(new RepairFieldAbility(5f, 112f * 8, 50f));
+            abilities.add(new RepairFieldAbility(5f, 112f, 50f));
 
             weapons.add(new Weapon("poly-weapon"){{
                 top = false;
