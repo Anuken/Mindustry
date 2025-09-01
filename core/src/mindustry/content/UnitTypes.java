@@ -3824,7 +3824,7 @@ public class UnitTypes{
             health = 6000f;
             armor = 4f;
             hitSize = 36f;
-            payloadCapacity = Mathf.sqr(3f) * tilePayload;
+            payloadCapacity = Mathf.sqr(4f) * tilePayload;
             researchCostMultiplier = 0f;
             targetAir = false;
 
