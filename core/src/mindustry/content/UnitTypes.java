@@ -2703,7 +2703,6 @@ public class UnitTypes{
                 shootSound = Sounds.railgunMedium;
                 layerOffset = 0.0001f;
                 reload = 180f;
-                shootY = 0f;
                 shake = 5f;
                 recoil = 4f;
                 rotate = true;
@@ -2724,65 +2723,50 @@ public class UnitTypes{
                     pierce = false;
                     pierceBuilding = true;
                     setDefaults = false;
-                    hitColor = trailColor = Color.valueOf("feb380");
+                    hitColor = Color.valueOf("feb380");
                     pointEffectSpace = 1f;
 
-                    pointEffect = new MultiEffect(
-                        new Effect(25f, e -> {
-                            Color color = Color.valueOf("feb380");
-                            float stroke = Mathf.lerp(6f, 0f, e.fin());
-                            Draw.color(color);
-                            Lines.stroke(stroke);
-                            Lines.lineAngle(e.x, e.y, e.rotation, 4f);
-                        }),
-                        new Effect(50f, e -> {
-                            Color color = Color.valueOf("fea480");
-                            float stroke = Mathf.lerp(2f, 0f, e.fin());
-                            Draw.color(color);
-                            Lines.stroke(stroke);
-                            Lines.lineAngle(e.x, e.y, e.rotation, 4f);
-                        })
-                    );
+                    pointEffect = new ParticleEffect(){{
+                        colorTo = colorFrom = Color.valueOf("feb380");
+                        line = cap = true;
+                        particles = 1;
+                        cone = length = 0f;
+                        baseLength = 2f;
+                        lifetime = Mathf.random(25f, 50f);
+                        strokeFrom = Mathf.random(2f, 6f);
+                        strokeTo = 0f;
+                        lenFrom = lenTo = 4f;
+                    }};
 
                     shootEffect = Fx.shootTitan;
-                    smokeEffect = new MultiEffect(
-                        new Effect(35f, e -> {
-                            Color color = Color.valueOf("fea480");
-                            for(int i = 0; i < 10; i++){
-                                float angle = e.rotation + Mathf.range(10f);
-                                float len = Mathf.lerp(14f, 0f, Interp.pow2Out.apply(e.fin()));
-                                float stroke = Mathf.lerp(2f, 0f, Interp.pow2Out.apply(e.fin()));
-                                Draw.color(color);
-                                Lines.stroke(stroke);
-                                Lines.lineAngle(e.x, e.y, angle, len);
-                            }
-                        }),
-                        new Effect(35f, e -> {
-                            Color color = Color.valueOf("fea480");
-                            for(int i = 0; i < 4; i++){
-                                float angle = e.rotation + Mathf.range(10f);
-                                float len = Mathf.lerp(7f, 0f, Interp.pow2Out.apply(e.fin()));
-                                float stroke = Mathf.lerp(2f, 0f, Interp.pow2Out.apply(e.fin()));
-                                Draw.color(color);
-                                Lines.stroke(stroke);
-                                Lines.lineAngle(e.x, e.y, angle, len);
-                            }
-                        })
-                    );
+                    smokeEffect = new ParticleEffect(){{
+                        colorTo = colorFrom = Color.valueOf("fea480");
+                        particles = Mathf.random(4, 10);
+                        length = Mathf.random(30f, 50f);
+                        lifetime = 35f;
+                        lenFrom = Mathf.random(7f, 14f);
+                        lenTo = strokeTo = 0f;
+                        strokeFrom = 2f;
+                        cone = 10f;
+                        line = true;
+                        interp = Interp.fade;
+                        interp = Interp.pow2Out;
+                        sizeInterp = Interp.pow2In;
+                    }};
 
-                    despawnEffect = Fx.blastExplosion;
-                    hitEffect = endEffect = new Effect(30f, e -> {
-                        Color colorTo = Color.valueOf("feb380");
-                        float angleStep = 40f / 8f;
-                        for(int i = 0; i < 8; i++){
-                            float angle = e.rotation + (i - 4) * angleStep;
-                            float len = Mathf.lerp(10f, 0f, e.fin());
-                            float stroke = Mathf.lerp(2f, 0f, Interp.pow2Out.apply(e.fin()));
-                            Draw.color(colorTo, e.fin());
-                            Lines.stroke(stroke);
-                            Lines.lineAngle(e.x, e.y, angle, len);
-                        }
-                    });
+                    hitEffect = endEffect = new ParticleEffect(){{
+                        colorTo = Color.valueOf("feb380");
+                        particles = 8;
+                        length = 60f;
+                        lifetime = 30f;
+                        lenFrom = 10f;
+                        lenTo = strokeTo = 0f;
+                        strokeFrom = 2f;
+                        cone = 40f;
+                        line = true;
+                        interp = Interp.pow2Out;
+                        sizeInterp = Interp.pow2In;
+                    }};  
 
                     fragRandomSpread = 0f;
                     fragSpread = 10f;
@@ -2813,7 +2797,7 @@ public class UnitTypes{
             for(float f : new float[] { 34f / 4f, -36f / 4f }){
                 int fi = i ++;
                 weapons.add(new Weapon("vanquish-point-weapon"){{
-                    reload = 15f / 2f;
+                    reload = 15f;
                     x = 48f / 4f;
                     y = f;
                     shootY = 5.5f;
@@ -2824,6 +2808,7 @@ public class UnitTypes{
                     shootSound = Sounds.shoot;
                     mirror = true;
                     alternate = true;
+                    otherSide = fi;
 
                     bullet = new BasicBulletType(12f, 50){{
                         sprite = "missile-large";
