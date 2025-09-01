@@ -1362,24 +1362,29 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     public static class TextureHolder implements JsonSerializable{
-        private static final ReusableByteOutStream stream = new ReusableByteOutStream();
-        private static final DataOutputStream output = new DataOutputStream(stream);
-
         public Object value = "white";
 
         @Override
         public void write(Json json){
-            stream.reset();
-            TypeIO.writeObject(Writes.get(output), value);
-            json.writeValue("value", stream.toByteArray());
+            if(value instanceof String s){
+                json.writeValue("string", s);
+            }else if(value instanceof UnlockableContent c){
+                json.writeValue("content", c.name);
+            }else if(value instanceof Building b){
+                json.writeValue("building", b.pos());
+            }
         }
 
         @Override
         public void read(Json json, JsonValue jsonData){
-            if(!jsonData.has("value") || jsonData.get("value").isNull()){
-                value = null;
+            if(jsonData.has("string")){
+                value = jsonData.get("string").asString();
+            }else if(jsonData.has("content")){
+                value = content.byName(jsonData.get("content").asString());
+            }else if(jsonData.has("building")){
+                value = world.build(jsonData.get("building").asInt());
             }else{
-                value = TypeIO.readObject(Reads.get(new ByteBufferInput(ByteBuffer.wrap(jsonData.get("value").asByteArray()))));
+                value = "white";
             }
         }
     }
