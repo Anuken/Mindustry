@@ -2772,7 +2772,7 @@ public class UnitTypes{
                     fragSpread = 10f;
                     fragBullets = 5;
                     fragVelocityMin = 1f;
-                    fragOffsetMin = fragOffsetMax = 20f;
+                    fragOffsetMin = fragOffsetMax = -100f;
                     despawnSound = Sounds.dullExplosion;
 
                     fragBullet = new BasicBulletType(8f, 46.5f){{
@@ -2787,6 +2787,7 @@ public class UnitTypes{
                         frontColor = Color.white;
                         trailWidth = 2.8f;
                         trailLength = 6;
+                        rangeOverride = 10f;
                         hitEffect = despawnEffect = Fx.blastExplosion;
                     }};
                 }};
