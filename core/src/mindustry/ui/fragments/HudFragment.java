@@ -121,7 +121,7 @@ public class HudFragment{
             || (!block.inEditor && !(block instanceof RemoveWall) && !(block instanceof RemoveOre))
             || !block.isOnPlanet(state.rules.planet)
             || block.buildVisibility == BuildVisibility.debugOnly
-            || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.trim().replaceAll(" +", " ").toLowerCase()))
+            || (!searchText.isEmpty() && !(block == Blocks.removeOre || block == Blocks.removeWall) && !block.localizedName.toLowerCase().contains(searchText.trim().replaceAll(" +", " ").toLowerCase()))
             ) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
