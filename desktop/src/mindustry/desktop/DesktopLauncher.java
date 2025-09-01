@@ -19,6 +19,7 @@ import mindustry.core.*;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
@@ -39,13 +40,22 @@ public class DesktopLauncher extends ClientLauncher{
     public static void main(String[] arg){
         try{
             Vars.loadLogger();
+
+            //note that this only does something on Windows
+            GpuDetect.init();
+
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
                 width = 900;
                 height = 700;
                 gl30Minor = 2;
-                gl30 = true;
+
+                //on Windows, Intel drivers might be buggy with OpenGL 3.x, so disable it. See https://github.com/Anuken/Mindustry/issues/11041
+                if(!GpuDetect.isIntel){
+                    gl30 = true;
+                }
+
                 for(int i = 0; i < arg.length; i++){
                     if(arg[i].charAt(0) == '-'){
                         String name = arg[i].substring(1);
