@@ -2716,7 +2716,7 @@ public class UnitTypes{
 
                 bullet = new RailBulletType(){{
                     length = 230f;
-                    damage = 200f;
+                    damage = 150f;
                     lifetime = 18f;
                     hitSize = 6f;
                     pierceCap = 1;
@@ -2775,7 +2775,7 @@ public class UnitTypes{
                     fragOffsetMin = fragOffsetMax = -50f;
                     despawnSound = Sounds.dullExplosion;
 
-                    fragBullet = new BasicBulletType(8f, 46.5f){{
+                    fragBullet = new BasicBulletType(8f, 35f){{
                         sprite = "missile-large";
                         pierce = true;
                         pierceCap = 2;
@@ -2808,7 +2808,7 @@ public class UnitTypes{
                     mirror = true;
                     alternate = true;
 
-                    bullet = new BasicBulletType(12f, 50f / 0.75f){{
+                    bullet = new BasicBulletType(12f, 50f){{
                         sprite = "missile-large";
                         width = 9.5f;
                         height = 13f;
