@@ -3444,6 +3444,8 @@ public class UnitTypes{
             targetAir = false;
             alwaysShootWhenMoving = true;
 
+            abilities.add(new LastStandAbility(StatusEffects.overclock, 1.8f, 1.4f, 2f / 18f));
+
             weapons.add(new Weapon("collaris-weapon"){{
                 shootSound = Sounds.pulseBlast;
                 mirror = true;
@@ -3824,7 +3826,7 @@ public class UnitTypes{
             health = 6000f;
             armor = 4f;
             hitSize = 36f;
-            payloadCapacity = Mathf.sqr(3f) * tilePayload;
+            payloadCapacity = Mathf.sqr(4f) * tilePayload;
             researchCostMultiplier = 0f;
             targetAir = false;
 
