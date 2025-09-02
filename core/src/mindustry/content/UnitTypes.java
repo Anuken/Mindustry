@@ -2772,7 +2772,7 @@ public class UnitTypes{
                     fragSpread = 10f;
                     fragBullets = 5;
                     fragVelocityMin = 1f;
-                    fragOffsetMin = fragOffsetMax = -50f;
+                    fragOffsetMin = fragOffsetMax = 0f;
                     despawnSound = Sounds.dullExplosion;
 
                     fragBullet = new BasicBulletType(8f, 35f){{
@@ -2781,7 +2781,7 @@ public class UnitTypes{
                         pierceCap = 2;
                         width = 8f;
                         height = 12f;
-                        lifetime = 15f;
+                        lifetime = 8f;
                         hitSize = 4f;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
                         frontColor = Color.white;
@@ -2807,6 +2807,7 @@ public class UnitTypes{
                     shootSound = Sounds.shoot;
                     mirror = true;
                     alternate = true;
+                    minWarmup = fi / 2f;
 
                     bullet = new BasicBulletType(12f, 50f){{
                         sprite = "missile-large";
