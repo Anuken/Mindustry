@@ -87,10 +87,26 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         return true;
     }
 
+    public boolean allowNumberedLaunch(Sector s){
+        return s.hasBase() && (s.info.bestCoreType.size >= 4 || s.isBeingPlayed() && state.rules.defaultTeam.cores().contains(b -> b.block.size >= 4));
+    }
+
     @Override
     public boolean allowLanding(Sector sector){
-        return sector.planet.allowLaunchToNumbered && (sector.hasBase() || sector.near().contains(s -> s.hasBase() &&
-            (s.info.bestCoreType.size >= 4 || s.isBeingPlayed() && state.rules.defaultTeam.cores().contains(b -> b.block.size >= 4))));
+        return sector.planet.allowLaunchToNumbered && (sector.hasBase() || sector.near().contains(this::allowNumberedLaunch));
+    }
+
+    @Override
+    public Sector findLaunchCandidate(Sector destination, Sector selected){
+        if(destination.preset == null || !destination.preset.requireUnlock){
+            if(selected != null && selected.isNear(destination) && allowNumberedLaunch(selected)){
+                return selected;
+            }else{
+                return destination.near().find(this::allowNumberedLaunch);
+            }
+        }else{
+            return super.findLaunchCandidate(destination, selected);
+        }
     }
 
     @Override
