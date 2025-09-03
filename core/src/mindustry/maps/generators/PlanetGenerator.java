@@ -54,6 +54,25 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         return sector.planet.allowLaunchToNumbered && (sector.hasBase() || sector.near().contains(Sector::hasBase));
     }
 
+    public Sector findLaunchCandidate(Sector destination, Sector selected){
+        Sector launchSector = selected != null && selected.planet == destination.planet && selected.hasBase() ? selected: null;
+        //directly nearby.
+        if(destination.near().contains(launchSector)) return launchSector;
+
+        Sector launchFrom = launchSector;
+        if(launchFrom == null || (destination.preset == null && !destination.near().contains(launchSector))){
+            //TODO pick one with the most resources
+            launchFrom = destination.near().find(Sector::hasBase);
+            if(launchFrom == null && destination.preset != null){
+                if(launchSector != null) return launchSector;
+                launchFrom = destination.planet.sectors.min(s -> !s.hasBase() ? Float.MAX_VALUE : s.tile.v.dst2(destination.tile.v));
+                if(!launchFrom.hasBase()) launchFrom = null;
+            }
+        }
+
+        return launchFrom;
+    }
+
     /** @return whether to allow landing on the specified procedural sector */
     public boolean allowAcceleratorLanding(Sector sector){
         return sector.planet.allowLaunchToNumbered;
