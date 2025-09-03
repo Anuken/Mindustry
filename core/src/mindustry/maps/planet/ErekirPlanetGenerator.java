@@ -1,8 +1,10 @@
 package mindustry.maps.planet;
 
+import arc.func.Boolf;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.Seq;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.Vars;
@@ -10,7 +12,7 @@ import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.maps.generators.*;
-import mindustry.type.Sector;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
@@ -433,8 +435,29 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         state.rules.waves = false;
         state.rules.showSpawns = true;
     }
+    
     @Override
     public Sector findLaunchCandidate(Sector destination, Sector selected){
-        return destination.planet.sectors.find(u -> u.items().has(universe.getLaunchResources()) && u.hasBase());
+        // TODO verify resources
+        // Numbered sectors are undefined for Erekir anyway
+        if (destination.preset == null) {
+            return super.findLaunchCandidate(destination, selected);
+        }
+        Seq<ItemStack> resources = destination.preset.generator.map.rules().loadout;
+
+        // Prioritize the current sector
+        Sector finalSelected = selected;
+        if(finalSelected != null && resources.allMatch(s -> finalSelected.items().has(s.item, s.amount))) return selected;
+
+        // Prioritize the nearest valid sector
+        float lowDistance = Float.MAX_VALUE;
+        for (Sector sector:destination.planet.sectors){
+            float distance = sector.tile.v.dst(destination.tile.v);
+            if(sector.hasBase() && resources.allMatch(s -> sector.items().has(s.item, s.amount)) && lowDistance > distance){
+                selected = sector;
+                lowDistance = distance;
+            }
+        }
+        return selected;
     }
 }
