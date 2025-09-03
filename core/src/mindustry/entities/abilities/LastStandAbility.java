@@ -35,11 +35,11 @@ public class LastStandAbility extends Ability{
         super.addStats(t);
         t.add((effect.hasEmoji() ? effect.emoji() : "") + "[stat]" + effect.localizedName);
         t.row();
-        t.add(abilityStat("laststand.minhealth", Strings.autoFixed(minHealth * 100f, 2)));
+        t.add(abilityStat("ability.laststand.stat.minhealth", Strings.autoFixed(minHealth * type.health, 2)));
         t.row();
-        t.add(abilityStat("laststand.damagemultiplier", Strings.autoFixed(damageMultiplier, 2)));
+        t.add(abilityStat("stat.damagemultiplier", Strings.autoFixed(damageMultiplier, 2)));
         t.row();
-        t.add(abilityStat("laststand.reloadmultiplier", Strings.autoFixed(reloadMultiplier, 2)));
+        t.add(abilityStat("stat.reloadmultiplier", Strings.autoFixed(reloadMultiplier, 2)));
     }
 
     @Override
