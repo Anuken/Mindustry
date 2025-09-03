@@ -68,7 +68,6 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
             if(!destination.allowLaunchLoadout()){
                 resources.clear();
-                //TODO this should be set to a proper loadout based on sector.
                 if(destination.preset != null){
                     var rules = destination.preset.generator.map.rules();
                     for(var stack : rules.loadout){

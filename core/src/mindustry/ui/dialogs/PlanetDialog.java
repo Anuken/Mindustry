@@ -430,10 +430,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         return mode == planetLaunch ? sector.planet.generator.allowAcceleratorLanding(sector) : sector.planet.generator.allowLanding(sector);
     }
 
-    Sector findLauncher(Sector to){
+    @Nullable Sector findLauncher(Sector to){
         if(mode == planetLaunch || to.planet.generator == null) return launchSector;
 
-        return to.planet.generator.findLaunchCandidate(to, launchSector);
+        Sector candidate = to.planet.generator.findLaunchCandidate(to, launchSector);
+        return candidate == null ? launchSector : candidate;
     }
 
     boolean showing(){

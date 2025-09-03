@@ -97,7 +97,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     }
 
     @Override
-    public Sector findLaunchCandidate(Sector destination, Sector selected){
+    public @Nullable Sector findLaunchCandidate(Sector destination, @Nullable Sector selected){
         if(destination.preset == null || !destination.preset.requireUnlock){
             if(selected != null && selected.isNear(destination) && allowNumberedLaunch(selected)){
                 return selected;
