@@ -5,10 +5,12 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.Vars;
 import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.maps.generators.*;
+import mindustry.type.Sector;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
@@ -430,5 +432,10 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //all sectors are wave sectors
         state.rules.waves = false;
         state.rules.showSpawns = true;
+    }
+    // 2025-09-02. If you are reading this message, this function should be deleted.
+    @Override
+    public Sector findLaunchCandidate(Sector destination, Sector selected){
+        return destination.planet.sectors.find(u -> u.items().has(universe.getLaunchResources()) && u.hasBase());
     }
 }
