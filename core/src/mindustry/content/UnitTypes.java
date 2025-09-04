@@ -113,13 +113,13 @@ public class UnitTypes{
                 bullet = new BasicBulletType(2.5f, 12){{
                     width = 7f;
                     height = 9f;
-                    lifetime = 56.5f;
+                    lifetime = 56f;
                 }};
             }});
         }};
 
         mace = new UnitType("mace"){{
-            speed = 0.62f;
+            speed = 0.61f;
             hitSize = 10f;
             rotateSpeed = 4f;
             health = 510;
@@ -158,7 +158,7 @@ public class UnitTypes{
             hitSize = 13f;
             rotateSpeed = 3.2f;
             targetAir = false;
-            health = 930;
+            health = 910;
             armor = 10f;
             mechFrontSway = 0.55f;
             ammoType = new ItemAmmoType(Items.graphite);
@@ -328,9 +328,12 @@ public class UnitTypes{
             hitSize = 8f;
             health = 90f;
             buildSpeed = 0.3f;
-            armor = 1f;
+            armor = 3f;
 
-            abilities.add(new RepairFieldAbility(10f, 90f, 60f));
+            abilities.add(new RepairFieldAbility(10f, 90f, 60f){{
+                sameTypeHealMult = 0.5f;
+            }});
+            
             ammoType = new PowerAmmoType(1000);
 
             weapons.add(new Weapon("heal-weapon"){{
@@ -367,7 +370,7 @@ public class UnitTypes{
             mineTier = 2;
             mineSpeed = 3.5f;
 
-            abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
+            abilities.add(new ShieldRegenFieldAbility(20f, 40f, 30f * 5, 60f));
             ammoType = new PowerAmmoType(1300);
 
             weapons.add(new Weapon("heal-shotgun-weapon"){{
