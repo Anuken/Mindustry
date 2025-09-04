@@ -8,7 +8,7 @@ import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
 
 public class MeshBuilder{
-    private static final boolean gl30 = Core.gl30 != null;
+    private static final boolean packNormals = Core.gl30 != null && (Core.app.isMobile() || Core.graphics.getGLVersion().atLeast(3, 3));
     private static volatile float[] tmpHeights = new float[14580]; //highest amount of corners in vanilla
 
     /** Note that the resulting icosphere does not have normals or a color. */
@@ -110,7 +110,7 @@ public class MeshBuilder{
         int position = 0;
 
         short[] shorts = indexed ? new short[12] : null;
-        float[] floats = new float[3 + (gl30 ? 1 : 3) + 1 + (emit ? 1 : 0)];
+        float[] floats = new float[3 + (packNormals ? 1 : 3) + 1 + (emit ? 1 : 0)];
         Vec3 nor = new Vec3();
 
         Color tmpCol = new Color();
@@ -199,7 +199,7 @@ public class MeshBuilder{
 
         if(normal){
             //only GL30 supports GL_INT_2_10_10_10_REV
-            attributes.add(gl30 ? VertexAttribute.packedNormal : VertexAttribute.normal);
+            attributes.add(packNormals ? VertexAttribute.packedNormal : VertexAttribute.normal);
         }
 
         attributes.add(VertexAttribute.color);
@@ -262,7 +262,7 @@ public class MeshBuilder{
         floats[1] = y;
         floats[2] = z;
 
-        if(gl30){
+        if(packNormals){
             floats[3] = packNormals(normal.x, normal.y, normal.z);
 
             floats[4] = color;
