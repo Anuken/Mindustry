@@ -33,8 +33,10 @@ public class RepairFieldAbility extends Ability{
         t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
         t.row();
         t.add(abilityStat("repairspeed", Strings.autoFixed(amount * 60f / reload, 2)));
-        t.row();
-        t.add(abilityStat("sametypehealmultiplier", (sameTypeHealMult < 1f ? "[negstat]" : "") + Strings.autoFixed(sameTypeHealMult * 100f, 2)));
+        if(sameTypeHealMult != 1f){
+            t.row();
+            t.add(abilityStat("sametypehealmultiplier", (sameTypeHealMult < 1f ? "[negstat]" : "") + Strings.autoFixed(sameTypeHealMult * 100f, 2)));
+        }
     }
 
     @Override
