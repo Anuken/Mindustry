@@ -2515,7 +2515,7 @@ public class UnitTypes{
             }});
         }};
 
-        //endregion uwu
+        //endregion
         //region erekir - tank
 
         stell = new TankUnitType("stell"){{
