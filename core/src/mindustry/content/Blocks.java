@@ -2650,6 +2650,7 @@ public class Blocks{
             size = 3;
             maxNodes = 1;
             laserRange = 500f;
+            powerLayer = Layer.legUnit + 2f;
             autolink = false;
             sameBlockConnection = true;
             laserColor2 = Color.valueOf("ffd9c2");

@@ -466,8 +466,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }
 
-        Sector hoverOrSelect = hovered != null ? hovered : selected;
-
         Sector current = Vars.state.getSector() != null && Vars.state.getSector().isBeingPlayed() && Vars.state.getSector().planet == state.planet ? Vars.state.getSector() : null;
 
         if(current != null){
