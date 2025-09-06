@@ -234,7 +234,7 @@ public class LogicBlock extends Block{
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
         public boolean checkedDuplicates = false;
-        //dynamic only for privileged processors
+        
         public int ipt = instructionsPerTick;
         /** Display name, for convenience. This is currently only available for world processors. */
         public @Nullable String tag;
@@ -509,11 +509,7 @@ public class LogicBlock extends Block{
             if(changed){
                 updateCode(code, true, null);
             }
-
-            if(!privileged){
-                ipt = instructionsPerTick;
-            }
-
+            
             if(state.rules.disableWorldProcessors && privileged) return;
 
             if(enabled && executor.initialized()){
@@ -692,7 +688,7 @@ public class LogicBlock extends Block{
 
         @Override
         public byte version(){
-            return 3;
+            return 4;
         }
 
         @Override
@@ -734,6 +730,8 @@ public class LogicBlock extends Block{
 
             if(privileged){
                 write.s(Mathf.clamp(ipt, 1, maxInstructionsPerTick));
+            } else {
+                write.s(ipt == instructionsPerTick ? 0 : Mathf.clamp(ipt, 1, instructionsPerTick));
             }
 
             TypeIO.writeString(write, tag);
@@ -797,6 +795,13 @@ public class LogicBlock extends Block{
 
             if(privileged && revision >= 2){
                 ipt = Mathf.clamp(read.s(), 1, maxInstructionsPerTick);
+            }
+
+            if(!privileged && revision >= 4){
+                short iptR = read.s();
+                if (iptR != 0) {
+                    ipt = Mathf.clamp(iptR, 1, instructionsPerTick);
+                }
             }
 
             if(revision >= 3){
