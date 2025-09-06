@@ -458,7 +458,7 @@ public class Fx{
             Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 50f * rand.random(1f, 0.6f) + 2f, e.finpow() * 100f * lenRand + 6f);
         }
     }),
-    
+
     titanExplosionSmall = new Effect(22f, 120f, e -> {
         color(e.color);
         stroke(e.fout() * 3f);
@@ -1407,6 +1407,15 @@ public class Fx{
             Fill.circle(e.x + x, e.y + y, 0.6f + e.fin() * 5f);
         });
     }).layer(Layer.bullet - 1f),
+
+    corrosionVapor = new Effect(50f, e -> {
+        color(e.color);
+        alpha(Interp.pow2Out.apply(e.fslope()) * 0.5f);
+
+        randLenVectors(e.id, 2, 8f + e.finpow() * 3f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 3f);
+        });
+    }),
 
     vapor = new Effect(110f, e -> {
         color(e.color);

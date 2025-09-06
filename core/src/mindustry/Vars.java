@@ -391,6 +391,9 @@ public class Vars implements Loadable{
 
     /** Cleans up after a successful launch. */
     public static void finishLaunch(){
+        Core.settings.put("lastBuild", Version.build);
+        Core.settings.put("lastBuildString", Version.buildString());
+
         if(launchIDFile != null){
             launchIDFile.delete();
         }

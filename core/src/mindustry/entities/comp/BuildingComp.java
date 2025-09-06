@@ -193,6 +193,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             write.f(timeScaleDuration);
         }
 
+        if(lastDisabler != null && lastDisabler.isValid()){
+            write.i(lastDisabler.pos());
+        }
+
         //efficiency is written as two bytes to save space
         write.b((byte)(Mathf.clamp(efficiency) * 255f));
         write.b((byte)(Mathf.clamp(optionalEfficiency) * 255f));
@@ -231,11 +235,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         if((moduleBits & 1) != 0) (items == null ? new ItemModule() : items).read(read, legacy);
-        if((moduleBits & 2) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
-        if((moduleBits & 4) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
-        if((moduleBits & 16) != 0){
+        if((moduleBits & (1 << 1)) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
+        if((moduleBits & (1 << 2)) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
+        //1 << 3 is skipped (oldconsume module)
+        if((moduleBits & (1 << 4)) != 0){
             timeScale = read.f();
             timeScaleDuration = read.f();
+        }
+        if((moduleBits & (1 << 5)) != 0){
+            lastDisabler = world.build(read.i());
         }
 
         //unnecessary consume module read in version 2 and below
@@ -254,7 +262,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public int moduleBitmask(){
-        return (items != null ? 1 : 0) | (power != null ? 2 : 0) | (liquids != null ? 4 : 0) | 8 | (timeScale != 1f ? 16 : 0);
+        return
+        (items != null ? 1 : 0) |
+        (power != null ? 1 << 1 : 0) |
+        (liquids != null ? 1 << 2 : 0) |
+        1 << 3 | //old consume module
+        (timeScale != 1f ? 1 << 4 : 0) |
+        (lastDisabler != null && lastDisabler.isValid() ? 1 << 5 : 0);
     }
 
     public void writeAll(Writes write){

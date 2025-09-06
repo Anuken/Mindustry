@@ -88,7 +88,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public Interval controlInterval = new Interval();
     public @Nullable Block block;
     public boolean overrideLineRotation;
-    public int rotation;
+    public int rotation = 1;
     public boolean droppingItem;
     public float itemDepositCooldown;
     public Group uiGroup;
@@ -477,7 +477,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(variants = Variant.one)
     public static void removeQueueBlock(int x, int y, boolean breaking){
-        player.unit().removeBuild(x, y, breaking);
+        if(!player.dead()){
+            player.unit().removeBuild(x, y, breaking);
+        }
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
@@ -1318,8 +1320,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void useSchematic(Schematic schem){
-        selectPlans.addAll(schematics.toPlans(schem, player.tileX(), player.tileY()));
+        useSchematic(schem, true);
     }
+
+    public abstract void useSchematic(Schematic schem, boolean checkHidden);
 
     protected void showSchematicSave(){
         if(lastSchematic == null) return;
@@ -1827,7 +1831,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean canTapPlayer(float x, float y){
-        return player.within(x, y, playerSelectRange) && !player.dead() && player.unit().stack.amount > 0;
+        return player.within(x, y, playerSelectRange) && !player.dead() && player.unit().stack.amount > 0 && block == null;
     }
 
     /** Tries to begin mining a tile, returns true if successful. */

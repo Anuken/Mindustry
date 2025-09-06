@@ -963,6 +963,11 @@ public class Block extends UnlockableContent implements Senseable{
 
     }
 
+    /** Called when pick blocked in the editor. */
+    public void editorPicked(Tile tile){
+
+    }
+
     public boolean isFloor(){
         return this instanceof Floor;
     }
@@ -1233,6 +1238,10 @@ public class Block extends UnlockableContent implements Senseable{
 
         if(fogRadius > 0){
             flags = flags.with(BlockFlag.hasFogRadius);
+        }
+
+        if(sync){
+            flags = flags.with(BlockFlag.synced);
         }
 
         //initialize default health based on size

@@ -485,7 +485,8 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("animatedwater", true);
 
         if(Shaders.shield != null){
-            graphics.checkPref("animatedshields", !mobile);
+            //animated shields are off by default on android (generally lower spec devices)
+            graphics.checkPref("animatedshields", !android);
         }
 
         graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
@@ -497,16 +498,12 @@ public class SettingsMenuDialog extends BaseDialog{
         });
 
         //iOS (and possibly Android) devices do not support linear filtering well, so disable it
-        if(!ios){
-            graphics.checkPref("linear", !mobile, b -> {
-                for(Texture tex : Core.atlas.getTextures()){
-                    TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
-                    tex.setFilter(filter, filter);
-                }
-            });
-        }else{
-            settings.put("linear", false);
-        }
+        graphics.checkPref("linear", !mobile, b -> {
+            for(Texture tex : Core.atlas.getTextures()){
+                TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
+                tex.setFilter(filter, filter);
+            }
+        });
 
         if(Core.settings.getBool("linear")){
             for(Texture tex : Core.atlas.getTextures()){

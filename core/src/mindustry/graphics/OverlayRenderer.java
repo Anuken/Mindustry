@@ -113,8 +113,6 @@ public class OverlayRenderer{
             }
         }
 
-        if(player.dead()) return; //dead players don't draw
-
         InputHandler input = control.input;
 
         Sized select = input.selectedUnit();
@@ -150,8 +148,10 @@ public class OverlayRenderer{
             tile.drawConfigure();
         }
 
-        input.drawTop();
+        if(!player.dead()) input.drawTop();
         input.drawUnitSelection();
+
+        if(player.dead()) return; //dead players don't draw
 
         buildFade = Mathf.lerpDelta(buildFade, input.isPlacing() || input.isUsingSchematic() ? 1f : 0f, 0.06f);
 
