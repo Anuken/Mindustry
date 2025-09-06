@@ -55,6 +55,7 @@ public class LExecutor{
     public Building[] links = {};
     public @Nullable LogicBuild build;
     public IntSet linkIds = new IntSet();
+    public ObjectSet<Building> disabledBlocks = new ObjectSet<>();
     public Team team = Team.derelict;
     public boolean privileged = false;
     //maps variable name to index in vars; lazily initialized
@@ -520,7 +521,9 @@ public class LExecutor{
                     if(p1.bool()){
                         b.noSleep();
                     }else{
+                        // Note: it might be a good idea to remove invalid blocks from the set here
                         b.lastDisabler = exec.build;
+                        exec.disabledBlocks.add(b);
                     }
                 }
 
