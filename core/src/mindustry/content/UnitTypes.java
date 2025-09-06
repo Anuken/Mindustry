@@ -3444,7 +3444,7 @@ public class UnitTypes{
             targetAir = false;
             alwaysShootWhenMoving = true;
 
-            abilities.add(new LastStandAbility(StatusEffects.overclock, 99f, 99f, 2f / 18f, health));
+            abilities.add(new LastStandAbility(StatusEffects.overclock, 1.8f, 1.4f, 2f / 18f, health));
 
             weapons.add(new Weapon("collaris-weapon"){{
                 shootSound = Sounds.pulseBlast;
