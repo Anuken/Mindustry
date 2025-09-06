@@ -15,7 +15,7 @@ public class LastStandAbility extends Ability{
     public float maxHealth;
     public float damageMultiplier = 2f;
     public float reloadMultiplier = 2f;
-    /** % of max health for reaching the maximum multiplers. */
+    /** % of max health for reaching the maximum multipliers. */
     public float minHealth = 0.2f;
     /** Applied slope steepness */
     public float exponent = 2f;

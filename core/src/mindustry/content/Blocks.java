@@ -5141,6 +5141,7 @@ public class Blocks{
                     speed = 4.6f;
                     maxRange = 6f;
                     lifetime = 60f * 5.5f;
+                    hitSize = 10f;
                     outlineColor = Pal.darkOutline;
                     engineColor = trailColor = Pal.redLight;
                     engineLayer = Layer.effect;
@@ -5228,6 +5229,7 @@ public class Blocks{
                     speed = 2.5f;
                     maxRange = 6f;
                     lifetime = 60f * 9.77f;
+                    hitSize = 10f;
                     outlineColor = Pal.darkOutline;
                     engineColor = trailColor = Color.valueOf("ffd37f");
                     engineLayer = Layer.effect;
@@ -5332,6 +5334,7 @@ public class Blocks{
                     speed = 4.4f;
                     maxRange = 6f;
                     lifetime = 60f * 1.4f;
+                    hitSize = 10f;
                     outlineColor = Pal.darkOutline;
                     engineColor = trailColor = Color.valueOf("f7e97e");
                     engineLayer = Layer.effect;
