@@ -14,7 +14,7 @@ public class RepairFieldAbility extends Ability{
     public Effect healEffect = Fx.heal;
     public Effect activeEffect = Fx.healWaveDynamic;
     public boolean parentizeEffects = false;
-/** Multiplies healing to units of the same type by this amount. */
+    /** Multiplies healing to units of the same type by this amount. */
     public float sameTypeHealMult = 1f;
 
     protected float timer;
