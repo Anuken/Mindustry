@@ -87,7 +87,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public Interval controlInterval = new Interval();
     public @Nullable Block block;
     public boolean overrideLineRotation;
-    public int rotation;
+    public int rotation = 1;
     public boolean droppingItem;
     public float itemDepositCooldown;
     public Group uiGroup;
@@ -476,7 +476,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(variants = Variant.one)
     public static void removeQueueBlock(int x, int y, boolean breaking){
-        player.unit().removeBuild(x, y, breaking);
+        if(!player.dead()){
+            player.unit().removeBuild(x, y, breaking);
+        }
     }
 
     @Remote(targets = Loc.both, called = Loc.server)

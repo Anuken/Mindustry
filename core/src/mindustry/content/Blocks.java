@@ -346,6 +346,7 @@ public class Blocks{
 
         charr = new Floor("char"){{
             blendGroup = stone;
+            attributes.set(Attribute.water, -0.25f);
         }};
 
         basalt = new Floor("basalt"){{
@@ -2649,6 +2650,7 @@ public class Blocks{
             size = 3;
             maxNodes = 1;
             laserRange = 500f;
+            powerLayer = Layer.legUnit + 2f;
             autolink = false;
             sameBlockConnection = true;
             laserColor2 = Color.valueOf("ffd9c2");
@@ -4802,6 +4804,7 @@ public class Blocks{
                 ammoMultiplier = 1f;
 
                 lifetime = 34f;
+                extraRangeMargin = 32f;
                 rotationOffset = 90f;
                 trailRotation = true;
                 trailEffect = Fx.disperseTrail;
@@ -5159,7 +5162,7 @@ public class Blocks{
 
                     fogRadius = 6f;
 
-                    health = 210;
+                    health = 240;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -5352,7 +5355,7 @@ public class Blocks{
 
                     fogRadius = 6f;
 
-                    health = 400;
+                    health = 300;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -5406,7 +5409,7 @@ public class Blocks{
 
                                     fogRadius = 6f;
 
-                                    health = 100;
+                                    health = 50;
 
                                     weapons.add(new Weapon(){{
                                         shootCone = 360f;
@@ -5867,7 +5870,7 @@ public class Blocks{
                     pierceCap = 2;
                     optimalLifeFract = 1f;
                 }};
-                
+
                 intervalBullets = 1;
                 fragSpread = fragRandomSpread = intervalRandomSpread = 0f;
                 bulletInterval = 20f;

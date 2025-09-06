@@ -19,6 +19,7 @@ import mindustry.core.*;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
@@ -39,31 +40,49 @@ public class DesktopLauncher extends ClientLauncher{
     public static void main(String[] arg){
         try{
             Vars.loadLogger();
+
+            //note that this only does something on Windows
+            GpuDetect.init();
+
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
+                coreProfile = true;
                 width = 900;
                 height = 700;
-                gl30Minor = 2;
-                gl30 = true;
+
+                //on Windows, Intel drivers might be buggy with OpenGL 3.x, so only use 2.0. See https://github.com/Anuken/Mindustry/issues/11041
+                if(GpuDetect.isIntel){
+                    coreProfile = false;
+                    glVersions = new int[][]{{2, 0}};
+                }else if(OS.isMac){
+                    //MacOS supports 4.1 at most
+                    glVersions = new int[][]{{4, 1}, {3, 2}, {2, 0}};
+                }else{
+                    //try essentially every OpenGL version
+                    glVersions = new int[][]{{4, 6}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {2, 0}};
+                }
+
                 for(int i = 0; i < arg.length; i++){
                     if(arg[i].charAt(0) == '-'){
                         String name = arg[i].substring(1);
                         switch(name){
                             case "width" -> width = Strings.parseInt(arg[i + 1], width);
                             case "height" -> height = Strings.parseInt(arg[i + 1], height);
-                            case "glMajor" -> {
-                                gl30Major = Strings.parseInt(arg[i + 1], gl30Major);
-                                gl30Minor = Strings.parseInt(arg[i + 1], gl30Minor);
-                                gl30 = true;
+                            case "gl" -> {
+                                String str = arg[i + 1];
+                                if(str.contains(".")){
+                                    String[] split = str.split("\\.");
+                                    if(split.length == 2 && Strings.canParsePositiveInt(split[0]) && Strings.canParsePositiveInt(split[1])){
+                                        glVersions = new int[][]{{Strings.parseInt(split[0]), Strings.parseInt(split[1])}};
+                                        break;
+                                    }
+
+                                }
+                                Log.err("Invalid GL version format string: '@'. GL version must be of the form <major>.<minor>", str);
                             }
-                            case "glMinor" -> {
-                                gl30Minor = Strings.parseInt(arg[i + 1], gl30Minor);
-                                gl30 = true;
-                            }
-                            case "gl3" -> gl30 = true;
-                            case "gl2" -> gl30 = false;
                             case "coreGl" -> coreProfile = true;
+                            case "compatibilityGl" -> coreProfile = false;
                             case "antialias" -> samples = 16;
                             case "debug" -> Log.level = LogLevel.debug;
                             case "maximized" -> maximized = Boolean.parseBoolean(arg[i + 1]);
