@@ -20,6 +20,8 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public abstract class PlanetGenerator extends BasicGenerator implements HexMesher{
+    protected static final ItemSeq tmpItems = new ItemSeq();
+
     public int baseSeed = 0;
     public int seed = 0;
 
@@ -52,6 +54,44 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
     /** @return whether to allow landing on the specified procedural sector */
     public boolean allowLanding(Sector sector){
         return sector.planet.allowLaunchToNumbered && (sector.hasBase() || sector.near().contains(Sector::hasBase));
+    }
+
+    public @Nullable Sector findLaunchCandidate(Sector destination, @Nullable Sector selected){
+        if(!destination.allowLaunchLoadout() && destination.preset != null){
+            tmpItems.clear();
+
+            var rules = destination.preset.generator.map.rules();
+            for(var stack : rules.loadout){
+                if(stack.item.isOnPlanet(destination.planet)){
+                    tmpItems.add(stack.item, stack.amount);
+                }
+            }
+
+            //currently played (selected) sector has all the resources
+            if(selected != null && selected.planet == destination.planet && selected.hasBase() && selected.items().has(tmpItems)){
+                return selected;
+            }else{
+                //find the closest sector that has resources (ranked by distance, not item quantity)
+                return destination.planet.sectors.min(s -> s.hasBase() && s.items().has(tmpItems), s -> s.tile.v.dst(destination.tile.v));
+            }
+        }else{
+            Sector launchSector = selected != null && selected.planet == destination.planet && selected.hasBase() ? selected : null;
+            //directly nearby.
+            if(destination.near().contains(launchSector)) return launchSector;
+
+            Sector launchFrom = launchSector;
+            if(launchFrom == null || destination.preset == null){
+                //TODO pick one with the most resources
+                launchFrom = destination.near().find(Sector::hasBase);
+                if(launchFrom == null && destination.preset != null){
+                    if(launchSector != null) return launchSector;
+                    launchFrom = destination.planet.sectors.min(s -> !s.hasBase() ? Float.MAX_VALUE : s.tile.v.dst2(destination.tile.v));
+                    if(!launchFrom.hasBase()) launchFrom = null;
+                }
+            }
+
+            return launchFrom;
+        }
     }
 
     /** @return whether to allow landing on the specified procedural sector */
