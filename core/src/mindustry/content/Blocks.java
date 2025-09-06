@@ -3320,7 +3320,7 @@ public class Blocks{
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 15f * 1.5f;
+                    splashDamage = 17f * 1.5f;
                     splashDamageRadius = 33f;
 
                     frontColor = Pal.scrapAmmoFront;
@@ -3334,7 +3334,7 @@ public class Blocks{
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 11f * 1.5f;
+                    splashDamage = 12f * 1.5f;
                     splashDamageRadius = 28f;
                 }},
                 Items.metaglass, new FlakBulletType(4f, 3){{
@@ -3349,7 +3349,7 @@ public class Blocks{
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 13f * 1.5f;
+                    splashDamage = 15f * 1.5f;
                     splashDamageRadius = 27f;
                     fragBullets = 4;
                     fragBullet = new BasicBulletType(3f, 5){{
@@ -3751,8 +3751,8 @@ public class Blocks{
 
                     knockback = 0.7f;
                     
-                    splashDamage = 12f;
-                    splashDamageRadius = 22f;
+                    splashDamage = 13f;
+                    splashDamageRadius = 23f;
 
                     makeFire = true;
                     lifetime = 60f;
@@ -4266,7 +4266,7 @@ public class Blocks{
                 }}
             );
             reload = 7.5f;
-            rotateSpeed = 1.3f;
+            rotateSpeed = 1.4f;
             recoilTime = reload * 2f;
             coolantMultiplier = 1f;
             ammoUseEffect = Fx.casing3;
