@@ -3241,7 +3241,7 @@ public class Blocks{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
-                    ammoMultiplier = 2;
+                    ammoMultiplier = 3;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
                     hitColor = backColor = trailColor = Pal.copperAmmoBack;
@@ -3250,8 +3250,9 @@ public class Blocks{
                 Items.graphite, new BasicBulletType(3.5f, 18){{
                     width = 9f;
                     height = 12f;
-                    ammoMultiplier = 4;
+                    ammoMultiplier = 2;
                     lifetime = 60f;
+                    reloadMultiplier = 0.8f;
                     rangeChange = 16f;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
@@ -3263,7 +3264,7 @@ public class Blocks{
                     height = 9f;
                     homingPower = 0.2f;
                     reloadMultiplier = 1.5f;
-                    ammoMultiplier = 5;
+                    ammoMultiplier = 3;
                     lifetime = 60f;
 
                     trailLength = 5;
@@ -3300,6 +3301,7 @@ public class Blocks{
             inaccuracy = 2f;
             rotateSpeed = 10f;
             coolant = consumeCoolant(0.1f);
+            coolantMultiplier = 10f;
             researchCostMultiplier = 0.05f;
 
             limitRange(5f);
@@ -3312,12 +3314,13 @@ public class Blocks{
                     lifetime = 60f;
                     ammoMultiplier = 5f;
                     shootEffect = Fx.shootSmall;
-                    reloadMultiplier = 0.5f;
+                    reloadMultiplier = 0.7f;
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 22f * 1.5f;
-                    splashDamageRadius = 24f;
+                    splashDamage = 8f * 1.5f;
+                    splashDamageRadius = 26f;
+                    rangeChange = 32f;
 
                     frontColor = Pal.scrapAmmoFront;
                     backColor = hitColor = Pal.scrapAmmoBack;
@@ -3330,8 +3333,8 @@ public class Blocks{
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 27f * 1.5f;
-                    splashDamageRadius = 15f;
+                    splashDamage = 19f * 1.5f;
+                    splashDamageRadius = 12f;
                 }},
                 Items.metaglass, new FlakBulletType(4f, 3){{
                     backColor = trailColor = Pal.glassAmmoBack;
@@ -3341,14 +3344,14 @@ public class Blocks{
                     lifetime = 60f;
                     ammoMultiplier = 5f;
                     shootEffect = Fx.shootSmall;
-                    reloadMultiplier = 0.8f;
+                    reloadMultiplier = 0.5f;
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 30f * 1.5f;
-                    splashDamageRadius = 20f;
+                    splashDamage = 10f * 1.5f;
+                    splashDamageRadius = 24f;
                     fragBullets = 6;
-                    fragBullet = new BasicBulletType(3f, 5){{
+                    fragBullet = new BasicBulletType(3f, 8){{
                         width = 5f;
                         height = 12f;
                         shrinkY = 1f;
@@ -3396,35 +3399,62 @@ public class Blocks{
                 Items.coal, new BulletType(3.35f, 17f){{
                     ammoMultiplier = 3f;
                     hitSize = 7f;
-                    lifetime = 18f;
+                    lifetime = 20.6f;
                     pierce = true;
                     collidesAir = false;
                     statusDuration = 60f * 4;
-                    shootEffect = Fx.shootSmallFlame;
+                    shootEffect = Fx.shootCoalFlame;
                     hitEffect = Fx.hitFlameSmall;
                     despawnEffect = Fx.none;
                     status = StatusEffects.burning;
                     keepVelocity = false;
                     hittable = false;
                 }},
-                Items.pyratite, new BulletType(4f, 60f){{
+                Items.pyratite, new BulletType(4f, 50f){{
                     ammoMultiplier = 6f;
                     hitSize = 7f;
-                    lifetime = 18f;
+                    lifetime = 17f;
                     pierce = true;
                     collidesAir = false;
+                    rangeChange = 52f;
                     statusDuration = 60f * 10;
                     shootEffect = Fx.shootPyraFlame;
-                    hitEffect = Fx.hitFlameSmall;
+                    hitEffect = Fx.none;
                     despawnEffect = Fx.none;
                     status = StatusEffects.burning;
                     hittable = false;
+
+                    spawnBullets.add(new BulletType(4f, 0f){{
+                        hitSize = 7f;
+                        lifetime = 17f;
+                        pierce = true;
+                        collidesAir = false;
+                        hitEffect = Fx.hitHeavyFlame;
+                        despawnEffect = Fx.none;
+                        hittable = false;
+                    }});
+
+                    fragBullets = pierceFragCap = 1;
+                    fragRandomSpread = fragOffsetMin = fragOffsetMax = 0;
+                    fragVelocityMin = 1f;
+                    fragOnHit = true;
+                    fragBullet = new BulletType(4f, 10f){{
+                        hitSize = 14f;
+                        lifetime = 13.5f;
+                        pierce = true;
+                        collidesAir = false;
+                        statusDuration = 60f * 10;
+                        hitEffect = Fx.hitFlameSmall;
+                        despawnEffect = Fx.none;
+                        status = StatusEffects.burning;
+                        hittable = false;
+                    }};
                 }}
             );
             recoil = 0f;
             reload = 6f;
             coolantMultiplier = 1.5f;
-            range = 60f;
+            range = 68f;
             shootY = 3;
             shootCone = 50f;
             targetAir = false;
@@ -3435,7 +3465,7 @@ public class Blocks{
         }};
 
         hail = new ItemTurret("hail"){{
-            requirements(Category.turret, with(Items.copper, 40, Items.graphite, 17));
+            requirements(Category.turret, with(Items.copper, 40, Items.graphite, 17, Items.silicon, 5));
             ammo(
                 Items.graphite, new ArtilleryBulletType(3f, 20){{
                     knockback = 0.8f;
@@ -3457,7 +3487,7 @@ public class Blocks{
                     splashDamageRadius = 25f * 0.75f;
                     splashDamage = 33f;
                     reloadMultiplier = 1.2f;
-                    ammoMultiplier = 3f;
+                    ammoMultiplier = 2f;
                     homingPower = 0.08f;
                     homingRange = 50f;
 
@@ -3490,11 +3520,14 @@ public class Blocks{
             reload = 60f;
             recoil = 2f;
             range = 235f;
+            velocityRnd = 0.2f;
+            scaleLifetimeOffset = 2f / 9f;
             inaccuracy = 1f;
             shootCone = 10f;
             health = 260;
             shootSound = Sounds.bang;
             coolant = consumeCoolant(0.1f);
+            coolantMultiplier = 10f;
             limitRange(0f);
         }};
 
@@ -3508,7 +3541,22 @@ public class Blocks{
                 }},
                 Liquids.slag, new LiquidBulletType(Liquids.slag){{
                     damage = 4;
+                    armorMultiplier = 0.4f;
                     drag = 0.01f;
+
+                    fragBullets = 2;
+                    fragRandomSpread = 5f;
+                    fragSpread = 130f;
+                    fragLifeMin = 1f;
+                    fragBullet = new LiquidBulletType(Liquids.slag){{
+                        damage = 4;
+                        armorMultiplier = 0.4f;
+
+                        knockback = 0f;
+                        drag = 0.01f;
+                        lifetime = 12f;
+                        pierce = true;
+                    }};
                 }},
                 Liquids.cryofluid, new LiquidBulletType(Liquids.cryofluid){{
                     drag = 0.01f;
@@ -3548,6 +3596,7 @@ public class Blocks{
             targetAir = false;
             moveWhileCharging = false;
             accurateDelay = false;
+            activationTime = 5.15f * 60f;
             shootSound = Sounds.laser;
             coolant = consumeCoolant(0.2f);
 
@@ -3559,6 +3608,7 @@ public class Blocks{
                 chargeEffect = new MultiEffect(Fx.lancerLaserCharge, Fx.lancerLaserChargeBegin);
 
                 buildingDamageMultiplier = 0.25f;
+                armorMultiplier = 4f;
                 hitEffect = Fx.hitLancer;
                 hitSize = 4;
                 lifetime = 16f;
@@ -3603,6 +3653,7 @@ public class Blocks{
             recoil = 1f;
             size = 1;
             health = 260;
+            activationTime = 2.8f * 60f;
             shootSound = Sounds.spark;
             consumePower(3.3f);
             coolant = consumeCoolant(0.1f);
@@ -3698,23 +3749,24 @@ public class Blocks{
         }};
 
         salvo = new ItemTurret("salvo"){{
-            requirements(Category.turret, with(Items.copper, 100, Items.graphite, 80, Items.titanium, 50));
+            requirements(Category.turret, with(Items.copper, 80, Items.graphite, 60, Items.titanium, 50));
             ammo(
-                Items.copper,  new BasicBulletType(2.5f, 11){{
+                Items.copper,  new BasicBulletType(2.5f, 15){{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
-                    ammoMultiplier = 2;
+                    ammoMultiplier = 5;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
                     hitColor = backColor = trailColor = Pal.copperAmmoBack;
                     frontColor = Pal.copperAmmoFront;
                 }},
-                Items.graphite, new BasicBulletType(3.5f, 20){{
+                Items.graphite, new BasicBulletType(3.5f, 24){{
                     width = 9f;
                     height = 12f;
-                    ammoMultiplier = 4;
+                    ammoMultiplier = 3;
                     lifetime = 60f;
+                    reloadMultiplier = 0.8f;
 
                     rangeChange = 4f * 8f;
 
@@ -3722,7 +3774,7 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.graphiteAmmoBack;
                     frontColor = Pal.graphiteAmmoFront;
                 }},
-                Items.pyratite, new BasicBulletType(3.2f, 18){{
+                Items.pyratite, new BasicBulletType(3.2f, 25){{
                     width = 10f;
                     height = 12f;
                     frontColor = hitColor = Pal.lightishOrange;
@@ -3732,18 +3784,18 @@ public class Blocks{
 
                     ammoMultiplier = 5;
 
-                    splashDamage = 12f;
+                    splashDamage = 15f;
                     splashDamageRadius = 22f;
 
                     makeFire = true;
                     lifetime = 60f;
                 }},
-                Items.silicon, new BasicBulletType(3f, 15, "bullet"){{
+                Items.silicon, new BasicBulletType(3f, 20, "bullet"){{
                     width = 8f;
                     height = 10f;
                     homingPower = 0.2f;
                     reloadMultiplier = 1.5f;
-                    ammoMultiplier = 5;
+                    ammoMultiplier = 3;
                     lifetime = 60f;
 
                     trailLength = 5;
@@ -3752,13 +3804,14 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.siliconAmmoBack;
                     frontColor = Pal.siliconAmmoFront;
                 }},
-                Items.thorium, new BasicBulletType(4f, 29, "bullet"){{
+                Items.thorium, new BasicBulletType(4f, 26, "bullet"){{
                     width = 8f;
                     height = 13f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                     ammoMultiplier = 4;
                     lifetime = 60f;
+                    pierceArmor = true;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
                     backColor = hitColor = trailColor = Pal.thoriumAmmoBack;
@@ -6145,19 +6198,19 @@ public class Blocks{
         //region units
 
         groundFactory = new UnitFactory("ground-factory"){{
-            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
+            requirements(Category.units, with(Items.copper, 50, Items.lead, 70));
             plans = Seq.with(
-                new UnitPlan(UnitTypes.dagger, 60f * 15, with(Items.silicon, 10, Items.lead, 10)),
-                new UnitPlan(UnitTypes.crawler, 60f * 10, with(Items.silicon, 8, Items.coal, 10)),
+                new UnitPlan(UnitTypes.dagger, 60f * 10, with(Items.silicon, 8, Items.lead, 5)),
+                new UnitPlan(UnitTypes.crawler, 60f * 15, with(Items.silicon, 8, Items.coal, 10)),
                 new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20))
             );
             size = 3;
-            consumePower(1.2f);
+            consumePower(1f);
             researchCostMultiplier = 0.5f;
         }};
 
         airFactory = new UnitFactory("air-factory"){{
-            requirements(Category.units, with(Items.copper, 60, Items.lead, 70));
+            requirements(Category.units, with(Items.copper, 40, Items.lead, 50, Items.silicon, 40));
             plans = Seq.with(
                 new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 15)),
                 new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15))
@@ -6183,7 +6236,7 @@ public class Blocks{
 
             size = 3;
             consumePower(3f);
-            consumeItems(with(Items.silicon, 40, Items.graphite, 40));
+            consumeItems(with(Items.silicon, 30, Items.graphite, 30));
 
             constructTime = 60f * 10f;
 
