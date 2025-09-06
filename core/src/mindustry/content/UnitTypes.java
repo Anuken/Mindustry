@@ -331,7 +331,7 @@ public class UnitTypes{
             armor = 3f;
 
             abilities.add(new RepairFieldAbility(10f, 90f, 60f){{
-                sametypehealmultiplier = 0.5f;
+                sameTypeHealMult = 0.5f;
             }});
             
             ammoType = new PowerAmmoType(1000);
