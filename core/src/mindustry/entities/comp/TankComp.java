@@ -56,7 +56,7 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
         boolean anyNonDeep = false;
 
         //calculate overlapping tiles so it slows down when going "over" walls
-        int r = Math.max((int)(hitSize * 0.6f / tilesize), 0);
+        int r = Math.max((int)(hitSize * 0.75f / tilesize), 0);
 
         int solids = 0, total = (r*2+1)*(r*2+1);
         for(int dx = -r; dx <= r; dx++){
@@ -104,7 +104,7 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
     public float floorSpeedMultiplier(){
         Floor on = isFlying() || type.hovering ? Blocks.air.asFloor() : floorOn();
         //TODO take into account extra blocks
-        return on.speedMultiplier * speedMultiplier * lastSlowdown;
+        return (float)Math.pow(on.speedMultiplier, type.floorMultiplier) * speedMultiplier * lastSlowdown;
     }
 
     @Replace
