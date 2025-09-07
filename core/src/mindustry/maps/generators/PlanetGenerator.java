@@ -178,13 +178,13 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         return res % 2 == 0 ? res : res + 1;
     }
 
-    public void generate(Tiles tiles, Sector sec, int seed){
+    public void generate(Tiles tiles, Sector sec, WorldParams params){
         this.tiles = tiles;
-        this.seed = seed + baseSeed;
+        this.seed = params.seedOffset + baseSeed;
         this.sector = sec;
         this.width = tiles.width;
         this.height = tiles.height;
-        this.rand.setSeed(sec.id + seed + baseSeed);
+        this.rand.setSeed(sec.id + params.seedOffset + baseSeed);
 
         TileGen gen = new TileGen();
         for(int y = 0; y < height; y++){
@@ -197,6 +197,6 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
             }
         }
 
-        generate(tiles);
+        generate(tiles, params);
     }
 }

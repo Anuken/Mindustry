@@ -283,6 +283,12 @@ public class Turret extends ReloadTurret{
             }
         }
 
+        //overridden so that the rotation isn't affected during repairs (standard placed() code isn't called)
+        @Override
+        public void onRepaired(){
+            super.placed();
+        }
+
         @Override
         public void remove(){
             super.remove();
@@ -519,7 +525,7 @@ public class Turret extends ReloadTurret{
                 }
 
                 if(validateTarget()){
-                    boolean canShoot = true;
+                    boolean canShoot;
 
                     if(isControlled()){ //player behavior
                         targetPos.set(unit.aimX(), unit.aimY());
