@@ -493,7 +493,9 @@ public class Control implements ApplicationListener, Loadable{
                                 }
 
                                 for(var build : previousBuildings){
-                                    build.updateProximity();
+                                    if(build.isValid()){
+                                        build.updateProximity();
+                                    }
                                 }
 
                                 //carry over all previous plans that don't already have the corresponding block at their position
@@ -504,6 +506,9 @@ public class Control implements ApplicationListener, Loadable{
                                     }
                                 }
                             });
+
+                            //blocks placed after WorldLoadEvent didn't queue an update, so fix that.
+                            renderer.minimap.updateAll();
                         }
                     }else{
                         state.set(State.playing);
