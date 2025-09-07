@@ -469,7 +469,7 @@ public class Control implements ApplicationListener, Loadable{
                             }}, () -> {
                                 var teamData = state.rules.defaultTeam.data();
 
-                                //all the old derelicts have to be removed.
+                                //all the derelicts from the new save have to be removed.
                                 for(var generatedDerelict : Team.derelict.data().buildings.<Building>toArray(Building.class)){
                                     generatedDerelict.tile.remove();
                                 }

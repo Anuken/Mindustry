@@ -101,7 +101,7 @@ public class FileMapGenerator implements WorldGenerator{
                         tile.build.items.clear();
                         tile.build.items.add(state.rules.loadout);
                     }
-                }else if(tile.build instanceof CoreBuild && tile.build.pos() != params.corePositionOverride){
+                }else if(tile.build instanceof CoreBuild && tile.team() == state.rules.defaultTeam && tile.build.pos() != params.corePositionOverride){
                     //other cores placed must be cleared; they have been overridden
                     tile.remove();
                 }
