@@ -17,7 +17,7 @@ public class LastStandAbility extends Ability{
     public float reloadMultiplier = 2f;
     /** % of max health for reaching the maximum multipliers. */
     public float minHealth = 0.2f;
-    /** Applied slope steepness */
+    /** Applied slope steepness. Higher values equal harder to archieve max boost */
     public float exponent = 2f;
 
     LastStandAbility(){}
@@ -47,8 +47,8 @@ public class LastStandAbility extends Ability{
     public void update(Unit unit){
         if(unit.health <= unit.maxHealth){
             float t = Mathf.clamp((1f - unit.health / unit.maxHealth) / (1f - minHealth), 0f, 1f);
-            unit.damageMultiplier = 1f + (damageMultiplier - 1f) * Mathf.pow(t, exponent);
-            unit.reloadMultiplier = 1f + (reloadMultiplier - 1f) * Mathf.pow(t, exponent);
+            unit.damageMultiplier *= 1f + (damageMultiplier - 1f) * Mathf.pow(t, exponent);
+            unit.reloadMultiplier *= 1f + (reloadMultiplier - 1f) * Mathf.pow(t, exponent);
 
             if (unit.health <= unit.maxHealth * minHealth) {
                 unit.apply(effect, 5f);
