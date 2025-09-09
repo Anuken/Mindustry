@@ -14,7 +14,6 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
-import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
