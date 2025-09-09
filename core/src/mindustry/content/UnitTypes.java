@@ -2725,6 +2725,9 @@ public class UnitTypes{
                     setDefaults = false;
                     hitColor = Color.valueOf("feb380");
                     pointEffectSpace = 1f;
+                    knockback = -20f;
+                    status = StatusEffects.slow;
+                    statusDuration = 140f;
 
                     pointEffect = new ParticleEffect(){{
                         colorTo = colorFrom = Color.valueOf("feb380");
@@ -2781,13 +2784,14 @@ public class UnitTypes{
                         pierceCap = 2;
                         width = 8f;
                         height = 12f;
-                        lifetime = 8f;
+                        lifetime = 10f;
                         hitSize = 4f;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
                         frontColor = Color.white;
                         trailWidth = 2.8f;
                         trailLength = 6;
                         hitEffect = despawnEffect = Fx.blastExplosion;
+                        knockback = -5f;
                     }};
                 }};
             }});
@@ -2825,6 +2829,7 @@ public class UnitTypes{
                         hitEffect = Fx.blastExplosion;
                         despawnEffect = Fx.hitBulletColor;
                         despawnSound = Sounds.dullExplosion;
+                        knockback = -2f;
                     }};
                 }});
             }
