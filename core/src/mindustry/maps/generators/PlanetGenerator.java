@@ -20,7 +20,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public abstract class PlanetGenerator extends BasicGenerator implements HexMesher{
-    protected static final ItemSeq tmpItems = new ItemSeq();
+    protected static @Nullable ItemSeq tmpItems;
 
     public int baseSeed = 0;
     public int seed = 0;
@@ -58,6 +58,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
 
     public @Nullable Sector findLaunchCandidate(Sector destination, @Nullable Sector selected){
         if(!destination.allowLaunchLoadout() && destination.preset != null){
+            if(tmpItems == null) tmpItems = new ItemSeq();
             tmpItems.clear();
 
             var rules = destination.preset.generator.map.rules();
