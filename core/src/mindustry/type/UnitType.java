@@ -472,6 +472,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     crawlSlowdown = 0.5f,
     /** damage dealt to blocks under this tank/crawler every frame. */
     crushDamage = 0f,
+    /** radius of damage dealt to units near this tank/crawler every frame. */
+    crushDamageRadius = 0f,
     /** the fraction of solids under this block necessary for it to reach crawlSlowdown. */
     crawlSlowdownFrac = 0.55f;
 

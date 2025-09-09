@@ -2699,6 +2699,7 @@ public class UnitTypes{
             armor = 20f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
+            crushDamageRadius = 4f;
             rotateSpeed = 1.2f;
             floorMultiplier = 0.5f;
             drownTimeMultiplier = 1.25f;
