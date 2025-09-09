@@ -5144,6 +5144,7 @@ public class Blocks{
                     speed = 4.6f;
                     maxRange = 6f;
                     lifetime = 60f * 5.5f;
+                    hitSize = 10f;
                     outlineColor = Pal.darkOutline;
                     engineColor = trailColor = Pal.redLight;
                     engineLayer = Layer.effect;
@@ -5224,13 +5225,14 @@ public class Blocks{
                 shootEffect = Fx.shootBig;
                 smokeEffect = Fx.shootSmokeMissileColor;
                 hitColor = Color.valueOf("ffd37f");
-                ammoMultiplier = 3f;
+                ammoMultiplier = 5f;
                 reloadMultiplier = 0.8f;
 
                 spawnUnit = new MissileUnitType("scathe-missile-phase"){{
-                    speed = 4f;
+                    speed = 2.5f;
                     maxRange = 6f;
-                    lifetime = 60f * 6.1f;
+                    lifetime = 60f * 9.77f;
+                    hitSize = 10f;
                     outlineColor = Pal.darkOutline;
                     engineColor = trailColor = Color.valueOf("ffd37f");
                     engineLayer = Layer.effect;
@@ -5268,10 +5270,9 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(400f, 120f){{
-                            //stats must be mirrored to the bullet that the unit uses
+                        bullet = new ExplosionBulletType(320f, 120f){{
                             reloadMultiplier = 0.8f;
-                            ammoMultiplier = 3f;
+                            ammoMultiplier = 5f;
 
                             hitColor = engineColor;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
@@ -5295,7 +5296,7 @@ public class Blocks{
                                 width = height = 18f;
                                 collidesTiles = false;
                                 splashDamageRadius = 56f;
-                                splashDamage = 164f;
+                                splashDamage = 120f;
                                 backColor = trailColor = hitColor = engineColor;
                                 frontColor = Color.white;
                                 smokeEffect = Fx.shootBigSmoke2;
@@ -5316,10 +5317,10 @@ public class Blocks{
                         rotation = 180f;
                         y = -9f;
                         color = Color.grays(0.6f).lerp(Pal.redLight, 0.5f).a(0.4f);
-                        interval = 7f;
+                        interval = 15f;
                     }});
 
-                    abilities.add(new ForceFieldAbility(90f, 0f, 2000f, 999999999f));
+                    abilities.add(new ForceFieldAbility(120f, 0f, 3000f, 999999999f));
 
                 }};
             }},
@@ -5330,13 +5331,13 @@ public class Blocks{
                 hitColor = Color.valueOf("f7e97e");
 
                 ammoMultiplier = 1f;
-                rangeChange = -8f*9f;
                 reloadMultiplier = 0.9f;
 
                 spawnUnit = new MissileUnitType("scathe-missile-surge"){{
                     speed = 4.4f;
                     maxRange = 6f;
                     lifetime = 60f * 1.4f;
+                    hitSize = 10f;
                     outlineColor = Pal.darkOutline;
                     engineColor = trailColor = Color.valueOf("f7e97e");
                     engineLayer = Layer.effect;
@@ -5367,7 +5368,6 @@ public class Blocks{
                         bullet = new ExplosionBulletType(1800f, 40f){{
                             //mirror stats
                             ammoMultiplier = 1f;
-                            rangeChange = -8f*9f;
                             reloadMultiplier = 0.9f;
                             lightning = 10;
                             lightningDamage = 45f;
@@ -5392,7 +5392,7 @@ public class Blocks{
                                 spawnUnit = new MissileUnitType("scathe-missile-surge-split"){{
                                     speed = 4.8f;
                                     maxRange = 6f;
-                                    lifetime = 60f * 3.5f;
+                                    lifetime = 60f * 3.7f;
                                     outlineColor = Pal.darkOutline;
                                     engineColor = trailColor = Color.valueOf("f7e97e");
                                     engineLayer = Layer.effect;

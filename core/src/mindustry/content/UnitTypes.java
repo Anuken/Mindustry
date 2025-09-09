@@ -3211,11 +3211,11 @@ public class UnitTypes{
         }};
 
         anthicus = new ErekirUnitType("anthicus"){{
-            speed = 0.65f;
+            speed = 0.6f;
             drag = 0.1f;
             hitSize = 21f;
             rotateSpeed = 3f;
-            health = 2900;
+            health = 2500;
             armor = 7f;
             fogRadius = 40f;
             stepShake = 0f;
@@ -3326,7 +3326,7 @@ public class UnitTypes{
                         trailColor = engineColor = Pal.techBlue;
                         engineSize = 1.75f;
                         engineLayer = Layer.effect;
-                        speed = 3.7f;
+                        speed = 3f;
                         maxRange = 6f;
                         lifetime = 60f * 1.5f;
                         outlineColor = Pal.darkOutline;
@@ -3887,7 +3887,7 @@ public class UnitTypes{
             health = 6000f;
             armor = 4f;
             hitSize = 36f;
-            payloadCapacity = Mathf.sqr(3f) * tilePayload;
+            payloadCapacity = Mathf.sqr(4f) * tilePayload;
             researchCostMultiplier = 0f;
             targetAir = false;
 
