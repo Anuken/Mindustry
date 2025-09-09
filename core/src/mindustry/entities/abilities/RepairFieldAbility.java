@@ -14,6 +14,8 @@ public class RepairFieldAbility extends Ability{
     public Effect healEffect = Fx.heal;
     public Effect activeEffect = Fx.healWaveDynamic;
     public boolean parentizeEffects = false;
+    /** Multiplies healing to units of the same type by this amount. */
+    public float sameTypeHealMult = 1f;
 
     protected float timer;
     protected boolean wasHealed = false;
@@ -32,6 +34,10 @@ public class RepairFieldAbility extends Ability{
         t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
         t.row();
         t.add(abilityStat("repairspeed", Strings.autoFixed(amount * 60f / reload, 2)));
+        if(sameTypeHealMult != 1f){
+            t.row();
+            t.add(abilityStat("sametypehealmultiplier", (sameTypeHealMult < 1f ? "[negstat]" : "") + Strings.autoFixed(sameTypeHealMult * 100f, 2)));
+        }
     }
 
     @Override
@@ -46,7 +52,8 @@ public class RepairFieldAbility extends Ability{
                     healEffect.at(other, parentizeEffects);
                     wasHealed = true;
                 }
-                other.heal(amount);
+                float healMult = unit.type == other.type ? sameTypeHealMult : 1f;
+                other.heal(amount * healMult);
             });
 
             if(wasHealed){

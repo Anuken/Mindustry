@@ -143,7 +143,7 @@ public class MapProcessorsDialog extends BaseDialog{
 
         processors.clear();
 
-        //scan the entire world for processor (Groups.build can be empty, indexer is probably inaccurate)
+        //scan the entire world for processors (Groups.build can be empty, indexer is probably inaccurate)
         Vars.world.tiles.eachTile(t -> {
             if(t.isCenter() && t.block() == Blocks.worldProcessor){
                 processors.add(t.build);
