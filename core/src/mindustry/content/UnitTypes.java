@@ -3453,8 +3453,6 @@ public class UnitTypes{
             targetAir = false;
             alwaysShootWhenMoving = true;
 
-            abilities.add(new LastStandAbility(StatusEffects.overclock, 1.8f, 1.4f, 2f / 18f, health));
-
             weapons.add(new Weapon("collaris-weapon"){{
                 shootSound = Sounds.pulseBlast;
                 mirror = true;
@@ -3473,7 +3471,7 @@ public class UnitTypes{
                 shadow = 10f;
 
                 shootStatus = StatusEffects.slow;
-                shootStatusDuration = reload + 140f;
+                shootStatusDuration = reload + 1f;
 
                 shoot.shots = 1;
                 heatColor = Color.red;
