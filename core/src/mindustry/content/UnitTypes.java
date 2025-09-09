@@ -2734,7 +2734,7 @@ public class UnitTypes{
                     pointEffectSpace = 1f;
                     knockback = -20f;
                     status = StatusEffects.slow;
-                    statusDuration = 140f;
+                    statusDuration = 90f;
 
                     pointEffect = new ParticleEffect(){{
                         colorTo = colorFrom = Color.valueOf("feb380");
