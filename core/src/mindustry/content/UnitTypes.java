@@ -2723,7 +2723,7 @@ public class UnitTypes{
 
                 bullet = new RailBulletType(){{
                     length = 230f;
-                    damage = 150f;
+                    damage = 90f;
                     lifetime = 18f;
                     hitSize = 6f;
                     pierceCap = 1;
@@ -2807,7 +2807,7 @@ public class UnitTypes{
             for(float f : new float[] { 34f / 4f, -36f / 4f }){
                 int fi = i ++;
                 weapons.add(new Weapon("vanquish-point-weapon"){{
-                    reload = 15f;
+                    reload = 30f;
                     x = 48f / 4f;
                     y = f;
                     shootY = 5.5f;
@@ -2836,7 +2836,7 @@ public class UnitTypes{
                         hitEffect = Fx.blastExplosion;
                         despawnEffect = Fx.hitBulletColor;
                         despawnSound = Sounds.dullExplosion;
-                        knockback = -2f;
+                        knockback = -3f;
                     }};
                 }});
             }
