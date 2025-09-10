@@ -2835,7 +2835,7 @@ public class UnitTypes{
                         hitEffect = Fx.blastExplosion;
                         despawnEffect = Fx.hitBulletColor;
                         despawnSound = Sounds.dullExplosion;
-                        knockback = -3f;
+                        knockback = -4f;
                     }};
                 }});
             }
