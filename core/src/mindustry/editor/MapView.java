@@ -11,6 +11,7 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.ui.*;
@@ -18,7 +19,7 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class MapView extends Element implements GestureListener{
-    EditorTool tool = EditorTool.pencil;
+    EditorTool tool = Vars.mobile ? EditorTool.zoom : EditorTool.pencil;
     private float offsetx, offsety;
     private float zoom = 1f;
     private boolean grid = false;
@@ -204,7 +205,7 @@ public class MapView extends Element implements GestureListener{
         zoom = Mathf.clamp(zoom, 0.2f, 20f);
     }
 
-    Point2 project(float x, float y){
+    public Point2 project(float x, float y){
         float ratio = 1f / ((float)editor.width() / editor.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;

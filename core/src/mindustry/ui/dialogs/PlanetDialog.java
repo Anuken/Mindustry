@@ -418,6 +418,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             return false;
         }
 
+        if(sector.planet.generator == null) return false;
+
         if(sector.hasBase() || sector.id == sector.planet.startSector) return true;
         //preset sectors can only be selected once unlocked
         if(sector.preset != null && sector.preset.requireUnlock){
@@ -425,33 +427,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             return sector.preset.unlocked() || node == null || node.parent == null || (node.parent.content.unlocked() && (!(node.parent.content instanceof SectorPreset preset) || preset.sector.hasBase()));
         }
 
-        return sector.planet.generator != null ?
-            //use planet impl when possible
-            (mode == planetLaunch ? sector.planet.generator.allowAcceleratorLanding(sector) : sector.planet.generator.allowLanding(sector)) :
-            mode == planetLaunch || sector.hasBase() || sector.near().contains(Sector::hasBase); //near an occupied sector
+        return mode == planetLaunch ? sector.planet.generator.allowAcceleratorLanding(sector) : sector.planet.generator.allowLanding(sector);
     }
 
-    Sector findLauncher(Sector to){
-        if(mode == planetLaunch){
-            return launchSector;
-        }
+    @Nullable Sector findLauncher(Sector to){
+        if(mode == planetLaunch || to.planet.generator == null) return launchSector;
 
-        Sector launchSector = this.launchSector != null && this.launchSector.planet == to.planet && this.launchSector.hasBase() ? this.launchSector : null;
-        //directly nearby.
-        if(to.near().contains(launchSector)) return launchSector;
-
-        Sector launchFrom = launchSector;
-        if(launchFrom == null || (to.preset == null && !to.near().contains(launchSector))){
-            //TODO pick one with the most resources
-            launchFrom = to.near().find(Sector::hasBase);
-            if(launchFrom == null && to.preset != null){
-                if(launchSector != null) return launchSector;
-                launchFrom = state.planet.sectors.min(s -> !s.hasBase() ? Float.MAX_VALUE : s.tile.v.dst2(to.tile.v));
-                if(!launchFrom.hasBase()) launchFrom = null;
-            }
-        }
-
-        return launchFrom;
+        Sector candidate = to.planet.generator.findLaunchCandidate(to, launchSector);
+        return candidate == null ? launchSector : candidate;
     }
 
     boolean showing(){
@@ -502,25 +485,29 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         planets.batch.flush(Gl.triangles);
+    }
 
-        if(hovered != null && !hovered.hasBase()){
-            Sector launchFrom = findLauncher(hovered);
-            if(launchFrom != null && hovered != launchFrom && canSelect(hovered)){
-                planets.drawArc(planet, launchFrom.tile.v, hovered.tile.v);
-            }
+    @Override
+    public void renderOverProjections(Planet planet){
+        Sector hoverOrSelect = hovered != null ? hovered : selected;
+        Sector launchFrom = hoverOrSelect != null && !hoverOrSelect.hasBase() ? findLauncher(hoverOrSelect) : null;
+
+        if(hoverOrSelect != null && !hoverOrSelect.hasBase() && launchFrom != null && hoverOrSelect != launchFrom && canSelect(hoverOrSelect)){
+            planets.drawArcLine(planet, launchFrom.tile.v, hoverOrSelect.tile.v);
         }
 
         if(mode == planetLaunch && launchSector != null && selected != null && hovered == null){
-            planets.drawArc(planet, launchSector.tile.v, selected.tile.v);
+            planets.drawArcLine(planet, launchSector.tile.v, selected.tile.v);
         }
 
         if(state.uiAlpha > 0.001f){
             for(Sector sec : planet.sectors){
                 if(sec.hasBase()){
+                    //draw vulnerable sector attack arc
                     if(planet.campaignRules.sectorInvasion){
                         for(Sector enemy : sec.near()){
-                            if(enemy.hasEnemyBase()){
-                                planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Color.clear, 0.24f, 110f, 25);
+                            if(enemy.hasEnemyBase() && (enemy.preset == null || !enemy.preset.requireUnlock)){
+                                planets.drawArcLine(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Color.clear, 0.24f, 110f, 25, 0.005f);
                             }
                         }
                     }
@@ -538,7 +525,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
             }
         }
-
     }
 
     @Override
@@ -936,7 +922,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             sectorTop.color.a = Mathf.lerpDelta(sectorTop.color.a, 1f, 0.1f);
         }
 
-        if(hovered != null && !mobile && state.planet.hasGrid()){
+        if(hovered != null && state.planet.hasGrid()){
             addChild(hoverLabel);
             hoverLabel.toFront();
             hoverLabel.touchable = Touchable.disabled;
@@ -952,7 +938,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     if(!(hovered.preset == null && !hovered.planet.allowLaunchToNumbered)){
                         if(mode == planetLaunch){
                             tx.append("[gray]").append(Iconc.cancel);
-                        }else if(hovered.planet.generator != null){
+                        }else if(hovered.planet.generator != null && mode != select){
                             hovered.planet.generator.getLockedText(hovered, tx);
                         }
                     }
@@ -1136,10 +1122,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     }
                 });
             }else{
-                if(sector.save != null){
-                    sector.save.delete();
-                }
-                sector.save = null;
+                sector.info.items.clear();
+                sector.info.damage = 1f;
+                sector.info.hasCore = false;
+                sector.info.production.clear();
+                sector.saveInfo();
             }
             updateSelected();
             rebuildList();

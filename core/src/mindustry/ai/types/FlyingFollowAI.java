@@ -28,7 +28,7 @@ public class FlyingFollowAI extends FlyingAI{
         }
 
         if(timer.get(timerTarget3, 30f)){
-            following = Units.closest(unit.team, unit.x, unit.y, Math.max(unit.type.range, 400f), u -> !u.dead() && u.type != unit.type, (u, tx, ty) -> -u.maxHealth + Mathf.dst2(u.x, u.y, tx, ty) / 6400f);
+            following = Units.closest(unit.team, unit.x, unit.y, Math.max(unit.type.range, 400f), u -> !u.dead() && !(u.controller() instanceof FlyingFollowAI) && u.type != unit.type, (u, tx, ty) -> -u.maxHealth + Mathf.dst2(u.x, u.y, tx, ty) / 6400f);
         }
     }
 
