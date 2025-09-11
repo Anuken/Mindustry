@@ -150,7 +150,7 @@ public class TractorBeamTurret extends BaseTurret{
             Draw.rect(region, x, y, rotation - 90);
 
             //draw laser if applicable
-            if(any){
+            if(any && !isPayload()){
                 Draw.z(Layer.bullet);
                 float ang = angleTo(lastX, lastY);
 

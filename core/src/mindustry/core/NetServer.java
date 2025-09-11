@@ -23,6 +23,7 @@ import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.net.*;
@@ -931,19 +932,20 @@ public class NetServer implements ApplicationListener{
         syncStream.reset();
 
         short sent = 0;
-        for(Building entity : Groups.build){
-            if(!entity.block.sync) continue;
-            sent++;
+        for(var team : state.teams.present){
+            for(var build : indexer.getFlagged(team.team, BlockFlag.synced)){
+                sent++;
 
-            dataStream.writeInt(entity.pos());
-            dataStream.writeShort(entity.block.id);
-            entity.writeSync(Writes.get(dataStream));
+                dataStream.writeInt(build.pos());
+                dataStream.writeShort(build.block.id);
+                build.writeSync(Writes.get(dataStream));
 
-            if(syncStream.size() > maxSnapshotSize){
-                dataStream.close();
-                Call.blockSnapshot(sent, syncStream.toByteArray());
-                sent = 0;
-                syncStream.reset();
+                if(syncStream.size() > maxSnapshotSize){
+                    dataStream.close();
+                    Call.blockSnapshot(sent, syncStream.toByteArray());
+                    sent = 0;
+                    syncStream.reset();
+                }
             }
         }
 

@@ -181,6 +181,11 @@ public class ColoredFloor extends Floor{
     }
 
     @Override
+    public void editorPicked(Tile tile){
+        lastConfig = tile.extraData;
+    }
+
+    @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         if(plan.config instanceof Integer i){
             Draw.tint(Tmp.c1.set(i | 0xff));
@@ -190,7 +195,7 @@ public class ColoredFloor extends Floor{
 
     @Override
     public boolean checkAutotileSame(Tile tile, @Nullable Tile other){
-        return other != null && other.floor().blendGroup == blendGroup && ((tile.extraData & 0xff) == flagIgnoreDifferentColor || tile.extraData == other.extraData);
+        return other != null && (this == tile.floor() ? other.floor() : other.overlay()).blendGroup == blendGroup && ((tile.extraData & 0xff) == flagIgnoreDifferentColor || tile.extraData == other.extraData);
     }
 
     @Override

@@ -65,6 +65,11 @@ public class ColoredWall extends StaticWall{
     }
 
     @Override
+    public void editorPicked(Tile tile){
+        lastConfig = tile.extraData;
+    }
+
+    @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         if(plan.config instanceof Integer i){
             Draw.tint(Tmp.c1.set(i | 0xff));

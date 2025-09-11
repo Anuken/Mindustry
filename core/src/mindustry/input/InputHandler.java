@@ -62,6 +62,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
     final static Seq<Unit> tmpUnits = new Seq<>(false);
+    final static Seq<Building> tmpBuildings = new Seq<>(false);
     final static KeyBind[] controlGroupBindings = {
     Binding.blockSelect01,
     Binding.blockSelect02,
@@ -86,7 +87,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public Interval controlInterval = new Interval();
     public @Nullable Block block;
     public boolean overrideLineRotation;
-    public int rotation;
+    public int rotation = 1;
     public boolean droppingItem;
     public float itemDepositCooldown;
     public Group uiGroup;
@@ -475,7 +476,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(variants = Variant.one)
     public static void removeQueueBlock(int x, int y, boolean breaking){
-        player.unit().removeBuild(x, y, breaking);
+        if(!player.dead()){
+            player.unit().removeBuild(x, y, breaking);
+        }
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
@@ -995,9 +998,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     //nothing selected, clear units
                     selectedUnits.clear();
                 }
-                selectedUnits.addAll(units);
-                Events.fire(Trigger.unitCommandChange);
                 commandBuildings.clear();
+
+                selectedUnits.addAll(units);
+                if(selectedUnits.isEmpty()){
+                    commandBuildings.addAll(selectedCommandBuildings(commandRectX, commandRectY, input.mouseWorldX() - commandRectX, input.mouseWorldY() - commandRectY));
+                }
+                Events.fire(Trigger.unitCommandChange);
             }
             commandRect = false;
         }
@@ -1096,6 +1103,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void drawCommand(Unit sel){
         Drawf.poly(sel.x, sel.y, 6, sel.hitSize / unitSelectRadScl + Mathf.absin(4f, 1f), 0f, selectedUnits.contains(sel) ? Pal.remove : Pal.accent);
+    }
+
+    public void drawCommand(Building build){
+        Drawf.poly(build.x, build.y, 4, build.hitSize() / 1.4f + + 0.5f + Mathf.absin(4f, 1f), 0f, commandBuildings.contains(build) ? Pal.remove : Pal.accent);
     }
 
     public void drawCommanded(){
@@ -1234,6 +1245,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             for(var unit : units){
                 drawCommand(unit);
             }
+            if(units.isEmpty()){
+                var buildings = selectedCommandBuildings(commandRectX, commandRectY, x2 - commandRectX, y2 - commandRectY);
+                for(var build : buildings){
+                    drawCommand(build);
+                }
+            }
 
             Draw.color(Pal.accent, 0.3f);
             Fill.crect(commandRectX, commandRectY, x2 - commandRectX, y2 - commandRectY);
@@ -1302,8 +1319,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void useSchematic(Schematic schem){
-        selectPlans.addAll(schematics.toPlans(schem, player.tileX(), player.tileY()));
+        useSchematic(schem, true);
     }
+
+    public abstract void useSchematic(Schematic schem, boolean checkHidden);
 
     protected void showSchematicSave(){
         if(lastSchematic == null) return;
@@ -1811,7 +1830,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean canTapPlayer(float x, float y){
-        return player.within(x, y, playerSelectRange) && !player.dead() && player.unit().stack.amount > 0;
+        return player.within(x, y, playerSelectRange) && !player.dead() && player.unit().stack.amount > 0 && block == null;
     }
 
     /** Tries to begin mining a tile, returns true if successful. */
@@ -1965,6 +1984,19 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         return tmpUnits.min(u -> !u.inFogTo(player.team()), u -> u.dst(x, y) - u.hitSize/2f);
+    }
+
+    public Seq<Building> selectedCommandBuildings(float x, float y, float w, float h){
+        var tree = player.team().data().buildingTree;
+        tmpBuildings.clear();
+        if(tree == null) return tmpBuildings;
+        float rad = 4f;
+        tree.intersect(Tmp.r1.set(x - rad/2f, y - rad/2f, rad*2f + w, rad*2f + h).normalize(), b -> {
+            if(b.isCommandable()){
+                tmpBuildings.add(b);
+            }
+        });
+        return tmpBuildings;
     }
 
     public Seq<Unit> selectedCommandUnits(float x, float y, float w, float h, Boolf<Unit> predicate){

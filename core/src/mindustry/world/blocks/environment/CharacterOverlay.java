@@ -80,6 +80,11 @@ public class CharacterOverlay extends OverlayFloor{
         tile.overlayData = CharOverlayData.get(data, (byte)rotation);
     }
 
+    @Override
+    public void editorPicked(Tile tile){
+        lastConfig = (int)CharOverlayData.character(tile.overlayData);
+    }
+
     public static byte charToData(char c){
         int index = chars.indexOf(Character.toUpperCase(c));
         return index == -1 ? 0 : (byte)index;
