@@ -1924,7 +1924,7 @@ public class Blocks{
             consumePower(5f);
             size = 2;
             speedBoost = 1.25f;
-            speedBoostPhase = 0.25f;
+            speedBoostPhase = 0.50f;
             useTime = (120f * 2f) / (speedBoost + speedBoostPhase) ;
             consumeItem(Items.phaseFabric, 1).boost();
         }};
