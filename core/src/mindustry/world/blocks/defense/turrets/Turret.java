@@ -527,7 +527,7 @@ public class Turret extends ReloadTurret{
             }
 
             if(activationTimer > 0){
-                activationTimer -= delta();
+                activationTimer -= Time.delta;
                 return;
             }
 
@@ -809,13 +809,12 @@ public class Turret extends ReloadTurret{
         @Override
         public void readSync(Reads read, byte revision){
             //maintain rotation and reload when syncing so clients don't see turrets snapping around
-            float oldRot = rotation, oldReload = reloadCounter, oldActTime = activationTimer;
+            float oldRot = rotation, oldReload = reloadCounter;
 
             readAll(read, revision);
 
             rotation = oldRot;
             reloadCounter = oldReload;
-            activationTimer = oldActTime;
         }
     }
 
