@@ -29,11 +29,13 @@ public class StatUnit{
     perMinute = new StatUnit("perMinute", false),
     perShot = new StatUnit("perShot", false),
     timesSpeed = new StatUnit("timesSpeed", false),
+    timesPowerUse = new StatUnit("timespoweruse", false),
     multiplier = new StatUnit("multiplier", false),
     percent = new StatUnit("percent", false),
     shieldHealth = new StatUnit("shieldHealth"),
     none = new StatUnit("none"),
-    items = new StatUnit("items");
+    items = new StatUnit("items"),
+    boost = new StatUnit("boost");
 
     public final boolean space;
     public final String name;

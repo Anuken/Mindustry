@@ -72,7 +72,7 @@ public class OverdriveProjector extends Block{
 
         if(hasBoost && findConsumer(f -> f instanceof ConsumeItems) instanceof ConsumeItems items){
             stats.remove(Stat.booster);
-            stats.add(Stat.booster, StatValues.itemBoosters("+{0}%", stats.timePeriod, speedBoostPhase * 100f, phaseRangeBoost, items.items));
+            stats.add(Stat.booster, StatValues.itemBoosters("+{0}% " + StatUnit.boost.localized(), stats.timePeriod, speedBoostPhase * 100f, phaseRangeBoost, phasePowerMult, items.items));
         }
     }
     
