@@ -4831,8 +4831,9 @@ public class Blocks{
                 lifetime = 34f;
                 rotationOffset = 90f;
                 trailLength = 7;
+                rangeChange = 80f;
                 //for chasing targets
-                extraRangeMargin = 32f;
+                extraRangeMargin = 28f;
 
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
