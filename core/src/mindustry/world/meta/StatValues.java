@@ -546,7 +546,7 @@ public class StatValues{
                         bt.right().defaults().padRight(3).left();
                         if(rangeBoost != 0) bt.add("[lightgray]+[stat]" + Strings.autoFixed(rangeBoost / tilesize, 2) + "[lightgray] " + StatUnit.blocks.localized()).row();
                         if(speedBoost != 0) bt.add("[lightgray]" + unit.replace("{0}", "[stat]" + Strings.autoFixed(speedBoost, 2) + "[lightgray]")).row();
-                        if(powerMult != 1f) bt.add("[lightgray]+[stat]" + (powerMult > 1f ? "[negstat]" : "") + Strings.autoFixed(powerMult, 2) + "[lightgray]" + StatUnit.timesPowerUse.localized());
+                        if(powerMult != 1f) bt.add("[lightgray]+[stat]" + (powerMult > 1f ? "[negstat]" : "") + Strings.autoFixed((powerMult - 1f) * 100f, 2) + "[lightgray]% " + StatUnit.powerUse.localized());
                     }).right().top().grow().pad(10f).padRight(15f);
                 }).growX().pad(5).padBottom(-5).row();
             }).growX().colspan(table.getColumns());
