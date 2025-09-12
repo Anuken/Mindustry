@@ -4440,8 +4440,8 @@ public class Blocks{
                 shootEffect = Fx.shootBigColor;
                 smokeEffect = Fx.shootSmokeSquareSparse;
                 ammoMultiplier = 1;
-                hitColor = backColor = trailColor = Pal.graphiteAmmoBack;
-                frontColor = Pal.graphiteAmmoFront;
+                hitColor = backColor = trailColor = Color.valueOf("858a9b");
+                frontColor = Color.valueOf("dae1ee");
                 trailWidth = 6f;
                 trailLength = 6;
                 hitEffect = despawnEffect = Fx.hitSquaresColor;
@@ -4824,8 +4824,8 @@ public class Blocks{
                 collidesTiles = false;
                 shootEffect = Fx.shootBig2;
                 smokeEffect = Fx.shootSmokeDisperse;
-                frontColor = Pal.graphiteAmmoFront;
-                backColor = trailColor = hitColor = Pal.graphiteAmmoBack;
+                frontColor = Color.white;
+                backColor = trailColor = hitColor = Color.valueOf("e89dbd");
                 ammoMultiplier = 4f;
 
                 lifetime = 34f;
