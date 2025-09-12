@@ -672,8 +672,8 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.reload", ammoStat(val)));
                     }
 
-                    if(type.knockback > 0){
-                        sep(bt, Core.bundle.format("bullet.knockback", Strings.autoFixed(type.knockback, 2)));
+                    if(type.knockback != 0f){
+                        sep(bt, Core.bundle.format("bullet.knockback", (type.knockback < 0f ? "[negstat]" : "") + Strings.autoFixed(type.knockback, 2)));
                     }
 
                     if(type.healPercent > 0f){
