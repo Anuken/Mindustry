@@ -1122,10 +1122,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     }
                 });
             }else{
-                if(sector.save != null){
-                    sector.save.delete();
-                }
-                sector.save = null;
+                sector.info.items.clear();
+                sector.info.damage = 1f;
+                sector.info.hasCore = false;
+                sector.info.production.clear();
+                sector.saveInfo();
             }
             updateSelected();
             rebuildList();

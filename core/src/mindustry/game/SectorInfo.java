@@ -41,8 +41,6 @@ public class SectorInfo{
     public int storageCapacity = 0;
     /** Whether a core is available here. */
     public boolean hasCore = true;
-    /** Whether a world processor is on this map - implies that the map will get cleared. */
-    public boolean hasWorldProcessor;
     /** Whether this sector was ever fully captured. */
     public boolean wasCaptured = false;
     /** Sector that was launched from. */
@@ -213,7 +211,6 @@ public class SectorInfo{
             spawnPosition = entity.pos();
         }
 
-        hasWorldProcessor = state.teams.present.contains(t -> t.getBuildings(Blocks.worldProcessor).any());
         waveSpacing = state.rules.waveSpacing;
         wave = state.wave;
         winWave = state.rules.winWave;

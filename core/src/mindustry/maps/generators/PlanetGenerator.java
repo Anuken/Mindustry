@@ -20,7 +20,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public abstract class PlanetGenerator extends BasicGenerator implements HexMesher{
-    protected static final ItemSeq tmpItems = new ItemSeq();
+    protected static @Nullable ItemSeq tmpItems;
 
     public int baseSeed = 0;
     public int seed = 0;
@@ -58,6 +58,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
 
     public @Nullable Sector findLaunchCandidate(Sector destination, @Nullable Sector selected){
         if(!destination.allowLaunchLoadout() && destination.preset != null){
+            if(tmpItems == null) tmpItems = new ItemSeq();
             tmpItems.clear();
 
             var rules = destination.preset.generator.map.rules();
@@ -178,13 +179,13 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         return res % 2 == 0 ? res : res + 1;
     }
 
-    public void generate(Tiles tiles, Sector sec, int seed){
+    public void generate(Tiles tiles, Sector sec, WorldParams params){
         this.tiles = tiles;
-        this.seed = seed + baseSeed;
+        this.seed = params.seedOffset + baseSeed;
         this.sector = sec;
         this.width = tiles.width;
         this.height = tiles.height;
-        this.rand.setSeed(sec.id + seed + baseSeed);
+        this.rand.setSeed(sec.id + params.seedOffset + baseSeed);
 
         TileGen gen = new TileGen();
         for(int y = 0; y < height; y++){
@@ -197,6 +198,6 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
             }
         }
 
-        generate(tiles);
+        generate(tiles, params);
     }
 }
