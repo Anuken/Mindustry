@@ -4440,7 +4440,7 @@ public class Blocks{
                 shootEffect = Fx.shootBigColor;
                 smokeEffect = Fx.shootSmokeSquareSparse;
                 ammoMultiplier = 1;
-                hitColor = backColor = trailColor = Color.valueOf("858a9b");
+                hitColor = backColor = trailColor = Pal.siliconAmmoBack;
                 frontColor = Color.valueOf("dae1ee");
                 trailWidth = 6f;
                 trailLength = 6;
@@ -4824,13 +4824,18 @@ public class Blocks{
                 collidesTiles = false;
                 shootEffect = Fx.shootBig2;
                 smokeEffect = Fx.shootSmokeDisperse;
-                frontColor = Color.white;
-                backColor = trailColor = hitColor = Color.valueOf("e89dbd");
-                ammoMultiplier = 4f;
+                frontColor = Color.valueOf("dae1ee");
+                backColor = trailColor = hitColor = Pal.siliconAmmoBack;
+                ammoMultiplier = 2f;
 
                 lifetime = 34f;
                 rotationOffset = 90f;
+                trailEffect = Fx.artilleryTrail;
+                trailInterp = Interp.slope;
                 trailLength = 7;
+                trailWidth = 4f;
+                trailChance = 0.2f;
+                trailParam = 3f;
                 rangeChange = 80f;
                 //for chasing targets
                 extraRangeMargin = 28f;

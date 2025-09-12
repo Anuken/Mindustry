@@ -258,7 +258,7 @@ public class BulletType extends Content implements Cloneable{
     /** Random offset of trail effect. */
     public float trailSpread = 0f;
     /** Rotation/size parameter that is passed to trail. Usually, this controls size. */
-    public float trailParam =  2f;
+    public float trailParam = 2f;
     /** Whether the parameter passed to the trail is the bullet rotation, instead of a flat value. */
     public boolean trailRotation = false;
     /** Interpolation for trail width as function of bullet lifetime */
