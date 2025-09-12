@@ -26,9 +26,13 @@ public class OverdriveProjector extends Block{
     public float speedBoostPhase = 0.75f;
     public float useTime = 400f;
     public float phaseRangeBoost = 20f;
+    public float phasePowerMult = 2f;
     public boolean hasBoost = true;
     public Color baseColor = Color.valueOf("feb380");
     public Color phaseColor = Color.valueOf("ffd59e");
+    
+    //initialized in init(), do not touch
+    protected float basePowerUse = 0f;
 
     public OverdriveProjector(String name){
         super(name);
@@ -76,6 +80,16 @@ public class OverdriveProjector extends Block{
     public void setBars(){
         super.setBars();
         addBar("boost", (OverdriveBuild entity) -> new Bar(() -> Core.bundle.format("bar.boost", Mathf.round(Math.max((entity.realBoost() * 100 - 100), 0))), () -> Pal.accent, () -> entity.realBoost() / (hasBoost ? speedBoost + speedBoostPhase : speedBoost)));
+    }
+
+   @Override
+    public void init(){
+        if(hasBoost){
+            basePowerUse = consPower != null ? consPower.usage : 0f;
+            consumePowerDynamic(basePowerUse, (OverdriveBuild b) -> b.shouldConsume() && b.optionalEfficiency > 0f ? basePowerUse * b.optionalEfficiency * phasePowerMult : basePowerUse);
+        }
+
+        super.init();
     }
 
     public class OverdriveBuild extends Building implements Ranged{
