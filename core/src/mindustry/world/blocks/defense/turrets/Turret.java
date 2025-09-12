@@ -192,6 +192,14 @@ public class Turret extends ReloadTurret{
             () -> Pal.lightOrange,
             () -> entity.heatReq / heatRequirement));
         }
+
+        if(activationTime > 0){
+            addBar("activationtimer", (TurretBuild entity) ->
+            new Bar(() ->
+            (entity.activationTimer > 0)? Core.bundle.format("bar.activationtimer", (int)(entity.activationTimer * 10/60f) / 10f) : Core.bundle.get("bar.activated"),
+            () -> (entity.activationTimer > 0)? Color.lightGray : Pal.powerLight,
+            () -> 1 - entity.activationTimer / activationTime));
+        }
     }
 
     @Override
