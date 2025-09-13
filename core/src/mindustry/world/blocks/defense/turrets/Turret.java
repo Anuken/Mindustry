@@ -114,6 +114,8 @@ public class Turret extends ReloadTurret{
 
     /** Color of heat region drawn on top (if found) */
     public Color heatColor = Pal.turretHeat;
+    /** Color of inactive region drawn on top (if found) */
+    public Color inactiveColor = Color.white;
     /** Optional override for all shoot effects. */
     public @Nullable Effect shootEffect;
     /** Optional override for all smoke effects. */
@@ -287,7 +289,7 @@ public class Turret extends ReloadTurret{
         public @Nullable SoundLoop soundLoop = (loopSound == Sounds.none ? null : new SoundLoop(loopSound, loopSoundVolume));
 
         float lastRangeChange;
-        float activationTimer = activationTime;
+        public float activationTimer = activationTime;
 
         @Override
         public void placed(){
