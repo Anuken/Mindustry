@@ -892,7 +892,7 @@ public class ApplicationTests{
 
                 logic.reset();
                 state.rules.sector = zone.sector;
-                world.loadGenerator(zone.generator.map.width, zone.generator.map.height, zone.generator::generate);
+                world.loadGenerator(zone.generator.map.width, zone.generator.map.height, tiles -> zone.generator.generate(tiles, new WorldParams()));
                 zone.rules.get(state.rules);
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;

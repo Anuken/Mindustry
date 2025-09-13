@@ -1333,6 +1333,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    /** Called when this block is derelict repaired. */
+    @CallSuper
+    public void onRepaired(){
+        placed();
+    }
+
     public boolean isCommandable(){
         return block.commandable;
     }
