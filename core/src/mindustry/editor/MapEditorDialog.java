@@ -576,7 +576,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                     b.row();
                                     b.add(Core.bundle.get("toolmode." + name + ".description")).color(Color.lightGray).left();
                                 }, () -> {
-                                    tool.mode = (tool.mode == mode ? -1 : mode);
+                                    tool.modeChanged((tool.mode == mode ? -1 : mode));
                                     table.remove();
                                 }).update(b -> b.setChecked(tool.mode == mode));
                                 table.row();
@@ -774,13 +774,17 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
 
             if(Core.input.keyTap(KeyCode.v)){
-                view.pasteSelection();
+                pasteSelection();
             }
 
             if(Core.input.keyTap(KeyCode.g)){
                 view.setGrid(!view.isGrid());
             }
         }
+    }
+
+    public void pasteSelection() {
+        view.pasteSelection();
     }
 
     private void tryExit(){

@@ -16,6 +16,7 @@ import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.ui.*;
 import mindustry.world.Tile;
+import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
@@ -86,10 +87,6 @@ public class MapView extends Element implements GestureListener{
                     tool = EditorTool.zoom;
                 }
 
-                if(button == KeyCode.mouseLeft && tool == EditorTool.copy){
-                    selection.selecting = true;
-                }
-
                 mousex = x;
                 mousey = y;
 
@@ -100,6 +97,10 @@ public class MapView extends Element implements GestureListener{
                 starty = p.y;
                 tool.touched(p.x, p.y);
                 firstTouch.set(p);
+
+                if(tool == EditorTool.copy && tool.mode == 0) {
+                    startSelection();
+                }
 
                 if(tool.edit){
                     ui.editor.resetSaved();
@@ -122,6 +123,10 @@ public class MapView extends Element implements GestureListener{
                 if(tool == EditorTool.line){
                     ui.editor.resetSaved();
                     tool.touchedLine(startx, starty, p.x, p.y);
+                }
+
+                if(tool == EditorTool.copy && tool.mode == 0) {
+                    endSelection();
                 }
 
                 editor.flushOp();
@@ -157,7 +162,6 @@ public class MapView extends Element implements GestureListener{
                     lastx = p.x;
                     lasty = p.y;
                 }
-
             }
         });
     }
@@ -293,8 +297,8 @@ public class MapView extends Element implements GestureListener{
         Draw.color(Pal.accent);
         Lines.stroke(Scl.scl(2f));
 
-        if(tool == EditorTool.copy && ((selection.width > 0 && selection.height > 0) || selection.selecting)){
-            if(selection.selecting){
+        if(tool == EditorTool.copy && ((selection.width > 0 && selection.height > 0) || tool.mode == 0)){
+            if(tool.mode == 0){
                 Point2 p = project(mousex, mousey);
                 int copyEndX = p.x, copyEndY = p.y;
 
@@ -398,7 +402,9 @@ public class MapView extends Element implements GestureListener{
     }
 
     public void startSelection() {
-        selection.selecting = true;
+        if(tool != EditorTool.copy) return;
+
+        tool.mode = 0;
         Point2 p = project(mousex, mousey);
         copyStartX = p.x;
         copyStartY = p.y;
@@ -407,7 +413,7 @@ public class MapView extends Element implements GestureListener{
     public void endSelection() {
         if(tool != EditorTool.copy) return;
 
-        selection.selecting = false;
+        tool.mode = -1;
         Point2 p = project(mousex, mousey);
         int copyEndX = p.x, copyEndY = p.y;
 
@@ -443,6 +449,8 @@ public class MapView extends Element implements GestureListener{
                 Tile stile = editor.tile(sx, sy);
                 Tile dtile = editor.tile(dx, dy);
 
+                editor.addTileOp(TileOp.get(dtile.x, dtile.y, DrawOperation.opData, TileOpData.get(dtile.data, dtile.floorData, dtile.overlayData)));
+                editor.addTileOp(TileOp.get(dtile.x, dtile.y, DrawOperation.opDataExtra, dtile.extraData));
                 dtile.setFloor(stile.floor());
                 dtile.setOverlay(stile.overlay());
                 if(stile.isCenter()) {
@@ -450,11 +458,12 @@ public class MapView extends Element implements GestureListener{
                 }
             }
         }
+
+        editor.flushOp();
     };
 
     class CopySelection{
         int sx, sy, width, height;
-        boolean selecting;
     }
 
 }
