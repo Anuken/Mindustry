@@ -4831,11 +4831,10 @@ public class Blocks{
                 lifetime = 34f;
                 rotationOffset = 90f;
                 trailEffect = Fx.artilleryTrail;
-                trailInterp = Interp.slope;
                 trailLength = 7;
-                trailWidth = 4f;
+                trailWidth = 3f;
                 trailChance = 0.2f;
-                trailParam = 3f;
+                trailParam = 4f;
                 rangeChange = 80f;
                 //for chasing targets
                 extraRangeMargin = 28f;
