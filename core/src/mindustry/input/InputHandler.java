@@ -2090,13 +2090,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build != null && build.acceptStack(stack.item, stack.amount, player.unit()) > 0 && build.interactable(player.team()) &&
         build.block.hasItems && player.unit().stack().amount > 0 && build.interactable(player.team())){
 
-            if(!(state.rules.onlyDepositCore && !(build instanceof CoreBuild)) && itemDepositCooldown <= 0f){
+            if(!(state.rules.onlyDepositCore && !(build instanceof CoreBuild)) && canDepositItem(build)){
                 Call.transferInventory(player, build);
-                itemDepositCooldown = state.rules.itemDepositCooldown + ((build.block instanceof Turret && state.rules.enableTurretDepositCooldown)? ((Turret)build.block).depositCooldown : 0);
+                itemDepositCooldown = state.rules.itemDepositCooldown;
             }
         }else{
             Call.dropItem(player.angleTo(x, y));
         }
+    }
+
+    public boolean canDepositItem(@Nullable Building build){
+        float depositCooldown = itemDepositCooldown + ((build.block instanceof Turret && state.rules.enableTurretDepositCooldown)? ((Turret)build.block).depositCooldown : 0);
+        return depositCooldown <= 0;
     }
 
     public void rebuildArea(int x1, int y1, int x2, int y2){
