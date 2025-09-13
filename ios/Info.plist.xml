@@ -107,7 +107,7 @@
                 <string>Owner</string>
                 <key>LSItemContentTypes</key>
                 <array>
-                    <string>public.archive</string>
+                    <string>public.zip-archive</string>
                 </array>
             </dict>
         </array>
