@@ -38,7 +38,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.defense.turrets.*;
-import mindustry.world.blocks.defense.turrets.Turret.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
@@ -2093,7 +2092,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             if(!(state.rules.onlyDepositCore && !(build instanceof CoreBuild)) && itemDepositCooldown <= 0f){
                 Call.transferInventory(player, build);
-                itemDepositCooldown = state.rules.itemDepositCooldown + ((build.block instanceof Turret)? ((Turret)build.block).depositCooldown : 0);
+                itemDepositCooldown = state.rules.itemDepositCooldown + ((build.block instanceof Turret && state.rules.enableTurretDepositCooldown)? ((Turret)build.block).depositCooldown : 0);
             }
         }else{
             Call.dropItem(player.angleTo(x, y));

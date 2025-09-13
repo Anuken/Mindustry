@@ -3301,6 +3301,7 @@ public class Blocks{
             rotateSpeed = 10f;
             coolant = consumeCoolant(0.1f);
             researchCostMultiplier = 0.05f;
+            depositCooldown = 1.5f;
 
             limitRange(5f);
         }};
@@ -3432,6 +3433,7 @@ public class Blocks{
             health = 400;
             shootSound = Sounds.flame;
             coolant = consumeCoolant(0.1f);
+            depositCooldown = 0.5f;
         }};
 
         hail = new ItemTurret("hail"){{
@@ -3495,6 +3497,7 @@ public class Blocks{
             health = 260;
             shootSound = Sounds.bang;
             coolant = consumeCoolant(0.1f);
+            depositCooldown = 1.5f;
             limitRange(0f);
         }};
 
@@ -3697,6 +3700,7 @@ public class Blocks{
 
             limitRange(5f);
             coolant = consumeCoolant(0.3f);
+            depositCooldown = 1.5f;
         }};
 
         salvo = new ItemTurret("salvo"){{
@@ -3798,6 +3802,7 @@ public class Blocks{
 
             limitRange();
             coolant = consumeCoolant(0.2f);
+            depositCooldown = 1.5f;
         }};
 
         segment = new PointDefenseTurret("segment"){{
@@ -3914,6 +3919,7 @@ public class Blocks{
                     shootEffect = smokeEffect = Fx.thoriumShoot;
                 }}
             );
+            depositCooldown = 0.5f;
         }};
 
         ripple = new ItemTurret("ripple"){{
@@ -4025,6 +4031,7 @@ public class Blocks{
 
             scaledHealth = 130;
             shootSound = Sounds.artillery;
+            depositCooldown = 1.5f;
         }};
 
         cyclone = new ItemTurret("cyclone"){{
@@ -4141,6 +4148,7 @@ public class Blocks{
             coolant = consumeCoolant(0.3f);
 
             scaledHealth = 145;
+            depositCooldown = 1.5f;
             limitRange();
         }};
 
@@ -4185,6 +4193,7 @@ public class Blocks{
             scaledHealth = 150;
 
             coolant = consumeCoolant(1f);
+            depositCooldown = 1.5f;
             consumePower(10f);
         }};
 
@@ -4250,6 +4259,7 @@ public class Blocks{
             scaledHealth = 160;
             coolant = consumeCoolant(1f);
 
+            depositCooldown = 1.5f;
             limitRange();
         }};
 

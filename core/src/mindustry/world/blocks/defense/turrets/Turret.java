@@ -75,7 +75,7 @@ public class Turret extends ReloadTurret{
     /** How much time to start shooting after placement. */
     public float activationTime = 0f;
     /** Cooldown, in seconds, applied to player item depositing when any item is deposited to this turret. Added to the itemDepositCooldown.*/
-    public float depositCooldown = 3f;
+    public float depositCooldown = 0f;
     /** If true, this turret will accurately target moving targets with respect to shoot.firstShotDelay. */
     public boolean accurateDelay = true;
     /** If false, this turret can't move while charging. */
