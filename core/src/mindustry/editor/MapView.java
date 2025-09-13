@@ -15,7 +15,7 @@ import mindustry.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.ui.*;
-import mindustry.world.Tile;
+import mindustry.world.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
@@ -401,7 +401,7 @@ public class MapView extends Element implements GestureListener{
     public void pinchStop(){
     }
 
-    public void startSelection() {
+    public void startSelection(){
         if(tool != EditorTool.copy) return;
 
         tool.mode = 0;
@@ -410,7 +410,7 @@ public class MapView extends Element implements GestureListener{
         copyStartY = p.y;
     }
 
-    public void endSelection() {
+    public void endSelection(){
         if(tool != EditorTool.copy) return;
 
         tool.mode = -1;
@@ -423,7 +423,7 @@ public class MapView extends Element implements GestureListener{
         selection.height = Math.abs(copyStartY - copyEndY) + 1;
     }
 
-    public void pasteSelection() {
+    public void pasteSelection(){
         if(tool != EditorTool.copy) return;
 
         Point2 p = project(mousex, mousey).sub(selection.width / 2, selection.height / 2);

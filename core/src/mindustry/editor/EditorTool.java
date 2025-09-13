@@ -302,17 +302,7 @@ public enum EditorTool{
             }
         }
     },
-    copy(KeyCode.c, "select", "paste"){
-        @Override
-        public void modeChanged(int newMode) {
-            if(newMode == 1) {
-                ui.editor.pasteSelection();
-                newMode = -1;
-            }
-
-            super.modeChanged(newMode);
-        }
-    };
+    copy(KeyCode.c, "select", "paste");
 
     public static final EditorTool[] all = values();
 
@@ -348,8 +338,4 @@ public enum EditorTool{
     public void touched(int x, int y){}
 
     public void touchedLine(int x1, int y1, int x2, int y2){}
-
-	public void modeChanged(int newMode){
-        mode = newMode;
-    }
 }

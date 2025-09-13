@@ -576,7 +576,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                     b.row();
                                     b.add(Core.bundle.get("toolmode." + name + ".description")).color(Color.lightGray).left();
                                 }, () -> {
-                                    tool.modeChanged((tool.mode == mode ? -1 : mode));
+                                    int newMode = tool.mode == mode ? -1 : mode;
+                                    if(tool == EditorTool.copy && newMode == 1){
+                                        //paste upon pressing this, anything else would not make sense on mubile
+                                        view.pasteSelection();
+                                        newMode = -1;
+                                    }
+                                    tool.mode = newMode;
                                     table.remove();
                                 }).update(b -> b.setChecked(tool.mode == mode));
                                 table.row();
@@ -774,17 +780,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
 
             if(Core.input.keyTap(KeyCode.v)){
-                pasteSelection();
+                view.pasteSelection();
             }
 
             if(Core.input.keyTap(KeyCode.g)){
                 view.setGrid(!view.isGrid());
             }
         }
-    }
-
-    public void pasteSelection() {
-        view.pasteSelection();
     }
 
     private void tryExit(){
