@@ -15,6 +15,7 @@ import mindustry.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.ui.*;
+import mindustry.world.Tile;
 
 import static mindustry.Vars.*;
 
@@ -27,10 +28,12 @@ public class MapView extends Element implements GestureListener{
     private Vec2 vec = new Vec2();
     private Rect rect = new Rect();
     private Vec2[][] brushPolygons = new Vec2[MapEditor.brushSizes.length][0];
+    private CopySelection selection = new CopySelection();
 
     boolean drawing;
     int lastx, lasty;
     int startx, starty;
+    int copyStartX, copyStartY;
     float mousex, mousey;
     EditorTool lastTool;
 
@@ -81,6 +84,10 @@ public class MapView extends Element implements GestureListener{
                 if(button == KeyCode.mouseMiddle){
                     lastTool = tool;
                     tool = EditorTool.zoom;
+                }
+
+                if(button == KeyCode.mouseLeft && tool == EditorTool.copy){
+                    selection.selecting = true;
                 }
 
                 mousex = x;
@@ -150,6 +157,7 @@ public class MapView extends Element implements GestureListener{
                     lastx = p.x;
                     lasty = p.y;
                 }
+
             }
         });
     }
@@ -285,7 +293,37 @@ public class MapView extends Element implements GestureListener{
         Draw.color(Pal.accent);
         Lines.stroke(Scl.scl(2f));
 
-        if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
+        if(tool == EditorTool.copy && ((selection.width > 0 && selection.height > 0) || selection.selecting)){
+            if(selection.selecting){
+                Point2 p = project(mousex, mousey);
+                int copyEndX = p.x, copyEndY = p.y;
+
+                Vec2 v1 = unproject(Math.min(copyStartX, copyEndX) + 1, Math.min(copyStartY, copyEndY) + 1).add(x, y);
+                float sx = v1.x, sy = v1.y;
+                Vec2 v2 = unproject(Math.max(copyStartX, copyEndX), Math.max(copyStartY, copyEndY)).add(x, y);
+                Lines.rect(sx, sy, v2.x - sx, v2.y - sy, scaling);
+            }else{
+                Draw.color(Color.white);
+                {
+                    Vec2 v1 = unproject(selection.sx + 1, selection.sy + 1).add(x, y);
+                    float sx = v1.x, sy = v1.y;
+                    Vec2 v2 = unproject(selection.sx + selection.width - 1, selection.sy + selection.height - 1).add(x, y);
+
+                    Lines.rect(sx, sy, v2.x - sx, v2.y - sy, scaling);
+                }
+
+                Draw.color(Pal.accent);
+                {
+                    Point2 p = project(mousex, mousey).sub(selection.width / 2, selection.height / 2);
+
+                    Vec2 v1 = unproject(p.x + 1, p.y + 1).add(x, y);
+                    float sx = v1.x, sy = v1.y;
+                    Vec2 v2 = unproject(p.x + selection.width - 1, p.y + selection.height - 1).add(x, y);
+
+                    Lines.rect(sx, sy, v2.x - sx, v2.y - sy, scaling);
+                }
+            }
+        }else if((!editor.drawBlock.isMultiblock() || tool == EditorTool.eraser) && tool != EditorTool.fill){
             if(tool == EditorTool.line && drawing){
                 Vec2 v1 = unproject(startx, starty).add(x, y);
                 float sx = v1.x, sy = v1.y;
@@ -357,6 +395,66 @@ public class MapView extends Element implements GestureListener{
 
     @Override
     public void pinchStop(){
-
     }
+
+    public void startSelection() {
+        selection.selecting = true;
+        Point2 p = project(mousex, mousey);
+        copyStartX = p.x;
+        copyStartY = p.y;
+    }
+
+    public void endSelection() {
+        if(tool != EditorTool.copy) return;
+
+        selection.selecting = false;
+        Point2 p = project(mousex, mousey);
+        int copyEndX = p.x, copyEndY = p.y;
+
+        selection.sx = Math.min(copyStartX, copyEndX);
+        selection.sy = Math.min(copyStartY, copyEndY);
+        selection.width = Math.abs(copyStartX - copyEndX) + 1;
+        selection.height = Math.abs(copyStartY - copyEndY) + 1;
+    }
+
+    public void pasteSelection() {
+        if(tool != EditorTool.copy) return;
+
+        Point2 p = project(mousex, mousey).sub(selection.width / 2, selection.height / 2);
+        int bdx = p.x, bdy = p.y;
+
+        //ths handles owerlapping selections
+        boolean rx = selection.sx < bdx;
+        boolean ry = selection.sy < bdy;
+
+        for(int x = 0; x < selection.width; x++){
+            for(int y = 0; y < selection.height; y++){
+                int fx = rx ? selection.width - x - 1 : x;
+                int fy = ry ? selection.height - y - 1 : y;
+
+                int sx = selection.sx + fx;
+                int sy = selection.sy + fy;
+                int dx = bdx + fx;
+                int dy = bdy + fy;
+
+                if(sx < 0 || sy < 0 || sx >= editor.width() || sy >= editor.height()) continue;
+                if(dx < 0 || dy < 0 || dx >= editor.width() || dy >= editor.height()) continue;
+
+                Tile stile = editor.tile(sx, sy);
+                Tile dtile = editor.tile(dx, dy);
+
+                dtile.setFloor(stile.floor());
+                dtile.setOverlay(stile.overlay());
+                if(stile.isCenter()) {
+                    dtile.setBlock(stile.block(), stile.team(), stile.build == null ? 0 : stile.build.rotation);
+                }
+            }
+        }
+    };
+
+    class CopySelection{
+        int sx, sy, width, height;
+        boolean selecting;
+    }
+
 }

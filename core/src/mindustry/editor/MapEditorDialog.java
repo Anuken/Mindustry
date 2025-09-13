@@ -650,10 +650,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.row();
 
+                addTool.get(EditorTool.copy);
+
+                tools.row();
+
                 tools.table(Tex.underline, t -> t.add("@editor.teams"))
                 .colspan(3).height(40).width(size * 3f + 3f).padBottom(3);
 
                 tools.row();
+
 
                 ButtonGroup<ImageButton> teamgroup = new ButtonGroup<>();
 
@@ -758,6 +763,18 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(Core.input.keyTap(KeyCode.s)){
                 save();
+            }
+
+            if(Core.input.keyTap(KeyCode.c)){
+                view.startSelection();
+            }
+
+            if(Core.input.keyRelease(KeyCode.c)){
+                view.endSelection();
+            }
+
+            if(Core.input.keyTap(KeyCode.v)){
+                view.pasteSelection();
             }
 
             if(Core.input.keyTap(KeyCode.g)){

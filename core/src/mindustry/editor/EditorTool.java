@@ -301,7 +301,8 @@ public enum EditorTool{
                 editor.drawBlocks(x, y, tile -> Mathf.chance(chance));
             }
         }
-    };
+    },
+    copy(KeyCode.c);
 
     public static final EditorTool[] all = values();
 
