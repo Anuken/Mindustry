@@ -302,7 +302,7 @@ public enum EditorTool{
             }
         }
     },
-    copy(KeyCode.c, "select", "paste");
+    copy(KeyCode.c, "select", "paste", "flipx", "flipy");
 
     public static final EditorTool[] all = values();
 
