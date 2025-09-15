@@ -2706,7 +2706,7 @@ public class UnitTypes{
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
             weapons.add(new Weapon("vanquish-weapon"){{
-                shootSound = Sounds.railgunMedium;
+                shootSound = Sounds.mediumRailgun;
                 layerOffset = 0.0001f;
                 reload = 180f;
                 shake = 5f;
@@ -2781,12 +2781,12 @@ public class UnitTypes{
                     fragSpread = 10f;
                     fragBullets = 5;
                     fragVelocityMin = 1f;
-                    fragOffsetMin = fragOffsetMax = 0f;
                     despawnSound = Sounds.dullExplosion;
 
                     fragBullet = new BasicBulletType(8f, 35f){{
                         sprite = "missile-large";
                         pierce = true;
+                        pierceBuilding = true;
                         pierceCap = 2;
                         width = 8f;
                         height = 12f;
