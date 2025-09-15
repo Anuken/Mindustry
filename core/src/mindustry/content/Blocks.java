@@ -6184,7 +6184,7 @@ public class Blocks{
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, with(Items.copper, 120, Items.lead, 70, Items.silicon, 80));
             plans = Seq.with(
-                new UnitPlan(UnitTypes.dagger, 60f * 15, with(Items.silicon, 12, Items.lead, 10)),
+                new UnitPlan(UnitTypes.dagger, 60f * 15, with(Items.silicon, 15, Items.lead, 10)),
                 new UnitPlan(UnitTypes.crawler, 60f * 10, with(Items.silicon, 10, Items.coal, 8)),
                 new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 25, Items.lead, 10, Items.titanium, 15))
             );
@@ -6312,7 +6312,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 90, Items.thorium, 80, Items.plastanium, 60));
             size = 2;
             length = 6f;
-            repairSpeed = 2f;
+            repairSpeed = 1.5f;
             repairRadius = 145f;
             powerUse = 5f;
             beamWidth = 1.1f;
