@@ -1,5 +1,6 @@
 package mindustry.content;
 
+import mindustry.maps.*;
 import mindustry.type.*;
 
 import static mindustry.content.Planets.*;
@@ -163,23 +164,7 @@ public class SectorPresets{
             difficulty = 10;
         }};
 
-        /*
-        registerHiddenSectors(serpulo,
-        68, //Winter Forest by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1235654407006322700
-        241,//River Bastion by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1232658317126402050
-        173,//Front Line by stormrider: https://discord.com/channels/391020510269669376/1165421701362897000/1188484967064404061
-        25, //HochuPizzu by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1170279703056228515
-        12, //Salt Outpost by skeledragon: https://discord.com/channels/391020510269669376/1165421701362897000/1193441915459338361
-        106,//Desert Wastes by xaphiro_: https://discord.com/channels/391020510269669376/1165421701362897000/1226498922898264157
-        243,//Port 012 by skeledragon: https://discord.com/channels/391020510269669376/1165421701362897000/1174884280242012262
-        240 //Cold Grove by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1230550892718194742
-        );
-
-        //these are hidden wave presets (TODO) find a better way to do this
-        Vars.content.sector("sector-serpulo-173").captureWave = 17;
-        Vars.content.sector("sector-serpulo-240").captureWave = 40;
-        serpulo.sectors.get(173).generateEnemyBase = false;
-        serpulo.sectors.get(240).generateEnemyBase = false;*/
+        SectorSubmissions.registerSectors();
 
         //endregion
         //region erekir
@@ -261,14 +246,5 @@ public class SectorPresets{
         }};
 
         //endregion
-    }
-
-    static void registerHiddenSectors(Planet planet, int... ids){
-        for(int id : ids){
-            new SectorPreset("sector-" + planet.name + "-" + id, "hidden/" + planet + "-" + id, planet, id){{
-                requireUnlock = false;
-            }};
-            planet.sectors.get(id).generateEnemyBase = true;
-        }
     }
 }
