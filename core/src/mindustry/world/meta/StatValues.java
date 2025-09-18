@@ -639,7 +639,8 @@ public class StatValues{
                         bt.row();
                     }
 
-                    if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
+                    // delayFrags as a workaround to show railbullettype damage and splash
+                    if(type.damage > 0 && (type.collides || type.delayFrags || type.splashDamage <= 0 )){
                         if(type.continuousDamage() > 0){
                             bt.add(Core.bundle.format("bullet.damage", type.continuousDamage()) + StatUnit.perSecond.localized());
                         }else{
