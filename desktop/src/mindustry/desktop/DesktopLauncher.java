@@ -51,16 +51,17 @@ public class DesktopLauncher extends ClientLauncher{
                 width = 900;
                 height = 700;
 
-                //on Windows, Intel drivers might be buggy with OpenGL 3.x, so only use 2.0. See https://github.com/Anuken/Mindustry/issues/11041
-                if(GpuDetect.isIntel){
+                //on Windows, Intel drivers might be buggy with OpenGL 3.x, so only use 2.x. See https://github.com/Anuken/Mindustry/issues/11041
+                if(GpuDetect.hasIntel && (!GpuDetect.hasAMD || !GpuDetect.hasNvidia)){
+                    allowGl30 = false;
                     coreProfile = false;
-                    glVersions = new int[][]{{2, 0}};
+                    glVersions = new int[][]{{2, 1}, {2, 0}};
                 }else if(OS.isMac){
                     //MacOS supports 4.1 at most
-                    glVersions = new int[][]{{4, 1}, {3, 2}, {2, 0}};
+                    glVersions = new int[][]{{4, 1}, {3, 2}, {2, 1}, {2, 0}};
                 }else{
                     //try essentially every OpenGL version
-                    glVersions = new int[][]{{4, 6}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {2, 0}};
+                    glVersions = new int[][]{{4, 6}, {4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {2, 1}, {2, 0}};
                 }
 
                 for(int i = 0; i < arg.length; i++){
