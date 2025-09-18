@@ -780,19 +780,19 @@ public class TypeIO{
             (entry.speedMultiplier != 1f ?       (1 << 2) : 0) |
             (entry.reloadMultiplier != 1f ?      (1 << 3) : 0) |
             (entry.buildSpeedMultiplier != 1f ?  (1 << 4) : 0) |
-            (entry.rotateSpeedMultiplier != 1f ? (1 << 5) : 0) |
-            (entry.dragMultiplier != 1f ?        (1 << 6) : 0) |
-            (entry.armorOverride >= 0f ?         (1 << 7) : 0)
+            (entry.dragMultiplier != 1f ?        (1 << 5) : 0) |
+            (entry.armorOverride >= 0f ?         (1 << 6) : 0) |
+            (entry.rotateSpeedMultiplier != 1f ? (1 << 7) : 0)
             );
 
             if(entry.damageMultiplier != 1f) write.f(entry.damageMultiplier);
             if(entry.healthMultiplier != 1f) write.f(entry.healthMultiplier);
             if(entry.speedMultiplier != 1f) write.f(entry.speedMultiplier);
             if(entry.reloadMultiplier != 1f) write.f(entry.reloadMultiplier);
-            if(entry.rotateSpeedMultiplier != 1f) write.f(entry.rotateSpeedMultiplier);
             if(entry.buildSpeedMultiplier != 1f) write.f(entry.buildSpeedMultiplier);
             if(entry.dragMultiplier != 1f) write.f(entry.dragMultiplier);
             if(entry.armorOverride >= 0f) write.f(entry.armorOverride);
+            if(entry.rotateSpeedMultiplier != 1f) write.f(entry.rotateSpeedMultiplier);
         }
     }
 
@@ -810,10 +810,10 @@ public class TypeIO{
             if((flags & (1 << 1)) != 0) result.healthMultiplier = read.f();
             if((flags & (1 << 2)) != 0) result.speedMultiplier = read.f();
             if((flags & (1 << 3)) != 0) result.reloadMultiplier = read.f();
-            if((flags & (1 << 4)) != 0) result.rotateSpeedMultiplier = read.f();
-            if((flags & (1 << 5)) != 0) result.buildSpeedMultiplier = read.f();
-            if((flags & (1 << 6)) != 0) result.dragMultiplier = read.f();
-            if((flags & (1 << 7)) != 0) result.armorOverride = read.f();
+            if((flags & (1 << 4)) != 0) result.buildSpeedMultiplier = read.f();
+            if((flags & (1 << 5)) != 0) result.dragMultiplier = read.f();
+            if((flags & (1 << 6)) != 0) result.armorOverride = read.f();
+            if((flags & (1 << 7)) != 0) result.rotateSpeedMultiplier = read.f();
         }
 
         return result;
