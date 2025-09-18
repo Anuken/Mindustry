@@ -21,7 +21,7 @@ abstract class StatusComp implements Posc{
 
     //these are considered read-only
     //note: armor is a special case; it is an override when >= 0, otherwise ignored
-    transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1, buildSpeedMultiplier = 1, dragMultiplier = 1, armorOverride = -1f;
+    transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1, buildSpeedMultiplier = 1, dragMultiplier = 1, armorOverride = -1f, rotateSpeedMultiplier = 1;
     transient boolean disarmed = false;
 
     @Import UnitType type;
@@ -150,6 +150,11 @@ abstract class StatusComp implements Posc{
         applyDynamicStatus().reloadMultiplier = reloadMultiplier;
     }
 
+    /** Uses a dynamic status effect to change rotation speed. */
+    public void statusRotateSpeedMultiplier(float rotateSpeedMultiplier){
+        applyDynamicStatus().rotateSpeedMultiplier = rotateSpeedMultiplier;
+    }
+
     /** Uses a dynamic status effect to override max health. */
     public void statusMaxHealth(float health){
         //maxHealth should never be zero
@@ -185,7 +190,7 @@ abstract class StatusComp implements Posc{
 
         applied.clear();
         armorOverride = -1f;
-        speedMultiplier = damageMultiplier = healthMultiplier = reloadMultiplier = buildSpeedMultiplier = dragMultiplier = 1f;
+        speedMultiplier = damageMultiplier = healthMultiplier = reloadMultiplier = buildSpeedMultiplier = dragMultiplier = rotateSpeedMultiplier = 1f;
         disarmed = false;
 
         if(statuses.isEmpty()) return;
@@ -214,6 +219,7 @@ abstract class StatusComp implements Posc{
                     healthMultiplier *= entry.healthMultiplier;
                     damageMultiplier *= entry.damageMultiplier;
                     reloadMultiplier *= entry.reloadMultiplier;
+                    rotateSpeedMultiplier *= entry.rotateSpeedMultiplier;
                     buildSpeedMultiplier *= entry.buildSpeedMultiplier;
                     dragMultiplier *= entry.dragMultiplier;
                     //armor is a special case; many units have it set it to 0, so an override at values >= 0 is used
@@ -223,6 +229,7 @@ abstract class StatusComp implements Posc{
                     healthMultiplier *= entry.effect.healthMultiplier;
                     damageMultiplier *= entry.effect.damageMultiplier;
                     reloadMultiplier *= entry.effect.reloadMultiplier;
+                    rotateSpeedMultiplier *= entry.effect.rotateSpeedMultiplier;
                     buildSpeedMultiplier *= entry.effect.buildSpeedMultiplier;
                     dragMultiplier *= entry.effect.dragMultiplier;
                 }

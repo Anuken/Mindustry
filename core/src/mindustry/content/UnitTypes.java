@@ -2705,6 +2705,12 @@ public class UnitTypes{
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
+            abilities.add(new LastStandAbility(){{
+                speedMultiplier = 1.5f;
+                rotateSpeedMultiplier = 2.5f;
+                exponent = 1.5f;
+            }});
+
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.mediumRailgun;
                 layerOffset = 0.0001f;
@@ -2723,6 +2729,8 @@ public class UnitTypes{
                 bullet = new RailBulletType(){{
                     length = 230f;
                     damage = 90f;
+                    splashDamageRadius = 20f;
+                    splashDamage = 30f;
                     lifetime = 18f;
                     hitSize = 6f;
                     pierceCap = 1;
@@ -2732,8 +2740,6 @@ public class UnitTypes{
                     hitColor = Color.valueOf("feb380");
                     pointEffectSpace = 1f;
                     knockback = -20f;
-                    status = StatusEffects.slow;
-                    statusDuration = 90f;
 
                     pointEffect = new ParticleEffect(){{
                         colorTo = colorFrom = Color.valueOf("feb380");
@@ -2787,6 +2793,8 @@ public class UnitTypes{
                         sprite = "missile-large";
                         pierce = true;
                         pierceBuilding = true;
+                        splashDamageRadius = 10f;
+                        splashDamage = 15f;
                         pierceCap = 2;
                         width = 8f;
                         height = 12f;
@@ -2797,7 +2805,6 @@ public class UnitTypes{
                         trailWidth = 2.8f;
                         trailLength = 6;
                         hitEffect = despawnEffect = Fx.blastExplosion;
-                        knockback = -5f;
                     }};
                 }};
             }});
@@ -2806,7 +2813,7 @@ public class UnitTypes{
             for(float f : new float[] { 34f / 4f, -36f / 4f }){
                 int fi = i ++;
                 weapons.add(new Weapon("vanquish-point-weapon"){{
-                    reload = 30f;
+                    reload = 22f;
                     x = 48f / 4f;
                     y = f;
                     shootY = 5.5f;
@@ -2823,7 +2830,7 @@ public class UnitTypes{
                         sprite = "missile-large";
                         width = 9.5f;
                         height = 13f;
-                        lifetime = 14f;
+                        lifetime = 10f;
                         hitSize = 6f;
                         maxRange = 170f;
                         shootEffect = Fx.sparkShoot;
@@ -2834,7 +2841,6 @@ public class UnitTypes{
                         trailLength = 8;
                         hitEffect = Fx.blastExplosion;
                         despawnEffect = Fx.hitBulletColor;
-                        knockback = -4f;
                     }};
                 }});
             }
