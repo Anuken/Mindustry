@@ -99,10 +99,10 @@ public class UnitTypes{
 
         dagger = new UnitType("dagger"){{
             researchCostMultiplier = 0.5f;
-            speed = 0.68f;
+            speed = 0.64f;
             hitSize = 8f;
             rotateSpeed = 7f;
-            health = 120;
+            health = 110;
             armor = 2f;
             weapons.add(new Weapon("large-weapon"){{
                 reload = 20f;
@@ -154,7 +154,7 @@ public class UnitTypes{
         }};
 
         fortress = new UnitType("fortress"){{
-            speed = 0.51f;
+            speed = 0.5f;
             hitSize = 13f;
             rotateSpeed = 3.2f;
             targetAir = false;
@@ -323,7 +323,7 @@ public class UnitTypes{
         nova = new UnitType("nova"){{
             canBoost = true;
             boostMultiplier = 1.5f;
-            speed = 0.7f;
+            speed = 0.68f;
             rotateSpeed = 7f;
             hitSize = 8f;
             health = 90f;
@@ -711,7 +711,7 @@ public class UnitTypes{
             legMoveSpace = 1.4f;
             legBaseOffset = 2f;
             hovering = true;
-            armor = 10f;
+            armor = 9f;
             ammoType = new PowerAmmoType(1000);
 
             shadowElevation = 0.3f;
@@ -997,7 +997,7 @@ public class UnitTypes{
             accel = 0.08f;
             drag = 0.04f;
             flying = true;
-            health = 30;
+            health = 35;
             rotateSpeed = 9f;
             engineOffset = 5.75f;
             //TODO balance
