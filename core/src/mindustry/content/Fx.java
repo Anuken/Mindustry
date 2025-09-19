@@ -890,6 +890,16 @@ public class Fx{
         });
     }),
 
+    hitHeavyFlame = new Effect(14, e -> {
+        color(Pal.lighterPyraFlame, Pal.darkPyraFlame, e.fin());
+        stroke(0.5f + e.fout());
+
+        randLenVectors(e.id, 2, 1f + e.fin() * 40f, e.rotation, 50f, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
+        });
+    }),
+
     hitFlamePlasma = new Effect(14, e -> {
         color(Color.white, Pal.heal, e.fin());
         stroke(0.5f + e.fout());
@@ -2022,10 +2032,24 @@ public class Fx{
         });
     }),
 
+    shootCoalFlame = new Effect(32f, 80f, e -> {
+        color(Pal.lightFlame, Pal.darkFlame, Color.gray, e.fin());
+
+        randLenVectors(e.id, 8, e.finpow() * 68f, e.rotation, 10f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.5f);
+        });
+    }),
+
     shootPyraFlame = new Effect(33f, 80f, e -> {
         color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
 
-        randLenVectors(e.id, 10, e.finpow() * 70f, e.rotation, 10f, (x, y) -> {
+        randLenVectors(e.id, 2, e.finpow() * 130f, e.rotation, 10f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f);
+        });
+
+        color(Pal.lighterPyraFlame, Pal.lightPyraFlame, Pal.darkPyraFlame, e.fin());
+
+        randLenVectors(e.id, 12, e.finpow() * 68f, e.rotation, 10f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f);
         });
     }),
