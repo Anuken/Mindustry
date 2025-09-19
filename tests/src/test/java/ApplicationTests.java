@@ -942,7 +942,7 @@ public class ApplicationTests{
                     }
                 }
 
-                assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + zone);
+                assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + zone + " (" + Team.sharded.cores() + ")");
 
                 assertTrue(hasSpawnPoint, "Sector \"" + zone.name + "\" has no spawn points.");
                 assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && state.rules.waveTeam.data().hasCore()), "Sector \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());
