@@ -540,7 +540,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 lastLineY = tileY;
             }else if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
                 //shoot on touch down when in keyboard mode
-                player.shooting = true;
+                player.shooting = !state.isEditor();
             }
         }
 
@@ -1053,7 +1053,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         unit.movePref(movement);
 
         //update shooting if not building + not mining
-        if(!unit.activelyBuilding() && unit.mineTile == null){
+        if(!unit.activelyBuilding() && unit.mineTile == null && !state.isEditor()){
 
             //autofire targeting
             if(manualShooting){
