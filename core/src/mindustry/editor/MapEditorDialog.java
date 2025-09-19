@@ -576,7 +576,23 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                     b.row();
                                     b.add(Core.bundle.get("toolmode." + name + ".description")).color(Color.lightGray).left();
                                 }, () -> {
-                                    tool.mode = (tool.mode == mode ? -1 : mode);
+                                    int newMode = tool.mode == mode ? -1 : mode;
+
+                                    //paste/flip upon pressing this, anything else would not make sense on mubile
+                                    if(tool == EditorTool.copy && newMode == 1){
+                                        view.pasteSelection();
+                                        newMode = -1;
+                                    }
+                                    if(tool == EditorTool.copy && newMode == 2){
+                                        view.selection.flipX = !view.selection.flipX;
+                                        newMode = -1;
+                                    }
+                                    if(tool == EditorTool.copy && newMode == 3){
+                                        view.selection.flipY = !view.selection.flipY;
+                                        newMode = -1;
+                                    }
+
+                                    tool.mode = newMode;
                                     table.remove();
                                 }).update(b -> b.setChecked(tool.mode == mode));
                                 table.row();
@@ -650,10 +666,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.row();
 
+                addTool.get(EditorTool.copy);
+
+                tools.row();
+
                 tools.table(Tex.underline, t -> t.add("@editor.teams"))
                 .colspan(3).height(40).width(size * 3f + 3f).padBottom(3);
 
                 tools.row();
+
 
                 ButtonGroup<ImageButton> teamgroup = new ButtonGroup<>();
 
@@ -734,6 +755,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
         }
 
+        if(Core.input.keyTap(KeyCode.x)){
+            view.selection.flipY = !view.selection.flipY;
+        }
+
+        if(Core.input.keyTap(KeyCode.z)){
+            view.selection.flipX = !view.selection.flipX;
+        }
+
         if(Core.input.keyTap(KeyCode.r)){
             editor.rotation = Mathf.mod(editor.rotation + 1, 4);
         }
@@ -758,6 +787,18 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(Core.input.keyTap(KeyCode.s)){
                 save();
+            }
+
+            if(Core.input.keyTap(KeyCode.c)){
+                view.startSelection();
+            }
+
+            if(Core.input.keyRelease(KeyCode.c)){
+                view.endSelection();
+            }
+
+            if(Core.input.keyTap(KeyCode.v)){
+                view.pasteSelection();
             }
 
             if(Core.input.keyTap(KeyCode.g)){
