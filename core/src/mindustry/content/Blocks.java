@@ -3297,7 +3297,7 @@ public class Blocks{
             recoil = 0.5f;
             shootY = 3f;
             reload = 20f;
-            range = 160;
+            range = 168;
             shootCone = 15f;
             ammoUseEffect = Fx.casing1;
             health = 250;
