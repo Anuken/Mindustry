@@ -707,7 +707,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
             }).margin(0).left().growY();
 
-
             cont.table(t -> t.add(view).grow()).grow();
 
             cont.table(this::addBlockSelection).right().growY();

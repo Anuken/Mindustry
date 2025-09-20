@@ -269,26 +269,6 @@ public class MapEditor{
         editor.flushOp();
     }
 
-    public void addFloorCliffs(){
-        for(Tile tile : world.tiles){
-            if(!tile.floor().hasSurface() || tile.block() == Blocks.cliff) continue;
-
-            int rotation = 0;
-            for(int i = 0; i < 8; i++){
-                Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
-                if(other != null && !other.floor().hasSurface()){
-                    rotation |= (1 << i);
-                }
-            }
-
-            if(rotation != 0){
-                tile.setBlock(Blocks.cliff);
-            }
-
-            tile.data = (byte)rotation;
-        }
-    }
-
     public void drawCircle(int x, int y, Cons<Tile> drawer){
         int clamped = (int)brushSize;
         for(int rx = -clamped; rx <= clamped; rx++){
