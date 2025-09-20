@@ -276,6 +276,8 @@ public class Turret extends ReloadTurret{
         public @Nullable float[] curRecoils;
         public float shootWarmup, charge, warmupHold = 0f;
         public int totalShots, barrelCounter;
+        public float excessReload = 0;
+        public int reloadShots = 0;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
@@ -528,6 +530,7 @@ public class Turret extends ReloadTurret{
             if(reloadWhileCharging || !charging()){
                 updateReload();
                 updateCooling();
+                capReload();
             }
 
             if(state.rules.fog){
@@ -683,11 +686,25 @@ public class Turret extends ReloadTurret{
             return queuedBullets > 0 && shoot.firstShotDelay > 0;
         }
 
-        protected void updateReload(){
-            reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
+        @Override
+        protected boolean canReload(){
+            return reloadShots < 1;
+        }
 
+        protected void updateReload(){
+            if(!canReload()) return;
+            reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
+        }
+
+        protected void capReload(){
             //cap reload for visual reasons
-            reloadCounter = Math.min(reloadCounter, reload);
+            if(canReload() && reloadCounter >= reload){
+                reloadShots++;
+                excessReload += reloadCounter - reload;
+                reloadCounter = reload;
+            }else{
+                excessReload = 0;
+            }
         }
 
         @Override
@@ -697,12 +714,15 @@ public class Turret extends ReloadTurret{
 
         protected void updateShooting(){
 
-            if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
+            if(!canReload() && !charging() && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
                 shoot(type);
 
+                reloadCounter += excessReload;
                 reloadCounter %= reload;
+                excessReload = 0;
+                reloadShots--;
             }
         }
 
