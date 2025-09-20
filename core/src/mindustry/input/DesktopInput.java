@@ -282,7 +282,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        shouldShoot = !scene.hasMouse() && !locked;
+        shouldShoot = !scene.hasMouse() && !locked && !state.isEditor();
 
         if(!locked && block == null && !scene.hasField() && !scene.hasDialog() &&
                 //disable command mode when player unit can boost and command mode binding is the same
@@ -313,7 +313,6 @@ public class DesktopInput extends InputHandler{
                         }
                     }
                 }
-
             }
 
             if(input.keyTap(Binding.selectAllUnitTransport)){

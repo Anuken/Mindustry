@@ -174,6 +174,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region io
 
     public final void writeBase(Writes write){
+        //TODO: this code is a legacy mess; in future versions, it should be replaced with a different system that has a 1-integer module bitmask + byte version.
         boolean writeVisibility = state.rules.fog && visibleFlags != 0;
 
         write.f(health);
@@ -237,7 +238,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if((moduleBits & 1) != 0) (items == null ? new ItemModule() : items).read(read, legacy);
         if((moduleBits & (1 << 1)) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
         if((moduleBits & (1 << 2)) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
-        //1 << 3 is skipped (oldconsume module)
+        //1 << 3 is skipped (old consume module)
         if((moduleBits & (1 << 4)) != 0){
             timeScale = read.f();
             timeScaleDuration = read.f();
@@ -1330,6 +1331,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 }
             });
         }
+    }
+
+    /** Called when this block is derelict repaired. */
+    @CallSuper
+    public void onRepaired(){
+        placed();
     }
 
     public boolean isCommandable(){
