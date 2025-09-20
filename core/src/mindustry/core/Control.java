@@ -434,19 +434,10 @@ public class Control implements ApplicationListener, Loadable{
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty() || hadNoCore){
 
-                        if(sector.planet.clearSectorOnLose){
+                        //don't carry over the spawn position and plans if the sector preset name or map size changed
+                        if(sector.planet.clearSectorOnLose || sector.info.spawnPosition == 0 || !sector.info.sectorDataMatches(sector)){
                             playNewSector(origin, sector, reloader);
                         }else{
-                            //no spawn set -> delete the sector save
-                            if(sector.info.spawnPosition == 0){
-                                //delete old save
-                                sector.save = null;
-                                slot.delete();
-                                //play again
-                                playSector(origin, sector, reloader);
-                                return;
-                            }
-
                             int spawnPos = sector.info.spawnPosition;
 
                             //set spawn for sector damage to use

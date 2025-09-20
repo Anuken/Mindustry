@@ -81,6 +81,10 @@ public class EditorTile extends Tile{
         }else{
             renderer.blocks.updateShadowTile(this);
         }
+
+        if(build != null){
+            build.wasVisible = true;
+        }
     }
 
     @Override

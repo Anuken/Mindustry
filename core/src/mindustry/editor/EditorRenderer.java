@@ -85,7 +85,7 @@ public class EditorRenderer implements Disposable{
         //don't process terrain updates every frame (helps with lag on low end devices)
         boolean doUpdate = Core.graphics.getFrameId() % 2 == 0;
 
-        if(doUpdate) renderer.blocks.floor.checkChanges();
+        if(doUpdate) renderer.blocks.floor.checkChanges(!editor.showTerrain);
 
         boolean prev = renderer.animateWater;
         renderer.animateWater = false;
@@ -95,14 +95,16 @@ public class EditorRenderer implements Disposable{
         Core.camera.width = 999999f;
         Core.camera.height = 999999f;
         Core.camera.mat.set(Draw.proj()).mul(Tmp.m3.setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize)).translate(4f, 4f));
-        renderer.blocks.floor.drawFloor();
+        if(editor.showFloor){
+            renderer.blocks.floor.drawFloor();
+        }
 
         Tmp.m2.set(Draw.proj());
 
         //scissors are always enabled because this is drawn clipped in UI, make sure they don't interfere with drawing shadow events
         Gl.disable(Gl.scissorTest);
 
-        if(doUpdate) renderer.blocks.processShadows();
+        if(doUpdate) renderer.blocks.processShadows(!editor.showBuildings, !editor.showTerrain);
 
         Gl.enable(Gl.scissorTest);
 
@@ -115,7 +117,9 @@ public class EditorRenderer implements Disposable{
         Draw.proj(Tmp.m2);
 
         renderer.blocks.floor.beginDraw();
-        renderer.blocks.floor.drawLayer(CacheLayer.walls);
+        if(editor.showTerrain){
+            renderer.blocks.floor.drawLayer(CacheLayer.walls);
+        }
         renderer.animateWater = prev;
 
         if(chunks == null) return;
@@ -125,16 +129,18 @@ public class EditorRenderer implements Disposable{
             recacheChunks.clear();
         }
 
-        shader.bind();
-        shader.setUniformMatrix4("u_projTrans", Tmp.m1.set(Core.camera.mat).translate(-packPad, -packPad).scale(packWidth, packHeight));
+        if(editor.showBuildings){
+            shader.bind();
+            shader.setUniformMatrix4("u_projTrans", Tmp.m1.set(Core.camera.mat).translate(-packPad, -packPad).scale(packWidth, packHeight));
 
-        for(int x = 0; x < chunks.length; x++){
-            for(int y = 0; y < chunks[0].length; y++){
-                EditorSpriteCache mesh = chunks[x][y];
+            for(int x = 0; x < chunks.length; x++){
+                for(int y = 0; y < chunks[0].length; y++){
+                    EditorSpriteCache mesh = chunks[x][y];
 
-                if(mesh == null) continue;
+                    if(mesh == null) continue;
 
-                mesh.render(shader);
+                    mesh.render(shader);
+                }
             }
         }
 
@@ -159,7 +165,7 @@ public class EditorRenderer implements Disposable{
     }
 
     void recache(){
-        renderer.blocks.floor.clearTiles();
+        renderer.blocks.floor.reload(!editor.showTerrain);
         renderer.blocks.reload();
 
         for(int x = 0; x < chunks.length; x++){
@@ -167,6 +173,20 @@ public class EditorRenderer implements Disposable{
                 recacheChunk(x, y);
             }
         }
+        //this causes 2 recaches, but it's necessary to fix the wrong shadows after a reload
+        if(!editor.showBuildings || !editor.showTerrain){
+            recacheShadows();
+        }
+    }
+
+    void recacheTerrain(){
+        renderer.blocks.floor.reload(!editor.showTerrain);
+        renderer.blocks.reload();
+        recacheShadows();
+    }
+
+    void recacheShadows(){
+        renderer.blocks.updateShadows(!editor.showBuildings, !editor.showTerrain);
     }
 
     void recacheChunk(int cx, int cy){
