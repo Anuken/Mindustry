@@ -775,13 +775,14 @@ public class TypeIO{
         if(entry.effect.dynamic){
             //write a byte with bits set based on which field is actually used
             write.b(
-            (entry.damageMultiplier != 1f ?     (1 << 0) : 0) |
-            (entry.healthMultiplier != 1f ?     (1 << 1) : 0) |
-            (entry.speedMultiplier != 1f ?      (1 << 2) : 0) |
-            (entry.reloadMultiplier != 1f ?     (1 << 3) : 0) |
-            (entry.buildSpeedMultiplier != 1f ? (1 << 4) : 0) |
-            (entry.dragMultiplier != 1f ?       (1 << 5) : 0) |
-            (entry.armorOverride >= 0f ?        (1 << 6) : 0)
+            (entry.damageMultiplier != 1f ?      (1 << 0) : 0) |
+            (entry.healthMultiplier != 1f ?      (1 << 1) : 0) |
+            (entry.speedMultiplier != 1f ?       (1 << 2) : 0) |
+            (entry.reloadMultiplier != 1f ?      (1 << 3) : 0) |
+            (entry.buildSpeedMultiplier != 1f ?  (1 << 4) : 0) |
+            (entry.dragMultiplier != 1f ?        (1 << 5) : 0) |
+            (entry.armorOverride >= 0f ?         (1 << 6) : 0) |
+            (entry.rotateSpeedMultiplier != 1f ? (1 << 7) : 0)
             );
 
             if(entry.damageMultiplier != 1f) write.f(entry.damageMultiplier);
@@ -791,6 +792,7 @@ public class TypeIO{
             if(entry.buildSpeedMultiplier != 1f) write.f(entry.buildSpeedMultiplier);
             if(entry.dragMultiplier != 1f) write.f(entry.dragMultiplier);
             if(entry.armorOverride >= 0f) write.f(entry.armorOverride);
+            if(entry.rotateSpeedMultiplier != 1f) write.f(entry.rotateSpeedMultiplier);
         }
     }
 
@@ -811,6 +813,7 @@ public class TypeIO{
             if((flags & (1 << 4)) != 0) result.buildSpeedMultiplier = read.f();
             if((flags & (1 << 5)) != 0) result.dragMultiplier = read.f();
             if((flags & (1 << 6)) != 0) result.armorOverride = read.f();
+            if((flags & (1 << 7)) != 0) result.rotateSpeedMultiplier = read.f();
         }
 
         return result;
