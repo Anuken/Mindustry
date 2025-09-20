@@ -14,7 +14,7 @@ import mindustry.type.*;
 public class LastStandAbility extends Ability{
     public StatusEffect effect = StatusEffects.none;
     public float maxHealth;
-    public float damageMultiplier = 1f, reloadMultiplier = 1f, speedMultiplier = 1f, rotateSpeedMultiplier = 1f;
+    public float damageMultiplier = 1f, reloadMultiplier = 1f, speedMultiplier = 1f, rotateSpeedMultiplier = 1f, weaponRotateMultiplier = 1f;
     /** % of max health for reaching the maximum multipliers. */
     public float minHealth = 0.2f;
     /** Applied slope steepness. Higher values equal harder to achieve max boost */
@@ -48,7 +48,8 @@ public class LastStandAbility extends Ability{
             new StatEntry("maxdamagemultiplier", damageMultiplier, effect.damageMultiplier),
             new StatEntry("maxreloadmultiplier", reloadMultiplier, effect.reloadMultiplier),
             new StatEntry("maxspeedmultiplier",  speedMultiplier, effect.speedMultiplier),
-            new StatEntry("maxrotatespeedmultiplier",  rotateSpeedMultiplier, 0f)
+            new StatEntry("maxrotatespeedmultiplier",  rotateSpeedMultiplier, effect.rotateSpeedMultiplier),
+            new StatEntry("maxweaponrotatemultiplier",  weaponRotateMultiplier, effect.weaponRotateMultiplier)
         );
 
         for(StatEntry s : stats){
@@ -77,6 +78,7 @@ public class LastStandAbility extends Ability{
             if(reloadMultiplier != 1f) unit.reloadMultiplier *= 1f + (reloadMultiplier - 1f) * Mathf.pow(t, exponent);
             if(speedMultiplier != 1f) unit.speedMultiplier *= 1f + (speedMultiplier - 1f) * Mathf.pow(t, exponent);
             if(rotateSpeedMultiplier != 1f) unit.rotateSpeedMultiplier *= 1f + (rotateSpeedMultiplier - 1f) * Mathf.pow(t, exponent);
+            if(weaponRotateMultiplier != 1f) unit.weaponRotateMultiplier *= 1f + (weaponRotateMultiplier - 1f) * Mathf.pow(t, exponent);
 
             if (unit.health <= unit.maxHealth * minHealth) {
                 unit.apply(effect, 5f);
