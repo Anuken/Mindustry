@@ -15,7 +15,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 
 public class LastStandAbility extends Ability{
-    public StatusEffect effect = StatusEffects.none;
+    public StatusEffect statusEffect = StatusEffects.none;
     public float maxHealth;
     /** Has support for both <1 and >1 values. */
     public float damageMultiplier = 1f, reloadMultiplier = 1f, speedMultiplier = 1f, rotateSpeedMultiplier = 1f, weaponRotateMultiplier = 1f;
@@ -29,6 +29,7 @@ public class LastStandAbility extends Ability{
     public String shineSuffix = "-shine";
     public Color color = Pal.turretHeat;
     public float z = -1;
+    public Effect effect = Fx.regenSuppressParticle;
 
     public Seq<StatEntry> stats;
 
@@ -49,24 +50,24 @@ public class LastStandAbility extends Ability{
         super.addStats(t);
         t.add(abilityStat("minhealthboost", maxHealth > 0f ? Strings.autoFixed(minHealth * maxHealth, 2) : Strings.autoFixed(minHealth * 100f, 2) + "%"));
         t.row();
-        if(effect != StatusEffects.none){
-        t.add((effect.hasEmoji() ? effect.emoji() : "") + "[stat]" + effect.localizedName + abilityStat("maxboosteffect"));
+        if(statusEffect != StatusEffects.none){
+        t.add((statusEffect.hasEmoji() ? statusEffect.emoji() : "") + "[stat]" + statusEffect.localizedName + abilityStat("maxboosteffect"));
         t.row();
         }
             
         // Consider boosteffect multiplier in stats
         stats = Seq.with(
-            new StatEntry("maxdamagemultiplier", damageMultiplier, effect.damageMultiplier),
-            new StatEntry("maxreloadmultiplier", reloadMultiplier, effect.reloadMultiplier),
-            new StatEntry("maxspeedmultiplier", speedMultiplier, effect.speedMultiplier),
-            new StatEntry("maxrotatespeedmultiplier", rotateSpeedMultiplier, effect.rotateSpeedMultiplier),
-            new StatEntry("maxweaponrotatemultiplier", weaponRotateMultiplier, effect.weaponRotateMultiplier)
+            new StatEntry("maxdamagemultiplier", damageMultiplier, statusEffect.damageMultiplier),
+            new StatEntry("maxreloadmultiplier", reloadMultiplier, statusEffect.reloadMultiplier),
+            new StatEntry("maxspeedmultiplier", speedMultiplier, statusEffect.speedMultiplier),
+            new StatEntry("maxrotatespeedmultiplier", rotateSpeedMultiplier, statusEffect.rotateSpeedMultiplier),
+            new StatEntry("maxweaponrotatemultiplier", weaponRotateMultiplier, statusEffect.weaponRotateMultiplier)
         );
 
         for(StatEntry s : stats){
             if(s.value > 0f && s.value != 1f){
                 String text = (s.value < 1f ?  "[negstat]" : "") + Strings.autoFixed(s.value * 100f, 2);
-                if(s.effectValue != 1f && effect != StatusEffects.none){
+                if(s.effectValue != 1f && statusEffect != StatusEffects.none){
                     text += "%" + (s.effectValue > 1f ? "[stat] + " : "[negstat] ") + Strings.autoFixed((s.effectValue - 1f) * 100f, 2);
                 }
                 t.add(abilityStat(s.name, text));
@@ -85,6 +86,7 @@ public class LastStandAbility extends Ability{
     public void update(Unit unit){
         if(unit.health <= unit.maxHealth){
             warmup = Mathf.clamp((1f - unit.health / unit.maxHealth) / (1f - minHealth), 0f, 1f);
+
             // I am unsure if this is a good way to implement this...
             if(damageMultiplier != 1f) unit.damageMultiplier *= 1f + (damageMultiplier - 1f) * Mathf.pow(warmup, exponent);
             if(reloadMultiplier != 1f) unit.reloadMultiplier *= 1f + (reloadMultiplier - 1f) * Mathf.pow(warmup, exponent);
@@ -92,8 +94,13 @@ public class LastStandAbility extends Ability{
             if(rotateSpeedMultiplier != 1f) unit.rotateSpeedMultiplier *= 1f + (rotateSpeedMultiplier - 1f) * Mathf.pow(warmup, exponent);
             if(weaponRotateMultiplier != 1f) unit.weaponRotateMultiplier *= 1f + (weaponRotateMultiplier - 1f) * Mathf.pow(warmup, exponent);
 
+            if(effect != null && Mathf.chanceDelta(warmup * 0.3f)){
+                Tmp.v1.rnd(Mathf.range(unit.type.hitSize * 0.8f));
+                effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, unit);
+            }
+
             if (unit.health <= unit.maxHealth * minHealth) {
-                unit.apply(effect, 5f);
+                unit.apply(statusEffect, 5f);
             }
         }
     }
