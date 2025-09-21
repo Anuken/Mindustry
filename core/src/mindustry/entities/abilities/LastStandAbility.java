@@ -27,9 +27,11 @@ public class LastStandAbility extends Ability{
 
     public TextureRegion shineRegion;
     public String shineSuffix = "-shine";
-    public Color color = Pal.turretHeat;
+    public boolean drawShine = true;
+    public float shineSpeed = 1f;
     public float z = -1;
-    public Effect effect = Fx.regenSuppressParticle;
+    public Color color = Pal.turretHeat;
+    public @Nullable Effect effect = Fx.regenSuppressParticle;
 
     public Seq<StatEntry> stats;
 
@@ -79,27 +81,26 @@ public class LastStandAbility extends Ability{
     @Override
     public void init(UnitType type){
         maxHealth = type.health;
-        shineRegion = Core.atlas.find(type.name + shineSuffix, type.region);
     } 
 
     @Override
     public void update(Unit unit){
         if(unit.health <= unit.maxHealth){
-            warmup = Mathf.clamp((1f - unit.health / unit.maxHealth) / (1f - minHealth), 0f, 1f);
+            warmup = Mathf.pow(Mathf.clamp((1f - unit.health / unit.maxHealth) / (1f - minHealth), 0f, 1f), exponent);
 
             // I am unsure if this is a good way to implement this...
-            if(damageMultiplier != 1f) unit.damageMultiplier *= 1f + (damageMultiplier - 1f) * Mathf.pow(warmup, exponent);
-            if(reloadMultiplier != 1f) unit.reloadMultiplier *= 1f + (reloadMultiplier - 1f) * Mathf.pow(warmup, exponent);
-            if(speedMultiplier != 1f) unit.speedMultiplier *= 1f + (speedMultiplier - 1f) * Mathf.pow(warmup, exponent);
-            if(rotateSpeedMultiplier != 1f) unit.rotateSpeedMultiplier *= 1f + (rotateSpeedMultiplier - 1f) * Mathf.pow(warmup, exponent);
-            if(weaponRotateMultiplier != 1f) unit.weaponRotateMultiplier *= 1f + (weaponRotateMultiplier - 1f) * Mathf.pow(warmup, exponent);
+            if(damageMultiplier != 1f) unit.damageMultiplier *= 1f + (damageMultiplier - 1f) * warmup;
+            if(reloadMultiplier != 1f) unit.reloadMultiplier *= 1f + (reloadMultiplier - 1f) * warmup;
+            if(speedMultiplier != 1f) unit.speedMultiplier *= 1f + (speedMultiplier - 1f) * warmup;
+            if(rotateSpeedMultiplier != 1f) unit.rotateSpeedMultiplier *= 1f + (rotateSpeedMultiplier - 1f) * warmup;
+            if(weaponRotateMultiplier != 1f) unit.weaponRotateMultiplier *= 1f + (weaponRotateMultiplier - 1f) * warmup;
 
             if(effect != null && Mathf.chanceDelta(warmup * 0.3f)){
                 Tmp.v1.rnd(Mathf.range(unit.type.hitSize * 0.8f));
                 effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, unit);
             }
 
-            if (unit.health <= unit.maxHealth * minHealth) {
+            if(unit.health <= unit.maxHealth * minHealth) {
                 unit.apply(statusEffect, 5f);
             }
         }
@@ -107,16 +108,20 @@ public class LastStandAbility extends Ability{
 
     @Override
     public void draw(Unit unit){
-        if(shineRegion.found() && warmup > 0.001f){
-            float pz = Draw.z();
-            if(z > 0) Draw.z(z);
-            Draw.color(color, warmup);
-            Draw.blend(Blending.additive);
-            Draw.alpha(Mathf.absin(Time.time, 2f / warmup, warmup / 2f + 0.5f));
-            Draw.rect(shineRegion, unit.x, unit.y, unit.rotation - 90f);
-            Draw.blend();
-            Draw.color();
-            Draw.z(pz);
+        if(drawShine){
+            shineRegion = Core.atlas.find(unit.type.name + shineSuffix, unit.type.region);
+
+            if(shineRegion.found() && warmup > 0.001f){
+                float pz = Draw.z();
+                if(z > 0) Draw.z(z);
+                Draw.color(color, warmup);
+                Draw.blend(Blending.additive);
+                Draw.alpha(Mathf.absin(Time.time, 2f / (warmup * shineSpeed), warmup / 2f + 0.5f));
+                Draw.rect(shineRegion, unit.x, unit.y, unit.rotation - 90f);
+                Draw.blend();
+                Draw.color();
+                Draw.z(pz);
+            }
         }
     }
 }
