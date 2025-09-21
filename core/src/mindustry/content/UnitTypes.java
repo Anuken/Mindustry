@@ -2709,9 +2709,9 @@ public class UnitTypes{
             abilities.add(new LastStandAbility(){{
                 speedMultiplier = 1.5f;
                 rotateSpeedMultiplier = 2.5f;
-                weaponRotateMultiplier = 2f;
+                weaponRotateMultiplier = 2.25f;
                 exponent = 1.5f;
-                minHealth = 0.30f;
+                minHealth = 0.3f;
             }});
 
             weapons.add(new Weapon("vanquish-weapon"){{
@@ -2732,7 +2732,7 @@ public class UnitTypes{
                 bullet = new RailBulletType(){{
                     length = 230f;
                     damage = 90f;
-                    splashDamageRadius = 20f;
+                    splashDamageRadius = 32f;
                     splashDamage = 30f;
                     lifetime = 18f;
                     hitSize = 6f;
@@ -2796,7 +2796,7 @@ public class UnitTypes{
                         sprite = "missile-large";
                         pierce = true;
                         pierceBuilding = true;
-                        splashDamageRadius = 10f;
+                        splashDamageRadius = 20f;
                         splashDamage = 15f;
                         pierceCap = 2;
                         width = 8f;
@@ -2825,6 +2825,7 @@ public class UnitTypes{
                     rotateSpeed = 3f;
                     shootCone = 30f;
                     shootSound = Sounds.shoot;
+                    layerOffset = 0.00001f;
                     mirror = true;
                     alternate = true;
                     minWarmup = fi / 2f;
@@ -2835,7 +2836,6 @@ public class UnitTypes{
                         height = 13f;
                         lifetime = 10f;
                         hitSize = 6f;
-                        maxRange = 170f;
                         shootEffect = Fx.sparkShoot;
                         smokeEffect = Fx.shootBigSmoke;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
