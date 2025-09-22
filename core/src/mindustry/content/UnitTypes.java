@@ -339,14 +339,14 @@ public class UnitTypes{
             weapons.add(new Weapon("heal-weapon"){{
                 top = false;
                 shootY = 2f;
-                reload = 18f;
+                reload = 24f;
                 x = 4.5f;
                 alternate = false;
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 shootSound = Sounds.lasershoot;
 
-                bullet = new LaserBoltBulletType(5.2f, 12){{
+                bullet = new LaserBoltBulletType(5.2f, 15){{
                     lifetime = 30f;
                     healPercent = 1f;
                     healAmount = 10f;
