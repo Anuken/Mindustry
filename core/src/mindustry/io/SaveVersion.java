@@ -311,14 +311,13 @@ public abstract class SaveVersion extends SaveFileReader{
                 boolean isCenter = true;
                 byte packedCheck = stream.readByte();
                 boolean hadEntity = (packedCheck & 1) != 0;
-                //old data format (bit 2): 1 byte only if no building is present
-                //new data format (bit 3): 7 bytes (3x block-specific bytes + 1x 4-byte extra data int)
-                boolean hadDataOld = (packedCheck & 2) != 0, hadDataNew = (packedCheck & 4) != 0;
+                //data check (bit 3): 7 bytes (3x block-specific bytes + 1x 4-byte extra data int)
+                boolean hadData = (packedCheck & 4) != 0;
 
                 byte data = 0, floorData = 0, overlayData = 0;
                 int extraData = 0;
 
-                if(hadDataNew){
+                if(hadData){
                     data = stream.readByte();
                     floorData = stream.readByte();
                     overlayData = stream.readByte();
@@ -335,7 +334,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 }
 
                 //must be assigned after setBlock, because that can reset data
-                if(hadDataNew){
+                if(hadData){
                     tile.data = data;
                     tile.floorData = floorData;
                     tile.overlayData = overlayData;
@@ -361,13 +360,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
                         context.onReadBuilding();
                     }
-                }else if(hadDataOld || hadDataNew){ //never read consecutive blocks if there's any kind of data
-                    if(hadDataOld){
-                        tile.setBlock(block);
-                        //the old data format was only read in the case where there is no building, and only contained a single byte
-                        tile.data = stream.readByte();
-                    }
-                }else{
+                }else if(!hadData){ //never read consecutive blocks if there's data
                     int consecutives = stream.readUnsignedByte();
 
                     for(int j = i + 1; j < i + 1 + consecutives; j++){

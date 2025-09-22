@@ -41,6 +41,10 @@ public class SectorInfo{
     public int storageCapacity = 0;
     /** Whether a core is available here. */
     public boolean hasCore = true;
+    /** Last sector preset name set to this sector. */
+    public @Nullable String lastPresetName;
+    /** Last size of the map. */
+    public int lastWidth, lastHeight;
     /** Whether this sector was ever fully captured. */
     public boolean wasCaptured = false;
     /** Sector that was launched from. */
@@ -101,6 +105,14 @@ public class SectorInfo{
     private @Nullable transient int[] coreDeltas;
     /** Core item storage input/output deltas. */
     private @Nullable transient int[] productionDeltas;
+
+    /** @return whether the sector was last saved with the same preset. if false, this means the preset changed, and thus the spawn/plan data should be discarded. */
+    public boolean sectorDataMatches(Sector sector){
+        if(sector.preset != null && (sector.preset.generator.map.width != lastWidth || sector.preset.generator.map.width != lastHeight)){
+            return false;
+        }
+        return Structs.eq(sector.preset == null ? null : sector.preset.name, lastPresetName);
+    }
 
     /** Handles core item changes. */
     public void handleCoreItem(Item item, int amount){
@@ -223,6 +235,9 @@ public class SectorInfo{
         wavesPassed = 0;
         damage = 0;
         hasSpawns = spawner.countSpawns() > 0;
+        lastPresetName = sector.preset == null ? null : sector.preset.name;
+        lastWidth = world.width();
+        lastHeight = world.height();
 
         lightCoverage = 0f;
         for(var build : state.rules.defaultTeam.data().buildings){

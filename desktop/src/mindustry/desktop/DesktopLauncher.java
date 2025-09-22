@@ -76,6 +76,7 @@ public class DesktopLauncher extends ClientLauncher{
                                     String[] split = str.split("\\.");
                                     if(split.length == 2 && Strings.canParsePositiveInt(split[0]) && Strings.canParsePositiveInt(split[1])){
                                         glVersions = new int[][]{{Strings.parseInt(split[0]), Strings.parseInt(split[1])}};
+                                        allowGl30 = true; //when a version is explicitly specified always allow GL 3
                                         break;
                                     }
 
