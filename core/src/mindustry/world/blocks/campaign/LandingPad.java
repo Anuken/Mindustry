@@ -70,6 +70,7 @@ public class LandingPad extends Block{
 
             build.config = item;
         });
+
         configClear((LandingPadBuild build) -> {
             if(!build.accessible()) return;
 
