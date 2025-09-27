@@ -24,7 +24,7 @@ public class DrawTurret extends DrawBlock{
     /** Overrides the liquid to draw in the liquid region. */
     public @Nullable Liquid liquidDraw;
     public float turretLayer = Layer.turret, shadowLayer = Layer.turret - 0.5f, heatLayer = Layer.turretHeat;
-    public TextureRegion base, liquid, top, heat, preview, outline;
+    public TextureRegion base, liquid, top, heat, preview, outline, inactive;
 
     public DrawTurret(String basePrefix){
         this.basePrefix = basePrefix;
@@ -68,6 +68,7 @@ public class DrawTurret extends DrawBlock{
 
         drawTurret(turret, tb);
         drawHeat(turret, tb);
+        drawInactive(turret, tb);
 
         if(parts.size > 0){
             if(outline.found()){
@@ -110,6 +111,15 @@ public class DrawTurret extends DrawBlock{
         Drawf.additive(heat, block.heatColor.write(Tmp.c1).a(build.heat), build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot(), heatLayer);
     }
 
+    public void drawInactive(Turret block, TurretBuild build){
+        if(build.activationTimer <= 0.00001f || !inactive.found()) return;
+
+        Draw.z(heatLayer);
+        Draw.color(block.inactiveColor.write(Tmp.c1).a(Mathf.sqrt(build.activationTimer / block.activationTime)));
+        Draw.rect(inactive, build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot());
+        Draw.color();
+    }
+
     /** Load any relevant texture regions. */
     @Override
     public void load(Block block){
@@ -121,6 +131,7 @@ public class DrawTurret extends DrawBlock{
         top = Core.atlas.find(block.name + "-top");
         heat = Core.atlas.find(block.name + "-heat");
         base = Core.atlas.find(block.name + "-base");
+        inactive = Core.atlas.find(block.name + "-inactive");
 
         for(var part : parts){
             part.turretShading = true;

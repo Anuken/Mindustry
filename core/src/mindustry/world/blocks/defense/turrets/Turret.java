@@ -73,6 +73,10 @@ public class Turret extends ReloadTurret{
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
     public float minWarmup = 0f;
+    /** How much time to start shooting after placement. */
+    public float activationTime = 0f;
+    /** Cooldown, in seconds, applied to player item depositing when any item is deposited to this turret. Added to the itemDepositCooldown.*/
+    public float depositCooldown = 0f;
     /** If true, this turret will accurately target moving targets with respect to shoot.firstShotDelay. */
     public boolean accurateDelay = true;
     /** If false, this turret can't move while charging. */
@@ -111,6 +115,8 @@ public class Turret extends ReloadTurret{
 
     /** Color of heat region drawn on top (if found) */
     public Color heatColor = Pal.turretHeat;
+    /** Color of inactive region drawn on top (if found) */
+    public Color inactiveColor = Color.white;
     /** Optional override for all shoot effects. */
     public @Nullable Effect shootEffect;
     /** Optional override for all smoke effects. */
@@ -177,6 +183,7 @@ public class Turret extends ReloadTurret{
         stats.add(Stat.reload, 60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f)) * shoot.shots, StatUnit.perSecond);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
+        if(activationTime > 0) stats.add(Stat.activationTime, activationTime / 60f, StatUnit.seconds);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
         if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
     }
@@ -191,6 +198,14 @@ public class Turret extends ReloadTurret{
             Core.bundle.format("bar.heatpercent", (int)entity.heatReq, (int)(Math.min(entity.heatReq / heatRequirement, maxHeatEfficiency) * 100)),
             () -> Pal.lightOrange,
             () -> entity.heatReq / heatRequirement));
+        }
+
+        if(activationTime > 0){
+            addBar("activationtimer", (TurretBuild entity) ->
+            new Bar(() ->
+            (entity.activationTimer > 0)? Core.bundle.format("bar.activationtimer", Mathf.ceil(entity.activationTimer / 60f)) : Core.bundle.get("bar.activated"),
+            () -> (entity.activationTimer > 0)?  Pal.lightOrange : Pal.techBlue,
+            () -> 1 - entity.activationTimer / activationTime));
         }
     }
 
@@ -272,6 +287,8 @@ public class Turret extends ReloadTurret{
         public @Nullable float[] curRecoils;
         public float shootWarmup, charge, warmupHold = 0f;
         public int totalShots, barrelCounter;
+        public float excessReload = 0;
+        public int reloadShots = 0;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
@@ -285,6 +302,7 @@ public class Turret extends ReloadTurret{
         public @Nullable SoundLoop soundLoop = (loopSound == Sounds.none ? null : new SoundLoop(loopSound, loopSoundVolume));
 
         float lastRangeChange;
+        public float activationTimer = activationTime;
 
         @Override
         public void remove(){
@@ -413,7 +431,12 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isActive(){
-            return (target != null || wasShooting) && enabled;
+            return (target != null || wasShooting) && enabled && activationTimer <= 0;
+        }
+
+        @Override
+        public BlockStatus status() {
+            return (activationTimer <= 0)? super.status() : BlockStatus.inactive;
         }
 
         public void targetPosition(Posc pos){
@@ -509,6 +532,7 @@ public class Turret extends ReloadTurret{
             if(reloadWhileCharging || !charging()){
                 updateReload();
                 updateCooling();
+                capReload();
             }
 
             if(state.rules.fog){
@@ -517,6 +541,11 @@ public class Turret extends ReloadTurret{
                     lastRangeChange = newRange;
                     fogControl.forceUpdate(team, this);
                 }
+            }
+
+            if(activationTimer > 0){
+                activationTimer -= Time.delta;
+                return;
             }
 
             if(hasAmmo()){
@@ -659,11 +688,25 @@ public class Turret extends ReloadTurret{
             return queuedBullets > 0 && shoot.firstShotDelay > 0;
         }
 
-        protected void updateReload(){
-            reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
+        @Override
+        protected boolean canReload(){
+            return reloadShots < 1;
+        }
 
+        protected void updateReload(){
+            if(!canReload()) return;
+            reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
+        }
+
+        protected void capReload(){
             //cap reload for visual reasons
-            reloadCounter = Math.min(reloadCounter, reload);
+            if(canReload() && reloadCounter >= reload){
+                reloadShots++;
+                excessReload += reloadCounter - reload;
+                reloadCounter = reload;
+            }else{
+                excessReload = 0;
+            }
         }
 
         @Override
@@ -673,12 +716,15 @@ public class Turret extends ReloadTurret{
 
         protected void updateShooting(){
 
-            if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
+            if(!canReload() && !charging() && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
                 shoot(type);
 
+                reloadCounter += excessReload;
                 reloadCounter %= reload;
+                excessReload = 0;
+                reloadShots--;
             }
         }
 
@@ -773,6 +819,7 @@ public class Turret extends ReloadTurret{
             super.write(write);
             write.f(reloadCounter);
             write.f(rotation);
+            write.f(activationTimer);
         }
 
         @Override
@@ -783,11 +830,14 @@ public class Turret extends ReloadTurret{
                 reloadCounter = read.f();
                 rotation = read.f();
             }
+            if(revision >= 4){
+                activationTimer = read.f();
+            }
         }
 
         @Override
         public byte version(){
-            return 1;
+            return 4;
         }
 
         @Override
