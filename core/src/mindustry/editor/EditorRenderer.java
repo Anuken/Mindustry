@@ -226,7 +226,7 @@ public class EditorRenderer implements Disposable{
             y * tilesize + block.offset - height / 2f,
             width/2f, height/2f,
             width, height,
-            tile.build == null || !block.rotate ? 0 : tile.build.rotdeg(),
+            tile.build == null || !block.rotate || !block.rotateDrawEditor ? 0 : tile.build.rotdeg(),
             Color.whiteFloatBits);
 
             if(tile.build != null){

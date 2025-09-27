@@ -59,12 +59,13 @@ public class SectorSubmissions{
         registerSerpuloSector(133, "wpx", "https://discord.com/channels/391020510269669376/1379926871227240770/1417920499761156126");
         registerSerpuloSector(185, "quad", "https://discord.com/channels/391020510269669376/1379926892181983283/1419231958336016458");
         registerSerpuloSector(254, "wpx", "https://discord.com/channels/391020510269669376/1379928045577703424/1420456601667502193");
+        registerSerpuloSector(0, "Jamespire", "https://discord.com/channels/391020510269669376/1379926780860698784/1418590967384117311");
 
         /* UNUSED SECTORS:
         registerHiddenSectors(serpulo,
         68, //Winter Forest by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1235654407006322700
         241,//River Bastion by wpx: https://discord.com/channels/391020510269669376/1165421701362897000/1232658317126402050
-        173,//Front Line by stormrider: https://discord.com/channels/391020510269 669376/1165421701362897000/1188484967064404061
+        173,//Front Line by stormrider: https://discord.com/channels/391020510269669376/1165421701362897000/1188484967064404061
         12, //Salt Outpost by skeledragon: https://discord.com/channels/391020510269669376/1165421701362897000/1193441915459338361
         106,//Desert Wastes by xaphiro_: https://discord.com/channels/391020510269669376/1165421701362897000/1226498922898264157
         243,//Port 012 by skeledragon: https://discord.com/channels/391020510269669376/1165421701362897000/1174884280242012262
@@ -73,6 +74,10 @@ public class SectorSubmissions{
     }
 
     static void registerSerpuloSector(int id, String author, String mapFileLink){
+        registerSerpuloSector(id, author, mapFileLink, -1);
+    }
+
+    static void registerSerpuloSector(int id, String author, String mapFileLink, int captureWave){
         Planet planet = Planets.serpulo;
         Sector sector = planet.sectors.get(id);
         MapSubmission sub = threadMap.get(sector, MapSubmission::new);
@@ -80,11 +85,15 @@ public class SectorSubmissions{
         sub.author = author;
         sub.mapFileLink = mapFileLink;
 
-        new SectorPreset("sector-" + planet.name + "-" + id, "hidden-serpulo/" + id, planet, id){{
-            requireUnlock = false;
-        }};
+        var preset = new SectorPreset("sector-" + planet.name + "-" + id, "hidden-serpulo/" + id, planet, id);
 
-        sector.generateEnemyBase = true;
+        preset.requireUnlock = false;
+
+        if(captureWave > 0){
+            preset.captureWave = captureWave;
+        }else{
+            sector.generateEnemyBase = true;
+        }
     }
 
     static void registerThread(int id, String link){
