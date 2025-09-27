@@ -14,7 +14,6 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
-import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -2709,7 +2708,6 @@ public class UnitTypes{
             abilities.add(new LastStandAbility(){{
                 speedMultiplier = 1.5f;
                 rotateSpeedMultiplier = 2.5f;
-                weaponRotateMultiplier = 2.25f;
                 exponent = 1.5f;
                 minHealth = 0.3f;
             }});

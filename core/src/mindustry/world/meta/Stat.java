@@ -43,7 +43,6 @@ public class Stat implements Comparable<Stat>{
     speedMultiplier = new Stat("speedMultiplier"),
     reloadMultiplier = new Stat("reloadMultiplier"),
     rotateSpeedMultiplier = new Stat("rotateSpeedMultiplier"),
-    weaponRotateMultiplier = new Stat("weaponRotateMultiplier"),
     buildSpeedMultiplier = new Stat("buildSpeedMultiplier"),
     reactive = new Stat("reactive"),
     healing = new Stat("healing"),

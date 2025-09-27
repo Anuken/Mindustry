@@ -345,7 +345,7 @@ public class Weapon implements Cloneable{
             axisY = unit.y + Angles.trnsy(unit.rotation - 90,  x, y);
 
             mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
-            mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * unit.weaponRotateMultiplier * Time.delta);
+            mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * unit.rotateSpeedMultiplier * Time.delta);
             if(rotationLimit < 360){
                 float dst = Angles.angleDist(mount.rotation, baseRotation);
                 if(dst > rotationLimit/2f){

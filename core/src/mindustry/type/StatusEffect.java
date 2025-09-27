@@ -25,8 +25,6 @@ public class StatusEffect extends UnlockableContent{
     public float reloadMultiplier = 1f;
     /** Unit rotate speed multiplier. */
     public float rotateSpeedMultiplier = 1f;
-    /** Unit weapon rotate speed multiplier. */
-    public float weaponRotateMultiplier = 1f;
     /** Unit build speed multiplier. */
     public float buildSpeedMultiplier = 1f;
     /** Unit drag multiplier. */
@@ -105,7 +103,6 @@ public class StatusEffect extends UnlockableContent{
         if(speedMultiplier != 1) stats.addMultModifier(Stat.speedMultiplier, speedMultiplier);
         if(reloadMultiplier != 1) stats.addMultModifier(Stat.reloadMultiplier, reloadMultiplier);
         if(rotateSpeedMultiplier != 1) stats.addMultModifier(Stat.rotateSpeedMultiplier, rotateSpeedMultiplier);
-        if(weaponRotateMultiplier != 1) stats.addMultModifier(Stat.weaponRotateMultiplier, weaponRotateMultiplier);
         if(buildSpeedMultiplier != 1) stats.addMultModifier(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
         if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
         if(damage < 0) stats.add(Stat.healing, -damage * 60f, StatUnit.perSecond);

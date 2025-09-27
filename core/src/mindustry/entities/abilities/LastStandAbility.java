@@ -18,7 +18,7 @@ public class LastStandAbility extends Ability{
     public StatusEffect statusEffect = StatusEffects.none;
     public float maxHealth;
     /** Has support for both <1 and >1 values. */
-    public float damageMultiplier = 1f, reloadMultiplier = 1f, speedMultiplier = 1f, rotateSpeedMultiplier = 1f, weaponRotateMultiplier = 1f;
+    public float damageMultiplier = 1f, reloadMultiplier = 1f, speedMultiplier = 1f, rotateSpeedMultiplier = 1f;
     /** % of max health for reaching the maximum multipliers. */
     public float minHealth = 0.2f;
     /** Applied slope steepness. Higher values equal harder to achieve max boost. */
@@ -62,8 +62,7 @@ public class LastStandAbility extends Ability{
             new StatEntry("maxdamagemultiplier", damageMultiplier, statusEffect.damageMultiplier),
             new StatEntry("maxreloadmultiplier", reloadMultiplier, statusEffect.reloadMultiplier),
             new StatEntry("maxspeedmultiplier", speedMultiplier, statusEffect.speedMultiplier),
-            new StatEntry("maxrotatespeedmultiplier", rotateSpeedMultiplier, statusEffect.rotateSpeedMultiplier),
-            new StatEntry("maxweaponrotatemultiplier", weaponRotateMultiplier, statusEffect.weaponRotateMultiplier)
+            new StatEntry("maxrotatespeedmultiplier", rotateSpeedMultiplier, statusEffect.rotateSpeedMultiplier)
         );
 
         for(StatEntry s : stats){
@@ -93,7 +92,6 @@ public class LastStandAbility extends Ability{
             if(reloadMultiplier != 1f) unit.reloadMultiplier *= 1f + (reloadMultiplier - 1f) * warmup;
             if(speedMultiplier != 1f) unit.speedMultiplier *= 1f + (speedMultiplier - 1f) * warmup;
             if(rotateSpeedMultiplier != 1f) unit.rotateSpeedMultiplier *= 1f + (rotateSpeedMultiplier - 1f) * warmup;
-            if(weaponRotateMultiplier != 1f) unit.weaponRotateMultiplier *= 1f + (weaponRotateMultiplier - 1f) * warmup;
 
             if(effect != null && Mathf.chanceDelta(warmup * 0.3f)){
                 Tmp.v1.rnd(Mathf.range(unit.type.hitSize * 0.8f));
