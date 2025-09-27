@@ -423,7 +423,7 @@ public class LogicBlock extends Block{
         public void removeFromProximity(){
             super.removeFromProximity();
 
-            for(var link : executor.links){
+            for(var link : executor.disabledBlocks){
                 if(!link.enabled && link.lastDisabler == this){
                     link.enabled = true;
                 }
@@ -692,7 +692,7 @@ public class LogicBlock extends Block{
 
         @Override
         public byte version(){
-            return 3;
+            return 4;
         }
 
         @Override
@@ -738,6 +738,14 @@ public class LogicBlock extends Block{
 
             TypeIO.writeString(write, tag);
             write.s(iconTag);
+
+            for(var link : executor.disabledBlocks){
+                // Only store the necessary blocks
+                if(link.isValid() && !link.enabled && link.lastDisabler == this){
+                    write.i(link.pos());
+                }
+            }
+            write.i(-1);
         }
 
         @Override
@@ -776,6 +784,24 @@ public class LogicBlock extends Block{
             //skip memory, it isn't used anymore
             read.skip(memory * 8);
 
+            if(privileged && revision >= 2){
+                ipt = Mathf.clamp(read.s(), 1, maxInstructionsPerTick);
+            }
+
+            if(revision >= 3){
+                tag = TypeIO.readString(read);
+                iconTag = (char)read.us();
+            }
+
+            IntSeq tiles = new IntSeq();
+            if(revision >= 4){
+                while(true){
+                    int tile = read.i();
+                    if(tile == -1) break;
+                    tiles.add(tile);
+                }
+            }
+
             loadBlock = () -> updateCode(code, false, asm -> {
                 //load up the variables that were stored
                 for(int i = 0; i < varcount; i++){
@@ -793,16 +819,15 @@ public class LogicBlock extends Block{
                         }
                     }
                 }
+
+                //load up disabled blocks
+                tiles.each(pos -> {
+                    Building build = world.build(Point2.x(pos), Point2.y(pos));
+                    if(build != null){
+                        executor.disabledBlocks.add(build);
+                    }
+                });
             });
-
-            if(privileged && revision >= 2){
-                ipt = Mathf.clamp(read.s(), 1, maxInstructionsPerTick);
-            }
-
-            if(revision >= 3){
-                tag = TypeIO.readString(read);
-                iconTag = (char)read.us();
-            }
 
         }
     }
