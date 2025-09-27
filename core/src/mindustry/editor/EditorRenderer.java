@@ -90,6 +90,9 @@ public class EditorRenderer implements Disposable{
         boolean prev = renderer.animateWater;
         renderer.animateWater = false;
 
+        Tmp.m4.set(Draw.trans());
+        Draw.trans().idt();
+
         Tmp.v3.set(Core.camera.position);
         Core.camera.position.set(world.width()/2f * tilesize, world.height()/2f * tilesize);
         Core.camera.width = 999999f;
@@ -144,7 +147,9 @@ public class EditorRenderer implements Disposable{
             }
         }
 
+
         Core.camera.position.set(Tmp.v3);
+        Draw.trans(Tmp.m4);
     }
 
     void updateStatic(int x, int y){
