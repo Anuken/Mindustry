@@ -98,7 +98,7 @@ public class LastStandAbility extends Ability{
                 effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, unit);
             }
 
-            if(unit.health <= unit.maxHealth * minHealth) {
+            if(unit.health <= unit.maxHealth * minHealth && statusEffect != StatusEffects.none) {
                 unit.apply(statusEffect, 5f);
             }
         }
