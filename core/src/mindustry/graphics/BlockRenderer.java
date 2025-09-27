@@ -310,13 +310,13 @@ public class BlockRenderer{
         }
 
         if(brokenFade > 0.001f){
-            for(BlockPlan block : player.team().data().plans){
-                Block b = block.block;
-                if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset, block.y * tilesize + b.offset))) continue;
+            for(BlockPlan plan : player.team().data().plans){
+                Block b = plan.block;
+                if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(plan.x * tilesize + b.offset, plan.y * tilesize + b.offset))) continue;
 
                 Draw.alpha(0.33f * brokenFade);
                 Draw.mixcol(Color.white, 0.2f + Mathf.absin(Time.globalTime, 6f, 0.2f));
-                Draw.rect(b.fullIcon, block.x * tilesize + b.offset, block.y * tilesize + b.offset, b.rotate ? block.rotation * 90 : 0f);
+                Draw.rect(b.fullIcon, plan.x * tilesize + b.offset, plan.y * tilesize + b.offset, b.rotate ? plan.rotation * 90 + plan.block.visualRotationOffset : 0f);
             }
             Draw.reset();
         }
