@@ -39,8 +39,9 @@ public class MapIO{
             SaveIO.readHeader(stream);
             int version = stream.readInt();
             SaveVersion ver = SaveIO.getSaveWriter(version);
+            if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
             StringMap tags = new StringMap();
-            ver.region("meta", stream, counter, in -> tags.putAll(ver.readStringMap(in)));
+            ver.readRegion("meta", stream, counter, in -> tags.putAll(ver.readStringMap(in)));
             return new Map(file, tags.getInt("width"), tags.getInt("height"), tags, custom, version, Version.build);
         }
     }
@@ -69,12 +70,19 @@ public class MapIO{
             SaveIO.readHeader(stream);
             int version = stream.readInt();
             SaveVersion ver = SaveIO.getSaveWriter(version);
-            ver.region("meta", stream, counter, ver::readStringMap);
+            if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
+            ver.readRegion("meta", stream, counter, ver::readStringMap);
 
             Pixmap floors = new Pixmap(map.width, map.height);
             Pixmap walls = new Pixmap(map.width, map.height);
             int black = 255;
             int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
+
+            int width = map.width, height = map.height;
+            int len = width*height;
+            short[] floorIds = new short[len];
+            boolean[] overlays = new boolean[len];
+
             CachedTile tile = new CachedTile(){
                 @Override
                 public void setBlock(Block type){
@@ -88,8 +96,8 @@ public class MapIO{
                 }
             };
 
-            ver.region("content", stream, counter, ver::readContentHeader);
-            ver.region("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext(){
+            ver.readRegion("content", stream, counter, ver::readContentHeader);
+            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext(){
                 @Override public void resize(int width, int height){}
                 @Override public boolean isGenerating(){return false;}
                 @Override public void begin(){
@@ -137,7 +145,27 @@ public class MapIO{
                     if(content.block(overlayID) == Blocks.spawn){
                         map.spawns ++;
                     }
+                    floorIds[x + y * width] = (short)floorID;
+                    overlays[x + y * width] = overlayID != 0;
                     return tile;
+                }
+
+                @Override
+                public void onReadTileData(){
+                    Block block = tile.block();
+                    Block floor = content.block(floorIds[tile.x + tile.y*width]);
+
+                    if(!block.synthetic() && block != Blocks.air){
+                        int color = block.minimapColor(tile);
+                        if(color != 0){
+                            walls.set(tile.x, walls.height - 1 - tile.y, color);
+                        }
+                    }else if(!overlays[tile.array()] && block == Blocks.air){
+                        int color = floor.minimapColor(tile);
+                        if(color != 0){
+                            floors.set(tile.x, floors.height - 1 - tile.y, color);
+                        }
+                    }
                 }
             }));
 
@@ -154,7 +182,14 @@ public class MapIO{
         for(int x = 0; x < pixmap.width; x++){
             for(int y = 0; y < pixmap.height; y++){
                 Tile tile = tiles.getn(x, y);
-                pixmap.set(x, pixmap.height - 1 - y, colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team()));
+                int color = 0;
+                if(!tile.block().synthetic() && tile.block() != Blocks.air){
+                    color = tile.block().minimapColor(tile);
+                }else if(tile.overlay() == Blocks.air && tile.block() == Blocks.air){
+                    color = tile.floor().minimapColor(tile);
+                }
+                if(color == 0) color = colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team());
+                pixmap.set(x, pixmap.height - 1 - y, color);
             }
         }
         return pixmap;
@@ -200,7 +235,7 @@ public class MapIO{
         for(Tile tile : tiles){
             //default to stone floor
             if(tile.floor() == Blocks.air){
-                tile.setFloorUnder((Floor)Blocks.stone);
+                tile.setFloor((Floor)Blocks.stone);
             }
         }
     }

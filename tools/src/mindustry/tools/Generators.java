@@ -70,23 +70,38 @@ public class Generators{
         ObjectMap<Block, Pixmap> gens = new ObjectMap<>();
 
         generate("autotiles", () -> {
-            for(Floor floor : content.blocks().select(b -> b.isFloor() && b.asFloor().autotile).<Floor>as()){
-                Fi basePath = new Fi("../../../assets-raw/sprites_out/blocks/environment/" + floor.name + "-autotile.png");
+            for(Block block : content.blocks().select(b -> (b.isFloor() && b.asFloor().autotile) || (b instanceof StaticWall && ((StaticWall)b).autotile))){
+                int variants = block instanceof Floor f && f.autotileVariants > 1 ? f.autotileVariants : 1;
+                for(int v = 0; v < variants; v++){
+                    Fi basePath = new Fi("../../../assets-raw/sprites_out/blocks/environment/" + block.name + "-autotile" + (variants <= 1 ? "" : "" + (v+1)) + ".png"), iconPath = basePath.parent().child(block.name + ".png");
 
-                if(basePath.exists()){
-                    //theoretically this might not finish in time, but I doubt that will ever happen
-                    mainExecutor.submit(() -> {
-                        try{
-                            ImageTileGenerator.generate(basePath, floor.name, new Fi("../../../assets-raw/sprites_out/blocks/environment/" + floor.name));
-                        }catch(Throwable e){
-                            Log.err("Failed to autotile: " + floor.name, e);
-                        }finally{
-                            //the raw autotile source image must never be included, it isn't useful
-                            basePath.delete();
+                    if(basePath.exists()){
+                        int variant = v;
+                        //theoretically this might not finish in time, but I doubt that will ever happen
+                        mainExecutor.submit(() -> {
+                            try{
+                                ImageTileGenerator.generate(basePath, block.name + (variants <= 1 ? "" : "-" + (variant+1)), new Fi("../../../assets-raw/sprites_out/blocks/environment"));
+                            }catch(Throwable e){
+                                Log.err("Failed to autotile: " + block.name, e);
+                            }finally{
+                                //the raw autotile source image must never be included, it isn't useful
+                                basePath.delete();
+                            }
+                        });
+
+                        if(v == 0){
+                            //save the bottom right region as the "main" sprite for previews
+                            Pixmap out = new Pixmap(basePath);
+                            Pixmap cropped = out.crop(32, 32, 32, 32);
+                            if(!iconPath.exists()){
+                                iconPath.writePng(cropped);
+                            }
+                            out.dispose();
+                            gens.put(block, cropped);
                         }
-                    });
-                }else{
-                    Log.warn("Autotile floor '@' not found: @", floor.name, basePath.absolutePath());
+                    }else{
+                        Log.warn("Autotile block '@' not found: @", block.name, basePath.absolutePath());
+                    }
                 }
             }
         });
@@ -248,7 +263,6 @@ public class Generators{
 
                     Fi fi = Fi.get("../blocks/environment/cliffmask" + (val & 0xff) + ".png");
                     fi.writePng(result);
-                    fi.copyTo(Fi.get("../editor").child("editor-" + fi.name()));
                 });
             }
 
@@ -309,14 +323,6 @@ public class Generators{
                 block.getRegionsToOutline(toOutline);
 
                 TextureRegion[] regions = block.getGeneratedIcons();
-
-                if(block.variants > 0 || block instanceof Floor){
-                    for(TextureRegion region : block.variantRegions()){
-                        GenRegion gen = (GenRegion)region;
-                        if(gen.path == null) continue;
-                        gen.path.copyTo(Fi.get("../editor/editor-" + gen.path.name()));
-                    }
-                }
 
                 for(TextureRegion region : block.makeIconRegions()){
                     GenRegion gen = (GenRegion)region;
@@ -380,33 +386,36 @@ public class Generators{
                         save(padded, region.name);
                     }
 
-                    if(!regions[0].found()){
+                    Pixmap image;
+
+                    if(regions[0].found()){
+                        image = get(regions[0]);
+
+                        int i = 0;
+                        for(TextureRegion region : regions){
+                            i++;
+                            if(i != regions.length || last == null){
+                                image.draw(get(region), true);
+                            }else{
+                                image.draw(last, true);
+                            }
+
+                            //draw shard (default team top) on top of first sprite
+                            if(region == block.teamRegions[Team.sharded.id] && shardTeamTop != null){
+                                image.draw(shardTeamTop, true);
+                            }
+                        }
+
+                        if(!(regions.length == 1 && regions[0] == Core.atlas.find(block.name) && shardTeamTop == null)){
+                            save(image, "block-" + block.name + "-full");
+                        }
+
+                        saveScaled(image, "../ui/block-" + block.name + "-ui", Math.min(image.width, maxUiIcon));
+                    }else if(gens.containsKey(block)){
+                        image = gens.get(block);
+                    }else{
                         continue;
                     }
-
-                    Pixmap image = get(regions[0]);
-
-                    int i = 0;
-                    for(TextureRegion region : regions){
-                        i++;
-                        if(i != regions.length || last == null){
-                            image.draw(get(region), true);
-                        }else{
-                            image.draw(last, true);
-                        }
-
-                        //draw shard (default team top) on top of first sprite
-                        if(region == block.teamRegions[Team.sharded.id] && shardTeamTop != null){
-                            image.draw(shardTeamTop, true);
-                        }
-                    }
-
-                    if(!(regions.length == 1 && regions[0] == Core.atlas.find(block.name) && shardTeamTop == null)){
-                        save(image, "block-" + block.name + "-full");
-                    }
-
-                    save(image, "../editor/" + block.name + "-icon-editor");
-                    saveScaled(image, "../ui/block-" + block.name + "-ui", Math.min(image.width, maxUiIcon));
 
                     boolean hasEmpty = false;
                     Color average = new Color(), c = new Color();
@@ -454,9 +463,8 @@ public class Generators{
                         }
                     }
 
-                    String name = floor.name + "" + (++index);
+                    String name = floor.name + (++index);
                     save(res, "../blocks/environment/" + name);
-                    save(res, "../editor/editor-" + name);
 
                     gens.put(floor, res);
                 }
@@ -496,7 +504,7 @@ public class Generators{
                 Pixmap container = new Pixmap(base.width + 10, base.height + 10);
                 container.draw(base, 5, 5, true);
 
-                replace("sector-" + item.name, container.outline(Pal.darkerGray, 5));
+                replace("../ui/sector-" + item.name, "sector-" + item.name, container.outline(Pal.darkerGray, 5));
             }
         });
 
@@ -810,7 +818,6 @@ public class Generators{
                     replace(ore.variantRegions[i], image);
 
                     save(image, "../blocks/environment/" + ore.name + (i + 1));
-                    save(image, "../editor/editor-" + ore.name + (i + 1));
 
                     save(image, "block-" + ore.name + "-full");
                     save(image, "../ui/block-" + ore.name + "-ui");
@@ -819,14 +826,15 @@ public class Generators{
         });
 
         generate("edges", () -> {
-            content.blocks().<Floor>each(b -> b instanceof Floor && !(b instanceof OverlayFloor), floor -> {
+            content.blocks().<Floor>each(b -> b instanceof Floor && !(b instanceof OverlayFloor) && !b.isAir(), floor -> {
 
-                if(has(floor.name + "-edge") || floor.blendGroup != floor){
+                if(has(floor.name + "-edge") || floor.blendGroup != floor || (!floor.drawEdgeOut)){
                     return;
                 }
 
                 try{
-                    Pixmap image = gens.get(floor, get(floor.getGeneratedIcons()[0]));
+                    Pixmap image = gens.get(floor);
+                    if(image == null) image = get(floor.getGeneratedIcons()[0]);
                     Pixmap edge = get("edge-stencil");
                     Pixmap result = new Pixmap(edge.width, edge.height);
 
@@ -838,7 +846,9 @@ public class Generators{
 
                     save(result, "../blocks/environment/" + floor.name + "-edge");
 
-                }catch(Exception ignored){}
+                }catch(Exception e){
+                    Log.err("Failed to generate edge for " + floor, e);
+                }
             });
         });
 

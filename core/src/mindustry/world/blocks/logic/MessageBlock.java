@@ -68,7 +68,7 @@ public class MessageBlock extends Block{
         return accessible();
     }
 
-    public class MessageBuild extends Building{
+    public class MessageBuild extends Building implements LReadable{
         public StringBuilder message = new StringBuilder();
 
         @Override
@@ -167,9 +167,20 @@ public class MessageBlock extends Block{
         }
 
         @Override
+        public boolean readable(LExecutor exec){
+            return isValid();
+        }
+
+        @Override
+        public void read(LVar position, LVar output){
+            int address = position.numi();
+            output.setnum(address < 0 || address >= message.length() ? Double.NaN : message.charAt(address));
+        }
+
+        @Override
         public double sense(LAccess sensor){
             return switch(sensor){
-                case bufferUsage -> message.length();
+                case bufferSize -> message.length();
                 default -> super.sense(sensor);
             };
         }

@@ -19,6 +19,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.editor.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -173,6 +174,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region io
 
     public final void writeBase(Writes write){
+        //TODO: this code is a legacy mess; in future versions, it should be replaced with a different system that has a 1-integer module bitmask + byte version.
         boolean writeVisibility = state.rules.fog && visibleFlags != 0;
 
         write.f(health);
@@ -190,6 +192,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(timeScale != 1f){
             write.f(timeScale);
             write.f(timeScaleDuration);
+        }
+
+        if(lastDisabler != null && lastDisabler.isValid()){
+            write.i(lastDisabler.pos());
         }
 
         //efficiency is written as two bytes to save space
@@ -230,11 +236,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         if((moduleBits & 1) != 0) (items == null ? new ItemModule() : items).read(read, legacy);
-        if((moduleBits & 2) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
-        if((moduleBits & 4) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
-        if((moduleBits & 16) != 0){
+        if((moduleBits & (1 << 1)) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
+        if((moduleBits & (1 << 2)) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
+        //1 << 3 is skipped (old consume module)
+        if((moduleBits & (1 << 4)) != 0){
             timeScale = read.f();
             timeScaleDuration = read.f();
+        }
+        if((moduleBits & (1 << 5)) != 0){
+            lastDisabler = world.build(read.i());
         }
 
         //unnecessary consume module read in version 2 and below
@@ -253,7 +263,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public int moduleBitmask(){
-        return (items != null ? 1 : 0) | (power != null ? 2 : 0) | (liquids != null ? 4 : 0) | 8 | (timeScale != 1f ? 16 : 0);
+        return
+        (items != null ? 1 : 0) |
+        (power != null ? 1 << 1 : 0) |
+        (liquids != null ? 1 << 2 : 0) |
+        1 << 3 | //old consume module
+        (timeScale != 1f ? 1 << 4 : 0) |
+        (lastDisabler != null && lastDisabler.isValid() ? 1 << 5 : 0);
     }
 
     public void writeAll(Writes write){
@@ -438,17 +454,19 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return heat;
     }
 
+    /** Sets the time scale of the building to the given intensity, unless it's above that value */
     public void applyBoost(float intensity, float duration){
-        //do not refresh time scale when getting a weaker intensity
+        //do not refresh time scale when getting a lower intensity
         if(intensity >= this.timeScale - 0.001f){
             timeScaleDuration = Math.max(timeScaleDuration, duration);
         }
         timeScale = Math.max(timeScale, intensity);
     }
 
+    /** Sets the time scale of the building to the given intensity, unless it's below that value */
     public void applySlowdown(float intensity, float duration){
-        //do not refresh time scale when getting a weaker intensity
-        if(intensity <= this.timeScale - 0.001f){
+        //do not refresh time scale when getting a higher intensity
+        if(intensity <= this.timeScale + 0.001f){
             timeScaleDuration = Math.max(timeScaleDuration, duration);
         }
         timeScale = Math.min(timeScale, intensity);
@@ -600,7 +618,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public boolean allowUpdate(){
         return team != Team.derelict && block.supportsEnv(state.rules.env) &&
             //check if outside map limit (privileged blocks are exempt)
-            (block.privileged || !state.rules.limitMapArea || !state.rules.disableOutsideArea || Rect.contains(state.rules.limitX, state.rules.limitY, state.rules.limitWidth, state.rules.limitHeight, tile.x, tile.y));
+            (tile instanceof EditorTile || block.privileged || !state.rules.limitMapArea || !state.rules.disableOutsideArea || Rect.contains(state.rules.limitX, state.rules.limitY, state.rules.limitWidth, state.rules.limitHeight, tile.x, tile.y));
     }
 
     public BlockStatus status(){
@@ -1313,6 +1331,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 }
             });
         }
+    }
+
+    /** Called when this block is derelict repaired. */
+    @CallSuper
+    public void onRepaired(){
+        placed();
     }
 
     public boolean isCommandable(){

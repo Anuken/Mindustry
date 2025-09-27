@@ -17,6 +17,7 @@ import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.pattern.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -152,10 +153,14 @@ public class Turret extends ReloadTurret{
     public Turret(String name){
         super(name);
         liquidCapacity = 20f;
-        quickRotate = false;
         outlinedIcon = 1;
         drawLiquidLight = false;
         sync = true;
+        rotate = true;
+        quickRotate = false;
+        drawArrow = false;
+        rotateDrawEditor = false;
+        visualRotationOffset = -90f;
     }
 
     @Override
@@ -212,6 +217,11 @@ public class Turret extends ReloadTurret{
     }
 
     @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        drawer.drawPlan(this, plan, list);
+    }
+
+    @Override
     public TextureRegion[] icons(){
         return drawer.finalIcons(this);
     }
@@ -224,7 +234,7 @@ public class Turret extends ReloadTurret{
     public void limitRange(BulletType bullet, float margin){
         float realRange = bullet.rangeChange + range;
         //doesn't handle drag
-        bullet.lifetime = (realRange + margin + bullet.extraRangeMargin) / bullet.speed;
+        bullet.lifetime = (realRange + margin + bullet.extraRangeMargin + 10f) / bullet.speed;
     }
 
     @Override
@@ -266,6 +276,20 @@ public class Turret extends ReloadTurret{
         public @Nullable SoundLoop soundLoop = (loopSound == Sounds.none ? null : new SoundLoop(loopSound, loopSoundVolume));
 
         float lastRangeChange;
+
+        @Override
+        public void placed(){
+            super.placed();
+            if(rotate){
+                rotation = rotdeg();
+            }
+        }
+
+        //overridden so that the rotation isn't affected during repairs (standard placed() code isn't called)
+        @Override
+        public void onRepaired(){
+            super.placed();
+        }
 
         @Override
         public void remove(){
@@ -503,7 +527,7 @@ public class Turret extends ReloadTurret{
                 }
 
                 if(validateTarget()){
-                    boolean canShoot = true;
+                    boolean canShoot;
 
                     if(isControlled()){ //player behavior
                         targetPos.set(unit.aimX(), unit.aimY());

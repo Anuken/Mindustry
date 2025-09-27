@@ -138,9 +138,6 @@ public class BulletType extends Content implements Cloneable{
     public boolean reflectable = true;
     /** Whether this projectile can be absorbed by shields. */
     public boolean absorbable = true;
-    /** Whether to move the bullet back depending on delta to fix some delta-time related issues.
-     * Do not change unless you know what you're doing. */
-    public boolean backMove = true;
     /** If true, the angle param in create is ignored. */
     public boolean ignoreSpawnAngle = false;
     /** Chance for this bullet to be created. */
@@ -928,14 +925,11 @@ public class BulletType extends Content implements Cloneable{
         bullet.aimY = aimY;
 
         bullet.initVel(angle, speed * velocityScl * (velocityScaleRandMin != 1f || velocityScaleRandMax != 1f ? Mathf.random(velocityScaleRandMin, velocityScaleRandMax) : 1f));
-        if(backMove){
-            bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
-        }else{
-            bullet.set(x, y);
-        }
+        bullet.set(x, y);
+        bullet.lastX = x;
+        bullet.lastY = y;
         bullet.lifetime = lifetime * lifetimeScl * (lifeScaleRandMin != 1f || lifeScaleRandMax != 1f ? Mathf.random(lifeScaleRandMin, lifeScaleRandMax) : 1f);
         bullet.data = data;
-        bullet.drag = drag;
         bullet.hitSize = hitSize;
         bullet.mover = mover;
         bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();

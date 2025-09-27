@@ -25,10 +25,8 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
-import mindustry.world.blocks.logic.CanvasBlock.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
-import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
@@ -36,7 +34,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class LExecutor{
-    public static final int maxInstructions = 1000;
+    public static int maxInstructions = 1000;
 
     public static final int
     maxGraphicsBuffer = 256,
@@ -59,11 +57,11 @@ public class LExecutor{
     public IntSet linkIds = new IntSet();
     public Team team = Team.derelict;
     public boolean privileged = false;
+    //maps variable name to index in vars; lazily initialized
+    protected @Nullable ObjectIntMap<String> nameMap;
 
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
     protected static IntFloatMap unitTimeouts = new IntFloatMap();
-    //lookup variable by name, lazy init.
-    protected @Nullable ObjectIntMap<String> nameMap;
 
     static{
         Events.on(ResetEvent.class, e -> unitTimeouts.clear());
@@ -379,7 +377,7 @@ public class LExecutor{
                         if(unit instanceof Payloadc pay){
                             //units
                             if(p1.bool()){
-                                Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+                                Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u != unit && u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
 
                                 if(result != null){
                                     Call.pickedUnitPayload(unit, result);
@@ -519,7 +517,7 @@ public class LExecutor{
             if(obj instanceof Building b && (exec.privileged || (exec.build != null && exec.build.validLink(b)))){
 
                 if(type == LAccess.enabled){
-                    if(p1.bool()) {
+                    if(p1.bool()){
                         b.noSleep();
                     }else{
                         b.lastDisabler = exec.build;
@@ -568,24 +566,15 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = position.numi();
-            Building from = target.building();
-
-            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
-                output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
-                LVar fromVar = logic.executor.optionalVar(name);
-                if(fromVar != null && !output.constant){
-                    output.objval = fromVar.objval;
-                    output.numval = fromVar.numval;
-                    output.isobj = fromVar.isobj;
+            Object targetObj = target.obj();
+            if(targetObj instanceof LReadable read){
+                if(!read.readable(exec)) return;
+                read.read(position, output);
+            }else{
+                int address = position.numi();
+                if(targetObj instanceof CharSequence str){
+                    output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
                 }
-            }else if(from instanceof MessageBuild msg){
-                output.setnum(address < 0 || address >= msg.message.length() ? Double.NaN : (int)msg.message.charAt(address));
-            }else if(target.isobj && target.objval instanceof CharSequence str){
-                output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
-            }else if(from instanceof CanvasBuild canvas && (exec.privileged || (from.team == exec.team))){
-                output.setnum(canvas.getPixel(address));
             }
         }
     }
@@ -604,20 +593,10 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = position.numi();
-            Building from = target.building();
-
-            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
-                mem.memory[address] = value.num();
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
-                LVar toVar = logic.executor.optionalVar(name);
-                if(toVar != null && !toVar.constant){
-                    toVar.objval = value.objval;
-                    toVar.numval = value.numval;
-                    toVar.isobj = value.isobj;
-                }
-            }else if(from instanceof CanvasBuild canvas && (exec.privileged || (from.team == exec.team))){
-		        canvas.setPixel(address, value.numi());
+            Object targetObj = target.obj();
+            if(targetObj instanceof LWritable write){
+                if(!write.writable(exec)) return;
+                write.write(position, value);
             }
         }
     }
@@ -660,7 +639,7 @@ public class LExecutor{
                     }
                 }
             }else{
-                if(target instanceof CharSequence seq && sense == LAccess.size){
+                if(target instanceof CharSequence seq && (sense == LAccess.size || sense == LAccess.bufferSize)){
                     to.setnum(seq.length());
                     return;
                 }
@@ -988,7 +967,7 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
-            if(target.building() instanceof LogicDisplayBuild d && (d.team == exec.team || exec.privileged)){
+            if(target.building() instanceof LogicDisplayBuild d && d.isValid() && (d.team == exec.team || exec.privileged)){
                 d.flushCommands(exec.graphicsBuffer);
                 exec.graphicsBuffer.clear();
             }
@@ -1122,8 +1101,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(target.building() instanceof MessageBuild d && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
-
+            if(target.building() instanceof MessageBuild d && d.isValid() && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
 
@@ -1413,7 +1391,6 @@ public class LExecutor{
 
             Tile tile = world.tile(x.numi(), y.numi());
             if(tile != null && block.obj() instanceof Block b){
-                //TODO this can be quite laggy...
                 switch(layer){
                     case ore -> {
                         if((b instanceof OverlayFloor || b == Blocks.air) && tile.overlay() != b) tile.setOverlayNet(b);

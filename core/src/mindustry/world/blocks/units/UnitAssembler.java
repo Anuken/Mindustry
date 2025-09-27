@@ -509,13 +509,18 @@ public class UnitAssembler extends PayloadBlock{
             Vec2 spawn = getUnitSpawn();
             consume();
 
-            if(!net.client()){
-                var unit = plan.unit.create(team);
-                if(unit != null && unit.isCommandable() && commandPos != null){
-                    unit.command().commandPosition(commandPos);
-                }
-                unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
-                unit.rotation = rotdeg();
+            var unit = plan.unit.create(team);
+            if(unit.isCommandable() && commandPos != null){
+                unit.command().commandPosition(commandPos);
+            }
+            unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
+            unit.rotation = rotdeg();
+            var targetBuild = unit.buildOn();
+            //'source' is the target build instead of this building; this is because some blocks only accept things from certain angles, and this is a non-standard payload
+            var payload = new UnitPayload(unit);
+            if(targetBuild != null && targetBuild.team == team && targetBuild.acceptPayload(targetBuild, payload)){
+                targetBuild.handlePayload(targetBuild, payload);
+            }else if(!net.client()){
                 unit.add();
                 Units.notifyUnitSpawn(unit);
             }
