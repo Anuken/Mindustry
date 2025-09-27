@@ -150,7 +150,7 @@ abstract class StatusComp implements Posc{
         applyDynamicStatus().reloadMultiplier = reloadMultiplier;
     }
 
-    /** Uses a dynamic status effect to change rotation speed. */
+    /** Uses a dynamic status effect to change unit and weapon rotation speed. */
     public void statusRotateSpeedMultiplier(float rotateSpeedMultiplier){
         applyDynamicStatus().rotateSpeedMultiplier = rotateSpeedMultiplier;
     }

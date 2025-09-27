@@ -23,7 +23,7 @@ public class StatusEffect extends UnlockableContent{
     public float speedMultiplier = 1f;
     /** Unit reload multiplier. */
     public float reloadMultiplier = 1f;
-    /** Unit rotate speed multiplier. */
+    /** Unit and weapon rotate speed multiplier. */
     public float rotateSpeedMultiplier = 1f;
     /** Unit build speed multiplier. */
     public float buildSpeedMultiplier = 1f;
