@@ -193,7 +193,12 @@ public class StackConveyor extends Block implements Autotiler{
         public void dropped(){
             super.dropped();
             var prev = Geometry.d4[(rotation + 2) % 4];
-            link = Point2.pack(tile.x + prev.x, tile.y + prev.y);
+            if(items.any()){
+                link = Point2.pack(tile.x + prev.x, tile.y + prev.y);
+                cooldown = 0f;
+            }else{
+                link = -1;
+            }
         }
 
         @Override
@@ -201,7 +206,7 @@ public class StackConveyor extends Block implements Autotiler{
             Draw.z(Layer.block - 0.15f);
             super.drawCracks();
         }
-        
+
         @Override
         public void payloadDraw(){
             Draw.rect(block.fullIcon, x, y);
@@ -294,7 +299,6 @@ public class StackConveyor extends Block implements Autotiler{
             }else{ //transfer
                 if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
                     if(front() instanceof StackConveyorBuild e && e.team == team){
-                        //sleep if its occupied
                         if(e.link == -1){
                             e.items.add(items);
                             e.lastItem = lastItem;

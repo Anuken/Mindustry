@@ -16,7 +16,6 @@ public class SerpuloTechTree{
         Planets.serpulo.techTree = nodeRoot("serpulo", coreShard, () -> {
 
             node(conveyor, () -> {
-
                 node(junction, () -> {
                     node(router, () -> {
                         node(advancedLaunchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
@@ -73,7 +72,6 @@ public class SerpuloTechTree{
             });
 
             node(mechanicalDrill, () -> {
-
                 node(mechanicalPump, () -> {
                     node(conduit, () -> {
                         node(liquidJunction, () -> {
