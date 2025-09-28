@@ -897,6 +897,9 @@ public class ApplicationTests{
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;
 
+                assertFalse(state.rules.infiniteResources, "Sector " + zone.name + " must not have infinite resources.");
+                assertFalse(state.rules.allowEditRules, "Sector " + zone.name + " must not have rule editing enabled.");
+
                 for(Tile tile : world.tiles){
                     if(tile.drop() != null){
                         resources.add(tile.drop());
