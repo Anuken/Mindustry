@@ -258,11 +258,11 @@ public class UnitTypes{
         }};
 
         reign = new UnitType("reign"){{
-            speed = 0.4933f;
+            speed = 0.48f;
             hitSize = 30f;
             rotateSpeed = 2.6f;
-            health = 24000;
-            armor = 25f;
+            health = 25000;
+            armor = 27f;
             mechStepParticles = true;
             stepShake = 0.75f;
             drownTimeMultiplier = 1.6f;
@@ -766,7 +766,7 @@ public class UnitTypes{
             drag = 0.1f;
             speed = 0.92f;
             hitSize = 23f;
-            health = 7200;
+            health = 7500;
             armor = 11f;
 
             rotateSpeed = 4f;
@@ -867,7 +867,7 @@ public class UnitTypes{
             speed = 0.84f;
             hitSize = 26f;
             health = 19000;
-            armor = 15f;
+            armor = 17f;
             lightRadius = 140f;
 
             rotateSpeed = 1.9f;
@@ -1122,8 +1122,8 @@ public class UnitTypes{
             rotateSpeed = 3.2f;
             flying = true;
             lowAltitude = true;
-            health = 8100;
-            armor = 9f;
+            health = 8300;
+            armor = 8f;
             engineOffset = 21;
             engineSize = 5.3f;
             hitSize = 46f;
@@ -1191,17 +1191,17 @@ public class UnitTypes{
         }};
 
         eclipse = new UnitType("eclipse"){{
-            speed = 0.7f;
+            speed = 0.66f;
             accel = 0.04f;
             drag = 0.04f;
             rotateSpeed = 2.7f;
             flying = true;
             lowAltitude = true;
-            health = 21000;
+            health = 23000;
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
-            armor = 22f;
+            armor = 17f;
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
