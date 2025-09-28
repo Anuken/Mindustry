@@ -66,6 +66,21 @@ public class MenuFragment{
 
         //info icon
         if(mobile){
+            //left/right gutter areas
+            parent.fill((x, y, w, h) -> {
+                x = 0f;
+                y = 0f;
+                w = Core.graphics.getWidth();
+                h = Core.graphics.getHeight();
+                if(Core.scene.marginLeft > 0){
+                    paneRight.draw(x, y, Core.scene.marginLeft, h);
+                }
+
+                if(Core.scene.marginRight > 0){
+                    paneLeft.draw(x + w - Core.scene.marginRight, y, Core.scene.marginRight, h);
+                }
+            });
+
             parent.fill(c -> c.bottom().left().button("", new TextButtonStyle(){{
                 font = Fonts.def;
                 fontColor = Color.white;
