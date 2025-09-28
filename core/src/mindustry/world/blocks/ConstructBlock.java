@@ -248,7 +248,7 @@ public class ConstructBlock extends Block{
                     Shaders.blockbuild.time = Time.time;
                     Shaders.blockbuild.progress = progress;
 
-                    Draw.rect(region, x, y, current.rotate && (noOverrides || current.regionRotated2 == i || current.regionRotated1 == i) ? rotdeg() : 0);
+                    Draw.rect(region, x, y, current.rotate && (noOverrides || current.regionRotated2 == i || current.regionRotated1 == i) ? rotdeg() + current.visualRotationOffset : 0);
                     Draw.flush();
                     i ++;
                 }
