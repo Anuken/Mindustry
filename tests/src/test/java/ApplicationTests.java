@@ -663,6 +663,17 @@ public class ApplicationTests{
     }
 
     @Test
+    void load152Save(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("152.msav"));
+
+        assertTrue(Groups.unit.contains(u -> u.type == UnitTypes.scepter));
+
+        assertEquals(2000, world.width());
+        assertEquals(195, world.height());
+    }
+
+    @Test
     void arrayIterators(){
         Seq<String> arr = Seq.with("a", "b" , "c", "d", "e", "f");
         Seq<String> results = new Seq<>();
