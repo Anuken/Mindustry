@@ -897,8 +897,9 @@ public class ApplicationTests{
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;
 
-                assertFalse(state.rules.infiniteResources, "Sector " + zone.name + " must not have infinite resources.");
+                assertFalse(state.rules.infiniteResources || Team.sharded.rules().infiniteResources, "Sector " + zone.name + " must not have infinite resources.");
                 assertFalse(state.rules.allowEditRules, "Sector " + zone.name + " must not have rule editing enabled.");
+                assertFalse(state.rules.allowEditWorldProcessors, "Sector " + zone.name + " must not have world processor editing enabled.");
                 assertEquals(Team.sharded, state.rules.defaultTeam, "Sector " + zone.name + " must have the Sharded player team.");
                 assertEquals(Vars.state.getPlanet() == Planets.serpulo ? Team.crux : Team.malis, state.rules.waveTeam, "Sector " + zone.name + " must have the correct enemy team.");
 
