@@ -40,7 +40,7 @@ public class StatusEffects{
             speedMultiplier = 0.6f;
             healthMultiplier = 0.8f;
             effect = Fx.freezing;
-            transitionDamage = 15f;
+            transitionDamage = 14f;
 
             init(() -> {
                 opposite(melting, burning);
