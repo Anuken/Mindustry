@@ -483,8 +483,8 @@ public class SectorDamage{
                         Tile other = tiles.getn(cx, cy);
                         float resultDamage = currDamage;
 
-                        //damage the tile if it's not friendly
-                        if(other.build != null && other.team() != state.rules.waveTeam){
+                        //damage the tile if it's the player team (derelict blocks get ignored)
+                        if(other.build != null && other.team() == state.rules.defaultTeam){
                             resultDamage -= other.build.health();
 
                             other.build.health -= currDamage;

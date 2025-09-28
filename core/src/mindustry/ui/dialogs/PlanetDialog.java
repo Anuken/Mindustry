@@ -269,7 +269,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         //announce new presets
         for(SectorPreset preset : content.sectors()){
-            if(preset.unlocked() && !preset.alwaysUnlocked && !preset.sector.info.shown && preset.requireUnlock && !preset.sector.hasBase() && preset.planet == state.planet){
+            if(preset.unlocked() && preset.sector.preset == preset && !preset.alwaysUnlocked && !preset.sector.info.shown && preset.requireUnlock && !preset.sector.hasBase() && preset.planet == state.planet){
                 newPresets.add(preset.sector);
                 preset.sector.info.shown = true;
                 preset.sector.saveInfo();
@@ -418,6 +418,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             return false;
         }
 
+        if(sector.planet.generator == null) return false;
+
         if(sector.hasBase() || sector.id == sector.planet.startSector) return true;
         //preset sectors can only be selected once unlocked
         if(sector.preset != null && sector.preset.requireUnlock){
@@ -425,33 +427,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             return sector.preset.unlocked() || node == null || node.parent == null || (node.parent.content.unlocked() && (!(node.parent.content instanceof SectorPreset preset) || preset.sector.hasBase()));
         }
 
-        return sector.planet.generator != null ?
-            //use planet impl when possible
-            (mode == planetLaunch ? sector.planet.generator.allowAcceleratorLanding(sector) : sector.planet.generator.allowLanding(sector)) :
-            mode == planetLaunch || sector.hasBase() || sector.near().contains(Sector::hasBase); //near an occupied sector
+        return mode == planetLaunch ? sector.planet.generator.allowAcceleratorLanding(sector) : sector.planet.generator.allowLanding(sector);
     }
 
-    Sector findLauncher(Sector to){
-        if(mode == planetLaunch){
-            return launchSector;
-        }
+    @Nullable Sector findLauncher(Sector to){
+        if(mode == planetLaunch || to.planet.generator == null) return launchSector;
 
-        Sector launchSector = this.launchSector != null && this.launchSector.planet == to.planet && this.launchSector.hasBase() ? this.launchSector : null;
-        //directly nearby.
-        if(to.near().contains(launchSector)) return launchSector;
-
-        Sector launchFrom = launchSector;
-        if(launchFrom == null || (to.preset == null && !to.near().contains(launchSector))){
-            //TODO pick one with the most resources
-            launchFrom = to.near().find(Sector::hasBase);
-            if(launchFrom == null && to.preset != null){
-                if(launchSector != null) return launchSector;
-                launchFrom = state.planet.sectors.min(s -> !s.hasBase() ? Float.MAX_VALUE : s.tile.v.dst2(to.tile.v));
-                if(!launchFrom.hasBase()) launchFrom = null;
-            }
-        }
-
-        return launchFrom;
+        Sector candidate = to.planet.generator.findLaunchCandidate(to, launchSector);
+        return candidate == null ? launchSector : candidate;
     }
 
     boolean showing(){
@@ -482,9 +465,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
             }
         }
-
-        Sector hoverOrSelect = hovered != null ? hovered : selected;
-        Sector launchFrom = hoverOrSelect != null && !hoverOrSelect.hasBase() ? findLauncher(hoverOrSelect) : null;
 
         Sector current = Vars.state.getSector() != null && Vars.state.getSector().isBeingPlayed() && Vars.state.getSector().planet == state.planet ? Vars.state.getSector() : null;
 
@@ -682,7 +662,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             PlanetData data = new PlanetData();
                             IntSeq attack = new IntSeq();
                             for(var sector : state.planet.sectors){
-                                if(sector.preset == null && sector.generateEnemyBase){
+                                if((sector.preset == null || !sector.preset.requireUnlock) && sector.generateEnemyBase){
                                     attack.add(sector.id);
                                 }
 
@@ -1142,10 +1122,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     }
                 });
             }else{
-                if(sector.save != null){
-                    sector.save.delete();
-                }
-                sector.save = null;
+                sector.info.items.clear();
+                sector.info.damage = 1f;
+                sector.info.hasCore = false;
+                sector.info.production.clear();
+                sector.saveInfo();
             }
             updateSelected();
             rebuildList();

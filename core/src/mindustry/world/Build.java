@@ -92,18 +92,14 @@ public class Build{
 
         //repair derelict tile
         if(tile.team() == Team.derelict && team != Team.derelict && tile.block == result && tile.build != null && tile.block.allowDerelictRepair && state.rules.derelictRepair){
-            float healthf = tile.build.healthf();
-            var config = tile.build.config();
-
-            tile.setBlock(result, team, rotation);
+            tile.build.rotation = rotation;
+            tile.build.changeTeam(team);
+            tile.build.enabled = true;
+            tile.build.checkAllowUpdate();
+            tile.build.updateProximity();
+            tile.build.onRepaired();
 
             if(unit != null && unit.getControllerName() != null) tile.build.lastAccessed = unit.getControllerName();
-
-            if(config != null){
-                tile.build.configured(unit, config);
-            }
-            //keep health
-            tile.build.health = result.health * healthf;
 
             if(fogControl.isVisibleTile(team, tile.x, tile.y)){
                 result.placeEffect.at(tile.drawx(), tile.drawy(), result.size);
@@ -111,7 +107,7 @@ public class Build{
                 //doesn't play a sound
             }
 
-            Events.fire(new BlockBuildEndEvent(tile, unit, team, false, config));
+            Events.fire(new BlockBuildEndEvent(tile, unit, team, false, tile.build.config()));
             return;
         }
 
@@ -168,8 +164,8 @@ public class Build{
     }
 
     /** @return whether a tile can be placed at this location by this team. */
-    public static boolean validPlace(Block type, Team team, int x, int y, int rotation, boolean checkVisible, boolean ignoreCoreRadius){
-        return validPlaceIgnoreUnits(type, team, x, y, rotation, checkVisible, ignoreCoreRadius) && checkNoUnitOverlap(type, x, y);
+    public static boolean validPlace(Block type, Team team, int x, int y, int rotation, boolean checkVisible, boolean checkCoreRadius){
+        return validPlaceIgnoreUnits(type, team, x, y, rotation, checkVisible, checkCoreRadius) && checkNoUnitOverlap(type, x, y);
     }
 
     /** @return whether a tile can be placed at this location by this team. */

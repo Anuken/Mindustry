@@ -654,6 +654,15 @@ public class ApplicationTests{
     }
 
     @Test
+    void load152BESave(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("152_be.msav"));
+
+        assertEquals(414, world.width());
+        assertEquals(414, world.height());
+    }
+
+    @Test
     void arrayIterators(){
         Seq<String> arr = Seq.with("a", "b" , "c", "d", "e", "f");
         Seq<String> results = new Seq<>();
@@ -883,7 +892,7 @@ public class ApplicationTests{
 
                 logic.reset();
                 state.rules.sector = zone.sector;
-                world.loadGenerator(zone.generator.map.width, zone.generator.map.height, zone.generator::generate);
+                world.loadGenerator(zone.generator.map.width, zone.generator.map.height, tiles -> zone.generator.generate(tiles, new WorldParams()));
                 zone.rules.get(state.rules);
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;
@@ -933,7 +942,7 @@ public class ApplicationTests{
                     }
                 }
 
-                assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + zone);
+                assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + zone + " (" + Team.sharded.cores() + ")");
 
                 assertTrue(hasSpawnPoint, "Sector \"" + zone.name + "\" has no spawn points.");
                 assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && state.rules.waveTeam.data().hasCore()), "Sector \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());

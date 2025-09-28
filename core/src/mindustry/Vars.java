@@ -58,7 +58,7 @@ public class Vars implements Loadable{
     /** If true, mod code and scripts do not run. For internal testing only. This WILL break mods if enabled. */
     public static boolean skipModCode = false;
     /** Default accessible content types used for player-selectable icons. */
-    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
+    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit, ContentType.status};
     /** Default rule environment. */
     public static final int defaultEnv = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
     /** Wall darkness radius. */

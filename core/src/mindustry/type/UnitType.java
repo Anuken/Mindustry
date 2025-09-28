@@ -439,6 +439,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public int treadFrames = 18;
     /** how much of a top part of a tread sprite is "cut off" relative to the pattern; this is corrected for */
     public int treadPullOffset = 0;
+    /** how affected this unit is by terrain */
+    public float floorMultiplier = 1f;
 
     //SEGMENTED / CRAWL UNITS (this is WIP content!)
 
@@ -743,6 +745,11 @@ public class UnitType extends UnlockableContent implements Senseable{
         stats.add(Stat.size, StatValues.squared(hitSize / tilesize, StatUnit.blocks));
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, Strings.autoFixed(maxRange / tilesize, 1), StatUnit.blocks);
+
+        if(crushDamage > 0){
+            stats.add(Stat.crushDamage, crushDamage * 60f * 5f, StatUnit.perSecond);
+        }
+
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
 
@@ -880,7 +887,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(flyingLayer < 0) flyingLayer = lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit;
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
-        singleTarget = weapons.size <= 1 && !forceMultiTarget;
+        singleTarget |= weapons.size <= 1 && !forceMultiTarget;
 
         if(itemCapacity < 0){
             itemCapacity = Math.max(Mathf.round((int)(hitSize * 4f), 10), 10);
