@@ -4085,10 +4085,10 @@ public class Blocks{
                     frontColor = Pal.glassAmmoFront;
                     despawnEffect = Fx.hitBulletColor;
                 }},
-                Items.blastCompound, new FlakBulletType(4f, 13){{
+                Items.blastCompound, new FlakBulletType(4f, 12){{
                     shootEffect = Fx.shootBig;
                     ammoMultiplier = 5f;
-                    splashDamage = 57f;
+                    splashDamage = 55f;
                     splashDamageRadius = 60f;
                     collidesGround = true;
 
@@ -4131,6 +4131,8 @@ public class Blocks{
                     collidesGround = true;
                     explodeRange = 20f;
 
+                    reloadMultiplier = 0.8f;
+                    
                     backColor = hitColor = trailColor = Pal.surgeAmmoBack;
                     frontColor = Pal.surgeAmmoFront;
                     despawnEffect = Fx.hitBulletColor;
