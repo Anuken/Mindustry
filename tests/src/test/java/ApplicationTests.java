@@ -899,6 +899,8 @@ public class ApplicationTests{
 
                 assertFalse(state.rules.infiniteResources, "Sector " + zone.name + " must not have infinite resources.");
                 assertFalse(state.rules.allowEditRules, "Sector " + zone.name + " must not have rule editing enabled.");
+                assertEquals(Team.sharded, state.rules.defaultTeam, "Sector " + zone.name + " must have the Sharded player team.");
+                assertEquals(Vars.state.getPlanet() == Planets.serpulo ? Team.crux : Team.malis, state.rules.waveTeam, "Sector " + zone.name + " must have the correct enemy team.");
 
                 for(Tile tile : world.tiles){
                     if(tile.drop() != null){
