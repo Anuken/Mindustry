@@ -3641,7 +3641,7 @@ public class Blocks{
                     height = 8f;
                     shrinkY = 0f;
                     splashDamageRadius = 42f;
-                    splashDamage = 39f;
+                    splashDamage = 37f;
                     ammoMultiplier = 5f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
@@ -4126,7 +4126,7 @@ public class Blocks{
                     splashDamageRadius = 35f;
                     lightning = 3;
                     lightningLength = 7;
-                    lightningDamage = 15;
+                    lightningDamage = 12;
                     shootEffect = Fx.shootBig;
                     collidesGround = true;
                     explodeRange = 20f;
@@ -4168,7 +4168,7 @@ public class Blocks{
             inaccuracy = 10f;
             shootCone = 30f;
             shootSound = Sounds.shootSnap;
-            coolant = consumeCoolant(0.3f);
+            coolant = consumeCoolant(0.2f);
 
             scaledHealth = 145;
             limitRange();
@@ -4221,7 +4221,7 @@ public class Blocks{
         spectre = new ItemTurret("spectre"){{
             requirements(Category.turret, with(Items.copper, 900, Items.graphite, 300, Items.surgeAlloy, 250, Items.plastanium, 175, Items.thorium, 250));
             ammo(
-                Items.graphite, new BasicBulletType(7.5f, 80){{
+                Items.graphite, new BasicBulletType(7.5f, 75){{
                     hitSize = 4.8f;
                     width = 15f;
                     height = 21f;
