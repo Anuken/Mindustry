@@ -477,6 +477,7 @@ public class Control implements ApplicationListener, Loadable{
                                 for(var build : previousBuildings){
                                     Tile tile = world.tile(build.tileX(), build.tileY());
                                     if(tile != null && tile.build == null && Build.validPlace(build.block, state.rules.defaultTeam, build.tileX(), build.tileY(), build.rotation, false, false)){
+                                        build.addPlan(false, true);
                                         tile.setBlock(build.block, state.rules.defaultTeam, build.rotation, () -> build);
                                         build.changeTeam(Team.derelict);
                                         build.dropped(); //TODO: call pickedUp too? this may screw up power networks in a major way as they refer to potentially deleted entities

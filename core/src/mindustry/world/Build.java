@@ -96,6 +96,7 @@ public class Build{
             tile.build.changeTeam(team);
             tile.build.enabled = true;
             tile.build.checkAllowUpdate();
+            tile.build.updateProximity();
             tile.build.onRepaired();
 
             if(unit != null && unit.getControllerName() != null) tile.build.lastAccessed = unit.getControllerName();

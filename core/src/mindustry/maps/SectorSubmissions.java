@@ -58,6 +58,8 @@ public class SectorSubmissions{
         registerSerpuloSector(248, "iqtik123", "https://discord.com/channels/391020510269669376/1379926979129774151/1417864622412922890");
         registerSerpuloSector(133, "wpx", "https://discord.com/channels/391020510269669376/1379926871227240770/1417920499761156126");
         registerSerpuloSector(185, "quad", "https://discord.com/channels/391020510269669376/1379926892181983283/1419231958336016458");
+        registerSerpuloSector(254, "wpx", "https://discord.com/channels/391020510269669376/1379928045577703424/1420456601667502193");
+        registerSerpuloSector(0, "Jamespire", "https://discord.com/channels/391020510269669376/1379926780860698784/1418590967384117311");
 
         /* UNUSED SECTORS:
         registerHiddenSectors(serpulo,
@@ -72,6 +74,10 @@ public class SectorSubmissions{
     }
 
     static void registerSerpuloSector(int id, String author, String mapFileLink){
+        registerSerpuloSector(id, author, mapFileLink, -1);
+    }
+
+    static void registerSerpuloSector(int id, String author, String mapFileLink, int captureWave){
         Planet planet = Planets.serpulo;
         Sector sector = planet.sectors.get(id);
         MapSubmission sub = threadMap.get(sector, MapSubmission::new);
@@ -79,11 +85,15 @@ public class SectorSubmissions{
         sub.author = author;
         sub.mapFileLink = mapFileLink;
 
-        new SectorPreset("sector-" + planet.name + "-" + id, "hidden-serpulo/" + id, planet, id){{
-            requireUnlock = false;
-        }};
+        var preset = new SectorPreset("sector-" + planet.name + "-" + id, "hidden-serpulo/" + id, planet, id);
 
-        sector.generateEnemyBase = true;
+        preset.requireUnlock = false;
+
+        if(captureWave > 0){
+            preset.captureWave = captureWave;
+        }else{
+            sector.generateEnemyBase = true;
+        }
     }
 
     static void registerThread(int id, String link){

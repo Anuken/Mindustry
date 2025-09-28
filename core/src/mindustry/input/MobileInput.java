@@ -752,6 +752,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(!commandMode){
             queueCommandMode = false;
+        }else{
+            mode = none;
+            schematicMode = false;
         }
 
         //cannot rebuild and place at the same time

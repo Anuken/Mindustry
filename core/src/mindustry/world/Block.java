@@ -112,6 +112,10 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean rotate;
     /** if rotate is true and this is false, the region won't rotate when drawing */
     public boolean rotateDraw = true;
+    /** if rotate is true and this is false, the region won't rotate when drawing in the editor */
+    public boolean rotateDrawEditor = true;
+    /** visual rotation offset used in broken plan rendering */
+    public float visualRotationOffset = 0f;
     /** if rotate = false and this is true, rotation will be locked at 0 when placing (default); advanced use only */
     public boolean lockRotation = true;
     /** if true, schematic flips with this block are inverted. */
