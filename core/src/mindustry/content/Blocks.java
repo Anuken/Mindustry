@@ -1927,8 +1927,8 @@ public class Blocks{
         }};
 
         overdriveDome = new OverdriveProjector("overdrive-dome"){{
-            requirements(Category.effect, with(Items.lead, 720, Items.titanium, 210, Items.silicon, 150, Items.plastanium, 210, Items.surgeAlloy, 175));
-            consumePower(10f);
+            requirements(Category.effect, with(Items.lead, 720, Items.titanium, 210, Items.silicon, 180, Items.plastanium, 135, Items.surgeAlloy, 175));
+            consumePower(25f);
             size = 3;
             range = 200f;
             speedBoost = 2.5f;
