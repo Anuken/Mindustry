@@ -420,7 +420,10 @@ public class Control implements ApplicationListener, Loadable{
             ui.planet.hide();
             SaveSlot slot = sector.save;
             sector.planet.setLastSector(sector);
-            if(slot != null && !clearSectors && (!sector.planet.clearSectorOnLose || sector.info.hasCore)){
+
+            boolean clearSave = sector.planet.clearSectorOnLose || sector.planet.campaignRules.clearSectorOnLose;
+
+            if(slot != null && !clearSectors && (!clearSave || sector.info.hasCore)){
 
                 try{
                     boolean hadNoCore = !sector.info.hasCore;
@@ -435,7 +438,7 @@ public class Control implements ApplicationListener, Loadable{
                     if(state.rules.defaultTeam.cores().isEmpty() || hadNoCore){
 
                         //don't carry over the spawn position and plans if the sector preset name or map size changed
-                        if(sector.planet.clearSectorOnLose || sector.info.spawnPosition == 0 || !sector.info.sectorDataMatches(sector)){
+                        if(clearSave || sector.info.spawnPosition == 0 || !sector.info.sectorDataMatches(sector)){
                             playNewSector(origin, sector, reloader);
                         }else{
                             int spawnPos = sector.info.spawnPosition;

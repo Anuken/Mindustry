@@ -298,18 +298,16 @@ public class StackConveyor extends Block implements Autotiler{
                 }
             }else{ //transfer
                 if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
-                    if(front() instanceof StackConveyorBuild e && e.team == team){
-                        if(e.link == -1){
-                            e.items.add(items);
-                            e.lastItem = lastItem;
-                            e.link = tile.pos();
-                            //▲ to | from ▼
-                            link = -1;
-                            items.clear();
+                    if(front() instanceof StackConveyorBuild e && e.team == team && e.link == -1){
+                        e.items.add(items);
+                        e.lastItem = lastItem;
+                        e.link = tile.pos();
+                        //▲ to | from ▼
+                        link = -1;
+                        items.clear();
 
-                            cooldown = recharge;
-                            e.cooldown = 1;
-                        }
+                        cooldown = recharge;
+                        e.cooldown = 1;
                     }
                 }
             }

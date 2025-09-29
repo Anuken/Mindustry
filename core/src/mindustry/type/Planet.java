@@ -125,6 +125,8 @@ public class Planet extends UnlockableContent{
     public boolean clearSectorOnLose = false;
     /** Multiplier for enemy rebuild speeds; only applied in campaign (not standard rules) */
     public float enemyBuildSpeedMultiplier = 1f;
+    /** If true, the enemy team always has infinite items. */
+    public boolean enemyInfiniteItems = true;
     /** If true, enemy cores are replaced with spawnpoints on this planet (for invasions) */
     public boolean enemyCoreSpawnReplace = false;
     /** If true, blocks in the radius of the core will be removed and "built up" in a shockwave upon landing. */

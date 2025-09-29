@@ -603,13 +603,15 @@ public class ApplicationTests{
 
         entities.each(Building::updateProximity);
 
+        final int iterations = 100_000;
+
         //warmup
-        for(int i = 0; i < 100000; i++){
+        for(int i = 0; i < iterations; i++){
             entities.each(Building::update);
         }
 
         Time.mark();
-        for(int i = 0; i < 200000; i++){
+        for(int i = 0; i < iterations*2; i++){
             entities.each(Building::update);
         }
         Log.info(Time.elapsed() + "ms to process " + itemsa[0] + " items");
@@ -660,6 +662,17 @@ public class ApplicationTests{
 
         assertEquals(414, world.width());
         assertEquals(414, world.height());
+    }
+
+    @Test
+    void load152Save(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("152.msav"));
+
+        assertTrue(Groups.unit.contains(u -> u.type == UnitTypes.scepter));
+
+        assertEquals(2000, world.width());
+        assertEquals(195, world.height());
     }
 
     @Test
@@ -896,6 +909,12 @@ public class ApplicationTests{
                 zone.rules.get(state.rules);
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;
+
+                assertFalse(state.rules.infiniteResources || Team.sharded.rules().infiniteResources, "Sector " + zone.name + " must not have infinite resources.");
+                assertFalse(state.rules.allowEditRules, "Sector " + zone.name + " must not have rule editing enabled.");
+                assertFalse(state.rules.allowEditWorldProcessors, "Sector " + zone.name + " must not have world processor editing enabled.");
+                assertEquals(Team.sharded, state.rules.defaultTeam, "Sector " + zone.name + " must have the Sharded player team.");
+                assertEquals(Vars.state.getPlanet() == Planets.serpulo ? Team.crux : Team.malis, state.rules.waveTeam, "Sector " + zone.name + " must have the correct enemy team.");
 
                 for(Tile tile : world.tiles){
                     if(tile.drop() != null){

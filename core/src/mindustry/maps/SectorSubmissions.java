@@ -38,14 +38,14 @@ public class SectorSubmissions{
         registerSerpuloSector(16, "Namero", "https://discord.com/channels/391020510269669376/1379926788280680579/1409970152283312352");
         registerSerpuloSector(116, "Jamespire", "https://discord.com/channels/391020510269669376/1379926845058711734/1404131805074034712");
         registerSerpuloSector(69, "Oct", "https://discord.com/channels/391020510269669376/1379926831326822610/1406230980120940556");
-        registerSerpuloSector(92, "Eggypc/Fish", "https://discord.com/channels/391020510269669376/1379926835621527615/1381929336860442731");
+        registerSerpuloSector(92, "Eggypc/Fish", "https://discord.com/channels/391020510269669376/1379926835621527615/1422178040489971834");
         registerSerpuloSector(197, "Hengryton Luck", "https://discord.com/channels/391020510269669376/1379926916911599676/1411358089759817793");
         registerSerpuloSector(67, "Ếch ngồi đáy giếng", "https://discord.com/channels/391020510269669376/1379926828696866898/1389981795386396768");
         //180 has an alternate submission that may be more appropriate in terms of difficulty: https://discord.com/channels/391020510269669376/1379926889648619580/1411534650412892185
         registerSerpuloSector(180, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926889648619580/1413522098370117765");
         registerSerpuloSector(55, "Namero", "https://discord.com/channels/391020510269669376/1379926823277695189/1412588965256761402");
         registerSerpuloSector(19, "Hengryton Luck", "https://discord.com/channels/391020510269669376/1379926792479183019/1411342610525585468");
-        registerSerpuloSector(200, "Axye", "https://discord.com/channels/391020510269669376/1379926918429806755/1398949995041914933");
+        registerSerpuloSector(200, "Axye", "https://discord.com/channels/391020510269669376/1379926918429806755/1419180347232485448");
         //191 has several alternate submissions
         registerSerpuloSector(191, "Skeledragon", "https://discord.com/channels/391020510269669376/1379926912004001914/1380025875806027849");
         //alternate, more difficult submission: https://discord.com/channels/391020510269669376/1379926782966497322/1416145231853781022
