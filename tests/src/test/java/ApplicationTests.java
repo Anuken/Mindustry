@@ -603,13 +603,15 @@ public class ApplicationTests{
 
         entities.each(Building::updateProximity);
 
+        final int iterations = 100_000;
+
         //warmup
-        for(int i = 0; i < 100000; i++){
+        for(int i = 0; i < iterations; i++){
             entities.each(Building::update);
         }
 
         Time.mark();
-        for(int i = 0; i < 200000; i++){
+        for(int i = 0; i < iterations*2; i++){
             entities.each(Building::update);
         }
         Log.info(Time.elapsed() + "ms to process " + itemsa[0] + " items");
