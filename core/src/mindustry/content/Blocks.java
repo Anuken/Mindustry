@@ -1920,14 +1920,14 @@ public class Blocks{
         }};
 
         overdriveProjector = new OverdriveProjector("overdrive-projector"){{
-            requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 75, Items.plastanium, 30));
+            requirements(Category.effect, with(Items.lead, 210, Items.titanium, 75, Items.silicon, 75, Items.plastanium, 35));
             consumePower(3.50f);
             size = 2;
             consumeItem(Items.phaseFabric).boost();
         }};
 
         overdriveDome = new OverdriveProjector("overdrive-dome"){{
-            requirements(Category.effect, with(Items.lead, 200, Items.titanium, 130, Items.silicon, 130, Items.plastanium, 80, Items.surgeAlloy, 120));
+            requirements(Category.effect, with(Items.lead, 720, Items.titanium, 210, Items.silicon, 150, Items.plastanium, 210, Items.surgeAlloy, 175));
             consumePower(10f);
             size = 3;
             range = 200f;
