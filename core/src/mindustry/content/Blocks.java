@@ -3724,7 +3724,7 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.copperAmmoBack;
                     frontColor = Pal.copperAmmoFront;
                 }},
-                Items.graphite, new BasicBulletType(3.5f, 27){{
+                Items.graphite, new BasicBulletType(3.5f, 25){{
                     width = 9f;
                     height = 12f;
                     ammoMultiplier = 4;
@@ -3760,7 +3760,7 @@ public class Blocks{
                     makeFire = true;
                     lifetime = 60f;
                 }},
-                Items.silicon, new BasicBulletType(3f, 21, "bullet"){{
+                Items.silicon, new BasicBulletType(3f, 18, "bullet"){{
                     width = 8f;
                     height = 10f;
                     homingPower = 0.2f;
@@ -3776,7 +3776,7 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.siliconAmmoBack;
                     frontColor = Pal.siliconAmmoFront;
                 }},
-                Items.thorium, new BasicBulletType(4f, 31, "bullet"){{
+                Items.thorium, new BasicBulletType(4f, 27, "bullet"){{
                     width = 8f;
                     height = 13f;
                     shootEffect = Fx.shootBig;
