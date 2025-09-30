@@ -1927,7 +1927,7 @@ public class Blocks{
         }};
 
         overdriveDome = new OverdriveProjector("overdrive-dome"){{
-            requirements(Category.effect, with(Items.lead, 720, Items.titanium, 210, Items.silicon, 180, Items.plastanium, 135, Items.surgeAlloy, 175));
+            requirements(Category.effect, with(Items.lead, 720, Items.titanium, 210, Items.silicon, 270, Items.plastanium, 175, Items.surgeAlloy, 375));
             consumePower(25f);
             size = 3;
             range = 200f;
@@ -3724,7 +3724,7 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.copperAmmoBack;
                     frontColor = Pal.copperAmmoFront;
                 }},
-                Items.graphite, new BasicBulletType(3.5f, 23){{
+                Items.graphite, new BasicBulletType(3.5f, 27){{
                     width = 9f;
                     height = 12f;
                     ammoMultiplier = 4;
@@ -3739,7 +3739,7 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.graphiteAmmoBack;
                     frontColor = Pal.graphiteAmmoFront;
                 }},
-                Items.pyratite, new BasicBulletType(3.2f, 27){{
+                Items.pyratite, new BasicBulletType(3.2f, 23){{
                     width = 10f;
                     height = 12f;
                     frontColor = hitColor = Pal.lightishOrange;
@@ -3748,6 +3748,9 @@ public class Blocks{
                     hitEffect = new MultiEffect(Fx.hitBulletColor, Fx.fireHit);
 
                     ammoMultiplier = 5;
+
+                    pierceCap = 2;
+                    pierceBuilding = false;
 
                     knockback = 0.7f;
                     
@@ -3780,6 +3783,9 @@ public class Blocks{
                     smokeEffect = Fx.shootBigSmoke;
                     ammoMultiplier = 4;
                     lifetime = 60f;
+
+                    pierceCap = 2;
+                    pierceBuilding = false;
 
                     reloadMultiplier = 0.7f;
                     knockback = 1.5f;
