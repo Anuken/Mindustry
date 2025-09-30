@@ -1119,10 +1119,10 @@ public class UnitTypes{
             speed = 0.72f;
             accel = 0.04f;
             drag = 0.04f;
-            rotateSpeed = 3.2f;
+            rotateSpeed = 2.5f;
             flying = true;
             lowAltitude = true;
-            health = 8300;
+            health = 8100;
             armor = 8f;
             engineOffset = 21;
             engineSize = 5.3f;
@@ -1194,7 +1194,7 @@ public class UnitTypes{
             speed = 0.66f;
             accel = 0.04f;
             drag = 0.04f;
-            rotateSpeed = 2.7f;
+            rotateSpeed = 2.3f;
             flying = true;
             lowAltitude = true;
             health = 23000;
