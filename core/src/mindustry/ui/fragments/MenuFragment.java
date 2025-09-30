@@ -79,6 +79,10 @@ public class MenuFragment{
                 if(Core.scene.marginRight > 0){
                     paneLeft.draw(x + w - Core.scene.marginRight, y, Core.scene.marginRight, h);
                 }
+
+                if(Core.scene.marginBottom > 0){
+                    Tex.paneTop.draw(Core.scene.marginLeft, 0, Core.graphics.getWidth() - Core.scene.marginRight, Core.scene.marginBottom);
+                }
             });
 
             parent.fill(c -> c.bottom().left().button("", new TextButtonStyle(){{
@@ -86,12 +90,6 @@ public class MenuFragment{
                 fontColor = Color.white;
                 up = infoBanner;
             }}, ui.about::show).size(84, 45).name("info"));
-
-            parent.fill((x, y, w, h) -> {
-                if(Core.scene.marginBottom > 0){
-                    Tex.paneTop.draw(0, 0, Core.graphics.getWidth(), Core.scene.marginBottom);
-                }
-            });
         }else if(becontrol.active()){
             parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();
