@@ -81,7 +81,7 @@ public class MenuFragment{
                 }
 
                 if(Core.scene.marginBottom > 0){
-                    Tex.paneTop.draw(Core.scene.marginLeft, 0, Core.graphics.getWidth() - Core.scene.marginRight, Core.scene.marginBottom);
+                    Tex.paneTop.draw(Core.scene.marginLeft, 0, Core.graphics.getWidth() - Core.scene.marginRight - Core.scene.marginLeft, Core.scene.marginBottom);
                 }
             });
 
