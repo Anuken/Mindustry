@@ -3711,7 +3711,7 @@ public class Blocks{
         }};
 
         salvo = new ItemTurret("salvo"){{
-            requirements(Category.turret, with(Items.copper, 120, Items.graphite, 50, Items.titanium, 35));
+            requirements(Category.turret, with(Items.copper, 125, Items.graphite, 70, Items.titanium, 50));
             ammo(
                 Items.copper,  new BasicBulletType(2.5f, 13){{
                     width = 7f;
@@ -3739,7 +3739,7 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.graphiteAmmoBack;
                     frontColor = Pal.graphiteAmmoFront;
                 }},
-                Items.pyratite, new BasicBulletType(3.2f, 23){{
+                Items.pyratite, new BasicBulletType(3.2f, 22){{
                     width = 10f;
                     height = 12f;
                     frontColor = hitColor = Pal.lightishOrange;
@@ -3754,7 +3754,7 @@ public class Blocks{
 
                     knockback = 0.7f;
                     
-                    splashDamage = 13f;
+                    splashDamage = 15f;
                     splashDamageRadius = 23f;
 
                     makeFire = true;
