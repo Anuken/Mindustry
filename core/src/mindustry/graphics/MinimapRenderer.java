@@ -336,7 +336,7 @@ public class MinimapRenderer{
         updatePixel(tile);
     }
 
-    void updatePixel(Tile tile){
+    public void updatePixel(Tile tile){
         updates.add(tile.pos());
     }
 
