@@ -2254,7 +2254,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Point2 next = i == points.size - 1 ? null : points.get(i + 1);
             line.x = point.x;
             line.y = point.y;
-            if(!overrideLineRotation || diagonal){
+            if((!overrideLineRotation || diagonal) && !(block != null && block.ignoreLineRotation)){
                 int result = baseRotation;
                 if(next != null){
                     result = Tile.relativeTo(point.x, point.y, next.x, next.y);
