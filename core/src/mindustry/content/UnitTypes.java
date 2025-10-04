@@ -440,12 +440,12 @@ public class UnitTypes{
                 shake = 2f;
                 shootY = 4f;
                 x = 6.5f;
-                reload = 37f;
+                reload = 55f;
                 recoil = 4f;
                 shootSound = Sounds.laser;
 
                 bullet = new LaserBulletType(){{
-                    damage = 45f;
+                    damage = 52f;
                     recoil = 0f;
                     sideAngle = 45f;
                     sideWidth = 1f;
@@ -742,7 +742,7 @@ public class UnitTypes{
             }});
 
             weapons.add(new Weapon("mount-purple-weapon"){{
-                reload = 15f;
+                reload = 18f;
                 rotate = true;
                 x = 4f;
                 y = 3f;
