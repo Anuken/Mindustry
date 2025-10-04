@@ -502,10 +502,7 @@ public class Control implements ApplicationListener, Loadable{
                                 }
                             });
 
-                            Core.app.post(() -> {
-                                //blocks placed after WorldLoadEvent didn't queue an update, so fix that.
-                                renderer.minimap.updateAll();
-                            });
+                            Core.app.post(renderer.minimap::updateAll);
                         }
                     }else{
                         state.set(State.playing);
