@@ -59,6 +59,8 @@ public class SectorInfo{
     public boolean attack = false;
     /** Whether this sector has any enemy spawns. */
     public boolean hasSpawns = true;
+    /** How many times the player has tried to land at this sector with a fresh core. */
+    public int attempts;
     /** Wave # from state */
     public int wave = 1, winWave = -1;
     /** Waves this sector can survive if under attack. Based on wave in info. <0 means uncalculated. */

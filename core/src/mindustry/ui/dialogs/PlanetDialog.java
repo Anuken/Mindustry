@@ -1036,6 +1036,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             c.add(Core.bundle.get("sectors.time") + " [accent]" + sector.save.getPlayTime()).left().row();
 
+            if(sector.info.attempts > 0){
+                c.add(Core.bundle.get("sectors.attempts") + " [accent]" + sector.info.attempts).left().row();
+            }
+
             if(sector.info.waves && sector.hasBase()){
                 c.add(Core.bundle.get("sectors.wave") + " [accent]" + (sector.info.wave + sector.info.wavesPassed)).left().row();
             }
