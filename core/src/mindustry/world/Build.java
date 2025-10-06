@@ -97,6 +97,7 @@ public class Build{
             tile.build.enabled = true;
             if(tile.build.power != null){
                 tile.build.power.links.clear();
+                tile.build.powerGraphRemoved();
             }
             tile.build.checkAllowUpdate();
             tile.build.updateProximity();
