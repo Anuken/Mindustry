@@ -95,6 +95,9 @@ public class Build{
             tile.build.rotation = rotation;
             tile.build.changeTeam(team);
             tile.build.enabled = true;
+            if(tile.build.power != null){
+                tile.build.power.links.clear();
+            }
             tile.build.checkAllowUpdate();
             tile.build.updateProximity();
             tile.build.onRepaired();
