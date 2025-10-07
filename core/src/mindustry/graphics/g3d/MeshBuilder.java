@@ -275,8 +275,8 @@ public class MeshBuilder{
             if(floats.length > 5) floats[5] = emissive;
         }else{
             floats[3] = normal.x;
-            floats[4] = normal.x;
-            floats[5] = normal.x;
+            floats[4] = normal.y;
+            floats[5] = normal.z;
 
             floats[6] = color;
             if(floats.length > 7) floats[7] = emissive;
