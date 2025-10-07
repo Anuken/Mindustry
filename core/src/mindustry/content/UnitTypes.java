@@ -700,7 +700,7 @@ public class UnitTypes{
         }};
 
         spiroct = new UnitType("spiroct"){{
-            speed = 0.9f;
+            speed = 0.856f;
             drag = 0.4f;
             hitSize = 15f;
             rotateSpeed = 7f;
