@@ -774,8 +774,7 @@ public class PlacementFragment{
                 return nextFlowBuild = hoverTile.build;
             }
 
-            //if the tile has a drop, display the drop
-            if((hoverTile.drop() != null && hoverTile.block() == Blocks.air) || hoverTile.wallDrop() != null || hoverTile.floor().liquidDrop != null){
+            if(hoverTile.displayable()){
                 return hoverTile;
             }
         }

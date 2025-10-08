@@ -697,6 +697,12 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     @Override
+    public boolean displayable(){
+        //if the tile has a drop, display the drop
+        return (drop() != null && block == Blocks.air) || wallDrop() != null || floor.liquidDrop != null;
+    }
+
+    @Override
     public void display(Table table){
 
         Block toDisplay =
