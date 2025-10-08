@@ -1689,7 +1689,7 @@ public class LExecutor{
                 return;
             }
 
-            String text = exec.textBuffer.toString();
+            String text = UI.formatIcons(exec.textBuffer.toString());
             if(text.startsWith("@")){
                 String substr = text.substring(1);
                 if(Core.bundle.has(substr)){
