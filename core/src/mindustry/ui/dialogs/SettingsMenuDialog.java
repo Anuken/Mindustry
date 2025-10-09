@@ -412,6 +412,13 @@ public class SettingsMenuDialog extends BaseDialog{
             return s + "%";
         });
 
+        if(ios){
+            graphics.checkPref("iosuncapfps", false, b -> Core.graphics.setPreferredFPS(b ? 0 : 60));
+            if(Core.settings.getBool("iosuncapfps")){
+                Core.graphics.setPreferredFPS(0);
+            }
+        }
+
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
