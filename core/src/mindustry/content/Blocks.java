@@ -1927,7 +1927,7 @@ public class Blocks{
         }};
 
         overdriveDome = new OverdriveProjector("overdrive-dome"){{
-            requirements(Category.effect, with(Items.lead, 720, Items.titanium, 210, Items.silicon, 270, Items.plastanium, 175, Items.surgeAlloy, 375));
+            requirements(Category.effect, with(Items.lead, 720, Items.titanium, 210, Items.silicon, 170, Items.plastanium, 175, Items.surgeAlloy, 275));
             consumePower(25f);
             size = 3;
             range = 200f;
@@ -3479,7 +3479,7 @@ public class Blocks{
                     lifetime = 80f;
                     width = height = 14f;
                     collidesTiles = false;
-                    splashDamageRadius = 32f * 0.75f;
+                    splashDamageRadius = 28f * 0.75f;
                     splashDamage = 45f;
                     status = StatusEffects.burning;
                     statusDuration = 60f * 12f;
@@ -4312,7 +4312,7 @@ public class Blocks{
             loopSoundVolume = 2f;
             envEnabled |= Env.space;
 
-            shootType = new ContinuousLaserBulletType(180){{
+            shootType = new ContinuousLaserBulletType(130){{
                 length = 200f;
                 hitEffect = Fx.hitMeltdown;
                 hitColor = Pal.meltdownHit;
@@ -6213,10 +6213,10 @@ public class Blocks{
         }};
 
         navalFactory = new UnitFactory("naval-factory"){{
-            requirements(Category.units, with(Items.copper, 120, Items.lead, 130, Items.metaglass, 120));
+            requirements(Category.units, with(Items.copper, 150, Items.lead, 130, Items.metaglass, 120));
             plans = Seq.with(
                 new UnitPlan(UnitTypes.risso, 60f * 45f, with(Items.silicon, 20, Items.metaglass, 35)),
-                new UnitPlan(UnitTypes.retusa, 60f * 35f, with(Items.silicon, 15, Items.titanium, 75))
+                new UnitPlan(UnitTypes.retusa, 60f * 35f, with(Items.silicon, 15, Items.metaglass, 25, Items.titanium, 20))
             );
             size = 3;
             consumePower(1.2f);
