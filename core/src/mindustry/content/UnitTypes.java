@@ -864,13 +864,13 @@ public class UnitTypes{
 
         toxopid = new UnitType("toxopid"){{
             drag = 0.1f;
-            speed = 0.84f;
+            speed = 0.68f;
             hitSize = 26f;
             health = 19000;
-            armor = 17f;
+            armor = 18f;
             lightRadius = 140f;
 
-            rotateSpeed = 1.9f;
+            rotateSpeed = 1.8f;
 
             legCount = 8;
             legMoveSpace = 0.8f;
