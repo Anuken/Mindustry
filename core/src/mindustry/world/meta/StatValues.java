@@ -704,6 +704,16 @@ public class StatValues{
                         sep(bt, "@bullet.armorpierce");
                     }
 
+                    if(type.armorMultiplier != 1f){
+                        if(type.armorMultiplier > 1f){
+                            sep(bt,  Core.bundle.format("bullet.armorweakness", (int)(type.armorMultiplier * 100)));
+                        }else if(type.armorMultiplier > 0){
+                            sep(bt,  Core.bundle.format("bullet.armorpiercing", (int)((1 - type.armorMultiplier) * 100)));
+                        }else{
+                            sep(bt,  Core.bundle.format("bullet.antiarmor", (-type.armorMultiplier)));
+                        }
+                    }
+
                     if(type.maxDamageFraction > 0){
                         sep(bt, Core.bundle.format("bullet.maxdamagefraction", (int)(type.maxDamageFraction * 100)));
                     }

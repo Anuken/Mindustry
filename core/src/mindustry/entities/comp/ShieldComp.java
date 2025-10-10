@@ -42,6 +42,18 @@ abstract class ShieldComp implements Healthc, Posc{
         }
     }
 
+    @Replace
+    @Override
+    public void damageArmorMult(float amount, float armorMult, boolean withEffect){
+        float pre = hitTime;
+
+        rawDamage(Damage.applyArmor(amount, armorOverride >= 0f ? armorOverride * armorMult : armor * armorMult) / healthMultiplier / Vars.state.rules.unitHealth(team));
+
+        if(!withEffect){
+            hitTime = pre;
+        }
+    }
+
     protected void rawDamage(float amount){
         boolean hadShields = shield > 0.0001f;
 
