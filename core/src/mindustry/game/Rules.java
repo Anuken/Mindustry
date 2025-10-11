@@ -120,6 +120,8 @@ public class Rules{
     public boolean onlyDepositCore = false;
     /** Cooldown, in seconds, of item depositing for players. */
     public float itemDepositCooldown = 0.5f;
+    /** If true, certain turrets add aditional cooldown similar to itemDepositCooldown. */
+    public boolean enableTurretDepositCooldown = false;
     /** If true, every enemy block in the radius of the (enemy) core is destroyed upon death. Used for campaign maps. */
     public boolean coreDestroyClear = false;
     /** If true, banned blocks are hidden from the build menu. */

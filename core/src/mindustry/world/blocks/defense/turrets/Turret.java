@@ -73,6 +73,8 @@ public class Turret extends ReloadTurret{
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
     public float minWarmup = 0f;
+    /** Cooldown, in seconds, applied to player item depositing when any item is deposited to this turret. Added to the itemDepositCooldown.*/
+    public float depositCooldown = 0f;
     /** If true, this turret will accurately target moving targets with respect to shoot.firstShotDelay. */
     public boolean accurateDelay = true;
     /** If false, this turret can't move while charging. */
@@ -275,6 +277,8 @@ public class Turret extends ReloadTurret{
         public @Nullable float[] curRecoils;
         public float shootWarmup, charge, warmupHold = 0f;
         public int totalShots, barrelCounter;
+        public float excessReload = 0;
+        public int reloadShots = 0;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
@@ -416,7 +420,7 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isActive(){
-            return (target != null || wasShooting) && enabled;
+            return (target != null || wasShooting) && enabled && activationTimer <= 0;
         }
 
         public void targetPosition(Posc pos){
@@ -512,6 +516,7 @@ public class Turret extends ReloadTurret{
             if(reloadWhileCharging || !charging()){
                 updateReload();
                 updateCooling();
+                capReload();
             }
 
             if(state.rules.fog){
@@ -520,6 +525,11 @@ public class Turret extends ReloadTurret{
                     lastRangeChange = newRange;
                     fogControl.forceUpdate(team, this);
                 }
+            }
+
+            if(activationTimer > 0){
+                activationTimer -= Time.delta;
+                return;
             }
 
             if(hasAmmo()){
@@ -662,11 +672,25 @@ public class Turret extends ReloadTurret{
             return queuedBullets > 0 && shoot.firstShotDelay > 0;
         }
 
-        protected void updateReload(){
-            reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
+        @Override
+        protected boolean canReload(){
+            return reloadShots < 1;
+        }
 
+        protected void updateReload(){
+            if(!canReload()) return;
+            reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
+        }
+
+        protected void capReload(){
             //cap reload for visual reasons
-            reloadCounter = Math.min(reloadCounter, reload);
+            if(canReload() && reloadCounter >= reload){
+                reloadShots++;
+                excessReload += reloadCounter - reload;
+                reloadCounter = reload;
+            }else{
+                excessReload = 0;
+            }
         }
 
         @Override
@@ -676,12 +700,15 @@ public class Turret extends ReloadTurret{
 
         protected void updateShooting(){
 
-            if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
+            if(!canReload() && !charging() && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
                 shoot(type);
 
+                reloadCounter += excessReload;
                 reloadCounter %= reload;
+                excessReload = 0;
+                reloadShots--;
             }
         }
 
@@ -776,6 +803,7 @@ public class Turret extends ReloadTurret{
             super.write(write);
             write.f(reloadCounter);
             write.f(rotation);
+            write.f(activationTimer);
         }
 
         @Override
@@ -786,11 +814,14 @@ public class Turret extends ReloadTurret{
                 reloadCounter = read.f();
                 rotation = read.f();
             }
+            if(revision >= 4){
+                activationTimer = read.f();
+            }
         }
 
         @Override
         public byte version(){
-            return 1;
+            return 4;
         }
 
         @Override
