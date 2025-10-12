@@ -102,7 +102,7 @@ public class UnitTypes{
             speed = 0.64f;
             hitSize = 8f;
             rotateSpeed = 7f;
-            health = 110;
+            health = 120;
             armor = 2f;
             weapons.add(new Weapon("large-weapon"){{
                 reload = 20f;
@@ -700,7 +700,7 @@ public class UnitTypes{
         }};
 
         spiroct = new UnitType("spiroct"){{
-            speed = 0.856f;
+            speed = 0.828f;
             drag = 0.4f;
             hitSize = 15f;
             rotateSpeed = 7f;
@@ -711,7 +711,7 @@ public class UnitTypes{
             legMoveSpace = 1.4f;
             legBaseOffset = 2f;
             hovering = true;
-            armor = 9f;
+            armor = 5f;
             ammoType = new PowerAmmoType(1000);
 
             shadowElevation = 0.3f;
@@ -1024,7 +1024,7 @@ public class UnitTypes{
         }};
 
         horizon = new UnitType("horizon"){{
-            health = 210;
+            health = 230;
             rotateSpeed = 7f;
             speed = 2.2f;
             accel = 0.08f;
@@ -1197,7 +1197,7 @@ public class UnitTypes{
             rotateSpeed = 2.3f;
             flying = true;
             lowAltitude = true;
-            health = 23000;
+            health = 22000;
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
