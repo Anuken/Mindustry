@@ -502,8 +502,10 @@ public class Control implements ApplicationListener, Loadable{
                                 }
                             });
 
-                            //blocks placed after WorldLoadEvent didn't queue an update, so fix that.
-                            renderer.minimap.updateAll();
+                            Core.app.post(() -> {
+                                //blocks placed after WorldLoadEvent didn't queue an update, so fix that.
+                                renderer.minimap.updateAll();
+                            });
                         }
                     }else{
                         state.set(State.playing);
@@ -534,6 +536,7 @@ public class Control implements ApplicationListener, Loadable{
         state.rules.sector = sector;
         sector.info.origin = origin;
         sector.info.destination = origin;
+        sector.info.attempts ++;
 
         if(beforePlay != null){
             beforePlay.run();

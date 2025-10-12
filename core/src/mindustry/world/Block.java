@@ -118,6 +118,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float visualRotationOffset = 0f;
     /** if rotate = false and this is true, rotation will be locked at 0 when placing (default); advanced use only */
     public boolean lockRotation = true;
+    /** if true, this block won't face the line drag direction */
+    public boolean ignoreLineRotation = false;
     /** if true, schematic flips with this block are inverted. */
     public boolean invertFlip = false;
     /** number of different variant regions to use */
