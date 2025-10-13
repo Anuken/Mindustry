@@ -284,7 +284,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
             }
 
             for(var other : children){
-                if(other instanceof ObjectiveTile tile && tile != ignore && Tmp.r2.set(tile.tx, tile.ty, objWidth, objHeight).overlaps(Tmp.r1)){
+                if(other instanceof ObjectiveTile tile && tile != ignore && Tmp.r2.set(tile.obj.editorX, tile.obj.editorY, objWidth, objHeight).overlaps(Tmp.r1)){
                     return false;
                 }
             }
@@ -340,7 +340,6 @@ public class MapObjectivesCanvas extends WidgetGroup{
 
         public class ObjectiveTile extends Table{
             public final MapObjective obj;
-            public int tx, ty;
 
             public final Mover mover;
             public final Connector conParent, conChildren;
@@ -392,8 +391,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
             }
 
             public void pos(int x, int y){
-                tx = obj.editorX = x;
-                ty = obj.editorY = y;
+                obj.editorX = x;
+                obj.editorY = y;
                 this.x = x * unitSize;
                 this.y = y * unitSize;
             }
@@ -439,8 +438,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
                     moving = ObjectiveTile.this;
                     moving.toFront();
 
-                    prevX = moving.tx;
-                    prevY = moving.ty;
+                    prevX = moving.obj.editorX;
+                    prevY = moving.obj.editorY;
 
                     // Convert to world pos first because the button gets dragged too.
                     Vec2 pos = event.listenerActor.localToStageCoordinates(Tmp.v1.set(x, y));
