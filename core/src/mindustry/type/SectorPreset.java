@@ -70,9 +70,13 @@ public class SectorPreset extends UnlockableContent{
             sector = data.presets.get(name, sector);
         }
         sector %= planet.sectors.size;
-        this.sector = planet.sectors.get(sector);
+        this.sector = planet.sectors.get(sector == -1 ? 0 : sector);
 
-        planet.preset(sector, this);
+        if(sector != -1){
+            planet.preset(sector, this);
+        }else{
+            Log.warn("Preset '@' doesn't have a sector assigned.", name);
+        }
     }
 
     @Override

@@ -281,7 +281,7 @@ public class Weather extends UnlockableContent{
 
     public static class WeatherEntry{
         /** The type of weather used. */
-        public Weather weather;
+        public Weather weather = Weathers.rain;
         /** Minimum and maximum spacing between weather events. Does not include the time of the event itself. */
         public float minFrequency, maxFrequency, minDuration, maxDuration;
         /** Cooldown time before the next weather event takes place This is *state*, not configuration. */

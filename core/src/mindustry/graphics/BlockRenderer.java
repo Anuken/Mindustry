@@ -154,6 +154,26 @@ public class BlockRenderer{
         updateDarkness();
     }
 
+    public void updateShadows(boolean ignoreBuildings, boolean ignoreTerrain){
+        shadows.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
+        shadows.resize(world.width(), world.height());
+        shadows.begin();
+        Core.graphics.clear(Color.white);
+        Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
+
+        Draw.color(blendShadowColor);
+
+        for(Tile tile : world.tiles){
+            if(tile.block().displayShadow(tile) && (tile.build == null || tile.build.wasVisible) && !(ignoreBuildings && !tile.block().isStatic()) && !(ignoreTerrain && tile.block().isStatic())){
+                Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+            }
+        }
+
+        Draw.flush();
+        Draw.color();
+        shadows.end();
+    }
+
     public void updateDarkness(){
         darkEvents.clear();
         dark.getTexture().setFilter(TextureFilter.linear);
@@ -237,6 +257,7 @@ public class BlockRenderer{
                 if(other != null){
                     darkEvents.add(other.pos());
                     floor.recacheTile(other);
+                    renderer.minimap.updatePixel(other);
                 }
             }
         }
@@ -290,19 +311,23 @@ public class BlockRenderer{
         }
 
         if(brokenFade > 0.001f){
-            for(BlockPlan block : player.team().data().plans){
-                Block b = block.block;
-                if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset, block.y * tilesize + b.offset))) continue;
+            for(BlockPlan plan : player.team().data().plans){
+                Block b = plan.block;
+                if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(plan.x * tilesize + b.offset, plan.y * tilesize + b.offset))) continue;
 
                 Draw.alpha(0.33f * brokenFade);
                 Draw.mixcol(Color.white, 0.2f + Mathf.absin(Time.globalTime, 6f, 0.2f));
-                Draw.rect(b.fullIcon, block.x * tilesize + b.offset, block.y * tilesize + b.offset, b.rotate ? block.rotation * 90 : 0f);
+                Draw.rect(b.fullIcon, plan.x * tilesize + b.offset, plan.y * tilesize + b.offset, b.rotate ? plan.rotation * 90 + plan.block.visualRotationOffset : 0f);
             }
             Draw.reset();
         }
     }
 
     public void processShadows(){
+        processShadows(false, false);
+    }
+
+    public void processShadows(boolean ignoreBuildings, boolean ignoreTerrain){
         if(!shadowEvents.isEmpty()){
             Draw.flush();
 
@@ -312,7 +337,7 @@ public class BlockRenderer{
             for(Tile tile : shadowEvents){
                 if(tile == null) continue;
                 //draw white/shadow color depending on blend
-                Draw.color((!tile.block().displayShadow(tile) || (state.rules.fog && tile.build != null && !tile.build.wasVisible)) ? Color.white : blendShadowColor);
+                Draw.color((!tile.block().displayShadow(tile) || (state.rules.fog && tile.build != null && !tile.build.wasVisible) || (ignoreBuildings && !tile.block().isStatic()) || (ignoreTerrain && tile.block().isStatic())) ? Color.white : blendShadowColor);
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
             }
 

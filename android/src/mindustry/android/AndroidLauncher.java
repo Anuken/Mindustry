@@ -160,7 +160,7 @@ public class AndroidLauncher extends AndroidApplication{
                                     @Override
                                     public OutputStream write(boolean append){
                                         try{
-                                            return getContentResolver().openOutputStream(uri);
+                                            return getContentResolver().openOutputStream(uri, "rwt");
                                         }catch(IOException e){
                                             throw new ArcRuntimeException(e);
                                         }

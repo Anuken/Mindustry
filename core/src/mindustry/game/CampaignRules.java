@@ -12,6 +12,7 @@ public class CampaignRules{
     public boolean randomWaveAI;
     public boolean legacyLaunchPads;
     public boolean rtsAI;
+    public boolean clearSectorOnLose;
 
     public void apply(Planet planet, Rules rules){
         rules.staticFog = rules.fog = fog;

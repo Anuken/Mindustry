@@ -601,6 +601,10 @@ public class UI implements ApplicationListener, Loadable{
         t.update(() -> {
             t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center);
             t.toFront();
+
+            if(state.isMenu() || !ui.hudfrag.shown){
+                t.remove();
+            }
         });
         t.actions(Actions.fadeOut(duration, Interp.pow4In), Actions.remove());
         t.pack();

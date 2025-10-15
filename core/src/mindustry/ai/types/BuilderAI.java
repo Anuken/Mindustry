@@ -224,6 +224,11 @@ public class BuilderAI extends AIController{
     }
 
     @Override
+    public boolean shouldFire(){
+        return !(unit.controller() instanceof CommandAI ai) || ai.shouldFire();
+    }
+
+    @Override
     public boolean shouldShoot(){
         return !unit.isBuilding() && unit.type.canAttack;
     }

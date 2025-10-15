@@ -31,7 +31,8 @@ public enum BlockFlag{
     unitAssembler,
     hasFogRadius,
     steamVent,
-    blockRepair;
+    blockRepair,
+    synced;
 
     public final static BlockFlag[] all = values();
 

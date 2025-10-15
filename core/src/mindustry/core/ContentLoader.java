@@ -212,6 +212,7 @@ public class ContentLoader{
     }
 
     public <T extends MappableContent> T getByName(ContentType type, String name){
+        if(name == null) return null;
         var map = contentNameMap[type.ordinal()];
 
         if(map == null) return null;

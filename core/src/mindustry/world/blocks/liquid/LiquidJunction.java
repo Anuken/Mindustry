@@ -10,6 +10,7 @@ public class LiquidJunction extends LiquidBlock{
 
     public LiquidJunction(String name){
         super(name);
+        floating = true;
     }
 
     @Override

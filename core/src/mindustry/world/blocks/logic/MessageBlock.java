@@ -168,7 +168,7 @@ public class MessageBlock extends Block{
 
         @Override
         public boolean readable(LExecutor exec){
-            return true;
+            return isValid();
         }
 
         @Override

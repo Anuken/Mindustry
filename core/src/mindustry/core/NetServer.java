@@ -23,6 +23,7 @@ import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.net.*;
@@ -115,6 +116,7 @@ public class NetServer implements ApplicationListener{
     private ReusableByteOutStream syncStream = new ReusableByteOutStream();
     /** Data stream for writing player sync data to. */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
+    private Writes dataStreamWrites = new Writes(dataStream);
     /** Packet handlers for custom types of messages. */
     private ObjectMap<String, Seq<Cons2<Player, String>>> customPacketHandlers = new ObjectMap<>();
     /** Packet handlers for custom types of messages - binary version. */
@@ -931,19 +933,20 @@ public class NetServer implements ApplicationListener{
         syncStream.reset();
 
         short sent = 0;
-        for(Building entity : Groups.build){
-            if(!entity.block.sync) continue;
-            sent++;
+        for(var team : state.teams.present){
+            for(var build : indexer.getFlagged(team.team, BlockFlag.synced)){
+                sent++;
 
-            dataStream.writeInt(entity.pos());
-            dataStream.writeShort(entity.block.id);
-            entity.writeSync(Writes.get(dataStream));
+                dataStream.writeInt(build.pos());
+                dataStream.writeShort(build.block.id);
+                build.writeSync(dataStreamWrites);
 
-            if(syncStream.size() > maxSnapshotSize){
-                dataStream.close();
-                Call.blockSnapshot(sent, syncStream.toByteArray());
-                sent = 0;
-                syncStream.reset();
+                if(syncStream.size() > maxSnapshotSize){
+                    dataStream.close();
+                    Call.blockSnapshot(sent, syncStream.toByteArray());
+                    sent = 0;
+                    syncStream.reset();
+                }
             }
         }
 
@@ -991,7 +994,7 @@ public class NetServer implements ApplicationListener{
             dataStream.writeInt(entity.id()); //write id
             dataStream.writeByte(entity.classId() & 0xFF); //write type ID
             entity.beforeWrite();
-            entity.writeSync(Writes.get(dataStream)); //write entity
+            entity.writeSync(dataStreamWrites); //write entity itself
 
             sent++;
 

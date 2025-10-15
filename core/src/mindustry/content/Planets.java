@@ -66,11 +66,7 @@ public class Planets{
             defaultCore = Blocks.coreBastion;
             iconColor = Color.valueOf("ff9266");
             enemyBuildSpeedMultiplier = 0.4f;
-
-            //TODO disallowed for now
             allowLaunchToNumbered = false;
-
-            //TODO SHOULD there be lighting?
             updateLighting = false;
 
             defaultAttributes.set(Attribute.heat, 0.8f);

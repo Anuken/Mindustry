@@ -30,8 +30,8 @@ task deploy(type: Copy){
 
 android{
     namespace = "io.anuke.mindustry"
-    buildToolsVersion = '34.0.0'
-    compileSdk = 34
+    buildToolsVersion = '36.0.0'
+    compileSdk = 36
     sourceSets{
         main{
             manifest.srcFile 'AndroidManifest.xml'
@@ -57,8 +57,8 @@ android{
 
         applicationId "io.anuke.mindustry"
         minSdkVersion 14
-        targetSdkVersion 34
-        
+        targetSdkVersion 36
+
         versionName versionNameResult
         versionCode = vcode
 

@@ -259,19 +259,19 @@ public class World{
     }
 
     public void loadSector(Sector sector){
-        loadSector(sector, 0, true);
+        loadSector(sector, new WorldParams());
     }
 
-    public void loadSector(Sector sector, int seedOffset, boolean saveInfo){
-        setSectorRules(sector, saveInfo);
+    public void loadSector(Sector sector, WorldParams params){
+        setSectorRules(sector, params.saveInfo);
 
         int size = sector.getSize();
         loadGenerator(size, size, tiles -> {
             if(sector.preset != null){
-                sector.preset.generator.generate(tiles);
+                sector.preset.generator.generate(tiles, params);
                 sector.preset.rules.get(state.rules); //apply extra rules
             }else if(sector.planet.generator != null){
-                sector.planet.generator.generate(tiles, sector, seedOffset);
+                sector.planet.generator.generate(tiles, sector, params);
             }else{
                 throw new RuntimeException("Sector " + sector.id + " on planet " + sector.planet.name + " has no generator or preset defined. Provide a planet generator or preset map.");
             }
@@ -279,7 +279,7 @@ public class World{
             state.rules.sector = sector;
         });
 
-        if(saveInfo && state.rules.waves){
+        if(params.saveInfo && state.rules.waves){
             sector.info.waves = state.rules.waves;
         }
 
@@ -289,7 +289,7 @@ public class World{
         }
 
         //reset rules
-        setSectorRules(sector, saveInfo);
+        setSectorRules(sector, params.saveInfo);
 
         if(state.rules.defaultTeam.core() != null){
             sector.info.spawnPosition = state.rules.defaultTeam.core().pos();

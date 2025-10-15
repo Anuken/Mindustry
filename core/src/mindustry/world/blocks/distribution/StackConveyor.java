@@ -133,7 +133,7 @@ public class StackConveyor extends Block implements Autotiler{
             //draw inputs
             if(state == stateLoad){
                 for(int i = 0; i < 4; i++){
-                    int dir = rotation - i;
+                    int dir = Mathf.mod(rotation - i, 4);
                     var near = nearby(dir);
                     if((blendprox & (1 << i)) != 0 && i != 0 && near != null && !near.block.squareSprite){
                         Draw.rect(sliced(regions[0], SliceMode.bottom), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, (float)(dir*90));
@@ -193,7 +193,12 @@ public class StackConveyor extends Block implements Autotiler{
         public void dropped(){
             super.dropped();
             var prev = Geometry.d4[(rotation + 2) % 4];
-            link = Point2.pack(tile.x + prev.x, tile.y + prev.y);
+            if(items.any()){
+                link = Point2.pack(tile.x + prev.x, tile.y + prev.y);
+                cooldown = 0f;
+            }else{
+                link = -1;
+            }
         }
 
         @Override
@@ -201,7 +206,7 @@ public class StackConveyor extends Block implements Autotiler{
             Draw.z(Layer.block - 0.15f);
             super.drawCracks();
         }
-        
+
         @Override
         public void payloadDraw(){
             Draw.rect(block.fullIcon, x, y);
@@ -293,19 +298,16 @@ public class StackConveyor extends Block implements Autotiler{
                 }
             }else{ //transfer
                 if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
-                    if(front() instanceof StackConveyorBuild e && e.team == team){
-                        //sleep if its occupied
-                        if(e.link == -1){
-                            e.items.add(items);
-                            e.lastItem = lastItem;
-                            e.link = tile.pos();
-                            //▲ to | from ▼
-                            link = -1;
-                            items.clear();
+                    if(front() instanceof StackConveyorBuild e && e.team == team && e.link == -1){
+                        e.items.add(items);
+                        e.lastItem = lastItem;
+                        e.link = tile.pos();
+                        //▲ to | from ▼
+                        link = -1;
+                        items.clear();
 
-                            cooldown = recharge;
-                            e.cooldown = 1;
-                        }
+                        cooldown = recharge;
+                        e.cooldown = 1;
                     }
                 }
             }

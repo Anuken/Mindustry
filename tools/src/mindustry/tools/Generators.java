@@ -89,16 +89,18 @@ public class Generators{
                             }
                         });
 
-                        if(!iconPath.exists() && v == 0){
+                        if(v == 0){
                             //save the bottom right region as the "main" sprite for previews
                             Pixmap out = new Pixmap(basePath);
                             Pixmap cropped = out.crop(32, 32, 32, 32);
-                            iconPath.writePng(cropped);
+                            if(!iconPath.exists()){
+                                iconPath.writePng(cropped);
+                            }
                             out.dispose();
                             gens.put(block, cropped);
                         }
                     }else{
-                        Log.warn("Autotile floor '@' not found: @", block.name, basePath.absolutePath());
+                        Log.warn("Autotile block '@' not found: @", block.name, basePath.absolutePath());
                     }
                 }
             }

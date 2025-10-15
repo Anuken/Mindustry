@@ -30,6 +30,7 @@ public class ImagePacker{
         ArcNativesLoader.load();
 
         fixSubdirectory("blocks/environment/character-overlay");
+        fixSubdirectory("blocks/environment/rune-overlay");
 
         Core.settings = new MockSettings();
         Log.logger = new NoopLogHandler();

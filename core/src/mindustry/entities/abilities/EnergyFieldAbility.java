@@ -144,6 +144,8 @@ public class EnergyFieldAbility extends Ability{
 
             all.sort(h -> h.dst2(rx, ry));
             int len = Math.min(all.size, maxTargets);
+            float scaledDamage = damage * state.rules.unitDamage(unit.team) * unit.damageMultiplier;
+
             for(int i = 0; i < len; i++){
                 Healthc other = all.get(i);
 
@@ -169,9 +171,9 @@ public class EnergyFieldAbility extends Ability{
                 }else{
                     anyNearby = true;
                     if(other instanceof Building b){
-                        b.damage(unit.team, damage * state.rules.unitDamage(unit.team));
+                        b.damage(unit.team, scaledDamage);
                     }else{
-                        other.damage(damage * state.rules.unitDamage(unit.team));
+                        other.damage(scaledDamage);
                     }
                     if(other instanceof Statusc s){
                         s.apply(status, statusDuration);

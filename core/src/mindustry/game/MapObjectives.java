@@ -185,7 +185,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         private transient final Seq<MapObjective> children = new Seq<>(2);
 
         /** For the objectives UI dialog. Do not modify directly! */
-        public transient int editorX = -1, editorY = -1;
+        public transient int editorX = -999, editorY = -999;
 
         /** Whether this objective has been done yet. This is internally set. */
         private boolean completed;
@@ -1196,7 +1196,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public @Vertices float[] vertices = new float[24];
         private boolean mapRegion = true;
 
-        private transient TextureRegion fetchedRegion;
+        private transient @Nullable TextureRegion fetchedRegion;
 
         public QuadMarker(){
             for(int i = 0; i < 4; i++){
@@ -1287,6 +1287,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         private void setUv(int i, double u, double v){
+            if(headless) return;
+
             if(i >= 0 && i < 4){
                 if(fetchedRegion == null) setTexture(textureName);
 

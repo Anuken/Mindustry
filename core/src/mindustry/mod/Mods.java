@@ -816,9 +816,6 @@ public class Mods implements Loadable{
     public void loadScripts(){
         if(skipModCode) return;
 
-        Time.mark();
-        boolean[] any = {false};
-
         try{
             eachEnabled(mod -> {
                 if(mod.root.child("scripts").exists()){
@@ -831,7 +828,6 @@ public class Mods implements Loadable{
                             if(scripts == null){
                                 scripts = platform.createScripts();
                             }
-                            any[0] = true;
                             scripts.run(mod, main);
                         }catch(Throwable e){
                             Core.app.post(() -> {
@@ -846,10 +842,6 @@ public class Mods implements Loadable{
             });
         }finally{
             content.setCurrentMod(null);
-        }
-
-        if(any[0]){
-            Log.info("Time to initialize modded scripts: @", Time.elapsed());
         }
     }
 

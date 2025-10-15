@@ -48,7 +48,7 @@ ext{
     mainClassName = "mindustry.ios.IOSLauncher"
 }
 
-task copyAssets(){
+tasks.register('copyAssets'){
     doLast{
         delete{
             delete "assets/"
@@ -61,17 +61,16 @@ task copyAssets(){
     }
 }
 
-task copyNatives(){
+tasks.register('copyNatives'){
     doLast{
         copy{
             from "../../Arc/natives/natives-freetype-ios/libs", "../../Arc/natives/natives-ios/libs"
             into "libs"
         }
-
     }
 }
 
-task deploy{
+tasks.register('deploy'){
     if(System.getProperty("os.name").contains("Mac")) dependsOn copyAssets
     dependsOn createIPA
 }

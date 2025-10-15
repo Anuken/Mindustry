@@ -54,12 +54,17 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         //debug GL information
         Log.info("[GL] Version: @", graphics.getGLVersion());
         Log.info("[GL] Max texture size: @", maxTextureSize);
-        Log.info("[GL] Using @ context.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
-        if(gl30 == null) Log.warn("[GL] Your device or video drivers do not support OpenGL 3. This will cause performance issues.");
-        if(NvGpuInfo.hasMemoryInfo()){
-            Log.info("[GL] Total available VRAM: @mb", NvGpuInfo.getMaxMemoryKB()/1024);
-        }
+        Log.info("[GL] Using @ API.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
+
+        if(GpuDetect.gpus.size > 0) Log.info("[GL] Detected GPU: @", GpuDetect.gpus.toString(", "));
+        if(GpuDetect.hasIntel && !graphics.isGL30Available()) Log.warn("[GL] Intel GPU detected. Due to memory corruption issues, OpenGL 3 support has been disabled for Intel GPUs. See issue #11041.");
+
+        if(gl30 == null && !GpuDetect.hasIntel) Log.warn("[GL] Your device or video drivers do not support OpenGL 3. This will cause performance issues.");
+
+        if(NvGpuInfo.hasMemoryInfo()) Log.info("[GL] Total available VRAM: @mb", NvGpuInfo.getMaxMemoryKB()/1024);
+
         if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
+
         Log.info("[JAVA] Version: @", OS.javaVersion);
         if(Core.app.isAndroid()){
             Log.info("[ANDROID] API level: @", Core.app.getVersion());
@@ -209,7 +214,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     public void update(){
         PerfCounter.update.begin();
 
-        int targetfps = Core.settings.getInt("fpscap", 120);
+        int targetfps = ios ? 0 : Core.settings.getInt("fpscap", 120);
         boolean changed = lastTargetFps != targetfps && lastTargetFps != -1;
         boolean limitFps = targetfps > 0 && targetfps <= 240;
 

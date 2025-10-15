@@ -113,7 +113,7 @@ public class FloorRenderer{
         }
         """);
 
-        Events.on(WorldLoadEvent.class, event -> clearTiles());
+        Events.on(WorldLoadEvent.class, event -> reload());
     }
 
     public IndexData getIndexData(){
@@ -162,7 +162,7 @@ public class FloorRenderer{
                 if(!Structs.inBounds(x, y, cache)) continue;
 
                 if(cache[x][y].length == 0){
-                    cacheChunk(x, y);
+                    cacheChunk(x, y, false);
                 }
 
                 ChunkMesh[] chunk = cache[x][y];
@@ -193,12 +193,16 @@ public class FloorRenderer{
     }
 
     public void checkChanges(){
+        checkChanges(false);
+    }
+
+    public void checkChanges(boolean ignoreWalls){
         if(recacheSet.size > 0){
             //recache one chunk at a time
             IntSetIterator iterator = recacheSet.iterator();
             while(iterator.hasNext){
                 int chunk = iterator.next();
-                cacheChunk(Point2.x(chunk), Point2.y(chunk));
+                cacheChunk(Point2.x(chunk), Point2.y(chunk), ignoreWalls);
             }
 
             recacheSet.clear();
@@ -278,13 +282,13 @@ public class FloorRenderer{
         layer.end();
     }
 
-    private void cacheChunk(int cx, int cy){
+    private void cacheChunk(int cx, int cy, boolean ignoreWalls){
         used.clear();
 
         for(int tilex = Math.max(cx * chunksize - 1, 0); tilex < (cx + 1) * chunksize + 1 && tilex < world.width(); tilex++){
             for(int tiley = Math.max(cy * chunksize - 1, 0); tiley < (cy + 1) * chunksize + 1 && tiley < world.height(); tiley++){
                 Tile tile = world.rawTile(tilex, tiley);
-                boolean wall = tile.block().cacheLayer != CacheLayer.normal;
+                boolean wall = !ignoreWalls && tile.block().cacheLayer != CacheLayer.normal;
 
                 if(wall){
                     used.add(tile.block().cacheLayer);
@@ -310,11 +314,11 @@ public class FloorRenderer{
         }
 
         for(CacheLayer layer : used){
-            meshes[layer.id] = cacheChunkLayer(cx, cy, layer);
+            meshes[layer.id] = cacheChunkLayer(cx, cy, layer, ignoreWalls);
         }
     }
 
-    private ChunkMesh cacheChunkLayer(int cx, int cy, CacheLayer layer){
+    private ChunkMesh cacheChunkLayer(int cx, int cy, CacheLayer layer, boolean ignoreWalls){
         vidx = 0;
 
         Batch current = Core.batch;
@@ -333,7 +337,7 @@ public class FloorRenderer{
 
                 if(tile.block().cacheLayer == layer && layer == CacheLayer.walls && !(tile.isDarkened() && tile.data >= 5)){
                     tile.block().drawBase(tile);
-                }else if(floor.cacheLayer == layer && (world.isAccessible(tile.x, tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
+                }else if(floor.cacheLayer == layer && (ignoreWalls || world.isAccessible(tile.x, tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
                     floor.drawBase(tile);
                 }else if(floor.cacheLayer != layer && layer != CacheLayer.walls){
                     floor.drawNonLayer(tile, layer);
@@ -355,7 +359,11 @@ public class FloorRenderer{
         return mesh;
     }
 
-    public void clearTiles(){
+    public void reload(){
+        reload(false);
+    }
+
+    public void reload(boolean ignoreWalls){
         //dispose all old meshes
         if(cache != null){
             for(var x : cache){
@@ -385,7 +393,7 @@ public class FloorRenderer{
 
             for(int x = 0; x < chunksx; x++){
                 for(int y = 0; y < chunksy; y++){
-                    cacheChunk(x, y);
+                    cacheChunk(x, y, ignoreWalls);
                 }
             }
 
