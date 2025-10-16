@@ -1,0 +1,65 @@
+import java.util.Random;
+import java.util.Scanner;
+
+public class GuessingGame {
+
+    public static void main(String[] args) {
+        
+        // --- 1. Setup and Initialization ---
+        
+        // Object to generate random numbers
+        Random randomGenerator = new Random();
+        int lowerBound = 1;
+        int upperBound = 100;
+        
+        // Generate the secret number between 1 and 100
+        int secretNumber = randomGenerator.nextInt(upperBound) + lowerBound;
+        
+        // Object to read user input from the console
+        Scanner scanner = new Scanner(System.in);
+        
+        int guess = 0;
+        int attempts = 0;
+        
+        // --- 2. Welcome and Instructions ---
+        
+        System.out.println("Welcome to the Number Guessing Game!");
+        System.out.println("I have generated a secret number between " + lowerBound + " and " + upperBound + ".");
+        System.out.println("Try to guess the number.");
+
+        // --- 3. Main Game Loop ---
+        
+        // The loop continues as long as the guess is incorrect
+        while (guess != secretNumber) {
+            
+            attempts++; 
+
+            System.out.print("Attempt " + attempts + ": Enter your guess: ");
+            
+            // Input validation: Check if the user entered an integer
+            if (scanner.hasNextInt()) {
+                guess = scanner.nextInt();
+                
+                // --- 4. Logic and Feedback ---
+                
+                if (guess < secretNumber) {
+                    System.out.println("The secret number is HIGHER. Try again.");
+                } else if (guess > secretNumber) {
+                    System.out.println("The secret number is LOWER. Try again.");
+                }
+                // If guess == secretNumber, the while loop automatically terminates
+            } else {
+                System.out.println("Invalid input. Please enter a whole number.");
+                scanner.next(); // Consume the invalid input to avoid an infinite loop
+            }
+        }
+
+        // --- 5. Game End and Score ---
+        
+        System.out.println("\nCongratulations! You guessed the number successfully.");
+        System.out.println("The secret number was: " + secretNumber);
+        System.out.println("Total attempts: " + attempts);
+        
+        scanner.close(); // Important command to close the Scanner resource
+    }
+}
