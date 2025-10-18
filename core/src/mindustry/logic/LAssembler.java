@@ -63,21 +63,94 @@ public class LAssembler{
         LVar constVar = Vars.logicVars.get(symbol, privileged);
         if(constVar != null) return constVar;
 
-        symbol = symbol.trim();
-
-        //string case
-        if(!symbol.isEmpty() && symbol.charAt(0) == '\"' && symbol.charAt(symbol.length() - 1) == '\"'){
-            return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n"));
+        //Parse escape codes, loosely based on C escape codes (with some changes)
+        int tailSpaces = 0;
+        boolean string = false, frontTrimmed = false, lastQuoteEsc = false;
+        StringBuilder unescapedSymbol = new StringBuilder(symbol.length());
+        for(int i = 0; i < symbol.length(); i++){
+            if(symbol.charAt(i) <= ' '){
+                if(!frontTrimmed) continue;
+                tailSpaces++;
+            }else{
+                if(!frontTrimmed && symbol.charAt(i) == '"') string = true;
+                frontTrimmed = true;
+                tailSpaces = 0;
+            }
+            if(symbol.charAt(i) != '\\'){
+                if(symbol.charAt(i) == '"') lastQuoteEsc = false;
+                unescapedSymbol.append(symbol.charAt(i));
+            }else if(i < symbol.length() - 1){
+                unescapedSymbol.append(switch(symbol.charAt(++i)){
+                    case '\\', '#', ';', '\t' -> symbol.charAt(i);
+                    case 'n' -> '\n';
+                    case '"' -> {
+                        lastQuoteEsc = true;
+                        yield symbol.charAt(i);
+                    }
+                    case ' ' -> {
+                        tailSpaces--;
+                        yield ' ';
+                    }
+                    case 'x' -> {
+                        char chr = ++i < symbol.length() ? symbol.charAt(i) : 0;
+                        if((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'F') || (chr >= 'a' && chr <= 'f')){
+                            int code = 0;
+                            int bits = 0;
+                            while(((chr >= '0' && chr <= '9') || (chr >= 'A' && chr <= 'F') || (chr >= 'a' && chr <= 'f')) && bits < 16){
+                                code = code << 4 | switch(chr){
+                                    case 'A', 'B', 'C', 'D', 'E', 'F' -> chr - 'A' + 10;
+                                    case 'a', 'b', 'c', 'd', 'e', 'f' -> chr - 'a' + 10;
+                                    default -> chr - '0';
+                                };
+                                bits += 4;
+                                chr = ++i < symbol.length() ? symbol.charAt(i) : 0;
+                            }
+                            i--;
+                            yield (char)code;
+                        }
+                        unescapedSymbol.append("\\x");
+                        yield chr;
+                    }
+                    default -> {
+                        char chr = symbol.charAt(i);
+                        //Octal case, unlike C can use more than 3 digits.
+                        if(chr >= '0' && chr < '8'){
+                            int code = 0;
+                            int bits = 0;
+                            while(chr >= '0' && chr < '8' && bits < 16){
+                                code = code << 3 | chr - '0';
+                                bits += 3;
+                                chr = ++i < symbol.length() ? symbol.charAt(i) : 0;
+                            }
+                            i--;
+                            yield (char)code;
+                        }
+                        unescapedSymbol.append('\\');
+                        yield chr;
+                    }
+                });
+            }else{
+                unescapedSymbol.append('\\');
+            }
+        }
+        String unescaped = unescapedSymbol.substring(0, unescapedSymbol.length() - Math.max(tailSpaces, 0));
+        //Potentially a string
+        string: if(string && unescaped.length() >= 2 && !lastQuoteEsc){
+            if(unescaped.charAt(unescaped.length() - 1) != '"') break string;
+            boolean escaped = false;
+            for(int i = unescaped.length() - 2; i > 1; i--){
+                if(unescaped.charAt(i) != '\\') break;
+                escaped = !escaped;
+            }
+            if(escaped) break string;
+            return putConst("___" + unescaped, unescaped.substring(1, unescaped.length() - 1));
         }
 
-        //remove spaces for non-strings
-        symbol = symbol.replace(' ', '_');
-
         //use a positive invalid number if number might be negative, else use a negative invalid number
-        double value = parseDouble(symbol);
+        double value = parseDouble(unescaped);
 
         if(Double.isNaN(value)){
-            return putVar(symbol);
+            return putVar(unescaped);
         }else{
             if(Double.isInfinite(value)) value = 0.0;
             //this creates a hidden const variable with the specified value
