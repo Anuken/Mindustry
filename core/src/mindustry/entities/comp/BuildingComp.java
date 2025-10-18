@@ -727,6 +727,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     }
 
+    public boolean allowDeposit(){
+        return block.alwaysAllowDeposit || !state.rules.onlyDepositCore;
+    }
+
     /** Called when this block is dropped as a payload. */
     public void dropped(){
 

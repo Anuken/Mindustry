@@ -126,5 +126,10 @@ public class StorageBlock extends Block{
         public boolean canPickup(){
             return linkedCore == null;
         }
+
+        @Override
+        public boolean allowDeposit(){
+            return linkedCore != null || super.allowDeposit();
+        }
     }
 }
