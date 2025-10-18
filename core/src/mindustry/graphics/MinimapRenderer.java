@@ -195,7 +195,7 @@ public class MinimapRenderer{
             float wf = world.width() * tilesize;
             float hf = world.height() * tilesize;
 
-            Draw.color(state.rules.dynamicColor, 0.5f);
+            Draw.color(state.rules.dynamicColor, Float.isNaN(state.rules.dynamicColor.a) ? 0.5f : Math.max(0.5f, state.rules.dynamicColor.a));
             Draw.rect(Tmp.tr1, wf / 2, hf / 2, wf, hf);
 
             if(state.rules.staticFog){

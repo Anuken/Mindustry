@@ -214,7 +214,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     public void update(){
         PerfCounter.update.begin();
 
-        int targetfps = Core.settings.getInt("fpscap", 120);
+        int targetfps = ios ? 0 : Core.settings.getInt("fpscap", 120);
         boolean changed = lastTargetFps != targetfps && lastTargetFps != -1;
         boolean limitFps = targetfps > 0 && targetfps <= 240;
 

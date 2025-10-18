@@ -52,7 +52,7 @@ public class DesktopLauncher extends ClientLauncher{
                 height = 700;
 
                 //on Windows, Intel drivers might be buggy with OpenGL 3.x, so only use 2.x. See https://github.com/Anuken/Mindustry/issues/11041
-                if(GpuDetect.hasIntel && (!GpuDetect.hasAMD || !GpuDetect.hasNvidia)){
+                if(GpuDetect.hasIntel && !GpuDetect.hasAMD && !GpuDetect.hasNvidia){
                     allowGl30 = false;
                     coreProfile = false;
                     glVersions = new int[][]{{2, 1}, {2, 0}};

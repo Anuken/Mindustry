@@ -536,6 +536,7 @@ public class Control implements ApplicationListener, Loadable{
         state.rules.sector = sector;
         sector.info.origin = origin;
         sector.info.destination = origin;
+        sector.info.attempts ++;
 
         if(beforePlay != null){
             beforePlay.run();
