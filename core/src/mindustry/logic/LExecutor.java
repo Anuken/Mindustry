@@ -921,25 +921,24 @@ public class LExecutor{
                     exec.textBuffer.setLength(0);
                 }
             }else{
-                int num1 = p1.numi(), num4 = p4.numi(), xval = packSign(x.numi()), yval = packSign(y.numi());
+                int num1 = packSign(p1.numi()), num4 = packSign(p4.numi()), xval = packSign(x.numi()), yval = packSign(y.numi());
 
                 if(type == LogicDisplay.commandImage){
+                    int packed = -1;
                     if(p1.obj() instanceof UnlockableContent u){
-                        //TODO: with mods, this will overflow (ID >= 512), but that's better than the previous system, at least
-                        num1 = u.id;
-                        num4 = u.getContentType().ordinal();
-                    }else{
-                        num1 = -1;
-                        num4 = -1;
+                        packed = (u.id << 5) | (u.getContentType().ordinal() & 31);
+                    }else if(p1.obj() instanceof LogicDisplayBuild d){
+                        packed = (d.index << 5) | 30;
                     }
-                    //num1 = p1.obj() instanceof UnlockableContent u ? u.iconId : 0;
+                    num1 = packed & 0x3FF;
+                    num4 = packed >> 10;
                 }else if(type == LogicDisplay.commandScale){
                     xval = packSign((int)(x.numf() / LogicDisplay.scaleStep));
                     yval = packSign((int)(y.numf() / LogicDisplay.scaleStep));
                 }
 
                 //add graphics calls, cap graphics buffer size
-                exec.graphicsBuffer.add(DisplayCmd.get(type, xval, yval, packSign(num1), packSign(p2.numi()), packSign(p3.numi()), packSign(num4)));
+                exec.graphicsBuffer.add(DisplayCmd.get(type, xval, yval, num1, packSign(p2.numi()), packSign(p3.numi()), num4));
             }
         }
 
