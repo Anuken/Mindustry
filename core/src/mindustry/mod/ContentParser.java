@@ -861,9 +861,7 @@ public class ContentParser{
      * @return the content that was parsed
      */
     public Content parse(LoadedMod mod, String name, String json, Fi file, ContentType type) throws Exception{
-        if(contentTypes.isEmpty()){
-            init();
-        }
+        checkInit();
 
         //remove extra # characters to make it valid json... apparently some people have *unquoted* # characters in their json
         if(file.extension().equals("json")){
@@ -887,6 +885,12 @@ public class ContentParser{
             c.minfo.mod = mod;
         }
         return c;
+    }
+
+    public void checkInit(){
+        if(contentTypes.isEmpty()){
+            init();
+        }
     }
 
     public void markError(Content content, LoadedMod mod, Fi file, Throwable error){
@@ -1277,6 +1281,11 @@ public class ContentParser{
 
     private interface TypeParser<T extends Content>{
         T parse(String mod, String name, JsonValue value) throws Exception;
+    }
+
+    public Json getJson(){
+        checkInit();
+        return parser;
     }
 
     //intermediate class for parsing
