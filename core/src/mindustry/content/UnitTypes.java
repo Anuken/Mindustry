@@ -175,7 +175,7 @@ public class UnitTypes{
                 bullet = new ArtilleryBulletType(2.5f, 20, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
-                    lifetime = 96.5f;
+                    lifetime = 94.8f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
@@ -327,7 +327,7 @@ public class UnitTypes{
             rotateSpeed = 7f;
             hitSize = 8f;
             health = 90f;
-            buildSpeed = 0.3f;
+            buildSpeed = 0.5f;
             armor = 3f;
 
             abilities.add(new RepairFieldAbility(10f, 90f, 60f){{
@@ -711,7 +711,7 @@ public class UnitTypes{
             legMoveSpace = 1.4f;
             legBaseOffset = 2f;
             hovering = true;
-            armor = 5f;
+            armor = 7f;
             ammoType = new PowerAmmoType(1000);
 
             shadowElevation = 0.3f;
@@ -766,7 +766,7 @@ public class UnitTypes{
             drag = 0.1f;
             speed = 0.92f;
             hitSize = 23f;
-            health = 7500;
+            health = 7800;
             armor = 11f;
 
             rotateSpeed = 4f;
@@ -866,7 +866,7 @@ public class UnitTypes{
             drag = 0.1f;
             speed = 0.68f;
             hitSize = 26f;
-            health = 19000;
+            health = 21000;
             armor = 18f;
             lightRadius = 140f;
 
@@ -1024,7 +1024,7 @@ public class UnitTypes{
         }};
 
         horizon = new UnitType("horizon"){{
-            health = 230;
+            health = 240;
             rotateSpeed = 7f;
             speed = 2.2f;
             accel = 0.08f;
@@ -1300,9 +1300,9 @@ public class UnitTypes{
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 130f;
-            health = 130;
+            health = 170;
             armor = 1f;
-            buildSpeed = 0.5f;
+            buildSpeed = 0.3f;
             engineOffset = 6.5f;
             hitSize = 9f;
             lowAltitude = true;
