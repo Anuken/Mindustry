@@ -6,6 +6,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.world.blocks.*;
 
@@ -46,6 +47,8 @@ public class GameState{
     public int enemies;
     /** Map being playtested (not edited!) */
     public @Nullable Map playtestingMap;
+    /** Null if not content patches have been applied. */
+    public @Nullable ContentPatcher patcher;
     /** Current game state. */
     private State state = State.menu;
 
