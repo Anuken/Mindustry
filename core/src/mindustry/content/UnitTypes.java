@@ -192,7 +192,7 @@ public class UnitTypes{
             hitSize = 22f;
             rotateSpeed = 3f;
             health = 9100;
-            armor = 13f;
+            armor = 14f;
             mechFrontSway = 1f;
             ammoType = new ItemAmmoType(Items.thorium);
 
@@ -479,7 +479,7 @@ public class UnitTypes{
             riseSpeed = 0.02f;
 
             health = 7800f;
-            armor = 11f;
+            armor = 13f;
             canBoost = true;
             mechLandShake = 4f;
             immunities = ObjectSet.with(StatusEffects.burning);
@@ -767,7 +767,7 @@ public class UnitTypes{
             speed = 0.92f;
             hitSize = 23f;
             health = 7800;
-            armor = 11f;
+            armor = 12f;
 
             rotateSpeed = 4f;
 
