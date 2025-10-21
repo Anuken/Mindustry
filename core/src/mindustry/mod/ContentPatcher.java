@@ -13,6 +13,7 @@ import mindustry.ctype.*;
 import java.lang.reflect.*;
 import java.util.*;
 
+/** The current implementation is awful. Consider it a proof of concept. */
 @SuppressWarnings("unchecked")
 public class ContentPatcher{
     private static final Object root = new Object();
@@ -22,8 +23,8 @@ public class ContentPatcher{
     private boolean applied;
     private ContentLoader contentLoader;
     private ObjectSet<PatchRecord> usedpatches = new ObjectSet<>();
-    private Seq<PatchRecord> patches = new Seq<>();
     private Seq<Runnable> resetters = new Seq<>();
+    private Seq<Runnable> afterCallbacks = new Seq<>();
 
     static{
         for(var type : ContentType.all){
@@ -41,6 +42,8 @@ public class ContentPatcher{
         for(var child : value){
             assign(root, child.name, child, null, null, null);
         }
+
+        afterCallbacks.each(Runnable::run);
     }
 
     public void unapply() throws Exception{
@@ -49,21 +52,26 @@ public class ContentPatcher{
         Vars.content = contentLoader;
         applied = false;
 
-        for(var record : patches){
-            assign(record.target, record.field, record.value, record.data, null, null);
-        }
-
+        resetters.reverse();
         resetters.each(Runnable::run);
         resetters.clear();
+
+        afterCallbacks.each(Runnable::run);
+        afterCallbacks.clear();
     }
 
-    void assign(Object object, String field, Object value, @Nullable FieldMetadata metadata, @Nullable Object parentObject, @Nullable String parentField) throws Exception{
+    void assign(Object object, String field, Object value, @Nullable FieldData metadata, @Nullable Object parentObject, @Nullable String parentField) throws Exception{
         if(field == null || field.isEmpty()) return;
 
+        char prefix = 0;
+
         //fetch modifier (+ or -) and concat it to the end, turning `+array` into `array.+`
-        if(field.charAt(0) == '-' || field.charAt(0) == '+'){
-            char prefix = field.charAt(0);
-            field = field.substring(1) + "." + prefix;
+        if(field.charAt(0) == '+'){
+            prefix = field.charAt(0);
+            field = field.substring(1);
+        }else if(field.endsWith(".+")){
+            prefix = field.charAt(field.length() - 1);
+            field = field.substring(0, field.length() - 2);
         }
 
         //field.field2.field3 nested syntax
@@ -71,29 +79,44 @@ public class ContentPatcher{
             //resolve the field chain until the final field is reached
             String[] path = field.split("\\.");
             for(int i = 0; i < path.length - 1; i++){
-                Object[] result = resolve(object, path[i], null, null);
+                Object[] result = resolve(object, path[i], metadata);
                 if(result == null){
                     //TODO report error
                     return;
                 }
                 object = result[0];
-                metadata = (FieldMetadata)result[1];
+                metadata = (FieldData)result[1];
             }
             field = path[path.length - 1];
         }
 
+        if(object instanceof Content c){
+            after(c::afterPatch);
+        }
+
         if(object == root){
-            warn("Content cannot be assigned.");
+            if(value instanceof JsonValue jval && jval.isObject()){
+                for(var child : jval){
+                    Object[] otherResolve = resolve(object, jval.name, null);
+                    if(otherResolve != null && otherResolve[0] instanceof ObjectMap map && map.containsKey(child.name)){
+                        assign(otherResolve[0], child.name, child, (FieldData)otherResolve[1], object, field);
+                    }else{
+                        Log.warn("Content not found: @.@", field, child.name);
+                    }
+                }
+            }else{
+                warn("Content '@' cannot be assigned.", field);
+            }
         }else if(object instanceof Seq<?> || object.getClass().isArray()){ //TODO
 
-            if(field.length() == 1 && (field.charAt(0) == '+')){
+            if(prefix == '+'){
                 //handle array addition syntax
                 if(object instanceof Seq s){
-                    modified(parentObject, parentField, s.copy(), null);
+                    modifiedField(parentObject, parentField, s.copy());
 
                     assignValue(object, field, metadata, () -> null, val -> s.add(val), value, false);
                 }else{
-                    modified(parentObject, parentField, copyArray(object), null);
+                    modifiedField(parentObject, parentField, copyArray(object));
 
                     var fobj = object;
                     assignValue(parentObject, parentField, metadata, () -> null, val -> {
@@ -123,28 +146,33 @@ public class ContentPatcher{
                 }
 
                 if(object instanceof Seq s){
-                    modified(parentObject, parentField, s.copy(), null);
+                    var copy = s.copy();
+                    reset(() -> s.set(copy));
 
                     assignValue(object, field, metadata, () -> s.get(i), val -> s.set(i, val), value, false);
                 }else{
-                    modified(parentObject, parentField, copyArray(object), null);
+                    modifiedField(parentObject, parentField, copyArray(object));
 
                     var fobj = object;
                     assignValue(object, field, metadata, () -> Array.get(fobj, i), val -> Array.set(fobj, i, val), value, false);
                 }
             }
-        }else if(object instanceof ObjectMap map){ //TODO
+        }else if(object instanceof ObjectMap map){
             if(metadata == null){
-                warn("ObjectMap cannot be parsed without metadata.");
-                return;
+                warn("ObjectMap cannot be parsed without metadata: @.@", parentObject, parentField);
+                throw new RuntimeException();
+                //return;
             }
             Object key = convertKeyType(field, metadata.keyType);
             if(key == null){
                 warn("Null key: '@'", field);
                 return;
             }
-            modified(parentObject, parentField, map.copy(), metadata);
-            assignValue(object, field, metadata, () -> map.get(key), val -> map.put(key, val), value, false);
+
+            var copy = map.copy();
+            reset(() -> map.set(copy));
+
+            assignValue(object, field, new FieldData(metadata.elementType, null, null), () -> map.get(key), val -> map.put(key, val), value, false);
         }else{
             Class<?> actualType = object.getClass();
             if(actualType.isAnonymousClass()) actualType = actualType.getSuperclass();
@@ -155,32 +183,36 @@ public class ContentPatcher{
                 if(checkField(fdata.field)) return;
 
                 var fobj = object;
-                assignValue(object, field, metadata, () -> Reflect.get(fobj, fdata.field), fv -> Reflect.set(fobj, fdata.field, fv), value, true);
+                assignValue(object, field, new FieldData(fdata), () -> Reflect.get(fobj, fdata.field), fv -> Reflect.set(fobj, fdata.field, fv), value, true);
             }else{
                 warn("Unknown field: '@' for '@'", field, actualType.getName());
             }
         }
     }
 
-    void assignValue(Object object, String field, FieldMetadata metadata, Prov getter, Cons setter, Object value, boolean modify) throws Exception{
+    void assignValue(Object object, String field, FieldData metadata, Prov getter, Cons setter, Object value, boolean modify) throws Exception{
         Object prevValue = getter.get();
 
         if(value instanceof JsonValue jsv){ //setting values from object
-            if(prevValue == null){
-                if(modify) modified(object, field, null, metadata);
-                setter.get(json.readValue(metadata.field.getType(), metadata.elementType, jsv));
+            if(prevValue == null || !jsv.isObject() || jsv.has("type")){
+                if(modify) modifiedField(object, field, getter.get());
+                try{
+                    setter.get(json.readValue(metadata.type, metadata.elementType, jsv));
+                }catch(Throwable e){
+                    warn("Failed to read value @.@ = @: @ (type = @ elementType = @)", object, field, value, e.getMessage(), metadata.type, metadata.elementType);
+                }
             }else{
                 //assign each field manually
                 var childFields = json.getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
                 for(var child : jsv){
                     if(child.name != null){
-                        assign(prevValue, child.name, child, childFields.get(child.name), object, field);
+                        assign(prevValue, child.name, child, !childFields.containsKey(child.name) ? null : new FieldData(childFields.get(child.name)), object, field);
                     }
                 }
             }
         }else{
             //direct value is set
-            if(modify) modified(object, field, prevValue, metadata);
+            if(modify) modifiedField(object, field, prevValue);
 
             setter.get(value);
         }
@@ -190,7 +222,7 @@ public class ContentPatcher{
      * 0: the object
      * 1: the field metadata for the object to use with deserializing collection types
      * */
-    Object[] resolve(Object object, String field, Object value, @Nullable FieldMetadata metadata) throws Exception{
+    Object[] resolve(Object object, String field, @Nullable FieldData metadata) throws Exception{
         if(object == null) return null;
 
         if(object == root){
@@ -199,7 +231,7 @@ public class ContentPatcher{
                 warn("Invalid content type: " + field);
                 return null;
             }
-            return new Object[]{Vars.content.getNamesBy(ctype), new FieldMetadata(null, MappableContent.class, String.class)};
+            return new Object[]{Vars.content.getNamesBy(ctype), new FieldData(ObjectMap.class, MappableContent.class, String.class)};
         }else if(object instanceof Seq<?> || object.getClass().isArray()){
             int i = Strings.parseInt(field);
             int length = object instanceof Seq s ? s.size : Array.getLength(object);
@@ -234,7 +266,7 @@ public class ContentPatcher{
             if(fdata != null){
                 if(checkField(fdata.field)) return null;
 
-                return new Object[]{fdata.field.get(object), fdata};
+                return new Object[]{fdata.field.get(object), new FieldData(fdata)};
             }else{
                 warn("Unknown field: '@' for '@'", field, actualType.getName());
                 return null;
@@ -250,14 +282,30 @@ public class ContentPatcher{
         return false;
     }
 
-    void modified(Object target, String field, Object value, FieldMetadata data){
-        if(!applied) return;
+    void modifiedField(Object target, String field, Object value){
+        if(!applied || target == null) return;
 
-        //TODO
-        var record = new PatchRecord(target, field, value, data);
-        if(usedpatches.add(record)){
-            patches.add(record);
+        var fields = json.getFields(target.getClass());
+        var meta = fields.get(field);
+        if(meta != null){
+
+            var record = new PatchRecord(target, meta.field, value);
+            if(usedpatches.add(record)){
+                resetters.add(() -> {
+                    try{
+                        record.field.set(record.target, record.value);
+                    }catch(Exception e){
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        }else{
+            warn("Missing field " + field + " for object " + target);
         }
+    }
+
+    void reset(Runnable run){
+        resetters.add(run);
     }
 
     Object convertKeyType(String string, Class<?> type){
@@ -269,8 +317,8 @@ public class ContentPatcher{
         Log.warn(error, fmt);
     }
 
-    void reset(Runnable run){
-        resetters.add(run);
+    void after(Runnable run){
+        afterCallbacks.add(run);
     }
 
     static Object copyArray(Object object){
@@ -285,17 +333,29 @@ public class ContentPatcher{
         return ((Object[])object).clone();
     }
 
+    private static class FieldData{
+        Class type, elementType, keyType;
+
+        public FieldData(Class type, Class elementType, Class keyType){
+            this.type = type;
+            this.elementType = elementType;
+            this.keyType = keyType;
+        }
+
+        public FieldData(FieldMetadata data){
+            this(data.field.getType(), data.elementType, data.keyType);
+        }
+    }
+
     private static class PatchRecord{
         Object target;
-        String field;
+        Field field;
         Object value;
-        FieldMetadata data;
 
-        PatchRecord(Object target, String field, Object value, FieldMetadata data){
+        PatchRecord(Object target, Field field, Object value){
             this.target = target;
             this.field = field;
             this.value = value;
-            this.data = data;
         }
 
         @Override

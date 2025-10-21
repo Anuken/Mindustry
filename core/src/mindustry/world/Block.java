@@ -700,6 +700,12 @@ public class Block extends UnlockableContent implements Senseable{
         }
     }
 
+    @Override
+    public void afterPatch(){
+        barMap.clear();
+        setBars();
+    }
+
     public boolean consumesItem(Item item){
         return itemFilter[item.id];
     }
