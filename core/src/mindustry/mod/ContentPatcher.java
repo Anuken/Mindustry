@@ -19,7 +19,7 @@ public class ContentPatcher{
     private static final Object root = new Object();
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
 
-    private Json json; //TODO ContentParser.json??
+    private Json json;
     private boolean applied;
     private ContentLoader contentLoader;
     private ObjectSet<PatchRecord> usedpatches = new ObjectSet<>();
@@ -38,24 +38,35 @@ public class ContentPatcher{
         applied = true;
         contentLoader = Vars.content.copy();
 
-        JsonValue value = json.fromJson(null, Jval.read(patch).toString(Jformat.plain));
-        for(var child : value){
-            assign(root, child.name, child, null, null, null);
-        }
+        try{
+            JsonValue value = json.fromJson(null, Jval.read(patch).toString(Jformat.plain));
+            for(var child : value){
+                assign(root, child.name, child, null, null, null);
+            }
 
-        afterCallbacks.each(Runnable::run);
+            afterCallbacks.each(Runnable::run);
+        }catch(Exception e){
+            Log.err("Failed to apply patch: " + patch, e);
+        }
     }
 
-    public void unapply() throws Exception{
+    public void unapply(){
         if(!applied) return;
 
         Vars.content = contentLoader;
         applied = false;
 
         resetters.reverse();
-        resetters.each(Runnable::run);
+        for(var reset : resetters){
+            try{
+                reset.run();
+            }catch(Throwable e){
+                Log.err("Failed to un-apply patch!", e);
+            }
+        }
         resetters.clear();
 
+        //this should never throw an exception
         afterCallbacks.each(Runnable::run);
         afterCallbacks.clear();
     }
@@ -160,8 +171,7 @@ public class ContentPatcher{
         }else if(object instanceof ObjectMap map){
             if(metadata == null){
                 warn("ObjectMap cannot be parsed without metadata: @.@", parentObject, parentField);
-                throw new RuntimeException();
-                //return;
+                return;
             }
             Object key = convertKeyType(field, metadata.keyType);
             if(key == null){
