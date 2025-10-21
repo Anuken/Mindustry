@@ -1105,7 +1105,7 @@ public class ContentParser{
             FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
             if(metadata == null){
                 if(ignoreUnknownFields){
-                    Log.warn("[@]: Ignoring unknown field: @ (@)", currentContent.minfo.sourceFile.name(), child.name, type.getSimpleName());
+                    Log.warn("[@]: Ignoring unknown field: @ (@)", currentContent == null ? null : currentContent.minfo.sourceFile.name(), child.name, type.getSimpleName());
                     continue;
                 }else{
                     SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");

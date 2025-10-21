@@ -14,6 +14,7 @@ import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
@@ -64,6 +65,7 @@ public abstract class UnlockableContent extends MappableContent{
     /** Tech nodes for all trees that this content is part of. */
     public Seq<TechNode> techNodes = new Seq<>();
     /** Unlock state. Loaded from settings. Do not modify outside the constructor. */
+    @NoPatch
     protected boolean unlocked;
 
     public UnlockableContent(String name){
