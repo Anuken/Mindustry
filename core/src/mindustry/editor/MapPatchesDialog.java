@@ -78,6 +78,11 @@ public class MapPatchesDialog extends BaseDialog{
                     b.getLabel().setAlignment(Align.left, Align.left);
                 });
 
+                t.button(Icon.copy, Styles.graySquarei, Vars.iconMed, () -> {
+                    Core.app.setClipboardText(patch.patch);
+                    ui.showInfoFade("@copied");
+                }).size(h);
+
                 t.button(Icon.refresh, Styles.graySquarei, Vars.iconMed, () -> {
                     showImport(str -> addPatch(str, patches.indexOf(patch)));
                 }).size(h);

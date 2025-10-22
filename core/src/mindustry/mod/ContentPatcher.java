@@ -23,7 +23,7 @@ public class ContentPatcher{
     private Json json;
     private boolean applied;
     private ContentLoader contentLoader;
-    private ObjectSet<PatchRecord> usedpatches = new ObjectSet<>();
+    private ObjectSet<Object> usedpatches = new ObjectSet<>();
     private Seq<Runnable> resetters = new Seq<>();
     private Seq<Runnable> afterCallbacks = new Seq<>();
     private @Nullable PatchSet currentlyApplying;
@@ -122,7 +122,7 @@ public class ContentPatcher{
             field = path[path.length - 1];
         }
 
-        if(object instanceof Content c){
+        if(object instanceof Content c && usedpatches.add(c)){
             after(c::afterPatch);
         }
 
