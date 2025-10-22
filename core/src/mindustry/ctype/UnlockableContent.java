@@ -97,6 +97,14 @@ public abstract class UnlockableContent extends MappableContent{
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
     }
 
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+
+        //reset stats
+        stats = new Stats();
+    }
+
     public boolean isBanned(){
         return false;
     }

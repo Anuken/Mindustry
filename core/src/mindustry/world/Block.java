@@ -702,6 +702,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     @Override
     public void afterPatch(){
+        super.afterPatch();
         barMap.clear();
         setBars();
     }
