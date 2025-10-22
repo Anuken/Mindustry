@@ -185,7 +185,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         private transient final Seq<MapObjective> children = new Seq<>(2);
 
         /** For the objectives UI dialog. Do not modify directly! */
-        public transient int editorX = -1, editorY = -1;
+        public transient int editorX = -999, editorY = -999;
 
         /** Whether this objective has been done yet. This is internally set. */
         private boolean completed;

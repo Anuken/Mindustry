@@ -97,6 +97,7 @@ public class ContentParser{
                 }
             }
         });
+        put(TextureRegion.class, (type, data) -> Core.atlas.find(data.asString()));
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(StatusEffect.class, (type, data) -> {
             if(data.isString()){
@@ -861,9 +862,7 @@ public class ContentParser{
      * @return the content that was parsed
      */
     public Content parse(LoadedMod mod, String name, String json, Fi file, ContentType type) throws Exception{
-        if(contentTypes.isEmpty()){
-            init();
-        }
+        checkInit();
 
         //remove extra # characters to make it valid json... apparently some people have *unquoted* # characters in their json
         if(file.extension().equals("json")){
@@ -887,6 +886,12 @@ public class ContentParser{
             c.minfo.mod = mod;
         }
         return c;
+    }
+
+    public void checkInit(){
+        if(contentTypes.isEmpty()){
+            init();
+        }
     }
 
     public void markError(Content content, LoadedMod mod, Fi file, Throwable error){
@@ -1101,7 +1106,7 @@ public class ContentParser{
             FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
             if(metadata == null){
                 if(ignoreUnknownFields){
-                    Log.warn("[@]: Ignoring unknown field: @ (@)", currentContent.minfo.sourceFile.name(), child.name, type.getSimpleName());
+                    Log.warn("[@]: Ignoring unknown field: @ (@)", currentContent == null ? null : currentContent.minfo.sourceFile.name(), child.name, type.getSimpleName());
                     continue;
                 }else{
                     SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");
@@ -1277,6 +1282,11 @@ public class ContentParser{
 
     private interface TypeParser<T extends Content>{
         T parse(String mod, String name, JsonValue value) throws Exception;
+    }
+
+    public Json getJson(){
+        checkInit();
+        return parser;
     }
 
     //intermediate class for parsing
