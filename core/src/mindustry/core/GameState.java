@@ -43,12 +43,12 @@ public class GameState{
     public Attributes envAttrs = new Attributes();
     /** Team data. Gets reset every new game. */
     public Teams teams = new Teams();
+    /** Handles JSON edits of game content. */
+    public ContentPatcher patcher = new ContentPatcher();
     /** Number of enemies in the game; only used clientside in servers. */
     public int enemies;
     /** Map being playtested (not edited!) */
     public @Nullable Map playtestingMap;
-    /** Null if not content patches have been applied. */
-    public @Nullable ContentPatcher patcher;
     /** Current game state. */
     private State state = State.menu;
 
