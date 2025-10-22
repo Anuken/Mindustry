@@ -27,7 +27,7 @@ public class SectorSubmissions{
         registerSerpuloSector(47, "tinport", "https://discord.com/channels/391020510269669376/1379926802591645820/1397649518203371544");
         registerSerpuloSector(225, "Summi", "https://discord.com/channels/391020510269669376/1379926925719376152/1399286858482978900");
         //111 has an alternate submission https://discord.com/channels/391020510269669376/1379926842659569864/1404825715244793938
-        registerSerpuloSector(111, "gausofid", "https://discord.com/channels/391020510269669376/1379926842659569864/1399847451527221301");
+        registerSerpuloSector(111, "gausofid", "https://discord.com/channels/391020510269669376/1379926842659569864/1422257393042985114");
         registerSerpuloSector(176, "wpx", "https://discord.com/channels/391020510269669376/1379926887203213353/1390418885081043135");
         registerSerpuloSector(13, "hoijlhj", "https://discord.com/channels/391020510269669376/1379926785164312810/1402569635299065948");
         registerSerpuloSector(259, "tinport", "https://discord.com/channels/391020510269669376/1379928048245280871/1381300770866987049");
@@ -50,9 +50,9 @@ public class SectorSubmissions{
         registerSerpuloSector(191, "Skeledragon", "https://discord.com/channels/391020510269669376/1379926912004001914/1380025875806027849");
         //alternate, more difficult submission: https://discord.com/channels/391020510269669376/1379926782966497322/1416145231853781022
         registerSerpuloSector(6, "Namero", "https://discord.com/channels/391020510269669376/1379926782966497322/1415735385828495464");
-        registerSerpuloSector(265, "Dem0", "https://discord.com/channels/391020510269669376/1379928052921929891/1416344658904088641");
+        registerSerpuloSector(265, "Dem0", "https://discord.com/channels/391020510269669376/1379928052921929891/1420029529619173459");
         registerSerpuloSector(161, "Hengryton Luck", "https://discord.com/channels/391020510269669376/1379926882203730024/1416686287204782217");
-        registerSerpuloSector(24, "Stormrider", "https://discord.com/channels/391020510269669376/1379926797042581716/1399404131520876577");
+        registerSerpuloSector(24, "Stormrider", "https://discord.com/channels/391020510269669376/1379926797042581716/1419213541512187935");
         registerSerpuloSector(263, "ltb12", "https://discord.com/channels/391020510269669376/1379928050010951694/1417750251741249569");
         registerSerpuloSector(66, "quad", "https://discord.com/channels/391020510269669376/1379926825941078128/1417752983889907755");
         registerSerpuloSector(248, "iqtik123", "https://discord.com/channels/391020510269669376/1379926979129774151/1417864622412922890");
@@ -60,6 +60,8 @@ public class SectorSubmissions{
         registerSerpuloSector(185, "quad", "https://discord.com/channels/391020510269669376/1379926892181983283/1419231958336016458");
         registerSerpuloSector(254, "wpx", "https://discord.com/channels/391020510269669376/1379928045577703424/1420456601667502193");
         registerSerpuloSector(0, "Jamespire", "https://discord.com/channels/391020510269669376/1379926780860698784/1418590967384117311");
+        registerSerpuloSector(103, "enwyz", "https://discord.com/channels/391020510269669376/1379926839559979030/1429203869514207255");
+        registerSerpuloSector(30, "cyan", "https://discord.com/channels/391020510269669376/1379926800854945823/1423932799647481910");
 
         /* UNUSED SECTORS:
         registerHiddenSectors(serpulo,

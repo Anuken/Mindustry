@@ -260,6 +260,7 @@ public class Logic implements ApplicationListener{
 
     public void reset(){
         State prev = state.getState();
+        state.patcher.unapply();
         //recreate gamestate - sets state to menu
         state = new GameState();
         //fire change event, since it was technically changed

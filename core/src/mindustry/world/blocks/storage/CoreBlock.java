@@ -68,6 +68,7 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
+        alwaysAllowDeposit = true;
         priority = TargetPriority.core;
         flags = EnumSet.of(BlockFlag.core);
         unitCapModifier = 10;
