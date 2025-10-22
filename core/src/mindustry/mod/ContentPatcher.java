@@ -242,6 +242,11 @@ public class ContentPatcher{
 
         if(value instanceof JsonValue jsv){ //setting values from object
             if(prevValue == null || !jsv.isObject() || jsv.has("type")){
+                if(UnlockableContent.class.isAssignableFrom(metadata.type) && (jsv.isObject())){
+                    warn("New content must not be instantiated: @", jsv);
+                    return;
+                }
+
                 if(modify) modifiedField(object, field, getter.get());
                 try{
                     setter.get(json.readValue(metadata.type, metadata.elementType, jsv));

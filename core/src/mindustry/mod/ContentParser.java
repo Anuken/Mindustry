@@ -97,6 +97,7 @@ public class ContentParser{
                 }
             }
         });
+        put(TextureRegion.class, (type, data) -> Core.atlas.find(data.asString()));
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(StatusEffect.class, (type, data) -> {
             if(data.isString()){
