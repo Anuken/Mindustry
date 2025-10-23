@@ -702,6 +702,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     @Override
     public void afterPatch(){
+        super.afterPatch();
         barMap.clear();
         setBars();
     }
@@ -1344,6 +1345,21 @@ public class Block extends UnlockableContent implements Senseable{
 
         if(buildVisibility == BuildVisibility.sandboxOnly){
             hideDetails = false;
+        }
+    }
+
+    public void reinitializeConsumers(){
+        consumers = consumeBuilder.toArray(Consume.class);
+        consPower = (ConsumePower)Structs.find(consumers, c -> c instanceof ConsumePower);
+        optionalConsumers = consumeBuilder.select(consume -> consume.optional && !consume.ignore()).toArray(Consume.class);
+        nonOptionalConsumers = consumeBuilder.select(consume -> !consume.optional && !consume.ignore()).toArray(Consume.class);
+        updateConsumers = consumeBuilder.select(consume -> consume.update && !consume.ignore()).toArray(Consume.class);
+        hasConsumers = consumers.length > 0;
+        itemFilter = new boolean[content.items().size];
+        liquidFilter = new boolean[content.liquids().size];
+
+        for(Consume cons : consumers){
+            cons.apply(this);
         }
     }
 
