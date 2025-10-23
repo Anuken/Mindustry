@@ -442,6 +442,52 @@ public class ContentParser{
         }
     };
 
+    public void readBlockConsumers(Block block, JsonValue value){
+        for(JsonValue child : value){
+            switch(child.name){
+                case "remove" -> {
+                    String[] values = child.isString() ? new String[]{child.asString()} : child.asStringArray();
+                    for(String type : values){
+                        Class<?> consumeType = resolve("Consume" + Strings.capitalize(type), Consume.class);
+                        if(consumeType != Consume.class){
+                            block.removeConsumers(b -> consumeType.isAssignableFrom(b.getClass()));
+                        }else{
+                            Log.warn("Unknown consumer type '@' (Class: @) in consume: remove.", type, "Consume" + Strings.capitalize(type));
+                        }
+                    }
+                }
+                case "item" -> block.consumeItem(find(ContentType.item, child.asString()));
+                case "itemCharged" -> block.consume((Consume)parser.readValue(ConsumeItemCharged.class, child));
+                case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
+                case "itemRadioactive" -> block.consume((Consume)parser.readValue(ConsumeItemRadioactive.class, child));
+                case "itemExplosive" -> block.consume((Consume)parser.readValue(ConsumeItemExplosive.class, child));
+                case "itemList" -> block.consume((Consume)parser.readValue(ConsumeItemList.class, child));
+                case "itemExplode" -> block.consume((Consume)parser.readValue(ConsumeItemExplode.class, child));
+                case "items" -> block.consume(
+                    child.isArray() ? new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
+                    child.isString() ? new ConsumeItems(new ItemStack[]{parser.readValue(ItemStack.class, child)}) :
+                    parser.readValue(ConsumeItems.class, child));
+
+                case "liquidFlammable" -> block.consume((Consume)parser.readValue(ConsumeLiquidFlammable.class, child));
+                case "liquid" -> block.consume((Consume)parser.readValue(ConsumeLiquid.class, child));
+                case "liquids" -> block.consume(
+                    child.isArray() ? new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
+                    parser.readValue(ConsumeLiquids.class, child));
+                case "coolant" -> block.consume((Consume)parser.readValue(ConsumeCoolant.class, child));
+                case "power" -> {
+                    if(child.isNumber()){
+                        block.consumePower(child.asFloat());
+                    }else{
+                        block.consume((Consume)parser.readValue(ConsumePower.class, child));
+                    }
+                }
+                case "powerBuffered" -> block.consumePowerBuffered(child.asFloat());
+                default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
+            }
+        }
+        value.remove("consumes");
+    }
+
     private ObjectMap<ContentType, TypeParser<?>> parsers = ObjectMap.of(
         ContentType.block, (TypeParser<Block>)(mod, name, value) -> {
             readBundle(ContentType.block, name, value);
@@ -463,46 +509,7 @@ public class ContentParser{
 
             read(() -> {
                 if(value.has("consumes") && value.get("consumes").isObject()){
-                    for(JsonValue child : value.get("consumes")){
-                        switch(child.name){
-                            case "remove" -> {
-                                String[] values = child.isString() ? new String[]{child.asString()} : child.asStringArray();
-                                for(String type : values){
-                                    Class<?> consumeType = resolve("Consume" + Strings.capitalize(type), Consume.class);
-                                    if(consumeType != Consume.class){
-                                        block.removeConsumers(b -> consumeType.isAssignableFrom(b.getClass()));
-                                    }else{
-                                        Log.warn("Unknown consumer type '@' (Class: @) in consume: remove.", type, "Consume" + Strings.capitalize(type));
-                                    }
-                                }
-                            }
-                            case "item" -> block.consumeItem(find(ContentType.item, child.asString()));
-                            case "itemCharged" -> block.consume((Consume)parser.readValue(ConsumeItemCharged.class, child));
-                            case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
-                            case "itemRadioactive" -> block.consume((Consume)parser.readValue(ConsumeItemRadioactive.class, child));
-                            case "itemExplosive" -> block.consume((Consume)parser.readValue(ConsumeItemExplosive.class, child));
-                            case "itemList" -> block.consume((Consume)parser.readValue(ConsumeItemList.class, child));
-                            case "itemExplode" -> block.consume((Consume)parser.readValue(ConsumeItemExplode.class, child));
-                            case "items" -> block.consume(child.isArray() ?
-                                    new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
-                                    parser.readValue(ConsumeItems.class, child));
-                            case "liquidFlammable" -> block.consume((Consume)parser.readValue(ConsumeLiquidFlammable.class, child));
-                            case "liquid" -> block.consume((Consume)parser.readValue(ConsumeLiquid.class, child));
-                            case "liquids" -> block.consume(child.isArray() ?
-                                    new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
-                                    parser.readValue(ConsumeLiquids.class, child));
-                            case "coolant" -> block.consume((Consume)parser.readValue(ConsumeCoolant.class, child));
-                            case "power" -> {
-                                if(child.isNumber()){
-                                    block.consumePower(child.asFloat());
-                                }else{
-                                    block.consume((Consume)parser.readValue(ConsumePower.class, child));
-                                }
-                            }
-                            case "powerBuffered" -> block.consumePowerBuffered(child.asFloat());
-                            default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
-                        }
-                    }
+                    readBlockConsumers(block, value.get("consumes"));
                     value.remove("consumes");
                 }
 

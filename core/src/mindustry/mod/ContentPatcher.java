@@ -9,12 +9,13 @@ import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.world.*;
+import mindustry.world.consumers.*;
 
 import java.lang.reflect.*;
 import java.util.*;
 
 /** The current implementation is awful. Consider it a proof of concept. */
-//TODO block consumer support
 @SuppressWarnings("unchecked")
 public class ContentPatcher{
     private static final Object root = new Object();
@@ -113,7 +114,7 @@ public class ContentPatcher{
             for(int i = 0; i < path.length - 1; i++){
                 Object[] result = resolve(object, path[i], metadata);
                 if(result == null){
-                    //TODO report error
+                    warn("Failed to resolve @.@", object, path[i]);
                     return;
                 }
                 object = result[0];
@@ -231,6 +232,23 @@ public class ContentPatcher{
                     }
                     Reflect.set(fobj, fdata.field, fv);
                 }, value, true);
+            }else if(value instanceof JsonValue jsv && object instanceof Block bl && jsv.isObject() && field.equals("consumes")){
+                modifiedField(bl, "consumeBuilder", Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy());
+                boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
+                reset(() -> {
+                    bl.hasItems = hadItems;
+                    bl.hasLiquids = hadLiquids;
+                    bl.hasPower = hadPower;
+                    bl.acceptsItems = acceptedItems;
+                });
+                after(bl::reinitializeConsumers);
+
+                try{
+                    Vars.mods.getContentParser().readBlockConsumers(bl, jsv);
+                }catch(Throwable e){
+                    Log.err(e);
+                    warn("Failed to read consumers for '@': @", bl, Strings.getSimpleMessage(e));
+                }
             }else{
                 warn("Unknown field: '@' for class '@'", field, actualType.getSimpleName());
             }
@@ -241,7 +259,7 @@ public class ContentPatcher{
         Object prevValue = getter.get();
 
         if(value instanceof JsonValue jsv){ //setting values from object
-            if(prevValue == null || !jsv.isObject() || jsv.has("type")){
+           if(prevValue == null || !jsv.isObject() || jsv.has("type")){
                 if(UnlockableContent.class.isAssignableFrom(metadata.type) && (jsv.isObject())){
                     warn("New content must not be instantiated: @", jsv);
                     return;

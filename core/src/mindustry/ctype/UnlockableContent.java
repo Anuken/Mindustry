@@ -24,6 +24,7 @@ import static mindustry.Vars.*;
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
     /** Stat storage for this content. Initialized on demand. */
+    @NoPatch
     public Stats stats = new Stats();
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
