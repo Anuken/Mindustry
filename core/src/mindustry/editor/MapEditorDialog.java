@@ -383,6 +383,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         state.rules.allowEditRules = false;
         state.rules.objectiveFlags.clear();
         state.rules.objectives.each(MapObjective::reset);
+        state.stats = new GameStats();
         String name = editor.tags.get("name", "").trim();
         editor.tags.put("rules", JsonIO.write(state.rules));
         editor.tags.remove("width");

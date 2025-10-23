@@ -63,6 +63,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean acceptsPayload = false;
     /** Visual flag use for blending of certain transportation blocks. */
     public boolean acceptsItems = false;
+    /** If true, this block won't be affected by the onlyDepositCore rule. */
+    public boolean alwaysAllowDeposit = false;
     /** If true, all item capacities of this block are separate instead of pooled as one number. */
     public boolean separateItemCapacity = false;
     /** maximum items this block can carry (usually, this is per-type of item) */
@@ -696,6 +698,13 @@ public class Block extends UnlockableContent implements Senseable{
                 addLiquidBar(build -> build.liquids.current());
             }
         }
+    }
+
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+        barMap.clear();
+        setBars();
     }
 
     public boolean consumesItem(Item item){
@@ -1336,6 +1345,21 @@ public class Block extends UnlockableContent implements Senseable{
 
         if(buildVisibility == BuildVisibility.sandboxOnly){
             hideDetails = false;
+        }
+    }
+
+    public void reinitializeConsumers(){
+        consumers = consumeBuilder.toArray(Consume.class);
+        consPower = (ConsumePower)Structs.find(consumers, c -> c instanceof ConsumePower);
+        optionalConsumers = consumeBuilder.select(consume -> consume.optional && !consume.ignore()).toArray(Consume.class);
+        nonOptionalConsumers = consumeBuilder.select(consume -> !consume.optional && !consume.ignore()).toArray(Consume.class);
+        updateConsumers = consumeBuilder.select(consume -> consume.update && !consume.ignore()).toArray(Consume.class);
+        hasConsumers = consumers.length > 0;
+        itemFilter = new boolean[content.items().size];
+        liquidFilter = new boolean[content.liquids().size];
+
+        for(Consume cons : consumers){
+            cons.apply(this);
         }
     }
 

@@ -14,6 +14,7 @@ import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
@@ -23,6 +24,7 @@ import static mindustry.Vars.*;
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
     /** Stat storage for this content. Initialized on demand. */
+    @NoPatch
     public Stats stats = new Stats();
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
@@ -64,6 +66,7 @@ public abstract class UnlockableContent extends MappableContent{
     /** Tech nodes for all trees that this content is part of. */
     public Seq<TechNode> techNodes = new Seq<>();
     /** Unlock state. Loaded from settings. Do not modify outside the constructor. */
+    @NoPatch
     protected boolean unlocked;
 
     public UnlockableContent(String name){
@@ -93,6 +96,14 @@ public abstract class UnlockableContent extends MappableContent{
             Core.atlas.find(name + "1"))))));
 
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
+    }
+
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+
+        //reset stats
+        stats = new Stats();
     }
 
     public boolean isBanned(){
