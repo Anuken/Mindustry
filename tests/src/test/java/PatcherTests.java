@@ -128,7 +128,7 @@ public class PatcherTests{
 
         assertEquals(1, UnitTypes.dagger.abilities.size);
         assertEquals(ShieldArcAbility.class, UnitTypes.dagger.abilities.get(0).getClass());
-        assertEquals(100f, ((ShieldArcAbility)UnitTypes.dagger.abilities.get(0)).max);
+        assertEquals(1000f, ((ShieldArcAbility)UnitTypes.dagger.abilities.get(0)).max);
 
         Vars.logic.reset();
 
