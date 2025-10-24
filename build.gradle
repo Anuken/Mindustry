@@ -223,7 +223,7 @@ configure(project(":annotations")){
 }
 
 //compile with java 8 compatibility for everything except the annotation project
-configure(subprojects - project(":annotations")){
+configure(subprojects - project(":annotations") - project(":tests")){
     tasks.withType(JavaCompile){
         options.compilerArgs.addAll(['--release', '8'])
     }
@@ -398,6 +398,12 @@ project(":tests"){
         testImplementation arcModule("backends:backend-headless")
         testImplementation "org.json:json:20230618"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.1"
+    }
+
+    tasks.withType(JavaCompile){
+        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        options.compilerArgs.addAll(['--release', '17'])
     }
 
     test{

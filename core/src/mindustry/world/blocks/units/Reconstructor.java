@@ -119,8 +119,19 @@ public class Reconstructor extends UnitBlock{
 
     @Override
     public void init(){
-        capacities = new int[Vars.content.items().size];
+        initCapacities();
+        super.init();
+    }
 
+    @Override
+    public void afterPatch(){
+        initCapacities();
+        super.afterPatch();
+    }
+
+    public void initCapacities(){
+        capacities = new int[Vars.content.items().size];
+        itemCapacity = 10;
         ConsumeItems cons = findConsumer(c -> c instanceof ConsumeItems);
         if(cons != null){
             for(ItemStack stack : cons.items){
@@ -130,8 +141,6 @@ public class Reconstructor extends UnitBlock{
         }
 
         consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
-
-        super.init();
     }
 
     public void addUpgrade(UnitType from, UnitType to){

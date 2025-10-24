@@ -93,25 +93,22 @@ public class ContentPatcher{
         usedpatches.clear();
     }
 
+    void visit(Object object){
+        if(object instanceof Content c && usedpatches.add(c)){
+            after(c::afterPatch);
+        }
+    }
+
     void assign(Object object, String field, Object value, @Nullable FieldData metadata, @Nullable Object parentObject, @Nullable String parentField) throws Exception{
         if(field == null || field.isEmpty()) return;
-
-        char prefix = 0;
-
-        //fetch modifier (+ or -) and concat it to the end, turning `+array` into `array.+`
-        if(field.charAt(0) == '+'){
-            prefix = field.charAt(0);
-            field = field.substring(1);
-        }else if(field.endsWith(".+")){
-            prefix = field.charAt(field.length() - 1);
-            field = field.substring(0, field.length() - 2);
-        }
 
         //field.field2.field3 nested syntax
         if(field.indexOf('.') != -1){
             //resolve the field chain until the final field is reached
             String[] path = field.split("\\.");
             for(int i = 0; i < path.length - 1; i++){
+                parentObject = object;
+                parentField = path[i];
                 Object[] result = resolve(object, path[i], metadata);
                 if(result == null){
                     warn("Failed to resolve @.@", object, path[i]);
@@ -119,13 +116,15 @@ public class ContentPatcher{
                 }
                 object = result[0];
                 metadata = (FieldData)result[1];
+
+                if(i < path.length - 2){
+                    visit(object);
+                }
             }
             field = path[path.length - 1];
         }
 
-        if(object instanceof Content c && usedpatches.add(c)){
-            after(c::afterPatch);
-        }
+        visit(object);
 
         if(object == root){
             if(value instanceof JsonValue jval && jval.isObject()){
@@ -142,17 +141,20 @@ public class ContentPatcher{
             }
         }else if(object instanceof Seq<?> || object.getClass().isArray()){ //TODO
 
-            if(prefix == '+'){
+            if(field.equals("+")){
+                var meta = new FieldData(metadata.elementType, null, null);
                 //handle array addition syntax
                 if(object instanceof Seq s){
                     modifiedField(parentObject, parentField, s.copy());
 
-                    assignValue(object, field, metadata, () -> null, val -> s.add(val), value, false);
+                    assignValue(object, field, meta, () -> null, s::add, value, false);
                 }else{
                     modifiedField(parentObject, parentField, copyArray(object));
 
                     var fobj = object;
-                    assignValue(parentObject, parentField, metadata, () -> null, val -> {
+                    var fpo = parentObject;
+                    var fpf = parentField;
+                    assignValue(parentObject, parentField, meta, () -> null, val -> {
                         try{
                             //create copy array, put the new object in the last slot, and assign the parent's field to it
                             int len = Array.getLength(fobj);
@@ -160,7 +162,7 @@ public class ContentPatcher{
                             Array.set(copy, len - 1, val);
                             System.arraycopy(fobj, 0, copy, 0, len);
 
-                            assign(parentObject, parentField, copy, null, null, null);
+                            assign(fpo, fpf, copy, null, null, null);
                         }catch(Exception e){
                             throw new RuntimeException(e);
                         }
@@ -190,7 +192,7 @@ public class ContentPatcher{
                     assignValue(object, field, metadata, () -> Array.get(fobj, i), val -> Array.set(fobj, i, val), value, false);
                 }
             }
-        }else if(object instanceof ObjectSet set && prefix == '+'){
+        }else if(object instanceof ObjectSet set && field.equals("+")){
             modifiedField(parentObject, parentField, set.copy());
 
             assignValue(object, field, metadata, () -> null, val -> set.add(val), value, false);
@@ -269,7 +271,7 @@ public class ContentPatcher{
                 try{
                     setter.get(json.readValue(metadata.type, metadata.elementType, jsv));
                 }catch(Throwable e){
-                    warn("Failed to read value @.@ = @: @ (type = @ elementType = @)", object, field, value, e.getMessage(), metadata.type, metadata.elementType);
+                    warn("Failed to read value @.@ = @: @ (type = @ elementType = @)\n@", object, field, value, e.getMessage(), metadata.type, metadata.elementType, Strings.getStackTrace(e));
                 }
             }else{
                 //assign each field manually

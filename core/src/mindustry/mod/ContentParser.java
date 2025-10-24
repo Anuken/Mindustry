@@ -105,7 +105,7 @@ public class ContentParser{
                 if(result != null) return result;
                 throw new IllegalArgumentException("Unknown status effect: '" + data.asString() + "'");
             }
-            StatusEffect effect = new StatusEffect(currentMod.name + "-" + data.getString("name"));
+            StatusEffect effect = new StatusEffect((currentMod == null ? null : currentMod.name + "-") + data.getString("name"));
             effect.minfo.mod = currentMod;
             readFields(effect, data);
             return effect;
@@ -310,7 +310,9 @@ public class ContentParser{
             data.remove("type");
             var weapon = make(oc);
             readFields(weapon, data);
-            weapon.name = currentMod.name + "-" + weapon.name;
+            if(currentMod != null){
+                weapon.name = currentMod.name + "-" + weapon.name;
+            }
             return weapon;
         });
         put(Consume.class, (type, data) -> {
@@ -448,11 +450,15 @@ public class ContentParser{
                 case "remove" -> {
                     String[] values = child.isString() ? new String[]{child.asString()} : child.asStringArray();
                     for(String type : values){
-                        Class<?> consumeType = resolve("Consume" + Strings.capitalize(type), Consume.class);
-                        if(consumeType != Consume.class){
-                            block.removeConsumers(b -> consumeType.isAssignableFrom(b.getClass()));
+                        if(type.equals("all")){
+                            block.removeConsumers(b -> true);
                         }else{
-                            Log.warn("Unknown consumer type '@' (Class: @) in consume: remove.", type, "Consume" + Strings.capitalize(type));
+                            Class<?> consumeType = resolve("Consume" + Strings.capitalize(type), Consume.class);
+                            if(consumeType != Consume.class){
+                                block.removeConsumers(b -> consumeType.isAssignableFrom(b.getClass()));
+                            }else{
+                                Log.warn("Unknown consumer type '@' (Class: @) in consume: remove.", type, "Consume" + Strings.capitalize(type));
+                            }
                         }
                     }
                 }
@@ -552,7 +558,6 @@ public class ContentParser{
             }
 
             currentContent = unit;
-            //TODO test this!
             read(() -> {
                 //add reconstructor type
                 if(value.has("requirements")){
@@ -765,7 +770,7 @@ public class ContentParser{
 
     private <T extends Content> T find(ContentType type, String name){
         Content c = Vars.content.getByName(type, name);
-        if(c == null) c = Vars.content.getByName(type, currentMod.name + "-" + name);
+        if(c == null && currentMod != null) c = Vars.content.getByName(type, currentMod.name + "-" + name);
         if(c == null) throw new IllegalArgumentException("No " + type + " found with name '" + name + "'");
         return (T)c;
     }
@@ -941,7 +946,7 @@ public class ContentParser{
 
     private <T extends MappableContent> T locate(ContentType type, String name){
         T first = Vars.content.getByName(type, name); //try vanilla replacement
-        return first != null ? first : Vars.content.getByName(type, currentMod.name + "-" + name);
+        return first != null ? first : Vars.content.getByName(type, currentMod == null ? name : currentMod.name + "-" + name);
     }
 
     private <T extends MappableContent> T locateAny(String name){
@@ -1277,7 +1282,7 @@ public class ContentParser{
         }
 
         if(def != null){
-            Log.warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentContent == null ? currentMod.name : "");
+            Log.warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentContent == null && currentMod != null ? currentMod.name : "");
             return def;
         }
         throw new IllegalArgumentException("Type not found: " + base);
