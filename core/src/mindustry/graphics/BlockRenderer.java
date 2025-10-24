@@ -516,10 +516,24 @@ public class BlockRenderer{
 
                 if(entity != null){
                     entity.drawLight();
-                }else if(tile.block().emitLight){
+                    continue;
+                }
+
+                if(tile.block().emitLight){
                     tile.block().drawEnvironmentLight(tile);
-                }else if(tile.floor().emitLight && tile.block() == Blocks.air){ //only draw floor light under non-solid blocks
-                    tile.floor().drawEnvironmentLight(tile);
+                    continue;
+                }
+
+                //only draw floor light under non-solid blocks
+                if(tile.block() == Blocks.air){
+                    if(tile.overlay().emitLight){
+                        tile.overlay().drawEnvironmentLight(tile);
+                        continue;
+                    }
+
+                    if(tile.floor().emitLight){
+                        tile.floor().drawEnvironmentLight(tile);
+                    }
                 }
             }
         }
