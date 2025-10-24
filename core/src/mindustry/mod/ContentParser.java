@@ -140,7 +140,8 @@ public class ContentParser{
             }else if(data.isArray()){
                 return new MultiBulletType(parser.readValue(BulletType[].class, data));
             }
-            Class<?> bc = resolve(data.getString("type", ""), resolve(Strings.capitalize(data.getString("type", "")) + "BulletType", BasicBulletType.class), false);
+            Class<?> alternate = resolve(Strings.capitalize(data.getString("type", "basic")) + "BulletType", Object.class, false);
+            Class<?> bc = alternate == Object.class ? resolve(data.getString("type", ""), BasicBulletType.class) : alternate;
             data.remove("type");
             BulletType result = (BulletType)make(bc);
             readFields(result, data);
@@ -863,6 +864,7 @@ public class ContentParser{
         reads.clear();
         postreads.clear();
         toBeParsed.clear();
+        currentMod = null;
     }
 
     /**
