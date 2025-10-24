@@ -142,12 +142,27 @@ public class ContentPatcher{
         }else if(object instanceof Seq<?> || object.getClass().isArray()){ //TODO
 
             if(field.equals("+")){
-                var meta = new FieldData(metadata.elementType, null, null);
+                var meta = new FieldData(metadata.type.isArray() ? metadata.type.getComponentType() : metadata.elementType, null, null);
+                boolean multiAdd;
+
+                if(value instanceof JsonValue jval && jval.isArray()){
+                    meta = metadata;
+                    multiAdd = true;
+                }else{
+                    multiAdd = false;
+                }
+
                 //handle array addition syntax
                 if(object instanceof Seq s){
                     modifiedField(parentObject, parentField, s.copy());
 
-                    assignValue(object, field, meta, () -> null, s::add, value, false);
+                    assignValue(object, field, meta, () -> null, val -> {
+                        if(multiAdd){
+                            s.addAll((Seq)val);
+                        }else{
+                            s.add(val);
+                        }
+                    }, value, false);
                 }else{
                     modifiedField(parentObject, parentField, copyArray(object));
 
@@ -158,9 +173,18 @@ public class ContentPatcher{
                         try{
                             //create copy array, put the new object in the last slot, and assign the parent's field to it
                             int len = Array.getLength(fobj);
-                            Object copy = Array.newInstance(fobj.getClass().getComponentType(), len + 1);
-                            Array.set(copy, len - 1, val);
-                            System.arraycopy(fobj, 0, copy, 0, len);
+                            Object copy;
+
+                            if(multiAdd){
+                                int otherLen = Array.getLength(val);
+                                copy = Array.newInstance(fobj.getClass().getComponentType(), len + otherLen);
+                                System.arraycopy(val, 0, copy, len, otherLen);
+                                System.arraycopy(fobj, 0, copy, 0, len);
+                            }else{
+                                copy = Array.newInstance(fobj.getClass().getComponentType(), len + 1);
+                                Array.set(copy, len, val);
+                                System.arraycopy(fobj, 0, copy, 0, len);
+                            }
 
                             assign(fpo, fpf, copy, null, null, null);
                         }catch(Exception e){
@@ -262,7 +286,7 @@ public class ContentPatcher{
 
         if(value instanceof JsonValue jsv){ //setting values from object
            if(prevValue == null || !jsv.isObject() || jsv.has("type")){
-                if(UnlockableContent.class.isAssignableFrom(metadata.type) && (jsv.isObject())){
+                if(UnlockableContent.class.isAssignableFrom(metadata.type) && jsv.isObject()){
                     warn("New content must not be instantiated: @", jsv);
                     return;
                 }

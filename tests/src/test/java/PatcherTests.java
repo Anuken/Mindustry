@@ -1,6 +1,7 @@
 import arc.struct.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.type.*;
 import mindustry.world.blocks.units.*;
@@ -114,5 +115,85 @@ public class PatcherTests{
 
         assertEquals(2, UnitTypes.dagger.weapons.size);
         assertEquals("large-weapon", UnitTypes.dagger.weapons.get(0).name);
+    }
+
+    @Test
+    void testUnitAbilities() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        unit.dagger.abilities.+: {
+            type: ShieldArcAbility
+            max: 1000
+        }
+        """));
+
+        assertEquals(1, UnitTypes.dagger.abilities.size);
+        assertEquals(ShieldArcAbility.class, UnitTypes.dagger.abilities.get(0).getClass());
+        assertEquals(100f, ((ShieldArcAbility)UnitTypes.dagger.abilities.get(0)).max);
+
+        Vars.logic.reset();
+
+        assertEquals(0, UnitTypes.dagger.abilities.size);
+    }
+
+    @Test
+    void testUnitAbilitiesArray() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        unit.dagger.abilities.+: [
+            {
+                type: ShieldArcAbility
+                max: 1000
+            },
+            {
+                type: MoveEffectAbility
+                amount: 10
+            }
+        ]
+        """));
+
+        assertEquals(2, UnitTypes.dagger.abilities.size);
+        assertEquals(ShieldArcAbility.class, UnitTypes.dagger.abilities.get(0).getClass());
+        assertEquals(1000f, ((ShieldArcAbility)UnitTypes.dagger.abilities.get(0)).max);
+
+        assertEquals(MoveEffectAbility.class, UnitTypes.dagger.abilities.get(1).getClass());
+        assertEquals(10, ((MoveEffectAbility)UnitTypes.dagger.abilities.get(1)).amount);
+
+        Vars.logic.reset();
+
+        assertEquals(0, UnitTypes.dagger.abilities.size);
+    }
+
+    @Test
+    void testUnitFlagsArray() throws Exception{
+        int oldLength = UnitTypes.dagger.targetFlags.length;
+
+        Vars.state.patcher.apply(Seq.with("""
+        unit.dagger.targetFlags.+: [
+            shield, drill
+        ]
+        """));
+
+        assertEquals(oldLength + 2, UnitTypes.dagger.targetFlags.length);
+        assertEquals(BlockFlag.shield, UnitTypes.dagger.targetFlags[UnitTypes.dagger.targetFlags.length - 2]);
+        assertEquals(BlockFlag.drill, UnitTypes.dagger.targetFlags[UnitTypes.dagger.targetFlags.length - 1]);
+
+        Vars.logic.reset();
+
+        assertEquals(oldLength, UnitTypes.dagger.targetFlags.length);
+    }
+
+    @Test
+    void testUnitFlags() throws Exception{
+        int oldLength = UnitTypes.dagger.targetFlags.length;
+
+        Vars.state.patcher.apply(Seq.with("""
+        unit.dagger.targetFlags.+: shield
+        """));
+
+        assertEquals(oldLength + 1, UnitTypes.dagger.targetFlags.length);
+        assertEquals(BlockFlag.shield, UnitTypes.dagger.targetFlags[UnitTypes.dagger.targetFlags.length - 1]);
+
+        Vars.logic.reset();
+
+        assertEquals(oldLength, UnitTypes.dagger.targetFlags.length);
     }
 }
