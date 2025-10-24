@@ -140,7 +140,7 @@ public class ContentParser{
             }else if(data.isArray()){
                 return new MultiBulletType(parser.readValue(BulletType[].class, data));
             }
-            Class<?> bc = resolve(data.getString("type", ""), BasicBulletType.class);
+            Class<?> bc = resolve(data.getString("type", ""), resolve(Strings.capitalize(data.getString("type", "")) + "BulletType", BasicBulletType.class), false);
             data.remove("type");
             BulletType result = (BulletType)make(bc);
             readFields(result, data);
@@ -897,6 +897,8 @@ public class ContentParser{
         if(!located){
             c.minfo.mod = mod;
         }
+
+        currentMod = null;
         return c;
     }
 
@@ -1262,6 +1264,11 @@ public class ContentParser{
 
     /** Tries to resolve a class from the class type map. */
     <T> Class<T> resolve(String base, Class<T> def){
+        return resolve(base, def, true);
+    }
+
+    /** Tries to resolve a class from the class type map. */
+    <T> Class<T> resolve(String base, Class<T> def, boolean warn){
         //no base class specified
         if((base == null || base.isEmpty()) && def != null) return def;
 
@@ -1282,7 +1289,7 @@ public class ContentParser{
         }
 
         if(def != null){
-            Log.warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentContent == null && currentMod != null ? currentMod.name : "");
+            if(warn) Log.warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentContent == null && currentMod != null ? currentMod.name : "");
             return def;
         }
         throw new IllegalArgumentException("Type not found: " + base);

@@ -90,4 +90,29 @@ public class PatcherTests{
         UnitTypes.dagger.checkStats();
         assertNull(UnitTypes.dagger.stats.toMap().get(StatCat.general).get(Stat.charge));
     }
+
+    @Test
+    void testUnitWeaponReassign() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        unit.dagger.weapons: [
+            {
+                name: megapoop
+                bullet: {
+                    type: rail
+                    lightningLength: 999
+                }
+            }
+        ]
+        """));
+
+        assertEquals(1, UnitTypes.dagger.weapons.size);
+        assertEquals("megapoop", UnitTypes.dagger.weapons.get(0).name);
+        assertEquals(RailBulletType.class, UnitTypes.dagger.weapons.get(0).bullet.getClass());
+        assertEquals(999, UnitTypes.dagger.weapons.get(0).bullet.lightningLength);
+
+        Vars.logic.reset();
+
+        assertEquals(2, UnitTypes.dagger.weapons.size);
+        assertEquals("large-weapon", UnitTypes.dagger.weapons.get(0).name);
+    }
 }
