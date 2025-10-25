@@ -742,7 +742,7 @@ public class ContentParser{
         }
     );
 
-    private Prov<Unit> unitType(JsonValue value){
+    Prov<Unit> unitType(JsonValue value){
         if(value == null) return UnitEntity::create;
         return switch(value.asString()){
             case "flying" -> UnitEntity::create;

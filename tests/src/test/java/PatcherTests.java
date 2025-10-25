@@ -3,6 +3,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.meta.*;
@@ -198,6 +199,20 @@ public class PatcherTests{
     }
 
     @Test
+    void testUnitType() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        unit.dagger.type: legs
+        """));
+
+        assertEquals(0, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(LegsUnit.class, UnitTypes.dagger.constructor.get().getClass());
+
+        Vars.logic.reset();
+
+        assertEquals(MechUnit.class, UnitTypes.dagger.constructor.get().getClass());
+    }
+
+    @Test
     void testCannotPatch() throws Exception{
         Vars.state.patcher.apply(Seq.with("""
         block.conveyor.size: 2
@@ -205,6 +220,17 @@ public class PatcherTests{
 
         assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
         assertEquals(1, Blocks.conveyor.size);
+    }
+
+    @Test
+    void testGibberish() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        }[35209509()jfkjhadsf,
+        ,,,,,[]
+        ]{
+        """));
+
+        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
     }
 
     @Test
@@ -218,7 +244,7 @@ public class PatcherTests{
         unit.dagger.frogs: 10
         """));
 
-        assertEquals(2, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
     }
 
     @Test

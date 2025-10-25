@@ -81,6 +81,11 @@ public class ContentPatcher{
                 currentlyApplying = null;
 
             }catch(Exception e){
+                PatchSet set = new PatchSet(patch, new JsonValue("error"));
+                set.error = true;
+                set.warnings.add(Strings.getSimpleMessage(e));
+                patches.add(set);
+
                 Log.err("Failed to apply patch: " + patch, e);
             }
         }
@@ -283,10 +288,10 @@ public class ContentPatcher{
 
             var fields = parser.getJson().getFields(actualType);
             var fdata = fields.get(field);
+            var fobj = object;
             if(fdata != null){
                 if(checkField(fdata.field)) return;
 
-                var fobj = object;
                 assignValue(object, field, new FieldData(fdata), () -> Reflect.get(fobj, fdata.field), fv -> {
                     if(fv == null && !fdata.field.isAnnotationPresent(Nullable.class) && !(Vars.headless && ContentParser.implicitNullable.contains(fdata.field.getType()))){
                         warn("Field '@' cannot be null.", fdata.field);
@@ -311,6 +316,9 @@ public class ContentPatcher{
                     Log.err(e);
                     warn("Failed to read consumers for '@': @", bl, Strings.getSimpleMessage(e));
                 }
+            }else if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("type")){
+                var fmeta = fields.get("constructor");
+                assignValue(object, "constructor", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), parser.unitType(jsv), true);
             }else{
                 warn("Unknown field '@' for class '@'", field, actualType.getSimpleName());
             }
@@ -320,37 +328,41 @@ public class ContentPatcher{
     void assignValue(Object object, String field, FieldData metadata, Prov getter, Cons setter, Object value, boolean modify) throws Exception{
         Object prevValue = getter.get();
 
-        if(value instanceof JsonValue jsv){ //setting values from object
-           if(prevValue == null || !jsv.isObject() || jsv.has("type")){
-                if(UnlockableContent.class.isAssignableFrom(metadata.type) && jsv.isObject()){
-                    warn("New content must not be instantiated: @", jsv);
-                    return;
-                }
+        try{
+            if(value instanceof JsonValue jsv){ //setting values from object
+               if(prevValue == null || !jsv.isObject() || jsv.has("type")){
+                    if(UnlockableContent.class.isAssignableFrom(metadata.type) && jsv.isObject()){
+                        warn("New content must not be instantiated: @", jsv);
+                        return;
+                    }
 
-                if(modify) modifiedField(object, field, getter.get());
+                    if(modify) modifiedField(object, field, getter.get());
 
-                //HACK: listen for creation of objects once
-               parser.listeners.add((type, jsonData, result) -> created(result, object));
-                try{
-                    setter.get(parser.getJson().readValue(metadata.type, metadata.elementType, jsv));
-                }catch(Throwable e){
-                    warn("Failed to read value @.@ = @: @ (type = @ elementType = @)\n@", object, field, value, e.getMessage(), metadata.type, metadata.elementType, Strings.getStackTrace(e));
-                }
-               parser.listeners.pop();
-            }else{
-                //assign each field manually
-                var childFields = parser.getJson().getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
-                for(var child : jsv){
-                    if(child.name != null){
-                        assign(prevValue, child.name, child, !childFields.containsKey(child.name) ? null : new FieldData(childFields.get(child.name)), object, field);
+                    //HACK: listen for creation of objects once
+                    parser.listeners.add((type, jsonData, result) -> created(result, object));
+                    try{
+                        setter.get(parser.getJson().readValue(metadata.type, metadata.elementType, jsv));
+                    }catch(Throwable e){
+                        warn("Failed to read value @.@ = @: @ (type = @ elementType = @)\n@", object, field, value, e.getMessage(), metadata.type, metadata.elementType, Strings.getStackTrace(e));
+                    }
+                   parser.listeners.pop();
+                }else{
+                    //assign each field manually
+                    var childFields = parser.getJson().getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
+                    for(var child : jsv){
+                        if(child.name != null){
+                            assign(prevValue, child.name, child, !childFields.containsKey(child.name) ? null : new FieldData(childFields.get(child.name)), object, field);
+                        }
                     }
                 }
-            }
-        }else{
-            //direct value is set
-            if(modify) modifiedField(object, field, prevValue);
+            }else{
+                //direct value is set
+                if(modify) modifiedField(object, field, prevValue);
 
-            setter.get(value);
+                setter.get(value);
+            }
+        }catch(Throwable e){
+            warn("Failed to assign @.@ = @: @", object, field, value, Strings.getStackTrace(e));
         }
     }
 
@@ -476,6 +488,7 @@ public class ContentPatcher{
         public String patch;
         public JsonValue json;
         public String name;
+        public boolean error;
         public Seq<String> warnings = new Seq<>();
 
         public PatchSet(String patch, JsonValue json){
