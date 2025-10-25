@@ -95,6 +95,14 @@ public class LiquidBulletType extends BulletType{
         hitEffect.at(hitx, hity, liquid.color);
         Puddles.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
 
+        if(fragOnHit){
+            if(delayFrags && fragBullet != null && fragBullet.delayFrags){
+                Time.run(0f, () -> createFrags(b, hitx, hity));
+            }else{
+                createFrags(b, hitx, hity);
+            }
+        }
+
         if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){
             float intensity = 400f * puddleSize/6f;
             Fires.extinguish(world.tileWorld(hitx, hity), intensity);
