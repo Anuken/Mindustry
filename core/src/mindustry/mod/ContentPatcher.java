@@ -23,8 +23,8 @@ import java.util.*;
 public class ContentPatcher{
     private static final Object root = new Object();
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
+    private static ContentParser parser = createParser();
 
-    private Json json;
     private boolean applied;
     private ContentLoader contentLoader;
     private ObjectSet<Object> usedpatches = new ObjectSet<>();
@@ -41,13 +41,27 @@ public class ContentPatcher{
         }
     }
 
+    static ContentParser createParser(){
+        ContentParser cont = new ContentParser(){
+            @Override
+            void warn(String string, Object... format){
+                //forward warnings to the current patcher - this is a bit hacky, but I do not want to re-initialize the parser every time
+                if(Vars.state.patcher != null){
+                    Vars.state.patcher.warn(string, format);
+                }
+            }
+        };
+        cont.allowClassResolution = false;
+
+        return cont;
+    }
+
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
     public void apply(Seq<String> patchArray) throws Exception{
         if(applied){
             unapply();
             applied = false;
         }
-        json = Vars.mods.getContentParser().getJson();
 
         applied = true;
         contentLoader = Vars.content.copy();
@@ -55,7 +69,7 @@ public class ContentPatcher{
 
         for(String patch : patchArray){
             try{
-                JsonValue value = json.fromJson(null, Jval.read(patch).toString(Jformat.plain));
+                JsonValue value = parser.getJson().fromJson(null, Jval.read(patch).toString(Jformat.plain));
                 PatchSet set = new PatchSet(patch, value);
                 patches.add(set);
                 currentlyApplying = set;
@@ -267,7 +281,7 @@ public class ContentPatcher{
             Class<?> actualType = object.getClass();
             if(actualType.isAnonymousClass()) actualType = actualType.getSuperclass();
 
-            var fields = json.getFields(actualType);
+            var fields = parser.getJson().getFields(actualType);
             var fdata = fields.get(field);
             if(fdata != null){
                 if(checkField(fdata.field)) return;
@@ -292,13 +306,13 @@ public class ContentPatcher{
                 after(bl::reinitializeConsumers);
 
                 try{
-                    Vars.mods.getContentParser().readBlockConsumers(bl, jsv);
+                    parser.readBlockConsumers(bl, jsv);
                 }catch(Throwable e){
                     Log.err(e);
                     warn("Failed to read consumers for '@': @", bl, Strings.getSimpleMessage(e));
                 }
             }else{
-                warn("Unknown field: '@' for class '@'", field, actualType.getSimpleName());
+                warn("Unknown field '@' for class '@'", field, actualType.getSimpleName());
             }
         }
     }
@@ -316,16 +330,16 @@ public class ContentPatcher{
                 if(modify) modifiedField(object, field, getter.get());
 
                 //HACK: listen for creation of objects once
-                Vars.mods.getContentParser().listeners.add((type, jsonData, result) -> created(result, object));
+               parser.listeners.add((type, jsonData, result) -> created(result, object));
                 try{
-                    setter.get(json.readValue(metadata.type, metadata.elementType, jsv));
+                    setter.get(parser.getJson().readValue(metadata.type, metadata.elementType, jsv));
                 }catch(Throwable e){
                     warn("Failed to read value @.@ = @: @ (type = @ elementType = @)\n@", object, field, value, e.getMessage(), metadata.type, metadata.elementType, Strings.getStackTrace(e));
                 }
-                Vars.mods.getContentParser().listeners.pop();
+               parser.listeners.pop();
             }else{
                 //assign each field manually
-                var childFields = json.getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
+                var childFields = parser.getJson().getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
                 for(var child : jsv){
                     if(child.name != null){
                         assign(prevValue, child.name, child, !childFields.containsKey(child.name) ? null : new FieldData(childFields.get(child.name)), object, field);
@@ -383,7 +397,7 @@ public class ContentPatcher{
             Class<?> actualType = object.getClass();
             if(actualType.isAnonymousClass()) actualType = actualType.getSuperclass();
 
-            var fields = json.getFields(actualType);
+            var fields = parser.getJson().getFields(actualType);
             var fdata = fields.get(field);
             if(fdata != null){
                 if(checkField(fdata.field)) return null;
@@ -407,7 +421,7 @@ public class ContentPatcher{
     void modifiedField(Object target, String field, Object value){
         if(!applied || target == null) return;
 
-        var fields = json.getFields(target.getClass());
+        var fields = parser.getJson().getFields(target.getClass());
         var meta = fields.get(field);
         if(meta != null){
 
@@ -431,7 +445,7 @@ public class ContentPatcher{
     }
 
     Object convertKeyType(String string, Class<?> type){
-        return json.fromJson(type, string);
+        return parser.getJson().fromJson(type, string);
     }
 
     void warn(String error, Object... fmt){

@@ -971,10 +971,6 @@ public class Mods implements Loadable{
         }
     }
 
-    public ContentParser getContentParser(){
-        return parser;
-    }
-
     /** @return the mods that the client is missing.
      * The inputted array is changed to contain the extra mods that the client has but the server doesn't.*/
     public Seq<String> getIncompatibility(Seq<String> out){

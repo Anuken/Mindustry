@@ -59,6 +59,8 @@ public class ContentParser{
 
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     Seq<ParseListener> listeners = new Seq<>();
+    /** If false, arbitrary class names cannot be resolved with Class.forName. */
+    boolean allowClassResolution = true;
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
         put(Effect.class, (type, data) -> {
@@ -458,7 +460,7 @@ public class ContentParser{
                             if(consumeType != Consume.class){
                                 block.removeConsumers(b -> consumeType.isAssignableFrom(b.getClass()));
                             }else{
-                                Log.warn("Unknown consumer type '@' (Class: @) in consume: remove.", type, "Consume" + Strings.capitalize(type));
+                                warn("Unknown consumer type '@' (Class: @) in consume: remove.", type, "Consume" + Strings.capitalize(type));
                             }
                         }
                     }
@@ -503,7 +505,7 @@ public class ContentParser{
 
             if(locate(ContentType.block, name) != null){
                 if(value.has("type")){
-                    Log.warn("Warning: '" + currentMod.name + "-" + name + "' re-declares a type. This will be interpreted as a new block. If you wish to override a vanilla block, omit the 'type' section, as vanilla block `type`s cannot be changed.");
+                    warn("Warning: '" + currentMod.name + "-" + name + "' re-declares a type. This will be interpreted as a new block. If you wish to override a vanilla block, omit the 'type' section, as vanilla block `type`s cannot be changed.");
                     block = make(resolve(value.getString("type", ""), Block.class), mod + "-" + name);
                 }else{
                     block = locate(ContentType.block, name);
@@ -1122,7 +1124,7 @@ public class ContentParser{
             FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
             if(metadata == null){
                 if(ignoreUnknownFields){
-                    Log.warn("[@]: Ignoring unknown field: @ (@)", currentContent == null ? null : currentContent.minfo.sourceFile.name(), child.name, type.getSimpleName());
+                    warn("@Unknown field '@' for class '@'", currentContent == null ? "" : "[" + currentContent.minfo.sourceFile.name() + "]: ", child.name, type.getSimpleName());
                     continue;
                 }else{
                     SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");
@@ -1241,7 +1243,7 @@ public class ContentParser{
                         TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName) || t.content.name.equals(SaveVersion.mapFallback(researchName)));
 
                         if(parent == null){
-                            Log.warn("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                            warn("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
                         }else{
                             //add this node to the parent
                             if(!parent.children.contains(node)){
@@ -1252,7 +1254,7 @@ public class ContentParser{
                             node.planet = parent.planet;
                         }
                     }else{
-                        Log.warn(unlock.name + " is not a root node, and does not have a `parent: ` property. Ignoring.");
+                        warn(unlock.name + " is not a root node, and does not have a `parent: ` property. Ignoring.");
                     }
                 }
             });
@@ -1279,7 +1281,7 @@ public class ContentParser{
         if(out != null) return (Class<T>)out;
 
         //try to resolve it as a raw class name
-        if(base.indexOf('.') != -1){
+        if(base.indexOf('.') != -1 && allowClassResolution){
             try{
                 return (Class<T>)Class.forName(base);
             }catch(Exception ignored){
@@ -1291,10 +1293,19 @@ public class ContentParser{
         }
 
         if(def != null){
-            if(warn) Log.warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentContent == null && currentMod != null ? currentMod.name : "");
+            if(warn) warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentContent == null && currentMod != null ? currentMod.name : "");
             return def;
         }
         throw new IllegalArgumentException("Type not found: " + base);
+    }
+
+    void warn(String string, Object... format){
+        Log.warn(string, format);
+    }
+
+    public Json getJson(){
+        checkInit();
+        return parser;
     }
 
     private interface FieldParser{
@@ -1303,11 +1314,6 @@ public class ContentParser{
 
     private interface TypeParser<T extends Content>{
         T parse(String mod, String name, JsonValue value) throws Exception;
-    }
-
-    public Json getJson(){
-        checkInit();
-        return parser;
     }
 
     //intermediate class for parsing

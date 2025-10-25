@@ -208,6 +208,20 @@ public class PatcherTests{
     }
 
     @Test
+    void testUnknownFieldWarn() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        unit.dagger.weapons.+: {
+            bullet: {
+                frogs: 99
+            }
+        }
+        unit.dagger.frogs: 10
+        """));
+
+        assertEquals(2, Vars.state.patcher.patches.first().warnings.size);
+    }
+
+    @Test
     void testBigPatch() throws Exception{
         Vars.state.patcher.apply(Seq.with("""
         item: {
