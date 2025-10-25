@@ -55,9 +55,9 @@ import static mindustry.Vars.*;
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     private static final ContentType[] typesToSearch = {ContentType.block, ContentType.item, ContentType.unit, ContentType.liquid, ContentType.planet};
+    static final ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class, TextureRegion[][][].class);
 
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
-    ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class, TextureRegion[][][].class);
     Seq<ParseListener> listeners = new Seq<>();
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
@@ -97,7 +97,7 @@ public class ContentParser{
                 }
             }
         });
-        put(TextureRegion.class, (type, data) -> Core.atlas.find(data.asString()));
+        put(TextureRegion.class, (type, data) -> Core.atlas == null ? null : Core.atlas.find(data.asString()));
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(StatusEffect.class, (type, data) -> {
             if(data.isString()){

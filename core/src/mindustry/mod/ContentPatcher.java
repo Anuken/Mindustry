@@ -9,8 +9,11 @@ import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.entities.part.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -96,6 +99,25 @@ public class ContentPatcher{
     void visit(Object object){
         if(object instanceof Content c && usedpatches.add(c)){
             after(c::afterPatch);
+        }
+    }
+
+    void created(Object object, Object parent){
+        if(!Vars.headless){
+            if(object instanceof DrawPart part && parent instanceof MappableContent cont){
+                part.load(cont.name);
+            }else if(object instanceof DrawBlock draw && parent instanceof Block block){
+                draw.load(block);
+            }else if(object instanceof Weapon weapon){
+                weapon.load();
+                weapon.init();
+            }else if(object instanceof Content cont){
+                cont.load();
+            }
+        }else{
+            if(object instanceof Weapon weapon){
+                weapon.init();
+            }
         }
     }
 
@@ -252,7 +274,7 @@ public class ContentPatcher{
 
                 var fobj = object;
                 assignValue(object, field, new FieldData(fdata), () -> Reflect.get(fobj, fdata.field), fv -> {
-                    if(fv == null && !fdata.field.isAnnotationPresent(Nullable.class)){
+                    if(fv == null && !fdata.field.isAnnotationPresent(Nullable.class) && !(Vars.headless && ContentParser.implicitNullable.contains(fdata.field.getType()))){
                         warn("Field '@' cannot be null.", fdata.field);
                         return;
                     }
@@ -292,11 +314,15 @@ public class ContentPatcher{
                 }
 
                 if(modify) modifiedField(object, field, getter.get());
+
+                //HACK: listen for creation of objects once
+                Vars.mods.getContentParser().listeners.add((type, jsonData, result) -> created(result, object));
                 try{
                     setter.get(json.readValue(metadata.type, metadata.elementType, jsv));
                 }catch(Throwable e){
                     warn("Failed to read value @.@ = @: @ (type = @ elementType = @)\n@", object, field, value, e.getMessage(), metadata.type, metadata.elementType, Strings.getStackTrace(e));
                 }
+                Vars.mods.getContentParser().listeners.pop();
             }else{
                 //assign each field manually
                 var childFields = json.getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());

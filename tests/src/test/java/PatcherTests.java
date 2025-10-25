@@ -196,4 +196,64 @@ public class PatcherTests{
 
         assertEquals(oldLength, UnitTypes.dagger.targetFlags.length);
     }
+
+    @Test
+    void testBigPatch() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        item: {
+        	fissile-matter: {
+        		hidden: false
+        		fullIcon: duo-preview
+        		uiIcon: block-duo-ui
+        	}
+        }
+        block: {
+        	pulverizer: {
+        		consumes: {
+        			remove: all
+        			item: copper
+        		}
+        		uiIcon: block-duo-ui
+        		region: block-duo-full
+        		outputItems: [fissile-matter/1]
+        		drawer: [
+        			{
+        				type: DrawRegion
+        				name: block-1
+        			}
+        			{
+        				type: DrawRegion
+        				rotateSpeed: 1
+        				name: duo-preview
+        			}
+        		]
+        	}
+        }
+        unit: {
+        	dagger: {
+        		region: duo-preview
+        		weapons: [
+        			{
+        			    x: 0
+        			    y: 0
+        			    reload: 20
+        				shoot: {
+        					type: ShootAlternate
+        					spread: 3.5
+        				}
+        				bullet: {
+        					width: 7
+        					height: 9
+        					lifetime: 60
+        					frontColor: eac1a8
+        					backColor: d39169
+        				}
+        			}
+        		]
+        	}
+        }
+        """));
+
+        assertEquals(new Seq<>(), Vars.state.patcher.patches.first().warnings);
+    }
 }
