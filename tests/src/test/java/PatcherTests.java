@@ -198,10 +198,21 @@ public class PatcherTests{
     }
 
     @Test
+    void testCannotPatch() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        block.conveyor.size: 2
+        """));
+
+        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(1, Blocks.conveyor.size);
+    }
+
+    @Test
     void testBigPatch() throws Exception{
         Vars.state.patcher.apply(Seq.with("""
         item: {
         	fissile-matter: {
+        	    localizedName: Duo
         		hidden: false
         		fullIcon: duo-preview
         		uiIcon: block-duo-ui
@@ -209,6 +220,7 @@ public class PatcherTests{
         }
         block: {
         	pulverizer: {
+        	    localizedName: Duo Factory
         		consumes: {
         			remove: all
         			item: copper

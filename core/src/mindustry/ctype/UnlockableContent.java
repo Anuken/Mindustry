@@ -62,8 +62,10 @@ public abstract class UnlockableContent extends MappableContent{
      * */
     public ObjectSet<UnlockableContent> databaseTabs = new ObjectSet<>();
     /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
+    @NoPatch
     public @Nullable TechNode techNode;
     /** Tech nodes for all trees that this content is part of. */
+    @NoPatch
     public Seq<TechNode> techNodes = new Seq<>();
     /** Unlock state. Loaded from settings. Do not modify outside the constructor. */
     @NoPatch
