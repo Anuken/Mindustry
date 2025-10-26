@@ -70,12 +70,14 @@ public class ContentPatcher{
         patches.clear();
 
         for(String patch : patchArray){
+            PatchSet set = new PatchSet(patch, new JsonValue("error"));
+            patches.add(set);
+
             try{
                 JsonValue value = parser.getJson().fromJson(null, Jval.read(patch).toString(Jformat.plain));
-                PatchSet set = new PatchSet(patch, value);
-                patches.add(set);
                 currentlyApplying = set;
 
+                set.name = value.getString("name", "");
                 value.remove("name"); //patchsets can have a name, ignore it if present
                 for(var child : value){
                     assign(root, child.name, child, null, null, null);
@@ -83,8 +85,9 @@ public class ContentPatcher{
                 currentlyApplying = null;
 
             }catch(Exception e){
-                patches.peek().error = true;
-                patches.peek().warnings.add(Strings.getSimpleMessage(e));
+                set.error = true;
+                set.warnings.add(Strings.getSimpleMessage(e));
+                currentlyApplying = null;
 
                 Log.err("Failed to apply patch: " + patch, e);
             }
@@ -516,14 +519,13 @@ public class ContentPatcher{
     public static class PatchSet{
         public String patch;
         public JsonValue json;
-        public String name;
+        public String name = "";
         public boolean error;
         public Seq<String> warnings = new Seq<>();
 
         public PatchSet(String patch, JsonValue json){
             this.patch = patch;
             this.json = json;
-            name = json.getString("name", "");
         }
     }
 

@@ -244,7 +244,7 @@ public class PatcherTests{
         unit.dagger.frogs: 10
         """));
 
-        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(2, Vars.state.patcher.patches.first().warnings.size);
     }
 
     @Test
