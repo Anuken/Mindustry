@@ -358,6 +358,15 @@ public class ContentParser{
 
     private Json parser = new Json(){
         @Override
+        protected <T> Class<T> resolveClass(String className){
+            if(allowClassResolution){
+                return super.resolveClass(className);
+            }else{
+                throw new SerializationException("Resolving arbitrary classes (" + className + ") is not allowed. Use short names for classes only (without the package prefix).");
+            }
+        }
+
+        @Override
         public <T> T readValue(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
             T t = internalRead(type, elementType, jsonData, keyType);
             if(t != null && !Reflect.isWrapper(t.getClass()) && (type == null || !type.isPrimitive())){

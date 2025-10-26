@@ -1,5 +1,6 @@
 import arc.struct.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
@@ -264,6 +265,19 @@ public class PatcherTests{
 
         assertEquals(0, Blocks.grass.attributes.get(Attribute.oil));
         assertEquals(0, Blocks.grass.attributes.get(Attribute.heat));
+    }
+
+    @Test
+    void testNoResolution() throws Exception{
+        String name = Pathfinder.class.getCanonicalName();
+
+        Vars.state.patcher.apply(Seq.with("""
+        block.conveyor.lastConfig: {
+            class: %theClass%
+        }
+        """.replace("%theClass%", name)));
+
+        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
     }
 
     @Test

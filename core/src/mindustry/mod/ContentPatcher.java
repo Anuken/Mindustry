@@ -375,7 +375,7 @@ public class ContentPatcher{
                     try{
                         setter.get(parser.getJson().readValue(metadata.type, metadata.elementType, jsv));
                     }catch(Throwable e){
-                        warn("Failed to read value @.@ = @: @ (type = @ elementType = @)\n@", object, field, value, e.getMessage(), metadata.type, metadata.elementType, Strings.getStackTrace(e));
+                        warn("Failed to read value @.@ = @: (type = @ elementType = @)\n@", object, field, value, metadata.type, metadata.elementType, Strings.getSimpleMessages(e));
                     }
                    parser.listeners.pop();
                 }else{
