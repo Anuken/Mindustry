@@ -3,8 +3,8 @@ package mindustry.mod;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
+import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -12,8 +12,10 @@ import mindustry.ctype.*;
 import mindustry.entities.part.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
+import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -81,10 +83,8 @@ public class ContentPatcher{
                 currentlyApplying = null;
 
             }catch(Exception e){
-                PatchSet set = new PatchSet(patch, new JsonValue("error"));
-                set.error = true;
-                set.warnings.add(Strings.getSimpleMessage(e));
-                patches.add(set);
+                patches.peek().error = true;
+                patches.peek().warnings.add(Strings.getSimpleMessage(e));
 
                 Log.err("Failed to apply patch: " + patch, e);
             }
@@ -260,7 +260,23 @@ public class ContentPatcher{
         }else if(object instanceof ObjectSet set && field.equals("+")){
             modifiedField(parentObject, parentField, set.copy());
 
-            assignValue(object, field, metadata, () -> null, val -> set.add(val), value, false);
+            var meta = new FieldData(metadata.elementType, null, null);
+            boolean multiAdd;
+
+            if(value instanceof JsonValue jval && jval.isArray()){
+                meta = metadata;
+                multiAdd = true;
+            }else{
+                multiAdd = false;
+            }
+
+            assignValue(object, field, multiAdd ? meta : metadata, () -> null, val -> {
+                if(multiAdd){
+                    set.addAll((ObjectSet)val);
+                }else{
+                    set.add(val);
+                }
+            }, value, false);
         }else if(object instanceof ObjectMap map){
             if(metadata == null){
                 warn("ObjectMap cannot be parsed without metadata: @.@", parentObject, parentField);
@@ -282,6 +298,19 @@ public class ContentPatcher{
             }else{
                 assignValue(object, field, new FieldData(metadata.elementType, null, null), () -> map.get(key), val -> map.put(key, val), value, false);
             }
+        }else if(object instanceof Attributes map && value instanceof JsonValue jval){
+            Attribute key = Attribute.getOrNull(field);
+            if(key == null){
+                warn("Unknown attribute: '@'", field);
+                return;
+            }
+            if(!jval.isNumber()){
+                warn("Attribute value must be a number: '@'", jval);
+                return;
+            }
+            float prev = map.get(key);
+            reset(() -> map.set(key, prev));
+            map.set(key, jval.asFloat());
         }else{
             Class<?> actualType = object.getClass();
             if(actualType.isAnonymousClass()) actualType = actualType.getSuperclass();
@@ -330,7 +359,7 @@ public class ContentPatcher{
 
         try{
             if(value instanceof JsonValue jsv){ //setting values from object
-               if(prevValue == null || !jsv.isObject() || jsv.has("type")){
+               if(prevValue == null || !jsv.isObject() || jsv.has("type") || (metadata != null && metadata.type == Attributes.class)){
                     if(UnlockableContent.class.isAssignableFrom(metadata.type) && jsv.isObject()){
                         warn("New content must not be instantiated: @", jsv);
                         return;

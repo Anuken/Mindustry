@@ -248,6 +248,41 @@ public class PatcherTests{
     }
 
     @Test
+    void testAttributes() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        block.grass.attributes: {
+            oil: 99
+        }
+        block.grass.attributes.heat: 77
+        """));
+
+        assertEquals(new Seq<>(), Vars.state.patcher.patches.first().warnings);
+        assertEquals(99, Blocks.grass.attributes.get(Attribute.oil));
+        assertEquals(77, Blocks.grass.attributes.get(Attribute.heat));
+
+        Vars.logic.reset();
+
+        assertEquals(0, Blocks.grass.attributes.get(Attribute.oil));
+        assertEquals(0, Blocks.grass.attributes.get(Attribute.heat));
+    }
+
+    @Test
+    void testSetMultiAdd() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        unit.dagger.immunities.+: [slow, fast]
+        """));
+
+        assertEquals(new Seq<>(), Vars.state.patcher.patches.first().warnings);
+        assertTrue(UnitTypes.dagger.immunities.contains(StatusEffects.slow));
+        assertTrue(UnitTypes.dagger.immunities.contains(StatusEffects.fast));
+
+        Vars.logic.reset();
+
+        assertFalse(UnitTypes.dagger.immunities.contains(StatusEffects.slow));
+        assertFalse(UnitTypes.dagger.immunities.contains(StatusEffects.fast));
+    }
+
+    @Test
     void testBigPatch() throws Exception{
         Vars.state.patcher.apply(Seq.with("""
         item: {
