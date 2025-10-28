@@ -75,6 +75,7 @@ public class ContentPatcher{
 
             try{
                 JsonValue value = parser.getJson().fromJson(null, Jval.read(patch).toString(Jformat.plain));
+                set.json = value;
                 currentlyApplying = set;
 
                 set.name = value.getString("name", "");
@@ -381,9 +382,13 @@ public class ContentPatcher{
                 }else{
                     //assign each field manually
                     var childFields = parser.getJson().getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
+
                     for(var child : jsv){
                         if(child.name != null){
-                            assign(prevValue, child.name, child, !childFields.containsKey(child.name) ? null : new FieldData(childFields.get(child.name)), object, field);
+                            assign(prevValue, child.name, child,
+                            metadata != null && metadata.type == ObjectMap.class ? metadata :
+                            !childFields.containsKey(child.name) ? null :
+                            new FieldData(childFields.get(child.name)), object, field);
                         }
                     }
                 }
@@ -540,6 +545,15 @@ public class ContentPatcher{
 
         public FieldData(FieldMetadata data){
             this(data.field.getType(), data.elementType, data.keyType);
+        }
+
+        @Override
+        public String toString(){
+            return "FieldData{" +
+            "type=" + type +
+            ", elementType=" + elementType +
+            ", keyType=" + keyType +
+            '}';
         }
     }
 
