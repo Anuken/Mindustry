@@ -467,6 +467,13 @@ public class ServerControl implements ApplicationListener{
             info("Map directory: &fi@", customMapDirectory.file().getAbsoluteFile().toString());
         });
 
+        handler.register("reloadpatches", "Reload all patch files from disk.", arg -> {
+            loadPatchFiles();
+            if(contentPatches.isEmpty()){
+                err("No valid content patch files found.");
+            }
+        });
+
         handler.register("reloadmaps", "Reload all maps from disk.", arg -> {
             int beforeMaps = maps.all().size;
             maps.reload();

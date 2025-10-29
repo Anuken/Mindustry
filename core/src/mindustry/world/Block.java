@@ -25,6 +25,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.*;
@@ -85,6 +86,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** if true, {@link #buildEditorConfig(Table)} will be called for configuring this block in the editor. */
     public boolean editorConfigurable;
     /** the last configuration value applied to this block. */
+    @NoPatch
     public @Nullable Object lastConfig;
     /** whether to save the last config and apply it to newly placed blocks */
     public boolean saveConfig = false;
@@ -205,6 +207,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** whether this block can be placed on edges of liquids. */
     public boolean floating = false;
     /** multiblock size */
+    @NoPatch //changing size often leads to catastrophic issues, so don't allow that
     public int size = 1;
     /** multiblock offset */
     public float offset = 0f;
@@ -372,21 +375,29 @@ public class Block extends UnlockableContent implements Senseable{
     /** Scroll position for certain blocks. */
     public float selectScroll;
     /** Building that is created for this block. Initialized in init() via reflection. Set manually if modded. */
+    @NoPatch
     public Prov<Building> buildType = null;
     /** Configuration handlers by type. */
+    @NoPatch
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
     /** Consumption filters. */
+    @NoPatch
     public boolean[] itemFilter = {}, liquidFilter = {};
     /** Array of consumers used by this block. Only populated after init(). */
+    @NoPatch
     public Consume[] consumers = {}, optionalConsumers = {}, nonOptionalConsumers = {}, updateConsumers = {};
     /** Set to true if this block has any consumers in its array. */
+    @NoPatch
     public boolean hasConsumers;
     /** The single power consumer, if applicable. */
+    @NoPatch
     public @Nullable ConsumePower consPower;
 
     /** Map of bars by name. */
+    @NoPatch
     protected OrderedMap<String, Func<Building, Bar>> barMap = new OrderedMap<>();
     /** List for building up consumption before init(). */
+    @NoPatch
     protected Seq<Consume> consumeBuilder = new Seq<>();
 
     protected TextureRegion[] generatedIcons;
