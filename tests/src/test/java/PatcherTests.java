@@ -166,6 +166,20 @@ public class PatcherTests{
     }
 
     @Test
+    void testUnitTypeObject() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        {
+            "name": "object syntax",
+            "unit.dagger": {
+                "type": "legs"
+            }
+        }
+        """));
+
+        assertEquals(new Seq<>(), Vars.state.patcher.patches.first().warnings);
+    }
+
+    @Test
     void testUnitFlagsArray() throws Exception{
         int oldLength = UnitTypes.dagger.targetFlags.length;
 

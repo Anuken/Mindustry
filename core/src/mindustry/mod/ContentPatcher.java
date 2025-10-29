@@ -363,7 +363,7 @@ public class ContentPatcher{
 
         try{
             if(value instanceof JsonValue jsv){ //setting values from object
-               if(prevValue == null || !jsv.isObject() || jsv.has("type") || (metadata != null && metadata.type == Attributes.class)){
+               if(prevValue == null || !jsv.isObject() || (jsv.has("type") && metadata.type != MappableContent.class) || (metadata != null && metadata.type == Attributes.class)){
                     if(UnlockableContent.class.isAssignableFrom(metadata.type) && jsv.isObject()){
                         warn("New content must not be instantiated: @", jsv);
                         return;
