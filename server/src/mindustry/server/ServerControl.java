@@ -10,6 +10,7 @@ import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
+import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
@@ -72,6 +73,8 @@ public class ServerControl implements ApplicationListener{
     private PrintWriter socketOutput;
     private String suggested;
     private boolean autoPaused = false;
+    private Fi patchDirectory;
+    private Seq<String> contentPatches = new Seq<>();
 
     public Cons<GameOverEvent> gameOverListener = event -> {
         if(state.rules.waves){
@@ -191,12 +194,16 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        customMapDirectory.mkdirs();
-
         if(Version.build == -1){
             warn("&lyYour server is running a custom build, which means that client checking is disabled.");
             warn("&lyIt is highly advised to specify which version you're using by building with gradle args &lb&fb-Pbuildversion=&lr<build>");
         }
+
+        customMapDirectory.mkdirs();
+
+        patchDirectory = dataDirectory.child("patches");
+        patchDirectory.mkdirs();
+        loadPatchFiles();
 
         //set up default shuffle mode
         try{
@@ -314,6 +321,30 @@ public class ServerControl implements ApplicationListener{
 
             info("Server loaded. Type @ for help.", "'help'");
         });
+
+        Events.on(ContentPatchLoadEvent.class, event -> {
+            //NOTE: if patches change, and an older save is loaded, the patches will be applied twice; the old ones won't be removed.
+            for(String patch : contentPatches){
+                event.patches.addUnique(patch);
+            }
+        });
+    }
+
+    void loadPatchFiles(){
+        contentPatches.clear();
+        Seq<Fi> patches = patchDirectory.findAll(f -> f.extEquals("json") || f.extEquals("hjson") || f.extEquals("json5")).sort();
+
+        for(Fi patch : patches){
+            try{
+                contentPatches.add(Jval.read(patch.readString()).toString(Jformat.plain));
+            }catch(Throwable e){
+                Log.err("Invalid patch file: " + patch.name(), e);
+            }
+        }
+
+        if(contentPatches.size > 0){
+            Log.info("Loaded @ content patch files.", contentPatches.size);
+        }
     }
 
     protected void registerCommands(){
@@ -434,6 +465,13 @@ public class ServerControl implements ApplicationListener{
                 info("No maps found.");
             }
             info("Map directory: &fi@", customMapDirectory.file().getAbsoluteFile().toString());
+        });
+
+        handler.register("reloadpatches", "Reload all patch files from disk.", arg -> {
+            loadPatchFiles();
+            if(contentPatches.isEmpty()){
+                err("No valid content patch files found.");
+            }
         });
 
         handler.register("reloadmaps", "Reload all maps from disk.", arg -> {

@@ -39,6 +39,11 @@ public class BuildPayload implements Payload{
     }
 
     @Override
+    public boolean contentEquals(Payload other){
+        return other instanceof BuildPayload bp && bp.block() == build.block;
+    }
+
+    @Override
     public UnlockableContent content(){
         return build.block;
     }

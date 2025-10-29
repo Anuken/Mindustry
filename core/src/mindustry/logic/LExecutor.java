@@ -377,7 +377,7 @@ public class LExecutor{
                         if(unit instanceof Payloadc pay){
                             //units
                             if(p1.bool()){
-                                Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+                                Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u != unit && u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
 
                                 if(result != null){
                                     Call.pickedUnitPayload(unit, result);
@@ -463,7 +463,7 @@ public class LExecutor{
                         }else{
                             Building build = p1.building();
                             int dropped = Math.min(unit.stack.amount, p2.numi());
-                            if(build != null && build.team == unit.team && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                            if(build != null && build.team == unit.team && build.isValid() && build.allowDeposit() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                                 int accepted = build.acceptStack(unit.item(), dropped, unit);
                                 if(accepted > 0){
                                     Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
@@ -1689,7 +1689,7 @@ public class LExecutor{
                 return;
             }
 
-            String text = exec.textBuffer.toString();
+            String text = UI.formatIcons(exec.textBuffer.toString());
             if(text.startsWith("@")){
                 String substr = text.substring(1);
                 if(Core.bundle.has(substr)){
