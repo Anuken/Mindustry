@@ -23,7 +23,9 @@ public class MapPatchesDialog extends BaseDialog{
         shown(this::setup);
 
         addCloseButton();
-        buttons.button("@add", Icon.add, () -> showImport(this::addPatch)).size(210f, 64f);
+        buttons.button("@editor.patches.guide", Icon.link, () -> Core.app.openURI(patchesGuideURL)).size(200, 64f);
+
+        buttons.button("@add", Icon.add, () -> showImport(this::addPatch)).size(200f, 64f);
 
         cont.top();
         getCell(cont).grow();

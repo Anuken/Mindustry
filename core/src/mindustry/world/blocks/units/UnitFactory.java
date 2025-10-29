@@ -80,7 +80,19 @@ public class UnitFactory extends UnitBlock{
 
     @Override
     public void init(){
+        initCapacities();
+        super.init();
+    }
+
+    @Override
+    public void afterPatch(){
+        initCapacities();
+        super.afterPatch();
+    }
+
+    public void initCapacities(){
         capacities = new int[Vars.content.items().size];
+        itemCapacity = 10; //unit factories can't control their own capacity externally, setting the value does nothing
         for(UnitPlan plan : plans){
             for(ItemStack stack : plan.requirements){
                 capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
@@ -89,8 +101,6 @@ public class UnitFactory extends UnitBlock{
         }
 
         consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
-
-        super.init();
     }
 
     @Override

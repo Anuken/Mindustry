@@ -1228,6 +1228,12 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
     }
 
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+        totalRequirements = cachedRequirements = firstRequirements = null;
+    }
+
     /** @return the time required to build this unit, as a value that takes into account reconstructors */
     public float getBuildTime(){
         getTotalRequirements();
