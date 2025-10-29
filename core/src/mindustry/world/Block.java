@@ -86,6 +86,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** if true, {@link #buildEditorConfig(Table)} will be called for configuring this block in the editor. */
     public boolean editorConfigurable;
     /** the last configuration value applied to this block. */
+    @NoPatch
     public @Nullable Object lastConfig;
     /** whether to save the last config and apply it to newly placed blocks */
     public boolean saveConfig = false;

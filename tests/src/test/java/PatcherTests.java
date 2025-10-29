@@ -6,6 +6,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.meta.*;
 import org.junit.jupiter.api.*;
@@ -294,6 +295,66 @@ public class PatcherTests{
 
         assertFalse(UnitTypes.dagger.immunities.contains(StatusEffects.slow));
         assertFalse(UnitTypes.dagger.immunities.contains(StatusEffects.fast));
+    }
+
+    @Test
+    void testAmmoReassign() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        block.fuse.ammoTypes: {
+          titanium: "-"
+          surge-alloy: {
+            type: LaserBulletType
+            ammoMultiplier: 1
+            reloadMultiplier: 0.5
+            damage: 100
+            colors: ["000000", "ff0000", "ffffff"]
+          }
+        }
+        """));
+
+        assertEquals(new Seq<>(), Vars.state.patcher.patches.first().warnings);
+        assertTrue(((ItemTurret)Blocks.fuse).ammoTypes.containsKey(Items.surgeAlloy));
+        assertFalse(((ItemTurret)Blocks.fuse).ammoTypes.containsKey(Items.titanium));
+        assertEquals(100, ((ItemTurret)Blocks.fuse).ammoTypes.get(Items.surgeAlloy).damage);
+
+        Vars.logic.reset();
+
+        assertFalse(((ItemTurret)Blocks.fuse).ammoTypes.containsKey(Items.surgeAlloy));
+        assertTrue(((ItemTurret)Blocks.fuse).ammoTypes.containsKey(Items.titanium));
+    }
+
+    @Test
+    void testIndexAccess() throws Exception{
+        float oldDamage = UnitTypes.dagger.weapons.first().bullet.damage;
+        Vars.state.patcher.apply(Seq.with("""
+        unit.dagger.weapons.0.bullet.damage: 100
+        """));
+
+        assertEquals(new Seq<>(), Vars.state.patcher.patches.first().warnings);
+        assertEquals(100, UnitTypes.dagger.weapons.first().bullet.damage);
+
+        Vars.logic.reset();
+
+        assertEquals(oldDamage, UnitTypes.dagger.weapons.first().bullet.damage);
+    }
+
+    @Test
+    void testAddWeapon() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        unit.flare.weapons.+: {
+          x: 0
+          y: 0
+          reload: 10
+          bullet: {
+            type: LaserBulletType
+            damage: 100
+          }
+        }
+        """));
+
+        assertEquals(new Seq<>(), Vars.state.patcher.patches.first().warnings);
+        assertEquals(3, UnitTypes.flare.weapons.size);
+        assertEquals(100, UnitTypes.flare.weapons.peek().bullet.damage);
     }
 
     @Test

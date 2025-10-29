@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -29,6 +30,8 @@ public class NuclearReactor extends PowerGenerator{
     public float itemDuration = 120;
     /** heating per frame * fullness */
     public float heating = 0.01f;
+    /** max heat this block can output */
+    public float heatOutput = 20f;
     /** threshold at which block starts smoking */
     public float smokeThreshold = 0.3f;
     /** heat threshold at which lights start flashing */
@@ -79,7 +82,7 @@ public class NuclearReactor extends PowerGenerator{
         addBar("heat", (NuclearReactorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
     }
 
-    public class NuclearReactorBuild extends GeneratorBuild{
+    public class NuclearReactorBuild extends GeneratorBuild implements HeatBlock{
         public float heat;
         public float flash;
         public float smoothLight;
@@ -120,6 +123,16 @@ public class NuclearReactor extends PowerGenerator{
                 Events.fire(Trigger.thoriumReactorOverheat);
                 kill();
             }
+        }
+
+        @Override
+        public float heatFrac(){
+            return heatOutput > 0f ? heat : 0f;
+        }
+
+        @Override
+        public float heat(){
+            return heatOutput > 0f ? heat * heatOutput : 0f;
         }
 
         @Override

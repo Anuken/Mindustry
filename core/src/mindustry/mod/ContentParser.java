@@ -448,7 +448,7 @@ public class ContentParser{
                     T two = (T)Vars.content.getByName(ctype, jsonData.asString());
 
                     if(two != null) return two;
-                    throw new IllegalArgumentException("\"" + jsonData.name + "\": No " + ctype + " found with name '" + jsonData.asString() + "'.\nMake sure '" + jsonData.asString() + "' is spelled correctly, and that it really exists!\nThis may also occur because its file failed to parse.");
+                    throw new IllegalArgumentException((jsonData.name == null ? "" : "\"" + jsonData.name + "\": ") + "No " + ctype + " found with name '" + jsonData.asString() + "'.\nMake sure '" + jsonData.asString() + "' is spelled correctly, and that it really exists!\nThis may also occur because its file failed to parse.");
                 }
             }
 
