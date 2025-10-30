@@ -773,8 +773,8 @@ public class TypeIO{
 
         //write dynamic fields
         if(entry.effect.dynamic){
-            //write a short with bits set based on which field is actually used
-            write.s(
+            //write a byte with bits set based on which field is actually used
+            write.b(
             (entry.damageMultiplier != 1f ?       (1 << 0) : 0) |
             (entry.healthMultiplier != 1f ?       (1 << 1) : 0) |
             (entry.speedMultiplier != 1f ?        (1 << 2) : 0) |
@@ -804,7 +804,7 @@ public class TypeIO{
 
         if(result.effect.dynamic){
             //read flags that store which fields are set
-            int flags = read.us();
+            int flags = read.ub();
 
             if((flags & (1 << 0)) != 0) result.damageMultiplier = read.f();
             if((flags & (1 << 1)) != 0) result.healthMultiplier = read.f();
