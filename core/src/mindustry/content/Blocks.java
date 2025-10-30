@@ -4676,10 +4676,10 @@ public class Blocks{
                 lifetime = 190f;
                 height = 19f;
                 width = 17f;
-                reloadMultiplier = 0.65f;
+                reloadMultiplier = 0.7f;
                 splashDamageRadius = 110f;
                 rangeChange = 8f;
-                splashDamage = 150f;
+                splashDamage = 180f;
                 scaledSplashDamage = true;
                 hitColor = backColor = trailColor = Color.valueOf("a0b380");
                 frontColor = Color.valueOf("e4ffd6");
@@ -4702,7 +4702,26 @@ public class Blocks{
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.25f;
                 status = StatusEffects.corroded;
-                statusDuration = 300f;
+                statusDuration = 60f * 8f;
+
+                fragBullets = 1;
+                fragBullet = new EmptyBulletType(){{
+                    damage = 0f;
+                    lifetime = 60f * 2.5f;
+                    bulletInterval = 20f;
+                    hitEffect = despawnEffect = Fx.none;
+                    intervalBullet = new EmptyBulletType(){{
+                        splashDamage = 15f;
+                        collidesGround = true;
+                        collidesAir = false;
+                        collides = false;
+                        hitEffect = despawnEffect = Fx.none;
+                        pierce = true;
+                        instantDisappear = true;
+                        splashDamageRadius = 90f;
+                        buildingDamageMultiplier = 0.01f;
+                    }};
+                }};
             }}
             );
 

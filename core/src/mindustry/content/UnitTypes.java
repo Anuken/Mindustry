@@ -3377,14 +3377,14 @@ public class UnitTypes{
                 velocityRnd = 0.33f;
                 heatColor = Color.red;
 
-                bullet = new MissileBulletType(4.2f, 60){{
+                bullet = new MissileBulletType(4.2f, 45){{
                     homingPower = 0.2f;
                     weaveMag = 4;
                     weaveScale = 4;
                     lifetime = 55f;
                     shootEffect = Fx.shootBig2;
                     smokeEffect = Fx.shootSmokeTitan;
-                    splashDamage = 70f;
+                    splashDamage = 52f;
                     splashDamageRadius = 30f;
                     frontColor = Color.white;
                     hitSound = Sounds.none;
