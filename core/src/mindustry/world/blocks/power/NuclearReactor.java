@@ -127,12 +127,12 @@ public class NuclearReactor extends PowerGenerator{
 
         @Override
         public float heatFrac(){
-            return heatOutput > 0f ? heat : 0f;
+            return heatOutput > 0f ? heat * efficiency : 0f;
         }
 
         @Override
         public float heat(){
-            return heatOutput > 0f ? heat * heatOutput : 0f;
+            return heatOutput > 0f ? heat * heatOutput * efficiency : 0f;
         }
 
         @Override
