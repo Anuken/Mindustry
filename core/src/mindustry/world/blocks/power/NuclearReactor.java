@@ -182,14 +182,12 @@ public class NuclearReactor extends PowerGenerator{
         public void write(Writes write){
             super.write(write);
             write.f(heat);
-            write.f(heatProgress);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             heat = read.f();
-            if(revision >= 12) heatProgress = read.f();
         }
     }
 }
