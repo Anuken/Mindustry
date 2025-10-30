@@ -21,7 +21,6 @@ public class SaveIO{
     public static final byte[] header = {'M', 'S', 'A', 'V'};
     public static final IntMap<SaveVersion> versions = new IntMap<>();
     public static final Seq<SaveVersion> versionArray = Seq.with(new Save1(), new Save2(), new Save3(), new Save4(), new Save5(), new Save6(), new Save7(), new Save8(), new Save9(), new Save10(), new Save11());
-
     static{
         for(SaveVersion version : versionArray){
             versions.put(version.version, version);
