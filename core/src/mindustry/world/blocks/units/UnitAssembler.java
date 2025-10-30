@@ -148,10 +148,21 @@ public class UnitAssembler extends PayloadBlock{
         consume(consItem = new ConsumeItemDynamic((UnitAssemblerBuild build) -> build.plan().itemReq != null ? build.plan().itemReq : ItemStack.empty));
         consume(new ConsumeLiquidsDynamic((UnitAssemblerBuild build) -> build.plan().liquidReq != null ? build.plan().liquidReq : LiquidStack.empty));
 
-        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
-
         super.init();
 
+        initCapacities();
+    }
+
+    @Override
+    public void afterPatch(){
+        initCapacities();
+        super.afterPatch();
+    }
+
+    public void initCapacities(){
+        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
+
+        itemCapacity = 10;
         capacities = new int[Vars.content.items().size];
         for(AssemblerUnitPlan plan : plans){
             if(plan.itemReq != null){
