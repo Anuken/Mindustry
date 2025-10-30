@@ -505,6 +505,14 @@ public abstract class SaveVersion extends SaveFileReader{
         readWorldEntities(stream, mapping);
     }
 
+    public void skipContentPatches(DataInput stream) throws IOException{
+        int amount = stream.readUnsignedByte();
+        for(int i = 0; i < amount; i++){
+            int len = stream.readInt();
+            stream.skipBytes(len);
+        }
+    }
+
     public void readContentPatches(DataInput stream) throws IOException{
         Seq<String> patches = new Seq<>();
 

@@ -24,6 +24,7 @@ import static mindustry.Vars.*;
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
     /** Stat storage for this content. Initialized on demand. */
+    @NoPatch
     public Stats stats = new Stats();
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
@@ -61,8 +62,10 @@ public abstract class UnlockableContent extends MappableContent{
      * */
     public ObjectSet<UnlockableContent> databaseTabs = new ObjectSet<>();
     /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
+    @NoPatch
     public @Nullable TechNode techNode;
     /** Tech nodes for all trees that this content is part of. */
+    @NoPatch
     public Seq<TechNode> techNodes = new Seq<>();
     /** Unlock state. Loaded from settings. Do not modify outside the constructor. */
     @NoPatch
