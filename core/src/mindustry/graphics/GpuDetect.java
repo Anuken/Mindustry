@@ -21,7 +21,7 @@ public class GpuDetect{
                 hasNvidia = rawGpuString.toLowerCase(Locale.ROOT).contains("nvidia");
                 hasAMD = rawGpuString.toLowerCase(Locale.ROOT).contains("amd") || rawGpuString.toLowerCase(Locale.ROOT).contains("radeon");
             }catch(Exception e){
-                Log.err(e);
+                Log.err("Failed to detect GPU type. This is not a fatal error, but if you are using a Intel GPU, it may result in rare graphical issues.", Strings.getSimpleMessage(e));
             }
         }
     }
