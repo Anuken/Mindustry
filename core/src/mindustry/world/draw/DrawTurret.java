@@ -50,6 +50,9 @@ public class DrawTurret extends DrawBlock{
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(base, plan.drawx(), plan.drawy());
         Draw.rect(preview, plan.drawx(), plan.drawy(), block.rotate ? plan.rotation * 90f - 90f : 0f);
+        if(top.found()){
+            Draw.rect(top, plan.drawx(), plan.drawy(), block.rotate ? plan.rotation * 90f - 90f : 0f);
+        }
     }
 
     @Override

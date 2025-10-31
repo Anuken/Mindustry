@@ -12,6 +12,7 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.maps.Map;
@@ -67,6 +68,7 @@ public abstract class SaveVersion extends SaveFileReader{
         readRegion("content", stream, counter, this::readContentHeader);
 
         try{
+            if(version >= 11) readRegion("patches", stream, counter, this::readContentPatches);
             readRegion("map", stream, counter, in -> readMap(in, context));
             readRegion("entities", stream, counter, this::readEntities);
             if(version >= 8) readRegion("markers", stream, counter, this::readMarkers);
@@ -79,6 +81,7 @@ public abstract class SaveVersion extends SaveFileReader{
     public void write(DataOutputStream stream, StringMap extraTags) throws IOException{
         writeRegion("meta", stream, out -> writeMeta(out, extraTags));
         writeRegion("content", stream, this::writeContentHeader);
+        writeRegion("patches", stream, this::writeContentPatches);
         writeRegion("map", stream, this::writeMap);
         writeRegion("entities", stream, this::writeEntities);
         writeRegion("markers", stream, this::writeMarkers);
@@ -311,14 +314,13 @@ public abstract class SaveVersion extends SaveFileReader{
                 boolean isCenter = true;
                 byte packedCheck = stream.readByte();
                 boolean hadEntity = (packedCheck & 1) != 0;
-                //old data format (bit 2): 1 byte only if no building is present
-                //new data format (bit 3): 7 bytes (3x block-specific bytes + 1x 4-byte extra data int)
-                boolean hadDataOld = (packedCheck & 2) != 0, hadDataNew = (packedCheck & 4) != 0;
+                //data check (bit 3): 7 bytes (3x block-specific bytes + 1x 4-byte extra data int)
+                boolean hadData = (packedCheck & 4) != 0;
 
                 byte data = 0, floorData = 0, overlayData = 0;
                 int extraData = 0;
 
-                if(hadDataNew){
+                if(hadData){
                     data = stream.readByte();
                     floorData = stream.readByte();
                     overlayData = stream.readByte();
@@ -335,7 +337,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 }
 
                 //must be assigned after setBlock, because that can reset data
-                if(hadDataNew){
+                if(hadData){
                     tile.data = data;
                     tile.floorData = floorData;
                     tile.overlayData = overlayData;
@@ -361,13 +363,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
                         context.onReadBuilding();
                     }
-                }else if(hadDataOld || hadDataNew){ //never read consecutive blocks if there's any kind of data
-                    if(hadDataOld){
-                        tile.setBlock(block);
-                        //the old data format was only read in the case where there is no building, and only contained a single byte
-                        tile.data = stream.readByte();
-                    }
-                }else{
+                }else if(!hadData){ //never read consecutive blocks if there's data
                     int consecutives = stream.readUnsignedByte();
 
                     for(int j = i + 1; j < i + 1 + consecutives; j++){
@@ -509,8 +505,54 @@ public abstract class SaveVersion extends SaveFileReader{
         readWorldEntities(stream, mapping);
     }
 
+    public void skipContentPatches(DataInput stream) throws IOException{
+        int amount = stream.readUnsignedByte();
+        for(int i = 0; i < amount; i++){
+            int len = stream.readInt();
+            stream.skipBytes(len);
+        }
+    }
+
+    public void readContentPatches(DataInput stream) throws IOException{
+        Seq<String> patches = new Seq<>();
+
+        int amount = stream.readUnsignedByte();
+        if(amount > 0){
+            for(int i = 0; i < amount; i++){
+                int len = stream.readInt();
+                byte[] bytes = new byte[len];
+                stream.readFully(bytes);
+                patches.add(new String(bytes, Strings.utf8));
+            }
+        }
+
+        Events.fire(new ContentPatchLoadEvent(patches));
+
+        if(patches.size > 0){
+            try{
+                state.patcher.apply(patches);
+            }catch(Throwable e){
+                Log.err("Failed to apply patches: " + patches, e);
+            }
+        }
+    }
+
+    public void writeContentPatches(DataOutput stream) throws IOException{
+        if(state.patcher.patches.size > 0){
+            var patches = state.patcher.patches;
+            stream.writeByte(patches.size);
+            for(var patchset : patches){
+                byte[] bytes = patchset.patch.getBytes(Strings.utf8);
+                stream.writeInt(bytes.length);
+                stream.write(bytes);
+            }
+        }else{
+            stream.writeByte(0);
+        }
+    }
+
     public void readContentHeader(DataInput stream) throws IOException{
-        byte mapped = stream.readByte();
+        int mapped = stream.readUnsignedByte();
 
         MappableContent[][] map = new MappableContent[ContentType.all.length][0];
 
@@ -527,6 +569,21 @@ public abstract class SaveVersion extends SaveFileReader{
         }
 
         content.setTemporaryMapper(map);
+
+        //HACK: versions below 11 don't read the patch chunk, which means the event for reading patches is never triggered.
+        //manually fire the event here for older versions.
+        if(version < 11){
+            Seq<String> patches = new Seq<>();
+            Events.fire(new ContentPatchLoadEvent(patches));
+
+            if(patches.size > 0){
+                try{
+                    state.patcher.apply(patches);
+                }catch(Throwable e){
+                    Log.err("Failed to apply patches: " + patches, e);
+                }
+            }
+        }
     }
 
     public void writeContentHeader(DataOutput stream) throws IOException{

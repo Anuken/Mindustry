@@ -131,6 +131,10 @@ public class LCanvas extends Table{
         statements.addChild(new StatementElem(statement));
     }
 
+    public void addAt(int at, LStatement statement){
+        statements.addChildAt(at, new StatementElem(statement));
+    }
+
     public String save(){
         Seq<LStatement> st = statements.getChildren().<StatementElem>as().map(s -> s.st);
         st.each(LStatement::saveUI);
@@ -433,6 +437,10 @@ public class LCanvas extends Table{
 
                 addressLabel = t.add(index + "").style(Styles.outlineLabel).color(color).padRight(8).get();
 
+                //taken from foo's client
+                t.button(Icon.add, Styles.logici, () -> Vars.ui.logic.showAddDialog(statements.insertPosition + 1))
+                .disabled(b -> canvas.statements.getChildren().size >= LExecutor.maxInstructions).size(24f).padRight(6);
+
                 t.button(Icon.copy, Styles.logici, () -> {
                 }).size(24f).padRight(6).get().tapped(this::copy);
 
@@ -447,6 +455,8 @@ public class LCanvas extends Table{
 
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                        //don't start dragging when pressing the menu buttons
+                        if(event.targetActor instanceof Image) return false;
 
                         if(button == KeyCode.mouseMiddle){
                             copy();

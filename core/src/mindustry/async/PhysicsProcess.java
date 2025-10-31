@@ -129,6 +129,7 @@ public class PhysicsProcess implements AsyncProcess{
         private final Seq<PhysicsBody> seq = new Seq<>(PhysicsBody.class);
         private final Rect rect = new Rect();
         private final Vec2 vec = new Vec2();
+        private final Rand rand = new Rand();
 
         public PhysicsWorld(Rect bounds){
             for(int i = 0; i < layers; i++){
@@ -180,7 +181,14 @@ public class PhysicsProcess implements AsyncProcess{
                     float dst = Mathf.dst(body.x, body.y, other.x, other.y);
 
                     if(dst < rs){
-                        vec.set(body.x - other.x, body.y - other.y).setLength(rs - dst);
+                        vec.set(body.x - other.x, body.y - other.y);
+
+                        if(vec.isZero()){ //exact stacked bodies will move in random directions away from each other
+                            vec.trns(rand.random(360f), rs - dst);
+                        }else{
+                            vec.setLength(rs - dst);
+                        }
+
                         float ms = body.mass + other.mass;
                         float m1 = other.mass / ms, m2 = body.mass / ms;
 

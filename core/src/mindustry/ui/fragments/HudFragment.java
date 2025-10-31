@@ -194,6 +194,21 @@ public class HudFragment{
             //.padLeft(dsize * 5 + 4f) to prevent alpha overlap on left
         });
 
+        //left/right gutter areas
+        parent.fill((x, y, w, h) -> {
+            x = 0f;
+            y = 0f;
+            w = Core.graphics.getWidth();
+            h = Core.graphics.getHeight();
+            if(Core.scene.marginLeft > 0){
+                paneRight.draw(x, y, Core.scene.marginLeft, h);
+            }
+
+            if(Core.scene.marginRight > 0){
+                paneLeft.draw(x + w - Core.scene.marginRight, y, Core.scene.marginRight, h);
+            }
+        });
+
         //"waiting for players"
         parent.fill(t -> {
             t.name = "waiting";

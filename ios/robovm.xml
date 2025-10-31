@@ -40,7 +40,13 @@
     </libs>
     <frameworks>
         <framework>UIKit</framework>
-        <framework>OpenGLES</framework>
+        <framework>MetalANGLEKit</framework>
+
+        <framework>libGLESv2</framework>
+        <framework>libEGL</framework>
+        <framework>libfeature_support</framework>
+
+        <framework>Metal</framework>
         <framework>QuartzCore</framework>
         <framework>CoreGraphics</framework>
         <framework>CoreAudio</framework>
