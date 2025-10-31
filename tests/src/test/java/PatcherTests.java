@@ -7,6 +7,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.*;
+import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.meta.*;
 import org.junit.jupiter.api.*;
@@ -261,6 +262,32 @@ public class PatcherTests{
         """));
 
         assertEquals(2, Vars.state.patcher.patches.first().warnings.size);
+    }
+
+    @Test
+    void testObjectFloatMap() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        block.mechanical-drill.drillMultipliers: {
+            titanium: 2.0
+        }
+        
+        block.mechanical-drill: {
+            drillMultipliers: {
+                copper: 3.0
+            }
+        }
+        block.mechanical-drill.drillMultipliers.surge-alloy: 10
+        """));
+
+        assertEquals(new Seq<>(), Vars.state.patcher.patches.first().warnings);
+        assertEquals(2f, ((Drill)Blocks.mechanicalDrill).drillMultipliers.get(Items.titanium, 0f));
+        assertEquals(3f, ((Drill)Blocks.mechanicalDrill).drillMultipliers.get(Items.copper, 0f));
+        assertEquals(10f, ((Drill)Blocks.mechanicalDrill).drillMultipliers.get(Items.surgeAlloy, 0f));
+
+        Vars.logic.reset();
+
+        assertEquals(0f, ((Drill)Blocks.mechanicalDrill).drillMultipliers.get(Items.titanium, 0f));
+        assertEquals(0f, ((Drill)Blocks.mechanicalDrill).drillMultipliers.get(Items.surgeAlloy, 0f));
     }
 
     @Test

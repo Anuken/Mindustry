@@ -302,6 +302,30 @@ public class ContentPatcher{
             }else{
                 assignValue(object, field, new FieldData(metadata.elementType, null, null), () -> map.get(key), val -> map.put(key, val), value, false);
             }
+        }else if(object instanceof ObjectFloatMap map){
+            if(metadata == null){
+                warn("ObjectFloatMap cannot be parsed without metadata: @.@", parentObject, parentField);
+                return;
+            }
+            Object key = convertKeyType(field, metadata.elementType);
+            if(key == null){
+                warn("Null key: '@'", field);
+                return;
+            }
+
+            var copy = new ObjectFloatMap(map);
+            reset(() -> {
+                map.clear();
+                map.putAll(copy);
+            });
+
+            if(value instanceof JsonValue jval && jval.isString() && (jval.asString().equals("-"))){
+                //removal syntax:
+                //"value": "-"
+                map.remove(key, 0f);
+            }else{
+                assignValue(object, field, new FieldData(float.class, null, null), () -> map.get(key, 0f), val -> map.put(key, (Float)val), value, false);
+            }
         }else if(object instanceof Attributes map && value instanceof JsonValue jval){
             Attribute key = Attribute.getOrNull(field);
             if(key == null){
@@ -386,7 +410,7 @@ public class ContentPatcher{
                     for(var child : jsv){
                         if(child.name != null){
                             assign(prevValue, child.name, child,
-                            metadata != null && metadata.type == ObjectMap.class ? metadata :
+                            metadata != null && (metadata.type == ObjectMap.class || metadata.type == ObjectFloatMap.class) ? metadata :
                             !childFields.containsKey(child.name) ? null :
                             new FieldData(childFields.get(child.name)), object, field);
                         }
