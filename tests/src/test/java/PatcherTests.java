@@ -300,6 +300,25 @@ public class PatcherTests{
     }
 
     @Test
+    void testSpecificArrayRequirements() throws Exception{
+        ItemStack[] reqs = Blocks.scatter.requirements.clone();
+        Vars.state.patcher.apply(Seq.with("""
+        block.scatter.requirements: {
+            0: surge-alloy/10
+        }
+        block.duo.requirements: [titanium/5, surge-alloy/20]
+        """));
+
+        assertEquals(new Seq<>(), Vars.state.patcher.patches.first().warnings);
+        assertEquals(Blocks.scatter.requirements[0], new ItemStack(Items.surgeAlloy, 10));
+        assertEquals(Blocks.scatter.requirements[1], reqs[1]);
+        assertEquals(Blocks.duo.requirements[0], new ItemStack(Items.titanium, 5));
+
+        Vars.logic.reset();
+        assertArrayEquals(reqs, Blocks.scatter.requirements);
+    }
+
+    @Test
     void testAttributes() throws Exception{
         Vars.state.patcher.apply(Seq.with("""
         block.grass.attributes: {

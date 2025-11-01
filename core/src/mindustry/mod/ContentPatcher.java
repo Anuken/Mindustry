@@ -184,7 +184,7 @@ public class ContentPatcher{
             }else{
                 warn("Content '@' cannot be assigned.", field);
             }
-        }else if(object instanceof Seq<?> || object.getClass().isArray()){ //TODO
+        }else if(object instanceof Seq<?> || object.getClass().isArray()){
 
             if(field.equals("+")){
                 var meta = new FieldData(metadata.type.isArray() ? metadata.type.getComponentType() : metadata.elementType, null, null);
@@ -411,6 +411,8 @@ public class ContentPatcher{
                         if(child.name != null){
                             assign(prevValue, child.name, child,
                             metadata != null && (metadata.type == ObjectMap.class || metadata.type == ObjectFloatMap.class) ? metadata :
+                            metadata != null && metadata.type == Seq.class ? new FieldData(metadata.elementType, null, null) :
+                            metadata != null && metadata.type.isArray() ? new FieldData(metadata.type.getComponentType(), null, null) :
                             !childFields.containsKey(child.name) ? null :
                             new FieldData(childFields.get(child.name)), object, field);
                         }
