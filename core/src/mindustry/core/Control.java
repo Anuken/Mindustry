@@ -420,7 +420,10 @@ public class Control implements ApplicationListener, Loadable{
             ui.planet.hide();
             SaveSlot slot = sector.save;
             sector.planet.setLastSector(sector);
-            if(slot != null && !clearSectors && (!sector.planet.clearSectorOnLose || sector.info.hasCore)){
+
+            boolean clearSave = sector.planet.clearSectorOnLose || sector.planet.campaignRules.clearSectorOnLose;
+
+            if(slot != null && !clearSectors && (!clearSave || sector.info.hasCore)){
 
                 try{
                     boolean hadNoCore = !sector.info.hasCore;
@@ -435,7 +438,7 @@ public class Control implements ApplicationListener, Loadable{
                     if(state.rules.defaultTeam.cores().isEmpty() || hadNoCore){
 
                         //don't carry over the spawn position and plans if the sector preset name or map size changed
-                        if(sector.planet.clearSectorOnLose || sector.info.spawnPosition == 0 || !sector.info.sectorDataMatches(sector)){
+                        if(clearSave || sector.info.spawnPosition == 0 || !sector.info.sectorDataMatches(sector)){
                             playNewSector(origin, sector, reloader);
                         }else{
                             int spawnPos = sector.info.spawnPosition;
@@ -477,6 +480,7 @@ public class Control implements ApplicationListener, Loadable{
                                 for(var build : previousBuildings){
                                     Tile tile = world.tile(build.tileX(), build.tileY());
                                     if(tile != null && tile.build == null && Build.validPlace(build.block, state.rules.defaultTeam, build.tileX(), build.tileY(), build.rotation, false, false)){
+                                        build.addPlan(false, true);
                                         tile.setBlock(build.block, state.rules.defaultTeam, build.rotation, () -> build);
                                         build.changeTeam(Team.derelict);
                                         build.dropped(); //TODO: call pickedUp too? this may screw up power networks in a major way as they refer to potentially deleted entities
@@ -498,8 +502,10 @@ public class Control implements ApplicationListener, Loadable{
                                 }
                             });
 
-                            //blocks placed after WorldLoadEvent didn't queue an update, so fix that.
-                            renderer.minimap.updateAll();
+                            Core.app.post(() -> {
+                                //blocks placed after WorldLoadEvent didn't queue an update, so fix that.
+                                renderer.minimap.updateAll();
+                            });
                         }
                     }else{
                         state.set(State.playing);
@@ -530,6 +536,7 @@ public class Control implements ApplicationListener, Loadable{
         state.rules.sector = sector;
         sector.info.origin = origin;
         sector.info.destination = origin;
+        sector.info.attempts ++;
 
         if(beforePlay != null){
             beforePlay.run();

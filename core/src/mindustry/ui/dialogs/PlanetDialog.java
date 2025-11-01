@@ -46,7 +46,7 @@ import static mindustry.ui.dialogs.PlanetDialog.Mode.*;
 
 public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     //if true, enables launching anywhere for testing
-    public static boolean debugSelect = false, debugSectorAttackEdit;
+    public static boolean debugSelect = false, debugSectorAttackEdit, debugShowNumbers = false;
     public static float sectorShowDuration = 60f * 2.4f;
 
     public final FrameBuffer buffer = new FrameBuffer(2, 2, true);
@@ -550,6 +550,17 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     });
                 }
             }
+
+            if(debugShowNumbers && (sec.hasEnemyBase() || sec.preset != null)){
+                planets.drawPlane(sec, () -> {
+                    Fonts.outline.getData().setScale(0.5f);
+                    Fonts.outline.setColor(sec.preset == null ? Color.scarlet : Color.white);
+
+                    Fonts.outline.draw(sec.id + "", 0f, 0f, Align.center);
+                    Fonts.outline.setColor(Color.white);
+                    Fonts.outline.getData().setScale(1f);
+                });
+            }
         }
 
         Draw.reset();
@@ -1035,6 +1046,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
 
             c.add(Core.bundle.get("sectors.time") + " [accent]" + sector.save.getPlayTime()).left().row();
+
+            if(sector.info.attempts > 0){
+                c.add(Core.bundle.get("sectors.attempts") + " [accent]" + sector.info.attempts).left().row();
+            }
 
             if(sector.info.waves && sector.hasBase()){
                 c.add(Core.bundle.get("sectors.wave") + " [accent]" + (sector.info.wave + sector.info.wavesPassed)).left().row();

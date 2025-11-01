@@ -214,7 +214,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     public void update(){
         PerfCounter.update.begin();
 
-        int targetfps = Core.settings.getInt("fpscap", 120);
+        int targetfps = ios ? 0 : Core.settings.getInt("fpscap", 120);
         boolean changed = lastTargetFps != targetfps && lastTargetFps != -1;
         boolean limitFps = targetfps > 0 && targetfps <= 240;
 
@@ -233,13 +233,13 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             if(assets.update(1000 / loadingFPS)){
                 loader.dispose();
                 loader = null;
-                Log.info("Total time to load: @ms", Time.timeSinceMillis(beginTime));
                 for(ApplicationListener listener : modules){
                     listener.init();
                 }
                 mods.eachClass(Mod::init);
                 finished = true;
                 Events.fire(new ClientLoadEvent());
+                Log.info("Total time to load: @ms", Time.timeSinceMillis(beginTime));
                 clientLoaded = true;
                 super.resize(graphics.getWidth(), graphics.getHeight());
                 app.post(() -> app.post(() -> app.post(() -> app.post(() -> {

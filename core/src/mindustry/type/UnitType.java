@@ -829,6 +829,28 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
     }
 
+    void initPathType(){
+        if(flowfieldPathType == -1){
+            flowfieldPathType =
+            naval ? Pathfinder.costNaval :
+            allowLegStep ? Pathfinder.costLegs :
+            flying ? Pathfinder.costNone :
+            hovering ? Pathfinder.costHover :
+            Pathfinder.costGround;
+        }
+
+        if(pathCost == null){
+            pathCost =
+            naval ? ControlPathfinder.costNaval :
+            allowLegStep ? ControlPathfinder.costLegs :
+            hovering ? ControlPathfinder.costHover :
+            ControlPathfinder.costGround;
+        }
+
+        pathCostId = ControlPathfinder.costTypes.indexOf(pathCost);
+        if(pathCostId == -1) pathCostId = 0;
+    }
+
     @CallSuper
     @Override
     public void init(){
@@ -852,25 +874,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             }
         }
 
-        if(flowfieldPathType == -1){
-            flowfieldPathType =
-                naval ? Pathfinder.costNaval :
-                allowLegStep ? Pathfinder.costLegs :
-                flying ? Pathfinder.costNone :
-                hovering ? Pathfinder.costHover :
-                Pathfinder.costGround;
-        }
-
-        if(pathCost == null){
-            pathCost =
-                naval ? ControlPathfinder.costNaval :
-                allowLegStep ? ControlPathfinder.costLegs :
-                hovering ? ControlPathfinder.costHover :
-                ControlPathfinder.costGround;
-        }
-
-        pathCostId = ControlPathfinder.costTypes.indexOf(pathCost);
-        if(pathCostId == -1) pathCostId = 0;
+        initPathType();
 
         if(flying){
             envEnabled |= Env.space;
@@ -1226,6 +1230,18 @@ public class UnitType extends UnlockableContent implements Senseable{
                 slice.dispose();
             }
         }
+    }
+
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+        totalRequirements = cachedRequirements = firstRequirements = null;
+
+        //this will technically reset any assigned values, but in vanilla, they're not reassigned anyway
+        flowfieldPathType = -1;
+        pathCost = null;
+        pathCostId = -1;
+        initPathType();
     }
 
     /** @return the time required to build this unit, as a value that takes into account reconstructors */

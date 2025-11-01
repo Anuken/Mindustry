@@ -59,6 +59,8 @@ public class SectorInfo{
     public boolean attack = false;
     /** Whether this sector has any enemy spawns. */
     public boolean hasSpawns = true;
+    /** How many times the player has tried to land at this sector with a fresh core. */
+    public int attempts;
     /** Wave # from state */
     public int wave = 1, winWave = -1;
     /** Waves this sector can survive if under attack. Based on wave in info. <0 means uncalculated. */
@@ -108,7 +110,7 @@ public class SectorInfo{
 
     /** @return whether the sector was last saved with the same preset. if false, this means the preset changed, and thus the spawn/plan data should be discarded. */
     public boolean sectorDataMatches(Sector sector){
-        if(sector.preset != null && (sector.preset.generator.map.width != lastWidth || sector.preset.generator.map.width != lastHeight)){
+        if(sector.preset != null && (sector.preset.generator.map.width != lastWidth || sector.preset.generator.map.height != lastHeight)){
             return false;
         }
         return Structs.eq(sector.preset == null ? null : sector.preset.name, lastPresetName);

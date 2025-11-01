@@ -11,8 +11,8 @@ import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.struct.Queue;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
@@ -40,7 +40,6 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
 import java.util.*;
@@ -452,7 +451,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Building build){
-        if(player == null || build == null || !player.within(build, itemTransferRange) || build.items == null || player.dead() || (state.rules.onlyDepositCore && !(build instanceof CoreBuild))) return;
+        if(player == null || build == null || !player.within(build, itemTransferRange) || build.items == null || player.dead() || !build.allowDeposit()) return;
 
         if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, build) ||
         //to avoid rejecting deposit packets that happen to overlap due to packet speed differences, the actual cap is double the cooldown with 2 deposits.
@@ -664,6 +663,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 return;
             }
         }
+        if(player != null) build.updateLastAccess(player);
         build.configured(player == null || player.dead() ? null : player.unit(), value);
         Events.fire(new ConfigEvent(build, player, value));
     }
@@ -2089,7 +2089,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build != null && build.acceptStack(stack.item, stack.amount, player.unit()) > 0 && build.interactable(player.team()) &&
         build.block.hasItems && player.unit().stack().amount > 0 && build.interactable(player.team())){
 
-            if(!(state.rules.onlyDepositCore && !(build instanceof CoreBuild)) && itemDepositCooldown <= 0f){
+            if(build.allowDeposit() && itemDepositCooldown <= 0f){
                 Call.transferInventory(player, build);
                 itemDepositCooldown = state.rules.itemDepositCooldown;
             }
@@ -2254,7 +2254,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Point2 next = i == points.size - 1 ? null : points.get(i + 1);
             line.x = point.x;
             line.y = point.y;
-            if(!overrideLineRotation || diagonal){
+            if((!overrideLineRotation || diagonal) && !(block != null && block.ignoreLineRotation)){
                 int result = baseRotation;
                 if(next != null){
                     result = Tile.relativeTo(point.x, point.y, next.x, next.y);

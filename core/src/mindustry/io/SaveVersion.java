@@ -12,6 +12,7 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.maps.Map;
@@ -67,6 +68,7 @@ public abstract class SaveVersion extends SaveFileReader{
         readRegion("content", stream, counter, this::readContentHeader);
 
         try{
+            if(version >= 11) readRegion("patches", stream, counter, this::readContentPatches);
             readRegion("map", stream, counter, in -> readMap(in, context));
             readRegion("entities", stream, counter, this::readEntities);
             if(version >= 8) readRegion("markers", stream, counter, this::readMarkers);
@@ -79,6 +81,7 @@ public abstract class SaveVersion extends SaveFileReader{
     public void write(DataOutputStream stream, StringMap extraTags) throws IOException{
         writeRegion("meta", stream, out -> writeMeta(out, extraTags));
         writeRegion("content", stream, this::writeContentHeader);
+        writeRegion("patches", stream, this::writeContentPatches);
         writeRegion("map", stream, this::writeMap);
         writeRegion("entities", stream, this::writeEntities);
         writeRegion("markers", stream, this::writeMarkers);
@@ -502,8 +505,54 @@ public abstract class SaveVersion extends SaveFileReader{
         readWorldEntities(stream, mapping);
     }
 
+    public void skipContentPatches(DataInput stream) throws IOException{
+        int amount = stream.readUnsignedByte();
+        for(int i = 0; i < amount; i++){
+            int len = stream.readInt();
+            stream.skipBytes(len);
+        }
+    }
+
+    public void readContentPatches(DataInput stream) throws IOException{
+        Seq<String> patches = new Seq<>();
+
+        int amount = stream.readUnsignedByte();
+        if(amount > 0){
+            for(int i = 0; i < amount; i++){
+                int len = stream.readInt();
+                byte[] bytes = new byte[len];
+                stream.readFully(bytes);
+                patches.add(new String(bytes, Strings.utf8));
+            }
+        }
+
+        Events.fire(new ContentPatchLoadEvent(patches));
+
+        if(patches.size > 0){
+            try{
+                state.patcher.apply(patches);
+            }catch(Throwable e){
+                Log.err("Failed to apply patches: " + patches, e);
+            }
+        }
+    }
+
+    public void writeContentPatches(DataOutput stream) throws IOException{
+        if(state.patcher.patches.size > 0){
+            var patches = state.patcher.patches;
+            stream.writeByte(patches.size);
+            for(var patchset : patches){
+                byte[] bytes = patchset.patch.getBytes(Strings.utf8);
+                stream.writeInt(bytes.length);
+                stream.write(bytes);
+            }
+        }else{
+            stream.writeByte(0);
+        }
+    }
+
     public void readContentHeader(DataInput stream) throws IOException{
-        byte mapped = stream.readByte();
+        int mapped = stream.readUnsignedByte();
 
         MappableContent[][] map = new MappableContent[ContentType.all.length][0];
 
@@ -520,6 +569,21 @@ public abstract class SaveVersion extends SaveFileReader{
         }
 
         content.setTemporaryMapper(map);
+
+        //HACK: versions below 11 don't read the patch chunk, which means the event for reading patches is never triggered.
+        //manually fire the event here for older versions.
+        if(version < 11){
+            Seq<String> patches = new Seq<>();
+            Events.fire(new ContentPatchLoadEvent(patches));
+
+            if(patches.size > 0){
+                try{
+                    state.patcher.apply(patches);
+                }catch(Throwable e){
+                    Log.err("Failed to apply patches: " + patches, e);
+                }
+            }
+        }
     }
 
     public void writeContentHeader(DataOutput stream) throws IOException{
