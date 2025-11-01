@@ -2045,7 +2045,7 @@ public class LExecutor{
                         marker.setTexture(exec.textBuffer.toString());
                         exec.textBuffer.setLength(0);
                     }else{
-                        marker.setTexture(PrintI.toString(p2.obj()));
+                        marker.setTexture(p2.obj());
                     }
                 }else{
                     marker.control(type, p1.numOrNan(), p2.numOrNan(), p3.numOrNan());
@@ -2116,10 +2116,10 @@ public class LExecutor{
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
-    public static void updateMarkerTexture(int id, String textureName){
+    public static void updateMarkerTexture(int id, Object texture){
         var marker = state.markers.get(id);
         if(marker != null){
-            marker.setTexture(textureName);
+            marker.setTexture(texture);
         }
     }
 
