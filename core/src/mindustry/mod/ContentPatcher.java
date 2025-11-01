@@ -313,11 +313,8 @@ public class ContentPatcher{
                 return;
             }
 
-            var copy = new ObjectFloatMap(map);
-            reset(() -> {
-                map.clear();
-                map.putAll(copy);
-            });
+            var copy = map.copy();
+            reset(() -> map.set(copy));
 
             if(value instanceof JsonValue jval && jval.isString() && (jval.asString().equals("-"))){
                 //removal syntax:
