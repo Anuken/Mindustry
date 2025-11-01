@@ -1098,137 +1098,159 @@ public class UnitTypes{
         }};
 
         antumbra = new UnitType("antumbra"){{
-            speed = 0.8f;
+            speed = 1.05f;
             accel = 0.04f;
             drag = 0.04f;
-            rotateSpeed = 1.9f;
+            rotateSpeed = 2.2f;
             flying = true;
             lowAltitude = true;
-            health = 7200;
-            armor = 9f;
+            health = 6400;
+            armor = 16f;
+            fogRadius = 48f;
             engineOffset = 21;
             engineSize = 5.3f;
-            hitSize = 46f;
+            hitSize = 44f;
             targetFlags = new BlockFlag[]{BlockFlag.generator, BlockFlag.core, null};
+            immunities.add(StatusEffects.wet);
             ammoType = new ItemAmmoType(Items.thorium);
 
-            BulletType missiles = new MissileBulletType(2.7f, 18){{
-                width = 8f;
-                height = 8f;
+            BulletType missiles = new MissileBulletType(6f, 60f){{
+                sprite = "missile-large";
+                width = 14f;
+                height = 20f;
                 shrinkY = 0f;
-                drag = -0.01f;
-                splashDamageRadius = 20f;
-                splashDamage = 37f;
+                drag = -0.001f;
+                splashDamageRadius = 36f;
+                splashDamage = 80f;
                 ammoMultiplier = 4f;
-                lifetime = 50f;
-                hitEffect = Fx.blastExplosion;
+                homingPower = 0.02f;
+                lifetime = 35f;
+                scaleLife = true;
+                hitEffect = Fx.flakExplosion;
                 despawnEffect = Fx.blastExplosion;
-
+                collidesTiles = false;
                 status = StatusEffects.blasted;
                 statusDuration = 60f;
+                incendChance = 0.25f;
+                incendSpread = 5f;
+                incendAmount = 2;
             }};
 
             weapons.add(
-            new Weapon("missiles-mount"){{
-                y = 8f;
-                x = 17f;
-                reload = 20f;
+            new Weapon("large-bullet-mount"){{
+                y = 7f;
+                x = 8f;
+                reload = 30f;
                 ejectEffect = Fx.casing1;
                 rotateSpeed = 8f;
                 bullet = missiles;
-                shootSound = Sounds.missile;
+                shootSound = Sounds.missileLarge;
                 rotate = true;
-                shadow = 6f;
-            }},
-            new Weapon("missiles-mount"){{
-                y = -8f;
-                x = 17f;
-                reload = 35;
-                rotateSpeed = 8f;
-                ejectEffect = Fx.casing1;
-                bullet = missiles;
-                shootSound = Sounds.missile;
-                rotate = true;
+                rotationLimit = 60f;
                 shadow = 6f;
             }},
             new Weapon("large-bullet-mount"){{
-                y = 2f;
-                x = 10f;
-                shootY = 10f;
-                reload = 12;
-                shake = 1f;
-                rotateSpeed = 2f;
+                y = 7f;
+                x = 20f;
+                reload = 30;
+                shoot.firstShotDelay = 15f;
+                rotateSpeed = 8f;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.shootBig;
+                bullet = missiles;
+                shootSound = Sounds.missileLarge;
                 rotate = true;
-                shadow = 8f;
-                bullet = new BasicBulletType(7f, 55){{
-                    width = 12f;
-                    height = 18f;
-                    lifetime = 25f;
-                    shootEffect = Fx.shootBig;
-                }};
+                rotationLimit = 60f;
+                shadow = 6f;
             }}
             );
         }};
 
         eclipse = new UnitType("eclipse"){{
-            speed = 0.54f;
+            speed = 0.95f;
             accel = 0.04f;
             drag = 0.04f;
-            rotateSpeed = 1f;
+            rotateSpeed = 1.2f;
             flying = true;
             lowAltitude = true;
-            health = 22000;
+            health = 18000;
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
-            armor = 13f;
+            armor = 22f;
+            fogRadius = 72f;
+            immunities = ObjectSet.with(StatusEffects.wet, StatusEffects.sapped);
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
-            BulletType fragBullet = new FlakBulletType(4f, 15){{
+            BulletType fragBullet = new BasicBulletType(9f, 80f){{
                 shootEffect = Fx.shootBig;
+                hitEffect = Fx.flakExplosion;
+                width = 9f;
+                height = 16f;
+                hitSize = 6f;
                 ammoMultiplier = 4f;
-                splashDamage = 65f;
-                splashDamageRadius = 25f;
-                collidesGround = true;
-                lifetime = 47f;
-
+                splashDamage = 120f;
+                splashDamageRadius = 28f;
+                collidesTiles = false;
+                lifetime = 28f;
+                scaleLife = true;
+                trailEffect = Fx.artilleryTrail;
                 status = StatusEffects.blasted;
                 statusDuration = 60f;
+                incendChance = 0.2f;
+                incendSpread = 5f;
+                incendAmount = 1;
             }};
 
             weapons.add(
             new Weapon("large-laser-mount"){{
                 shake = 4f;
                 shootY = 9f;
-                x = 18f;
-                y = 5f;
-                rotateSpeed = 2f;
-                reload = 45f;
+                x = 0f;
+                y = 30f;
+                mirror = false;
+                layerOffset = -0.2f;
+                reload = 240f;
                 recoil = 4f;
+                chargeSound = Sounds.lasercharge2;
                 shootSound = Sounds.laser;
                 shadow = 20f;
                 rotate = true;
+                rotateSpeed = 0.8f;
+                rotationLimit = 50f;
+                shoot.firstShotDelay = Fx.lancerLaserCharge.lifetime - 1f;
 
-                bullet = new LaserBulletType(){{
-                    damage = 115f;
-                    sideAngle = 20f;
-                    sideWidth = 1.5f;
-                    sideLength = 80f;
-                    width = 25f;
-                    length = 230f;
-                    shootEffect = Fx.shockwave;
-                    colors = new Color[]{Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
+                bullet = new BasicBulletType(7f, 180f){{
+                    sprite = "large-orb";
+                    chargeEffect = Fx.lancerLaserCharge;
+                    hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
+                    hitSound = Sounds.titanExplosion;
+                    width = height = 20f;
+                    hitSize = 8f;
+                    ammoMultiplier = 4f;
+                    splashDamage = 640f;
+                    splashDamageRadius = 40f;
+                    collidesTiles = false;
+                    lifetime = 36f;
+                    scaleLife = true;
+                    trailLength = 12;
+                    trailWidth = 2.2f;
+                    frontColor = Pal.lightishOrange;
+                    hitColor = backColor = Pal.lightOrange;
+                    trailEffect = Fx.incendTrail;
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+                    incendChance = 0.6f;
+                    incendSpread = 5f;
+                    incendAmount = 3;
                 }};
             }},
             new Weapon("large-artillery"){{
-                x = 11f;
-                y = 27f;
+                x = 15f;
+                y = 28f;
                 rotateSpeed = 2f;
-                reload = 9f;
-                shootSound = Sounds.shoot;
+                reload = 20f;
+                shootSound = Sounds.mediumCannon;
                 shadow = 7f;
                 rotate = true;
                 recoil = 0.5f;
@@ -1236,16 +1258,17 @@ public class UnitTypes{
                 bullet = fragBullet;
             }},
             new Weapon("large-artillery"){{
-                y = -13f;
-                x = 20f;
-                reload = 12f;
+                y = 16f;
+                x = -28f;
+                reload = 20f;
                 ejectEffect = Fx.casing1;
-                rotateSpeed = 7f;
+                rotateSpeed = 2f;
                 shake = 1f;
-                shootSound = Sounds.shoot;
+                shootSound = Sounds.mediumCannon;
                 rotate = true;
-                shadow = 12f;
+                shadow = 7f;
                 shootY = 7.25f;
+                shoot.firstShotDelay = 9f;
                 bullet = fragBullet;
             }});
         }};
