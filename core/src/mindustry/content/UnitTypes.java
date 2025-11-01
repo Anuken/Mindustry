@@ -982,7 +982,7 @@ public class UnitTypes{
             accel = 0.08f;
             drag = 0.04f;
             flying = true;
-            health = 70;
+            health = 35;
             engineOffset = 5.75f;
             //TODO balance
             //targetAir = false;
@@ -1008,7 +1008,7 @@ public class UnitTypes{
         }};
 
         horizon = new UnitType("horizon"){{
-            health = 340;
+            health = 170;
             speed = 1.65f;
             accel = 0.08f;
             drag = 0.016f;
@@ -1050,7 +1050,7 @@ public class UnitTypes{
         }};
 
         zenith = new UnitType("zenith"){{
-            health = 700;
+            health = 350;
             speed = 1.7f;
             accel = 0.04f;
             drag = 0.016f;
