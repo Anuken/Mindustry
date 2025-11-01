@@ -251,6 +251,15 @@ public class PatcherTests{
     }
 
     @Test
+    void testNoIdAssign() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        block.router.id: 9231
+        """));
+
+        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
+    }
+
+    @Test
     void testUnknownFieldWarn() throws Exception{
         Vars.state.patcher.apply(Seq.with("""
         unit.dagger.weapons.+: {

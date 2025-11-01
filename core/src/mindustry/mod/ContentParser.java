@@ -8,6 +8,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
@@ -99,7 +100,22 @@ public class ContentParser{
                 }
             }
         });
-        put(TextureRegion.class, (type, data) -> Core.atlas == null ? null : Core.atlas.find(data.asString()));
+        put(TextureRegion.class, (type, data) -> {
+            if(Core.atlas == null) return null;
+            String str = data.asString();
+            if(str.startsWith("icon-")){
+                var icon = Icon.icons.get(str.substring("icon-".length()));
+                if(icon != null){
+                    icon.getRegion().scale = 1f / Scl.scl(1f);
+                    return icon.getRegion();
+                }
+            }
+            TextureRegion result = Core.atlas.find(str);
+            if(!result.found()){
+                warn("Sprite not found: '" + str + "'");
+            }
+            return result;
+        });
         put(Color.class, (type, data) -> Color.valueOf(data.asString()));
         put(StatusEffect.class, (type, data) -> {
             if(data.isString()){
