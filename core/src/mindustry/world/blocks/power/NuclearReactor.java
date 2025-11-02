@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.Geometry;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -16,6 +17,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.environment.Floor;
 import mindustry.world.blocks.heat.*;
@@ -197,29 +199,42 @@ public class NuclearReactor extends PowerGenerator{
         public void onDestroyed(){
             super.onDestroyed();
 
-            // add unit dust by killing an eclipse (janky, but it works)
+            // add unit dust by killing an eclipse (janky, but it works lol)
             Unit u = UnitTypes.eclipse.spawn(Team.derelict, x, y);
             u.kill();
 
 
             int clearRadius = 19;
-            for(int dx = -clearRadius; dx <= clearRadius; dx++){
-                for(int dy = -clearRadius; dy <= clearRadius; dy++){
-                    Tile t = world.tile(tile.x + dx, tile.y + dy);
-                    if(t != null && t.block() == Blocks.boulder){
-                        t.setAir();
+            Geometry.circle(tile.x, tile.y, clearRadius, (x, y) -> {
+                Tile t = world.tile(x, y);
+                if(t == null) return;
+
+                Block overlay = t.overlay();
+                if(overlay != null && overlay.breakable && overlay.isOverlay()){
+                    t.setOverlay(Blocks.air);
+                }
+
+                Block block = t.block();
+                if(block != null && block.breakable && block.isOverlay()){
+                    t.setAir();
+                }
+                if(block != null && block == Blocks.boulder){
+                    t.setAir();
+                }
+
+                Floor floor = t.floor();
+                if(floor == Blocks.tar){
+                    for(int i = 0; i < 8; i++){
+                        Fx.fire.at(t.worldx(), t.worldy());
                     }
-                    if(t != null && t.floor() == Blocks.tar){
-                        for (int i = 0; i < 360; i++) {
-                            Fx.fire.at(t.worldx(), t.worldy());
-                        }
-                    } else if( t != null && (t.floor() == Blocks.water || t.floor() == Blocks.deepwater)){
-                        for (int i = 0; i < 360; i++) {
-                            Fx.steam.at(t.worldx(), t.worldy());
-                        }
+                } else if(floor == Blocks.water || floor == Blocks.deepwater){
+                    for(int i = 0; i < 8; i++){
+                        Fx.steam.at(t.worldx(), t.worldy());
                     }
                 }
-            }
+            });
+
+
 
         }
 
