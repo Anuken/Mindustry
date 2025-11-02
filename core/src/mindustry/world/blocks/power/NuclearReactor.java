@@ -10,11 +10,14 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
+import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.Tile;
+import mindustry.world.blocks.environment.Floor;
 import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
 
@@ -116,7 +119,7 @@ public class NuclearReactor extends PowerGenerator{
                 float smoke = 1.0f + (heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
                 if(Mathf.chance(smoke / 20.0 * delta())){
                     Fx.reactorsmoke.at(x + Mathf.range(size * tilesize / 2f),
-                    y + Mathf.range(size * tilesize / 2f));
+                            y + Mathf.range(size * tilesize / 2f));
                 }
             }
 
@@ -189,5 +192,36 @@ public class NuclearReactor extends PowerGenerator{
             super.read(read, revision);
             heat = read.f();
         }
+
+        @Override
+        public void onDestroyed(){
+            super.onDestroyed();
+
+            // add unit dust by killing an eclipse (janky, but it works)
+            Unit u = UnitTypes.eclipse.spawn(Team.derelict, x, y);
+            u.kill();
+
+
+            int clearRadius = 19;
+            for(int dx = -clearRadius; dx <= clearRadius; dx++){
+                for(int dy = -clearRadius; dy <= clearRadius; dy++){
+                    Tile t = world.tile(tile.x + dx, tile.y + dy);
+                    if(t != null && t.block() == Blocks.boulder){
+                        t.setAir();
+                    }
+                    if(t != null && t.floor() == Blocks.tar){
+                        for (int i = 0; i < 360; i++) {
+                            Fx.fire.at(t.worldx(), t.worldy());
+                        }
+                    } else if( t != null && (t.floor() == Blocks.water || t.floor() == Blocks.deepwater)){
+                        for (int i = 0; i < 360; i++) {
+                            Fx.steam.at(t.worldx(), t.worldy());
+                        }
+                    }
+                }
+            }
+
+        }
+
     }
 }
