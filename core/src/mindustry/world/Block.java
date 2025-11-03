@@ -366,6 +366,8 @@ public class Block extends UnlockableContent implements Senseable{
     public @Nullable Team forceTeam;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
+    /** Maximum number of instantTransfer consecutive blocks. */
+    public int maxConsecutive = 2;
     /** Whether you can rotate this block after it is placed. */
     public boolean quickRotate = true;
     /** If true, this derelict block can be repair by clicking it. */
@@ -610,7 +612,7 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         if(instantTransfer){
-            stats.add(Stat.maxConsecutive, 2, StatUnit.none);
+            stats.add(Stat.maxConsecutive, maxConsecutive, StatUnit.none);
         }
 
         for(var c : consumers){
