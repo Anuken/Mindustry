@@ -17,6 +17,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -106,7 +107,33 @@ public class ForceProjector extends Block{
         if(consItems && itemConsumer instanceof ConsumeItems coni){
             stats.remove(Stat.booster);
             stats.add(Stat.booster, StatValues.itemBoosters("+{0} " + StatUnit.shieldHealth.localized(), stats.timePeriod, phaseShieldBoost, phaseRadiusBoost, coni.items));
-            stats.add(Stat.booster, StatValues.speedBoosters("", coolantConsumption, Float.MAX_VALUE, true, this::consumesLiquid));
+
+            stats.add(Stat.booster, (table) -> {
+                table.row();
+                table.table(c -> {
+                    for(Liquid liquid : content.liquids()){
+                        if(!consumesLiquid(liquid)) continue;
+
+                        c.table(Styles.grayPanel, b -> {
+                            b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> StatValues.withTooltip(i, liquid, false));
+                            b.table(info -> {
+                                info.add(liquid.localizedName).left().row();
+                                info.add(Strings.autoFixed(coolantConsumption * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
+                            });
+
+                            float regenBoost = (cooldownNormal / cooldownLiquid - 1f) * 100f * liquid.heatCapacity;
+                            float cooldownBoost = (1f - cooldownLiquid / cooldownNormal) * 100f * liquid.heatCapacity;
+                                
+                            b.table(bt -> {
+                                bt.right().defaults().padRight(3).left();
+                                bt.add("[lightgray]+" + Core.bundle.format("bar.regenerationrate", Strings.autoFixed(regenBoost, 2))).pad(5).row();
+                                bt.add("[lightgray]-" + Core.bundle.format("ability.stat.cooldown", Strings.autoFixed(cooldownBoost, 2))).pad(5);
+                            }).right().grow().pad(10f).padRight(15f);
+                        }).growX().pad(5).row();
+                    }
+                }).growX().colspan(table.getColumns());
+                table.row();
+            });
         }
     }
 
