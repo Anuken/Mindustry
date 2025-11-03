@@ -24,6 +24,14 @@ public class Router extends Block{
         noUpdateDisabled = true;
     }
 
+    @Override
+    public void init(){
+        super.init();
+        if(instantTransfer){
+            itemCapacity = 0;
+        }
+    }
+
     public class RouterBuild extends Building implements ControlBlock{
         public Item lastItem;
         public Tile lastInput;
@@ -51,19 +59,21 @@ public class Router extends Block{
 
         @Override
         public void updateTile(){
-            if(lastItem == null && items.any()){
-                lastItem = items.first();
-            }
+            if(!instantTransfer){
+                if(lastItem == null && items.any()){
+                    lastItem = items.first();
+                }
 
-            if(lastItem != null){
-                time += 1f / speed * delta();
-                Building target = getTileTarget(lastItem, lastInput, false);
+                if(lastItem != null){
+                    time += 1f / speed * delta();
+                    Building target = getTileTarget(lastItem, lastInput, null, false);
 
-                if(target != null && (time >= 1f || !(target.block instanceof Router || target.block.instantTransfer))){
-                    getTileTarget(lastItem, lastInput, true);
-                    target.handleItem(this, lastItem);
-                    items.remove(lastItem, 1);
-                    lastItem = null;
+                    if(target != null && (time >= 1f || !(target.block instanceof Router || target.block.instantTransfer))){
+                        getTileTarget(lastItem, lastInput, target, true);
+                        target.handleItem(this, lastItem);
+                        items.remove(lastItem, 1);
+                        lastItem = null;
+                    } 
                 }
             }
         }
@@ -75,27 +85,44 @@ public class Router extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return team == source.team && lastItem == null && items.total() == 0;
+            if(instantTransfer){            
+                Building to = getTileTarget(item, lastInput, source, false);
+
+                return to != null && to.acceptItem(this, item) && to.team == team;
+                
+            }else{
+                return team == source.team && lastItem == null && items.total() == 0;
+            }
         }
 
         @Override
         public void handleItem(Building source, Item item){
-            items.add(item, 1);
-            lastItem = item;
-            time = 0f;
-            lastInput = source.tile;
+            if(instantTransfer){
+                Building target = getTileTarget(item, lastInput, source, false);
+
+                if(target != null) target.handleItem(this, item);
+
+            }else{
+                items.add(item, 1);
+                lastItem = item;
+                time = 0f;
+                lastInput = source.tile;
+            }
         }
 
         @Override
         public int removeStack(Item item, int amount){
-            int result = super.removeStack(item, amount);
-            if(result != 0 && item == lastItem){
-                lastItem = null;
+            if(!instantTransfer){
+                int result = super.removeStack(item, amount);
+                if(result != 0 && item == lastItem){
+                    lastItem = null;
+                }
+                return result;
             }
-            return result;
+            return 0;
         }
 
-        public Building getTileTarget(Item item, Tile from, boolean set){
+        public @Nullable Building getTileTarget(Item item, Tile from, Building src, boolean set){
             if(unit != null && isControlled()){
                 unit.health(health);
                 unit.ammo(unit.type().ammoCapacity * (items.total() > 0 ? 1f : 0f));
@@ -118,7 +145,7 @@ public class Router extends Block{
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);
                 if(set) rotation = ((byte)((rotation + 1) % proximity.size));
-                if(other.tile == from && from.block() == Blocks.overflowGate) continue;
+                if(from != null && other.tile == from && from.block() == Blocks.overflowGate || other == src) continue;
                 if(other.acceptItem(this, item)){
                     return other;
                 }

@@ -2133,6 +2133,8 @@ public class Blocks{
             requirements(Category.distribution, with(Items.lead, 4, Items.copper, 4));
             buildCostMultiplier = 3f;
             size = 2;
+            instantTransfer = true;
+            maxConsecutive = 1;
         }};
 
         overflowGate = new OverflowGate("overflow-gate"){{
