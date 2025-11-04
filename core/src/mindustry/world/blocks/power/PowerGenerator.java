@@ -38,6 +38,8 @@ public class PowerGenerator extends PowerDistributor{
     public float explosionMinWarmup = 0f;
 
     public float explosionShake = 0f, explosionShakeDuration = 6f;
+    /** Size of scorch effect on the ground after explosion. Value from 1-9. < 1 to disable. */
+    public int explosionScorchSize = 0;
 
     public PowerGenerator(String name){
         super(name);
@@ -120,24 +122,32 @@ public class PowerGenerator extends PowerDistributor{
 
         public void createExplosion(){
             if(shouldExplode()){
-                if(explosionDamage > 0){
-                    Damage.damage(x, y, explosionRadius * tilesize, explosionDamage);
-                }
+                onExplosion();
+            }
+        }
 
-                explodeEffect.at(this);
-                explodeSound.at(this);
+        public void onExplosion(){
+            if(explosionDamage > 0){
+                Damage.damage(x, y, explosionRadius * tilesize, explosionDamage);
+            }
 
-                if(explosionPuddleLiquid != null){
-                    for(int i = 0; i < explosionPuddles; i++){
-                        Tmp.v1.trns(Mathf.random(360f), Mathf.random(explosionPuddleRange));
-                        Tile tile = world.tileWorld(x + Tmp.v1.x, y + Tmp.v1.y);
-                        Puddles.deposit(tile, explosionPuddleLiquid, explosionPuddleAmount);
-                    }
-                }
+            explodeEffect.at(this);
+            explodeSound.at(this);
 
-                if(explosionShake > 0){
-                    Effect.shake(explosionShake, explosionShakeDuration, this);
+            if(explosionPuddleLiquid != null){
+                for(int i = 0; i < explosionPuddles; i++){
+                    Tmp.v1.trns(Mathf.random(360f), Mathf.random(explosionPuddleRange));
+                    Tile tile = world.tileWorld(x + Tmp.v1.x, y + Tmp.v1.y);
+                    Puddles.deposit(tile, explosionPuddleLiquid, explosionPuddleAmount);
                 }
+            }
+
+            if(explosionShake > 0){
+                Effect.shake(explosionShake, explosionShakeDuration, this);
+            }
+
+            if(explosionScorchSize > 0){
+                Effect.scorch(x, y, explosionScorchSize);
             }
         }
 
