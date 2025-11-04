@@ -3895,19 +3895,24 @@ public class Blocks{
             coolant = consumeCoolant(0.3f);
 
             float brange = range + 10f;
+            final ShootPattern pattern = ((ShootPattern)shoot);
 
             ammo(
                 Items.titanium, new ShrapnelBulletType(){{
-                    length = brange;
+                    length = brange + 64f;
+                    rangeChange = 64f;
+                    width = 5f;
                     damage = 66f;
-                    ammoMultiplier = 4f;
+                    ammoMultiplier = 2f;
                     width = 17f;
                     reloadMultiplier = 1.3f;
+                    serrations = 9;
+                    serrationSpacing = 20f;
                 }},
                 Items.thorium, new ShrapnelBulletType(){{
                     length = brange;
                     damage = 105f;
-                    ammoMultiplier = 5f;
+                    ammoMultiplier = 2f;
                     toColor = Pal.thoriumPink;
                     shootEffect = smokeEffect = Fx.thoriumShoot;
                 }}
