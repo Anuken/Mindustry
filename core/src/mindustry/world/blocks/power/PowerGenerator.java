@@ -140,7 +140,7 @@ public class PowerGenerator extends PowerDistributor{
             if(explosionIgnitionChance > 0){
                 Geometry.circle(tileX(), tileY(), explosionRadius, (tx, ty) -> {
                     if(Mathf.chance(explosionIgnitionChance *
-                                       (explosionScaleIgnitionChance ? 1 - Mathf.dst(tileX(), tileY(), tx, ty) / explosionRadius : 1))){
+                                       (explosionScaleIgnitionChance ? 1 - Mathf.sqrt(Mathf.dst(tileX(), tileY(), tx, ty) / explosionRadius) : 1))){
                         Fires.create(Vars.world.tile(tx, ty));
                     }
                 });
