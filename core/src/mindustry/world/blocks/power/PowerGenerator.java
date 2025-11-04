@@ -43,6 +43,8 @@ public class PowerGenerator extends PowerDistributor{
     public float explosionShake = 0f, explosionShakeDuration = 6f;
     /** Size of scorch effect on the ground after explosion. Value from 1-9. < 1 to disable. */
     public int explosionScorchSize = 0;
+    /** The time for ignition and boulder breaking spread to reach max range. */
+    public float explosionTime = 15f;
     /** Chance for each tile in the explosion radius to catch on fire. */
     public float explosionIgnitionChance = 0f;
     /** If true, the ignition chance decreases with distance. */
@@ -140,18 +142,21 @@ public class PowerGenerator extends PowerDistributor{
 
             Geometry.circle(tileX(), tileY(), explosionRadius, (tx, ty) -> {
                 Tile t = Vars.world.tile(tx, ty);
-                //Create fires
-                if(explosionIgnitionChance > 0){
+                float dst = Mathf.dst(tileX(), tileY(), tx, ty);
+                Time.run(dst / explosionRadius * explosionTime, () -> {
+                    //Create fires
+                    if(explosionIgnitionChance > 0){
                         if(Mathf.chance(explosionIgnitionChance *
-                                           (explosionScaleIgnitionChance ? 1 - Mathf.sqrt(Mathf.dst(tileX(), tileY(), tx, ty) / explosionRadius) : 1))){
+                            (explosionScaleIgnitionChance ? 1 - Mathf.sqrt(dst / explosionRadius) : 1))){
                             Fires.create(t);
                         }
-                }
+                    }
 
-                //Break boulders
-                if(t != null && t.block().unitMoveBreakable){ //Probably a good enough indicator
-                    ConstructBlock.deconstructFinish(t, t.block(), null);
-                }
+                    //Break boulders
+                    if(t != null && t.block().unitMoveBreakable){ //Probably a good enough indicator
+                        ConstructBlock.deconstructFinish(t, t.block(), null);
+                    }
+                });
             });
 
             explodeEffect.at(this);
