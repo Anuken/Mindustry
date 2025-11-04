@@ -2505,7 +2505,7 @@ public class Blocks{
 
             explosionShake = 1f;
             explosionScorchSize = 1;
-            explosionIgnitionChance = 0.1f;
+            explosionIgnitionChance = 0.5f;
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
@@ -2538,7 +2538,7 @@ public class Blocks{
 
             explosionShake = 1f;
             explosionScorchSize = 2;
-            explosionIgnitionChance = 0.1f;
+            explosionIgnitionChance = 0.5f;
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
