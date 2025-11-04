@@ -102,7 +102,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public float floorSpeedMultiplier(){
         Floor on = isFlying() || type.hovering ? Blocks.air.asFloor() : floorOn();
-        return on.speedMultiplier * speedMultiplier;
+        return (float)Math.pow(on.speedMultiplier, type.floorMultiplier) * speedMultiplier;
     }
 
     /** Called when this unit was unloaded from a factory or spawn point. */

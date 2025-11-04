@@ -102,6 +102,7 @@ public class ForceProjector extends Block{
         if(consItems) stats.timePeriod = phaseUseTime;
         super.setStats();
         stats.add(Stat.shieldHealth, shieldHealth, StatUnit.none);
+        stats.add(Stat.regenerationRate, cooldownNormal * 60f, StatUnit.perSecond);
         stats.add(Stat.cooldownTime, (int) (shieldHealth / cooldownBrokenBase / 60f), StatUnit.seconds);
 
         if(consItems && itemConsumer instanceof ConsumeItems coni){
@@ -121,13 +122,14 @@ public class ForceProjector extends Block{
                                 info.add(Strings.autoFixed(coolantConsumption * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
                             });
 
-                            float regenBoost = (cooldownNormal / cooldownLiquid - 1f) * 100f * liquid.heatCapacity;
-                            float cooldownBoost = (1f - cooldownLiquid / cooldownNormal) * 100f * liquid.heatCapacity;
+                            float liquidHeat = (1f + (liquid.heatCapacity - 0.4f) * 0.9f);
+                            float regenBoost = ((cooldownNormal * (cooldownLiquid * liquidHeat)) - cooldownNormal) * 60f;
+                            float cooldownBoost = (shieldHealth / (cooldownBrokenBase * (cooldownLiquid * liquidHeat)) - shieldHealth / cooldownBrokenBase) / 60f;
                                 
                             b.table(bt -> {
                                 bt.right().defaults().padRight(3).left();
                                 bt.add("[lightgray]+" + Core.bundle.format("bar.regenerationrate", Strings.autoFixed(regenBoost, 2))).pad(5).row();
-                                bt.add("[lightgray]-" + Core.bundle.format("ability.stat.cooldown", Strings.autoFixed(cooldownBoost, 2))).pad(5);
+                                bt.add(Core.bundle.format("ability.stat.cooldown", Strings.autoFixed(cooldownBoost, 2))).pad(5);
                             }).right().grow().pad(10f).padRight(15f);
                         }).growX().pad(5).row();
                     }
