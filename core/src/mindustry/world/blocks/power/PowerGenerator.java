@@ -4,9 +4,11 @@ import arc.*;
 import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -40,6 +42,10 @@ public class PowerGenerator extends PowerDistributor{
     public float explosionShake = 0f, explosionShakeDuration = 6f;
     /** Size of scorch effect on the ground after explosion. Value from 1-9. < 1 to disable. */
     public int explosionScorchSize = 0;
+    /** Chance for each tile in the explosion radius to catch on fire. */
+    public float explosionIgnitionChance = 0f;
+    /** If true, the ignition chance decreases with distance. */
+    public boolean explosionScaleIgnitionChance = true;
 
     public PowerGenerator(String name){
         super(name);
@@ -129,6 +135,15 @@ public class PowerGenerator extends PowerDistributor{
         public void onExplosion(){
             if(explosionDamage > 0){
                 Damage.damage(x, y, explosionRadius * tilesize, explosionDamage);
+            }
+
+            if(explosionIgnitionChance > 0){
+                Geometry.circle(tileX(), tileY(), explosionRadius, (tx, ty) -> {
+                    if(Mathf.chance(explosionIgnitionChance *
+                                       (explosionScaleIgnitionChance ? 1 - Mathf.dst(tileX(), tileY(), tx, ty) / explosionRadius : 1))){
+                        Fires.create(Vars.world.tile(tx, ty));
+                    }
+                });
             }
 
             explodeEffect.at(this);
