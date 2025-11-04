@@ -716,6 +716,8 @@ public class Block extends UnlockableContent implements Senseable{
         super.afterPatch();
         barMap.clear();
         setBars();
+        offset = ((size + 1) % 2) * tilesize / 2f;
+        sizeOffset = -((size - 1) / 2);
     }
 
     public boolean consumesItem(Item item){
