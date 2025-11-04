@@ -17,6 +17,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -137,14 +138,21 @@ public class PowerGenerator extends PowerDistributor{
                 Damage.damage(x, y, explosionRadius * tilesize, explosionDamage);
             }
 
-            if(explosionIgnitionChance > 0){
-                Geometry.circle(tileX(), tileY(), explosionRadius, (tx, ty) -> {
-                    if(Mathf.chance(explosionIgnitionChance *
-                                       (explosionScaleIgnitionChance ? 1 - Mathf.sqrt(Mathf.dst(tileX(), tileY(), tx, ty) / explosionRadius) : 1))){
-                        Fires.create(Vars.world.tile(tx, ty));
-                    }
-                });
-            }
+            Geometry.circle(tileX(), tileY(), explosionRadius, (tx, ty) -> {
+                Tile t = Vars.world.tile(tx, ty);
+                //Create fires
+                if(explosionIgnitionChance > 0){
+                        if(Mathf.chance(explosionIgnitionChance *
+                                           (explosionScaleIgnitionChance ? 1 - Mathf.sqrt(Mathf.dst(tileX(), tileY(), tx, ty) / explosionRadius) : 1))){
+                            Fires.create(t);
+                        }
+                }
+
+                //Break boulders
+                if(t != null && t.block().unitMoveBreakable){ //Probably a good enough indicator
+                    ConstructBlock.deconstructFinish(t, t.block(), null);
+                }
+            });
 
             explodeEffect.at(this);
             explodeSound.at(this);
