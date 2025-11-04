@@ -57,6 +57,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public float speed = 1.1f,
     /** multiplier for speed when boosting */
     boostMultiplier = 1f,
+    /** how affected this unit is by terrain */
+    floorMultiplier = 1f,
     /** body rotation speed in degrees/t */
     rotateSpeed = 5f,
     /** mech base rotation speed in degrees/t*/
@@ -439,8 +441,6 @@ public class UnitType extends UnlockableContent implements Senseable{
     public int treadFrames = 18;
     /** how much of a top part of a tread sprite is "cut off" relative to the pattern; this is corrected for */
     public int treadPullOffset = 0;
-    /** how affected this unit is by terrain */
-    public float floorMultiplier = 1f;
 
     //SEGMENTED / CRAWL UNITS (this is WIP content!)
 
@@ -748,6 +748,11 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(crushDamage > 0){
             stats.add(Stat.crushDamage, crushDamage * 60f * 5f, StatUnit.perSecond);
+        }
+
+        if(legSplashDamage > 0 && legSplashRange > 0){
+            stats.add(Stat.legSplashDamage, legSplashDamage, StatUnit.perLeg);
+            stats.add(Stat.legSplashRange, Strings.autoFixed(legSplashRange / tilesize, 1), StatUnit.blocks);
         }
 
         stats.add(Stat.targetsAir, targetAir);
