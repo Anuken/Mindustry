@@ -2610,14 +2610,14 @@ public class Blocks{
             size = 4;
             health = 900;
             powerProduction = 130f;
-            itemDuration = 140f;
+            itemDuration = 150f;
             ambientSound = Sounds.pulse;
             ambientSoundVolume = 0.07f;
-            liquidCapacity = 80f;
+            liquidCapacity = 160f;
 
             consumePower(25f);
             consumeItem(Items.blastCompound);
-            consumeLiquid(Liquids.cryofluid, 0.25f);
+            consumeLiquid(Liquids.cryofluid, 14.75f / 60f);
         }};
 
         //erekir
