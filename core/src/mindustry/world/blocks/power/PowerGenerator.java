@@ -43,12 +43,12 @@ public class PowerGenerator extends PowerDistributor{
     public float explosionShake = 0f, explosionShakeDuration = 6f;
     /** Size of scorch effect on the ground after explosion. Value from 1-9. < 1 to disable. */
     public int explosionScorchSize = 0;
-    /** The time for ignition spread to reach max range. */
-    public float explosionTime = 60f;
     /** Chance for each tile in the explosion radius to catch on fire. */
     public float explosionIgnitionChance = 0f;
     /** If true, the ignition chance decreases with distance. */
     public boolean explosionScaleIgnitionChance = true;
+    /** The speed at which ignition spreads. */
+    public float explosionSpeed = 0.5f;
 
     public PowerGenerator(String name){
         super(name);
@@ -143,15 +143,16 @@ public class PowerGenerator extends PowerDistributor{
             Geometry.circle(tileX(), tileY(), explosionRadius, (tx, ty) -> {
                 Tile t = Vars.world.tile(tx, ty);
                 float dst = Mathf.dst(tileX(), tileY(), tx, ty);
-                Time.run(dst / explosionRadius * explosionTime, () -> {
-                    //Create fires
-                    if(explosionIgnitionChance > 0){
-                        if(Mathf.chance(explosionIgnitionChance *
-                            (explosionScaleIgnitionChance ? 1 - Mathf.sqrt(dst / explosionRadius) : 1))){
-                            Fires.create(t);
-                        }
-                    }
-                });
+
+                //Create fires
+                if(explosionIgnitionChance > 0 &&
+                    Mathf.chance(explosionIgnitionChance *
+                    (explosionScaleIgnitionChance ? 1 - Mathf.sqrt(dst / explosionRadius) : 1))
+                ){
+                    Time.run(dst / explosionSpeed, () -> {
+                        Fires.create(t);
+                    });
+                }
 
                 //Break boulders
                 if(t != null && t.block().unitMoveBreakable){ //Probably a good enough indicator
