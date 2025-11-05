@@ -41,6 +41,7 @@ public class PowerGenerator extends PowerDistributor{
     public float explosionMinWarmup = 0f;
 
     public float explosionShake = 0f, explosionShakeDuration = 6f;
+    public boolean explosionBreaksProps = true;
     /** Size of scorch effect on the ground after explosion. Value from 1-9. < 1 to disable. */
     public int explosionScorchSize = 0;
     /** Chance for each tile in the explosion radius to catch on fire. */
@@ -155,7 +156,7 @@ public class PowerGenerator extends PowerDistributor{
                 }
 
                 //Break boulders
-                if(t != null && t.block().unitMoveBreakable){ //Probably a good enough indicator
+                if(explosionBreaksProps && t != null && t.block().unitMoveBreakable){ //Probably a good enough indicator
                     ConstructBlock.deconstructFinish(t, t.block(), null);
                 }
             });
