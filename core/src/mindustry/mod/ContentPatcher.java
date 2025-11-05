@@ -355,17 +355,19 @@ public class ContentPatcher{
                 }, value, true);
             }else if(value instanceof JsonValue jsv && object instanceof Block bl && jsv.isObject() && field.equals("consumes")){
                 modifiedField(bl, "consumeBuilder", Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy());
+                modifiedField(bl, "consumers", Reflect.<Consume[]>get(Block.class, bl, "consumers"));
                 boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
                 reset(() -> {
+                    bl.reinitializeConsumers();
                     bl.hasItems = hadItems;
                     bl.hasLiquids = hadLiquids;
                     bl.hasPower = hadPower;
                     bl.acceptsItems = acceptedItems;
                 });
-                after(bl::reinitializeConsumers);
 
                 try{
                     parser.readBlockConsumers(bl, jsv);
+                    bl.reinitializeConsumers();
                 }catch(Throwable e){
                     Log.err(e);
                     warn("Failed to read consumers for '@': @", bl, Strings.getSimpleMessage(e));
