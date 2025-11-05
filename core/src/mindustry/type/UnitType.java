@@ -57,6 +57,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public float speed = 1.1f,
     /** multiplier for speed when boosting */
     boostMultiplier = 1f,
+    /** how affected this unit is by terrain */
+    floorMultiplier = 1f,
     /** body rotation speed in degrees/t */
     rotateSpeed = 5f,
     /** mech base rotation speed in degrees/t*/
@@ -439,8 +441,6 @@ public class UnitType extends UnlockableContent implements Senseable{
     public int treadFrames = 18;
     /** how much of a top part of a tread sprite is "cut off" relative to the pattern; this is corrected for */
     public int treadPullOffset = 0;
-    /** how affected this unit is by terrain */
-    public float floorMultiplier = 1f;
 
     //SEGMENTED / CRAWL UNITS (this is WIP content!)
 
@@ -750,6 +750,11 @@ public class UnitType extends UnlockableContent implements Senseable{
             stats.add(Stat.crushDamage, crushDamage * 60f * 5f, StatUnit.perSecond);
         }
 
+        if(legSplashDamage > 0 && legSplashRange > 0){
+            stats.add(Stat.legSplashDamage, legSplashDamage, StatUnit.perLeg);
+            stats.add(Stat.legSplashRange, Strings.autoFixed(legSplashRange / tilesize, 1), StatUnit.blocks);
+        }
+
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
 
@@ -829,6 +834,28 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
     }
 
+    void initPathType(){
+        if(flowfieldPathType == -1){
+            flowfieldPathType =
+            naval ? Pathfinder.costNaval :
+            allowLegStep ? Pathfinder.costLegs :
+            flying ? Pathfinder.costNone :
+            hovering ? Pathfinder.costHover :
+            Pathfinder.costGround;
+        }
+
+        if(pathCost == null){
+            pathCost =
+            naval ? ControlPathfinder.costNaval :
+            allowLegStep ? ControlPathfinder.costLegs :
+            hovering ? ControlPathfinder.costHover :
+            ControlPathfinder.costGround;
+        }
+
+        pathCostId = ControlPathfinder.costTypes.indexOf(pathCost);
+        if(pathCostId == -1) pathCostId = 0;
+    }
+
     @CallSuper
     @Override
     public void init(){
@@ -852,25 +879,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             }
         }
 
-        if(flowfieldPathType == -1){
-            flowfieldPathType =
-                naval ? Pathfinder.costNaval :
-                allowLegStep ? Pathfinder.costLegs :
-                flying ? Pathfinder.costNone :
-                hovering ? Pathfinder.costHover :
-                Pathfinder.costGround;
-        }
-
-        if(pathCost == null){
-            pathCost =
-                naval ? ControlPathfinder.costNaval :
-                allowLegStep ? ControlPathfinder.costLegs :
-                hovering ? ControlPathfinder.costHover :
-                ControlPathfinder.costGround;
-        }
-
-        pathCostId = ControlPathfinder.costTypes.indexOf(pathCost);
-        if(pathCostId == -1) pathCostId = 0;
+        initPathType();
 
         if(flying){
             envEnabled |= Env.space;
@@ -1232,6 +1241,12 @@ public class UnitType extends UnlockableContent implements Senseable{
     public void afterPatch(){
         super.afterPatch();
         totalRequirements = cachedRequirements = firstRequirements = null;
+
+        //this will technically reset any assigned values, but in vanilla, they're not reassigned anyway
+        flowfieldPathType = -1;
+        pathCost = null;
+        pathCostId = -1;
+        initPathType();
     }
 
     /** @return the time required to build this unit, as a value that takes into account reconstructors */

@@ -31,7 +31,9 @@ public class NuclearReactor extends PowerGenerator{
     /** heating per frame * fullness */
     public float heating = 0.01f;
     /** max heat this block can output */
-    public float heatOutput = 20f;
+    public float heatOutput = 15f;
+    /** rate at which heat progress increases */
+    public float heatWarmupRate = 1f;
     /** threshold at which block starts smoking */
     public float smokeThreshold = 0.3f;
     /** heat threshold at which lights start flashing */
@@ -84,6 +86,7 @@ public class NuclearReactor extends PowerGenerator{
 
     public class NuclearReactorBuild extends GeneratorBuild implements HeatBlock{
         public float heat;
+        public float heatProgress;
         public float flash;
         public float smoothLight;
 
@@ -118,6 +121,7 @@ public class NuclearReactor extends PowerGenerator{
             }
 
             heat = Mathf.clamp(heat);
+            heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput * (enabled ? 1f : 0f), heatWarmupRate * delta()) : 0f;
 
             if(heat >= 0.999f){
                 Events.fire(Trigger.thoriumReactorOverheat);
@@ -127,12 +131,12 @@ public class NuclearReactor extends PowerGenerator{
 
         @Override
         public float heatFrac(){
-            return heatOutput > 0f ? heat : 0f;
+            return heatProgress / heatOutput;
         }
 
         @Override
         public float heat(){
-            return heatOutput > 0f ? heat * heatOutput : 0f;
+            return heatProgress;
         }
 
         @Override
