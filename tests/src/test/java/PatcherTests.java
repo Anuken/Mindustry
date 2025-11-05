@@ -73,7 +73,7 @@ public class PatcherTests{
     @Test
     void reconstructorPlans() throws Exception{
         var reconstructor = ((Reconstructor)Blocks.additiveReconstructor);
-        var prev = reconstructor.upgrades;
+        var prev = reconstructor.upgrades.copy();
         var prevConsumes = reconstructor.<ConsumeItems>findConsumer(c -> c instanceof ConsumeItems).items;
 
         Vars.state.patcher.apply(Seq.with(
@@ -96,6 +96,46 @@ public class PatcherTests{
         assertEquals(prev, reconstructor.upgrades);
         assertArrayEquals(reconstructor.<ConsumeItems>findConsumer(c -> c instanceof ConsumeItems).items, prevConsumes);
 
+    }
+
+    @Test
+    void reconstructorPlansEditSpecific() throws Exception{
+        var reconstructor = ((Reconstructor)Blocks.additiveReconstructor);
+        var prev = reconstructor.upgrades.copy();
+
+        Vars.state.patcher.apply(Seq.with(
+        """
+        block.additive-reconstructor.upgrades.1: [dagger, flare]
+        """
+        ));
+
+        assertNoWarnings();
+        var plan = reconstructor.upgrades.get(1);
+        assertArrayEquals(new UnitType[]{UnitTypes.dagger, UnitTypes.flare}, plan);
+
+        resetAfter();
+
+        assertEquals(prev, reconstructor.upgrades);
+    }
+
+    @Test
+    void reconstructorPlansAdd() throws Exception{
+        var reconstructor = ((Reconstructor)Blocks.additiveReconstructor);
+        var prev = reconstructor.upgrades.copy();
+
+        Vars.state.patcher.apply(Seq.with(
+        """
+        block.additive-reconstructor.upgrades.+: [[dagger, flare]]
+        """
+        ));
+
+        assertNoWarnings();
+        var plan = reconstructor.upgrades.peek();
+        assertArrayEquals(new UnitType[]{UnitTypes.dagger, UnitTypes.flare}, plan);
+
+        resetAfter();
+
+        assertEquals(prev, reconstructor.upgrades);
     }
 
     @Test

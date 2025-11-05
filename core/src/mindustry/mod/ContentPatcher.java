@@ -238,6 +238,13 @@ public class ContentPatcher{
                     }, value, false);
                 }
             }else{
+                if(metadata != null){
+                    var meta = new FieldData(metadata.type.isArray() ? metadata.type.getComponentType() : metadata.elementType, null, null);
+                    if(meta.type != null){
+                        metadata = meta;
+                    }
+                }
+
                 int i = Strings.parseInt(field);
                 int length = object instanceof Seq s ? s.size : Array.getLength(object);
 
