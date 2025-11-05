@@ -141,25 +141,27 @@ public class PowerGenerator extends PowerDistributor{
                 Damage.damage(x, y, explosionRadius * tilesize, explosionDamage);
             }
 
-            Geometry.circle(tileX(), tileY(), explosionRadius, (tx, ty) -> {
-                Tile t = Vars.world.tile(tx, ty);
-                float dst = Mathf.dst(tileX(), tileY(), tx, ty);
+            if(explosionIgnitionChance > 0 || explosionBreaksProps){
+                Geometry.circle(tileX(), tileY(), explosionRadius, (tx, ty) -> {
+                    Tile t = Vars.world.tile(tx, ty);
+                    float dst = Mathf.dst(tileX(), tileY(), tx, ty);
 
-                //Create fires
-                if(explosionIgnitionChance > 0 &&
-                    Mathf.chance(explosionIgnitionChance *
-                    (explosionScaleIgnitionChance ? 1 - Mathf.sqrt(dst / explosionRadius) : 1))
-                ){
-                    Time.run(dst / explosionSpeed, () -> {
-                        Fires.create(t);
-                    });
-                }
+                    //Create fires
+                    if(explosionIgnitionChance > 0 &&
+                        Mathf.chance(explosionIgnitionChance *
+                            (explosionScaleIgnitionChance ? 1 - Mathf.sqrt(dst / explosionRadius) : 1))
+                    ){
+                        Time.run(dst / explosionSpeed, () -> {
+                            Fires.create(t);
+                        });
+                    }
 
-                //Break boulders
-                if(explosionBreaksProps && t != null && t.block().unitMoveBreakable){ //Probably a good enough indicator
-                    ConstructBlock.deconstructFinish(t, t.block(), null);
-                }
-            });
+                    //Break boulders
+                    if(explosionBreaksProps && t != null && t.block().unitMoveBreakable){ //Probably a good enough indicator
+                        ConstructBlock.deconstructFinish(t, t.block(), null);
+                    }
+                });
+            }
 
             explodeEffect.at(this);
             explodeSound.at(this);
