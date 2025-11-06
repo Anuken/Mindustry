@@ -20,7 +20,8 @@ public class SoundPriority{
 
         //priority 1.5: big weapon sounds, not loops
         set(1.5f,
-        railgun
+        railgun,
+        largeCannon
         );
 
         //priority 1: ambient noises
