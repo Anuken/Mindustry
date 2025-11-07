@@ -1530,6 +1530,12 @@ public class Fx{
         Lines.circle(e.x, e.y, e.fin() * 28f);
     }),
 
+    shockwaveSmaller = new Effect(9f, 80f, e -> {
+        color(Color.white, Color.lightGray, e.fin());
+        stroke(e.fout() * 2f + 0.2f);
+        Lines.circle(e.x, e.y, e.fin() * 22f);
+    }),
+
     bigShockwave = new Effect(10f, 80f, e -> {
         color(Color.white, Color.lightGray, e.fin());
         stroke(e.fout() * 3f);

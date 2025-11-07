@@ -3,7 +3,6 @@ package mindustry.audio;
 import arc.*;
 import arc.audio.*;
 import arc.struct.*;
-import mindustry.gen.*;
 
 import static mindustry.gen.Sounds.*;
 
@@ -36,13 +35,13 @@ public class SoundPriority{
         respawning
         );
 
-        //this is spammed a LOT
-        Sounds.shootBig.setMinConcurrentInterrupt(shootBig.getLength() * 0.9f);
 
         for(var sound : Core.assets.getAll(Sound.class, new Seq<>())){
             sound.setMinConcurrentInterrupt(Math.min(0.25f, sound.getLength() * 0.5f));
-            sound.setMaxConcurrent(7);
         }
+
+        mechStep.setMinConcurrentInterrupt(0.3f);
+        mechStep.setMaxConcurrent(3);
     }
 
     static void set(float value, Sound... sounds){

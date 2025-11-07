@@ -51,6 +51,7 @@ abstract class MechComp implements Posc, Hitboxc, Unitc, Mechc, ElevationMovec{
             if(type.mechStepParticles){
                 Effect.floorDust(cx, cy, hitSize/8f);
             }
+            type.stepSound.at(cx, cy, 1f + Mathf.range(0.1f), type.stepSoundVolume);
         }
 
         walkExtension = extendScl;

@@ -197,6 +197,8 @@ public class UnitTypes{
             stepShake = 0.15f;
             singleTarget = true;
             drownTimeMultiplier = 1.5f;
+            stepSound = Sounds.mechStep;
+            stepSoundVolume = 0.25f;
 
             abilities.add(new ShieldRegenFieldAbility(25f, 250f, 60f * 1, 60f));
 
@@ -266,6 +268,7 @@ public class UnitTypes{
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
             ammoType = new ItemAmmoType(Items.thorium);
+            stepSound = Sounds.mechStep;
 
             weapons.add(
             new Weapon("reign-weapon"){{
@@ -475,6 +478,8 @@ public class UnitTypes{
             immunities = ObjectSet.with(StatusEffects.burning);
 
             singleTarget = true;
+            stepSound = Sounds.mechStep;
+            stepSoundVolume = 0.25f;
 
             weapons.add(new Weapon("vela-weapon"){{
                 mirror = false;
@@ -1813,7 +1818,7 @@ public class UnitTypes{
                 shake = 6f;
                 recoil = 10.5f;
                 shadow = 50f;
-                shootSound = Sounds.railgun;
+                shootSound = Sounds.shootOmura;
 
                 ejectEffect = Fx.none;
 
