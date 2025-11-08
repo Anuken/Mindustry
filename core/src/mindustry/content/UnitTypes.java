@@ -2436,15 +2436,14 @@ public class UnitTypes{
             health = 170f;
             engineOffset = 6f;
             hitSize = 9f;
-            faceTarget = false;
             lowAltitude = true;
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;
                 reload = 20f;
                 x = 3f;
-                y = 0.5f;
-                rotate = true;
+                y = 1f;
+                recoil = 1f;
                 shoot.shots = 2;
                 shoot.shotDelay = 4f;
 
