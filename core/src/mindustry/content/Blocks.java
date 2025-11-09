@@ -3892,7 +3892,8 @@ public class Blocks{
             envEnabled |= Env.space;
 
             scaledHealth = 220;
-            shootSound = Sounds.fuse;
+            shootSound = Sounds.shotgun;
+            shootSoundVolume = 0.9f;
             coolant = consumeCoolant(0.3f);
 
             float brange = range + 10f;
@@ -4005,7 +4006,7 @@ public class Blocks{
                     collidesTiles = false;
                     splashDamageRadius = 40f * 0.75f;
                     splashDamage = 90f;
-                    fragBullet = new BasicBulletType(2.5f, 10, "bullet"){{
+                    fragBullet = new BasicBulletType(2.5f, 14, "bullet"){{
                         width = 10f;
                         height = 12f;
                         shrinkY = 1f;
@@ -4015,7 +4016,7 @@ public class Blocks{
                         despawnEffect = Fx.none;
                         collidesAir = false;
                     }};
-                    fragBullets = 10;
+                    fragBullets = 15;
                     backColor = Pal.plastaniumBack;
                     frontColor = Pal.plastaniumFront;
                     lifeScaleRandMax = 1.08f;
@@ -4041,7 +4042,7 @@ public class Blocks{
             coolant = consumeCoolant(0.3f);
 
             scaledHealth = 130;
-            shootSound = Sounds.artillery;
+            shootSound = Sounds.shootRipple;
         }};
 
         cyclone = new ItemTurret("cyclone"){{
