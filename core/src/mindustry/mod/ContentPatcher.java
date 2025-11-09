@@ -184,7 +184,7 @@ public class ContentPatcher{
             }else{
                 warn("Content '@' cannot be assigned.", field);
             }
-        }else if(object instanceof Seq<?> || object.getClass().isArray()){ //TODO
+        }else if(object instanceof Seq<?> || object.getClass().isArray()){
 
             if(field.equals("+")){
                 var meta = new FieldData(metadata.type.isArray() ? metadata.type.getComponentType() : metadata.elementType, null, null);
@@ -238,6 +238,13 @@ public class ContentPatcher{
                     }, value, false);
                 }
             }else{
+                if(metadata != null){
+                    var meta = new FieldData(metadata.type.isArray() ? metadata.type.getComponentType() : metadata.elementType, null, null);
+                    if(meta.type != null){
+                        metadata = meta;
+                    }
+                }
+
                 int i = Strings.parseInt(field);
                 int length = object instanceof Seq s ? s.size : Array.getLength(object);
 
@@ -302,6 +309,27 @@ public class ContentPatcher{
             }else{
                 assignValue(object, field, new FieldData(metadata.elementType, null, null), () -> map.get(key), val -> map.put(key, val), value, false);
             }
+        }else if(object instanceof ObjectFloatMap map){
+            if(metadata == null){
+                warn("ObjectFloatMap cannot be parsed without metadata: @.@", parentObject, parentField);
+                return;
+            }
+            Object key = convertKeyType(field, metadata.elementType);
+            if(key == null){
+                warn("Null key: '@'", field);
+                return;
+            }
+
+            var copy = map.copy();
+            reset(() -> map.set(copy));
+
+            if(value instanceof JsonValue jval && jval.isString() && (jval.asString().equals("-"))){
+                //removal syntax:
+                //"value": "-"
+                map.remove(key, 0f);
+            }else{
+                assignValue(object, field, new FieldData(float.class, null, null), () -> map.get(key, 0f), val -> map.put(key, (Float)val), value, false);
+            }
         }else if(object instanceof Attributes map && value instanceof JsonValue jval){
             Attribute key = Attribute.getOrNull(field);
             if(key == null){
@@ -334,17 +362,19 @@ public class ContentPatcher{
                 }, value, true);
             }else if(value instanceof JsonValue jsv && object instanceof Block bl && jsv.isObject() && field.equals("consumes")){
                 modifiedField(bl, "consumeBuilder", Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy());
+                modifiedField(bl, "consumers", Reflect.<Consume[]>get(Block.class, bl, "consumers"));
                 boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
                 reset(() -> {
+                    bl.reinitializeConsumers();
                     bl.hasItems = hadItems;
                     bl.hasLiquids = hadLiquids;
                     bl.hasPower = hadPower;
                     bl.acceptsItems = acceptedItems;
                 });
-                after(bl::reinitializeConsumers);
 
                 try{
                     parser.readBlockConsumers(bl, jsv);
+                    bl.reinitializeConsumers();
                 }catch(Throwable e){
                     Log.err(e);
                     warn("Failed to read consumers for '@': @", bl, Strings.getSimpleMessage(e));
@@ -386,7 +416,9 @@ public class ContentPatcher{
                     for(var child : jsv){
                         if(child.name != null){
                             assign(prevValue, child.name, child,
-                            metadata != null && metadata.type == ObjectMap.class ? metadata :
+                            metadata != null && (metadata.type == ObjectMap.class || metadata.type == ObjectFloatMap.class) ? metadata :
+                            metadata != null && metadata.type == Seq.class ? new FieldData(metadata.elementType, null, null) :
+                            metadata != null && metadata.type.isArray() ? new FieldData(metadata.type.getComponentType(), null, null) :
                             !childFields.containsKey(child.name) ? null :
                             new FieldData(childFields.get(child.name)), object, field);
                         }
