@@ -3689,7 +3689,7 @@ public class Blocks{
             }};
 
             shootY = 4.5f;
-            reload = 30f;
+            reload = 60f * 4f / 7f;
             inaccuracy = 10f;
             range = 240f;
             consumeAmmoOnce = false;
@@ -4136,7 +4136,7 @@ public class Blocks{
                 }
             }};
 
-            reload = 8f;
+            reload = 10f;
             range = 200f;
             size = 3;
             recoil = 1.5f;
