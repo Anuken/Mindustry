@@ -25,6 +25,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
@@ -161,6 +162,11 @@ public class Turret extends ReloadTurret{
         rotate = true;
         quickRotate = false;
         drawArrow = false;
+        ignoreLineRotation = true;
+        rotateDrawEditor = false;
+        visualRotationOffset = -90f;
+        regionRotated1 = 1;
+        regionRotated2 = 2;
     }
 
     @Override
@@ -252,6 +258,14 @@ public class Turret extends ReloadTurret{
         public abstract BulletType type();
     }
 
+    @Override
+    public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
+        super.placeEnded(tile, builder, rotation, config);
+        if(rotate && tile.build instanceof TurretBuild turret){
+            turret.rotation = tile.build.rotdeg();
+        }
+    }
+
     public class TurretBuild extends ReloadTurretBuild implements ControlBlock{
         //TODO storing these as instance variables is horrible design
         /** Turret sprite offset, based on recoil. Updated every frame. */
@@ -278,20 +292,6 @@ public class Turret extends ReloadTurret{
         public @Nullable SoundLoop soundLoop = (loopSound == Sounds.none ? null : new SoundLoop(loopSound, loopSoundVolume));
 
         float lastRangeChange;
-
-        @Override
-        public void placed(){
-            super.placed();
-            if(rotate){
-                rotation = rotdeg();
-            }
-        }
-
-        //overridden so that the rotation isn't affected during repairs (standard placed() code isn't called)
-        @Override
-        public void onRepaired(){
-            super.placed();
-        }
 
         @Override
         public void remove(){
@@ -505,6 +505,11 @@ public class Turret extends ReloadTurret{
 
             if(heatRequirement > 0){
                 heatReq = calculateHeat(sideHeat);
+            }
+
+            if(rotate){
+                //sync underlying rotation; 0-3 rotation is a shadowed field
+                ((Building)this).rotation = Mathf.mod(Mathf.round(rotation / 90f), 4);
             }
 
             //turret always reloads regardless of whether it's targeting something

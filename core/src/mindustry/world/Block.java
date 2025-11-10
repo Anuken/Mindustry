@@ -25,6 +25,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.*;
@@ -63,6 +64,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean acceptsPayload = false;
     /** Visual flag use for blending of certain transportation blocks. */
     public boolean acceptsItems = false;
+    /** If true, this block won't be affected by the onlyDepositCore rule. */
+    public boolean alwaysAllowDeposit = false;
     /** If true, all item capacities of this block are separate instead of pooled as one number. */
     public boolean separateItemCapacity = false;
     /** maximum items this block can carry (usually, this is per-type of item) */
@@ -83,6 +86,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** if true, {@link #buildEditorConfig(Table)} will be called for configuring this block in the editor. */
     public boolean editorConfigurable;
     /** the last configuration value applied to this block. */
+    @NoPatch
     public @Nullable Object lastConfig;
     /** whether to save the last config and apply it to newly placed blocks */
     public boolean saveConfig = false;
@@ -112,8 +116,14 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean rotate;
     /** if rotate is true and this is false, the region won't rotate when drawing */
     public boolean rotateDraw = true;
+    /** if rotate is true and this is false, the region won't rotate when drawing in the editor */
+    public boolean rotateDrawEditor = true;
+    /** visual rotation offset used in broken plan rendering */
+    public float visualRotationOffset = 0f;
     /** if rotate = false and this is true, rotation will be locked at 0 when placing (default); advanced use only */
     public boolean lockRotation = true;
+    /** if true, this block won't face the line drag direction */
+    public boolean ignoreLineRotation = false;
     /** if true, schematic flips with this block are inverted. */
     public boolean invertFlip = false;
     /** number of different variant regions to use */
@@ -197,6 +207,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** whether this block can be placed on edges of liquids. */
     public boolean floating = false;
     /** multiblock size */
+    @NoPatch //changing size often leads to catastrophic issues, so don't allow that
     public int size = 1;
     /** multiblock offset */
     public float offset = 0f;
@@ -364,21 +375,29 @@ public class Block extends UnlockableContent implements Senseable{
     /** Scroll position for certain blocks. */
     public float selectScroll;
     /** Building that is created for this block. Initialized in init() via reflection. Set manually if modded. */
+    @NoPatch
     public Prov<Building> buildType = null;
     /** Configuration handlers by type. */
+    @NoPatch
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
     /** Consumption filters. */
+    @NoPatch
     public boolean[] itemFilter = {}, liquidFilter = {};
     /** Array of consumers used by this block. Only populated after init(). */
+    @NoPatch
     public Consume[] consumers = {}, optionalConsumers = {}, nonOptionalConsumers = {}, updateConsumers = {};
     /** Set to true if this block has any consumers in its array. */
+    @NoPatch
     public boolean hasConsumers;
     /** The single power consumer, if applicable. */
+    @NoPatch
     public @Nullable ConsumePower consPower;
 
     /** Map of bars by name. */
+    @NoPatch
     protected OrderedMap<String, Func<Building, Bar>> barMap = new OrderedMap<>();
     /** List for building up consumption before init(). */
+    @NoPatch
     protected Seq<Consume> consumeBuilder = new Seq<>();
 
     protected TextureRegion[] generatedIcons;
@@ -690,6 +709,15 @@ public class Block extends UnlockableContent implements Senseable{
                 addLiquidBar(build -> build.liquids.current());
             }
         }
+    }
+
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+        barMap.clear();
+        setBars();
+        offset = ((size + 1) % 2) * tilesize / 2f;
+        sizeOffset = -((size - 1) / 2);
     }
 
     public boolean consumesItem(Item item){
@@ -1330,6 +1358,21 @@ public class Block extends UnlockableContent implements Senseable{
 
         if(buildVisibility == BuildVisibility.sandboxOnly){
             hideDetails = false;
+        }
+    }
+
+    public void reinitializeConsumers(){
+        consumers = consumeBuilder.toArray(Consume.class);
+        consPower = (ConsumePower)Structs.find(consumers, c -> c instanceof ConsumePower);
+        optionalConsumers = consumeBuilder.select(consume -> consume.optional && !consume.ignore()).toArray(Consume.class);
+        nonOptionalConsumers = consumeBuilder.select(consume -> !consume.optional && !consume.ignore()).toArray(Consume.class);
+        updateConsumers = consumeBuilder.select(consume -> consume.update && !consume.ignore()).toArray(Consume.class);
+        hasConsumers = consumers.length > 0;
+        itemFilter = new boolean[content.items().size];
+        liquidFilter = new boolean[content.liquids().size];
+
+        for(Consume cons : consumers){
+            cons.apply(this);
         }
     }
 

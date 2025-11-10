@@ -383,6 +383,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         state.rules.allowEditRules = false;
         state.rules.objectiveFlags.clear();
         state.rules.objectives.each(MapObjective::reset);
+        state.stats = new GameStats();
         String name = editor.tags.get("name", "").trim();
         editor.tags.put("rules", JsonIO.write(state.rules));
         editor.tags.remove("width");
@@ -650,10 +651,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.row();
 
-                tools.table(Tex.underline, t -> t.add("@editor.teams"))
-                .colspan(3).height(40).width(size * 3f + 3f).padBottom(3);
-
-                tools.row();
+                tools.image(Tex.whiteui, Pal.gray).colspan(3).height(4f).width(size * 3f + 3f).row();
 
                 ButtonGroup<ImageButton> teamgroup = new ButtonGroup<>();
 
@@ -695,13 +693,20 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 mid.row();
 
+                mid.check("@editor.showblocks", editor.showBuildings, b -> {
+                    editor.showBuildings = b;
+                    editor.renderer.recacheShadows();
+                }).pad(2f).growX().with(Table::left).row();
+                mid.check("@editor.showterrain", editor.showTerrain, b -> {
+                    editor.showTerrain = b;
+                    editor.renderer.recacheTerrain();
+                }).pad(2f).growX().with(Table::left).row();
+                mid.check("@editor.showfloor", editor.showFloor, b -> editor.showFloor = b).pad(2f).growX().with(Table::left).row();
+
                 if(!mobile){
-                    mid.table(t -> {
-                        t.button("@editor.center", Icon.move, Styles.flatt, view::center).growX().margin(9f);
-                    }).growX().top();
+                    mid.button("@editor.center", Icon.move, Styles.flatt, view::center).growX().margin(9f);
                 }
             }).margin(0).left().growY();
-
 
             cont.table(t -> t.add(view).grow()).grow();
 

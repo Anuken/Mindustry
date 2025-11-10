@@ -384,8 +384,8 @@ public class UnitTypes{
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
-                    damage = 14f;
-                    lightningLength = 7;
+                    damage = 15f;
+                    lightningLength = 8;
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
                     //Does not actually do anything; Just here to make stats work
@@ -418,13 +418,13 @@ public class UnitTypes{
             mechFrontSway = 0.55f;
             ammoType = new PowerAmmoType(1500);
 
-            speed = 0.4f;
+            speed = 0.5f;
             hitSize = 13f;
 
             mineSpeed = 4f;
             drawShields = false;
 
-            abilities.add(new ForceFieldAbility(60f, 0.3f, 400f, 60f * 6));
+            abilities.add(new ForceFieldAbility(60f, 0.4f, 500f, 60f * 6));
 
             weapons.add(new Weapon("beam-weapon"){{
                 top = false;
@@ -443,7 +443,7 @@ public class UnitTypes{
                     sideLength = 70f;
                     healPercent = 10f;
                     collidesTeam = true;
-                    length = 135f;
+                    length = 150f;
                     colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
                 }};
             }});
@@ -2392,14 +2392,22 @@ public class UnitTypes{
                 x = 2.75f;
                 y = 1f;
                 top = false;
-                ejectEffect = Fx.casing1;
 
-                bullet = new BasicBulletType(2.5f, 11){{
-                    width = 7f;
-                    height = 9f;
+                bullet = new LaserBoltBulletType(2.5f, 11){{
+                    shootSound = Sounds.laserbolt;
+                    keepVelocity = false;
+                    width = 1.5f;
+                    height = 4.5f;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                    trailWidth = 1.2f;
+                    trailLength = 3;
+                    shootEffect = Fx.shootSmallColor;
+                    smokeEffect = Fx.hitLaserColor;
+                    backColor = trailColor = Pal.yellowBoltFront;
+                    hitColor = Pal.yellowBoltFront;
+                    frontColor = Color.white;
+
                     lifetime = 60f;
-                    shootEffect = Fx.shootSmall;
-                    smokeEffect = Fx.shootSmallSmoke;
                     buildingDamageMultiplier = 0.01f;
                 }};
             }});
@@ -2434,14 +2442,22 @@ public class UnitTypes{
                 rotate = true;
                 shoot.shots = 2;
                 shoot.shotDelay = 4f;
-                ejectEffect = Fx.casing1;
 
-                bullet = new BasicBulletType(3f, 11){{
-                    width = 7f;
-                    height = 9f;
+                bullet = new LaserBoltBulletType(3f, 11){{
+                    shootSound = Sounds.laserbolt;
+                    keepVelocity = false;
+                    width = 1.5f;
+                    height = 4.5f;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                    trailWidth = 1.2f;
+                    trailLength = 3;
+                    shootEffect = Fx.shootSmallColor;
+                    smokeEffect = Fx.hitLaserColor;
+                    backColor = trailColor = Pal.yellowBoltFront;
+                    hitColor = Pal.yellowBoltFront;
+                    frontColor = Color.white;
+
                     lifetime = 60f;
-                    shootEffect = Fx.shootSmall;
-                    smokeEffect = Fx.shootSmallSmoke;
                     buildingDamageMultiplier = 0.01f;
                 }};
             }});
@@ -2479,14 +2495,22 @@ public class UnitTypes{
                 }};
 
                 inaccuracy = 3f;
-                ejectEffect = Fx.casing1;
 
-                bullet = new BasicBulletType(3.5f, 11){{
-                    width = 6.5f;
-                    height = 11f;
+                bullet = new LaserBoltBulletType(3.5f, 11){{
+                    shootSound = Sounds.laserbolt;
+                    keepVelocity = false;
+                    width = 1.5f;
+                    height = 5f;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                    trailWidth = 1.2f;
+                    trailLength = 4;
+                    shootEffect = Fx.shootSmallColor;
+                    smokeEffect = Fx.hitLaserColor;
+                    backColor = trailColor = Pal.yellowBoltFront;
+                    hitColor = Pal.yellowBoltFront;
+                    frontColor = Color.white;
+
                     lifetime = 70f;
-                    shootEffect = Fx.shootSmall;
-                    smokeEffect = Fx.shootSmallSmoke;
                     buildingDamageMultiplier = 0.01f;
                     homingPower = 0.04f;
                 }};
@@ -2799,7 +2823,7 @@ public class UnitTypes{
             rotateSpeed = 0.8f;
             floorMultiplier = 0.3f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
-            
+
             float xo = 231f/2f, yo = 231f/2f;
             treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};
 
