@@ -674,8 +674,8 @@ public class Turret extends ReloadTurret{
 
         @Override
         protected boolean canReload(){
-            //keep reloading until the limit as the turret keeps shooting
-            return (reloadShots < 1 || wasShooting) && reloadShots < 10000;
+            //keep reloading as the turret keeps shooting
+            return reloadShots < 1 || wasShooting;
         }
 
         protected void updateReload(){
@@ -688,8 +688,9 @@ public class Turret extends ReloadTurret{
             if(canReload() && reloadCounter >= reload){
                 reloadShots += (int)(reloadCounter / reload);
                 excessReload += reloadCounter % reload;
-                reloadCounter = reload;
             }
+            reloadCounter = Math.min(reloadCounter, reload);
+            reloadShots = Math.min(reloadShots, 100);
 
             if(!wasShooting){
                 reloadShots = 0;
