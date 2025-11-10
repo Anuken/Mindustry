@@ -482,8 +482,6 @@ public class Turret extends ReloadTurret{
                 shootWarmup = Mathf.lerpDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
             }
 
-            wasShooting = false;
-
             curRecoil = Mathf.approachDelta(curRecoil, 0, 1 / recoilTime);
             if(recoils > 0){
                 if(curRecoils == null) curRecoils = new float[recoils];
@@ -518,6 +516,8 @@ public class Turret extends ReloadTurret{
                 updateCooling();
                 capReload();
             }
+
+            wasShooting = false;
 
             if(state.rules.fog){
                 float newRange = hasAmmo() ? peekAmmo().rangeChange : 0f;
@@ -674,7 +674,8 @@ public class Turret extends ReloadTurret{
 
         @Override
         protected boolean canReload(){
-            return reloadShots < 1;
+            //keep reloading until the limit as the turret keeps shooting
+            return (reloadShots < 1 || wasShooting) && reloadShots < 10000;
         }
 
         protected void updateReload(){
@@ -683,12 +684,15 @@ public class Turret extends ReloadTurret{
         }
 
         protected void capReload(){
-            //cap reload for visual reasons
+            //cap reload for visual reasons, need to store the excess reload to keep the firerate consistent
             if(canReload() && reloadCounter >= reload){
-                reloadShots++;
-                excessReload += reloadCounter - reload;
+                reloadShots += (int)(reloadCounter / reload);
+                excessReload += reloadCounter % reload;
                 reloadCounter = reload;
-            }else{
+            }
+
+            if(!wasShooting){
+                reloadShots = 0;
                 excessReload = 0;
             }
         }
@@ -700,13 +704,12 @@ public class Turret extends ReloadTurret{
 
         protected void updateShooting(){
 
-            if(!canReload() && !charging() && shootWarmup >= minWarmup){
+            if(reloadShots > 0 && !charging() && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
                 shoot(type);
 
-                reloadCounter += excessReload;
-                reloadCounter %= reload;
+                reloadCounter = excessReload;
                 excessReload = 0;
                 reloadShots--;
             }
