@@ -280,7 +280,7 @@ public class UnitTypes{
                 recoil = 5f;
                 shake = 2f;
                 ejectEffect = Fx.casing4;
-                shootSound = Sounds.bang;
+                shootSound = Sounds.shootReign;
 
                 bullet = new BasicBulletType(13f, 80){{
                     pierce = true;
