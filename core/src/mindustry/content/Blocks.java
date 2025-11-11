@@ -3828,7 +3828,7 @@ public class Blocks{
                     damage = 0.2f;
                     layer = Layer.bullet - 2f;
                 }},
-                Liquids.slag,  new LiquidBulletType(Liquids.slag){{
+                Liquids.slag, new LiquidBulletType(Liquids.slag){{
                     lifetime = 49f;
                     speed = 4f;
                     knockback = 1.3f;
