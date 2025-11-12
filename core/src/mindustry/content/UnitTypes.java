@@ -219,7 +219,7 @@ public class UnitTypes{
                 recoil = 5f;
                 shake = 2f;
                 ejectEffect = Fx.casing3;
-                shootSound = Sounds.bang;
+                shootSound = Sounds.shootScepter;
                 inaccuracy = 3f;
 
                 shoot.shots = 3;
@@ -235,6 +235,7 @@ public class UnitTypes{
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
                     lightningDamage = 20;
+                    despawnSound = Sounds.sparkBullet;
                 }};
             }},
 
@@ -245,6 +246,7 @@ public class UnitTypes{
                 rotate = true;
                 ejectEffect = Fx.casing1;
                 bullet = smallBullet;
+                shootSound = Sounds.shootDagger;
             }},
             new Weapon("mount-weapon"){{
                 reload = 16f;
@@ -253,6 +255,7 @@ public class UnitTypes{
                 rotate = true;
                 ejectEffect = Fx.casing1;
                 bullet = smallBullet;
+                shootSound = Sounds.shootDagger;
             }}
             );
         }};
@@ -299,6 +302,7 @@ public class UnitTypes{
                     fragBullets = 3;
                     fragLifeMin = 0f;
                     fragRandomSpread = 30f;
+                    despawnSound = Sounds.explosion;
 
                     fragBullet = new BasicBulletType(9f, 20){{
                         width = 10f;
@@ -1080,7 +1084,7 @@ public class UnitTypes{
                 shoot.shots = 2;
                 inaccuracy = 5f;
                 velocityRnd = 0.2f;
-                shootSound = Sounds.missile;
+                shootSound = Sounds.missileLong;
 
                 bullet = new MissileBulletType(3f, 14){{
                     width = 8f;
@@ -1165,7 +1169,7 @@ public class UnitTypes{
                 shake = 1f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.shootBig;
+                shootSound = Sounds.shootSpectre;
                 rotate = true;
                 shadow = 8f;
                 bullet = new BasicBulletType(7f, 55){{
@@ -1214,7 +1218,7 @@ public class UnitTypes{
                 rotateSpeed = 2f;
                 reload = 45f;
                 recoil = 4f;
-                shootSound = Sounds.laser;
+                shootSound = Sounds.laser2;
                 shadow = 20f;
                 rotate = true;
 
@@ -1234,7 +1238,7 @@ public class UnitTypes{
                 y = 27f;
                 rotateSpeed = 2f;
                 reload = 9f;
-                shootSound = Sounds.shoot;
+                shootSound = Sounds.shootCyclone;
                 shadow = 7f;
                 rotate = true;
                 recoil = 0.5f;
@@ -1248,7 +1252,7 @@ public class UnitTypes{
                 ejectEffect = Fx.casing1;
                 rotateSpeed = 7f;
                 shake = 1f;
-                shootSound = Sounds.shoot;
+                shootSound = Sounds.shootCyclone;
                 rotate = true;
                 shadow = 12f;
                 shootY = 7.25f;
@@ -1307,7 +1311,7 @@ public class UnitTypes{
                 reload = 30f;
                 ejectEffect = Fx.none;
                 recoil = 2f;
-                shootSound = Sounds.missile;
+                shootSound = Sounds.missileShort;
                 velocityRnd = 0.5f;
                 inaccuracy = 15f;
                 alternate = true;
@@ -1504,6 +1508,7 @@ public class UnitTypes{
                 y = 1.5f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
+                shootSound = Sounds.shootDagger;
                 bullet = new BasicBulletType(2.5f, 9){{
                     width = 7f;
                     height = 9f;
@@ -1519,7 +1524,7 @@ public class UnitTypes{
                 y = -5f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.missile;
+                shootSound = Sounds.missileShort;
                 bullet = new MissileBulletType(2.7f, 12, "missile"){{
                     keepVelocity = true;
                     width = 8f;
@@ -1565,7 +1570,7 @@ public class UnitTypes{
                 rotateSpeed = 5f;
                 inaccuracy = 8f;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.shoot;
+                shootSound = Sounds.shootDuo;
                 bullet = new FlakBulletType(4.2f, 3){{
                     lifetime = 60f;
                     ammoMultiplier = 4f;
@@ -1587,7 +1592,7 @@ public class UnitTypes{
                 rotateSpeed = 2f;
                 shake = 1.5f;
                 ejectEffect = Fx.casing2;
-                shootSound = Sounds.bang;
+                shootSound = Sounds.artillerySmall;
                 bullet = new ArtilleryBulletType(3f, 20, "shell"){{
                     hitEffect = Fx.flakExplosion;
                     knockback = 0.8f;
@@ -1671,7 +1676,7 @@ public class UnitTypes{
 
                 inaccuracy = 5f;
                 velocityRnd = 0.1f;
-                shootSound = Sounds.missile;
+                shootSound = Sounds.missileShort;
                 ammoType = new ItemAmmoType(Items.thorium);
 
                 ejectEffect = Fx.none;
@@ -1730,7 +1735,7 @@ public class UnitTypes{
                 inaccuracy = 7f;
                 ejectEffect = Fx.none;
                 shake = 1f;
-                shootSound = Sounds.missile;
+                shootSound = Sounds.missileLong;
 
                 shoot = new ShootAlternate(){{
                     shots = 6;
@@ -1772,7 +1777,7 @@ public class UnitTypes{
                 recoil = 3f;
                 shadow = 12f;
                 ejectEffect = Fx.casing3;
-                shootSound = Sounds.shootBig;
+                shootSound = Sounds.shootSpectre;
 
                 shoot.shots = 3;
                 shoot.shotDelay = 4f;

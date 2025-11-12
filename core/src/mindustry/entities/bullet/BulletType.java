@@ -609,7 +609,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
-        despawnSound.at(b);
+        despawnSound.at(b, 1f + Mathf.range(hitSoundPitchRange));
 
         Effect.shake(despawnShake, despawnShake, b);
     }

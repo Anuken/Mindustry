@@ -3,11 +3,13 @@ package mindustry.audio;
 import arc.*;
 import arc.audio.*;
 import arc.struct.*;
+import mindustry.gen.*;
 
 import static mindustry.gen.Sounds.*;
 
 /** Sets up priorities and groups for various sounds. */
 public class SoundPriority{
+    static int lastGroup = 1;
 
     public static void init(){
         //priority 2: long weapon loops
@@ -35,6 +37,7 @@ public class SoundPriority{
         respawning
         );
 
+        sameGroup(Sounds.missile, Sounds.missileShort);
 
         for(var sound : Core.assets.getAll(Sound.class, new Seq<>())){
             sound.setMinConcurrentInterrupt(Math.min(0.25f, sound.getLength() * 0.5f));
@@ -42,6 +45,11 @@ public class SoundPriority{
 
         mechStep.setMinConcurrentInterrupt(0.3f);
         mechStep.setMaxConcurrent(3);
+    }
+
+    static void sameGroup(Sound... sounds){
+        int id = lastGroup ++;
+        for(var s : sounds) s.setConcurrentGroup(id);
     }
 
     static void set(float value, Sound... sounds){

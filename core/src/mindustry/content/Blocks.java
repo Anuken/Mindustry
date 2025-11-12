@@ -3494,7 +3494,7 @@ public class Blocks{
             inaccuracy = 1f;
             shootCone = 10f;
             health = 260;
-            shootSound = Sounds.bang;
+            shootSound = Sounds.artillerySmall;
             coolant = consumeCoolant(0.1f);
             limitRange(0f);
         }};
@@ -3531,7 +3531,6 @@ public class Blocks{
             flags = EnumSet.of(BlockFlag.turret, BlockFlag.extinguisher);
         }};
 
-        //TODO these may work in space, but what's the point?
         lancer = new PowerTurret("lancer"){{
             requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 60, Items.titanium, 30));
             range = 165f;
@@ -3551,6 +3550,7 @@ public class Blocks{
             accurateDelay = false;
             shootSound = Sounds.laser;
             coolant = consumeCoolant(0.2f);
+            chargeSound = Sounds.lasercharge3;
 
             consumePower(6f);
 
