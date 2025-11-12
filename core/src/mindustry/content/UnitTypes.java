@@ -103,6 +103,7 @@ public class UnitTypes{
             hitSize = 8f;
             health = 150;
             weapons.add(new Weapon("large-weapon"){{
+                shootSound = Sounds.shootDagger;
                 reload = 13f;
                 x = 4f;
                 y = 2f;
@@ -2537,6 +2538,7 @@ public class UnitTypes{
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("stell-weapon"){{
+                shootSound = Sounds.shootStell;
                 layerOffset = 0.0001f;
                 reload = 50f;
                 shootY = 4.5f;
@@ -2801,6 +2803,7 @@ public class UnitTypes{
                     recoil = 2f;
                     rotate = true;
                     rotateSpeed = 2f;
+                    shootSound = Sounds.shootStell;
 
                     bullet = new BasicBulletType(4.5f, 25){{
                         width = 6.5f;

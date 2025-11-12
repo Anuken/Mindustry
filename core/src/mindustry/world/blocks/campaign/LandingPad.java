@@ -54,7 +54,7 @@ public class LandingPad extends Block{
     public Color bottomColor = Pal.darkerMetal;
 
     public float landSoundVolume = 0.75f;
-    //sound duration must be exactly equal to arrivalDuration
+    //impact timing must be exactly equal to arrivalDuration
     public Sound landSound = Sounds.padLand;
 
     public LandingPad(String name){

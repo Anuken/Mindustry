@@ -3793,7 +3793,7 @@ public class Blocks{
 
             ammoUseEffect = Fx.casing2;
             scaledHealth = 240;
-            shootSound = Sounds.shootFast;
+            shootSound = Sounds.shootSalvo;
 
             limitRange();
             coolant = consumeCoolant(0.2f);
