@@ -372,7 +372,7 @@ public class ResearchDialog extends BaseDialog{
         }
     }
 
-    void checkNodes(TechTreeNode node){
+    public void checkNodes(TechTreeNode node){
         boolean locked = locked(node.node);
         if(!locked && (node.parent == null || node.parent.visible)) node.visible = true;
         node.selectable = selectable(node.node);
@@ -552,7 +552,6 @@ public class ResearchDialog extends BaseDialog{
             if(net.client()){
                 // Must tell host to spend(). Specifically if canSpend(node) then spend(node)
                 ResearchPacket p = new ResearchPacket();    
-                Log.info(node.content); 
                 p.name = node.content.toString(); 
                 net.send(p, true); 
                 return;
@@ -566,7 +565,6 @@ public class ResearchDialog extends BaseDialog{
             for(int i = 0; i < node.requirements.length; i++){
                 ItemStack req = node.requirements[i];
                 if (req == null) {
-                    Log.info("F"); 
                     continue; 
                 }
                 ItemStack completed = node.finishedRequirements[i];

@@ -167,35 +167,27 @@ public class Packets{
             return priorityHigh;
         }
     }
-    // 50275: TODO finish 
-    // A client sends a ResearchPacket to a server to make it research... 
+    
     public static class ResearchPacket extends Packet{
         public String name; 
-        // I know this is horrible but it does not get better
-        // TechTree.all.find(u => u.content == "conveyor")
-        // REQUIRED: The client writes the String to the network buffer
         @Override
         public void write(Writes buffer){
-            // Use TypeIO.writeString for Mindustry's custom String serialization
             TypeIO.writeString(buffer, name); 
         }
-    
-        // REQUIRED: The host reads the String from the network buffer
         @Override
         public void read(Reads buffer){
-            // Use TypeIO.readString to read the serialized String
             name = TypeIO.readString(buffer);
         }
         @Override
         public void handleServer(NetConnection cons){
-            // TODO horrible code lol
+            // TODO can't this be improved?
             Core.app.post(() -> {
                 TechTree.TechNode node = TechTree.all.find(u -> u.content.toString().equals(name));
                 if (node == null) {
-                    Log.warn("Research not found for: " + String.valueOf(name) + "!");
+                    // Log.warn("Research not found for: " + String.valueOf(name) + "!");
                     return;
                 }
-                Log.info("successfully found " + name);
+                // Log.info("successfully found " + name);
                 ui.research.rebuildItems(); 
                 ui.research.view.spend(node);
             });

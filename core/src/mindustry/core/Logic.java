@@ -412,6 +412,7 @@ public class Logic implements ApplicationListener{
         if(!was){
             Events.fire(new UnlockEvent(u));
         }
+        Vars.ui.research.checkNodes(Vars.ui.research.root);
     }
 
     @Override
