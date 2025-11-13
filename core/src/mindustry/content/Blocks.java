@@ -4527,7 +4527,7 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
 
             liquidCapacity = 50f;
-            liquidConsumed = 15f / 60f;
+            liquidConsumed = 18f / 60f;
             targetInterval = 5f;
             newTargetInterval = 30f;
             targetUnderBlocks = false;
@@ -4543,6 +4543,7 @@ public class Blocks{
             Liquids.ozone, new ContinuousFlameBulletType(){{
                 damage = 60f;
                 length = r;
+                ammoMultiplier = 1.2f;
                 knockback = 1f;
                 pierceCap = 2;
                 buildingDamageMultiplier = 0.3f;
@@ -4553,7 +4554,6 @@ public class Blocks{
             Liquids.cyanogen, new ContinuousFlameBulletType(){{
                 damage = 130f;
                 rangeChange = 70f;
-                ammoMultiplier = 15f / 18f;
                 length = r + rangeChange;
                 knockback = 2f;
                 pierceCap = 3;
