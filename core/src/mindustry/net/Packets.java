@@ -2,7 +2,6 @@ package mindustry.net;
 
 import arc.*;
 import arc.struct.*;
-import arc.util.Log;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.content.TechTree;
@@ -61,7 +60,7 @@ public class Packets{
 
     /** Generic client disconnection event. */
     public static class Disconnect extends Packet{
-        public String reason;   
+        public String reason;
 
         @Override
         public int getPriority(){
@@ -167,7 +166,7 @@ public class Packets{
             return priorityHigh;
         }
     }
-    
+
     public static class ResearchPacket extends Packet{
         public String name; 
         @Override
@@ -183,11 +182,7 @@ public class Packets{
             // TODO can't this be improved?
             Core.app.post(() -> {
                 TechTree.TechNode node = TechTree.all.find(u -> u.content.toString().equals(name));
-                if (node == null) {
-                    // Log.warn("Research not found for: " + String.valueOf(name) + "!");
-                    return;
-                }
-                // Log.info("successfully found " + name);
+                if (node == null) return;
                 ui.research.rebuildItems(); 
                 ui.research.view.spend(node);
             });

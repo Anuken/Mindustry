@@ -290,8 +290,7 @@ public class Net{
                 handleClientReceived(builder.build());
                 currentStream = null;
             }
-        } 
-        else{
+        }else{
             int p = object.getPriority();
 
             if(clientLoaded || p == Packet.priorityHigh){

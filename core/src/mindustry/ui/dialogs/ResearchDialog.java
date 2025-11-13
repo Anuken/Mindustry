@@ -570,7 +570,7 @@ public class ResearchDialog extends BaseDialog{
                 ItemStack completed = node.finishedRequirements[i];
                 
                 //amount actually taken from inventory
-                int used = Math.max(Math.min(req.amount - completed.amount, items.get(req.item)), 0); // LINE 575
+                int used = Math.max(Math.min(req.amount - completed.amount, items.get(req.item)), 0); 
                 items.remove(req.item, used);
                 completed.amount += used;
 
@@ -594,7 +594,7 @@ public class ResearchDialog extends BaseDialog{
             //??????
             Core.scene.act();
             rebuild(shine);
-            itemDisplay.rebuild(items, usedShine); 
+            itemDisplay.rebuild(items, usedShine);
             checkMargin();
         }
 
