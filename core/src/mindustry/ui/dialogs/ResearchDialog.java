@@ -26,7 +26,9 @@ import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.layout.*;
+import mindustry.ui.layout.BranchTreeLayout.TreeLocation;
 import mindustry.ui.layout.TreeLayout.*;
+import mindustry.net.Packets.*;
 
 import java.util.*;
 
@@ -58,7 +60,7 @@ public class ResearchDialog extends BaseDialog{
         });
 
         Events.on(UnlockEvent.class, e -> {
-            if(net.client() && !needsRebuild){
+            if(false && !needsRebuild){
                 needsRebuild = true;
                 Core.app.post(() -> {
                     needsRebuild = false;
@@ -109,7 +111,7 @@ public class ResearchDialog extends BaseDialog{
 
         margin(0f).marginBottom(8);
         cont.stack(titleTable, view = new View(), itemDisplay = new ItemsDisplay()).grow();
-        itemDisplay.visible(() -> !net.client());
+        itemDisplay.visible(() -> true);
 
         titleTable.toFront();
 
@@ -441,7 +443,7 @@ public class ResearchDialog extends BaseDialog{
                 button.resizeImage(32f);
                 button.getImage().setScaling(Scaling.fit);
                 button.visible(() -> node.visible);
-                if(!net.client()){
+                if(true){
                     button.clicked(() -> {
                         if(moved) return;
 
@@ -485,10 +487,10 @@ public class ResearchDialog extends BaseDialog{
                 button.userObject = node.node;
                 button.setSize(nodeSize);
                 button.update(() -> {
-                    button.setDisabled(net.client() && !mobile);
+                    button.setDisabled(false && !mobile);
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
-                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !selectable(node.node) || (!canSpend(node.node) && !net.client()) ? Tex.buttonRed : Tex.button;
+                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !selectable(node.node) || (!canSpend(node.node) && !false) ? Tex.buttonRed : Tex.button;
 
                     ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.uiIcon : Icon.lock.getRegion());
                     button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? Color.gray : Pal.gray);
@@ -531,7 +533,7 @@ public class ResearchDialog extends BaseDialog{
         }
 
         boolean canSpend(TechNode node){
-            if(!selectable(node) || net.client()) return false;
+            if(!selectable(node)) return false;
 
             if(node.requirements.length == 0) return true;
 
@@ -546,8 +548,15 @@ public class ResearchDialog extends BaseDialog{
             return node.content.locked();
         }
 
-        void spend(TechNode node){
-            if(net.client()) return;
+        public void spend(TechNode node){
+            if(net.client()){
+                // Must tell host to spend(). Specifically if canSpend(node) then spend(node)
+                ResearchPacket p = new ResearchPacket();    
+                Log.info(node.content); 
+                p.name = node.content.toString(); 
+                net.send(p, true); 
+                return;
+            } 
 
             boolean complete = true;
 
@@ -556,10 +565,14 @@ public class ResearchDialog extends BaseDialog{
 
             for(int i = 0; i < node.requirements.length; i++){
                 ItemStack req = node.requirements[i];
+                if (req == null) {
+                    Log.info("F"); 
+                    continue; 
+                }
                 ItemStack completed = node.finishedRequirements[i];
-
+                
                 //amount actually taken from inventory
-                int used = Math.max(Math.min(req.amount - completed.amount, items.get(req.item)), 0);
+                int used = Math.max(Math.min(req.amount - completed.amount, items.get(req.item)), 0); // LINE 575
                 items.remove(req.item, used);
                 completed.amount += used;
 
@@ -583,7 +596,7 @@ public class ResearchDialog extends BaseDialog{
             //??????
             Core.scene.act();
             rebuild(shine);
-            itemDisplay.rebuild(items, usedShine);
+            itemDisplay.rebuild(items, usedShine); 
             checkMargin();
         }
 
@@ -653,9 +666,9 @@ public class ResearchDialog extends BaseDialog{
                     desc.left().defaults().left();
                     desc.add(selectable ? node.content.localizedName : "[accent]???");
                     desc.row();
-                    if(locked(node) || (debugShowRequirements && !net.client())){
+                    if(locked(node) || (debugShowRequirements)){
 
-                        if(net.client()){
+                        if(false){
                             desc.add("@locked").color(Pal.remove);
                         }else{
                             desc.table(t -> {
@@ -736,7 +749,7 @@ public class ResearchDialog extends BaseDialog{
                     }
                 }).pad(9);
 
-                if(mobile && locked(node) && !net.client()){
+                if(mobile && locked(node)){
                     b.row();
                     b.button("@research", Icon.ok, new TextButtonStyle(){{
                         disabled = Tex.button;

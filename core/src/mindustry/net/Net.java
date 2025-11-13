@@ -6,6 +6,8 @@ import arc.net.*;
 import arc.net.Server.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Log.*; 
+import mindustry.content.TechTree;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.net.Packets.*;
@@ -47,6 +49,7 @@ public class Net{
         registerPacket(StreamChunk::new);
         registerPacket(WorldStream::new);
         registerPacket(ConnectPacket::new);
+        registerPacket(ResearchPacket::new); 
 
         //register generated packet classes
         Call.registerPackets();
@@ -287,7 +290,8 @@ public class Net{
                 handleClientReceived(builder.build());
                 currentStream = null;
             }
-        }else{
+        } 
+        else{
             int p = object.getPriority();
 
             if(clientLoaded || p == Packet.priorityHigh){
