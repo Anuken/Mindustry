@@ -14,7 +14,6 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
-import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -3184,12 +3183,10 @@ public class UnitTypes{
 
         anthicus = new ErekirUnitType("anthicus"){{
             speed = 0.65f;
-            speed = 0.6f;
             drag = 0.1f;
             hitSize = 21f;
             rotateSpeed = 3f;
             health = 2900;
-            health = 2500;
             armor = 7f;
             fogRadius = 40f;
             stepShake = 0f;

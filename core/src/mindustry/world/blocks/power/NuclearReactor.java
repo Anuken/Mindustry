@@ -105,7 +105,6 @@ public class NuclearReactor extends PowerGenerator{
                 }
             }else{
                 productionEfficiency = 0f;
-                heatProgress = 0f;
             }
 
             if(heat > 0){
@@ -123,7 +122,6 @@ public class NuclearReactor extends PowerGenerator{
             }
 
             heat = Mathf.clamp(heat);
-            heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput * (enabled ? 1f : 0f), heatWarmupRate * delta()) : 0f;
 
             if(heat >= 0.999f){
                 Events.fire(Trigger.thoriumReactorOverheat);
