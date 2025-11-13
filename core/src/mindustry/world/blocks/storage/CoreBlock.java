@@ -47,6 +47,8 @@ public class CoreBlock extends StorageBlock{
     public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
     public float thrusterLength = 14f/4f, thrusterOffset = 0f;
     public boolean isFirstTier;
+    /** If false, players can't respawn at this core. */
+    public boolean allowSpawn = true;
     /** If true, this core type requires a core zone to upgrade. */
     public boolean requiresCoreZone;
     public boolean incinerateNonBuildable = false;
@@ -553,7 +555,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void onControlSelect(Unit unit){
-            if(!unit.isPlayer()) return;
+            if(!unit.isPlayer() || !allowSpawn) return;
             Player player = unit.getPlayer();
 
             Fx.spawn.at(player);
@@ -568,7 +570,7 @@ public class CoreBlock extends StorageBlock{
 
         public void requestSpawn(Player player){
             //do not try to respawn in unsupported environments at all
-            if(!unitType.supportsEnv(state.rules.env)) return;
+            if(!unitType.supportsEnv(state.rules.env) || !allowSpawn) return;
 
             Call.playerSpawn(tile, player);
         }

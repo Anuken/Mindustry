@@ -46,7 +46,7 @@ import static mindustry.ui.dialogs.PlanetDialog.Mode.*;
 
 public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     //if true, enables launching anywhere for testing
-    public static boolean debugSelect = false, debugSectorAttackEdit;
+    public static boolean debugSelect = false, debugSectorAttackEdit, debugShowNumbers = false;
     public static float sectorShowDuration = 60f * 2.4f;
 
     public final FrameBuffer buffer = new FrameBuffer(2, 2, true);
@@ -549,6 +549,17 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                         Draw.rect(icon, 0, 0, iw, iw * icon.height / icon.width);
                     });
                 }
+            }
+
+            if(debugShowNumbers && (sec.hasEnemyBase() || sec.preset != null)){
+                planets.drawPlane(sec, () -> {
+                    Fonts.outline.getData().setScale(0.5f);
+                    Fonts.outline.setColor(sec.preset == null ? Color.scarlet : Color.white);
+
+                    Fonts.outline.draw(sec.id + "", 0f, 0f, Align.center);
+                    Fonts.outline.setColor(Color.white);
+                    Fonts.outline.getData().setScale(1f);
+                });
             }
         }
 
