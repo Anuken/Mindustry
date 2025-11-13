@@ -1600,7 +1600,7 @@ public class Blocks{
         }};
 
         cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
-            requirements(Category.crafting, with(Items.carbide, 50, Items.silicon, 80, Items.beryllium, 90));
+            requirements(Category.crafting, with(Items.carbide, 80, Items.silicon, 120, Items.beryllium, 140, Items.oxide, 40));
 
             heatRequirement = 5f;
 
@@ -4553,7 +4553,7 @@ public class Blocks{
             Liquids.cyanogen, new ContinuousFlameBulletType(){{
                 damage = 130f;
                 rangeChange = 70f;
-                ammoMultiplier = 1.5f;
+                ammoMultiplier = 15f / 18f;
                 length = r + rangeChange;
                 knockback = 2f;
                 pierceCap = 3;

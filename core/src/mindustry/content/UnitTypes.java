@@ -14,6 +14,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -3158,10 +3159,12 @@ public class UnitTypes{
         }};
 
         anthicus = new ErekirUnitType("anthicus"){{
+            speed = 0.65f;
             speed = 0.6f;
             drag = 0.1f;
             hitSize = 21f;
             rotateSpeed = 3f;
+            health = 2900;
             health = 2500;
             armor = 7f;
             fogRadius = 40f;
@@ -3273,7 +3276,7 @@ public class UnitTypes{
                         trailColor = engineColor = Pal.techBlue;
                         engineSize = 1.75f;
                         engineLayer = Layer.effect;
-                        speed = 3f;
+                        speed = 3.7f;
                         maxRange = 6f;
                         lifetime = 60f * 1.5f;
                         outlineColor = Pal.darkOutline;
@@ -3453,8 +3456,6 @@ public class UnitTypes{
             targetAir = false;
             alwaysShootWhenMoving = true;
 
-            abilities.add(new LastStandAbility(StatusEffects.overclock, 1.8f, 1.4f, 2f / 18f, health));
-
             weapons.add(new Weapon("collaris-weapon"){{
                 shootSound = Sounds.pulseBlast;
                 mirror = true;
@@ -3473,7 +3474,7 @@ public class UnitTypes{
                 shadow = 10f;
 
                 shootStatus = StatusEffects.slow;
-                shootStatusDuration = reload + 140f;
+                shootStatusDuration = reload + 1f;
 
                 shoot.shots = 1;
                 heatColor = Color.red;

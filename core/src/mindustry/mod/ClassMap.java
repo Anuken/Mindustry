@@ -32,7 +32,6 @@ public class ClassMap{
         classes.put("MoveLightningAbility", mindustry.entities.abilities.MoveLightningAbility.class);
         classes.put("RegenAbility", mindustry.entities.abilities.RegenAbility.class);
         classes.put("RepairFieldAbility", mindustry.entities.abilities.RepairFieldAbility.class);
-        classes.put("LastStandAbility", mindustry.entities.abilities.LastStandAbility.class);
         classes.put("ShieldArcAbility", mindustry.entities.abilities.ShieldArcAbility.class);
         classes.put("ShieldRegenFieldAbility", mindustry.entities.abilities.ShieldRegenFieldAbility.class);
         classes.put("SpawnDeathAbility", mindustry.entities.abilities.SpawnDeathAbility.class);
