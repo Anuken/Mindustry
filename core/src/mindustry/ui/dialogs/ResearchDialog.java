@@ -60,7 +60,7 @@ public class ResearchDialog extends BaseDialog{
         });
 
         Events.on(UnlockEvent.class, e -> {
-            if(false && !needsRebuild){
+            if(net.client() && !needsRebuild){
                 needsRebuild = true;
                 Core.app.post(() -> {
                     needsRebuild = false;
@@ -587,6 +587,11 @@ public class ResearchDialog extends BaseDialog{
 
             if(complete){
                 unlock(node);
+            } 
+            // TODO: this has absolutely no effect
+            // show partial research to clients
+            if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
+                state.rules.partiallyResearched.put(node.content, node.finishedRequirements); 
             }
 
             node.save();
@@ -673,14 +678,18 @@ public class ResearchDialog extends BaseDialog{
                                 t.left();
                                 if(selectable){
 
+                                    // If the tech is in Rules.partiallyResearched, then use it instead of node.finishedRequirements. 
+                                    ItemStack[] itemstack = state.rules.partiallyResearched.containsKey(node.content) && net.client() 
+                                        ? state.rules.partiallyResearched.get(node.content) : node.finishedRequirements; 
+
                                     //check if there is any progress, add research progress text
-                                    if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
+                                    if(Structs.contains(itemstack, s -> s.amount > 0)){
                                         float sum = 0f, used = 0f;
                                         boolean shiny = false;
 
                                         for(int i = 0; i < node.requirements.length; i++){
                                             sum += node.requirements[i].item.cost * node.requirements[i].amount;
-                                            used += node.finishedRequirements[i].item.cost * node.finishedRequirements[i].amount;
+                                            used += itemstack[i].item.cost * itemstack[i].amount;
                                             if(shine != null) shiny |= shine[i];
                                         }
 
@@ -698,7 +707,7 @@ public class ResearchDialog extends BaseDialog{
 
                                     for(int i = 0; i < node.requirements.length; i++){
                                         ItemStack req = node.requirements[i];
-                                        ItemStack completed = node.finishedRequirements[i];
+                                        ItemStack completed = itemstack[i];
 
                                         //skip finished stacks
                                         if(req.amount <= completed.amount && !debugShowRequirements) continue;
