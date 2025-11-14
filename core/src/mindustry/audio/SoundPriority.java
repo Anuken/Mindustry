@@ -3,7 +3,6 @@ package mindustry.audio;
 import arc.*;
 import arc.audio.*;
 import arc.struct.*;
-import mindustry.gen.*;
 
 import static mindustry.gen.Sounds.*;
 
@@ -12,17 +11,24 @@ public class SoundPriority{
     static int lastGroup = 1;
 
     public static void init(){
+        max(7, laserbig, beam, laserbeam);
+
         //priority 2: long weapon loops
         set(
         2f,
         laserbig,
-        beam
+        beam,
+        laserbeam
         );
 
         //priority 1.5: big weapon sounds, not loops
-        set(1.5f,
+        set(
+        1.5f,
         railgun,
-        largeCannon
+        largeCannon,
+        lasercharge,
+        lasercharge2,
+        lasercharge3
         );
 
         //priority 1: ambient noises
@@ -37,7 +43,13 @@ public class SoundPriority{
         respawning
         );
 
-        sameGroup(Sounds.missile, Sounds.missileShort);
+        //very loud
+        laser.setMaxConcurrent(5);
+
+        sameGroup(hit1, hit2, hit3);
+        max(4, hit1, hit2, hit3);
+
+        sameGroup(missile, missileShort, missilePlasmaShort);
 
         for(var sound : Core.assets.getAll(Sound.class, new Seq<>())){
             sound.setMinConcurrentInterrupt(Math.min(0.25f, sound.getLength() * 0.5f));
@@ -45,6 +57,10 @@ public class SoundPriority{
 
         mechStep.setMinConcurrentInterrupt(0.3f);
         mechStep.setMaxConcurrent(3);
+    }
+
+    static void max(int max, Sound... sounds){
+        for(var s : sounds) s.setMaxConcurrent(max);
     }
 
     static void sameGroup(Sound... sounds){

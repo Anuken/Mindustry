@@ -633,13 +633,13 @@ public class UnitTypes{
                 reload = 24f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
-                shootSound = Sounds.explosion;
+                shootSound = Sounds.crawlerExplosion;
+                shootSoundVolume = 0.4f;
                 x = shootY = 0f;
                 mirror = false;
                 bullet = new BulletType(){{
                     collidesTiles = false;
                     collides = false;
-                    hitSound = Sounds.explosion;
 
                     rangeOverride = 25f;
                     hitEffect = Fx.pulverize;
@@ -1311,7 +1311,7 @@ public class UnitTypes{
                 reload = 30f;
                 ejectEffect = Fx.none;
                 recoil = 2f;
-                shootSound = Sounds.missileShort;
+                shootSound = Sounds.missilePlasmaShort;
                 velocityRnd = 0.5f;
                 inaccuracy = 15f;
                 alternate = true;
@@ -1897,8 +1897,9 @@ public class UnitTypes{
                 rotate = true;
                 reload = 90f;
                 x = y = shootX = shootY = 0f;
-                shootSound = Sounds.mineDeploy;
+                shootSound = Sounds.missilePlasmaShort;
                 rotateSpeed = 180f;
+                shootSoundVolume = 0.9f;
 
                 shoot.shots = 3;
                 shoot.shotDelay = 7f;
@@ -1917,7 +1918,7 @@ public class UnitTypes{
                     frontColor = Color.white;
                     mixColorTo = Color.white;
 
-                    hitSound = Sounds.plasmaboom;
+                    hitSound = Sounds.explosionPlasmaSmall;
                     underwater = true;
 
                     ejectEffect = Fx.none;
@@ -2068,7 +2069,7 @@ public class UnitTypes{
                 rotate = true;
                 inaccuracy = 1f;
                 velocityRnd = 0.1f;
-                shootSound = Sounds.missile;
+                shootSound = Sounds.missilePlasma;
 
                 ejectEffect = Fx.none;
                 bullet = new FlakBulletType(2.5f, 25){{
@@ -2084,6 +2085,7 @@ public class UnitTypes{
                     lightRadius = 60f;
                     lightOpacity = 0.7f;
                     lightColor = Pal.heal;
+                    despawnSound = Sounds.explosion;
 
                     splashDamageRadius = 30f;
                     splashDamage = 25f;
@@ -2302,8 +2304,7 @@ public class UnitTypes{
                 shootY = 7f;
                 recoil = 4f;
                 cooldownTime = reload - 10f;
-                //TODO better sound
-                shootSound = Sounds.laser;
+                shootSound = Sounds.shootNavanax;
 
                 bullet = new EmpBulletType(){{
                     float rad = 100f;
@@ -2337,7 +2338,7 @@ public class UnitTypes{
                     hitShake = 4f;
                     trailRotation = true;
                     status = StatusEffects.electrified;
-                    hitSound = Sounds.plasmaboom;
+                    hitSound = Sounds.empBlast;
 
                     trailEffect = new Effect(16f, e -> {
                         color(Pal.heal);
