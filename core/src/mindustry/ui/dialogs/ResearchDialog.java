@@ -588,10 +588,10 @@ public class ResearchDialog extends BaseDialog{
             if(complete){
                 unlock(node);
             } 
-            // TODO: this has absolutely no effect
-            // show partial research to clients
             if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
                 state.rules.partiallyResearched.put(node.content, node.finishedRequirements); 
+                // TODO might not be acceptable
+                Call.setRules(state.rules);
             }
 
             node.save();
