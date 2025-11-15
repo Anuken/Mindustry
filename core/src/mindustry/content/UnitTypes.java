@@ -388,7 +388,7 @@ public class UnitTypes{
 
                 ejectEffect = Fx.none;
                 recoil = 2.5f;
-                shootSound = Sounds.spark;
+                shootSound = Sounds.shock;
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
@@ -499,7 +499,8 @@ public class UnitTypes{
                 reload = 155f;
                 recoil = 0f;
                 chargeSound = Sounds.lasercharge2;
-                shootSound = Sounds.beam;
+                shootSound = Sounds.beamPlasma;
+                initialShootSound = Sounds.beamPlasmaFire;
                 continuous = true;
                 cooldownTime = 200f;
 
@@ -2249,7 +2250,8 @@ public class UnitTypes{
                         rotateSpeed = 3.5f;
                         reload = 170f;
                         recoil = 1f;
-                        shootSound = Sounds.beam;
+                        shootSound = Sounds.beamPlasmaSmall;
+                        initialShootSound = Sounds.beamPlasmaFireSmall;
                         continuous = true;
                         cooldownTime = reload;
                         immunities.add(StatusEffects.burning);

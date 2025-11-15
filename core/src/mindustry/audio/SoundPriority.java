@@ -18,7 +18,8 @@ public class SoundPriority{
         2f,
         laserbig,
         beam,
-        laserbeam
+        laserbeam,
+        beamPlasma
         );
 
         //priority 1.5: big weapon sounds, not loops
