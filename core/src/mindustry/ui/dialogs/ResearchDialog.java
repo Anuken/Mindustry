@@ -80,10 +80,12 @@ public class ResearchDialog extends BaseDialog{
         Events.on(PartialResearchEvent.class, e -> {
             if(net.client() && !needsRebuild){
                 // order matters and I don't know xddd
-                Core.scene.act();
-                ui.research.view.rebuild();
-                itemDisplay.rebuild(items);
-                checkMargin();
+                Core.app.post(() -> {
+                    Core.scene.act();
+                    ui.research.view.rebuild();
+                    itemDisplay.rebuild(items);
+                    checkMargin();
+                });
             }
         });
 
