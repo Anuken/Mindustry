@@ -1803,10 +1803,6 @@ public class UnitTypes{
             faceTarget = false;
             ammoType = new PowerAmmoType(4000);
 
-            float spawnTime = 60f * 15f;
-
-            abilities.add(new UnitSpawnAbility(flare, spawnTime, 19.25f, -31.75f), new UnitSpawnAbility(flare, spawnTime, -19.25f, -31.75f));
-
             trailLength = 70;
             waveTrailX = 23f;
             waveTrailY = -32f;
