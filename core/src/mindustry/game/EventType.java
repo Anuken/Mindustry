@@ -481,6 +481,13 @@ public class EventType{
             this.content = content;
         }
     }
+    
+    public static class PartialResearchEvent{
+        public final UnlockableContent content;
+        public PartialResearchEvent(UnlockableContent content){
+            this.content = content;
+        }
+    }
 
     public static class ResearchEvent{
         public final UnlockableContent content;

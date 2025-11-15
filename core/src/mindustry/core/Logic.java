@@ -154,6 +154,12 @@ public class Logic implements ApplicationListener{
                 Call.researched(e.content);
             }
         });
+        //sync partial research
+        Events.on(PartialResearchEvent.class, e -> {
+            if(net.server()){
+                Call.partiallyResearched(e.content);
+            }
+        });
 
         Events.on(SectorCaptureEvent.class, e -> {
             if(!net.client() && e.sector == state.getSector() && e.sector.isBeingPlayed()){
@@ -411,9 +417,17 @@ public class Logic implements ApplicationListener{
 
         if(!was){
             Events.fire(new UnlockEvent(u));
-        }
+        }   
     }
 
+    @Remote 
+    public static void partiallyResearched(Content content){
+        if(!(content instanceof UnlockableContent u)) return;
+        // if(u.techNode == null) return; // this shouldn't be necessary-
+        if(net.client()) {
+            Events.fire(new PartialResearchEvent(u)); 
+        }
+    }
     @Override
     public void dispose(){
         //save the settings before quitting

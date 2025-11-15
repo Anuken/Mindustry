@@ -72,6 +72,19 @@ public class ResearchDialog extends BaseDialog{
                     Core.scene.act();
                 });
             }
+            if(state.rules.partiallyResearched.containsKey(e.content)){
+                state.rules.partiallyResearched.remove(e.content); 
+            }
+        });
+        // TODO really? 
+        Events.on(PartialResearchEvent.class, e -> {
+            if(net.client() && !needsRebuild){
+                // order matters and I don't know xddd
+                Core.scene.act();
+                ui.research.view.rebuild();
+                itemDisplay.rebuild(items);
+                checkMargin();
+            }
         });
 
         titleTable.remove();
@@ -587,11 +600,15 @@ public class ResearchDialog extends BaseDialog{
 
             if(complete){
                 unlock(node);
+                state.rules.researched.add(node.content);
             } 
-            if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
-                state.rules.partiallyResearched.put(node.content, node.finishedRequirements); 
+            else if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
+                // state.rules.partiallyResearched.put(node.content, node.finishedRequirements); 
+                // Events.fire(new PartialResearchEvent(node.content));
                 // TODO might not be acceptable
+                state.rules.partiallyResearched.put(node.content, node.finishedRequirements);
                 Call.setRules(state.rules);
+                Call.partiallyResearched(node.content); 
             }
 
             node.save();
