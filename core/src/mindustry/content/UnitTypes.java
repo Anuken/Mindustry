@@ -995,18 +995,25 @@ public class UnitTypes{
             flying = true;
             health = 70;
             engineOffset = 5.75f;
-            //TODO balance
-            //targetAir = false;
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
             hitSize = 9;
             itemCapacity = 10;
+            circleTarget = true;
+            omniMovement = false;
+            rotateSpeed = 5f;
+            circleTargetRadius = 60f;
 
             weapons.add(new Weapon(){{
-                y = 0f;
-                x = 2f;
-                reload = 20f;
+                y = 1f;
+                x = 0f;
+                minShootVelocity = 2f;
+                shootCone = 10f;
+                reload = 80f;
+                shoot.shots = 3;
+                shoot.shotDelay = 3f;
                 ejectEffect = Fx.casing1;
-                bullet = new BasicBulletType(2.5f, 9){{
+                mirror = false;
+                bullet = new BasicBulletType(2.5f, 15){{
                     width = 7f;
                     height = 9f;
                     lifetime = 45f;
@@ -1014,7 +1021,7 @@ public class UnitTypes{
                     smokeEffect = Fx.shootSmallSmoke;
                     ammoMultiplier = 2;
                 }};
-                shootSound = Sounds.pew;
+                shootSound = Sounds.shootDagger;
             }});
         }};
 
@@ -1035,9 +1042,12 @@ public class UnitTypes{
             targetFlags = new BlockFlag[]{BlockFlag.factory, null};
             circleTarget = true;
             ammoType = new ItemAmmoType(Items.graphite);
+            omniMovement = false;
+            rotateSpeed = 4.5f;
+            circleTargetRadius = 40f;
 
             weapons.add(new Weapon(){{
-                minShootVelocity = 0.75f;
+                minShootVelocity = 1f;
                 x = 3f;
                 shootY = 0f;
                 reload = 12f;

@@ -93,6 +93,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     mineRange = 70f,
     /** range at which this unit can build */
     buildRange = Vars.buildingRange,
+    /** radius for circleTarget, if true */
+    circleTargetRadius = 80f,
     /** multiplier for damage this (flying) unit deals when crashing on enemy things */
     crashDamageMultiplier = 1f,
     /** multiplier for health that this flying unit has for its wreck, based on its max health. */
