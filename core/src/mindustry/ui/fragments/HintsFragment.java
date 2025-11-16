@@ -81,6 +81,8 @@ public class HintsFragment{
             }
         });
 
+        Events.run(Trigger.cannotUpgrade, () -> events.add("cannotupgrade"));
+
         Events.on(ResetEvent.class, e -> {
             placedBlocks.clear();
             events.clear();
@@ -186,6 +188,7 @@ public class HintsFragment{
         generator(() -> control.input.block == Blocks.combustionGenerator, () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)),
         rebuildSelect(() -> state.rules.defaultTeam.data().plans.size >= 10, () -> control.input.isRebuildSelecting()),
         guardian(() -> state.boss() != null && isSerpulo() && state.boss().armor >= 4, () -> state.boss() == null),
+        cannotUpgrade(() -> ui.hints.events.contains("cannotupgrade"), () -> false),
         factoryControl(() -> !(state.isCampaign() && state.rules.sector.preset == SectorPresets.onset) &&
             state.rules.defaultTeam.data().getBuildings(Blocks.tankFabricator).size + state.rules.defaultTeam.data().getBuildings(Blocks.groundFactory).size > 0, () -> ui.hints.events.contains("factorycontrol")),
         coreUpgrade(() -> state.isCampaign() && state.rules.sector.planet == Planets.serpulo && Blocks.coreFoundation.unlocked()

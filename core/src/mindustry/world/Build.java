@@ -66,9 +66,9 @@ public class Build{
         Events.fire(new BlockBuildBeginEvent(tile, team, unit, true));
     }
 
-    /** Places a ConstructBlock at this location. */
+    /** Places a ConstructBlock at this location. To preserve bandwidth, a config is only passed in the case of instant-place blocks. */
     @Remote(called = Loc.server)
-    public static void beginPlace(@Nullable Unit unit, Block result, Team team, int x, int y, int rotation){
+    public static void beginPlace(@Nullable Unit unit, Block result, Team team, int x, int y, int rotation, @Nullable Object placeConfig){
         if(!validPlace(result, team, x, y, rotation)){
             return;
         }
@@ -92,18 +92,18 @@ public class Build{
 
         //repair derelict tile
         if(tile.team() == Team.derelict && team != Team.derelict && tile.block == result && tile.build != null && tile.block.allowDerelictRepair && state.rules.derelictRepair){
-            float healthf = tile.build.healthf();
-            var config = tile.build.config();
-
-            tile.setBlock(result, team, rotation);
+            tile.build.rotation = rotation;
+            tile.build.changeTeam(team);
+            tile.build.enabled = true;
+            if(tile.build.power != null){
+                tile.build.power.links.clear();
+                tile.build.powerGraphRemoved();
+            }
+            tile.build.checkAllowUpdate();
+            tile.build.updateProximity();
+            tile.build.onRepaired();
 
             if(unit != null && unit.getControllerName() != null) tile.build.lastAccessed = unit.getControllerName();
-
-            if(config != null){
-                tile.build.configured(unit, config);
-            }
-            //keep health
-            tile.build.health = result.health * healthf;
 
             if(fogControl.isVisibleTile(team, tile.x, tile.y)){
                 result.placeEffect.at(tile.drawx(), tile.drawy(), result.size);
@@ -111,7 +111,7 @@ public class Build{
                 //doesn't play a sound
             }
 
-            Events.fire(new BlockBuildEndEvent(tile, unit, team, false, config));
+            Events.fire(new BlockBuildEndEvent(tile, unit, team, false, tile.build.config()));
             return;
         }
 
@@ -127,7 +127,7 @@ public class Build{
         if(result.instantBuild){
             Events.fire(new BlockBuildBeginEvent(tile, team, unit, false));
             result.placeBegan(tile, tile.block, unit);
-            ConstructBlock.constructFinish(tile, result, unit, (byte)rotation, team, null);
+            ConstructBlock.constructFinish(tile, result, unit, (byte)rotation, team, placeConfig);
             return;
         }
 
@@ -168,8 +168,8 @@ public class Build{
     }
 
     /** @return whether a tile can be placed at this location by this team. */
-    public static boolean validPlace(Block type, Team team, int x, int y, int rotation, boolean checkVisible, boolean ignoreCoreRadius){
-        return validPlaceIgnoreUnits(type, team, x, y, rotation, checkVisible, ignoreCoreRadius) && checkNoUnitOverlap(type, x, y);
+    public static boolean validPlace(Block type, Team team, int x, int y, int rotation, boolean checkVisible, boolean checkCoreRadius){
+        return validPlaceIgnoreUnits(type, team, x, y, rotation, checkVisible, checkCoreRadius) && checkNoUnitOverlap(type, x, y);
     }
 
     /** @return whether a tile can be placed at this location by this team. */
@@ -242,12 +242,13 @@ public class Build{
                 (type.size == 2 && world.getDarkness(wx, wy) >= 3) ||
                 (state.rules.staticFog && state.rules.fog && !fogControl.isDiscovered(team, wx, wy)) ||
                 (check.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) || //deep water
+                (!state.rules.derelictRepair && check.team() == Team.derelict && check.build != null) ||
                 (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate && !((type == check.block && team != Team.derelict && check.team() == Team.derelict))) || //same block, same rotation
                 !check.interactable(team) || //cannot interact
                 !check.floor().placeableOn && !type.ignoreBuildDarkness || //solid floor
                 //when you have a payload, you cannot place blocks on things, even if normal placement rules allow it. this is a hack that assumes checkVisible = true means it's coming from a payload
                 (!checkVisible && checkCoreRadius && !check.block().alwaysReplace) || //replacing a block that should be replaced (e.g. payload placement)
-                    !(((type.canReplace(check.block()) || (check.build != null && check.build.canBeReplaced(type)) || (type == check.block && team != Team.derelict && state.rules.derelictRepair && check.team() == Team.derelict)) || //can replace type OR can replace derelict block of same type
+                    !(((type.canReplace(check.block()) || (check.build != null && check.build.canBeReplaced(type)) || (type == check.block && team != Team.derelict && check.team() == Team.derelict)) || //can replace type OR can replace derelict block of same type
                         (check.build instanceof ConstructBuild build && build.current == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
                     type.bounds(tile.x, tile.y, Tmp.r1).grow(0.01f).contains(check.block.bounds(check.centerX(), check.centerY(), Tmp.r2))) || //no replacement
                 (type.requiresWater && check.floor().liquidDrop != Liquids.water) //requires water but none found

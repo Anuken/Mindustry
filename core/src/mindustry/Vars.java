@@ -58,7 +58,7 @@ public class Vars implements Loadable{
     /** If true, mod code and scripts do not run. For internal testing only. This WILL break mods if enabled. */
     public static boolean skipModCode = false;
     /** Default accessible content types used for player-selectable icons. */
-    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
+    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit, ContentType.status};
     /** Default rule environment. */
     public static final int defaultEnv = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
     /** Wall darkness radius. */
@@ -79,6 +79,8 @@ public class Vars implements Loadable{
     public static final String discordURL = "https://discord.gg/mindustry";
     /** Link to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
+    /** Link to the wiki's patch guide.*/
+    public static final String patchesGuideURL = "https://mindustrygame.github.io/wiki/contentpatches/";
     /** URLs to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String[] serverJsonBeURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_be.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_be.json"};
     /** URLs to the JSON file containing all the stable servers.  */
@@ -89,6 +91,8 @@ public class Vars implements Loadable{
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<ServerGroup> defaultServers = Seq.with();
+    /** cached server list - only used if defaultServers have not been fetched*/
+    public static final Seq<ServerGroup> cachedServers = Seq.with();
     /** maximum openGL errors logged */
     public static final int maxGlErrors = 100;
     /** maximum size of any block, do not change unless you know what you're doing */
@@ -206,6 +210,10 @@ public class Vars implements Loadable{
     public static boolean drawDebugHitboxes = false;
     /** Whether to draw avoidance fields. */
     public static boolean debugDrawAvoidance = false;
+    /** Whether the on-disk server file cache has been loaded. */
+    public static boolean loadedServerCache = false;
+    /** Whether the server list has been fetched from Github. */
+    public static boolean fetchedServers = false;
     /** application data directory, equivalent to {@link Settings#getDataDirectory()} */
     public static Fi dataDirectory;
     /** data subdirectory used for screenshots */
@@ -226,6 +234,8 @@ public class Vars implements Loadable{
     public static Fi bebuildDirectory;
     /** file used to store launch ID */
     public static Fi launchIDFile;
+    /** local cache of server list */
+    public static Fi serverCacheFile;
     /** empty map, indicates no current map */
     public static Map emptyMap;
     /** empty tile for payloads */
@@ -322,6 +332,7 @@ public class Vars implements Loadable{
         modDirectory = dataDirectory.child("mods/");
         schematicDirectory = dataDirectory.child("schematics/");
         bebuildDirectory = dataDirectory.child("be_builds/");
+        serverCacheFile = dataDirectory.child("server_list.json");
         emptyMap = new Map(new StringMap());
 
         if(tree == null) tree = new FileTree();
@@ -382,6 +393,9 @@ public class Vars implements Loadable{
 
     /** Cleans up after a successful launch. */
     public static void finishLaunch(){
+        Core.settings.put("lastBuild", Version.build);
+        Core.settings.put("lastBuildString", Version.buildString());
+
         if(launchIDFile != null){
             launchIDFile.delete();
         }

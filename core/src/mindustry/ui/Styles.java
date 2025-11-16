@@ -92,7 +92,7 @@ public class Styles{
 
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane, noBarPane;
     public static SliderStyle defaultSlider;
-    public static LabelStyle defaultLabel, outlineLabel, techLabel;
+    public static LabelStyle defaultLabel, outlineLabel, techLabel, monoLabel;
     public static TextFieldStyle defaultField, nodeField, areaField, nodeArea;
     public static CheckBoxStyle defaultCheck;
     public static DialogStyle defaultDialog, fullDialog;
@@ -378,6 +378,10 @@ public class Styles{
         }};
         techLabel = new LabelStyle(){{
             font = Fonts.tech;
+            fontColor = Color.white;
+        }};
+        monoLabel = new LabelStyle(){{
+            font = Fonts.monospace;
             fontColor = Color.white;
         }};
 

@@ -113,8 +113,6 @@ public class OverlayRenderer{
             }
         }
 
-        if(player.dead()) return; //dead players don't draw
-
         InputHandler input = control.input;
 
         Sized select = input.selectedUnit();
@@ -150,8 +148,10 @@ public class OverlayRenderer{
             tile.drawConfigure();
         }
 
-        input.drawTop();
+        if(!player.dead()) input.drawTop();
         input.drawUnitSelection();
+
+        if(player.dead()) return; //dead players don't draw
 
         buildFade = Mathf.lerpDelta(buildFade, input.isPlacing() || input.isUsingSchematic() ? 1f : 0f, 0.06f);
 
@@ -246,7 +246,7 @@ public class OverlayRenderer{
             if(input.canDropItem() && build != null && build.interactable(player.team()) && build.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(build, itemTransferRange) &&
                 input.itemDepositCooldown <= 0f){
 
-                boolean invalid = (state.rules.onlyDepositCore && !(build instanceof CoreBuild));
+                boolean invalid = !build.allowDeposit();
 
                 Lines.stroke(3f, Pal.gray);
                 Lines.square(build.x, build.y, build.block.size * tilesize / 2f + 3 + Mathf.absin(Time.time, 5f, 1f));

@@ -25,6 +25,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.*;
@@ -63,6 +64,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean acceptsPayload = false;
     /** Visual flag use for blending of certain transportation blocks. */
     public boolean acceptsItems = false;
+    /** If true, this block won't be affected by the onlyDepositCore rule. */
+    public boolean alwaysAllowDeposit = false;
     /** If true, all item capacities of this block are separate instead of pooled as one number. */
     public boolean separateItemCapacity = false;
     /** maximum items this block can carry (usually, this is per-type of item) */
@@ -80,7 +83,10 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean displayFlow = true;
     /** whether this block is visible in the editor */
     public boolean inEditor = true;
+    /** if true, {@link #buildEditorConfig(Table)} will be called for configuring this block in the editor. */
+    public boolean editorConfigurable;
     /** the last configuration value applied to this block. */
+    @NoPatch
     public @Nullable Object lastConfig;
     /** whether to save the last config and apply it to newly placed blocks */
     public boolean saveConfig = false;
@@ -110,8 +116,14 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean rotate;
     /** if rotate is true and this is false, the region won't rotate when drawing */
     public boolean rotateDraw = true;
+    /** if rotate is true and this is false, the region won't rotate when drawing in the editor */
+    public boolean rotateDrawEditor = true;
+    /** visual rotation offset used in broken plan rendering */
+    public float visualRotationOffset = 0f;
     /** if rotate = false and this is true, rotation will be locked at 0 when placing (default); advanced use only */
     public boolean lockRotation = true;
+    /** if true, this block won't face the line drag direction */
+    public boolean ignoreLineRotation = false;
     /** if true, schematic flips with this block are inverted. */
     public boolean invertFlip = false;
     /** number of different variant regions to use */
@@ -195,6 +207,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** whether this block can be placed on edges of liquids. */
     public boolean floating = false;
     /** multiblock size */
+    @NoPatch //changing size often leads to catastrophic issues, so don't allow that
     public int size = 1;
     /** multiblock offset */
     public float offset = 0f;
@@ -362,29 +375,36 @@ public class Block extends UnlockableContent implements Senseable{
     /** Scroll position for certain blocks. */
     public float selectScroll;
     /** Building that is created for this block. Initialized in init() via reflection. Set manually if modded. */
+    @NoPatch
     public Prov<Building> buildType = null;
     /** Configuration handlers by type. */
+    @NoPatch
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
     /** Consumption filters. */
+    @NoPatch
     public boolean[] itemFilter = {}, liquidFilter = {};
     /** Array of consumers used by this block. Only populated after init(). */
+    @NoPatch
     public Consume[] consumers = {}, optionalConsumers = {}, nonOptionalConsumers = {}, updateConsumers = {};
     /** Set to true if this block has any consumers in its array. */
+    @NoPatch
     public boolean hasConsumers;
     /** The single power consumer, if applicable. */
+    @NoPatch
     public @Nullable ConsumePower consPower;
 
     /** Map of bars by name. */
+    @NoPatch
     protected OrderedMap<String, Func<Building, Bar>> barMap = new OrderedMap<>();
     /** List for building up consumption before init(). */
+    @NoPatch
     protected Seq<Consume> consumeBuilder = new Seq<>();
 
     protected TextureRegion[] generatedIcons;
-    protected TextureRegion[] editorVariantRegions;
 
     /** Regions indexes from icons() that are rotated. If either of these is not -1, other regions won't be rotated in ConstructBlocks. */
     public int regionRotated1 = -1, regionRotated2 = -1;
-    public TextureRegion region, editorIcon;
+    public TextureRegion region;
     public @Load("@-shadow") TextureRegion customShadowRegion;
     public @Load("@-team") TextureRegion teamRegion;
     public TextureRegion[] teamRegions, variantRegions, variantShadowRegions;
@@ -566,6 +586,11 @@ public class Block extends UnlockableContent implements Senseable{
         return forceDark;
     }
 
+    /** If true, the 'map edge' darkness will be applied to this block. */
+    public boolean isDarkened(Tile tile){
+        return solid && ((!synthetic() && fillsTile) || checkForceDark(tile));
+    }
+
     @Override
     public void setStats(){
         super.setStats();
@@ -684,6 +709,15 @@ public class Block extends UnlockableContent implements Senseable{
                 addLiquidBar(build -> build.liquids.current());
             }
         }
+    }
+
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+        barMap.clear();
+        setBars();
+        offset = ((size + 1) % 2) * tilesize / 2f;
+        sizeOffset = -((size - 1) / 2);
     }
 
     public boolean consumesItem(Item item){
@@ -857,24 +891,6 @@ public class Block extends UnlockableContent implements Senseable{
         }
     }
 
-    /** Never use outside of the editor! */
-    public TextureRegion editorIcon(){
-        return editorIcon == null ? (editorIcon = Core.atlas.find(name + "-icon-editor")) : editorIcon;
-    }
-
-    /** Never use outside of the editor! */
-    public TextureRegion[] editorVariantRegions(){
-        if(editorVariantRegions == null){
-            variantRegions();
-            editorVariantRegions = new TextureRegion[variantRegions.length];
-            for(int i = 0; i < variantRegions.length; i++){
-                AtlasRegion region = (AtlasRegion)variantRegions[i];
-                editorVariantRegions[i] = Core.atlas.find("editor-" + region.name);
-            }
-        }
-        return editorVariantRegions;
-    }
-
     /** @return special icons to outline and save with an -outline variant. Vanilla only. */
     public TextureRegion[] makeIconRegions(){
         return new TextureRegion[0];
@@ -940,6 +956,21 @@ public class Block extends UnlockableContent implements Senseable{
         return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
     }
 
+    /** Called to set up configuration UI in the editor. {@link #editorConfigurable} must be true.
+     * Config value should be assigned to lastConfig.*/
+    public void buildEditorConfig(Table table){}
+
+    /** Called when the block is picked (middle click). Clientside only! */
+    public void onPicked(Tile tile){}
+
+    /** @return the config value returned when this block is picked on a certain tile. This is only called for non-buildings. */
+    public Object getConfig(Tile tile){
+        return null;
+    }
+
+    /** Called when this block is set on the specified tile. */
+    public void blockChanged(Tile tile){}
+
     /** Called when building of this block begins. */
     public void placeBegan(Tile tile, Block previous){
 
@@ -951,12 +982,17 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     /** Called when building of this block ends. */
-    public void placeEnded(Tile tile, @Nullable Unit builder){
+    public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
 
     }
 
     /** Called right before building of this block begins. */
     public void beforePlaceBegan(Tile tile, Block previous){
+
+    }
+
+    /** Called when pick blocked in the editor. */
+    public void editorPicked(Tile tile){
 
     }
 
@@ -1232,6 +1268,10 @@ public class Block extends UnlockableContent implements Senseable{
             flags = flags.with(BlockFlag.hasFogRadius);
         }
 
+        if(sync){
+            flags = flags.with(BlockFlag.synced);
+        }
+
         //initialize default health based on size
         if(health == -1){
             boolean round = false;
@@ -1321,6 +1361,21 @@ public class Block extends UnlockableContent implements Senseable{
         }
     }
 
+    public void reinitializeConsumers(){
+        consumers = consumeBuilder.toArray(Consume.class);
+        consPower = (ConsumePower)Structs.find(consumers, c -> c instanceof ConsumePower);
+        optionalConsumers = consumeBuilder.select(consume -> consume.optional && !consume.ignore()).toArray(Consume.class);
+        nonOptionalConsumers = consumeBuilder.select(consume -> !consume.optional && !consume.ignore()).toArray(Consume.class);
+        updateConsumers = consumeBuilder.select(consume -> consume.update && !consume.ignore()).toArray(Consume.class);
+        hasConsumers = consumers.length > 0;
+        itemFilter = new boolean[content.items().size];
+        liquidFilter = new boolean[content.liquids().size];
+
+        for(Consume cons : consumers){
+            cons.apply(this);
+        }
+    }
+
     @Override
     public void load(){
         super.load();
@@ -1364,13 +1419,6 @@ public class Block extends UnlockableContent implements Senseable{
         if(!synthetic()){
             PixmapRegion image = Core.atlas.getPixmap(fullIcon);
             mapColor.set(image.get(image.width/2, image.height/2));
-        }
-
-        if(variants > 0){
-            for(int i = 0; i < variants; i++){
-                String rname = name + (i + 1);
-                packer.add(PageType.editor, "editor-" + rname, Core.atlas.getPixmap(rname));
-            }
         }
 
         Seq<Pixmap> toDispose = new Seq<>();
@@ -1437,8 +1485,6 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
-        PixmapRegion editorBase;
-
         if(gen.length > 1){
             Pixmap base = Core.atlas.getPixmap(gen[0]).crop();
             for(int i = 1; i < gen.length; i++){
@@ -1450,14 +1496,10 @@ public class Block extends UnlockableContent implements Senseable{
             }
             packer.add(PageType.main, "block-" + name + "-full", base);
 
-            editorBase = new PixmapRegion(base);
             toDispose.add(base);
         }else{
             if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", Core.atlas.getPixmap(gen[0]));
-            editorBase = gen[0] == null ? Core.atlas.getPixmap(fullIcon) : Core.atlas.getPixmap(gen[0]);
         }
-
-        packer.add(PageType.editor, name + "-icon-editor", editorBase);
 
         toDispose.each(Pixmap::dispose);
     }
@@ -1499,6 +1541,16 @@ public class Block extends UnlockableContent implements Senseable{
 
     @Override
     public double sense(Content content){
+        if(content instanceof Item item){
+            if(state.rules.infiniteResources) return 0;
+
+            for(ItemStack r : requirements){
+                if(r.item == item){
+                    return Math.round(r.amount * state.rules.buildCostMultiplier);
+                }
+            }
+            return 0f;
+        }
         return Double.NaN;
     }
 

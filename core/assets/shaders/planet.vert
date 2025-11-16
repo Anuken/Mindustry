@@ -29,10 +29,10 @@ void main(){
         specular = vec3(1.0 * pow(specularFactor, 40.0)) * albedo;
     }
 
-	vec3 norc = (u_ambientColor + specular) * (diffuse + vec3(clamp((dot(a_normal, u_lightdir) + 1.0) / 2.0, 0.0, 1.0)));
+	  vec3 norc = (u_ambientColor + specular) * (diffuse + vec3(clamp((dot(a_normal, u_lightdir) + 1.0) / 2.0, 0.0, 1.0)));
 
     float emissive = a_emissive.a * u_emissive * min(pow(max(0.0, (1.0 - norc.r) * 1.2), 3.0), 1.1);
 
-	v_col = vec4(mix(a_color.rgb, a_emissive.rgb, emissive), 1.0) * vec4(mix(norc, vec3(1.0), emissive), 1.0);
+	  v_col = vec4(mix(a_color.rgb, a_emissive.rgb, emissive), 1.0) * vec4(mix(norc, vec3(1.0), emissive), 1.0);
     gl_Position = u_proj * u_trans * a_position;
 }

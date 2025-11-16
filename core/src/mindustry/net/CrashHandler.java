@@ -33,13 +33,15 @@ public class CrashHandler{
         return report
         + "Version: " + Version.combined() + (Version.buildDate.equals("unknown") ? "" : " (Built " + Version.buildDate + ")") + (Vars.headless ? " (Server)" : "") + "\n"
         + "Date: " + new SimpleDateFormat("MMMM d, yyyy HH:mm:ss a", Locale.getDefault()).format(new Date()) + "\n"
-        + "OS: " + OS.osName + " x" + (OS.osArchBits) + " (" + OS.osArch + ")\n"
+        + "OS: " + OS.osName + (OS.osArchBits != null ? " x" + (OS.osArchBits) : "") + " (" + OS.osArch + ")\n" +
+        (graphics == null || graphics.getGLVersion() == null ? "" : "GL Version: " + graphics.getGLVersion() + "\n")
         + ((OS.isAndroid || OS.isIos) && app != null ? "Android API level: " + Core.app.getVersion() + "\n" : "")
         + "Java Version: " + OS.javaVersion + "\n"
         + "Runtime Available Memory: " + (Runtime.getRuntime().maxMemory() / 1024 / 1024) + "mb\n"
         + "Cores: " + OS.cores + "\n"
         + (cause == null ? "" : "Likely Cause: " + cause.meta.displayName + " (" + cause.name + " v" + cause.meta.version + ")\n")
-        + (enabledMods == null ? "<no mod init>" : "Mods: " + (enabledMods.isEmpty() ? "none (vanilla)" : enabledMods.toString(", ", mod -> mod.name + ":" + mod.meta.version)))
+        + (enabledMods == null ? "<no mod init>" : "Mods: " + (enabledMods.isEmpty() ? "none (vanilla)" : enabledMods.toString(", ", mod -> mod.name + ":" + mod.meta.version))) + "\n"
+        + (state != null && state.patcher != null && state.patcher.patches != null && state.patcher.patches.size > 0 ? "Patches: \n" + state.patcher.patches.toString("\n---\n", p -> p.patch) + "\n" : "")
         + "\n\n" + error;
     }
 

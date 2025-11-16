@@ -152,6 +152,7 @@ public class LAssembler{
         if(Double.isNaN(value)){
             return putVar(unescaped);
         }else{
+            if(Double.isInfinite(value)) value = 0.0;
             //this creates a hidden const variable with the specified value
             return putConst("___" + value, value);
         }
