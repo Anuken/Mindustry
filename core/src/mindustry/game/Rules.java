@@ -104,6 +104,8 @@ public class Rules{
     public float buildCostMultiplier = 1f;
     /** Multiplier for building speed. */
     public float buildSpeedMultiplier = 1f;
+    /** Maximum block build progress that can be built per frame */
+    public float limitBuildProgress = Float.MAX_VALUE;
     /** Multiplier for percentage of materials refunded when deconstructing. */
     public float deconstructRefundMultiplier = 0.5f;
     /** Multiplier for time in timer objectives. */
@@ -283,6 +285,10 @@ public class Rules{
 
     public float buildSpeed(Team team){
         return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
+    }
+
+    public float limitBuildProgress(Team team){
+        return instantBuild ? Float.MAX_VALUE : limitBuildProgress / 60f;
     }
 
     public boolean isBanned(Block block){
