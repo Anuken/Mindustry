@@ -126,41 +126,44 @@ public class PlacementFragment{
     }
 
     boolean updatePick(InputHandler input){
-        if(Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
-            var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        Tile tile = world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+        if(tile != null && Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
+            var build = tile.build;
 
             //can't middle click buildings in fog
             if(build != null && build.inFogTo(player.team())){
                 build = null;
             }
 
-            Block tryRecipe = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
+            Block tryBlock = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
             Object tryConfig = build == null || !build.block.copyConfig ? null : build.config();
 
             for(BuildPlan req : player.unit().plans()){
                 if(!req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).contains(Core.input.mouseWorld())){
-                    tryRecipe = req.block;
+                    tryBlock = req.block;
                     tryConfig = req.config;
                     break;
                 }
             }
 
-            if(tryRecipe == null && state.rules.editor){
-                var tile = world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
-                if(tile != null){
-                    tryRecipe =
+            if(tryBlock == null && state.rules.editor){
+                tryBlock =
                     tile.block() != Blocks.air ? tile.block() :
                     tile.overlay() != Blocks.air ? tile.overlay() :
                     tile.floor() != Blocks.air ? tile.floor() : null;
-                }
             }
 
-            if(tryRecipe != null && ((tryRecipe.isVisible() && unlocked(tryRecipe)) || state.rules.editor)){
-                input.block = tryRecipe;
-                tryRecipe.lastConfig = tryConfig;
-                if(tryRecipe.isVisible()){
+            if(tryBlock != null && build == null && tryConfig == null){
+                tryConfig = tryBlock.getConfig(tile);
+            }
+
+            if(tryBlock != null && ((tryBlock.isVisible() && unlocked(tryBlock)) || state.rules.editor)){
+                input.block = tryBlock;
+                tryBlock.lastConfig = tryConfig;
+                if(tryBlock.isVisible()){
                     currentCategory = input.block.category;
                 }
+                tryBlock.onPicked(tile);
                 return true;
             }
         }
@@ -374,9 +377,9 @@ public class PlacementFragment{
                                         }
                                     }
                                 }
-                                final String keyComboFinal = keyCombo;
+                                String keyComboFinal = keyCombo;
                                 header.left();
-                                header.add(new Image(displayBlock.uiIcon)).size(8 * 4);
+                                header.add(new Image(displayBlock.uiIcon)).scaling(Scaling.fit).size(8 * 4);
                                 header.labelWrap(() -> !unlocked(displayBlock) ? Core.bundle.get("block.unknown") : displayBlock.localizedName + keyComboFinal)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
@@ -581,7 +584,7 @@ public class PlacementFragment{
                                         for(var stance : stances){
 
                                             coms.button(stance.getIcon(), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitStance(player, units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance);
+                                                Call.setUnitStance(player, units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance, !activeStances.get(stance.id));
                                             }).checked(i -> activeStances.get(stance.id)).size(50f).tooltip(stance.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
@@ -604,7 +607,7 @@ public class PlacementFragment{
                                 for(var unit : control.input.selectedUnits){
                                     if(unit.controller() instanceof CommandAI cmd){
                                         activeCommands.set(cmd.command.id);
-                                        activeStances.set(cmd.stance.id);
+                                        activeStances.set(cmd.stances);
                                     }
 
                                     stancesOut.clear();
@@ -631,7 +634,7 @@ public class PlacementFragment{
                                 for(UnitStance stance : stances){
                                     //first stance must always be the stop stance
                                     if(stance.keybind != null && Core.input.keyTap(stance.keybind)){
-                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance);
+                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance, !activeStances.get(stance.id));
                                     }
                                 }
 

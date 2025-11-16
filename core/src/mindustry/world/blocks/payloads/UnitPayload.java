@@ -43,6 +43,11 @@ public class UnitPayload implements Payload{
     }
 
     @Override
+    public boolean contentEquals(Payload other){
+        return other instanceof UnitPayload up && up.unit.type == unit.type;
+    }
+
+    @Override
     public void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){
         unit.type.updatePayload(unit, unitHolder, buildingHolder);
     }

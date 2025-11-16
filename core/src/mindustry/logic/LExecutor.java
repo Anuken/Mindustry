@@ -27,7 +27,6 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
-import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
@@ -35,7 +34,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class LExecutor{
-    public static final int maxInstructions = 1000;
+    public static int maxInstructions = 1000;
 
     public static final int
     maxGraphicsBuffer = 256,
@@ -59,11 +58,11 @@ public class LExecutor{
     public IntSet linkIds = new IntSet();
     public Team team = Team.derelict;
     public boolean privileged = false;
+    //maps variable name to index in vars; lazily initialized
+    protected @Nullable ObjectIntMap<String> nameMap;
 
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
     protected static IntFloatMap unitTimeouts = new IntFloatMap();
-    //lookup variable by name, lazy init.
-    protected @Nullable ObjectIntMap<String> nameMap;
 
     static{
         Events.on(ResetEvent.class, e -> unitTimeouts.clear());
@@ -381,7 +380,7 @@ public class LExecutor{
                         if(unit instanceof Payloadc pay){
                             //units
                             if(p1.bool()){
-                                Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+                                Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u != unit && u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
 
                                 if(result != null){
                                     Call.pickedUnitPayload(unit, result);
@@ -467,7 +466,7 @@ public class LExecutor{
                         }else{
                             Building build = p1.building();
                             int dropped = Math.min(unit.stack.amount, p2.numi());
-                            if(build != null && build.team == unit.team && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                            if(build != null && build.team == unit.team && build.isValid() && build.allowDeposit() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                                 int accepted = build.acceptStack(unit.item(), dropped, unit);
                                 if(accepted > 0){
                                     Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
@@ -518,14 +517,14 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = target.obj();
-            if(obj instanceof Building b && (exec.privileged || (b.team == exec.team && exec.linkIds.contains(b.id)))){
+            if(obj instanceof Building b && (exec.privileged || (exec.build != null && exec.build.validLink(b)))){
 
-                if(type == LAccess.enabled && !p1.bool()){
-                    b.lastDisabler = exec.build;
-                }
-
-                if(type == LAccess.enabled && p1.bool()){
-                    b.noSleep();
+                if(type == LAccess.enabled){
+                    if(p1.bool()){
+                        b.noSleep();
+                    }else{
+                        b.lastDisabler = exec.build;
+                    }
                 }
 
                 if(type.isObj && p1.isobj){
@@ -570,20 +569,15 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = position.numi();
-            Building from = target.building();
-
-            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged))){
-                output.setnum(address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
-                LVar fromVar = logic.executor.optionalVar(name);
-                if(fromVar != null && !output.constant){
-                    output.objval = fromVar.objval;
-                    output.numval = fromVar.numval;
-                    output.isobj = fromVar.isobj;
+            Object targetObj = target.obj();
+            if(targetObj instanceof LReadable read){
+                if(!read.readable(exec)) return;
+                read.read(position, output);
+            }else{
+                int address = position.numi();
+                if(targetObj instanceof CharSequence str){
+                    output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
                 }
-            }else if(target.isobj && target.objval instanceof CharSequence str){
-                output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
             }
         }
     }
@@ -602,18 +596,10 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = position.numi();
-            Building from = target.building();
-
-            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
-                mem.memory[address] = value.num();
-            }else if(from instanceof LogicBuild logic && (exec.privileged || (from.team == exec.team && !from.block.privileged)) && position.isobj && position.objval instanceof String name){
-                LVar toVar = logic.executor.optionalVar(name);
-                if(toVar != null && !toVar.constant){
-                    toVar.objval = value.objval;
-                    toVar.numval = value.numval;
-                    toVar.isobj = value.isobj;
-                }
+            Object targetObj = target.obj();
+            if(targetObj instanceof LWritable write){
+                if(!write.writable(exec)) return;
+                write.write(position, value);
             }
         }
     }
@@ -656,7 +642,7 @@ public class LExecutor{
                     }
                 }
             }else{
-                if(target instanceof CharSequence seq && sense == LAccess.size){
+                if(target instanceof CharSequence seq && (sense == LAccess.size || sense == LAccess.bufferSize)){
                     to.setnum(seq.length());
                     return;
                 }
@@ -783,15 +769,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(!to.constant){
-                if(from.isobj){
-                    to.objval = from.objval;
-                    to.isobj = true;
-                }else{
-                    to.numval = LVar.invalid(from.numval) ? 0 : from.numval;
-                    to.isobj = false;
-                }
-            }
+            if(!to.constant) to.set(from);
         }
     }
 
@@ -824,6 +802,28 @@ public class LExecutor{
                 }
 
             }
+        }
+    }
+
+    public static class SelectI implements LInstruction{
+        public ConditionOp op = ConditionOp.notEqual;
+        public LVar result, comp0, comp1, a, b;
+
+        public SelectI(ConditionOp op, LVar result, LVar comp0, LVar comp1, LVar a, LVar b){
+            this.op = op;
+            this.result = result;
+            this.comp0 = comp0;
+            this.comp1 = comp1;
+            this.a = a;
+            this.b = b;
+        }
+
+        public SelectI(){}
+
+        @Override
+        public void run(LExecutor exec){
+            if(result.constant) return;
+            result.set(op.test(comp0, comp1) ? a : b);
         }
     }
 
@@ -881,7 +881,7 @@ public class LExecutor{
                     int advance = (int)data.spaceXadvance, lineHeight = (int)data.lineHeight;
 
                     int xOffset, yOffset;
-                    int align = p1.id; //p1 is not a variable, it's a raw align value. what a massive hack
+                    int align = p1.numi();
 
                     int maxWidth = 0, lines = 1, lineWidth = 0;
                     for(int i = 0; i < str.length(); i++){
@@ -970,7 +970,7 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
-            if(target.building() instanceof LogicDisplayBuild d && (d.team == exec.team || exec.privileged)){
+            if(target.building() instanceof LogicDisplayBuild d && d.isValid() && (d.team == exec.team || exec.privileged)){
                 d.flushCommands(exec.graphicsBuffer);
                 exec.graphicsBuffer.clear();
             }
@@ -1104,8 +1104,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(target.building() instanceof MessageBuild d && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
-
+            if(target.building() instanceof MessageBuild d && d.isValid() && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
 
@@ -1132,23 +1131,8 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(address != -1){
-                LVar va = value;
-                LVar vb = compare;
-                boolean cmp;
-
-                if(op == ConditionOp.strictEqual){
-                    cmp = va.isobj == vb.isobj && ((va.isobj && va.objval == vb.objval) || (!va.isobj && va.numval == vb.numval));
-                }else if(op.objFunction != null && va.isobj && vb.isobj){
-                    //use object function if both are objects
-                    cmp = op.objFunction.get(value.obj(), compare.obj());
-                }else{
-                    cmp = op.function.get(value.num(), compare.num());
-                }
-
-                if(cmp){
-                    exec.counter.numval = address;
-                }
+            if(address != -1 && op.test(value, compare)){
+                exec.counter.numval = address;
             }
         }
     }
@@ -1410,7 +1394,6 @@ public class LExecutor{
 
             Tile tile = world.tile(x.numi(), y.numi());
             if(tile != null && block.obj() instanceof Block b){
-                //TODO this can be quite laggy...
                 switch(layer){
                     case ore -> {
                         if((b instanceof OverlayFloor || b == Blocks.air) && tile.overlay() != b) tile.setOverlayNet(b);
@@ -1709,7 +1692,7 @@ public class LExecutor{
                 return;
             }
 
-            String text = exec.textBuffer.toString();
+            String text = UI.formatIcons(exec.textBuffer.toString());
             if(text.startsWith("@")){
                 String substr = text.substring(1);
                 if(Core.bundle.has(substr)){

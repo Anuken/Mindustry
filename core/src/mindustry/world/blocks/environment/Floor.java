@@ -80,9 +80,18 @@ public class Floor extends Block{
     public int tilingVariants = 0;
     /** If true, this floor uses autotiling; variants are not supported. See https://github.com/GglLfr/tile-gen*/
     public boolean autotile = false;
+    /** If >1, the middle region of the autotile has random variants. */
+    public int autotileMidVariants = 1;
+    /** Variants of the main autotile sprite. */
+    public int autotileVariants = 1;
+    /** If true (default), this floor will draw edges of other floors on itself. */
+    public boolean drawEdgeIn = true;
+    /** If true (default), this floor will draw its edges onto other floors. */
+    public boolean drawEdgeOut = true;
 
     protected TextureRegion[][][] tilingRegions;
-    protected TextureRegion[] autotileRegions;
+    protected TextureRegion[] autotileRegions, autotileMidRegions;
+    protected TextureRegion[][] autotileVariantRegions;
     protected int tilingSize;
     protected TextureRegion[][] edges;
     protected Seq<Floor> blenders = new Seq<>();
@@ -141,9 +150,15 @@ public class Floor extends Block{
         }
 
         if(autotile){
-            autotileRegions = new TextureRegion[47];
-            for(int i = 0; i < 47; i++){
-                autotileRegions[i] = Core.atlas.find(name + "-" + i);
+            autotileRegions = TileBitmask.load(name);
+            if(autotileVariants > 1){
+                autotileVariantRegions = TileBitmask.loadVariants(name, autotileVariants);
+            }
+            if(autotileMidVariants > 1){
+                autotileMidRegions = new TextureRegion[autotileMidVariants];
+                for(int i = 0; i < autotileMidVariants; i++){
+                    autotileMidRegions[i] = Core.atlas.find(i == 0 ? name + "-13" : name + "-mid-" + (i + 1));
+                }
             }
         }
 
@@ -195,7 +210,6 @@ public class Floor extends Block{
     @Override
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
-        packer.add(PageType.editor, "editor-" + name, Core.atlas.getPixmap(fullIcon));
 
         if(blendGroup != this){
             return;
@@ -219,6 +233,21 @@ public class Floor extends Block{
 
     @Override
     public void drawBase(Tile tile){
+        drawMain(tile);
+
+        if(drawEdgeIn){
+            drawEdges(tile);
+        }
+        drawOverlay(tile);
+
+        if(tile.overlay() != Blocks.air && tile.floor() == this && isLiquid){
+            Draw.alpha(1f - overlayAlpha);
+            drawMain(tile);
+            Draw.color();
+        }
+    }
+
+    public void drawMain(Tile tile){
         if(tilingVariants > 0){
             int index = Mathf.randomSeed(Point2.pack(tile.x / tilingSize, tile.y / tilingSize), 0, tilingVariants - 1);
             TextureRegion[][] regions = tilingRegions[index];
@@ -226,37 +255,42 @@ public class Floor extends Block{
         }else if(autotile){
             int bits = 0;
 
+            TextureRegion[] regions = autotileVariants > 1 ? autotileVariantRegions[variant(tile.x, tile.y, autotileVariantRegions.length)] : autotileRegions;
+
             for(int i = 0; i < 8; i++){
                 Tile other = tile.nearby(Geometry.d8[i]);
-                if(other != null && other.floor().blendGroup == blendGroup){
+                if(checkAutotileSame(tile, other)){
                     bits |= (1 << i);
                 }
             }
 
-            Draw.rect(autotileRegions[TileBitmask.values[bits]], tile.worldx(), tile.worldy());
+            int bit = TileBitmask.values[bits];
+            TextureRegion region = bit == 13 && autotileMidVariants > 1 ? autotileMidRegions[variant(tile.x, tile.y, autotileMidRegions.length)] : regions[bit];
+
+            Draw.rect(region, tile.worldx(), tile.worldy());
         }else{
             Draw.rect(variantRegions[variant(tile.x, tile.y)], tile.worldx(), tile.worldy());
         }
 
         Draw.alpha(1f);
-        drawEdges(tile);
-        drawOverlay(tile);
+    }
+
+    public boolean checkAutotileSame(Tile tile, @Nullable Tile other){
+        return other != null && (this == tile.floor() ? other.floor() : other.overlay()).blendGroup == blendGroup;
     }
 
     public int variant(int x, int y){
-        return Mathf.randomSeed(Point2.pack(x, y), 0, Math.max(0, variantRegions.length - 1));
+        return variant(x, y, variantRegions.length);
+    }
+
+    public int variant(int x, int y, int max){
+        return Mathf.randomSeed(Point2.pack(x, y), 0, Math.max(0, max - 1));
     }
 
     public void drawOverlay(Tile tile){
         Floor floor = tile.overlay();
         if(floor != Blocks.air && floor != this){
-            if(isLiquid){
-                Draw.alpha(overlayAlpha);
-            }
             floor.drawBase(tile);
-            if(isLiquid){
-                Draw.alpha(1f);
-            }
         }
     }
 
@@ -264,6 +298,9 @@ public class Floor extends Block{
     public TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
+
+    /** Called when this floor is set on the specified tile. */
+    public void floorChanged(Tile tile){}
 
     /** @return whether to index this floor by flag */
     public boolean shouldIndex(Tile tile){
@@ -298,7 +335,7 @@ public class Floor extends Block{
             Point2 point = Geometry.d8[i];
             Tile other = tile.nearby(point);
             //special case: empty is, well, empty, so never draw emptiness on top, as that would just be an incorrect black texture
-            if(other != null && other.floor().cacheLayer == layer && other.floor().edges(tile.x, tile.y) != null && other.floor() != Blocks.empty){
+            if(other != null && other.floor().drawEdgeOut && other.floor().cacheLayer == layer && other.floor().edges(tile.x, tile.y) != null){
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
                     dirs[i] = other.floorID();
@@ -319,11 +356,15 @@ public class Floor extends Block{
             Point2 point = Geometry.d8[i];
             Tile other = tile.nearby(point);
 
-            if(other != null && doEdge(tile, other, other.floor()) && other.floor().cacheLayer == realCache && other.floor().edges(tile.x, tile.y) != null && other.floor() != Blocks.empty){
-                if(!blended.getAndSet(other.floor().id)){
-                    blenders.add(other.floor());
+            if(other == null) continue;
+
+            Floor ob = (this == tile.floor() || other.overlay() == Blocks.air ? other.floor() : other.overlay());
+
+            if(ob.drawEdgeOut && doEdge(tile, other, ob) && other.floor().cacheLayer == realCache && ob.edges(tile.x, tile.y) != null){
+                if(!blended.getAndSet(ob.id)){
+                    blenders.add(ob);
                 }
-                dirs[i] = other.floorID();
+                dirs[i] = ob.id;
             }
         }
 
@@ -331,31 +372,24 @@ public class Floor extends Block{
     }
 
     protected void drawBlended(Tile tile, boolean checkId){
-        blenders.sort(a -> a.id);
+        //prioritize the "actual" floor over other floors to fix weird square corners
+        blenders.sort(a -> a.id + (tile.floor() != this && a == tile.floor() ? 99999 : 0));
 
         for(Floor block : blenders){
             for(int i = 0; i < 8; i++){
                 Point2 point = Geometry.d8[i];
                 Tile other = tile.nearby(point);
-                if(other != null && other.floor() == block && (!checkId || dirs[i] == block.id)){
+
+                if(other == null) continue;
+
+                Floor ob = (this == tile.floor() || other.overlay() == Blocks.air ? other.floor() : other.overlay());
+
+                if(ob == block && (!checkId || dirs[i] == block.id)){
                     TextureRegion region = block.edge(tile.x, tile.y, 1 - point.x, 1 - point.y);
                     Draw.rect(region, tile.worldx(), tile.worldy());
                 }
             }
         }
-    }
-
-    //'new' style of edges with shadows instead of colors, not used currently
-    protected void drawEdgesFlat(Tile tile, boolean sameLayer){
-        for(int i = 0; i < 4; i++){
-            Tile other = tile.nearby(i);
-            if(other != null && doEdge(tile, other, other.floor())){
-                Color color = other.floor().mapColor;
-                Draw.color(color.r, color.g, color.b, 1f);
-                Draw.rect(edgeRegion, tile.worldx(), tile.worldy(), i*90);
-            }
-        }
-        Draw.color();
     }
 
     public int realBlendId(Tile tile){
@@ -377,6 +411,11 @@ public class Floor extends Block{
     /** @return whether the edges from {@param other} should be drawn onto this tile **/
     protected boolean doEdge(Tile tile, Tile otherTile, Floor other){
         return (other.realBlendId(otherTile) > realBlendId(tile) || edges(tile.x, tile.y) == null);
+    }
+
+    /** @return whether being on this floor can damage a unit */
+    public boolean damages(){
+        return damageTaken > 0f || (status != null && status.damage > 0f);
     }
 
     public static class UpdateRenderState{

@@ -1,6 +1,7 @@
 package mindustry.game;
 
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
@@ -17,6 +18,7 @@ public class EventType{
     //events that occur very often
     public enum Trigger{
         shock,
+        cannotUpgrade,
         openConsole,
         blastFreeze,
         impactPower,
@@ -100,6 +102,15 @@ public class EventType{
     public static class WorldLoadBeginEvent{}
     /** Called when a game begins and the world tiles are initiated. About to updates tile proximity and sets up physics for the world(Before WorldLoadEvent) */
     public static class WorldLoadEndEvent{}
+
+    /** Called when a save loads custom patches. {@link #patches} can be modified in the event handler. */
+    public static class ContentPatchLoadEvent{
+        public final Seq<String> patches;
+
+        public ContentPatchLoadEvent(Seq<String> patches){
+            this.patches = patches;
+        }
+    }
 
     public static class SaveLoadEvent{
         public final boolean isMap;
@@ -410,6 +421,22 @@ public class EventType{
             this.tile = tile;
             this.previous = previous;
             this.floor = floor;
+            return this;
+        }
+    }
+
+    /**
+     * Called when a tile changes its overlay. Do not cache or use with a timer.
+     * Do not modify any tiles inside listener code.
+     * */
+    public static class TileOverlayChangeEvent{
+        public Tile tile;
+        public Floor previous, overlay;
+
+        public TileOverlayChangeEvent set(Tile tile, Floor previous, Floor overlay){
+            this.tile = tile;
+            this.previous = previous;
+            this.overlay = overlay;
             return this;
         }
     }

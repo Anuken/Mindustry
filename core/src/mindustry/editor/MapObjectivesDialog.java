@@ -17,6 +17,7 @@ import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -280,6 +281,15 @@ public class MapObjectivesDialog extends BaseDialog{
             });
         }));
 
+        setInterpreter(Alignment.class, int.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            Alignment align = field.getAnnotation(Alignment.class);
+            name(cont, name, remover, indexer);
+            cont.button(b -> {
+                b.label(() -> LStatement.alignToName.get(get.get(), "center"));
+                b.clicked(() -> LStatement.showAlignSelect(b, get.get(), set::get, align.hor(), align.ver()));
+            }, () -> {});
+        });
+
         // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] from using it.
         for(var obj : MapObjectives.allObjectiveTypes) setInterpreter(obj.get().getClass(), defaultInterpreter());
         for(var mark : MapObjectives.allMarkerTypes) setInterpreter(mark.get().getClass(), defaultInterpreter());
@@ -535,10 +545,7 @@ public class MapObjectivesDialog extends BaseDialog{
         if(
         objectives.any() && (
         // If the objectives were previously programmatically made...
-        objectives.contains(obj -> obj.editorX == -1 || obj.editorY == -1) ||
-        // ... or some idiot somehow made it not work...
-        objectives.contains(obj -> !canvas.tilemap.createTile(obj))
-        )){
+        objectives.contains(obj -> obj.editorX == -999 || obj.editorY == -999))){
             // ... then rebuild the structure.
             canvas.clearObjectives();
 
@@ -563,6 +570,8 @@ public class MapObjectivesDialog extends BaseDialog{
                     if(i >= objectives.size) break loop;
                 }
             }
+        }else{
+            objectives.each(o -> canvas.tilemap.createTile(o.editorX, o.editorY, o, true));
         }
 
         canvas.objectives.set(objectives);

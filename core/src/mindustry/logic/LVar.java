@@ -101,8 +101,22 @@ public class LVar{
         isobj = true;
     }
 
+    public void set(LVar other){
+        isobj = other.isobj;
+        // Setting a non-numeric value to @counter must preserve its numeric field
+        if(isobj){
+            objval = other.objval;
+        }else{
+            numval = invalid(other.numval) ? 0 : other.numval;
+        }
+    }
+
     public static boolean invalid(double d){
         return Double.isNaN(d) || Double.isInfinite(d);
     }
 
+    @Override
+    public String toString(){
+        return name + ": " + (isobj ? objval : numval) + (constant ? " [const]" : "");
+    }
 }

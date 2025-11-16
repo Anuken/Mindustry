@@ -78,6 +78,6 @@ public class SectorSelectDialog extends BaseDialog{
     }
 
     boolean matches(SectorPreset sector, String text){
-        return sector.planet == planet && (text.isEmpty() || sector.name.toLowerCase(Locale.ROOT).contains(text) || sector.localizedName.toLowerCase(Locale.ROOT).contains(text));
+        return sector.planet == planet && sector.requireUnlock && (text.isEmpty() || sector.name.toLowerCase(Locale.ROOT).contains(text) || sector.localizedName.toLowerCase(Locale.ROOT).contains(text));
     }
 }
