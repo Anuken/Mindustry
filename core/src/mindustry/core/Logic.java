@@ -24,6 +24,7 @@ import mindustry.world.blocks.storage.CoreBlock.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
+import static mindustry.Vars.content;
 
 /**
  * Logic module.
@@ -160,7 +161,6 @@ public class Logic implements ApplicationListener{
                 Call.partiallyResearched(e.content);
             }
         });
-
         Events.on(SectorCaptureEvent.class, e -> {
             if(!net.client() && e.sector == state.getSector() && e.sector.isBeingPlayed()){
                 state.rules.waveTeam.data().destroyToDerelict();
@@ -427,6 +427,12 @@ public class Logic implements ApplicationListener{
         if(net.client()) {
             Events.fire(new PartialResearchEvent(u)); 
         }
+    }
+    @Remote(targets=Loc.client)
+    public static void clientResearch(@Nullable Player player, Content content){
+        if(!(content instanceof UnlockableContent u)) return;
+        ui.research.rebuildItems();
+        ui.research.view.spend(u.techNode);
     }
     @Override
     public void dispose(){

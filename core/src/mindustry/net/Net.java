@@ -49,7 +49,6 @@ public class Net{
         registerPacket(StreamChunk::new);
         registerPacket(WorldStream::new);
         registerPacket(ConnectPacket::new);
-        registerPacket(ResearchPacket::new); 
 
         //register generated packet classes
         Call.registerPackets();

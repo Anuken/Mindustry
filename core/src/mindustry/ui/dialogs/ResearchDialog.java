@@ -567,9 +567,7 @@ public class ResearchDialog extends BaseDialog{
         public void spend(TechNode node){
             if(net.client()){
                 // Must tell host to spend(). Specifically if canSpend(node) then spend(node)
-                ResearchPacket p = new ResearchPacket();    
-                p.name = node.content.toString(); 
-                net.send(p, true); 
+                Call.clientResearch(node.content);
                 return;
             } 
 
