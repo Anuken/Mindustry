@@ -79,6 +79,7 @@ public class ResearchDialog extends BaseDialog{
         // TODO really? 
         Events.on(PartialResearchEvent.class, e -> {
             if(net.client() && !needsRebuild){
+                needsRebuild = true; 
                 // order matters and I don't know xddd
                 Core.app.post(() -> {
                     Core.scene.act();
