@@ -1013,7 +1013,7 @@ public class UnitTypes{
                 shoot.shotDelay = 3f;
                 ejectEffect = Fx.casing1;
                 mirror = false;
-                bullet = new BasicBulletType(2.5f, 15){{
+                bullet = new BasicBulletType(2.5f, 16){{
                     width = 7f;
                     height = 9f;
                     lifetime = 45f;

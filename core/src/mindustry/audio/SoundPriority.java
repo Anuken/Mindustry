@@ -51,6 +51,7 @@ public class SoundPriority{
         //max(4, hit1, hit2, hit3);
 
         sameGroup(missile, missileShort, missilePlasmaShort);
+        sameGroup(spark, shock);
 
         for(var sound : Core.assets.getAll(Sound.class, new Seq<>())){
             sound.setMinConcurrentInterrupt(Math.min(0.25f, sound.getLength() * 0.5f));
