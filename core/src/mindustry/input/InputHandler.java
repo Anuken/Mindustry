@@ -198,9 +198,59 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, unreliable = true)
+    public static void setItems(Building build, ItemStack[] items){
+        if(build == null || build.items == null) return;
+
+        for(ItemStack stack : items){
+            build.items.set(stack.item, stack.amount);
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void setTileItems(Item item, int amount, int[] positions){
+        for(int pos : positions){
+            Building build = world.build(pos);
+            if(build != null && build.items != null){
+                build.items.set(item, amount);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
     public static void clearItems(Building build){
         if(build == null || build.items == null) return;
         build.items.clear();
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void setLiquid(Building build, Liquid liquid, float amount){
+        if(build == null || build.liquids == null) return;
+        build.liquids.set(liquid, amount);
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void setLiquids(Building build, LiquidStack[] liquids){
+        if(build == null || build.liquids == null) return;
+
+        for(LiquidStack stack : liquids){
+            build.liquids.set(stack.liquid, stack.amount);
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void setTileLiquids(Liquid liquid, float amount, int[] positions){
+        for(int pos : positions){
+            Building build = world.build(pos);
+            if(build != null && build.liquids != null){
+                build.liquids.set(liquid, amount);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void clearLiquids(Building build){
+        if(build == null || build.liquids == null) return;
+        build.liquids.clear();
     }
 
     @Remote(called = Loc.server, unreliable = true)
