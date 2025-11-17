@@ -15,12 +15,15 @@ import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.Vars;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
@@ -50,6 +53,8 @@ public class ResearchDialog extends BaseDialog{
     private boolean showTechSelect;
     private boolean needsRebuild;
 
+    public static boolean researchRequiresAdmin = false;
+
     public ResearchDialog(){
         super("");
 
@@ -58,10 +63,10 @@ public class ResearchDialog extends BaseDialog{
         });
 
         Events.on(UnlockEvent.class, e -> {
-            if(net.server()) Core.app.post(Call::requestPlanetItems);
             if(net.client() && !needsRebuild){
                 needsRebuild = true;
                 Core.app.post(() -> {
+                    Call.requestPlanetItems();
                     needsRebuild = false;
 
                     checkNodes(root);
@@ -77,12 +82,12 @@ public class ResearchDialog extends BaseDialog{
         });
         // TODO really? 
         Events.on(PartialResearchEvent.class, e -> {
-            if(net.server()) Core.app.post(Call::requestPlanetItems);
             if(net.client()){
                 Core.app.post(() -> {
-                    Core.scene.act();
+                    Call.requestPlanetItems();
+                    // TODO add shine
                     view.rebuild();
-//                    itemDisplay.rebuild(items);
+                    Core.scene.act();
                     checkMargin();
                 });
             }
@@ -214,7 +219,11 @@ public class ResearchDialog extends BaseDialog{
             }
         });
     }
-
+    @Override
+    public Dialog show(){
+        if(net.client()) Call.requestPlanetItems();
+        return super.show();
+    }
     void checkMargin(){
         if(Core.graphics.isPortrait() && showTechSelect){
             itemDisplay.marginTop(60f);
@@ -504,7 +513,7 @@ public class ResearchDialog extends BaseDialog{
                     button.setDisabled(false && !mobile);
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
-                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !selectable(node.node) || (!canSpend(node.node) && !false) ? Tex.buttonRed : Tex.button;
+                    button.getStyle().up = !locked(node.node) ? buttonOver : !selectable(node.node) || (!canSpend(node.node) && !false) ? Tex.buttonRed : Tex.button;
 
                     ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.uiIcon : Icon.lock.getRegion());
                     button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? Color.gray : Pal.gray);
@@ -602,12 +611,9 @@ public class ResearchDialog extends BaseDialog{
                 state.rules.researched.add(node.content);
             } 
             else if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
-                // state.rules.partiallyResearched.put(node.content, node.finishedRequirements); 
-                // Events.fire(new PartialResearchEvent(node.content));
-                // TODO might not be acceptable
                 state.rules.partiallyResearched.put(node.content, node.finishedRequirements);
-                Call.setRules(state.rules);
-                Call.partiallyResearched(node.content); 
+//                Call.setRules(state.rules);
+                Call.partiallyResearched(node.content);
             }
 
             node.save();
@@ -827,5 +833,41 @@ public class ResearchDialog extends BaseDialog{
             Draw.reset();
             super.drawChildren();
         }
+    }
+
+    // TODO shouldn't this have a target?
+    @Remote
+    public static void partiallyResearched(Content content){
+        if(!(content instanceof UnlockableContent u) || u.techNode == null) return;
+        if(net.client()) {
+            Events.fire(new PartialResearchEvent(u));
+        }
+    }
+    @Remote(targets = Loc.client)
+    public static void clientResearch(@Nullable Player player, Content content){
+        if(player == null || (!player.admin() && researchRequiresAdmin)) return;
+        if(!(content instanceof UnlockableContent u)) return;
+        ui.research.rebuildItems();
+        ui.research.view.spend(u.techNode);
+    }
+    @Remote(targets = Loc.client)
+    public static void requestPlanetItems(@Nullable Player player) {
+        if(player == null || (!player.admin() && researchRequiresAdmin)) return;
+        int[] quantity = new int[Vars.content.items().size];
+        ui.research.rebuildItems();
+        int index = 0;
+        for (Item item : Vars.content.items()) {
+            quantity[index++] = ui.research.items.get(item);
+        }
+        Call.sendPlanetItems(player.con, quantity);
+    }
+    @Remote(targets = Loc.server, variants = Variant.one)
+    public static void sendPlanetItems(int[] values){
+        int index = 0;
+        if(ui.research.items == null) ui.research.items = new ItemSeq();
+        for (Item item : Vars.content.items()) {
+            ui.research.items.set(item, values[index++]);
+        }
+        ui.research.itemDisplay.rebuild(ui.research.items);
     }
 }
