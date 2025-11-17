@@ -125,7 +125,7 @@ public class ForceProjector extends Block{
                             float liquidHeat = (1f + (liquid.heatCapacity - 0.4f) * 0.9f);
                             float regenBoost = ((cooldownNormal * (cooldownLiquid * liquidHeat)) - cooldownNormal) * 60f;
                             float cooldownBoost = (shieldHealth / (cooldownBrokenBase * (cooldownLiquid * liquidHeat)) - shieldHealth / cooldownBrokenBase) / 60f;
-                                
+
                             b.table(bt -> {
                                 bt.right().defaults().padRight(3).left();
                                 bt.add("[lightgray]+" + Core.bundle.format("bar.regenerationrate", Strings.autoFixed(regenBoost, 2))).pad(5).row();
@@ -155,6 +155,15 @@ public class ForceProjector extends Block{
     public class ForceBuild extends Building implements Ranged, ExplosionShield{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
+
+        @Override
+        public void setProp(LAccess prop, double value){
+            if(prop == LAccess.shield){
+                buildup = Math.max(shieldHealth + phaseShieldBoost * phaseHeat - (float)value, 0f);
+            }else{
+                super.setProp(prop, value);
+            }
+        }
 
         @Override
         public float range(){
