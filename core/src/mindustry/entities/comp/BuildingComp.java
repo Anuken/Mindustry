@@ -1910,11 +1910,19 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
 
             minEfficiency = Math.min(minEfficiency, result);
+
+            if(minEfficiency <= 0.0000001f && !shouldConsumePower){
+                break;
+            }
         }
 
         //same for optionals
         for(var cons : block.optionalConsumers){
             optionalEfficiency = Math.min(optionalEfficiency, cons.efficiency(self()));
+
+            if(optionalEfficiency <= 0.0000001f){
+                break;
+            }
         }
 
         //efficiency is now this minimum value
