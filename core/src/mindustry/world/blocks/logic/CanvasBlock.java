@@ -68,6 +68,8 @@ public class CanvasBlock extends Block{
         clipSize = Math.max(clipSize, size * 8 - padding);
 
         previewPixmap = new Pixmap(canvasSize, canvasSize);
+
+        if(!Mathf.isPowerOfTwo(palette.length)) throw new RuntimeException("Non power-of-two palettes for canvas blocks are not supported.");
     }
 
     @Override
@@ -150,7 +152,7 @@ public class CanvasBlock extends Block{
         public @Nullable Texture texture;
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
         public int blending;
-        
+
         protected boolean updated = false;
 
         public void setPixel(int pos, int index){
@@ -286,7 +288,7 @@ public class CanvasBlock extends Block{
                 }
             }
         }
-        
+
         @Override
         public double sense(LAccess sensor){
             return switch(sensor){
@@ -314,12 +316,12 @@ public class CanvasBlock extends Block{
                 int[] curColor = {palette[0]};
                 boolean[] modified = {false};
                 boolean[] fill = {false};
-                
+
                 dialog.hidden(() -> {
                     texture.dispose();
                     pix.dispose();
                 });
-                
+
                 dialog.resized(dialog::hide);
 
                 dialog.cont.table(Tex.pane, body -> {
