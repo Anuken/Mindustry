@@ -56,6 +56,13 @@ public enum LogicOp{
     acos("acos", d -> Math.acos(d) * Mathf.doubleRadDeg),
     atan("atan", d -> Math.atan(d) * Mathf.doubleRadDeg),
 
+    sinh("sinh", Math::sinh),
+    cosh("cosh", Math::cosh),
+    tanh("tanh", Math::tanh),
+
+    asinh("asinh", d -> Math.log(d + Math.sqrt(d*d + 1d))),
+    acosh("acosh", d -> Math.log(d + Math.sqrt(d*d - 1d))),
+    atanh("atanh", d -> 0.5d * Math.log((1d + d) / (1d - d)))
     ;
 
     public static final LogicOp[] all = values();
