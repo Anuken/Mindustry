@@ -491,7 +491,6 @@ public class EventType{
 
     public static class ResearchEvent{
         public final UnlockableContent content;
-
         public ResearchEvent(UnlockableContent content){
             this.content = content;
         }

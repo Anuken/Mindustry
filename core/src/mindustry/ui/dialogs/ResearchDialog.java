@@ -26,9 +26,7 @@ import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.layout.*;
-import mindustry.ui.layout.BranchTreeLayout.TreeLocation;
 import mindustry.ui.layout.TreeLayout.*;
-import mindustry.net.Packets.*;
 
 import java.util.*;
 
@@ -60,6 +58,7 @@ public class ResearchDialog extends BaseDialog{
         });
 
         Events.on(UnlockEvent.class, e -> {
+            if(net.server()) Core.app.post(Call::requestPlanetItems);
             if(net.client() && !needsRebuild){
                 needsRebuild = true;
                 Core.app.post(() -> {
@@ -78,13 +77,12 @@ public class ResearchDialog extends BaseDialog{
         });
         // TODO really? 
         Events.on(PartialResearchEvent.class, e -> {
-            if(net.client() && !needsRebuild){
-                needsRebuild = true; 
-                // order matters and I don't know xddd
+            if(net.server()) Core.app.post(Call::requestPlanetItems);
+            if(net.client()){
                 Core.app.post(() -> {
                     Core.scene.act();
-                    ui.research.view.rebuild();
-                    itemDisplay.rebuild(items);
+                    view.rebuild();
+//                    itemDisplay.rebuild(items);
                     checkMargin();
                 });
             }

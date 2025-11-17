@@ -434,6 +434,33 @@ public class Logic implements ApplicationListener{
         ui.research.rebuildItems();
         ui.research.view.spend(u.techNode);
     }
+    @Remote(targets=Loc.client)
+    public static void requestPlanetItems(@Nullable Player player) {
+//      if player isn't admin
+        if (player == null) return;
+//      TODO SUBMISSION FAILURE shouldn't this be somewhere else? Also this should be REUSING the array this is horrible practice.
+        int[] quantity = new int[Vars.content.items().size];
+        ui.research.rebuildItems();
+        int[] index = {0};
+        Vars.content.items().each(item -> {
+            quantity[index[0]++] = ui.research.items.get(item);
+        });
+        Call.sendPlanetItems(player, quantity);
+    }
+    // TODO shouldn't I only send this to one client?
+    @Remote(targets=Loc.server)
+    public static void sendPlanetItems(Player player, int[] items){
+        if (player == null) return;
+
+        // TODO SUBMISSION FAILURE
+        int[] i = {0};
+        Vars.content.items().each(item -> {
+            ui.research.items.set(item, items[i[0]++]);
+        });
+        ui.research.itemDisplay.rebuild(ui.research.items);
+        Log.info("success");
+    }
+
     @Override
     public void dispose(){
         //save the settings before quitting
