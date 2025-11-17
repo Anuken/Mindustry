@@ -82,13 +82,21 @@ public class ResearchDialog extends BaseDialog{
         });
         // TODO really? 
         Events.on(PartialResearchEvent.class, e -> {
+            if(e.content.techNode == null) return;
             if(net.client()){
                 Core.app.post(() -> {
+                    // TODO submission failure
+                    boolean[] shine = new boolean[Vars.content.items().size];
+                    int i = 0;
+                    for(ItemStack stack : e.content.techNode.finishedRequirements){
+                        shine[i++] = e.items[stack.item.id] > stack.amount;
+                        stack.amount = e.items[stack.item.id];
+                    }
                     Call.requestPlanetItems();
                     // TODO add shine
-                    view.rebuild();
+                    view.rebuild(shine);
                     Core.scene.act();
-                    checkMargin();
+//                    checkMargin();
                 });
             }
         });
@@ -513,7 +521,7 @@ public class ResearchDialog extends BaseDialog{
                     button.setDisabled(false && !mobile);
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
-                    button.getStyle().up = !locked(node.node) ? buttonOver : !selectable(node.node) || (!canSpend(node.node) && !false) ? Tex.buttonRed : Tex.button;
+                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !selectable(node.node) || (!canSpend(node.node) && !false) ? Tex.buttonRed : Tex.button;
 
                     ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.uiIcon : Icon.lock.getRegion());
                     button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? Color.gray : Pal.gray);
@@ -840,7 +848,12 @@ public class ResearchDialog extends BaseDialog{
     public static void partiallyResearched(Content content){
         if(!(content instanceof UnlockableContent u) || u.techNode == null) return;
         if(net.client()) {
-            Events.fire(new PartialResearchEvent(u));
+            int[] values = new int[Vars.content.items().size];
+            int index = 0;
+            for (ItemStack item : u.techNode.finishedRequirements) {
+                values[item.item.id] += item.amount;
+            }
+            Events.fire(new PartialResearchEvent(u, values));
         }
     }
     @Remote(targets = Loc.client)
