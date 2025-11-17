@@ -484,10 +484,12 @@ public class EventType{
     
     public static class PartialResearchEvent{
         public final UnlockableContent content;
-        public final int[] items;
-        public PartialResearchEvent(UnlockableContent content, int[] items){
+        public final int[] ids;
+        public final int[] quantity;
+        public PartialResearchEvent(UnlockableContent content, int[] ids, int[] quantity){
             this.content = content;
-            this.items = items;
+            this.ids = ids;
+            this.quantity = quantity;
         }
     }
 

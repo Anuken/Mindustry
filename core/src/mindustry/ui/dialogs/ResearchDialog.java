@@ -38,6 +38,7 @@ import static mindustry.gen.Tex.*;
 
 public class ResearchDialog extends BaseDialog{
     public static boolean debugShowRequirements = false;
+    public static boolean researchRequiresAdmin = false;
 
     public final float nodeSize = Scl.scl(60f);
     public ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
@@ -53,8 +54,8 @@ public class ResearchDialog extends BaseDialog{
     private boolean showTechSelect;
     private boolean needsRebuild;
 
-    public static boolean researchRequiresAdmin = false;
 
+    private boolean[] usedShine;
     public ResearchDialog(){
         super("");
 
@@ -85,30 +86,28 @@ public class ResearchDialog extends BaseDialog{
             if(e.content.techNode == null) return;
             if(net.client()){
                 Core.app.post(() -> {
-                    // horrible
-//                    ItemStack[] before = state.rules.partiallyResearched.get(e.content);
-                    ItemStack[] now = new ItemStack[Vars.content.items().size];
-//                    if(before == null) before = now; // shouldn't I arrays.fill(shine, true) then?
+                    int len = e.ids.length;
+                    ItemStack[] previous = state.rules.partiallyResearched.get(e.content);
+                    ItemStack[] now = (previous == null) ? new ItemStack[len] : previous;
 
-                    // TODO submission failure
-//                    boolean[] shine = new boolean[Vars.content.items().size];
-                    int index = 0;
-                    for (int i : e.items) {
-                        now[index] = new ItemStack(Vars.content.items().get(index), 0);
-//                        shine[index] = (before[index] == null ? 0 : before[index].amount) < now[index].amount;
-                        now[index++].amount = i;
+                    boolean[] shine = new boolean[len]; // no idea how to reuse this
+                    usedShine = (usedShine == null) ? new boolean[content.items().size] : usedShine;
+                    for(int i=0; i<len; i++){
+                        //research progress is 0%. any items spent at all shine
+                        if(previous == null) {
+                            usedShine[e.ids[i]] = shine[i] = e.quantity[i] > 0;
+                            now[i] = new ItemStack(Vars.content.item(e.ids[i]), 0);
+                        }else{ // research is not 0%. check if more was spent
+                            usedShine[e.ids[i]] = shine[i] = e.quantity[i] > previous[i].amount;
+                        } // update finishedRequirements
+                        now[i].amount = e.quantity[i];
                     }
-                    state.rules.partiallyResearched.put(e.content, now);
-//                    for(ItemStack stack : e.content.techNode.finishedRequirements){
-//                        shine[stack.item.id] = e.items[stack.item.id] > stack.amount;
-//                        target.finishedRequirements[stack.item.id].amount = e.items[stack.item.id];
-//                    }
-
                     Call.requestPlanetItems();
-                    // TODO add shine
-                    view.rebuild();
+                    state.rules.partiallyResearched.put(e.content, now);
+                    view.rebuild(shine);
+                    itemDisplay.rebuild(items, usedShine);
                     Core.scene.act();
-//                    checkMargin();
+                    checkMargin();
                 });
             }
         });
@@ -607,7 +606,7 @@ public class ResearchDialog extends BaseDialog{
             for(int i = 0; i < node.requirements.length; i++){
                 ItemStack req = node.requirements[i];
                 if (req == null) {
-                    continue; 
+                    continue;
                 }
                 ItemStack completed = node.finishedRequirements[i];
                 
@@ -633,13 +632,15 @@ public class ResearchDialog extends BaseDialog{
             } 
             else if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
                 state.rules.partiallyResearched.put(node.content, node.finishedRequirements);
-//                Call.setRules(state.rules);
-                // TODO Submission Failure
-                int[] values = new int[Vars.content.items().size];
+                int len = node.finishedRequirements.length;;
+                int[] ids = new int[len];
+                int[] quantity = new int[len];
+                int index = 0;
                 for (ItemStack item : node.finishedRequirements) {
-                    values[item.item.id] += item.amount;
+                    ids[index] = item.item.id;
+                    quantity[index++] = item.amount;
                 }
-                Call.partiallyResearched(node.content, values);
+                Call.partiallyResearched(node.content, ids, quantity);
             }
 
             node.save();
@@ -719,8 +720,9 @@ public class ResearchDialog extends BaseDialog{
                     desc.row();
                     if(locked(node) || (debugShowRequirements)){
 
-                        if(false){
+                        if(net.client() && researchRequiresAdmin){
                             desc.add("@locked").color(Pal.remove);
+                            ui.research.itemDisplay.visible = false;
                         }else{
                             desc.table(t -> {
                                 t.left();
@@ -863,10 +865,10 @@ public class ResearchDialog extends BaseDialog{
 
     // TODO shouldn't this have a target?
     @Remote
-    public static void partiallyResearched(Content content, int[] items){
+    public static void partiallyResearched(Content content, int[] ids, int[] quantity){
         if(!(content instanceof UnlockableContent u) || u.techNode == null) return;
         if(net.client()) { // TODO isn't this always true?
-            Events.fire(new PartialResearchEvent(u, items));
+            Events.fire(new PartialResearchEvent(u, ids, quantity));
         }
     }
     @Remote(targets = Loc.client)
