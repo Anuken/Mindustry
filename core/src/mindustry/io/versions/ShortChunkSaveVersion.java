@@ -101,6 +101,7 @@ public class ShortChunkSaveVersion extends SaveVersion{
                 //set block only if this is the center; otherwise, it's handled elsewhere
                 if(isCenter){
                     tile.setBlock(block);
+                    if(tile.build != null) tile.build.enabled = true;
                 }
 
                 //must be assigned after setBlock, because that can reset data
