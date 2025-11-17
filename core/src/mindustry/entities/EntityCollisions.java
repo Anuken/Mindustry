@@ -11,8 +11,8 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class EntityCollisions{
-    //move in 1-unit chunks (can this be made more efficient?)
-    private static final float seg = 1f, maxDelta = 1000f;
+    //move in adaptive chunks based on distance - optimized from fixed 1-unit segments
+    private static final float minSeg = 1f, maxSeg = 4f, maxDelta = 1000f;
 
     //tile collisions
     private Vec2 vector = new Vec2(), l1 = new Vec2();
@@ -44,27 +44,32 @@ public class EntityCollisions{
         entity.hitboxTile(r1);
         int r = Math.max(Math.round(r1.width / tilesize), 1);
 
+        float segX = Math.min(maxSeg, Math.max(minSeg, Math.abs(deltax) / 4f));
+
         while(Math.abs(deltax) > 0 || !movedx){
             movedx = true;
-            moveDelta(entity, Math.min(Math.abs(deltax), seg) * Mathf.sign(deltax), 0, r, true, solidCheck);
+            float step = Math.min(Math.abs(deltax), segX) * Mathf.sign(deltax);
+            moveDelta(entity, step, 0, r, true, solidCheck);
 
-            if(Math.abs(deltax) >= seg){
-                deltax -= seg * Mathf.sign(deltax);
-            }else{
-                deltax = 0f;
+            deltax -= step;
+
+            if(Math.abs(deltax) < segX){
+                segX = Math.max(minSeg, Math.abs(deltax));
             }
         }
 
         boolean movedy = false;
+        float segY = Math.min(maxSeg, Math.max(minSeg, Math.abs(deltay) / 4f));
 
         while(Math.abs(deltay) > 0 || !movedy){
             movedy = true;
-            moveDelta(entity, 0, Math.min(Math.abs(deltay), seg) * Mathf.sign(deltay), r, false, solidCheck);
+            float step = Math.min(Math.abs(deltay), segY) * Mathf.sign(deltay);
+            moveDelta(entity, 0, step, r, false, solidCheck);
 
-            if(Math.abs(deltay) >= seg){
-                deltay -= seg * Mathf.sign(deltay);
-            }else{
-                deltay = 0f;
+            deltay -= step;
+            
+            if(Math.abs(deltay) < segY){
+                segY = Math.max(minSeg, Math.abs(deltay));
             }
         }
     }
@@ -162,7 +167,7 @@ public class EntityCollisions{
         if(a != b && a.collides(b) && b.collides(a)){
             l1.set(a.getX(), a.getY());
             boolean collide = r1.overlaps(r2) || collide(r1.x, r1.y, r1.width, r1.height, vax, vay,
-            r2.x, r2.y, r2.width, r2.height, vbx, vby, l1);
+                    r2.x, r2.y, r2.width, r2.height, vbx, vby, l1);
             if(collide){
                 a.collision(b, l1.x, l1.y);
                 b.collision(a, l1.x, l1.y);
@@ -171,7 +176,7 @@ public class EntityCollisions{
     }
 
     public static boolean collide(float x1, float y1, float w1, float h1, float vx1, float vy1,
-                            float x2, float y2, float w2, float h2, float vx2, float vy2, Vec2 out){
+                                  float x2, float y2, float w2, float h2, float vx2, float vy2, Vec2 out){
         float px = vx1, py = vy1;
 
         vx1 -= vx2;
