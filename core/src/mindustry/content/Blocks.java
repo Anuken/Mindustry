@@ -3895,7 +3895,6 @@ public class Blocks{
             coolant = consumeCoolant(0.3f);
 
             float brange = range + 10f;
-            final ShootPattern pattern = ((ShootPattern)shoot);
 
             ammo(
                 Items.titanium, new ShrapnelBulletType(){{
