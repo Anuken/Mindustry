@@ -3901,12 +3901,13 @@ public class Blocks{
                     length = brange + 64f;
                     rangeChange = 64f;
                     width = 5f;
-                    damage = 66f;
+                    damage = 60f;
                     ammoMultiplier = 2f;
                     width = 17f;
                     reloadMultiplier = 1.3f;
                     serrations = 9;
                     serrationSpacing = 20f;
+                    shootPattern = new ShootSpread(3, 10f);
                 }},
                 Items.thorium, new ShrapnelBulletType(){{
                     length = brange;
