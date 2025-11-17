@@ -156,11 +156,11 @@ public class Logic implements ApplicationListener{
             }
         });
         //sync partial research
-        Events.on(PartialResearchEvent.class, e -> {
-            if(net.server()){
-                Call.partiallyResearched(e.content);
-            }
-        });
+//        Events.on(PartialResearchEvent.class, e -> {
+//            if(net.server()){
+//                Call.partiallyResearched(e.content);
+//            }
+//        });
         Events.on(SectorCaptureEvent.class, e -> {
             if(!net.client() && e.sector == state.getSector() && e.sector.isBeingPlayed()){
                 state.rules.waveTeam.data().destroyToDerelict();

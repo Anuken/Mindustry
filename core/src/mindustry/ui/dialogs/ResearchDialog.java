@@ -85,16 +85,28 @@ public class ResearchDialog extends BaseDialog{
             if(e.content.techNode == null) return;
             if(net.client()){
                 Core.app.post(() -> {
+                    // horrible
+//                    ItemStack[] before = state.rules.partiallyResearched.get(e.content);
+                    ItemStack[] now = new ItemStack[Vars.content.items().size];
+//                    if(before == null) before = now; // shouldn't I arrays.fill(shine, true) then?
+
                     // TODO submission failure
-                    boolean[] shine = new boolean[Vars.content.items().size];
-                    int i = 0;
-                    for(ItemStack stack : e.content.techNode.finishedRequirements){
-                        shine[i++] = e.items[stack.item.id] > stack.amount;
-                        stack.amount = e.items[stack.item.id];
+//                    boolean[] shine = new boolean[Vars.content.items().size];
+                    int index = 0;
+                    for (int i : e.items) {
+                        now[index] = new ItemStack(Vars.content.items().get(index), 0);
+//                        shine[index] = (before[index] == null ? 0 : before[index].amount) < now[index].amount;
+                        now[index++].amount = i;
                     }
+                    state.rules.partiallyResearched.put(e.content, now);
+//                    for(ItemStack stack : e.content.techNode.finishedRequirements){
+//                        shine[stack.item.id] = e.items[stack.item.id] > stack.amount;
+//                        target.finishedRequirements[stack.item.id].amount = e.items[stack.item.id];
+//                    }
+
                     Call.requestPlanetItems();
                     // TODO add shine
-                    view.rebuild(shine);
+                    view.rebuild();
                     Core.scene.act();
 //                    checkMargin();
                 });
@@ -581,6 +593,7 @@ public class ResearchDialog extends BaseDialog{
 
         public void spend(TechNode node){
             if(net.client()){
+                if(player == null || (!player.admin() && researchRequiresAdmin)) return;
                 // Must tell host to spend(). Specifically if canSpend(node) then spend(node)
                 Call.clientResearch(node.content);
                 return;
@@ -621,7 +634,12 @@ public class ResearchDialog extends BaseDialog{
             else if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
                 state.rules.partiallyResearched.put(node.content, node.finishedRequirements);
 //                Call.setRules(state.rules);
-                Call.partiallyResearched(node.content);
+                // TODO Submission Failure
+                int[] values = new int[Vars.content.items().size];
+                for (ItemStack item : node.finishedRequirements) {
+                    values[item.item.id] += item.amount;
+                }
+                Call.partiallyResearched(node.content, values);
             }
 
             node.save();
@@ -845,15 +863,10 @@ public class ResearchDialog extends BaseDialog{
 
     // TODO shouldn't this have a target?
     @Remote
-    public static void partiallyResearched(Content content){
+    public static void partiallyResearched(Content content, int[] items){
         if(!(content instanceof UnlockableContent u) || u.techNode == null) return;
-        if(net.client()) {
-            int[] values = new int[Vars.content.items().size];
-            int index = 0;
-            for (ItemStack item : u.techNode.finishedRequirements) {
-                values[item.item.id] += item.amount;
-            }
-            Events.fire(new PartialResearchEvent(u, values));
+        if(net.client()) { // TODO isn't this always true?
+            Events.fire(new PartialResearchEvent(u, items));
         }
     }
     @Remote(targets = Loc.client)
