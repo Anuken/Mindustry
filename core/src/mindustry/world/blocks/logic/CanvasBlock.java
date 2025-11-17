@@ -30,13 +30,15 @@ public class CanvasBlock extends Block{
     public int bitsPerPixel;
     public IntIntMap colorToIndex = new IntIntMap();
 
+    public int fallbackColor = 0x000000_ff; //to be used where there's a color index out of palette bounds
+
     public @Load("@-side1") TextureRegion side1;
     public @Load("@-side2") TextureRegion side2;
 
     public @Load("@-corner1") TextureRegion corner1;
     public @Load("@-corner2") TextureRegion corner2;
 
-    protected @Nullable Pixmap previewPixmap; // please use only for previews
+    protected @Nullable Pixmap previewPixmap; //please use only for previews
     protected @Nullable Texture previewTexture;
     protected int tempBlend = 0;
 
@@ -68,8 +70,6 @@ public class CanvasBlock extends Block{
         clipSize = Math.max(clipSize, size * 8 - padding);
 
         previewPixmap = new Pixmap(canvasSize, canvasSize);
-
-        if(!Mathf.isPowerOfTwo(palette.length)) throw new RuntimeException("Non power-of-two palettes for canvas blocks are not supported.");
     }
 
     @Override
@@ -134,7 +134,7 @@ public class CanvasBlock extends Block{
         for(int i = 0; i < pixels; i++){
             int bitOffset = i * bpp;
             int pal = getByte(data, bitOffset);
-            target.set(i % canvasSize, i / canvasSize, palette[pal]);
+            target.set(i % canvasSize, i / canvasSize, pal < palette.length ? palette[pal] : fallbackColor);
         }
         return target;
     }
