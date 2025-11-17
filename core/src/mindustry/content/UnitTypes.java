@@ -123,24 +123,23 @@ public class UnitTypes{
             health = 550;
             armor = 4f;
             ammoType = new ItemAmmoType(Items.coal);
-
             immunities.add(StatusEffects.burning);
 
             weapons.add(new Weapon("flamethrower"){{
                 top = false;
                 shootSound = Sounds.flame;
                 shootY = 2f;
-                reload = 11f;
+                reload = 22f;
                 recoil = 1f;
                 ejectEffect = Fx.none;
-                bullet = new BulletType(4.2f, 37f){{
+                bullet = new BulletType(4.2f, 37f*2f){{
                     ammoMultiplier = 3f;
                     hitSize = 7f;
                     lifetime = 13f;
                     pierce = true;
                     pierceBuilding = true;
                     pierceCap = 2;
-                    statusDuration = 60f * 4;
+                    statusDuration = 60f * 5;
                     shootEffect = Fx.shootSmallFlame;
                     hitEffect = Fx.hitFlameSmall;
                     despawnEffect = Fx.none;
@@ -1055,7 +1054,8 @@ public class UnitTypes{
                 ejectEffect = Fx.none;
                 inaccuracy = 15f;
                 ignoreRotation = true;
-                shootSound = Sounds.none;
+                shootSound = Sounds.bombDrop;
+                soundPitchMax = 1.2f;
                 bullet = new BombBulletType(27f, 25f){{
                     width = 10f;
                     height = 14f;
@@ -1987,7 +1987,8 @@ public class UnitTypes{
                 rotateSpeed = 5f;
                 inaccuracy = 10f;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.flame;
+                shootSound = Sounds.flamePlasma;
+                shootSoundVolume = 0.9f;
                 shootCone = 30f;
 
                 bullet = new BulletType(3.4f, 23f){{

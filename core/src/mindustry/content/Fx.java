@@ -2023,18 +2023,18 @@ public class Fx{
     shootSmallFlame = new Effect(32f, 80f, e -> {
         color(Pal.lightFlame, Pal.darkFlame, Color.gray, e.fin());
 
-        randLenVectors(e.id, 8, e.finpow() * 60f, e.rotation, 10f, (x, y) -> {
+        randLenVectors(e.id, 12, e.finpow() * 60f, e.rotation, 10f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.5f);
         });
-    }),
+    }).followParent(false),
 
     shootPyraFlame = new Effect(33f, 80f, e -> {
         color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
 
-        randLenVectors(e.id, 10, e.finpow() * 70f, e.rotation, 10f, (x, y) -> {
+        randLenVectors(e.id, 13, e.finpow() * 70f, e.rotation, 10f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f);
         });
-    }),
+    }).followParent(false),
 
     shootLiquid = new Effect(15f, 80f, e -> {
         color(e.color);

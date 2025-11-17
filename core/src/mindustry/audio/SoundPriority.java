@@ -47,6 +47,8 @@ public class SoundPriority{
         //very loud
         laser.setMaxConcurrent(5);
 
+        sameGroup(flame, flamePlasma);
+
         //sameGroup(hit1, hit2, hit3);
         //max(4, hit1, hit2, hit3);
 
