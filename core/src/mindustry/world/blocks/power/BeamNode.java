@@ -92,10 +92,10 @@ public class BeamNode extends PowerBlock{
             }
 
             Drawf.dashLine(Pal.placing,
-                x * tilesize + dx * (tilesize * size / 2f + 2),
-                y * tilesize + dy * (tilesize * size / 2f + 2),
-                x * tilesize + dx * (maxLen) * tilesize,
-                y * tilesize + dy * (maxLen) * tilesize
+                    x * tilesize + dx * (tilesize * size / 2f + 2),
+                    y * tilesize + dy * (tilesize * size / 2f + 2),
+                    x * tilesize + dx * (maxLen) * tilesize,
+                    y * tilesize + dy * (maxLen) * tilesize
             );
 
             if(dest != null){
@@ -216,8 +216,8 @@ public class BeamNode extends PowerBlock{
 
             for(int i = 0; i < 4; i ++){
                 if(dests[i] != null && links[i].wasVisible && (!(links[i].block instanceof BeamNode node) ||
-                    (links[i].tileX() != tileX() && links[i].tileY() != tileY()) ||
-                    (links[i].id > id && range >= node.range) || range > node.range)){
+                        (links[i].tileX() != tileX() && links[i].tileY() != tileY()) ||
+                        (links[i].id > id && range >= node.range) || range > node.range)){
 
                     int dst = Math.max(Math.abs(dests[i].x - tile.x),  Math.abs(dests[i].y - tile.y));
                     //don't draw lasers for adjacent blocks
@@ -267,8 +267,8 @@ public class BeamNode extends PowerBlock{
                 if(next != prev){
                     //unlinked, disconnect and reflow
                     if(prev != null && prev.isAdded()){
-                        prev.power.links.removeValue(pos());
-                        power.links.removeValue(prev.pos());
+                        prev.power.removeLink(pos());
+                        power.removeLink(prev.pos());
 
                         PowerGraph newgraph = new PowerGraph();
                         //reflow from this point, covering all tiles on this side
@@ -283,8 +283,8 @@ public class BeamNode extends PowerBlock{
 
                     //linked to a new one, connect graphs
                     if(next != null){
-                        power.links.addUnique(next.pos());
-                        next.power.links.addUnique(pos());
+                        power.addLinkUnique(next.pos());
+                        next.power.addLinkUnique(pos());
 
                         power.graph.addGraph(next.power.graph);
                     }

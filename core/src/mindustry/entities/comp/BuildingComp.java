@@ -264,12 +264,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public int moduleBitmask(){
         return
-        (items != null ? 1 : 0) |
-        (power != null ? 1 << 1 : 0) |
-        (liquids != null ? 1 << 2 : 0) |
-        1 << 3 | //old consume module
-        (timeScale != 1f ? 1 << 4 : 0) |
-        (lastDisabler != null && lastDisabler.isValid() ? 1 << 5 : 0);
+                (items != null ? 1 : 0) |
+                        (power != null ? 1 << 1 : 0) |
+                        (liquids != null ? 1 << 2 : 0) |
+                        1 << 3 | //old consume module
+                        (timeScale != 1f ? 1 << 4 : 0) |
+                        (lastDisabler != null && lastDisabler.isValid() ? 1 << 5 : 0);
     }
 
     public void writeAll(Writes write){
@@ -316,10 +316,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }else{
             int s = block.size / 2;
             return fogControl.isDiscovered(viewer, tile.x, tile.y) ||
-                fogControl.isDiscovered(viewer, tile.x - s, tile.y - s) ||
-                fogControl.isDiscovered(viewer, tile.x - s, tile.y + s) ||
-                fogControl.isDiscovered(viewer, tile.x + s, tile.y + s) ||
-                fogControl.isDiscovered(viewer, tile.x + s, tile.y - s);
+                    fogControl.isDiscovered(viewer, tile.x - s, tile.y - s) ||
+                    fogControl.isDiscovered(viewer, tile.x - s, tile.y + s) ||
+                    fogControl.isDiscovered(viewer, tile.x + s, tile.y + s) ||
+                    fogControl.isDiscovered(viewer, tile.x + s, tile.y - s);
         }
     }
 
@@ -617,8 +617,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** @return whether this block is allowed to update based on team/environment */
     public boolean allowUpdate(){
         return team != Team.derelict && block.supportsEnv(state.rules.env) &&
-            //check if outside map limit (privileged blocks are exempt)
-            (tile instanceof EditorTile || block.privileged || !state.rules.limitMapArea || !state.rules.disableOutsideArea || Rect.contains(state.rules.limitX, state.rules.limitY, state.rules.limitWidth, state.rules.limitHeight, tile.x, tile.y));
+                //check if outside map limit (privileged blocks are exempt)
+                (tile instanceof EditorTile || block.privileged || !state.rules.limitMapArea || !state.rules.disableOutsideArea || Rect.contains(state.rules.limitX, state.rules.limitY, state.rules.limitWidth, state.rules.limitHeight, tile.x, tile.y));
     }
 
     public BlockStatus status(){
@@ -1162,10 +1162,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(int i = 0; i < power.links.size; i++){
             Tile other = world.tile(power.links.get(i));
             if(other != null && other.build != null && other.build.power != null){
-                other.build.power.links.removeValue(pos());
+                other.build.power.removeLink(pos());
             }
         }
-        power.links.clear();
+        power.clearLinks();
     }
 
     public boolean conductsTo(Building other){
@@ -1178,9 +1178,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(Building other : proximity){
             if(other != null && other.power != null
-            && other.team == team
-            && !(block.consumesPower && other.block.consumesPower && !block.outputsPower && !other.block.outputsPower && !block.conductivePower && !other.block.conductivePower)
-            && conductsTo(other) && other.conductsTo(self()) && !power.links.contains(other.pos())){
+                    && other.team == team
+                    && !(block.consumesPower && other.block.consumesPower && !block.outputsPower && !other.block.outputsPower && !block.conductivePower && !other.block.conductivePower)
+                    && conductsTo(other) && other.conductsTo(self()) && !power.containsLink(other.pos())){
                 out.add(other);
             }
         }
@@ -1330,7 +1330,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if((block.consumesPower || block.outputsPower) && block.hasPower && block.connectedPower){
             PowerNode.getNodeLinks(tile, block, team, other -> {
-                if(!other.power.links.contains(pos())){
+                if(!other.power.containsLink(pos())){
                     other.configureAny(pos());
                 }
             });
@@ -1491,8 +1491,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public String getDisplayName(){
         //derelict team icon currently doesn't display
         return team == Team.derelict ?
-            block.localizedName + "\n" + Core.bundle.get("block.derelict") :
-            block.localizedName + (team == player.team() || team.emoji.isEmpty() ? "" : " " + team.emoji);
+                block.localizedName + "\n" + Core.bundle.get("block.derelict") :
+                block.localizedName + (team == player.team() || team.emoji.isEmpty() ? "" : " " + team.emoji);
     }
 
     public TextureRegion getDisplayIcon(){
@@ -1619,8 +1619,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
-     /** Called when this block is tapped to build a UI on the table.
-      * configurable must be true for this to be called.*/
+    /** Called when this block is tapped to build a UI on the table.
+     * configurable must be true for this to be called.*/
     public void buildConfiguration(Table table){
     }
 
@@ -1752,8 +1752,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 var other = world.build(power.links.items[i]);
 
                 if(other != null && other.team != team && other.power != null){
-                    power.links.removeIndex(i);
-                    other.power.links.removeValue(pos());
+                    power.removeLinkIndex(i);
+                    other.power.removeLink(pos());
 
                     new PowerGraph().reflow(other);
 
@@ -1787,7 +1787,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(power != null){
             //TODO can lead to ghost graphs?
             power.graph = new PowerGraph();
-            power.links.clear();
+            power.clearLinks();
             if(block.consPower != null && !block.consPower.buffered){
                 power.status = 0f;
             }
@@ -1911,6 +1911,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
             minEfficiency = Math.min(minEfficiency, result);
 
+            //early exit: if efficiency is already zero, no need to check remaining consumers
             if(minEfficiency <= 0.0000001f && !shouldConsumePower){
                 break;
             }
@@ -1920,6 +1921,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(var cons : block.optionalConsumers){
             optionalEfficiency = Math.min(optionalEfficiency, cons.efficiency(self()));
 
+            //early exit: if optional efficiency is already zero, stop checking
             if(optionalEfficiency <= 0.0000001f){
                 break;
             }
