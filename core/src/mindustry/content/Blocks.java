@@ -290,6 +290,7 @@ public class Blocks{
             liquidDrop = Liquids.oil;
             isLiquid = true;
             cacheLayer = CacheLayer.tar;
+            obstructsLight = true;
         }};
 
         cryofluid = new Floor("pooled-cryofluid"){{
@@ -308,6 +309,8 @@ public class Blocks{
             emitLight = true;
             lightRadius = 25f;
             lightColor = Color.cyan.cpy().a(0.19f);
+            obstructsLight = true;
+            forceDrawLight = true;
         }};
 
         slag = new Floor("molten-slag"){{
@@ -324,6 +327,8 @@ public class Blocks{
             emitLight = true;
             lightRadius = 40f;
             lightColor = Color.orange.cpy().a(0.38f);
+            obstructsLight = true;
+            forceDrawLight = true;
         }};
 
         space = new Floor("space"){{
@@ -486,6 +491,7 @@ public class Blocks{
             drownTime = 200f;
             cacheLayer = CacheLayer.arkycite;
             albedo = 0.9f;
+            obstructsLight = true;
         }};
 
         arkyicStone = new Floor("arkyic-stone"){{
@@ -688,6 +694,7 @@ public class Blocks{
         sporeCluster = new Prop("spore-cluster"){{
             variants = 3;
             breakSound = Sounds.plantBreak;
+            obstructsLight = false;
         }};
 
         redweed = new Seaweed("redweed"){{
@@ -765,6 +772,7 @@ public class Blocks{
             variants = 3;
             customShadow = true;
             arkyicStone.asFloor().decoration = this;
+            obstructsLight = false;
         }};
 
         crystalCluster = new TallBlock("crystal-cluster"){{

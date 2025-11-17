@@ -403,7 +403,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             infoDialog.show();
             Core.app.post(() -> ui.showErrorMessage("@editor.save.noname"));
         }else{
-            Map map = maps.all().find(m -> m.name().equals(name));
+            Map map = maps.all().find(m -> m.name().equalsIgnoreCase(name));
             if(map != null && !map.custom && !map.workshop){
                 handleSaveBuiltin(map);
             }else{
