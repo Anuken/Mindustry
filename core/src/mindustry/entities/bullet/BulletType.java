@@ -15,7 +15,7 @@ import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.part.*;
-import mindustry.entities.pattern.ShootPattern;
+import mindustry.entities.pattern.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
