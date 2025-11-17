@@ -111,7 +111,7 @@ public class AIController implements UnitController{
     public void faceTarget(){
         if(unit.type.omniMovement || unit instanceof Mechc){
             if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.faceTarget && unit.type.hasWeapons()){
-                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
+                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet));
             }else if(unit.moving()){
                 unit.lookAt(unit.vel().angle());
             }
@@ -218,7 +218,7 @@ public class AIController implements UnitController{
                     shoot = bomberTarget != null;
                 }
 
-                Vec2 to = Predict.intercept(unit, mount.target, weapon.bullet.speed);
+                Vec2 to = Predict.intercept(unit, mount.target, weapon.bullet);
                 mount.aimX = to.x;
                 mount.aimY = to.y;
             }

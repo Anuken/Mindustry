@@ -622,6 +622,7 @@ public class Mods implements Loadable{
     }
 
     /** Check all warnings related to content and show relevant dialogs. Client only. */
+    //TODO move to another class, Mods.java should not handle UI
     private void checkWarnings(){
         //show 'scripts have errored' info
         if(scripts != null && scripts.hasErrored()){
@@ -679,6 +680,7 @@ public class Mods implements Loadable{
     }
 
     /** Assume mods in toCheck are missing dependencies. */
+    //TODO move to another class, Mods.java should not handle UI
     private void checkDependencies(Seq<LoadedMod> toCheck, boolean soft){
         new Dialog(""){{
             setFillParent(true);
@@ -741,6 +743,7 @@ public class Mods implements Loadable{
         });
     }
 
+    //TODO move to another class, Mods.java should not handle UI
     private void displayDependencyImportStatus(Seq<String> failed, Seq<String> success){
         new Dialog(""){{
             setFillParent(true);

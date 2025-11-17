@@ -6,6 +6,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.world.blocks.*;
 
@@ -42,6 +43,8 @@ public class GameState{
     public Attributes envAttrs = new Attributes();
     /** Team data. Gets reset every new game. */
     public Teams teams = new Teams();
+    /** Handles JSON edits of game content. */
+    public ContentPatcher patcher = new ContentPatcher();
     /** Number of enemies in the game; only used clientside in servers. */
     public int enemies;
     /** Map being playtested (not edited!) */

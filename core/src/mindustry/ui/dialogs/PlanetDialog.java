@@ -269,7 +269,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         //announce new presets
         for(SectorPreset preset : content.sectors()){
-            if(preset.unlocked() && !preset.alwaysUnlocked && !preset.sector.info.shown && preset.requireUnlock && !preset.sector.hasBase() && preset.planet == state.planet){
+            if(preset.unlocked() && preset.sector.preset == preset && !preset.alwaysUnlocked && !preset.sector.info.shown && preset.requireUnlock && !preset.sector.hasBase() && preset.planet == state.planet){
                 newPresets.add(preset.sector);
                 preset.sector.info.shown = true;
                 preset.sector.saveInfo();
@@ -662,7 +662,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             PlanetData data = new PlanetData();
                             IntSeq attack = new IntSeq();
                             for(var sector : state.planet.sectors){
-                                if(sector.preset == null && sector.generateEnemyBase){
+                                if((sector.preset == null || !sector.preset.requireUnlock) && sector.generateEnemyBase){
                                     attack.add(sector.id);
                                 }
 
@@ -1036,6 +1036,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             c.add(Core.bundle.get("sectors.time") + " [accent]" + sector.save.getPlayTime()).left().row();
 
+            if(sector.info.attempts > 0){
+                c.add(Core.bundle.get("sectors.attempts") + " [accent]" + sector.info.attempts).left().row();
+            }
+
             if(sector.info.waves && sector.hasBase()){
                 c.add(Core.bundle.get("sectors.wave") + " [accent]" + (sector.info.wave + sector.info.wavesPassed)).left().row();
             }
@@ -1122,10 +1126,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     }
                 });
             }else{
-                if(sector.save != null){
-                    sector.save.delete();
-                }
-                sector.save = null;
+                sector.info.items.clear();
+                sector.info.damage = 1f;
+                sector.info.hasCore = false;
+                sector.info.production.clear();
+                sector.saveInfo();
             }
             updateSelected();
             rebuildList();
