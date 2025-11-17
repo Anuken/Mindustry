@@ -629,7 +629,7 @@ public class BlockRenderer{
 
         @Override
         protected QuadTree<Tile> newChild(Rect rect){
-            return new FloorQuadtree(rect);
+            return new OverlayQuadtree(rect);
         }
     }
 
