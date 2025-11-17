@@ -86,6 +86,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** if true, {@link #buildEditorConfig(Table)} will be called for configuring this block in the editor. */
     public boolean editorConfigurable;
     /** the last configuration value applied to this block. */
+    @NoPatch
     public @Nullable Object lastConfig;
     /** whether to save the last config and apply it to newly placed blocks */
     public boolean saveConfig = false;
@@ -320,6 +321,8 @@ public class Block extends UnlockableContent implements Senseable{
     public Color lightColor = Color.white.cpy();
     /** If true, drawLight() will be called for this block. */
     public boolean emitLight = false;
+    /** If true, this block obstructs light emitted by other blocks. */
+    public boolean obstructsLight = true;
     /** Radius of the light emitted by this block. */
     public float lightRadius = 60f;
 
@@ -715,6 +718,8 @@ public class Block extends UnlockableContent implements Senseable{
         super.afterPatch();
         barMap.clear();
         setBars();
+        offset = ((size + 1) % 2) * tilesize / 2f;
+        sizeOffset = -((size - 1) / 2);
     }
 
     public boolean consumesItem(Item item){

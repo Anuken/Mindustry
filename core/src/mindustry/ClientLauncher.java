@@ -10,6 +10,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.ai.*;
+import mindustry.audio.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -233,13 +234,14 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             if(assets.update(1000 / loadingFPS)){
                 loader.dispose();
                 loader = null;
-                Log.info("Total time to load: @ms", Time.timeSinceMillis(beginTime));
+                SoundPriority.init();
                 for(ApplicationListener listener : modules){
                     listener.init();
                 }
                 mods.eachClass(Mod::init);
                 finished = true;
                 Events.fire(new ClientLoadEvent());
+                Log.info("Total time to load: @ms", Time.timeSinceMillis(beginTime));
                 clientLoaded = true;
                 super.resize(graphics.getWidth(), graphics.getHeight());
                 app.post(() -> app.post(() -> app.post(() -> app.post(() -> {

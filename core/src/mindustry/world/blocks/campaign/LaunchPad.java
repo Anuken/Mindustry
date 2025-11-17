@@ -34,6 +34,7 @@ public class LaunchPad extends Block{
 
     public @Load("@-light") TextureRegion lightRegion;
     public @Load(value = "@-pod", fallback = "launchpod") TextureRegion podRegion;
+    public @Load(value = "@-preview", fallback = "@") TextureRegion previewRegion;
     public Color lightColor = Color.valueOf("eab678");
     public boolean acceptMultipleItems = false;
 
@@ -71,6 +72,11 @@ public class LaunchPad extends Block{
     @Override
     public boolean outputsItems(){
         return false;
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{previewRegion};
     }
 
     public class LaunchPadBuild extends Building{
