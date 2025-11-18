@@ -804,7 +804,7 @@ public class ResearchDialog extends BaseDialog{
                     }
                 }).pad(9);
 
-                if(mobile && locked(node)){
+                if(mobile && locked(node) && (!net.client() || !researchRequiresAdmin)){
                     b.row();
                     b.button("@research", Icon.ok, new TextButtonStyle(){{
                         disabled = Tex.button;
