@@ -68,8 +68,6 @@ public class CanvasBlock extends Block{
         clipSize = Math.max(clipSize, size * 8 - padding);
 
         previewPixmap = new Pixmap(canvasSize, canvasSize);
-
-        if(!Mathf.isPowerOfTwo(palette.length)) throw new RuntimeException("Non power-of-two palettes for canvas blocks are not supported.");
     }
 
     @Override
@@ -122,7 +120,6 @@ public class CanvasBlock extends Block{
                     }
                 }
             }
-
         }else{
             super.drawPlanRegion(plan, list);
         }
@@ -134,7 +131,7 @@ public class CanvasBlock extends Block{
         for(int i = 0; i < pixels; i++){
             int bitOffset = i * bpp;
             int pal = getByte(data, bitOffset);
-            target.set(i % canvasSize, i / canvasSize, palette[pal]);
+            target.set(i % canvasSize, i / canvasSize, palette[Math.min(pal, palette.length)]);
         }
         return target;
     }
