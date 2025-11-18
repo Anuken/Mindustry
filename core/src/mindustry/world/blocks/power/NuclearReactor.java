@@ -98,7 +98,6 @@ public class NuclearReactor extends PowerGenerator{
 
             if(fuel > 0 && enabled){
                 heat += fullness * heating * Math.min(delta(), 4f);
-                heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput, heatWarmupRate * delta()) : 0f;
 
                 if(timer(timerFuel, itemDuration / timeScale)){
                     consume();
@@ -122,6 +121,8 @@ public class NuclearReactor extends PowerGenerator{
             }
 
             heat = Mathf.clamp(heat);
+            heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput * (enabled ? 1f : 0f), heatWarmupRate * delta()) : 0f;
+
 
             if(heat >= 0.999f){
                 Events.fire(Trigger.thoriumReactorOverheat);

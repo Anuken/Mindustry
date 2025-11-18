@@ -4853,18 +4853,13 @@ public class Blocks{
                 smokeEffect = Fx.shootSmokeDisperse;
                 frontColor = Color.valueOf("dae1ee");
                 backColor = trailColor = hitColor = Pal.siliconAmmoBack;
-                ammoMultiplier = 2f;
+                ammoMultiplier = 4f;
 
                 lifetime = 34f;
                 rotationOffset = 90f;
-                trailEffect = Fx.artilleryTrail;
                 trailLength = 7;
-                trailWidth = 3f;
-                trailChance = 0.2f;
-                trailParam = 4f;
-                rangeChange = 80f;
                 //for chasing targets
-                extraRangeMargin = 28f;
+                extraRangeMargin = 32f;
 
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
