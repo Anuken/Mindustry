@@ -2763,7 +2763,6 @@ public class UnitTypes{
                     splashDamage = 50f;
                     maxRange = 180f;
 
-
                     fragRandomSpread = 0f;
                     fragSpread = 10f;
                     fragBullets = 5;
