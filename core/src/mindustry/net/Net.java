@@ -6,8 +6,6 @@ import arc.net.*;
 import arc.net.Server.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.Log.*; 
-import mindustry.content.TechTree;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.net.Packets.*;

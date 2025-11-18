@@ -81,7 +81,6 @@ public class ResearchDialog extends BaseDialog{
                 state.rules.partiallyResearched.remove(e.content); 
             }
         });
-        // TODO really? 
         Events.on(PartialResearchEvent.class, e -> {
             if(e.content.techNode == null) return;
             if(net.client()){
@@ -149,7 +148,7 @@ public class ResearchDialog extends BaseDialog{
 
         margin(0f).marginBottom(8);
         cont.stack(titleTable, view = new View(), itemDisplay = new ItemsDisplay()).grow();
-        itemDisplay.visible(() -> true);
+        itemDisplay.visible(() -> !(net.client() && researchRequiresAdmin));
 
         titleTable.toFront();
 
@@ -722,7 +721,6 @@ public class ResearchDialog extends BaseDialog{
 
                         if(net.client() && researchRequiresAdmin){
                             desc.add("@locked").color(Pal.remove);
-                            ui.research.itemDisplay.visible = false;
                         }else{
                             desc.table(t -> {
                                 t.left();
@@ -874,7 +872,7 @@ public class ResearchDialog extends BaseDialog{
     @Remote(targets = Loc.client)
     public static void clientResearch(@Nullable Player player, Content content){
         if(player == null || (!player.admin() && researchRequiresAdmin)) return;
-        if(!(content instanceof UnlockableContent u)) return;
+        if(!(content instanceof UnlockableContent u) || !ui.research.view.canSpend(u.techNode)) return;
         ui.research.rebuildItems();
         ui.research.view.spend(u.techNode);
     }

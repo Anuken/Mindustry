@@ -35,13 +35,11 @@ public class NetworkIO{
                             if (u.unlocked()) {
                                 state.rules.researched.add(u);
                             } else if (Structs.contains(u.techNode.finishedRequirements, s -> s.amount > 0)) {
-                                // TODO: also put() upon spend()
                                 state.rules.partiallyResearched.put(u, u.techNode.finishedRequirements); 
                             }
                         }
                     }
                 }
-
             }
 
             stream.writeUTF(JsonIO.write(state.rules));

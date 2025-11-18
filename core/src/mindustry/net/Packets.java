@@ -4,11 +4,8 @@ import arc.*;
 import arc.struct.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
-import mindustry.content.TechTree;
 import mindustry.core.*;
 import mindustry.io.*;
-
-import static mindustry.Vars.ui;
 
 import java.util.zip.*;
 
@@ -113,7 +110,7 @@ public class Packets{
         }
     }
 
-    public static class ConnectPacket extends Packet {
+    public static class ConnectPacket extends Packet{
         public int version;
         public String versionType;
         public Seq<String> mods;
@@ -122,7 +119,7 @@ public class Packets{
         public int color;
 
         @Override
-        public void write(Writes buffer) {
+        public void write(Writes buffer){
             buffer.i(Version.build);
             TypeIO.writeString(buffer, versionType);
             TypeIO.writeString(buffer, name);
@@ -135,34 +132,34 @@ public class Packets{
             crc.update(Base64Coder.decode(uuid), 0, b.length);
             buffer.l(crc.getValue());
 
-            buffer.b(mobile ? (byte) 1 : 0);
+            buffer.b(mobile ? (byte)1 : 0);
             buffer.i(color);
-            buffer.b((byte) mods.size);
-            for (int i = 0; i < mods.size; i++) {
+            buffer.b((byte)mods.size);
+            for(int i = 0; i < mods.size; i++){
                 TypeIO.writeString(buffer, mods.get(i));
             }
         }
 
         @Override
-        public void read(Reads buffer) {
+        public void read(Reads buffer){
             version = buffer.i();
             versionType = TypeIO.readString(buffer);
             name = TypeIO.readString(buffer);
             locale = TypeIO.readString(buffer);
             usid = TypeIO.readString(buffer);
-            byte[] idbytes = buffer.b(16);
+            byte[] idbytes =  buffer.b(16);
             uuid = new String(Base64Coder.encode(idbytes));
             mobile = buffer.b() == 1;
             color = buffer.i();
             int totalMods = buffer.b();
             mods = new Seq<>(totalMods);
-            for (int i = 0; i < totalMods; i++) {
+            for(int i = 0; i < totalMods; i++){
                 mods.add(TypeIO.readString(buffer));
             }
         }
 
         @Override
-        public int getPriority() {
+        public int getPriority(){
             return priorityHigh;
         }
     }

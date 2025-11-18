@@ -191,6 +191,7 @@ public class TechTree{
 
         /** Flushes research progress to settings. */
         public void save(){
+
             //save finished requirements by item type
             for(ItemStack stack : finishedRequirements){
                 Core.settings.put("req-" + content.name + "-" + stack.item.name, stack.amount);

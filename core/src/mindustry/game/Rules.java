@@ -168,6 +168,8 @@ public class Rules{
     public ObjectSet<UnlockableContent> researched = new ObjectSet<>();
     /** Partially unlocked content names. Only used in multiplayer when the campaign is enabled. */
     public ObjectMap<UnlockableContent, ItemStack[]> partiallyResearched = new ObjectMap<>();
+    /** Whether or not clients are allowed to try to research techs. */
+    public boolean researchRequiresAdmin = false;
     /** In-map objective executor. */
     public MapObjectives objectives = new MapObjectives();
     /** Flags set by objectives. Used in world processors. */
