@@ -147,7 +147,7 @@ public class ResearchDialog extends BaseDialog{
 
         margin(0f).marginBottom(8);
         cont.stack(titleTable, view = new View(), itemDisplay = new ItemsDisplay()).grow();
-        itemDisplay.visible(() -> !(net.client() && state.rules.researchRequiresAdmin));
+        itemDisplay.visible(() -> ui.research.researchAllowed(player));
 
         titleTable.toFront();
 
@@ -590,7 +590,7 @@ public class ResearchDialog extends BaseDialog{
 
         public void spend(TechNode node){
             if(net.client()){
-                if(player == null || (!player.admin() && state.rules.researchRequiresAdmin)) return;
+                if(player == null || !ui.research.researchAllowed(player)) return;
                 // Must tell host to spend(). Specifically if canSpend(node) then spend(node)
                 Call.clientResearch(node.content);
                 return;
@@ -718,7 +718,7 @@ public class ResearchDialog extends BaseDialog{
                     desc.row();
                     if(locked(node) || (debugShowRequirements)){
 
-                        if(net.client() && state.rules.researchRequiresAdmin){
+                        if(!ui.research.researchAllowed(player)){
                             desc.add("@locked").color(Pal.remove);
                         }else{
                             desc.table(t -> {
@@ -803,7 +803,7 @@ public class ResearchDialog extends BaseDialog{
                     }
                 }).pad(9);
 
-                if(mobile && locked(node) && (!net.client() || !state.rules.researchRequiresAdmin)){
+                if(mobile && locked(node) && ui.research.researchAllowed(player)){
                     b.row();
                     b.button("@research", Icon.ok, new TextButtonStyle(){{
                         disabled = Tex.button;
@@ -859,7 +859,10 @@ public class ResearchDialog extends BaseDialog{
             super.drawChildren();
         }
     }
-
+    //Whether this player is allowed to research (for use in multiplayer campaign)
+    public boolean researchAllowed(@Nullable Player player){
+        return !Vars.net.active() || (player != null && (player.admin() || !state.rules.researchRequiresAdmin));
+    }
     // TODO shouldn't this have a target?
     @Remote
     public static void partiallyResearched(Content content, int[] ids, int[] quantity){
@@ -870,14 +873,14 @@ public class ResearchDialog extends BaseDialog{
     }
     @Remote(targets = Loc.client)
     public static void clientResearch(@Nullable Player player, Content content){
-        if(player == null || (!player.admin() && state.rules.researchRequiresAdmin)) return;
+        if(!ui.research.researchAllowed(player)) return;
         if(!(content instanceof UnlockableContent u) || !ui.research.view.canSpend(u.techNode)) return;
         ui.research.rebuildItems();
         ui.research.view.spend(u.techNode);
     }
     @Remote(targets = Loc.client)
     public static void requestPlanetItems(@Nullable Player player) {
-        if(player == null || (!player.admin() && state.rules.researchRequiresAdmin)) return;
+        if(!ui.research.researchAllowed(player)) return;
         int[] quantity = new int[Vars.content.items().size];
         ui.research.rebuildItems();
         int index = 0;
