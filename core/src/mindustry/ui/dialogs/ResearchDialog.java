@@ -38,7 +38,6 @@ import static mindustry.gen.Tex.*;
 
 public class ResearchDialog extends BaseDialog{
     public static boolean debugShowRequirements = false;
-    public static boolean researchRequiresAdmin = false;
 
     public final float nodeSize = Scl.scl(60f);
     public ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
@@ -78,7 +77,7 @@ public class ResearchDialog extends BaseDialog{
                 });
             }
             if(state.rules.partiallyResearched.containsKey(e.content)){
-                state.rules.partiallyResearched.remove(e.content); 
+                state.rules.partiallyResearched.remove(e.content);
             }
         });
         Events.on(PartialResearchEvent.class, e -> {
@@ -148,7 +147,7 @@ public class ResearchDialog extends BaseDialog{
 
         margin(0f).marginBottom(8);
         cont.stack(titleTable, view = new View(), itemDisplay = new ItemsDisplay()).grow();
-        itemDisplay.visible(() -> !(net.client() && researchRequiresAdmin));
+        itemDisplay.visible(() -> !(net.client() && state.rules.researchRequiresAdmin));
 
         titleTable.toFront();
 
@@ -161,8 +160,8 @@ public class ResearchDialog extends BaseDialog{
             Core.app.post(this::checkMargin);
 
             Planet currPlanet = ui.planet.isShown() ?
-                ui.planet.state.planet :
-                state.isCampaign() ? state.rules.sector.planet : null;
+                    ui.planet.state.planet :
+                    state.isCampaign() ? state.rules.sector.planet : null;
 
             if(currPlanet != null && currPlanet.techTree != null){
                 switchTree(currPlanet.techTree);
@@ -325,8 +324,8 @@ public class ResearchDialog extends BaseDialog{
 
     public @Nullable TechNode getPrefRoot(){
         Planet currPlanet = ui.planet.isShown() ?
-            ui.planet.state.planet :
-            state.isCampaign() ? state.rules.sector.planet : null;
+                ui.planet.state.planet :
+                state.isCampaign() ? state.rules.sector.planet : null;
         return currPlanet == null ? null : currPlanet.techTree;
     }
 
@@ -591,11 +590,11 @@ public class ResearchDialog extends BaseDialog{
 
         public void spend(TechNode node){
             if(net.client()){
-                if(player == null || (!player.admin() && researchRequiresAdmin)) return;
+                if(player == null || (!player.admin() && state.rules.researchRequiresAdmin)) return;
                 // Must tell host to spend(). Specifically if canSpend(node) then spend(node)
                 Call.clientResearch(node.content);
                 return;
-            } 
+            }
 
             boolean complete = true;
 
@@ -608,9 +607,9 @@ public class ResearchDialog extends BaseDialog{
                     continue;
                 }
                 ItemStack completed = node.finishedRequirements[i];
-                
+
                 //amount actually taken from inventory
-                int used = Math.max(Math.min(req.amount - completed.amount, items.get(req.item)), 0); 
+                int used = Math.max(Math.min(req.amount - completed.amount, items.get(req.item)), 0);
                 items.remove(req.item, used);
                 completed.amount += used;
 
@@ -628,7 +627,7 @@ public class ResearchDialog extends BaseDialog{
             if(complete){
                 unlock(node);
                 state.rules.researched.add(node.content);
-            } 
+            }
             else if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
                 state.rules.partiallyResearched.put(node.content, node.finishedRequirements);
                 int len = node.finishedRequirements.length;;
@@ -719,16 +718,16 @@ public class ResearchDialog extends BaseDialog{
                     desc.row();
                     if(locked(node) || (debugShowRequirements)){
 
-                        if(net.client() && researchRequiresAdmin){
+                        if(net.client() && state.rules.researchRequiresAdmin){
                             desc.add("@locked").color(Pal.remove);
                         }else{
                             desc.table(t -> {
                                 t.left();
                                 if(selectable){
 
-                                    // If the tech is in Rules.partiallyResearched, then use it instead of node.finishedRequirements. 
-                                    ItemStack[] itemstack = state.rules.partiallyResearched.containsKey(node.content) && net.client() 
-                                        ? state.rules.partiallyResearched.get(node.content) : node.finishedRequirements; 
+                                    // If the tech is in Rules.partiallyResearched, then use it instead of node.finishedRequirements.
+                                    ItemStack[] itemstack = state.rules.partiallyResearched.containsKey(node.content) && net.client()
+                                            ? state.rules.partiallyResearched.get(node.content) : node.finishedRequirements;
 
                                     //check if there is any progress, add research progress text
                                     if(Structs.contains(itemstack, s -> s.amount > 0)){
@@ -768,8 +767,8 @@ public class ResearchDialog extends BaseDialog{
                                             list.image(req.item.uiIcon).size(8 * 3).padRight(3);
                                             list.add(req.item.localizedName).color(Color.lightGray);
                                             Label label = list.label(() -> " " +
-                                            UI.formatAmount(Math.min(items.get(req.item), reqAmount)) + " / "
-                                            + UI.formatAmount(reqAmount)).get();
+                                                    UI.formatAmount(Math.min(items.get(req.item), reqAmount)) + " / "
+                                                    + UI.formatAmount(reqAmount)).get();
 
                                             Color targetColor = items.has(req.item) ? Color.lightGray : Color.scarlet;
 
@@ -804,7 +803,7 @@ public class ResearchDialog extends BaseDialog{
                     }
                 }).pad(9);
 
-                if(mobile && locked(node) && (!net.client() || !researchRequiresAdmin)){
+                if(mobile && locked(node) && (!net.client() || !state.rules.researchRequiresAdmin)){
                     b.row();
                     b.button("@research", Icon.ok, new TextButtonStyle(){{
                         disabled = Tex.button;
@@ -871,14 +870,14 @@ public class ResearchDialog extends BaseDialog{
     }
     @Remote(targets = Loc.client)
     public static void clientResearch(@Nullable Player player, Content content){
-        if(player == null || (!player.admin() && researchRequiresAdmin)) return;
+        if(player == null || (!player.admin() && state.rules.researchRequiresAdmin)) return;
         if(!(content instanceof UnlockableContent u) || !ui.research.view.canSpend(u.techNode)) return;
         ui.research.rebuildItems();
         ui.research.view.spend(u.techNode);
     }
     @Remote(targets = Loc.client)
     public static void requestPlanetItems(@Nullable Player player) {
-        if(player == null || (!player.admin() && researchRequiresAdmin)) return;
+        if(player == null || (!player.admin() && state.rules.researchRequiresAdmin)) return;
         int[] quantity = new int[Vars.content.items().size];
         ui.research.rebuildItems();
         int index = 0;
