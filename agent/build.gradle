@@ -1,0 +1,21 @@
+apply plugin: "java"
+
+dependencies {
+    implementation "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7"
+}
+
+jar {
+    manifest {
+        attributes(
+            'Premain-Class': 'mindustry.agent.MixinAgent',
+            'Can-Redefine-Classes': 'true',
+            'Can-Retransform-Classes': 'true'
+        )
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

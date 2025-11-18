@@ -9,7 +9,11 @@ def ICON_DIR = new File("$rootDir/core/assets/icons/icon.icns")
 def platforms = ["Linux64", "Windows64", "Windows32", "MacOS"]
 
 task run(dependsOn: classes, type: JavaExec){
-    mainClass = project.mainClassName
+    // Build the agent JAR first
+    dependsOn ":agent:jar"
+
+    // Use MixinLauncher instead of DesktopLauncher to initialize Mixin first
+    mainClass = "mindustry.desktop.MixinLauncher"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
@@ -18,6 +22,17 @@ task run(dependsOn: classes, type: JavaExec){
     if(System.getProperty("os.name").toLowerCase().contains("mac")){
         jvmArgs("-XstartOnFirstThread")
     }
+
+    // Add our custom Mixin Java agent
+    def agentJar = project(":agent").tasks.jar.archiveFile.get().asFile
+    jvmArgs("-javaagent:${agentJar.absolutePath}")
+    println "[Mixin] Added Java agent: ${agentJar.absolutePath}"
+
+    // Enable Mixin debug output
+    systemProperty "mixin.debug", "true"
+    systemProperty "mixin.verbose", "true"
+    systemProperty "mixin.debug.export", "true"
+    systemProperty "mixin.debug.verify", "true"
 
     jvmArgs += "-XX:+ShowCodeDetailsInExceptionMessages"
 

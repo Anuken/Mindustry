@@ -184,6 +184,8 @@ allprojects{
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
         maven{ url 'https://jitpack.io' }
+        maven{ url 'https://repo.spongepowered.org/maven/' }
+        maven{ url 'https://maven.fabricmc.net/' }
     }
 
     task clearCache{
@@ -336,6 +338,11 @@ project(":core"){
         api arcModule("extensions:arcnet")
         implementation arcModule("extensions:filedialogs")
         api "com.github.Anuken:rhino:$rhinoVersion"
+        api "net.fabricmc:sponge-mixin:0.15.3+mixin.0.8.7"
+        api "com.google.guava:guava:33.3.1-jre"
+        api "com.google.code.gson:gson:2.10.1"
+        api "org.ow2.asm:asm:9.5"
+        api "org.ow2.asm:asm-tree:9.5"
         if(localArc && debugged()) api arcModule("extensions:recorder")
         if(localArc) api arcModule(":extensions:packer")
 

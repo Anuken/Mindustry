@@ -19,6 +19,7 @@ ios/libs/
 /core/assets-raw/sprites_out/
 /annotations/build/
 /annotations/out/
+/agent/build/
 /net/build/
 /tools/build/
 /tests/build/
