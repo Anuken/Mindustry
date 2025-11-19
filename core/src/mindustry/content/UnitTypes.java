@@ -2380,7 +2380,7 @@ public class UnitTypes{
             speed = 3f;
             rotateSpeed = 15f;
             accel = 0.1f;
-            fogRadius = 0f;
+            baseFogRadius = 0f;
             itemCapacity = 30;
             health = 150f;
             engineOffset = 6f;
@@ -2426,7 +2426,7 @@ public class UnitTypes{
             speed = 3.3f;
             rotateSpeed = 17f;
             accel = 0.1f;
-            fogRadius = 0f;
+            baseFogRadius = 0f;
             itemCapacity = 50;
             health = 170f;
             engineOffset = 6f;
@@ -2477,7 +2477,7 @@ public class UnitTypes{
             speed = 3.55f;
             rotateSpeed = 19f;
             accel = 0.11f;
-            fogRadius = 0f;
+            baseFogRadius = 0f;
             itemCapacity = 70;
             health = 220f;
             engineOffset = 6f;
@@ -3188,7 +3188,7 @@ public class UnitTypes{
             rotateSpeed = 3f;
             health = 2900;
             armor = 7f;
-            fogRadius = 40f;
+            baseFogRadius = 40f;
             stepShake = 0f;
 
             legCount = 6;
@@ -3688,7 +3688,7 @@ public class UnitTypes{
             armor = 3f;
             hitSize = 12f;
             engineSize = 0;
-            fogRadius = 25;
+            baseFogRadius = 25;
             itemCapacity = 0;
 
             setEnginesMirror(
@@ -3735,7 +3735,7 @@ public class UnitTypes{
             hitSize = 25f;
             engineSize = 4.3f;
             engineOffset = 54f / 4f;
-            fogRadius = 25;
+            baseFogRadius = 25f;
             itemCapacity = 0;
             lowAltitude = true;
 
@@ -4177,7 +4177,7 @@ public class UnitTypes{
             pickupUnits = false;
             vulnerableWithPayloads = true;
 
-            fogRadius = 0f;
+            baseFogRadius = 0f;
             targetable = false;
             hittable = false;
 
@@ -4242,7 +4242,7 @@ public class UnitTypes{
             pickupUnits = false;
             vulnerableWithPayloads = true;
 
-            fogRadius = 0f;
+            baseFogRadius = 0f;
             targetable = false;
             hittable = false;
 

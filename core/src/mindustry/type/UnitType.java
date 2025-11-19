@@ -144,6 +144,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     softShadowScl = 1f,
     /** fog view radius in tiles. <0 for automatic radius. */
     fogRadius = -1f,
+    /** base fog radius before effected by weather */
+    baseFogRadius = -1f,
 
     /** horizontal offset of wave trail in naval units */
     waveTrailX = 4f,
@@ -640,6 +642,11 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     }
 
+    public void updateFogRadius(float multiplier)
+    {
+        fogRadius = baseFogRadius * multiplier;
+    }
+
     public void killed(Unit unit){}
 
     public void landed(Unit unit){}
@@ -926,10 +933,11 @@ public class UnitType extends UnlockableContent implements Senseable{
             }
         }
 
-        if(fogRadius < 0){
+        if(baseFogRadius < 0){
             //TODO depend on range?
-            fogRadius = Math.max(58f * 3f, hitSize * 2f) / 8f;
+            baseFogRadius = Math.max(58f * 3f, hitSize * 2f) / 8f;
         }
+        fogRadius = baseFogRadius;
 
         if(!weapons.contains(w -> w.useAttackRange)){
             if(range < 0 || range == Float.MAX_VALUE) range = mineRange;
