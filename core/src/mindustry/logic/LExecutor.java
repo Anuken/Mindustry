@@ -573,7 +573,7 @@ public class LExecutor{
             if((n = node.building()) != null){
                 switch(type){
                     case power -> {
-                        if(i < 0) break;
+                        if(i < 0 || n.power == null) break;
                         IntSeq links = n.power.links;
                         if(i < links.size){
                             building.setobj(world.build(links.get(i)));
