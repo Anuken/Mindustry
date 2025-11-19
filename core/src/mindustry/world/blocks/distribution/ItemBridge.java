@@ -14,6 +14,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.logic.LAccess;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -490,6 +491,12 @@ public class ItemBridge extends Block{
         @Override
         public Point2 config(){
             return Point2.unpack(link).sub(tile.x, tile.y);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.totalBridgeNodes) return incoming.size + (link > -1 ? 1 : 0);
+            return super.sense(sensor);
         }
 
         @Override

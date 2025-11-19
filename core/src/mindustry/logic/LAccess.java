@@ -8,6 +8,8 @@ public enum LAccess{
     firstItem,
     totalLiquids,
     totalPower,
+    totalPowerNodes,
+    totalBridgeNodes,
     itemCapacity,
     liquidCapacity,
     powerCapacity,

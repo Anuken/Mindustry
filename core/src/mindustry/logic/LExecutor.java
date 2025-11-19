@@ -23,6 +23,7 @@ import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.distribution.ItemBridge.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
@@ -549,6 +550,53 @@ public class LExecutor{
             int address = index.numi();
 
             output.setobj(address >= 0 && address < exec.links.length ? exec.links[address] : null);
+        }
+    }
+
+    public static class GetNodeI implements LInstruction{
+        public LNode type = LNode.power;
+        public LVar building, node, index;
+
+        public GetNodeI(LNode type, LVar building, LVar node, LVar index){
+            this.type = type;
+            this.building = building;
+            this.node = node;
+            this.index = index;
+        }
+
+        public GetNodeI(){}
+
+        @Override
+        public void run(LExecutor exec){
+            Building n;
+            int i = index.numi();
+            if((n = node.building()) != null){
+                switch(type){
+                    case power -> {
+                        if(i < 0) break;
+                        IntSeq links = n.power.links;
+                        if(i < links.size){
+                            building.setobj(world.build(links.get(i)));
+                            return;
+                        }
+                    }
+
+                    case bridge -> {
+                        if((i < -1) || !(n instanceof ItemBridgeBuild ib)) break;
+
+                        if(i == -1) {
+                            building.setobj(world.build(ib.link));
+                            return;
+                        }
+
+                        if(i < ib.incoming.size){
+                            building.setobj(world.build(ib.incoming.get(i)));
+                            return;
+                        }
+                    }
+                }
+                building.setobj(null);
+            }
         }
     }
 

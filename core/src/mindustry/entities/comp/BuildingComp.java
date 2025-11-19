@@ -2044,6 +2044,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             //totalLiquids is inherently bad design, but unfortunately it is useful for conduits/tanks
             case totalLiquids -> liquids == null ? 0 : liquids.currentAmount();
             case totalPower -> power == null || block.consPower == null ? 0 : power.status * (block.consPower.buffered ? block.consPower.capacity : 1f);
+            case totalPowerNodes -> power == null ? 0 : power.links.size;
             case itemCapacity -> block.hasItems ? block.itemCapacity : 0;
             case liquidCapacity -> block.hasLiquids ? block.liquidCapacity : 0;
             case powerCapacity -> block.consPower != null ? block.consPower.capacity : 0f;
