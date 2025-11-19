@@ -379,7 +379,12 @@ public class AIController implements UnitController{
 
         if(arrive){
             Tmp.v3.set(-unit.vel.x / unit.type.accel * 2f, -unit.vel.y / unit.type.accel * 2f).add((target.getX() - unit.x), (target.getY() - unit.y));
-            vec.add(Tmp.v3).limit(speed * length);
+            if(unit.type.omniMovement){
+                vec.add(Tmp.v3).limit(speed * length);
+            }else{
+                //directly move the unit to prevent a backwards movement vector from messing things up
+                unit.moveAt(Tmp.v3.limit(speed * length));
+            }
         }
 
         if(length < -0.5f){

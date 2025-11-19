@@ -1357,7 +1357,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(stacks != null){
             ItemStack[] out = new ItemStack[stacks.length];
             for(int i = 0; i < out.length; i++){
-                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1.1) * researchCostMultiplier)));
+                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(stacks[i].amount * researchCostMultiplier)));
             }
 
             //remove zero-requirements for automatic unlocks
