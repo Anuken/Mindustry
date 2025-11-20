@@ -103,6 +103,11 @@ public class EventType{
     /** Called when a game begins and the world tiles are initiated. About to updates tile proximity and sets up physics for the world(Before WorldLoadEvent) */
     public static class WorldLoadEndEvent{}
 
+    public static class FogWeatherEvent{
+        public final float multiplier;
+
+        public FogWeatherEvent(float multiplier) { this.multiplier = multiplier; }
+    }
     /** Called when a save loads custom patches. {@link #patches} can be modified in the event handler. */
     public static class ContentPatchLoadEvent{
         public final Seq<String> patches;
@@ -785,4 +790,6 @@ public class EventType{
             this.action = action;
         }
     }
+
+
 }
