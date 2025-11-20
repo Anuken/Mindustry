@@ -2,9 +2,11 @@ package mindustry.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
+import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -71,12 +73,31 @@ public class DuctRouter extends Block{
         return false;
     }
 
-    public class DuctRouterBuild extends Building{
+    public class DuctRouterBuild extends Building implements ControlBlock{
         public @Nullable Item sortItem;
 
         public float progress;
         public @Nullable Item current;
+        public @Nullable BlockUnitc unit;
 
+        @Override
+        public Unit unit(){
+            if(unit == null){
+                unit = (BlockUnitc)UnitTypes.block.create(team);
+                unit.tile(this);
+            }
+            return (Unit)unit;
+        }
+
+        @Override
+        public boolean canControl(){
+            return size == 1;
+        }
+
+        @Override
+        public boolean shouldAutoTarget(){
+            return false;
+        }
         @Override
         public void draw(){
             Draw.rect(region, x, y);
@@ -128,6 +149,24 @@ public class DuctRouter extends Block{
             if(current == null) return null;
 
             int dump = cdump;
+
+            if(unit != null && isControlled()){
+                unit.health(health);
+                unit.ammo(unit.type().ammoCapacity * (items.total() > 0 ? 1f : 0f));
+                unit.team(team);
+                unit.set(x, y);
+
+                int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
+
+                if(unit.isShooting()){
+                    Building other = nearby(angle);
+                    if(other != null && other.acceptItem(this, current) &&  other.team == team && angle != (rotation + 2) % 4){
+                        return other;
+                    }
+                }
+
+                return null;
+            }
 
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + dump) % proximity.size);
