@@ -4727,7 +4727,7 @@ public class Blocks{
                         pierce = true;
                         instantDisappear = true;
                         splashDamageRadius = 90f;
-                        buildingDamageMultiplier = 0.01f;
+                        buildingDamageMultiplier = 0f;
                     }};
                 }};
             }}
