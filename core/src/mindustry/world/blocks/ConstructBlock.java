@@ -288,7 +288,7 @@ public class ConstructBlock extends Block{
 
             maxProgress = core == null || team.rules().infiniteResources ? maxProgress : checkRequired(core.items, maxProgress, true);
 
-            progress = Mathf.clamp(progress + maxProgress);
+            progress = Mathf.clamp(progress + Math.min(maxProgress, state.rules.limitBuildProgress * amount));
 
             if(progress >= 1f || state.rules.infiniteResources){
                 boolean canFinish = true;
@@ -362,7 +362,7 @@ public class ConstructBlock extends Block{
                 }
             }
 
-            progress = Mathf.clamp(progress - amount);
+            progress = Mathf.clamp(progress - Math.min(amount, state.rules.limitBuildProgress * amount));
 
             if(progress <= current.deconstructThreshold || state.rules.infiniteResources){
                 //add any leftover items that weren't obtained due to rounding errors
