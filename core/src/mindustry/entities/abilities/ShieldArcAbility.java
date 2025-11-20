@@ -136,7 +136,7 @@ public class ShieldArcAbility extends Ability{
     public boolean pushUnits = true;
 
     /** State. */
-    protected float widthScale, alpha;
+    protected float widthScale, alpha, scaledMax = max;
 
     @Override
     public void addStats(Table t){
@@ -153,8 +153,12 @@ public class ShieldArcAbility extends Ability{
     @Override
     public void update(Unit unit){
 
-        if(data < max){
+        //gamerules can change during gameplay
+        scaledMax = max * Vars.state.rules.unitHealth(unit.team);
+        if(data < scaledMax){
             data += Time.delta * regen;
+        }else{
+            data = scaledMax;
         }
 
         boolean active = data > 0 && (unit.isShooting || !whenShooting);
@@ -176,7 +180,7 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void created(Unit unit){
-        data = max;
+        data = scaledMax;
     }
 
     @Override
@@ -208,6 +212,6 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void displayBars(Unit unit, Table bars){
-        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> data / max)).row();
+        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> data / scaledMax)).row();
     }
 }
