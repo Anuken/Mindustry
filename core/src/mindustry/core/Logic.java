@@ -363,6 +363,19 @@ public class Logic implements ApplicationListener{
         }
     }
 
+    void updateFogFromWeather(){
+        float fogMultiplier = 1f;
+
+        for(WeatherState entry : Groups.weather){
+            float mult = entry.weather.attrs.get(Attribute.fogVisibilityMultiplier);
+            if(mult != 0f){
+                fogMultiplier *= mult;
+            }
+        }
+
+        Events.fire(new FogWeatherEvent(fogMultiplier));
+    }
+
     @Remote(called = Loc.server)
     public static void sectorCapture(){
         //the sector has been conquered - waves get disabled
@@ -539,16 +552,7 @@ public class Logic implements ApplicationListener{
                 Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
                 //apply fog effects
-                float fogMultiplier = 1f;
-                for(WeatherState entry : Groups.weather){
-                    // get the fog multiplier from the weather’s attributes
-                    float mult = entry.weather.attrs.get(Attribute.fogVisibilityMultiplier);
-                    if(mult != 0f)
-                    {
-                        fogMultiplier *= mult;
-                    }
-                }
-                Events.fire(new FogWeatherEvent(fogMultiplier));
+                updateFogFromWeather();
 
 
                 PerfCounter.entityUpdate.begin();

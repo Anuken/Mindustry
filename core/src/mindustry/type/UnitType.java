@@ -642,8 +642,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     }
 
-    public void updateFogRadius(float multiplier)
-    {
+    public void updateFogRadius(float multiplier){
         fogRadius = baseFogRadius * multiplier;
     }
 
