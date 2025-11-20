@@ -681,7 +681,7 @@ public class UnitTypes{
                 ejectEffect = Fx.none;
                 recoil = 1f;
                 x = 7f;
-                shootSound = Sounds.flame;
+                shootSound = Sounds.shootAtrax;
 
                 bullet = new LiquidBulletType(Liquids.slag){{
                     damage = 13;
@@ -830,13 +830,14 @@ public class UnitTypes{
                 shake = 3f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.artillery;
+                shootSound = Sounds.artillerySap;
                 rotate = true;
                 shadow = 8f;
                 recoil = 3f;
 
                 bullet = new ArtilleryBulletType(2f, 12){{
                     hitEffect = Fx.sapExplosion;
+                    despawnSound = Sounds.artilleryShockExplosion;
                     knockback = 0.8f;
                     lifetime = 70f;
                     width = height = 19f;
@@ -895,7 +896,8 @@ public class UnitTypes{
                 shake = 4f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.shootBig;
+                shootSound = Sounds.shotgunSap;
+                shootSoundVolume = 0.8f;
                 rotate = true;
                 shadow = 12f;
                 recoil = 3f;
@@ -927,13 +929,14 @@ public class UnitTypes{
                 recoil = 10f;
                 rotateSpeed = 1f;
                 ejectEffect = Fx.casing3;
-                shootSound = Sounds.artillery;
+                shootSound = Sounds.artillerySapBig;
                 rotate = true;
                 shadow = 30f;
 
                 rotationLimit = 80f;
 
                 bullet = new ArtilleryBulletType(3f, 50){{
+                    despawnSound = Sounds.artilleryShockExplosionBig;
                     hitEffect = Fx.sapExplosion;
                     knockback = 0.8f;
                     lifetime = 80f;
@@ -959,6 +962,7 @@ public class UnitTypes{
                     fragBullets = 9;
 
                     fragBullet = new ArtilleryBulletType(2.3f, 30){{
+                        despawnSound = Sounds.artilleryShockExplosion;
                         hitEffect = Fx.sapExplosion;
                         knockback = 0.8f;
                         lifetime = 90f;
