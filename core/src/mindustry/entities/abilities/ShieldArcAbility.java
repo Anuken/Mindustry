@@ -44,6 +44,7 @@ public class ShieldArcAbility extends Ability{
                 b.owner = paramUnit;
                 b.team = paramUnit.team;
                 b.time += 1f;
+                b.type.buildingDamageMultiplier = 1f;
 
             }else{
                 b.absorb();
