@@ -15,12 +15,15 @@ import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.Vars;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
@@ -50,6 +53,8 @@ public class ResearchDialog extends BaseDialog{
     private boolean showTechSelect;
     private boolean needsRebuild;
 
+
+    private boolean[] usedShine;
     public ResearchDialog(){
         super("");
 
@@ -61,6 +66,7 @@ public class ResearchDialog extends BaseDialog{
             if(net.client() && !needsRebuild){
                 needsRebuild = true;
                 Core.app.post(() -> {
+                    Call.requestPlanetItems();
                     needsRebuild = false;
 
                     checkNodes(root);
@@ -68,6 +74,38 @@ public class ResearchDialog extends BaseDialog{
                     treeLayout();
                     view.rebuild();
                     Core.scene.act();
+                });
+            }
+            if(state.rules.partiallyResearched.containsKey(e.content)){
+                state.rules.partiallyResearched.remove(e.content);
+            }
+        });
+        Events.on(PartialResearchEvent.class, e -> {
+            if(e.content.techNode == null) return;
+            if(net.client()){
+                Core.app.post(() -> {
+                    int len = e.ids.length;
+                    ItemStack[] previous = state.rules.partiallyResearched.get(e.content);
+                    ItemStack[] now = (previous == null) ? new ItemStack[len] : previous;
+
+                    boolean[] shine = new boolean[len]; // no idea how to reuse this
+                    usedShine = (usedShine == null) ? new boolean[content.items().size] : usedShine;
+                    for(int i=0; i<len; i++){
+                        //research progress is 0%. any items spent at all shine
+                        if(previous == null) {
+                            usedShine[e.ids[i]] = shine[i] = e.quantity[i] > 0;
+                            now[i] = new ItemStack(Vars.content.item(e.ids[i]), 0);
+                        }else{ // research is not 0%. check if more was spent
+                            usedShine[e.ids[i]] = shine[i] = e.quantity[i] > previous[i].amount;
+                        } // update finishedRequirements
+                        now[i].amount = e.quantity[i];
+                    }
+                    Call.requestPlanetItems();
+                    state.rules.partiallyResearched.put(e.content, now);
+                    view.rebuild(shine);
+                    itemDisplay.rebuild(items, usedShine);
+                    Core.scene.act();
+                    checkMargin();
                 });
             }
         });
@@ -109,7 +147,7 @@ public class ResearchDialog extends BaseDialog{
 
         margin(0f).marginBottom(8);
         cont.stack(titleTable, view = new View(), itemDisplay = new ItemsDisplay()).grow();
-        itemDisplay.visible(() -> !net.client());
+        itemDisplay.visible(() -> ui.research.researchAllowed(player));
 
         titleTable.toFront();
 
@@ -122,8 +160,8 @@ public class ResearchDialog extends BaseDialog{
             Core.app.post(this::checkMargin);
 
             Planet currPlanet = ui.planet.isShown() ?
-                ui.planet.state.planet :
-                state.isCampaign() ? state.rules.sector.planet : null;
+                    ui.planet.state.planet :
+                    state.isCampaign() ? state.rules.sector.planet : null;
 
             if(currPlanet != null && currPlanet.techTree != null){
                 switchTree(currPlanet.techTree);
@@ -198,7 +236,11 @@ public class ResearchDialog extends BaseDialog{
             }
         });
     }
-
+    @Override
+    public Dialog show(){
+        if(net.client()) Call.requestPlanetItems();
+        return super.show();
+    }
     void checkMargin(){
         if(Core.graphics.isPortrait() && showTechSelect){
             itemDisplay.marginTop(60f);
@@ -282,8 +324,8 @@ public class ResearchDialog extends BaseDialog{
 
     public @Nullable TechNode getPrefRoot(){
         Planet currPlanet = ui.planet.isShown() ?
-            ui.planet.state.planet :
-            state.isCampaign() ? state.rules.sector.planet : null;
+                ui.planet.state.planet :
+                state.isCampaign() ? state.rules.sector.planet : null;
         return currPlanet == null ? null : currPlanet.techTree;
     }
 
@@ -370,7 +412,7 @@ public class ResearchDialog extends BaseDialog{
         }
     }
 
-    void checkNodes(TechTreeNode node){
+    public void checkNodes(TechTreeNode node){
         boolean locked = locked(node.node);
         if(!locked && (node.parent == null || node.parent.visible)) node.visible = true;
         node.selectable = selectable(node.node);
@@ -441,7 +483,7 @@ public class ResearchDialog extends BaseDialog{
                 button.resizeImage(32f);
                 button.getImage().setScaling(Scaling.fit);
                 button.visible(() -> node.visible);
-                if(!net.client()){
+                if(true){
                     button.clicked(() -> {
                         if(moved) return;
 
@@ -485,10 +527,10 @@ public class ResearchDialog extends BaseDialog{
                 button.userObject = node.node;
                 button.setSize(nodeSize);
                 button.update(() -> {
-                    button.setDisabled(net.client() && !mobile);
+                    button.setDisabled(false && !mobile);
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
-                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !selectable(node.node) || (!canSpend(node.node) && !net.client()) ? Tex.buttonRed : Tex.button;
+                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !selectable(node.node) || (!canSpend(node.node) && !false) ? Tex.buttonRed : Tex.button;
 
                     ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.uiIcon : Icon.lock.getRegion());
                     button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? Color.gray : Pal.gray);
@@ -531,7 +573,7 @@ public class ResearchDialog extends BaseDialog{
         }
 
         boolean canSpend(TechNode node){
-            if(!selectable(node) || net.client()) return false;
+            if(!selectable(node)) return false;
 
             if(node.requirements.length == 0) return true;
 
@@ -546,8 +588,13 @@ public class ResearchDialog extends BaseDialog{
             return node.content.locked();
         }
 
-        void spend(TechNode node){
-            if(net.client()) return;
+        public void spend(TechNode node){
+            if(net.client()){
+                if(player == null || !ui.research.researchAllowed(player)) return;
+                // Must tell host to spend(). Specifically if canSpend(node) then spend(node)
+                Call.clientResearch(node.content);
+                return;
+            }
 
             boolean complete = true;
 
@@ -556,6 +603,9 @@ public class ResearchDialog extends BaseDialog{
 
             for(int i = 0; i < node.requirements.length; i++){
                 ItemStack req = node.requirements[i];
+                if (req == null) {
+                    continue;
+                }
                 ItemStack completed = node.finishedRequirements[i];
 
                 //amount actually taken from inventory
@@ -576,6 +626,19 @@ public class ResearchDialog extends BaseDialog{
 
             if(complete){
                 unlock(node);
+                state.rules.researched.add(node.content);
+            }
+            else if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
+                state.rules.partiallyResearched.put(node.content, node.finishedRequirements);
+                int len = node.finishedRequirements.length;;
+                int[] ids = new int[len];
+                int[] quantity = new int[len];
+                int index = 0;
+                for (ItemStack item : node.finishedRequirements) {
+                    ids[index] = item.item.id;
+                    quantity[index++] = item.amount;
+                }
+                Call.partiallyResearched(node.content, ids, quantity);
             }
 
             node.save();
@@ -653,23 +716,27 @@ public class ResearchDialog extends BaseDialog{
                     desc.left().defaults().left();
                     desc.add(selectable ? node.content.localizedName : "[accent]???");
                     desc.row();
-                    if(locked(node) || (debugShowRequirements && !net.client())){
+                    if(locked(node) || (debugShowRequirements)){
 
-                        if(net.client()){
+                        if(!ui.research.researchAllowed(player)){
                             desc.add("@locked").color(Pal.remove);
                         }else{
                             desc.table(t -> {
                                 t.left();
                                 if(selectable){
 
+                                    // If the tech is in Rules.partiallyResearched, then use it instead of node.finishedRequirements.
+                                    ItemStack[] itemstack = state.rules.partiallyResearched.containsKey(node.content) && net.client()
+                                            ? state.rules.partiallyResearched.get(node.content) : node.finishedRequirements;
+
                                     //check if there is any progress, add research progress text
-                                    if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
+                                    if(Structs.contains(itemstack, s -> s.amount > 0)){
                                         float sum = 0f, used = 0f;
                                         boolean shiny = false;
 
                                         for(int i = 0; i < node.requirements.length; i++){
                                             sum += node.requirements[i].item.cost * node.requirements[i].amount;
-                                            used += node.finishedRequirements[i].item.cost * node.finishedRequirements[i].amount;
+                                            used += itemstack[i].item.cost * itemstack[i].amount;
                                             if(shine != null) shiny |= shine[i];
                                         }
 
@@ -687,7 +754,7 @@ public class ResearchDialog extends BaseDialog{
 
                                     for(int i = 0; i < node.requirements.length; i++){
                                         ItemStack req = node.requirements[i];
-                                        ItemStack completed = node.finishedRequirements[i];
+                                        ItemStack completed = itemstack[i];
 
                                         //skip finished stacks
                                         if(req.amount <= completed.amount && !debugShowRequirements) continue;
@@ -700,8 +767,8 @@ public class ResearchDialog extends BaseDialog{
                                             list.image(req.item.uiIcon).size(8 * 3).padRight(3);
                                             list.add(req.item.localizedName).color(Color.lightGray);
                                             Label label = list.label(() -> " " +
-                                            UI.formatAmount(Math.min(items.get(req.item), reqAmount)) + " / "
-                                            + UI.formatAmount(reqAmount)).get();
+                                                    UI.formatAmount(Math.min(items.get(req.item), reqAmount)) + " / "
+                                                    + UI.formatAmount(reqAmount)).get();
 
                                             Color targetColor = items.has(req.item) ? Color.lightGray : Color.scarlet;
 
@@ -736,7 +803,7 @@ public class ResearchDialog extends BaseDialog{
                     }
                 }).pad(9);
 
-                if(mobile && locked(node) && !net.client()){
+                if(mobile && locked(node) && ui.research.researchAllowed(player)){
                     b.row();
                     b.button("@research", Icon.ok, new TextButtonStyle(){{
                         disabled = Tex.button;
@@ -791,5 +858,44 @@ public class ResearchDialog extends BaseDialog{
             Draw.reset();
             super.drawChildren();
         }
+    }
+    //Whether this player is allowed to research (for use in multiplayer campaign)
+    public boolean researchAllowed(@Nullable Player player){
+        return !Vars.net.active() || (player != null && (player.admin() || !state.rules.researchRequiresAdmin));
+    }
+    // TODO shouldn't this have a target?
+    @Remote
+    public static void partiallyResearched(Content content, int[] ids, int[] quantity){
+        if(!(content instanceof UnlockableContent u) || u.techNode == null) return;
+        if(net.client()) { // TODO isn't this always true?
+            Events.fire(new PartialResearchEvent(u, ids, quantity));
+        }
+    }
+    @Remote(targets = Loc.client)
+    public static void clientResearch(@Nullable Player player, Content content){
+        if(!ui.research.researchAllowed(player)) return;
+        if(!(content instanceof UnlockableContent u) || !ui.research.view.canSpend(u.techNode)) return;
+        ui.research.rebuildItems();
+        ui.research.view.spend(u.techNode);
+    }
+    @Remote(targets = Loc.client)
+    public static void requestPlanetItems(@Nullable Player player) {
+        if(!ui.research.researchAllowed(player)) return;
+        int[] quantity = new int[Vars.content.items().size];
+        ui.research.rebuildItems();
+        int index = 0;
+        for (Item item : Vars.content.items()) {
+            quantity[index++] = ui.research.items.get(item);
+        }
+        Call.sendPlanetItems(player.con, quantity);
+    }
+    @Remote(targets = Loc.server, variants = Variant.one)
+    public static void sendPlanetItems(int[] values){
+        int index = 0;
+        if(ui.research.items == null) ui.research.items = new ItemSeq();
+        for (Item item : Vars.content.items()) {
+            ui.research.items.set(item, values[index++]);
+        }
+        ui.research.itemDisplay.rebuild(ui.research.items);
     }
 }

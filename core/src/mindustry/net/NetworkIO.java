@@ -28,10 +28,15 @@ public class NetworkIO{
             //write all researched content to rules if hosting
             if(state.isCampaign()){
                 state.rules.researched.clear();
+                state.rules.partiallyResearched.clear();
                 for(ContentType type : ContentType.all){
                     for(Content c : content.getBy(type)){
-                        if(c instanceof UnlockableContent u && u.unlocked() && u.techNode != null){
-                            state.rules.researched.add(u);
+                        if(c instanceof UnlockableContent u && u.techNode != null){
+                            if (u.unlocked()) {
+                                state.rules.researched.add(u);
+                            } else if (Structs.contains(u.techNode.finishedRequirements, s -> s.amount > 0)) {
+                                state.rules.partiallyResearched.put(u, u.techNode.finishedRequirements); 
+                            }
                         }
                     }
                 }
