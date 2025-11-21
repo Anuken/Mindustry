@@ -405,7 +405,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     protected TextureRegion[] generatedIcons;
 
-    public ObjectMap<Item, Boolean> acceptsItemsInput = new ObjectMap<>();
+    public ObjectMap<Item, Boolean> acceptsItemsInput = ObjectMap.of();
 
     /** Regions indexes from icons() that are rotated. If either of these is not -1, other regions won't be rotated in ConstructBlocks. */
     public int regionRotated1 = -1, regionRotated2 = -1;
@@ -429,9 +429,11 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void FilterSet(){
-        for(var item : content.items().items){
-            if(acceptsItemsInput.get(item) != null){
-                itemFilter[item.id] = acceptsItemsInput.get(item);
+        if (!acceptsItemsInput.isEmpty()){
+            for (var item : content.items().items) {
+                if (acceptsItemsInput.getNull(item) != null) {
+                    itemFilter[item.id] = acceptsItemsInput.get(item);
+                }
             }
         }
     }
