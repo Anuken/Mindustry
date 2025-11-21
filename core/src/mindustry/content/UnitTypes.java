@@ -551,6 +551,10 @@ public class UnitTypes{
             rotateSpeed = 1.5f;
             drownTimeMultiplier = 1.6f;
 
+            stepSound = Sounds.walkerStep;
+            stepSoundVolume = 1.1f;
+            stepSoundPitch = 0.9f;
+
             legCount = 4;
             legLength = 14f;
             legBaseOffset = 11f;
@@ -778,6 +782,10 @@ public class UnitTypes{
             legSpeed = 0.2f;
             ammoType = new PowerAmmoType(2000);
 
+            stepSound = Sounds.walkerStep;
+            stepSoundVolume = 0.75f;
+            stepSoundPitch = 1.1f;
+
             legSplashDamage = 32;
             legSplashRange = 30;
 
@@ -865,6 +873,8 @@ public class UnitTypes{
             health = 22000;
             armor = 13f;
             lightRadius = 140f;
+            stepSound = Sounds.walkerStep;
+            stepSoundVolume = 1.1f;
 
             rotateSpeed = 1.9f;
 
@@ -3375,6 +3385,10 @@ public class UnitTypes{
             legMaxLength = 1.3f;
             researchCostMultiplier = 0f;
 
+            stepSound = Sounds.walkerStep;
+            stepSoundVolume = 1f;
+            stepSoundPitch = 1f;
+
             abilities.add(new ShieldArcAbility(){{
                 region = "tecta-shield";
                 radius = 45f;
@@ -3477,6 +3491,10 @@ public class UnitTypes{
             legContinuousMove = true;
             legStraightness = 0.6f;
             baseLegStraightness = 0.5f;
+
+            stepSound = Sounds.walkerStep;
+            stepSoundVolume = 1.1f;
+            stepSoundPitch = 0.9f;
 
             legCount = 8;
             legLength = 30f;

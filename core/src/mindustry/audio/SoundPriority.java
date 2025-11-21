@@ -59,8 +59,11 @@ public class SoundPriority{
             sound.setMinConcurrentInterrupt(Math.min(0.25f, sound.getLength() * 0.5f));
         }
 
-        mechStep.setMinConcurrentInterrupt(0.3f);
-        mechStep.setMaxConcurrent(3);
+        mechStep.setMinConcurrentInterrupt(0.5f);
+        walkerStep.setMinConcurrentInterrupt(0.6f);
+
+        mechStep.setMaxConcurrent(4);
+        walkerStep.setMaxConcurrent(4);
     }
 
     static void max(int max, Sound... sounds){
