@@ -408,7 +408,7 @@ public class StatValues{
         return content(list.as(), t -> true, "@none");
     }
 
-    public static StatValue drillables(float drillTime, float drillMultiplier, float size, ObjectFloatMap<Item> multipliers, Boolf<Block> filter){
+    public static StatValue drillables(float drillTime, float drillMultiplier, float size, ObjectMap<Item, Float> multipliers, Boolf<Block> filter){
         return table -> {
             table.row();
             table.table(c -> {
