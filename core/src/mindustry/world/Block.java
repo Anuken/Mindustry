@@ -405,7 +405,13 @@ public class Block extends UnlockableContent implements Senseable{
 
     protected TextureRegion[] generatedIcons;
 
-    public ObjectMap<Item, Boolean> acceptsItemsInput = ObjectMap.of();
+    public ObjectMap<Item, Boolean> acceptsItemsInput = new ObjectMap<>();
+
+    {
+        for(Item item : content.items().items){
+            acceptsItemsInput.put(item, itemFilter[item.id]);
+        }
+    }
 
     /** Regions indexes from icons() that are rotated. If either of these is not -1, other regions won't be rotated in ConstructBlocks. */
     public int regionRotated1 = -1, regionRotated2 = -1;
