@@ -44,7 +44,7 @@ public class BeamDrill extends Block{
     public float optionalBoostIntensity = 2.5f;
 
     /** Multipliers of drill speed for each item. Defaults to 1. */
-    public ObjectMap<Item, Float> drillMultipliers = new ObjectMap<>();
+    public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
     /** Special exemption item that this drill can't mine. */
     public @Nullable Item blockedItem;
     /** Special exemption items that this drill can't mine. */

@@ -63,7 +63,7 @@ public class Drill extends Block{
     public float updateEffectChance = 0.02f;
 
     /** Multipliers of drill speed for each item. Defaults to 1. */
-    public ObjectMap<Item, Float> drillMultipliers = new ObjectMap<>();
+    public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
 
     public boolean drawRim = false;
     public boolean drawSpinSprite = true;
