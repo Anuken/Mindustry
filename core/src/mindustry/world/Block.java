@@ -13,6 +13,7 @@ import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
+import mindustry.Vars;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -383,6 +384,7 @@ public class Block extends UnlockableContent implements Senseable{
     @NoPatch
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
     /** Consumption filters. */
+    @NoPatch
     public boolean[] itemFilter = {}, liquidFilter = {};
     /** Array of consumers used by this block. Only populated after init(). */
     @NoPatch
@@ -403,6 +405,8 @@ public class Block extends UnlockableContent implements Senseable{
 
     protected TextureRegion[] generatedIcons;
 
+    public ObjectMap<Item, Boolean> acceptsItemsInput = ObjectMap.of();
+
     /** Regions indexes from icons() that are rotated. If either of these is not -1, other regions won't be rotated in ConstructBlocks. */
     public int regionRotated1 = -1, regionRotated2 = -1;
     public TextureRegion region;
@@ -422,6 +426,14 @@ public class Block extends UnlockableContent implements Senseable{
         super(name);
         initBuilding();
         selectionSize = 28f;
+    }
+
+    public void FilterSet(){
+        for(var item : content.items().items){
+            if(acceptsItemsInput.get(item) != null){
+                itemFilter[item.id] = acceptsItemsInput.get(item);
+            }
+        }
     }
 
     public void drawBase(Tile tile){
@@ -719,6 +731,7 @@ public class Block extends UnlockableContent implements Senseable{
         setBars();
         offset = ((size + 1) % 2) * tilesize / 2f;
         sizeOffset = -((size - 1) / 2);
+        FilterSet();
     }
 
     public boolean consumesItem(Item item){
