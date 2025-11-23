@@ -13,7 +13,6 @@ import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
-import mindustry.Vars;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -386,6 +385,8 @@ public class Block extends UnlockableContent implements Senseable{
     /** Consumption filters. */
     @NoPatch
     public boolean[] itemFilter = {}, liquidFilter = {};
+    /** Added interface for modifying itemFilter in ContentPatches */
+    public ObjectMap<Item, Boolean> acceptsItemInput = new ObjectMap<>();
     /** Array of consumers used by this block. Only populated after init(). */
     @NoPatch
     public Consume[] consumers = {}, optionalConsumers = {}, nonOptionalConsumers = {}, updateConsumers = {};
@@ -404,14 +405,6 @@ public class Block extends UnlockableContent implements Senseable{
     protected Seq<Consume> consumeBuilder = new Seq<>();
 
     protected TextureRegion[] generatedIcons;
-
-    public ObjectMap<Item, Boolean> acceptsItemsInput = new ObjectMap<>();
-
-    {
-        for(Item item : content.items().items){
-            acceptsItemsInput.put(item, itemFilter[item.id]);
-        }
-    }
 
     /** Regions indexes from icons() that are rotated. If either of these is not -1, other regions won't be rotated in ConstructBlocks. */
     public int regionRotated1 = -1, regionRotated2 = -1;
@@ -432,16 +425,6 @@ public class Block extends UnlockableContent implements Senseable{
         super(name);
         initBuilding();
         selectionSize = 28f;
-    }
-
-    public void FilterSet(){
-        if (!acceptsItemsInput.isEmpty()){
-            for (var item : content.items().items) {
-                if (acceptsItemsInput.getNull(item) != null) {
-                    itemFilter[item.id] = acceptsItemsInput.get(item);
-                }
-            }
-        }
     }
 
     public void drawBase(Tile tile){
@@ -673,7 +656,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void setBars(){
-        addBar("health", entity -> new Bar("stat.health", Pal.health, entity::healthf).blink(Color.white));
+        addBar("health", entity -> new Bar("stat.health", Pal.health, () -> entity.healthf).blink(Color.white));
 
         if(consPower != null){
             boolean buffered = consPower.buffered;
@@ -739,7 +722,12 @@ public class Block extends UnlockableContent implements Senseable{
         setBars();
         offset = ((size + 1) % 2) * tilesize / 2f;
         sizeOffset = -((size - 1) / 2);
-        FilterSet();
+        for (Item it : content.items().items) {
+            boolean var = acceptsItemInput.get(it, (Boolean) null);
+            if (var != (Boolean) null) {
+                itemFilter[it.id] = var;
+            }
+        }
     }
 
     public boolean consumesItem(Item item){

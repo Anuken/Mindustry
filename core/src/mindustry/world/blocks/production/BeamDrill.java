@@ -45,6 +45,8 @@ public class BeamDrill extends Block{
 
     /** Multipliers of drill speed for each item. Defaults to 1. */
     public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
+    /** Added interface for modifying drillMultipliers in ContentPatches */
+    public ObjectMap<Item, Float> itemsDrillMultiplier = new ObjectMap<>();
     /** Special exemption item that this drill can't mine. */
     public @Nullable Item blockedItem;
     /** Special exemption items that this drill can't mine. */
@@ -217,6 +219,17 @@ public class BeamDrill extends Block{
 
     public float getDrillTime(Item item){
         return drillTime / drillMultipliers.get(item, 1f);
+    }
+
+    @Override
+    public void afterPatch() {
+        super.afterPatch();
+        for (Item it : content.items().items) {
+            float var = itemsDrillMultiplier.get(it, -1f);
+            if (var >= 0f) {
+                drillMultipliers.put(it, var);
+            }
+        }
     }
 
     public class BeamDrillBuild extends Building{
