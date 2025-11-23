@@ -386,7 +386,7 @@ public class Block extends UnlockableContent implements Senseable{
     @NoPatch
     public boolean[] itemFilter = {}, liquidFilter = {};
     /** Added interface for modifying itemFilter in ContentPatches */
-    public ObjectMap<Item, Boolean> acceptsItemInput = new ObjectMap<>();
+    public ObjectMap<Item, Object> acceptsItemInput = new ObjectMap<>();
     /** Array of consumers used by this block. Only populated after init(). */
     @NoPatch
     public Consume[] consumers = {}, optionalConsumers = {}, nonOptionalConsumers = {}, updateConsumers = {};
@@ -723,9 +723,9 @@ public class Block extends UnlockableContent implements Senseable{
         offset = ((size + 1) % 2) * tilesize / 2f;
         sizeOffset = -((size - 1) / 2);
         for (Item it : content.items()) {
-            boolean var = acceptsItemInput.get(it, (Boolean) null);
-            if (var != (Boolean) null) {
-                itemFilter[it.id] = var;
+            Object var = acceptsItemInput.get(it, "null");
+            if (var instanceof Boolean) {
+                itemFilter[it.id] = (boolean) var;
             }
         }
     }
