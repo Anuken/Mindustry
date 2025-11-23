@@ -65,8 +65,6 @@ public class Drill extends Block{
 
     /** Multipliers of drill speed for each item. Defaults to 1. */
     public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
-    /** Added interface for modifying drillMultipliers in ContentPatches */
-    public ObjectMap<Item, Float> itemsDrillMultiplier = new ObjectMap<>();
 
     public boolean drawRim = false;
     public boolean drawSpinSprite = true;
@@ -236,17 +234,6 @@ public class Drill extends Block{
         if(tile == null || tile.block().isStatic()) return false;
         Item drops = tile.drop();
         return drops != null && drops.hardness <= tier && (blockedItems == null || !blockedItems.contains(drops));
-    }
-
-    @Override
-    public void afterPatch() {
-        super.afterPatch();
-        for (Item it : content.items()) {
-            float var = itemsDrillMultiplier.get(it, -1f);
-            if (var >= 0f) {
-                drillMultipliers.put(it, var);
-            }
-        }
     }
 
     public class DrillBuild extends Building{
