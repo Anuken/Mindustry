@@ -722,7 +722,7 @@ public class Block extends UnlockableContent implements Senseable{
         setBars();
         offset = ((size + 1) % 2) * tilesize / 2f;
         sizeOffset = -((size - 1) / 2);
-        for (Item it : content.items().items) {
+        for (Item it : content.items()) {
             boolean var = acceptsItemInput.get(it, (Boolean) null);
             if (var != (Boolean) null) {
                 itemFilter[it.id] = var;

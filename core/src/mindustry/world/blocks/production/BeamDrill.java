@@ -224,7 +224,7 @@ public class BeamDrill extends Block{
     @Override
     public void afterPatch() {
         super.afterPatch();
-        for (Item it : content.items().items) {
+        for (Item it : content.items()) {
             float var = itemsDrillMultiplier.get(it, -1f);
             if (var >= 0f) {
                 drillMultipliers.put(it, var);
