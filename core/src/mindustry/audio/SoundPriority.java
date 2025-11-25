@@ -3,25 +3,33 @@ package mindustry.audio;
 import arc.*;
 import arc.audio.*;
 import arc.struct.*;
-import mindustry.gen.*;
 
 import static mindustry.gen.Sounds.*;
 
 /** Sets up priorities and groups for various sounds. */
 public class SoundPriority{
+    static int lastGroup = 1;
 
     public static void init(){
+        max(7, laserbig, beam, laserbeam);
+
         //priority 2: long weapon loops
         set(
         2f,
         laserbig,
-        beam
+        beam,
+        laserbeam,
+        beamPlasma
         );
 
         //priority 1.5: big weapon sounds, not loops
-        set(1.5f,
+        set(
+        1.5f,
         railgun,
-        largeCannon
+        largeCannon,
+        lasercharge,
+        lasercharge2,
+        lasercharge3
         );
 
         //priority 1: ambient noises
@@ -36,13 +44,35 @@ public class SoundPriority{
         respawning
         );
 
-        //this is spammed a LOT
-        Sounds.shootBig.setMinConcurrentInterrupt(shootBig.getLength() * 0.9f);
+        //very loud
+        laser.setMaxConcurrent(5);
+
+        sameGroup(flame, flamePlasma);
+
+        //sameGroup(hit1, hit2, hit3);
+        //max(4, hit1, hit2, hit3);
+
+        sameGroup(missile, missileShort, missilePlasmaShort);
+        sameGroup(spark, shock);
 
         for(var sound : Core.assets.getAll(Sound.class, new Seq<>())){
             sound.setMinConcurrentInterrupt(Math.min(0.25f, sound.getLength() * 0.5f));
-            sound.setMaxConcurrent(7);
         }
+
+        mechStep.setMinConcurrentInterrupt(0.5f);
+        walkerStep.setMinConcurrentInterrupt(0.6f);
+
+        mechStep.setMaxConcurrent(4);
+        walkerStep.setMaxConcurrent(4);
+    }
+
+    static void max(int max, Sound... sounds){
+        for(var s : sounds) s.setMaxConcurrent(max);
+    }
+
+    static void sameGroup(Sound... sounds){
+        int id = lastGroup ++;
+        for(var s : sounds) s.setConcurrentGroup(id);
     }
 
     static void set(float value, Sound... sounds){

@@ -461,6 +461,8 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void readWorldEntities(DataInput stream, Prov[] mapping) throws IOException{
+        IntSet used = new IntSet();
+        Seq<Entityc> reassign = new Seq<>();
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
@@ -477,8 +479,18 @@ public abstract class SaveVersion extends SaveFileReader{
                 EntityGroup.checkNextId(id);
                 entity.id(id);
                 entity.read(in);
-                entity.add();
+                if(used.add(id)){
+                    entity.add();
+                }else{
+                    Log.warn("Duplicate entity ID in save: @ (@)", id, entity);
+                    reassign.add(entity);
+                }
             });
+        }
+
+        for(var ent : reassign){
+            ent.id(EntityGroup.nextId());
+            ent.add();
         }
 
         Groups.all.each(Entityc::afterReadAll);
