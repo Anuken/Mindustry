@@ -121,6 +121,8 @@ public class Turret extends ReloadTurret{
     public Effect ammoUseEffect = Fx.none;
     /** Sound emitted when a single bullet is shot. */
     public Sound shootSound = Sounds.shoot;
+    /** Volume of shooting sound. */
+    public float shootSoundVolume = 1f;
     /** Sound emitted when shoot.firstShotDelay is >0 and shooting begins. */
     public Sound chargeSound = Sounds.none;
     /** The sound that this block makes while active. One sound loop. Do not overuse. */
@@ -766,7 +768,7 @@ public class Turret extends ReloadTurret{
 
             (shootEffect == null ? type.shootEffect : shootEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
             (smokeEffect == null ? type.smokeEffect : smokeEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
-            shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
+            shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax), shootSoundVolume);
 
             ammoUseEffect.at(
                 x - Angles.trnsx(rotation, ammoEjectBack),

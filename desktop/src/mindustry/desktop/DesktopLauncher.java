@@ -118,17 +118,19 @@ public class DesktopLauncher extends ClientLauncher{
         testMobile = Seq.with(args).contains("-testMobile");
 
         if(useDiscord){
-            try{
-                DiscordRPC.connect(discordID);
-                Log.info("Initialized Discord rich presence.");
-                Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::close));
-            }catch(NoDiscordClientException none){
-                //don't log if no client is found
-                useDiscord = false;
-            }catch(Throwable t){
-                useDiscord = false;
-                Log.warn("Failed to initialize Discord RPC - you are likely using a JVM <16.");
-            }
+            Threads.daemon(() -> {
+                try{
+                    DiscordRPC.connect(discordID);
+                    Log.info("Initialized Discord rich presence.");
+                    Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::close));
+                }catch(NoDiscordClientException none){
+                    //don't log if no client is found
+                    useDiscord = false;
+                }catch(Throwable t){
+                    useDiscord = false;
+                    Log.warn("Failed to initialize Discord RPC - you are likely using a JVM <16.");
+                }
+            });
         }
 
         if(useSteam){
