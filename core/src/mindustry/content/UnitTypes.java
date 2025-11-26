@@ -840,6 +840,7 @@ public class UnitTypes{
                     lightningLength = 10;
                     smokeEffect = Fx.shootBigSmoke2;
                     shake = 5f;
+                    maxRange = 190f;
 
                     status = StatusEffects.sapped;
                     statusDuration = 60f * 10;
