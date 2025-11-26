@@ -15,6 +15,7 @@ import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.part.*;
+import mindustry.entities.pattern.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -72,6 +73,8 @@ public class BulletType extends Content implements Cloneable{
     public Effect despawnEffect = Fx.hitBulletSmall;
     /** Effect created when shooting. */
     public Effect shootEffect = Fx.shootSmall;
+    /** Pattern used to shoot this bullet. If null, uses turret's default pattern. */
+    public @Nullable ShootPattern shootPattern = null;
     /** Effect created when charging starts; only usable in single-shot weapons with a firstShotDelay / shotDelay. */
     public Effect chargeEffect = Fx.none;
     /** Extra smoke effect created when shooting. */
