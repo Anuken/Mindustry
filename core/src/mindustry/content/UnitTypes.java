@@ -1429,11 +1429,9 @@ public class UnitTypes{
             drag = 0.017f;
             lowAltitude = false;
             flying = true;
-            autoDropBombs = true;
-            circleTarget = true;
+
             engineOffset = 13f;
             engineSize = 7f;
-            faceTarget = false;
             hitSize = 36f;
             payloadCapacity = (3 * 3) * tilePayload;
             buildSpeed = 2.5f;
@@ -1441,63 +1439,71 @@ public class UnitTypes{
             range = 140f;
             targetAir = false;
             targetFlags = new BlockFlag[]{BlockFlag.battery, BlockFlag.factory, null};
-
+            fogRadius = 72f;
             ammoType = new PowerAmmoType(3000);
 
-            weapons.add(
-            new Weapon(){{
+            weapons.add(new Weapon("plasma-missile-mount"){{
                 x = y = 0f;
                 mirror = false;
                 reload = 55f;
-                minShootVelocity = 0.01f;
-
+                layerOffset = -0.2f;
+                rotate = true;
+                rotateSpeed = 0.4f;
+                rotationLimit = 60f;
                 soundPitchMin = 1f;
                 shootSound = Sounds.plasmadrop;
 
-                bullet = new BasicBulletType(){{
+                bullet = new ArtilleryBulletType(2f, 21f){{
                     sprite = "large-bomb";
                     width = height = 120/4f;
-
-                    maxRange = 30f;
-                    ignoreRotation = true;
+                    drag = 0f;
 
                     backColor = Pal.heal;
                     frontColor = Color.white;
                     mixColorTo = Color.white;
 
                     hitSound = Sounds.plasmaboom;
-
-                    shootCone = 180f;
+                    shootCone = 150f;
                     ejectEffect = Fx.none;
                     hitShake = 4f;
-
-                    collidesAir = false;
-
-                    lifetime = 70f;
-
+                    lifetime = 48f;
                     despawnEffect = Fx.greenBomb;
                     hitEffect = Fx.massiveExplosion;
                     keepVelocity = false;
                     spin = 2f;
-
                     shrinkX = shrinkY = 0.7f;
-
-                    speed = 0f;
-                    collides = false;
-
-                    healPercent = 15f;
-                    splashDamage = 220f;
-                    splashDamageRadius = 80f;
-                    damage = splashDamage * 0.7f;
+                    healPercent = 50f;
+                    splashDamage = 60f;
+                    splashDamageRadius = 72f;
+                    status = StatusEffects.electrified;
+                    statusDuration = 60f * 4f;
+                    collidesTeam = true;
+                    fragBullets = 36;
+                    fragVelocityMin = 0.3f;
+                    fragRandomSpread = 0f;
+                    fragSpread = 10f;
+                    fragBullet = new LiquidBulletType(Liquids.cryofluid){{
+                        lifetime = 24f;
+                        speed = 0.5f;
+                        knockback = 2.3f;
+                        puddleSize = 28f;
+                        orbSize = 4f;
+                        drag = 0f;
+                        statusDuration = 60f * 6f;
+                        damage = 0f;
+                        collides = false;
+                        splashDamage = 2f;
+                        splashDamageRadius = 24f;
+                    }};   
                 }};
             }});
         }};
 
         oct = new UnitType("oct"){{
             aiController = DefenderAI::new;
-
+            fogRadius = 96f;
             armor = 16f;
-            health = 24000;
+            health = 16000;
             speed = 0.8f;
             rotateSpeed = 1f;
             accel = 0.04f;
@@ -1514,7 +1520,27 @@ public class UnitTypes{
             buildBeamOffset = 43;
             ammoCapacity = 1;
 
-            abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8, 8, 0f), new RepairFieldAbility(130f, 60f * 2, 140f));
+            abilities.add(new ForceFieldAbility(152f, 9f, 20000f, 60f * 6, 8, 0f), new StatusFieldAbility(StatusEffects.overclock, 60f * 4, 60f * 4f, 150f));
+            weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
+                x = 25f;
+                y = 15f;
+                shootY = 6f;
+                beamWidth = 1.2f;
+                repairSpeed = 4f;
+                bullet = new BulletType(){{
+                    maxRange = 192f;
+                }};
+            }});
+            weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
+                x = 25f;
+                y = -32f;
+                shootY = 6f;
+                beamWidth = 1.2f;
+                repairSpeed = 4f;
+                bullet = new BulletType(){{
+                    maxRange = 192f;
+                }};
+            }});
         }};
 
         //endregion
