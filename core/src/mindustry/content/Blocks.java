@@ -2568,7 +2568,7 @@ public class Blocks{
         }};
 
         rtgGenerator = new ConsumeGenerator("rtg-generator"){{
-            requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phaseFabric, 25, Items.plastanium, 75, Items.thorium, 50));
+            requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phaseFabric, 15, Items.plastanium, 40, Items.thorium, 50));
             size = 2;
             powerProduction = 4.5f;
             itemDuration = 60 * 14f;
