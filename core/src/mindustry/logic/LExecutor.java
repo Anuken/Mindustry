@@ -451,7 +451,7 @@ public class LExecutor{
                         }
                     }
                     case itemDrop -> {
-                        if(!exec.timeoutDone(unit, LogicAI.transferDelay)) return;
+                        if(!exec.timeoutDone(unit, LogicAI.transferDelay) || !((LogicBlock)exec.build.block).allowUnitControl) return;
 
                         //clear item when dropping to @air
                         if(p1.obj() == Blocks.air){
@@ -473,7 +473,7 @@ public class LExecutor{
                         }
                     }
                     case itemTake -> {
-                        if(!exec.timeoutDone(unit, LogicAI.transferDelay)) return;
+                        if(!exec.timeoutDone(unit, LogicAI.transferDelay) || !((LogicBlock)exec.build.block).allowUnitControl) return;
 
                         Building build = p1.building();
                         int amount = p3.numi();

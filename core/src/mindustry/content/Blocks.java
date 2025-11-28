@@ -6750,6 +6750,7 @@ public class Blocks{
 
             instructionsPerTick = 2;
             size = 1;
+            allowUnitControl = false;
         }};
 
         logicProcessor = new LogicBlock("logic-processor"){{

@@ -39,6 +39,8 @@ public class LogicBlock extends Block{
 
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
+    /** Enable itemDrop and itemTake instructions.*/
+    public boolean allowUnitControl = true; 
     //privileged only
     public int maxInstructionsPerTick = 40;
     public float range = 8 * 10;
