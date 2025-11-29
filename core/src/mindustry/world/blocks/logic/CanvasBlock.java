@@ -120,7 +120,6 @@ public class CanvasBlock extends Block{
                     }
                 }
             }
-
         }else{
             super.drawPlanRegion(plan, list);
         }
@@ -132,7 +131,7 @@ public class CanvasBlock extends Block{
         for(int i = 0; i < pixels; i++){
             int bitOffset = i * bpp;
             int pal = getByte(data, bitOffset);
-            target.set(i % canvasSize, i / canvasSize, palette[pal]);
+            target.set(i % canvasSize, i / canvasSize, palette[Math.min(pal, palette.length)]);
         }
         return target;
     }
@@ -150,7 +149,7 @@ public class CanvasBlock extends Block{
         public @Nullable Texture texture;
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
         public int blending;
-        
+
         protected boolean updated = false;
 
         public void setPixel(int pos, int index){
@@ -286,7 +285,7 @@ public class CanvasBlock extends Block{
                 }
             }
         }
-        
+
         @Override
         public double sense(LAccess sensor){
             return switch(sensor){
@@ -314,12 +313,12 @@ public class CanvasBlock extends Block{
                 int[] curColor = {palette[0]};
                 boolean[] modified = {false};
                 boolean[] fill = {false};
-                
+
                 dialog.hidden(() -> {
                     texture.dispose();
                     pix.dispose();
                 });
-                
+
                 dialog.resized(dialog::hide);
 
                 dialog.cont.table(Tex.pane, body -> {

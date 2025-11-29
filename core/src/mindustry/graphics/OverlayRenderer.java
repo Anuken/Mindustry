@@ -246,7 +246,7 @@ public class OverlayRenderer{
             if(input.canDropItem() && build != null && build.interactable(player.team()) && build.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(build, itemTransferRange) &&
                 input.itemDepositCooldown <= 0f){
 
-                boolean invalid = (state.rules.onlyDepositCore && !(build instanceof CoreBuild));
+                boolean invalid = !build.allowDeposit();
 
                 Lines.stroke(3f, Pal.gray);
                 Lines.square(build.x, build.y, build.block.size * tilesize / 2f + 3 + Mathf.absin(Time.time, 5f, 1f));

@@ -125,6 +125,8 @@ public class Planet extends UnlockableContent{
     public boolean clearSectorOnLose = false;
     /** Multiplier for enemy rebuild speeds; only applied in campaign (not standard rules) */
     public float enemyBuildSpeedMultiplier = 1f;
+    /** If true, the enemy team always has infinite items. */
+    public boolean enemyInfiniteItems = true;
     /** If true, enemy cores are replaced with spawnpoints on this planet (for invasions) */
     public boolean enemyCoreSpawnReplace = false;
     /** If true, blocks in the radius of the core will be removed and "built up" in a shockwave upon landing. */
@@ -158,7 +160,7 @@ public class Planet extends UnlockableContent{
     /** Content (usually planet-specific) that is unlocked upon landing here. */
     public Seq<UnlockableContent> unlockedOnLand = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
-    public Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
+    public Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlitWhite, 2), cloudMeshLoader = () -> null;
     /** Loads the planet grid outline mesh. Clientside only. */
     public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineRad * radius);
 
@@ -627,7 +629,9 @@ public class Planet extends UnlockableContent{
             batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f).add(normal, -stroke));
         }
+        Gl.disable(Gl.cullFace);
         batch.flush(Gl.triangleStrip);
+        Gl.enable(Gl.cullFace);
     }
 
     public Vec3 lookAt(Sector sector, Vec3 out){
