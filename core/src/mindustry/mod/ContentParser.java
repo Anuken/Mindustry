@@ -578,6 +578,11 @@ public class ContentParser{
                     value.remove("consumes");
                 }
 
+                if(value.has("canInputItems") && value.get("canInputItems").isObject()){
+                    readBlockCanInputItems(block, value.get("canInputItems"));
+                    value.remove("canInputItems");
+                }
+
                 readFields(block, value, true);
 
                 if(block.size > maxBlockSize){
@@ -587,11 +592,6 @@ public class ContentParser{
                 //make block visible by default if there are requirements and no visibility set
                 if(value.has("requirements") && block.buildVisibility == BuildVisibility.hidden){
                     block.buildVisibility = BuildVisibility.shown;
-                }
-
-                if(value.has("canInputItems") && value.get("canInputItems").isObject()){
-                    readBlockCanInputItems(block, value.get("canInputItems"));
-                    value.remove("canInputItems");
                 }
             });
 
