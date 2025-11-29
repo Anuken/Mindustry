@@ -1925,7 +1925,7 @@ public class Blocks{
             size = 2;
             speedBoost = 1.25f;
             speedBoostPhase = 0.50f;
-            useTime = (120f * 2f) / (speedBoost + speedBoostPhase) ;
+            useTime = (120f * 4f) / (speedBoost + speedBoostPhase) ;
             consumeItem(Items.phaseFabric, 1).boost();
         }};
 
@@ -1934,8 +1934,8 @@ public class Blocks{
             consumePower(20f);
             size = 3;
             range = 200f;
-            speedBoost = 2f;
-            useTime = 120f / speedBoost;
+            speedBoost = 1.75f;
+            useTime = 240f / speedBoost;
             hasBoost = false;
             consumeItems(with(Items.phaseFabric, 1, Items.silicon, 1));
         }};
