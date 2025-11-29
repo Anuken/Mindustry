@@ -522,6 +522,32 @@ public class ContentParser{
         value.remove("consumes");
     }
 
+    public void readBlockCanInputItems(Block block, JsonValue value){
+        boolean[] booleans = block.itemFilter;
+        for(JsonValue child : value){
+            switch(child.name){
+                case "add" -> {
+                    Item[] arr = child.isArray()? new Item[]{parser.readValue(Item.class, child)} : new Item[]{};
+                    for (Item it : arr) {
+                        if (!booleans[it.id]) {
+                            block.itemFilter[it.id] = true;
+                        }
+                    }
+                }
+                case "remove" -> {
+                    Item[] arr = child.isArray()? new Item[]{parser.readValue(Item.class, child)} : new Item[]{};
+                    for (Item it : arr) {
+                        if(booleans[it.id]){
+                            block.itemFilter[it.id] = false;
+                        }
+                    }
+                }
+                default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
+            }
+        }
+        value.remove("canInputItems");
+    }
+
     private ObjectMap<ContentType, TypeParser<?>> parsers = ObjectMap.of(
         ContentType.block, (TypeParser<Block>)(mod, name, value) -> {
             readBundle(ContentType.block, name, value);
@@ -556,6 +582,11 @@ public class ContentParser{
                 //make block visible by default if there are requirements and no visibility set
                 if(value.has("requirements") && block.buildVisibility == BuildVisibility.hidden){
                     block.buildVisibility = BuildVisibility.shown;
+                }
+
+                if(value.has("canInputItems") && value.get("canInputItems").isObject()){
+                    readBlockCanInputItems(block, value.get("canInputItems"));
+                    value.remove("canInputItems");
                 }
             });
 

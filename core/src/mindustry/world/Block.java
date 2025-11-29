@@ -385,8 +385,6 @@ public class Block extends UnlockableContent implements Senseable{
     /** Consumption filters. */
     @NoPatch
     public boolean[] itemFilter = {}, liquidFilter = {};
-    /** Added interface for modifying itemFilter in ContentPatches */
-    public Item[] acceptsItemInput = {}, denyItemInput = {};
     /** Array of consumers used by this block. Only populated after init(). */
     @NoPatch
     public Consume[] consumers = {}, optionalConsumers = {}, nonOptionalConsumers = {}, updateConsumers = {};
@@ -722,16 +720,6 @@ public class Block extends UnlockableContent implements Senseable{
         setBars();
         offset = ((size + 1) % 2) * tilesize / 2f;
         sizeOffset = -((size - 1) / 2);
-        for (Item it : acceptsItemInput) {
-            if (!itemFilter[it.id]){
-                itemFilter[it.id] = true;
-            }
-        }
-        for (Item it : denyItemInput) {
-            if (itemFilter[it.id]) {
-                itemFilter[it.id] = false;
-            }
-        }
     }
 
     public boolean consumesItem(Item item){
