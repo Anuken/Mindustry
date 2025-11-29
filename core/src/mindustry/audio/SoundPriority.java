@@ -59,6 +59,8 @@ public class SoundPriority{
         walkerStep.setMinConcurrentInterrupt(0.6f);
         mechStepHeavy.setMinConcurrentInterrupt(0.6f);
 
+        shieldHit.setMaxConcurrent(4);
+
         max(4, mechStep, mechStepHeavy, walkerStep);
     }
 

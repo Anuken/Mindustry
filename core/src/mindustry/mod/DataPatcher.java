@@ -137,6 +137,8 @@ public class DataPatcher{
                 weapon.load();
                 weapon.init();
             }else if(object instanceof Content cont){
+                cont.init();
+                cont.postInit();
                 cont.load();
             }
         }else{

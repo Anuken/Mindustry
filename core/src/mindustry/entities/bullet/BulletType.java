@@ -377,6 +377,13 @@ public class BulletType extends Content implements Cloneable{
     }
 
     @Override
+    public void afterPatch(){
+        super.afterPatch();
+
+        range = calculateRange();
+    }
+
+    @Override
     public void load(){
         for(var part : parts){
             part.turretShading = false;
