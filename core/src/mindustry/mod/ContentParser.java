@@ -534,16 +534,14 @@ public class ContentParser{
         for(JsonValue child : value){
             switch(child.name){
                 case "add" -> {
-                    Item[] arr = child.isArray()? new Item[]{parser.readValue(Item.class, child)} : new Item[]{};
-                    for (Item it : arr) {
+                    for (Item it : parser.readValue(Item[].class, child)) {
                         if (!booleans[it.id]) {
                             block.itemFilter[it.id] = true;
                         }
                     }
                 }
                 case "remove" -> {
-                    Item[] arr = child.isArray()? new Item[]{parser.readValue(Item.class, child)} : new Item[]{};
-                    for (Item it : arr) {
+                    for (Item it : parser.readValue(Item[].class, child)) {
                         if(booleans[it.id]){
                             block.itemFilter[it.id] = false;
                         }
