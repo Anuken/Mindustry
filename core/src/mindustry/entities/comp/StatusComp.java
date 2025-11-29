@@ -22,6 +22,7 @@ abstract class StatusComp implements Posc{
     //these are considered read-only
     //note: armor is a special case; it is an override when >= 0, otherwise ignored
     transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1, buildSpeedMultiplier = 1, dragMultiplier = 1, armorOverride = -1f;
+    transient int armorReduction = -1;
     transient boolean disarmed = false;
 
     @Import UnitType type;
@@ -225,6 +226,8 @@ abstract class StatusComp implements Posc{
                     reloadMultiplier *= entry.effect.reloadMultiplier;
                     buildSpeedMultiplier *= entry.effect.buildSpeedMultiplier;
                     dragMultiplier *= entry.effect.dragMultiplier;
+
+                    if(entry.effect.armorReduction > 0) armorReduction = entry.effect.armorReduction;
                 }
 
                 disarmed |= entry.effect.disarm;

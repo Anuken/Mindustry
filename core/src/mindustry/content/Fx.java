@@ -1407,6 +1407,15 @@ public class Fx{
         });
     }),
 
+    armorRendVapor = new Effect(80f, e -> {
+        color(e.color);
+        alpha(Interp.pow2Out.apply(e.fslope()) * 0.5f);
+
+        randLenVectors(e.id, 2, 5f + e.finpow() * 5f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 2f);
+        });
+    }),
+
     vapor = new Effect(110f, e -> {
         color(e.color);
         alpha(e.fout());

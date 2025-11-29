@@ -39,6 +39,8 @@ public class StatusEffect extends UnlockableContent{
     public float intervalDamage;
     /** If true, interval damage is armor piercing. */
     public boolean intervalDamagePierce = false;
+    /** Unit armor reduction. */
+    public int armorReduction = -1;
     /** Chance of effect appearing. */
     public float effectChance = 0.15f;
     /** Should the effect be given a parent. */
@@ -103,6 +105,7 @@ public class StatusEffect extends UnlockableContent{
         if(buildSpeedMultiplier != 1) stats.addMultModifier(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
         if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
         if(damage < 0) stats.add(Stat.healing, -damage * 60f, StatUnit.perSecond);
+        if(armorReduction > 0) stats.add(Stat.armorReduction, armorReduction);
 
         if(intervalDamageTime > 0f && intervalDamage > 0){
             stats.add(Stat.damage, intervalDamage);

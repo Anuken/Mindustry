@@ -14,6 +14,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -3070,6 +3071,9 @@ public class UnitTypes{
 
                     shrinkX = 0.6f;
                     shrinkY = 0.2f;
+
+                    status = StatusEffects.armorRend;
+                    statusDuration = 300f;
 
                     hitEffect = despawnEffect = new MultiEffect(Fx.hitSquaresColor, new WaveEffect(){{
                         colorFrom = colorTo = Pal.techBlue;
