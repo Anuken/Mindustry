@@ -287,9 +287,7 @@ public class GenericCrafter extends Block{
             return totalProgress;
         }
 
-        public void craft(){
-            consume();
-
+        public void craftOutputs(){
             if(outputItems != null){
                 for(var output : outputItems){
                     for(int i = 0; i < output.amount; i++){
@@ -297,6 +295,11 @@ public class GenericCrafter extends Block{
                     }
                 }
             }
+        }
+
+        public void craft(){
+            consume();
+            craftOutputs();
 
             if(wasVisible){
                 craftEffect.at(x, y);

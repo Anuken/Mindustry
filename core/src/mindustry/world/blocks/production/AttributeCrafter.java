@@ -3,6 +3,7 @@ package mindustry.world.blocks.production;
 import arc.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -17,6 +18,8 @@ public class AttributeCrafter extends GenericCrafter{
     public float displayEfficiencyScale = 1f;
     public boolean displayEfficiency = true;
     public boolean scaleLiquidConsumption = false;
+    /** Scale output ammount on efficiency */
+    public boolean scaleOutput = false;
 
     public AttributeCrafter(String name){
         super(name);
@@ -73,6 +76,40 @@ public class AttributeCrafter extends GenericCrafter{
         @Override
         public float efficiencyScale(){
             return scaleLiquidConsumption ? efficiencyMultiplier() : super.efficiencyScale();
+        }
+
+        public float scaleOutputs(float amount){
+            return scaleOutput ?  Math.min(itemCapacity, Math.round(amount * efficiencyMultiplier())) : amount;
+        }
+
+        @Override
+        public void craftOutputs(){
+            if(outputItems != null){
+                for(var output : outputItems){
+                    for(int i = 0; i < scaleOutputs(output.amount); i++){
+                        offload(output.item);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void dumpOutputs(){
+            if(outputItems != null && timer(timerDump, dumpTime / timeScale)){
+                for(ItemStack output : outputItems){
+                    for(int i = 0; i < scaleOutputs(output.amount); i++){
+                        dump(output.item);
+                    }
+                }
+            }
+
+            if(outputLiquids != null){
+                for(int i = 0; i < outputLiquids.length; i++){
+                    int dir = liquidOutputDirections.length > i ? liquidOutputDirections[i] : -1;
+
+                    dumpLiquid(outputLiquids[i].liquid, 2f, dir);
+                }
+            }
         }
 
         @Override
