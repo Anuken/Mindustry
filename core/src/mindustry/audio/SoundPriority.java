@@ -48,10 +48,6 @@ public class SoundPriority{
         laser.setMaxConcurrent(5);
 
         sameGroup(flame, flamePlasma);
-
-        //sameGroup(hit1, hit2, hit3);
-        //max(4, hit1, hit2, hit3);
-
         sameGroup(missile, missileShort, missilePlasmaShort);
         sameGroup(spark, shock);
 
@@ -61,9 +57,9 @@ public class SoundPriority{
 
         mechStep.setMinConcurrentInterrupt(0.5f);
         walkerStep.setMinConcurrentInterrupt(0.6f);
+        mechStepHeavy.setMinConcurrentInterrupt(0.6f);
 
-        mechStep.setMaxConcurrent(4);
-        walkerStep.setMaxConcurrent(4);
+        max(4, mechStep, mechStepHeavy, walkerStep);
     }
 
     static void max(int max, Sound... sounds){

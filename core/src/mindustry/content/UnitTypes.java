@@ -198,7 +198,8 @@ public class UnitTypes{
             singleTarget = true;
             drownTimeMultiplier = 1.5f;
             stepSound = Sounds.mechStep;
-            stepSoundVolume = 0.25f;
+            stepSoundPitch = 0.9f;
+            stepSoundVolume = 0.35f;
 
             abilities.add(new ShieldRegenFieldAbility(25f, 250f, 60f * 1, 60f));
 
@@ -219,6 +220,7 @@ public class UnitTypes{
                 shake = 2f;
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.shootScepter;
+                shootSoundVolume = 0.95f;
                 inaccuracy = 3f;
 
                 shoot.shots = 3;
@@ -271,7 +273,9 @@ public class UnitTypes{
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
             ammoType = new ItemAmmoType(Items.thorium);
-            stepSound = Sounds.mechStep;
+            stepSound = Sounds.mechStepHeavy;
+            stepSoundPitch = 0.9f;
+            stepSoundVolume = 0.45f;
 
             weapons.add(
             new Weapon("reign-weapon"){{
@@ -483,6 +487,7 @@ public class UnitTypes{
 
             singleTarget = true;
             stepSound = Sounds.mechStep;
+            stepSoundPitch = 0.9f;
             stepSoundVolume = 0.25f;
 
             weapons.add(new Weapon("vela-weapon"){{
@@ -1918,7 +1923,7 @@ public class UnitTypes{
                 rotate = true;
                 reload = 90f;
                 x = y = shootX = shootY = 0f;
-                shootSound = Sounds.missilePlasmaShort;
+                shootSound = Sounds.torpedoPlasma;
                 rotateSpeed = 180f;
                 shootSoundVolume = 0.9f;
 
