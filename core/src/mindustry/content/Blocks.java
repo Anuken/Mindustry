@@ -2864,7 +2864,7 @@ public class Blocks{
             drillTime = 400;
             size = 2;
 
-            consumeLiquid(Liquids.water, 0.06f).boost();
+            consumeLiquid(Liquids.water, 3.5f / 60f).boost();
         }};
 
         laserDrill = new Drill("laser-drill"){{
