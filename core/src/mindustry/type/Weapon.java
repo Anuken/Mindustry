@@ -128,6 +128,10 @@ public class Weapon implements Cloneable{
     public float layerOffset = 0f;
     /** sound used for shooting */
     public Sound shootSound = Sounds.pew;
+    /** volume of the shoot sound */
+    public float shootSoundVolume = 1f;
+    /** sound used when this weapon first fires; for continuous weapons only */
+    public Sound initialShootSound = Sounds.none;
     /** sound used for weapons that have a delay */
     public Sound chargeSound = Sounds.none;
     /** sound played when there is nothing to shoot */
@@ -324,7 +328,7 @@ public class Weapon implements Cloneable{
                 shoot = mount.target.within(mountX, mountY, bullet.range + Math.abs(shootY) + (mount.target instanceof Sized s ? s.hitSize()/2f : 0f)) && can;
 
                 if(predictTarget){
-                    Vec2 to = Predict.intercept(unit, mount.target, bullet.speed);
+                    Vec2 to = Predict.intercept(unit, mount.target, bullet);
                     mount.aimX = to.x;
                     mount.aimY = to.y;
                 }else{
@@ -498,7 +502,9 @@ public class Weapon implements Cloneable{
         handleBullet(unit, mount, mount.bullet);
 
         if(!continuous){
-            shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
+            shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax), shootSoundVolume);
+        }else{
+            initialShootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax), shootSoundVolume);
         }
 
         ejectEffect.at(mountX, mountY, angle * Mathf.sign(this.x));

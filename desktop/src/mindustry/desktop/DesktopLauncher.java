@@ -51,16 +51,17 @@ public class DesktopLauncher extends ClientLauncher{
                 width = 900;
                 height = 700;
 
-                //on Windows, Intel drivers might be buggy with OpenGL 3.x, so only use 2.0. See https://github.com/Anuken/Mindustry/issues/11041
-                if(GpuDetect.isIntel){
+                //on Windows, Intel drivers might be buggy with OpenGL 3.x, so only use 2.x. See https://github.com/Anuken/Mindustry/issues/11041
+                if(GpuDetect.hasIntel && !GpuDetect.hasAMD && !GpuDetect.hasNvidia){
+                    allowGl30 = false;
                     coreProfile = false;
-                    glVersions = new int[][]{{2, 0}};
+                    glVersions = new int[][]{{2, 1}, {2, 0}};
                 }else if(OS.isMac){
                     //MacOS supports 4.1 at most
-                    glVersions = new int[][]{{4, 1}, {3, 2}, {2, 0}};
+                    glVersions = new int[][]{{4, 1}, {3, 2}, {2, 1}, {2, 0}};
                 }else{
                     //try essentially every OpenGL version
-                    glVersions = new int[][]{{4, 6}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {2, 0}};
+                    glVersions = new int[][]{{4, 6}, {4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {2, 1}, {2, 0}};
                 }
 
                 for(int i = 0; i < arg.length; i++){
@@ -75,6 +76,7 @@ public class DesktopLauncher extends ClientLauncher{
                                     String[] split = str.split("\\.");
                                     if(split.length == 2 && Strings.canParsePositiveInt(split[0]) && Strings.canParsePositiveInt(split[1])){
                                         glVersions = new int[][]{{Strings.parseInt(split[0]), Strings.parseInt(split[1])}};
+                                        allowGl30 = true; //when a version is explicitly specified always allow GL 3
                                         break;
                                     }
 
@@ -116,17 +118,19 @@ public class DesktopLauncher extends ClientLauncher{
         testMobile = Seq.with(args).contains("-testMobile");
 
         if(useDiscord){
-            try{
-                DiscordRPC.connect(discordID);
-                Log.info("Initialized Discord rich presence.");
-                Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::close));
-            }catch(NoDiscordClientException none){
-                //don't log if no client is found
-                useDiscord = false;
-            }catch(Throwable t){
-                useDiscord = false;
-                Log.warn("Failed to initialize Discord RPC - you are likely using a JVM <16.");
-            }
+            Threads.daemon(() -> {
+                try{
+                    DiscordRPC.connect(discordID);
+                    Log.info("Initialized Discord rich presence.");
+                    Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::close));
+                }catch(NoDiscordClientException none){
+                    //don't log if no client is found
+                    useDiscord = false;
+                }catch(Throwable t){
+                    useDiscord = false;
+                    Log.warn("Failed to initialize Discord RPC - you are likely using a JVM <16.");
+                }
+            });
         }
 
         if(useSteam){

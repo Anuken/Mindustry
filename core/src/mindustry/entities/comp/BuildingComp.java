@@ -727,6 +727,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     }
 
+    public boolean allowDeposit(){
+        return block.alwaysAllowDeposit || !state.rules.onlyDepositCore;
+    }
+
     /** Called when this block is dropped as a payload. */
     public void dropped(){
 
@@ -1505,7 +1509,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //TODO duplicated code?
         table.table(t -> {
             t.left();
-            t.add(new Image(block.getDisplayIcon(tile))).size(8 * 4);
+            t.add(new Image(block.getDisplayIcon(tile))).scaling(Scaling.fit).size(8 * 4);
             t.labelWrap(block.getDisplayName(tile)).left().width(190f).padLeft(5);
         }).growX().left();
 

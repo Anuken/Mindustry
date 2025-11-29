@@ -540,7 +540,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 lastLineY = tileY;
             }else if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
                 //shoot on touch down when in keyboard mode
-                player.shooting = true;
+                player.shooting = !state.isEditor();
             }
         }
 
@@ -752,6 +752,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(!commandMode){
             queueCommandMode = false;
+        }else{
+            mode = none;
+            schematicMode = false;
         }
 
         //cannot rebuild and place at the same time
@@ -996,11 +999,10 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         targetPos.set(Core.camera.position);
-        float attractDst = 15f;
 
+        float attractDst = 15f;
         float speed = unit.speed();
         float range = unit.hasWeapons() ? unit.range() : 0f;
-        float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
         boolean aimCursor = omni && player.shooting && type.hasWeapons() && !boosted && type.faceTarget;
 
@@ -1053,7 +1055,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         unit.movePref(movement);
 
         //update shooting if not building + not mining
-        if(!unit.activelyBuilding() && unit.mineTile == null){
+        if(!unit.activelyBuilding() && unit.mineTile == null && !state.isEditor()){
 
             //autofire targeting
             if(manualShooting){
@@ -1078,7 +1080,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //this may be a bad idea, aiming for a point far in front could work better, test it out
                 unit.aim(Core.input.mouseWorldX(), Core.input.mouseWorldY());
             }else{
-                Vec2 intercept = player.unit().type.weapons.contains(w -> w.predictTarget) ? Predict.intercept(unit, target, bulletSpeed) : Tmp.v1.set(target);
+                Vec2 intercept = player.unit().type.weapons.contains(w -> w.predictTarget) ? Predict.intercept(unit, target, type.weapons.first().bullet) : Tmp.v1.set(target);
 
                 player.mouseX = intercept.x;
                 player.mouseY = intercept.y;

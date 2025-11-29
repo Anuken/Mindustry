@@ -17,6 +17,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -101,12 +102,40 @@ public class ForceProjector extends Block{
         if(consItems) stats.timePeriod = phaseUseTime;
         super.setStats();
         stats.add(Stat.shieldHealth, shieldHealth, StatUnit.none);
+        stats.add(Stat.regenerationRate, cooldownNormal * 60f, StatUnit.perSecond);
         stats.add(Stat.cooldownTime, (int) (shieldHealth / cooldownBrokenBase / 60f), StatUnit.seconds);
 
         if(consItems && itemConsumer instanceof ConsumeItems coni){
             stats.remove(Stat.booster);
             stats.add(Stat.booster, StatValues.itemBoosters("+{0} " + StatUnit.shieldHealth.localized(), stats.timePeriod, phaseShieldBoost, phaseRadiusBoost, coni.items));
-            stats.add(Stat.booster, StatValues.speedBoosters("", coolantConsumption, Float.MAX_VALUE, true, this::consumesLiquid));
+
+            stats.add(Stat.booster, (table) -> {
+                table.row();
+                table.table(c -> {
+                    for(Liquid liquid : content.liquids()){
+                        if(!consumesLiquid(liquid)) continue;
+
+                        c.table(Styles.grayPanel, b -> {
+                            b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> StatValues.withTooltip(i, liquid, false));
+                            b.table(info -> {
+                                info.add(liquid.localizedName).left().row();
+                                info.add(Strings.autoFixed(coolantConsumption * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
+                            });
+
+                            float liquidHeat = (1f + (liquid.heatCapacity - 0.4f) * 0.9f);
+                            float regenBoost = ((cooldownNormal * (cooldownLiquid * liquidHeat)) - cooldownNormal) * 60f;
+                            float cooldownBoost = (shieldHealth / (cooldownBrokenBase * (cooldownLiquid * liquidHeat)) - shieldHealth / cooldownBrokenBase) / 60f;
+
+                            b.table(bt -> {
+                                bt.right().defaults().padRight(3).left();
+                                bt.add("[lightgray]+" + Core.bundle.format("bar.regenerationrate", Strings.autoFixed(regenBoost, 2))).pad(5).row();
+                                bt.add(Core.bundle.format("ability.stat.cooldown", Strings.autoFixed(cooldownBoost, 2))).pad(5);
+                            }).right().grow().pad(10f).padRight(15f);
+                        }).growX().pad(5).row();
+                    }
+                }).growX().colspan(table.getColumns());
+                table.row();
+            });
         }
     }
 
@@ -126,6 +155,15 @@ public class ForceProjector extends Block{
     public class ForceBuild extends Building implements Ranged, ExplosionShield{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
+
+        @Override
+        public void setProp(LAccess prop, double value){
+            if(prop == LAccess.shield){
+                buildup = Math.max(shieldHealth + phaseShieldBoost * phaseHeat - (float)value, 0f);
+            }else{
+                super.setProp(prop, value);
+            }
+        }
 
         @Override
         public float range(){

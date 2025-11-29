@@ -16,7 +16,6 @@ public class SerpuloTechTree{
         Planets.serpulo.techTree = nodeRoot("serpulo", coreShard, () -> {
 
             node(conveyor, () -> {
-
                 node(junction, () -> {
                     node(router, () -> {
                         node(advancedLaunchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
@@ -73,7 +72,6 @@ public class SerpuloTechTree{
             });
 
             node(mechanicalDrill, () -> {
-
                 node(mechanicalPump, () -> {
                     node(conduit, () -> {
                         node(liquidJunction, () -> {
@@ -580,6 +578,14 @@ public class SerpuloTechTree{
                                         new Research(cyclone),
                                         new Research(ripple)
                                         ), () -> {
+                                            node(sunkenPier, Seq.with(
+                                            new SectorComplete(navalFortress),
+                                            new SectorComplete(coastline),
+                                            new Research(multiplicativeReconstructor)
+                                            ), () -> {
+
+                                            });
+
                                             node(weatheredChannels, Seq.with(
                                             new SectorComplete(impact0078),
                                             new SectorComplete(navalFortress),

@@ -80,9 +80,9 @@ public class BulletType extends Content implements Cloneable{
     public Sound hitSound = Sounds.none;
     /** Sound made when hitting something or getting removed.*/
     public Sound despawnSound = Sounds.none;
-    /** Pitch of the sound made when hitting something*/
-    public float hitSoundPitch = 1;
-    /** Volume of the sound made when hitting something*/
+    /** Pitch of the sound made when hitting something */
+    public float hitSoundPitch = 1, hitSoundPitchRange = 0.1f;
+    /** Volume of the sound made when hitting something */
     public float hitSoundVolume = 1;
     /** Extra inaccuracy when firing. */
     public float inaccuracy = 0f;
@@ -511,7 +511,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void hit(Bullet b, float x, float y){
         hitEffect.at(x, y, b.rotation(), hitColor);
-        hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
+        hitSound.at(x, y, hitSoundPitch + Mathf.range(hitSoundPitchRange), hitSoundVolume);
 
         Effect.shake(hitShake, hitShake, b);
 
@@ -609,7 +609,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
-        despawnSound.at(b);
+        despawnSound.at(b, 1f + Mathf.range(hitSoundPitchRange));
 
         Effect.shake(despawnShake, despawnShake, b);
     }
