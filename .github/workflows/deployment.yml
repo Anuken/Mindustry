@@ -1,9 +1,7 @@
 name: Deployment
 
 on:
-  push:
-    tags:
-      - 'test'
+  workflow_dispatch:
 
 permissions: {}
 jobs:
