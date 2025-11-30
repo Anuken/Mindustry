@@ -1931,7 +1931,7 @@ public class Blocks{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 75, Items.plastanium, 30));
             consumePower(5f);
             size = 2;
-            speedBoost = 1.25f;
+            speedBoost = 1.5f;
             speedBoostPhase = 0.50f;
             consumeItem(Items.phaseFabric, 1).boost();
         }};
@@ -1941,7 +1941,7 @@ public class Blocks{
             consumePower(20f);
             size = 3;
             range = 200f;
-            speedBoost = 1.75f;
+            speedBoost = 2f;
             useTime = 300f;
             hasBoost = false;
             consumeItems(with(Items.phaseFabric, 1, Items.silicon, 1));
