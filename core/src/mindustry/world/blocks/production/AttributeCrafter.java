@@ -1,6 +1,7 @@
 package mindustry.world.blocks.production;
 
 import arc.*;
+import arc.math.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -18,7 +19,7 @@ public class AttributeCrafter extends GenericCrafter{
     public float displayEfficiencyScale = 1f;
     public boolean displayEfficiency = true;
     public boolean scaleLiquidConsumption = false;
-    /** Scale output ammount on efficiency */
+    /** Scale output amount on efficiency */
     public boolean scaleOutput = false;
 
     public AttributeCrafter(String name){
@@ -63,6 +64,8 @@ public class AttributeCrafter extends GenericCrafter{
 
     public class AttributeCrafterBuild extends GenericCrafterBuild{
         public float attrsum;
+        public float accumulator;
+        public float scaledOutput, lastScaledOutput;
 
         @Override
         public float getProgressIncrease(float base){
@@ -78,38 +81,16 @@ public class AttributeCrafter extends GenericCrafter{
             return scaleLiquidConsumption ? efficiencyMultiplier() : super.efficiencyScale();
         }
 
-        public float scaleOutputs(float amount){
-            return scaleOutput ?  Math.min(itemCapacity, Math.round(amount * efficiencyMultiplier())) : amount;
-        }
-
         @Override
-        public void craftOutputs(){
-            if(outputItems != null){
-                for(var output : outputItems){
-                    for(int i = 0; i < scaleOutputs(output.amount); i++){
-                        offload(output.item);
-                    }
-                }
-            }
-        }
+        public float scaleOutput(float amount, boolean accumulate){
+            scaledOutput = amount * efficiencyMultiplier();
 
-        @Override
-        public void dumpOutputs(){
-            if(outputItems != null && timer(timerDump, dumpTime / timeScale)){
-                for(ItemStack output : outputItems){
-                    for(int i = 0; i < scaleOutputs(output.amount); i++){
-                        dump(output.item);
-                    }
-                }
+            if(accumulate){
+                accumulator = accumulator > 1f ? accumulator - 1f : accumulator + scaledOutput % 1f;
             }
-
-            if(outputLiquids != null){
-                for(int i = 0; i < outputLiquids.length; i++){
-                    int dir = liquidOutputDirections.length > i ? liquidOutputDirections[i] : -1;
-
-                    dumpLiquid(outputLiquids[i].liquid, 2f, dir);
-                }
-            }
+            
+            lastScaledOutput = scaleOutput ? Math.min(itemCapacity, scaledOutput + Mathf.floor(accumulator)) : amount;
+            return lastScaledOutput;
         }
 
         @Override
