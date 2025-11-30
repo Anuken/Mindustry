@@ -1929,17 +1929,19 @@ public class Blocks{
 
         overdriveProjector = new OverdriveProjector("overdrive-projector"){{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 75, Items.plastanium, 30));
-            consumePower(3.50f);
+            consumePower(5f);
             size = 2;
-            consumeItem(Items.phaseFabric).boost();
+            speedBoost = 1.5f;
+            speedBoostPhase = 0.50f;
+            consumeItem(Items.phaseFabric, 1).boost();
         }};
 
         overdriveDome = new OverdriveProjector("overdrive-dome"){{
-            requirements(Category.effect, with(Items.lead, 200, Items.titanium, 130, Items.silicon, 130, Items.plastanium, 80, Items.surgeAlloy, 120));
-            consumePower(10f);
+            requirements(Category.effect, with(Items.lead, 750, Items.titanium, 480, Items.silicon, 480, Items.plastanium, 300, Items.surgeAlloy, 375));
+            consumePower(20f);
             size = 3;
             range = 200f;
-            speedBoost = 2.5f;
+            speedBoost = 2f;
             useTime = 300f;
             hasBoost = false;
             consumeItems(with(Items.phaseFabric, 1, Items.silicon, 1));
