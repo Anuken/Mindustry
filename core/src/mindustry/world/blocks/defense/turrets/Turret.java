@@ -581,6 +581,14 @@ public class Turret extends ReloadTurret{
             super.handleLiquid(source, liquid, amount);
         }
 
+        @Override
+        public boolean canConsume(){
+            if(heatRequirement > 0 && heatReq <= 0f){
+                return false;
+            }
+            return super.canConsume();
+        }
+
         protected boolean validateTarget(){
             return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || isControlled() || logicControlled();
         }
