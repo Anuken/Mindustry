@@ -2764,93 +2764,152 @@ public class UnitTypes{
             armor = 20f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
+            crushDamageRadius = 4f;
+            rotateSpeed = 1.2f;
             floorMultiplier = 0.5f;
             drownTimeMultiplier = 1.25f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
+            abilities.add(new LastStandAbility(){{
+                speedMultiplier = 1.5f;
+                rotateSpeedMultiplier = 2.5f;
+                exponent = 1.5f;
+                minHealth = 0.3f;
+            }});
+
             weapons.add(new Weapon("vanquish-weapon"){{
-                shootSound = Sounds.mediumCannon;
+                shootSound = Sounds.mediumRailgun;
                 layerOffset = 0.0001f;
-                reload = 70f;
-                shootY = 71f / 4f;
+                reload = 180f;
                 shake = 5f;
                 recoil = 4f;
                 rotate = true;
                 rotateSpeed = 1f;
+                shootCone = 0f;
                 mirror = false;
-                x = 0f;
-                y = 0;
+                x = y = 0f;
                 shadow = 28f;
                 heatColor = Color.valueOf("f9350f");
-                cooldownTime = 80f;
+                cooldownTime = 160f;
 
-                bullet = new BasicBulletType(8f, 190){{
-                    sprite = "missile-large";
-                    width = 9.5f;
-                    height = 13f;
+                bullet = new RailBulletType(){{
+                    length = 230f;
+                    damage = 90f;
+                    splashDamageRadius = 32f;
+                    splashDamage = 30f;
                     lifetime = 18f;
                     hitSize = 6f;
-                    shootEffect = Fx.shootTitan;
-                    smokeEffect = Fx.shootSmokeTitan;
-                    pierceCap = 2;
-                    pierce = true;
+                    pierceCap = 1;
+                    pierce = false;
                     pierceBuilding = true;
-                    hitColor = backColor = trailColor = Color.valueOf("feb380");
-                    frontColor = Color.white;
-                    trailWidth = 3.1f;
-                    trailLength = 8;
-                    hitEffect = despawnEffect = Fx.blastExplosion;
-                    splashDamageRadius = 20f;
-                    splashDamage = 50f;
+                    setDefaults = false;
+                    hitColor = Color.valueOf("feb380");
+                    pointEffectSpace = 1f;
+                    knockback = -20f;
 
-                    fragOnHit = false;
+                    pointEffect = new ParticleEffect(){{
+                        colorTo = colorFrom = Color.valueOf("feb380");
+                        line = cap = true;
+                        particles = 1;
+                        cone = length = 0f;
+                        baseLength = 2f;
+                        lifetime = Mathf.random(25f, 50f);
+                        strokeFrom = Mathf.random(2f, 6f);
+                        strokeTo = 0f;
+                        lenFrom = lenTo = 4f;
+                    }};
+
+                    shootEffect = Fx.shootTitan;
+                    smokeEffect = new ParticleEffect(){{
+                        colorTo = colorFrom = Color.valueOf("fea480");
+                        particles = Mathf.random(4, 10);
+                        length = Mathf.random(30f, 50f);
+                        lifetime = 35f;
+                        lenFrom = Mathf.random(7f, 14f);
+                        lenTo = strokeTo = 0f;
+                        strokeFrom = 2f;
+                        cone = 10f;
+                        line = true;
+                        interp = Interp.fade;
+                        interp = Interp.pow2Out;
+                        sizeInterp = Interp.pow2In;
+                    }};
+
+                    hitEffect = endEffect = new ParticleEffect(){{
+                        colorTo = Color.valueOf("feb380");
+                        particles = 8;
+                        length = 60f;
+                        lifetime = 30f;
+                        lenFrom = 10f;
+                        lenTo = strokeTo = 0f;
+                        strokeFrom = 2f;
+                        cone = 40f;
+                        line = true;
+                        interp = Interp.pow2Out;
+                        sizeInterp = Interp.pow2In;
+                    }};  
+
                     fragRandomSpread = 0f;
                     fragSpread = 10f;
                     fragBullets = 5;
                     fragVelocityMin = 1f;
                     despawnSound = Sounds.dullExplosion;
 
-                    fragBullet = new BasicBulletType(8f, 35){{
+                    fragBullet = new BasicBulletType(8f, 35f){{
                         sprite = "missile-large";
+                        pierce = true;
+                        pierceBuilding = true;
+                        splashDamageRadius = 20f;
+                        splashDamage = 15f;
+                        pierceCap = 2;
                         width = 8f;
                         height = 12f;
-                        lifetime = 15f;
+                        lifetime = 10f;
                         hitSize = 4f;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
                         frontColor = Color.white;
                         trailWidth = 2.8f;
                         trailLength = 6;
                         hitEffect = despawnEffect = Fx.blastExplosion;
-                        splashDamageRadius = 10f;
-                        splashDamage = 20f;
                     }};
                 }};
             }});
 
             int i = 0;
-            for(float f : new float[]{34f / 4f, -36f / 4f}){
+            for(float f : new float[] { 34f / 4f, -36f / 4f }){
                 int fi = i ++;
                 weapons.add(new Weapon("vanquish-point-weapon"){{
-                    reload = 35f + fi * 5;
+                    reload = 22f;
                     x = 48f / 4f;
                     y = f;
                     shootY = 5.5f;
                     recoil = 2f;
                     rotate = true;
+                    rotateSpeed = 3f;
+                    shootCone = 30f;
+                    shootSound = Sounds.shoot;
+                    layerOffset = 0.00001f;
+                    mirror = true;
+                    alternate = true;
+                    minWarmup = fi / 2f;
                     rotateSpeed = 2f;
                     shootSound = Sounds.shootStell;
 
-                    bullet = new BasicBulletType(4.5f, 25){{
-                        width = 6.5f;
-                        height = 11f;
+                    bullet = new BasicBulletType(12f, 50f){{
+                        sprite = "missile-large";
+                        width = 9.5f;
+                        height = 13f;
+                        lifetime = 10f;
+                        hitSize = 6f;
                         shootEffect = Fx.sparkShoot;
                         smokeEffect = Fx.shootBigSmoke;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
                         frontColor = Color.white;
-                        trailWidth = 1.5f;
-                        trailLength = 4;
-                        hitEffect = despawnEffect = Fx.hitBulletColor;
+                        trailWidth = 3.1f;
+                        trailLength = 8;
+                        hitEffect = Fx.blastExplosion;
+                        despawnEffect = Fx.hitBulletColor;
                     }};
                 }});
             }
@@ -3229,7 +3288,7 @@ public class UnitTypes{
             drag = 0.1f;
             hitSize = 21f;
             rotateSpeed = 3f;
-            health = 2900;
+            health = 2700;
             armor = 7f;
             fogRadius = 40f;
             stepShake = 0f;
@@ -3340,7 +3399,7 @@ public class UnitTypes{
                         trailColor = engineColor = Pal.techBlue;
                         engineSize = 1.75f;
                         engineLayer = Layer.effect;
-                        speed = 3.7f;
+                        speed = 3.35f;
                         maxRange = 6f;
                         lifetime = 60f * 1.5f;
                         outlineColor = Pal.darkOutline;
@@ -3909,7 +3968,7 @@ public class UnitTypes{
             health = 6000f;
             armor = 4f;
             hitSize = 36f;
-            payloadCapacity = Mathf.sqr(3f) * tilePayload;
+            payloadCapacity = Mathf.sqr(4f) * tilePayload;
             researchCostMultiplier = 0f;
             targetAir = false;
 
