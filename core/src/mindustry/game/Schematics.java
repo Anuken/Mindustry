@@ -60,6 +60,7 @@ public class Schematics implements Loadable{
     private ObjectMap<CoreBlock, Seq<Schematic>> loadouts = new ObjectMap<>();
     private ObjectMap<CoreBlock, Schematic> defaultLoadouts = new ObjectMap<>();
     private @Nullable FrameBuffer shadowBuffer;
+    private boolean triedCreatingShadowBuffer;
     private Texture errorTexture;
     private long lastClearTime;
 
@@ -97,17 +98,6 @@ public class Schematics implements Loadable{
         });
 
         all.sort();
-
-        if(shadowBuffer == null && !headless){
-            Core.app.post(() -> {
-                try{
-                    shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 8, maxSchematicSize + padding + 8);
-                }catch(Exception e){
-                    Log.err(Strings.format("Failed to create shadow buffer (@x@): @. This is likely because a mod is setting maxSchematicSize too high. Don't do that.",
-                    maxSchematicSize + padding + 8, maxSchematicSize + padding + 8, Strings.getSimpleMessage(e)));
-                }
-            });
-        }
     }
 
     private void loadLoadouts(){
@@ -221,6 +211,16 @@ public class Schematics implements Loadable{
             Tmp.m1.set(Draw.proj());
             Tmp.m2.set(Draw.trans());
             FrameBuffer buffer = new FrameBuffer((schematic.width + padding) * resolution, (schematic.height + padding) * resolution);
+
+            if(shadowBuffer == null && !triedCreatingShadowBuffer){
+                triedCreatingShadowBuffer = true;
+                try{
+                    shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 8, maxSchematicSize + padding + 8);
+                }catch(Exception e){
+                    Log.err(Strings.format("Failed to create shadow buffer (@x@): @. This is likely because a mod is setting maxSchematicSize too high. Don't do that.",
+                    maxSchematicSize + padding + 8, maxSchematicSize + padding + 8, Strings.getSimpleMessage(e)));
+                }
+            }
 
             if(shadowBuffer != null){
                 shadowBuffer.begin(Color.clear);
