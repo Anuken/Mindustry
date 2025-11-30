@@ -2362,6 +2362,7 @@ public class Blocks{
 
         bridgeConduit = new LiquidBridge("bridge-conduit"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 8));
+            floating = true;
             fadeIn = moveArrows = false;
             arrowSpacing = 6f;
             range = 4;
@@ -2372,6 +2373,7 @@ public class Blocks{
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
             requirements(Category.liquid, with(Items.phaseFabric, 5, Items.silicon, 7, Items.metaglass, 20, Items.titanium, 10));
+            floating = true;
             range = 12;
             arrowPeriod = 0.9f;
             arrowTimeScl = 2.75f;
