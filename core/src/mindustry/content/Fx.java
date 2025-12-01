@@ -1250,6 +1250,51 @@ public class Fx{
         Fill.circle(e.x, e.y, e.rotation * e.fout());
     }).layer(Layer.bullet - 0.001f),
 
+    bulletSparkSmokeTrailSmall = new Effect(28f, e -> {
+        color(e.color);
+        rand.setSeed(e.id);
+
+        for(int i = 0; i < 6; i++){
+            float fin = e.fin() / rand.random(0.6f, 1f);
+            float fout = 1f - fin;
+
+            float angle = rand.random(360f);
+            float len = rand.random(0.3f, 0.8f);
+
+            if(fin <= 1f){
+                Tmp.v1.trns(angle, fin * 10f * len);
+
+                alpha((0.4f - Math.abs(fin - 0.5f)) * 1.6f);
+                Fill.circle(
+                    e.x + Tmp.v1.x,
+                    e.y + Tmp.v1.y,
+                    0.4f + fout * 2.2f
+                );
+            }
+        }
+
+        rand.setSeed(e.id * 2);
+
+        for(int s = 0; s < (int)rand.random(0, 2); s++){
+            float fin = e.fin();
+            float fout = 1f - fin;
+
+            float angle = rand.random(360f);
+            float len = rand.random(0.5f, 1.2f);
+
+            Tmp.v2.trns(angle, fin * 10f * len);
+
+            color(Pal.surge, Color.white, fin);
+            alpha(fout * 0.9f);
+
+            Lines.stroke(1.5f * fout);
+            Lines.lineAngle(e.x + Tmp.v2.x, e.y + Tmp.v2.y, angle, 2.5f + 3f * fout
+            );
+        }
+
+        reset();
+    }),
+
     colorTrail = new Effect(50, e -> {
         color(e.color);
         Fill.circle(e.x, e.y, e.rotation * e.fout());

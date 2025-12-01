@@ -14,6 +14,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -203,10 +204,17 @@ public class UnitTypes{
 
             abilities.add(new ShieldRegenFieldAbility(25f, 250f, 60f * 1, 60f));
 
-            BulletType smallBullet = new BasicBulletType(3f, 10){{
-                width = 7f;
-                height = 9f;
-                lifetime = 50f;
+            BulletType smallBullet = new BasicBulletType(6f, 20){{
+                width = 8f;
+                height = 13f;
+                lifetime = 33f;
+
+                trailWidth = 2.2f;
+                trailLength = 5;
+                trailChance = 20f / 60f;
+                trailColor = Pal.bulletYellowBack;
+                trailEffect = new MultiEffect(Fx.bulletSparkSmokeTrailSmall, Fx.lightning);
+                trailSpread = 12f;
             }};
 
             weapons.add(
@@ -226,22 +234,33 @@ public class UnitTypes{
                 shoot.shots = 3;
                 shoot.shotDelay = 4f;
 
-                bullet = new BasicBulletType(8f, 80){{
+                bullet = new BasicBulletType(8f, 70){{
                     width = 11f;
                     height = 20f;
                     lifetime = 27f;
+                    shrinkY = 0.7f;
                     shootEffect = Fx.shootBig;
+                    trailColor = Pal.surge;
+                    trailParam = 0.5f;
                     lightning = 2;
                     lightningLength = 6;
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
                     lightningDamage = 20;
                     despawnSound = Sounds.sparkBullet;
+
+                    bulletInterval = 3f;
+                    intervalBullet = new LightningBulletType(){{
+                        damage = 5f;
+                        lightningLength = 2;
+                        lightningLengthRand = 5;
+                        lightningColor = Pal.surge;
+                    }};
                 }};
             }},
 
-            new Weapon("mount-weapon"){{
-                reload = 13f;
+            new Weapon("scepter-mount"){{
+                reload = 12f;
                 x = 8.5f;
                 y = 6f;
                 rotate = true;
@@ -249,13 +268,13 @@ public class UnitTypes{
                 bullet = smallBullet;
                 shootSound = Sounds.shootDagger;
             }},
-            new Weapon("mount-weapon"){{
-                reload = 16f;
+            new Weapon("scepter-mount"){{
+                reload = 15f;
                 x = 8.5f;
                 y = -7f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
-                bullet = smallBullet;
+                bullet = smallBullet; 
                 shootSound = Sounds.shootDagger;
             }}
             );
