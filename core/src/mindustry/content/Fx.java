@@ -938,6 +938,16 @@ public class Fx{
         });
     }),
 
+    hitLancerLow = new Effect(12, e -> {
+        color(Color.white);
+        stroke(e.fout() * 1.5f);
+
+        randLenVectors(e.id, 4, e.finpow() * 17f, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
+        });
+    }),
+
     hitBeam = new Effect(12, e -> {
         color(e.color);
         stroke(e.fout() * 2f);
@@ -1254,45 +1264,27 @@ public class Fx{
         color(e.color);
         rand.setSeed(e.id);
 
-        for(int i = 0; i < 6; i++){
-            float fin = e.fin() / rand.random(0.6f, 1f);
-            float fout = 1f - fin;
-
-            float angle = rand.random(360f);
+        for(int i = 0; i < 3; i++){
             float len = rand.random(0.3f, 0.8f);
+            float angle = rand.random(360f);
+            Tmp.v1.trns(angle, e.fin() * 10f * len);
 
-            if(fin <= 1f){
-                Tmp.v1.trns(angle, fin * 10f * len);
-
-                alpha((0.4f - Math.abs(fin - 0.5f)) * 1.6f);
-                Fill.circle(
-                    e.x + Tmp.v1.x,
-                    e.y + Tmp.v1.y,
-                    0.4f + fout * 2.2f
-                );
-            }
+            float alpha = 0.4f - Math.abs(e.fin() - 0.5f) * 1.5f;
+            alpha(rand.random(alpha, alpha * 2f));
+            Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 0.4f + e.fout() * 3.5f);
         }
-
-        rand.setSeed(e.id * 2);
 
         for(int s = 0; s < (int)rand.random(0, 2); s++){
-            float fin = e.fin();
-            float fout = 1f - fin;
-
-            float angle = rand.random(360f);
             float len = rand.random(0.5f, 1.2f);
+            float angle = rand.random(360f);
+            Tmp.v2.trns(angle, e.fin() * 10f * len);
 
-            Tmp.v2.trns(angle, fin * 10f * len);
+            color(Pal.surge, Color.white, e.fin());
+            alpha(e.fout() * 0.9f);
 
-            color(Pal.surge, Color.white, fin);
-            alpha(fout * 0.9f);
-
-            Lines.stroke(1.5f * fout);
-            Lines.lineAngle(e.x + Tmp.v2.x, e.y + Tmp.v2.y, angle, 2.5f + 3f * fout
-            );
+            Lines.stroke(1.5f * e.fout());
+            Lines.lineAngle(e.x + Tmp.v2.x, e.y + Tmp.v2.y, angle, 2.5f + 3f * e.fout());
         }
-
-        reset();
     }),
 
     colorTrail = new Effect(50, e -> {
