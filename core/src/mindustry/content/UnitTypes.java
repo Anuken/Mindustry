@@ -273,7 +273,7 @@ public class UnitTypes{
                 y = -7f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
-                bullet = smallBullet; 
+                bullet = smallBullet;
                 shootSound = Sounds.shootDagger;
             }}
             );
