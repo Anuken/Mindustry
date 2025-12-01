@@ -4,7 +4,6 @@ import arc.*;
 import arc.math.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -19,8 +18,8 @@ public class AttributeCrafter extends GenericCrafter{
     public float displayEfficiencyScale = 1f;
     public boolean displayEfficiency = true;
     public boolean scaleLiquidConsumption = false;
-    /** Scale output amount on efficiency */
-    public boolean scaleOutput = false;
+    /** Scaled output multiplier, scales with efficiency. <=0 to disable. */
+    public float scaledMultiplier = 0f;
 
     public AttributeCrafter(String name){
         super(name);
@@ -64,8 +63,9 @@ public class AttributeCrafter extends GenericCrafter{
 
     public class AttributeCrafterBuild extends GenericCrafterBuild{
         public float attrsum;
-        public float accumulator;
-        public float scaledOutput, lastScaledOutput;
+        public float accumulator, lastAccumulator;
+        public float scaledOutput;
+        public int scaledInt;
 
         @Override
         public float getProgressIncrease(float base){
@@ -82,15 +82,20 @@ public class AttributeCrafter extends GenericCrafter{
         }
 
         @Override
-        public float scaleOutput(float amount, boolean accumulate){
-            scaledOutput = amount * efficiencyMultiplier();
+        public float scaleOutput(float amount, boolean accumulate, boolean consumer){
+            scaledOutput = amount * scaledMultiplier * efficiencyMultiplier();
 
             if(accumulate){
-                accumulator = accumulator > 1f ? accumulator - 1f : accumulator + scaledOutput % 1f;
+                if(consumer){
+                    scaledInt = Mathf.floor(accumulator + scaledOutput);
+                }else{
+                    accumulator += scaledOutput;
+                    scaledInt = Mathf.floor(accumulator);
+                    accumulator -= scaledInt;
+                }
             }
-            
-            lastScaledOutput = scaleOutput ? Math.min(itemCapacity, scaledOutput + Mathf.floor(accumulator)) : amount;
-            return lastScaledOutput;
+
+            return scaledMultiplier > 0f ? Math.min(itemCapacity, scaledInt) : amount;
         }
 
         @Override

@@ -1077,7 +1077,7 @@ public class Blocks{
             size = 3;
             hasPower = true;
             hasLiquids = false;
-            scaleOutput = true;
+            scaledMultiplier = 1f;
             itemCapacity = 30;
             boostScale = 0.15f;
             drawer = new DrawMulti(new DrawDefault(), new DrawFlame(Color.valueOf("ffef99")));
