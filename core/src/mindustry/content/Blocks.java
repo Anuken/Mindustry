@@ -4187,7 +4187,6 @@ public class Blocks{
                     pointEffectSpace = 20f;
                     damage = 1350;
                     buildingDamageMultiplier = 0.2f;
-                    maxDamageFraction = 0.6f;
                     pierceDamageFactor = 1f;
                     length = brange;
                     hitShake = 6f;
