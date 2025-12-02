@@ -372,7 +372,7 @@ public class LogicBlock extends Block{
                     Object oldUnit = null;
 
                     if(keep){
-                        oldUnit = executor.unit.objval;
+                        if(executor.unit != null) oldUnit = executor.unit.objval;
                         //store any older variables
                         for(LVar var : executor.vars){
                             if(!var.constant){
