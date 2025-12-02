@@ -81,6 +81,14 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
                     }else if(t.block().unitMoveBreakable){
                         ConstructBlock.deconstructFinish(t, t.block(), self());
                     }
+                    if(type.crushDamageRadius > 0){
+                        float radius = type.crushDamageRadius + hitSize;
+                        Units.nearbyEnemies(team, x, y, radius, other -> {
+                            if(other.targetable(team ) && !other.isFlying() && Mathf.within(x, y, other.x, other.y, radius) && Angles.within(Angles.angle(x, y, other.x, other.y), rotation, 90f)){
+                                other.damage(type.crushDamage * Mathf.clamp(1.5f - (other.dst(x, y) - hitSize) / type.crushDamageRadius, 0f, 1f) * Time.delta * state.rules.unitDamage(team));
+                            }
+                        });
+                    }
                 }
             }
         }
