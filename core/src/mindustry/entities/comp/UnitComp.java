@@ -40,7 +40,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import boolean dead, disarmed;
     @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, ammo, dragMultiplier, armorOverride, speedMultiplier;
     @Import Team team;
-    @Import int id, armorReduction;
+    @Import int id;
     @Import @Nullable Tile mineTile;
     @Import Vec2 vel;
     @Import WeaponMount[] mounts;
@@ -102,7 +102,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public float floorSpeedMultiplier(){
         Floor on = isFlying() || type.hovering ? Blocks.air.asFloor() : floorOn();
-        return (float)Math.pow(on.speedMultiplier, type.floorMultiplier) * speedMultiplier;
+        return on.speedMultiplier * speedMultiplier;
     }
 
     /** Called when this unit was unloaded from a factory or spawn point. */
@@ -275,7 +275,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case mining -> mining() ? 1 : 0;
             case mineX -> mining() ? mineTile.x : -1;
             case mineY -> mining() ? mineTile.y : -1;
-            case armor -> armorOverride >= 0f ? armorOverride : armorReduction > 0 ? Math.max(armor - armorReduction, 0) : armor;
+            case armor -> armorOverride >= 0f ? armorOverride : armor;
             case flag -> flag;
             case speed -> type.speed * 60f / tilesize * speedMultiplier;
             case controlled -> !isValid() ? 0 :
