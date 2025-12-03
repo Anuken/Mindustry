@@ -3312,6 +3312,7 @@ public class Blocks{
             rotateSpeed = 10f;
             coolant = consumeCoolant(0.1f);
             researchCostMultiplier = 0.05f;
+            depositCooldown = 2.0f;
 
             limitRange(5f);
         }};
@@ -3397,6 +3398,7 @@ public class Blocks{
             shootSound = Sounds.shootSnap;
             coolant = consumeCoolant(0.2f);
             researchCostMultiplier = 0.05f;
+            depositCooldown = 0.5f;
 
             limitRange(2);
         }};
@@ -3443,6 +3445,7 @@ public class Blocks{
             health = 400;
             shootSound = Sounds.flame;
             coolant = consumeCoolant(0.1f);
+            depositCooldown = 1.0f;
         }};
 
         hail = new ItemTurret("hail"){{
@@ -3506,6 +3509,7 @@ public class Blocks{
             health = 260;
             shootSound = Sounds.artillerySmall;
             coolant = consumeCoolant(0.1f);
+            depositCooldown = 2.0f;
             limitRange(0f);
         }};
 
@@ -3558,6 +3562,7 @@ public class Blocks{
             targetAir = false;
             moveWhileCharging = false;
             accurateDelay = false;
+            activationTime = 5.15f * 60f;
             shootSound = Sounds.laser;
             coolant = consumeCoolant(0.2f);
             chargeSound = Sounds.lasercharge3;
@@ -3570,6 +3575,7 @@ public class Blocks{
                 chargeEffect = new MultiEffect(Fx.lancerLaserCharge, Fx.lancerLaserChargeBegin);
 
                 buildingDamageMultiplier = 0.25f;
+                armorMultiplier = 4f;
                 hitEffect = Fx.hitLancer;
                 hitSize = 4;
                 lifetime = 16f;
@@ -3614,6 +3620,7 @@ public class Blocks{
             recoil = 1f;
             size = 1;
             health = 260;
+            activationTime = 2.8f * 60f;
             shootSound = Sounds.spark;
             consumePower(3.3f);
             coolant = consumeCoolant(0.1f);
@@ -3695,7 +3702,7 @@ public class Blocks{
             }};
 
             shootY = 4.5f;
-            reload = 30f;
+            reload = 60f * 4f / 7f;
             inaccuracy = 10f;
             range = 240f;
             consumeAmmoOnce = false;
@@ -3706,6 +3713,7 @@ public class Blocks{
 
             limitRange(5f);
             coolant = consumeCoolant(0.3f);
+            depositCooldown = 2.0f;
         }};
 
         salvo = new ItemTurret("salvo"){{
@@ -3807,6 +3815,7 @@ public class Blocks{
 
             limitRange();
             coolant = consumeCoolant(0.2f);
+            depositCooldown = 2.0f;
         }};
 
         segment = new PointDefenseTurret("segment"){{
@@ -3924,6 +3933,7 @@ public class Blocks{
                     shootEffect = smokeEffect = Fx.thoriumShoot;
                 }}
             );
+            depositCooldown = 1.0f;
         }};
 
         ripple = new ItemTurret("ripple"){{
@@ -4052,6 +4062,8 @@ public class Blocks{
             coolant = consumeCoolant(0.3f);
 
             scaledHealth = 130;
+            depositCooldown = 2.0f;
+            shootSound = Sounds.artillery;
             shootSound = Sounds.shootRipple;
         }};
 
@@ -4157,7 +4169,7 @@ public class Blocks{
                 }
             }};
 
-            reload = 8f;
+            reload = 10f;
             range = 200f;
             size = 3;
             recoil = 1.5f;
@@ -4169,6 +4181,7 @@ public class Blocks{
             coolant = consumeCoolant(0.3f);
 
             scaledHealth = 145;
+            depositCooldown = 2.0f;
             limitRange();
         }};
 
@@ -4212,6 +4225,7 @@ public class Blocks{
             scaledHealth = 150;
 
             coolant = consumeCoolant(1f);
+            depositCooldown = 2.0f;
             consumePower(10f);
         }};
 
@@ -4277,6 +4291,7 @@ public class Blocks{
             scaledHealth = 160;
             coolant = consumeCoolant(1f);
 
+            depositCooldown = 2.0f;
             limitRange();
         }};
 
