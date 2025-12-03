@@ -3721,7 +3721,8 @@ public class UnitTypes{
                     width = 7f;
                     height = 12f;
                     lifetime = 18f;
-                    buildingDamageMultiplier = 0.7f;
+                    //floating point inaccuracy makes 0.6f show as -39%
+                    buildingDamageMultiplier = 0.599999f;
                     shootEffect = Fx.sparkShoot;
                     smokeEffect = Fx.shootBigSmoke;
                     hitColor = backColor = trailColor = Pal.suppress;
@@ -3732,13 +3733,13 @@ public class UnitTypes{
 
                     setDefaults = false;
                     fragBullets = 2;
-                    fragBullet = new BasicBulletType(3f, 9){{
+                    fragBullet = new BasicBulletType(3f, 15){{
                         width = 5f;
                         height = 8f;
                         lifetime = 14f;
                         fragVelocityMax = 1f;
                         fragVelocityMin = 0.7f;
-                        buildingDamageMultiplier = 0.7f;
+                        buildingDamageMultiplier = 0.5f;
                         hitColor = backColor = trailColor = Pal.suppress;
                         frontColor = Color.white;
                         trailWidth = 1.2f;
