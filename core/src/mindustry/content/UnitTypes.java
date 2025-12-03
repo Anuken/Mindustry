@@ -3072,9 +3072,6 @@ public class UnitTypes{
                     shrinkX = 0.6f;
                     shrinkY = 0.2f;
 
-                    status = StatusEffects.armorRend;
-                    statusDuration = 300f;
-
                     hitEffect = despawnEffect = new MultiEffect(Fx.hitSquaresColor, new WaveEffect(){{
                         colorFrom = colorTo = Pal.techBlue;
                         sizeTo = splashDamageRadius + 2f;
