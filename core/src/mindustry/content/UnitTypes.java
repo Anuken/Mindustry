@@ -3721,7 +3721,7 @@ public class UnitTypes{
                     width = 7f;
                     height = 12f;
                     lifetime = 18f;
-                    buildingDamageMultiplier = 0.5f;
+                    buildingDamageMultiplier = 0.7f;
                     shootEffect = Fx.sparkShoot;
                     smokeEffect = Fx.shootBigSmoke;
                     hitColor = backColor = trailColor = Pal.suppress;
@@ -3738,7 +3738,7 @@ public class UnitTypes{
                         lifetime = 14f;
                         fragVelocityMax = 1f;
                         fragVelocityMin = 0.7f;
-                        buildingDamageMultiplier = 0.5f;
+                        buildingDamageMultiplier = 0.7f;
                         hitColor = backColor = trailColor = Pal.suppress;
                         frontColor = Color.white;
                         trailWidth = 1.2f;
