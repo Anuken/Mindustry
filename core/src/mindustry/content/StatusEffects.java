@@ -199,12 +199,6 @@ public class StatusEffects{
             effect = Fx.corrosionVapor;
         }};
 
-        armorRend = new StatusEffect("armor-rend"){{
-            color = Pal.stoneGray;
-            armorReduction = 5;
-            effect = Fx.armorRendVapor;
-        }};
-
         disarmed = new StatusEffect("disarmed"){{
             color = Color.valueOf("e9ead3");
             disarm = true;
