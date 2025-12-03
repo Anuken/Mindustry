@@ -3721,13 +3721,30 @@ public class UnitTypes{
                     width = 7f;
                     height = 12f;
                     lifetime = 18f;
+                    buildingDamageMultiplier = 0.5f;
                     shootEffect = Fx.sparkShoot;
                     smokeEffect = Fx.shootBigSmoke;
                     hitColor = backColor = trailColor = Pal.suppress;
                     frontColor = Color.white;
                     trailWidth = 1.5f;
                     trailLength = 5;
-                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                    hitEffect = despawnEffect = new MultiEffect(Fx.hitSquaresColor, Fx.squareWaveEffect);
+
+                    setDefaults = false;
+                    fragBullets = 2;
+                    fragBullet = new BasicBulletType(3f, 9){{
+                        width = 5f;
+                        height = 8f;
+                        lifetime = 14f;
+                        fragVelocityMax = 1f;
+                        fragVelocityMin = 0.7f;
+                        buildingDamageMultiplier = 0.5f;
+                        hitColor = backColor = trailColor = Pal.suppress;
+                        frontColor = Color.white;
+                        trailWidth = 1.2f;
+                        trailLength = 4;
+                        hitEffect = despawnEffect = Fx.hitBulletColor;
+                    }};
                 }};
             }});
         }};
