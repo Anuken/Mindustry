@@ -2772,7 +2772,7 @@ public class UnitTypes{
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.mediumCannon;
                 layerOffset = 0.0001f;
-                reload = 70f;
+                reload = 80f;
                 shootY = 71f / 4f;
                 shake = 5f;
                 recoil = 4f;
@@ -2785,16 +2785,17 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 190){{
+                bullet = new BasicBulletType(8f, 150){{
                     sprite = "missile-large";
                     width = 9.5f;
-                    height = 13f;
+                    height = 15f;
                     lifetime = 18f;
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
                     smokeEffect = Fx.shootSmokeTitan;
                     pierceCap = 2;
                     pierce = true;
+                    pierceBuilding = true;
 
                     hitColor = backColor = trailColor = Color.valueOf("feb380");
                     frontColor = Color.white;
@@ -2817,7 +2818,7 @@ public class UnitTypes{
                     fragBullet = new BasicBulletType(8f, 35){{
                         sprite = "missile-large";
                         width = 8f;
-                        height = 12f;
+                        height = 16f;
                         lifetime = 15f;
                         hitSize = 4f;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
@@ -2835,7 +2836,7 @@ public class UnitTypes{
             for(float f : new float[]{34f / 4f, -36f / 4f}){
                 int fi = i ++;
                 weapons.add(new Weapon("vanquish-point-weapon"){{
-                    reload = 19 + fi * 5;
+                    reload = 22 + fi * 5;
                     x = 48f / 4f;
                     y = f;
                     shootY = 5.5f;
@@ -2847,7 +2848,7 @@ public class UnitTypes{
                     bullet = new BasicBulletType(12f, 50f){{
                         sprite = "missile-large";
                         width = 6.5f;
-                        height = 13f;
+                        height = 11f;
                         shrinkY = 0f;
                         shrinkX = 0.2f;
                         lifetime = 15f;

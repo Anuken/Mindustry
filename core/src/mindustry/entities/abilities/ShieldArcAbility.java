@@ -38,8 +38,10 @@ public class ShieldArcAbility extends Ability{
 
                 if(penX > penY){
                     b.vel.x *= -1;
+                    b.vel.y *= -0.5;
                 }else{
                     b.vel.y *= -1;
+                    b.vel.x *= -0.5;
                 }
 
                 b.owner = paramUnit;
