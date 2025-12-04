@@ -1251,6 +1251,7 @@ public class LExecutor{
             if(headless) return;
 
             switch(action){
+                case active -> p1.setbool(control.input.logicCutscene);
                 case pan -> {
                     control.input.logicCutscene = true;
                     control.input.logicCamPan.set(World.unconv(p1.numf()), World.unconv(p2.numf()));
@@ -1260,9 +1261,10 @@ public class LExecutor{
                     control.input.logicCutscene = true;
                     control.input.logicCutsceneZoom = Mathf.clamp(p1.numf());
                 }
-                case stop -> {
-                    control.input.logicCutscene = false;
-                }
+                case stop -> control.input.logicCutscene = false;
+                case shake -> renderer.shake(p1.numf(), p2.numf() * 60);
+                case getHud -> p1.setbool(!control.input.logicHideHud);
+                case setHud -> control.input.logicHideHud = !p1.bool();
             }
         }
     }

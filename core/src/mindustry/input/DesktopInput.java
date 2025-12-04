@@ -64,7 +64,7 @@ public class DesktopInput extends InputHandler{
     private boolean changedCursor, pressedCommandRect;
 
     boolean showHint(){
-        return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() && !player.dead() &&
+        return ui.hudfrag.shown() && Core.settings.getBool("hints") && selectPlans.isEmpty() && !player.dead() &&
             (!isBuilding && !Core.settings.getBool("buildautopause") || player.unit().isBuilding() || !player.dead() && !player.unit().spawnedByCore());
     }
 
@@ -98,7 +98,7 @@ public class DesktopInput extends InputHandler{
 
         //schematic controls
         group.fill(t -> {
-            t.visible(() -> ui.hudfrag.shown && lastSchematic != null && !selectPlans.isEmpty());
+            t.visible(() -> ui.hudfrag.shown() && lastSchematic != null && !selectPlans.isEmpty());
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();

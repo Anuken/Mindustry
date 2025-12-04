@@ -1792,10 +1792,14 @@ public class LStatements{
                 b.clicked(() -> showSelect(b, CutsceneAction.all, action, o -> {
                     action = o;
                     rebuild(table);
-                }));
-            }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
+                }, 3, cell -> cell.size(120f, 40f)));
+            }, Styles.logict, () -> {}).size(120f, 40f).padLeft(2).color(table.color);
 
             switch(action){
+                case active, getHud -> {
+                    table.add(" result ");
+                    fields(table, p1, str -> p1 = str);
+                }
                 case pan -> {
                     table.add(" x ");
                     fields(table, p1, str -> p1 = str);
@@ -1809,6 +1813,16 @@ public class LStatements{
                 }
                 case zoom -> {
                     table.add(" level ");
+                    fields(table, p1, str -> p1 = str);
+                }
+                case shake -> {
+                    table.add(" amount ");
+                    fields(table, p1, str -> p1 = str);
+                    table.add(" duration ");
+                    fields(table, p2, str -> p2 = str);
+                }
+                case setHud -> {
+                    table.add(" shown ");
                     fields(table, p1, str -> p1 = str);
                 }
             }
