@@ -856,8 +856,8 @@ public class Fx{
 
     squareWaveEffect =  new Effect(14, e -> {
         rand.setSeed(e.id);
-        color(Color.white, e.color, rand.random(0.5f, 1.5f) * e.fin());
-        stroke(rand.random(0.6f, 1.1f) + e.fout());
+        color(Color.white, e.color, rand.random(0.8f, 1.5f) * e.fin());
+        stroke(rand.random(0.4f, 0.8f) + e.fout() * 2);
         float rot = rand.random(45f, 180f) * e.fin();
         float rotation = rand.random(0, 1) > 0.5f ? rot : -rot;
         Lines.square(e.x, e.y, e.fin() * rand.random(4f, 11f) + 4f, e.rotation + rand.random(360f) + rotation);

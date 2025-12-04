@@ -164,7 +164,7 @@ public class BulletType extends Content implements Cloneable{
     public boolean makeFire = false;
     /** Whether this bullet will always hit blocks under it. */
     public boolean hitUnder = false;
-    /** Whether to create hit effects on despawn. Forced to true if this bullet has any special effects like splash damage. */
+    /** Whether to create hit effects on despawn. Forced to true if this bullet has any special effects like splash damage. Disable setDefaults to avoid override */
     public boolean despawnHit = false;
     /** If true, this bullet will create bullets when it hits anything, not just when it despawns. */
     public boolean fragOnHit = true;
@@ -201,6 +201,8 @@ public class BulletType extends Content implements Cloneable{
     public float fragOffsetMin = 1f, fragOffsetMax = 7f;
     /** How many times this bullet can release frag bullets, if pierce = true. */
     public int pierceFragCap = -1;
+    /** Release frag bullets starting from pierceCap (last) instead of 0 (first).*/
+    public boolean invertPierceFragCap = false;
 
     /** Bullet that is created at a fixed interval. */
     public @Nullable BulletType intervalBullet;
@@ -506,20 +508,24 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void hit(Bullet b){
-        hit(b, b.x, b.y);
+        hit(b, b.x, b.y, false);
     }
 
     public void hit(Bullet b, float x, float y){
+        hit(b, b.x, b.y, false);
+    }
+
+    public void hit(Bullet b, float x, float y, boolean fragOnDespawn){
         hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
 
         Effect.shake(hitShake, hitShake, b);
 
-        if(fragOnHit){
+        if(fragOnHit || fragOnDespawn){
             if(delayFrags && fragBullet != null && fragBullet.delayFrags){
-                Time.run(0f, () -> createFrags(b, x, y));
+                Time.run(0f, () -> createFrags(b, x, y, fragOnDespawn));
             }else{
-                createFrags(b, x, y);
+                createFrags(b, x, y, fragOnDespawn);
             }
         }
         createPuddles(b, x, y);
@@ -574,15 +580,16 @@ public class BulletType extends Content implements Cloneable{
         }
     }
 
-    public void createFrags(Bullet b, float x, float y){
-        if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && !(b.frags >= pierceFragCap && pierceFragCap > 0)){
+    public void createFrags(Bullet b, float x, float y, boolean fragOnDespawn){
+        int reachedCap = invertPierceFragCap && !fragOnDespawn ? pierceCap - b.frags - 1 : b.frags;
+        if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && !(reachedCap >= pierceFragCap && pierceFragCap > 0)){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(fragOffsetMin, fragOffsetMax);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + fragSpread * i - (fragBullets - 1) * fragSpread / 2f;
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
-            b.frags++;
         }
+        b.frags++;
     }
 
     public void createUnits(Bullet b, float x, float y){
@@ -599,13 +606,9 @@ public class BulletType extends Content implements Cloneable{
     /** Called when the bullet reaches the end of its lifetime or is destroyed by something external. */
     public void despawned(Bullet b){
         if(despawnHit){
-            hit(b);
+            hit(b, b.x, b.y, true);
         }else{
             createUnits(b, b.x, b.y);
-        }
-
-        if(!fragOnHit){
-            createFrags(b, b.x, b.y);
         }
 
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
@@ -793,7 +796,7 @@ public class BulletType extends Content implements Cloneable{
                 }
             }
 
-            if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
+            if(fragBullet != null || splashDamageRadius > 0 || lightning > 0 || !fragOnHit){
                 despawnHit = true;
             }
         }
