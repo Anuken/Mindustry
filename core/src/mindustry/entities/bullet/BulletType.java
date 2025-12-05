@@ -591,8 +591,9 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void createFrags(Bullet b, float x, float y, boolean fragOnDespawn){
-        int reachedCap = invertPierceFragCap && !fragOnDespawn ? pierceCap - b.frags - 1 : b.frags;
-        if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && !(reachedCap >= pierceFragCap && pierceFragCap > 0)){
+        boolean reachedCap = (fragOnAbsorb || !b.absorbed) && !invertPierceFragCap || b.frags >= pierceCap - pierceFragCap && (b.frags < pierceFragCap || fragOnDespawn);
+
+        if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && !(!reachedCap && pierceFragCap > 0)){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(fragOffsetMin, fragOffsetMax);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + fragSpread * i - (fragBullets - 1) * fragSpread / 2f;

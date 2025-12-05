@@ -854,7 +854,7 @@ public class Fx{
         Drawf.light(e.x, e.y, 20f, e.color, 0.6f * e.fout());
     }),
 
-    squareWaveEffect =  new Effect(14, e -> {
+    squareWaveEffect =  new Effect(14, 40f, e -> {
         rand.setSeed(e.id);
         color(Color.white, e.color, rand.random(0.8f, 1.5f) * e.fin());
         stroke(rand.random(0.4f, 0.8f) + e.fout() * 2);

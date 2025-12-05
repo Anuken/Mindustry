@@ -2788,12 +2788,12 @@ public class UnitTypes{
                 bullet = new BasicBulletType(8f, 150){{
                     sprite = "missile-large";
                     width = 9.5f;
-                    height = 15f;
+                    height = 18f;
                     lifetime = 18f;
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
                     smokeEffect = Fx.shootSmokeTitan;
-                    pierceCap = 2;
+                    pierceCap = 3;
                     pierce = true;
                     pierceBuilding = true;
 
