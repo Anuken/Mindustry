@@ -437,6 +437,13 @@ public class FloorRenderer{
             int idx = vidx;
             vidx += spriteSize;
 
+            //fixes graphical artifacting due to low precision positions/UVs. TODO: test for issues
+            final float grow = 0.01f;
+            x -= grow;
+            y -= grow;
+            width += grow*2f;
+            height += grow*2f;
+
             if(!Mathf.zero(rotation)){
                 //bottom left and top right corner points relative to origin
                 float worldOriginX = x + originX;
