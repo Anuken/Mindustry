@@ -480,6 +480,7 @@ public class PatcherTests{
 
     @Test
     void addWeapon() throws Exception{
+        int oldSize = UnitTypes.flare.weapons.size;
         Vars.state.patcher.apply(Seq.with("""
         unit.flare.weapons.+: {
           x: 0
@@ -493,7 +494,7 @@ public class PatcherTests{
         """));
 
         assertNoWarnings();
-        assertEquals(3, UnitTypes.flare.weapons.size);
+        assertEquals(oldSize + 1, UnitTypes.flare.weapons.size);
         assertEquals(100, UnitTypes.flare.weapons.peek().bullet.damage);
     }
 
