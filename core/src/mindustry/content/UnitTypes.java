@@ -102,6 +102,8 @@ public class UnitTypes{
             speed = 0.5f;
             hitSize = 8f;
             health = 150;
+            stepSoundVolume = 0.4f;
+
             weapons.add(new Weapon("large-weapon"){{
                 shootSound = Sounds.shootDagger;
                 reload = 13f;
@@ -159,6 +161,8 @@ public class UnitTypes{
             armor = 9f;
             mechFrontSway = 0.55f;
             ammoType = new ItemAmmoType(Items.graphite);
+            stepSoundPitch = 0.8f;
+            stepSoundVolume = 0.65f;
 
             weapons.add(new Weapon("artillery"){{
                 top = false;
@@ -372,6 +376,7 @@ public class UnitTypes{
 
             mineTier = 2;
             mineSpeed = 3f;
+            stepSound = Sounds.mechStepSmall;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = new PowerAmmoType(1300);
@@ -428,6 +433,8 @@ public class UnitTypes{
 
             mechFrontSway = 0.55f;
             ammoType = new PowerAmmoType(1500);
+            stepSoundPitch = 0.9f;
+            stepSoundVolume = 0.6f;
 
             speed = 0.5f;
             hitSize = 13f;
@@ -635,6 +642,8 @@ public class UnitTypes{
             mechSideSway = 0.25f;
             range = 40f;
             ammoType = new ItemAmmoType(Items.coal);
+            stepSound = Sounds.walkerStepTiny;
+            stepSoundVolume = 0.4f;
 
             weapons.add(new Weapon(){{
                 shootOnDeath = true;
@@ -671,6 +680,10 @@ public class UnitTypes{
             targetAir = false;
             health = 600;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
+
+            stepSound = Sounds.walkerStepSmall;
+            stepSoundPitch = 1f;
+            stepSoundVolume = 0.3f;
 
             legCount = 4;
             legLength = 9f;
@@ -720,6 +733,10 @@ public class UnitTypes{
 
             shadowElevation = 0.3f;
             groundLayer = Layer.legUnit;
+
+            stepSound = Sounds.walkerStepSmall;
+            stepSoundPitch = 0.7f;
+            stepSoundVolume = 0.35f;
 
             weapons.add(new Weapon("spiroct-weapon"){{
                 shootY = 4f;
@@ -788,7 +805,7 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(2000);
 
             stepSound = Sounds.walkerStep;
-            stepSoundVolume = 0.75f;
+            stepSoundVolume = 0.85f;
             stepSoundPitch = 1.1f;
 
             legSplashDamage = 32;
@@ -3043,6 +3060,8 @@ public class UnitTypes{
             armor = 4f;
             legStraightness = 0.3f;
             stepShake = 0f;
+            stepSound = Sounds.walkerStepTiny;
+            stepSoundVolume = 0.7f;
 
             legCount = 6;
             legLength = 8f;
@@ -3126,6 +3145,8 @@ public class UnitTypes{
             health = 1100;
             armor = 5f;
             stepShake = 0f;
+
+            stepSound = Sounds.walkerStepSmall;
 
             legCount = 4;
             legLength = 14f;
@@ -3234,6 +3255,9 @@ public class UnitTypes{
             fogRadius = 40f;
             stepShake = 0f;
 
+            stepSound = Sounds.walkerStepSmall;
+            stepSoundPitch = 0.78f;
+
             legCount = 6;
             legLength = 18f;
             legGroupSize = 3;
@@ -3271,6 +3295,7 @@ public class UnitTypes{
 
             weapons.add(new Weapon("anthicus-weapon"){{
                 shootSound = Sounds.missileLarge;
+                shootSoundVolume = 0.8f;
                 x = 29f / 4f;
                 y = -11f / 4f;
                 shootY = 1.5f;

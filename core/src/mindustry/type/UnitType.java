@@ -301,11 +301,11 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** volume of loop sound */
     public float loopSoundVolume = 0.5f;
     /** sound played when this mech/insect unit does a step */
-    public Sound stepSound = Sounds.none;
+    public Sound stepSound = Sounds.mechStepSmall;
     /** volume of step sound */
     public float stepSoundVolume = 0.5f;
     /** base pitch of step sound */
-    public float stepSoundPitch = 1f;
+    public float stepSoundPitch = 1f, stepSoundPitchRange = 0.1f;
     /** effect that this unit emits when falling */
     public Effect fallEffect = Fx.fallSmoke;
     /** effect created at engine when unit falls. */
