@@ -530,21 +530,16 @@ public class ContentParser{
     }
 
     public void readBlockCanInputItems(Block block, JsonValue value){
-        boolean[] booleans = block.itemFilter;
         for(JsonValue child : value){
             switch(child.name){
                 case "add" -> {
                     for (Item it : parser.readValue(Item[].class, child)) {
-                        if (!booleans[it.id]) {
-                            block.itemFilter[it.id] = true;
-                        }
+                        block.itemFilter[it.id] = true;
                     }
                 }
                 case "remove" -> {
                     for (Item it : parser.readValue(Item[].class, child)) {
-                        if(booleans[it.id]){
-                            block.itemFilter[it.id] = false;
-                        }
+                        block.itemFilter[it.id] = false;
                     }
                 }
                 default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
