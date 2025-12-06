@@ -2590,6 +2590,9 @@ public class UnitTypes{
             treadRects = new Rect[]{new Rect(12 - 32f, 7 - 32f, 14, 51)};
             researchCostMultiplier = 0f;
 
+            tankMoveVolume *= 0.6f;
+            tankMoveSound = Sounds.tankMoveSmall;
+
             weapons.add(new Weapon("stell-weapon"){{
                 shootSound = Sounds.shootStell;
                 layerOffset = 0.0001f;
@@ -2632,6 +2635,9 @@ public class UnitTypes{
             floorMultiplier = 0.8f;
             treadRects = new Rect[]{new Rect(17 - 96f/2f, 10 - 96f/2f, 19, 76)};
             researchCostMultiplier = 0f;
+
+            tankMoveVolume *= 0.75f;
+            tankMoveSound = Sounds.tankMove;
 
             weapons.add(new Weapon("locus-weapon"){{
                 shootSound = Sounds.bolt;
@@ -2786,6 +2792,9 @@ public class UnitTypes{
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
+            tankMoveVolume *= 1.25f;
+            tankMoveSound = Sounds.tankMoveHeavy;
+
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.mediumCannon;
                 layerOffset = 0.0001f;
@@ -2883,6 +2892,9 @@ public class UnitTypes{
             rotateSpeed = 0.8f;
             floorMultiplier = 0.3f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
+
+            tankMoveVolume *= 1.5f;
+            tankMoveSound = Sounds.tankMoveHeavy;
 
             float xo = 231f/2f, yo = 231f/2f;
             treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};
@@ -3295,7 +3307,7 @@ public class UnitTypes{
 
             weapons.add(new Weapon("anthicus-weapon"){{
                 shootSound = Sounds.missileLarge;
-                shootSoundVolume = 0.8f;
+                shootSoundVolume = 0.65f;
                 x = 29f / 4f;
                 y = -11f / 4f;
                 shootY = 1.5f;

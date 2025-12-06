@@ -306,6 +306,10 @@ public class UnitType extends UnlockableContent implements Senseable{
     public float stepSoundVolume = 0.5f;
     /** base pitch of step sound */
     public float stepSoundPitch = 1f, stepSoundPitchRange = 0.1f;
+    /** sound looped when tank moves */
+    public Sound tankMoveSound = Sounds.tankMove;
+    /** volume of tank move sfx */
+    public float tankMoveVolume = 0.5f;
     /** effect that this unit emits when falling */
     public Effect fallEffect = Fx.fallSmoke;
     /** effect created at engine when unit falls. */
