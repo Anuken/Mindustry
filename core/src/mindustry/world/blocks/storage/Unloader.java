@@ -14,6 +14,8 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.blocks.storage.StorageBlock.*;
 import mindustry.world.meta.*;
 
 import java.util.*;
@@ -24,6 +26,7 @@ public class Unloader extends Block{
     public @Load(value = "@-center", fallback = "unloader-center") TextureRegion centerRegion;
 
     public float speed = 1f;
+    public boolean allowCoreUnload = true;
 
     /** Cached result of content.items() */
     static Item[] allItems;
@@ -138,8 +141,8 @@ public class Unloader extends Block{
                 if(!other.interactable(team)) continue; //avoid blocks of the wrong team
 
                 //partial check
-                boolean canLoad = !(other.block instanceof StorageBlock);
-                boolean canUnload = other.canUnload() && other.items != null;
+                boolean canLoad = !(other instanceof CoreBuild || (other instanceof StorageBuild sb && sb.linkedCore != null));
+                boolean canUnload = other.canUnload() && (allowCoreUnload || canLoad) && other.items != null;
 
                 if(canLoad || canUnload){ //avoid blocks that can neither give nor receive items
                     var pb = Pools.obtain(ContainerStat.class, ContainerStat::new);
