@@ -573,7 +573,7 @@ public class Blocks{
 
         shale = new Floor("shale"){{
             variants = 3;
-            attributes.set(Attribute.oil, 1.6f);
+            attributes.set(Attribute.oil, 2f);
         }};
 
         moss = new Floor("moss"){{
