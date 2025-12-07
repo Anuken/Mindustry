@@ -154,13 +154,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         });
 
         Events.on(ResetEvent.class, e -> {
-            logicCutscene = false;
-            commandBuildings.clear();
-            selectedUnits.clear();
-            itemDepositCooldown = 0f;
-            Arrays.fill(controlGroups, null);
-            lastUnit = null;
-            lastPlans.clear();
+            reset();
         });
     }
 
@@ -883,6 +877,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void spectate(Unit unit){
         spectating = unit;
         camera.position.set(unit);
+    }
+
+    public void reset(){
+        logicCutscene = false;
+        commandBuildings.clear();
+        selectedUnits.clear();
+        itemDepositCooldown = 0f;
+        Arrays.fill(controlGroups, null);
+        lastUnit = null;
+        lastPlans.clear();
+        player.shooting = false;
     }
 
     public void update(){
