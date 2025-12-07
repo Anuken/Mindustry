@@ -108,6 +108,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 ui.loadAnd(() -> {
                     try{
                         Pixmap pixmap = new Pixmap(file);
+                        //if you want to bypass the limit, use mods or the console; larger maps are not supported
+                        if(pixmap.width > MapResizeDialog.maxSize || pixmap.height > MapResizeDialog.maxSize){
+                            throw new Exception("Image is too large (maximum size is " + MapResizeDialog.maxSize + "x" + MapResizeDialog.maxSize + ")");
+                        }
                         editor.beginEdit(pixmap);
                         pixmap.dispose();
                     }catch(Exception e){

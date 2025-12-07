@@ -550,6 +550,36 @@ public class Fx{
         }
     }),
 
+    coreExplosion = new Effect(55f, 240f, e -> {
+        color(e.color);
+        stroke(e.fout() * 4f);
+        float circleRad = 6f + e.finpow() * 120f;
+        Lines.circle(e.x, e.y, circleRad);
+
+        stroke(e.fout() * 2.5f);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 30; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 50f * rand.random(1f, 0.6f) + 2f, e.finpow() * 100f * lenRand + 6f);
+        }
+
+        stroke(e.fout() * 2f);
+
+        for(int i = 0; i < 30; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            float speed = rand.random(1f, 0.6f);
+            float fin = e.finpow() / rand.random(0.3f, 1f);
+            float fout = 1f - fin;
+
+            if(fin < 1f){
+                stroke(fout * 2f);
+                Lines.lineAngle(e.x, e.y, angle, Interp.pow3Out.apply(fin) * 80f * speed + 2f, fin * 100f * lenRand + 6f);
+            }
+        }
+    }),
 
     smokeAoeCloud = new Effect(60f * 3f, 250f, e -> {
         color(e.color, 0.65f);
@@ -1530,6 +1560,12 @@ public class Fx{
         Lines.circle(e.x, e.y, e.fin() * 28f);
     }),
 
+    shockwaveSmaller = new Effect(9f, 80f, e -> {
+        color(Color.white, Color.lightGray, e.fin());
+        stroke(e.fout() * 2f + 0.2f);
+        Lines.circle(e.x, e.y, e.fin() * 22f);
+    }),
+
     bigShockwave = new Effect(10f, 80f, e -> {
         color(Color.white, Color.lightGray, e.fin());
         stroke(e.fout() * 3f);
@@ -2017,18 +2053,18 @@ public class Fx{
     shootSmallFlame = new Effect(32f, 80f, e -> {
         color(Pal.lightFlame, Pal.darkFlame, Color.gray, e.fin());
 
-        randLenVectors(e.id, 8, e.finpow() * 60f, e.rotation, 10f, (x, y) -> {
+        randLenVectors(e.id, 12, e.finpow() * 60f, e.rotation, 10f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.5f);
         });
-    }),
+    }).followParent(false),
 
     shootPyraFlame = new Effect(33f, 80f, e -> {
         color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
 
-        randLenVectors(e.id, 10, e.finpow() * 70f, e.rotation, 10f, (x, y) -> {
+        randLenVectors(e.id, 13, e.finpow() * 70f, e.rotation, 10f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f);
         });
-    }),
+    }).followParent(false),
 
     shootLiquid = new Effect(15f, 80f, e -> {
         color(e.color);
