@@ -33,6 +33,12 @@ public class StatusEffect extends UnlockableContent{
     public boolean disarm = false;
     /** Damage per frame. */
     public float damage;
+    /** Spacing (in ticks) between interval damage. <=0 to disable. */
+    public float intervalDamageTime;
+    /** Damage dealt by interval damage. */
+    public float intervalDamage;
+    /** If true, interval damage is armor piercing. */
+    public boolean intervalDamagePierce = false;
     /** Chance of effect appearing. */
     public float effectChance = 0.15f;
     /** Should the effect be given a parent. */
@@ -98,6 +104,11 @@ public class StatusEffect extends UnlockableContent{
         if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
         if(damage < 0) stats.add(Stat.healing, -damage * 60f, StatUnit.perSecond);
 
+        if(intervalDamageTime > 0f && intervalDamage > 0){
+            stats.add(Stat.damage, intervalDamage);
+            stats.add(Stat.frequency, 60f / intervalDamageTime, StatUnit.perSecond);
+        }
+
         boolean reacts = false;
 
         for(var e : opposites.toSeq().sort()){
@@ -131,14 +142,26 @@ public class StatusEffect extends UnlockableContent{
     }
 
     /** Runs every tick on the affected unit while time is greater than 0. */
-    public void update(Unit unit, float time){
+    public void update(Unit unit, StatusEntry entry){
         if(damage > 0){
             unit.damageContinuousPierce(damage);
         }else if(damage < 0){ //heal unit
             unit.heal(-1f * damage * Time.delta);
         }
 
-        if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
+        if(intervalDamageTime > 0){
+            entry.damageTime += Time.delta;
+            if(entry.damageTime >= intervalDamageTime){
+                entry.damageTime %= intervalDamageTime;
+                if(intervalDamagePierce){
+                    unit.damagePierce(intervalDamage);
+                }else{
+                    unit.damage(intervalDamage);
+                }
+            }
+        }
+
+        if(!Vars.headless && effect != Fx.none && Mathf.chanceDelta(effectChance) && !unit.inFogTo(Vars.player.team())){
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }

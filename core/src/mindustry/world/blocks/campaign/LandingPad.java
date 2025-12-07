@@ -3,6 +3,7 @@ package mindustry.world.blocks.campaign;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -52,6 +53,10 @@ public class LandingPad extends Block{
     public float liquidPad = 2f;
     public Color bottomColor = Pal.darkerMetal;
 
+    public float landSoundVolume = 0.75f;
+    //impact timing must be exactly equal to arrivalDuration
+    public Sound landSound = Sounds.padLand;
+
     public LandingPad(String name){
         super(name);
 
@@ -70,6 +75,7 @@ public class LandingPad extends Block{
 
             build.config = item;
         });
+
         configClear((LandingPadBuild build) -> {
             if(!build.accessible()) return;
 
@@ -144,6 +150,7 @@ public class LandingPad extends Block{
             arriving = config;
             arrivingTimer = 0f;
             liquidRemoved = 0f;
+            landSound.at(x, y, 1f, landSoundVolume);
 
             if(state.isCampaign() && !isFake()){
                 state.rules.sector.info.importCooldownTimers.put(config, 0f);
@@ -302,6 +309,8 @@ public class LandingPad extends Block{
 
                     items.set(arriving, itemCapacity);
                     if(!isFake()){
+                        //receiving items counts as "production" for now
+                        produced(arriving, itemCapacity);
                         state.getSector().info.handleItemImport(arriving, itemCapacity);
                     }
 
@@ -337,13 +346,6 @@ public class LandingPad extends Block{
         /** @return whether this pad should receive items forever, essentially acting as an item source for maps. */
         public boolean isFake(){
             return team != state.rules.defaultTeam || !state.isCampaign();
-        }
-
-        @Override
-        public boolean canDump(Building to, Item item){
-            //hack: canDump is only ever called right before item offload, so count the item as "produced" before that.
-            produced(item);
-            return true;
         }
 
         @Override

@@ -35,6 +35,7 @@ public class Planet extends UnlockableContent{
     private static final Mat3D mat = new Mat3D();
     /** drawArc() temp curve points. */
     private static final Seq<Vec3> points = new Seq<>();
+    private static final Vec3 tmpNormal = new Vec3();
 
     /** Mesh used for rendering. Created on load() - will be null on the server! */
     public @Nullable GenericMesh mesh;
@@ -124,6 +125,8 @@ public class Planet extends UnlockableContent{
     public boolean clearSectorOnLose = false;
     /** Multiplier for enemy rebuild speeds; only applied in campaign (not standard rules) */
     public float enemyBuildSpeedMultiplier = 1f;
+    /** If true, the enemy team always has infinite items. */
+    public boolean enemyInfiniteItems = true;
     /** If true, enemy cores are replaced with spawnpoints on this planet (for invasions) */
     public boolean enemyCoreSpawnReplace = false;
     /** If true, blocks in the radius of the core will be removed and "built up" in a shockwave upon landing. */
@@ -157,7 +160,7 @@ public class Planet extends UnlockableContent{
     /** Content (usually planet-specific) that is unlocked upon landing here. */
     public Seq<UnlockableContent> unlockedOnLand = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
-    public Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
+    public Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlitWhite, 2), cloudMeshLoader = () -> null;
     /** Loads the planet grid outline mesh. Clientside only. */
     public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineRad * radius);
 
@@ -599,6 +602,36 @@ public class Planet extends UnlockableContent{
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
         }
         batch.flush(Gl.lineStrip);
+    }
+
+    /** Draws an arc from one point to another on the planet. Has thickness. */
+    public void drawArcLine(VertexBatch3D batch, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount, float stroke){
+        //increase curve height when on opposite side of planet, so it doesn't tunnel through
+        float scaledOutlineRad = outlineRad * radius;
+        float dot = 1f - (Tmp.v32.set(a).nor().dot(Tmp.v33.set(b).nor()) + 1f)/2f;
+
+        Vec3 avg = Tmp.v31.set(b).add(a).scl(0.5f);
+        avg.setLength(radius * (1f + length) + dot * 1.35f);
+
+        points.clear();
+        points.addAll(Tmp.v33.set(b).setLength(scaledOutlineRad), Tmp.v31, Tmp.v34.set(a).setLength(scaledOutlineRad));
+        Tmp.bz3.set(points);
+
+        Vec3 normal = tmpNormal;
+        Vec3 point1 = points.get(0), point2 = points.get(1), point3 = points.get(2);
+        normal.set(point1).sub(point2).crs(point2.x - point3.x, point2.y - point3.y, point2.z - point3.z).nor();
+
+        for(int i = 0; i < pointCount + 1; i++){
+            float f = i / (float)pointCount;
+            Tmp.c1.set(from).lerp(to, (f + Time.globalTime / timeScale) % 1f);
+            batch.color(Tmp.c1);
+            batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f).add(normal, stroke));
+            batch.color(Tmp.c1);
+            batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f).add(normal, -stroke));
+        }
+        Gl.disable(Gl.cullFace);
+        batch.flush(Gl.triangleStrip);
+        Gl.enable(Gl.cullFace);
     }
 
     public Vec3 lookAt(Sector sector, Vec3 out){

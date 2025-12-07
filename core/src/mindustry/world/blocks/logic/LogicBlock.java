@@ -35,6 +35,8 @@ public class LogicBlock extends Block{
     private static final int maxLinks = 6000;
     public static final int maxNameLength = 32;
 
+    private static final IntSet usedBuildings = new IntSet();
+
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
     //privileged only
@@ -268,6 +270,7 @@ public class LogicBlock extends Block{
                         stream.readInt();
                     }
                 }else{
+                    usedBuildings.clear();
                     for(int i = 0; i < total; i++){
                         String name = stream.readUTF();
                         short x = stream.readShort(), y = stream.readShort();
@@ -280,6 +283,9 @@ public class LogicBlock extends Block{
                         Building build = world.build(x, y);
 
                         if(build != null){
+                            if(!usedBuildings.add(build.id)){
+                                continue;
+                            }
                             String bestName = getLinkName(build.block);
                             if(!name.startsWith(bestName)){
                                 name = findLinkName(build.block);
@@ -534,7 +540,7 @@ public class LogicBlock extends Block{
 
         @Override
         public boolean readable(LExecutor exec){
-            return exec.privileged || (this.team == exec.team && !this.block.privileged);
+            return isValid() && (exec.privileged || (this.team == exec.team && !this.block.privileged));
         }
 
         @Override
@@ -552,7 +558,7 @@ public class LogicBlock extends Block{
 
         @Override
         public boolean writable(LExecutor exec){
-            return exec.privileged || (this.team == exec.team && !this.block.privileged);
+            return readable(exec);
         }
 
         @Override
@@ -703,18 +709,24 @@ public class LogicBlock extends Block{
             write.i(compressed.length);
             write.b(compressed);
 
-            //write only the non-constant variables
-            int count = Structs.count(executor.vars, v -> (!v.constant || v == executor.unit) && !(v.isobj && v.objval == null));
+            boolean writeUnit = executor.unit != null && executor.unit.objval != null;
+
+            //only write non-null values; constants cannot be contained in executor.vars
+            int count = Structs.count(executor.vars, v -> !(v.isobj && v.objval == null)) + (writeUnit ? 1 : 0);
 
             write.i(count);
+
+            //the unit is technically a constant that isn't the variable pool, so write that separately
+            if(writeUnit){
+                write.str("@unit");
+                TypeIO.writeObject(write, executor.unit.objval);
+            }
+
             for(int i = 0; i < executor.vars.length; i++){
                 LVar v = executor.vars[i];
 
                 //null is the default variable value, so waste no time serializing that
                 if(v.isobj && v.objval == null) continue;
-
-                //skip constants
-                if(v.constant && v != executor.unit) continue;
 
                 //write the name and the object value
                 write.str(v.name);

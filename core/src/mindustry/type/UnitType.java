@@ -57,6 +57,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public float speed = 1.1f,
     /** multiplier for speed when boosting */
     boostMultiplier = 1f,
+    /** how affected this unit is by terrain */
+    floorMultiplier = 1f,
     /** body rotation speed in degrees/t */
     rotateSpeed = 5f,
     /** mech base rotation speed in degrees/t*/
@@ -91,6 +93,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     mineRange = 70f,
     /** range at which this unit can build */
     buildRange = Vars.buildingRange,
+    /** radius for circleTarget, if true */
+    circleTargetRadius = 80f,
     /** multiplier for damage this (flying) unit deals when crashing on enemy things */
     crashDamageMultiplier = 1f,
     /** multiplier for health that this flying unit has for its wreck, based on its max health. */
@@ -296,6 +300,16 @@ public class UnitType extends UnlockableContent implements Senseable{
     public Sound loopSound = Sounds.none;
     /** volume of loop sound */
     public float loopSoundVolume = 0.5f;
+    /** sound played when this mech/insect unit does a step */
+    public Sound stepSound = Sounds.mechStepSmall;
+    /** volume of step sound */
+    public float stepSoundVolume = 0.5f;
+    /** base pitch of step sound */
+    public float stepSoundPitch = 1f, stepSoundPitchRange = 0.1f;
+    /** sound looped when tank moves */
+    public Sound tankMoveSound = Sounds.tankMove;
+    /** volume of tank move sfx */
+    public float tankMoveVolume = 0.5f;
     /** effect that this unit emits when falling */
     public Effect fallEffect = Fx.fallSmoke;
     /** effect created at engine when unit falls. */
@@ -593,6 +607,10 @@ public class UnitType extends UnlockableContent implements Senseable{
         return targetable || (vulnerableWithPayloads && unit instanceof Payloadc p && p.hasPayload());
     }
 
+    public boolean killable(Unit unit){
+        return killable;
+    }
+
     public boolean hittable(Unit unit){
         return hittable || (vulnerableWithPayloads && unit instanceof Payloadc p && p.hasPayload());
     }
@@ -739,6 +757,16 @@ public class UnitType extends UnlockableContent implements Senseable{
         stats.add(Stat.size, StatValues.squared(hitSize / tilesize, StatUnit.blocks));
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, Strings.autoFixed(maxRange / tilesize, 1), StatUnit.blocks);
+
+        if(crushDamage > 0){
+            stats.add(Stat.crushDamage, crushDamage * 60f * 5f, StatUnit.perSecond);
+        }
+
+        if(legSplashDamage > 0 && legSplashRange > 0){
+            stats.add(Stat.legSplashDamage, legSplashDamage, StatUnit.perLeg);
+            stats.add(Stat.legSplashRange, Strings.autoFixed(legSplashRange / tilesize, 1), StatUnit.blocks);
+        }
+
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
 
@@ -778,22 +806,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
 
         if(immunities.size > 0){
-            var imm = immunities.toSeq().sort();
-            //it's redundant to list wet for naval units
-            if(naval){
-                imm.remove(StatusEffects.wet);
-            }
-            stats.add(Stat.immunities, StatValues.statusEffects(imm));
-        }
-    }
-
-    //never actually called; it turns out certain mods have custom weapons that do not need bullets.
-    protected void validateWeapons(){
-        for(int i = 0; i < weapons.size; i++){
-            var wep = weapons.get(i);
-            if(wep.bullet == Bullets.placeholder || wep.bullet == null){
-                throw new RuntimeException("Unit: " + name + ": weapon #" + i + " ('" + wep.name + "') does not have a bullet defined. Make sure you have a bullet: (JSON) or `bullet = ` field in your unit definition.");
-            }
+            stats.add(Stat.immunities, StatValues.statusEffects(immunities.toSeq().sort()));
         }
     }
 
@@ -833,6 +846,28 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
     }
 
+    void initPathType(){
+        if(flowfieldPathType == -1){
+            flowfieldPathType =
+            naval ? Pathfinder.costNaval :
+            allowLegStep ? Pathfinder.costLegs :
+            flying ? Pathfinder.costNone :
+            hovering ? Pathfinder.costHover :
+            Pathfinder.costGround;
+        }
+
+        if(pathCost == null){
+            pathCost =
+            naval ? ControlPathfinder.costNaval :
+            allowLegStep ? ControlPathfinder.costLegs :
+            hovering ? ControlPathfinder.costHover :
+            ControlPathfinder.costGround;
+        }
+
+        pathCostId = ControlPathfinder.costTypes.indexOf(pathCost);
+        if(pathCostId == -1) pathCostId = 0;
+    }
+
     @CallSuper
     @Override
     public void init(){
@@ -856,25 +891,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             }
         }
 
-        if(flowfieldPathType == -1){
-            flowfieldPathType =
-                naval ? Pathfinder.costNaval :
-                allowLegStep ? Pathfinder.costLegs :
-                flying ? Pathfinder.costNone :
-                hovering ? Pathfinder.costHover :
-                Pathfinder.costGround;
-        }
-
-        if(pathCost == null){
-            pathCost =
-                naval ? ControlPathfinder.costNaval :
-                allowLegStep ? ControlPathfinder.costLegs :
-                hovering ? ControlPathfinder.costHover :
-                ControlPathfinder.costGround;
-        }
-
-        pathCostId = ControlPathfinder.costTypes.indexOf(pathCost);
-        if(pathCostId == -1) pathCostId = 0;
+        initPathType();
 
         if(flying){
             envEnabled |= Env.space;
@@ -891,7 +908,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(flyingLayer < 0) flyingLayer = lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit;
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
-        singleTarget = weapons.size <= 1 && !forceMultiTarget;
+        singleTarget |= weapons.size <= 1 && !forceMultiTarget;
 
         if(itemCapacity < 0){
             itemCapacity = Math.max(Mathf.round((int)(hitSize * 4f), 10), 10);
@@ -900,13 +917,11 @@ public class UnitType extends UnlockableContent implements Senseable{
         //assume slight range margin
         float margin = 4f;
 
-        boolean skipWeapons = !weapons.contains(w -> !w.useAttackRange);
-
         //set up default range
         if(range < 0){
             range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
-                if(!weapon.useAttackRange && skipWeapons) continue;
+                if(!weapon.useAttackRange) continue;
 
                 range = Math.min(range, weapon.range() - margin);
                 maxRange = Math.max(maxRange, weapon.range() - margin);
@@ -917,7 +932,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             maxRange = Math.max(0f, range);
 
             for(Weapon weapon : weapons){
-                if(!weapon.useAttackRange && skipWeapons) continue;
+                if(!weapon.useAttackRange) continue;
 
                 maxRange = Math.max(maxRange, weapon.range() - margin);
             }
@@ -928,8 +943,9 @@ public class UnitType extends UnlockableContent implements Senseable{
             fogRadius = Math.max(58f * 3f, hitSize * 2f) / 8f;
         }
 
-        if(weapons.isEmpty()){
-            range = maxRange = mineRange;
+        if(!weapons.contains(w -> w.useAttackRange)){
+            if(range < 0 || range == Float.MAX_VALUE) range = mineRange;
+            if(maxRange < 0 || maxRange == Float.MAX_VALUE) maxRange = mineRange;
         }
 
         if(mechStride < 0){
@@ -1233,6 +1249,18 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
     }
 
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+        totalRequirements = cachedRequirements = firstRequirements = null;
+
+        //this will technically reset any assigned values, but in vanilla, they're not reassigned anyway
+        flowfieldPathType = -1;
+        pathCost = null;
+        pathCostId = -1;
+        initPathType();
+    }
+
     /** @return the time required to build this unit, as a value that takes into account reconstructors */
     public float getBuildTime(){
         getTotalRequirements();
@@ -1335,7 +1363,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(stacks != null){
             ItemStack[] out = new ItemStack[stacks.length];
             for(int i = 0; i < out.length; i++){
-                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1.1) * researchCostMultiplier)));
+                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(stacks[i].amount * researchCostMultiplier)));
             }
 
             //remove zero-requirements for automatic unlocks
@@ -1548,9 +1576,12 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     public <T extends Unit & Payloadc> void drawPayload(T unit){
         if(unit.hasPayload()){
+            float prev = Draw.z();
+            Draw.z(prev - 0.02f);
             Payload pay = unit.payloads().first();
             pay.set(unit.x, unit.y, unit.rotation);
             pay.draw();
+            Draw.z(prev);
         }
     }
 

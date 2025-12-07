@@ -8,7 +8,9 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -20,6 +22,7 @@ public enum EditorTool{
 
             Tile tile = editor.tile(x, y);
             editor.drawBlock = tile.block() == Blocks.air || !tile.block().inEditor ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
+            editor.drawBlock.editorPicked(tile);
         }
     },
     line(KeyCode.l, "replace", "orthogonal"){
@@ -46,8 +49,7 @@ public enum EditorTool{
             });
         }
     },
-    //the "under liquid" rendering is too buggy to make public
-    pencil(KeyCode.b, "replace", "square", "drawteams"/*, "underliquid"*/){
+    pencil(KeyCode.b, "replace", "square", "drawteams", "underliquid"){
         {
             edit = true;
             draggable = true;
@@ -67,7 +69,7 @@ public enum EditorTool{
             }else if(mode == 2){
                 //draw teams
                 editor.drawCircle(x, y, tile -> tile.setTeam(editor.drawTeam));
-            }else if(mode == 3){
+            }else if(mode == 3 && !(editor.drawBlock instanceof Floor f && f.isLiquid)){
                 editor.drawBlocks(x, y, false, true, tile -> tile.floor().isLiquid);
             }
 
@@ -92,7 +94,7 @@ public enum EditorTool{
             });
         }
     },
-    fill(KeyCode.g, "replaceall", "fillteams", "fillerase"){
+    fill(KeyCode.g, "replaceall", "fillteams", "fillerase", "fillcliffs"){
         {
             edit = true;
         }
@@ -131,13 +133,33 @@ public enum EditorTool{
                     Block dest = tile.floor();
                     if(dest == editor.drawBlock) return;
                     tester = t -> t.floor() == dest;
-                    setter = t -> t.setFloor(editor.drawBlock.asFloor());
+                    setter = t -> {
+                        t.setFloor(editor.drawBlock.asFloor());
+                        if(!(t.overlay() instanceof OverlayFloor) && !t.floor().supportsOverlay){
+                            t.setOverlay(Blocks.air);
+                        }
+                    };
                 }else{
                     Block dest = tile.block();
                     if(dest == editor.drawBlock) return;
                     tester = t -> t.block() == dest;
                     setter = t -> t.setBlock(editor.drawBlock, editor.drawTeam);
                 }
+
+                var oldSetter = setter;
+                setter = t -> {
+                    if(editor.drawBlock.saveData){
+                        editor.addTileOp(TileOp.get(t.x, t.y, DrawOperation.opData, TileOpData.get(t.data, t.floorData, t.overlayData)));
+                        editor.addTileOp(TileOp.get(t.x, t.y, DrawOperation.opDataExtra, t.extraData));
+                    }
+
+                    oldSetter.get(t);
+
+                    if(!editor.drawBlock.synthetic() && editor.drawBlock.saveConfig){
+                        editor.drawBlock.placeEnded(t, null, editor.rotation, editor.drawBlock.lastConfig);
+                        editor.renderer.updateStatic(t.x, t.y);
+                    }
+                };
 
                 //replace only when the mode is 0 using the specified functions
                 fill(x, y, mode == 0, tester, setter);
@@ -170,6 +192,27 @@ public enum EditorTool{
                 if(setter != null){
                     fill(x, y, false, tester, setter);
                 }
+            }else if(mode == 3){ //cliff fill
+                if(!tile.block().isStatic() || tile.block() == Blocks.cliff) return;
+                Bits wasStatic = new Bits(editor.width() * editor.height());
+                fill(x, y, false, t -> t.block().isStatic() && t.block() != Blocks.cliff, t -> {
+                    int rotation = 0;
+                    for(int i = 0; i < 8; i++){
+                        Tile other = world.tiles.get(t.x + Geometry.d8[i].x, t.y + Geometry.d8[i].y);
+                        if(other != null && !other.block().isStatic() && !wasStatic.get(other.array())){
+                            rotation |= (1 << i);
+                        }
+                    }
+
+                    if(rotation != 0){
+                        t.setBlock(Blocks.cliff);
+                    }else{
+                        t.setBlock(Blocks.air);
+                        wasStatic.set(t.array());
+                    }
+
+                    t.data = (byte)rotation;
+                });
             }
         }
 

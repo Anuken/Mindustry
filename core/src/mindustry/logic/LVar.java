@@ -107,7 +107,7 @@ public class LVar{
         if(isobj){
             objval = other.objval;
         }else{
-            numval = other.numval;
+            numval = invalid(other.numval) ? 0 : other.numval;
         }
     }
 
@@ -115,4 +115,8 @@ public class LVar{
         return Double.isNaN(d) || Double.isInfinite(d);
     }
 
+    @Override
+    public String toString(){
+        return name + ": " + (isobj ? objval : numval) + (constant ? " [const]" : "");
+    }
 }

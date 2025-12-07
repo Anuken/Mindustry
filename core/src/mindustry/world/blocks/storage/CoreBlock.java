@@ -47,6 +47,8 @@ public class CoreBlock extends StorageBlock{
     public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
     public float thrusterLength = 14f/4f, thrusterOffset = 0f;
     public boolean isFirstTier;
+    /** If false, players can't respawn at this core. */
+    public boolean allowSpawn = true;
     /** If true, this core type requires a core zone to upgrade. */
     public boolean requiresCoreZone;
     public boolean incinerateNonBuildable = false;
@@ -68,9 +70,11 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
+        alwaysAllowDeposit = true;
         priority = TargetPriority.core;
         flags = EnumSet.of(BlockFlag.core);
         unitCapModifier = 10;
+        sync = false; //core items are synced elsewhere
         drawDisabled = false;
         canOverdrive = false;
         commandable = true;
@@ -78,6 +82,8 @@ public class CoreBlock extends StorageBlock{
 
         //support everything
         replaceable = false;
+        destroySound = Sounds.coreExplode;
+        destroySoundVolume = 1.6f;
     }
 
     @Remote(called = Loc.server)
@@ -114,7 +120,6 @@ public class CoreBlock extends StorageBlock{
     public void setStats(){
         super.setStats();
 
-        stats.remove(Stat.buildTime);
         stats.add(Stat.unitType, table -> {
             table.row();
             table.table(Styles.grayPanel, b -> {
@@ -552,7 +557,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void onControlSelect(Unit unit){
-            if(!unit.isPlayer()) return;
+            if(!unit.isPlayer() || !allowSpawn) return;
             Player player = unit.getPlayer();
 
             Fx.spawn.at(player);
@@ -567,7 +572,7 @@ public class CoreBlock extends StorageBlock{
 
         public void requestSpawn(Player player){
             //do not try to respawn in unsupported environments at all
-            if(!unitType.supportsEnv(state.rules.env)) return;
+            if(!unitType.supportsEnv(state.rules.env) || !allowSpawn) return;
 
             Call.playerSpawn(tile, player);
         }
@@ -618,6 +623,9 @@ public class CoreBlock extends StorageBlock{
                 super.onDestroyed();
             }
 
+            Effect.shockwaveDust(x, y, 40f + block.size * tilesize, 0.5f);
+            Fx.coreExplosion.at(x, y, team.color);
+
             //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
             if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1 && spawner.getSpawns().size == 0 && state.rules.sector.planet.enemyCoreSpawnReplace){
                 //do not recache
@@ -629,6 +637,16 @@ public class CoreBlock extends StorageBlock{
             }
 
             Events.fire(new CoreChangeEvent(this));
+        }
+
+        @Override
+        public void playDestroySound(){
+            if(team.data().cores.size <= 1 && player != null && player.team() == team && state.rules.canGameOver){
+                //play at full volume when doing a game over
+                block.destroySound.play(block.destroySoundVolume, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), 0f);
+            }else{
+                super.playDestroySound();
+            }
         }
 
         @Override
@@ -658,7 +676,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return items.get(item) < getMaximumAccepted(item);
+            return state.rules.coreIncinerates || items.get(item) < getMaximumAccepted(item);
         }
 
         @Override
