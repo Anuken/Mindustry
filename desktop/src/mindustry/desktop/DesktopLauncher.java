@@ -88,6 +88,7 @@ public class DesktopLauncher extends ClientLauncher{
                             case "antialias" -> samples = 16;
                             case "debug" -> Log.level = LogLevel.debug;
                             case "maximized" -> maximized = Boolean.parseBoolean(arg[i + 1]);
+                            case "testMobile" -> testMobile = true;
                             case "gltrace" -> {
                                 Events.on(ClientCreateEvent.class, e -> {
                                     var profiler = new GLProfiler(Core.graphics);
@@ -115,7 +116,6 @@ public class DesktopLauncher extends ClientLauncher{
 
         Version.init();
         boolean useSteam = Version.modifier.contains("steam");
-        testMobile = Seq.with(args).contains("-testMobile");
 
         if(useDiscord){
             Threads.daemon(() -> {

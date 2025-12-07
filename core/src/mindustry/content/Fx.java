@@ -550,6 +550,36 @@ public class Fx{
         }
     }),
 
+    coreExplosion = new Effect(55f, 240f, e -> {
+        color(e.color);
+        stroke(e.fout() * 4f);
+        float circleRad = 6f + e.finpow() * 120f;
+        Lines.circle(e.x, e.y, circleRad);
+
+        stroke(e.fout() * 2.5f);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 30; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 50f * rand.random(1f, 0.6f) + 2f, e.finpow() * 100f * lenRand + 6f);
+        }
+
+        stroke(e.fout() * 2f);
+
+        for(int i = 0; i < 30; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            float speed = rand.random(1f, 0.6f);
+            float fin = e.finpow() / rand.random(0.3f, 1f);
+            float fout = 1f - fin;
+
+            if(fin < 1f){
+                stroke(fout * 2f);
+                Lines.lineAngle(e.x, e.y, angle, Interp.pow3Out.apply(fin) * 80f * speed + 2f, fin * 100f * lenRand + 6f);
+            }
+        }
+    }),
 
     smokeAoeCloud = new Effect(60f * 3f, 250f, e -> {
         color(e.color, 0.65f);

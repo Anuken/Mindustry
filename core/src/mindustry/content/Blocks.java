@@ -2624,7 +2624,7 @@ public class Blocks{
             powerProduction = 130f;
             itemDuration = 140f;
             ambientSound = Sounds.pulse;
-            ambientSoundVolume = 0.07f;
+            ambientSoundVolume = 0.08f;
             liquidCapacity = 80f;
 
             consumePower(25f);
@@ -6300,6 +6300,7 @@ public class Blocks{
             beamWidth = 0.73f;
             powerUse = 1f;
             pulseRadius = 5f;
+            ambientSoundVolume = 0.9f;
         }};
 
         repairTurret = new RepairTurret("repair-turret"){{
@@ -6314,6 +6315,7 @@ public class Blocks{
             coolantUse = 0.16f;
             coolantMultiplier = 1.6f;
             acceptCoolant = true;
+            ambientSoundVolume = 1.25f;
         }};
 
         //endregion
