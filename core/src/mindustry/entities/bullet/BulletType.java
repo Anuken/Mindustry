@@ -161,6 +161,10 @@ public class BulletType extends Content implements Cloneable{
     public float healPercent = 0f;
     /** flat amount of block health healed */
     public float healAmount = 0f;
+    /** sound played when a block is healed */
+    public Sound healSound = Sounds.blockHeal;
+    /** volume of heal sound */
+    public float healSoundVolume = 0.9f;
     /** Fraction of bullet damage that heals that shooter. */
     public float lifesteal = 0f;
     /** Whether to make fire on impact */
@@ -442,6 +446,7 @@ public class BulletType extends Content implements Cloneable{
         if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
             healEffect.at(build.x, build.y, 0f, healColor, build.block);
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
+            healSound.at(build, 1f + Mathf.range(0.1f), healSoundVolume);
 
             hit(b);
         }else if(build.team != b.team && direct){

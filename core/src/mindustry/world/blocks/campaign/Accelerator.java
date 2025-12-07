@@ -354,7 +354,7 @@ public class Accelerator extends Block{
                 float spacing = 12f;
                 for(int i = 0; i < 13; i++){
                     int fi = i;
-                    Time.run(i * 1.1f, () -> {
+                    Time.run(i * 2f, () -> {
                         float radius = block.size/2f + 1 + spacing * fi;
                         int rays = Mathf.ceil(radius * Mathf.PI * 2f / 6f);
                         for(int r = 0; r < rays; r++){
@@ -369,8 +369,6 @@ public class Accelerator extends Block{
                         }
                     });
                 }
-
-
             });
         }
 
