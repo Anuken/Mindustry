@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
@@ -126,6 +127,10 @@ public class Weapon implements Cloneable{
     public int otherSide = -1;
     /** draw Z offset relative to the default value */
     public float layerOffset = 0f;
+    /** sound looped when shooting */
+    public Sound activeSound = Sounds.none;
+    /** volume of active sound */
+    public float activeSoundVolume = 1f;
     /** sound used for shooting */
     public Sound shootSound = Sounds.pew;
     /** volume of the shoot sound */
@@ -417,6 +422,10 @@ public class Weapon implements Cloneable{
         if(otherSide != -1 && alternate && mount.side == flipSprite && mount.reload <= reload / 2f && lastReload > reload / 2f){
             unit.mounts[otherSide].side = !unit.mounts[otherSide].side;
             mount.side = !mount.side;
+        }
+
+        if(!headless && activeSound != Sounds.none && mount.shoot && can && mount.warmup >= minWarmup){
+            Vars.control.sound.loop(activeSound, unit, activeSoundVolume);
         }
 
         //shoot if applicable

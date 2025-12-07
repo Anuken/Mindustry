@@ -314,6 +314,8 @@ public class Block extends UnlockableContent implements Senseable{
     public Sound breakSound = Sounds.breaks;
     /** Sounds made when this block is destroyed.*/
     public Sound destroySound = Sounds.boom;
+    /** Volume of destruction sound. */
+    public float destroySoundVolume = 1f;
     /** Range of destroy sound. */
     public float destroyPitchMin = 1f, destroyPitchMax = 1f;
     /** How reflective this block is. */

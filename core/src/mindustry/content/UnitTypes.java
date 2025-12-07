@@ -3307,7 +3307,7 @@ public class UnitTypes{
 
             weapons.add(new Weapon("anthicus-weapon"){{
                 shootSound = Sounds.missileLarge;
-                shootSoundVolume = 0.65f;
+                shootSoundVolume = 0.5f;
                 x = 29f / 4f;
                 y = -11f / 4f;
                 shootY = 1.5f;
