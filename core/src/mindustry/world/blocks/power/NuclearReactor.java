@@ -15,7 +15,6 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -86,7 +85,7 @@ public class NuclearReactor extends PowerGenerator{
         addBar("heat", (NuclearReactorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
     }
 
-    public class NuclearReactorBuild extends GeneratorBuild implements HeatBlock{
+    public class NuclearReactorBuild extends GeneratorBuild implements HeatBlock {
         public float heat;
         public float heatProgress;
         public float flash;

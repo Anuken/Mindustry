@@ -1,4 +1,4 @@
-package mindustry.world.blocks.heat;
+package mindustry.world;
 
 public interface HeatConsumer{
     float[] sideHeat();

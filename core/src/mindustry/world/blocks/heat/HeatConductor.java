@@ -49,7 +49,7 @@ public class HeatConductor extends Block{
         return drawer.finalIcons(this);
     }
 
-    public class HeatConductorBuild extends Building implements HeatBlock, HeatConsumer{
+    public class HeatConductorBuild extends Building implements HeatConsumer{
         public float heat = 0f;
         public float[] sideHeat = new float[4];
         public IntSet cameFrom = new IntSet();

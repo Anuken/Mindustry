@@ -523,6 +523,7 @@ public class ContentParser{
                 case "liquidsBoost" -> block.consume(
                         child.isArray() ? new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
                         parser.readValue(ConsumeLiquids.class, child)).boost();
+                case "heat" -> block.consume((Consume)parser.readValue(ConsumeHeat.class, child));
                 default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
             }
         }

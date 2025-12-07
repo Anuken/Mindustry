@@ -7,7 +7,6 @@ import arc.math.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.HeatCrafter.*;
 
 public class DrawHeatRegion extends DrawBlock{
     public Color color = new Color(1f, 0.22f, 0.22f, 0.8f);

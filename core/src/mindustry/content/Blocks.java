@@ -1388,7 +1388,7 @@ public class Blocks{
             liquidOutputDirections = new int[]{1, 3};
         }};
 
-        atmosphericConcentrator = new HeatCrafter("atmospheric-concentrator"){{
+        atmosphericConcentrator = new GenericCrafter("atmospheric-concentrator"){{
             requirements(Category.crafting, with(Items.oxide, 60, Items.beryllium, 180, Items.silicon, 150));
             size = 3;
             hasLiquids = true;
@@ -1410,14 +1410,14 @@ public class Blocks{
             ambientSound = Sounds.extractLoop;
             ambientSoundVolume = 0.06f;
 
-            heatRequirement = 6f;
+            consumeHeat(6f);
 
             outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
 
             researchCost = with(Items.silicon, 2000, Items.oxide, 900, Items.beryllium, 2400);
         }};
 
-        oxidationChamber = new HeatProducer("oxidation-chamber"){{
+        oxidationChamber = new GenericCrafter("oxidation-chamber"){{
             requirements(Category.crafting, with(Items.tungsten, 120, Items.graphite, 80, Items.silicon, 100, Items.beryllium, 120));
             size = 3;
 
@@ -1437,10 +1437,10 @@ public class Blocks{
             regionRotated1 = 2;
             craftTime = 60f * 2f;
             liquidCapacity = 30f;
-            heatOutput = 5f;
+            outputHeat(5f);
         }};
 
-        electricHeater = new HeatProducer("electric-heater"){{
+        electricHeater = new GenericCrafter("electric-heater"){{
             requirements(Category.crafting, with(Items.tungsten, 30, Items.oxide, 30, Items.beryllium, 30));
 
             researchCostMultiplier = 4f;
@@ -1448,14 +1448,14 @@ public class Blocks{
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
             rotateDraw = false;
             size = 2;
-            heatOutput = 3f;
+            outputHeat(3f);
             regionRotated1 = 1;
             ambientSound = Sounds.hum;
             itemCapacity = 0;
             consumePower(100f / 60f);
         }};
 
-        slagHeater = new HeatProducer("slag-heater"){{
+        slagHeater = new GenericCrafter("slag-heater"){{
             requirements(Category.crafting, with(Items.tungsten, 50, Items.oxide, 20, Items.beryllium, 20));
 
             researchCostMultiplier = 4f;
@@ -1468,17 +1468,17 @@ public class Blocks{
             regionRotated1 = 1;
             ambientSound = Sounds.hum;
             consumeLiquid(Liquids.slag, 40f / 60f);
-            heatOutput = 8f;
+            outputHeat(8f);
 
             researchCost = with(Items.tungsten, 1200, Items.oxide, 900, Items.beryllium, 2400);
         }};
 
-        phaseHeater = new HeatProducer("phase-heater"){{
+        phaseHeater = new GenericCrafter("phase-heater"){{
             requirements(Category.crafting, with(Items.oxide, 30, Items.carbide, 30, Items.beryllium, 30));
 
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
             size = 2;
-            heatOutput = 15f;
+            outputHeat(15f);
             craftTime = 60f * 8f;
             ambientSound = Sounds.hum;
             consumeItem(Items.phaseFabric);
@@ -1525,7 +1525,7 @@ public class Blocks{
             consumeLiquid(Liquids.slag, 0f);
         }};
 
-        carbideCrucible = new HeatCrafter("carbide-crucible"){{
+        carbideCrucible = new GenericCrafter("carbide-crucible"){{
             requirements(Category.crafting, with(Items.tungsten, 110, Items.thorium, 150, Items.oxide, 60));
             craftEffect = Fx.none;
             outputItem = new ItemStack(Items.carbide, 1);
@@ -1537,7 +1537,7 @@ public class Blocks{
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.09f;
 
-            heatRequirement = 10f;
+            consumeHeat(10f);
 
             consumeItems(with(Items.tungsten, 2, Items.graphite, 3));
             consumePower(2f);
@@ -1574,13 +1574,13 @@ public class Blocks{
             //outputItem = new ItemStack(Items.scrap, 1);
         }};
 
-        surgeCrucible = new HeatCrafter("surge-crucible"){{
+        surgeCrucible = new GenericCrafter("surge-crucible"){{
             requirements(Category.crafting, with(Items.silicon, 100, Items.graphite, 80, Items.tungsten, 80, Items.oxide, 80));
 
             size = 3;
 
             itemCapacity = 20;
-            heatRequirement = 10f;
+            consumeHeat(10f);
             craftTime = 60f * 3f;
             liquidCapacity = 80f * 5;
 
@@ -1609,10 +1609,10 @@ public class Blocks{
             consumePower(1.5f);
         }};
 
-        cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
+        cyanogenSynthesizer = new GenericCrafter("cyanogen-synthesizer"){{
             requirements(Category.crafting, with(Items.carbide, 50, Items.silicon, 80, Items.beryllium, 90));
 
-            heatRequirement = 5f;
+            consumeHeat(5f);
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.cyanogen),
             new DrawParticles(){{
@@ -1639,13 +1639,13 @@ public class Blocks{
             consumePower(2f);
         }};
 
-        phaseSynthesizer = new HeatCrafter("phase-synthesizer"){{
+        phaseSynthesizer = new GenericCrafter("phase-synthesizer"){{
             requirements(Category.crafting, with(Items.carbide, 90, Items.silicon, 100, Items.thorium, 100, Items.tungsten, 200));
 
             size = 3;
 
             itemCapacity = 40;
-            heatRequirement = 8f;
+            consumeHeat(8f);
             craftTime = 60f * 2f;
             liquidCapacity = 10f * 4;
 
@@ -1672,7 +1672,7 @@ public class Blocks{
             consumePower(8f);
         }};
 
-        heatReactor = new HeatProducer("heat-reactor"){{
+        heatReactor = new GenericCrafter("heat-reactor"){{
             requirements(Category.crafting, BuildVisibility.debugOnly, with(Items.oxide, 70, Items.graphite, 20, Items.carbide, 10, Items.thorium, 80));
             size = 3;
             craftTime = 60f * 10f;
@@ -1684,6 +1684,7 @@ public class Blocks{
 
             consumeItem(Items.thorium, 3);
             consumeLiquid(Liquids.nitrogen, 1f / 60f);
+            outputHeat(10f);
         }};
 
         //endregion

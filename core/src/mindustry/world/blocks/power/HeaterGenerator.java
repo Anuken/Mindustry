@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.util.io.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.heat.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -41,7 +40,7 @@ public class HeaterGenerator extends ConsumeGenerator{
         addBar("heat", (HeaterGeneratorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat / heatOutput));
     }
 
-    public class HeaterGeneratorBuild extends ConsumeGeneratorBuild implements HeatBlock{
+    public class HeaterGeneratorBuild extends ConsumeGeneratorBuild implements HeatBlock {
         public float heat;
 
         @Override
