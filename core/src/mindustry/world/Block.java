@@ -397,7 +397,6 @@ public class Block extends UnlockableContent implements Senseable{
     /** The single power consumer, if applicable. */
     @NoPatch
     public @Nullable ConsumePower consPower;
-
     /** Map of bars by name. */
     @NoPatch
     protected OrderedMap<String, Func<Building, Bar>> barMap = new OrderedMap<>();
@@ -416,6 +415,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     protected static final Seq<Tile> tempTiles = new Seq<>();
     protected static final Seq<Building> tempBuilds = new Seq<>();
+
+    public boolean outputHeat = false;
+
+    public float outputsHeat = -1;
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
@@ -1104,6 +1107,10 @@ public class Block extends UnlockableContent implements Senseable{
         return consume(new ConsumeItems(items));
     }
 
+    public ConsumeHeat consumeHeat(float heatRequirement){
+        return consume(new ConsumeHeat(heatRequirement));
+    }
+
     public ConsumeCoolant consumeCoolant(float amount){
         return consume(new ConsumeCoolant(amount));
     }
@@ -1146,6 +1153,11 @@ public class Block extends UnlockableContent implements Senseable{
         this.buildVisibility = visible;
 
         Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
+    }
+
+    public void outputHeat(float heatOutput) {
+        outputHeat = true;
+        outputsHeat = heatOutput;
     }
 
     protected void initBuilding(){

@@ -1,4 +1,4 @@
-package mindustry.world.blocks.heat;
+package mindustry.world;
 
 /** Basic interface for any block that produces heat.*/
 public interface HeatBlock{

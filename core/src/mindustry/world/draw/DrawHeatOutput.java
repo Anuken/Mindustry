@@ -9,7 +9,6 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.heat.*;
 
 public class DrawHeatOutput extends DrawBlock{
     public TextureRegion heat, glow, top1, top2;

@@ -516,10 +516,37 @@ public class ContentParser{
                     }
                 }
                 case "powerBuffered" -> block.consumePowerBuffered(child.asFloat());
+                case "itemsBoost" -> block.consume(
+                        child.isArray()? new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
+                        child.isString() ? new ConsumeItems(new ItemStack[]{parser.readValue(ItemStack.class, child)}) :
+                        parser.readValue(ConsumeItems.class, child)).boost();
+                case "liquidsBoost" -> block.consume(
+                        child.isArray() ? new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
+                        parser.readValue(ConsumeLiquids.class, child)).boost();
+                case "heat" -> block.consume((Consume)parser.readValue(ConsumeHeat.class, child));
                 default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
             }
         }
         value.remove("consumes");
+    }
+
+    public void readBlockCanInputItems(Block block, JsonValue value){
+        for(JsonValue child : value){
+            switch(child.name){
+                case "add" -> {
+                    for (Item it : parser.readValue(Item[].class, child)) {
+                        block.itemFilter[it.id] = true;
+                    }
+                }
+                case "remove" -> {
+                    for (Item it : parser.readValue(Item[].class, child)) {
+                        block.itemFilter[it.id] = false;
+                    }
+                }
+                default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
+            }
+        }
+        value.remove("canInputItems");
     }
 
     private ObjectMap<ContentType, TypeParser<?>> parsers = ObjectMap.of(
@@ -545,6 +572,11 @@ public class ContentParser{
                 if(value.has("consumes") && value.get("consumes").isObject()){
                     readBlockConsumers(block, value.get("consumes"));
                     value.remove("consumes");
+                }
+
+                if(value.has("canInputItems") && value.get("canInputItems").isObject()){
+                    readBlockCanInputItems(block, value.get("canInputItems"));
+                    value.remove("canInputItems");
                 }
 
                 readFields(block, value, true);

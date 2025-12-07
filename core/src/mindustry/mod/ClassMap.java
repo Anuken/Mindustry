@@ -1,6 +1,7 @@
 package mindustry.mod;
 
 import arc.struct.*;
+
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
 public class ClassMap{
@@ -283,12 +284,6 @@ public class ClassMap{
         classes.put("TallBlock", mindustry.world.blocks.environment.TallBlock.class);
         classes.put("TreeBlock", mindustry.world.blocks.environment.TreeBlock.class);
         classes.put("WobbleProp", mindustry.world.blocks.environment.WobbleProp.class);
-        classes.put("HeatBlock", mindustry.world.blocks.heat.HeatBlock.class);
-        classes.put("HeatConductor", mindustry.world.blocks.heat.HeatConductor.class);
-        classes.put("HeatConductorBuild", mindustry.world.blocks.heat.HeatConductor.HeatConductorBuild.class);
-        classes.put("HeatConsumer", mindustry.world.blocks.heat.HeatConsumer.class);
-        classes.put("HeatProducer", mindustry.world.blocks.heat.HeatProducer.class);
-        classes.put("HeatProducerBuild", mindustry.world.blocks.heat.HeatProducer.HeatProducerBuild.class);
         classes.put("LegacyBlock", mindustry.world.blocks.legacy.LegacyBlock.class);
         classes.put("LegacyCommandCenter", mindustry.world.blocks.legacy.LegacyCommandCenter.class);
         classes.put("CommandBuild", mindustry.world.blocks.legacy.LegacyCommandCenter.CommandBuild.class);
@@ -394,8 +389,6 @@ public class ClassMap{
         classes.put("FrackerBuild", mindustry.world.blocks.production.Fracker.FrackerBuild.class);
         classes.put("GenericCrafter", mindustry.world.blocks.production.GenericCrafter.class);
         classes.put("GenericCrafterBuild", mindustry.world.blocks.production.GenericCrafter.GenericCrafterBuild.class);
-        classes.put("HeatCrafter", mindustry.world.blocks.production.HeatCrafter.class);
-        classes.put("HeatCrafterBuild", mindustry.world.blocks.production.HeatCrafter.HeatCrafterBuild.class);
         classes.put("Incinerator", mindustry.world.blocks.production.Incinerator.class);
         classes.put("IncineratorBuild", mindustry.world.blocks.production.Incinerator.IncineratorBuild.class);
         classes.put("ItemIncinerator", mindustry.world.blocks.production.ItemIncinerator.class);

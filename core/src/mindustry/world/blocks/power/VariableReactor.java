@@ -13,7 +13,6 @@ import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -70,7 +69,7 @@ public class VariableReactor extends PowerGenerator{
     }
 
     //TODO: draw warmup fraction on block?
-    public class VariableReactorBuild extends GeneratorBuild implements HeatConsumer{
+    public class VariableReactorBuild extends GeneratorBuild implements HeatConsumer {
         public float[] sideHeat = new float[4];
         public float heat = 0f, instability, totalProgress, warmup, flash;
 
