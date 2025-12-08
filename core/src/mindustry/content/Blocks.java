@@ -116,7 +116,7 @@ public class Blocks{
 
     //transport
     conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
-    overflowGate, underflowGate, massDriver,
+    overflowGate, underflowGate, unloader, massDriver,
 
     //transport - alternate
     duct, armoredDuct, ductRouter, overflowDuct, underflowDuct, ductBridge, ductUnloader,
@@ -143,7 +143,7 @@ public class Blocks{
     cliffCrusher, largeCliffCrusher, plasmaBore, largePlasmaBore, impactDrill, eruptionDrill,
 
     //storage
-    coreShard, coreFoundation, coreNucleus, vault, container, unloader,
+    coreShard, coreFoundation, coreNucleus, vault, container,
     //storage - erekir
     coreBastion, coreCitadel, coreAcropolis, reinforcedContainer, reinforcedVault,
 
@@ -2154,6 +2154,12 @@ public class Blocks{
             invert = true;
         }};
 
+        unloader = new Unloader("unloader"){{
+            requirements(Category.distribution, with(Items.titanium, 25, Items.silicon, 30));
+            speed = 60f / 11f;
+            group = BlockGroup.transportation;
+        }};
+
         massDriver = new MassDriver("mass-driver"){{
             requirements(Category.distribution, with(Items.titanium, 125, Items.silicon, 75, Items.lead, 125, Items.thorium, 50));
             size = 3;
@@ -3216,13 +3222,6 @@ public class Blocks{
             size = 3;
             itemCapacity = 1000;
             scaledHealth = 55;
-        }};
-
-        //TODO move tabs?
-        unloader = new Unloader("unloader"){{
-            requirements(Category.effect, with(Items.titanium, 25, Items.silicon, 30));
-            speed = 60f / 11f;
-            group = BlockGroup.transportation;
         }};
 
         reinforcedContainer = new StorageBlock("reinforced-container"){{

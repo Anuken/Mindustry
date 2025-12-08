@@ -415,7 +415,7 @@ public class DataPatcher{
                     }catch(Throwable e){
                         warn("Failed to read value @.@ = @: (type = @ elementType = @)\n@", object, field, value, metadata.type, metadata.elementType, Strings.getSimpleMessages(e));
                     }
-                   parser.listeners.pop();
+                    parser.listeners.pop();
                 }else{
                     //assign each field manually
                     var childFields = parser.getJson().getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
