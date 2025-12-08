@@ -1211,7 +1211,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     var cmd =  ai.currentCommand();
                     lastPos = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
 
-                    if(unit.isFlying() != flying) continue;
+                    if((unit.isFlying() || unit.type.allowLegStep) != flying) continue;
 
                     //draw target line
                     if(ai.targetPos != null && cmd.drawTarget){
