@@ -179,6 +179,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Unitc{
                             floor.walkSound.at(x, y, 1f, floor.walkSoundVolume);
                         }else{
                             Fx.unitLandSmall.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
+                            type.stepSound.at(l.base.x, l.base.y, type.stepSoundPitch + Mathf.range(type.stepSoundPitchRange), type.stepSoundVolume);
                         }
 
                         //shake when legs contact ground

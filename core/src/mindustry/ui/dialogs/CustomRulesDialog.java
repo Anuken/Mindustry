@@ -86,7 +86,7 @@ public class CustomRulesDialog extends BaseDialog{
                         //objectives and spawns are considered to be map-specific; don't use them
                         newRules.spawns = rules.spawns;
                         newRules.objectives = rules.objectives;
-                        rules = newRules;
+                        JsonIO.copy(newRules, rules);
                         refresh();
                     }catch(Throwable e){
                         Log.err(e);
@@ -96,7 +96,7 @@ public class CustomRulesDialog extends BaseDialog{
                 }).disabled(Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith("{")).marginLeft(12f).row();
 
                 t.button("@settings.reset", Icon.refresh, style, () -> {
-                    rules = resetter.get();
+                    JsonIO.copy(resetter.get(), rules);
                     refresh();
                 }).marginLeft(12f);
             });

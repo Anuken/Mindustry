@@ -22,7 +22,7 @@ import java.util.*;
 
 /** The current implementation is awful. Consider it a proof of concept. */
 @SuppressWarnings("unchecked")
-public class ContentPatcher{
+public class DataPatcher{
     private static final Object root = new Object();
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
     private static ContentParser parser = createParser();
@@ -68,6 +68,8 @@ public class ContentPatcher{
         applied = true;
         contentLoader = Vars.content.copy();
         patches.clear();
+
+        Log.info(patchArray.toString("\n"));
 
         for(String patch : patchArray){
             PatchSet set = new PatchSet(patch, new JsonValue("error"));
@@ -129,12 +131,16 @@ public class ContentPatcher{
         if(!Vars.headless){
             if(object instanceof DrawPart part && parent instanceof MappableContent cont){
                 part.load(cont.name);
+            }else if(object instanceof DrawPart part && parent instanceof Weapon w){
+                part.load(w.name);
             }else if(object instanceof DrawBlock draw && parent instanceof Block block){
                 draw.load(block);
             }else if(object instanceof Weapon weapon){
                 weapon.load();
                 weapon.init();
             }else if(object instanceof Content cont){
+                cont.init();
+                cont.postInit();
                 cont.load();
             }
         }else{
@@ -373,6 +379,7 @@ public class ContentPatcher{
                 });
 
                 try{
+                    bl.hasPower = false; //if a block doesn't have a power consumer, hasPower should be false. if it does, it will get set to true in reinitializeConsumers
                     parser.readBlockConsumers(bl, jsv);
                     bl.reinitializeConsumers();
                 }catch(Throwable e){
@@ -408,7 +415,7 @@ public class ContentPatcher{
                     }catch(Throwable e){
                         warn("Failed to read value @.@ = @: (type = @ elementType = @)\n@", object, field, value, metadata.type, metadata.elementType, Strings.getSimpleMessages(e));
                     }
-                   parser.listeners.pop();
+                    parser.listeners.pop();
                 }else{
                     //assign each field manually
                     var childFields = parser.getJson().getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
