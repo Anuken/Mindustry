@@ -69,6 +69,8 @@ public class DataPatcher{
         contentLoader = Vars.content.copy();
         patches.clear();
 
+        Log.info(patchArray.toString("\n"));
+
         for(String patch : patchArray){
             PatchSet set = new PatchSet(patch, new JsonValue("error"));
             patches.add(set);
@@ -377,6 +379,7 @@ public class DataPatcher{
                 });
 
                 try{
+                    bl.hasPower = false; //if a block doesn't have a power consumer, hasPower should be false. if it does, it will get set to true in reinitializeConsumers
                     parser.readBlockConsumers(bl, jsv);
                     bl.reinitializeConsumers();
                 }catch(Throwable e){
