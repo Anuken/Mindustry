@@ -45,7 +45,7 @@ public class LExecutor{
     /** Non-constant variables used for network sync */
     public LVar[] vars = {};
 
-    public LVar counter, unit, thisv, ipt;
+    public LVar counter, unit, thisv, ipt, instrAcc;
 
     public int[] binds;
     public boolean yield;
@@ -92,6 +92,13 @@ public class LExecutor{
         }
     }
 
+    /** Runs a single instruction. Accepts an instruction budget variable. */
+    public void runOnce(double instrAccVal){
+        instrAcc.numval = instrAccVal;
+        instrAcc.isobj = false;
+        runOnce();
+    }
+
     /** Loads with a specified assembler. Resets all variables. */
     public void load(LAssembler builder){
         nameMap = null;
@@ -105,6 +112,7 @@ public class LExecutor{
         unit = builder.getVar("@unit");
         thisv = builder.getVar("@this");
         ipt = builder.putConst("@ipt", build != null ? build.ipt : 0);
+        instrAcc = builder.putConst("@instrAcc", 0);
     }
 
     //region utility
