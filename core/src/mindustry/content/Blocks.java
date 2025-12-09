@@ -4374,6 +4374,7 @@ public class Blocks{
                 rangeChange = 7f*8f;
                 buildingDamageMultiplier = 0.3f;
                 trailRotation = true;
+                shootSound = Sounds.shootBreachCarbide;
 
                 fragBullets = 3;
                 fragRandomSpread = 0f;

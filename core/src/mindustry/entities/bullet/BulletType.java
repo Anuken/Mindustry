@@ -79,6 +79,8 @@ public class BulletType extends Content implements Cloneable{
     public Effect chargeEffect = Fx.none;
     /** Extra smoke effect created when shooting. */
     public Effect smokeEffect = Fx.shootSmallSmoke;
+    /** Overrides the shoot sound in turrets if set. Does nothing in units, as they can't have multiple ammo types. */
+    public Sound shootSound = Sounds.none;
     /** Sound made when hitting something or getting removed.*/
     public Sound hitSound = Sounds.none;
     /** Sound made when hitting something or getting removed.*/
