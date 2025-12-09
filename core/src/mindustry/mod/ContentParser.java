@@ -532,13 +532,13 @@ public class ContentParser{
 
     public void readBlockCanInputItems(Block block, JsonValue value){
         for(JsonValue child : value){
-            switch(child.name){
+            switch(child.name) {
                 case "add" -> {
                     for (Item it : parser.readValue(Item[].class, child)) {
                         block.itemFilter[it.id] = true;
                     }
                 }
-                case "remove" -> {
+                case "rem" -> {
                     for (Item it : parser.readValue(Item[].class, child)) {
                         block.itemFilter[it.id] = false;
                     }
