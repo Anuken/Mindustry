@@ -295,7 +295,13 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** override for unit shield colour. */
     public @Nullable Color shieldColor;
     /** sound played when this unit explodes (*not* when it is shot down) */
-    public Sound deathSound = Sounds.bang;
+    public Sound deathSound = Sounds.unset;
+    /** volume of death sound */
+    public float deathSoundVolume = 1f;
+    /** sound played when the unit wreck is shot down */
+    public Sound wreckSound = Sounds.unset;
+    /** volume of wreck falling sound */
+    public float wreckSoundVolume = 1f;
     /** sound played on loop when this unit is around. */
     public Sound loopSound = Sounds.none;
     /** volume of loop sound */
@@ -895,6 +901,17 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(flying){
             envEnabled |= Env.space;
+        }
+
+        if(deathSound == Sounds.unset){
+            deathSound =
+                hitSize < 12f ? Sounds.unitExplode1 :
+                hitSize < 22f ? Sounds.unitExplode2 :
+                Sounds.unitExplode3;
+        }
+
+        if(wreckSound == Sounds.unset){
+            wreckSound = hitSize >= 22f ? Sounds.wreckFallBig : Sounds.wreckFall;
         }
 
         if(lightRadius == -1){

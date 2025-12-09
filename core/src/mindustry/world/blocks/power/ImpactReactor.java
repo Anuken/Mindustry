@@ -38,7 +38,7 @@ public class ImpactReactor extends PowerGenerator{
         explosionDamage = 1900 * 4;
         explosionMinWarmup = 0.3f;
         explodeEffect = Fx.impactReactorExplosion;
-        explodeSound = Sounds.explosionbig;
+        explodeSound = Sounds.reactorExplosion2;
     }
 
     @Override

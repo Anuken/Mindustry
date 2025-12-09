@@ -13,13 +13,17 @@ public class SoundPriority{
     public static void init(){
         max(7, laserbig, beam, laserbeam);
 
-        //priority 2: long weapon loops
+        //priority 2: long weapon loops and big explosions
         set(
         2f,
         laserbig,
         beam,
         laserbeam,
-        beamPlasma
+        beamPlasma,
+        reactorExplosion,
+        reactorExplosion2,
+        coreExplode,
+        blockExplodeElectricBig, blockExplodeExplosive
         );
 
         //priority 1.5: big weapon sounds, not loops
