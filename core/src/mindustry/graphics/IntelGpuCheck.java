@@ -2,7 +2,6 @@ package mindustry.graphics;
 
 import arc.files.*;
 import arc.util.*;
-import mindustry.*;
 
 import java.util.*;
 
@@ -15,7 +14,7 @@ public class IntelGpuCheck{
 
         boolean isIntel = vendor.toLowerCase(Locale.ROOT).contains("intel");
         try{
-            Fi file = Vars.dataDirectory.child("was_intel_gpu");
+            Fi file = new Fi(OS.getAppDataDirectoryString("Mindustry")).child("was_intel_gpu");
             if(isIntel){
                 file.writeString("1");
             }else if(file.exists()){
