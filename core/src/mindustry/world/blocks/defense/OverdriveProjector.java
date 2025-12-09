@@ -44,6 +44,11 @@ public class OverdriveProjector extends Block{
     }
 
     @Override
+    public boolean canReplace(Block other){
+        return super.canReplace(other) || (other instanceof OverdriveProjector && other != this);
+    }
+
+    @Override
     public boolean outputsItems(){
         return false;
     }
