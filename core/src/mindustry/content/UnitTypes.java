@@ -3196,7 +3196,7 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("cleroi-weapon"){{
-                shootSound = Sounds.blaster;
+                shootSound = Sounds.shootCleroi;
                 x = 14f / 4f;
                 y = 33f / 4f;
                 reload = 33f;
@@ -3223,6 +3223,8 @@ public class UnitTypes{
 
                     splashDamageRadius = 30f;
                     splashDamage = 43f;
+
+                    despawnSound = Sounds.explosionCleroi;
 
                     hitEffect = despawnEffect = new MultiEffect(Fx.hitBulletColor, new WaveEffect(){{
                         colorFrom = colorTo = Pal.techBlue;
