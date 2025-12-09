@@ -1037,6 +1037,7 @@ public class UnitTypes{
             omniMovement = false;
             rotateSpeed = 5f;
             circleTargetRadius = 60f;
+            wreckSoundVolume = 0.7f;
 
             weapons.add(new Weapon(){{
                 y = 1f;
@@ -1323,6 +1324,7 @@ public class UnitTypes{
             range = 50f;
             isEnemy = false;
             controlSelectGlobal = false;
+            wreckSoundVolume = deathSoundVolume = 0.7f;
 
             ammoType = new PowerAmmoType(500);
 
@@ -1348,6 +1350,7 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(900);
             mineTier = 2;
             mineSpeed = 3.5f;
+            wreckSoundVolume = 0.9f;
 
             abilities.add(new RepairFieldAbility(5f, 60f * 8, 50f));
 
@@ -2445,6 +2448,8 @@ public class UnitTypes{
             engineOffset = 6f;
             hitSize = 8f;
             alwaysUnlocked = true;
+            wreckSoundVolume = 0.8f;
+            deathSoundVolume = 0.7f;
 
             weapons.add(new Weapon("small-basic-weapon"){{
                 reload = 17f;

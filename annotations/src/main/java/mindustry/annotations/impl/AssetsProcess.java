@@ -184,6 +184,7 @@ public class AssetsProcess extends BaseProcessor{
 
         if(classname.equals("Sounds")){
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new " + rtype + "()").build());
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "unset", Modifier.STATIC, Modifier.PUBLIC).initializer("new " + rtype + "()").build());
         }
 
         type.addMethod(loadBegin.build());

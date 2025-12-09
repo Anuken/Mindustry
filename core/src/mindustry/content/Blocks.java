@@ -6253,6 +6253,7 @@ public class Blocks{
             consumePower(13f);
             consumeItems(with(Items.silicon, 850, Items.titanium, 750, Items.plastanium, 650));
             consumeLiquid(Liquids.cryofluid, 1f);
+            createSound = Sounds.unitCreateBig;
 
             constructTime = 60f * 60f * 1.5f;
             liquidCapacity = 60f;
@@ -6278,6 +6279,7 @@ public class Blocks{
 
             constructTime = 60f * 60f * 4;
             liquidCapacity = 180f;
+            createSound = Sounds.unitCreateBig;
 
             upgrades.addAll(
                 new UnitType[]{UnitTypes.antumbra, UnitTypes.eclipse},
