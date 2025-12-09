@@ -80,7 +80,7 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
 
                     if(t.build != null && t.build.team != team){
                         t.build.damage(team, type.crushDamage * Time.delta * t.block().crushDamageMultiplier * state.rules.unitDamage(team)
-                                * ((speedMultiplier - 1) / 10));
+                                * ((speedMultiplier- 1) / 10 + 1));
                     }else if(t.block().unitMoveBreakable){
                         ConstructBlock.deconstructFinish(t, t.block(), self());
                     }
