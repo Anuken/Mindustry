@@ -41,9 +41,6 @@ public class DesktopLauncher extends ClientLauncher{
         try{
             Vars.loadLogger();
 
-            //note that this only does something on Windows
-            GpuDetect.init();
-
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
@@ -52,7 +49,7 @@ public class DesktopLauncher extends ClientLauncher{
                 height = 700;
 
                 //on Windows, Intel drivers might be buggy with OpenGL 3.x, so only use 2.x. See https://github.com/Anuken/Mindustry/issues/11041
-                if(GpuDetect.hasIntel && !GpuDetect.hasAMD && !GpuDetect.hasNvidia){
+                if(IntelGpuCheck.wasIntel()){
                     allowGl30 = false;
                     coreProfile = false;
                     glVersions = new int[][]{{2, 1}, {2, 0}};
@@ -79,7 +76,6 @@ public class DesktopLauncher extends ClientLauncher{
                                         allowGl30 = true; //when a version is explicitly specified always allow GL 3
                                         break;
                                     }
-
                                 }
                                 Log.err("Invalid GL version format string: '@'. GL version must be of the form <major>.<minor>", str);
                             }

@@ -1037,6 +1037,7 @@ public class UnitTypes{
             omniMovement = false;
             rotateSpeed = 5f;
             circleTargetRadius = 60f;
+            wreckSoundVolume = 0.7f;
 
             weapons.add(new Weapon(){{
                 y = 1f;
@@ -1323,6 +1324,7 @@ public class UnitTypes{
             range = 50f;
             isEnemy = false;
             controlSelectGlobal = false;
+            wreckSoundVolume = deathSoundVolume = 0.7f;
 
             ammoType = new PowerAmmoType(500);
 
@@ -1348,6 +1350,7 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(900);
             mineTier = 2;
             mineSpeed = 3.5f;
+            wreckSoundVolume = 0.9f;
 
             abilities.add(new RepairFieldAbility(5f, 60f * 8, 50f));
 
@@ -1482,7 +1485,7 @@ public class UnitTypes{
                     frontColor = Color.white;
                     mixColorTo = Color.white;
 
-                    hitSound = Sounds.plasmaboom;
+                    hitSound = Sounds.plasmaBomb;
 
                     shootCone = 180f;
                     ejectEffect = Fx.none;
@@ -2445,6 +2448,8 @@ public class UnitTypes{
             engineOffset = 6f;
             hitSize = 8f;
             alwaysUnlocked = true;
+            wreckSoundVolume = 0.8f;
+            deathSoundVolume = 0.7f;
 
             weapons.add(new Weapon("small-basic-weapon"){{
                 reload = 17f;
@@ -3099,7 +3104,7 @@ public class UnitTypes{
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("merui-weapon"){{
-                shootSound = Sounds.missile;
+                shootSound = Sounds.shootMerui;
                 mirror = false;
                 showStatSprite = false;
                 x = 0f;
@@ -3191,7 +3196,7 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("cleroi-weapon"){{
-                shootSound = Sounds.blaster;
+                shootSound = Sounds.shootCleroi;
                 x = 14f / 4f;
                 y = 33f / 4f;
                 reload = 33f;
@@ -3218,6 +3223,8 @@ public class UnitTypes{
 
                     splashDamageRadius = 30f;
                     splashDamage = 43f;
+
+                    despawnSound = Sounds.explosionCleroi;
 
                     hitEffect = despawnEffect = new MultiEffect(Fx.hitBulletColor, new WaveEffect(){{
                         colorFrom = colorTo = Pal.techBlue;
@@ -3737,7 +3744,7 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("elude-weapon"){{
-                shootSound = Sounds.blaster;
+                shootSound = Sounds.shootElude;
                 y = -2f;
                 x = 4f;
                 top = true;
@@ -3785,7 +3792,7 @@ public class UnitTypes{
             );
 
             weapons.add(new Weapon("avert-weapon"){{
-                shootSound = Sounds.blaster;
+                shootSound = Sounds.shootAvert;
                 reload = 35f;
                 x = 0f;
                 y = 6.5f;
@@ -3874,7 +3881,7 @@ public class UnitTypes{
                     }});
                     smokeEffect = Fx.shootSmokeTitan;
                     hitColor = Pal.sapBullet;
-                    despawnSound = Sounds.spark;
+                    despawnSound = Sounds.artilleryShockExplosion;
 
                     sprite = "large-orb";
                     trailEffect = Fx.missileTrail;

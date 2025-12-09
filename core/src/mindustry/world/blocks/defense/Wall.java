@@ -41,6 +41,7 @@ public class Wall extends Block{
 
         //it's a wall of course it's supported everywhere
         envEnabled = Env.any;
+        destroySound = Sounds.blockExplodeWall;
     }
 
     @Override

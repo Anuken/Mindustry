@@ -4402,7 +4402,7 @@ public class Blocks{
             );
 
             coolantMultiplier = 15f;
-            shootSound = Sounds.shootAlt;
+            shootSound = Sounds.shootBreach;
 
             targetUnderBlocks = false;
             shake = 1f;
@@ -4489,7 +4489,7 @@ public class Blocks{
             consumeAmmoOnce = true;
             targetUnderBlocks = false;
 
-            shootSound = Sounds.shootAltLong;
+            shootSound = Sounds.shootDiffuse;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-front"){{
@@ -4917,7 +4917,7 @@ public class Blocks{
             rotateSpeed = 5f;
             shootCone = 30f;
             consumeAmmoOnce = true;
-            shootSound = Sounds.shootBig;
+            shootSound = Sounds.shootDisperse;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-side"){{
@@ -5005,10 +5005,9 @@ public class Blocks{
                     waveStroke = 4f;
                     waveRad = 40f;
                 }};
-                despawnSound = Sounds.dullExplosion;
 
-                //TODO shoot sound
-                shootSound = Sounds.cannon;
+                despawnSound = Sounds.afflictExplosion;
+                shootSound = Sounds.shootAfflict;
 
                 fragBullet = intervalBullet = new BasicBulletType(3f, 35){{
                     width = 9f;
@@ -6253,6 +6252,7 @@ public class Blocks{
             consumePower(13f);
             consumeItems(with(Items.silicon, 850, Items.titanium, 750, Items.plastanium, 650));
             consumeLiquid(Liquids.cryofluid, 1f);
+            createSound = Sounds.unitCreateBig;
 
             constructTime = 60f * 60f * 1.5f;
             liquidCapacity = 60f;
@@ -6278,6 +6278,7 @@ public class Blocks{
 
             constructTime = 60f * 60f * 4;
             liquidCapacity = 180f;
+            createSound = Sounds.unitCreateBig;
 
             upgrades.addAll(
                 new UnitType[]{UnitTypes.antumbra, UnitTypes.eclipse},
