@@ -77,7 +77,7 @@ public class ForceProjector extends Block{
         hasLiquids = true;
         hasItems = true;
         envEnabled |= Env.space;
-        ambientSound = Sounds.shield;
+        ambientSound = Sounds.loopShield;
         ambientSoundVolume = 0.08f;
         flags = EnumSet.of(BlockFlag.shield);
 

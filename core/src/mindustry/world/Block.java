@@ -311,7 +311,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** Sound made when this block is built. */
     public Sound placeSound = Sounds.unset;
     /** Sound made when this block is deconstructed. */
-    public Sound breakSound = Sounds.breaks;
+    public Sound breakSound = Sounds.unset;
     /** Sounds made when this block is destroyed.*/
     public Sound destroySound = Sounds.unset;
     /** Volume of destruction sound. */
@@ -1264,14 +1264,21 @@ public class Block extends UnlockableContent implements Senseable{
             destroySound =
                 size >= 3 ? Sounds.blockExplode3 :
                 size >= 2 ? Sounds.blockExplode2 :
-                Sounds.blockExplode1;
+                new RandomSound(Sounds.blockExplode1, Sounds.blockExplode1Alt);
         }
 
         if(placeSound == Sounds.unset){
             placeSound =
-                size >= 3 ? Sounds.place3 :
-                size >= 2 ? Sounds.place2 :
-                Sounds.place1;
+                size >= 3 ? Sounds.blockPlace3 :
+                size >= 2 ? Sounds.blockPlace2 :
+                Sounds.blockPlace1;
+        }
+
+        if(breakSound == Sounds.unset){
+            breakSound =
+                size >= 3 ? Sounds.blockBreak3 :
+                size >= 2 ? Sounds.blockBreak2 :
+                Sounds.blockBreak1;
         }
 
         //disable standard shadow
