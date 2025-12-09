@@ -4402,7 +4402,7 @@ public class Blocks{
             );
 
             coolantMultiplier = 15f;
-            shootSound = Sounds.shootAlt;
+            shootSound = Sounds.shootBreach;
 
             targetUnderBlocks = false;
             shake = 1f;
@@ -4489,7 +4489,7 @@ public class Blocks{
             consumeAmmoOnce = true;
             targetUnderBlocks = false;
 
-            shootSound = Sounds.shootAltLong;
+            shootSound = Sounds.shootDiffuse;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-front"){{
@@ -4917,7 +4917,7 @@ public class Blocks{
             rotateSpeed = 5f;
             shootCone = 30f;
             consumeAmmoOnce = true;
-            shootSound = Sounds.shootBig;
+            shootSound = Sounds.shootDisperse;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-side"){{
@@ -5005,10 +5005,9 @@ public class Blocks{
                     waveStroke = 4f;
                     waveRad = 40f;
                 }};
-                despawnSound = Sounds.dullExplosion;
 
-                //TODO shoot sound
-                shootSound = Sounds.cannon;
+                despawnSound = Sounds.afflictExplosion;
+                shootSound = Sounds.shootAfflict;
 
                 fragBullet = intervalBullet = new BasicBulletType(3f, 35){{
                     width = 9f;

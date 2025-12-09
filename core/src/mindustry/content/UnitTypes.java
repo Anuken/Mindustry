@@ -1485,7 +1485,7 @@ public class UnitTypes{
                     frontColor = Color.white;
                     mixColorTo = Color.white;
 
-                    hitSound = Sounds.plasmaboom;
+                    hitSound = Sounds.plasmaBomb;
 
                     shootCone = 180f;
                     ejectEffect = Fx.none;
@@ -3104,7 +3104,7 @@ public class UnitTypes{
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("merui-weapon"){{
-                shootSound = Sounds.missile;
+                shootSound = Sounds.shootMerui;
                 mirror = false;
                 showStatSprite = false;
                 x = 0f;
@@ -3744,7 +3744,7 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("elude-weapon"){{
-                shootSound = Sounds.blaster;
+                shootSound = Sounds.shootElude;
                 y = -2f;
                 x = 4f;
                 top = true;
@@ -3792,7 +3792,7 @@ public class UnitTypes{
             );
 
             weapons.add(new Weapon("avert-weapon"){{
-                shootSound = Sounds.blaster;
+                shootSound = Sounds.shootAvert;
                 reload = 35f;
                 x = 0f;
                 y = 6.5f;
@@ -3881,7 +3881,7 @@ public class UnitTypes{
                     }});
                     smokeEffect = Fx.shootSmokeTitan;
                     hitColor = Pal.sapBullet;
-                    despawnSound = Sounds.spark;
+                    despawnSound = Sounds.artilleryShockExplosion;
 
                     sprite = "large-orb";
                     trailEffect = Fx.missileTrail;
