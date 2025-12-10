@@ -2746,8 +2746,8 @@ public class Blocks{
         }};
 
         fluxReactor = new VariableReactor("flux-reactor"){{
-            requirements(Category.power, with(Items.graphite, 300, Items.carbide, 100, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 200));
-            powerProduction = 265f;
+            requirements(Category.power, with(Items.graphite, 240, Items.carbide, 60, Items.oxide, 80, Items.silicon, 480, Items.surgeAlloy, 120));
+            powerProduction = 18000f / 60f;
             maxHeat = 150f;
 
             consumeLiquid(Liquids.cyanogen, 9f / 60f);
