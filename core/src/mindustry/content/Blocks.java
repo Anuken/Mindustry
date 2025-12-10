@@ -2807,7 +2807,7 @@ public class Blocks{
             explosionRadius = 9;
             explosionDamage = 2000;
             explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
-            explodeSound = Sounds.largeExplosion;
+            explodeSound = Sounds.explosionReactorNeoplasm;
 
             powerProduction = 140f;
 
@@ -4619,7 +4619,7 @@ public class Blocks{
                 backColor = hitColor = trailColor = Color.valueOf("ea8878").lerp(Pal.redLight, 0.5f);
                 frontColor = Color.white;
                 ammoMultiplier = 1f;
-                hitSound = Sounds.titanExplosion;
+                hitSound = Sounds.explosionTitan;
 
                 status = StatusEffects.blasted;
 
@@ -4653,7 +4653,7 @@ public class Blocks{
                 backColor = hitColor = trailColor = Color.valueOf("ab8ec5");
                 frontColor = Color.white;
                 ammoMultiplier = 1f;
-                hitSound = Sounds.titanExplosion;
+                hitSound = Sounds.explosionTitan;
 
                 status = StatusEffects.blasted;
 
@@ -4713,7 +4713,7 @@ public class Blocks{
                 hitColor = backColor = trailColor = Color.valueOf("a0b380");
                 frontColor = Color.valueOf("e4ffd6");
                 ammoMultiplier = 1f;
-                hitSound = Sounds.titanExplosion;
+                hitSound = Sounds.explosionTitan;
 
                 trailLength = 32;
                 trailWidth = 3.35f;
@@ -5007,7 +5007,7 @@ public class Blocks{
                     waveRad = 40f;
                 }};
 
-                despawnSound = Sounds.afflictExplosion;
+                despawnSound = Sounds.explosionAfflict;
                 shootSound = Sounds.shootAfflict;
 
                 fragBullet = intervalBullet = new BasicBulletType(3f, 35){{
@@ -5183,7 +5183,7 @@ public class Blocks{
                     lowAltitude = true;
                     loopSound = Sounds.loopMissileTrail;
                     loopSoundVolume = 0.6f;
-                    deathSound = Sounds.largeExplosion;
+                    deathSound = Sounds.explosionMissile;
                     targetAir = false;
                     targetUnderBlocks = false;
 
@@ -5270,7 +5270,7 @@ public class Blocks{
                     lowAltitude = true;
                     loopSound = Sounds.loopMissileTrail;
                     loopSoundVolume = 0.6f;
-                    deathSound = Sounds.largeExplosion;
+                    deathSound = Sounds.explosionMissile;
                     targetAir = false;
                     targetUnderBlocks = false;
 
@@ -5376,7 +5376,7 @@ public class Blocks{
                     lowAltitude = true;
                     loopSound = Sounds.loopMissileTrail;
                     loopSoundVolume = 0.6f;
-                    deathSound = Sounds.largeExplosion;
+                    deathSound = Sounds.explosionMissile;
                     targetAir = false;
                     targetUnderBlocks = false;
 
@@ -5431,7 +5431,7 @@ public class Blocks{
                                     lowAltitude = true;
                                     loopSound = Sounds.loopMissileTrail;
                                     loopSoundVolume = 0.6f;
-                                    deathSound = Sounds.largeExplosion;
+                                    deathSound = Sounds.explosionMissile;
                                     targetAir = false;
                                     targetUnderBlocks = false;
 

@@ -1263,7 +1263,7 @@ public class Block extends UnlockableContent implements Senseable{
         if(destroySound == Sounds.unset){
             destroySound =
                 size >= 3 ? Sounds.blockExplode3 :
-                size >= 2 ? Sounds.blockExplode2 :
+                size >= 2 ? new RandomSound(Sounds.blockExplode2, Sounds.blockExplode2Alt) :
                 new RandomSound(Sounds.blockExplode1, Sounds.blockExplode1Alt);
         }
 

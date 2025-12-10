@@ -648,7 +648,7 @@ public class UnitTypes{
                 reload = 24f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
-                shootSound = Sounds.crawlerExplosion;
+                shootSound = Sounds.explosionCrawler;
                 shootSoundVolume = 0.4f;
                 x = shootY = 0f;
                 mirror = false;
@@ -864,7 +864,7 @@ public class UnitTypes{
 
                 bullet = new ArtilleryBulletType(2f, 12){{
                     hitEffect = Fx.sapExplosion;
-                    despawnSound = Sounds.artilleryShockExplosion;
+                    despawnSound = Sounds.explosionArtilleryShock;
                     knockback = 0.8f;
                     lifetime = 70f;
                     width = height = 19f;
@@ -965,7 +965,7 @@ public class UnitTypes{
                 rotationLimit = 80f;
 
                 bullet = new ArtilleryBulletType(3f, 50){{
-                    despawnSound = Sounds.artilleryShockExplosionBig;
+                    despawnSound = Sounds.explosionArtilleryShockBig;
                     hitEffect = Fx.sapExplosion;
                     knockback = 0.8f;
                     lifetime = 80f;
@@ -991,7 +991,7 @@ public class UnitTypes{
                     fragBullets = 9;
 
                     fragBullet = new ArtilleryBulletType(2.3f, 30){{
-                        despawnSound = Sounds.artilleryShockExplosion;
+                        despawnSound = Sounds.explosionArtilleryShock;
                         hitEffect = Fx.sapExplosion;
                         knockback = 0.8f;
                         lifetime = 90f;
@@ -1481,7 +1481,7 @@ public class UnitTypes{
                     frontColor = Color.white;
                     mixColorTo = Color.white;
 
-                    hitSound = Sounds.explodePlasma;
+                    hitSound = Sounds.explosionQuad;
 
                     shootCone = 180f;
                     ejectEffect = Fx.none;
@@ -2451,9 +2451,9 @@ public class UnitTypes{
                 x = 2.75f;
                 y = 1f;
                 top = false;
+                shootSound = Sounds.shootAlpha;
 
                 bullet = new LaserBoltBulletType(2.5f, 11){{
-                    shootSound = Sounds.shootAlpha;
                     keepVelocity = false;
                     width = 1.5f;
                     height = 4.5f;
@@ -2500,9 +2500,9 @@ public class UnitTypes{
                 recoil = 1f;
                 shoot.shots = 2;
                 shoot.shotDelay = 4f;
+                shootSound = Sounds.shootAlpha;
 
                 bullet = new LaserBoltBulletType(3f, 11){{
-                    shootSound = Sounds.shootAlpha;
                     keepVelocity = false;
                     width = 1.5f;
                     height = 4.5f;
@@ -2553,9 +2553,9 @@ public class UnitTypes{
                 }};
 
                 inaccuracy = 3f;
+                shootSound = Sounds.shootAlpha;
 
                 bullet = new LaserBoltBulletType(3.5f, 11){{
-                    shootSound = Sounds.shootAlpha;
                     keepVelocity = false;
                     width = 1.5f;
                     height = 5f;
@@ -2721,7 +2721,7 @@ public class UnitTypes{
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("precept-weapon"){{
-                shootSound = Sounds.dullExplosion;
+                shootSound = Sounds.explosionDull;
                 layerOffset = 0.0001f;
                 reload = 80f;
                 shootY = 16f;
@@ -2835,7 +2835,7 @@ public class UnitTypes{
                     fragSpread = 10f;
                     fragBullets = 5;
                     fragVelocityMin = 1f;
-                    despawnSound = Sounds.dullExplosion;
+                    despawnSound = Sounds.explosionDull;
 
                     fragBullet = new BasicBulletType(8f, 35){{
                         sprite = "missile-large";
@@ -3507,7 +3507,7 @@ public class UnitTypes{
                     trailWidth = 2.8f;
                     trailLength = 20;
                     trailChance = -1f;
-                    despawnSound = Sounds.dullExplosion;
+                    despawnSound = Sounds.explosionDull;
 
                     despawnEffect = Fx.none;
                     hitEffect = new ExplosionEffect(){{
@@ -3629,7 +3629,7 @@ public class UnitTypes{
                     trailChance = -1f;
 
                     despawnEffect = Fx.none;
-                    despawnSound = Sounds.dullExplosion;
+                    despawnSound = Sounds.explosionDull;
 
                     hitEffect = despawnEffect = new ExplosionEffect(){{
                         lifetime = 50f;
@@ -3876,7 +3876,7 @@ public class UnitTypes{
                     }});
                     smokeEffect = Fx.shootSmokeTitan;
                     hitColor = Pal.sapBullet;
-                    despawnSound = Sounds.artilleryShockExplosion;
+                    despawnSound = Sounds.explosionArtilleryShock;
 
                     sprite = "large-orb";
                     trailEffect = Fx.missileTrail;

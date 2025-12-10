@@ -82,7 +82,7 @@ public class CoreBlock extends StorageBlock{
 
         //support everything
         replaceable = false;
-        destroySound = Sounds.coreExplode;
+        destroySound = Sounds.explosionCore;
         destroySoundVolume = 1.6f;
     }
 

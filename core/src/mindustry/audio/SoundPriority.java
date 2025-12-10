@@ -19,10 +19,11 @@ public class SoundPriority{
         beamMeltdown,
         beamLustre,
         beamPlasma,
-        reactorExplosion,
-        reactorExplosion2,
-        coreExplode,
-        blockExplodeElectricBig, blockExplodeExplosive
+        explosionReactor,
+        explosionReactor2,
+        explosionReactorNeoplasm,
+        explosionCore,
+        blockExplodeElectricBig, blockExplodeExplosive, blockExplodeExplosiveAlt
         );
 
         //priority 1.5: big weapon sounds, not loops
@@ -35,7 +36,14 @@ public class SoundPriority{
         shootCorvus,
         chargeCorvus,
         chargeVela,
-        chargeLancer
+        chargeLancer,
+        shootReign,
+        shootEclipse,
+        shootArtillerySapBig,
+        shootToxopidShotgun,
+        beamPlasmaSmall,
+        shootNavanax,
+        explosionNavanax
         );
 
         //priority 1: ambient noises
@@ -78,7 +86,7 @@ public class SoundPriority{
         //step sounds are low priority
         set(-2f, mechStep, mechStepHeavy, walkerStep, walkerStepSmall, walkerStepTiny, mechStepSmall);
 
-        coreExplode.setFalloffOffset(100f);
+        explosionCore.setFalloffOffset(100f);
     }
 
     static void max(int max, Sound... sounds){
