@@ -82,6 +82,8 @@ public class CoreBlock extends StorageBlock{
 
         //support everything
         replaceable = false;
+        destroySound = Sounds.coreExplode;
+        destroySoundVolume = 1.6f;
     }
 
     @Remote(called = Loc.server)
@@ -621,6 +623,9 @@ public class CoreBlock extends StorageBlock{
                 super.onDestroyed();
             }
 
+            Effect.shockwaveDust(x, y, 40f + block.size * tilesize, 0.5f);
+            Fx.coreExplosion.at(x, y, team.color);
+
             //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
             if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1 && spawner.getSpawns().size == 0 && state.rules.sector.planet.enemyCoreSpawnReplace){
                 //do not recache
@@ -632,6 +637,16 @@ public class CoreBlock extends StorageBlock{
             }
 
             Events.fire(new CoreChangeEvent(this));
+        }
+
+        @Override
+        public void playDestroySound(){
+            if(team.data().cores.size <= 1 && player != null && player.team() == team && state.rules.canGameOver){
+                //play at full volume when doing a game over
+                block.destroySound.play(block.destroySoundVolume, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), 0f);
+            }else{
+                super.playDestroySound();
+            }
         }
 
         @Override

@@ -196,7 +196,7 @@ public class Floor extends Block{
         }
 
         if(isLiquid && walkSound == Sounds.none){
-            walkSound = Sounds.splash;
+            walkSound = Sounds.stepWater;
         }
     }
 

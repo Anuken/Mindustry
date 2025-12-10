@@ -1,6 +1,7 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -34,6 +35,8 @@ public class UnitFactory extends UnitBlock{
     public int[] capacities = {};
 
     public Seq<UnitPlan> plans = new Seq<>(4);
+    public Sound createSound = Sounds.unitCreate;
+    public float createSoundVolume = 1f;
 
     public UnitFactory(String name){
         super(name);
@@ -47,7 +50,7 @@ public class UnitFactory extends UnitBlock{
         rotate = true;
         regionRotated1 = 1;
         commandable = true;
-        ambientSound = Sounds.respawning;
+        ambientSound = Sounds.loopUnitBuilding;
 
         config(Integer.class, (UnitFactoryBuild build, Integer i) -> {
             if(!configurable) return;
@@ -417,6 +420,7 @@ public class UnitFactory extends UnitBlock{
                         unit.command().command(command == null && unit.type.defaultCommand != null ? unit.type.defaultCommand : command);
                     }
 
+                    createSound.at(this, 1f + Mathf.range(0.06f), createSoundVolume);
                     payload = new UnitPayload(unit);
                     payVector.setZero();
                     consume();

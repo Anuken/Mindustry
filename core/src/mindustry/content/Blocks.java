@@ -116,7 +116,7 @@ public class Blocks{
 
     //transport
     conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
-    overflowGate, underflowGate, massDriver,
+    overflowGate, underflowGate, unloader, massDriver,
 
     //transport - alternate
     duct, armoredDuct, ductRouter, overflowDuct, underflowDuct, ductBridge, ductUnloader,
@@ -143,7 +143,7 @@ public class Blocks{
     cliffCrusher, largeCliffCrusher, plasmaBore, largePlasmaBore, impactDrill, eruptionDrill,
 
     //storage
-    coreShard, coreFoundation, coreNucleus, vault, container, unloader,
+    coreShard, coreFoundation, coreNucleus, vault, container,
     //storage - erekir
     coreBastion, coreCitadel, coreAcropolis, reinforcedContainer, reinforcedVault,
 
@@ -399,7 +399,7 @@ public class Blocks{
             statusDuration = 30f;
             attributes.set(Attribute.water, 1f);
             cacheLayer = CacheLayer.mud;
-            walkSound = Sounds.mud;
+            walkSound = Sounds.stepMud;
             walkSoundVolume = 0.08f;
             walkSoundPitchMin = 0.4f;
             walkSoundPitchMax = 0.5f;
@@ -1070,7 +1070,7 @@ public class Blocks{
             hasPower = true;
             hasLiquids = false;
             drawer = new DrawMulti(new DrawDefault(), new DrawFlame(Color.valueOf("ffef99")));
-            ambientSound = Sounds.smelter;
+            ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.07f;
 
             consumeItems(with(Items.coal, 1, Items.sand, 2));
@@ -1088,7 +1088,7 @@ public class Blocks{
             itemCapacity = 30;
             boostScale = 0.15f;
             drawer = new DrawMulti(new DrawDefault(), new DrawFlame(Color.valueOf("ffef99")));
-            ambientSound = Sounds.smelter;
+            ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.07f;
 
             consumeItems(with(Items.coal, 4, Items.sand, 6, Items.pyratite, 1));
@@ -1103,7 +1103,7 @@ public class Blocks{
             size = 2;
             hasPower = hasItems = true;
             drawer = new DrawMulti(new DrawDefault(), new DrawFlame(Color.valueOf("ffc099")));
-            ambientSound = Sounds.smelter;
+            ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.07f;
 
             consumeItems(with(Items.lead, 1, Items.sand, 1));
@@ -1138,7 +1138,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawWeave(), new DrawDefault());
             envEnabled |= Env.space;
 
-            ambientSound = Sounds.techloop;
+            ambientSound = Sounds.loopTech;
             ambientSoundVolume = 0.02f;
 
             consumeItems(with(Items.thorium, 4, Items.sand, 10));
@@ -1292,7 +1292,7 @@ public class Blocks{
                 spinSprite = true;
                 rotateSpeed = 2f;
             }}, new DrawRegion("-top"));
-            ambientSound = Sounds.grinding;
+            ambientSound = Sounds.loopGrind;
             ambientSoundVolume = 0.025f;
 
             consumeItem(Items.scrap, 1);
@@ -1335,7 +1335,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawArcSmelt(), new DrawDefault());
             fogRadius = 3;
             researchCost = with(Items.beryllium, 150, Items.graphite, 50);
-            ambientSound = Sounds.smelter;
+            ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.12f;
 
             consumeItems(with(Items.graphite, 1, Items.sand, 4));
@@ -1378,7 +1378,7 @@ public class Blocks{
                 }}
             );
 
-            ambientSound = Sounds.electricHum;
+            ambientSound = Sounds.loopElectricHum;
             ambientSoundVolume = 0.08f;
 
             regionRotated1 = 3;
@@ -1405,7 +1405,7 @@ public class Blocks{
             itemCapacity = 0;
             liquidCapacity = 60f;
             consumePower(2f);
-            ambientSound = Sounds.extractLoop;
+            ambientSound = Sounds.loopExtract;
             ambientSoundVolume = 0.06f;
 
             heatRequirement = 6f;
@@ -1429,7 +1429,7 @@ public class Blocks{
             rotateDraw = false;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawDefault(), new DrawHeatOutput());
-            ambientSound = Sounds.extractLoop;
+            ambientSound = Sounds.loopExtract;
             ambientSoundVolume = 0.08f;
 
             regionRotated1 = 2;
@@ -1448,7 +1448,7 @@ public class Blocks{
             size = 2;
             heatOutput = 3f;
             regionRotated1 = 1;
-            ambientSound = Sounds.hum;
+            ambientSound = Sounds.loopHum;
             itemCapacity = 0;
             consumePower(100f / 60f);
         }};
@@ -1464,7 +1464,7 @@ public class Blocks{
             liquidCapacity = 120f;
             rotateDraw = false;
             regionRotated1 = 1;
-            ambientSound = Sounds.hum;
+            ambientSound = Sounds.loopHum;
             consumeLiquid(Liquids.slag, 40f / 60f);
             heatOutput = 8f;
 
@@ -1478,7 +1478,7 @@ public class Blocks{
             size = 2;
             heatOutput = 15f;
             craftTime = 60f * 8f;
-            ambientSound = Sounds.hum;
+            ambientSound = Sounds.loopHum;
             consumeItem(Items.phaseFabric);
         }};
 
@@ -1532,7 +1532,7 @@ public class Blocks{
             itemCapacity = 20;
             hasPower = hasItems = true;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawCrucibleFlame(), new DrawDefault(), new DrawHeatInput());
-            ambientSound = Sounds.smelter;
+            ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.09f;
 
             heatRequirement = 10f;
@@ -1582,7 +1582,7 @@ public class Blocks{
             craftTime = 60f * 3f;
             liquidCapacity = 80f * 5;
 
-            ambientSound = Sounds.smelter;
+            ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.9f;
 
             outputItem = new ItemStack(Items.surgeAlloy, 1);
@@ -1626,7 +1626,7 @@ public class Blocks{
 
             size = 3;
 
-            ambientSound = Sounds.extractLoop;
+            ambientSound = Sounds.loopExtract;
             ambientSoundVolume = 0.08f;
 
             liquidCapacity = 80f;
@@ -1647,7 +1647,7 @@ public class Blocks{
             craftTime = 60f * 2f;
             liquidCapacity = 10f * 4;
 
-            ambientSound = Sounds.techloop;
+            ambientSound = Sounds.loopTech;
             ambientSoundVolume = 0.04f;
 
             outputItem = new ItemStack(Items.phaseFabric, 1);
@@ -2154,6 +2154,12 @@ public class Blocks{
             invert = true;
         }};
 
+        unloader = new Unloader("unloader"){{
+            requirements(Category.distribution, with(Items.titanium, 25, Items.silicon, 30));
+            speed = 60f / 11f;
+            group = BlockGroup.transportation;
+        }};
+
         massDriver = new MassDriver("mass-driver"){{
             requirements(Category.distribution, with(Items.titanium, 125, Items.silicon, 75, Items.lead, 125, Items.thorium, 50));
             size = 3;
@@ -2362,6 +2368,7 @@ public class Blocks{
 
         bridgeConduit = new LiquidBridge("bridge-conduit"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 8));
+            floating = true;
             fadeIn = moveArrows = false;
             arrowSpacing = 6f;
             range = 4;
@@ -2372,6 +2379,7 @@ public class Blocks{
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
             requirements(Category.liquid, with(Items.phaseFabric, 5, Items.silicon, 7, Items.metaglass, 20, Items.titanium, 10));
+            floating = true;
             range = 12;
             arrowPeriod = 0.9f;
             arrowTimeScl = 2.75f;
@@ -2507,7 +2515,7 @@ public class Blocks{
             powerProduction = 1f;
             itemDuration = 120f;
 
-            ambientSound = Sounds.smelter;
+            ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.03f;
             generateEffect = Fx.generatespark;
 
@@ -2524,7 +2532,7 @@ public class Blocks{
             effectChance = 0.011f;
             size = 2;
             floating = true;
-            ambientSound = Sounds.hum;
+            ambientSound = Sounds.loopHum;
             ambientSoundVolume = 0.06f;
         }};
 
@@ -2537,7 +2545,7 @@ public class Blocks{
             size = 2;
             generateEffect = Fx.generatespark;
 
-            ambientSound = Sounds.smelter;
+            ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.06f;
 
             consume(new ConsumeItemFlammable());
@@ -2565,9 +2573,9 @@ public class Blocks{
             hasLiquids = true;
             hasItems = true;
             size = 3;
-            ambientSound = Sounds.steam;
+            ambientSound = Sounds.loopSteam;
             generateEffect = Fx.generatespark;
-            ambientSoundVolume = 0.03f;
+            ambientSoundVolume = 0.05f;
 
             drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion(), new DrawLiquidRegion());
 
@@ -2601,7 +2609,7 @@ public class Blocks{
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
             requirements(Category.power, with(Items.lead, 300, Items.silicon, 200, Items.graphite, 150, Items.thorium, 150, Items.metaglass, 50));
-            ambientSound = Sounds.hum;
+            ambientSound = Sounds.loopHum;
             ambientSoundVolume = 0.24f;
             size = 3;
             health = 700;
@@ -2619,8 +2627,8 @@ public class Blocks{
             health = 900;
             powerProduction = 130f;
             itemDuration = 140f;
-            ambientSound = Sounds.pulse;
-            ambientSoundVolume = 0.07f;
+            ambientSound = Sounds.loopPulse;
+            ambientSoundVolume = 0.08f;
             liquidCapacity = 80f;
 
             consumePower(25f);
@@ -2677,7 +2685,7 @@ public class Blocks{
             generateEffect = Fx.turbinegenerate;
             effectChance = 0.04f;
             size = 3;
-            ambientSound = Sounds.hum;
+            ambientSound = Sounds.loopHum;
             ambientSoundVolume = 0.06f;
 
             drawer = new DrawMulti(new DrawDefault(), new DrawBlurSpin("-rotator", 0.6f * 9f){{
@@ -2709,7 +2717,7 @@ public class Blocks{
 
             liquidCapacity = 20f * 5;
 
-            ambientSound = Sounds.smelter;
+            ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.06f;
         }};
 
@@ -2737,7 +2745,7 @@ public class Blocks{
 
             generateEffect = Fx.none;
 
-            ambientSound = Sounds.smelter;
+            ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.06f;
 
             researchCostMultiplier = 0.4f;
@@ -2755,8 +2763,8 @@ public class Blocks{
             explosionRadius = 17;
             explosionDamage = 2500;
 
-            ambientSound = Sounds.flux;
-            ambientSoundVolume = 0.13f;
+            ambientSound = Sounds.loopFlux;
+            ambientSoundVolume = 0.15f;
 
             size = 5;
 
@@ -2803,7 +2811,7 @@ public class Blocks{
 
             powerProduction = 140f;
 
-            ambientSound = Sounds.bioLoop;
+            ambientSound = Sounds.loopBio;
             ambientSoundVolume = 0.2f;
 
             explosionPuddles = 80;
@@ -2864,7 +2872,7 @@ public class Blocks{
             drillTime = 400;
             size = 2;
 
-            consumeLiquid(Liquids.water, 0.06f).boost();
+            consumeLiquid(Liquids.water, 3.5f / 60f).boost();
         }};
 
         laserDrill = new Drill("laser-drill"){{
@@ -2970,7 +2978,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawBlurSpin("-rotator", 6f), new DrawRegion("-mid"), new DrawLiquidTile(Liquids.water, 38f / 4f), new DrawDefault());
             craftTime = 120f;
             size = 3;
-            ambientSound = Sounds.hum;
+            ambientSound = Sounds.loopHum;
             ambientSoundVolume = 0.06f;
             hasLiquids = true;
             boostScale = 1f / 9f;
@@ -2990,7 +2998,7 @@ public class Blocks{
             output = Items.sand;
             fogRadius = 2;
             researchCost = with(Items.beryllium, 100, Items.graphite, 40);
-            ambientSound = Sounds.drill;
+            ambientSound = Sounds.loopDrill;
             ambientSoundVolume = 0.04f;
         }};
 
@@ -3003,7 +3011,7 @@ public class Blocks{
             attribute = Attribute.sand;
             output = Items.sand;
             fogRadius = 3;
-            ambientSound = Sounds.drill;
+            ambientSound = Sounds.loopDrill;
             ambientSoundVolume = 0.08f;
 
             consumeLiquid(Liquids.hydrogen, 1f / 60f);
@@ -3216,13 +3224,6 @@ public class Blocks{
             scaledHealth = 55;
         }};
 
-        //TODO move tabs?
-        unloader = new Unloader("unloader"){{
-            requirements(Category.effect, with(Items.titanium, 25, Items.silicon, 30));
-            speed = 60f / 11f;
-            group = BlockGroup.transportation;
-        }};
-
         reinforcedContainer = new StorageBlock("reinforced-container"){{
             requirements(Category.effect, with(Items.tungsten, 30, Items.graphite, 40));
             size = 2;
@@ -3392,7 +3393,7 @@ public class Blocks{
             shootCone = 35f;
 
             scaledHealth = 200;
-            shootSound = Sounds.shootSnap;
+            shootSound = Sounds.shootScatter;
             coolant = consumeCoolant(0.2f);
             researchCostMultiplier = 0.05f;
 
@@ -3439,7 +3440,7 @@ public class Blocks{
             targetAir = false;
             ammoUseEffect = Fx.none;
             health = 400;
-            shootSound = Sounds.flame;
+            shootSound = Sounds.shootFlame;
             coolant = consumeCoolant(0.1f);
         }};
 
@@ -3502,7 +3503,7 @@ public class Blocks{
             inaccuracy = 1f;
             shootCone = 10f;
             health = 260;
-            shootSound = Sounds.artillerySmall;
+            shootSound = Sounds.shootArtillerySmall;
             coolant = consumeCoolant(0.1f);
             limitRange(0f);
         }};
@@ -3556,9 +3557,9 @@ public class Blocks{
             targetAir = false;
             moveWhileCharging = false;
             accurateDelay = false;
-            shootSound = Sounds.laser;
+            shootSound = Sounds.shootLancer;
             coolant = consumeCoolant(0.2f);
-            chargeSound = Sounds.lasercharge3;
+            chargeSound = Sounds.chargeLancer;
 
             consumePower(6f);
 
@@ -3612,7 +3613,7 @@ public class Blocks{
             recoil = 1f;
             size = 1;
             health = 260;
-            shootSound = Sounds.spark;
+            shootSound = Sounds.shootArc;
             consumePower(3.3f);
             coolant = consumeCoolant(0.1f);
         }};
@@ -3699,7 +3700,7 @@ public class Blocks{
             consumeAmmoOnce = false;
             size = 2;
             scaledHealth = 300;
-            shootSound = Sounds.missile;
+            shootSound = Sounds.shootMissile;
             envEnabled |= Env.space;
 
             limitRange(5f);
@@ -3900,7 +3901,7 @@ public class Blocks{
             envEnabled |= Env.space;
 
             scaledHealth = 220;
-            shootSound = Sounds.shotgun;
+            shootSound = Sounds.shootFuse;
             shootSoundVolume = 0.9f;
             coolant = consumeCoolant(0.3f);
 
@@ -4185,7 +4186,6 @@ public class Blocks{
                     pointEffectSpace = 20f;
                     damage = 1350;
                     buildingDamageMultiplier = 0.2f;
-                    maxDamageFraction = 0.6f;
                     pierceDamageFactor = 1f;
                     length = brange;
                     hitShake = 6f;
@@ -4203,7 +4203,7 @@ public class Blocks{
             shake = 4f;
             size = 4;
             shootCone = 2f;
-            shootSound = Sounds.railgun;
+            shootSound = Sounds.shootForeshadow;
             unitSort = UnitSorts.strongest;
             envEnabled |= Env.space;
 
@@ -4290,8 +4290,8 @@ public class Blocks{
             reload = 90f;
             firingMoveFract = 0.5f;
             shootDuration = 230f;
-            shootSound = Sounds.laserbig;
-            loopSound = Sounds.beam;
+            shootSound = Sounds.shootMeltdown;
+            loopSound = Sounds.beamMeltdown;
             loopSoundVolume = 2f;
             envEnabled |= Env.space;
 
@@ -4374,6 +4374,7 @@ public class Blocks{
                 rangeChange = 7f*8f;
                 buildingDamageMultiplier = 0.3f;
                 trailRotation = true;
+                shootSound = Sounds.shootBreachCarbide;
 
                 fragBullets = 3;
                 fragRandomSpread = 0f;
@@ -4402,7 +4403,7 @@ public class Blocks{
             );
 
             coolantMultiplier = 15f;
-            shootSound = Sounds.shootAlt;
+            shootSound = Sounds.shootBreach;
 
             targetUnderBlocks = false;
             shake = 1f;
@@ -4489,7 +4490,7 @@ public class Blocks{
             consumeAmmoOnce = true;
             targetUnderBlocks = false;
 
-            shootSound = Sounds.shootAltLong;
+            shootSound = Sounds.shootDiffuse;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-front"){{
@@ -4563,7 +4564,7 @@ public class Blocks{
 
             float r = range = 130f;
 
-            loopSound = Sounds.torch;
+            loopSound = Sounds.shootSublimate;
             shootSound = Sounds.none;
             loopSoundVolume = 1f;
 
@@ -4734,7 +4735,7 @@ public class Blocks{
             }}
             );
 
-            shootSound = Sounds.mediumCannon;
+            shootSound = Sounds.shootTank;
             ammoPerShot = 4;
             maxAmmo = ammoPerShot * 3;
             targetAir = false;
@@ -4917,7 +4918,7 @@ public class Blocks{
             rotateSpeed = 5f;
             shootCone = 30f;
             consumeAmmoOnce = true;
-            shootSound = Sounds.shootBig;
+            shootSound = Sounds.shootDisperse;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-side"){{
@@ -5005,10 +5006,9 @@ public class Blocks{
                     waveStroke = 4f;
                     waveRad = 40f;
                 }};
-                despawnSound = Sounds.dullExplosion;
 
-                //TODO shoot sound
-                shootSound = Sounds.cannon;
+                despawnSound = Sounds.afflictExplosion;
+                shootSound = Sounds.shootAfflict;
 
                 fragBullet = intervalBullet = new BasicBulletType(3f, 35){{
                     width = 9f;
@@ -5135,7 +5135,7 @@ public class Blocks{
             scaleDamageEfficiency = true;
             shootSound = Sounds.none;
             loopSoundVolume = 1f;
-            loopSound = Sounds.laserbeam;
+            loopSound = Sounds.beamLustre;
 
             shootWarmupSpeed = 0.08f;
             shootCone = 360f;
@@ -5181,7 +5181,7 @@ public class Blocks{
                     trailLength = 18;
                     missileAccelTime = 50f;
                     lowAltitude = true;
-                    loopSound = Sounds.missileTrail;
+                    loopSound = Sounds.loopMissileTrail;
                     loopSoundVolume = 0.6f;
                     deathSound = Sounds.largeExplosion;
                     targetAir = false;
@@ -5268,7 +5268,7 @@ public class Blocks{
                     trailLength = 18;
                     missileAccelTime = 50f;
                     lowAltitude = true;
-                    loopSound = Sounds.missileTrail;
+                    loopSound = Sounds.loopMissileTrail;
                     loopSoundVolume = 0.6f;
                     deathSound = Sounds.largeExplosion;
                     targetAir = false;
@@ -5374,7 +5374,7 @@ public class Blocks{
                     trailLength = 18;
                     missileAccelTime = 30f;
                     lowAltitude = true;
-                    loopSound = Sounds.missileTrail;
+                    loopSound = Sounds.loopMissileTrail;
                     loopSoundVolume = 0.6f;
                     deathSound = Sounds.largeExplosion;
                     targetAir = false;
@@ -5429,7 +5429,7 @@ public class Blocks{
                                     rotateSpeed = 1.4f;
                                     trailLength = 12;
                                     lowAltitude = true;
-                                    loopSound = Sounds.missileTrail;
+                                    loopSound = Sounds.loopMissileTrail;
                                     loopSoundVolume = 0.6f;
                                     deathSound = Sounds.largeExplosion;
                                     targetAir = false;
@@ -5533,7 +5533,7 @@ public class Blocks{
 
             fogRadiusMultiplier = 0.4f;
             coolantMultiplier = 15f;
-            shootSound = Sounds.missileLaunch;
+            shootSound = Sounds.shootScathe;
 
             minWarmup = 0.94f;
             newTargetInterval = 40f;
@@ -5825,7 +5825,7 @@ public class Blocks{
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange();
 
-            loopSound = Sounds.glow;
+            loopSound = Sounds.loopGlow;
             loopSoundVolume = 0.8f;
         }};
 
@@ -5840,8 +5840,8 @@ public class Blocks{
             var circleColor = haloColor;
             float circleY = 25f, circleRad = 11f, circleRotSpeed = 3.5f, circleStroke = 1.6f;
 
-            shootSound = Sounds.malignShoot;
-            loopSound = Sounds.spellLoop;
+            shootSound = Sounds.shootMalign;
+            loopSound = Sounds.loopMalign;
             loopSoundVolume = 1.3f;
 
             shootType = new FlakBulletType(8f, 70f){{
@@ -6253,6 +6253,7 @@ public class Blocks{
             consumePower(13f);
             consumeItems(with(Items.silicon, 850, Items.titanium, 750, Items.plastanium, 650));
             consumeLiquid(Liquids.cryofluid, 1f);
+            createSound = Sounds.unitCreateBig;
 
             constructTime = 60f * 60f * 1.5f;
             liquidCapacity = 60f;
@@ -6278,6 +6279,7 @@ public class Blocks{
 
             constructTime = 60f * 60f * 4;
             liquidCapacity = 180f;
+            createSound = Sounds.unitCreateBig;
 
             upgrades.addAll(
                 new UnitType[]{UnitTypes.antumbra, UnitTypes.eclipse},
@@ -6297,6 +6299,7 @@ public class Blocks{
             beamWidth = 0.73f;
             powerUse = 1f;
             pulseRadius = 5f;
+            ambientSoundVolume = 0.9f;
         }};
 
         repairTurret = new RepairTurret("repair-turret"){{
@@ -6311,6 +6314,7 @@ public class Blocks{
             coolantUse = 0.16f;
             coolantMultiplier = 1.6f;
             acceptCoolant = true;
+            ambientSoundVolume = 1.25f;
         }};
 
         //endregion

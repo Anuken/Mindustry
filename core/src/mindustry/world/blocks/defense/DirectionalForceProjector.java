@@ -65,7 +65,7 @@ public class DirectionalForceProjector extends Block{
         solid = true;
         group = BlockGroup.projectors;
         envEnabled |= Env.space;
-        ambientSound = Sounds.shield;
+        ambientSound = Sounds.loopShield;
         ambientSoundVolume = 0.08f;
     }
 

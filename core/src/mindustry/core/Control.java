@@ -131,7 +131,7 @@ public class Control implements ApplicationListener, Loadable{
                 state.map.setHighScore(state.wave);
             }
 
-            Sounds.wave.play();
+            Sounds.waveSpawn.play();
         });
 
         Events.on(GameOverEvent.class, event -> {

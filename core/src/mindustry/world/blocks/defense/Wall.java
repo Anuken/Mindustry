@@ -20,7 +20,7 @@ public class Wall extends Block{
     public float lightningDamage = 20f;
     public int lightningLength = 17;
     public Color lightningColor = Pal.surge;
-    public Sound lightningSound = Sounds.spark;
+    public Sound lightningSound = Sounds.shootArc;
 
     /** Bullet deflection chance. -1 to disable */
     public float chanceDeflect = -1f;
@@ -41,6 +41,7 @@ public class Wall extends Block{
 
         //it's a wall of course it's supported everywhere
         envEnabled = Env.any;
+        destroySound = Sounds.blockExplodeWall;
     }
 
     @Override
