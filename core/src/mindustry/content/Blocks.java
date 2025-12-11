@@ -2942,6 +2942,9 @@ public class Blocks{
             envRequired |= Env.spores;
             attribute = Attribute.spores;
 
+            ambientSound = Sounds.loopCultivator;
+            ambientSoundVolume = 0.075f;
+
             legacyReadWarmup = true;
             drawer = new DrawMulti(
             new DrawRegion("-bottom"),
