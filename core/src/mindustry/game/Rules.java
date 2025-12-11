@@ -193,7 +193,7 @@ public class Rules{
     /** Mission string displayed instead of wave/core counter. Null to disable. */
     public @Nullable String mission;
     /** Whether cores incinerate items when full, just like in the campaign. */
-    public boolean coreIncinerates = false;
+    public boolean coreIncinerates = true;
     /** If false, borders fade out into darkness. Only use with custom backgrounds!*/
     public boolean borderDarkness = true;
     /** If true, the map play area is cropped based on the rectangle below. */
