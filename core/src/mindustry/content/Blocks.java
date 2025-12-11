@@ -1189,6 +1189,8 @@ public class Blocks{
             envEnabled |= Env.space;
 
             size = 2;
+            ambientSound = Sounds.loopMachineSpin;
+            ambientSoundVolume = 0.09f;
 
             consumePower(0.20f);
             consumeItems(with(Items.coal, 1, Items.lead, 2, Items.sand, 2));
@@ -1201,6 +1203,8 @@ public class Blocks{
             outputItem = new ItemStack(Items.blastCompound, 1);
             size = 2;
             envEnabled |= Env.space;
+            ambientSound = Sounds.loopMachineSpin;
+            ambientSoundVolume = 0.1f;
 
             consumeItems(with(Items.pyratite, 1, Items.sporePod, 1));
             consumePower(0.40f);
@@ -1932,6 +1936,7 @@ public class Blocks{
             consumePower(3.50f);
             size = 2;
             consumeItem(Items.phaseFabric).boost();
+            ambientSoundVolume = 0.05f;
         }};
 
         overdriveDome = new OverdriveProjector("overdrive-dome"){{
@@ -2573,9 +2578,9 @@ public class Blocks{
             hasLiquids = true;
             hasItems = true;
             size = 3;
-            ambientSound = Sounds.loopSteam;
+            ambientSound = Sounds.loopDifferential;
             generateEffect = Fx.generatespark;
-            ambientSoundVolume = 0.05f;
+            ambientSoundVolume = 0.12f;
 
             drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion(), new DrawLiquidRegion());
 
