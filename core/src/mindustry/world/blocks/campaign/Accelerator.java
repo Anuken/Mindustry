@@ -40,9 +40,8 @@ public class Accelerator extends Block{
     /** Override for planets that this block can launch to. If null, the planet's launch candidates are used. */
     public @Nullable Seq<Planet> launchCandidates;
 
-    public Music launchMusic = Musics.coreLaunch;
     public Sound lightningSound = new RandomSound(Sounds.acceleratorLightning1, Sounds.acceleratorLightning2, Sounds.shootArc);
-    public float lightningSoundVolume = 0.9f;
+    public float lightningSoundVolume = 0.85f;
     public Sound chargeSound = Sounds.acceleratorCharge;
     public Sound launchSound = Sounds.acceleratorLaunch;
     public Sound constructSound = Sounds.acceleratorConstruct;
@@ -311,13 +310,7 @@ public class Accelerator extends Block{
 
         @Override
         public Music landMusic(){
-            //unused
-            return launchMusic;
-        }
-
-        @Override
-        public Music launchMusic(){
-            return launchMusic;
+            return null;
         }
 
         @Override

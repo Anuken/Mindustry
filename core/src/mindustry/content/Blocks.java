@@ -1190,7 +1190,7 @@ public class Blocks{
 
             size = 2;
             ambientSound = Sounds.loopMachineSpin;
-            ambientSoundVolume = 0.09f;
+            ambientSoundVolume = 0.1f;
 
             consumePower(0.20f);
             consumeItems(with(Items.coal, 1, Items.lead, 2, Items.sand, 2));
@@ -1204,7 +1204,7 @@ public class Blocks{
             size = 2;
             envEnabled |= Env.space;
             ambientSound = Sounds.loopMachineSpin;
-            ambientSoundVolume = 0.1f;
+            ambientSoundVolume = 0.12f;
 
             consumeItems(with(Items.pyratite, 1, Items.sporePod, 1));
             consumePower(0.40f);
@@ -1936,7 +1936,7 @@ public class Blocks{
             consumePower(3.50f);
             size = 2;
             consumeItem(Items.phaseFabric).boost();
-            ambientSoundVolume = 0.05f;
+            ambientSoundVolume = 0.08f;
         }};
 
         overdriveDome = new OverdriveProjector("overdrive-dome"){{
@@ -1946,6 +1946,7 @@ public class Blocks{
             range = 200f;
             speedBoost = 2.5f;
             useTime = 300f;
+            ambientSoundVolume = 0.12f;
             hasBoost = false;
             consumeItems(with(Items.phaseFabric, 1, Items.silicon, 1));
         }};

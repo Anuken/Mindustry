@@ -51,6 +51,7 @@ public class UnitFactory extends UnitBlock{
         regionRotated1 = 1;
         commandable = true;
         ambientSound = Sounds.loopUnitBuilding;
+        ambientSoundVolume = 0.09f;
 
         config(Integer.class, (UnitFactoryBuild build, Integer i) -> {
             if(!configurable) return;
