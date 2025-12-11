@@ -13,6 +13,12 @@ public class SoundPriority{
     public static void init(){
         max(7, beamPlasma, shootMeltdown, beamMeltdown);
 
+        //priority 3: absolutely do not interrupt these
+        set(
+        3f,
+        acceleratorLaunch, acceleratorCharge
+        );
+
         //priority 2: long weapon loops and big explosions
         set(
         2f,
