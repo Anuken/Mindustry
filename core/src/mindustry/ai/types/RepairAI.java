@@ -30,7 +30,7 @@ public class RepairAI extends AIController{
 
         if(target != null && target instanceof Building b && b.team == unit.team){
             if(unit.type.circleTarget){
-                circleAttack(120f);
+                circleAttack(unit.type.circleTargetRadius);
             }else if(!target.within(unit, unit.type.range * 0.65f)){
                 moveTo(target, unit.type.range * 0.65f);
             }

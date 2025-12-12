@@ -369,6 +369,10 @@ public class StatValues{
     }
 
     public static <T extends UnlockableContent> StatValue content(Seq<T> list, Boolf<T> check){
+        return content(list, check, "@none.inmap");
+    }
+
+    public static <T extends UnlockableContent> StatValue content(Seq<T> list, Boolf<T> check, String noneText){
         return table -> table.table(l -> {
             l.left();
 
@@ -387,7 +391,7 @@ public class StatValues{
             }
 
             if(!any){
-                l.add("@none.inmap");
+                l.add(noneText);
             }
         });
     }
@@ -401,7 +405,7 @@ public class StatValues{
     }
 
     public static StatValue statusEffects(Seq<StatusEffect> list){
-        return content(list.as());
+        return content(list.as(), t -> true, "@none");
     }
 
     public static StatValue drillables(float drillTime, float drillMultiplier, float size, ObjectFloatMap<Item> multipliers, Boolf<Block> filter){
@@ -505,7 +509,7 @@ public class StatValues{
                     if(!filter.get(liquid)) continue;
 
                     c.table(Styles.grayPanel, b -> {
-                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));;
+                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));
                         b.table(info -> {
                             info.add(liquid.localizedName).left().row();
                             info.add(Strings.autoFixed(amount * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);

@@ -79,6 +79,9 @@ public class ConstructBlock extends Block{
             tile.setOverlay(overlay);
         }else if(block instanceof Floor floor){
             tile.setFloor(floor);
+            if(!(tile.overlay() instanceof OverlayFloor) && !floor.supportsOverlay){
+                tile.setOverlay(Blocks.air);
+            }
         }else{
             tile.setBlock(block, team, rotation);
         }
@@ -139,6 +142,10 @@ public class ConstructBlock extends Block{
             lastTime = Time.millis();
             return Mathf.random(0.7f, 1.3f);
         }
+    }
+
+    public static void playRepairSound(Team team, Tile tile){
+        if(!headless && shouldPlay() && fogControl.isVisibleTile(team, tile.x, tile.y)) Sounds.blockRepair.at(tile, calcPitch(true));
     }
 
     public static void constructed(Tile tile, Block block, Unit builder, byte rotation, Team team, Object config){
@@ -248,7 +255,7 @@ public class ConstructBlock extends Block{
                     Shaders.blockbuild.time = Time.time;
                     Shaders.blockbuild.progress = progress;
 
-                    Draw.rect(region, x, y, current.rotate && (noOverrides || current.regionRotated2 == i || current.regionRotated1 == i) ? rotdeg() : 0);
+                    Draw.rect(region, x, y, current.rotate && (noOverrides || current.regionRotated2 == i || current.regionRotated1 == i) ? rotdeg() + current.visualRotationOffset : 0);
                     Draw.flush();
                     i ++;
                 }

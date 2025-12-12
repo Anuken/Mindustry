@@ -174,6 +174,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region io
 
     public final void writeBase(Writes write){
+        //TODO: this code is a legacy mess; in future versions, it should be replaced with a different system that has a 1-integer module bitmask + byte version.
         boolean writeVisibility = state.rules.fog && visibleFlags != 0;
 
         write.f(health);
@@ -191,6 +192,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(timeScale != 1f){
             write.f(timeScale);
             write.f(timeScaleDuration);
+        }
+
+        if(lastDisabler != null && lastDisabler.isValid()){
+            write.i(lastDisabler.pos());
         }
 
         //efficiency is written as two bytes to save space
@@ -231,11 +236,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         if((moduleBits & 1) != 0) (items == null ? new ItemModule() : items).read(read, legacy);
-        if((moduleBits & 2) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
-        if((moduleBits & 4) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
-        if((moduleBits & 16) != 0){
+        if((moduleBits & (1 << 1)) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
+        if((moduleBits & (1 << 2)) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
+        //1 << 3 is skipped (old consume module)
+        if((moduleBits & (1 << 4)) != 0){
             timeScale = read.f();
             timeScaleDuration = read.f();
+        }
+        if((moduleBits & (1 << 5)) != 0){
+            lastDisabler = world.build(read.i());
         }
 
         //unnecessary consume module read in version 2 and below
@@ -254,7 +263,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public int moduleBitmask(){
-        return (items != null ? 1 : 0) | (power != null ? 2 : 0) | (liquids != null ? 4 : 0) | 8 | (timeScale != 1f ? 16 : 0);
+        return
+        (items != null ? 1 : 0) |
+        (power != null ? 1 << 1 : 0) |
+        (liquids != null ? 1 << 2 : 0) |
+        1 << 3 | //old consume module
+        (timeScale != 1f ? 1 << 4 : 0) |
+        (lastDisabler != null && lastDisabler.isValid() ? 1 << 5 : 0);
     }
 
     public void writeAll(Writes write){
@@ -710,6 +725,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Called when an unloader takes an item. */
     public void itemTaken(Item item){
 
+    }
+
+    public boolean allowDeposit(){
+        return block.alwaysAllowDeposit || !state.rules.onlyDepositCore;
     }
 
     /** Called when this block is dropped as a payload. */
@@ -1318,6 +1337,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    /** Called when this block is derelict repaired. */
+    @CallSuper
+    public void onRepaired(){
+        placed();
+    }
+
     public boolean isCommandable(){
         return block.commandable;
     }
@@ -1427,7 +1452,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called when the block is destroyed. The tile is still intact at this stage. */
     public void onDestroyed(){
-
         float explosiveness = block.baseExplosiveness;
         float flammability = 0f;
         float power = 0f;
@@ -1451,7 +1475,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         if(block.hasLiquids && state.rules.damageExplosions){
-
             liquids.each(this::splashLiquid);
         }
 
@@ -1461,6 +1484,26 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(block.createRubble && !floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
         }
+
+        if(!headless){
+            playDestroySound();
+
+            if(explosiveness > 40f){
+                (Mathf.chance(0.5) ? Sounds.blockExplodeExplosive : Sounds.blockExplodeExplosiveAlt).at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }else if(flammability > 5f){
+                Sounds.blockExplodeFlammable.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }
+
+            if(power > 30000f){
+                Sounds.blockExplodeElectricBig.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }else if(power > 2000f){
+                Sounds.blockExplodeElectric.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }
+        }
+    }
+
+    public void playDestroySound(){
+        block.destroySound.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
     }
 
     public String getDisplayName(){
@@ -1484,7 +1527,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //TODO duplicated code?
         table.table(t -> {
             t.left();
-            t.add(new Image(block.getDisplayIcon(tile))).size(8 * 4);
+            t.add(new Image(block.getDisplayIcon(tile))).scaling(Scaling.fit).size(8 * 4);
             t.labelWrap(block.getDisplayName(tile)).left().width(190f).padLeft(5);
         }).growX().left();
 
@@ -2153,7 +2196,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void killed(){
         dead = true;
         Events.fire(new BlockDestroyEvent(tile));
-        block.destroySound.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax));
         onDestroyed();
         if(tile != emptyTile){
             tile.remove();

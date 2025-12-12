@@ -66,17 +66,30 @@ public class MenuFragment{
 
         //info icon
         if(mobile){
+            //left/right gutter areas
+            parent.fill((x, y, w, h) -> {
+                x = 0f;
+                y = 0f;
+                w = Core.graphics.getWidth();
+                h = Core.graphics.getHeight();
+                if(Core.scene.marginLeft > 0){
+                    paneRight.draw(x, y, Core.scene.marginLeft, h);
+                }
+
+                if(Core.scene.marginRight > 0){
+                    paneLeft.draw(x + w - Core.scene.marginRight, y, Core.scene.marginRight, h);
+                }
+
+                if(Core.scene.marginBottom > 0){
+                    Tex.paneTop.draw(Core.scene.marginLeft, 0, Core.graphics.getWidth() - Core.scene.marginRight - Core.scene.marginLeft, Core.scene.marginBottom);
+                }
+            });
+
             parent.fill(c -> c.bottom().left().button("", new TextButtonStyle(){{
                 font = Fonts.def;
                 fontColor = Color.white;
                 up = infoBanner;
             }}, ui.about::show).size(84, 45).name("info"));
-
-            parent.fill((x, y, w, h) -> {
-                if(Core.scene.marginBottom > 0){
-                    Tex.paneTop.draw(0, 0, Core.graphics.getWidth(), Core.scene.marginBottom);
-                }
-            });
         }else if(becontrol.active()){
             parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();
