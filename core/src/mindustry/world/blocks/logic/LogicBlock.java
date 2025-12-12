@@ -575,6 +575,14 @@ public class LogicBlock extends Block{
             return compress(code, relativeConnections());
         }
 
+        @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case operations -> executor.operations;
+                default -> super.sense(sensor);
+            };
+        }
+
         public Seq<LogicLink> relativeConnections(){
             var copy = new Seq<LogicLink>(links.size);
             for(var l : links){
