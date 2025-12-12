@@ -81,6 +81,10 @@ public class EditorTile extends Tile{
         }else{
             renderer.blocks.updateShadowTile(this);
         }
+
+        if(build != null){
+            build.wasVisible = true;
+        }
     }
 
     @Override
@@ -112,7 +116,7 @@ public class EditorTile extends Tile{
 
     @Override
     protected void fireChanged(){
-        if(skip()){
+        if(state.isGame()){
             super.fireChanged();
         }else{
             updateStatic();
@@ -121,7 +125,7 @@ public class EditorTile extends Tile{
 
     @Override
     protected void firePreChanged(){
-        if(skip()){
+        if(state.isGame()){
             super.firePreChanged();
         }else{
             updateStatic();

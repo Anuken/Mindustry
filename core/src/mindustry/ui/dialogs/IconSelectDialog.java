@@ -15,7 +15,6 @@ import static mindustry.Vars.*;
 
 public class IconSelectDialog extends Dialog{
     private Intc consumer = i -> Log.info("you have mere seconds");
-    private boolean allowLocked;
 
     public IconSelectDialog(){
         this(true);

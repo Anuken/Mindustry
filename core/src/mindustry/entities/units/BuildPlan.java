@@ -74,6 +74,12 @@ public class BuildPlan implements Position, QuadTreeObject{
         return tile != null && tile.team() == team && tile.block() == block && tile.build != null && tile.build.rotation != rotation;
     }
 
+    public boolean isDerelictRepair(){
+        if(breaking || !state.rules.derelictRepair) return false;
+        Tile tile = tile();
+        return tile != null && tile.team() == Team.derelict && tile.block() == block && tile.build != null;
+    }
+
     public boolean samePos(BuildPlan other){
         return x == other.x && y == other.y;
     }

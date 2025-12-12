@@ -116,6 +116,7 @@ public class NetServer implements ApplicationListener{
     private ReusableByteOutStream syncStream = new ReusableByteOutStream();
     /** Data stream for writing player sync data to. */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
+    private Writes dataStreamWrites = new Writes(dataStream);
     /** Packet handlers for custom types of messages. */
     private ObjectMap<String, Seq<Cons2<Player, String>>> customPacketHandlers = new ObjectMap<>();
     /** Packet handlers for custom types of messages - binary version. */
@@ -938,7 +939,7 @@ public class NetServer implements ApplicationListener{
 
                 dataStream.writeInt(build.pos());
                 dataStream.writeShort(build.block.id);
-                build.writeSync(Writes.get(dataStream));
+                build.writeSync(dataStreamWrites);
 
                 if(syncStream.size() > maxSnapshotSize){
                     dataStream.close();
@@ -993,7 +994,7 @@ public class NetServer implements ApplicationListener{
             dataStream.writeInt(entity.id()); //write id
             dataStream.writeByte(entity.classId() & 0xFF); //write type ID
             entity.beforeWrite();
-            entity.writeSync(Writes.get(dataStream)); //write entity
+            entity.writeSync(dataStreamWrites); //write entity itself
 
             sent++;
 

@@ -379,7 +379,7 @@ public class PlacementFragment{
                                 }
                                 String keyComboFinal = keyCombo;
                                 header.left();
-                                header.add(new Image(displayBlock.uiIcon)).size(8 * 4);
+                                header.add(new Image(displayBlock.uiIcon)).scaling(Scaling.fit).size(8 * 4);
                                 header.labelWrap(() -> !unlocked(displayBlock) ? Core.bundle.get("block.unknown") : displayBlock.localizedName + keyComboFinal)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
