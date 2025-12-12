@@ -383,7 +383,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** if true, harder materials will take longer to mine */
     public boolean mineHardnessScaling = true;
     /** continuous sound emitted when mining. */
-    public Sound mineSound = Sounds.minebeam;
+    public Sound mineSound = Sounds.loopMineBeam;
     /** volume of mining sound. */
     public float mineSoundVolume = 0.6f;
     /** Target items to mine. Used in MinerAI */

@@ -43,7 +43,7 @@ public class Reconstructor extends UnitBlock{
         regionRotated1 = 1;
         regionRotated2 = 2;
         commandable = true;
-        ambientSound = Sounds.respawning;
+        ambientSound = Sounds.loopUnitBuilding;
         configurable = true;
         config(UnitCommand.class, (ReconstructorBuild build, UnitCommand command) -> build.command = command);
         configClear((ReconstructorBuild build) -> build.command = null);

@@ -15,7 +15,7 @@ public class RepairFieldAbility extends Ability{
     public float amount = 1, reload = 100, range = 60, healPercent = 0f;
     public Effect healEffect = Fx.heal;
     public Effect activeEffect = Fx.healWaveDynamic;
-    public Sound sound = Sounds.healAbility;
+    public Sound sound = Sounds.healWave;
     public float soundVolume = 0.5f;
     public boolean parentizeEffects = false;
     /** Multiplies healing to units of the same type by this amount. */
