@@ -180,12 +180,7 @@ public class DataPatcher{
         if(object == root){
             if(value instanceof JsonValue jval && jval.isObject()){
                 for(var child : jval){
-                    Object[] otherResolve = resolve(object, jval.name, null);
-                    if(otherResolve != null && otherResolve[0] instanceof ObjectMap map && map.containsKey(child.name)){
-                        assign(otherResolve[0], child.name, child, (FieldData)otherResolve[1], object, field);
-                    }else{
-                        Log.warn("Content not found: @.@", field, child.name);
-                    }
+                    assign(root, field + "." + child.name, child, null, null, null);
                 }
             }else{
                 warn("Content '@' cannot be assigned.", field);
