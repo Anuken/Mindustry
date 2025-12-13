@@ -681,7 +681,7 @@ public class UnitTypes{
 
             stepSound = Sounds.walkerStepSmall;
             stepSoundPitch = 1f;
-            stepSoundVolume = 0.2f;
+            stepSoundVolume = 0.25f;
 
             legCount = 4;
             legLength = 9f;
@@ -1037,6 +1037,11 @@ public class UnitTypes{
             circleTargetRadius = 60f;
             wreckSoundVolume = 0.7f;
 
+            moveSound = Sounds.loopThruster;
+            moveSoundPitchMin = 0.3f;
+            moveSoundPitchMax = 1.5f;
+            moveSoundVolume = 0.2f;
+
             weapons.add(new Weapon(){{
                 y = 1f;
                 x = 0f;
@@ -1062,7 +1067,7 @@ public class UnitTypes{
             health = 340;
             speed = 1.65f;
             accel = 0.08f;
-            drag = 0.016f;
+            drag = 0.03f;
             flying = true;
             hitSize = 11f;
             targetAir = false;
@@ -1078,6 +1083,10 @@ public class UnitTypes{
             omniMovement = false;
             rotateSpeed = 4.5f;
             circleTargetRadius = 40f;
+
+            moveSound = Sounds.loopThruster;
+            moveSoundPitchMin = 0.6f;
+            moveSoundVolume = 0.4f;
 
             weapons.add(new Weapon(){{
                 minShootVelocity = 1f;
@@ -2599,7 +2608,7 @@ public class UnitTypes{
             treadRects = new Rect[]{new Rect(12 - 32f, 7 - 32f, 14, 51)};
             researchCostMultiplier = 0f;
 
-            tankMoveVolume *= 0.6f;
+            tankMoveVolume *= 0.32f;
             tankMoveSound = Sounds.tankMoveSmall;
 
             weapons.add(new Weapon("stell-weapon"){{
@@ -2645,7 +2654,7 @@ public class UnitTypes{
             treadRects = new Rect[]{new Rect(17 - 96f/2f, 10 - 96f/2f, 19, 76)};
             researchCostMultiplier = 0f;
 
-            tankMoveVolume *= 0.75f;
+            tankMoveVolume *= 0.55f;
             tankMoveSound = Sounds.tankMove;
 
             weapons.add(new Weapon("locus-weapon"){{
@@ -3729,6 +3738,10 @@ public class UnitTypes{
             itemCapacity = 0;
             useEngineElevation = false;
             researchCostMultiplier = 0f;
+            moveSound = Sounds.loopExtract;
+            moveSoundVolume = 0.25f;
+            moveSoundPitchMin = 0.7f;
+            moveSoundPitchMax = 1.5f;
 
             abilities.add(new MoveEffectAbility(0f, -7f, Pal.sapBulletBack, Fx.missileTrailShort, 4f){{
                 teamColor = true;
