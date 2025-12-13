@@ -81,7 +81,7 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
-        ambientSound = Sounds.drill;
+        ambientSound = Sounds.loopDrill;
         ambientSoundVolume = 0.019f;
         //drills work in space I guess
         envEnabled |= Env.space;

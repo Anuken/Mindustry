@@ -2004,7 +2004,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Sound sound = Sounds.getSound(id.numi());
-            if(sound == null || sound == Sounds.swish) sound = Sounds.none; //no.
+            if(sound == null) sound = Sounds.none;
 
             if(positional){
                 sound.at(World.unconv(x.numf()), World.unconv(y.numf()), pitch.numf(), Math.min(volume.numf(), 2f), limit.bool());

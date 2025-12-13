@@ -707,8 +707,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             kill();
         }
 
-        if(!headless && type.loopSound != Sounds.none){
+        if(!headless){
             control.sound.loop(type.loopSound, this, type.loopSoundVolume);
+            if(type.moveSound != Sounds.none){
+                float progress = Mathf.clamp(vel.len() / type.speed);
+                float pitch = Mathf.lerp(type.moveSoundPitchMin,  type.moveSoundPitchMax, progress);
+                control.sound.loop(type.moveSound, this, type.moveSoundVolume * progress, pitch);
+            }
         }
 
         //check if environment is unsupported
@@ -854,7 +859,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             Effect.scorch(x, y, (int)(hitSize / 5));
         }
         Effect.shake(shake, shake, this);
-        type.deathSound.at(this);
+        type.deathSound.at(this, 1f, type.deathSoundVolume);
 
         Events.fire(new UnitDestroyEvent(self()));
 
@@ -935,6 +940,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //don't waste time when the unit is already on the ground, just destroy it
         if(!type.flying || !type.createWreck){
             destroy();
+        }else{
+           type.wreckSound.at(this, 1f, type.wreckSoundVolume);
         }
     }
 
