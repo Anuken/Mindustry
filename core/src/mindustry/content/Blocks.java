@@ -1954,7 +1954,7 @@ public class Blocks{
         shockMine = new ShockMine("shock-mine"){{
             requirements(Category.effect, with(Items.lead, 25, Items.silicon, 12));
             hasShadow = false;
-            health = 30;
+            health = 80;
             damage = 15;
             tileDamage = 7f;
             length = 10;
@@ -3129,8 +3129,8 @@ public class Blocks{
             requirements(Category.effect, with(Items.copper, 8000, Items.lead, 8000, Items.silicon, 5000, Items.thorium, 4000));
 
             unitType = UnitTypes.gamma;
-            health = 9000;
-            armor = 8f;
+            health = 8000;
+            armor = 7f;
             itemCapacity = 13000;
             size = 5;
             thrusterLength = 40/4f;
@@ -3641,7 +3641,7 @@ public class Blocks{
                     height = 8f;
                     shrinkY = 0f;
                     splashDamageRadius = 42f;
-                    splashDamage = 33f;
+                    splashDamage = 27f;
                     ammoMultiplier = 5f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
