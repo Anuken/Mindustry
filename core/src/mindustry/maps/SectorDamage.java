@@ -338,9 +338,7 @@ public class SectorDamage{
                 sumHealth += unit.health*healthMult + unit.shield;
                 sumDps += unit.type.dpsEstimate;
                 sumRps += unit.type.weapons.sumf(w -> w.shotsPerSec() * (w.bullet.healPercent/100f * 20f + w.bullet.healAmount));
-                if(unit.controller() instanceof CommandAI ai && ai.command == UnitCommand.rebuildCommand){
-                    sumRps += unit.type.buildSpeed * 20f;
-                }
+                sumRps += unit.type.buildSpeed * 20f;
             }else{
                 float bossMult = unit.isBoss() ? 3f : 1f;
                 curEnemyDps += unit.type.dpsEstimate * unit.damageMultiplier() * bossMult;
