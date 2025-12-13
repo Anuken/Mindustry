@@ -6002,7 +6002,7 @@ public class UnitTypes{
             lowAltitude = true;
             buildBeamOffset = 43;
             ammoCapacity = 1;
-
+            
             loopSound = Sounds.loopHover;
 
             abilities.add(new ForceFieldAbility(140f, 10f, 12000f, 60f * 8, 8, 0f){{
