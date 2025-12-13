@@ -1167,6 +1167,8 @@ public class UnitTypes{
             targetFlags = new BlockFlag[]{BlockFlag.generator, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
+            loopSound = Sounds.loopHover;
+
             BulletType missiles = new MissileBulletType(2.7f, 18){{
                 width = 8f;
                 height = 8f;
@@ -1241,6 +1243,8 @@ public class UnitTypes{
             armor = 13f;
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
+
+            loopSound = Sounds.loopHover;
 
             BulletType fragBullet = new FlakBulletType(4f, 15){{
                 shootEffect = Fx.shootBig;
@@ -1461,6 +1465,8 @@ public class UnitTypes{
 
             ammoType = new PowerAmmoType(3000);
 
+            loopSound = Sounds.loopHover;
+
             weapons.add(
             new Weapon(){{
                 x = y = 0f;
@@ -1530,6 +1536,8 @@ public class UnitTypes{
             lowAltitude = true;
             buildBeamOffset = 43;
             ammoCapacity = 1;
+
+            loopSound = Sounds.loopHover;
 
             abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8, 8, 0f){{
                 breakSound = Sounds.shieldBreak;
@@ -3957,6 +3965,9 @@ public class UnitTypes{
             engineOffset = 61 / 4f;
             range = 4.3f * 60f * 1.4f;
 
+            loopSoundVolume = 0.85f;
+            loopSound = Sounds.loopHover;
+
             abilities.add(new SuppressionFieldAbility(){{
                 reload = 60f * 8f;
                 orbRadius = 5.3f;
@@ -4055,6 +4066,8 @@ public class UnitTypes{
 
             engineSize = 6f;
             engineOffset = 25.25f;
+
+            loopSound = Sounds.loopHover;
 
             float orbRad = 5f, partRad = 3f;
             int parts = 10;
