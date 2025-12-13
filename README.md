@@ -18,7 +18,7 @@ This changes appliees to most stuff in game and/or strongly affect in game (impo
 **Core Armor Additions:**
 - Shard: Health 1100 → 2000, Armor 0 → 3
 - Foundation: Armor 0 → 5
-- Nucleus: Health 6000 → 8000, Armor 0 → 8 //todo
+- Nucleus: Health 6000 → 8000, Armor 0 → 7 
 
 Cores got armor and health buff! It might looks like questionable change, but it suppose to make most T1 attacks (and any units with low damage and/or fast firerate) more designed for eco harass. Armor suppose to makes T1 less dangerous for killing cores, making T2 in game more useful. Also upgrading core will make a more sense in PvP (and even PvE probably) to make it more defendable (against units like zenith, spiroct and etc (all units with low damage but good DPS on non-armor stuff). Also it make flares (together with other changes, yoy gonna read them later) less broken unit. Also cores got health buff as counterbuff to a percentage healing nerf (like poly, mega, ...), so outheal your core would be much harder, but increased health and armor gonna give you more time for defending 
 
@@ -88,23 +88,15 @@ Unit builcost changes:
             
 **ShockMine**
 <<<<<<< HEAD
-- health: 50 -> 30
-=======
-- health: 50 -> 80 //todo add in gaem
->>>>>>> 1168da8f27d491e2b40c572e2977b34cbbce2fc2
+- health: 50 -> 80 
 - tendrils: 4 -> 7
 - damage: 25 -> 15
 (Small nerfs for landmines against armored units (T3+), it touches more competitive gameplay, in v7 was very abused to kill in few seconds huge T3 army (like fortress), in v8 new hitbox sizes makes landmine slighty weaker (but still powerful). Landmine kinda good (and even better than vanilla) against T1 and T2, but weaker to use on T3+ units which has big armor value)
 
 ## Effects
 **Burning:**
-<<<<<<< HEAD
-- Added reload multiplier: 0.9
-- Added speed multiplier: 0.9
-=======
-- Added reload multiplier: 0.92 
-- Added speed multiplier: 0.92 //todo changw from 0.9 to 0.92 in gaem
->>>>>>> 1168da8f27d491e2b40c572e2977b34cbbce2fc2
+- Added reload multiplier: 0.92
+- Added speed multiplier: 0.92
 - Transition damage: 8 → 12
 (Burning effect was made for buffing mace to counter against atrax enjoiners (which using melting effect with even more insane multiplies). Also it makes turrets on pyratite ammo (hail, swarmer, ripple, spectre)
 
@@ -166,7 +158,7 @@ Unit builcost changes:
 No changes /shrug
 
 ### Swarmer
-- blastCompound: damage: 10 -> 13; splashdamage: 45 -> 33; splashDamageRadius: 3.7 -> 5.2
+- blastCompound: damage: 10 -> 13; splashdamage: 45 -> 27; splashDamageRadius: 3.7 -> 5.2
 - pyratite: damage: (no changes); splashdamage: 45 -> 32; splashDamageRadius: 2.5 -> 5.5
 - surgeAlloy: damage: 18 -> 15; splashDamageRadius: 3.1 -> 3.2
 
