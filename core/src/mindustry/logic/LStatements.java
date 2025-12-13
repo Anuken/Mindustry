@@ -427,6 +427,46 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("getnode")
+    public static class GetNodeStatement extends LStatement{
+        public LNode type = LNode.power;
+        public String building = "building", node = "node", index = "0";
+
+        @Override
+        public void build(Table table){
+            field(table, building, str -> building = str);
+
+            table.add(" = ");
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, LNode.values(), type, o -> {
+                    type = o;
+                }));
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+
+            row(table);
+
+            table.add(" node of ");
+
+            field(table, node, str -> node = str);
+
+            table.add(" at # ");
+
+            field(table, index, str -> index = str);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder) {
+            return new GetNodeI(type, builder.var(building), builder.var(node), builder.var(index));
+        }
+
+        @Override
+        public LCategory category() {
+            return LCategory.block;
+        }
+    }
+
     @RegisterStatement("control")
     public static class ControlStatement extends LStatement{
         public LAccess type = LAccess.enabled;
