@@ -88,7 +88,7 @@ public class SoundPriority{
 
         shieldHit.setMaxConcurrent(4);
 
-        max(4, mechStep, mechStepHeavy, walkerStep, walkerStepSmall, walkerStepTiny, mechStepSmall);
+        max(5, mechStep, mechStepHeavy, walkerStep, walkerStepSmall, walkerStepTiny);
 
         //repair sounds are lower priority and generally not important
         set(-1f, blockHeal, healWave);

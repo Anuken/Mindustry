@@ -160,6 +160,7 @@ public class UnitTypes{
             armor = 9f;
             mechFrontSway = 0.55f;
             ammoType = new ItemAmmoType(Items.graphite);
+            stepSound = Sounds.mechStepSmall;
             stepSoundPitch = 0.8f;
             stepSoundVolume = 0.65f;
 
@@ -373,7 +374,6 @@ public class UnitTypes{
 
             mineTier = 2;
             mineSpeed = 3f;
-            stepSound = Sounds.mechStepSmall;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = new PowerAmmoType(1300);
@@ -430,6 +430,7 @@ public class UnitTypes{
 
             mechFrontSway = 0.55f;
             ammoType = new PowerAmmoType(1500);
+            stepSound = Sounds.mechStepSmall;
             stepSoundPitch = 0.9f;
             stepSoundVolume = 0.6f;
 
@@ -640,7 +641,7 @@ public class UnitTypes{
             range = 40f;
             ammoType = new ItemAmmoType(Items.coal);
             stepSound = Sounds.walkerStepTiny;
-            stepSoundVolume = 0.4f;
+            stepSoundVolume = 0.2f;
 
             weapons.add(new Weapon(){{
                 shootOnDeath = true;
@@ -680,7 +681,7 @@ public class UnitTypes{
 
             stepSound = Sounds.walkerStepSmall;
             stepSoundPitch = 1f;
-            stepSoundVolume = 0.3f;
+            stepSoundVolume = 0.2f;
 
             legCount = 4;
             legLength = 9f;
@@ -3073,7 +3074,7 @@ public class UnitTypes{
             legStraightness = 0.3f;
             stepShake = 0f;
             stepSound = Sounds.walkerStepTiny;
-            stepSoundVolume = 0.7f;
+            stepSoundVolume = 0.4f;
 
             legCount = 6;
             legLength = 8f;
