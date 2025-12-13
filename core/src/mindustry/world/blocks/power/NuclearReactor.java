@@ -68,7 +68,7 @@ public class NuclearReactor extends PowerGenerator{
         explosionDamage = 1250 * 4;
 
         explodeEffect = Fx.reactorExplosion;
-        explodeSound = Sounds.reactorExplosion;
+        explodeSound = Sounds.explosionReactor;
     }
 
     @Override

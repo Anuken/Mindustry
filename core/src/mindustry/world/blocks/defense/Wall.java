@@ -41,7 +41,6 @@ public class Wall extends Block{
 
         //it's a wall of course it's supported everywhere
         envEnabled = Env.any;
-        destroySound = Sounds.blockExplodeWall;
     }
 
     @Override
@@ -53,6 +52,12 @@ public class Wall extends Block{
             stats.add(Stat.lightningChance, lightningChance * 100f, StatUnit.percent);
             stats.add(Stat.lightningDamage, lightningDamage, StatUnit.none);
         }
+    }
+
+    @Override
+    public void init(){
+        if(size == 2 && destroySound == Sounds.unset) destroySound = Sounds.blockExplodeWall;
+        super.init();
     }
 
     @Override

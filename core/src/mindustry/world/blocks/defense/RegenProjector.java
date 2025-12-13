@@ -47,6 +47,8 @@ public class RegenProjector extends Block{
         envEnabled |= Env.space;
         rotateDraw = false;
         flags = EnumSet.of(BlockFlag.blockRepair);
+        ambientSound = Sounds.loopRegen;
+        ambientSoundVolume = 0.45f;
     }
 
     @Override

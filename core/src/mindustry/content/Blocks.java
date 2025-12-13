@@ -1189,6 +1189,8 @@ public class Blocks{
             envEnabled |= Env.space;
 
             size = 2;
+            ambientSound = Sounds.loopMachineSpin;
+            ambientSoundVolume = 0.1f;
 
             consumePower(0.20f);
             consumeItems(with(Items.coal, 1, Items.lead, 2, Items.sand, 2));
@@ -1201,6 +1203,8 @@ public class Blocks{
             outputItem = new ItemStack(Items.blastCompound, 1);
             size = 2;
             envEnabled |= Env.space;
+            ambientSound = Sounds.loopMachineSpin;
+            ambientSoundVolume = 0.12f;
 
             consumeItems(with(Items.pyratite, 1, Items.sporePod, 1));
             consumePower(0.40f);
@@ -1932,6 +1936,7 @@ public class Blocks{
             consumePower(3.50f);
             size = 2;
             consumeItem(Items.phaseFabric).boost();
+            ambientSoundVolume = 0.08f;
         }};
 
         overdriveDome = new OverdriveProjector("overdrive-dome"){{
@@ -1941,6 +1946,7 @@ public class Blocks{
             range = 200f;
             speedBoost = 2.5f;
             useTime = 300f;
+            ambientSoundVolume = 0.12f;
             hasBoost = false;
             consumeItems(with(Items.phaseFabric, 1, Items.silicon, 1));
         }};
@@ -2573,9 +2579,9 @@ public class Blocks{
             hasLiquids = true;
             hasItems = true;
             size = 3;
-            ambientSound = Sounds.loopSteam;
+            ambientSound = Sounds.loopDifferential;
             generateEffect = Fx.generatespark;
-            ambientSoundVolume = 0.05f;
+            ambientSoundVolume = 0.12f;
 
             drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion(), new DrawLiquidRegion());
 
@@ -2807,7 +2813,7 @@ public class Blocks{
             explosionRadius = 9;
             explosionDamage = 2000;
             explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
-            explodeSound = Sounds.largeExplosion;
+            explodeSound = Sounds.explosionReactorNeoplasm;
 
             powerProduction = 140f;
 
@@ -2935,6 +2941,9 @@ public class Blocks{
             craftEffect = Fx.none;
             envRequired |= Env.spores;
             attribute = Attribute.spores;
+
+            ambientSound = Sounds.loopCultivator;
+            ambientSoundVolume = 0.075f;
 
             legacyReadWarmup = true;
             drawer = new DrawMulti(
@@ -4619,7 +4628,7 @@ public class Blocks{
                 backColor = hitColor = trailColor = Color.valueOf("ea8878").lerp(Pal.redLight, 0.5f);
                 frontColor = Color.white;
                 ammoMultiplier = 1f;
-                hitSound = Sounds.titanExplosion;
+                hitSound = Sounds.explosionTitan;
 
                 status = StatusEffects.blasted;
 
@@ -4653,7 +4662,7 @@ public class Blocks{
                 backColor = hitColor = trailColor = Color.valueOf("ab8ec5");
                 frontColor = Color.white;
                 ammoMultiplier = 1f;
-                hitSound = Sounds.titanExplosion;
+                hitSound = Sounds.explosionTitan;
 
                 status = StatusEffects.blasted;
 
@@ -4713,7 +4722,7 @@ public class Blocks{
                 hitColor = backColor = trailColor = Color.valueOf("a0b380");
                 frontColor = Color.valueOf("e4ffd6");
                 ammoMultiplier = 1f;
-                hitSound = Sounds.titanExplosion;
+                hitSound = Sounds.explosionTitan;
 
                 trailLength = 32;
                 trailWidth = 3.35f;
@@ -5007,7 +5016,7 @@ public class Blocks{
                     waveRad = 40f;
                 }};
 
-                despawnSound = Sounds.afflictExplosion;
+                despawnSound = Sounds.explosionAfflict;
                 shootSound = Sounds.shootAfflict;
 
                 fragBullet = intervalBullet = new BasicBulletType(3f, 35){{
@@ -5183,7 +5192,7 @@ public class Blocks{
                     lowAltitude = true;
                     loopSound = Sounds.loopMissileTrail;
                     loopSoundVolume = 0.6f;
-                    deathSound = Sounds.largeExplosion;
+                    deathSound = Sounds.explosionMissile;
                     targetAir = false;
                     targetUnderBlocks = false;
 
@@ -5270,7 +5279,7 @@ public class Blocks{
                     lowAltitude = true;
                     loopSound = Sounds.loopMissileTrail;
                     loopSoundVolume = 0.6f;
-                    deathSound = Sounds.largeExplosion;
+                    deathSound = Sounds.explosionMissile;
                     targetAir = false;
                     targetUnderBlocks = false;
 
@@ -5376,7 +5385,7 @@ public class Blocks{
                     lowAltitude = true;
                     loopSound = Sounds.loopMissileTrail;
                     loopSoundVolume = 0.6f;
-                    deathSound = Sounds.largeExplosion;
+                    deathSound = Sounds.explosionMissile;
                     targetAir = false;
                     targetUnderBlocks = false;
 
@@ -5431,7 +5440,7 @@ public class Blocks{
                                     lowAltitude = true;
                                     loopSound = Sounds.loopMissileTrail;
                                     loopSoundVolume = 0.6f;
-                                    deathSound = Sounds.largeExplosion;
+                                    deathSound = Sounds.explosionMissile;
                                     targetAir = false;
                                     targetUnderBlocks = false;
 

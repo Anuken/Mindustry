@@ -3,6 +3,7 @@ package mindustry.audio;
 import arc.*;
 import arc.audio.*;
 import arc.struct.*;
+import mindustry.*;
 
 import static mindustry.gen.Sounds.*;
 
@@ -11,7 +12,16 @@ public class SoundPriority{
     static int lastGroup = 1;
 
     public static void init(){
+        //launching should not get interrupted by the loading screen
+        coreLaunch.setBus(Vars.control.sound.uiBus);
+
         max(7, beamPlasma, shootMeltdown, beamMeltdown);
+
+        //priority 3: absolutely do not interrupt these
+        set(
+        3f,
+        acceleratorLaunch, acceleratorCharge, coreLand, coreLaunch
+        );
 
         //priority 2: long weapon loops and big explosions
         set(
@@ -19,10 +29,11 @@ public class SoundPriority{
         beamMeltdown,
         beamLustre,
         beamPlasma,
-        reactorExplosion,
-        reactorExplosion2,
-        coreExplode,
-        blockExplodeElectricBig, blockExplodeExplosive
+        explosionReactor,
+        explosionReactor2,
+        explosionReactorNeoplasm,
+        explosionCore,
+        blockExplodeElectricBig, blockExplodeExplosive, blockExplodeExplosiveAlt
         );
 
         //priority 1.5: big weapon sounds, not loops
@@ -35,7 +46,14 @@ public class SoundPriority{
         shootCorvus,
         chargeCorvus,
         chargeVela,
-        chargeLancer
+        chargeLancer,
+        shootReign,
+        shootEclipse,
+        shootArtillerySapBig,
+        shootToxopidShotgun,
+        beamPlasmaSmall,
+        shootNavanax,
+        explosionNavanax
         );
 
         //priority 1: ambient noises
@@ -70,7 +88,7 @@ public class SoundPriority{
 
         shieldHit.setMaxConcurrent(4);
 
-        max(4, mechStep, mechStepHeavy, walkerStep, walkerStepSmall, walkerStepTiny, mechStepSmall);
+        max(5, mechStep, mechStepHeavy, walkerStep, walkerStepSmall, walkerStepTiny);
 
         //repair sounds are lower priority and generally not important
         set(-1f, blockHeal, healWave);
@@ -78,7 +96,7 @@ public class SoundPriority{
         //step sounds are low priority
         set(-2f, mechStep, mechStepHeavy, walkerStep, walkerStepSmall, walkerStepTiny, mechStepSmall);
 
-        coreExplode.setFalloffOffset(100f);
+        explosionCore.setFalloffOffset(100f);
     }
 
     static void max(int max, Sound... sounds){
