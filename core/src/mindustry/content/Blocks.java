@@ -4071,7 +4071,6 @@ public class Blocks{
 
             scaledHealth = 130;
             depositCooldown = 2.0f;
-            shootSound = Sounds.artillery;
             shootSound = Sounds.shootRipple;
         }};
 
