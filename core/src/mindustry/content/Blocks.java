@@ -9492,8 +9492,8 @@ public class Blocks{
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
             requirements(Category.power, with(Items.lead, 300, Items.silicon, 200, Items.graphite, 150, Items.thorium, 150, Items.metaglass, 50));
-            ambientSound = Sounds.loopHum;
-            ambientSoundVolume = 0.24f;
+            ambientSound = Sounds.loopThoriumReactor;
+            ambientSoundVolume = 0.11f;
             size = 3;
             health = 700;
             itemDuration = 360f;

@@ -63,6 +63,8 @@ public class SectorSubmissions{
         registerSerpuloSector(103, "enwyz", "https://discord.com/channels/391020510269669376/1379926839559979030/1429203869514207255");
         registerSerpuloSector(30, "cyan", "https://discord.com/channels/391020510269669376/1379926800854945823/1423932799647481910");
         registerSerpuloSector(20, "Namero", "https://discord.com/channels/391020510269669376/1379926794114961634/1406768731471872162");
+        registerSerpuloSector(162, "Bravo Tizmo", "https://discord.com/channels/391020510269669376/1379926884606808247/1443239231366500415");
+        registerSerpuloSector(230, "Jamespire", "https://discord.com/channels/391020510269669376/1379926927585841163/1442675816084406305");
 
         /* UNUSED SECTORS:
         registerHiddenSectors(serpulo,
