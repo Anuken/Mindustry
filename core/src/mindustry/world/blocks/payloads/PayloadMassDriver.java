@@ -32,7 +32,9 @@ public class PayloadMassDriver extends PayloadBlock{
     public Effect shootEffect = Fx.shootBig2;
     public Effect smokeEffect = Fx.shootPayloadDriver;
     public Effect receiveEffect = Fx.payloadReceive;
-    public Sound shootSound = Sounds.shootBig;
+    public Sound shootSound = Sounds.massdriver;
+    public Sound receiveSound = Sounds.massdriverReceive;
+    public float shootSoundVolume = 0.7f;
     public float shake = 3f;
 
     public Effect transferEffect = new Effect(11f, 600f, e -> {
@@ -176,6 +178,7 @@ public class PayloadMassDriver extends PayloadBlock{
                 receiveEffect.at(x - cx/2f, y - cy/2f, turretRotation);
                 reloadCounter = 1f;
                 Effect.shake(shake, shake, this);
+                receiveSound.at(x, y, 1f + Mathf.range(0.2f), shootSoundVolume);
             }
 
             charging = false;
@@ -294,7 +297,7 @@ public class PayloadMassDriver extends PayloadBlock{
                                 smokeEffect.at(x, y, turretRotation);
 
                                 Effect.shake(shake, shake, this);
-                                shootSound.at(this, Mathf.random(0.9f, 1.1f));
+                                shootSound.at(x, y, Mathf.random(0.9f, 1.1f), shootSoundVolume);
                                 transferEffect.at(x + cx, y + cy, turretRotation, new PayloadMassDriverData(x + cx, y + cy, other.x - cx, other.y - cy, payload));
                                 Payload pay = payload;
                                 other.recPayload = payload;

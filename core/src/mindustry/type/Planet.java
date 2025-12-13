@@ -629,7 +629,9 @@ public class Planet extends UnlockableContent{
             batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f).add(normal, -stroke));
         }
+        Gl.disable(Gl.cullFace);
         batch.flush(Gl.triangleStrip);
+        Gl.enable(Gl.cullFace);
     }
 
     public Vec3 lookAt(Sector sector, Vec3 out){

@@ -1,6 +1,7 @@
 package mindustry.world.blocks;
 
 import arc.audio.*;
+import arc.util.*;
 import mindustry.gen.*;
 
 public interface LaunchAnimator{
@@ -17,12 +18,8 @@ public interface LaunchAnimator{
 
     float launchDuration();
 
-    default Music landMusic(){
+    default @Nullable Music landMusic(){
         return Musics.land;
-    }
-
-    default Music launchMusic(){
-        return Musics.launch;
     }
 
     float zoomLaunch();

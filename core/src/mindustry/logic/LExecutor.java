@@ -463,7 +463,7 @@ public class LExecutor{
                         }else{
                             Building build = p1.building();
                             int dropped = Math.min(unit.stack.amount, p2.numi());
-                            if(build != null && build.team == unit.team && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                            if(build != null && build.team == unit.team && build.isValid() && build.allowDeposit() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                                 int accepted = build.acceptStack(unit.item(), dropped, unit);
                                 if(accepted > 0){
                                     Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
@@ -2004,7 +2004,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Sound sound = Sounds.getSound(id.numi());
-            if(sound == null || sound == Sounds.swish) sound = Sounds.none; //no.
+            if(sound == null) sound = Sounds.none;
 
             if(positional){
                 sound.at(World.unconv(x.numf()), World.unconv(y.numf()), pitch.numf(), Math.min(volume.numf(), 2f), limit.bool());

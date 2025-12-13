@@ -50,6 +50,8 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
 
                 treadEffectTime = 0f;
             }
+
+            control.sound.loop(type.tankMoveSound, this, type.tankMoveVolume);
         }
 
         lastDeepFloor = null;

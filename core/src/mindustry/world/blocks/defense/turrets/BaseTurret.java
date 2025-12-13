@@ -47,9 +47,24 @@ public class BaseTurret extends Block{
             coolant = findConsumer(c -> c instanceof ConsumeCoolant);
         }
 
-        //just makes things a little more convenient
+        checkInitCoolant();
+
+        if(!disableOverlapCheck){
+            placeOverlapRange = Math.max(placeOverlapRange, range + placeOverlapMargin);
+        }
+        fogRadius = Math.max(Mathf.round(range / tilesize * fogRadiusMultiplier), fogRadius);
+        super.init();
+    }
+
+    @Override
+    public void reinitializeConsumers(){
+        checkInitCoolant();
+
+        super.reinitializeConsumers();
+    }
+
+    void checkInitCoolant(){
         if(coolant != null){
-            //TODO coolant fix
             coolant.update = false;
             coolant.booster = true;
             coolant.optional = true;
@@ -57,12 +72,6 @@ public class BaseTurret extends Block{
             //json parsing does not add to consumes
             if(!hasConsumer(coolant)) consume(coolant);
         }
-
-        if(!disableOverlapCheck){
-            placeOverlapRange = Math.max(placeOverlapRange, range + placeOverlapMargin);
-        }
-        fogRadius = Math.max(Mathf.round(range / tilesize * fogRadiusMultiplier), fogRadius);
-        super.init();
     }
 
     @Override

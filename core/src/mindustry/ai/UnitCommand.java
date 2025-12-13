@@ -89,7 +89,7 @@ public class UnitCommand extends MappableContent{
             drawTarget = true;
             resetTarget = false;
         }};
-        enterPayloadCommand = new UnitCommand("enterPayload", "downOpen", Binding.unitCommandEnterPayload, null){{
+        enterPayloadCommand = new UnitCommand("enterPayload", "downOpen", Binding.unitCommandEnterPayload, u -> new BoostAI()){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;

@@ -59,6 +59,10 @@ public class SoundControl{
 
         Events.on(ResetEvent.class, e -> {
             lastPlayed = Time.millis();
+
+            //stop all in-game voices
+            Core.audio.soundBus.stop();
+            Core.audio.soundBus.play();
         });
     }
 

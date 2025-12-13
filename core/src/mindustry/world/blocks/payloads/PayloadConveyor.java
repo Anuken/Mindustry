@@ -261,7 +261,7 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void unitOn(Unit unit){
-            if(!pushUnits || !enabled) return;
+            if(!pushUnits || !enabled || (lastInterp == 0f)) return;
 
             //calculate derivative of units moved last frame
             float delta = (curInterp - lastInterp) * size * tilesize;
