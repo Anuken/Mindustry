@@ -87,7 +87,6 @@ Unit builcost changes:
 (Ahhh, ODD spam, very controversible block in game. Some players wanna remove this block from game, some half its percentage boost and etc. Being very questionable block (and being ODD speedrun very powerful build order in competitve gamemodes. Nerfing percentage could one of most controversible change in any rebalance, so I did necessary evil. Increased its cost and energy consuption to delay ita placement and much harder to speedrun when (also keep in head that ODD doing turret in x2.5 times faster (and stronger), so its increase window for T1-T3 agressive micro/macro gameplay (before turrets get insanely powerful ODD/POD buffs)
             
 **ShockMine**
-<<<<<<< HEAD
 - health: 50 -> 80 
 - tendrils: 4 -> 7
 - damage: 25 -> 15
@@ -127,11 +126,11 @@ Unit builcost changes:
 (Nearly halved damage, but increased coolant boost. Scatter, being very cheap and easy to use, could easily kill T1-T3 in big amount, and even possible to kill or deal massive damage to few T4 in vanilla. My changes are designed to be useful against T1-T2, but against zenith spam it would request to use alteast a coolant (also flare hp was halfed, reduced hp for horizon and zenith)
 
 ### Scorch
-- pyratite: damage: 60 -> 35
+- pyratite: damage: 60 -> 32; rangeChange: 0 -> +3 tiles 
 
 - range: 7.5 -> 9
 
-(Nerfed scorch, its not meta rn. I hope that range increase could make it slighty more useful in PvP)
+(Nerfed scorch, its not meta rn I guess. I hope that range increase could make it slighty more useful in PvP (coal scorch more designed against T1-T2 (up to mace), while pyra scorch can stop up to spiroct (can be extremely useful against early spiroct rush)
 
 ### Hail
 - silicone: splashDamage: 33 -> 27
@@ -162,11 +161,8 @@ No changes /shrug
 - pyratite: damage: (no changes); splashdamage: 45 -> 32; splashDamageRadius: 2.5 -> 5.5
 - surgeAlloy: damage: 18 -> 15; splashDamageRadius: 3.1 -> 3.2
 
-<<<<<<< HEAD
 (Nerfing swarmer to not be a meta. Swarmer feels very strong turret which can be useful even against T5 (and insane for reactive damage spam). I thinking I could overbuff range for pyratite and blast, so probably it can be removed (should be discussed))
-=======
-(Nerfing swarmer to not be a meta. Swarmer feels very strong turret which can be useful even against T5 (and insane for reactive damage spam). I thinking I could overbuff range for pyratite and blast, so probably it can be nerfed (should be discussed))
->>>>>>> 1168da8f27d491e2b40c572e2977b34cbbce2fc2
+
 
 ### Salvo
 - copper: damage: 11 -> 13
@@ -176,86 +172,58 @@ No changes /shrug
 - thorium: damage: 29 -> 27, reloadMultiplier = 0.7x, knockback = 1.5, pierceCap = 2
 
 - reload: 31f -> 32f
-<<<<<<< HEAD
-- requirements (block buildcost): copper = 100, graphite = 80 -> copper = 125, graphite = 70
-- added inaccuracy (real)
-
-
-
-### Segment
-No changes
-=======
 - requirements (block buildcost): copper = 100, graphite = 80 -> copper = 125, graphite = 70 //todo recheck change
-- added inaccuracy (real)
+- added inaccuracy (real) 
 
 (Salvo feels kinda useless turret (out of PvE, and even in PvE can easily be changed to swarmer). Game has kinda funny pattern when non AoE turrets (duo, salvo, spectre) are much worse than turrets with splash. I did slightly reduced cost buff for graphite to make it easier to place, also added knockback for all ammo and double pierce to pyratite and thorium (as ammo which hardly to get (comparing with 3 other ammo types) to keep it slightly more useful against flying units (knockback more sensitive to flying units one) and pierce for motivation to use better ammo. To avoid overbuff (most ammo already got damage buff in couple with reduced buildcost), thorium ammo got slightly reduced damage (as counternerf because double pierce) and reduced firerate for thorium and graphite one. Adding inaccuracy feels a cosmetic change and can be removed (but shots now looks more beatiful)
 
 
 ### Segment
 No changes (idk what to change)
->>>>>>> 1168da8f27d491e2b40c572e2977b34cbbce2fc2
 
 ## Tsunami
 - slag: rangeChange (+4 range);
 - cryofluid: rangeChange (+2.5 range);
 - oil: rangeChange (+4 range);
-
-<<<<<<< HEAD
-### Fuse
-No changes
-=======
+  
 (Small buffs for rarely used tsunamy ammo. Same idea as wave, except cryo buff (to keep blast cyclone/swarmer weaker than surge versions one, but with synergy to be much better (blast swarmer/cyclone < surge swarmer/cyclone, but cryo tsunamy + blast >> water tsunamy + surge)
 
 ### Fuse
 No changes (idk what to change, turret feels already fine (atleast gonna strongly outclass scorch (because it got nerfed))
->>>>>>> 1168da8f27d491e2b40c572e2977b34cbbce2fc2
+
 
 ## Ripple
-- plastanium: splashDamage: 45 -> 35, pierceCap = 2, fragBullets: 10 -> 5, fragBulletDamage (idk how it names): 10 -> 15
-- blastCompound: splashDamage: 55 -> 75, splashDamageRadius = 4.2 -> 5.2, reloadMultiplier: 0.7x
-<<<<<<< HEAD
-- pyratite: splashDamage: 45 -> 48, splashDamageRadius = 2.3 -> 4.7
-
-- requirements (block buildcost): copper = 150, graphite = 135, titanium = 60 -> copper = 175, graphite = 90, titanium = 70
-
-### Cyclone
-- metaglass: damage: 6 -> 13, ammoMultiplier: 2x -> 5x, reloadMultiplier: 0.8x -> 1.2x, splashDamage: 45 -> 32, fragBullets: 4 -> 10
-=======
-- pyratite: splashDamage: 45 -> 48, splashDamageRadius = 2.3 -> 4.7 //todo check new changes
-
-- requirements (block buildcost): copper = 150, graphite = 135, titanium = 60 -> copper = 175, graphite = 90, titanium = 70 //todo recheck changes
+- graphite: splashDamage: 70 -> 75, splashRadius: 0.8 -> 1.2;
+- silicone: splashDamage: 70 -> 72;
+- plastanium: splashDamage: 45 -> 70, fragBullets: 10 -> 7, fragBulletDamage (idk how it names): 10 -> 15;
+- blastCompound: splashDamage: 55 -> 115, splashDamageRadius = 4.2 -> 5.2, reloadMultiplier: 0.7x;
+- pyratite: splashDamage: 45 -> 90, splashDamageRadius = 2.3 -> 4.7;
+- requirements (block buildcost): copper = 150, graphite = 135, titanium = 60 -> copper = 175, graphite = 90, titanium = 70;
+//todo recheck changes
 
 (Ripple also feels kinda weird. It has splashdamage, but rarely used in actual gameplay (because kinda expensive and ineffectice for pvp (except plast bvb and defending against naval (still sucks but its better than foreshadow against T2 fr)(and kinda questionable for pve becsuse cyclone/swarmer exist). Anuke halfed its firerate with doubled damage, so I did somrthing like this too. Might need some revieves because can be actually very strong even against T5 (I dont thinking thats bad, but need more tests). Nerfed plast frags because very unfairly strong and annoying in bvb)
 
 ### Cyclone
 - metaglass: damage: 6 -> 13, ammoMultiplier: 2x -> 5x, splashDamage: 45 -> 32, fragBullets: 4 -> 10
->>>>>>> 1168da8f27d491e2b40c572e2977b34cbbce2fc2
 - blastCompound: damage: 8 -> 12, splashDamage: 45 -> 55
 - plastanium: damage: 8 -> 15, splashDamage: 37 -> 35
 - surgeAlloy: splashDamageRadius = 4.7 -> 4.3
 
 - coolant: 0.3f -> 0.2f ((decreased coolant buff (water: 160% -> 140%; cryofluid: 235% -> 190%))
 
-<<<<<<< HEAD
-### Foreshadow
-- reload: 0.3 -> 0.22 /todo
-- increased coolant buff (water: 116% -> 140%; cryofluid: 136% -> 190%)
-=======
-(Decreased cyclone coolant to keep it more ammo-save turret (and make it looks more different to swarmer). Buffed non-meta ammo and minor nerf for surge ammo)
-
 ### Foreshadow
 - reload: 0.3 -> 0.22 /todo
 - damage: 1350 -> 1250
 - increased coolant buff (water: 116% -> 140%; cryofluid: 136% -> 190%) // todo remove fracture damage cap
 (Kinda huge foreshadow nerf. Reduced damage and firerate, but increased coolant boost
->>>>>>> 1168da8f27d491e2b40c572e2977b34cbbce2fc2
+
 
 ### Spectre
 - graphite: damage: 50 -> 75, ammoMultiplier: 4 -> 3, knockback: 0.3 -> 1
 - thorium: damage: 80 -> 120, knockback: 0.7 -> 1.3, ammoMultiplier: 4 -> 2
 - pyratite: damage: 70 -> 110, splashDamage: 20 -> 32, knockback: 0.6 -> 0.7
 
-- reload: 8.57 -> 8
+- reload: 8.57 -> 7.5
 - increased coolant buff (water: 116% -> 140%; cryofluid: 136% -> 190%)
 - maxAmmo: 30 -> 90
 - range: 32.5 -> 34.1
@@ -318,11 +286,8 @@ No changes (idk what to change, turret feels already fine (atleast gonna strongl
 - Health: 320 → 290
 - Mine speed: 300% -> 350%
 - Heal weapon bullet:
-  - Heal percent: 5% → 1%
-  - Added heal amount: 10
+  - Heal percent: 2% → 1%
 - Lightning bullet:
-  - Damage: 15 → 13
-  - Lightning length: 8 → 7
   - Heal percent: 1.6% → 0.75%
 
 ### Quasar
@@ -347,7 +312,7 @@ No changes (idk what to change, turret feels already fine (atleast gonna strongl
 - Repair beam speed: 84/sec (*2) → 116/sec (*2)
 
 ### Corvus
-- Health: 18000 → 15000
+- Health: 18000 → 12000
 - Armor: 9 → 12
 
 - Weapon now fires 3 shots with short delay between shots (instead single beam)
@@ -359,12 +324,12 @@ No changes (idk what to change, turret feels already fine (atleast gonna strongl
 ---------------------------
 
 ### Crawler
-- Health: 150 → 110
+- Health: 150 → 120
+- Speed: 7.5 -> 6
 
 ### Atrax**
 - Speed: 4.5 → 6.3
 - Health: 600 → 370
-- Weapon damage: 13 → 12
 
 ### Spiroct
 - Speed: 4.05 → 6.21
