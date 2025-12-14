@@ -121,10 +121,6 @@ public class Sector{
         Core.settings.remove(planet.name + "-s-" + id + "-info");
     }
 
-    public float getProductionScale(){
-        return Math.max(1f - info.damage, 0);
-    }
-
     public boolean isAttacked(){
         if(isBeingPlayed()) return state.rules.waves || state.rules.attackMode;
         return save != null && (info.waves || info.attack) && info.hasCore;
@@ -133,6 +129,10 @@ public class Sector{
     /** @return whether the player has a base (active save with a core) here. */
     public boolean hasBase(){
         return save != null && info.hasCore && !(Vars.state.isGame() && Vars.state.rules.sector == this && state.gameOver);
+    }
+
+    public boolean isFrozen(){
+        return isAttacked() && !isBeingPlayed();
     }
 
     /** @return whether the enemy has a generated base here. */
