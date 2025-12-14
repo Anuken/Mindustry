@@ -6,8 +6,20 @@ _Sprite Packing:_ `gradlew tools:pack`
 _Server:_ `gradlew server:dist`
 (Ignore this thats for me)
 
+# Disclaimer!
+Documentation isn't fully finished. Some changes here might be not slighty outdated or I could forget to write here something. I highly recomment to check minimal.diff in release (with ALL github changes which I made (compared my fork and upstream (anuke BE)). My rebalance works kinda fine in real playtests, so spend few hours on playtesting before placing final vote (if you placing negative voting, give me a list with all changes which you dont like or where I did balance issue. I need all player opinion and rebalance experience/feedback so I can make it better). My rebalance is the only one which exist rn as a stuff which fixes all game issues and pretending to be really added in game. ALSO please playtest Anuke BE version/v153 before playtesting rebalance (optional, but v7 experience feels very different from v8 experience and has a lot changes which might looks like made by me, but can be misunderstood as anuke changes one). Also I has small problems with English (its not my native language). Dropping //todo list below documentation what else I am planning to finish (and ip server list where you can playtest my rebalance with someone)
 
-# Changelog. I gonna slowly turn this changelog in documentation ~~(changelog but with description and writing every reason to my changes)~~
+## What my rebalance changes:
+- Changing most stats in UnitTypes, Blocks, StatusEffect files
+- idk what else it could change
+
+## What my rebalance NOT changes:
+- New game sounds
+- Campaign maps, difficulty, ...
+- Unloader placement in conveyor section (in building menu) and etc
+
+# Changelog. I gonna slowly turn this changelog in documentation 
+//todo finish it tomorrow I am so eepy
 
 ---------------------
 # Global changes
@@ -195,7 +207,7 @@ No changes (idk what to change, turret feels already fine (atleast gonna strongl
 ## Ripple
 - graphite: splashDamage: 70 -> 75, splashRadius: 0.8 -> 1.2;
 - silicone: splashDamage: 70 -> 72;
-- plastanium: splashDamage: 45 -> 70, fragBullets: 10 -> 7, fragBulletDamage (idk how it names): 10 -> 15;
+- plastanium: splashDamage: 45 -> 70, fragBullets: 10 -> 7, fragBulletDamage (idk how it names): 14 -> 15;
 - blastCompound: splashDamage: 55 -> 115, splashDamageRadius = 4.2 -> 5.2, reloadMultiplier: 0.7x;
 - pyratite: splashDamage: 45 -> 90, splashDamageRadius = 2.3 -> 4.7;
 - requirements (block buildcost): copper = 150, graphite = 135, titanium = 60 -> copper = 175, graphite = 90, titanium = 70;
@@ -210,13 +222,14 @@ No changes (idk what to change, turret feels already fine (atleast gonna strongl
 
 - coolant: 0.3f -> 0.2f ((decreased coolant buff (water: 160% -> 140%; cryofluid: 235% -> 190%))
 
-
+(Decrease coolant buff (To keep turret more designed for ammo-save and compensate decreased firerate by being more anti-armor turret). Did huge metaglass ammo buff (metaglass scatter DPS unironically was bigger than metaglass cyclone). Now metaglass can be used as best ammo for shredding annoying T1 unit spam/units with low armor (up to zenith), ye (cheap ammo with 5x ammo multiple). Minor balance changes for plastanium and surge ammo. Buffed blast ammo to be more useful (while surge cyclone by itself) 
 
 ### Foreshadow
 - reload: 0.3 -> 0.22 /todo
 - damage: 1350 -> 1250
-- increased coolant buff (water: 116% -> 140%; cryofluid: 136% -> 190%) // todo remove fracture damage cap
-(Kinda huge foreshadow nerf. Reduced damage and firerate, but increased coolant boost
+- increased coolant buff (water: 116% -> 140%; cryofluid: 136% -> 190%)
+
+(Minor foreshadow nerf. Reduced firerate, but increased coolant boost (so if player wanna keep foreshadow shoot at full power, he must to do something with stable liquid supply too (vanilla coolant power making it useless or make a very low sense))
 
 
 ### Spectre
@@ -226,13 +239,18 @@ No changes (idk what to change, turret feels already fine (atleast gonna strongl
 
 - reload: 8.57 -> 7.5
 - increased coolant buff (water: 116% -> 140%; cryofluid: 136% -> 190%)
-- maxAmmo: 30 -> 90
 - range: 32.5 -> 34.1
+
+(Kinda fine turret for PvE but still worse than cyclone/swarmer + tsunamy combo. Huge damage buff for all ammo. Spcetre got slighty reduced firerate which compensated by increased coolant power. Decreased ammoMultiplier to keep it more cost for shooting (I thinking its pretty fair for a lategame. ~~Unlimited~~ Huge power but big difficulty for ammo and water supply). Also did slighty increased range (also to keep this turret way more useful. Doesn't break any maps)
 
 ### Meltdown
 - damage: 936/sec -> 1560/sec
 - reload: 90f -> 170f,
 - firerate: 0.666 -> 0.352
+
+(Since meltdown can be boostable (with overdrive) in v8, it gets extremely powerful and overpowered. Also meltdown with cryo and ODD (and even POD) shooting and reloading extremely fast, so it looks very comical (extremely fast rotarespeed and almost non-stop fire))
+
+//todo finish documentation tomorrow
 
 ---
 
@@ -248,14 +266,14 @@ No changes (idk what to change, turret feels already fine (atleast gonna strongl
 - Speed: 3.75 → 4.575
 - Health: 550 → 510
 - Armor: 4 → 5
-- Damage: 37 → 27
+- Damage: 74 → 54
 
 ### Fortress
 - Speed: 3.225 → 3.75
 - Health: 900 → 910
 - Armor: 9 → 10
 - Spldashdamage: 80 → 70
-- Increased fortress speed projectile. Decreased range from 29.5 -> 28.2
+- Increased fortress speed projectile. Decreased range from 29.5 -> 28.8
   
 ### Scepter
 - Speed: 2.7 → 3.9
@@ -355,7 +373,7 @@ No changes (idk what to change, turret feels already fine (atleast gonna strongl
 ### Flare
 - Health: 70 → 35
 - Firerate: 1.5 -> 2
-- Bullet damage: 9 → 10
+- Bullet damage: 9 → 12 //todo finish changelog for flare (new ai and new changes ahh jumpscare. Spend much more time on testing flares tomorrow to be sure that all my changes are make a sense)
 
 ### Horizon
 - Health: 340 → 240
@@ -439,6 +457,7 @@ no changes
 - Health: 22000 -> 21000
 - Range: 62 -> 50.7
 - Speed: 4.65 -> 3.97
+
 ---------------------------
 
 ### Retusa
@@ -464,3 +483,19 @@ Decreased segment-like attack firerate
 
 - Changed main cannon firerate (0.46/sec -> 0.81/sec), damage (60 -> 30), splashdamage (70 -> 210), range (37 -> 34.5)
 - Minor range and firerate buff for scorch-like cannons
+
+---------------------------
+
+# TODO list
+- Finish documentation (probably 15.12 - 16.12 (day.month))
+- Slowly increase servers with new gamemodes to playtest new changes
+- Finish data-patcher (and open servers with data-patcher so player wont need to install custom jar)
+- Create a list with all playtestes/those who help me/etc
+- ...
+
+---------------------------
+
+# Server list
+mindurka.online:3020 - forts
+meowisland.ru:7000 - team pvp server
+n4.xpdustry.com:50019 - survival/attack server (with all non-numbered campaign maps (from #map-review (all maps except hidden and rejected) //todo add numbered maps
