@@ -3721,7 +3721,7 @@ public class Blocks{
             consumeAmmoOnce = false;
             size = 2;
             scaledHealth = 300;
-            shootSound = Sounds.missile;
+            shootSound = Sounds.shootMissile;
             envEnabled |= Env.space;
             rotateSpeed = 4f;
             
