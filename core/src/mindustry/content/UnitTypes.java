@@ -1561,11 +1561,13 @@ public class UnitTypes{
             drag = 0.13f;
             hitSize = 10f;
             health = 280;
+            armor = 2f;
             accel = 0.4f;
             rotateSpeed = 3.3f;
             faceTarget = false;
 
-            armor = 2f;
+            moveSoundVolume = 0.4f;
+            moveSound = Sounds.shipMove;
 
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 13f;
@@ -1621,6 +1623,10 @@ public class UnitTypes{
             rotateSpeed = 2.6f;
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
+
+            moveSoundVolume = 0.55f;
+            moveSoundPitchMin = moveSoundPitchMax = 0.9f;
+            moveSound = Sounds.shipMove;
 
             trailLength = 20;
             waveTrailX = 5.5f;
@@ -1680,6 +1686,10 @@ public class UnitTypes{
             armor = 7f;
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
+
+            moveSoundVolume = 0.7f;
+            moveSoundPitchMin = moveSoundPitchMax = 0.77f;
+            moveSound = Sounds.shipMove;
 
             trailLength = 22;
             waveTrailX = 7f;
@@ -1778,6 +1788,10 @@ public class UnitTypes{
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.thorium);
 
+            moveSoundVolume = 1f;
+            moveSound = Sounds.shipMoveBig;
+            moveSoundPitchMin = moveSoundPitchMax = 0.95f;
+
             trailLength = 50;
             waveTrailX = 18f;
             waveTrailY = -21f;
@@ -1868,6 +1882,10 @@ public class UnitTypes{
             faceTarget = false;
             ammoType = new PowerAmmoType(4000);
 
+            moveSoundVolume = 1.1f;
+            moveSound = Sounds.shipMoveBig;
+            moveSoundPitchMin = moveSoundPitchMax = 0.9f;
+
             trailLength = 70;
             waveTrailX = 23f;
             waveTrailY = -32f;
@@ -1919,6 +1937,9 @@ public class UnitTypes{
             range = 100f;
             ammoType = new PowerAmmoType(900);
             armor = 3f;
+
+            moveSoundVolume = 0.4f;
+            moveSound = Sounds.shipMove;
 
             buildSpeed = 1.5f;
             rotateToBuilding = false;
@@ -2021,6 +2042,10 @@ public class UnitTypes{
             rotateSpeed = 4f;
             faceTarget = false;
 
+            moveSoundVolume = 0.55f;
+            moveSoundPitchMin = moveSoundPitchMax = 0.9f;
+            moveSound = Sounds.shipMove;
+
             trailLength = 22;
             waveTrailX = 5.5f;
             waveTrailY = -4f;
@@ -2099,6 +2124,10 @@ public class UnitTypes{
             armor = 6f;
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
+
+            moveSoundVolume = 0.7f;
+            moveSoundPitchMin = moveSoundPitchMax = 0.77f;
+            moveSound = Sounds.shipMove;
 
             trailLength = 23;
             waveTrailX = 9f;
@@ -2240,6 +2269,10 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(3500);
             ammoCapacity = 40;
 
+            moveSoundVolume = 1f;
+            moveSound = Sounds.shipMoveBig;
+            moveSoundPitchMin = moveSoundPitchMax = 0.95f;
+
             //clip size is massive due to energy field
             clipSize = 250f;
 
@@ -2287,6 +2320,10 @@ public class UnitTypes{
             rotateSpeed = 1.1f;
             faceTarget = false;
             ammoType = new PowerAmmoType(4500);
+
+            moveSoundVolume = 1.1f;
+            moveSound = Sounds.shipMoveBig;
+            moveSoundPitchMin = moveSoundPitchMax = 0.9f;
 
             trailLength = 70;
             waveTrailX = 23f;
