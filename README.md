@@ -161,7 +161,7 @@ No changes /shrug
 - pyratite: damage: (no changes); splashdamage: 45 -> 32; splashDamageRadius: 2.5 -> 5.5
 - surgeAlloy: damage: 18 -> 15; splashDamageRadius: 3.1 -> 3.2
 
-(Nerfing swarmer to not be a meta. Swarmer feels very strong turret which can be useful even against T5 (and insane for reactive damage spam). I thinking I could overbuff range for pyratite and blast, so probably it can be removed (should be discussed))
+(Nerfing swarmer to not be a meta. Swarmer feels very strong turret which can be useful even against T5 (and insane for reactive damage spam). I thinking I could overbuff splashDamageRadius for pyratite and blast, so probably it can be nerfed (should be discussed). Also decreased blast splashDamage (becuase cryo + swarmer feels overpowered))
 
 
 ### Salvo
@@ -199,9 +199,8 @@ No changes (idk what to change, turret feels already fine (atleast gonna strongl
 - blastCompound: splashDamage: 55 -> 115, splashDamageRadius = 4.2 -> 5.2, reloadMultiplier: 0.7x;
 - pyratite: splashDamage: 45 -> 90, splashDamageRadius = 2.3 -> 4.7;
 - requirements (block buildcost): copper = 150, graphite = 135, titanium = 60 -> copper = 175, graphite = 90, titanium = 70;
-//todo recheck changes
 
-(Ripple also feels kinda weird. It has splashdamage, but rarely used in actual gameplay (because kinda expensive and ineffectice for pvp (except plast bvb and defending against naval (still sucks but its better than foreshadow against T2 fr)(and kinda questionable for pve becsuse cyclone/swarmer exist). Anuke halfed its firerate with doubled damage, so I did somrthing like this too. Might need some revieves because can be actually very strong even against T5 (I dont thinking thats bad, but need more tests). Nerfed plast frags because very unfairly strong and annoying in bvb)
+(Ripple also feels kinda weird. It has splashdamage, but rarely used in actual gameplay (because kinda expensive and ineffectice for pvp (except plast bvb and defending against naval (still sucks but its better than foreshadow against T2 fr)(and kinda questionable for pve becsuse cyclone/swarmer exist). Anuke halfed its firerate with doubled damage, so I did something like this too. Might need some revieves because can be actually very strong even against T5 (I dont thinking thats bad, but need more tests). Nerfed plast frags because very unfairly strong and annoying in bvb)
 
 ### Cyclone
 - metaglass: damage: 6 -> 13, ammoMultiplier: 2x -> 5x, splashDamage: 45 -> 32, fragBullets: 4 -> 10
@@ -210,6 +209,8 @@ No changes (idk what to change, turret feels already fine (atleast gonna strongl
 - surgeAlloy: splashDamageRadius = 4.7 -> 4.3
 
 - coolant: 0.3f -> 0.2f ((decreased coolant buff (water: 160% -> 140%; cryofluid: 235% -> 190%))
+
+
 
 ### Foreshadow
 - reload: 0.3 -> 0.22 /todo
