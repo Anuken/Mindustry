@@ -409,6 +409,32 @@ public class PatcherTests{
     }
 
     @Test
+    void singleValue() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        block: {
+         graphite-press.craftTime: 1
+        }
+        """));
+
+        assertNoWarnings();
+        assertEquals(1f, ((GenericCrafter)Blocks.graphitePress).craftTime);
+    }
+
+    @Test
+    void singleValue2() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        block: {
+         graphite-press: {
+            craftTime: 1
+         }
+        }
+        """));
+
+        assertNoWarnings();
+        assertEquals(1f, ((GenericCrafter)Blocks.graphitePress).craftTime);
+    }
+
+    @Test
     void noResolution() throws Exception{
         String name = Pathfinder.class.getCanonicalName();
 
