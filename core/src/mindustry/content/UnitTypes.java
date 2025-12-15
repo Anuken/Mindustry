@@ -14,6 +14,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.part.DrawPart.PartProgress;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -207,10 +208,52 @@ public class UnitTypes{
 
             abilities.add(new ShieldRegenFieldAbility(25f, 250f, 60f * 1, 60f));
 
-            BulletType smallBullet = new BasicBulletType(3f, 10){{
-                width = 7f;
-                height = 9f;
-                lifetime = 50f;
+            BulletType smallBullet = new BasicBulletType(12f, 20){{
+                width = 4.5f;
+                height = 35f;
+                lifetime = (26f * tilesize) / 12f;
+                shrinkX = 0.6f;
+                shrinkY = 0f;
+                shrinkInterp = Interp.slope;
+
+                trailChance = 10f / 60f;
+                trailColor = Pal.bulletYellowBack;
+                trailEffect = Fx.bulletSparkSmokeTrailSmall;
+                trailSpread = 12f;
+                shootEffect = new Effect(4, e -> {
+                    float w = 1.2f + 7 * e.fout();
+
+                    for(int i : Mathf.signs){
+                        color(Pal.bulletYellow, Pal.bulletYellowBack, e.fout() * 1.5f);
+                        Drawf.tri(e.x, e.y, w, 10f + e.fout() * 2f, e.rotation + i * 90f);
+                    }
+
+                    color(Pal.bulletYellow, Pal.bulletYellowBack, e.fout() * 0.5f);
+                    Drawf.tri(e.x, e.y, w, 15f * e.fout(), e.rotation);
+                    Drawf.tri(e.x, e.y, w, 3f * e.fout(), e.rotation + 180f);
+
+                }).layer(Layer.effect + 1f);
+
+                hitEffect = new Effect(8, e -> {
+                    Fx.rand.setSeed(e.id);
+                    
+                    for(int i : Mathf.signs){
+                        color(Pal.bulletYellow, Pal.bulletYellowBack, e.fout() * 1.2f);
+                        Drawf.tri(e.x, e.y, e.fout() * 0.2f + 2f, 5f + 30f * e.fout(), e.rotation + 155f * i);
+                    }
+                
+                    for(int s = 0; s < Fx.rand.random(1, 5); s++){
+                        float rand = Fx.rand.random(0.5f * e.fin(), e.fin());
+                        float angle = Fx.rand.random(e.rotation - 20f, e.rotation + 20f);
+                        Tmp.v1.trns(angle, Fx.rand.random(2f, 40f) * e.fin());
+                        alpha(e.fout() * Fx.rand.random(0.4f, 2f));
+
+                        color(Pal.surge, Color.white, e.fin() * 0.8f);
+                        Lines.stroke(rand * 1.5f * e.fin() + 0.2f);
+                        Lines.lineAngle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, angle, Fx.rand.random(3f, 9f) + 1.5f * e.fin());
+                    }
+
+                }).layer(Layer.bullet - 1f);
             }};
 
             weapons.add(
@@ -230,30 +273,43 @@ public class UnitTypes{
                 shoot.shots = 3;
                 shoot.shotDelay = 4f;
 
-                bullet = new BasicBulletType(8f, 80){{
+                bullet = new BasicBulletType(8f, 70){{
                     width = 11f;
                     height = 20f;
                     lifetime = 27f;
+                    shrinkX = 0.4f;
+                    shrinkY = 0f;
                     shootEffect = Fx.shootBig;
+                    hitEffect = Fx.blastExplosion;
+                    trailParam = 0.5f;
                     lightning = 2;
                     lightningLength = 6;
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
                     lightningDamage = 20;
                     despawnSound = Sounds.shockBullet;
+                    bulletInterval = 4f;
+
+                    intervalBullet = new LightningBulletType(){{
+                        damage = 5f;
+                        lightningLength = 3;
+                        lightningLengthRand = 4;
+                        lightningColor = Pal.surge;
+                        hitEffect = Fx.hitLancerLow;
+                    }};
                 }};
             }},
 
-            new Weapon("mount-weapon"){{
-                reload = 13f;
+            new Weapon("scepter-mount"){{
+                reload = 12f;
                 x = 8.5f;
                 y = 6f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
                 bullet = smallBullet;
             }},
-            new Weapon("mount-weapon"){{
-                reload = 16f;
+            new Weapon("scepter-mount"){{
+                reload = 15f;
                 x = 8.5f;
                 y = -7f;
                 rotate = true;

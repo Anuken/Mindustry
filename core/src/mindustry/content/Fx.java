@@ -968,6 +968,16 @@ public class Fx{
         });
     }),
 
+    hitLancerLow = new Effect(12, e -> {
+        color(Color.white);
+        stroke(e.fout() * 1.5f);
+
+        randLenVectors(e.id, 4, e.finpow() * 17f, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
+        });
+    }),
+
     hitBeam = new Effect(12, e -> {
         color(e.color);
         stroke(e.fout() * 2f);
@@ -1279,6 +1289,33 @@ public class Fx{
         color(e.color);
         Fill.circle(e.x, e.y, e.rotation * e.fout());
     }).layer(Layer.bullet - 0.001f),
+
+    bulletSparkSmokeTrailSmall = new Effect(28f, e -> {
+        color(e.color);
+        rand.setSeed(e.id);
+
+        for(int i = 0; i < 3; i++){
+            float len = rand.random(0.3f, 0.8f);
+            float angle = rand.random(360f);
+            Tmp.v1.trns(angle, e.fin() * 10f * len);
+
+            float alpha = 0.4f - Math.abs(e.fin() - 0.5f) * 1.5f;
+            alpha(rand.random(alpha, alpha * 2f));
+            Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 0.4f + e.fout() * 3.5f);
+        }
+
+        for(int s = 0; s < (int)rand.random(0, 2); s++){
+            float len = rand.random(0.5f, 1.2f);
+            float angle = rand.random(360f);
+            Tmp.v2.trns(angle, e.fin() * 10f * len);
+
+            color(Pal.surge, Color.white, e.fin());
+            alpha(e.fout() * 0.9f);
+
+            Lines.stroke(1.5f * e.fout());
+            Lines.lineAngle(e.x + Tmp.v2.x, e.y + Tmp.v2.y, angle, 2.5f + 3f * e.fout());
+        }
+    }),
 
     colorTrail = new Effect(50, e -> {
         color(e.color);
