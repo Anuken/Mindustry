@@ -61,6 +61,7 @@ public class RepairBeamWeapon extends Weapon{
         recoil = 0f;
         noAttack = true;
         useAttackRange = false;
+        activeSound = Sounds.beamHeal;
     }
 
     @Override

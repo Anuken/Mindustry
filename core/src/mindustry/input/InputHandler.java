@@ -154,13 +154,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         });
 
         Events.on(ResetEvent.class, e -> {
-            logicCutscene = false;
-            commandBuildings.clear();
-            selectedUnits.clear();
-            itemDepositCooldown = 0f;
-            Arrays.fill(controlGroups, null);
-            lastUnit = null;
-            lastPlans.clear();
+            reset();
         });
     }
 
@@ -198,9 +192,59 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, unreliable = true)
+    public static void setItems(Building build, ItemStack[] items){
+        if(build == null || build.items == null) return;
+
+        for(ItemStack stack : items){
+            build.items.set(stack.item, stack.amount);
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void setTileItems(Item item, int amount, int[] positions){
+        for(int pos : positions){
+            Building build = world.build(pos);
+            if(build != null && build.items != null){
+                build.items.set(item, amount);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
     public static void clearItems(Building build){
         if(build == null || build.items == null) return;
         build.items.clear();
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void setLiquid(Building build, Liquid liquid, float amount){
+        if(build == null || build.liquids == null) return;
+        build.liquids.set(liquid, amount);
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void setLiquids(Building build, LiquidStack[] liquids){
+        if(build == null || build.liquids == null) return;
+
+        for(LiquidStack stack : liquids){
+            build.liquids.set(stack.liquid, stack.amount);
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void setTileLiquids(Liquid liquid, float amount, int[] positions){
+        for(int pos : positions){
+            Building build = world.build(pos);
+            if(build != null && build.liquids != null){
+                build.liquids.set(liquid, amount);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void clearLiquids(Building build){
+        if(build == null || build.liquids == null) return;
+        build.liquids.clear();
     }
 
     @Remote(called = Loc.server, unreliable = true)
@@ -638,6 +682,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         build.updateProximity();
         build.noSleep();
         Fx.rotateBlock.at(build.x, build.y, build.block.size);
+        if(!headless) Sounds.blockRotate.at(build, 1f + Mathf.range(0.1f), 1f);
         Events.fire(new BuildRotateEvent(build, player == null ? null : player.unit(), previous));
     }
 
@@ -835,6 +880,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         camera.position.set(unit);
     }
 
+    public void reset(){
+        logicCutscene = false;
+        commandBuildings.clear();
+        selectedUnits.clear();
+        itemDepositCooldown = 0f;
+        Arrays.fill(controlGroups, null);
+        lastUnit = null;
+        lastPlans.clear();
+        player.shooting = false;
+    }
+
     public void update(){
         if(spectating != null && (!spectating.isValid() || spectating.team != player.team())){
             spectating = null;
@@ -885,10 +941,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(player.isBuilder()){
             player.unit().updateBuilding(isBuilding);
-        }
-
-        if(!player.dead() && player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && !player.team().rules().infiniteAmmo && player.unit().ammo <= 0){
-            player.unit().type.weapons.first().noAmmoSound.at(player.unit());
         }
 
         //you don't want selected blocks while locked, looks weird
@@ -1117,6 +1169,24 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.draw(Layer.groundUnit - 1, () -> {
             drawCommanded(false);
         });
+
+        Draw.draw(Layer.overlayUI, () -> {
+            drawCommandedTargets();
+        });
+    }
+
+    public void drawCommandedTargets(){
+        if(commandMode){
+            for(Unit unit : selectedUnits){
+                if(unit.controller() instanceof CommandAI ai){
+                    var cmd =  ai.currentCommand();
+
+                    if(ai.attackTarget != null && cmd.drawTarget){
+                        Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
+                    }
+                }
+            }
+        }
     }
 
     public void drawCommanded(boolean flying){
@@ -1128,7 +1198,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             //happens sometimes
             selectedUnits.removeAll(u -> !u.allowCommand());
 
-            //draw command overlay UI
             for(Unit unit : selectedUnits){
 
                 Color color = unit.controller() instanceof LogicAI ? Team.malis.color : Pal.accent;
@@ -1139,11 +1208,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     var cmd =  ai.currentCommand();
                     lastPos = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
 
-                    if(flying && ai.attackTarget != null && cmd.drawTarget){
-                        Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
-                    }
-
-                    if(unit.isFlying() != flying) continue;
+                    if((unit.isFlying() || unit.type.allowLegStep) != flying) continue;
 
                     //draw target line
                     if(ai.targetPos != null && cmd.drawTarget){

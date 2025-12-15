@@ -95,8 +95,9 @@ public class Block extends UnlockableContent implements Senseable{
     /** if true, double-tapping this configurable block clears configuration. */
     public boolean clearOnDoubleTap = false;
     /** whether this block has a tile entity that updates */
+    @NoPatch
     public boolean update;
-    /** whether this block has health and can be destroyed */
+    /** whether this block has health and can be destroyed. note that setting this to false does nothing if update = true! */
     public boolean destructible;
     /** whether unloaders work on this block */
     public boolean unloadable = true;
@@ -308,11 +309,13 @@ public class Block extends UnlockableContent implements Senseable{
     /** Should the sound made when this block is deconstructed change in pitch. */
     public boolean breakPitchChange = true;
     /** Sound made when this block is built. */
-    public Sound placeSound = Sounds.place;
+    public Sound placeSound = Sounds.unset;
     /** Sound made when this block is deconstructed. */
-    public Sound breakSound = Sounds.breaks;
+    public Sound breakSound = Sounds.unset;
     /** Sounds made when this block is destroyed.*/
-    public Sound destroySound = Sounds.boom;
+    public Sound destroySound = Sounds.unset;
+    /** Volume of destruction sound. */
+    public float destroySoundVolume = 1f;
     /** Range of destroy sound. */
     public float destroyPitchMin = 1f, destroyPitchMax = 1f;
     /** How reflective this block is. */
@@ -321,6 +324,8 @@ public class Block extends UnlockableContent implements Senseable{
     public Color lightColor = Color.white.cpy();
     /** If true, drawLight() will be called for this block. */
     public boolean emitLight = false;
+    /** If true, this block obstructs light emitted by other blocks. */
+    public boolean obstructsLight = true;
     /** Radius of the light emitted by this block. */
     public float lightRadius = 60f;
 
@@ -716,6 +721,8 @@ public class Block extends UnlockableContent implements Senseable{
         super.afterPatch();
         barMap.clear();
         setBars();
+        offset = ((size + 1) % 2) * tilesize / 2f;
+        sizeOffset = -((size - 1) / 2);
     }
 
     public boolean consumesItem(Item item){
@@ -1252,6 +1259,27 @@ public class Block extends UnlockableContent implements Senseable{
     @CallSuper
     public void init(){
         super.init();
+
+        if(destroySound == Sounds.unset){
+            destroySound =
+                size >= 3 ? Sounds.blockExplode3 :
+                size >= 2 ? new RandomSound(Sounds.blockExplode2, Sounds.blockExplode2Alt) :
+                new RandomSound(Sounds.blockExplode1, Sounds.blockExplode1Alt);
+        }
+
+        if(placeSound == Sounds.unset){
+            placeSound =
+                size >= 3 ? Sounds.blockPlace3 :
+                size >= 2 ? Sounds.blockPlace2 :
+                Sounds.blockPlace1;
+        }
+
+        if(breakSound == Sounds.unset){
+            breakSound =
+                size >= 3 ? Sounds.blockBreak3 :
+                size >= 2 ? Sounds.blockBreak2 :
+                Sounds.blockBreak1;
+        }
 
         //disable standard shadow
         if(customShadow){

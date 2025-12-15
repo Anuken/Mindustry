@@ -44,7 +44,7 @@ public class GameState{
     /** Team data. Gets reset every new game. */
     public Teams teams = new Teams();
     /** Handles JSON edits of game content. */
-    public ContentPatcher patcher = new ContentPatcher();
+    public DataPatcher patcher = new DataPatcher();
     /** Number of enemies in the game; only used clientside in servers. */
     public int enemies;
     /** Map being playtested (not edited!) */
