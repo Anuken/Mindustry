@@ -164,6 +164,27 @@ public class Fx{
         Lines.circle(e.x, e.y, e.fin() * 6f);
     }),
 
+    hitScepterSecondary = new Effect(8, e -> {
+        rand.setSeed(e.id);
+
+        for(int i : Mathf.signs){
+            color(Pal.bulletYellow, Pal.bulletYellowBack, e.fout() * 1.2f);
+            Drawf.tri(e.x, e.y, e.fout() * 0.2f + 2f, 5f + 30f * e.fout(), e.rotation + 155f * i);
+        }
+
+        for(int s = 0; s < rand.random(1, 5); s++){
+            float stroke = rand.random(0.5f * e.fin(), e.fin());
+            float angle = rand.random(e.rotation - 20f, e.rotation + 20f);
+            Tmp.v1.trns(angle, rand.random(2f, 40f) * e.fin());
+            alpha(e.fout() * rand.random(0.4f, 2f));
+
+            color(Pal.surge, Color.white, e.fin() * 0.8f);
+            Lines.stroke(stroke * 1.5f * e.fin() + 0.2f);
+            Lines.lineAngle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, angle,rand.random(3f, 9f) + 1.5f * e.fin());
+        }
+
+    }).layer(Layer.bullet - 1f),
+
     lightning = new Effect(10f, 500f, e -> {
         if(!(e.data instanceof Seq)) return;
         Seq<Vec2> lines = e.data();
@@ -1845,6 +1866,20 @@ public class Fx{
         Drawf.tri(e.x, e.y, w, 32f * e.fout(), e.rotation);
         Drawf.tri(e.x, e.y, w, 3f * e.fout(), e.rotation + 180f);
     }),
+
+    shootScepterSecondary = new Effect(4, e -> {
+        float w = 1.2f + 7 * e.fout();
+
+        for(int i : Mathf.signs){
+            color(Pal.bulletYellow, Pal.bulletYellowBack, e.fout() * 1.5f);
+            Drawf.tri(e.x, e.y, w, 10f + e.fout() * 2f, e.rotation + i * 90f);
+        }
+
+        color(Pal.bulletYellow, Pal.bulletYellowBack, e.fout() * 0.5f);
+        Drawf.tri(e.x, e.y, w, 15f * e.fout(), e.rotation);
+        Drawf.tri(e.x, e.y, w, 3f * e.fout(), e.rotation + 180f);
+
+    }).layer(Layer.effect + 1f),
 
     shootTitan = new Effect(10, e -> {
         color(Pal.lightOrange, e.color, e.fin());
