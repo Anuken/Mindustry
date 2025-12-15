@@ -16,6 +16,7 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 
 public class ShieldArcAbility extends Ability{
+
     private static Unit paramUnit;
     private static ShieldArcAbility paramField;
     private static Vec2 paramPos = new Vec2();
@@ -48,6 +49,8 @@ public class ShieldArcAbility extends Ability{
             }else{
                 b.absorb();
                 Fx.absorb.at(b);
+
+                paramField.hitSound.at(b.x, b.y, 1f + Mathf.range(0.1f), paramField.hitSoundVolume);
             }
 
             // break shield
@@ -55,6 +58,8 @@ public class ShieldArcAbility extends Ability{
                 paramField.data -= paramField.cooldown * paramField.regen;
 
                 Fx.arcShieldBreak.at(paramPos.x, paramPos.y, 0, paramField.color == null ? paramUnit.type.shieldColor(paramUnit) : paramField.color, paramUnit);
+
+                paramField.breakSound.at(paramPos.x, paramPos.y);
             }
 
             // shieldDamage for consistency
@@ -121,6 +126,9 @@ public class ShieldArcAbility extends Ability{
     public float chanceDeflect = -1f;
     /** Deflection sound. */
     public Sound deflectSound = Sounds.none;
+    public Sound breakSound = Sounds.shieldBreakSmall;
+    public Sound hitSound = Sounds.shieldHit;
+    public float hitSoundVolume = 0.12f;
     /** Multiplier for shield damage taken from missile units. */
     public float missileUnitMultiplier = 2f;
 

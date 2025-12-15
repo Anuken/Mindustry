@@ -54,7 +54,7 @@ public class StackConveyor extends Block implements Autotiler{
         underBullets = true;
         priority = TargetPriority.transport;
 
-        ambientSound = Sounds.conveyor;
+        ambientSound = Sounds.loopConveyor;
         ambientSoundVolume = 0.004f;
     }
 
