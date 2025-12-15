@@ -41,9 +41,6 @@ public class DesktopLauncher extends ClientLauncher{
         try{
             Vars.loadLogger();
 
-            //note that this only does something on Windows
-            GpuDetect.init();
-
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
@@ -52,7 +49,7 @@ public class DesktopLauncher extends ClientLauncher{
                 height = 700;
 
                 //on Windows, Intel drivers might be buggy with OpenGL 3.x, so only use 2.x. See https://github.com/Anuken/Mindustry/issues/11041
-                if(GpuDetect.hasIntel && !GpuDetect.hasAMD && !GpuDetect.hasNvidia){
+                if(IntelGpuCheck.wasIntel()){
                     allowGl30 = false;
                     coreProfile = false;
                     glVersions = new int[][]{{2, 1}, {2, 0}};
@@ -79,7 +76,6 @@ public class DesktopLauncher extends ClientLauncher{
                                         allowGl30 = true; //when a version is explicitly specified always allow GL 3
                                         break;
                                     }
-
                                 }
                                 Log.err("Invalid GL version format string: '@'. GL version must be of the form <major>.<minor>", str);
                             }
@@ -88,6 +84,7 @@ public class DesktopLauncher extends ClientLauncher{
                             case "antialias" -> samples = 16;
                             case "debug" -> Log.level = LogLevel.debug;
                             case "maximized" -> maximized = Boolean.parseBoolean(arg[i + 1]);
+                            case "testMobile" -> testMobile = true;
                             case "gltrace" -> {
                                 Events.on(ClientCreateEvent.class, e -> {
                                     var profiler = new GLProfiler(Core.graphics);
@@ -115,20 +112,21 @@ public class DesktopLauncher extends ClientLauncher{
 
         Version.init();
         boolean useSteam = Version.modifier.contains("steam");
-        testMobile = Seq.with(args).contains("-testMobile");
 
         if(useDiscord){
-            try{
-                DiscordRPC.connect(discordID);
-                Log.info("Initialized Discord rich presence.");
-                Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::close));
-            }catch(NoDiscordClientException none){
-                //don't log if no client is found
-                useDiscord = false;
-            }catch(Throwable t){
-                useDiscord = false;
-                Log.warn("Failed to initialize Discord RPC - you are likely using a JVM <16.");
-            }
+            Threads.daemon(() -> {
+                try{
+                    DiscordRPC.connect(discordID);
+                    Log.info("Initialized Discord rich presence.");
+                    Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::close));
+                }catch(NoDiscordClientException none){
+                    //don't log if no client is found
+                    useDiscord = false;
+                }catch(Throwable t){
+                    useDiscord = false;
+                    Log.warn("Failed to initialize Discord RPC - you are likely using a JVM <16.");
+                }
+            });
         }
 
         if(useSteam){

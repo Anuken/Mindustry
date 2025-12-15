@@ -73,7 +73,7 @@ public class PatcherTests{
     @Test
     void reconstructorPlans() throws Exception{
         var reconstructor = ((Reconstructor)Blocks.additiveReconstructor);
-        var prev = reconstructor.upgrades;
+        var prev = reconstructor.upgrades.copy();
         var prevConsumes = reconstructor.<ConsumeItems>findConsumer(c -> c instanceof ConsumeItems).items;
 
         Vars.state.patcher.apply(Seq.with(
@@ -96,6 +96,46 @@ public class PatcherTests{
         assertEquals(prev, reconstructor.upgrades);
         assertArrayEquals(reconstructor.<ConsumeItems>findConsumer(c -> c instanceof ConsumeItems).items, prevConsumes);
 
+    }
+
+    @Test
+    void reconstructorPlansEditSpecific() throws Exception{
+        var reconstructor = ((Reconstructor)Blocks.additiveReconstructor);
+        var prev = reconstructor.upgrades.copy();
+
+        Vars.state.patcher.apply(Seq.with(
+        """
+        block.additive-reconstructor.upgrades.1: [dagger, flare]
+        """
+        ));
+
+        assertNoWarnings();
+        var plan = reconstructor.upgrades.get(1);
+        assertArrayEquals(new UnitType[]{UnitTypes.dagger, UnitTypes.flare}, plan);
+
+        resetAfter();
+
+        assertEquals(prev, reconstructor.upgrades);
+    }
+
+    @Test
+    void reconstructorPlansAdd() throws Exception{
+        var reconstructor = ((Reconstructor)Blocks.additiveReconstructor);
+        var prev = reconstructor.upgrades.copy();
+
+        Vars.state.patcher.apply(Seq.with(
+        """
+        block.additive-reconstructor.upgrades.+: [[dagger, flare]]
+        """
+        ));
+
+        assertNoWarnings();
+        var plan = reconstructor.upgrades.peek();
+        assertArrayEquals(new UnitType[]{UnitTypes.dagger, UnitTypes.flare}, plan);
+
+        resetAfter();
+
+        assertEquals(prev, reconstructor.upgrades);
     }
 
     @Test
@@ -369,6 +409,32 @@ public class PatcherTests{
     }
 
     @Test
+    void singleValue() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        block: {
+         graphite-press.craftTime: 1
+        }
+        """));
+
+        assertNoWarnings();
+        assertEquals(1f, ((GenericCrafter)Blocks.graphitePress).craftTime);
+    }
+
+    @Test
+    void singleValue2() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        block: {
+         graphite-press: {
+            craftTime: 1
+         }
+        }
+        """));
+
+        assertNoWarnings();
+        assertEquals(1f, ((GenericCrafter)Blocks.graphitePress).craftTime);
+    }
+
+    @Test
     void noResolution() throws Exception{
         String name = Pathfinder.class.getCanonicalName();
 
@@ -440,6 +506,7 @@ public class PatcherTests{
 
     @Test
     void addWeapon() throws Exception{
+        int oldSize = UnitTypes.flare.weapons.size;
         Vars.state.patcher.apply(Seq.with("""
         unit.flare.weapons.+: {
           x: 0
@@ -453,7 +520,7 @@ public class PatcherTests{
         """));
 
         assertNoWarnings();
-        assertEquals(3, UnitTypes.flare.weapons.size);
+        assertEquals(oldSize + 1, UnitTypes.flare.weapons.size);
         assertEquals(100, UnitTypes.flare.weapons.peek().bullet.damage);
     }
 
