@@ -28,6 +28,7 @@ import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
 import mindustry.entities.part.DrawPart.*;
 import mindustry.entities.pattern.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -62,6 +63,8 @@ public class ContentParser{
     Seq<ParseListener> listeners = new Seq<>();
     /** If false, arbitrary class names cannot be resolved with Class.forName. */
     boolean allowClassResolution = true;
+    /** If false, sound asset loading is disabled. */
+    boolean allowAssetLoading = true;
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
         put(Effect.class, (type, data) -> {
@@ -298,11 +301,20 @@ public class ContentParser{
             if(data.isArray()) return new RandomSound(parser.readValue(Sound[].class, data));
 
             var field = fieldOpt(Sounds.class, data);
+
+            if(!allowAssetLoading && field == null){
+                warn("Sound not found: @", data.asString());
+                return Sounds.none;
+            }
             return field != null ? field : Vars.tree.loadSound(data.asString());
         });
         put(Music.class, (type, data) -> {
             var field = fieldOpt(Musics.class, data);
 
+            if(!allowAssetLoading && field == null){
+                warn("Music not found: @", data.asString());
+                return new Music();
+            }
             return field != null ? field : Vars.tree.loadMusic(data.asString());
         });
         put(Objectives.Objective.class, (type, data) -> {
@@ -602,16 +614,15 @@ public class ContentParser{
                     }else{
                         throw new IllegalArgumentException("Missing a valid 'block' in 'requirements'");
                     }
-
                 }
 
                 if(value.has("controller") || value.has("aiController")){
-                    unit.aiController = supply(resolve(value.getString("controller", value.getString("aiController", "")), FlyingAI.class));
+                    unit.aiController = resolveController(value.getString("controller", value.getString("aiController", "")));
                     value.remove("controller");
                 }
 
                 if(value.has("defaultController")){
-                    var sup = supply(resolve(value.getString("defaultController"), FlyingAI.class));
+                    var sup = resolveController(value.getString("defaultController"));
                     unit.controller = u -> sup.get();
                     value.remove("defaultController");
                 }
@@ -1092,6 +1103,12 @@ public class ContentParser{
         }catch(Exception e){
             throw new RuntimeException(e);
         }
+    }
+
+    Prov<UnitController> resolveController(String type){
+        //this is used as a captured value to avoid parsing it multiple times
+        var controller = supply(resolve(type, FlyingAI.class));
+        return controller::get;
     }
 
     Object field(Class<?> type, JsonValue value){
