@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
@@ -126,16 +127,18 @@ public class Weapon implements Cloneable{
     public int otherSide = -1;
     /** draw Z offset relative to the default value */
     public float layerOffset = 0f;
+    /** sound looped when shooting */
+    public Sound activeSound = Sounds.none;
+    /** volume of active sound */
+    public float activeSoundVolume = 1f;
     /** sound used for shooting */
-    public Sound shootSound = Sounds.pew;
+    public Sound shootSound = Sounds.shoot;
     /** volume of the shoot sound */
     public float shootSoundVolume = 1f;
     /** sound used when this weapon first fires; for continuous weapons only */
     public Sound initialShootSound = Sounds.none;
     /** sound used for weapons that have a delay */
     public Sound chargeSound = Sounds.none;
-    /** sound played when there is nothing to shoot */
-    public Sound noAmmoSound = Sounds.noammo;
     /** displayed region (autoloaded) */
     public TextureRegion region;
     /** heat region, must be same size as region (optional) */
@@ -414,9 +417,13 @@ public class Weapon implements Cloneable{
 
         //flip weapon shoot side for alternating weapons
         boolean wasFlipped = mount.side;
-        if(otherSide != -1 && alternate && mount.side == flipSprite && mount.reload <= reload / 2f && lastReload > reload / 2f){
+        if(otherSide >= 0 && alternate && mount.side == flipSprite && otherSide < unit.mounts.length && mount.reload <= reload / 2f && lastReload > reload / 2f){
             unit.mounts[otherSide].side = !unit.mounts[otherSide].side;
             mount.side = !mount.side;
+        }
+
+        if(!headless && activeSound != Sounds.none && mount.shoot && can && mount.warmup >= minWarmup){
+            Vars.control.sound.loop(activeSound, unit, activeSoundVolume);
         }
 
         //shoot if applicable
