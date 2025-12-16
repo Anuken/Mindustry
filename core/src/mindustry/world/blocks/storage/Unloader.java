@@ -97,7 +97,7 @@ public class Unloader extends Block{
         protected final Comparator<ContainerStat> comparator = (x, y) -> {
             //sort so it gives priority for blocks that can only either receive or give (not both), and then by load, and then by last use
             //highest = unload from, lowest = unload to
-            int unloadCore = Boolean.compare(!x.notStorage, !y.notStorage); //priority to containers always
+            int unloadCore = Boolean.compare(!x.notStorage, !y.notStorage); //priority to core and core containers always
             if(unloadCore != 0) return unloadCore;
             int unloadPriority = Boolean.compare(x.canUnload && !x.canLoad, y.canUnload && !y.canLoad); //priority to receive if it cannot give
             if(unloadPriority != 0) return unloadPriority;
