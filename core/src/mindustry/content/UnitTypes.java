@@ -1593,6 +1593,10 @@ public class UnitTypes{
             rotateSpeed = 3.3f;
             faceTarget = false;
 
+            trailLength = 20;
+            waveTrailX = 4f;
+            trailScl = 1.3f;
+
             moveSoundVolume = 0.4f;
             moveSound = Sounds.shipMove;
 

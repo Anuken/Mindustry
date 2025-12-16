@@ -434,7 +434,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(mode == planetLaunch || to.planet.generator == null) return launchSector;
 
         Sector candidate = to.planet.generator.findLaunchCandidate(to, launchSector);
-        return candidate == null ? launchSector : candidate;
+        return candidate == null && launchSector != null && (mode == planetLaunch || !launchSector.isAttacked()) ? launchSector : candidate;
     }
 
     boolean showing(){
@@ -1316,12 +1316,16 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
             }
 
+            boolean noCandidate = sector != sector.planet.getStartSector() && !sector.hasBase() && findLauncher(sector) == null;
+
             stable.button(
                 mode == select ? "@sectors.select" :
                 sector.isBeingPlayed() ? "@sectors.resume" :
                 sector.hasBase() ? "@sectors.go" :
-                locked ? "@locked" : "@sectors.launch",
-                locked ? Icon.lock : Icon.play, this::playSelected).growX().height(54f).minWidth(170f).padTop(4).disabled(locked);
+                locked ? "@locked" :
+                noCandidate ? "@sectors.nolaunchcandidate" :
+                "@sectors.launch",
+                locked ? Icon.lock : Icon.play, this::playSelected).growX().height(54f).minWidth(170f).padTop(4).disabled(locked || noCandidate);
         }
 
         stable.pack();

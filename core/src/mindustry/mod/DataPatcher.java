@@ -10,6 +10,8 @@ import mindustry.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.part.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -54,6 +56,7 @@ public class DataPatcher{
             }
         };
         cont.allowClassResolution = false;
+        cont.allowAssetLoading = false;
 
         return cont;
     }
@@ -351,7 +354,14 @@ public class DataPatcher{
             var fields = parser.getJson().getFields(actualType);
             var fdata = fields.get(field);
             var fobj = object;
-            if(fdata != null){
+
+            if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("controller")){
+                var fmeta = fields.get("controller");
+                assignValue(object, "controller", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), (Func<Unit, UnitController>)(u -> parser.resolveController(jsv.asString()).get()), true);
+            }else if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("aiController")){
+                var fmeta = fields.get("aiController");
+                assignValue(object, "aiController", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), parser.resolveController(jsv.asString()), true);
+            }else if(fdata != null){
                 if(checkField(fdata.field)) return;
 
                 assignValue(object, field, new FieldData(fdata), () -> Reflect.get(fobj, fdata.field), fv -> {
