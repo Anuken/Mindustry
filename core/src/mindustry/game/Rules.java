@@ -15,8 +15,6 @@ import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
-import static mindustry.Vars.state;
-
 /**
  * Defines current rules on how the game should function.
  * Does not store game state, just configuration.
@@ -288,7 +286,7 @@ public class Rules{
     }
 
     public boolean assignPlayers(Team team){
-        return !(state.rules.waveTeam == team && state.rules.waves) && team != Team.derelict && teams.get(team).protectCores;
+        return !(waveTeam == team && waves) && team != Team.derelict && teams.get(team).protectCores;
     }
 
     public boolean isBanned(Block block){
