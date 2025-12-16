@@ -310,7 +310,9 @@ public class CustomRulesDialog extends BaseDialog{
                 check("@rules.buildai", b -> teams.buildAi = b, () -> teams.buildAi, () -> team != rules.defaultTeam && rules.env != Planets.erekir.defaultEnv && !rules.pvp);
                 number("@rules.buildaitier", false, f -> teams.buildAiTier = f, () -> teams.buildAiTier, () -> teams.buildAi && rules.env != Planets.erekir.defaultEnv && !rules.pvp, 0, 1);
 
-                number("@rules.extracorebuildradius", f -> teams.extraCoreBuildRadius = f * tilesize, () -> Math.min(teams.extraCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection);
+                check("@rules.protectcores", b -> teams.protectCores = b, () -> teams.protectCores);
+                number("@rules.extracorebuildradius", f -> teams.extraCoreBuildRadius = f * tilesize, () -> Math.min(teams.extraCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection && teams.protectCores);
+                check("@rules.checkplacement", b -> teams.checkPlacement = b, () -> teams.checkPlacement);
 
                 check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
                 check("@rules.fillitems", b -> teams.fillItems = b, () -> teams.fillItems);

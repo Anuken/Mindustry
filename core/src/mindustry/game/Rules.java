@@ -15,6 +15,8 @@ import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
+import static mindustry.Vars.state;
+
 /**
  * Defines current rules on how the game should function.
  * Does not store game state, just configuration.
@@ -246,7 +248,7 @@ public class Rules{
     }
 
     public float buildRadius(Team team){
-        return enemyCoreBuildRadius + teams.get(team).extraCoreBuildRadius;
+        return !teams.get(team).protectCores ? 0f : enemyCoreBuildRadius + teams.get(team).extraCoreBuildRadius;
     }
 
     public float unitBuildSpeed(Team team){
@@ -285,6 +287,10 @@ public class Rules{
         return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
     }
 
+    public boolean assignPlayers(Team team){
+        return !(state.rules.waveTeam == team && state.rules.waves) && team != Team.derelict && teams.get(team).protectCores;
+    }
+
     public boolean isBanned(Block block){
         return blockWhitelist != bannedBlocks.contains(block);
     }
@@ -297,6 +303,10 @@ public class Rules{
     public static class TeamRule{
         /** Whether, when AI is enabled, ships should be spawned from the core. TODO remove / unnecessary? */
         public boolean aiCoreSpawn = true;
+        /** Whether the core no-build radius/polygonal protection applies to this team, unprotected teams are ignored by team assigner */
+        public boolean protectCores = true;
+        /** Whether the placeRangeCheck applies to this team */
+        public boolean checkPlacement = true;
         /** If true, blocks don't require power or resources. */
         public boolean cheat;
         /** If true, the core is always filled to capacity with all items. */
@@ -343,8 +353,18 @@ public class Rules{
         /** Extra spacing added to the no-build zone around the core. */
         public float extraCoreBuildRadius = 0f;
 
-
         //build cost disabled due to technical complexity
+
+        //for reading from json
+        public TeamRule(){
+        }
+
+        public TeamRule(Team team){
+            if(team == Team.derelict){
+                protectCores = false;
+                checkPlacement = false;
+            }
+        }
     }
 
     /** A simple map for storing TeamRules in an efficient way without hashing. */
@@ -353,7 +373,7 @@ public class Rules{
 
         public TeamRule get(Team team){
             TeamRule out = values[team.id];
-            return out == null ? (values[team.id] = new TeamRule()) : out;
+            return out == null ? (values[team.id] = new TeamRule(team)) : out;
         }
 
         @Override
