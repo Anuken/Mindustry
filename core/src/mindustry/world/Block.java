@@ -1327,12 +1327,16 @@ public class Block extends UnlockableContent implements Senseable{
             lightClipSize = Math.max(lightClipSize, size * 30f * 2f);
         }
 
-        // some blocks dont have hasLiquids but have liquid consumers/liquid capacity
+        //some blocks don't have hasLiquids, but have liquid consumers/liquid capacity
         if(liquidCapacity < 0){
             float consumeAmount = 1f;
             for(var cons : consumeBuilder){
-                if(cons instanceof ConsumeLiquid liq){
+                if(cons instanceof ConsumeLiquidBase liq){
                     consumeAmount = Math.max(consumeAmount, liq.amount * 60f);
+                }else if(cons instanceof ConsumeLiquids liq){
+                    for(var stack : liq.liquids){
+                        consumeAmount = Math.max(consumeAmount, stack.amount * 60f);
+                    }
                 }
             }
             liquidCapacity = Mathf.round(10f * consumeAmount);
