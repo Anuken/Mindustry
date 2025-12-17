@@ -6265,7 +6265,6 @@ public class Blocks{
             createSound = Sounds.unitCreateBig;
 
             constructTime = 60f * 60f * 1.5f;
-            liquidCapacity = 60f;
 
             upgrades.addAll(
                 new UnitType[]{UnitTypes.zenith, UnitTypes.antumbra},
@@ -6287,7 +6286,6 @@ public class Blocks{
             consumeLiquid(Liquids.cryofluid, 3f);
 
             constructTime = 60f * 60f * 4;
-            liquidCapacity = 180f;
             createSound = Sounds.unitCreateBig;
 
             upgrades.addAll(
