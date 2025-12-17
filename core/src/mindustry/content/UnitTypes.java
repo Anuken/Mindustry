@@ -2785,15 +2785,15 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 150){{
+                bullet = new BasicBulletType(8f, 120f){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 18f;
-                    lifetime = 18f;
+                    lifetime = 16f;
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
                     smokeEffect = Fx.shootSmokeTitan;
-                    pierceCap = 3;
+                    pierceCap = 2;
                     pierce = true;
                     pierceBuilding = true;
 
@@ -2803,23 +2803,23 @@ public class UnitTypes{
                     trailLength = 8;
                     hitEffect = despawnEffect = Fx.blastExplosion;
                     splashDamageRadius = 20f;
-                    splashDamage = 50f;
-                    maxRange = 180f;
+                    splashDamage = 35f;
+                    maxRange = 190f;
 
-                    despawnHit = true;
+                    fragOnHit = false;
+                    fragOnLastHit = true;
                     pierceFragCap = 1;
-                    invertPierceFragCap = true;
                     fragRandomSpread = 0f;
                     fragSpread = 10f;
                     fragBullets = 5;
                     fragVelocityMin = 1f;
                     despawnSound = Sounds.dullExplosion;
 
-                    fragBullet = new BasicBulletType(8f, 35){{
+                    fragBullet = new BasicBulletType(8f, 35f){{
                         sprite = "missile-large";
                         width = 8f;
                         height = 16f;
-                        lifetime = 15f;
+                        lifetime = 10f;
                         hitSize = 4f;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
                         frontColor = Color.white;
@@ -3783,8 +3783,7 @@ public class UnitTypes{
                     trailLength = 5;
                     hitEffect = despawnEffect = new MultiEffect(Fx.hitSquaresColor, Fx.squareWaveEffect);
 
-                    despawnHit = false;
-                    setDefaults = false;
+                    fragOnDespawn = false;
                     fragBullets = 2;
                     fragBullet = new BasicBulletType(3f, 15){{
                         width = 5f;

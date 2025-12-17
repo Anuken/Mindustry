@@ -155,7 +155,7 @@ public class BulletType extends Content implements Cloneable{
     public float extraRangeMargin = 0f;
     /** Range initialized in init(). */
     public float range = 0f;
-    /** When used in a turret with multiple ammoo types, this can be set to a non-zero value to influence minRange */
+    /** When used in a turret with multiple ammo types, this can be set to a non-zero value to influence minRange */
     public float minRangeChange = 0f;
     /** % of block health healed **/
     public float healPercent = 0f;
@@ -169,9 +169,13 @@ public class BulletType extends Content implements Cloneable{
     public boolean hitUnder = false;
     /** Whether to create hit effects on despawn. Forced to true if this bullet has any special effects like splash damage. Disable setDefaults to avoid override */
     public boolean despawnHit = false;
-    /** If true, this bullet will create bullets when it hits anything, not just when it despawns. */
+    /** If true, this bullet will create bullets when it hits anything */
     public boolean fragOnHit = true;
-    /** If false, this bullet will not create fraags when absorbed by a shield. */
+    /** If true, this bullet will create bullets on the last hit, regardless of fragOnHit */
+    public boolean fragOnLastHit = false;
+    /** If true, this bullet will create bullets when it despawns */
+    public boolean fragOnDespawn = true;
+    /** If false, this bullet will not create frags when absorbed by a shield. */
     public boolean fragOnAbsorb = true;
     /** If true, unit armor is ignored in damage calculations. */
     public boolean pierceArmor = false;
@@ -204,8 +208,6 @@ public class BulletType extends Content implements Cloneable{
     public float fragOffsetMin = 1f, fragOffsetMax = 7f;
     /** How many times this bullet can release frag bullets, if pierce = true. */
     public int pierceFragCap = -1;
-    /** Release frag bullets starting from pierceCap (last) instead of 0 (first).*/
-    public boolean invertPierceFragCap = false;
 
     /** Bullet that is created at a fixed interval. */
     public @Nullable BulletType intervalBullet;
@@ -518,24 +520,24 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void hit(Bullet b){
-        hit(b, b.x, b.y, false);
+        hit(b, b.x, b.y, true);
     }
 
     public void hit(Bullet b, float x, float y){
-        hit(b, b.x, b.y, false);
+        hit(b, b.x, b.y, true);
     }
 
-    public void hit(Bullet b, float x, float y, boolean fragOnDespawn){
+    public void hit(Bullet b, float x, float y, boolean createFrags){
         hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(x, y, hitSoundPitch + Mathf.range(hitSoundPitchRange), hitSoundVolume);
 
         Effect.shake(hitShake, hitShake, b);
 
-        if(fragOnHit || fragOnDespawn){
+        if(createFrags && (fragOnHit || fragOnLastHit)){
             if(delayFrags && fragBullet != null && fragBullet.delayFrags){
-                Time.run(0f, () -> createFrags(b, x, y, fragOnDespawn));
+                Time.run(0f, () -> createFrags(b, x, y));
             }else{
-                createFrags(b, x, y, fragOnDespawn);
+                createFrags(b, x, y);
             }
         }
         createPuddles(b, x, y);
@@ -590,10 +592,12 @@ public class BulletType extends Content implements Cloneable{
         }
     }
 
-    public void createFrags(Bullet b, float x, float y, boolean fragOnDespawn){
-        boolean reachedCap = (fragOnAbsorb || !b.absorbed) && !invertPierceFragCap || b.frags >= pierceCap - pierceFragCap && (b.frags < pierceFragCap || fragOnDespawn);
+    public void createFrags(Bullet b, float x, float y){
+        createFrags(b, b.x, b.y, false);
+    }
 
-        if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && !(!reachedCap && pierceFragCap > 0)){
+    public void createFrags(Bullet b, float x, float y, boolean despawn){
+        if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && (pierceFragCap < 0 || (fragOnLastHit ? b.frags == pierceFragCap : b.frags < pierceFragCap) || despawn)){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(fragOffsetMin, fragOffsetMax);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + fragSpread * i - (fragBullets - 1) * fragSpread / 2f;
@@ -617,9 +621,13 @@ public class BulletType extends Content implements Cloneable{
     /** Called when the bullet reaches the end of its lifetime or is destroyed by something external. */
     public void despawned(Bullet b){
         if(despawnHit){
-            hit(b, b.x, b.y, true);
+            hit(b, b.x, b.y, false);
         }else{
             createUnits(b, b.x, b.y);
+        }
+
+        if(fragOnDespawn){
+            createFrags(b, b.x, b.y, true);
         }
 
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
@@ -807,7 +815,7 @@ public class BulletType extends Content implements Cloneable{
                 }
             }
 
-            if(fragBullet != null || splashDamageRadius > 0 || lightning > 0 || !fragOnHit){
+            if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
                 despawnHit = true;
             }
         }
