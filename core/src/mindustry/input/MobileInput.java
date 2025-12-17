@@ -745,6 +745,12 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
+    public void reset(){
+        super.reset();
+        manualShooting = down = false;
+    }
+
+    @Override
     public void update(){
         super.update();
 
@@ -1003,7 +1009,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         float attractDst = 15f;
         float speed = unit.speed();
         float range = unit.hasWeapons() ? unit.range() : 0f;
-        float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
         boolean aimCursor = omni && player.shooting && type.hasWeapons() && !boosted && type.faceTarget;
 
@@ -1081,7 +1086,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //this may be a bad idea, aiming for a point far in front could work better, test it out
                 unit.aim(Core.input.mouseWorldX(), Core.input.mouseWorldY());
             }else{
-                Vec2 intercept = player.unit().type.weapons.contains(w -> w.predictTarget) ? Predict.intercept(unit, target, bulletSpeed) : Tmp.v1.set(target);
+                Vec2 intercept = player.unit().type.weapons.contains(w -> w.predictTarget) ? Predict.intercept(unit, target, type.weapons.first().bullet) : Tmp.v1.set(target);
 
                 player.mouseX = intercept.x;
                 player.mouseY = intercept.y;

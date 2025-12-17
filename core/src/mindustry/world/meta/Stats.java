@@ -3,9 +3,11 @@ package mindustry.world.meta;
 import arc.struct.ObjectMap.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 
 /** Hold and organizes a list of block stats. */
+@NoPatch
 public class Stats{
     /** Whether to display stats with categories. If false, categories are completely ignored during display. */
     public boolean useCategories = false;

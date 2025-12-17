@@ -33,7 +33,7 @@ public class Fonts{
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
     private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
 
-    public static Font def, outline, icon, iconLarge, tech, logic;
+    public static Font def, outline, icon, iconLarge, tech, logic, monospace;
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -65,6 +65,13 @@ public class Fonts{
         FreeTypeFontParameter param = fontParameter();
 
         Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.def = f;
+
+        Core.assets.load("monospace", Font.class, new FreeTypeFontLoaderParameter("fonts/monospace.woff", new FreeTypeFontParameter(){{
+            size = 16;
+            incremental = true;
+            //most people will never see the monospace font, so don't pre-bake anything
+            characters = "\u0000 ";
+        }})).loaded = f -> Fonts.monospace = f;
 
         Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;

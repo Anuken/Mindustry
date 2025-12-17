@@ -98,7 +98,7 @@ public class RegionPart extends DrawPart{
             int i = params.sideOverride == -1 ? s : params.sideOverride;
 
             //can be null
-            var region = drawRegion ? regions[Math.min(i, regions.length - 1)] : null;
+            var region = drawRegion && regions.length > 0 ? regions[Math.min(i, regions.length - 1)] : null;
             float sign = (i == 0 ? 1 : -1) * params.sideMultiplier;
             Tmp.v1.set((x + mx) * sign, y + my).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
