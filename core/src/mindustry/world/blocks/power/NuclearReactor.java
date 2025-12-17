@@ -31,9 +31,11 @@ public class NuclearReactor extends PowerGenerator{
     /** heating per frame * fullness */
     public float heating = 0.01f;
     /** max heat this block can output */
-    public float heatOutput = 10f;
+    public float heatOutput = 15f;
     /** rate at which heat progress increases */
     public float heatWarmupRate = 1f;
+    /** time taken to cool down if no fuel is inputted even if coolant is not present*/
+    public float ambientCooldownTime = 60f * 20f;
     /** threshold at which block starts smoking */
     public float smokeThreshold = 0.3f;
     /** heat threshold at which lights start flashing */
@@ -66,7 +68,7 @@ public class NuclearReactor extends PowerGenerator{
         explosionDamage = 1250 * 4;
 
         explodeEffect = Fx.reactorExplosion;
-        explodeSound = Sounds.explosionbig;
+        explodeSound = Sounds.explosionReactor;
     }
 
     @Override
@@ -104,6 +106,7 @@ public class NuclearReactor extends PowerGenerator{
                 }
             }else{
                 productionEfficiency = 0f;
+                heat = Math.max(0f, heat - Time.delta / ambientCooldownTime);
             }
 
             if(heat > 0){
@@ -121,7 +124,7 @@ public class NuclearReactor extends PowerGenerator{
             }
 
             heat = Mathf.clamp(heat);
-            heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput * efficiency, heatWarmupRate * delta()) : 0f;
+            heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput * (enabled ? 1f : 0f), heatWarmupRate * delta()) : 0f;
 
             if(heat >= 0.999f){
                 Events.fire(Trigger.thoriumReactorOverheat);

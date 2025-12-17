@@ -55,7 +55,7 @@ public class MapPatchesDialog extends BaseDialog{
 
                             for(var warning : patch.warnings){
                                 p.table(Styles.grayPanel, in -> {
-                                    in.add(warning, Styles.monoLabel).grow().wrap();
+                                    in.add(warning.replaceAll("\t", "  "), Styles.monoLabel).grow().wrap();
                                 }).margin(6f).growX().pad(3f).row();
                             }
                         }).grow();
