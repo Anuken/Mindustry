@@ -2954,7 +2954,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(8f, 360f){{
+                bullet = new BasicBulletType(8f, 420f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
@@ -2975,7 +2975,7 @@ public class UnitTypes{
                         lifetime = 40f;
                         waveStroke = 4f;
                         waveColor = sparkColor = trailColor;
-                        waveRad = 15f;
+                        waveRad = 50f;
                         smokeSize = 5f;
                         smokes = 8;
                         smokeSizeBase = 0f;
@@ -3010,13 +3010,13 @@ public class UnitTypes{
                                 weaveScale = (3f + s/2f) / 1.2f;
                                 weaveMag = i * (4f - fin * 2f);
 
-                                splashDamage = 65f;
-                                splashDamageRadius = 30f;
+                                splashDamage = 85f;
+                                splashDamageRadius = 50f;
                                 despawnEffect = new ExplosionEffect(){{
                                     lifetime = 50f;
                                     waveStroke = 4f;
                                     waveColor = sparkColor = trailColor;
-                                    waveRad = 30f;
+                                    waveRad = 50f;
                                     smokeSize = 7f;
                                     smokes = 6;
                                     smokeSizeBase = 0f;
@@ -3238,7 +3238,7 @@ public class UnitTypes{
             drag = 0.1f;
             hitSize = 21f;
             rotateSpeed = 3f;
-            health = 2900;
+            health = 2700;
             armor = 7f;
             fogRadius = 40f;
             stepShake = 0f;
@@ -3349,9 +3349,9 @@ public class UnitTypes{
                         trailColor = engineColor = Pal.techBlue;
                         engineSize = 1.75f;
                         engineLayer = Layer.effect;
-                        speed = 3.7f;
+                        speed = 3.35f;
                         maxRange = 6f;
-                        lifetime = 60f * 1.5f;
+                        lifetime = 60f * 1.66f;
                         outlineColor = Pal.darkOutline;
                         health = 55;
                         lowAltitude = true;
@@ -3555,7 +3555,7 @@ public class UnitTypes{
                 shadow = 10f;
 
                 shootStatus = StatusEffects.slow;
-                shootStatusDuration = reload + 1f;
+                shootStatusDuration = reload + 170f;
 
                 shoot.shots = 1;
                 heatColor = Color.red;
