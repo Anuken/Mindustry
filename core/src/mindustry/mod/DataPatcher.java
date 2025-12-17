@@ -72,8 +72,6 @@ public class DataPatcher{
         contentLoader = Vars.content.copy();
         patches.clear();
 
-        Log.info(patchArray.toString("\n"));
-
         for(String patch : patchArray){
             PatchSet set = new PatchSet(patch, new JsonValue("error"));
             patches.add(set);
