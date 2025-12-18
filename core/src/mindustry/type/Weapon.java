@@ -433,7 +433,7 @@ public class Weapon implements Cloneable{
         (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
         (!alternate || wasFlipped == flipSprite) &&
         mount.warmup >= minWarmup && //must be warmed up
-        unit.vel.len() >= minShootVelocity && //check velocity requirements
+        unit.deltaLen() / Time.delta >= minShootVelocity && //check velocity requirements
         (mount.reload <= 0.0001f || (alwaysContinuous && mount.bullet == null)) && //reload has to be 0, or it has to be an always-continuous weapon
         (alwaysShooting || Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone)) //has to be within the cone
         ){
