@@ -6196,7 +6196,7 @@ public class Blocks{
         airFactory = new UnitFactory("air-factory"){{
             requirements(Category.units, with(Items.copper, 60, Items.lead, 70));
             plans = Seq.with(
-                new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 15)),
+                new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 20)),
                 new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15))
             );
             size = 3;
@@ -6265,7 +6265,6 @@ public class Blocks{
             createSound = Sounds.unitCreateBig;
 
             constructTime = 60f * 60f * 1.5f;
-            liquidCapacity = 60f;
 
             upgrades.addAll(
                 new UnitType[]{UnitTypes.zenith, UnitTypes.antumbra},
@@ -6287,7 +6286,6 @@ public class Blocks{
             consumeLiquid(Liquids.cryofluid, 3f);
 
             constructTime = 60f * 60f * 4;
-            liquidCapacity = 180f;
             createSound = Sounds.unitCreateBig;
 
             upgrades.addAll(
