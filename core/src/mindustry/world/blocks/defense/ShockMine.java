@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -64,7 +65,7 @@ public class ShockMine extends Block{
 
         public void triggered(){
             for(int i = 0; i < tendrils; i++){
-                Lightning.create(team, lightningColor, damage, x, y, Mathf.random(360f), length);
+                Lightning.create(Bullets.damageLightningGround, team, lightningColor, damage, x, y, Mathf.random(360f), length);
             }
             if(bullet != null){
                 for(int i = 0; i < shots; i++){

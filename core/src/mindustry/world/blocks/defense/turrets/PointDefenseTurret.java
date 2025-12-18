@@ -27,7 +27,7 @@ public class PointDefenseTurret extends ReloadTurret{
     public Effect hitEffect = Fx.pointHit;
     public Effect shootEffect = Fx.sparkShoot;
 
-    public Sound shootSound = Sounds.lasershoot;
+    public Sound shootSound = Sounds.shootSegment;
 
     public float shootCone = 5f;
     public float bulletDamage = 10f;

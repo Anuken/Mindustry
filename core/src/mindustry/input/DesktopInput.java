@@ -69,6 +69,13 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
+    public void reset(){
+        super.reset();
+        shouldShoot = false;
+        deleting = false;
+    }
+
+    @Override
     public void buildUI(Group group){
         //building and respawn hints
         group.fill(t -> {

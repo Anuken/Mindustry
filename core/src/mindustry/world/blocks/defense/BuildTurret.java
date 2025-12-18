@@ -220,7 +220,6 @@ public class BuildTurret extends BaseTurret{
 
         @Override
         public void draw(){
-            super.draw();
 
             Draw.rect(baseRegion, x, y);
             Draw.color();

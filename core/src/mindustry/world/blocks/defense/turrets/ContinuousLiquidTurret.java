@@ -17,7 +17,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         super(name);
         hasLiquids = true;
         //TODO
-        loopSound = Sounds.minebeam;
+        loopSound = Sounds.loopMineBeam;
         shootSound = Sounds.none;
         smokeEffect = Fx.none;
         shootEffect = Fx.none;

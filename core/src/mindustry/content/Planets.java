@@ -133,7 +133,6 @@ public class Planets{
             sectorSeed = 2;
             allowWaves = true;
             allowLegacyLaunchPads = true;
-            allowWaveSimulation = true;
             allowSectorInvasion = true;
             allowLaunchSchematics = true;
             enemyCoreSpawnReplace = true;
@@ -157,7 +156,7 @@ public class Planets{
             landCloudColor = Pal.spore.cpy().a(0.5f);
         }};
 
-        verilus = makeAsteroid("verlius", sun, Blocks.stoneWall, Blocks.iceWall, -1, 0.5f, 12, 2f, gen -> {
+        verilus = makeAsteroid("verilus", sun, Blocks.stoneWall, Blocks.iceWall, -1, 0.5f, 12, 2f, gen -> {
             gen.berylChance = 0f;
             gen.iceChance = 0.6f;
             gen.carbonChance = 0.1f;

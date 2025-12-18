@@ -133,15 +133,13 @@ public class World{
         return tile;
     }
 
-    @Nullable
-    public Building build(int x, int y){
+    public @Nullable Building build(int x, int y){
         Tile tile = tile(x, y);
         if(tile == null) return null;
         return tile.build;
     }
 
-    @Nullable
-    public Building build(int pos){
+    public @Nullable Building build(int pos){
         Tile tile = tile(pos);
         if(tile == null) return null;
         return tile.build;
@@ -151,14 +149,16 @@ public class World{
         return tiles.getn(x, y);
     }
 
-    @Nullable
-    public Tile tileWorld(float x, float y){
+    public @Nullable Tile tileWorld(float x, float y){
         return tile(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
-    @Nullable
-    public Building buildWorld(float x, float y){
+    public @Nullable Building buildWorld(float x, float y){
         return build(Math.round(x / tilesize), Math.round(y / tilesize));
+    }
+
+    public @Nullable Building buildWorld(Position pos){
+        return buildWorld(pos.getX(), pos.getY());
     }
 
     /** Convert from world to logic tile coordinates. Whole numbers are at centers of tiles. */

@@ -169,7 +169,7 @@ public class FloorRenderer{
 
                 //loop through all layers, and add layer index if it exists
                 for(int i = 0; i < layers; i++){
-                    if(chunk[i] != null && i != CacheLayer.walls.id && chunk[i].bounds.overlaps(bounds)){
+                    if(i < chunk.length && chunk[i] != null && i != CacheLayer.walls.id && chunk[i].bounds.overlaps(bounds)){
                         drawnLayerSet.add(i);
                     }
                 }
@@ -436,6 +436,13 @@ public class FloorRenderer{
             float[] verts = vertices;
             int idx = vidx;
             vidx += spriteSize;
+
+            //fixes graphical artifacting due to low precision positions/UVs. TODO: test for issues
+            final float grow = 0.01f;
+            x -= grow;
+            y -= grow;
+            width += grow*2f;
+            height += grow*2f;
 
             if(!Mathf.zero(rotation)){
                 //bottom left and top right corner points relative to origin

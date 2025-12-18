@@ -77,37 +77,9 @@ public class Logic implements ApplicationListener{
                     SectorInfo info = state.rules.sector.info;
                     info.write();
 
-                    //only simulate waves if the planet allows it
-                    if(state.rules.sector.planet.allowWaveSimulation){
-                        //how much wave time has passed
-                        int wavesPassed = info.wavesPassed;
-
-                        //wave has passed, remove all enemies, they are assumed to be dead
-                        if(wavesPassed > 0){
-                            Groups.unit.each(u -> {
-                                if(u.team == state.rules.waveTeam){
-                                    u.remove();
-                                }
-                            });
-                        }
-
-                        //simulate passing of waves
-                        if(wavesPassed > 0){
-                            //simulate wave counter moving forward
-                            state.wave += wavesPassed;
-                            state.wavetime = state.rules.waveSpacing * state.getPlanet().campaignRules.difficulty.waveTimeMultiplier;
-
-                            SectorDamage.applyCalculatedDamage();
-                        }
-                    }
-
                     state.getSector().planet.applyRules(state.rules);
 
-                    //reset values
-                    info.damage = 0f;
-                    info.wavesPassed = 0;
                     info.hasCore = true;
-                    info.secondsPassed = 0;
 
                     state.rules.sector.saveInfo();
                 }

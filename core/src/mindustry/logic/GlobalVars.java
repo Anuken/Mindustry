@@ -96,7 +96,7 @@ public class GlobalVars{
         //sounds
         if(Core.assets != null){
             for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
-                if(sound != Sounds.none && sound != Sounds.swish && sound.file != null){
+                if(sound != Sounds.none && sound.file != null){
                     String name = sound.file.nameWithoutExtension();
                     soundNames.add(name);
                     put("@sfx-" + name, Sounds.getSoundId(sound));

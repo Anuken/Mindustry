@@ -138,7 +138,7 @@ public class UI implements ApplicationListener, Loadable{
             Core.app.post(() -> showErrorMessage("Failed to access local storage.\nSettings will not be saved."));
         });
 
-        ClickListener.clicked = () -> Sounds.press.play();
+        ClickListener.clicked = () -> Sounds.uiButton.play();
 
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());

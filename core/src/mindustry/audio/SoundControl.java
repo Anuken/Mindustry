@@ -96,15 +96,21 @@ public class SoundControl{
     }
 
     public void loop(Sound sound, Position pos, float volume){
-        if(Vars.headless) return;
+        loop(sound, pos, volume, 1f);
+    }
+
+    public void loop(Sound sound, Position pos, float volume, float pitch){
+        if(Vars.headless || sound == Sounds.none || volume <= 0.00001f) return;
 
         float baseVol = sound.calcFalloff(pos.getX(), pos.getY());
         float vol = baseVol * volume;
 
         SoundData data = sounds.get(sound, SoundData::new);
         data.volume += vol;
+        data.pitch += pitch * vol;
         data.volume = Mathf.clamp(data.volume, 0f, 1f);
         data.total += baseVol;
+        data.totalVolume += vol;
         data.sum.add(pos.getX() * baseVol, pos.getY() * baseVol);
     }
 
@@ -198,9 +204,10 @@ public class SoundControl{
 
             boolean play = data.curVolume > 0.01f;
             float pan = Mathf.zero(data.total, 0.0001f) ? 0f : sound.calcPan(data.sum.x / data.total, data.sum.y / data.total);
+            float pitch = Mathf.zero(data.totalVolume, 0.0001f) ? 1f : data.pitch / data.totalVolume;
             if(data.soundID <= 0 || !Core.audio.isPlaying(data.soundID)){
                 if(play){
-                    data.soundID = sound.loop(data.curVolume, 1f, pan);
+                    data.soundID = sound.loop(data.curVolume, pitch, pan);
                     Core.audio.protect(data.soundID, true);
                 }
             }else{
@@ -210,10 +217,15 @@ public class SoundControl{
                     return;
                 }
                 Core.audio.set(data.soundID, pan, data.curVolume);
+                if(!Mathf.equal(pitch, 1f, 0.001f)){
+                    Core.audio.setPitch(data.soundID, pitch);
+                }
             }
 
+            data.pitch = 0f;
             data.volume = 0f;
             data.total = 0f;
+            data.totalVolume = 0f;
             data.sum.setZero();
         });
     }
@@ -323,11 +335,11 @@ public class SoundControl{
     }
 
     protected static class SoundData{
-        float volume;
+        float volume, pitch;
         float total;
         Vec2 sum = new Vec2();
 
         int soundID;
-        float curVolume;
+        float curVolume, totalVolume;
     }
 }

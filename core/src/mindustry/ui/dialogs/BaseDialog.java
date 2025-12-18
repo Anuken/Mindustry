@@ -26,7 +26,7 @@ public class BaseDialog extends Dialog{
             if(shouldPause && state.isGame() && !net.active() && !wasPaused){
                 state.set(State.playing);
             }
-            Sounds.back.play();
+            Sounds.uiBack.play();
         });
 
         shown(() -> {

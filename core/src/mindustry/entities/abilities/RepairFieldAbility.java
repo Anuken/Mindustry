@@ -1,6 +1,8 @@
 package mindustry.entities.abilities;
 
 import arc.*;
+import arc.audio.*;
+import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -13,6 +15,8 @@ public class RepairFieldAbility extends Ability{
     public float amount = 1, reload = 100, range = 60, healPercent = 0f;
     public Effect healEffect = Fx.heal;
     public Effect activeEffect = Fx.healWaveDynamic;
+    public Sound sound = Sounds.healWave;
+    public float soundVolume = 0.5f;
     public boolean parentizeEffects = false;
     /** Multiplies healing to units of the same type by this amount. */
     public float sameTypeHealMult = 1f;
@@ -69,6 +73,7 @@ public class RepairFieldAbility extends Ability{
 
             if(wasHealed){
                 activeEffect.at(unit, range);
+                sound.at(unit, 1f + Mathf.range(0.1f), soundVolume);
             }
 
             timer = 0f;
