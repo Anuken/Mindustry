@@ -452,9 +452,10 @@ configure([":core", ":server"].collect{project(it)}){
         publications{
             maven(MavenPublication){
                 from components.java
-                if(project.name == "core"){
-                    artifact(tasks.named("assetsJar"))
-                }
+                //TODO: uncomment this once the jitpack packing is fixed (currently depends on a newer glibc version)
+                //if(project.name == "core"){
+                //    artifact(tasks.named("assetsJar"))
+                //}
             }
         }
     }
