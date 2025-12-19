@@ -25,9 +25,6 @@ public class BasicBulletType extends BulletType{
     public BasicBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage);
         this.sprite = bulletSprite;
-
-        hitSoundPitchRange = 0.2f;
-        hitSoundVolume = 0.4f;
     }
 
     public BasicBulletType(float speed, float damage){

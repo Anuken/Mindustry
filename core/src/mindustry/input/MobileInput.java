@@ -745,6 +745,12 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
+    public void reset(){
+        super.reset();
+        manualShooting = down = false;
+    }
+
+    @Override
     public void update(){
         super.update();
 
