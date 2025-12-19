@@ -370,10 +370,10 @@ public class DataPatcher{
                     Reflect.set(fobj, fdata.field, fv);
                 }, value, true);
             }else if(value instanceof JsonValue jsv && object instanceof Block bl && jsv.isObject() && field.equals("consumes")){
-                modifiedField(bl, "consumeBuilder", Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy());
-                modifiedField(bl, "consumers", Reflect.<Consume[]>get(Block.class, bl, "consumers"));
+                Seq<Consume> prevBuilder = Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy();
                 boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
                 reset(() -> {
+                    Reflect.set(Block.class, bl, "consumeBuilder", prevBuilder);
                     bl.reinitializeConsumers();
                     bl.hasItems = hadItems;
                     bl.hasLiquids = hadLiquids;
