@@ -154,12 +154,16 @@ public class Mods implements Loadable{
             Seq<Fi> sprites = mod.root.child("sprites").findAll(f -> f.extension().equals("png"));
             Seq<Fi> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
 
+            if(sprites.isEmpty() && overrides.isEmpty()) return;
+
             packSprites(packer, sprites, mod, true, tasks, textureResize);
             packSprites(packer, overrides, mod, false, tasks, textureResize);
 
             Log.debug("Packed @ images for mod '@'.", sprites.size + overrides.size, mod.meta.name);
             totalSprites[0] += sprites.size + overrides.size;
         });
+
+        if(tasks.isEmpty()) return;
 
         for(var result : tasks){
             try{
