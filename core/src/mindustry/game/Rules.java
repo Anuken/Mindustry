@@ -285,10 +285,6 @@ public class Rules{
         return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
     }
 
-    public boolean assignPlayers(Team team){
-        return !(waveTeam == team && waves) && team != Team.derelict && teams.get(team).protectCores;
-    }
-
     public boolean isBanned(Block block){
         return blockWhitelist != bannedBlocks.contains(block);
     }
