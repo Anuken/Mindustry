@@ -10,6 +10,8 @@ import mindustry.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.part.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -54,6 +56,7 @@ public class DataPatcher{
             }
         };
         cont.allowClassResolution = false;
+        cont.allowAssetLoading = false;
 
         return cont;
     }
@@ -178,12 +181,7 @@ public class DataPatcher{
         if(object == root){
             if(value instanceof JsonValue jval && jval.isObject()){
                 for(var child : jval){
-                    Object[] otherResolve = resolve(object, jval.name, null);
-                    if(otherResolve != null && otherResolve[0] instanceof ObjectMap map && map.containsKey(child.name)){
-                        assign(otherResolve[0], child.name, child, (FieldData)otherResolve[1], object, field);
-                    }else{
-                        Log.warn("Content not found: @.@", field, child.name);
-                    }
+                    assign(root, field + "." + child.name, child, null, null, null);
                 }
             }else{
                 warn("Content '@' cannot be assigned.", field);
@@ -354,7 +352,14 @@ public class DataPatcher{
             var fields = parser.getJson().getFields(actualType);
             var fdata = fields.get(field);
             var fobj = object;
-            if(fdata != null){
+
+            if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("controller")){
+                var fmeta = fields.get("controller");
+                assignValue(object, "controller", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), (Func<Unit, UnitController>)(u -> parser.resolveController(jsv.asString()).get()), true);
+            }else if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("aiController")){
+                var fmeta = fields.get("aiController");
+                assignValue(object, "aiController", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), parser.resolveController(jsv.asString()), true);
+            }else if(fdata != null){
                 if(checkField(fdata.field)) return;
 
                 assignValue(object, field, new FieldData(fdata), () -> Reflect.get(fobj, fdata.field), fv -> {
@@ -377,6 +382,7 @@ public class DataPatcher{
                 });
 
                 try{
+                    bl.hasPower = false; //if a block doesn't have a power consumer, hasPower should be false. if it does, it will get set to true in reinitializeConsumers
                     parser.readBlockConsumers(bl, jsv);
                     bl.reinitializeConsumers();
                 }catch(Throwable e){
@@ -412,7 +418,7 @@ public class DataPatcher{
                     }catch(Throwable e){
                         warn("Failed to read value @.@ = @: (type = @ elementType = @)\n@", object, field, value, metadata.type, metadata.elementType, Strings.getSimpleMessages(e));
                     }
-                   parser.listeners.pop();
+                    parser.listeners.pop();
                 }else{
                     //assign each field manually
                     var childFields = parser.getJson().getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());

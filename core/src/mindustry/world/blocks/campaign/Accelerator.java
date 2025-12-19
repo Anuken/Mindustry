@@ -40,9 +40,11 @@ public class Accelerator extends Block{
     /** Override for planets that this block can launch to. If null, the planet's launch candidates are used. */
     public @Nullable Seq<Planet> launchCandidates;
 
-    //TODO: launching needs audio!
-
-    public Music launchMusic = Musics.coreLaunch;
+    public Sound lightningSound = new RandomSound(Sounds.acceleratorLightning1, Sounds.acceleratorLightning2, Sounds.shootArc);
+    public float lightningSoundVolume = 0.85f;
+    public Sound chargeSound = Sounds.acceleratorCharge;
+    public Sound launchSound = Sounds.acceleratorLaunch;
+    public Sound constructSound = Sounds.acceleratorConstruct;
     public float launchDuration = 120f;
     public float chargeDuration = 220f;
     public float buildDuration = 120f;
@@ -308,13 +310,7 @@ public class Accelerator extends Block{
 
         @Override
         public Music landMusic(){
-            //unused
-            return launchMusic;
-        }
-
-        @Override
-        public Music launchMusic(){
-            return launchMusic;
+            return null;
         }
 
         @Override
@@ -340,11 +336,14 @@ public class Accelerator extends Block{
                 }
             });
             Core.scene.add(image);
+            chargeSound.at(this);
+            constructSound.at(this);
 
             Time.run(chargeDuration, () -> {
                 Fx.coreLaunchConstruct.at(x, y, launchBlock.size);
                 Fx.launchAccelerator.at(x, y);
                 Effect.shake(10f, 14f, this);
+                launchSound.at(this);
 
                 for(int i = 0; i < launchLightning; i++){
                     float a = Mathf.random(360f);
@@ -410,6 +409,7 @@ public class Accelerator extends Block{
             if(in > launchDuration){
                 if(Mathf.chanceDelta(lightningLaunchChance * Interp.pow3In.apply(chargeFout))){
                     float a = Mathf.random(360f);
+                    lightningSound.at(this, 1f + Mathf.range(0.1f), lightningSoundVolume);
                     Lightning.create(team, lightningColor, lightningDamage, x + Angles.trnsx(a, lightningOffset), y + Angles.trnsy(a, lightningOffset), a, Mathf.random(lightningLengthMin, lightningLengthMax));
                 }
             }
