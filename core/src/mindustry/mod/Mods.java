@@ -1492,7 +1492,7 @@ public class Mods implements Loadable{
         disabled,
     }
 
-    public static class ModResolutionContext {
+    public static class ModResolutionContext{
         public final ObjectMap<String, Seq<ModDependency>> dependencies = new ObjectMap<>();
         public final ObjectSet<String> visited = new ObjectSet<>();
         public final OrderedSet<String> ordered = new OrderedSet<>();

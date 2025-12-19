@@ -92,6 +92,8 @@ public class Rules{
     public boolean ghostBlocks = true;
     /** Whether to allow units to build with logic. */
     public boolean logicUnitBuild = true;
+    /** Whether to allow units to deconstruct blocks with logic. */
+    public boolean logicUnitDeconstruct = false;
     /** If true, world processors can be edited and placed on this map. */
     public boolean allowEditWorldProcessors = false;
     /** If true, world processors no longer update. Used for testing. */
