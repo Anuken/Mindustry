@@ -92,6 +92,8 @@ public class Rules{
     public boolean ghostBlocks = true;
     /** Whether to allow units to build with logic. */
     public boolean logicUnitBuild = true;
+    /** Whether to allow units to deconstruct blocks with logic. */
+    public boolean logicUnitDeconstruct = false;
     /** If true, world processors can be edited and placed on this map. */
     public boolean allowEditWorldProcessors = false;
     /** If true, world processors no longer update. Used for testing. */
@@ -195,7 +197,7 @@ public class Rules{
     /** Mission string displayed instead of wave/core counter. Null to disable. */
     public @Nullable String mission;
     /** Whether cores incinerate items when full, just like in the campaign. */
-    public boolean coreIncinerates = false;
+    public boolean coreIncinerates = true;
     /** If false, borders fade out into darkness. Only use with custom backgrounds!*/
     public boolean borderDarkness = true;
     /** If true, the map play area is cropped based on the rectangle below. */

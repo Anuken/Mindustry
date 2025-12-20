@@ -157,7 +157,6 @@ public class Turret extends ReloadTurret{
 
     public Turret(String name){
         super(name);
-        liquidCapacity = 20f;
         outlinedIcon = 1;
         drawLiquidLight = false;
         sync = true;
@@ -186,7 +185,8 @@ public class Turret extends ReloadTurret{
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
         if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
-    }
+        if(maxHeatEfficiency > 0) stats.add(Stat.maxEfficiency, (int)(maxHeatEfficiency * 100f), StatUnit.percent);
+    } 
 
     @Override
     public void setBars(){

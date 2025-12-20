@@ -207,10 +207,20 @@ public class UnitTypes{
 
             abilities.add(new ShieldRegenFieldAbility(25f, 250f, 60f * 1, 60f));
 
-            BulletType smallBullet = new BasicBulletType(3f, 10){{
-                width = 7f;
-                height = 9f;
-                lifetime = 50f;
+            BulletType smallBullet = new BasicBulletType(12f, 20){{
+                width = 4.5f;
+                height = 35f;
+                lifetime = (26f * tilesize) / 12f;
+                shrinkX = 0.6f;
+                shrinkY = 0f;
+                shrinkInterp = Interp.slope;
+
+                trailChance = 10f / 60f;
+                trailColor = Pal.bulletYellowBack;
+                trailEffect = Fx.bulletSparkSmokeTrailSmall;
+                trailSpread = 12f;
+                shootEffect = Fx.shootScepterSecondary;
+                hitEffect = Fx.hitScepterSecondary;
             }};
 
             weapons.add(
@@ -230,35 +240,52 @@ public class UnitTypes{
                 shoot.shots = 3;
                 shoot.shotDelay = 4f;
 
-                bullet = new BasicBulletType(8f, 80){{
+                bullet = new BasicBulletType(8f, 70){{
                     width = 11f;
                     height = 20f;
                     lifetime = 27f;
+                    shrinkX = 0.4f;
+                    shrinkY = 0f;
                     shootEffect = Fx.shootBig;
+                    hitEffect = Fx.blastExplosion;
+                    trailParam = 0.5f;
                     lightning = 2;
                     lightningLength = 6;
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
                     lightningDamage = 20;
                     despawnSound = Sounds.shockBullet;
+                    bulletInterval = 4f;
+
+                    intervalBullet = new LightningBulletType(){{
+                        damage = 5f;
+                        lightningLength = 3;
+                        lightningLengthRand = 4;
+                        lightningColor = Pal.surge;
+                        hitEffect = Fx.hitLancerLow;
+                    }};
                 }};
             }},
 
-            new Weapon("mount-weapon"){{
-                reload = 13f;
+            new Weapon("scepter-mount"){{
+                reload = 12f;
                 x = 8.5f;
                 y = 6f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
                 bullet = smallBullet;
+                shootSound = Sounds.shootScepterSecondary;
+                rotateSpeed = 3f;
             }},
-            new Weapon("mount-weapon"){{
-                reload = 16f;
+            new Weapon("scepter-mount"){{
+                reload = 15f;
                 x = 8.5f;
                 y = -7f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
                 bullet = smallBullet;
+                shootSound = Sounds.shootScepterSecondary;
+                rotateSpeed = 3f;
             }}
             );
         }};
@@ -1052,10 +1079,11 @@ public class UnitTypes{
                 shoot.shotDelay = 3f;
                 ejectEffect = Fx.casing1;
                 mirror = false;
-                bullet = new BasicBulletType(2.5f, 16){{
+                bullet = new BasicBulletType(2.5f, 9){{
+                    inaccuracy = 4f;
                     width = 7f;
                     height = 9f;
-                    lifetime = 45f;
+                    lifetime = 32f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
                     ammoMultiplier = 2;
@@ -1498,6 +1526,7 @@ public class UnitTypes{
                     mixColorTo = Color.white;
 
                     hitSound = Sounds.explosionQuad;
+                    hitSoundVolume = 0.9f;
 
                     shootCone = 180f;
                     ejectEffect = Fx.none;
@@ -1561,11 +1590,17 @@ public class UnitTypes{
             drag = 0.13f;
             hitSize = 10f;
             health = 280;
+            armor = 2f;
             accel = 0.4f;
             rotateSpeed = 3.3f;
             faceTarget = false;
 
-            armor = 2f;
+            trailLength = 20;
+            waveTrailX = 4f;
+            trailScl = 1.3f;
+
+            moveSoundVolume = 0.4f;
+            moveSound = Sounds.shipMove;
 
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 13f;
@@ -1621,6 +1656,10 @@ public class UnitTypes{
             rotateSpeed = 2.6f;
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
+
+            moveSoundVolume = 0.55f;
+            moveSoundPitchMin = moveSoundPitchMax = 0.9f;
+            moveSound = Sounds.shipMove;
 
             trailLength = 20;
             waveTrailX = 5.5f;
@@ -1680,6 +1719,10 @@ public class UnitTypes{
             armor = 7f;
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
+
+            moveSoundVolume = 0.7f;
+            moveSoundPitchMin = moveSoundPitchMax = 0.77f;
+            moveSound = Sounds.shipMove;
 
             trailLength = 22;
             waveTrailX = 7f;
@@ -1778,6 +1821,10 @@ public class UnitTypes{
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.thorium);
 
+            moveSoundVolume = 1f;
+            moveSound = Sounds.shipMoveBig;
+            moveSoundPitchMin = moveSoundPitchMax = 0.95f;
+
             trailLength = 50;
             waveTrailX = 18f;
             waveTrailY = -21f;
@@ -1868,6 +1915,10 @@ public class UnitTypes{
             faceTarget = false;
             ammoType = new PowerAmmoType(4000);
 
+            moveSoundVolume = 1.1f;
+            moveSound = Sounds.shipMoveBig;
+            moveSoundPitchMin = moveSoundPitchMax = 0.9f;
+
             trailLength = 70;
             waveTrailX = 23f;
             waveTrailY = -32f;
@@ -1919,6 +1970,9 @@ public class UnitTypes{
             range = 100f;
             ammoType = new PowerAmmoType(900);
             armor = 3f;
+
+            moveSoundVolume = 0.4f;
+            moveSound = Sounds.shipMove;
 
             buildSpeed = 1.5f;
             rotateToBuilding = false;
@@ -2021,6 +2075,10 @@ public class UnitTypes{
             rotateSpeed = 4f;
             faceTarget = false;
 
+            moveSoundVolume = 0.55f;
+            moveSoundPitchMin = moveSoundPitchMax = 0.9f;
+            moveSound = Sounds.shipMove;
+
             trailLength = 22;
             waveTrailX = 5.5f;
             waveTrailY = -4f;
@@ -2099,6 +2157,10 @@ public class UnitTypes{
             armor = 6f;
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
+
+            moveSoundVolume = 0.7f;
+            moveSoundPitchMin = moveSoundPitchMax = 0.77f;
+            moveSound = Sounds.shipMove;
 
             trailLength = 23;
             waveTrailX = 9f;
@@ -2240,6 +2302,10 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(3500);
             ammoCapacity = 40;
 
+            moveSoundVolume = 1f;
+            moveSound = Sounds.shipMoveBig;
+            moveSoundPitchMin = moveSoundPitchMax = 0.95f;
+
             //clip size is massive due to energy field
             clipSize = 250f;
 
@@ -2287,6 +2353,10 @@ public class UnitTypes{
             rotateSpeed = 1.1f;
             faceTarget = false;
             ammoType = new PowerAmmoType(4500);
+
+            moveSoundVolume = 1.1f;
+            moveSound = Sounds.shipMoveBig;
+            moveSoundPitchMin = moveSoundPitchMax = 0.9f;
 
             trailLength = 70;
             waveTrailX = 23f;

@@ -729,7 +729,7 @@ public class NetServer implements ApplicationListener{
             long elapsed = Math.min(Time.timeSinceMillis(con.lastReceivedClientTime), 1500);
             float maxSpeed = unit.speed();
 
-            float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.2f;
+            float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
             //ignore the position if the player thinks they're dead, or the unit is wrong
             boolean ignorePosition = dead || unit.id != unitID;

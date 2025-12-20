@@ -573,7 +573,7 @@ public class Blocks{
 
         shale = new Floor("shale"){{
             variants = 3;
-            attributes.set(Attribute.oil, 1.6f);
+            attributes.set(Attribute.oil, 2f);
         }};
 
         moss = new Floor("moss"){{
@@ -2615,8 +2615,8 @@ public class Blocks{
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
             requirements(Category.power, with(Items.lead, 300, Items.silicon, 200, Items.graphite, 150, Items.thorium, 150, Items.metaglass, 50));
-            ambientSound = Sounds.loopHum;
-            ambientSoundVolume = 0.24f;
+            ambientSound = Sounds.loopThoriumReactor;
+            ambientSoundVolume = 0.11f;
             size = 3;
             health = 700;
             itemDuration = 360f;
@@ -3270,6 +3270,7 @@ public class Blocks{
                     height = 12f;
                     ammoMultiplier = 4;
                     lifetime = 60f;
+                    reloadMultiplier = 0.8f;
                     rangeChange = 16f;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
@@ -3319,6 +3320,7 @@ public class Blocks{
             inaccuracy = 2f;
             rotateSpeed = 10f;
             coolant = consumeCoolant(0.1f);
+            coolantMultiplier = 10f;
             researchCostMultiplier = 0.05f;
             depositCooldown = 2.0f;
 
@@ -3517,6 +3519,7 @@ public class Blocks{
             health = 260;
             shootSound = Sounds.shootArtillerySmall;
             coolant = consumeCoolant(0.1f);
+            coolantMultiplier = 10f;
             depositCooldown = 2.0f;
             limitRange(0f);
         }};
@@ -6210,7 +6213,7 @@ public class Blocks{
         airFactory = new UnitFactory("air-factory"){{
             requirements(Category.units, with(Items.copper, 60, Items.lead, 70));
             plans = Seq.with(
-                new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 15)),
+                new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 20)),
                 new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15))
             );
             size = 3;
@@ -6279,7 +6282,6 @@ public class Blocks{
             createSound = Sounds.unitCreateBig;
 
             constructTime = 60f * 60f * 1.5f;
-            liquidCapacity = 60f;
 
             upgrades.addAll(
                 new UnitType[]{UnitTypes.zenith, UnitTypes.antumbra},
@@ -6301,7 +6303,6 @@ public class Blocks{
             consumeLiquid(Liquids.cryofluid, 3f);
 
             constructTime = 60f * 60f * 4;
-            liquidCapacity = 180f;
             createSound = Sounds.unitCreateBig;
 
             upgrades.addAll(
