@@ -10,6 +10,8 @@ import mindustry.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.part.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -54,6 +56,7 @@ public class DataPatcher{
             }
         };
         cont.allowClassResolution = false;
+        cont.allowAssetLoading = false;
 
         return cont;
     }
@@ -68,8 +71,6 @@ public class DataPatcher{
         applied = true;
         contentLoader = Vars.content.copy();
         patches.clear();
-
-        Log.info(patchArray.toString("\n"));
 
         for(String patch : patchArray){
             PatchSet set = new PatchSet(patch, new JsonValue("error"));
@@ -351,7 +352,14 @@ public class DataPatcher{
             var fields = parser.getJson().getFields(actualType);
             var fdata = fields.get(field);
             var fobj = object;
-            if(fdata != null){
+
+            if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("controller")){
+                var fmeta = fields.get("controller");
+                assignValue(object, "controller", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), (Func<Unit, UnitController>)(u -> parser.resolveController(jsv.asString()).get()), true);
+            }else if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("aiController")){
+                var fmeta = fields.get("aiController");
+                assignValue(object, "aiController", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), parser.resolveController(jsv.asString()), true);
+            }else if(fdata != null){
                 if(checkField(fdata.field)) return;
 
                 assignValue(object, field, new FieldData(fdata), () -> Reflect.get(fobj, fdata.field), fv -> {
@@ -362,10 +370,10 @@ public class DataPatcher{
                     Reflect.set(fobj, fdata.field, fv);
                 }, value, true);
             }else if(value instanceof JsonValue jsv && object instanceof Block bl && jsv.isObject() && field.equals("consumes")){
-                modifiedField(bl, "consumeBuilder", Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy());
-                modifiedField(bl, "consumers", Reflect.<Consume[]>get(Block.class, bl, "consumers"));
+                Seq<Consume> prevBuilder = Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy();
                 boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
                 reset(() -> {
+                    Reflect.set(Block.class, bl, "consumeBuilder", prevBuilder);
                     bl.reinitializeConsumers();
                     bl.hasItems = hadItems;
                     bl.hasLiquids = hadLiquids;

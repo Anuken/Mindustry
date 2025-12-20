@@ -210,10 +210,20 @@ public class UnitTypes{
 
             abilities.add(new ShieldRegenFieldAbility(25f, 250f, 60f * 1, 60f));
 
-            BulletType smallBullet = new BasicBulletType(3f, 23){{
-                width = 7f;
-                height = 9f;
-                lifetime = 55f;
+            BulletType smallBullet = new BasicBulletType(12f, 20){{
+                width = 4.5f;
+                height = 35f;
+                lifetime = 55;
+                shrinkX = 0.6f;
+                shrinkY = 0f;
+                shrinkInterp = Interp.slope;
+
+                trailChance = 10f / 60f;
+                trailColor = Pal.bulletYellowBack;
+                trailEffect = Fx.bulletSparkSmokeTrailSmall;
+                trailSpread = 12f;
+                shootEffect = Fx.shootScepterSecondary;
+                hitEffect = Fx.hitScepterSecondary;
             }};
 
             weapons.add(
@@ -237,31 +247,48 @@ public class UnitTypes{
                     width = 11f;
                     height = 20f;
                     lifetime = 22f;
+                    shrinkX = 0.4f;
+                    shrinkY = 0f;
                     shootEffect = Fx.shootBig;
+                    hitEffect = Fx.blastExplosion;
+                    trailParam = 0.5f;
                     lightning = 2;
                     lightningLength = 6;
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
                     lightningDamage = 20;
                     despawnSound = Sounds.shockBullet;
+                    bulletInterval = 4f;
+
+                    intervalBullet = new LightningBulletType(){{
+                        damage = 5f;
+                        lightningLength = 3;
+                        lightningLengthRand = 4;
+                        lightningColor = Pal.surge;
+                        hitEffect = Fx.hitLancerLow;
+                    }};
                 }};
             }},
 
-            new Weapon("mount-weapon"){{
-                reload = 13f;
+            new Weapon("scepter-mount"){{
+                reload = 12f;
                 x = 8.5f;
                 y = 6f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
                 bullet = smallBullet;
+                shootSound = Sounds.shootScepterSecondary;
+                rotateSpeed = 3f;
             }},
-            new Weapon("mount-weapon"){{
-                reload = 16f;
+            new Weapon("scepter-mount"){{
+                reload = 15f;
                 x = 8.5f;
                 y = -7f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
                 bullet = smallBullet;
+                shootSound = Sounds.shootScepterSecondary;
+                rotateSpeed = 3f;
             }}
             );
         }};
@@ -1063,10 +1090,11 @@ public class UnitTypes{
                 shoot.shotDelay = 4f;
                 ejectEffect = Fx.casing1;
                 mirror = false;
-                bullet = new BasicBulletType(2.5f, 12){{
+                bullet = new BasicBulletType(2.5f, 9){{
+                    inaccuracy = 4f;
                     width = 7f;
                     height = 9f;
-                    lifetime = 45f;
+                    lifetime = 32f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
                     ammoMultiplier = 2;
@@ -1516,6 +1544,7 @@ public class UnitTypes{
                     mixColorTo = Color.white;
 
                     hitSound = Sounds.explosionQuad;
+                    hitSoundVolume = 0.9f;
 
                     shootCone = 180f;
                     ejectEffect = Fx.none;
@@ -1583,6 +1612,10 @@ public class UnitTypes{
             accel = 0.4f;
             rotateSpeed = 8f;
             faceTarget = false;
+
+            trailLength = 20;
+            waveTrailX = 4f;
+            trailScl = 1.3f;
 
             moveSoundVolume = 0.4f;
             moveSound = Sounds.shipMove;
