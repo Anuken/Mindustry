@@ -102,7 +102,7 @@ public class UnitTypes{
             speed = 0.64f;
             hitSize = 8f;
             rotateSpeed = 7f;
-            health = 120;
+            health = 130;
             armor = 2f;
             stepSoundVolume = 0.4f;
 

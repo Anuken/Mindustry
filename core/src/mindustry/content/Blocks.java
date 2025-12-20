@@ -3258,7 +3258,7 @@ public class Blocks{
         duo = new ItemTurret("duo"){{
             requirements(Category.turret, with(Items.copper, 35));
             ammo(
-                Items.copper,  new BasicBulletType(2.5f, 13){{
+                Items.copper,  new BasicBulletType(2.5f, 12){{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
@@ -3317,7 +3317,7 @@ public class Blocks{
             recoil = 0.5f;
             shootY = 3f;
             reload = 20f;
-            range = 168;
+            range = 160;
             shootCone = 15f;
             ammoUseEffect = Fx.casing1;
             health = 250;
