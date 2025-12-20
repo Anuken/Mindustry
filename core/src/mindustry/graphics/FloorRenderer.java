@@ -169,7 +169,7 @@ public class FloorRenderer{
 
                 //loop through all layers, and add layer index if it exists
                 for(int i = 0; i < layers; i++){
-                    if(chunk[i] != null && i != CacheLayer.walls.id && chunk[i].bounds.overlaps(bounds)){
+                    if(i < chunk.length && chunk[i] != null && i != CacheLayer.walls.id && chunk[i].bounds.overlaps(bounds)){
                         drawnLayerSet.add(i);
                     }
                 }

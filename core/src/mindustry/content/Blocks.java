@@ -573,7 +573,7 @@ public class Blocks{
 
         shale = new Floor("shale"){{
             variants = 3;
-            attributes.set(Attribute.oil, 1.6f);
+            attributes.set(Attribute.oil, 2f);
         }};
 
         moss = new Floor("moss"){{
@@ -3274,6 +3274,7 @@ public class Blocks{
                     ammoMultiplier = 4;
                     reloadMultiplier = 0.7f;
                     lifetime = 60f;
+                    reloadMultiplier = 0.8f;
                     rangeChange = 16f;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
@@ -3323,6 +3324,7 @@ public class Blocks{
             inaccuracy = 2f;
             rotateSpeed = 10f;
             coolant = consumeCoolant(0.1f);
+            coolantMultiplier = 10f;
             researchCostMultiplier = 0.05f;
 
             limitRange(5f);
@@ -3520,6 +3522,7 @@ public class Blocks{
             health = 260;
             shootSound = Sounds.shootArtillerySmall;
             coolant = consumeCoolant(0.1f);
+            coolantMultiplier = 10f;
             limitRange(0f);
         }};
 
@@ -6299,7 +6302,6 @@ public class Blocks{
             createSound = Sounds.unitCreateBig;
 
             constructTime = 60f * 60f * 1.5f;
-            liquidCapacity = 60f;
 
             upgrades.addAll(
                 new UnitType[]{UnitTypes.zenith, UnitTypes.antumbra},
@@ -6321,7 +6323,6 @@ public class Blocks{
             consumeLiquid(Liquids.cryofluid, 3f);
 
             constructTime = 60f * 60f * 4;
-            liquidCapacity = 180f;
             createSound = Sounds.unitCreateBig;
 
             upgrades.addAll(
