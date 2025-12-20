@@ -85,7 +85,7 @@ public class Junction extends Block{
 
             if(relative == -1 || !buffer.accepts(relative)) return false;
             Building to = nearby(relative);
-            //allow accepting if the target can accept items, is another junction, or produce items (hasItems) like a crafter
+            //allow accepting if the target can accept items, is another junction, or produces items (hasItems) like a crafter
             return to != null && to.team == team && (to.acceptItem(this, item) || to instanceof JunctionBuild || to.block.hasItems);
         }
 
