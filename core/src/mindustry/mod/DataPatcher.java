@@ -129,6 +129,13 @@ public class DataPatcher{
     }
 
     void created(Object object, Object parent){
+        if(object instanceof Weapon weapon){
+            weapon.init();
+        }else if(object instanceof Content cont){
+            cont.init();
+            cont.postInit();
+        }
+
         if(!Vars.headless){
             if(object instanceof DrawPart part && parent instanceof MappableContent cont){
                 part.load(cont.name);
@@ -138,15 +145,8 @@ public class DataPatcher{
                 draw.load(block);
             }else if(object instanceof Weapon weapon){
                 weapon.load();
-                weapon.init();
             }else if(object instanceof Content cont){
-                cont.init();
-                cont.postInit();
                 cont.load();
-            }
-        }else{
-            if(object instanceof Weapon weapon){
-                weapon.init();
             }
         }
     }
