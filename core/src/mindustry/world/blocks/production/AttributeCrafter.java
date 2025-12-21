@@ -1,7 +1,6 @@
 package mindustry.world.blocks.production;
 
 import arc.*;
-import arc.math.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -12,14 +11,15 @@ import mindustry.world.meta.*;
 public class AttributeCrafter extends GenericCrafter{
     public Attribute attribute = Attribute.heat;
     public float baseEfficiency = 1f;
-    public float boostScale = 1f;
     public float maxBoost = 1f;
     public float minEfficiency = -1f;
     public float displayEfficiencyScale = 1f;
     public boolean displayEfficiency = true;
+    public boolean displayScaledOutput = true;
     public boolean scaleLiquidConsumption = false;
-    /** Scaled output multiplier, scales with efficiency. <=0 to disable. */
-    public float scaledMultiplier = 0f;
+    /** Scaled output multiplier, scales with attribute. <=0 to disable. */
+    public float outputScale = 0f;
+    public float boostScale = 1f;
 
     public AttributeCrafter(String name){
         super(name);
@@ -29,23 +29,39 @@ public class AttributeCrafter extends GenericCrafter{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        if(!displayEfficiency) return;
+        if(!displayEfficiency && !displayScaledOutput) return;
 
-        drawPlaceText(Core.bundle.format("bar.efficiency",
-        (int)((baseEfficiency + Math.min(maxBoost, boostScale * sumAttribute(attribute, x, y))) * 100f)), x, y, valid);
+        drawPlaceText(
+        (displayEfficiency ?
+            Core.bundle.format("bar.efficiency",
+            (int)((baseEfficiency + Math.min(maxBoost, boostScale * sumAttribute(attribute, x, y))) * 100f))
+        : "") +
+        (displayScaledOutput ? "\n" +
+            Core.bundle.format("bar.outputscale",
+            (int)(Math.min(maxBoost, outputScale * sumAttribute(attribute, x, y)) * 100f))
+        : ""), x, y, valid);
     }
 
     @Override
     public void setBars(){
         super.setBars();
 
-        if(!displayEfficiency) return;
+        if(!displayEfficiency && !displayScaledOutput) return;
 
-        addBar("efficiency", (AttributeCrafterBuild entity) ->
+        if(displayEfficiency){
+            addBar("efficiency", (AttributeCrafterBuild entity) ->
             new Bar(
-            () -> Core.bundle.format("bar.efficiency", (int)(entity.efficiencyMultiplier() * 100 * displayEfficiencyScale)),
+            () -> Core.bundle.format("bar.efficiency", (int)(entity.efficiencyMultiplier() * 100)),
             () -> Pal.lightOrange,
             entity::efficiencyMultiplier));
+        }
+        if(displayScaledOutput){
+            addBar("outputscale", (AttributeCrafterBuild entity) ->
+            new Bar(
+            () -> Core.bundle.format("bar.outputscale", (int)((entity.outputMultiplier() - baseEfficiency) * 100)),
+            () -> Pal.lightOrange,
+            entity::outputMultiplier));
+        }
     }
 
     @Override
@@ -72,6 +88,10 @@ public class AttributeCrafter extends GenericCrafter{
             return super.getProgressIncrease(base) * efficiencyMultiplier();
         }
 
+        public float outputMultiplier(){
+            return baseEfficiency + Math.min(maxBoost, outputScale * attrsum) + attribute.env();
+        }
+
         public float efficiencyMultiplier(){
             return baseEfficiency + Math.min(maxBoost, boostScale * attrsum) + attribute.env();
         }
@@ -82,20 +102,20 @@ public class AttributeCrafter extends GenericCrafter{
         }
 
         @Override
-        public float scaleOutput(float amount, boolean accumulate, boolean consumer){
-            scaledOutput = amount * scaledMultiplier * efficiencyMultiplier();
+        public float scaleOutput(float amount, boolean item, boolean accumulate){
+            scaledOutput = amount * outputMultiplier();
 
-            if(accumulate){
-                if(consumer){
-                    scaledInt = Mathf.floor(accumulator + scaledOutput);
-                }else{
+            if(item){
+                if(accumulate){
                     accumulator += scaledOutput;
-                    scaledInt = Mathf.floor(accumulator);
+                    scaledInt = (int)(accumulator);
                     accumulator -= scaledInt;
+                }else{
+                    scaledInt = (int)(accumulator + scaledOutput);
                 }
             }
 
-            return scaledMultiplier > 0f ? Math.min(itemCapacity, scaledInt) : amount;
+            return outputScale > 0f ? Math.min(itemCapacity, scaledInt) : amount;
         }
 
         @Override

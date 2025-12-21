@@ -193,7 +193,7 @@ public class GenericCrafter extends Block{
         public boolean shouldConsume(){
             if(outputItems != null){
                 for(var output : outputItems){
-                    if(items.get(output.item) + scaleOutput(output.amount, true, true) > itemCapacity){
+                    if(items.get(output.item) + scaleOutput(output.amount, true, false) > itemCapacity){
                         return false;
                     }
                 }
@@ -291,7 +291,7 @@ public class GenericCrafter extends Block{
             return scaleOutput(amount, false, false);
         }
 
-        public float scaleOutput(float amount, boolean accumulate, boolean consumer){
+        public float scaleOutput(float amount, boolean item, boolean accumulate){
             return amount;
         }
 
@@ -300,7 +300,7 @@ public class GenericCrafter extends Block{
 
             if(outputItems != null){
                 for(var output : outputItems){
-                float maxOutput = scaleOutput(output.amount, true, false);
+                float maxOutput = scaleOutput(output.amount, true, true);
                     for(int i = 0; i < maxOutput; i++){
                         offload(output.item);
                     }
