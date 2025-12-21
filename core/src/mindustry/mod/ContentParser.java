@@ -399,7 +399,9 @@ public class ContentParser{
             T t = internalRead(type, elementType, jsonData, keyType);
             if(t != null && !Reflect.isWrapper(t.getClass()) && (type == null || !type.isPrimitive())){
                 checkNullFields(t);
-                listeners.each(hook -> hook.parsed(type, jsonData, t));
+                if(jsonData.isObject()){
+                    listeners.each(hook -> hook.parsed(type, jsonData, t));
+                }
             }
             return t;
         }

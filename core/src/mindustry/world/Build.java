@@ -191,6 +191,10 @@ public class Build{
                 float mindst = Float.MAX_VALUE;
                 CoreBuild closest = null;
                 for(TeamData data : state.teams.active){
+                    if(!data.team.rules().protectCores){
+                        continue;
+                    }
+
                     for(CoreBuild tile : data.cores){
                         float dst = tile.dst2(x * tilesize + type.offset, y * tilesize + type.offset);
                         if(dst < mindst){
@@ -265,7 +269,7 @@ public class Build{
     }
 
     public static @Nullable Building getEnemyOverlap(Block block, Team team, int x, int y){
-        return indexer.findEnemyTile(team, x * tilesize + block.size, y * tilesize + block.size, block.placeOverlapRange + 4f, p -> true);
+        return indexer.findEnemyTile(team, x * tilesize + block.size, y * tilesize + block.size, block.placeOverlapRange + 4f, b -> b.team.rules().checkPlacement);
     }
 
     public static boolean contactsGround(int x, int y, Block block){
