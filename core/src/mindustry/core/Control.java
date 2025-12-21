@@ -31,6 +31,7 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.power.PowerNode.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -56,6 +57,7 @@ public class Control implements ApplicationListener, Loadable{
     private boolean hiscore = false;
     private boolean wasPaused = false, backgroundPaused = false;
     private Seq<Building> toBePlaced = new Seq<>(false);
+    private Seq<Object[]> toBePlacedConfigs = new Seq<>();
 
     public Control(){
         saves = new Saves();
@@ -119,6 +121,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(ResetEvent.class, event -> {
             player.reset();
             toBePlaced.clear();
+            toBePlacedConfigs.clear();
             indicators.clear();
 
             hiscore = false;
@@ -239,6 +242,15 @@ public class Control implements ApplicationListener, Loadable{
 
                     //TODO if the save is unloaded or map is hosted, these blocks do not get built.
                     boolean anyBuilds = false;
+                    float maxDelay = 0f;
+
+                    for(var build : state.rules.defaultTeam.data().buildings){
+                        //power nodes need to be configured later once everything is built
+                        if(build instanceof PowerNodeBuild){
+                            toBePlacedConfigs.add(new Object[]{build, build.config()});
+                        }
+                    }
+
                     for(var build : state.rules.defaultTeam.data().buildings.copy()){
                         if(!(build instanceof CoreBuild) && !build.block.privileged){
                             var ccore = build.closestCore();
@@ -251,8 +263,10 @@ public class Control implements ApplicationListener, Loadable{
                                     build.tile.remove();
 
                                     toBePlaced.add(build);
+                                    float delay = build.dst(ccore) / unitsPerTick + coreDelay;
+                                    maxDelay = Math.max(delay, maxDelay);
 
-                                    Time.run(build.dst(ccore) / unitsPerTick + coreDelay, () -> {
+                                    Time.run(delay, () -> {
                                         if(build.tile.build != build){
                                             placeLandBuild(build);
 
@@ -269,6 +283,7 @@ public class Control implements ApplicationListener, Loadable{
                     }
 
                     if(anyBuilds){
+                        Time.run(maxDelay + 1f, this::configurePlaced);
                         for(var ccore : state.rules.defaultTeam.data().cores){
                             Time.run(coreDelay, () -> {
                                 Fx.coreBuildShockwave.at(ccore.x, ccore.y, buildRadius);
@@ -292,7 +307,17 @@ public class Control implements ApplicationListener, Loadable{
             placeLandBuild(build);
         }
 
+        configurePlaced();
         toBePlaced.clear();
+    }
+
+    private void configurePlaced(){
+        for(Object[] obj : toBePlacedConfigs){
+            Building build = (Building)obj[0];
+            Object config = obj[1];
+            build.configureAny(config);
+        }
+        toBePlacedConfigs.clear();
     }
 
     private void placeLandBuild(Building build){
