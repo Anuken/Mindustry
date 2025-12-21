@@ -300,7 +300,8 @@ public class GenericCrafter extends Block{
 
             if(outputItems != null){
                 for(var output : outputItems){
-                    for(int i = 0; i < scaleOutput(output.amount, true, false); i++){
+                float maxOutput = scaleOutput(output.amount, true, false);
+                    for(int i = 0; i < maxOutput; i++){
                         offload(output.item);
                     }
                 }

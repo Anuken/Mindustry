@@ -63,7 +63,7 @@ public class AttributeCrafter extends GenericCrafter{
 
     public class AttributeCrafterBuild extends GenericCrafterBuild{
         public float attrsum;
-        public float accumulator, lastAccumulator;
+        public float accumulator;
         public float scaledOutput;
         public int scaledInt;
 
@@ -87,7 +87,7 @@ public class AttributeCrafter extends GenericCrafter{
 
             if(accumulate){
                 if(consumer){
-                    scaledInt = Mathf.floor(accumulator + scaledOutput) + 1;
+                    scaledInt = Mathf.floor(accumulator + scaledOutput);
                 }else{
                     accumulator += scaledOutput;
                     scaledInt = Mathf.floor(accumulator);
