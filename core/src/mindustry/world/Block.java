@@ -41,11 +41,11 @@ import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent implements Senseable{
     /** If true, buildings have an ItemModule. */
-    public boolean hasItems;
+    public @NoPatch boolean hasItems;
     /** If true, buildings have a LiquidModule. */
-    public boolean hasLiquids;
+    public @NoPatch boolean hasLiquids;
     /** If true, buildings have a PowerModule. */
-    public boolean hasPower;
+    public @NoPatch boolean hasPower;
     /** Flag for determining whether this block outputs liquid somewhere; used for connections. */
     public boolean outputsLiquid = false;
     /** Used by certain power blocks (nodes) to flag as non-consuming of power. True by default, even if this block has no power. */
