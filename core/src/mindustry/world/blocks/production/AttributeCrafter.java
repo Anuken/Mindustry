@@ -87,7 +87,7 @@ public class AttributeCrafter extends GenericCrafter{
 
             if(accumulate){
                 if(consumer){
-                    scaledInt = Mathf.floor(accumulator + scaledOutput);
+                    scaledInt = Mathf.floor(accumulator + scaledOutput) + 1;
                 }else{
                     accumulator += scaledOutput;
                     scaledInt = Mathf.floor(accumulator);
