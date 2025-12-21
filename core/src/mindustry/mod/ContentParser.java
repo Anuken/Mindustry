@@ -543,19 +543,23 @@ public class ContentParser{
     }
 
     public void readBlockCanInputItems(Block block, JsonValue value){
-        for(JsonValue child : value){
+        for(JsonValue child : value) {
             switch(child.name) {
                 case "add" -> {
-                    for (Item it : parser.readValue(Item[].class, child)) {
-                        block.itemFilter[it.id] = true;
-                    }
+                    if (child.isArray()) {
+                        for (Item it : parser.readValue(Item[].class, child)) {
+                            block.itemFilter[it.id] = true;
+                        }
+                    } else block.itemFilter[parser.readValue(Item.class, child).id] = true;
                 }
                 case "rem" -> {
-                    for (Item it : parser.readValue(Item[].class, child)) {
-                        block.itemFilter[it.id] = false;
-                    }
+                    if (child.isArray()) {
+                        for (Item it : parser.readValue(Item[].class, child)) {
+                            block.itemFilter[it.id] = false;
+                        }
+                    } else block.itemFilter[parser.readValue(Item.class, child).id] = false;
                 }
-                default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
+                default -> throw new IllegalArgumentException("Unknown can input item type: '" + child.name + "' for block '" + block.name + "'.");
             }
         }
         value.remove("canInputItems");
