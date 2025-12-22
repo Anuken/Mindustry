@@ -120,6 +120,8 @@ public class Rules{
     public boolean cleanupDeadTeams = true;
     /** If true, items can only be deposited in the core. */
     public boolean onlyDepositCore = false;
+    /** If true, Serpulo unloaders can take items from the core. */
+    public boolean allowCoreUnloaders = true;
     /** Cooldown, in seconds, of item depositing for players. */
     public float itemDepositCooldown = 0.5f;
     /** If true, every enemy block in the radius of the (enemy) core is destroyed upon death. Used for campaign maps. */

@@ -277,6 +277,11 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public boolean canUnload(){
+            return block.unloadable && state.rules.allowCoreUnloaders;
+        }
+
+        @Override
         public void draw(){
             //draw thrusters when just landed
             if(thrusterTime > 0){
