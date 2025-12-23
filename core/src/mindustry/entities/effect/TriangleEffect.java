@@ -12,7 +12,6 @@ import mindustry.graphics.*;
 /** Creates a triangle with heavily customizable parameters. */
 public class TriangleEffect extends Effect{
     private static final Rand rand = new Rand();
-    private static final int spinI
 
     /** Triangle color. */
     public Color colorFrom = Color.white.cpy(), colorTo = Color.white.cpy();
@@ -37,6 +36,8 @@ public class TriangleEffect extends Effect{
     public float widthFrom = 4f, widthTo = 0f, heightFrom = 4f, heightTo = 4f;
     /** Whether the rotation adds with the parent */
     public boolean useRotation = true;
+    /** Spin in degrees/tick. */
+    public int spin = 0;
     /** Rotation offset. */
     public float offset = 0;
 
@@ -44,7 +45,7 @@ public class TriangleEffect extends Effect{
     public void init(){
         if(widthInterp == null) widthInterp = interp;
         if(heightInterp == null) heightInterp = interp;
-        if(colorInterp == null) colorInterp = interp
+        if(colorInterp == null) colorInterp = interp;
     }
 
     @Override
