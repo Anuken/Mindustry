@@ -85,13 +85,14 @@ public class ParticleEffect extends Effect{
         float realRotation = (useRotation ? (casingFlip ? Math.abs(e.rotation) : e.rotation) : baseRotation);
         int flip = casingFlip ? -Mathf.sign(e.rotation) : 1;
         float rawfin = e.fin();
-        float fin = e.fin(colorInterp);
+        float fin = e.fin(interp);
+        float colFin = e.fin(colorInterp);
         float rad = sizeInterp.apply(sizeFrom, sizeTo, Mathf.curve(rawfin, sizeChangeStart / lifetime, 1f)) * 2;
         float width = rad * (widthInterp.apply(widthFrom, widthTo, Mathf.curve(rawfin, widthChangeStart / lifetime, 1f)) * 2);
         float height = rad * (heightInterp.apply(heightFrom, heightTo, Mathf.curve(rawfin, heightChangeStart / lifetime, 1f)) * 2);
         float ox = e.x + Angles.trnsx(realRotation, offsetX * flip, offsetY), oy = e.y + Angles.trnsy(realRotation, offsetX * flip, offsetY);
 
-        Draw.color(colorFrom, colorTo, fin);
+        Draw.color(colorFrom, colorTo, colFin);
         Color lightColor = this.lightColor == null ? Draw.getColor() : this.lightColor;
 
         if(line){
