@@ -42,11 +42,9 @@ public class TriangleEffect extends Effect{
 
     @Override
     public void init(){
-        for(int i = 0; i < 3; i++) {
         if(widthInterp == null) widthInterp = interp;
         if(heightInterp == null) heightInterp = interp;
-        if(colorInterp == null) colorInterp = interp;
-    }
+        if(colorInterp == null) colorInterp = interp
     }
 
     @Override
@@ -68,6 +66,6 @@ public class TriangleEffect extends Effect{
         Color lightColor = this.lightColor == null ? Draw.getColor() : this.lightColor;
         
         Drawf.tri(pos.x + e.x, pos.y + e.y, width, height, realRotation + offset + e.time * spin);
-        Drawf.light(pos.x + e.x, pos.y + e.y, lightScl, lightColor, lightOpacity * Draw.getColorAlpha());
+        Drawf.light(pos.x + e.x, pos.y + e.y, lightScl, lightColor, lightOpac * Draw.getColorAlpha());
     }
 }
