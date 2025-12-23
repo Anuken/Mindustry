@@ -183,7 +183,7 @@ public class Turret extends ReloadTurret{
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
         if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
-        if(maxHeatEfficiency > 0) stats.add(Stat.maxEfficiency, (int)(maxHeatEfficiency * 100f), StatUnit.percent);
+        if(heatRequirement > 0 && maxHeatEfficiency > 0) stats.add(Stat.maxEfficiency, (int)(maxHeatEfficiency * 100f), StatUnit.percent);
     } 
 
     @Override
