@@ -27,11 +27,11 @@ public class ParticleEffect extends Effect{
     public Interp interp = Interp.linear;
     /** Particle size interpolation. Null to use interp. */
     public @Nullable Interp sizeInterp = null;
-    /** Particle width interpolation. Null to use interp. */
+    /** Particle color interpolation. Null to use interp. */
     public @Nullable Interp colorInterp = null;
     /** Offset position of the particle. */
     public float offsetX, offsetY;
-    /** Particle ligght properties. */
+    /** Particle light properties. */
     public float lightScl = 2f, lightOpacity = 0.6f;
     /** Color of the light each particle emits. */
     public @Nullable Color lightColor;
