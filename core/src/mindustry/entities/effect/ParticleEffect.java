@@ -28,7 +28,7 @@ public class ParticleEffect extends Effect{
     /** Particle size interpolation. Null to use interp. */
     public @Nullable Interp sizeInterp = null;
     /** Particle width interpolation. Null to use interp. */
-    public @Nullable Interp colorInterpInterp = null;
+    public @Nullable Interp colorInterp = null;
     /** Offset position of the particle. */
     public float offsetX, offsetY;
     /** Particle ligght properties. */
