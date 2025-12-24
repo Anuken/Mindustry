@@ -1149,6 +1149,26 @@ public class LExecutor{
         }
     }
 
+    public static class SetRateI implements LInstruction{
+        public LVar amount;
+
+        public SetRateI(LVar amount){
+            this.amount = amount;
+        }
+
+        public SetRateI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            exec.build.ipt = Mathf.clamp(amount.numi(), 1, exec.build.block.privileged ? ((LogicBlock)exec.build.block).maxInstructionsPerTick : ((LogicBlock)exec.build.block).instructionsPerTick);
+            if(exec.ipt != null){
+                exec.ipt.numval = exec.build.ipt;
+            }
+
+        }
+    }
+
     public static class WaitI implements LInstruction{
         public LVar value;
 
@@ -1791,25 +1811,6 @@ public class LExecutor{
                 Fx.spawnShockwave.at(x, y, World.conv(radius));
             }else{
                 Fx.dynamicExplosion.at(x, y, World.conv(radius) / 8f);
-            }
-        }
-    }
-
-    public static class SetRateI implements LInstruction{
-        public LVar amount;
-
-        public SetRateI(LVar amount){
-            this.amount = amount;
-        }
-
-        public SetRateI(){
-        }
-
-        @Override
-        public void run(LExecutor exec){
-            exec.build.ipt = Mathf.clamp(amount.numi(), 1, ((LogicBlock)exec.build.block).maxInstructionsPerTick);
-            if(exec.ipt != null){
-                exec.ipt.numval = exec.build.ipt;
             }
         }
     }
