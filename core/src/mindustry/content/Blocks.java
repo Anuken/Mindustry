@@ -3578,6 +3578,7 @@ public class Blocks{
                 lightningLength = 25;
                 collidesAir = false;
                 ammoMultiplier = 1f;
+                pierceCap = 5;
 
                 //for visual stats only.
                 buildingDamageMultiplier = 0.25f;
