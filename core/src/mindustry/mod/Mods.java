@@ -1112,7 +1112,6 @@ public class Mods implements Loadable{
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods. */
     private LoadedMod loadMod(Fi sourceFile, boolean overwrite, boolean initialize) throws Exception{
-        Time.mark();
 
         ZipFi rootZip = null;
 
@@ -1232,7 +1231,7 @@ public class Mods implements Loadable{
             }
 
             if(!headless && Core.settings.getBool("mod-" + baseName + "-enabled", true)){
-                Log.info("Loaded mod '@' in @ms", meta.name, Time.elapsed());
+                Log.info("Loading mod: @", meta.name);
             }
 
             return new LoadedMod(sourceFile, zip, mainMod, loader, meta);
