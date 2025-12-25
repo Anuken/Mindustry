@@ -23,6 +23,7 @@ public class Weathers{
             sizeMin = 2.6f;
             density = 1200f;
             attrs.set(Attribute.light, -0.15f);
+            attrs.set(Attribute.fogVisibilityMultiplier, 0.8f);
 
             sound = Sounds.windHowl;
             soundVol = 0f;
@@ -37,6 +38,7 @@ public class Weathers{
             status = StatusEffects.wet;
             sound = Sounds.rain;
             soundVol = 0.25f;
+            attrs.set(Attribute.fogVisibilityMultiplier, 0.8f);
         }};
 
         sandstorm = new ParticleWeather("sandstorm"){{
@@ -57,6 +59,7 @@ public class Weathers{
             sound = Sounds.wind;
             soundVol = 0.8f;
             duration = 7f * Time.toMinutes;
+            attrs.set(Attribute.fogVisibilityMultiplier, 0.6f);
         }};
 
         sporestorm = new ParticleWeather("sporestorm"){{
@@ -79,6 +82,7 @@ public class Weathers{
             sound = Sounds.wind;
             soundVol = 0.7f;
             duration = 7f * Time.toMinutes;
+            attrs.set(Attribute.fogVisibilityMultiplier, 0.7f);
         }};
 
         fog = new ParticleWeather("fog"){{
@@ -100,6 +104,7 @@ public class Weathers{
             attrs.set(Attribute.light, -0.3f);
             attrs.set(Attribute.water, 0.05f);
             opacityMultiplier = 0.47f;
+            attrs.set(Attribute.fogVisibilityMultiplier, 0.5f);
         }};
 
         suspendParticles = new ParticleWeather("suspend-particles"){{
