@@ -155,6 +155,7 @@ public class Turret extends ReloadTurret{
 
     public Turret(String name){
         super(name);
+        liquidCapacity = 20f;
         outlinedIcon = 1;
         drawLiquidLight = false;
         sync = true;
