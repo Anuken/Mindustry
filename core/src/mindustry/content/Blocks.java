@@ -4220,6 +4220,7 @@ public class Blocks{
             envEnabled |= Env.space;
 
             coolantMultiplier = 0.4f;
+            liquidCapacity = 60f;
             scaledHealth = 150;
 
             coolant = consumeCoolant(1f);
@@ -4275,6 +4276,7 @@ public class Blocks{
             reload = 7f;
             recoilTime = reload * 2f;
             coolantMultiplier = 0.5f;
+            liquidCapacity = 120f;
             ammoUseEffect = Fx.casing3;
             range = 260f;
             inaccuracy = 3f;
@@ -4322,6 +4324,7 @@ public class Blocks{
             }};
 
             scaledHealth = 200;
+            liquidCapacity = 60f;
             coolant = consumeCoolant(0.5f);
             consumePower(17f);
         }};
