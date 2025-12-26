@@ -27,7 +27,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Import Entityc owner;
     @Import float x, y, damage, lastX, lastY, time, lifetime;
 
-    IntSeq collided = new IntSeq(6);
+    IntSet collided = new IntSet();
     BulletType type;
     Vec2 vel = new Vec2();
 
