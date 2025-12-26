@@ -113,7 +113,13 @@ public class BaseTurret extends Block{
 
     public class BaseTurretBuild extends Building implements Ranged, RotBlock{
         public float rotation = 90;
-        public float activationTimer = activationTime;
+        public float activationTimer = 0;
+
+        @Override
+        public void placed(){
+            super.placed();
+            activationTimer = activationTime;
+        }
 
         @Override
         public float range(){
