@@ -126,7 +126,6 @@ public class Logic implements ApplicationListener{
                 Call.researched(e.content);
             }
         });
-
         Events.on(SectorCaptureEvent.class, e -> {
             if(!net.client() && e.sector == state.getSector() && e.sector.isBeingPlayed()){
                 state.rules.waveTeam.data().destroyToDerelict();
