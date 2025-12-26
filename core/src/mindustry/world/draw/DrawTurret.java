@@ -12,7 +12,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.*;
-import mindustry.world.blocks.defense.turrets.BaseTurret.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 
 /** Extend to implement custom drawing behavior for a turret. */
@@ -25,7 +24,7 @@ public class DrawTurret extends DrawBlock{
     /** Overrides the liquid to draw in the liquid region. */
     public @Nullable Liquid liquidDraw;
     public float turretLayer = Layer.turret, shadowLayer = Layer.turret - 0.5f, heatLayer = Layer.turretHeat;
-    public TextureRegion base, liquid, top, heat, preview, outline, inactive;
+    public TextureRegion base, liquid, top, heat, preview, outline;
 
     public DrawTurret(String basePrefix){
         this.basePrefix = basePrefix;
@@ -72,7 +71,6 @@ public class DrawTurret extends DrawBlock{
 
         drawTurret(turret, tb);
         drawHeat(turret, tb);
-        drawInactive((BaseTurret)build.block, (BaseTurretBuild)build);
 
         if(parts.size > 0){
             if(outline.found()){
@@ -115,17 +113,6 @@ public class DrawTurret extends DrawBlock{
         Drawf.additive(heat, block.heatColor.write(Tmp.c1).a(build.heat), build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot(), heatLayer);
     }
 
-    public void drawInactive(BaseTurret block, BaseTurretBuild build){
-        if(build.activationTimer <= 0.00001f || !inactive.found()) return;
-        float x = build.x + ((build instanceof TurretBuild)? ((TurretBuild)build).recoilOffset.x : 0f);
-        float y = build.y + ((build instanceof TurretBuild)? ((TurretBuild)build).recoilOffset.y : 0f);
-
-        Draw.z(heatLayer);
-        Draw.color(block.inactiveColor.write(Tmp.c1).a(Mathf.sqrt(build.activationTimer / block.activationTime)));
-        Draw.rect(inactive, x, y, build.drawrot());
-        Draw.color();
-    }
-
     /** Load any relevant texture regions. */
     @Override
     public void load(Block block){
@@ -137,7 +124,6 @@ public class DrawTurret extends DrawBlock{
         top = Core.atlas.find(block.name + "-top");
         heat = Core.atlas.find(block.name + "-heat");
         base = Core.atlas.find(block.name + "-base");
-        inactive = Core.atlas.find(block.name + "-inactive");
 
         for(var part : parts){
             part.turretShading = true;

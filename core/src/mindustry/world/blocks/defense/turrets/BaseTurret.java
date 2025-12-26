@@ -26,8 +26,6 @@ public class BaseTurret extends Block{
     public boolean disableOverlapCheck = false;
     /** How much time to start shooting after placement. */
     public float activationTime = 0f;
-    /** Color of inactive region drawn on top (if found) */
-    public Color inactiveColor = Color.white;
 
     /** Effect displayed when coolant is used. */
     public Effect coolEffect = Fx.fuelburn;
