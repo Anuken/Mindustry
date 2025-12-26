@@ -1500,6 +1500,9 @@ public class UnitType extends UnlockableContent implements Senseable{
         Draw.z(z);
 
         if(unit instanceof Crawlc c){
+            if(isPayload){
+                c.segmentRot(c.rotation());
+            }
             drawCrawl(c);
         }
 
