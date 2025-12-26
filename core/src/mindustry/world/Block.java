@@ -41,11 +41,11 @@ import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent implements Senseable{
     /** If true, buildings have an ItemModule. */
-    public boolean hasItems;
+    public @NoPatch boolean hasItems;
     /** If true, buildings have a LiquidModule. */
-    public boolean hasLiquids;
+    public @NoPatch boolean hasLiquids;
     /** If true, buildings have a PowerModule. */
-    public boolean hasPower;
+    public @NoPatch boolean hasPower;
     /** Flag for determining whether this block outputs liquid somewhere; used for connections. */
     public boolean outputsLiquid = false;
     /** Used by certain power blocks (nodes) to flag as non-consuming of power. True by default, even if this block has no power. */
@@ -70,8 +70,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean separateItemCapacity = false;
     /** maximum items this block can carry (usually, this is per-type of item) */
     public int itemCapacity = 10;
-    /** maximum total liquids this block can carry if hasLiquids = true */
-    public float liquidCapacity = 10f;
+    /** maximum total liquids this block can carry if hasLiquids = true. Default value is 10, scales with max liquid consumption in ConsumeLiquid */
+    public float liquidCapacity = -1f;
     /** higher numbers increase liquid output speed; TODO remove and replace with better liquids system */
     public float liquidPressure = 1f;
     /** If true, this block outputs to its facing direction, when applicable.
@@ -309,11 +309,11 @@ public class Block extends UnlockableContent implements Senseable{
     /** Should the sound made when this block is deconstructed change in pitch. */
     public boolean breakPitchChange = true;
     /** Sound made when this block is built. */
-    public Sound placeSound = Sounds.place;
+    public Sound placeSound = Sounds.unset;
     /** Sound made when this block is deconstructed. */
-    public Sound breakSound = Sounds.breaks;
+    public Sound breakSound = Sounds.unset;
     /** Sounds made when this block is destroyed.*/
-    public Sound destroySound = Sounds.boom;
+    public Sound destroySound = Sounds.unset;
     /** Volume of destruction sound. */
     public float destroySoundVolume = 1f;
     /** Range of destroy sound. */
@@ -1260,6 +1260,27 @@ public class Block extends UnlockableContent implements Senseable{
     public void init(){
         super.init();
 
+        if(destroySound == Sounds.unset){
+            destroySound =
+                size >= 3 ? Sounds.blockExplode3 :
+                size >= 2 ? new RandomSound(Sounds.blockExplode2, Sounds.blockExplode2Alt) :
+                new RandomSound(Sounds.blockExplode1, Sounds.blockExplode1Alt);
+        }
+
+        if(placeSound == Sounds.unset){
+            placeSound =
+                size >= 3 ? Sounds.blockPlace3 :
+                size >= 2 ? Sounds.blockPlace2 :
+                Sounds.blockPlace1;
+        }
+
+        if(breakSound == Sounds.unset){
+            breakSound =
+                size >= 3 ? Sounds.blockBreak3 :
+                size >= 2 ? Sounds.blockBreak2 :
+                Sounds.blockBreak1;
+        }
+
         //disable standard shadow
         if(customShadow){
             hasShadow = false;
@@ -1304,6 +1325,21 @@ public class Block extends UnlockableContent implements Senseable{
         if(hasLiquids && drawLiquidLight){
             emitLight = true;
             lightClipSize = Math.max(lightClipSize, size * 30f * 2f);
+        }
+
+        //some blocks don't have hasLiquids, but have liquid consumers/liquid capacity
+        if(liquidCapacity < 0){
+            float consumeAmount = 1f;
+            for(var cons : consumeBuilder){
+                if(cons instanceof ConsumeLiquidBase liq){
+                    consumeAmount = Math.max(consumeAmount, liq.amount * 60f);
+                }else if(cons instanceof ConsumeLiquids liq){
+                    for(var stack : liq.liquids){
+                        consumeAmount = Math.max(consumeAmount, stack.amount * 60f);
+                    }
+                }
+            }
+            liquidCapacity = Mathf.round(10f * consumeAmount);
         }
 
         if(emitLight){

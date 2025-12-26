@@ -18,6 +18,7 @@ import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
+import rhino.*;
 
 import java.io.*;
 import java.util.*;
@@ -135,6 +136,14 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 cont.setDelegate(new ChooserDelegate());
 
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {});
+            }
+
+            @Override
+            public Context getScriptContext(){
+                Context context = Context.getCurrentContext();
+                if(context == null) context = Context.enter();
+                context.setOptimizationLevel(-1);
+                return context;
             }
 
             @Override

@@ -1452,7 +1452,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called when the block is destroyed. The tile is still intact at this stage. */
     public void onDestroyed(){
-
         float explosiveness = block.baseExplosiveness;
         float flammability = 0f;
         float power = 0f;
@@ -1476,7 +1475,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         if(block.hasLiquids && state.rules.damageExplosions){
-
             liquids.each(this::splashLiquid);
         }
 
@@ -1486,6 +1484,26 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(block.createRubble && !floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
         }
+
+        if(!headless){
+            playDestroySound();
+
+            if(explosiveness > 40f){
+                (Mathf.chance(0.5) ? Sounds.blockExplodeExplosive : Sounds.blockExplodeExplosiveAlt).at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }else if(flammability > 5f){
+                Sounds.blockExplodeFlammable.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }
+
+            if(power > 30000f){
+                Sounds.blockExplodeElectricBig.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }else if(power > 2000f){
+                Sounds.blockExplodeElectric.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }
+        }
+    }
+
+    public void playDestroySound(){
+        block.destroySound.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
     }
 
     public String getDisplayName(){
@@ -2179,17 +2197,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void killed(){
         dead = true;
         Events.fire(new BlockDestroyEvent(tile));
-        if(!headless) playDestroySound();
         onDestroyed();
         if(tile != emptyTile){
             tile.remove();
         }
         remove();
         afterDestroyed();
-    }
-
-    public void playDestroySound(){
-        block.destroySound.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
     }
 
     public void checkAllowUpdate(){

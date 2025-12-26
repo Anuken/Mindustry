@@ -682,6 +682,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         build.updateProximity();
         build.noSleep();
         Fx.rotateBlock.at(build.x, build.y, build.block.size);
+        if(!headless) Sounds.blockRotate.at(build, 1f + Mathf.range(0.1f), 1f);
         Events.fire(new BuildRotateEvent(build, player == null ? null : player.unit(), previous));
     }
 
@@ -940,10 +941,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(player.isBuilder()){
             player.unit().updateBuilding(isBuilding);
-        }
-
-        if(!player.dead() && player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && !player.team().rules().infiniteAmmo && player.unit().ammo <= 0){
-            player.unit().type.weapons.first().noAmmoSound.at(player.unit());
         }
 
         //you don't want selected blocks while locked, looks weird

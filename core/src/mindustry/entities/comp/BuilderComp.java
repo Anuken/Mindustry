@@ -155,7 +155,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             if(!within(tile, finalPlaceDst)) continue;
 
             if(!headless){
-                Vars.control.sound.loop(Sounds.build, tile, 0.15f);
+                Vars.control.sound.loop(Sounds.loopBuild, tile, 1.2f);
             }
 
             if(!(tile.build instanceof ConstructBuild cb)){
