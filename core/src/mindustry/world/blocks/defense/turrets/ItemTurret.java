@@ -184,7 +184,7 @@ public class ItemTurret extends Turret{
 
         @Override
         public byte version(){
-            return 5;
+            return 2;
         }
 
         @Override

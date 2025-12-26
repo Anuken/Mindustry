@@ -830,14 +830,11 @@ public class Turret extends ReloadTurret{
                 reloadCounter = read.f();
                 rotation = read.f();
             }
-            if(revision >= 4){
-                activationTimer = read.f();
-            }
         }
 
         @Override
         public byte version(){
-            return 4;
+            return 1;
         }
 
         @Override
