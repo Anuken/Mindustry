@@ -528,7 +528,7 @@ public class LogicBlock extends Block{
                 if(accumulator > maxInstructionScale * ipt) accumulator = maxInstructionScale * ipt;
 
                 while(accumulator >= 1f){
-                    executor.runOnce();
+                    executor.runOnce((double)accumulator);
                     accumulator --;
                     if(executor.yield){
                         executor.yield = false;
