@@ -819,7 +819,6 @@ public class Turret extends ReloadTurret{
             super.write(write);
             write.f(reloadCounter);
             write.f(rotation);
-            write.f(activationTimer);
         }
 
         @Override
