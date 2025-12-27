@@ -314,6 +314,12 @@ public class UnitType extends UnlockableContent implements Senseable{
     public float stepSoundPitch = 1f, stepSoundPitchRange = 0.1f;
     /** sound looped when tank moves */
     public Sound tankMoveSound = Sounds.tankMove;
+    /** sound looped when the unit moves; volume depends on velocity */
+    public Sound moveSound = Sounds.none;
+    /** volume of movement sound */
+    public float moveSoundVolume = 1f;
+    /** pitch of movement sound based on velocity */
+    public float moveSoundPitchMin = 1f, moveSoundPitchMax = 1f;
     /** volume of tank move sfx */
     public float tankMoveVolume = 0.5f;
     /** effect that this unit emits when falling */
@@ -383,7 +389,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** if true, harder materials will take longer to mine */
     public boolean mineHardnessScaling = true;
     /** continuous sound emitted when mining. */
-    public Sound mineSound = Sounds.minebeam;
+    public Sound mineSound = Sounds.loopMineBeam;
     /** volume of mining sound. */
     public float mineSoundVolume = 0.6f;
     /** Target items to mine. Used in MinerAI */
@@ -1494,6 +1500,9 @@ public class UnitType extends UnlockableContent implements Senseable{
         Draw.z(z);
 
         if(unit instanceof Crawlc c){
+            if(isPayload){
+                c.segmentRot(c.rotation());
+            }
             drawCrawl(c);
         }
 

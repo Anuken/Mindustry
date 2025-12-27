@@ -231,7 +231,7 @@ public class ResearchDialog extends BaseDialog{
                 //add global counts of each sector
                 for(Planet planet : rootPlanets){
                     for(Sector sector : planet.sectors){
-                        if(sector.hasBase()){
+                        if(sector.hasBase() && !sector.isFrozen()){
                             ItemSeq cached = sector.items();
                             cache.put(sector, cached);
                             cached.each((item, amount) -> {
@@ -602,7 +602,7 @@ public class ResearchDialog extends BaseDialog{
             treeLayout();
             rebuild();
             Core.scene.act();
-            Sounds.unlock.play();
+            Sounds.uiUnlock.play();
             Events.fire(new ResearchEvent(node.content));
         }
 

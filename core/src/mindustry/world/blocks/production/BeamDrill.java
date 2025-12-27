@@ -69,9 +69,9 @@ public class BeamDrill extends Block{
         solid = true;
         drawArrow = false;
         regionRotated1 = 1;
-        ignoreLineRotation = true;
+        if(!mobile) ignoreLineRotation = true;
         ambientSoundVolume = 0.05f;
-        ambientSound = Sounds.minebeam;
+        ambientSound = Sounds.loopMineBeam;
 
         envEnabled |= Env.space;
         flags = EnumSet.of(BlockFlag.drill);

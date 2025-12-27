@@ -64,7 +64,7 @@ public class UnitAssembler extends PayloadBlock{
         group = BlockGroup.units;
         commandable = true;
         quickRotate = false;
-        ambientSound = Sounds.respawning;
+        ambientSound = Sounds.loopUnitBuilding;
         ambientSoundVolume = 0.13f;
     }
 

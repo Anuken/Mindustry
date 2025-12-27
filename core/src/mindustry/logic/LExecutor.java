@@ -430,6 +430,28 @@ public class LExecutor{
                             }
                         }
                     }
+                    case deconstruct -> {
+                        if((state.rules.logicUnitDeconstruct || exec.privileged) && unit.canBuild()){
+                            //reset state of last request when necessary
+                            if(ai.plan.x != World.toTile(x1) || ai.plan.y != World.toTile(y1) || !ai.plan.breaking || unit.plans.isEmpty()){
+                                ai.plan.progress = 0;
+                                ai.plan.initialized = false;
+                                ai.plan.stuck = false;
+                            }
+
+                            ai.plan.x = World.toTile(x1);
+                            ai.plan.y = World.toTile(y1);
+                            ai.plan.breaking = true;
+
+                            unit.clearBuilding();
+                            Tile tile = ai.plan.tile();
+
+                            if(tile != null && Build.validBreak(unit.team, ai.plan.x, ai.plan.y)){
+                                unit.updateBuilding = true;
+                                unit.addBuild(ai.plan);
+                            }
+                        }
+                    }
                     case getBlock -> {
                         float range = Math.max(unit.range(), unit.type.buildRange);
                         if(!unit.within(x1, y1, range)){
