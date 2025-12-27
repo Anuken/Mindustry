@@ -434,7 +434,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(mode == planetLaunch || to.planet.generator == null) return launchSector;
 
         Sector candidate = to.planet.generator.findLaunchCandidate(to, launchSector);
-        return candidate == null ? launchSector : candidate;
+        return candidate == null && launchSector != null && (mode == planetLaunch || !launchSector.isAttacked()) ? launchSector : candidate;
     }
 
     boolean showing(){
@@ -587,8 +587,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     boolean selectable(Planet planet){
-        //TODO what if any sector is selectable?
-        //TODO launch criteria - which planets can be launched to? Where should this be defined? Should planets even be selectable?
         if(mode == select) return planet == state.planet;
         if(mode == planetLaunch) return launchSector != null && (launchCandidates.contains(planet) || (planet == launchSector.planet && planet.allowSelfSectorLaunch));
         return (planet.alwaysUnlocked && planet.isLandable()) || planet.sectors.contains(Sector::hasBase) || debugSelect;
@@ -1006,18 +1004,18 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         state.uiAlpha = Mathf.lerpDelta(state.uiAlpha, Mathf.num(state.zoom < 1.9f), 0.1f);
     }
 
-    void displayItems(Table c, float scl, ObjectMap<Item, ExportStat> stats, String name){
-        displayItems(c, scl, stats, name, t -> {});
+    void displayItems(Table c, ObjectMap<Item, ExportStat> stats, String name){
+        displayItems(c, stats, name, t -> {});
     }
 
-    void displayItems(Table c, float scl, ObjectMap<Item, ExportStat> stats, String name, Cons<Table> builder){
+    void displayItems(Table c, ObjectMap<Item, ExportStat> stats, String name, Cons<Table> builder){
         Table t = new Table().left();
 
         int i = 0;
         for(var item : content.items()){
             var stat = stats.get(item);
             if(stat == null) continue;
-            int total = (int)(stat.mean * 60 * scl);
+            int total = (int)(stat.mean * 60);
             if(total > 1){
                 t.image(item.uiIcon).padRight(3);
                 t.add(UI.formatAmount(total) + " " + Core.bundle.get("unit.perminute")).color(Color.lightGray).padRight(3);
@@ -1052,7 +1050,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
 
             if(sector.info.waves && sector.hasBase()){
-                c.add(Core.bundle.get("sectors.wave") + " [accent]" + (sector.info.wave + sector.info.wavesPassed)).left().row();
+                c.add(Core.bundle.get("sectors.wave") + " [accent]" + sector.info.wave).left().row();
             }
 
             if(sector.isAttacked() || !sector.hasBase()){
@@ -1069,11 +1067,17 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }).padLeft(10f).left().row();
             }
 
+            boolean lockdown = sector.isAttacked() && !sector.isBeingPlayed();
+
+            if(lockdown){
+                c.add(UI.formatIcons(bundle.get("sector.lockdown"))).wrap().fillX().padBottom(10f).row();
+            }
+
             //production
-            displayItems(c, sector.getProductionScale(), sector.info.production, "@sectors.production");
+            displayItems(c, sector.info.production, "@sectors.production");
 
             //export
-            displayItems(c, sector.getProductionScale(), sector.info.export, "@sectors.export", t -> {
+            displayItems(c, sector.info.export, "@sectors.export", t -> {
                 if(sector.info.destination != null && sector.info.destination.hasBase()){
                     String ic = sector.info.destination.iconChar();
                     t.add(Iconc.rightOpen + " " + (ic == null || ic.isEmpty() ? "" : ic + " ") + sector.info.destination.name()).padLeft(10f).row();
@@ -1082,7 +1086,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             //import
             if(sector.hasBase()){
-                displayItems(c, 1f, sector.info.imports, "@sectors.import", t -> {
+                displayItems(c, sector.info.imports, "@sectors.import", t -> {
                     sector.info.eachImport(sector.planet, other -> {
                         String ic = other.iconChar();
                         t.add(Iconc.rightOpen + " " + (ic == null || ic.isEmpty() ? "" : ic + " ") + other.name()).padLeft(10f).row();
@@ -1138,7 +1142,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 });
             }else{
                 sector.info.items.clear();
-                sector.info.damage = 1f;
                 sector.info.hasCore = false;
                 sector.info.production.clear();
                 sector.saveInfo();
@@ -1150,14 +1153,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     void addSurvivedInfo(Sector sector, Table table, boolean wrap){
         if(!wrap){
-            table.add(sector.planet.allowWaveSimulation ? Core.bundle.format("sectors.underattack", (int)(sector.info.damage * 100)) : "@sectors.underattack.nodamage").wrapLabel(wrap).row();
-        }
-
-        if(sector.planet.allowWaveSimulation && sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
-            int toCapture = sector.info.attack || sector.info.winWave <= 1 ? -1 : sector.info.winWave - (sector.info.wave + sector.info.wavesPassed);
-            boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= SectorDamage.maxRetWave - 1;
-            table.add(Core.bundle.format("sectors.survives", Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture <= 0 ? 200 : toCapture) +
-            (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture))).wrapLabel(wrap).row();
+            table.add("@sectors.underattack").wrapLabel(wrap).row();
         }
     }
 
@@ -1320,12 +1316,16 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
             }
 
+            boolean noCandidate = sector != sector.planet.getStartSector() && !sector.hasBase() && findLauncher(sector) == null;
+
             stable.button(
                 mode == select ? "@sectors.select" :
                 sector.isBeingPlayed() ? "@sectors.resume" :
                 sector.hasBase() ? "@sectors.go" :
-                locked ? "@locked" : "@sectors.launch",
-                locked ? Icon.lock : Icon.play, this::playSelected).growX().height(54f).minWidth(170f).padTop(4).disabled(locked);
+                locked ? "@locked" :
+                noCandidate ? "@sectors.nolaunchcandidate" :
+                "@sectors.launch",
+                locked ? Icon.lock : Icon.play, this::playSelected).growX().height(54f).minWidth(170f).padTop(4).disabled(locked || noCandidate);
         }
 
         stable.pack();
@@ -1347,27 +1347,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(sector.preset != null && sector.preset.requireUnlock && sector.preset.locked() && sector.preset.techNode != null && !sector.hasBase()){
             return;
-        }
-
-        Planet planet = sector.planet;
-
-        //make sure there are no under-attack sectors (other than this one)
-        if(!planet.allowWaveSimulation && !debugSelect){
-            //if there are two or more attacked sectors... something went wrong, don't show the dialog to prevent softlock
-            Sector attacked = planet.sectors.find(s -> s.isAttacked() && s != sector);
-            if(attacked != null &&  planet.sectors.count(s -> s.isAttacked()) < 2){
-                BaseDialog dialog = new BaseDialog("@sector.noswitch.title");
-                dialog.cont.add(bundle.format("sector.noswitch", attacked.name(), attacked.planet.localizedName)).width(400f).labelAlign(Align.center).center().wrap();
-                dialog.addCloseButton();
-                dialog.buttons.button("@sector.view", Icon.eyeSmall, () -> {
-                    dialog.hide();
-                    lookAt(attacked);
-                    selectSector(attacked);
-                });
-                dialog.show();
-
-                return;
-            }
         }
 
         boolean shouldHide = true;

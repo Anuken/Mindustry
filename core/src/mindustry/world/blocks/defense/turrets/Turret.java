@@ -118,7 +118,9 @@ public class Turret extends ReloadTurret{
     /** Effect created when ammo is used. Not optional. */
     public Effect ammoUseEffect = Fx.none;
     /** Sound emitted when a single bullet is shot. */
-    public Sound shootSound = Sounds.shoot;
+    public Sound shootSound = Sounds.shootDuo;
+    /** Volume of shooting sound. */
+    public float shootSoundVolume = 1f;
     /** Sound emitted when shoot.firstShotDelay is >0 and shooting begins. */
     public Sound chargeSound = Sounds.none;
     /** The sound that this block makes while active. One sound loop. Do not overuse. */
@@ -182,7 +184,8 @@ public class Turret extends ReloadTurret{
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
         if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
-    }
+        if(heatRequirement > 0 && maxHeatEfficiency > 0) stats.add(Stat.maxEfficiency, (int)(maxHeatEfficiency * 100f), StatUnit.percent);
+    } 
 
     @Override
     public void setBars(){
@@ -579,6 +582,14 @@ public class Turret extends ReloadTurret{
             super.handleLiquid(source, liquid, amount);
         }
 
+        @Override
+        public boolean canConsume(){
+            if(heatRequirement > 0 && heatReq <= 0f){
+                return false;
+            }
+            return super.canConsume();
+        }
+
         protected boolean validateTarget(){
             return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || isControlled() || logicControlled();
         }
@@ -695,7 +706,9 @@ public class Turret extends ReloadTurret{
                 type.chargeEffect.at(bulletX, bulletY, rotation);
             }
 
-            shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
+            ShootPattern pattern = type.shootPattern != null ? type.shootPattern : shoot;
+
+            pattern.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
                 queuedBullets++;
                 int barrel = barrelCounter;
 
@@ -735,7 +748,7 @@ public class Turret extends ReloadTurret{
 
             (shootEffect == null ? type.shootEffect : shootEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
             (smokeEffect == null ? type.smokeEffect : smokeEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
-            shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
+            (type.shootSound != Sounds.none ? type.shootSound : shootSound).at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax), shootSoundVolume);
 
             ammoUseEffect.at(
                 x - Angles.trnsx(rotation, ammoEjectBack),

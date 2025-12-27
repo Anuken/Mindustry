@@ -54,7 +54,7 @@ public class GenericCrafter extends Block{
         update = true;
         solid = true;
         hasItems = true;
-        ambientSound = Sounds.machine;
+        ambientSound = Sounds.loopMachine;
         sync = true;
         ambientSoundVolume = 0.03f;
         flags = EnumSet.of(BlockFlag.factory);

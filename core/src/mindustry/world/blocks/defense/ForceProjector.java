@@ -1,6 +1,7 @@
 package mindustry.world.blocks.defense;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -42,6 +43,9 @@ public class ForceProjector extends Block{
     public float coolantConsumption = 0.1f;
     public boolean consumeCoolant = true;
     public float crashDamageMultiplier = 2f;
+    public Sound breakSound = Sounds.shieldBreak;
+    public Sound hitSound = Sounds.shieldHit;
+    public float hitSoundVolume = 0.12f;
     public Effect absorbEffect = Fx.absorb;
     public Effect shieldBreakEffect = Fx.shieldBreak;
     public @Load("@-top") TextureRegion topRegion;
@@ -49,12 +53,16 @@ public class ForceProjector extends Block{
     //TODO json support
     public @Nullable Consume itemConsumer, coolantConsumer;
 
+    //lambdas need to be static to prevent GC
+    protected static ForceProjector paramBlock;
     protected static ForceBuild paramEntity;
-    protected static Effect paramEffect;
     protected static final Cons<Bullet> shieldConsumer = bullet -> {
-        if(bullet.team != paramEntity.team && bullet.type.absorbable && !bullet.absorbed && Intersector.isInRegularPolygon(((ForceProjector)(paramEntity.block)).sides, paramEntity.x, paramEntity.y, paramEntity.realRadius(), ((ForceProjector)(paramEntity.block)).shieldRotation, bullet.x, bullet.y)){
+        if(bullet.team != paramEntity.team && bullet.type.absorbable && !bullet.absorbed &&
+            Intersector.isInRegularPolygon(paramBlock.sides, paramEntity.x, paramEntity.y, paramEntity.realRadius(), paramBlock.shieldRotation, bullet.x, bullet.y)){
+
             bullet.absorb();
-            paramEffect.at(bullet);
+            paramBlock.hitSound.at(bullet.x, bullet.y, 1f + Mathf.range(0.1f), paramBlock.hitSoundVolume);
+            paramBlock.absorbEffect.at(bullet);
             paramEntity.hit = 1f;
             paramEntity.buildup += bullet.type.shieldDamage(bullet);
         }
@@ -69,8 +77,8 @@ public class ForceProjector extends Block{
         hasLiquids = true;
         hasItems = true;
         envEnabled |= Env.space;
-        ambientSound = Sounds.shield;
-        ambientSoundVolume = 0.08f;
+        ambientSound = Sounds.loopShield;
+        ambientSoundVolume = 0.1f;
         flags = EnumSet.of(BlockFlag.shield);
 
         if(consumeCoolant){
@@ -233,6 +241,7 @@ public class ForceProjector extends Block{
                 broken = true;
                 buildup = shieldHealth;
                 shieldBreakEffect.at(x, y, realRadius(), team.color);
+                breakSound.at(x, y);
                 if(team != state.rules.defaultTeam){
                     Events.fire(Trigger.forceProjectorBreak);
                 }
@@ -249,8 +258,8 @@ public class ForceProjector extends Block{
             float realRadius = realRadius();
 
             if(realRadius > 0 && !broken){
+                paramBlock = ForceProjector.this;
                 paramEntity = this;
-                paramEffect = absorbEffect;
                 Groups.bullet.intersect(x - realRadius, y - realRadius, realRadius * 2f, realRadius * 2f, shieldConsumer);
             }
         }

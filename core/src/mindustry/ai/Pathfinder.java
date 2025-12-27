@@ -106,6 +106,10 @@ public class Pathfinder implements Runnable{
     IntSeq tmpArray = new IntSeq();
 
     boolean needsRefresh;
+    /** Last time flowfields were refreshed, for timestamp-based refresh interval. */
+    private long lastRefreshTime;
+    /** Minimum interval between flowfield refreshes in milliseconds. */
+    private static final long refreshIntervalMs = 100;
 
     public Pathfinder(){
         clearCache();
@@ -182,29 +186,31 @@ public class Pathfinder implements Runnable{
         });
 
         Events.run(Trigger.afterGameUpdate, () -> {
-            //only refresh periodically (every 2 frames) to batch flowfield updates
-            //TODO: is it worth switching to a timestamp based system instead that updates every X milliseconds?
-            if(needsRefresh && Core.graphics.getFrameId() % 2 == 0){
-                needsRefresh = false;
+            if(!needsRefresh) return;
 
-                //can't iterate through array so use the map, which should not lead to problems
-                for(Flowfield path : mainList){
-                    //paths with a refresh rate should not be updated by tiles changing
-                    if(path != null && path.needsRefresh()){
-                        synchronized(path.targets){
-                            //TODO: this is super slow and forces a refresh for every tile changed!
-                            path.updateTargetPositions();
-                        }
+            long now = Time.millis();
+            if(now - lastRefreshTime < refreshIntervalMs) return;
+
+            lastRefreshTime = now;
+            needsRefresh = false;
+
+            //can't iterate through array so use the map, which should not lead to problems
+            for(Flowfield path : mainList){
+                //paths with a refresh rate should not be updated by tiles changing
+                if(path != null && path.needsRefresh()){
+                    synchronized(path.targets){
+                        //TODO: this is super slow and forces a refresh for every tile changed!
+                        path.updateTargetPositions();
                     }
                 }
-
-                //mark every flow field as dirty, so it updates when it's done
-                queue.post(() -> {
-                    for(Flowfield data : threadList){
-                        data.dirty = true;
-                    }
-                });
             }
+
+            //mark every flow field as dirty, so it updates when it's done
+            queue.post(() -> {
+                for(Flowfield data : threadList){
+                    data.dirty = true;
+                }
+            });
         });
     }
 

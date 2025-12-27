@@ -28,6 +28,7 @@ public class AIController implements UnitController{
     /** main target that is being faced */
     protected @Nullable Teamc target;
     protected @Nullable Teamc bomberTarget;
+    protected boolean turningAway;
 
     {
         resetTimers();
@@ -155,7 +156,8 @@ public class AIController implements UnitController{
     }
 
     public void targetInvalidated(){
-        //TODO: try this for normal units, reset the target timer
+        //immediately find a new target
+        timer.reset(timerTarget, -1f);
     }
 
     public void updateWeapons(){
@@ -169,7 +171,7 @@ public class AIController implements UnitController{
         noTargetTime += Time.delta;
 
         if(invalid(target)){
-            if(target != null && !target.isAdded()){
+            if(target instanceof Healthc h && !h.isValid()){
                 targetInvalidated();
             }
             target = null;
@@ -300,14 +302,32 @@ public class AIController implements UnitController{
     }
 
     public void circleAttack(float circleLength){
+        if(target == null) return;
+
         vec.set(target).sub(unit);
 
         float ang = unit.angleTo(target);
         float diff = Angles.angleDist(ang, unit.rotation());
 
+        if(target instanceof Unit u && u.collisionLayer() == unit.collisionLayer()){
+            float avoidDist = u.physicSize() + 30f;
+            if(turningAway){
+
+                vec.setLength(prefSpeed()).scl(-1f);
+                unit.movePref(vec);
+
+                if(!unit.within(u, unit.type.circleTargetRadius*0.5f + u.physicSize())){
+                    turningAway = false;
+                }
+                return;
+            }else if(unit.within(u, avoidDist)){
+                turningAway = true;
+            }
+        }
+
         if(diff > 70f && vec.len() < circleLength){
             vec.setAngle(unit.vel().angle());
-        }else{
+        }else if(unit.type.omniMovement){ //non-omni movement units don't need to do this as the turning is already smoothed out
             vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 6f));
         }
 
@@ -357,9 +377,15 @@ public class AIController implements UnitController{
 
         vec.setLength(speed * length);
 
-        if(arrive){
+        if(arrive && length > 0){
             Tmp.v3.set(-unit.vel.x / unit.type.accel * 2f, -unit.vel.y / unit.type.accel * 2f).add((target.getX() - unit.x), (target.getY() - unit.y));
-            vec.add(Tmp.v3).limit(speed * length);
+
+            if(unit.type.omniMovement || unit.type.rotateMoveFirst){
+                vec.add(Tmp.v3).limit(speed * length);
+            }else{
+                //directly move the unit to prevent a backwards movement vector from messing things up
+                unit.moveAt(Tmp.v3.limit(speed * length));
+            }
         }
 
         if(length < -0.5f){

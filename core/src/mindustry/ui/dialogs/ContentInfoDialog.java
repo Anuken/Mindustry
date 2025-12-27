@@ -100,7 +100,7 @@ public class ContentInfoDialog extends BaseDialog{
                 if(contentClass.isAnonymousClass()) contentClass = contentClass.getSuperclass();
 
                 Core.app.openURI("https://mindustrygame.github.io/wiki/Modding%20Classes/" + contentClass.getSimpleName());
-            }).margin(8f).pad(4f).size(300f, 50f).row();
+            }).margin(8f).pad(4f).padTop(8f).size(300f, 50f).row();
         }
 
         content.displayExtra(table);
