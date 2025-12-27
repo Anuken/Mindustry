@@ -440,7 +440,7 @@ public class LStatements{
 
             table.button(b -> {
                 b.label(() -> type.name());
-                b.clicked(() -> showSelect(b, LNode.values(), type, o -> {
+                b.clicked(() -> showSelect(b, LNode.get, type, o -> {
                     type = o;
                 }));
             }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
@@ -459,6 +459,50 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder) {
             return new GetNodeI(type, builder.var(building), builder.var(node), builder.var(index));
+        }
+
+        @Override
+        public LCategory category() {
+            return LCategory.block;
+        }
+    }
+
+    @RegisterStatement("setnode")
+    public static class SetNodeStatement extends LStatement{
+        public LNode type = LNode.add;
+        public String from = "from", to = "to", enabled = "enabled";
+
+        @Override
+        public void build(Table table){
+            table.clearChildren();
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, LNode.set, type, o -> {
+                    type = o;
+                    build(table);
+                }));
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+
+            field(table, from, str -> from = str);
+
+            switch(type){
+                case add -> table.add(" to ");
+                case remove -> table.add(" from ");
+            }
+
+            field(table, to, str -> to = str);
+
+            table.row();
+
+            table.add("enabled: ");
+
+            field(table, enabled, str -> enabled = str);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder) {
+            return new SetNodeI(type, builder.var(from), builder.var(to), builder.var(enabled));
         }
 
         @Override

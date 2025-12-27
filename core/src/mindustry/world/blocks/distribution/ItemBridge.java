@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 public class ItemBridge extends Block{
     private static BuildPlan otherReq;
 
-    public final int timerCheckMoved = timers ++;
+    public final int timerCheckMoved = timers ++, checkLink = timers ++;
 
     public int range;
     public float transportTime;

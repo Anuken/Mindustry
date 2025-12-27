@@ -23,6 +23,7 @@ import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.distribution.ItemBridge;
 import mindustry.world.blocks.distribution.ItemBridge.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
@@ -30,6 +31,8 @@ import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.power.*;
+import mindustry.world.blocks.power.PowerNode.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -596,6 +599,72 @@ public class LExecutor{
                     }
                 }
                 building.setobj(null);
+            }
+        }
+    }
+
+    public static class SetNodeI implements LInstruction{
+        public LNode type = LNode.add;
+        public LVar from, target, enabled;
+
+        public SetNodeI(LNode type, LVar from, LVar target, LVar enabled){
+            this.type = type;
+            this.from = from;
+            this.target = target;
+            this.enabled = enabled;
+        }
+
+        public SetNodeI(){}
+
+        @Override
+        public void run(LExecutor exec){
+            Building input = from.building(), dest = target.building();
+
+            if(input == null || dest == null || input.pos() == dest.pos() || net.client()) return;
+
+            if(input instanceof PowerNodeBuild node && ((PowerNode)node.block).linkValid(node, dest) && (type.mode ^ node.power.links.contains(dest.pos()))){
+                if(!input.timer(((PowerNode)node.block).checkLink, 30f)){
+                    enabled.setbool(false);
+                    return;
+                }
+
+                node.configureAny(dest.pos());
+                enabled.setbool(true);
+            }
+
+            if(input instanceof ItemBridgeBuild ib && dest instanceof ItemBridgeBuild other){
+                boolean valid = ((ItemBridge) ib.block).linkValid(input.tile, dest.tile, false);
+
+                if(!valid) return;
+
+                if(!input.timer(((ItemBridge)ib.block).checkLink, 10f)){
+                    enabled.setbool(false);
+                    return;
+                }
+
+                switch(type){
+                    case add -> {
+                        if(ib.pos() == other.link){
+                            ib.configureAny(other.pos());
+                            other.configureAny(-1);
+                            break;
+                        }
+
+                        if (ib.link != other.pos()){
+                            ib.configureAny(other.pos());
+                        }
+                    }
+                    case remove -> {
+                        if(ib.link == other.pos()){
+                            ib.configureAny(-1);
+                        }
+
+                        if(ib.pos() == other.link){
+                            other.configureAny(-1);
+                        }
+                    }
+                }
+                enabled.setbool(true);
             }
         }
     }

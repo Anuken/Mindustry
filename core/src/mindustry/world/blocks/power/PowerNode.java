@@ -33,6 +33,7 @@ public class PowerNode extends PowerBlock{
     public @Load(value = "@-laser-end", fallback = "laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
     public int maxNodes = 3;
+    public final int checkLink = timers ++;
     public boolean autolink = true, drawRange = true, sameBlockConnection = false;
     public float laserScale = 0.25f;
     public float powerLayer = Layer.power;
