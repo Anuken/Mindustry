@@ -102,7 +102,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public float floorSpeedMultiplier(){
         Floor on = isFlying() || type.hovering ? Blocks.air.asFloor() : floorOn();
-        return on.speedMultiplier * speedMultiplier;
+        return (float)Math.pow(on.speedMultiplier, type.floorMultiplier) * speedMultiplier;
     }
 
     /** Called when this unit was unloaded from a factory or spawn point. */
@@ -532,6 +532,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.targetable(self(), targeter);
     }
 
+    public boolean killable(){
+        return type.killable(self());
+    }
+
     public boolean hittable(){
         return type.hittable(self());
     }
@@ -602,7 +606,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         if(floor != null && floor.isLiquid && floor.drownTime > 0 && canDrown()){
             lastDrownFloor = floor;
-            drownTime += Time.delta / floor.drownTime / type.drownTimeMultiplier;
+            drownTime += Time.delta / (hitSize / 8f * type.drownTimeMultiplier * floor.drownTime);
             if(Mathf.chanceDelta(0.05f)){
                 floor.drownUpdateEffect.at(x, y, hitSize, floor.mapColor);
             }
@@ -703,8 +707,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             kill();
         }
 
-        if(!headless && type.loopSound != Sounds.none){
+        if(!headless){
             control.sound.loop(type.loopSound, this, type.loopSoundVolume);
+            if(type.moveSound != Sounds.none){
+                float progress = Mathf.clamp(vel.len() / type.speed);
+                float pitch = Mathf.lerp(type.moveSoundPitchMin,  type.moveSoundPitchMax, progress);
+                control.sound.loop(type.moveSound, this, type.moveSoundVolume * progress, pitch);
+            }
         }
 
         //check if environment is unsupported
@@ -832,7 +841,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** Actually destroys the unit, removing it and creating explosions. **/
     public void destroy(){
-        if(!isAdded() || !type.killable) return;
+        if(!isAdded() || !killable()) return;
 
         float explosiveness = 2f + item().explosiveness * stack().amount * 1.53f;
         float flammability = item().flammability * stack().amount / 1.9f;
@@ -850,7 +859,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             Effect.scorch(x, y, (int)(hitSize / 5));
         }
         Effect.shake(shake, shake, this);
-        type.deathSound.at(this);
+        type.deathSound.at(this, 1f, type.deathSoundVolume);
 
         Events.fire(new UnitDestroyEvent(self()));
 
@@ -931,13 +940,15 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //don't waste time when the unit is already on the ground, just destroy it
         if(!type.flying || !type.createWreck){
             destroy();
+        }else{
+           type.wreckSound.at(this, 1f, type.wreckSoundVolume);
         }
     }
 
     @Override
     @Replace
     public void kill(){
-        if(dead || net.client() || !type.killable) return;
+        if(dead || net.client() || !killable()) return;
 
         //deaths are synced; this calls killed()
         Call.unitDeath(id);

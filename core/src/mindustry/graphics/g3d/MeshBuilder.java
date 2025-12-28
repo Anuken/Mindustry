@@ -8,14 +8,14 @@ import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
 
 public class MeshBuilder{
-    private static final boolean gl30 = Core.gl30 != null;
+    private static final boolean packNormals = Core.gl30 != null && (Core.app.isMobile() || Core.graphics.getGLVersion().atLeast(3, 3));
     private static volatile float[] tmpHeights = new float[14580]; //highest amount of corners in vanilla
 
     /** Note that the resulting icosphere does not have normals or a color. */
     public static Mesh buildIcosphere(int divisions, float radius){
         MeshResult result = Icosphere.create(divisions);
 
-        Mesh mesh = begin(result.vertices.size / 3, result.indices.size, false, false);
+        Mesh mesh = begin(result.vertices.size / 3, result.indices.size, false, false, false);
 
         if(result.vertices.size >= 65535) throw new RuntimeException("Due to index size limits, only meshes with a maximum of 65535 vertices are supported. If you want more than that, make your own non-indexed mesh builder.");
 
@@ -110,7 +110,7 @@ public class MeshBuilder{
         int position = 0;
 
         short[] shorts = indexed ? new short[12] : null;
-        float[] floats = new float[3 + (gl30 ? 1 : 3) + 1 + (emit ? 1 : 0)];
+        float[] floats = new float[3 + (packNormals ? 1 : 3) + 1 + (emit ? 1 : 0)];
         Vec3 nor = new Vec3();
 
         Color tmpCol = new Color();
@@ -193,16 +193,22 @@ public class MeshBuilder{
     }
 
     private static Mesh begin(int vertices, int indices, boolean normal, boolean emissive){
+        return begin(vertices, indices, normal, emissive, true);
+    }
+
+    private static Mesh begin(int vertices, int indices, boolean normal, boolean emissive, boolean color){
         Seq<VertexAttribute> attributes = Seq.with(
         VertexAttribute.position3
         );
 
         if(normal){
             //only GL30 supports GL_INT_2_10_10_10_REV
-            attributes.add(gl30 ? VertexAttribute.packedNormal : VertexAttribute.normal);
+            attributes.add(packNormals ? VertexAttribute.packedNormal : VertexAttribute.normal);
         }
 
-        attributes.add(VertexAttribute.color);
+        if(color){
+            attributes.add(VertexAttribute.color);
+        }
 
         if(emissive){
             attributes.add(new VertexAttribute(4, GL20.GL_UNSIGNED_BYTE, true, "a_emissive"));
@@ -262,15 +268,15 @@ public class MeshBuilder{
         floats[1] = y;
         floats[2] = z;
 
-        if(gl30){
+        if(packNormals){
             floats[3] = packNormals(normal.x, normal.y, normal.z);
 
             floats[4] = color;
             if(floats.length > 5) floats[5] = emissive;
         }else{
             floats[3] = normal.x;
-            floats[4] = normal.x;
-            floats[5] = normal.x;
+            floats[4] = normal.y;
+            floats[5] = normal.z;
 
             floats[6] = color;
             if(floats.length > 7) floats[7] = emissive;

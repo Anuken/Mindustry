@@ -54,6 +54,11 @@ public class StorageBlock extends Block{
         }
 
         @Override
+        public boolean canUnload(){
+            return linkedCore == null ? super.canUnload() : linkedCore.canUnload();
+        }
+
+        @Override
         public void handleItem(Building source, Item item){
             if(linkedCore != null){
                 if(linkedCore.items.get(item) >= ((CoreBuild)linkedCore).storageCapacity){
@@ -125,6 +130,11 @@ public class StorageBlock extends Block{
         @Override
         public boolean canPickup(){
             return linkedCore == null;
+        }
+
+        @Override
+        public boolean allowDeposit(){
+            return linkedCore != null || super.allowDeposit();
         }
     }
 }

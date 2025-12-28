@@ -18,8 +18,10 @@ public class StaticWall extends Prop{
     public TextureRegion[][] split;
     /** If true, this wall uses autotiling; variants are not supported. See https://github.com/GglLfr/tile-gen*/
     public boolean autotile;
+    /** If >1, the middle region of the autotile has random variants. */
+    public int autotileMidVariants = 1;
 
-    protected TextureRegion[] autotileRegions;
+    protected TextureRegion[] autotileRegions, autotileMidRegions;
 
     public StaticWall(String name){
         super(name);
@@ -46,7 +48,11 @@ public class StaticWall extends Prop{
                 }
             }
 
-            Draw.rect(autotileRegions[TileBitmask.values[bits]], tile.worldx(), tile.worldy());
+            int bit = TileBitmask.values[bits];
+
+            TextureRegion region = bit == 13 && autotileMidVariants > 1 ? autotileMidRegions[variant(tile.x, tile.y, autotileMidRegions.length)] : autotileRegions[bit];
+
+            Draw.rect(region, tile.worldx(), tile.worldy());
         }else{
             int rx = tile.x / 2 * 2;
             int ry = tile.y / 2 * 2;
@@ -64,6 +70,10 @@ public class StaticWall extends Prop{
         if(tile.overlay().wallOre){
             tile.overlay().drawBase(tile);
         }
+    }
+
+    public int variant(int x, int y, int max){
+        return Mathf.randomSeed(Point2.pack(x, y), 0, Math.max(0, max - 1));
     }
 
     public boolean checkAutotileSame(Tile tile, @Nullable Tile other){
@@ -85,6 +95,13 @@ public class StaticWall extends Prop{
 
         if(autotile){
             autotileRegions = TileBitmask.load(name);
+
+            if(autotileMidVariants > 1){
+                autotileMidRegions = new TextureRegion[autotileMidVariants];
+                for(int i = 0; i < autotileMidVariants; i++){
+                    autotileMidRegions[i] = Core.atlas.find(i == 0 ? name + "-13" : name + "-mid-" + (i + 1));
+                }
+            }
         }
     }
 

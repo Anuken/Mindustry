@@ -121,7 +121,7 @@ public class HudFragment{
             || (!block.inEditor && !(block instanceof RemoveWall) && !(block instanceof RemoveOre))
             || !block.isOnPlanet(state.rules.planet)
             || block.buildVisibility == BuildVisibility.debugOnly
-            || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.trim().replaceAll(" +", " ").toLowerCase()))
+            || (!searchText.isEmpty() && !(block == Blocks.removeOre || block == Blocks.removeWall) && !block.localizedName.toLowerCase().contains(searchText.trim().replaceAll(" +", " ").toLowerCase()))
             ) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
@@ -192,6 +192,21 @@ public class HudFragment{
             t.table(Styles.black6, top -> top.label(() -> state.gameOver && state.isCampaign() ? "@sector.curlost" : "@paused")
                 .style(Styles.outlineLabel).pad(8f)).height(pauseHeight).growX();
             //.padLeft(dsize * 5 + 4f) to prevent alpha overlap on left
+        });
+
+        //left/right gutter areas
+        parent.fill((x, y, w, h) -> {
+            x = 0f;
+            y = 0f;
+            w = Core.graphics.getWidth();
+            h = Core.graphics.getHeight();
+            if(Core.scene.marginLeft > 0){
+                paneRight.draw(x, y, Core.scene.marginLeft, h);
+            }
+
+            if(Core.scene.marginRight > 0){
+                paneLeft.draw(x + w - Core.scene.marginRight, y, Core.scene.marginRight, h);
+            }
         });
 
         //"waiting for players"
@@ -595,7 +610,7 @@ public class HudFragment{
         if(state.isMenu()) return;
 
         scheduleToast(() -> {
-            Sounds.message.play();
+            Sounds.uiNotify.play();
 
             Table table = new Table(Tex.button);
             table.update(() -> {
@@ -625,7 +640,7 @@ public class HudFragment{
         //also don't play in the tutorial to prevent confusion
         if(state.isMenu()) return;
 
-        Sounds.message.play();
+        Sounds.uiNotify.play();
 
         //if there's currently no unlock notification...
         if(lastUnlockTable == null){
@@ -915,6 +930,11 @@ public class HudFragment{
             if(!state.rules.waves && state.rules.attackMode){
                 int sum = Math.max(state.teams.present.sum(t -> t.team != player.team() ? t.cores.size : 0), 1);
                 builder.append(sum > 1 ? enemycsf.get(sum) : enemycf.get(sum));
+                return builder;
+            }
+
+            //do not show status after game over
+            if(state.afterGameOver && state.isCampaign()){
                 return builder;
             }
 

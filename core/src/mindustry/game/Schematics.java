@@ -172,7 +172,7 @@ public class Schematics implements Loadable{
     public void savePreview(Schematic schematic, Fi file){
         FrameBuffer buffer = getBuffer(schematic);
         Draw.flush();
-        buffer.begin();
+        buffer.begin(Color.clear);
         Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, buffer.getWidth(), buffer.getHeight());
         file.writePng(pixmap);
         buffer.end();
@@ -274,10 +274,15 @@ public class Schematics implements Loadable{
         return previews.get(schematic);
     }
 
-    /** Creates an array of build plans from a schematic's data, centered on the provided x+y coordinates. */
+    /** Creates an array of build plans from a schematic's data, centered on the provided x,y coordinates. */
     public Seq<BuildPlan> toPlans(Schematic schem, int x, int y){
+        return toPlans(schem, x, y, true);
+    }
+
+    /** Creates an array of build plans from a schematic's data, centered on the provided x,y coordinates. */
+    public Seq<BuildPlan> toPlans(Schematic schem, int x, int y, boolean checkHidden){
         return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block, t.config))
-            .removeAll(s -> (!s.block.isVisible() && !(s.block instanceof CoreBlock)) || !s.block.unlockedNow()).sort(Structs.comparingInt(s -> -s.block.schematicPriority));
+            .removeAll(s -> (checkHidden && !s.block.isVisible() && !(s.block instanceof CoreBlock)) || !s.block.unlockedNow()).sort(Structs.comparingInt(s -> -s.block.schematicPriority));
     }
 
     /** @return all the valid loadouts for a specific core type. */
@@ -588,11 +593,13 @@ public class Schematics implements Loadable{
 
             if(total > 128 * 128) throw new IOException("Invalid schematic: Too many blocks.");
 
+            Reads read = new Reads(stream);
+
             Seq<Stile> tiles = new Seq<>(total);
             for(int i = 0; i < total; i++){
                 Block block = blocks.get(stream.readByte());
                 int position = stream.readInt();
-                Object config = ver == 0 ? mapConfig(block, stream.readInt(), position) : TypeIO.readObject(Reads.get(stream), false, mapper);
+                Object config = ver == 0 ? mapConfig(block, stream.readInt(), position) : TypeIO.readObject(read, false, mapper);
                 byte rotation = stream.readByte();
                 if(block != Blocks.air){
                     tiles.add(new Stile(block, Point2.x(position), Point2.y(position), config, rotation));
@@ -614,6 +621,7 @@ public class Schematics implements Loadable{
         output.write(version);
 
         try(DataOutputStream stream = new DataOutputStream(new DeflaterOutputStream(output))){
+            Writes write = new Writes(stream);
 
             stream.writeShort(schematic.width);
             stream.writeShort(schematic.height);
@@ -650,7 +658,7 @@ public class Schematics implements Loadable{
             for(Stile tile : schematic.tiles){
                 stream.writeByte(blocks.orderedItems().indexOf(tile.block));
                 stream.writeInt(Point2.pack(tile.x, tile.y));
-                TypeIO.writeObject(Writes.get(stream), tile.config);
+                TypeIO.writeObject(write, tile.config);
                 stream.writeByte(tile.rotation);
             }
         }

@@ -50,7 +50,7 @@ public class Vars implements Loadable{
     /** Min game version for all mods. */
     public static final int minModGameVersion = 136;
     /** Min game version for java mods specifically - this is higher, as Java mods have more breaking changes. */
-    public static final int minJavaModGameVersion = 147;
+    public static final int minJavaModGameVersion = 154;
     /** If true, a button to view sector submission threads is shown. */
     public static boolean showSectorSubmissions = true;
     /** If true, the BE server list is always used. */
@@ -58,7 +58,7 @@ public class Vars implements Loadable{
     /** If true, mod code and scripts do not run. For internal testing only. This WILL break mods if enabled. */
     public static boolean skipModCode = false;
     /** Default accessible content types used for player-selectable icons. */
-    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
+    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit, ContentType.status};
     /** Default rule environment. */
     public static final int defaultEnv = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
     /** Wall darkness radius. */
@@ -79,6 +79,8 @@ public class Vars implements Loadable{
     public static final String discordURL = "https://discord.gg/mindustry";
     /** Link to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
+    /** Link to the wiki's patch guide.*/
+    public static final String patchesGuideURL = "https://mindustrygame.github.io/wiki/datapatches/";
     /** URLs to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String[] serverJsonBeURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_be.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_be.json"};
     /** URLs to the JSON file containing all the stable servers.  */

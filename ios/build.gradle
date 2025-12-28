@@ -4,7 +4,7 @@ buildscript{
     }
 
     dependencies{
-        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.23"
+        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.24"
     }
 }
 
@@ -20,7 +20,7 @@ task incrementConfig{
     }else{
         props['app.id'] = 'io.anuke.mindustry'
         props['app.version'] = '7.0'
-        props['app.mainclass'] = 'mindustry.IOSLauncher'
+        props['app.mainclass'] = 'mindustry.ios.IOSLauncher'
         props['app.executable'] = 'IOSLauncher'
         props['app.name'] = 'Mindustry'
     }
@@ -48,7 +48,7 @@ ext{
     mainClassName = "mindustry.ios.IOSLauncher"
 }
 
-task copyAssets(){
+tasks.register('copyAssets'){
     doLast{
         delete{
             delete "assets/"
@@ -61,17 +61,16 @@ task copyAssets(){
     }
 }
 
-task copyNatives(){
+tasks.register('copyNatives'){
     doLast{
         copy{
             from "../../Arc/natives/natives-freetype-ios/libs", "../../Arc/natives/natives-ios/libs"
             into "libs"
         }
-
     }
 }
 
-task deploy{
+tasks.register('deploy'){
     if(System.getProperty("os.name").contains("Mac")) dependsOn copyAssets
     dependsOn createIPA
 }

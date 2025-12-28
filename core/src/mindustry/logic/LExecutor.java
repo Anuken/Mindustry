@@ -57,11 +57,11 @@ public class LExecutor{
     public IntSet linkIds = new IntSet();
     public Team team = Team.derelict;
     public boolean privileged = false;
+    //maps variable name to index in vars; lazily initialized
+    protected @Nullable ObjectIntMap<String> nameMap;
 
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
     protected static IntFloatMap unitTimeouts = new IntFloatMap();
-    //lookup variable by name, lazy init.
-    protected @Nullable ObjectIntMap<String> nameMap;
 
     static{
         Events.on(ResetEvent.class, e -> unitTimeouts.clear());
@@ -377,7 +377,7 @@ public class LExecutor{
                         if(unit instanceof Payloadc pay){
                             //units
                             if(p1.bool()){
-                                Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+                                Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u != unit && u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
 
                                 if(result != null){
                                     Call.pickedUnitPayload(unit, result);
@@ -430,6 +430,28 @@ public class LExecutor{
                             }
                         }
                     }
+                    case deconstruct -> {
+                        if((state.rules.logicUnitDeconstruct || exec.privileged) && unit.canBuild()){
+                            //reset state of last request when necessary
+                            if(ai.plan.x != World.toTile(x1) || ai.plan.y != World.toTile(y1) || !ai.plan.breaking || unit.plans.isEmpty()){
+                                ai.plan.progress = 0;
+                                ai.plan.initialized = false;
+                                ai.plan.stuck = false;
+                            }
+
+                            ai.plan.x = World.toTile(x1);
+                            ai.plan.y = World.toTile(y1);
+                            ai.plan.breaking = true;
+
+                            unit.clearBuilding();
+                            Tile tile = ai.plan.tile();
+
+                            if(tile != null && Build.validBreak(unit.team, ai.plan.x, ai.plan.y)){
+                                unit.updateBuilding = true;
+                                unit.addBuild(ai.plan);
+                            }
+                        }
+                    }
                     case getBlock -> {
                         float range = Math.max(unit.range(), unit.type.buildRange);
                         if(!unit.within(x1, y1, range)){
@@ -463,7 +485,7 @@ public class LExecutor{
                         }else{
                             Building build = p1.building();
                             int dropped = Math.min(unit.stack.amount, p2.numi());
-                            if(build != null && build.team == unit.team && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                            if(build != null && build.team == unit.team && build.isValid() && build.allowDeposit() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                                 int accepted = build.acceptStack(unit.item(), dropped, unit);
                                 if(accepted > 0){
                                     Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
@@ -1689,7 +1711,7 @@ public class LExecutor{
                 return;
             }
 
-            String text = exec.textBuffer.toString();
+            String text = UI.formatIcons(exec.textBuffer.toString());
             if(text.startsWith("@")){
                 String substr = text.substring(1);
                 if(Core.bundle.has(substr)){
@@ -2004,7 +2026,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Sound sound = Sounds.getSound(id.numi());
-            if(sound == null || sound == Sounds.swish) sound = Sounds.none; //no.
+            if(sound == null) sound = Sounds.none;
 
             if(positional){
                 sound.at(World.unconv(x.numf()), World.unconv(y.numf()), pitch.numf(), Math.min(volume.numf(), 2f), limit.bool());

@@ -19,6 +19,7 @@ public class SeaBush extends Prop{
     public SeaBush(String name){
         super(name);
         variants = 0;
+        obstructsLight = false;
     }
 
     @Override

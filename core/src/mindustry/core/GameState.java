@@ -6,6 +6,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.world.blocks.*;
 
@@ -22,6 +23,8 @@ public class GameState{
     public long updateId;
     /** Whether the game is in game over state. */
     public boolean gameOver = false;
+    /** For the campaign, this is whether the map is in a "after game over" state. In this state, the game is always paused. */
+    public boolean afterGameOver = false;
     /** Whether the player's team won the match. */
     public boolean won = false;
     /** Server ticks/second. Only valid in multiplayer. */
@@ -40,6 +43,8 @@ public class GameState{
     public Attributes envAttrs = new Attributes();
     /** Team data. Gets reset every new game. */
     public Teams teams = new Teams();
+    /** Handles JSON edits of game content. */
+    public DataPatcher patcher = new DataPatcher();
     /** Number of enemies in the game; only used clientside in servers. */
     public int enemies;
     /** Map being playtested (not edited!) */

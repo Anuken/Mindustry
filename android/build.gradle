@@ -30,8 +30,8 @@ task deploy(type: Copy){
 
 android{
     namespace = "io.anuke.mindustry"
-    buildToolsVersion = '34.0.0'
-    compileSdk = 34
+    buildToolsVersion = '36.0.0'
+    compileSdk = 36
     sourceSets{
         main{
             manifest.srcFile 'AndroidManifest.xml'
@@ -57,8 +57,8 @@ android{
 
         applicationId "io.anuke.mindustry"
         minSdkVersion 14
-        targetSdkVersion 34
-        
+        targetSdkVersion 36
+
         versionName versionNameResult
         versionCode = vcode
 
@@ -125,11 +125,10 @@ dependencies{
     natives "com.github.Anuken.Arc:natives-android:$arcHash"
     natives "com.github.Anuken.Arc:natives-freetype-android:$arcHash"
 
-    def version;
-    def highestVersion;
+    def version, highestVersion
     new File((String)findSdkDir(), "/platforms").eachFileMatch ~/android-\d+/, {
-        version = it.name.find(/\d+/).toInteger();
-        highestVersion = version > highestVersion ? version : highestVersion;
+        version = it.name.find(/\d+/).toInteger()
+        highestVersion = version > highestVersion ? version : highestVersion
     }
 
     def sdkFile = new File((String)findSdkDir(), "/platforms/android-${highestVersion}/android.jar")

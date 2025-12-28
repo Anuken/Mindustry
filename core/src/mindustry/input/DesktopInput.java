@@ -69,6 +69,13 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
+    public void reset(){
+        super.reset();
+        shouldShoot = false;
+        deleting = false;
+    }
+
+    @Override
     public void buildUI(Group group){
         //building and respawn hints
         group.fill(t -> {
@@ -282,7 +289,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        shouldShoot = !scene.hasMouse() && !locked;
+        shouldShoot = !scene.hasMouse() && !locked && !state.isEditor();
 
         if(!locked && block == null && !scene.hasField() && !scene.hasDialog() &&
                 //disable command mode when player unit can boost and command mode binding is the same
@@ -313,7 +320,6 @@ public class DesktopInput extends InputHandler{
                         }
                     }
                 }
-
             }
 
             if(input.keyTap(Binding.selectAllUnitTransport)){
@@ -499,13 +505,13 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
-    public void useSchematic(Schematic schem){
+    public void useSchematic(Schematic schem, boolean checkHidden){
         block = null;
         schematicX = tileX(getMouseX());
         schematicY = tileY(getMouseY());
 
         selectPlans.clear();
-        selectPlans.addAll(schematics.toPlans(schem, schematicX, schematicY));
+        selectPlans.addAll(schematics.toPlans(schem, schematicX, schematicY, checkHidden));
         mode = none;
     }
 
@@ -539,10 +545,14 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
             tappedOne = false;
 
+            Tile selected = tileAt(Core.input.mouseX(), Core.input.mouseY());
+
             if(commandMode){
                 commandRect = true;
                 commandRectX = input.mouseWorldX();
                 commandRectY = input.mouseWorldY();
+            }else if(selected != null){
+                tileTapped(selected.build);
             }
         }
     }
