@@ -185,7 +185,7 @@ public class LogicDisplay extends Block{
                                         Tmp.tr1.set(displays.get(id).buffer.getTexture());
                                         Draw.rect(Tmp.tr1, x, y, p2, p2, p3 + 90);
                                     }
-                                }else if(ctype < ContentType.all.length && Vars.content.getByID(ContentType.all[p4], id) instanceof UnlockableContent u){
+                                }else if(ctype < ContentType.all.length && Vars.content.getByID(ContentType.all[ctype], id) instanceof UnlockableContent u){
                                     var icon = u.fullIcon;
                                     Draw.rect(icon, x, y, p2, p2 / icon.ratio(), p3);
                                 }
