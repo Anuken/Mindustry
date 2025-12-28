@@ -124,6 +124,8 @@ public class DatabaseDialog extends BaseDialog{
 
             tmpCategory.clear();
 
+            boolean categoryHasResult = false;
+
             for (int j = 0; j < categoryContents.size; j++) {
                 String tagName = categoryContents.orderedKeys().get(j);
                 Seq<UnlockableContent> array = categoryContents.get(tagName).select(u ->
@@ -133,6 +135,7 @@ public class DatabaseDialog extends BaseDialog{
                 if (array.isEmpty()) continue;
 
                 hasResult = true;
+                categoryHasResult = true;
 
                 //sorting only makes sense when in-game; otherwise, banned blocks can't exist
                 if(state.isGame()){
@@ -142,7 +145,7 @@ public class DatabaseDialog extends BaseDialog{
                 tmpCategory.put(tagName, array);
             }
 
-            if (tmpCategory.isEmpty()) continue;
+            if (tmpCategory.isEmpty() || !categoryHasResult) continue;
 
             all.add("@database-category." + categoryName).growX().left().color(Pal.accent);
             all.row();
