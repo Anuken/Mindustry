@@ -11,6 +11,7 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -42,6 +43,8 @@ public class LogicDisplay extends Block{
     ;
 
     public static final Seq<LogicDisplayBuild> displays = new Seq<>(false);
+    /** When the content type of a draw command is this number, it counts as a display. */
+    public static final int displayDrawType = 30;
 
     public static final float scaleStep = 0.05f;
 
@@ -49,6 +52,10 @@ public class LogicDisplay extends Block{
 
     public int displaySize = 64;
     public float scaleFactor = 1f;
+
+    static{
+        Events.on(ResetEvent.class, e -> displays.clear());
+    }
 
     public LogicDisplay(String name){
         super(name);
@@ -173,8 +180,8 @@ public class LogicDisplay extends Block{
                                 int packed = (DisplayCmd.p4(c) << 10) | DisplayCmd.p1(c);
                                 int ctype = packed & 0x1F;
                                 int id = packed >> 5;
-                                if(ctype == 30){
-                                    if(id != index && id < displays.size && displays.get(id).buffer != null){
+                                if(ctype == displayDrawType){
+                                    if(id != index && id < displays.size && id >= 0 && displays.get(id).buffer != null){
                                         Tmp.tr1.set(displays.get(id).buffer.getTexture());
                                         Draw.rect(Tmp.tr1, x, y, p2, p2, p3 + 90);
                                     }

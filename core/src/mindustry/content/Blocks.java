@@ -6646,11 +6646,13 @@ public class Blocks{
         liquidSource = new LiquidSource("liquid-source"){{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
+            floating = true;
         }};
 
         liquidVoid = new LiquidVoid("liquid-void"){{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
+            floating = true;
         }};
 
         payloadSource = new PayloadSource("payload-source"){{
