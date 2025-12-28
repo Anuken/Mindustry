@@ -41,6 +41,8 @@ public class LogicDisplay extends Block{
         commandResetTransform = 15
     ;
 
+    public static final Seq<LogicDisplayBuild> displays = new Seq<>(false);
+
     public static final float scaleStep = 0.05f;
 
     public int maxSides = 25;
@@ -81,6 +83,7 @@ public class LogicDisplay extends Block{
         public LongQueue commands = new LongQueue(256);
         public @Nullable Mat transform;
         public long operations;
+        public int index = -1;
 
         @Override
         public void draw(){
@@ -167,7 +170,15 @@ public class LogicDisplay extends Block{
                             case commandColor -> Draw.color(this.color = Color.toFloatBits(x, y, p1, p2));
                             case commandStroke -> Lines.stroke(this.stroke = x);
                             case commandImage -> {
-                                if(p4 >= 0 && p4 < ContentType.all.length && Vars.content.getByID(ContentType.all[p4], p1) instanceof UnlockableContent u){
+                                int packed = (DisplayCmd.p4(c) << 10) | DisplayCmd.p1(c);
+                                int ctype = packed & 0x1F;
+                                int id = packed >> 5;
+                                if(ctype == 30){
+                                    if(id != index && id < displays.size && displays.get(id).buffer != null){
+                                        Tmp.tr1.set(displays.get(id).buffer.getTexture());
+                                        Draw.rect(Tmp.tr1, x, y, p2, p2, p3 + 90);
+                                    }
+                                }else if(ctype < ContentType.all.length && Vars.content.getByID(ContentType.all[p4], id) instanceof UnlockableContent u){
                                     var icon = u.fullIcon;
                                     Draw.rect(icon, x, y, p2, p2 / icon.ratio(), p3);
                                 }
@@ -232,8 +243,23 @@ public class LogicDisplay extends Block{
         }
 
         @Override
+        public void add(){
+            super.add();
+
+            index = displays.size;
+            displays.add(this);
+        }
+
+        @Override
         public void remove(){
             super.remove();
+
+            if(index != -1){
+                displays.get(displays.size - 1).index = index;
+                displays.remove(index);
+                index = -1;
+            }
+
             if(buffer != null){
                 buffer.dispose();
                 buffer = null;
