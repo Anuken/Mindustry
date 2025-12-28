@@ -61,6 +61,19 @@ public abstract class UnlockableContent extends MappableContent{
      * If shownPlanets is also empty, it will use Serpulo as the "default" tab.
      * */
     public ObjectSet<UnlockableContent> databaseTabs = new ObjectSet<>();
+    /**
+     * Content category. Defines the primary category of content classification in core database.
+     * For example, "block", "liquid", "unit".
+     * use getContentType().name() as fallback when null or empty value.
+     */
+    public @Nullable String databaseCategory;
+    /**
+     * Category tags. Secondary category of content classification in core database.
+     * For example, "turret", "wall" under databaseCategory "block", "core-unit", "ground-unit" under databaseCategory "units".
+     * use "default" as fallback when null or empty value. when using "default", no extra tag label are displayed.
+     */
+    public @Nullable String databaseTag;
+
     /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
     @NoPatch
     public @Nullable TechNode techNode;
@@ -83,6 +96,9 @@ public abstract class UnlockableContent extends MappableContent{
     @Override
     public void postInit(){
         super.postInit();
+
+        if (databaseCategory == null || databaseCategory.isEmpty()) databaseCategory = getContentType().name();
+        if (databaseTag == null || databaseTag.isEmpty()) databaseTag = "default";
 
         databaseTabs.addAll(shownPlanets);
     }
