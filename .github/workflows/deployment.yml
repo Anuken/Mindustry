@@ -3,7 +3,7 @@ name: Deployment
 on:
   push:
     tags:
-      - 'test'
+      - 'v*'
 
 permissions: {}
 jobs:
