@@ -2711,7 +2711,7 @@ public class UnitTypes{
                 y = -1f;
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
-                bullet = new BasicBulletType(7f, 120){{
+                bullet = new BasicBulletType(7f, 10){{
                     sprite = "missile-large";
                     width = 7.5f;
                     height = 13f;
@@ -2785,7 +2785,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 120f){{
+                bullet = new BasicBulletType(8f, 150f){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 18f;
@@ -2803,7 +2803,7 @@ public class UnitTypes{
                     trailLength = 8;
                     hitEffect = despawnEffect = Fx.blastExplosion;
                     splashDamageRadius = 20f;
-                    splashDamage = 35f;
+                    splashDamage = 50f;
                     maxRange = 190f;
 
                     fragOnHit = false;
@@ -3409,7 +3409,7 @@ public class UnitTypes{
                 region = "tecta-shield";
                 radius = 45f;
                 angle = 82f;
-                regen = 40f / 60f;
+                regen = 45f / 60f;
                 cooldown = 60f * 8f;
                 max = 2500f;
                 y = -20f;
