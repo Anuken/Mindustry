@@ -3411,7 +3411,7 @@ public class UnitTypes{
                 angle = 82f;
                 regen = 40f / 60f;
                 cooldown = 60f * 8f;
-                max = 2200f;
+                max = 2500f;
                 y = -20f;
                 width = 8f;
                 whenShooting = false;
