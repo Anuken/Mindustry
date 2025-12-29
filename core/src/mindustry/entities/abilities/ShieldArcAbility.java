@@ -38,16 +38,18 @@ public class ShieldArcAbility extends Ability{
 
                 if(penX > penY){
                     b.vel.x *= -1;
-                    b.vel.y *= -0.5;
+                    b.vel.y *= paramField.reflectVel;
                 }else{
                     b.vel.y *= -1;
-                    b.vel.x *= -0.5;
+                    b.vel.x *= paramField.reflectVel;
                 }
 
                 b.owner = paramUnit;
                 b.team = paramUnit.team;
                 b.time += 1f;
-                b.type.buildingDamageMultiplier = 1f;
+                if(paramField.reflectBuildingDamage > 0f){
+                    b.type.buildingDamageMultiplier = paramField.reflectBuildingDamage;
+                }
 
             }else{
                 b.absorb();
@@ -127,6 +129,10 @@ public class ShieldArcAbility extends Ability{
     public float width = 6f;
     /** Bullet deflection chance. -1 to disable */
     public float chanceDeflect = -1f;
+    /** Multiplier for reflected bullet building damage. -1 to disable */
+    public float reflectBuildingDamage = 1f;
+    /** Velocity multiplier for reflected bullets on the opposite axis. */
+    public float reflectVel = -0.5f;
     /** Deflection sound. */
     public Sound deflectSound = Sounds.none;
     public Sound breakSound = Sounds.shieldBreakSmall;
