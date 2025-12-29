@@ -2954,7 +2954,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(8f, 420f){{
+                bullet = new BasicBulletType(8f, 360f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
@@ -2975,7 +2975,7 @@ public class UnitTypes{
                         lifetime = 40f;
                         waveStroke = 4f;
                         waveColor = sparkColor = trailColor;
-                        waveRad = 50f;
+                        waveRad = 15f;
                         smokeSize = 5f;
                         smokes = 8;
                         smokeSizeBase = 0f;
@@ -3010,13 +3010,13 @@ public class UnitTypes{
                                 weaveScale = (3f + s/2f) / 1.2f;
                                 weaveMag = i * (4f - fin * 2f);
 
-                                splashDamage = 85f;
-                                splashDamageRadius = 50f;
+                                splashDamage = 65f;
+                                splashDamageRadius = 30f;
                                 despawnEffect = new ExplosionEffect(){{
                                     lifetime = 50f;
                                     waveStroke = 4f;
                                     waveColor = sparkColor = trailColor;
-                                    waveRad = 50f;
+                                    waveRad = 30f;
                                     smokeSize = 7f;
                                     smokes = 6;
                                     smokeSizeBase = 0f;

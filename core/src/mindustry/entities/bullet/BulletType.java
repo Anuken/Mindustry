@@ -171,7 +171,7 @@ public class BulletType extends Content implements Cloneable{
     public boolean despawnHit = false;
     /** If true, this bullet will create bullets when it hits anything */
     public boolean fragOnHit = true;
-    /** If true, this bullet will create bullets on the last hit, regardless of fragOnHit */
+    /** If true, this bullet will create bullets on the last hit, regardless of fragOnHit. Respects pierceFragCap, leaving the last frag to the last hit */
     public boolean fragOnLastHit = false;
     /** If true, this bullet will create bullets when it despawns */
     public boolean fragOnDespawn = true;
@@ -597,7 +597,8 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void createFrags(Bullet b, float x, float y, boolean despawn){
-        if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && (pierceFragCap < 0 || (fragOnLastHit ? b.frags == pierceFragCap : b.frags < pierceFragCap) || despawn)){
+        if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && (pierceFragCap < 0 || (fragOnLastHit ? 
+            (b.frags < pierceFragCap - 1 && fragOnHit) || (b.frags + 1) == pierceCap : b.frags < pierceFragCap) || despawn)){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(fragOffsetMin, fragOffsetMax);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + fragSpread * i - (fragBullets - 1) * fragSpread / 2f;
