@@ -140,6 +140,12 @@ public class LogicDisplay extends Block{
             }
         }
 
+        public void getBufferRegion(TextureRegion region){
+            if(buffer != null){
+                region.set(buffer.getTexture(), 0, buffer.getTexture().height, buffer.getTexture().width, -buffer.getTexture().height);
+            }
+        }
+
         public void processCommands(){
             //don't bother processing commands if displays are off
             if(!commands.isEmpty() && buffer != null){
@@ -182,8 +188,8 @@ public class LogicDisplay extends Block{
                                 int id = packed >> 5;
                                 if(ctype == displayDrawType){
                                     if(id != index && id < displays.size && id >= 0 && displays.get(id).buffer != null){
-                                        Tmp.tr1.set(displays.get(id).buffer.getTexture());
-                                        Draw.rect(Tmp.tr1, x, y, p2, p2, p3 + 90);
+                                        displays.get(id).getBufferRegion(Tmp.tr1);
+                                        Draw.rect(Tmp.tr1, x, y, p2, p2 / Tmp.tr1.ratio(), p3);
                                     }
                                 }else if(ctype < ContentType.all.length && Vars.content.getByID(ContentType.all[ctype], id) instanceof UnlockableContent u){
                                     var icon = u.fullIcon;
