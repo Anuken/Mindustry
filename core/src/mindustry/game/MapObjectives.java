@@ -10,7 +10,6 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
@@ -27,9 +26,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.logic.CanvasBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 
-import java.io.*;
 import java.lang.annotation.*;
-import java.nio.*;
 import java.util.*;
 
 import static java.lang.annotation.ElementType.*;
@@ -1333,29 +1330,28 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
         }else if(texture instanceof UnlockableContent u){
             out.set(u.fullIcon);
-        }else if(texture instanceof LogicDisplayBuild d){
+        }else if(texture instanceof LogicDisplayBuild d && d.isAdded()){
             d.ensureBuffer();
             out.set(d.buffer.getTexture());
-        }else if(texture instanceof CanvasBuild c){
-            if(c.texture == null) c.updateTexture();
-            out.set(c.texture);
+        }else if(texture instanceof CanvasBuild c && c.isAdded()){
+            c.updateTexture();
+            if(c.texture != null) out.set(c.texture);
         }else{
             out.set(Core.atlas.find("error"));
         }
     }
 
     private static void prepareTexture(ObjectiveMarker marker, Object texture){
-        if(texture instanceof LogicDisplayBuild d){
+        if(texture instanceof LogicDisplayBuild d && d.isAdded()){
             if(d.buffer == null || d.buffer.isDisposed()){
                 marker.setTexture("error");
             }else{
                 d.processCommands();
             }
-        }else if(texture instanceof CanvasBuild c){
+        }else if(texture instanceof CanvasBuild c && c.isAdded()){
             if(c.texture == null || c.texture.isDisposed()){
                 marker.setTexture("error");
-            }else if(c.updated){
-                c.updated = false;
+            }else{
                 c.updateTexture();
             }
         }
