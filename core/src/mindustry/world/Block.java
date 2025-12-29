@@ -1251,7 +1251,7 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
-        if (databaseTag == null || databaseTag.isEmpty()) {
+        if(databaseTag == null || databaseTag.isEmpty()){
             databaseTag = category.name();
         }
 

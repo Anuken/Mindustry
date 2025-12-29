@@ -530,13 +530,13 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void postInit() {
-        if (databaseTag == null || databaseTag.isEmpty()) {
-            if (flying) {
+    public void postInit(){
+        if(databaseTag == null || databaseTag.isEmpty()){
+            if(flying){
                 databaseTag = "unit-air";
-            }else if (naval) {
+            }else if(naval){
                 databaseTag = "unit-naval";
-            }else {
+            }else{
                 databaseTag = "unit-ground";
             }
         }

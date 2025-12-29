@@ -18,8 +18,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
-import java.util.Objects;
-
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
@@ -118,7 +116,7 @@ public class DatabaseDialog extends BaseDialog{
 
         boolean hasResult = false;
 
-        for (int i = 0; i < sortedContents.size; i++) {
+        for(int i = 0; i < sortedContents.size; i++){
             String categoryName = sortedContents.orderedKeys().get(i);
             OrderedMap<String, Seq<UnlockableContent>> categoryContents = sortedContents.get(categoryName);
 
@@ -126,13 +124,13 @@ public class DatabaseDialog extends BaseDialog{
 
             boolean categoryHasResult = false;
 
-            for (int j = 0; j < categoryContents.size; j++) {
+            for(int j = 0; j < categoryContents.size; j++){
                 String tagName = categoryContents.orderedKeys().get(j);
                 Seq<UnlockableContent> array = categoryContents.get(tagName).select(u ->
-                        !u.isHidden() && !u.hideDatabase &&
-                        (tab == Planets.sun || u.allDatabaseTabs || u.databaseTabs.contains(tab)) &&
-                        (text.isEmpty() || u.localizedName.toLowerCase().contains(text))).as();
-                if (array.isEmpty()) continue;
+                !u.isHidden() && !u.hideDatabase &&
+                (tab == Planets.sun || u.allDatabaseTabs || u.databaseTabs.contains(tab)) &&
+                (text.isEmpty() || u.localizedName.toLowerCase().contains(text))).as();
+                if(array.isEmpty()) continue;
 
                 hasResult = true;
                 categoryHasResult = true;
@@ -145,7 +143,7 @@ public class DatabaseDialog extends BaseDialog{
                 tmpCategory.put(tagName, array);
             }
 
-            if (tmpCategory.isEmpty() || !categoryHasResult) continue;
+            if(tmpCategory.isEmpty() || !categoryHasResult) continue;
 
             all.add("@database-category." + categoryName).growX().left().color(Pal.accent);
             all.row();
@@ -153,12 +151,12 @@ public class DatabaseDialog extends BaseDialog{
             all.row();
 
             all.table(sub -> {
-                for (int j = 0; j < tmpCategory.size; j++) {
+                for(int j = 0; j < tmpCategory.size; j++){
                     String tagName = categoryContents.orderedKeys().get(j);
                     Seq<UnlockableContent> array = tmpCategory.get(tagName);
-                    if (array == null || array.isEmpty()) continue;
+                    if(array == null || array.isEmpty()) continue;
 
-                    if (!(Objects.equals(tagName, "default"))) {
+                    if(!"default".equals(tagName)){
                         sub.table(tag -> {
                             tag.add("@database-tag." + tagName).left().color(Pal.gray);
                             tag.image().growX().pad(5).height(3).color(Pal.gray);
@@ -209,7 +207,7 @@ public class DatabaseDialog extends BaseDialog{
                             }
                         }
 
-                        for (int k = 0; k < cols - count; k++) {
+                        for(int k = 0; k < cols - count; k++){
                             Image image = new Image();
                             image.setColor(Color.clear);
                             list.add(image).size(8 * 4).pad(3);
