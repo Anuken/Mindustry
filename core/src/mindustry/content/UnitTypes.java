@@ -102,8 +102,9 @@ public class UnitTypes{
             speed = 0.5f;
             hitSize = 8f;
             health = 150;
+            stepSoundVolume = 0.4f;
+
             weapons.add(new Weapon("large-weapon"){{
-                shootSound = Sounds.shootDagger;
                 reload = 13f;
                 x = 4f;
                 y = 2f;
@@ -127,7 +128,7 @@ public class UnitTypes{
 
             weapons.add(new Weapon("flamethrower"){{
                 top = false;
-                shootSound = Sounds.flame;
+                shootSound = Sounds.shootFlame;
                 shootY = 2f;
                 reload = 22f;
                 recoil = 1f;
@@ -159,6 +160,9 @@ public class UnitTypes{
             armor = 9f;
             mechFrontSway = 0.55f;
             ammoType = new ItemAmmoType(Items.graphite);
+            stepSound = Sounds.mechStepSmall;
+            stepSoundPitch = 0.8f;
+            stepSoundVolume = 0.65f;
 
             weapons.add(new Weapon("artillery"){{
                 top = false;
@@ -168,7 +172,7 @@ public class UnitTypes{
                 recoil = 4f;
                 shake = 2f;
                 ejectEffect = Fx.casing2;
-                shootSound = Sounds.artillery;
+                shootSound = Sounds.shootArtillery;
                 bullet = new ArtilleryBulletType(2f, 20, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
@@ -203,10 +207,20 @@ public class UnitTypes{
 
             abilities.add(new ShieldRegenFieldAbility(25f, 250f, 60f * 1, 60f));
 
-            BulletType smallBullet = new BasicBulletType(3f, 10){{
-                width = 7f;
-                height = 9f;
-                lifetime = 50f;
+            BulletType smallBullet = new BasicBulletType(12f, 20){{
+                width = 4.5f;
+                height = 35f;
+                lifetime = (26f * tilesize) / 12f;
+                shrinkX = 0.6f;
+                shrinkY = 0f;
+                shrinkInterp = Interp.slope;
+
+                trailChance = 10f / 60f;
+                trailColor = Pal.bulletYellowBack;
+                trailEffect = Fx.bulletSparkSmokeTrailSmall;
+                trailSpread = 12f;
+                shootEffect = Fx.shootScepterSecondary;
+                hitEffect = Fx.hitScepterSecondary;
             }};
 
             weapons.add(
@@ -226,37 +240,52 @@ public class UnitTypes{
                 shoot.shots = 3;
                 shoot.shotDelay = 4f;
 
-                bullet = new BasicBulletType(8f, 80){{
+                bullet = new BasicBulletType(8f, 70){{
                     width = 11f;
                     height = 20f;
                     lifetime = 27f;
+                    shrinkX = 0.4f;
+                    shrinkY = 0f;
                     shootEffect = Fx.shootBig;
+                    hitEffect = Fx.blastExplosion;
+                    trailParam = 0.5f;
                     lightning = 2;
                     lightningLength = 6;
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
                     lightningDamage = 20;
-                    despawnSound = Sounds.sparkBullet;
+                    despawnSound = Sounds.shockBullet;
+                    bulletInterval = 4f;
+
+                    intervalBullet = new LightningBulletType(){{
+                        damage = 5f;
+                        lightningLength = 3;
+                        lightningLengthRand = 4;
+                        lightningColor = Pal.surge;
+                        hitEffect = Fx.hitLancerLow;
+                    }};
                 }};
             }},
 
-            new Weapon("mount-weapon"){{
-                reload = 13f;
+            new Weapon("scepter-mount"){{
+                reload = 12f;
                 x = 8.5f;
                 y = 6f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
                 bullet = smallBullet;
-                shootSound = Sounds.shootDagger;
+                shootSound = Sounds.shootScepterSecondary;
+                rotateSpeed = 3f;
             }},
-            new Weapon("mount-weapon"){{
-                reload = 16f;
+            new Weapon("scepter-mount"){{
+                reload = 15f;
                 x = 8.5f;
                 y = -7f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
                 bullet = smallBullet;
-                shootSound = Sounds.shootDagger;
+                shootSound = Sounds.shootScepterSecondary;
+                rotateSpeed = 3f;
             }}
             );
         }};
@@ -348,7 +377,7 @@ public class UnitTypes{
                 alternate = false;
                 ejectEffect = Fx.none;
                 recoil = 2f;
-                shootSound = Sounds.lasershoot;
+                shootSound = Sounds.shootLaser;
 
                 bullet = new LaserBoltBulletType(5.2f, 13){{
                     lifetime = 30f;
@@ -391,7 +420,7 @@ public class UnitTypes{
 
                 ejectEffect = Fx.none;
                 recoil = 2.5f;
-                shootSound = Sounds.shock;
+                shootSound = Sounds.shootPulsar;
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
@@ -428,6 +457,9 @@ public class UnitTypes{
 
             mechFrontSway = 0.55f;
             ammoType = new PowerAmmoType(1500);
+            stepSound = Sounds.mechStepSmall;
+            stepSoundPitch = 0.9f;
+            stepSoundVolume = 0.6f;
 
             speed = 0.5f;
             hitSize = 13f;
@@ -444,7 +476,7 @@ public class UnitTypes{
                 x = 6.5f;
                 reload = 55f;
                 recoil = 4f;
-                shootSound = Sounds.laser;
+                shootSound = Sounds.shootLancer;
 
                 bullet = new LaserBulletType(){{
                     damage = 45f;
@@ -502,9 +534,9 @@ public class UnitTypes{
 
                 reload = 155f;
                 recoil = 0f;
-                chargeSound = Sounds.lasercharge2;
+                chargeSound = Sounds.chargeVela;
                 shootSound = Sounds.beamPlasma;
-                initialShootSound = Sounds.beamPlasmaFire;
+                initialShootSound = Sounds.shootBeamPlasma;
                 continuous = true;
                 cooldownTime = 200f;
 
@@ -575,8 +607,8 @@ public class UnitTypes{
             drawShields = false;
 
             weapons.add(new Weapon("corvus-weapon"){{
-                shootSound = Sounds.laserblast;
-                chargeSound = Sounds.lasercharge;
+                shootSound = Sounds.shootCorvus;
+                chargeSound = Sounds.chargeCorvus;
                 soundPitchMin = 1f;
                 top = false;
                 mirror = false;
@@ -635,6 +667,8 @@ public class UnitTypes{
             mechSideSway = 0.25f;
             range = 40f;
             ammoType = new ItemAmmoType(Items.coal);
+            stepSound = Sounds.walkerStepTiny;
+            stepSoundVolume = 0.2f;
 
             weapons.add(new Weapon(){{
                 shootOnDeath = true;
@@ -642,7 +676,7 @@ public class UnitTypes{
                 reload = 24f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
-                shootSound = Sounds.crawlerExplosion;
+                shootSound = Sounds.explosionCrawler;
                 shootSoundVolume = 0.4f;
                 x = shootY = 0f;
                 mirror = false;
@@ -671,6 +705,10 @@ public class UnitTypes{
             targetAir = false;
             health = 600;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
+
+            stepSound = Sounds.walkerStepSmall;
+            stepSoundPitch = 1f;
+            stepSoundVolume = 0.25f;
 
             legCount = 4;
             legLength = 9f;
@@ -721,13 +759,17 @@ public class UnitTypes{
             shadowElevation = 0.3f;
             groundLayer = Layer.legUnit;
 
+            stepSound = Sounds.walkerStepSmall;
+            stepSoundPitch = 0.7f;
+            stepSoundVolume = 0.35f;
+
             weapons.add(new Weapon("spiroct-weapon"){{
                 shootY = 4f;
                 reload = 14f;
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 rotate = true;
-                shootSound = Sounds.sap;
+                shootSound = Sounds.shootSap;
 
                 x = 8.5f;
                 y = -1.5f;
@@ -750,7 +792,7 @@ public class UnitTypes{
                 rotate = true;
                 x = 4f;
                 y = 3f;
-                shootSound = Sounds.sap;
+                shootSound = Sounds.shootSap;
 
                 bullet = new SapBulletType(){{
                     sapStrength = 0.8f;
@@ -788,7 +830,7 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(2000);
 
             stepSound = Sounds.walkerStep;
-            stepSoundVolume = 0.75f;
+            stepSoundVolume = 0.85f;
             stepSoundPitch = 1.1f;
 
             legSplashDamage = 32;
@@ -817,7 +859,7 @@ public class UnitTypes{
                 y = 8f;
                 rotate = true;
                 bullet = sapper;
-                shootSound = Sounds.sap;
+                shootSound = Sounds.shootSap;
             }},
             new Weapon("spiroct-weapon"){{
                 reload = 14f;
@@ -825,7 +867,7 @@ public class UnitTypes{
                 y = 6f;
                 rotate = true;
                 bullet = sapper;
-                shootSound = Sounds.sap;
+                shootSound = Sounds.shootSap;
             }},
             new Weapon("spiroct-weapon"){{
                 reload = 22f;
@@ -833,7 +875,7 @@ public class UnitTypes{
                 y = 0f;
                 rotate = true;
                 bullet = sapper;
-                shootSound = Sounds.sap;
+                shootSound = Sounds.shootSap;
             }},
             new Weapon("large-purple-mount"){{
                 y = -7f;
@@ -843,14 +885,14 @@ public class UnitTypes{
                 shake = 3f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.artillerySap;
+                shootSound = Sounds.shootArtillerySap;
                 rotate = true;
                 shadow = 8f;
                 recoil = 3f;
 
                 bullet = new ArtilleryBulletType(2f, 12){{
                     hitEffect = Fx.sapExplosion;
-                    despawnSound = Sounds.artilleryShockExplosion;
+                    despawnSound = Sounds.explosionArtilleryShock;
                     knockback = 0.8f;
                     lifetime = 70f;
                     width = height = 19f;
@@ -911,7 +953,7 @@ public class UnitTypes{
                 shake = 4f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.shotgunSap;
+                shootSound = Sounds.shootToxopidShotgun;
                 shootSoundVolume = 0.8f;
                 rotate = true;
                 shadow = 12f;
@@ -944,14 +986,14 @@ public class UnitTypes{
                 recoil = 10f;
                 rotateSpeed = 1f;
                 ejectEffect = Fx.casing3;
-                shootSound = Sounds.artillerySapBig;
+                shootSound = Sounds.shootArtillerySapBig;
                 rotate = true;
                 shadow = 30f;
 
                 rotationLimit = 80f;
 
                 bullet = new ArtilleryBulletType(3f, 50){{
-                    despawnSound = Sounds.artilleryShockExplosionBig;
+                    despawnSound = Sounds.explosionArtilleryShockBig;
                     hitEffect = Fx.sapExplosion;
                     knockback = 0.8f;
                     lifetime = 80f;
@@ -977,7 +1019,7 @@ public class UnitTypes{
                     fragBullets = 9;
 
                     fragBullet = new ArtilleryBulletType(2.3f, 30){{
-                        despawnSound = Sounds.artilleryShockExplosion;
+                        despawnSound = Sounds.explosionArtilleryShock;
                         hitEffect = Fx.sapExplosion;
                         knockback = 0.8f;
                         lifetime = 90f;
@@ -1020,6 +1062,12 @@ public class UnitTypes{
             omniMovement = false;
             rotateSpeed = 5f;
             circleTargetRadius = 60f;
+            wreckSoundVolume = 0.7f;
+
+            moveSound = Sounds.loopThruster;
+            moveSoundPitchMin = 0.3f;
+            moveSoundPitchMax = 1.5f;
+            moveSoundVolume = 0.2f;
 
             weapons.add(new Weapon(){{
                 y = 1f;
@@ -1031,15 +1079,15 @@ public class UnitTypes{
                 shoot.shotDelay = 3f;
                 ejectEffect = Fx.casing1;
                 mirror = false;
-                bullet = new BasicBulletType(2.5f, 16){{
+                bullet = new BasicBulletType(2.5f, 9){{
+                    inaccuracy = 4f;
                     width = 7f;
                     height = 9f;
-                    lifetime = 45f;
+                    lifetime = 32f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
                     ammoMultiplier = 2;
                 }};
-                shootSound = Sounds.shootDagger;
             }});
         }};
 
@@ -1047,7 +1095,7 @@ public class UnitTypes{
             health = 340;
             speed = 1.65f;
             accel = 0.08f;
-            drag = 0.016f;
+            drag = 0.03f;
             flying = true;
             hitSize = 11f;
             targetAir = false;
@@ -1064,6 +1112,10 @@ public class UnitTypes{
             rotateSpeed = 4.5f;
             circleTargetRadius = 40f;
 
+            moveSound = Sounds.loopThruster;
+            moveSoundPitchMin = 0.6f;
+            moveSoundVolume = 0.4f;
+
             weapons.add(new Weapon(){{
                 minShootVelocity = 1f;
                 x = 3f;
@@ -1073,7 +1125,7 @@ public class UnitTypes{
                 ejectEffect = Fx.none;
                 inaccuracy = 15f;
                 ignoreRotation = true;
-                shootSound = Sounds.bombDrop;
+                shootSound = Sounds.shootHorizon;
                 soundPitchMax = 1.2f;
                 bullet = new BombBulletType(27f, 25f){{
                     width = 10f;
@@ -1114,7 +1166,7 @@ public class UnitTypes{
                 shoot.shots = 2;
                 inaccuracy = 5f;
                 velocityRnd = 0.2f;
-                shootSound = Sounds.missileLong;
+                shootSound = Sounds.shootMissileLong;
 
                 bullet = new MissileBulletType(3f, 14){{
                     width = 8f;
@@ -1152,6 +1204,8 @@ public class UnitTypes{
             targetFlags = new BlockFlag[]{BlockFlag.generator, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
+            loopSound = Sounds.loopHover;
+
             BulletType missiles = new MissileBulletType(2.7f, 18){{
                 width = 8f;
                 height = 8f;
@@ -1176,7 +1230,7 @@ public class UnitTypes{
                 ejectEffect = Fx.casing1;
                 rotateSpeed = 8f;
                 bullet = missiles;
-                shootSound = Sounds.missile;
+                shootSound = Sounds.shootMissile;
                 rotate = true;
                 shadow = 6f;
             }},
@@ -1187,7 +1241,7 @@ public class UnitTypes{
                 rotateSpeed = 8f;
                 ejectEffect = Fx.casing1;
                 bullet = missiles;
-                shootSound = Sounds.missile;
+                shootSound = Sounds.shootMissile;
                 rotate = true;
                 shadow = 6f;
             }},
@@ -1227,6 +1281,8 @@ public class UnitTypes{
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
+            loopSound = Sounds.loopHover;
+
             BulletType fragBullet = new FlakBulletType(4f, 15){{
                 shootEffect = Fx.shootBig;
                 ammoMultiplier = 4f;
@@ -1248,7 +1304,7 @@ public class UnitTypes{
                 rotateSpeed = 2f;
                 reload = 45f;
                 recoil = 4f;
-                shootSound = Sounds.laser2;
+                shootSound = Sounds.shootEclipse;
                 shadow = 20f;
                 rotate = true;
 
@@ -1306,6 +1362,7 @@ public class UnitTypes{
             range = 50f;
             isEnemy = false;
             controlSelectGlobal = false;
+            wreckSoundVolume = deathSoundVolume = 0.7f;
 
             ammoType = new PowerAmmoType(500);
 
@@ -1331,6 +1388,7 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(900);
             mineTier = 2;
             mineSpeed = 3.5f;
+            wreckSoundVolume = 0.9f;
 
             abilities.add(new RepairFieldAbility(5f, 60f * 8, 50f));
 
@@ -1341,7 +1399,7 @@ public class UnitTypes{
                 reload = 30f;
                 ejectEffect = Fx.none;
                 recoil = 2f;
-                shootSound = Sounds.missilePlasmaShort;
+                shootSound = Sounds.shootMissilePlasmaShort;
                 velocityRnd = 0.5f;
                 inaccuracy = 15f;
                 alternate = true;
@@ -1391,7 +1449,7 @@ public class UnitTypes{
 
             weapons.add(
             new Weapon("heal-weapon-mount"){{
-                shootSound = Sounds.lasershoot;
+                shootSound = Sounds.shootLaser;
                 reload = 24f;
                 x = 8f;
                 y = -6f;
@@ -1405,7 +1463,7 @@ public class UnitTypes{
                 }};
             }},
             new Weapon("heal-weapon-mount"){{
-                shootSound = Sounds.lasershoot;
+                shootSound = Sounds.shootLaser;
                 reload = 15f;
                 x = 4f;
                 y = 5f;
@@ -1444,6 +1502,8 @@ public class UnitTypes{
 
             ammoType = new PowerAmmoType(3000);
 
+            loopSound = Sounds.loopHover;
+
             weapons.add(
             new Weapon(){{
                 x = y = 0f;
@@ -1452,7 +1512,7 @@ public class UnitTypes{
                 minShootVelocity = 0.01f;
 
                 soundPitchMin = 1f;
-                shootSound = Sounds.plasmadrop;
+                shootSound = Sounds.shootQuad;
 
                 bullet = new BasicBulletType(){{
                     sprite = "large-bomb";
@@ -1465,7 +1525,8 @@ public class UnitTypes{
                     frontColor = Color.white;
                     mixColorTo = Color.white;
 
-                    hitSound = Sounds.plasmaboom;
+                    hitSound = Sounds.explosionQuad;
+                    hitSoundVolume = 0.9f;
 
                     shootCone = 180f;
                     ejectEffect = Fx.none;
@@ -1514,6 +1575,8 @@ public class UnitTypes{
             buildBeamOffset = 43;
             ammoCapacity = 1;
 
+            loopSound = Sounds.loopHover;
+
             abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8, 8, 0f){{
                 breakSound = Sounds.shieldBreak;
             }}, new RepairFieldAbility(130f, 60f * 2, 140f));
@@ -1527,11 +1590,17 @@ public class UnitTypes{
             drag = 0.13f;
             hitSize = 10f;
             health = 280;
+            armor = 2f;
             accel = 0.4f;
             rotateSpeed = 3.3f;
             faceTarget = false;
 
-            armor = 2f;
+            trailLength = 20;
+            waveTrailX = 4f;
+            trailScl = 1.3f;
+
+            moveSoundVolume = 0.4f;
+            moveSound = Sounds.shipMove;
 
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 13f;
@@ -1540,7 +1609,6 @@ public class UnitTypes{
                 y = 1.5f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.shootDagger;
                 bullet = new BasicBulletType(2.5f, 9){{
                     width = 7f;
                     height = 9f;
@@ -1556,7 +1624,7 @@ public class UnitTypes{
                 y = -5f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.missileShort;
+                shootSound = Sounds.shootMissileShort;
                 bullet = new MissileBulletType(2.7f, 12, "missile"){{
                     keepVelocity = true;
                     width = 8f;
@@ -1588,6 +1656,10 @@ public class UnitTypes{
             rotateSpeed = 2.6f;
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
+
+            moveSoundVolume = 0.55f;
+            moveSoundPitchMin = moveSoundPitchMax = 0.9f;
+            moveSound = Sounds.shipMove;
 
             trailLength = 20;
             waveTrailX = 5.5f;
@@ -1624,7 +1696,7 @@ public class UnitTypes{
                 rotateSpeed = 2f;
                 shake = 1.5f;
                 ejectEffect = Fx.casing2;
-                shootSound = Sounds.artillerySmall;
+                shootSound = Sounds.shootArtillerySmall;
                 bullet = new ArtilleryBulletType(3f, 20, "shell"){{
                     hitEffect = Fx.flakExplosion;
                     knockback = 0.8f;
@@ -1648,6 +1720,10 @@ public class UnitTypes{
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
 
+            moveSoundVolume = 0.7f;
+            moveSoundPitchMin = moveSoundPitchMax = 0.77f;
+            moveSound = Sounds.shipMove;
+
             trailLength = 22;
             waveTrailX = 7f;
             waveTrailY = -9f;
@@ -1669,7 +1745,7 @@ public class UnitTypes{
 
                 inaccuracy = 3f;
                 ejectEffect = Fx.casing3;
-                shootSound = Sounds.artillery;
+                shootSound = Sounds.shootArtillery;
 
                 bullet = new ArtilleryBulletType(3.2f, 15){{
                     trailMult = 0.8f;
@@ -1708,7 +1784,7 @@ public class UnitTypes{
 
                 inaccuracy = 5f;
                 velocityRnd = 0.1f;
-                shootSound = Sounds.missileShort;
+                shootSound = Sounds.shootMissileShort;
                 ammoType = new ItemAmmoType(Items.thorium);
 
                 ejectEffect = Fx.none;
@@ -1745,6 +1821,10 @@ public class UnitTypes{
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.thorium);
 
+            moveSoundVolume = 1f;
+            moveSound = Sounds.shipMoveBig;
+            moveSoundPitchMin = moveSoundPitchMax = 0.95f;
+
             trailLength = 50;
             waveTrailX = 18f;
             waveTrailY = -21f;
@@ -1767,7 +1847,7 @@ public class UnitTypes{
                 inaccuracy = 7f;
                 ejectEffect = Fx.none;
                 shake = 1f;
-                shootSound = Sounds.missileLong;
+                shootSound = Sounds.shootMissileLong;
 
                 shoot = new ShootAlternate(){{
                     shots = 6;
@@ -1835,6 +1915,10 @@ public class UnitTypes{
             faceTarget = false;
             ammoType = new PowerAmmoType(4000);
 
+            moveSoundVolume = 1.1f;
+            moveSound = Sounds.shipMoveBig;
+            moveSoundPitchMin = moveSoundPitchMax = 0.9f;
+
             trailLength = 70;
             waveTrailX = 23f;
             waveTrailY = -32f;
@@ -1887,6 +1971,9 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(900);
             armor = 3f;
 
+            moveSoundVolume = 0.4f;
+            moveSound = Sounds.shipMove;
+
             buildSpeed = 1.5f;
             rotateToBuilding = false;
 
@@ -1904,7 +1991,7 @@ public class UnitTypes{
             }});
 
             weapons.add(new Weapon("retusa-weapon"){{
-                shootSound = Sounds.lasershoot;
+                shootSound = Sounds.shootLaser;
                 reload = 22f;
                 x = 4.5f;
                 y = -3.5f;
@@ -1925,7 +2012,7 @@ public class UnitTypes{
                 rotate = true;
                 reload = 90f;
                 x = y = shootX = shootY = 0f;
-                shootSound = Sounds.torpedoPlasma;
+                shootSound = Sounds.shootRetusa;
                 rotateSpeed = 180f;
                 shootSoundVolume = 0.9f;
 
@@ -1988,6 +2075,10 @@ public class UnitTypes{
             rotateSpeed = 4f;
             faceTarget = false;
 
+            moveSoundVolume = 0.55f;
+            moveSoundPitchMin = moveSoundPitchMax = 0.9f;
+            moveSound = Sounds.shipMove;
+
             trailLength = 22;
             waveTrailX = 5.5f;
             waveTrailY = -4f;
@@ -2008,7 +2099,7 @@ public class UnitTypes{
                 rotateSpeed = 5f;
                 inaccuracy = 10f;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.flamePlasma;
+                shootSound = Sounds.shootFlamePlasma;
                 shootSoundVolume = 0.9f;
                 shootCone = 30f;
 
@@ -2067,6 +2158,10 @@ public class UnitTypes{
             faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
 
+            moveSoundVolume = 0.7f;
+            moveSoundPitchMin = moveSoundPitchMax = 0.77f;
+            moveSound = Sounds.shipMove;
+
             trailLength = 23;
             waveTrailX = 9f;
             waveTrailY = -9f;
@@ -2098,7 +2193,7 @@ public class UnitTypes{
                 rotate = true;
                 inaccuracy = 1f;
                 velocityRnd = 0.1f;
-                shootSound = Sounds.missilePlasma;
+                shootSound = Sounds.shootMissilePlasma;
 
                 ejectEffect = Fx.none;
                 bullet = new FlakBulletType(2.5f, 25){{
@@ -2207,6 +2302,10 @@ public class UnitTypes{
             ammoType = new PowerAmmoType(3500);
             ammoCapacity = 40;
 
+            moveSoundVolume = 1f;
+            moveSound = Sounds.shipMoveBig;
+            moveSoundPitchMin = moveSoundPitchMax = 0.95f;
+
             //clip size is massive due to energy field
             clipSize = 250f;
 
@@ -2255,6 +2354,10 @@ public class UnitTypes{
             faceTarget = false;
             ammoType = new PowerAmmoType(4500);
 
+            moveSoundVolume = 1.1f;
+            moveSound = Sounds.shipMoveBig;
+            moveSoundPitchMin = moveSoundPitchMax = 0.9f;
+
             trailLength = 70;
             waveTrailX = 23f;
             waveTrailY = -32f;
@@ -2283,7 +2386,7 @@ public class UnitTypes{
                         reload = 170f;
                         recoil = 1f;
                         shootSound = Sounds.beamPlasmaSmall;
-                        initialShootSound = Sounds.beamPlasmaFireSmall;
+                        initialShootSound = Sounds.shootBeamPlasmaSmall;
                         continuous = true;
                         cooldownTime = reload;
                         immunities.add(StatusEffects.burning);
@@ -2368,7 +2471,7 @@ public class UnitTypes{
                     hitShake = 4f;
                     trailRotation = true;
                     status = StatusEffects.electrified;
-                    hitSound = Sounds.empBlast;
+                    hitSound = Sounds.explosionNavanax;
 
                     trailEffect = new Effect(16f, e -> {
                         color(Pal.heal);
@@ -2428,15 +2531,17 @@ public class UnitTypes{
             engineOffset = 6f;
             hitSize = 8f;
             alwaysUnlocked = true;
+            wreckSoundVolume = 0.8f;
+            deathSoundVolume = 0.7f;
 
             weapons.add(new Weapon("small-basic-weapon"){{
                 reload = 17f;
                 x = 2.75f;
                 y = 1f;
                 top = false;
+                shootSound = Sounds.shootAlpha;
 
                 bullet = new LaserBoltBulletType(2.5f, 11){{
-                    shootSound = Sounds.laserbolt;
                     keepVelocity = false;
                     width = 1.5f;
                     height = 4.5f;
@@ -2483,9 +2588,9 @@ public class UnitTypes{
                 recoil = 1f;
                 shoot.shots = 2;
                 shoot.shotDelay = 4f;
+                shootSound = Sounds.shootAlpha;
 
                 bullet = new LaserBoltBulletType(3f, 11){{
-                    shootSound = Sounds.laserbolt;
                     keepVelocity = false;
                     width = 1.5f;
                     height = 4.5f;
@@ -2536,9 +2641,9 @@ public class UnitTypes{
                 }};
 
                 inaccuracy = 3f;
+                shootSound = Sounds.shootAlpha;
 
                 bullet = new LaserBoltBulletType(3.5f, 11){{
-                    shootSound = Sounds.laserbolt;
                     keepVelocity = false;
                     width = 1.5f;
                     height = 5f;
@@ -2572,6 +2677,9 @@ public class UnitTypes{
             floorMultiplier = 0.95f;
             treadRects = new Rect[]{new Rect(12 - 32f, 7 - 32f, 14, 51)};
             researchCostMultiplier = 0f;
+
+            tankMoveVolume *= 0.32f;
+            tankMoveSound = Sounds.tankMoveSmall;
 
             weapons.add(new Weapon("stell-weapon"){{
                 shootSound = Sounds.shootStell;
@@ -2616,8 +2724,11 @@ public class UnitTypes{
             treadRects = new Rect[]{new Rect(17 - 96f/2f, 10 - 96f/2f, 19, 76)};
             researchCostMultiplier = 0f;
 
+            tankMoveVolume *= 0.55f;
+            tankMoveSound = Sounds.tankMove;
+
             weapons.add(new Weapon("locus-weapon"){{
-                shootSound = Sounds.bolt;
+                shootSound = Sounds.shootLocus;
                 layerOffset = 0.0001f;
                 reload = 18f;
                 shootY = 10f;
@@ -2698,7 +2809,7 @@ public class UnitTypes{
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("precept-weapon"){{
-                shootSound = Sounds.dullExplosion;
+                shootSound = Sounds.explosionDull;
                 layerOffset = 0.0001f;
                 reload = 80f;
                 shootY = 16f;
@@ -2769,8 +2880,11 @@ public class UnitTypes{
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
+            tankMoveVolume *= 1.25f;
+            tankMoveSound = Sounds.tankMoveHeavy;
+
             weapons.add(new Weapon("vanquish-weapon"){{
-                shootSound = Sounds.mediumCannon;
+                shootSound = Sounds.shootTank;
                 layerOffset = 0.0001f;
                 reload = 80f;
                 shootY = 71f / 4f;
@@ -2813,7 +2927,7 @@ public class UnitTypes{
                     fragSpread = 10f;
                     fragBullets = 5;
                     fragVelocityMin = 1f;
-                    despawnSound = Sounds.dullExplosion;
+                    despawnSound = Sounds.explosionDull;
 
                     fragBullet = new BasicBulletType(8f, 35f){{
                         sprite = "missile-large";
@@ -2876,11 +2990,14 @@ public class UnitTypes{
             floorMultiplier = 0.3f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
 
+            tankMoveVolume *= 1.5f;
+            tankMoveSound = Sounds.tankMoveHeavy;
+
             float xo = 231f/2f, yo = 231f/2f;
             treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};
 
             weapons.add(new Weapon("conquer-weapon"){{
-                shootSound = Sounds.largeCannon;
+                shootSound = Sounds.shootConquer;
                 layerOffset = 0.1f;
                 reload = 100f;
                 shootY = 32.5f;
@@ -3052,6 +3169,8 @@ public class UnitTypes{
             armor = 4f;
             legStraightness = 0.3f;
             stepShake = 0f;
+            stepSound = Sounds.walkerStepTiny;
+            stepSoundVolume = 0.4f;
 
             legCount = 6;
             legLength = 8f;
@@ -3077,7 +3196,7 @@ public class UnitTypes{
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("merui-weapon"){{
-                shootSound = Sounds.missile;
+                shootSound = Sounds.shootMerui;
                 mirror = false;
                 showStatSprite = false;
                 x = 0f;
@@ -3136,6 +3255,8 @@ public class UnitTypes{
             armor = 5f;
             stepShake = 0f;
 
+            stepSound = Sounds.walkerStepSmall;
+
             legCount = 4;
             legLength = 14f;
             lockLegBase = true;
@@ -3167,7 +3288,7 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("cleroi-weapon"){{
-                shootSound = Sounds.blaster;
+                shootSound = Sounds.shootCleroi;
                 x = 14f / 4f;
                 y = 33f / 4f;
                 reload = 33f;
@@ -3194,6 +3315,8 @@ public class UnitTypes{
 
                     splashDamageRadius = 30f;
                     splashDamage = 43f;
+
+                    despawnSound = Sounds.explosionCleroi;
 
                     hitEffect = despawnEffect = new MultiEffect(Fx.hitBulletColor, new WaveEffect(){{
                         colorFrom = colorTo = Pal.techBlue;
@@ -3224,7 +3347,7 @@ public class UnitTypes{
                 recoil = 0.5f;
 
                 bullet = new BulletType(){{
-                    shootSound = Sounds.lasershoot;
+                    shootSound = Sounds.shootLaser;
                     shootEffect = Fx.sparkShoot;
                     hitEffect = Fx.pointHit;
                     maxRange = 100f;
@@ -3242,6 +3365,9 @@ public class UnitTypes{
             armor = 7f;
             fogRadius = 40f;
             stepShake = 0f;
+
+            stepSound = Sounds.walkerStepSmall;
+            stepSoundPitch = 0.78f;
 
             legCount = 6;
             legLength = 18f;
@@ -3279,7 +3405,8 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("anthicus-weapon"){{
-                shootSound = Sounds.missileLarge;
+                shootSound = Sounds.shootMissileLarge;
+                shootSoundVolume = 0.5f;
                 x = 29f / 4f;
                 y = -11f / 4f;
                 shootY = 1.5f;
@@ -3440,7 +3567,7 @@ public class UnitTypes{
             groundLayer = Layer.legUnit;
 
             weapons.add(new Weapon("tecta-weapon"){{
-                shootSound = Sounds.malignShoot;
+                shootSound = Sounds.shootMalign;
                 mirror = true;
                 top = false;
 
@@ -3477,7 +3604,7 @@ public class UnitTypes{
                     trailWidth = 2.8f;
                     trailLength = 20;
                     trailChance = -1f;
-                    despawnSound = Sounds.dullExplosion;
+                    despawnSound = Sounds.explosionDull;
 
                     despawnEffect = Fx.none;
                     hitEffect = new ExplosionEffect(){{
@@ -3538,7 +3665,7 @@ public class UnitTypes{
             alwaysShootWhenMoving = true;
 
             weapons.add(new Weapon("collaris-weapon"){{
-                shootSound = Sounds.pulseBlast;
+                shootSound = Sounds.shootCollaris;
                 mirror = true;
                 rotationLimit = 30f;
                 rotateSpeed = 0.4f;
@@ -3599,7 +3726,7 @@ public class UnitTypes{
                     trailChance = -1f;
 
                     despawnEffect = Fx.none;
-                    despawnSound = Sounds.dullExplosion;
+                    despawnSound = Sounds.explosionDull;
 
                     hitEffect = despawnEffect = new ExplosionEffect(){{
                         lifetime = 50f;
@@ -3690,6 +3817,10 @@ public class UnitTypes{
             itemCapacity = 0;
             useEngineElevation = false;
             researchCostMultiplier = 0f;
+            moveSound = Sounds.loopExtract;
+            moveSoundVolume = 0.25f;
+            moveSoundPitchMin = 0.7f;
+            moveSoundPitchMax = 1.5f;
 
             abilities.add(new MoveEffectAbility(0f, -7f, Pal.sapBulletBack, Fx.missileTrailShort, 4f){{
                 teamColor = true;
@@ -3709,7 +3840,7 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("elude-weapon"){{
-                shootSound = Sounds.blaster;
+                shootSound = Sounds.shootElude;
                 y = -2f;
                 x = 4f;
                 top = true;
@@ -3757,7 +3888,7 @@ public class UnitTypes{
             );
 
             weapons.add(new Weapon("avert-weapon"){{
-                shootSound = Sounds.blaster;
+                shootSound = Sounds.shootAvert;
                 reload = 35f;
                 x = 0f;
                 y = 6.5f;
@@ -3840,7 +3971,7 @@ public class UnitTypes{
             }});
 
             weapons.add(new Weapon(){{
-                shootSound = Sounds.shockBlast;
+                shootSound = Sounds.explosionObviate;
                 x = 0f;
                 y = -2f;
                 shootY = 0f;
@@ -3864,7 +3995,7 @@ public class UnitTypes{
                     }});
                     smokeEffect = Fx.shootSmokeTitan;
                     hitColor = Pal.sapBullet;
-                    despawnSound = Sounds.spark;
+                    despawnSound = Sounds.explosionArtilleryShock;
 
                     sprite = "large-orb";
                     trailEffect = Fx.missileTrail;
@@ -3944,6 +4075,9 @@ public class UnitTypes{
             engineOffset = 61 / 4f;
             range = 4.3f * 60f * 1.4f;
 
+            loopSoundVolume = 0.85f;
+            loopSound = Sounds.loopHover;
+
             abilities.add(new SuppressionFieldAbility(){{
                 reload = 60f * 8f;
                 orbRadius = 5.3f;
@@ -3951,7 +4085,7 @@ public class UnitTypes{
             }});
 
             weapons.add(new Weapon("quell-weapon"){{
-                shootSound = Sounds.missileSmall;
+                shootSound = Sounds.shootMissileSmall;
                 x = 51 / 4f;
                 y = 5 / 4f;
                 rotate = true;
@@ -4043,6 +4177,8 @@ public class UnitTypes{
             engineSize = 6f;
             engineOffset = 25.25f;
 
+            loopSound = Sounds.loopHover;
+
             float orbRad = 5f, partRad = 3f;
             int parts = 10;
 
@@ -4068,7 +4204,8 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("disrupt-weapon"){{
-                shootSound = Sounds.missileLarge;
+                shootSound = Sounds.shootMissileLarge;
+                shootSoundVolume = 0.6f;
                 x = 78f / 4f;
                 y = -10f / 4f;
                 mirror = true;

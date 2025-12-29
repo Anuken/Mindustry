@@ -59,8 +59,7 @@ public class Schematics implements Loadable{
     private ObjectSet<Schematic> errored = new ObjectSet<>();
     private ObjectMap<CoreBlock, Seq<Schematic>> loadouts = new ObjectMap<>();
     private ObjectMap<CoreBlock, Schematic> defaultLoadouts = new ObjectMap<>();
-    private @Nullable FrameBuffer shadowBuffer;
-    private boolean triedCreatingShadowBuffer;
+    private FrameBuffer shadowBuffer;
     private Texture errorTexture;
     private long lastClearTime;
 
@@ -98,6 +97,10 @@ public class Schematics implements Loadable{
         });
 
         all.sort();
+
+        if(shadowBuffer == null && !headless){
+            Core.app.post(() -> shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 8, maxSchematicSize + padding + 8));
+        }
     }
 
     private void loadLoadouts(){
@@ -169,7 +172,7 @@ public class Schematics implements Loadable{
     public void savePreview(Schematic schematic, Fi file){
         FrameBuffer buffer = getBuffer(schematic);
         Draw.flush();
-        buffer.begin();
+        buffer.begin(Color.clear);
         Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, buffer.getWidth(), buffer.getHeight());
         file.writePng(pixmap);
         buffer.end();
@@ -212,49 +215,35 @@ public class Schematics implements Loadable{
             Tmp.m2.set(Draw.trans());
             FrameBuffer buffer = new FrameBuffer((schematic.width + padding) * resolution, (schematic.height + padding) * resolution);
 
-            if(shadowBuffer == null && !triedCreatingShadowBuffer){
-                triedCreatingShadowBuffer = true;
-                try{
-                    shadowBuffer = new FrameBuffer(maxSchematicSize + padding + 8, maxSchematicSize + padding + 8);
-                }catch(Exception e){
-                    Log.err(Strings.format("Failed to create shadow buffer (@x@): @. This is likely because a mod is setting maxSchematicSize too high. Don't do that.",
-                    maxSchematicSize + padding + 8, maxSchematicSize + padding + 8, Strings.getSimpleMessage(e)));
-                }
-            }
+            shadowBuffer.begin(Color.clear);
 
-            if(shadowBuffer != null){
-                shadowBuffer.begin(Color.clear);
+            Draw.trans().idt();
+            Draw.proj().setOrtho(0, 0, shadowBuffer.getWidth(), shadowBuffer.getHeight());
 
-                Draw.trans().idt();
-                Draw.proj().setOrtho(0, 0, shadowBuffer.getWidth(), shadowBuffer.getHeight());
-
-                Draw.color();
-                schematic.tiles.each(t -> {
-                    int size = t.block.size;
-                    int offsetx = -(size - 1) / 2;
-                    int offsety = -(size - 1) / 2;
-                    for(int dx = 0; dx < size; dx++){
-                        for(int dy = 0; dy < size; dy++){
-                            int wx = t.x + dx + offsetx;
-                            int wy = t.y + dy + offsety;
-                            Fill.square(padding/2f + wx + 0.5f, padding/2f + wy + 0.5f, 0.5f);
-                        }
+            Draw.color();
+            schematic.tiles.each(t -> {
+                int size = t.block.size;
+                int offsetx = -(size - 1) / 2;
+                int offsety = -(size - 1) / 2;
+                for(int dx = 0; dx < size; dx++){
+                    for(int dy = 0; dy < size; dy++){
+                        int wx = t.x + dx + offsetx;
+                        int wy = t.y + dy + offsety;
+                        Fill.square(padding/2f + wx + 0.5f, padding/2f + wy + 0.5f, 0.5f);
                     }
-                });
+                }
+            });
 
-                shadowBuffer.end();
-            }
+            shadowBuffer.end();
 
             buffer.begin(Color.clear);
 
             Draw.proj().setOrtho(0, buffer.getHeight(), buffer.getWidth(), -buffer.getHeight());
 
-            if(shadowBuffer != null){
-                Tmp.tr1.set(shadowBuffer.getTexture(), 0, 0, schematic.width + padding, schematic.height + padding);
-                Draw.color(0f, 0f, 0f, 1f);
-                Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
-                Draw.color();
-            }
+            Tmp.tr1.set(shadowBuffer.getTexture(), 0, 0, schematic.width + padding, schematic.height + padding);
+            Draw.color(0f, 0f, 0f, 1f);
+            Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
+            Draw.color();
 
             Seq<BuildPlan> plans = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config));
 
@@ -484,6 +473,10 @@ public class Schematics implements Loadable{
             if(check && !(st.block instanceof CoreBlock)){
                 seq.clear();
                 tile.getLinkedTilesAs(st.block, seq);
+                //remove env blocks, or not?
+                //if(seq.contains(t -> !t.block().alwaysReplace && !t.synthetic())){
+                //    return;
+                //}
                 for(var t : seq){
                     if(t.block() != Blocks.air){
                         t.remove();

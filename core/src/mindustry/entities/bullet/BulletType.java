@@ -79,6 +79,8 @@ public class BulletType extends Content implements Cloneable{
     public Effect chargeEffect = Fx.none;
     /** Extra smoke effect created when shooting. */
     public Effect smokeEffect = Fx.shootSmallSmoke;
+    /** Overrides the shoot sound in turrets if set. Does nothing in units, as they can't have multiple ammo types. */
+    public Sound shootSound = Sounds.none;
     /** Sound made when hitting something or getting removed.*/
     public Sound hitSound = Sounds.none;
     /** Sound made when hitting something or getting removed.*/
@@ -161,6 +163,10 @@ public class BulletType extends Content implements Cloneable{
     public float healPercent = 0f;
     /** flat amount of block health healed */
     public float healAmount = 0f;
+    /** sound played when a block is healed */
+    public Sound healSound = Sounds.blockHeal;
+    /** volume of heal sound */
+    public float healSoundVolume = 0.9f;
     /** Fraction of bullet damage that heals that shooter. */
     public float lifesteal = 0f;
     /** Whether to make fire on impact */
@@ -446,6 +452,7 @@ public class BulletType extends Content implements Cloneable{
         if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
             healEffect.at(build.x, build.y, 0f, healColor, build.block);
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
+            healSound.at(build, 1f + Mathf.range(0.1f), healSoundVolume);
 
             hit(b);
         }else if(build.team != b.team && direct){
@@ -641,6 +648,12 @@ public class BulletType extends Content implements Cloneable{
     public void removed(Bullet b){
         if(trailLength > 0 && b.trail != null && b.trail.size() > 0){
             Fx.trailFade.at(b.x, b.y, trailWidth, trailColor, b.trail.copy());
+        }
+
+        //if the bullet never created any frags and is removed (probably by hitting something), it needs to spawn those
+        //TODO: disabled for now as this makes vanquish significantly more powerful
+        if(b.frags == 0 && !fragOnHit && fragBullet != null){
+        //    createFrags(b, b.x, b.y);
         }
     }
 

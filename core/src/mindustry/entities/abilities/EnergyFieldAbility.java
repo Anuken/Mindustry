@@ -24,7 +24,7 @@ public class EnergyFieldAbility extends Ability{
     public float damage = 1, reload = 100, range = 60;
     public Effect healEffect = Fx.heal, hitEffect = Fx.hitLaserBlast, damageEffect = Fx.chainLightning;
     public StatusEffect status = StatusEffects.electrified;
-    public Sound shootSound = Sounds.spark;
+    public Sound shootSound = Sounds.shootEnergyField;
     public float statusDuration = 60f * 6f;
     public float x, y;
     public boolean targetGround = true, targetAir = true, hitBuildings = true, hitUnits = true;
@@ -185,7 +185,7 @@ public class EnergyFieldAbility extends Ability{
             }
 
             if(anyNearby){
-                shootSound.at(unit);
+                shootSound.at(unit, 1f + Mathf.range(0.1f), 1f);
 
                 if(useAmmo && state.rules.unitAmmo){
                     unit.ammo --;
