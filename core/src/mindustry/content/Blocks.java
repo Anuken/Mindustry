@@ -4038,6 +4038,9 @@ public class Blocks{
                     width = height = 17f;
                     collidesTiles = false;
                     ammoMultiplier = 2f;
+
+                    reloadMultiplier = 0.7;
+                    
                     splashDamageRadius = 42f;
                     splashDamage = 115f;
 
@@ -4117,6 +4120,7 @@ public class Blocks{
                         backColor = Pal.gray;
                         frontColor = Color.white;
                         despawnEffect = Fx.none;
+                        buildingDamageMultiplier = 0.3;
                     }};
                     fragBullets = 10;
                     explodeRange = 20f;
