@@ -173,7 +173,7 @@ public class Blocks{
     payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, largePayloadMassDriver, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
 
     //logic
-    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, logicDisplayTile, memoryCell, memoryBank,
+    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, tileLogicDisplay, memoryCell, memoryBank,
     canvas, reinforcedMessage,
     worldProcessor, worldCell, worldMessage, worldSwitch,
 
@@ -4220,6 +4220,7 @@ public class Blocks{
             envEnabled |= Env.space;
 
             coolantMultiplier = 0.4f;
+            liquidCapacity = 60f;
             scaledHealth = 150;
 
             coolant = consumeCoolant(1f);
@@ -4275,6 +4276,7 @@ public class Blocks{
             reload = 7f;
             recoilTime = reload * 2f;
             coolantMultiplier = 0.5f;
+            liquidCapacity = 120f;
             ammoUseEffect = Fx.casing3;
             range = 260f;
             inaccuracy = 3f;
@@ -4322,6 +4324,7 @@ public class Blocks{
             }};
 
             scaledHealth = 200;
+            liquidCapacity = 60f;
             coolant = consumeCoolant(0.5f);
             consumePower(17f);
         }};
@@ -6643,11 +6646,13 @@ public class Blocks{
         liquidSource = new LiquidSource("liquid-source"){{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
+            floating = true;
         }};
 
         liquidVoid = new LiquidVoid("liquid-void"){{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
+            floating = true;
         }};
 
         payloadSource = new PayloadSource("payload-source"){{
@@ -6814,7 +6819,7 @@ public class Blocks{
             size = 6;
         }};
 
-        logicDisplayTile = new TileableLogicDisplay("tile-logic-display"){{
+        tileLogicDisplay = new TileableLogicDisplay("tile-logic-display"){{
             requirements(Category.logic, with(Items.lead, 8, Items.silicon, 8, Items.metaglass, 8, Items.phaseFabric, 3));
         }};
 

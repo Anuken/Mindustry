@@ -32,6 +32,7 @@ import java.net.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
+import java.util.regex.*;
 
 import static arc.util.ColorCodes.*;
 import static arc.util.Log.*;
@@ -725,6 +726,50 @@ public class ServerControl implements ApplicationListener{
 
                     netServer.admins.removeSubnetBan(arg[1]);
                     info("Unbanned @**", arg[1]);
+                }else{
+                    err("Incorrect usage. Provide add/remove as the second argument.");
+                }
+            }
+        });
+
+        handler.register("name-ban", "[add/remove/clear] [regex]", "Ban a name by case-insensitive regex.", arg -> {
+            var names = netServer.admins.bannedNames;
+
+            if(arg.length == 0){
+                info("Name regexes banned: @", names.isEmpty() ? "<none>" : "");
+                for(Pattern subnet : names){
+                    info("&lw\t" + subnet.pattern());
+                }
+            }else if(arg.length == 1){
+                if(arg[0].equals("clear")){
+                    names.clear();
+                    netServer.admins.save();
+                }else{
+                    err("You must provide a name regex to add or remove.");
+                }
+            }else{
+                if(arg[0].equals("add")){
+                    if(names.contains(p -> p.pattern().equals(arg[1]))){
+                        err("That name regex is already banned.");
+                        return;
+                    }
+
+                    try{
+                        netServer.admins.addNameBan(arg[1]);
+                        info("Banned names by regex: @", arg[1]);
+                    }catch(Exception e){
+                        err("Invalid regex: @", Strings.getSimpleMessage(e));
+                    }
+                }else if(arg[0].equals("remove")){
+                    int target = names.indexOf(p -> p.pattern().equals(arg[1]));
+                    if(target == -1){
+                        err("That name isn't banned.");
+                        return;
+                    }
+
+                    names.remove(target);
+                    netServer.admins.save();
+                    info("Unbanned regex: @", arg[1]);
                 }else{
                     err("Incorrect usage. Provide add/remove as the second argument.");
                 }

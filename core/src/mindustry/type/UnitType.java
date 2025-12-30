@@ -529,6 +529,21 @@ public class UnitType extends UnlockableContent implements Senseable{
         selectionSize = 30f;
     }
 
+    @Override
+    public void postInit(){
+        if(databaseTag == null || databaseTag.isEmpty()){
+            if(flying){
+                databaseTag = "unit-air";
+            }else if(naval){
+                databaseTag = "unit-naval";
+            }else{
+                databaseTag = "unit-ground";
+            }
+        }
+
+        super.postInit();
+    }
+
     public UnitController createController(Unit unit){
         return controller.get(unit);
     }
@@ -1500,6 +1515,9 @@ public class UnitType extends UnlockableContent implements Senseable{
         Draw.z(z);
 
         if(unit instanceof Crawlc c){
+            if(isPayload){
+                c.segmentRot(c.rotation());
+            }
             drawCrawl(c);
         }
 

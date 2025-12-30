@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.Json.*;
 import arc.util.serialization.*;
+import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -553,14 +554,14 @@ public class DataPatcher{
 
     static Object copyArray(Object object){
         if(object instanceof int[] i) return i.clone();
-        if(object instanceof long[] i) return i.clone();
-        if(object instanceof short[] i) return i.clone();
-        if(object instanceof byte[] i) return i.clone();
-        if(object instanceof boolean[] i) return i.clone();
-        if(object instanceof char[] i) return i.clone();
-        if(object instanceof float[] i) return i.clone();
-        if(object instanceof double[] i) return i.clone();
-        return ((Object[])object).clone();
+        else if(object instanceof long[] i) return i.clone();
+        else if(object instanceof short[] i) return i.clone();
+        else if(object instanceof byte[] i) return i.clone();
+        else if(object instanceof boolean[] i) return i.clone();
+        else if(object instanceof char[] i) return i.clone();
+        else if(object instanceof float[] i) return i.clone();
+        else if(object instanceof double[] i) return i.clone();
+        else return ((Object[])object).clone();
     }
 
     public static class PatchSet{
@@ -573,6 +574,12 @@ public class DataPatcher{
         public PatchSet(String patch, JsonValue json){
             this.patch = patch;
             this.json = json;
+        }
+
+        @Override
+        public String toString(){
+            //the json can be a single 'error' value if it failed to parse
+            return !json.isObject() ? patch : json.prettyPrint(OutputType.minimal, 2);
         }
     }
 

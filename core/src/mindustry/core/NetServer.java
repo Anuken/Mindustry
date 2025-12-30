@@ -170,7 +170,8 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.isIDBanned(uuid)){
+            //there's no reason to tell users that their name is inappropriate, as they may try to bypass it
+            if(admins.isIDBanned(uuid) || admins.isNameBanned(packet.name)){
                 con.kick(KickReason.banned);
                 return;
             }
