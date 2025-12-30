@@ -985,9 +985,6 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            //graphics on headless servers are useless.
-            if(Vars.headless) return;
-
             if(target.building() instanceof LogicDisplayBuild d && d.isValid() && (d.team == exec.team || exec.privileged)){
                 d.flushCommands(exec.graphicsBuffer);
                 exec.graphicsBuffer.clear();
