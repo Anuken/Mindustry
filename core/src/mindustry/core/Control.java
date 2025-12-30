@@ -503,7 +503,7 @@ public class Control implements ApplicationListener, Loadable{
                                     }
                                 }
 
-                                //copy over all buildings from the previous save, retaining config and health, and making them derelict. contents are not saved (derelict repair clears them anyway)
+                                //copy over all buildings from the previous save, retaining config and health, and making them derelict
                                 for(var build : previousBuildings){
                                     Tile tile = world.tile(build.tileX(), build.tileY());
                                     if(tile != null && tile.build == null && Build.validPlace(build.block, state.rules.defaultTeam, build.tileX(), build.tileY(), build.rotation, false, false)){
