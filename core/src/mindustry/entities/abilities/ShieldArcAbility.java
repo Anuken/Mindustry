@@ -131,8 +131,8 @@ public class ShieldArcAbility extends Ability{
     public float chanceDeflect = -1f;
     /** Multiplier for reflected bullet building damage. -1 to disable */
     public float reflectBuildingDamage = 1f;
-    /** Velocity multiplier for reflected bullets on the opposite axis. */
-    public float reflectVel = -0.5f;
+    /** Velocity multiplier for reflected bullets on the opposite axis. Negative values = concave, positive values = convex */
+    public float reflectVel = 1f;
     /** Deflection sound. */
     public Sound deflectSound = Sounds.none;
     public Sound breakSound = Sounds.shieldBreakSmall;
