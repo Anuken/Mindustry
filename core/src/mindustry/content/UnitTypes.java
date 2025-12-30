@@ -1138,7 +1138,7 @@ public class UnitTypes{
                 ignoreRotation = true;
                 shootSound = Sounds.shootHorizon;
                 soundPitchMax = 1.2f;
-                bullet = new BombBulletType(27f, 23f){{
+                bullet = new BombBulletType(23f, 27f){{
                     width = 10f;
                     height = 14f;
                     hitEffect = Fx.flakExplosion;
