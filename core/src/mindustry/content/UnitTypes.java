@@ -1380,7 +1380,7 @@ public class UnitTypes{
             accel = 0.1f;
             range = 130f;
             health = 400;
-            buildSpeed = 0.5f;
+            buildSpeed = 0.25f;
             engineOffset = 6.5f;
             hitSize = 9f;
             lowAltitude = true;
@@ -1390,7 +1390,10 @@ public class UnitTypes{
             mineSpeed = 3.5f;
             wreckSoundVolume = 0.9f;
 
-            abilities.add(new RepairFieldAbility(5f, 60f * 8, 50f));
+            abilities.add(new RepairFieldAbility(5f, 112f, 50f)
+            {{
+                sameTypeHealMult = 0.5f;
+            }});
 
             weapons.add(new Weapon("poly-weapon"){{
                 top = false;
@@ -1416,7 +1419,7 @@ public class UnitTypes{
                     frontColor = Color.white;
                     hitSound = Sounds.none;
 
-                    healPercent = 5.5f;
+                    healAmount = 45f;
                     collidesTeam = true;
                     reflectable = false;
                     backColor = Pal.heal;
@@ -2520,7 +2523,7 @@ public class UnitTypes{
             flying = true;
             mineSpeed = 6.5f;
             mineTier = 1;
-            buildSpeed = 0.5f;
+            buildSpeed = 1f;
             drag = 0.05f;
             speed = 3f;
             rotateSpeed = 15f;
@@ -2568,7 +2571,7 @@ public class UnitTypes{
             flying = true;
             mineSpeed = 7f;
             mineTier = 1;
-            buildSpeed = 0.75f;
+            buildSpeed = 1.25f;
             drag = 0.05f;
             speed = 3.3f;
             rotateSpeed = 17f;
@@ -2618,7 +2621,7 @@ public class UnitTypes{
             flying = true;
             mineSpeed = 8f;
             mineTier = 2;
-            buildSpeed = 1f;
+            buildSpeed = 1.5f;
             drag = 0.05f;
             speed = 3.55f;
             rotateSpeed = 19f;
