@@ -3,7 +3,7 @@ package mindustry.logic;
 import mindustry.ctype.*;
 
 public interface Senseable{
-    Object noSensed = new Object(), noSensedPos = new Object();
+    Object noSensed = new Object();
 
     double sense(LAccess sensor);
 
