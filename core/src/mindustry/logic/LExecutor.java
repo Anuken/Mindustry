@@ -551,6 +551,7 @@ public class LExecutor{
                 }
 
                 if(type.isObj && p1.isobj){
+                    if(type == LAccess.powerConfig || type == LAccess.bridgeConfig) b.control(type, p1.obj(), p2.num(), p3.num(), exec.privileged ? 1 : 0); //this pass the processor's privileged parameter into only these 2 control modes
                     b.control(type, p1.obj(), p2.num(), p3.num(), p4.num());
                 }else{
                     b.control(type, p1.num(), p2.num(), p3.num(), p4.num());
@@ -575,119 +576,6 @@ public class LExecutor{
             int address = index.numi();
 
             output.setobj(address >= 0 && address < exec.links.length ? exec.links[address] : null);
-        }
-    }
-
-    public static class GetNodeI implements LInstruction{
-        public LNode type = LNode.power;
-        public LVar building, node, index;
-
-        public GetNodeI(LNode type, LVar building, LVar node, LVar index){
-            this.type = type;
-            this.building = building;
-            this.node = node;
-            this.index = index;
-        }
-
-        public GetNodeI(){}
-
-        @Override
-        public void run(LExecutor exec){
-            Building n;
-            int i = index.numi();
-            if((n = node.building()) != null){
-                switch(type){
-                    case power -> {
-                        if(i < 0 || n.power == null) break;
-                        IntSeq links = n.power.links;
-                        if(i < links.size){
-                            building.setobj(world.build(links.get(i)));
-                            return;
-                        }
-                    }
-
-                    case bridge -> {
-                        if((i < -1) || !(n instanceof ItemBridgeBuild ib)) break;
-
-                        if(i == -1) {
-                            building.setobj(world.build(ib.link));
-                            return;
-                        }
-
-                        if(i < ib.incoming.size){
-                            building.setobj(world.build(ib.incoming.get(i)));
-                            return;
-                        }
-                    }
-                }
-                building.setobj(null);
-            }
-        }
-    }
-
-    public static class SetNodeI implements LInstruction{
-        public LNode type = LNode.add;
-        public LVar from, target, enabled;
-
-        public SetNodeI(LNode type, LVar from, LVar target, LVar enabled){
-            this.type = type;
-            this.from = from;
-            this.target = target;
-            this.enabled = enabled;
-        }
-
-        public SetNodeI(){}
-
-        @Override
-        public void run(LExecutor exec){
-            Building input = from.building(), dest = target.building();
-
-            if(input == null || dest == null || input.pos() == dest.pos() || net.client()) return;
-
-            if(input instanceof PowerNodeBuild node && ((PowerNode)node.block).linkValid(node, dest) && (type.mode ^ node.power.links.contains(dest.pos()))){
-                if(!input.timer(((PowerNode)node.block).checkLink, 30f)){
-                    enabled.setbool(false);
-                    return;
-                }
-
-                node.configureAny(dest.pos());
-                enabled.setbool(true);
-            }
-
-            if(input instanceof ItemBridgeBuild ib && dest instanceof ItemBridgeBuild other){
-                boolean valid = ((ItemBridge) ib.block).linkValid(input.tile, dest.tile, false);
-
-                if(!valid) return;
-
-                if(!input.timer(((ItemBridge)ib.block).checkLink, 10f)){
-                    enabled.setbool(false);
-                    return;
-                }
-
-                switch(type){
-                    case add -> {
-                        if(ib.pos() == other.link){
-                            ib.configureAny(other.pos());
-                            other.configureAny(-1);
-                            break;
-                        }
-
-                        if (ib.link != other.pos()){
-                            ib.configureAny(other.pos());
-                        }
-                    }
-                    case remove -> {
-                        if(ib.link == other.pos()){
-                            ib.configureAny(-1);
-                        }
-
-                        if(ib.pos() == other.link){
-                            other.configureAny(-1);
-                        }
-                    }
-                }
-                enabled.setbool(true);
-            }
         }
     }
 
@@ -741,12 +629,13 @@ public class LExecutor{
     }
 
     public static class SenseI implements LInstruction{
-        public LVar from, to, type;
+        public LVar from, to, type, at;
 
-        public SenseI(LVar from, LVar to, LVar type){
+        public SenseI(LVar from, LVar to, LVar type, LVar at){
             this.from = from;
             this.to = to;
             this.type = type;
+            this.at = at;
         }
 
         public SenseI(){
@@ -770,12 +659,17 @@ public class LExecutor{
                     Object objOut = se.senseObject(la);
 
                     if(objOut == Senseable.noSensed){
-                        //numeric output
-                        to.setnum(se.sense(la));
-                    }else{
-                        //object output
-                        to.setobj(objOut);
+                        objOut = se.senseObject(la, at.numi());
+
+                        if(objOut == Senseable.noSensed){
+                            //numeric output
+                            to.setnum(se.sense(la));
+                            return;
+                        }
                     }
+
+                    //object output
+                    to.setobj(objOut);
                 }
             }else{
                 if(target instanceof CharSequence seq && (sense == LAccess.size || sense == LAccess.bufferSize)){

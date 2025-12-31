@@ -500,6 +500,46 @@ public class ItemBridge extends Block{
         }
 
         @Override
+        public Object senseObject(LAccess sensor, int pos){
+            return switch(sensor){
+                case currentBridgeLink -> {
+                    if(pos < -1 || pos >= incoming.size) yield null;
+                    if(pos == -1) yield world.build(link);
+                    yield world.build(incoming.get(pos));
+                }
+                default -> super.senseObject(sensor, pos);
+            };
+        }
+
+        @Override
+        public void control(LAccess type, Object p1, double p2, double p3, double p4) {
+            if(type == LAccess.bridgeConfig && p1 instanceof ItemBridgeBuild other && linkValid(tile, other.tile, false)){
+                if(Mathf.zero(p2)){
+                    if(link == other.pos() && isConfigurable(p4)){ //This arrangement will not trigger a timer countdown if bridges are not satisfied for a config op to happen.
+                        configureAny(-1);
+                    }
+
+                    if(pos() == other.link && isConfigurable(p4)){
+                        other.configureAny(-1);
+                    }
+                }else{
+                    if(pos() == other.link && isConfigurable(p4)){
+                        configureAny(other.pos());
+                        other.configureAny(-1);
+                    }
+
+                    if (link != other.pos() && isConfigurable(p4)){
+                        configureAny(other.pos());
+                    }
+                }
+            }
+        }
+
+        boolean isConfigurable(double p4){
+            return !Mathf.zero(p4) || timer(checkLink, 10f);
+        }
+
+        @Override
         public byte version(){
             return 1;
         }

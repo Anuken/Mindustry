@@ -15,6 +15,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.logic.LAccess;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -508,6 +509,16 @@ public class PowerNode extends PowerBlock{
                 out[i] = Point2.unpack(power.links.get(i)).sub(tile.x, tile.y);
             }
             return out;
+        }
+
+        @Override
+        public void control(LAccess type, Object p1, double p2, double p3, double p4) {
+            if(type == LAccess.powerConfig && p1 instanceof Building other && linkValid(this, other) && !Mathf.zero(p2) ^ linked(other)){
+                if(!Mathf.zero(p4)){
+                    if(!timer(checkLink, 30f)) return;
+                }
+                configureAny(other.pos());
+            }
         }
     }
 }

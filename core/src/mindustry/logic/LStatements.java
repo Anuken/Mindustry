@@ -427,7 +427,7 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("getnode")
+    /*@RegisterStatement("getnode")
     public static class GetNodeStatement extends LStatement{
         public LNode type = LNode.power;
         public String building = "building", node = "node", index = "0";
@@ -465,51 +465,7 @@ public class LStatements{
         public LCategory category() {
             return LCategory.block;
         }
-    }
-
-    @RegisterStatement("setnode")
-    public static class SetNodeStatement extends LStatement{
-        public LNode type = LNode.add;
-        public String from = "from", to = "to", enabled = "enabled";
-
-        @Override
-        public void build(Table table){
-            table.clearChildren();
-
-            table.button(b -> {
-                b.label(() -> type.name());
-                b.clicked(() -> showSelect(b, LNode.set, type, o -> {
-                    type = o;
-                    build(table);
-                }));
-            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
-
-            field(table, from, str -> from = str);
-
-            switch(type){
-                case add -> table.add(" to ");
-                case remove -> table.add(" from ");
-            }
-
-            field(table, to, str -> to = str);
-
-            table.row();
-
-            table.add("enabled: ");
-
-            field(table, enabled, str -> enabled = str);
-        }
-
-        @Override
-        public LInstruction build(LAssembler builder) {
-            return new SetNodeI(type, builder.var(from), builder.var(to), builder.var(enabled));
-        }
-
-        @Override
-        public LCategory category() {
-            return LCategory.block;
-        }
-    }
+    }*/
 
     @RegisterStatement("control")
     public static class ControlStatement extends LStatement{
@@ -638,10 +594,11 @@ public class LStatements{
     @RegisterStatement("sensor")
     public static class SensorStatement extends LStatement{
         public String to = "result";
-        public String from = "block1", type = "@copper";
+        public String from = "block1", type = "@copper", at = "0";
 
         private transient int selected = 0;
         private transient TextField tfield;
+        private transient boolean lookupMode = false;
 
         @Override
         public void build(Table table){
@@ -745,6 +702,17 @@ public class LStatements{
             table.add(" in ").self(this::param);
 
             field(table, from, str -> from = str);
+
+            Boolp vis = () -> {
+                for(int i=0; i<LAccess.senseable2.length; i++){
+                    if("@".concat(LAccess.senseable2[i].name()).equals(type)) return true;
+                }
+                return false;
+            };
+
+            row(table);
+            table.add(" at ").visible(vis);
+            field(table, at, str -> at = str).visible(vis);
         }
 
         private void stype(String text){
@@ -754,7 +722,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SenseI(builder.var(from), builder.var(to), builder.var(type));
+            return new SenseI(builder.var(from), builder.var(to), builder.var(type), builder.var(at));
         }
 
         @Override
