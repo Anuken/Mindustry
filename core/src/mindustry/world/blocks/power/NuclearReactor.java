@@ -30,8 +30,8 @@ public class NuclearReactor extends PowerGenerator{
     public float itemDuration = 120;
     /** heating per frame * fullness */
     public float heating = 0.01f;
-    /** max heat this block can output */
-    public float heatOutput = 15f;
+    /** max heat this block can output per side */
+    public float heatOutput = 10f;
     /** rate at which heat progress increases */
     public float heatWarmupRate = 1f;
     /** time taken to cool down if no fuel is inputted even if coolant is not present*/
