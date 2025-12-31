@@ -73,8 +73,6 @@ public class Turret extends ReloadTurret{
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
     public float minWarmup = 0f;
-    /** Cooldown, in seconds, applied to player item depositing when any item is deposited to this turret. Overrides the itemDepositCooldown if non-negative. */
-    public float depositCooldown = -1f;
     /** If true, this turret will accurately target moving targets with respect to shoot.firstShotDelay. */
     public boolean accurateDelay = true;
     /** If false, this turret can't move while charging. */

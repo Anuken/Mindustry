@@ -2165,12 +2165,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean canDepositItem(@Nullable Building build){
-        //takes advantage of itemDepositCooldown being able to be negative, allows the cooldown to be different for each turret
-        float cooldownOverride = 0;
-        if(build.block instanceof Turret turret && state.rules.enableTurretDepositCooldown && turret.depositCooldown >= 0){
-            cooldownOverride = -state.rules.itemDepositCooldown + turret.depositCooldown;
+        //takes advantage of itemDepositCooldown being able to be negative, allows the cooldown to be different for each building
+        if(build.block.depositCooldown >= 0){
+            return itemDepositCooldown - state.rules.itemDepositCooldown <= -build.block.depositCooldown;
         }
-        return itemDepositCooldown + cooldownOverride <= 0f;
+        return itemDepositCooldown <= 0;
     }
 
     public void rebuildArea(int x1, int y1, int x2, int y2){
