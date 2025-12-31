@@ -573,6 +573,7 @@ public class UnitTypes{
                 shootY = 6f;
                 beamWidth = 0.8f;
                 repairSpeed = 1.4f;
+                unitSort = UnitSorts.leastHealth;
 
                 bullet = new BulletType(){{
                     maxRange = 120f;

@@ -11,6 +11,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
+import mindustry.entities.Units.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -34,6 +35,9 @@ public class RepairBeamWeapon extends Weapon{
     public float pulseStroke = 2f;
     public float widthSinMag = 0f, widthSinScl = 4f;
     public float recentDamageMultiplier = 0.1f;
+
+    /** Function for choosing which unit to target. */
+    public Sortf unitSort = UnitSorts.closest;
 
     public TextureRegion laser, laserEnd, laserTop, laserTopEnd;
 
@@ -87,7 +91,7 @@ public class RepairBeamWeapon extends Weapon{
 
     @Override
     protected Teamc findTarget(Unit unit, float x, float y, float range, boolean air, boolean ground){
-        var out = targetUnits ? Units.closest(unit.team, x, y, range, u -> u != unit && u.damaged()) :  null;
+        var out = targetUnits ? Units.closest(unit.team, x, y, range, u -> u != unit && u.damaged(), unitSort) : null;
         if(out != null || !targetBuildings) return out;
         return Units.findAllyTile(unit.team, x, y, range, Building::damaged);
     }
