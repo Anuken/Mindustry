@@ -8,6 +8,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
+/** Renders walls in packed square tiles, sized to be as large as possible given the provided size constraints. Concept and some code taken from Twcash/Aquarion. */
 public class TiledWall extends StaticWall{
     public TextureRegion[][][][] sizedRegions;
     public int maxSize = 3;
@@ -26,10 +27,10 @@ public class TiledWall extends StaticWall{
     public void load(){
         super.load();
 
-        sizedRegions = new TextureRegion[maxSize + 1][variants][][];
+        sizedRegions = new TextureRegion[maxSize + 1][Math.max(variants, 1)][][];
 
         for(int size = 1; size <= maxSize; size++){
-            for(int v = 0; v < variants; v++){
+            for(int v = 0; v < Math.max(variants, 1); v++){
                 TextureRegion base = Core.atlas.find(name + "-" + size + "-" + v);
                 int actualSize = size;
                 if(!base.found()) base = Core.atlas.find(name + "-" + size);
@@ -51,7 +52,7 @@ public class TiledWall extends StaticWall{
     public void blockChanged(Tile tile){
         super.blockChanged(tile);
 
-        if(TiledState.changes(state(tile)) != world.tileChanges && !world.isGenerating()){
+        if(!world.isGenerating() && TiledState.changes(state(tile)) != world.tileChanges){
             scan(tile);
         }
     }

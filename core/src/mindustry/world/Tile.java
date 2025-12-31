@@ -452,7 +452,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     /** @return whether the floor on this tile deals damage or can be drowned on. */
     public boolean dangerous(){
-        return !block.solid && (floor.isDeep() || floor.damageTaken > 0);
+        return !block.solid && (floor.isDeep() || floor.damages());
     }
 
     /**

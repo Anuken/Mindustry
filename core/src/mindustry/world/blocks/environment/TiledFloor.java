@@ -9,6 +9,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
+/** Renders floors in packed square tiles, sized to be as large as possible given the provided size constraints. Concept and some code taken from Twcash/Aquarion. */
 public class TiledFloor extends Floor{
     public TextureRegion[][][][] sizedRegions;
     public int maxSize = 3;
@@ -27,10 +28,10 @@ public class TiledFloor extends Floor{
     public void load(){
         super.load();
 
-        sizedRegions = new TextureRegion[maxSize + 1][variants][][];
+        sizedRegions = new TextureRegion[maxSize + 1][Math.max(variants, 1)][][];
 
         for(int size = 1; size <= maxSize; size++){
-            for(int v = 0; v < variants; v++){
+            for(int v = 0; v < Math.max(variants, 1); v++){
                 TextureRegion base = Core.atlas.find(name + "-" + size + "-" + v);
                 int actualSize = size;
                 if(!base.found()) base = Core.atlas.find(name + "-" + size);
@@ -51,7 +52,7 @@ public class TiledFloor extends Floor{
     @Override
     public void floorChanged(Tile tile){
 
-        if(TiledState.changes(state(tile)) != world.floorChanges && !world.isGenerating()){
+        if(!world.isGenerating() && TiledState.changes(state(tile)) != world.floorChanges){
             scan(tile);
         }
     }
@@ -60,13 +61,13 @@ public class TiledFloor extends Floor{
         //max size possible
         int size = maxSize;
         int changes = world.floorChanges;
-        boolean isOverlay = tile.floor() != this;
+        boolean isOverlay = tile.overlay() == this;
 
         //scan to the top right for the biggest size possible
         for(int cx = 0; cx < size; cx++){
             for(int cy = 0; cy < size; cy++){
                 Tile other = tile.nearby(cx, cy);
-                if(other == null || ((isOverlay ? other.overlay() : other.floor()) != this) || TiledState.changes(state(other)) == changes){
+                if(other == null || (isOverlay ? other.overlay() : other.floor()) != this || TiledState.changes(state(other)) == changes){
                     int max = Math.max(cx, cy);
                     size = Math.min(max, size);
                     size = Math.min(max, size);
