@@ -2164,7 +2164,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    public boolean canDepositItem(@Nullable Building build){
+    public boolean canDepositItem(Building build){
         //takes advantage of itemDepositCooldown being able to be negative, allows the cooldown to be different for each building
         if(build.block.depositCooldown >= 0){
             return itemDepositCooldown - state.rules.itemDepositCooldown <= -build.block.depositCooldown;
