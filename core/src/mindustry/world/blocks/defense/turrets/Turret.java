@@ -698,7 +698,7 @@ public class Turret extends ReloadTurret{
                 excessReload += reloadCounter % reload;
             }
             reloadCounter = Math.min(reloadCounter, reload);
-            reloadShots = Math.min(reloadShots, 100);
+            reloadShots = Math.min(reloadShots, 5);
 
             if(!wasShooting){
                 reloadShots = 0;
