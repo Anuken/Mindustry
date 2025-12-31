@@ -938,6 +938,8 @@ public class LExecutor{
                             exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandPrint, packSign(curX + xOffset), packSign(curY + yOffset), next, 0, 0, 0));
                         }
                         curX += advance;
+
+                        if(exec.graphicsBuffer.size >= maxGraphicsBuffer) break;
                     }
 
                     exec.textBuffer.setLength(0);
@@ -1010,7 +1012,7 @@ public class LExecutor{
             if(value.isobj){
                 String strValue = toString(value.objval);
 
-                exec.textBuffer.append(strValue);
+                exec.textBuffer.append(strValue, 0, Math.min(strValue.length(), maxTextBuffer - exec.textBuffer.length()));
             }else{
                 //display integer version when possible
                 if(Math.abs(value.numval - Math.round(value.numval)) < 0.00001){
@@ -1122,7 +1124,6 @@ public class LExecutor{
             if(target.building() instanceof MessageBuild d && d.isValid() && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
-
             }
             exec.textBuffer.setLength(0);
 
