@@ -650,15 +650,13 @@ public class BulletType extends Content implements Cloneable{
             Fx.trailFade.at(b.x, b.y, trailWidth, trailColor, b.trail.copy());
         }
 
-        //if the bullet never created any frags and is removed (probably by hitting something), it needs to spawn those
-        //TODO: disabled for now as this makes vanquish significantly more powerful
         if(b.frags == 0 && !fragOnHit && fragBullet != null){
-        //    createFrags(b, b.x, b.y);
+            createFrags(b, b.x, b.y);
         }
     }
 
     public float buildingDamage(Bullet b){
-        return b.damage() * buildingDamageMultiplier;
+        return b.damage() * b.buildingDamageMultiplier;
     }
 
     public float shieldDamage(Bullet b){
@@ -969,6 +967,7 @@ public class BulletType extends Content implements Cloneable{
         bullet.hitSize = hitSize;
         bullet.mover = mover;
         bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
+        bullet.buildingDamageMultiplier = buildingDamageMultiplier;
         //reset trail
         if(bullet.trail != null){
             bullet.trail.clear();
