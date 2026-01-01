@@ -944,6 +944,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             block = null;
         }
 
+        player.selectedBlock = block;
+        player.selectedRotation = rotation;
+
         wasShooting = player.shooting;
 
         //only reset the controlled type and control a unit after the timer runs out

@@ -13,6 +13,7 @@ import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -699,7 +700,7 @@ public class NetClient implements ApplicationListener{
             unit == null ? 0f : unit.vel.x, unit == null ? 0f : unit.vel.y,
             dead ? null : unit.mineTile,
             player.boosting, player.shooting, ui.chatfrag.shown(), control.input.isBuilding,
-            player.isBuilder() && unit != null ? unit.plans : null,
+            player.selectedBlock, player.selectedRotation, player.isBuilder() && unit != null ? unit.plans : null,
             Core.camera.position.x, Core.camera.position.y,
             Core.camera.width, Core.camera.height
             );
