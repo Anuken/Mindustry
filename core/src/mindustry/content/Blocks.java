@@ -3432,7 +3432,7 @@ public class Blocks{
                     keepVelocity = false;
                     hittable = false;
                 }},
-                Items.pyratite, new BulletType(4f, 60f){{
+                Items.pyratite, new BulletType(4f, 27f){{
                     ammoMultiplier = 6f;
                     hitSize = 7f;
                     lifetime = 18f;
