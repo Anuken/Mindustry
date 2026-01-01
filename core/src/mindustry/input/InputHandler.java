@@ -37,6 +37,7 @@ import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
@@ -2149,13 +2150,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build != null && build.acceptStack(stack.item, stack.amount, player.unit()) > 0 && build.interactable(player.team()) &&
         build.block.hasItems && player.unit().stack().amount > 0 && build.interactable(player.team())){
 
-            if(build.allowDeposit() && itemDepositCooldown <= 0f){
+            if(build.allowDeposit() && canDepositItem(build)){
                 Call.transferInventory(player, build);
                 itemDepositCooldown = state.rules.itemDepositCooldown;
             }
         }else{
             Call.dropItem(player.angleTo(x, y));
         }
+    }
+
+    public boolean canDepositItem(Building build){
+        //takes advantage of itemDepositCooldown being able to be negative, allows the cooldown to be different for each building
+        if(build.block.depositCooldown >= 0){
+            return itemDepositCooldown - state.rules.itemDepositCooldown <= -build.block.depositCooldown;
+        }
+        return itemDepositCooldown <= 0;
     }
 
     public void rebuildArea(int x1, int y1, int x2, int y2){
