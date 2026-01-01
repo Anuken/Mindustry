@@ -2527,6 +2527,7 @@ public class Blocks{
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
+            itemDurationMultipliers.put(Items.pyratite, 3f);
 
             drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion());
         }};
@@ -2556,6 +2557,7 @@ public class Blocks{
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
+            itemDurationMultipliers.put(Items.pyratite, 3f);
 
             drawer = new DrawMulti(
             new DrawDefault(),
