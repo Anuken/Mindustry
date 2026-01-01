@@ -341,11 +341,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                         ai.group = null;
                     }
 
-                    //remove when other player command
-                    if(!headless && player != Vars.player){
-                        control.input.selectedUnits.remove(unit);
-                    }
-
                     toAdd.add(unit);
                 }
             }
@@ -2319,7 +2314,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Point2 next = i == points.size - 1 ? null : points.get(i + 1);
             line.x = point.x;
             line.y = point.y;
-            if((!overrideLineRotation || diagonal) && !(block != null && block.ignoreLineRotation)){
+            if((!overrideLineRotation || diagonal) && !(block != null && block.ignoreLineRotation && !mobile)){
                 int result = baseRotation;
                 if(next != null){
                     result = Tile.relativeTo(point.x, point.y, next.x, next.y);
