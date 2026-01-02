@@ -182,10 +182,9 @@ public class Mods implements Loadable{
             }
         }
 
-       Log.debug("Total sprites: @", totalSprites[0]);
+        Log.debug("Total sprites: @", totalSprites[0]);
 
         TextureFilter filter = Core.settings.getBool("linear", true) ? TextureFilter.linear : TextureFilter.nearest;
-        Texture[] whiteToDispose = {null};
 
         class RegionEntry{
             String name;
@@ -232,15 +231,20 @@ public class Mods implements Loadable{
             }
         }
 
+        Pixmap[] whitePixmap = {null};
+        Texture[] whiteTex = {null};
+
         waitForMain(() -> {
+            whitePixmap[0] = Pixmaps.blankPixmap();
+            whiteTex[0] = new Texture(whitePixmap[0]);
+            var whiteRegion = new AtlasRegion(whiteTex[0], 0, 0, 1, 1);
+
             Core.atlas.dispose();
 
             //dead shadow-atlas for getting regions, but not pixmaps
             var shadow = Core.atlas;
             //dummy texture atlas that returns the 'shadow' regions; used for mod loading
             Core.atlas = new TextureAtlas(){
-                boolean foundWhite;
-                AtlasRegion whiteRegion;
 
                 {
                     //needed for the correct operation of the found() method in the TextureRegion
@@ -249,13 +253,7 @@ public class Mods implements Loadable{
 
                 @Override
                 public AtlasRegion white(){
-                    if(Core.app.isOnMainThread() && !foundWhite){
-                        Pixmap pixmap = Pixmaps.blankPixmap();
-                        Texture tex = new Texture(pixmap);
-                        whiteToDispose[0] = tex;
-                        return whiteRegion = new AtlasRegion(tex, 0, 0, 1, 1);
-                    }
-                    return super.white();
+                    return whiteRegion;
                 }
 
                 @Override
@@ -312,9 +310,8 @@ public class Mods implements Loadable{
         }
 
         waitForMain(() -> {
-            if(whiteToDispose[0] != null){
-                whiteToDispose[0].dispose();
-            }
+            whitePixmap[0].dispose();
+            whiteTex[0].dispose();
 
             //replace old atlas data
             Core.atlas = packer.flush(filter, new TextureAtlas(){
@@ -1112,7 +1109,6 @@ public class Mods implements Loadable{
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods. */
     private LoadedMod loadMod(Fi sourceFile, boolean overwrite, boolean initialize) throws Exception{
-        Time.mark();
 
         ZipFi rootZip = null;
 
@@ -1232,7 +1228,7 @@ public class Mods implements Loadable{
             }
 
             if(!headless && Core.settings.getBool("mod-" + baseName + "-enabled", true)){
-                Log.info("Loaded mod '@' in @ms", meta.name, Time.elapsed());
+                Log.info("Loading mod: @", meta.name);
             }
 
             return new LoadedMod(sourceFile, zip, mainMod, loader, meta);

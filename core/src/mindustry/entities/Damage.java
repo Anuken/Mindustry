@@ -178,6 +178,8 @@ public class Damage{
     }
 
     public static float findPierceLength(Bullet b, int pierceCap, boolean laser, float length){
+        if(pierceCap <= 0) return length;
+
         vec.trnsExact(b.rotation(), length);
         rect.setPosition(b.x, b.y).setSize(vec.x, vec.y).normalize().grow(3f);
 
@@ -215,7 +217,7 @@ public class Damage{
 
         //return either the length when not enough things were pierced,
         //or the last pierced object if there were enough blockages
-        return Math.min(distances.size < pierceCap || pierceCap < 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
+        return Math.min(distances.size < pierceCap ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
     }
 
     /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */

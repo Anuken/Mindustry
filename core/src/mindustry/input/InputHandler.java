@@ -37,6 +37,7 @@ import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
@@ -339,11 +340,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     unit.lastCommanded = player.coloredName();
                     if(ai.commandQueue.size <= 0){
                         ai.group = null;
-                    }
-
-                    //remove when other player command
-                    if(!headless && player != Vars.player){
-                        control.input.selectedUnits.remove(unit);
                     }
 
                     toAdd.add(unit);
@@ -2154,13 +2150,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build != null && build.acceptStack(stack.item, stack.amount, player.unit()) > 0 && build.interactable(player.team()) &&
         build.block.hasItems && player.unit().stack().amount > 0 && build.interactable(player.team())){
 
-            if(build.allowDeposit() && itemDepositCooldown <= 0f){
+            if(build.allowDeposit() && canDepositItem(build)){
                 Call.transferInventory(player, build);
                 itemDepositCooldown = state.rules.itemDepositCooldown;
             }
         }else{
             Call.dropItem(player.angleTo(x, y));
         }
+    }
+
+    public boolean canDepositItem(Building build){
+        //takes advantage of itemDepositCooldown being able to be negative, allows the cooldown to be different for each building
+        if(build.block.depositCooldown >= 0){
+            return itemDepositCooldown - state.rules.itemDepositCooldown <= -build.block.depositCooldown;
+        }
+        return itemDepositCooldown <= 0;
     }
 
     public void rebuildArea(int x1, int y1, int x2, int y2){
@@ -2319,7 +2323,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Point2 next = i == points.size - 1 ? null : points.get(i + 1);
             line.x = point.x;
             line.y = point.y;
-            if((!overrideLineRotation || diagonal) && !(block != null && block.ignoreLineRotation)){
+            if((!overrideLineRotation || diagonal) && !(block != null && block.ignoreLineRotation && !mobile)){
                 int result = baseRotation;
                 if(next != null){
                     result = Tile.relativeTo(point.x, point.y, next.x, next.y);

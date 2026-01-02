@@ -277,6 +277,11 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public boolean canUnload(){
+            return block.unloadable && state.rules.allowCoreUnloaders;
+        }
+
+        @Override
         public void draw(){
             //draw thrusters when just landed
             if(thrusterTime > 0){
@@ -617,6 +622,11 @@ public class CoreBlock extends StorageBlock{
                 //just create an explosion, no fire. this prevents immediate recapture
                 Damage.dynamicExplosion(x, y, 0, 0, 0, tilesize * block.size / 2f, state.rules.damageExplosions);
                 Fx.commandSend.at(x, y, 140f);
+
+                //make sure the sound still plays
+                if(!headless){
+                    playDestroySound();
+                }
             }else{
                 super.onDestroyed();
             }

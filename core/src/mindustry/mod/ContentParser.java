@@ -395,6 +395,13 @@ public class ContentParser{
         }
 
         @Override
+        protected Object newInstance(Class type){
+            Object o = super.newInstance(type);
+            onNewInstance(o, type);
+            return o;
+        }
+
+        @Override
         public <T> T readValue(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
             T t = internalRead(type, elementType, jsonData, keyType);
             if(t != null && !Reflect.isWrapper(t.getClass()) && (type == null || !type.isPrimitive())){
@@ -1382,6 +1389,8 @@ public class ContentParser{
     void warn(String string, Object... format){
         Log.warn(string, format);
     }
+
+    void onNewInstance(Object object, Class<?> type){}
 
     public Json getJson(){
         checkInit();

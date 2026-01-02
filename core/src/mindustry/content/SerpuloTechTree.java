@@ -175,7 +175,7 @@ public class SerpuloTechTree{
 
                                         });
 
-                                        node(logicDisplayTile, () -> {
+                                        node(tileLogicDisplay, () -> {
 
                                         });
                                     });
