@@ -3437,6 +3437,7 @@ public class Blocks{
                     hitSize = 7f;
                     lifetime = 18f;
                     pierce = true;
+                    pierceArmor = true;
                     collidesAir = false;
                     statusDuration = 60f * 10;
                     shootEffect = Fx.shootPyraFlame;
