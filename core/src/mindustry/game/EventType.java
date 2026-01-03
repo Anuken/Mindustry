@@ -481,10 +481,20 @@ public class EventType{
             this.content = content;
         }
     }
+    
+    public static class PartialResearchEvent{
+        public final UnlockableContent content;
+        public final int[] ids;
+        public final int[] quantity;
+        public PartialResearchEvent(UnlockableContent content, int[] ids, int[] quantity){
+            this.content = content;
+            this.ids = ids;
+            this.quantity = quantity;
+        }
+    }
 
     public static class ResearchEvent{
         public final UnlockableContent content;
-
         public ResearchEvent(UnlockableContent content){
             this.content = content;
         }

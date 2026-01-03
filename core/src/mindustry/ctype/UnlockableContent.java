@@ -240,6 +240,9 @@ public abstract class UnlockableContent extends MappableContent{
 
     /** Makes this piece of content unlocked; if it already unlocked, nothing happens. */
     public void unlock(){
+        if(state.rules.partiallyResearched.containsKey(this)){
+            state.rules.partiallyResearched.remove(this); 
+        }
         if(!unlocked && !alwaysUnlocked){
             unlocked = true;
             Core.settings.put(name + "-unlocked", true);
