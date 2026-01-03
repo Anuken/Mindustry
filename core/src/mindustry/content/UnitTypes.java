@@ -1395,7 +1395,7 @@ public class UnitTypes{
 
             abilities.add(new RepairFieldAbility(5f, 112f, 50f)
             {{
-                sameTypeHealMult = 0.5f;
+                sameTypeHealMult = 0.25f;
             }});
 
             weapons.add(new Weapon("poly-weapon"){{
