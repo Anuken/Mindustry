@@ -722,9 +722,13 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.suppression", Strings.autoFixed(type.suppressionDuration / 60f, 2), Strings.fixed(type.suppressionRange / tilesize, 1)));
                     }
 
-                    if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.hasEmoji() ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" +
-                            Strings.autoFixed(type.statusDuration / 60f, 1) + "[lightgray] " + Core.bundle.get("unit.seconds"))).with(c -> withTooltip(c, type.status));
+                    // It is redundant to show the status effect if it can't be applied
+                    if(type.status != StatusEffects.none && type.statusChance > 0.001f){
+                        sep(bt,
+                            (type.statusChance < 1f ? "[stat]" + Strings.autoFixed(type.statusChance * 100f, 1) + "% [lightgray]chance of [white]" : "") +
+                                    (type.status.hasEmoji() ? type.status.emoji() + " " : "") + "[stat]" + type.status.localizedName +
+                                    (type.status.reactive ? "" : "[lightgray] ~ [stat]" + Strings.autoFixed(type.statusDuration / 60f, 1) + "[lightgray] " + Core.bundle.get("unit.seconds"))
+                        ).with(c -> withTooltip(c, type.status));
                     }
 
                     if(!type.targetMissiles){
