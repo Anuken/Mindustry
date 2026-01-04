@@ -260,7 +260,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         zoom = 1f;
         state.zoom = 1f;
         state.uiAlpha = 0f;
-        launchSector = Vars.state.getSector();
+        launchSector = Vars.state.gameOver ? null : Vars.state.getSector();
         presetShow = 0f;
         showed = false;
         listener = s -> {};

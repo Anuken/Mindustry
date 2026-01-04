@@ -214,7 +214,7 @@ public class Effect{
     public static void floorDust(float x, float y, float size){
         Tile tile = world.tileWorld(x, y);
         if(tile != null){
-            Color color = tile.floor().mapColor;
+            Color color = tile.getFloorColor();
             Fx.unitLand.at(x, y, size, color);
         }
     }
@@ -222,7 +222,7 @@ public class Effect{
     public static void floorDustAngle(Effect effect, float x, float y, float angle){
         Tile tile = world.tileWorld(x, y);
         if(tile != null){
-            Color color = tile.floor().mapColor;
+            Color color = tile.getFloorColor();
             effect.at(x, y, angle, color);
         }
     }
@@ -280,7 +280,7 @@ public class Effect{
                         float ox = Angles.trnsx(angle, radius), oy = Angles.trnsy(angle, radius);
                         Tile t = world.tileWorld(x + ox, y + oy);
                         if(t != null){
-                            Fx.podLandDust.at(t.worldx(), t.worldy(), angle + Mathf.range(30f), Tmp.c1.set(t.floor().mapColor).mul(1.7f + Mathf.range(0.15f)));
+                            Fx.podLandDust.at(t.worldx(), t.worldy(), angle + Mathf.range(30f), Tmp.c1.set(t.getFloorColor()).mul(1.7f + Mathf.range(0.15f)));
                         }
                     }
                 }

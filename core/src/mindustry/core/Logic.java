@@ -145,9 +145,7 @@ public class Logic implements ApplicationListener{
 
         Events.on(BlockDestroyEvent.class, e -> {
             if(e.tile.build instanceof CoreBuild core && core.team.isAI() && state.rules.coreDestroyClear){
-                Core.app.post(() -> {
-                    core.team.data().timeDestroy(core.x, core.y, state.rules.enemyCoreBuildRadius);
-                });
+                Core.app.post(() -> core.team.data().timeDestroy(core.x, core.y, state.rules.enemyCoreBuildRadius));
             }
         });
 
