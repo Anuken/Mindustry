@@ -2921,7 +2921,6 @@ public class UnitTypes{
                     maxRange = 190f;
 
                     fragOnHit = false;
-                    fragOnLastHit = true;
                     pierceFragCap = 1;
                     fragRandomSpread = 0f;
                     fragSpread = 10f;

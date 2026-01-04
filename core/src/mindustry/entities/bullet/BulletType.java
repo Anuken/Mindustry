@@ -177,8 +177,6 @@ public class BulletType extends Content implements Cloneable{
     public boolean despawnHit = false;
     /** If true, this bullet will create bullets when it hits anything */
     public boolean fragOnHit = true;
-    /** If true, this bullet will create bullets on the last hit, regardless of fragOnHit. Respects pierceFragCap, leaving the last frag to the last hit */
-    public boolean fragOnLastHit = false;
     /** If true, this bullet will create bullets when it despawns */
     public boolean fragOnDespawn = true;
     /** If false, this bullet will not create frags when absorbed by a shield. */
@@ -540,7 +538,7 @@ public class BulletType extends Content implements Cloneable{
 
         Effect.shake(hitShake, hitShake, b);
 
-        if(createFrags && (fragOnHit || fragOnLastHit)){
+        if(createFrags && fragOnHit){
             if(delayFrags && fragBullet != null && fragBullet.delayFrags){
                 Time.run(0f, () -> createFrags(b, x, y));
             }else{
@@ -600,19 +598,14 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void createFrags(Bullet b, float x, float y){
-        createFrags(b, b.x, b.y, false);
-    }
-
-    public void createFrags(Bullet b, float x, float y, boolean despawn){
-        if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && (pierceFragCap < 0 || (fragOnLastHit ? 
-            (b.frags < pierceFragCap - 1 && fragOnHit) || (b.frags + 1) == pierceCap : b.frags < pierceFragCap) || despawn)){
+        if(fragBullet != null && (fragOnAbsorb || !b.absorbed) && (pierceFragCap < 0 || b.frags < pierceFragCap)){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(fragOffsetMin, fragOffsetMax);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + fragSpread * i - (fragBullets - 1) * fragSpread / 2f;
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
+            b.frags++;
         }
-        b.frags++;
     }
 
     public void createUnits(Bullet b, float x, float y){
@@ -634,10 +627,6 @@ public class BulletType extends Content implements Cloneable{
             createUnits(b, b.x, b.y);
         }
 
-        if(fragOnDespawn){
-            createFrags(b, b.x, b.y, true);
-        }
-
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         despawnSound.at(b, 1f + Mathf.range(hitSoundPitchRange));
 
@@ -650,7 +639,7 @@ public class BulletType extends Content implements Cloneable{
             Fx.trailFade.at(b.x, b.y, trailWidth, trailColor, b.trail.copy());
         }
 
-        if(b.frags == 0 && !fragOnHit && fragBullet != null){
+        if(b.frags == 0 && fragOnDespawn && fragBullet != null){
             createFrags(b, b.x, b.y);
         }
     }

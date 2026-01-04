@@ -46,7 +46,7 @@ public class ShieldArcAbility extends Ability{
 
                 b.owner = paramUnit;
                 b.team = paramUnit.team;
-                b.time += 1f;
+                b.time = b.lifetime * paramField.reflectTime;
                 if(paramField.reflectBuildingDamage > 0f){
                     b.buildingDamageMultiplier = paramField.reflectBuildingDamage;
                 }
@@ -133,6 +133,8 @@ public class ShieldArcAbility extends Ability{
     public float reflectBuildingDamage = 1f;
     /** Velocity multiplier for reflected bullets on the opposite axis. Negative values = concave, positive values = convex */
     public float reflectVel = 1f;
+    /** Time multiplier for reflected bullets. */
+    public float reflectTime = 1f - 0.3f;
     /** Deflection sound. */
     public Sound deflectSound = Sounds.none;
     public Sound breakSound = Sounds.shieldBreakSmall;
