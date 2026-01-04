@@ -563,6 +563,11 @@ public class Block extends UnlockableContent implements Senseable{
         return 0;
     }
 
+    public Color getColor(Tile tile){
+        int mc = minimapColor(tile);
+        return mc == 0 ? mapColor : Tmp.c3.set(mc);
+    }
+
     public boolean outputsItems(){
         return hasItems;
     }

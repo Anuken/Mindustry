@@ -676,7 +676,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(isFlying() != wasFlying){
             if(wasFlying){
                 if(tile != null){
-                    Fx.unitLand.at(x, y, floor.isLiquid ? 1f : 0.5f, tile.floor().mapColor);
+                    Fx.unitLand.at(x, y, floor.isLiquid ? 1f : 0.5f, tile.getFloorColor());
                 }
             }
 
@@ -685,7 +685,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         if(!type.hovering && isGrounded() && type.emitWalkEffect){
             if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= (7f + hitSize()/8f)){
-                floor.walkEffect.at(x, y, hitSize() / 8f, floor.mapColor);
+                floor.walkEffect.at(x, y, hitSize() / 8f, tile != null ? tile.getFloorColor() : floor.mapColor);
                 splashTimer = 0f;
 
                 if(type.emitWalkSound){
