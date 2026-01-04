@@ -305,6 +305,7 @@ public class SettingsMenuDialog extends BaseDialog{
         game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
 
         if(mobile){
+            game.sliderPref("longpressduration", 300, 100, 600, 50, i -> Core.bundle.format("setting.milliseconds", i));
             game.checkPref("autotarget", true);
             game.checkPref("keyboard", false, val -> {
                 control.setInput(val ? new DesktopInput() : new MobileInput());
