@@ -126,7 +126,7 @@ public class HudFragment{
         boolean isFav = favoriteBlocks.contains(block.name);
         if(isFav){
             favoriteBlocks.remove(block.name);
-            // Sounds.uiFavRemove.play();
+            Sounds.uiUnFavorite.play();
         }else{
             favoriteBlocks.add(block.name);
             lastFavorited = block.name;
