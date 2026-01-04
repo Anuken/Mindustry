@@ -130,6 +130,7 @@ public class HudFragment{
         }else{
             favoriteBlocks.add(block.name);
             lastFavorited = block.name;
+            Sounds.uiFavorite.play();
         }
         saveFavorites();
     }
