@@ -2874,7 +2874,7 @@ public class Blocks{
         }};
 
         blastDrill = new Drill("blast-drill"){{
-            requirements(Category.production, with(Items.copper, 65, Items.silicon, 60, Items.titanium, 50, Items.thorium, 75));
+            requirements(Category.production, with(Items.copper, 90, Items.silicon, 90, Items.titanium, 75, Items.thorium, 125));
             drillTime = 280;
             size = 4;
             drawRim = true;
