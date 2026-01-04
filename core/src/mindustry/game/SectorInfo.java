@@ -6,7 +6,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -41,6 +40,10 @@ public class SectorInfo{
     public int storageCapacity = 0;
     /** Whether a core is available here. */
     public boolean hasCore = true;
+    /** Last sector preset name set to this sector. */
+    public @Nullable String lastPresetName;
+    /** Last size of the map. */
+    public int lastWidth, lastHeight;
     /** Whether this sector was ever fully captured. */
     public boolean wasCaptured = false;
     /** Sector that was launched from. */
@@ -55,20 +58,14 @@ public class SectorInfo{
     public boolean attack = false;
     /** Whether this sector has any enemy spawns. */
     public boolean hasSpawns = true;
+    /** How many times the player has tried to land at this sector with a fresh core. */
+    public int attempts;
     /** Wave # from state */
     public int wave = 1, winWave = -1;
-    /** Waves this sector can survive if under attack. Based on wave in info. <0 means uncalculated. */
-    public int wavesSurvived = -1;
     /** Time between waves. */
     public float waveSpacing = 2 * Time.toMinutes;
-    /** Damage dealt to sector. */
-    public float damage;
-    /** How many waves have passed while the player was away. */
-    public int wavesPassed;
     /** Packed core spawn position. */
     public int spawnPosition;
-    /** How long the player has been playing elsewhere. */
-    public float secondsPassed;
     /** How many minutes this sector has been captured. */
     public float minutesCaptured;
     /** Light coverage in terms of radius. */
@@ -84,11 +81,6 @@ public class SectorInfo{
     /** Whether this sector was indicated to the player or not. */
     public boolean shown = false;
 
-    /** Special variables for simulation. */
-    public float sumHealth, sumRps, sumDps, bossHealth, bossDps, curEnemyHealth, curEnemyDps;
-    /** Wave where first boss shows up. */
-    public int bossWave = -1;
-
     public ObjectFloatMap<Item> importCooldownTimers = new ObjectFloatMap<>();
     public @Nullable transient float[] importRateCache;
 
@@ -101,6 +93,14 @@ public class SectorInfo{
     private @Nullable transient int[] coreDeltas;
     /** Core item storage input/output deltas. */
     private @Nullable transient int[] productionDeltas;
+
+    /** @return whether the sector was last saved with the same preset. if false, this means the preset changed, and thus the spawn/plan data should be discarded. */
+    public boolean sectorDataMatches(Sector sector){
+        if(sector.preset != null && (sector.preset.generator.map.width != lastWidth || sector.preset.generator.map.height != lastHeight)){
+            return false;
+        }
+        return Structs.eq(sector.preset == null ? null : sector.preset.name, lastPresetName);
+    }
 
     /** Handles core item changes. */
     public void handleCoreItem(Item item, int amount){
@@ -208,7 +208,10 @@ public class SectorInfo{
                 this.items.set(content.item(i), items.get(i));
             }
 
-            spawnPosition = entity.pos();
+            //don't change the spawn position after the sector spawn is set by the generator once
+            if(spawnPosition == 0){
+                spawnPosition = entity.pos();
+            }
         }
 
         waveSpacing = state.rules.waveSpacing;
@@ -219,10 +222,10 @@ public class SectorInfo{
         hasCore = entity != null;
         bestCoreType = !hasCore ? Blocks.air : state.rules.defaultTeam.cores().max(e -> e.block.size).block;
         storageCapacity = entity != null ? entity.storageCapacity : 0;
-        secondsPassed = 0;
-        wavesPassed = 0;
-        damage = 0;
         hasSpawns = spawner.countSpawns() > 0;
+        lastPresetName = sector.preset == null ? null : sector.preset.name;
+        lastWidth = world.width();
+        lastHeight = world.height();
 
         lightCoverage = 0f;
         for(var build : state.rules.defaultTeam.data().buildings){
@@ -246,10 +249,6 @@ public class SectorInfo{
         }
 
         sector.saveInfo();
-
-        if(sector.planet.allowWaveSimulation){
-            SectorDamage.writeParameters(sector);
-        }
 
         if(sector.planet.generator != null){
             sector.planet.generator.beforeSaveWrite(sector);

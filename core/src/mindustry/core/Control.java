@@ -31,6 +31,7 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.power.PowerNode.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -56,6 +57,7 @@ public class Control implements ApplicationListener, Loadable{
     private boolean hiscore = false;
     private boolean wasPaused = false, backgroundPaused = false;
     private Seq<Building> toBePlaced = new Seq<>(false);
+    private Seq<Object[]> toBePlacedConfigs = new Seq<>();
 
     public Control(){
         saves = new Saves();
@@ -119,6 +121,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(ResetEvent.class, event -> {
             player.reset();
             toBePlaced.clear();
+            toBePlacedConfigs.clear();
             indicators.clear();
 
             hiscore = false;
@@ -131,7 +134,7 @@ public class Control implements ApplicationListener, Loadable{
                 state.map.setHighScore(state.wave);
             }
 
-            Sounds.wave.play();
+            Sounds.waveSpawn.play();
         });
 
         Events.on(GameOverEvent.class, event -> {
@@ -216,9 +219,11 @@ public class Control implements ApplicationListener, Loadable{
                 if(settings.getInt("musicvol") > 0){
                     //TODO what to do if another core with different music is already playing?
                     Music music = core.landMusic();
-                    music.stop();
-                    music.play();
-                    music.setVolume(settings.getInt("musicvol") / 100f);
+                   if(music != null){
+                       music.stop();
+                       music.play();
+                       music.setVolume(settings.getInt("musicvol") / 100f);
+                   }
                 }
 
                 renderer.showLanding(core);
@@ -237,6 +242,15 @@ public class Control implements ApplicationListener, Loadable{
 
                     //TODO if the save is unloaded or map is hosted, these blocks do not get built.
                     boolean anyBuilds = false;
+                    float maxDelay = 0f;
+
+                    for(var build : state.rules.defaultTeam.data().buildings){
+                        //power nodes need to be configured later once everything is built
+                        if(build instanceof PowerNodeBuild){
+                            toBePlacedConfigs.add(new Object[]{build, build.config()});
+                        }
+                    }
+
                     for(var build : state.rules.defaultTeam.data().buildings.copy()){
                         if(!(build instanceof CoreBuild) && !build.block.privileged){
                             var ccore = build.closestCore();
@@ -249,8 +263,10 @@ public class Control implements ApplicationListener, Loadable{
                                     build.tile.remove();
 
                                     toBePlaced.add(build);
+                                    float delay = build.dst(ccore) / unitsPerTick + coreDelay;
+                                    maxDelay = Math.max(delay, maxDelay);
 
-                                    Time.run(build.dst(ccore) / unitsPerTick + coreDelay, () -> {
+                                    Time.run(delay, () -> {
                                         if(build.tile.build != build){
                                             placeLandBuild(build);
 
@@ -267,6 +283,7 @@ public class Control implements ApplicationListener, Loadable{
                     }
 
                     if(anyBuilds){
+                        Time.run(maxDelay + 1f, this::configurePlaced);
                         for(var ccore : state.rules.defaultTeam.data().cores){
                             Time.run(coreDelay, () -> {
                                 Fx.coreBuildShockwave.at(ccore.x, ccore.y, buildRadius);
@@ -290,7 +307,17 @@ public class Control implements ApplicationListener, Loadable{
             placeLandBuild(build);
         }
 
+        configurePlaced();
         toBePlaced.clear();
+    }
+
+    private void configurePlaced(){
+        for(Object[] obj : toBePlacedConfigs){
+            Building build = (Building)obj[0];
+            Object config = obj[1];
+            build.configureAny(config);
+        }
+        toBePlacedConfigs.clear();
     }
 
     private void placeLandBuild(Building build){
@@ -420,7 +447,10 @@ public class Control implements ApplicationListener, Loadable{
             ui.planet.hide();
             SaveSlot slot = sector.save;
             sector.planet.setLastSector(sector);
-            if(slot != null && !clearSectors && (!sector.planet.clearSectorOnLose || sector.info.hasCore)){
+
+            boolean clearSave = sector.planet.clearSectorOnLose || sector.planet.campaignRules.clearSectorOnLose;
+
+            if(slot != null && !clearSectors && (!clearSave || sector.info.hasCore)){
 
                 try{
                     boolean hadNoCore = !sector.info.hasCore;
@@ -434,19 +464,10 @@ public class Control implements ApplicationListener, Loadable{
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty() || hadNoCore){
 
-                        if(sector.planet.clearSectorOnLose){
+                        //don't carry over the spawn position and plans if the sector preset name or map size changed
+                        if(clearSave || sector.info.spawnPosition == 0 || !sector.info.sectorDataMatches(sector)){
                             playNewSector(origin, sector, reloader);
                         }else{
-                            //no spawn set -> delete the sector save
-                            if(sector.info.spawnPosition == 0){
-                                //delete old save
-                                sector.save = null;
-                                slot.delete();
-                                //play again
-                                playSector(origin, sector, reloader);
-                                return;
-                            }
-
                             int spawnPos = sector.info.spawnPosition;
 
                             //set spawn for sector damage to use
@@ -482,10 +503,11 @@ public class Control implements ApplicationListener, Loadable{
                                     }
                                 }
 
-                                //copy over all buildings from the previous save, retaining config and health, and making them derelict. contents are not saved (derelict repair clears them anyway)
+                                //copy over all buildings from the previous save, retaining config and health, and making them derelict
                                 for(var build : previousBuildings){
                                     Tile tile = world.tile(build.tileX(), build.tileY());
                                     if(tile != null && tile.build == null && Build.validPlace(build.block, state.rules.defaultTeam, build.tileX(), build.tileY(), build.rotation, false, false)){
+                                        build.addPlan(false, true);
                                         tile.setBlock(build.block, state.rules.defaultTeam, build.rotation, () -> build);
                                         build.changeTeam(Team.derelict);
                                         build.dropped(); //TODO: call pickedUp too? this may screw up power networks in a major way as they refer to potentially deleted entities
@@ -507,8 +529,10 @@ public class Control implements ApplicationListener, Loadable{
                                 }
                             });
 
-                            //blocks placed after WorldLoadEvent didn't queue an update, so fix that.
-                            renderer.minimap.updateAll();
+                            Core.app.post(() -> {
+                                //blocks placed after WorldLoadEvent didn't queue an update, so fix that.
+                                renderer.minimap.updateAll();
+                            });
                         }
                     }else{
                         state.set(State.playing);
@@ -539,6 +563,7 @@ public class Control implements ApplicationListener, Loadable{
         state.rules.sector = sector;
         sector.info.origin = origin;
         sector.info.destination = origin;
+        sector.info.attempts ++;
 
         if(beforePlay != null){
             beforePlay.run();

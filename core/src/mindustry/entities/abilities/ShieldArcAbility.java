@@ -16,6 +16,7 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 
 public class ShieldArcAbility extends Ability{
+
     private static Unit paramUnit;
     private static ShieldArcAbility paramField;
     private static Vec2 paramPos = new Vec2();
@@ -48,13 +49,17 @@ public class ShieldArcAbility extends Ability{
             }else{
                 b.absorb();
                 Fx.absorb.at(b);
+
+                paramField.hitSound.at(b.x, b.y, 1f + Mathf.range(0.1f), paramField.hitSoundVolume);
             }
-            
+
             // break shield
             if(paramField.data <= b.damage()){
                 paramField.data -= paramField.cooldown * paramField.regen;
 
                 Fx.arcShieldBreak.at(paramPos.x, paramPos.y, 0, paramField.color == null ? paramUnit.type.shieldColor(paramUnit) : paramField.color, paramUnit);
+
+                paramField.breakSound.at(paramPos.x, paramPos.y);
             }
 
             // shieldDamage for consistency
@@ -69,7 +74,7 @@ public class ShieldArcAbility extends Ability{
             !(unit.within(paramPos, paramField.radius - paramField.width) && paramPos.within(unit.x - unit.deltaX, unit.y - unit.deltaY, paramField.radius - paramField.width)) &&
             (Tmp.v1.set(unit).add(unit.deltaX, unit.deltaY).within(paramPos, paramField.radius + paramField.width) || unit.within(paramPos, paramField.radius + paramField.width)) &&
             (Angles.within(paramPos.angleTo(unit), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(unit.x + unit.deltaX, unit.y + unit.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
-                
+
             if(unit.isMissile() && unit.killable() && paramField.missileUnitMultiplier >= 0f){
 
                 unit.remove();
@@ -77,17 +82,17 @@ public class ShieldArcAbility extends Ability{
                 unit.type.deathExplosionEffect.at(unit);
                 Fx.absorb.at(unit);
                 Fx.circleColorSpark.at(unit.x, unit.y,paramUnit.team.color);
-                
+
                 // consider missile hp and gamerule to damage the shield
                 paramField.data -= unit.health() * paramField.missileUnitMultiplier * Vars.state.rules.unitDamage(unit.team);
                 paramField.alpha = 1f;
 
-            }else{
+            }else if(paramField.pushUnits && !(!unit.isFlying() && paramUnit.isFlying())){
 
                 float reach = paramField.radius + paramField.width;
                 float overlapDst = reach - unit.dst(paramPos.x,paramPos.y);
 
-                if(overlapDst>0){
+                if(overlapDst > 0){
                     //stop
                     unit.vel.setZero();
                     // get out
@@ -121,6 +126,9 @@ public class ShieldArcAbility extends Ability{
     public float chanceDeflect = -1f;
     /** Deflection sound. */
     public Sound deflectSound = Sounds.none;
+    public Sound breakSound = Sounds.shieldBreakSmall;
+    public Sound hitSound = Sounds.shieldHit;
+    public float hitSoundVolume = 0.12f;
     /** Multiplier for shield damage taken from missile units. */
     public float missileUnitMultiplier = 2f;
 
@@ -132,6 +140,8 @@ public class ShieldArcAbility extends Ability{
     public @Nullable Color color;
     /** If true, sprite position will be influenced by x/y. */
     public boolean offsetRegion = false;
+    /** If true, enemy units are pushed out. */
+    public boolean pushUnits = true;
 
     /** State. */
     protected float widthScale, alpha;

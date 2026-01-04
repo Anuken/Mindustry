@@ -52,6 +52,7 @@ public class HudFragment{
     private long lastToast;
 
     private Seq<Block> blocksOut = new Seq<>();
+    private Table hudLabel;
 
     private void addBlockSelection(Table cont){
         Table blockSelection = new Table();
@@ -183,6 +184,10 @@ public class HudFragment{
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
             coreItems.clear();
+            if(hudLabel != null){
+                hudLabel.color.a = 0f;
+            }
+            showHudText = false;
         });
 
         //paused table
@@ -192,6 +197,21 @@ public class HudFragment{
             t.table(Styles.black6, top -> top.label(() -> state.gameOver && state.isCampaign() ? "@sector.curlost" : "@paused")
                 .style(Styles.outlineLabel).pad(8f)).height(pauseHeight).growX();
             //.padLeft(dsize * 5 + 4f) to prevent alpha overlap on left
+        });
+
+        //left/right gutter areas
+        parent.fill((x, y, w, h) -> {
+            x = 0f;
+            y = 0f;
+            w = Core.graphics.getWidth();
+            h = Core.graphics.getHeight();
+            if(Core.scene.marginLeft > 0){
+                paneRight.draw(x, y, Core.scene.marginLeft, h);
+            }
+
+            if(Core.scene.marginRight > 0){
+                paneLeft.draw(x + w - Core.scene.marginRight, y, Core.scene.marginRight, h);
+            }
         });
 
         //"waiting for players"
@@ -485,15 +505,8 @@ public class HudFragment{
             }).blink(Color.white).outline(new Color(0, 0, 0, 0.6f), 7f)).grow())
             .fillX().width(320f).height(60f).name("boss").visible(() -> state.rules.waves && state.boss() != null && !(mobile && Core.graphics.isPortrait())).padTop(7).row();
 
-            t.table(Styles.black3, p -> p.margin(4).label(() -> hudText).style(Styles.outlineLabel)).touchable(Touchable.disabled).with(p -> p.visible(() -> {
-                p.color.a = Mathf.lerpDelta(p.color.a, Mathf.num(showHudText), 0.2f);
-                if(state.isMenu()){
-                    p.color.a = 0f;
-                    showHudText = false;
-                }
-
-                return p.color.a >= 0.001f;
-            }));
+            t.table(Styles.black3, p -> p.margin(4).label(() -> hudText).style(Styles.outlineLabel)).touchable(Touchable.disabled).with(p -> hudLabel = p)
+                .with(p -> p.visible(() -> (p.color.a = Mathf.lerpDelta(p.color.a, Mathf.num(showHudText), 0.2f)) >= 0.001f));
         });
 
         //spawner warning
@@ -595,7 +608,7 @@ public class HudFragment{
         if(state.isMenu()) return;
 
         scheduleToast(() -> {
-            Sounds.message.play();
+            Sounds.uiNotify.play();
 
             Table table = new Table(Tex.button);
             table.update(() -> {
@@ -625,7 +638,7 @@ public class HudFragment{
         //also don't play in the tutorial to prevent confusion
         if(state.isMenu()) return;
 
-        Sounds.message.play();
+        Sounds.uiNotify.play();
 
         //if there's currently no unlock notification...
         if(lastUnlockTable == null){

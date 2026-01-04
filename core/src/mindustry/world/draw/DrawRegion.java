@@ -1,6 +1,7 @@
 package mindustry.world.draw;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.entities.units.*;
@@ -11,6 +12,9 @@ import mindustry.world.*;
 public class DrawRegion extends DrawBlock{
     public TextureRegion region;
     public String suffix = "";
+    /** If set, overrides the region name. */
+    public @Nullable String name;
+    public @Nullable Color color;
     public boolean spinSprite = false;
     public boolean drawPlan = true;
     public boolean buildingRotate = false;
@@ -40,11 +44,13 @@ public class DrawRegion extends DrawBlock{
     public void draw(Building build){
         float z = Draw.z();
         if(layer > 0) Draw.z(layer);
+        if(color != null) Draw.color(color);
         if(spinSprite){
             Drawf.spinSprite(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed + rotation + (buildingRotate ? build.rotdeg() : 0));
         }else{
             Draw.rect(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed + rotation + (buildingRotate ? build.rotdeg() : 0));
         }
+        if(color != null) Draw.color();
         Draw.z(z);
     }
 
@@ -65,6 +71,6 @@ public class DrawRegion extends DrawBlock{
 
     @Override
     public void load(Block block){
-        region = Core.atlas.find(block.name + suffix);
+        region = Core.atlas.find(name != null ? name : block.name + suffix);
     }
 }

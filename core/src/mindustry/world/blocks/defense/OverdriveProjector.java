@@ -41,6 +41,8 @@ public class OverdriveProjector extends Block{
         emitLight = true;
         lightRadius = 50f;
         envEnabled |= Env.space;
+        ambientSound = Sounds.loopCircuit;
+        ambientSoundVolume = 0.13f;
     }
 
     @Override
@@ -71,7 +73,7 @@ public class OverdriveProjector extends Block{
             stats.add(Stat.booster, StatValues.itemBoosters("+{0}%", stats.timePeriod, speedBoostPhase * 100f, phaseRangeBoost, items.items));
         }
     }
-    
+
     @Override
     public void setBars(){
         super.setBars();

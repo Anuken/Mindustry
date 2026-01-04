@@ -88,7 +88,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     }
 
     public boolean allowNumberedLaunch(Sector s){
-        return s.hasBase() && (s.info.bestCoreType.size >= 4 || s.isBeingPlayed() && state.rules.defaultTeam.cores().contains(b -> b.block.size >= 4));
+        return s.hasBase() && !s.isAttacked() && (s.info.bestCoreType.size >= 4 || s.isBeingPlayed() && state.rules.defaultTeam.cores().contains(b -> b.block.size >= 4));
     }
 
     @Override
@@ -507,7 +507,8 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             ores.add(Blocks.oreTitanium);
         }
 
-        if(Simplex.noise3d(seed, 2, 0.5, scl, sector.tile.v.x + 2, sector.tile.v.y, sector.tile.v.z)*nmag + poles > 0.7f*addscl){
+        //218 doesn't have thorium generation due to proximity (TODO remove the special case and replace with hidden preset)
+        if(Simplex.noise3d(seed, 2, 0.5, scl, sector.tile.v.x + 2, sector.tile.v.y, sector.tile.v.z)*nmag + poles > 0.7f*addscl && sector.id != 218){
             ores.add(Blocks.oreThorium);
         }
 

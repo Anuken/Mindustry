@@ -36,6 +36,8 @@ public class EditorTile extends Tile{
 
         op(DrawOperation.opFloor, floor.id);
 
+        world.floorChanges ++;
+
         this.floor = type;
         type.floorChanged(this);
     }
@@ -81,6 +83,14 @@ public class EditorTile extends Tile{
         }else{
             renderer.blocks.updateShadowTile(this);
         }
+
+        if(build != null){
+            build.wasVisible = true;
+        }
+
+        world.tileChanges ++;
+
+        type.blockChanged(this);
     }
 
     @Override
@@ -108,6 +118,10 @@ public class EditorTile extends Tile{
         if(this.overlay == overlay) return;
         op(DrawOperation.opOverlay, this.overlay.id);
         super.setOverlay(overlay);
+
+        world.floorChanges ++;
+
+        ((Floor)overlay).floorChanged(this);
     }
 
     @Override

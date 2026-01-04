@@ -214,7 +214,7 @@ public class Effect{
     public static void floorDust(float x, float y, float size){
         Tile tile = world.tileWorld(x, y);
         if(tile != null){
-            Color color = tile.floor().mapColor;
+            Color color = tile.getFloorColor();
             Fx.unitLand.at(x, y, size, color);
         }
     }
@@ -222,7 +222,7 @@ public class Effect{
     public static void floorDustAngle(Effect effect, float x, float y, float angle){
         Tile tile = world.tileWorld(x, y);
         if(tile != null){
-            Color color = tile.floor().mapColor;
+            Color color = tile.getFloorColor();
             effect.at(x, y, angle, color);
         }
     }
@@ -260,6 +260,32 @@ public class Effect{
 
         TextureRegion region = Core.atlas.find("rubble-" + blockSize + "-" + (Core.atlas.has("rubble-" + blockSize + "-1") ? Mathf.random(0, 1) : "0"));
         decal(region, x, y, Mathf.random(4) * 90, 3600, Pal.rubble);
+    }
+
+    public static void shockwaveDust(float x, float y, float rad){
+        shockwaveDust(x, y, rad, 1f);
+    }
+
+    public static void shockwaveDust(float x, float y, float rad, float density){
+        float spacing = 12f;
+        int waves = Math.max(1, Mathf.ceil(rad / spacing));
+        for(int i = 0; i < waves; i++){
+            int fi = i;
+            Time.run(i * 3.5f, () -> {
+                float radius = 1 + spacing * fi;
+                int rays = Mathf.ceil(radius * Mathf.PI * 2f / 6f * density);
+                for(int r = 0; r < rays; r++){
+                    if(Mathf.chance(0.7f - fi  * 0.02f)){
+                        float angle = r * 360f / (float)rays;
+                        float ox = Angles.trnsx(angle, radius), oy = Angles.trnsy(angle, radius);
+                        Tile t = world.tileWorld(x + ox, y + oy);
+                        if(t != null){
+                            Fx.podLandDust.at(t.worldx(), t.worldy(), angle + Mathf.range(30f), Tmp.c1.set(t.getFloorColor()).mul(1.7f + Mathf.range(0.15f)));
+                        }
+                    }
+                }
+            });
+        }
     }
 
     public static class EffectContainer implements Scaled{
