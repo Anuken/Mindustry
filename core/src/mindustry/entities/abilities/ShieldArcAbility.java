@@ -134,7 +134,7 @@ public class ShieldArcAbility extends Ability{
     /** Velocity multiplier for reflected bullets on the opposite axis. Negative values = concave, positive values = convex */
     public float reflectVel = 1f;
     /** Time multiplier for reflected bullets. */
-    public float reflectTime = 1f - 0.3f;
+    public float reflectTime = 1f - 0.5f;
     /** Deflection sound. */
     public Sound deflectSound = Sounds.none;
     public Sound breakSound = Sounds.shieldBreakSmall;
