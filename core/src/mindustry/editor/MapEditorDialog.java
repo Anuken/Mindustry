@@ -706,6 +706,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     editor.renderer.recacheTerrain();
                 }).pad(2f).growX().with(Table::left).row();
                 mid.check("@editor.showfloor", editor.showFloor, b -> editor.showFloor = b).pad(2f).growX().with(Table::left).row();
+                mid.check("@editor.xray", editor.xrayMode, b -> {
+                    editor.xrayMode = b;
+                }).pad(2f).growX().with(Table::left).row();
 
                 if(!mobile){
                     mid.button("@editor.center", Icon.move, Styles.flatt, view::center).growX().margin(9f);
