@@ -126,11 +126,11 @@ public class HudFragment{
         boolean isFav = favoriteBlocks.contains(block.name);
         if(isFav){
             favoriteBlocks.remove(block.name);
-            Sounds.uiUnFavorite.play();
+            Sounds.uiFavorite.play(1f, 0.4f, 0f);
         }else{
             favoriteBlocks.add(block.name);
             lastFavorited = block.name;
-            Sounds.uiFavorite.play();
+            Sounds.uiFavorite.play(1f, 1.0f, 0f);
         }
         saveFavorites();
     }
