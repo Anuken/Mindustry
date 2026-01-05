@@ -51,6 +51,7 @@ public class CanvasBlock extends Block{
         config(byte[].class, (CanvasBuild build, byte[] bytes) -> {
             if(build.data.length == bytes.length){
                 System.arraycopy(bytes, 0, build.data, 0, bytes.length);
+                build.invalidated = true;
                 build.updateTexture();
             }
         });
@@ -120,7 +121,6 @@ public class CanvasBlock extends Block{
                     }
                 }
             }
-
         }else{
             super.drawPlanRegion(plan, list);
         }
@@ -132,7 +132,7 @@ public class CanvasBlock extends Block{
         for(int i = 0; i < pixels; i++){
             int bitOffset = i * bpp;
             int pal = getByte(data, bitOffset);
-            target.set(i % canvasSize, i / canvasSize, palette[pal]);
+            target.set(i % canvasSize, i / canvasSize, palette[Math.min(pal, palette.length)]);
         }
         return target;
     }
@@ -146,24 +146,23 @@ public class CanvasBlock extends Block{
         return result;
     }
 
-    public class CanvasBuild extends Building{
+    public class CanvasBuild extends Building implements LReadable, LWritable{
         public @Nullable Texture texture;
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
         public int blending;
-        
-        protected boolean updated = false;
+        protected boolean invalidated = false;
 
         public void setPixel(int pos, int index){
             if(pos < canvasSize * canvasSize && pos >= 0 && index >= 0 && index < palette.length){
                 setByte(data, pos * bitsPerPixel, index);
-                updated = true;
+                invalidated = true;
             }
         }
 
         public void setPixel(int x, int y, int index){
             if(x >= 0 && y >= 0 && x < canvasSize && y < canvasSize && index >= 0 && index < palette.length){
                 setByte(data, (y * canvasSize + x) * bitsPerPixel, index);
-                updated = true;
+                invalidated = true;
             }
         }
 
@@ -182,7 +181,7 @@ public class CanvasBlock extends Block{
         }
 
         public void updateTexture(){
-            if(headless) return;
+            if(headless || (texture != null && !invalidated)) return;
 
             Pixmap pix = makePixmap(data, previewPixmap);
             if(texture != null){
@@ -190,6 +189,8 @@ public class CanvasBlock extends Block{
             }else{
                 texture = new Texture(pix);
             }
+
+            invalidated = false;
         }
 
         public byte[] packPixmap(Pixmap pixmap){
@@ -226,6 +227,26 @@ public class CanvasBlock extends Block{
             }
         }
 
+        @Override
+        public boolean readable(LExecutor exec){
+            return isValid() && (exec.privileged || this.team == exec.team);
+        }
+
+        @Override
+        public void read(LVar position, LVar output){
+            output.setnum(getPixel(position.numi()));
+        }
+
+        @Override
+        public boolean writable(LExecutor exec){
+            return readable(exec);
+        }
+
+        @Override
+        public void write(LVar position, LVar value){
+            setPixel(position.numi(), value.numi());
+        }
+
         boolean blends(Tile other){
             return other != null && other.build != null && other.build.block == block && other.build.tileX() == other.x && other.build.tileY() == other.y;
         }
@@ -242,10 +263,10 @@ public class CanvasBlock extends Block{
                 super.draw();
             }
 
-            if(texture == null || updated){
-                updated = false;
+            if(texture == null || invalidated){
                 updateTexture();
             }
+
             Tmp.tr1.set(texture);
             float pad = blending == 0 ? padding : 0f;
 
@@ -266,7 +287,7 @@ public class CanvasBlock extends Block{
                 }
             }
         }
-        
+
         @Override
         public double sense(LAccess sensor){
             return switch(sensor){
@@ -294,12 +315,12 @@ public class CanvasBlock extends Block{
                 int[] curColor = {palette[0]};
                 boolean[] modified = {false};
                 boolean[] fill = {false};
-                
+
                 dialog.hidden(() -> {
                     texture.dispose();
                     pix.dispose();
                 });
-                
+
                 dialog.resized(dialog::hide);
 
                 dialog.cont.table(Tex.pane, body -> {

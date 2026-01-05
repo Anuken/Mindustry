@@ -21,7 +21,7 @@ public class LiquidTurret extends Turret{
     public LiquidTurret(String name){
         super(name);
         hasLiquids = true;
-        loopSound = Sounds.spray;
+        loopSound = Sounds.loopSpray;
         shootSound = Sounds.none;
         smokeEffect = Fx.none;
         shootEffect = Fx.none;
@@ -54,7 +54,9 @@ public class LiquidTurret extends Turret{
             }
         });
 
-        ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+        if(targetGround){
+            ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+        }
 
         super.init();
     }
@@ -94,7 +96,7 @@ public class LiquidTurret extends Turret{
                         var fire = Fires.get(x + tx, y + ty);
                         float dst = fire == null ? 0 : dst2(fire);
                         //do not extinguish fires on other team blocks
-                        if(other != null && fire != null && Fires.has(other.x, other.y) && dst <= range * range && (result == null || dst < mindst) && (other.build == null || other.team() == team)){
+                        if(other != null && fire != null && other.build != this && Fires.has(other.x, other.y) && dst <= range * range && (result == null || dst < mindst) && (other.build == null || other.team() == team)){
                             result = fire;
                             mindst = dst;
                         }

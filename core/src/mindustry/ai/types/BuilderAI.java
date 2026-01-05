@@ -121,9 +121,9 @@ public class BuilderAI extends AIController{
                         Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation)));
 
             if(valid){
-                float range = Math.min(unit.type.buildRange - 20f, 100f);
+                float range = Math.min(unit.type.buildRange - unit.type.hitSize * 2f, buildRadius);
                 //move toward the plan
-                moveTo(req.tile(), range - 10f, 20f);
+                moveTo(req.tile(), range, 20f);
                 moving = !unit.within(req.tile(), range);
             }else{
                 //discard invalid plan
@@ -221,6 +221,11 @@ public class BuilderAI extends AIController{
             return true;
         }
         return state.rules.waves && unit.team == state.rules.waveTeam && !unit.team.rules().rtsAi;
+    }
+
+    @Override
+    public boolean shouldFire(){
+        return !(unit.controller() instanceof CommandAI ai) || ai.shouldFire();
     }
 
     @Override

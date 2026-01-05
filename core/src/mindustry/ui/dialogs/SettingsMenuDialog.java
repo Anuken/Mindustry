@@ -306,18 +306,15 @@ public class SettingsMenuDialog extends BaseDialog{
 
         if(mobile){
             game.checkPref("autotarget", true);
-            if(!ios){
-                game.checkPref("keyboard", false, val -> {
-                    control.setInput(val ? new DesktopInput() : new MobileInput());
-                    input.setUseKeyboard(val);
-                });
-                if(Core.settings.getBool("keyboard")){
-                    control.setInput(new DesktopInput());
-                    input.setUseKeyboard(true);
-                }
-            }else{
-                Core.settings.put("keyboard", false);
+            game.checkPref("keyboard", false, val -> {
+                control.setInput(val ? new DesktopInput() : new MobileInput());
+                input.setUseKeyboard(val);
+            });
+            if(Core.settings.getBool("keyboard")){
+                control.setInput(new DesktopInput());
+                input.setUseKeyboard(true);
             }
+
         }
         //the issue with touchscreen support on desktop is that:
         //1) I can't test it
@@ -389,7 +386,18 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.sliderPref("bloomintensity", 6, 0, 16, i -> (int)(i/4f * 100f) + "%");
         graphics.sliderPref("bloomblur", 2, 1, 16, i -> i + "x");
 
-        graphics.sliderPref("fpscap", 240, 10, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
+        graphics.sliderPref("fpscap", 240, 10, 245, 5, s -> {
+            if(ios){
+                Core.graphics.setPreferredFPS(s > 240 ? 0 : s);
+            }
+            return (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s));
+        });
+
+        if(ios){
+            int value = Core.settings.getInt("fpscap", 240);
+            Core.graphics.setPreferredFPS(value > 240 ? 0 : value);
+        }
+
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
         graphics.sliderPref("lasersopacity", 100, 0, 100, 5, s -> {
             if(ui.settings != null){
@@ -474,6 +482,9 @@ public class SettingsMenuDialog extends BaseDialog{
         }
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("smoothcamera", true);
+        if(!mobile){
+            graphics.checkPref("detach-camera", false);
+        }
         graphics.checkPref("position", false);
         if(!mobile){
             graphics.checkPref("mouseposition", false);
@@ -485,7 +496,8 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("animatedwater", true);
 
         if(Shaders.shield != null){
-            graphics.checkPref("animatedshields", !mobile);
+            //animated shields are off by default on android (generally lower spec devices)
+            graphics.checkPref("animatedshields", !android);
         }
 
         graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
@@ -497,16 +509,12 @@ public class SettingsMenuDialog extends BaseDialog{
         });
 
         //iOS (and possibly Android) devices do not support linear filtering well, so disable it
-        if(!ios){
-            graphics.checkPref("linear", !mobile, b -> {
-                for(Texture tex : Core.atlas.getTextures()){
-                    TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
-                    tex.setFilter(filter, filter);
-                }
-            });
-        }else{
-            settings.put("linear", false);
-        }
+        graphics.checkPref("linear", !mobile, b -> {
+            for(Texture tex : Core.atlas.getTextures()){
+                TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
+                tex.setFilter(filter, filter);
+            }
+        });
 
         if(Core.settings.getBool("linear")){
             for(Texture tex : Core.atlas.getTextures()){

@@ -61,6 +61,7 @@ public class NetClient implements ApplicationListener{
     /** Byte stream for reading in snapshots. */
     private ReusableByteInStream byteStream = new ReusableByteInStream();
     private DataInputStream dataStream = new DataInputStream(byteStream);
+    private Reads dataStreamReads = new Reads(dataStream);
     /** Packet handlers for custom types of messages. */
     private ObjectMap<String, Seq<Cons<String>>> customPacketHandlers = new ObjectMap<>();
     /** Packet handlers for custom types of messages, in binary. */
@@ -230,7 +231,7 @@ public class NetClient implements ApplicationListener{
     public static void sendMessage(String message, @Nullable String unformatted, @Nullable Player playersender){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message);
-            Sounds.chatMessage.play();
+            Sounds.uiChat.play();
         }
 
         if(playersender != null && unformatted != null){
@@ -247,7 +248,7 @@ public class NetClient implements ApplicationListener{
     public static void sendMessage(String message){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message);
-            Sounds.chatMessage.play();
+            Sounds.uiChat.play();
         }
     }
 
@@ -423,6 +424,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.one)
     public static void setPosition(float x, float y){
+        if(player.dead()) return;
         player.unit().set(x, y);
         player.set(x, y);
     }
@@ -484,9 +486,10 @@ public class NetClient implements ApplicationListener{
             netClient.lastSnapshotTimestamp = Time.millis();
             netClient.byteStream.setBytes(data);
             DataInputStream input = netClient.dataStream;
+            Reads reads = netClient.dataStreamReads;
 
             for(int j = 0; j < amount; j++){
-                readSyncEntity(input, Reads.get(input));
+                readSyncEntity(input, reads);
             }
         }catch(Exception e){
             //don't disconnect, just log it
@@ -510,6 +513,7 @@ public class NetClient implements ApplicationListener{
         try{
             netClient.byteStream.setBytes(data);
             DataInputStream input = netClient.dataStream;
+            Reads reads = netClient.dataStreamReads;
 
             for(int i = 0; i < amount; i++){
                 int pos = input.readInt();
@@ -523,7 +527,7 @@ public class NetClient implements ApplicationListener{
                     Log.warn("Block ID mismatch at @: @ != @. Skipping block snapshot.", tile, tile.build.block.id, block);
                     break;
                 }
-                tile.build.readSync(Reads.get(input), tile.build.version());
+                tile.build.readSync(reads, tile.build.version());
             }
         }catch(Exception e){
             Log.err(e);

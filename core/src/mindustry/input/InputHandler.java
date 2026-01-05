@@ -11,8 +11,8 @@ import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.struct.Queue;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
@@ -37,10 +37,10 @@ import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
 import java.util.*;
@@ -62,6 +62,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
     final static Seq<Unit> tmpUnits = new Seq<>(false);
+    final static Seq<Building> tmpBuildings = new Seq<>(false);
     final static KeyBind[] controlGroupBindings = {
     Binding.blockSelect01,
     Binding.blockSelect02,
@@ -86,7 +87,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public Interval controlInterval = new Interval();
     public @Nullable Block block;
     public boolean overrideLineRotation;
-    public int rotation;
+    public int rotation = 1;
     public boolean droppingItem;
     public float itemDepositCooldown;
     public Group uiGroup;
@@ -154,13 +155,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         });
 
         Events.on(ResetEvent.class, e -> {
-            logicCutscene = false;
-            commandBuildings.clear();
-            selectedUnits.clear();
-            itemDepositCooldown = 0f;
-            Arrays.fill(controlGroups, null);
-            lastUnit = null;
-            lastPlans.clear();
+            reset();
         });
     }
 
@@ -198,9 +193,59 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, unreliable = true)
+    public static void setItems(Building build, ItemStack[] items){
+        if(build == null || build.items == null) return;
+
+        for(ItemStack stack : items){
+            build.items.set(stack.item, stack.amount);
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void setTileItems(Item item, int amount, int[] positions){
+        for(int pos : positions){
+            Building build = world.build(pos);
+            if(build != null && build.items != null){
+                build.items.set(item, amount);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
     public static void clearItems(Building build){
         if(build == null || build.items == null) return;
         build.items.clear();
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void setLiquid(Building build, Liquid liquid, float amount){
+        if(build == null || build.liquids == null) return;
+        build.liquids.set(liquid, amount);
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void setLiquids(Building build, LiquidStack[] liquids){
+        if(build == null || build.liquids == null) return;
+
+        for(LiquidStack stack : liquids){
+            build.liquids.set(stack.liquid, stack.amount);
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void setTileLiquids(Liquid liquid, float amount, int[] positions){
+        for(int pos : positions){
+            Building build = world.build(pos);
+            if(build != null && build.liquids != null){
+                build.liquids.set(liquid, amount);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void clearLiquids(Building build){
+        if(build == null || build.liquids == null) return;
+        build.liquids.clear();
     }
 
     @Remote(called = Loc.server, unreliable = true)
@@ -297,11 +342,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                         ai.group = null;
                     }
 
-                    //remove when other player command
-                    if(!headless && player != Vars.player){
-                        control.input.selectedUnits.remove(unit);
-                    }
-
                     toAdd.add(unit);
                 }
             }
@@ -372,15 +412,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 //make sure its current stance is valid with its current command
                 stancesOut.clear();
                 unit.type.getUnitStances(unit, stancesOut);
-                if(stancesOut.size > 0 && !stancesOut.contains(ai.stance)){
-                    ai.stance = stancesOut.first();
+                for(var stance : content.unitStances()){
+                    //disable stances that the unit does not support anymore (TODO: this is slow!)
+                    if(ai.hasStance(stance) && !stancesOut.contains(stance)){
+                        ai.disableStance(stance);
+                    }
                 }
             }
         }
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
-    public static void setUnitStance(Player player, int[] unitIds, UnitStance stance){
+    public static void setUnitStance(Player player, int[] unitIds, UnitStance stance, boolean enable){
         if(player == null || unitIds == null || stance == null) return;
 
         if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
@@ -395,7 +438,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(stance == UnitStance.stop){ //not a real stance, just cancels orders
                     ai.clearCommands();
                 }else if(unit.type.allowStance(unit, stance)){
-                    ai.stance = stance;
+                    //if toggle is not allowed, the stance will always be set to true when pressed
+                    ai.setStance(stance, !stance.toggle || enable);
                 }
                 unit.lastCommanded = player.coloredName();
             }
@@ -447,7 +491,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Building build){
-        if(player == null || build == null || !player.within(build, itemTransferRange) || build.items == null || player.dead() || (state.rules.onlyDepositCore && !(build instanceof CoreBuild))) return;
+        if(player == null || build == null || !player.within(build, itemTransferRange) || build.items == null || player.dead() || !build.allowDeposit()) return;
 
         if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, build) ||
         //to avoid rejecting deposit packets that happen to overlap due to packet speed differences, the actual cap is double the cooldown with 2 deposits.
@@ -471,7 +515,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(variants = Variant.one)
     public static void removeQueueBlock(int x, int y, boolean breaking){
-        player.unit().removeBuild(x, y, breaking);
+        if(!player.dead()){
+            player.unit().removeBuild(x, y, breaking);
+        }
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
@@ -632,6 +678,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         build.updateProximity();
         build.noSleep();
         Fx.rotateBlock.at(build.x, build.y, build.block.size);
+        if(!headless) Sounds.blockRotate.at(build, 1f + Mathf.range(0.1f), 1f);
         Events.fire(new BuildRotateEvent(build, player == null ? null : player.unit(), previous));
     }
 
@@ -657,6 +704,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 return;
             }
         }
+        if(player != null) build.updateLastAccess(player);
         build.configured(player == null || player.dead() ? null : player.unit(), value);
         Events.fire(new ConfigEvent(build, player, value));
     }
@@ -828,6 +876,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         camera.position.set(unit);
     }
 
+    public void reset(){
+        logicCutscene = false;
+        commandBuildings.clear();
+        selectedUnits.clear();
+        itemDepositCooldown = 0f;
+        Arrays.fill(controlGroups, null);
+        lastUnit = null;
+        lastPlans.clear();
+        player.shooting = false;
+    }
+
     public void update(){
         if(spectating != null && (!spectating.isValid() || spectating.team != player.team())){
             spectating = null;
@@ -878,10 +937,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(player.isBuilder()){
             player.unit().updateBuilding(isBuilding);
-        }
-
-        if(!player.dead() && player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && !player.team().rules().infiniteAmmo && player.unit().ammo <= 0){
-            player.unit().type.weapons.first().noAmmoSound.at(player.unit());
         }
 
         //you don't want selected blocks while locked, looks weird
@@ -991,9 +1046,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     //nothing selected, clear units
                     selectedUnits.clear();
                 }
-                selectedUnits.addAll(units);
-                Events.fire(Trigger.unitCommandChange);
                 commandBuildings.clear();
+
+                selectedUnits.addAll(units);
+                if(selectedUnits.isEmpty()){
+                    commandBuildings.addAll(selectedCommandBuildings(commandRectX, commandRectY, input.mouseWorldX() - commandRectX, input.mouseWorldY() - commandRectY));
+                }
+                Events.fire(Trigger.unitCommandChange);
             }
             commandRect = false;
         }
@@ -1094,6 +1153,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Drawf.poly(sel.x, sel.y, 6, sel.hitSize / unitSelectRadScl + Mathf.absin(4f, 1f), 0f, selectedUnits.contains(sel) ? Pal.remove : Pal.accent);
     }
 
+    public void drawCommand(Building build){
+        Drawf.poly(build.x, build.y, 4, build.hitSize() / 1.4f + + 0.5f + Mathf.absin(4f, 1f), 0f, commandBuildings.contains(build) ? Pal.remove : Pal.accent);
+    }
+
     public void drawCommanded(){
         Draw.draw(Layer.plans, () -> {
             drawCommanded(true);
@@ -1102,6 +1165,24 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.draw(Layer.groundUnit - 1, () -> {
             drawCommanded(false);
         });
+
+        Draw.draw(Layer.overlayUI, () -> {
+            drawCommandedTargets();
+        });
+    }
+
+    public void drawCommandedTargets(){
+        if(commandMode){
+            for(Unit unit : selectedUnits){
+                if(unit.controller() instanceof CommandAI ai){
+                    var cmd =  ai.currentCommand();
+
+                    if(ai.attackTarget != null && cmd.drawTarget){
+                        Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
+                    }
+                }
+            }
+        }
     }
 
     public void drawCommanded(boolean flying){
@@ -1113,7 +1194,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             //happens sometimes
             selectedUnits.removeAll(u -> !u.allowCommand());
 
-            //draw command overlay UI
             for(Unit unit : selectedUnits){
 
                 Color color = unit.controller() instanceof LogicAI ? Team.malis.color : Pal.accent;
@@ -1124,11 +1204,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     var cmd =  ai.currentCommand();
                     lastPos = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
 
-                    if(flying && ai.attackTarget != null && cmd.drawTarget){
-                        Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
-                    }
-
-                    if(unit.isFlying() != flying) continue;
+                    if((unit.isFlying() || unit.type.allowLegStep) != flying) continue;
 
                     //draw target line
                     if(ai.targetPos != null && cmd.drawTarget){
@@ -1230,6 +1306,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             for(var unit : units){
                 drawCommand(unit);
             }
+            if(units.isEmpty()){
+                var buildings = selectedCommandBuildings(commandRectX, commandRectY, x2 - commandRectX, y2 - commandRectY);
+                for(var build : buildings){
+                    drawCommand(build);
+                }
+            }
 
             Draw.color(Pal.accent, 0.3f);
             Fill.crect(commandRectX, commandRectY, x2 - commandRectX, y2 - commandRectY);
@@ -1298,8 +1380,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void useSchematic(Schematic schem){
-        selectPlans.addAll(schematics.toPlans(schem, player.tileX(), player.tileY()));
+        useSchematic(schem, true);
     }
+
+    public abstract void useSchematic(Schematic schem, boolean checkHidden);
 
     protected void showSchematicSave(){
         if(lastSchematic == null) return;
@@ -1623,6 +1707,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** Draws a placement icon for a specific block. */
     protected void drawPlan(int x, int y, Block block, int rotation){
         bplan.set(x, y, rotation, block);
+        if(block.saveConfig){
+            bplan.config = block.lastConfig;
+        }
         bplan.animScale = 1f;
         block.drawPlan(bplan, allPlans(), validPlace(x, y, block, rotation));
     }
@@ -1804,7 +1891,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean canTapPlayer(float x, float y){
-        return player.within(x, y, playerSelectRange) && !player.dead() && player.unit().stack.amount > 0;
+        return player.within(x, y, playerSelectRange) && !player.dead() && player.unit().stack.amount > 0 && block == null;
     }
 
     /** Tries to begin mining a tile, returns true if successful. */
@@ -1960,6 +2047,19 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return tmpUnits.min(u -> !u.inFogTo(player.team()), u -> u.dst(x, y) - u.hitSize/2f);
     }
 
+    public Seq<Building> selectedCommandBuildings(float x, float y, float w, float h){
+        var tree = player.team().data().buildingTree;
+        tmpBuildings.clear();
+        if(tree == null) return tmpBuildings;
+        float rad = 4f;
+        tree.intersect(Tmp.r1.set(x - rad/2f, y - rad/2f, rad*2f + w, rad*2f + h).normalize(), b -> {
+            if(b.isCommandable()){
+                tmpBuildings.add(b);
+            }
+        });
+        return tmpBuildings;
+    }
+
     public Seq<Unit> selectedCommandUnits(float x, float y, float w, float h, Boolf<Unit> predicate){
         var tree = player.team().data().tree();
         tmpUnits.clear();
@@ -2050,13 +2150,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build != null && build.acceptStack(stack.item, stack.amount, player.unit()) > 0 && build.interactable(player.team()) &&
         build.block.hasItems && player.unit().stack().amount > 0 && build.interactable(player.team())){
 
-            if(!(state.rules.onlyDepositCore && !(build instanceof CoreBuild)) && itemDepositCooldown <= 0f){
+            if(build.allowDeposit() && canDepositItem(build)){
                 Call.transferInventory(player, build);
                 itemDepositCooldown = state.rules.itemDepositCooldown;
             }
         }else{
             Call.dropItem(player.angleTo(x, y));
         }
+    }
+
+    public boolean canDepositItem(Building build){
+        //takes advantage of itemDepositCooldown being able to be negative, allows the cooldown to be different for each building
+        if(build.block.depositCooldown >= 0){
+            return itemDepositCooldown - state.rules.itemDepositCooldown <= -build.block.depositCooldown;
+        }
+        return itemDepositCooldown <= 0;
     }
 
     public void rebuildArea(int x1, int y1, int x2, int y2){
@@ -2215,7 +2323,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Point2 next = i == points.size - 1 ? null : points.get(i + 1);
             line.x = point.x;
             line.y = point.y;
-            if(!overrideLineRotation || diagonal){
+            if((!overrideLineRotation || diagonal) && !(block != null && block.ignoreLineRotation && !mobile)){
                 int result = baseRotation;
                 if(next != null){
                     result = Tile.relativeTo(point.x, point.y, next.x, next.y);

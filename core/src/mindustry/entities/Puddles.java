@@ -53,7 +53,7 @@ public class Puddles{
             return;
         }
 
-        if(tile.floor().isLiquid && !canStayOn(liquid, tile.floor().liquidDrop)){
+        if(tile.floor().isLiquid && tile.floor().liquidDrop != null && !canStayOn(liquid, tile.floor().liquidDrop)){
             reactPuddle(tile.floor().liquidDrop, liquid, amount, tile, ax, ay);
 
             Puddle p = get(tile);
@@ -110,7 +110,7 @@ public class Puddles{
     }
 
     public static void register(Puddle puddle){
-        world.tiles.setPuddle(puddle.tile().array(), puddle);
+        world.tiles.setPuddle(puddle.tile.array(), puddle);
     }
 
     /** Reacts two liquids together at a location. */

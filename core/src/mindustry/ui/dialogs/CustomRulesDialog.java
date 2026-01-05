@@ -86,7 +86,7 @@ public class CustomRulesDialog extends BaseDialog{
                         //objectives and spawns are considered to be map-specific; don't use them
                         newRules.spawns = rules.spawns;
                         newRules.objectives = rules.objectives;
-                        rules = newRules;
+                        JsonIO.copy(newRules, rules);
                         refresh();
                     }catch(Throwable e){
                         Log.err(e);
@@ -96,7 +96,7 @@ public class CustomRulesDialog extends BaseDialog{
                 }).disabled(Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith("{")).marginLeft(12f).row();
 
                 t.button("@settings.reset", Icon.refresh, style, () -> {
-                    rules = resetter.get();
+                    JsonIO.copy(resetter.get(), rules);
                     refresh();
                 }).marginLeft(12f);
             });
@@ -162,6 +162,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.alloweditworldprocessors", b -> rules.allowEditWorldProcessors = b, () -> rules.allowEditWorldProcessors);
         check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
         check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore);
+        check("@rules.coreunloaders", b -> rules.allowCoreUnloaders = b, () -> rules.allowCoreUnloaders);
         check("@rules.derelictrepair", b -> rules.derelictRepair = b, () -> rules.derelictRepair);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
@@ -189,7 +190,6 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.hidebannedblocks", b -> rules.hideBannedBlocks = b, () -> rules.hideBannedBlocks);
         check("@bannedblocks.whitelist", b -> rules.blockWhitelist = b, () -> rules.blockWhitelist);
 
-
         category("unit");
         check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
         check("@rules.unitpayloadsexplode", b -> rules.unitPayloadsExplode = b, () -> rules.unitPayloadsExplode);
@@ -199,13 +199,13 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.unitminespeedmultiplier", f -> rules.unitMineSpeedMultiplier = f, () -> rules.unitMineSpeedMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0f, 50f);
         number("@rules.unitcostmultiplier", f -> rules.unitCostMultiplier = f, () -> rules.unitCostMultiplier);
-        number("@rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
+        check("@rules.logicunitbuild", b -> rules.logicUnitBuild = b, () -> rules.logicUnitBuild);
+        check("@rules.logicunitdeconstruct", b -> rules.logicUnitDeconstruct = b, () -> rules.logicUnitDeconstruct);
 
         if(Core.bundle.get("bannedunits").toLowerCase().contains(ruleSearch)){
             current.button("@bannedunits", () -> bannedUnits.show(rules.bannedUnits)).left().width(300f).row();
         }
         check("@bannedunits.whitelist", b -> rules.unitWhitelist = b, () -> rules.unitWhitelist);
-
 
         category("enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
@@ -310,7 +310,9 @@ public class CustomRulesDialog extends BaseDialog{
                 check("@rules.buildai", b -> teams.buildAi = b, () -> teams.buildAi, () -> team != rules.defaultTeam && rules.env != Planets.erekir.defaultEnv && !rules.pvp);
                 number("@rules.buildaitier", false, f -> teams.buildAiTier = f, () -> teams.buildAiTier, () -> teams.buildAi && rules.env != Planets.erekir.defaultEnv && !rules.pvp, 0, 1);
 
-                number("@rules.extracorebuildradius", f -> teams.extraCoreBuildRadius = f * tilesize, () -> Math.min(teams.extraCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection);
+                check("@rules.protectcores", b -> teams.protectCores = b, () -> teams.protectCores);
+                number("@rules.extracorebuildradius", f -> teams.extraCoreBuildRadius = f * tilesize, () -> Math.min(teams.extraCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection && teams.protectCores);
+                check("@rules.checkplacement", b -> teams.checkPlacement = b, () -> teams.checkPlacement);
 
                 check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
                 check("@rules.fillitems", b -> teams.fillItems = b, () -> teams.fillItems);
@@ -462,6 +464,8 @@ public class CustomRulesDialog extends BaseDialog{
                 base.clearChildren();
                 int cols = Math.max(1, (int)(Core.graphics.getWidth() / Scl.scl(450)));
                 int idx = 0;
+
+                rules.weather.removeAll(w -> w.weather == null);
 
                 for(WeatherEntry entry : rules.weather){
                     base.top();

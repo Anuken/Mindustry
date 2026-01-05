@@ -1,6 +1,7 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -45,6 +46,9 @@ public class UnitAssembler extends PayloadBlock{
 
     public Seq<AssemblerUnitPlan> plans = new Seq<>(4);
 
+    public Sound createSound = Sounds.unitCreateBig;
+    public float createSoundVolume = 1f;
+
     protected @Nullable ConsumePayloadDynamic consPayload;
     protected @Nullable ConsumeItemDynamic consItem;
 
@@ -60,6 +64,8 @@ public class UnitAssembler extends PayloadBlock{
         group = BlockGroup.units;
         commandable = true;
         quickRotate = false;
+        ambientSound = Sounds.loopUnitBuilding;
+        ambientSoundVolume = 0.13f;
     }
 
     public Rect getRect(Rect rect, float x, float y, int rotation){
@@ -148,10 +154,21 @@ public class UnitAssembler extends PayloadBlock{
         consume(consItem = new ConsumeItemDynamic((UnitAssemblerBuild build) -> build.plan().itemReq != null ? build.plan().itemReq : ItemStack.empty));
         consume(new ConsumeLiquidsDynamic((UnitAssemblerBuild build) -> build.plan().liquidReq != null ? build.plan().liquidReq : LiquidStack.empty));
 
-        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
-
         super.init();
 
+        initCapacities();
+    }
+
+    @Override
+    public void afterPatch(){
+        initCapacities();
+        super.afterPatch();
+    }
+
+    public void initCapacities(){
+        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
+
+        itemCapacity = 10;
         capacities = new int[Vars.content.items().size];
         for(AssemblerUnitPlan plan : plans){
             if(plan.itemReq != null){
@@ -509,19 +526,26 @@ public class UnitAssembler extends PayloadBlock{
             Vec2 spawn = getUnitSpawn();
             consume();
 
-            if(!net.client()){
-                var unit = plan.unit.create(team);
-                if(unit != null && unit.isCommandable() && commandPos != null){
-                    unit.command().commandPosition(commandPos);
-                }
-                unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
-                unit.rotation = rotdeg();
+            var unit = plan.unit.create(team);
+            if(unit.isCommandable() && commandPos != null){
+                unit.command().commandPosition(commandPos);
+            }
+            unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
+            unit.rotation = rotdeg();
+            var targetBuild = unit.buildOn();
+            //'source' is the target build instead of this building; this is because some blocks only accept things from certain angles, and this is a non-standard payload
+            var payload = new UnitPayload(unit);
+            if(targetBuild != null && targetBuild.team == team && targetBuild.acceptPayload(targetBuild, payload)){
+                targetBuild.handlePayload(targetBuild, payload);
+            }else if(!net.client()){
                 unit.add();
                 Units.notifyUnitSpawn(unit);
             }
 
+            createSound.at(spawn.x, spawn.y, 1f + Mathf.range(0.06f), createSoundVolume);
+
             progress = 0f;
-            Fx.unitAssemble.at(spawn.x, spawn.y, 0f, plan.unit);
+            Fx.unitAssemble.at(spawn.x, spawn.y, rotdeg() - 90f, plan.unit);
             blocks.clear();
         }
 
@@ -646,6 +670,7 @@ public class UnitAssembler extends PayloadBlock{
             float rot = payload.angleTo(spawn);
             Fx.shootPayloadDriver.at(payload.x(), payload.y(), rot);
             Fx.payloadDeposit.at(payload.x(), payload.y(), rot, new YeetData(spawn.cpy(), payload.content()));
+            Sounds.shootPayload.at(x, y, 1f + Mathf.range(0.1f), 1f);
         }
 
         @Override
@@ -662,8 +687,10 @@ public class UnitAssembler extends PayloadBlock{
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             var plan = plan();
-            return (this.payload == null || source instanceof UnitAssemblerModuleBuild) &&
-                    plan.requirements.contains(b -> b.item == payload.content() && blocks.get(payload.content()) < Mathf.round(b.amount * state.rules.unitCost(team)));
+            return (this.payload == null || (source instanceof UnitAssemblerModuleBuild)) &&
+                    plan.requirements.contains(b -> b.item == payload.content() &&
+                    blocks.get(payload.content()) < Mathf.round(b.amount * state.rules.unitCost(team)) -
+                    (source instanceof UnitAssemblerModuleBuild && (this.payload != null && this.payload.contentEquals(payload)) ? 1 : 0));
         }
 
         @Override

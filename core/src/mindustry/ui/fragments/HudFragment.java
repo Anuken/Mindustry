@@ -52,6 +52,7 @@ public class HudFragment{
     private long lastToast;
 
     private Seq<Block> blocksOut = new Seq<>();
+    private Table hudLabel;
 
     private void addBlockSelection(Table cont){
         Table blockSelection = new Table();
@@ -72,12 +73,28 @@ public class HudFragment{
             }
         });
 
+        Table[] configTable = {null};
+        Block[] lastBlock = {null};
+
         cont.table(search -> {
             search.image(Icon.zoom).padRight(8);
             search.field("", text -> rebuildBlockSelection(blockSelection, text)).growX()
             .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
         }).growX().pad(-2).padLeft(6f);
         cont.row();
+        cont.collapser(t -> {
+            configTable[0] = t;
+        }, () -> control.input.block != null && control.input.block.editorConfigurable).with(c -> c.setEnforceMinSize(true)).update(col -> {
+
+            if(lastBlock[0] != control.input.block){
+                configTable[0].clear();
+                if(control.input.block != null){
+                    control.input.block.buildEditorConfig(configTable[0]);
+                    col.invalidateHierarchy();
+                }
+                lastBlock[0] = control.input.block;
+            }
+        }).growX().row();
         cont.add(pane).expandY().top().left();
 
         rebuildBlockSelection(blockSelection, "");
@@ -105,7 +122,7 @@ public class HudFragment{
             || (!block.inEditor && !(block instanceof RemoveWall) && !(block instanceof RemoveOre))
             || !block.isOnPlanet(state.rules.planet)
             || block.buildVisibility == BuildVisibility.debugOnly
-            || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.trim().replaceAll(" +", " ").toLowerCase()))
+            || (!searchText.isEmpty() && !(block == Blocks.removeOre || block == Blocks.removeWall) && !block.localizedName.toLowerCase().contains(searchText.trim().replaceAll(" +", " ").toLowerCase()))
             ) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
@@ -167,6 +184,10 @@ public class HudFragment{
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
             coreItems.clear();
+            if(hudLabel != null){
+                hudLabel.color.a = 0f;
+            }
+            showHudText = false;
         });
 
         //paused table
@@ -176,6 +197,21 @@ public class HudFragment{
             t.table(Styles.black6, top -> top.label(() -> state.gameOver && state.isCampaign() ? "@sector.curlost" : "@paused")
                 .style(Styles.outlineLabel).pad(8f)).height(pauseHeight).growX();
             //.padLeft(dsize * 5 + 4f) to prevent alpha overlap on left
+        });
+
+        //left/right gutter areas
+        parent.fill((x, y, w, h) -> {
+            x = 0f;
+            y = 0f;
+            w = Core.graphics.getWidth();
+            h = Core.graphics.getHeight();
+            if(Core.scene.marginLeft > 0){
+                paneRight.draw(x, y, Core.scene.marginLeft, h);
+            }
+
+            if(Core.scene.marginRight > 0){
+                paneLeft.draw(x + w - Core.scene.marginRight, y, Core.scene.marginRight, h);
+            }
         });
 
         //"waiting for players"
@@ -469,15 +505,8 @@ public class HudFragment{
             }).blink(Color.white).outline(new Color(0, 0, 0, 0.6f), 7f)).grow())
             .fillX().width(320f).height(60f).name("boss").visible(() -> state.rules.waves && state.boss() != null && !(mobile && Core.graphics.isPortrait())).padTop(7).row();
 
-            t.table(Styles.black3, p -> p.margin(4).label(() -> hudText).style(Styles.outlineLabel)).touchable(Touchable.disabled).with(p -> p.visible(() -> {
-                p.color.a = Mathf.lerpDelta(p.color.a, Mathf.num(showHudText), 0.2f);
-                if(state.isMenu()){
-                    p.color.a = 0f;
-                    showHudText = false;
-                }
-
-                return p.color.a >= 0.001f;
-            }));
+            t.table(Styles.black3, p -> p.margin(4).label(() -> hudText).style(Styles.outlineLabel)).touchable(Touchable.disabled).with(p -> hudLabel = p)
+                .with(p -> p.visible(() -> (p.color.a = Mathf.lerpDelta(p.color.a, Mathf.num(showHudText), 0.2f)) >= 0.001f));
         });
 
         //spawner warning
@@ -579,7 +608,7 @@ public class HudFragment{
         if(state.isMenu()) return;
 
         scheduleToast(() -> {
-            Sounds.message.play();
+            Sounds.uiNotify.play();
 
             Table table = new Table(Tex.button);
             table.update(() -> {
@@ -609,7 +638,7 @@ public class HudFragment{
         //also don't play in the tutorial to prevent confusion
         if(state.isMenu()) return;
 
-        Sounds.message.play();
+        Sounds.uiNotify.play();
 
         //if there's currently no unlock notification...
         if(lastUnlockTable == null){
@@ -902,6 +931,11 @@ public class HudFragment{
                 return builder;
             }
 
+            //do not show status after game over
+            if(state.afterGameOver && state.isCampaign()){
+                return builder;
+            }
+
             if(!state.rules.waves && state.isCampaign()){
                 builder.append("[lightgray]").append(Core.bundle.get("sector.curcapture"));
             }
@@ -972,6 +1006,7 @@ public class HudFragment{
         table.table().update(t -> {
             if(player.unit() instanceof Payloadc payload){
                 if(count[0] != payload.payloadUsed()){
+                    t.clear();
                     payload.contentInfo(t, 8 * 2, 275f);
                     count[0] = payload.payloadUsed();
                 }
@@ -979,7 +1014,11 @@ public class HudFragment{
                 count[0] = -1;
                 t.clear();
             }
-        }).growX().visible(() -> player.unit() instanceof Payloadc p && p.payloadUsed() > 0).colspan(2);
+        }).growX().visible(() -> {
+            boolean result = player.unit() instanceof Payloadc p && p.payloadUsed() > 0;
+            if(!result) count[0] = -1f;
+            return result;
+        }).colspan(2);
         table.row();
 
         Bits statuses = new Bits();

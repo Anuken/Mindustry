@@ -1,6 +1,7 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -34,6 +35,8 @@ public class UnitFactory extends UnitBlock{
     public int[] capacities = {};
 
     public Seq<UnitPlan> plans = new Seq<>(4);
+    public Sound createSound = Sounds.unitCreate;
+    public float createSoundVolume = 1f;
 
     public UnitFactory(String name){
         super(name);
@@ -47,7 +50,8 @@ public class UnitFactory extends UnitBlock{
         rotate = true;
         regionRotated1 = 1;
         commandable = true;
-        ambientSound = Sounds.respawning;
+        ambientSound = Sounds.loopUnitBuilding;
+        ambientSoundVolume = 0.09f;
 
         config(Integer.class, (UnitFactoryBuild build, Integer i) -> {
             if(!configurable) return;
@@ -80,7 +84,19 @@ public class UnitFactory extends UnitBlock{
 
     @Override
     public void init(){
+        initCapacities();
+        super.init();
+    }
+
+    @Override
+    public void afterPatch(){
+        initCapacities();
+        super.afterPatch();
+    }
+
+    public void initCapacities(){
         capacities = new int[Vars.content.items().size];
+        itemCapacity = 10; //unit factories can't control their own capacity externally, setting the value does nothing
         for(UnitPlan plan : plans){
             for(ItemStack stack : plan.requirements){
                 capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
@@ -89,8 +105,6 @@ public class UnitFactory extends UnitBlock{
         }
 
         consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
-
-        super.init();
     }
 
     @Override
@@ -217,6 +231,14 @@ public class UnitFactory extends UnitBlock{
             //auto-set to the first plan, it's better than nothing.
             if(currentPlan == -1){
                 currentPlan = plans.indexOf(u -> u.unit.unlockedNow());
+            }
+        }
+
+        @Override
+        public void drawSelect(){
+            super.drawSelect();
+            if(plans.size > 1 && currentPlan != -1 && currentPlan < plans.size){
+                drawItemSelection(plans.get(currentPlan).unit);
             }
         }
 
@@ -399,6 +421,7 @@ public class UnitFactory extends UnitBlock{
                         unit.command().command(command == null && unit.type.defaultCommand != null ? unit.type.defaultCommand : command);
                     }
 
+                    createSound.at(this, 1f + Mathf.range(0.06f), createSoundVolume);
                     payload = new UnitPayload(unit);
                     payVector.setZero();
                     consume();

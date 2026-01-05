@@ -58,7 +58,7 @@ public class Teams{
 
     public boolean anyEnemyCoresWithinBuildRadius(Team team, float x, float y){
         for(TeamData data : active){
-            if(team != data.team){
+            if(team != data.team && data.team.rules().protectCores){
                 for(CoreBuild tile : data.cores){
                     if(tile.within(x, y, state.rules.buildRadius(tile.team) + tilesize)){
                         return true;
@@ -71,7 +71,7 @@ public class Teams{
 
     public boolean anyEnemyCoresWithin(Team team, float x, float y, float radius){
         for(TeamData data : active){
-            if(team != data.team){
+            if(team != data.team && data.team.rules().protectCores){
                 for(CoreBuild tile : data.cores){
                     if(tile.within(x, y, radius)){
                         return true;
@@ -383,6 +383,8 @@ public class Teams{
             if(Mathf.chance(0.2)){
                 Time.run(Mathf.random(0f, 60f * 6f), build::kill);
             }
+            //don't bother checking previous for performance reasons
+            build.addPlan(false, true);
         }
 
         private void finishScheduleDerelict(){

@@ -69,8 +69,9 @@ public class BeamDrill extends Block{
         solid = true;
         drawArrow = false;
         regionRotated1 = 1;
+        ignoreLineRotation = true;
         ambientSoundVolume = 0.05f;
-        ambientSound = Sounds.minebeam;
+        ambientSound = Sounds.loopMineBeam;
 
         envEnabled |= Env.space;
         flags = EnumSet.of(BlockFlag.drill);
@@ -285,6 +286,9 @@ public class BeamDrill extends Block{
             for(int i = 0; i < size; i++){
                 Tile face = facing[i];
                 if(face != null){
+                    Item drop = face.wallDrop();
+
+                    if(drop == null) continue;
                     Point2 p = lasers[i];
                     float lx = face.worldx() - (dir.x/2f)*tilesize, ly = face.worldy() - (dir.y/2f)*tilesize;
 
@@ -325,7 +329,7 @@ public class BeamDrill extends Block{
                     Draw.z(Layer.effect);
                     Lines.stroke(warmup);
                     rand.setState(i, id);
-                    Color col = face.wallDrop().color;
+                    Color col = drop.color;
                     Color spark = Tmp.c3.set(sparkColor).lerp(boostHeatColor, boostWarmup);
                     for(int j = 0; j < sparks; j++){
                         float fin = (Time.time / sparkLife + rand.random(sparkRecurrence + 1f)) % sparkRecurrence;

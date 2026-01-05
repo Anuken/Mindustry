@@ -96,7 +96,7 @@ public class GlobalVars{
         //sounds
         if(Core.assets != null){
             for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
-                if(sound != Sounds.none && sound != Sounds.swish && sound.file != null){
+                if(sound != Sounds.none && sound.file != null){
                     String name = sound.file.nameWithoutExtension();
                     soundNames.add(name);
                     put("@sfx-" + name, Sounds.getSoundId(sound));
@@ -146,6 +146,8 @@ public class GlobalVars{
         for(LAccess sensor : LAccess.all){
             put("@" + sensor.name(), sensor);
         }
+
+        LStatement.nameToAlign.each((name, align) -> put("@" + name, align));
 
         logicIdToContent = new UnlockableContent[ContentType.all.length][];
         contentIdToLogicId = new int[ContentType.all.length][];

@@ -11,6 +11,7 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -41,12 +42,20 @@ public class LogicDisplay extends Block{
         commandResetTransform = 15
     ;
 
+    public static final Seq<LogicDisplayBuild> displays = new Seq<>(false);
+    /** When the content type of a draw command is this number, it counts as a display. */
+    public static final int displayDrawType = 30;
+
     public static final float scaleStep = 0.05f;
 
     public int maxSides = 25;
 
     public int displaySize = 64;
     public float scaleFactor = 1f;
+
+    static{
+        Events.on(ResetEvent.class, e -> displays.clear());
+    }
 
     public LogicDisplay(String name){
         super(name);
@@ -73,12 +82,15 @@ public class LogicDisplay extends Block{
     }
 
     public class LogicDisplayBuild extends Building{
+        //The root display (bottom left corner of display for tileable displays)
+        public LogicDisplayBuild rootDisplay = this;
         public @Nullable FrameBuffer buffer;
         public float color = Color.whiteFloatBits;
         public float stroke = 1f;
         public LongQueue commands = new LongQueue(256);
         public @Nullable Mat transform;
         public long operations;
+        public int index = -1;
 
         @Override
         public void draw(){
@@ -87,15 +99,7 @@ public class LogicDisplay extends Block{
             //don't even bother processing anything when displays are off.
             if(!Vars.renderer.drawDisplays) return;
 
-            Draw.draw(Draw.z(), () -> {
-                if(buffer == null){
-                    buffer = new FrameBuffer(displaySize, displaySize);
-                    //clear the buffer - some OSs leave garbage in it
-                    buffer.begin(Pal.darkerMetal);
-                    buffer.end();
-                }
-            });
-
+            Draw.draw(Draw.z(), this::ensureBuffer);
             processCommands();
 
             Draw.blend(Blending.disabled);
@@ -111,8 +115,8 @@ public class LogicDisplay extends Block{
         public double sense(LAccess sensor){
             return switch(sensor){
                 case displayWidth, displayHeight -> displaySize;
-                case bufferUsage -> commands.size;
-                case operations -> operations;
+                case bufferSize -> rootDisplay.commands.size;
+                case operations -> rootDisplay.operations;
                 default -> super.sense(sensor);
             };
         }
@@ -127,11 +131,26 @@ public class LogicDisplay extends Block{
             operations++;
         }
 
+        public void ensureBuffer() {
+            if(buffer == null){
+                buffer = new FrameBuffer(displaySize, displaySize);
+                //clear the buffer - some OSs leave garbage in it
+                buffer.begin(Pal.darkerMetal);
+                buffer.end();
+            }
+        }
+
+        public void getBufferRegion(TextureRegion region){
+            if(buffer != null){
+                region.set(buffer.getTexture(), 0, buffer.getTexture().height, buffer.getTexture().width, -buffer.getTexture().height);
+            }
+        }
+
         public void processCommands(){
             //don't bother processing commands if displays are off
             if(!commands.isEmpty() && buffer != null){
                 Draw.draw(Draw.z(), () -> {
-                    if(buffer == null) return;
+                    if(buffer == null || commands.isEmpty()) return;
 
                     Tmp.m1.set(Draw.proj());
                     Tmp.m2.set(Draw.trans());
@@ -164,7 +183,15 @@ public class LogicDisplay extends Block{
                             case commandColor -> Draw.color(this.color = Color.toFloatBits(x, y, p1, p2));
                             case commandStroke -> Lines.stroke(this.stroke = x);
                             case commandImage -> {
-                                if(p4 >= 0 && p4 < ContentType.all.length && Vars.content.getByID(ContentType.all[p4], p1) instanceof UnlockableContent u){
+                                int packed = (DisplayCmd.p4(c) << 10) | DisplayCmd.p1(c);
+                                int ctype = packed & 0x1F;
+                                int id = packed >> 5;
+                                if(ctype == displayDrawType){
+                                    if(id != index && id < displays.size && id >= 0 && displays.get(id).buffer != null){
+                                        displays.get(id).getBufferRegion(Tmp.tr1);
+                                        Draw.rect(Tmp.tr1, x, y, p2, p2 / Tmp.tr1.ratio(), p3);
+                                    }
+                                }else if(ctype < ContentType.all.length && Vars.content.getByID(ContentType.all[ctype], id) instanceof UnlockableContent u){
                                     var icon = u.fullIcon;
                                     Draw.rect(icon, x, y, p2, p2 / icon.ratio(), p3);
                                 }
@@ -229,8 +256,23 @@ public class LogicDisplay extends Block{
         }
 
         @Override
+        public void add(){
+            super.add();
+
+            index = displays.size;
+            displays.add(this);
+        }
+
+        @Override
         public void remove(){
             super.remove();
+
+            if(index != -1){
+                displays.get(displays.size - 1).index = index;
+                displays.remove(index);
+                index = -1;
+            }
+
             if(buffer != null){
                 buffer.dispose();
                 buffer = null;

@@ -66,11 +66,7 @@ public class Planets{
             defaultCore = Blocks.coreBastion;
             iconColor = Color.valueOf("ff9266");
             enemyBuildSpeedMultiplier = 0.4f;
-
-            //TODO disallowed for now
             allowLaunchToNumbered = false;
-
-            //TODO SHOULD there be lighting?
             updateLighting = false;
 
             defaultAttributes.set(Attribute.heat, 0.8f);
@@ -137,13 +133,10 @@ public class Planets{
             sectorSeed = 2;
             allowWaves = true;
             allowLegacyLaunchPads = true;
-            allowWaveSimulation = true;
             allowSectorInvasion = true;
             allowLaunchSchematics = true;
             enemyCoreSpawnReplace = true;
             allowLaunchLoadout = true;
-            //doesn't play well with configs
-            prebuildBase = false;
             ruleSetter = r -> {
                 r.waveTeam = Team.crux;
                 r.placeRangeCheck = false;
@@ -161,7 +154,7 @@ public class Planets{
             landCloudColor = Pal.spore.cpy().a(0.5f);
         }};
 
-        verilus = makeAsteroid("verlius", sun, Blocks.stoneWall, Blocks.iceWall, -1, 0.5f, 12, 2f, gen -> {
+        verilus = makeAsteroid("verilus", sun, Blocks.stoneWall, Blocks.iceWall, -1, 0.5f, 12, 2f, gen -> {
             gen.berylChance = 0f;
             gen.iceChance = 0.6f;
             gen.carbonChance = 0.1f;

@@ -17,6 +17,7 @@ import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.pattern.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -24,6 +25,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
@@ -116,7 +118,9 @@ public class Turret extends ReloadTurret{
     /** Effect created when ammo is used. Not optional. */
     public Effect ammoUseEffect = Fx.none;
     /** Sound emitted when a single bullet is shot. */
-    public Sound shootSound = Sounds.shoot;
+    public Sound shootSound = Sounds.shootDuo;
+    /** Volume of shooting sound. */
+    public float shootSoundVolume = 1f;
     /** Sound emitted when shoot.firstShotDelay is >0 and shooting begins. */
     public Sound chargeSound = Sounds.none;
     /** The sound that this block makes while active. One sound loop. Do not overuse. */
@@ -152,10 +156,17 @@ public class Turret extends ReloadTurret{
     public Turret(String name){
         super(name);
         liquidCapacity = 20f;
-        quickRotate = false;
         outlinedIcon = 1;
         drawLiquidLight = false;
         sync = true;
+        rotate = true;
+        quickRotate = false;
+        drawArrow = false;
+        ignoreLineRotation = true;
+        rotateDrawEditor = false;
+        visualRotationOffset = -90f;
+        regionRotated1 = 1;
+        regionRotated2 = 2;
     }
 
     @Override
@@ -173,7 +184,8 @@ public class Turret extends ReloadTurret{
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
         if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
-    }
+        if(heatRequirement > 0 && maxHeatEfficiency > 0) stats.add(Stat.maxEfficiency, (int)(maxHeatEfficiency * 100f), StatUnit.percent);
+    } 
 
     @Override
     public void setBars(){
@@ -212,6 +224,11 @@ public class Turret extends ReloadTurret{
     }
 
     @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        drawer.drawPlan(this, plan, list);
+    }
+
+    @Override
     public TextureRegion[] icons(){
         return drawer.finalIcons(this);
     }
@@ -224,7 +241,7 @@ public class Turret extends ReloadTurret{
     public void limitRange(BulletType bullet, float margin){
         float realRange = bullet.rangeChange + range;
         //doesn't handle drag
-        bullet.lifetime = (realRange + margin + bullet.extraRangeMargin) / bullet.speed;
+        bullet.lifetime = (realRange + margin + bullet.extraRangeMargin + 10f) / bullet.speed;
     }
 
     @Override
@@ -242,6 +259,14 @@ public class Turret extends ReloadTurret{
         public abstract BulletType type();
     }
 
+    @Override
+    public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
+        super.placeEnded(tile, builder, rotation, config);
+        if(rotate && tile.build instanceof TurretBuild turret){
+            turret.rotation = tile.build.rotdeg();
+        }
+    }
+
     public class TurretBuild extends ReloadTurretBuild implements ControlBlock{
         //TODO storing these as instance variables is horrible design
         /** Turret sprite offset, based on recoil. Updated every frame. */
@@ -253,6 +278,8 @@ public class Turret extends ReloadTurret{
         public @Nullable float[] curRecoils;
         public float shootWarmup, charge, warmupHold = 0f;
         public int totalShots, barrelCounter;
+        public float excessReload = 0;
+        public int reloadShots = 0;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
@@ -394,7 +421,7 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isActive(){
-            return (target != null || wasShooting) && enabled;
+            return (target != null || wasShooting) && enabled && activationTimer <= 0;
         }
 
         public void targetPosition(Posc pos){
@@ -456,8 +483,6 @@ public class Turret extends ReloadTurret{
                 shootWarmup = Mathf.lerpDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
             }
 
-            wasShooting = false;
-
             curRecoil = Mathf.approachDelta(curRecoil, 0, 1 / recoilTime);
             if(recoils > 0){
                 if(curRecoils == null) curRecoils = new float[recoils];
@@ -481,11 +506,19 @@ public class Turret extends ReloadTurret{
                 heatReq = calculateHeat(sideHeat);
             }
 
+            if(rotate){
+                //sync underlying rotation; 0-3 rotation is a shadowed field
+                ((Building)this).rotation = Mathf.mod(Mathf.round(rotation / 90f), 4);
+            }
+
             //turret always reloads regardless of whether it's targeting something
             if(reloadWhileCharging || !charging()){
                 updateReload();
                 updateCooling();
+                capReload();
             }
+
+            wasShooting = false;
 
             if(state.rules.fog){
                 float newRange = hasAmmo() ? peekAmmo().rangeChange : 0f;
@@ -493,6 +526,11 @@ public class Turret extends ReloadTurret{
                     lastRangeChange = newRange;
                     fogControl.forceUpdate(team, this);
                 }
+            }
+
+            if(activationTimer > 0){
+                activationTimer -= Time.delta;
+                return;
             }
 
             if(hasAmmo()){
@@ -503,7 +541,7 @@ public class Turret extends ReloadTurret{
                 }
 
                 if(validateTarget()){
-                    boolean canShoot = true;
+                    boolean canShoot;
 
                     if(isControlled()){ //player behavior
                         targetPos.set(unit.aimX(), unit.aimY());
@@ -550,6 +588,14 @@ public class Turret extends ReloadTurret{
             }
 
             super.handleLiquid(source, liquid, amount);
+        }
+
+        @Override
+        public boolean canConsume(){
+            if(heatRequirement > 0 && heatReq <= 0f){
+                return false;
+            }
+            return super.canConsume();
         }
 
         protected boolean validateTarget(){
@@ -635,11 +681,30 @@ public class Turret extends ReloadTurret{
             return queuedBullets > 0 && shoot.firstShotDelay > 0;
         }
 
-        protected void updateReload(){
-            reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
+        @Override
+        protected boolean canReload(){
+            //keep reloading as the turret keeps shooting
+            return reloadShots < 1 || wasShooting;
+        }
 
-            //cap reload for visual reasons
+        protected void updateReload(){
+            if(!canReload()) return;
+            reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
+        }
+
+        protected void capReload(){
+            //cap reload for visual reasons, need to store the excess reload to keep the firerate consistent
+            if(canReload() && reloadCounter >= reload){
+                reloadShots += (int)(reloadCounter / reload);
+                excessReload += reloadCounter % reload;
+            }
             reloadCounter = Math.min(reloadCounter, reload);
+            reloadShots = Math.min(reloadShots, 5);
+
+            if(!wasShooting){
+                reloadShots = 0;
+                excessReload = 0;
+            }
         }
 
         @Override
@@ -649,12 +714,14 @@ public class Turret extends ReloadTurret{
 
         protected void updateShooting(){
 
-            if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
+            if(reloadShots > 0 && !charging() && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
                 shoot(type);
 
-                reloadCounter %= reload;
+                reloadCounter = excessReload;
+                excessReload = 0;
+                reloadShots--;
             }
         }
 
@@ -668,7 +735,9 @@ public class Turret extends ReloadTurret{
                 type.chargeEffect.at(bulletX, bulletY, rotation);
             }
 
-            shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
+            ShootPattern pattern = type.shootPattern != null ? type.shootPattern : shoot;
+
+            pattern.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
                 queuedBullets++;
                 int barrel = barrelCounter;
 
@@ -708,7 +777,7 @@ public class Turret extends ReloadTurret{
 
             (shootEffect == null ? type.shootEffect : shootEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
             (smokeEffect == null ? type.smokeEffect : smokeEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
-            shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
+            (type.shootSound != Sounds.none ? type.shootSound : shootSound).at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax), shootSoundVolume);
 
             ammoUseEffect.at(
                 x - Angles.trnsx(rotation, ammoEjectBack),

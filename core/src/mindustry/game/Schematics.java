@@ -25,6 +25,7 @@ import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.input.Placement.*;
 import mindustry.io.*;
+import mindustry.io.TypeIO.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.distribution.*;
@@ -171,7 +172,7 @@ public class Schematics implements Loadable{
     public void savePreview(Schematic schematic, Fi file){
         FrameBuffer buffer = getBuffer(schematic);
         Draw.flush();
-        buffer.begin();
+        buffer.begin(Color.clear);
         Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, buffer.getWidth(), buffer.getHeight());
         file.writePng(pixmap);
         buffer.end();
@@ -273,10 +274,15 @@ public class Schematics implements Loadable{
         return previews.get(schematic);
     }
 
-    /** Creates an array of build plans from a schematic's data, centered on the provided x+y coordinates. */
+    /** Creates an array of build plans from a schematic's data, centered on the provided x,y coordinates. */
     public Seq<BuildPlan> toPlans(Schematic schem, int x, int y){
+        return toPlans(schem, x, y, true);
+    }
+
+    /** Creates an array of build plans from a schematic's data, centered on the provided x,y coordinates. */
+    public Seq<BuildPlan> toPlans(Schematic schem, int x, int y, boolean checkHidden){
         return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block, t.config))
-            .removeAll(s -> (!s.block.isVisible() && !(s.block instanceof CoreBlock)) || !s.block.unlockedNow()).sort(Structs.comparingInt(s -> -s.block.schematicPriority));
+            .removeAll(s -> (checkHidden && !s.block.isVisible() && !(s.block instanceof CoreBlock)) || !s.block.unlockedNow()).sort(Structs.comparingInt(s -> -s.block.schematicPriority));
     }
 
     /** @return all the valid loadouts for a specific core type. */
@@ -539,6 +545,8 @@ public class Schematics implements Loadable{
 
         int ver = input.read();
 
+        if(ver > version) throw new IOException("Unknown version: " + ver + " (are you trying to load a schematic from a newer version of the game?)");
+
         try(DataInputStream stream = new DataInputStream(new InflaterInputStream(input))){
             short width = stream.readShort(), height = stream.readShort();
 
@@ -550,13 +558,28 @@ public class Schematics implements Loadable{
                 map.put(stream.readUTF(), stream.readUTF());
             }
 
+            ContentMapper mapper = null;
+
+            //set up content mapping if found; this should not fail
+            if(map.containsKey("contentMap")){
+                IntMap<ObjectIntMap<String>> nameMap = JsonIO.json.fromJson(IntMap.class, ObjectIntMap.class, map.get("contentMap", "{}"));
+                IntMap<IntMap<Content>> contentMap = new IntMap<>();
+                for(var entry : nameMap){
+                    var inner = new IntMap<Content>();
+                    contentMap.put(entry.key, inner);
+                    for(var ce : entry.value){
+                        inner.put(ce.value, content.getByName(ContentType.all[entry.key], ce.key));
+                    }
+                }
+                mapper = (type, id) -> contentMap.get(type.ordinal(), IntMap::new).get(id);
+            }
+
             String[] labels = null;
 
             //try to read the categories, but skip if it fails
             try{
                 labels = JsonIO.read(String[].class, map.get("labels", "[]"));
-            }catch(Exception ignored){
-            }
+            }catch(Exception ignored){}
 
             IntMap<Block> blocks = new IntMap<>();
             int length = stream.readUnsignedByte();
@@ -570,11 +593,13 @@ public class Schematics implements Loadable{
 
             if(total > 128 * 128) throw new IOException("Invalid schematic: Too many blocks.");
 
+            Reads read = new Reads(stream);
+
             Seq<Stile> tiles = new Seq<>(total);
             for(int i = 0; i < total; i++){
                 Block block = blocks.get(stream.readByte());
                 int position = stream.readInt();
-                Object config = ver == 0 ? mapConfig(block, stream.readInt(), position) : TypeIO.readObject(Reads.get(stream));
+                Object config = ver == 0 ? mapConfig(block, stream.readInt(), position) : TypeIO.readObject(read, false, mapper);
                 byte rotation = stream.readByte();
                 if(block != Blocks.air){
                     tiles.add(new Stile(block, Point2.x(position), Point2.y(position), config, rotation));
@@ -596,11 +621,22 @@ public class Schematics implements Loadable{
         output.write(version);
 
         try(DataOutputStream stream = new DataOutputStream(new DeflaterOutputStream(output))){
+            Writes write = new Writes(stream);
 
             stream.writeShort(schematic.width);
             stream.writeShort(schematic.height);
 
             schematic.tags.put("labels", JsonIO.write(schematic.labels.toArray(String.class)));
+
+            //write a map for content name -> id to make sure remapping doesn't occur
+            IntMap<ObjectIntMap<String>> contentMap = new IntMap<>();
+            for(var tile : schematic.tiles){
+                if(tile.config instanceof MappableContent c){
+                    contentMap.get(c.getContentType().ordinal(), ObjectIntMap::new).put(c.name, c.id);
+                }
+            }
+
+            schematic.tags.put("contentMap", JsonIO.write(contentMap));
 
             stream.writeByte(schematic.tags.size);
             for(var e : schematic.tags.entries()){
@@ -622,7 +658,7 @@ public class Schematics implements Loadable{
             for(Stile tile : schematic.tiles){
                 stream.writeByte(blocks.orderedItems().indexOf(tile.block));
                 stream.writeInt(Point2.pack(tile.x, tile.y));
-                TypeIO.writeObject(Writes.get(stream), tile.config);
+                TypeIO.writeObject(write, tile.config);
                 stream.writeByte(tile.rotation);
             }
         }

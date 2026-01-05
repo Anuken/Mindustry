@@ -33,7 +33,7 @@ public class Incinerator extends Block{
 
         @Override
         public BlockStatus status(){
-            return heat > 0.5f ? BlockStatus.active : BlockStatus.noInput;
+            return !enabled ? BlockStatus.logicDisable : heat > 0.5f ? BlockStatus.active : BlockStatus.noInput;
         }
 
         @Override

@@ -12,7 +12,8 @@ import static mindustry.Vars.*;
 public class AsyncCore{
     //all processes to be executed each frame
     public final Seq<AsyncProcess> processes = Seq.with(
-        new PhysicsProcess()
+        new PhysicsProcess(),
+        avoidance = new AvoidanceProcess()
     );
 
     //futures to be awaited

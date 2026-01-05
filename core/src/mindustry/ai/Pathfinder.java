@@ -106,6 +106,10 @@ public class Pathfinder implements Runnable{
     IntSeq tmpArray = new IntSeq();
 
     boolean needsRefresh;
+    /** Last time flowfields were refreshed, for timestamp-based refresh interval. */
+    private long lastRefreshTime;
+    /** Minimum interval between flowfield refreshes in milliseconds. */
+    private static final long refreshIntervalMs = 100;
 
     public Pathfinder(){
         clearCache();
@@ -120,7 +124,6 @@ public class Pathfinder implements Runnable{
             threadList = new Seq<>();
             mainList = new Seq<>();
             clearCache();
-
 
             for(int i = 0; i < tiles.length; i++){
                 Tile tile = world.tiles.geti(i);
@@ -183,29 +186,31 @@ public class Pathfinder implements Runnable{
         });
 
         Events.run(Trigger.afterGameUpdate, () -> {
-            //only refresh periodically (every 2 frames) to batch flowfield updates
-            //TODO: is it worth switching to a timestamp based system instead that updates every X milliseconds?
-            if(needsRefresh && Core.graphics.getFrameId() % 2 == 0){
-                needsRefresh = false;
+            if(!needsRefresh) return;
 
-                //can't iterate through array so use the map, which should not lead to problems
-                for(Flowfield path : mainList){
-                    //paths with a refresh rate should not be updated by tiles changing
-                    if(path != null && path.needsRefresh()){
-                        synchronized(path.targets){
-                            //TODO: this is super slow and forces a refresh for every tile changed!
-                            path.updateTargetPositions();
-                        }
+            long now = Time.millis();
+            if(now - lastRefreshTime < refreshIntervalMs) return;
+
+            lastRefreshTime = now;
+            needsRefresh = false;
+
+            //can't iterate through array so use the map, which should not lead to problems
+            for(Flowfield path : mainList){
+                //paths with a refresh rate should not be updated by tiles changing
+                if(path != null && path.needsRefresh()){
+                    synchronized(path.targets){
+                        //TODO: this is super slow and forces a refresh for every tile changed!
+                        path.updateTargetPositions();
                     }
                 }
-
-                //mark every flow field as dirty, so it updates when it's done
-                queue.post(() -> {
-                    for(Flowfield data : threadList){
-                        data.dirty = true;
-                    }
-                });
             }
+
+            //mark every flow field as dirty, so it updates when it's done
+            queue.post(() -> {
+                for(Flowfield data : threadList){
+                    data.dirty = true;
+                }
+            });
         });
     }
 
@@ -240,6 +245,17 @@ public class Pathfinder implements Runnable{
             }
         }
 
+        //check diagonals for allDeep
+        if(allDeep){
+            for(int i = 0; i < 4; i++){
+                Tile other = tile.nearby(Geometry.d8edge[i]);
+                if(other != null && !other.floor().isDeep()){
+                    allDeep = false;
+                    break;
+                }
+            }
+        }
+
         int tid = tile.getTeamID();
 
         return PathTile.get(
@@ -253,7 +269,7 @@ public class Pathfinder implements Runnable{
         nearSolid,
         nearLegSolid,
         tile.floor().isDeep(),
-        tile.floor().damageTaken > 0.00001f,
+        tile.floor().damages(),
         allDeep,
         nearDeep,
         tile.block().teamPassable
@@ -359,6 +375,11 @@ public class Pathfinder implements Runnable{
 
     /** Gets next tile to travel to. Main thread only. */
     public @Nullable Tile getTargetTile(Tile tile, Flowfield path, boolean diagonals){
+        return getTargetTile(tile, path, diagonals, 0);
+    }
+
+    /** Gets next tile to travel to. Main thread only. */
+    public @Nullable Tile getTargetTile(Tile tile, Flowfield path, boolean diagonals, int avoidanceId){
         if(tile == null) return null;
 
         //uninitialized flowfields are not applicable
@@ -390,6 +411,7 @@ public class Pathfinder implements Runnable{
         int value = values[apos];
 
         var points = diagonals ? Geometry.d8 : Geometry.d4;
+        int[] avoid = avoidanceId <= 0 ? null : avoidance.getAvoidance();
 
         Tile current = null;
         int tl = 0;
@@ -400,11 +422,13 @@ public class Pathfinder implements Runnable{
             if(other == null) continue;
 
             int packed = dx/res + dy/res * ww;
+            int avoidance = avoid == null ? 0 : avoid[packed] > Integer.MAX_VALUE - avoidanceId ? 1 : 0;
+            int cost = values[packed] + avoidance;
 
-            if(values[packed] < value && (current == null || values[packed] < tl) && path.passable(packed) &&
+            if(cost < value && avoidance == 0 && (current == null || cost < tl) && path.passable(packed) &&
             !(point.x != 0 && point.y != 0 && (!path.passable(((tile.x + point.x)/res + tile.y/res*ww)) || !path.passable((tile.x/res + (tile.y + point.y)/res*ww))))){ //diagonal corner trap
                 current = other;
-                tl = values[packed];
+                tl = cost;
             }
         }
 
@@ -653,6 +677,11 @@ public class Pathfinder implements Runnable{
         /** @return the next tile to travel to for this flowfield. Main thread only. */
         public @Nullable Tile getNextTile(Tile from){
             return pathfinder.getTargetTile(from, this);
+        }
+
+        /** @return the next tile to travel to for this flowfield. Main thread only. */
+        public @Nullable Tile getNextTile(Tile from, int unitAvoidanceId){
+            return pathfinder.getTargetTile(from, this, true, unitAvoidanceId);
         }
 
         public boolean hasCompleteWeights(){

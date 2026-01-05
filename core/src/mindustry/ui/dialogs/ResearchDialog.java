@@ -46,6 +46,7 @@ public class ResearchDialog extends BaseDialog{
 
     public ItemSeq items;
 
+    private final Seq<Planet> rootPlanets = new Seq<>(false, 4);
     private boolean showTechSelect;
     private boolean needsRebuild;
 
@@ -214,21 +215,30 @@ public class ResearchDialog extends BaseDialog{
             ObjectMap<Sector, ItemSeq> cache = new ObjectMap<>();
 
             {
-                //first, find a planet associated with the current tech tree
-                Planet rootPlanet = lastNode.planet != null ? lastNode.planet : content.planets().find(p -> p.techTree == lastNode);
+                //first, find a planets associated with the current tech tree
+                rootPlanets.clear();
+                for(var planet : content.planets()){
+                    if(planet.techTree == lastNode || lastNode.planet == planet){
+                        rootPlanets.add(planet);
+                    }
+                }
 
                 //if there is no root, fall back to serpulo
-                if(rootPlanet == null) rootPlanet = Planets.serpulo;
+                if(rootPlanets.size == 0){
+                    rootPlanets.add(Planets.serpulo);
+                }
 
                 //add global counts of each sector
-                for(Sector sector : rootPlanet.sectors){
-                    if(sector.hasBase()){
-                        ItemSeq cached = sector.items();
-                        cache.put(sector, cached);
-                        cached.each((item, amount) -> {
-                            values[item.id] += Math.max(amount, 0);
-                            total += Math.max(amount, 0);
-                        });
+                for(Planet planet : rootPlanets){
+                    for(Sector sector : planet.sectors){
+                        if(sector.hasBase() && !sector.isFrozen()){
+                            ItemSeq cached = sector.items();
+                            cache.put(sector, cached);
+                            cached.each((item, amount) -> {
+                                values[item.id] += Math.max(amount, 0);
+                                total += Math.max(amount, 0);
+                            });
+                        }
                     }
                 }
             }
@@ -592,7 +602,7 @@ public class ResearchDialog extends BaseDialog{
             treeLayout();
             rebuild();
             Core.scene.act();
-            Sounds.unlock.play();
+            Sounds.uiUnlock.play();
             Events.fire(new ResearchEvent(node.content));
         }
 
