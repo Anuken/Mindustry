@@ -1422,6 +1422,7 @@ public class Block extends UnlockableContent implements Senseable{
         hasConsumers = consumers.length > 0;
         itemFilter = new boolean[content.items().size];
         liquidFilter = new boolean[content.liquids().size];
+        if(outputsPower) hasPower = true;
 
         for(Consume cons : consumers){
             cons.apply(this);
