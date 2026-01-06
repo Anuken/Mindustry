@@ -25,6 +25,8 @@ public class SectorPreset extends UnlockableContent{
     public boolean isLastSector;
     /** If true, this sector must be unlocked before landing is permitted. */
     public boolean requireUnlock = true;
+    /** If true, the icon and name is shown, even when it's a 'hidden' always-unlocked sector. TODO: this field may be changed, not sure how it should work*/
+    public boolean showHidden = false;
     public boolean showSectorLandInfo = true;
     /** If true, uses this sector's launch fields instead */
     public boolean overrideLaunchDefaults = false;
