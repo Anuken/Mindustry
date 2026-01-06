@@ -105,17 +105,11 @@ public class HudFragment{
     }
 
     private static void loadFavorites(){
-        favoriteBlocks.clear();
-        String favs = Core.settings.getString("editor-block-favorites", "");
-        if(favs.isEmpty()) return;
-        for(String s : favs.split(",")){
-            try{
-                favoriteBlocks.add(s.trim());
-            }catch(NumberFormatException ignored){}
-        }
+        favoriteBlocks = Core.settings.getJson("editor-block-favorites", ObjectSet.class, String.class, ObjectSet::new);
     }
+
     private static void saveFavorites(){
-        Core.settings.put("editor-block-favorites", String.join(",", favoriteBlocks));
+        Core.settings.putJson("editor-block-favorites", String.class, favoriteBlocks);
     }
 
     private static boolean isFavorite(Block block){
