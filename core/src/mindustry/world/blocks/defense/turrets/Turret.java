@@ -185,7 +185,7 @@ public class Turret extends ReloadTurret{
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
         if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
         if(heatRequirement > 0 && maxHeatEfficiency > 0) stats.add(Stat.maxEfficiency, (int)(maxHeatEfficiency * 100f), StatUnit.percent);
-    } 
+    }
 
     @Override
     public void setBars(){
@@ -257,6 +257,12 @@ public class Turret extends ReloadTurret{
         public int amount;
 
         public abstract BulletType type();
+    }
+
+
+    @Override
+    public boolean rotatedOutput(int x, int y){
+        return false;
     }
 
     @Override
