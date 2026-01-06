@@ -239,10 +239,10 @@ public class Effect{
 
         Decal decal = Decal.create();
         decal.set(x, y);
-        decal.rotation(rotation);
-        decal.lifetime(lifetime);
-        decal.color().set(color);
-        decal.region(region);
+        decal.rotation = rotation;
+        decal.lifetime = lifetime;
+        decal.color.set(color);
+        decal.region = region;
         decal.add();
     }
 
