@@ -247,6 +247,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** Sound played when this block is configured. */
+    public Sound configureSound = Sounds.click;
     /** If true, this block does not have pointConfig with a transform called on map resize. */
     public boolean ignoreResizeConfig;
     /** If true, this building can be selected like a unit when commanding. */

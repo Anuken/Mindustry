@@ -2,6 +2,7 @@ package mindustry.type;
 
 import arc.*;
 import arc.func.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -38,6 +39,8 @@ public class SectorPreset extends UnlockableContent{
     public boolean attackAfterWaves = false;
     /** The original position of this sector; used for migration. Internal use for vanilla campaign only! */
     public int originalPosition;
+    /** Sectors that prevent this sector from being landed on until they are completed. */
+    public Seq<Sector> shieldSectors = new Seq<>();
 
     public SectorPreset(String name, Planet planet, int sector){
         this(name, null, planet, sector);
@@ -78,6 +81,16 @@ public class SectorPreset extends UnlockableContent{
             planet.preset(sector, this);
         }else{
             Log.warn("Preset '@' doesn't have a sector assigned.", name);
+        }
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        //note that sectors can only have one visual shield target
+        for(var other : shieldSectors){
+            other.shieldTarget = sector;
         }
     }
 

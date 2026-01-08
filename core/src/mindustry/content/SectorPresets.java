@@ -159,8 +159,6 @@ public class SectorPresets{
             isLastSector = true;
         }};
 
-        //TODO: show up differently with PLT selected.
-
         new SectorPreset("geothermalStronghold", serpulo, 264){{
             requireUnlock = false;
             difficulty = 10;

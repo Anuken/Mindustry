@@ -31,6 +31,7 @@ public class Sector{
 
     public @Nullable SaveSlot save;
     public @Nullable SectorPreset preset;
+    public @Nullable Sector shieldTarget;
     public SectorInfo info = new SectorInfo();
 
     /** Number 0-1 indicating the difficulty based on nearby bases. */
@@ -119,6 +120,10 @@ public class Sector{
     public void clearInfo(){
         info = new SectorInfo();
         Core.settings.remove(planet.name + "-s-" + id + "-info");
+    }
+
+    public boolean isShielded(){
+        return preset != null && preset.shieldSectors.size > 0 && preset.shieldSectors.contains(s -> !s.isCaptured());
     }
 
     public boolean isAttacked(){
