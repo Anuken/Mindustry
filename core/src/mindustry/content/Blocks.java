@@ -84,7 +84,7 @@ public class Blocks{
     wallOreBeryllium, graphiticWall, wallOreGraphite, wallOreTungsten,
 
     //crafting
-    siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
+    siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, phaseRoller, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //crafting - erekir
@@ -1147,6 +1147,21 @@ public class Blocks{
             consumeItems(with(Items.thorium, 4, Items.sand, 10));
             consumePower(5f);
             itemCapacity = 30;
+        }};
+
+        phaseRoller = new GenericCrafter("phase-roller"){{
+            requirements(Category.crafting, with(Items.metaglass, 80, Items.silicon, 80, Items.graphite, 80, Items.surgeAlloy, 40, Items.plastanium, 40));
+            craftEffect = Fx.formsmoke;
+            outputItem = new ItemStack(Items.phaseFabric, 8);
+            craftTime = 240f;
+            size = 3;
+            hasPower = true;
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPlasma(), new DrawDefault());
+            envEnabled |= Env.space;
+
+            consumeItems(with(Items.thorium, 8, Items.metaglass, 16, Items.blastCompound, 3));
+            consumePower(20f);
+            itemCapacity = 60;
         }};
 
         surgeSmelter = new GenericCrafter("surge-smelter"){{
