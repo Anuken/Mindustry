@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.core.Version;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.game.*;
@@ -46,6 +47,8 @@ public class GlobalVars{
         putEntryOnly("@thisy");
         putEntryOnly("@links");
         putEntryOnly("@ipt");
+
+        putEntry("@version", (Version.build < 0 ? 999999 : Version.build) + Version.revision / 100.0);
 
         putEntryOnly("sectionGeneral");
 
