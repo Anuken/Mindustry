@@ -77,6 +77,10 @@ public class Lightning{
                     }
                 });
             }
+            
+            if(hitter.type.pierceCap > 0 && hit.size >= hitter.type.pierceCap){
+                break;
+            }
 
             Unit furthest = Geometry.findFurthest(x, y, entities);
 

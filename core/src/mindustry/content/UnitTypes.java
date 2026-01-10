@@ -907,6 +907,7 @@ public class UnitTypes{
                     lightningLength = 10;
                     smokeEffect = Fx.shootBigSmoke2;
                     shake = 5f;
+                    maxRange = 190f;
 
                     status = StatusEffects.sapped;
                     statusDuration = 60f * 10;
@@ -1381,7 +1382,8 @@ public class UnitTypes{
             accel = 0.1f;
             range = 130f;
             health = 400;
-            buildSpeed = 0.5f;
+            armor = 1f;
+            buildSpeed = 0.3f;
             engineOffset = 6.5f;
             hitSize = 9f;
             lowAltitude = true;
@@ -1391,7 +1393,7 @@ public class UnitTypes{
             mineSpeed = 3.5f;
             wreckSoundVolume = 0.9f;
 
-            abilities.add(new RepairFieldAbility(5f, 60f * 8, 50f));
+            abilities.add(new RepairFieldAbility(5f, 112f, 50f));
 
             weapons.add(new Weapon("poly-weapon"){{
                 top = false;
@@ -1417,7 +1419,7 @@ public class UnitTypes{
                     frontColor = Color.white;
                     hitSound = Sounds.none;
 
-                    healPercent = 5.5f;
+                    healPercent = 3f;
                     collidesTeam = true;
                     reflectable = false;
                     backColor = Pal.heal;
