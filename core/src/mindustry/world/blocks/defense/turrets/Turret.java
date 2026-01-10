@@ -673,8 +673,13 @@ public class Turret extends ReloadTurret{
         /** @return whether the turret has ammo. */
         public boolean hasAmmo(){
             //skip first entry if it has less than the required amount of ammo
-            if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot && ammo.get(ammo.size - 2).amount >= ammoPerShot){
-                ammo.swap(ammo.size - 1, ammo.size - 2);
+            if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot){
+                for(int i = 0; i < ammo.size; i ++){
+                    if(ammo.get(i).amount >= ammoPerShot){
+                        ammo.swap(ammo.size - 1, i);
+                        break;
+                    }
+                }
             }
 
             //used for "side-ammo" like gas in some turrets
