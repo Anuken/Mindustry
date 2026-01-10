@@ -41,11 +41,11 @@ import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent implements Senseable{
     /** If true, buildings have an ItemModule. */
-    public boolean hasItems;
+    public @NoPatch boolean hasItems;
     /** If true, buildings have a LiquidModule. */
-    public boolean hasLiquids;
+    public @NoPatch boolean hasLiquids;
     /** If true, buildings have a PowerModule. */
-    public boolean hasPower;
+    public @NoPatch boolean hasPower;
     /** Flag for determining whether this block outputs liquid somewhere; used for connections. */
     public boolean outputsLiquid = false;
     /** Used by certain power blocks (nodes) to flag as non-consuming of power. True by default, even if this block has no power. */
@@ -66,12 +66,14 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean acceptsItems = false;
     /** If true, this block won't be affected by the onlyDepositCore rule. */
     public boolean alwaysAllowDeposit = false;
+    /** Cooldown, in seconds, applied to player item depositing when any item is deposited to this block. Overrides the itemDepositCooldown if non-negative. */
+    public float depositCooldown = -1f;
     /** If true, all item capacities of this block are separate instead of pooled as one number. */
     public boolean separateItemCapacity = false;
     /** maximum items this block can carry (usually, this is per-type of item) */
     public int itemCapacity = 10;
-    /** maximum total liquids this block can carry if hasLiquids = true */
-    public float liquidCapacity = 10f;
+    /** maximum total liquids this block can carry if hasLiquids = true. Default value is 10, scales with max liquid consumption in ConsumeLiquid */
+    public float liquidCapacity = -1f;
     /** higher numbers increase liquid output speed; TODO remove and replace with better liquids system */
     public float liquidPressure = 1f;
     /** If true, this block outputs to its facing direction, when applicable.
@@ -245,6 +247,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** Sound played when this block is configured. */
+    public Sound configureSound = Sounds.click;
     /** If true, this block does not have pointConfig with a transform called on map resize. */
     public boolean ignoreResizeConfig;
     /** If true, this building can be selected like a unit when commanding. */
@@ -309,11 +313,13 @@ public class Block extends UnlockableContent implements Senseable{
     /** Should the sound made when this block is deconstructed change in pitch. */
     public boolean breakPitchChange = true;
     /** Sound made when this block is built. */
-    public Sound placeSound = Sounds.place;
+    public Sound placeSound = Sounds.unset;
     /** Sound made when this block is deconstructed. */
-    public Sound breakSound = Sounds.breaks;
+    public Sound breakSound = Sounds.unset;
     /** Sounds made when this block is destroyed.*/
-    public Sound destroySound = Sounds.boom;
+    public Sound destroySound = Sounds.unset;
+    /** Volume of destruction sound. */
+    public float destroySoundVolume = 1f;
     /** Range of destroy sound. */
     public float destroyPitchMin = 1f, destroyPitchMax = 1f;
     /** How reflective this block is. */
@@ -557,6 +563,11 @@ public class Block extends UnlockableContent implements Senseable{
     /** @return a custom minimap color for this or 0 to use default colors. */
     public int minimapColor(Tile tile){
         return 0;
+    }
+
+    public Color getColor(Tile tile){
+        int mc = minimapColor(tile);
+        return mc == 0 ? mapColor : Tmp.c3.set(mc);
     }
 
     public boolean outputsItems(){
@@ -1249,6 +1260,10 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
+        if(databaseTag == null || databaseTag.isEmpty()){
+            databaseTag = category.name();
+        }
+
         super.postInit();
     }
 
@@ -1257,6 +1272,27 @@ public class Block extends UnlockableContent implements Senseable{
     @CallSuper
     public void init(){
         super.init();
+
+        if(destroySound == Sounds.unset){
+            destroySound =
+                size >= 3 ? Sounds.blockExplode3 :
+                size >= 2 ? new RandomSound(Sounds.blockExplode2, Sounds.blockExplode2Alt) :
+                new RandomSound(Sounds.blockExplode1, Sounds.blockExplode1Alt);
+        }
+
+        if(placeSound == Sounds.unset){
+            placeSound =
+                size >= 3 ? Sounds.blockPlace3 :
+                size >= 2 ? Sounds.blockPlace2 :
+                Sounds.blockPlace1;
+        }
+
+        if(breakSound == Sounds.unset){
+            breakSound =
+                size >= 3 ? Sounds.blockBreak3 :
+                size >= 2 ? Sounds.blockBreak2 :
+                Sounds.blockBreak1;
+        }
 
         //disable standard shadow
         if(customShadow){
@@ -1302,6 +1338,21 @@ public class Block extends UnlockableContent implements Senseable{
         if(hasLiquids && drawLiquidLight){
             emitLight = true;
             lightClipSize = Math.max(lightClipSize, size * 30f * 2f);
+        }
+
+        //some blocks don't have hasLiquids, but have liquid consumers/liquid capacity
+        if(liquidCapacity < 0){
+            float consumeAmount = 1f;
+            for(var cons : consumeBuilder){
+                if(cons instanceof ConsumeLiquidBase liq){
+                    consumeAmount = Math.max(consumeAmount, liq.amount * 60f);
+                }else if(cons instanceof ConsumeLiquids liq){
+                    for(var stack : liq.liquids){
+                        consumeAmount = Math.max(consumeAmount, stack.amount * 60f);
+                    }
+                }
+            }
+            liquidCapacity = Mathf.round(10f * consumeAmount);
         }
 
         if(emitLight){
@@ -1373,6 +1424,7 @@ public class Block extends UnlockableContent implements Senseable{
         hasConsumers = consumers.length > 0;
         itemFilter = new boolean[content.items().size];
         liquidFilter = new boolean[content.liquids().size];
+        if(outputsPower) hasPower = true;
 
         for(Consume cons : consumers){
             cons.apply(this);

@@ -183,7 +183,11 @@ public class AssetsProcess extends BaseProcessor{
         }
 
         if(classname.equals("Sounds")){
-            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new " + rtype + "()").build());
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new " + rtype + "()")
+            .addJavadoc("Does not play anything.").build());
+
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "unset", Modifier.STATIC, Modifier.PUBLIC).initializer("new " + rtype + "()")
+            .addJavadoc("Used a placeholder value for unset default values. This is usually reassigned in init() of the relevant block or unit. Does not play anything.").build());
         }
 
         type.addMethod(loadBegin.build());

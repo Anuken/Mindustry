@@ -231,7 +231,7 @@ public class NetClient implements ApplicationListener{
     public static void sendMessage(String message, @Nullable String unformatted, @Nullable Player playersender){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message);
-            Sounds.chatMessage.play();
+            Sounds.uiChat.play();
         }
 
         if(playersender != null && unformatted != null){
@@ -248,7 +248,7 @@ public class NetClient implements ApplicationListener{
     public static void sendMessage(String message){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message);
-            Sounds.chatMessage.play();
+            Sounds.uiChat.play();
         }
     }
 
