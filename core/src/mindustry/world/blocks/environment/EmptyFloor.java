@@ -12,6 +12,7 @@ public class EmptyFloor extends Floor{
         canShadow = false;
         placeableOn = false;
         solid = true;
+        drawEdgeOut = false;
     }
 
     @Override

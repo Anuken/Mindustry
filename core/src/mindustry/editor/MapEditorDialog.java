@@ -108,6 +108,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 ui.loadAnd(() -> {
                     try{
                         Pixmap pixmap = new Pixmap(file);
+                        //if you want to bypass the limit, use mods or the console; larger maps are not supported
+                        if(pixmap.width > MapResizeDialog.maxSize || pixmap.height > MapResizeDialog.maxSize){
+                            throw new Exception("Image is too large (maximum size is " + MapResizeDialog.maxSize + "x" + MapResizeDialog.maxSize + ")");
+                        }
                         editor.beginEdit(pixmap);
                         pixmap.dispose();
                     }catch(Exception e){
@@ -403,7 +407,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             infoDialog.show();
             Core.app.post(() -> ui.showErrorMessage("@editor.save.noname"));
         }else{
-            Map map = maps.all().find(m -> m.name().equals(name));
+            Map map = maps.all().find(m -> m.name().equalsIgnoreCase(name));
             if(map != null && !map.custom && !map.workshop){
                 handleSaveBuiltin(map);
             }else{

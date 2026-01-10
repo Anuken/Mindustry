@@ -4,7 +4,7 @@ buildscript{
     }
 
     dependencies{
-        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.23"
+        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.24"
     }
 }
 
@@ -20,7 +20,7 @@ task incrementConfig{
     }else{
         props['app.id'] = 'io.anuke.mindustry'
         props['app.version'] = '7.0'
-        props['app.mainclass'] = 'mindustry.IOSLauncher'
+        props['app.mainclass'] = 'mindustry.ios.IOSLauncher'
         props['app.executable'] = 'IOSLauncher'
         props['app.name'] = 'Mindustry'
     }
