@@ -963,14 +963,10 @@ public class BulletType extends Content implements Cloneable{
         bullet.mover = mover;
         bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
         //reset trail
-        if(bullet.trail != null){
-            bullet.trail.clear();
-        }
+        if(bullet.trail != null) bullet.trail.clear();
         bullet.status = status;
         // remove the status if it fails the chance
-        if(statusChance < 1f && !Mathf.chance(statusChance)){
-            bullet.status = StatusEffects.none;
-        }
+        if(statusChance < 1f && !Mathf.chance(statusChance)) bullet.status = StatusEffects.none;
         bullet.add();
 
         if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel());
