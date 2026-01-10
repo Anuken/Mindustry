@@ -180,7 +180,11 @@ public class DatabaseDialog extends BaseDialog{
                                     touchable = Touchable.disabled;
                                 }}).size(8 * 4).pad(3);
                             }else if(state.isGame() && state.patcher.isPatched(unlock)){
-                                list.table(Tex.whiteui, t -> t.add(image).size(8 * 4).pad(2)).color(Pal.accent).pad(1);
+                                list.stack(image, new Table(){{
+                                    right().bottom().touchable = Touchable.disabled;
+                                    // Interpolated color (lerp lightishGray and white) for better contrast
+                                    image(Icon.settingsSmall).color(Tmp.c1.set(208, 208, 208)).size(12f);
+                                }}).size(8 * 4).pad(3);
                             }else{
                                 list.add(image).size(8 * 4).pad(3);
                             }
