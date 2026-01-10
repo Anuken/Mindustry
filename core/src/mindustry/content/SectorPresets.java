@@ -13,8 +13,6 @@ public class SectorPresets{
     impact0078, desolateRift, nuclearComplex, planetaryTerminal,
     coastline, navalFortress, weatheredChannels, seaPort,
 
-    geothermalStronghold, cruxscape,
-
     onset, aegis, lake, intersect, basin, atlas, split, marsh, peaks, ravine, caldera,
     stronghold, crevice, siege, crossroads, karst, origin;
 
@@ -161,12 +159,16 @@ public class SectorPresets{
             isLastSector = true;
         }};
 
-        geothermalStronghold = new SectorPreset("geothermalStronghold", serpulo, 264){{
+        new SectorPreset("geothermalStronghold", serpulo, 264){{
+            requireUnlock = false;
             difficulty = 10;
+            showHidden = true;
         }};
 
-        cruxscape = new SectorPreset("cruxscape", serpulo, 54){{
+        new SectorPreset("cruxscape", serpulo, 54){{
+            requireUnlock = false;
             difficulty = 10;
+            showHidden = true;
         }};
 
         SectorSubmissions.registerSectors();

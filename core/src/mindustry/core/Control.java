@@ -472,6 +472,10 @@ public class Control implements ApplicationListener, Loadable{
 
                             //set spawn for sector damage to use
                             Tile spawn = world.tile(spawnPos);
+                            if(spawn == null){
+                                playNewSector(origin, sector, reloader);
+                                return;
+                            }
                             spawn.setBlock(sector.planet.defaultCore, state.rules.defaultTeam);
 
                             //apply damage to simulate the sector being lost

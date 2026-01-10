@@ -521,29 +521,7 @@ public class SerpuloTechTree{
                                                 new Research(exponentialReconstructor),
                                                 new Research(tetrativeReconstructor)
                                                 ), () -> {
-                                                    node(geothermalStronghold, Seq.with(
-                                                    new Research(omura),
-                                                    new Research(navanax),
-                                                    new Research(eclipse),
-                                                    new Research(oct),
-                                                    new Research(reign),
-                                                    new Research(corvus),
-                                                    new Research(toxopid)
-                                                    ), () -> {
 
-                                                    });
-
-                                                    node(cruxscape, Seq.with(
-                                                    new Research(omura),
-                                                    new Research(navanax),
-                                                    new Research(eclipse),
-                                                    new Research(oct),
-                                                    new Research(reign),
-                                                    new Research(corvus),
-                                                    new Research(toxopid)
-                                                    ), () -> {
-
-                                                    });
                                                 });
                                             });
                                         });
