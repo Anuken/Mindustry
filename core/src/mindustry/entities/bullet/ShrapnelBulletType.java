@@ -29,7 +29,6 @@ public class ShrapnelBulletType extends BulletType{
         pierce = true;
         hittable = false;
         absorbable = false;
-        removeAfterPierce = false;
         lightOpacity = 0.6f;
     }
 

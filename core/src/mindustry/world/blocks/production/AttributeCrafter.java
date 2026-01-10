@@ -1,6 +1,7 @@
 package mindustry.world.blocks.production;
 
 import arc.*;
+import arc.struct.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -13,12 +14,12 @@ public class AttributeCrafter extends GenericCrafter{
     public float baseEfficiency = 1f;
     public float maxBoost = 1f;
     public float minEfficiency = -1f;
-    public float displayEfficiencyScale = 1f;
     public boolean displayEfficiency = true;
     public boolean displayScaledOutput = true;
     public boolean scaleLiquidConsumption = false;
-    /** Scaled output multiplier, scales with attribute. <=0 to disable. */
+    /** Scaled output (yield) multiplier, scales with attribute. <=0 to disable. */
     public float outputScale = 0f;
+    /** Scaled efficiency (speed) multiplier, scales with attribute. <=0 to disable. */
     public float boostScale = 1f;
 
     public AttributeCrafter(String name){
@@ -32,12 +33,12 @@ public class AttributeCrafter extends GenericCrafter{
         if(!displayEfficiency && !displayScaledOutput) return;
 
         drawPlaceText(
-        (displayEfficiency ?
+        (displayEfficiency && boostScale > 0f?
             Core.bundle.format("bar.efficiency",
             (int)((baseEfficiency + Math.min(maxBoost, boostScale * sumAttribute(attribute, x, y))) * 100f))
         : "") +
-        (displayScaledOutput ? "\n" +
-            Core.bundle.format("bar.outputscale",
+        (displayScaledOutput && outputScale > 0f ? "\n" +
+            Core.bundle.format("bar.yield",
             (int)(Math.min(maxBoost, outputScale * sumAttribute(attribute, x, y)) * 100f))
         : ""), x, y, valid);
     }
@@ -48,17 +49,17 @@ public class AttributeCrafter extends GenericCrafter{
 
         if(!displayEfficiency && !displayScaledOutput) return;
 
-        if(displayEfficiency){
+        if(displayEfficiency && boostScale > 0f){
             addBar("efficiency", (AttributeCrafterBuild entity) ->
             new Bar(
             () -> Core.bundle.format("bar.efficiency", (int)(entity.efficiencyMultiplier() * 100)),
             () -> Pal.lightOrange,
             entity::efficiencyMultiplier));
         }
-        if(displayScaledOutput){
-            addBar("outputscale", (AttributeCrafterBuild entity) ->
+        if(displayScaledOutput && outputScale > 0f){
+            addBar("yield", (AttributeCrafterBuild entity) ->
             new Bar(
-            () -> Core.bundle.format("bar.outputscale", (int)((entity.outputMultiplier() - baseEfficiency) * 100)),
+            () -> Core.bundle.format("bar.yield", (int)((entity.outputMultiplier() - baseEfficiency) * 100)),
             () -> Pal.lightOrange,
             entity::outputMultiplier));
         }
@@ -74,7 +75,7 @@ public class AttributeCrafter extends GenericCrafter{
     public void setStats(){
         super.setStats();
 
-        stats.add(baseEfficiency <= 0.0001f ? Stat.tiles : Stat.affinities, attribute, floating, boostScale * size * size, !displayEfficiency);
+        stats.add(baseEfficiency <= 0.0001f ? Stat.tiles : Stat.affinities, attribute, floating, boostScale * size * size, outputScale * size * size, Seq.with(outputItems), craftTime, !displayEfficiency);
     }
 
     public class AttributeCrafterBuild extends GenericCrafterBuild{

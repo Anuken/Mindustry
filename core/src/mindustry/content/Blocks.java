@@ -2594,7 +2594,7 @@ public class Blocks{
         }};
 
         rtgGenerator = new ConsumeGenerator("rtg-generator"){{
-            requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phaseFabric, 15, Items.plastanium, 40, Items.thorium, 50));
+            requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phaseFabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
             powerProduction = 4.5f;
             itemDuration = 60 * 14f;
@@ -2899,7 +2899,7 @@ public class Blocks{
         }};
 
         blastDrill = new Drill("blast-drill"){{
-            requirements(Category.production, with(Items.copper, 90, Items.silicon, 90, Items.titanium, 75, Items.thorium, 125));
+            requirements(Category.production, with(Items.copper, 65, Items.silicon, 60, Items.titanium, 50, Items.thorium, 75));
             drillTime = 280;
             size = 4;
             drawRim = true;
@@ -3608,7 +3608,6 @@ public class Blocks{
                 lightningLength = 25;
                 collidesAir = false;
                 ammoMultiplier = 1f;
-                pierceCap = 5;
 
                 //for visual stats only.
                 buildingDamageMultiplier = 0.25f;
@@ -3933,22 +3932,16 @@ public class Blocks{
 
             ammo(
                 Items.titanium, new ShrapnelBulletType(){{
-                    length = brange + 64f;
-                    rangeChange = 64f;
-                    width = 5f;
-                    damage = 60f;
-                    ammoMultiplier = 2f;
+                    length = brange;
+                    damage = 66f;
+                    ammoMultiplier = 4f;
                     width = 17f;
                     reloadMultiplier = 1.3f;
-                    pierceCap = 3;
-                    serrations = 9;
-                    serrationSpacing = 20f;
-                    shootPattern = new ShootSpread(3, 10f);
                 }},
                 Items.thorium, new ShrapnelBulletType(){{
                     length = brange;
                     damage = 105f;
-                    ammoMultiplier = 2f;
+                    ammoMultiplier = 5f;
                     toColor = Pal.thoriumPink;
                     shootEffect = smokeEffect = Fx.thoriumShoot;
                 }}
