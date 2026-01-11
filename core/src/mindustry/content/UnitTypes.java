@@ -430,7 +430,7 @@ public class UnitTypes{
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
                     //Does not actually do anything; Just here to make stats work
-                    healPercent = 2f;
+                    healAmount = 22f;
 
                     lightningType = new BulletType(0.0001f, 0f){{
                         lifetime = Fx.lightning.lifetime;
@@ -1387,15 +1387,16 @@ public class UnitTypes{
             engineOffset = 6.5f;
             hitSize = 9f;
             lowAltitude = true;
+            itemCapacity = 20;
 
             ammoType = new PowerAmmoType(900);
             mineTier = 2;
             mineSpeed = 3.5f;
             wreckSoundVolume = 0.9f;
 
-            abilities.add(new RepairFieldAbility(5f, 112f, 50f)
+            abilities.add(new RepairFieldAbility(5f, 60f * 6f, 50f)
             {{
-                sameTypeHealMult = 0.25f;
+                sameTypeHealMult = 0.75f;
             }});
 
             weapons.add(new Weapon("poly-weapon"){{
@@ -1462,7 +1463,7 @@ public class UnitTypes{
                 rotate = true;
                 bullet = new LaserBoltBulletType(5.2f, 10){{
                     lifetime = 35f;
-                    healPercent = 5.5f;
+                    healAmount = 45f;
                     collidesTeam = true;
                     backColor = Pal.heal;
                     frontColor = Color.white;
@@ -1500,7 +1501,7 @@ public class UnitTypes{
             faceTarget = false;
             hitSize = 36f;
             payloadCapacity = (3 * 3) * tilePayload;
-            buildSpeed = 4.5f;
+            buildSpeed = 6f;
             buildBeamOffset = 23;
             range = 140f;
             targetAir = false;

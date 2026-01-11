@@ -3930,11 +3930,11 @@ public class Blocks{
                 Items.titanium, new ShrapnelBulletType(){{
                     length = brange + 64f;
                     rangeChange = 64f;
-                    damage = 66f;
+                    damage = 50f;
                     ammoMultiplier = 2f;
                     width = 17f;
                     reloadMultiplier = 1.3f;
-                    pierceCap = 3;
+                    pierceCap = 4;
                     serrations = 9;
                     serrationSpacing = 20f;
                     shootPattern = new ShootSpread(3, 10f);
