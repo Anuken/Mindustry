@@ -430,7 +430,7 @@ public class UnitTypes{
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
                     //Does not actually do anything; Just here to make stats work
-                    healAmount = 22f;
+                    healAmount = 18f;
 
                     lightningType = new BulletType(0.0001f, 0f){{
                         lifetime = Fx.lightning.lifetime;
@@ -439,7 +439,7 @@ public class UnitTypes{
                         status = StatusEffects.shocked;
                         statusDuration = 10f;
                         hittable = false;
-                        healPercent = 1.6f;
+                        healAmount = 18f;
                         collidesTeam = true;
                     }};
                 }};
