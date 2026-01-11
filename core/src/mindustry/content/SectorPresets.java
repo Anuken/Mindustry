@@ -9,7 +9,7 @@ public class SectorPresets{
     public static SectorPreset
     groundZero,
     craters, biomassFacility, taintedWoods, frozenForest, ruinousShores, facility32m, windsweptIslands, stainedMountains, tarFields,
-    frontier, fungalPass, infestedCanyons, atolls, sunkenPier, mycelialBastion, extractionOutpost, saltFlats, testingGrounds, overgrowth, //polarAerodrome,
+    frontier, fungalPass, infestedCanyons, atolls, sunkenPier, mycelialBastion, extractionOutpost, saltFlats, testingGrounds, overgrowth,
     impact0078, desolateRift, fallenVessel, nuclearComplex, planetaryTerminal,
     coastline, navalFortress, weatheredChannels, seaPort,
 
@@ -85,11 +85,6 @@ public class SectorPresets{
         extractionOutpost = new SectorPreset("extractionOutpost", serpulo, 165){{
             difficulty = 5;
         }};
-
-        //TODO: removed for now
-        //polarAerodrome = new SectorPreset("polarAerodrome", serpulo, 68){{
-        //    difficulty = 7;
-        //}};
 
         coastline = new SectorPreset("coastline", serpulo, 108){{
             captureWave = 30;

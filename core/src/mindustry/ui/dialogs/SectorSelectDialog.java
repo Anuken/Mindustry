@@ -22,7 +22,7 @@ public class SectorSelectDialog extends BaseDialog{
     TextField search;
 
     public SectorSelectDialog(){
-        super("@content.sector.name");
+        super("@database-category.sector");
 
         cont.top();
         cont.table(s -> {
