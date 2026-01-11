@@ -66,6 +66,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean acceptsItems = false;
     /** If true, this block won't be affected by the onlyDepositCore rule. */
     public boolean alwaysAllowDeposit = false;
+    /** Cooldown, in seconds, applied to player item depositing when any item is deposited to this block. Overrides the itemDepositCooldown if non-negative. */
+    public float depositCooldown = -1f;
     /** If true, all item capacities of this block are separate instead of pooled as one number. */
     public boolean separateItemCapacity = false;
     /** maximum items this block can carry (usually, this is per-type of item) */
@@ -245,6 +247,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** Sound played when this block is configured. */
+    public Sound configureSound = Sounds.click;
     /** If true, this block does not have pointConfig with a transform called on map resize. */
     public boolean ignoreResizeConfig;
     /** If true, this building can be selected like a unit when commanding. */
@@ -559,6 +563,11 @@ public class Block extends UnlockableContent implements Senseable{
     /** @return a custom minimap color for this or 0 to use default colors. */
     public int minimapColor(Tile tile){
         return 0;
+    }
+
+    public Color getColor(Tile tile){
+        int mc = minimapColor(tile);
+        return mc == 0 ? mapColor : Tmp.c3.set(mc);
     }
 
     public boolean outputsItems(){
@@ -1415,6 +1424,7 @@ public class Block extends UnlockableContent implements Senseable{
         hasConsumers = consumers.length > 0;
         itemFilter = new boolean[content.items().size];
         liquidFilter = new boolean[content.liquids().size];
+        if(outputsPower) hasPower = true;
 
         for(Consume cons : consumers){
             cons.apply(this);

@@ -549,8 +549,7 @@ public class Planet extends UnlockableContent{
             Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(curr.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
             Tmp.v32.set(next.v).sub(sector.tile.v).setLength(next.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
 
-            batch.tri(curr.v, next.v, Tmp.v31, color);
-            batch.tri(Tmp.v31, next.v, Tmp.v32, color);
+            batch.quad(curr.v, next.v, Tmp.v32, Tmp.v31, color);
 
             sector.tile.v.scl(1f / arad);
             next.v.scl(1f / arad);
