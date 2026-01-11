@@ -30,10 +30,10 @@ public class AttributeCrafter extends GenericCrafter{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        if(!displayEfficiency && !displayScaledOutput) return;
+        if((!displayEfficiency || boostScale <= 0f) && (!displayScaledOutput || outputScale <= 0f)) return;
 
         drawPlaceText(
-        (displayEfficiency && boostScale > 0f?
+        (displayEfficiency && boostScale > 0f ?
             Core.bundle.format("bar.efficiency",
             (int)((baseEfficiency + Math.min(maxBoost, boostScale * sumAttribute(attribute, x, y))) * 100f))
         : "") +
@@ -47,7 +47,7 @@ public class AttributeCrafter extends GenericCrafter{
     public void setBars(){
         super.setBars();
 
-        if(!displayEfficiency && !displayScaledOutput) return;
+        if((!displayEfficiency || boostScale <= 0f) && (!displayScaledOutput || outputScale <= 0f)) return;
 
         if(displayEfficiency && boostScale > 0f){
             addBar("efficiency", (AttributeCrafterBuild entity) ->
@@ -74,8 +74,12 @@ public class AttributeCrafter extends GenericCrafter{
     @Override
     public void setStats(){
         super.setStats();
-
-        stats.add(baseEfficiency <= 0.0001f ? Stat.tiles : Stat.affinities, attribute, floating, boostScale * size * size, outputScale * size * size, Seq.with(outputItems), craftTime, !displayEfficiency);
+        if(outputScale > 0f){
+            stats.add(baseEfficiency <= 0.0001f ? Stat.tiles : 
+                Stat.affinities, attribute, floating, boostScale * size * size, outputScale * size * size, Seq.with(outputItems), craftTime, !displayEfficiency);
+        }else{
+            stats.add(baseEfficiency <= 0.0001f ? Stat.tiles : Stat.affinities, attribute, floating, boostScale * size * size, !displayEfficiency);
+        }
     }
 
     public class AttributeCrafterBuild extends GenericCrafterBuild{
