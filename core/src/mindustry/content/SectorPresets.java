@@ -10,7 +10,7 @@ public class SectorPresets{
     groundZero,
     craters, biomassFacility, taintedWoods, frozenForest, ruinousShores, facility32m, windsweptIslands, stainedMountains, tarFields,
     frontier, fungalPass, infestedCanyons, atolls, sunkenPier, mycelialBastion, extractionOutpost, saltFlats, testingGrounds, overgrowth, //polarAerodrome,
-    impact0078, desolateRift, nuclearComplex, planetaryTerminal,
+    impact0078, desolateRift, fallenVessel, nuclearComplex, planetaryTerminal,
     coastline, navalFortress, weatheredChannels, seaPort,
 
     onset, aegis, lake, intersect, basin, atlas, split, marsh, peaks, ravine, caldera,
@@ -147,6 +147,11 @@ public class SectorPresets{
         desolateRift = new SectorPreset("desolateRift", serpulo, 123){{
             captureWave = 18;
             difficulty = 8;
+        }};
+
+        fallenVessel = new SectorPreset("fallenVessel", serpulo, -1){{
+            captureWave = 121;
+            difficulty = 9;
         }};
 
         nuclearComplex = new SectorPreset("nuclearComplex", serpulo, 130){{

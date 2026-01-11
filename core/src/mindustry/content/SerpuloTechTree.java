@@ -571,7 +571,15 @@ public class SerpuloTechTree{
                                             new Research(surgeSmelter),
                                             new Research(overdriveProjector)
                                             ), () -> {
+                                                node(fallenVessel, Seq.with(
+                                                new SectorComplete(desolateRift),
+                                                new SectorComplete(mycelialBastion),
+                                                new Research(sei),
+                                                new Research(meltdown),
+                                                new Research(spectre)
+                                                ), () -> {
 
+                                                });
                                             });
                                         });
                                     });
