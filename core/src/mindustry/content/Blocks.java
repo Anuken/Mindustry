@@ -65,7 +65,7 @@ public class Blocks{
     //new metal floors
     metalTiles1, metalTiles2, metalTiles3, metalTiles4, metalTiles5, metalTiles6, metalTiles7, metalTiles8, metalTiles9, metalTiles10, metalTiles11, metalTiles12, metalTiles13,
     //new metal walls
-    metalWall1, metalWall2, metalWall3, metalWall4,
+    metalWall1, metalWall2, metalWall3,
 
     //colored
     coloredFloor, coloredWall,
@@ -81,7 +81,7 @@ public class Blocks{
     oreBeryllium, oreTungsten, oreCrystalThorium, wallOreThorium,
 
     //wall ores
-    wallOreBeryllium, graphiticWall, wallOreTungsten,
+    wallOreBeryllium, graphiticWall, wallOreGraphite, wallOreTungsten,
 
     //crafting
     siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -1024,7 +1024,10 @@ public class Blocks{
             variants = 3;
         }};
 
-        //TODO merge with standard ore?
+        wallOreGraphite = new OreBlock("ore-wall-graphite", Items.graphite){{
+            wallOre = true;
+        }};
+
         wallOreTungsten = new OreBlock("ore-wall-tungsten", Items.tungsten){{
             wallOre = true;
         }};

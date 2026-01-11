@@ -185,7 +185,7 @@ public class Turret extends ReloadTurret{
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
         if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
         if(heatRequirement > 0 && maxHeatEfficiency > 0) stats.add(Stat.maxEfficiency, (int)(maxHeatEfficiency * 100f), StatUnit.percent);
-    } 
+    }
 
     @Override
     public void setBars(){
@@ -257,6 +257,12 @@ public class Turret extends ReloadTurret{
         public int amount;
 
         public abstract BulletType type();
+    }
+
+
+    @Override
+    public boolean rotatedOutput(int x, int y){
+        return false;
     }
 
     @Override
@@ -667,8 +673,13 @@ public class Turret extends ReloadTurret{
         /** @return whether the turret has ammo. */
         public boolean hasAmmo(){
             //skip first entry if it has less than the required amount of ammo
-            if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot && ammo.get(ammo.size - 2).amount >= ammoPerShot){
-                ammo.swap(ammo.size - 1, ammo.size - 2);
+            if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot){
+                for(int i = 0; i < ammo.size; i ++){
+                    if(ammo.get(i).amount >= ammoPerShot){
+                        ammo.swap(ammo.size - 1, i);
+                        break;
+                    }
+                }
             }
 
             //used for "side-ammo" like gas in some turrets
