@@ -176,7 +176,8 @@ public class UnitTypes{
                 bullet = new ArtilleryBulletType(2f, 20, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
-                    lifetime = 120f;
+                    lifetime = 120f - 35f / 2f;
+                    rangeOverride = 240f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
@@ -1079,10 +1080,11 @@ public class UnitTypes{
                 shoot.shotDelay = 3f;
                 ejectEffect = Fx.casing1;
                 mirror = false;
-                bullet = new BasicBulletType(2.5f, 16){{
+                bullet = new BasicBulletType(2.5f, 9){{
+                    inaccuracy = 4f;
                     width = 7f;
                     height = 9f;
-                    lifetime = 45f;
+                    lifetime = 32f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
                     ammoMultiplier = 2;
@@ -1525,6 +1527,7 @@ public class UnitTypes{
                     mixColorTo = Color.white;
 
                     hitSound = Sounds.explosionQuad;
+                    hitSoundVolume = 0.9f;
 
                     shootCone = 180f;
                     ejectEffect = Fx.none;
@@ -1674,7 +1677,7 @@ public class UnitTypes{
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.shootDuo;
                 bullet = new FlakBulletType(4.2f, 3){{
-                    lifetime = 60f;
+                    lifetime = 52.5f;
                     ammoMultiplier = 4f;
                     shootEffect = Fx.shootSmall;
                     width = 6f;
@@ -1698,7 +1701,7 @@ public class UnitTypes{
                 bullet = new ArtilleryBulletType(3f, 20, "shell"){{
                     hitEffect = Fx.flakExplosion;
                     knockback = 0.8f;
-                    lifetime = 80f;
+                    lifetime = 73.5f;
                     width = height = 11f;
                     collidesTiles = false;
                     splashDamageRadius = 30f * 0.75f;

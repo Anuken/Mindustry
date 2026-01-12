@@ -181,6 +181,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean fragOnAbsorb = true;
     /** If true, unit armor is ignored in damage calculations. */
     public boolean pierceArmor = false;
+    /** Multiplies the unit armor used in damage calculations. Used for armor weakness, armor piercing, and anti-armor. */
+    public float armorMultiplier = 1f;
     /** If true, the bullet will "stick" to enemies and get deactivated on collision. */
     public boolean sticky = false;
     /** Extra time added to bullet when it sticks to something. */
@@ -483,6 +485,8 @@ public class BulletType extends Content implements Cloneable{
             }
             if(pierceArmor){
                 h.damagePierce(damage);
+            }else if(armorMultiplier != 1){
+                h.damageArmorMult(damage, armorMultiplier);
             }else{
                 h.damage(damage);
             }
@@ -635,6 +639,12 @@ public class BulletType extends Content implements Cloneable{
     public void removed(Bullet b){
         if(trailLength > 0 && b.trail != null && b.trail.size() > 0){
             Fx.trailFade.at(b.x, b.y, trailWidth, trailColor, b.trail.copy());
+        }
+
+        //if the bullet never created any frags and is removed (probably by hitting something), it needs to spawn those
+        //TODO: disabled for now as this makes vanquish significantly more powerful
+        if(b.frags == 0 && !fragOnHit && fragBullet != null){
+        //    createFrags(b, b.x, b.y);
         }
     }
 

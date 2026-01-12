@@ -65,7 +65,7 @@ public class Blocks{
     //new metal floors
     metalTiles1, metalTiles2, metalTiles3, metalTiles4, metalTiles5, metalTiles6, metalTiles7, metalTiles8, metalTiles9, metalTiles10, metalTiles11, metalTiles12, metalTiles13,
     //new metal walls
-    metalWall1, metalWall2, metalWall3, metalWall4,
+    metalWall1, metalWall2, metalWall3,
 
     //colored
     coloredFloor, coloredWall,
@@ -81,7 +81,7 @@ public class Blocks{
     oreBeryllium, oreTungsten, oreCrystalThorium, wallOreThorium,
 
     //wall ores
-    wallOreBeryllium, graphiticWall, wallOreTungsten,
+    wallOreBeryllium, graphiticWall, wallOreGraphite, wallOreTungsten,
 
     //crafting
     siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -173,7 +173,7 @@ public class Blocks{
     payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, largePayloadMassDriver, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
 
     //logic
-    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, logicDisplayTile, memoryCell, memoryBank,
+    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, tileLogicDisplay, memoryCell, memoryBank,
     canvas, reinforcedMessage,
     worldProcessor, worldCell, worldMessage, worldSwitch,
 
@@ -1024,7 +1024,10 @@ public class Blocks{
             variants = 3;
         }};
 
-        //TODO merge with standard ore?
+        wallOreGraphite = new OreBlock("ore-wall-graphite", Items.graphite){{
+            wallOre = true;
+        }};
+
         wallOreTungsten = new OreBlock("ore-wall-tungsten", Items.tungsten){{
             wallOre = true;
         }};
@@ -3270,6 +3273,7 @@ public class Blocks{
                     height = 12f;
                     ammoMultiplier = 4;
                     lifetime = 60f;
+                    reloadMultiplier = 0.8f;
                     rangeChange = 16f;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
@@ -3319,7 +3323,9 @@ public class Blocks{
             inaccuracy = 2f;
             rotateSpeed = 10f;
             coolant = consumeCoolant(0.1f);
+            coolantMultiplier = 10f;
             researchCostMultiplier = 0.05f;
+            depositCooldown = 2.0f;
 
             limitRange(5f);
         }};
@@ -3405,6 +3411,7 @@ public class Blocks{
             shootSound = Sounds.shootScatter;
             coolant = consumeCoolant(0.2f);
             researchCostMultiplier = 0.05f;
+            depositCooldown = 0.5f;
 
             limitRange(2);
         }};
@@ -3451,6 +3458,7 @@ public class Blocks{
             health = 400;
             shootSound = Sounds.shootFlame;
             coolant = consumeCoolant(0.1f);
+            depositCooldown = 1.0f;
         }};
 
         hail = new ItemTurret("hail"){{
@@ -3514,6 +3522,8 @@ public class Blocks{
             health = 260;
             shootSound = Sounds.shootArtillerySmall;
             coolant = consumeCoolant(0.1f);
+            coolantMultiplier = 10f;
+            depositCooldown = 2.0f;
             limitRange(0f);
         }};
 
@@ -3578,6 +3588,7 @@ public class Blocks{
                 chargeEffect = new MultiEffect(Fx.lancerLaserCharge, Fx.lancerLaserChargeBegin);
 
                 buildingDamageMultiplier = 0.25f;
+                armorMultiplier = 4f;
                 hitEffect = Fx.hitLancer;
                 hitSize = 4;
                 lifetime = 16f;
@@ -3703,7 +3714,7 @@ public class Blocks{
             }};
 
             shootY = 4.5f;
-            reload = 30f;
+            reload = 60f * 4f / 7f;
             inaccuracy = 10f;
             range = 240f;
             consumeAmmoOnce = false;
@@ -3714,6 +3725,7 @@ public class Blocks{
 
             limitRange(5f);
             coolant = consumeCoolant(0.3f);
+            depositCooldown = 2.0f;
         }};
 
         salvo = new ItemTurret("salvo"){{
@@ -3815,6 +3827,7 @@ public class Blocks{
 
             limitRange();
             coolant = consumeCoolant(0.2f);
+            depositCooldown = 2.0f;
         }};
 
         segment = new PointDefenseTurret("segment"){{
@@ -3932,6 +3945,7 @@ public class Blocks{
                     shootEffect = smokeEffect = Fx.thoriumShoot;
                 }}
             );
+            depositCooldown = 1.0f;
         }};
 
         ripple = new ItemTurret("ripple"){{
@@ -4060,6 +4074,7 @@ public class Blocks{
             coolant = consumeCoolant(0.3f);
 
             scaledHealth = 130;
+            depositCooldown = 2.0f;
             shootSound = Sounds.shootRipple;
         }};
 
@@ -4165,7 +4180,7 @@ public class Blocks{
                 }
             }};
 
-            reload = 8f;
+            reload = 10f;
             range = 200f;
             size = 3;
             recoil = 1.5f;
@@ -4177,6 +4192,7 @@ public class Blocks{
             coolant = consumeCoolant(0.3f);
 
             scaledHealth = 145;
+            depositCooldown = 2.0f;
             limitRange();
         }};
 
@@ -4217,9 +4233,11 @@ public class Blocks{
             envEnabled |= Env.space;
 
             coolantMultiplier = 0.4f;
+            liquidCapacity = 60f;
             scaledHealth = 150;
 
             coolant = consumeCoolant(1f);
+            depositCooldown = 2.0f;
             consumePower(10f);
         }};
 
@@ -4272,6 +4290,7 @@ public class Blocks{
             reload = 7f;
             recoilTime = reload * 2f;
             coolantMultiplier = 0.5f;
+            liquidCapacity = 120f;
             ammoUseEffect = Fx.casing3;
             range = 260f;
             inaccuracy = 3f;
@@ -4285,6 +4304,7 @@ public class Blocks{
             scaledHealth = 160;
             coolant = consumeCoolant(1f);
 
+            depositCooldown = 2.0f;
             limitRange();
         }};
 
@@ -4319,6 +4339,7 @@ public class Blocks{
             }};
 
             scaledHealth = 200;
+            liquidCapacity = 60f;
             coolant = consumeCoolant(0.5f);
             consumePower(17f);
         }};
@@ -6194,7 +6215,7 @@ public class Blocks{
         }};
 
         airFactory = new UnitFactory("air-factory"){{
-            requirements(Category.units, with(Items.copper, 60, Items.lead, 70));
+            requirements(Category.units, with(Items.copper, 60, Items.lead, 70, Items.silicon, 60));
             plans = Seq.with(
                 new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 15)),
                 new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15))
@@ -6265,7 +6286,6 @@ public class Blocks{
             createSound = Sounds.unitCreateBig;
 
             constructTime = 60f * 60f * 1.5f;
-            liquidCapacity = 60f;
 
             upgrades.addAll(
                 new UnitType[]{UnitTypes.zenith, UnitTypes.antumbra},
@@ -6287,7 +6307,6 @@ public class Blocks{
             consumeLiquid(Liquids.cryofluid, 3f);
 
             constructTime = 60f * 60f * 4;
-            liquidCapacity = 180f;
             createSound = Sounds.unitCreateBig;
 
             upgrades.addAll(
@@ -6642,11 +6661,13 @@ public class Blocks{
         liquidSource = new LiquidSource("liquid-source"){{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
+            floating = true;
         }};
 
         liquidVoid = new LiquidVoid("liquid-void"){{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
+            floating = true;
         }};
 
         payloadSource = new PayloadSource("payload-source"){{
@@ -6813,7 +6834,7 @@ public class Blocks{
             size = 6;
         }};
 
-        logicDisplayTile = new TileableLogicDisplay("tile-logic-display"){{
+        tileLogicDisplay = new TileableLogicDisplay("tile-logic-display"){{
             requirements(Category.logic, with(Items.lead, 8, Items.silicon, 8, Items.metaglass, 8, Items.phaseFabric, 3));
         }};
 
