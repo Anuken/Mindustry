@@ -2120,6 +2120,7 @@ public class Blocks{
             speed = 74f;
             arrowSpacing = 6f;
             bufferCapacity = 14;
+            crushFragile = true;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
@@ -2231,6 +2232,7 @@ public class Blocks{
             speed = 4f;
             buildCostMultiplier = 2f;
             researchCostMultiplier = 0.3f;
+            crushFragile = true;
         }};
 
         ductUnloader = new DirectionalUnloader("duct-unloader"){{
