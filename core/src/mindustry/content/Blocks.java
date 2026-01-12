@@ -2489,6 +2489,7 @@ public class Blocks{
             maxNodes = 10;
             laserRange = 6;
             underBullets = true;
+            crushFragile = true;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{
@@ -2658,7 +2659,7 @@ public class Blocks{
             range = 10;
             fogRadius = 1;
             researchCost = with(Items.beryllium, 5);
-            buildCostMultiplier = 2.5f;
+            crushFragile = true;
 
             consumePowerBuffered(1000f);
         }};
