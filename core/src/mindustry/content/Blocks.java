@@ -2662,6 +2662,7 @@ public class Blocks{
             fogRadius = 1;
             researchCost = with(Items.beryllium, 5);
             crushFragile = true;
+            pierceable = true;
 
             consumePowerBuffered(1000f);
         }};
