@@ -2883,17 +2883,15 @@ public class UnitTypes{
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
+            tankMoveVolume *= 1.25f;
+            tankMoveSound = Sounds.tankMoveHeavy;
+
             abilities.add(new LastStandAbility(){{
                 speedMultiplier = 1.5f;
                 rotateSpeedMultiplier = 2.5f;
                 exponent = 1.5f;
                 minHealth = 0.3f;
             }});
-
-            weapons.add(new Weapon("vanquish-weapon"){{
-                shootSound = Sounds.mediumRailgun;
-            tankMoveVolume *= 1.25f;
-            tankMoveSound = Sounds.tankMoveHeavy;
 
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.shootTank;
