@@ -2723,6 +2723,7 @@ public class UnitTypes{
             itemCapacity = 0;
             floorMultiplier = 0.8f;
             treadRects = new Rect[]{new Rect(17 - 96f/2f, 10 - 96f/2f, 19, 76)};
+            crushFragile = true;
             researchCostMultiplier = 0f;
 
             tankMoveVolume *= 0.55f;
@@ -2807,6 +2808,7 @@ public class UnitTypes{
             drownTimeMultiplier = 1.2f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
+            crushFragile = true;
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("precept-weapon"){{
@@ -2879,6 +2881,7 @@ public class UnitTypes{
             floorMultiplier = 0.5f;
             drownTimeMultiplier = 1.25f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
+            crushFragile = true;
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
             tankMoveVolume *= 1.25f;
@@ -2984,6 +2987,7 @@ public class UnitTypes{
 
             tankMoveVolume *= 1.5f;
             tankMoveSound = Sounds.tankMoveHeavy;
+            crushFragile = true;
 
             float xo = 231f/2f, yo = 231f/2f;
             treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};
