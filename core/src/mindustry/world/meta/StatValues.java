@@ -723,9 +723,9 @@ public class StatValues{
                     }
 
                     // It is redundant to show the status effect if it can't be applied
-                    if(type.status != StatusEffects.none && type.statusChance > 0.001f){
+                    if(type.status != StatusEffects.none && type.statusChance > 0f){
                         sep(bt,
-                            (type.statusChance < 1f ? Core.bundle.format("bullet.statuschance", Strings.autoFixed(type.statusChance * 100f, 1)) : "") +
+                            (type.statusChance < 1f ? Core.bundle.format("stat.chance", Strings.autoFixed(type.statusChance * 100f, 4)) : "") +
                                 (type.status.hasEmoji() ? type.status.emoji() + " " : "") + "[stat]" + type.status.localizedName +
                                 (type.status.reactive ? "" : "[lightgray] ~ [stat]" + Strings.autoFixed(type.statusDuration / 60f, 1) + "[lightgray] " + Core.bundle.get("unit.seconds"))
                         ).with(c -> withTooltip(c, type.status));
