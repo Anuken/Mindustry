@@ -52,7 +52,7 @@ public class NetServer implements ApplicationListener{
         if(state.rules.pvp){
             //find team with minimum amount of players and auto-assign player to that.
             TeamData re = state.teams.getActive().min(data -> {
-                if((state.rules.waveTeam == data.team && state.rules.waves) || !data.hasCore() || data.team == Team.derelict) return Integer.MAX_VALUE;
+                if((state.rules.waveTeam == data.team && state.rules.waves) || !data.hasCore() || data.team == Team.derelict || !data.team.rules().protectCores) return Integer.MAX_VALUE;
 
                 int count = 0;
                 for(Player other : players){
@@ -170,7 +170,8 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.isIDBanned(uuid)){
+            //there's no reason to tell users that their name is inappropriate, as they may try to bypass it
+            if(admins.isIDBanned(uuid) || admins.isNameBanned(packet.name)){
                 con.kick(KickReason.banned);
                 return;
             }

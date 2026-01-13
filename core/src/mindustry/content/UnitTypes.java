@@ -176,7 +176,8 @@ public class UnitTypes{
                 bullet = new ArtilleryBulletType(2f, 20, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
-                    lifetime = 120f;
+                    lifetime = 120f - 35f / 2f;
+                    rangeOverride = 240f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
@@ -1676,7 +1677,7 @@ public class UnitTypes{
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.shootDuo;
                 bullet = new FlakBulletType(4.2f, 3){{
-                    lifetime = 60f;
+                    lifetime = 52.5f;
                     ammoMultiplier = 4f;
                     shootEffect = Fx.shootSmall;
                     width = 6f;
@@ -1700,7 +1701,7 @@ public class UnitTypes{
                 bullet = new ArtilleryBulletType(3f, 20, "shell"){{
                     hitEffect = Fx.flakExplosion;
                     knockback = 0.8f;
-                    lifetime = 80f;
+                    lifetime = 73.5f;
                     width = height = 11f;
                     collidesTiles = false;
                     splashDamageRadius = 30f * 0.75f;
@@ -2722,6 +2723,7 @@ public class UnitTypes{
             itemCapacity = 0;
             floorMultiplier = 0.8f;
             treadRects = new Rect[]{new Rect(17 - 96f/2f, 10 - 96f/2f, 19, 76)};
+            crushFragile = true;
             researchCostMultiplier = 0f;
 
             tankMoveVolume *= 0.55f;
@@ -2806,6 +2808,7 @@ public class UnitTypes{
             drownTimeMultiplier = 1.2f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
             treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
+            crushFragile = true;
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("precept-weapon"){{
@@ -2878,6 +2881,7 @@ public class UnitTypes{
             floorMultiplier = 0.5f;
             drownTimeMultiplier = 1.25f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
+            crushFragile = true;
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
             tankMoveVolume *= 1.25f;
@@ -2983,6 +2987,7 @@ public class UnitTypes{
 
             tankMoveVolume *= 1.5f;
             tankMoveSound = Sounds.tankMoveHeavy;
+            crushFragile = true;
 
             float xo = 231f/2f, yo = 231f/2f;
             treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};

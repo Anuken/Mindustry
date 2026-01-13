@@ -282,7 +282,7 @@ public class LogicDialog extends BaseDialog{
 
                     search.keyDown(KeyCode.enter, () -> {
                         if(!searchText[0].isEmpty() && matched[0] != null){
-                            canvas.add((LStatement)matched[0].get());
+                            canvas.addAt(position == -1 ? canvas.statements.getChildren().size : position, (LStatement)matched[0].get());
                             dialog.hide();
                         }
                     });

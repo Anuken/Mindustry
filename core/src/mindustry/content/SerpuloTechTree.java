@@ -175,7 +175,7 @@ public class SerpuloTechTree{
 
                                         });
 
-                                        node(logicDisplayTile, () -> {
+                                        node(tileLogicDisplay, () -> {
 
                                         });
                                     });
@@ -521,29 +521,7 @@ public class SerpuloTechTree{
                                                 new Research(exponentialReconstructor),
                                                 new Research(tetrativeReconstructor)
                                                 ), () -> {
-                                                    node(geothermalStronghold, Seq.with(
-                                                    new Research(omura),
-                                                    new Research(navanax),
-                                                    new Research(eclipse),
-                                                    new Research(oct),
-                                                    new Research(reign),
-                                                    new Research(corvus),
-                                                    new Research(toxopid)
-                                                    ), () -> {
 
-                                                    });
-
-                                                    node(cruxscape, Seq.with(
-                                                    new Research(omura),
-                                                    new Research(navanax),
-                                                    new Research(eclipse),
-                                                    new Research(oct),
-                                                    new Research(reign),
-                                                    new Research(corvus),
-                                                    new Research(toxopid)
-                                                    ), () -> {
-
-                                                    });
                                                 });
                                             });
                                         });
@@ -593,7 +571,15 @@ public class SerpuloTechTree{
                                             new Research(surgeSmelter),
                                             new Research(overdriveProjector)
                                             ), () -> {
+                                                node(fallenVessel, Seq.with(
+                                                new SectorComplete(desolateRift),
+                                                new SectorComplete(mycelialBastion),
+                                                new Research(sei),
+                                                new Research(meltdown),
+                                                new Research(spectre)
+                                                ), () -> {
 
+                                                });
                                             });
                                         });
                                     });
@@ -667,7 +653,7 @@ public class SerpuloTechTree{
                                 new Research(mace),
                                 new Research(mono)
                                 ), () -> {
-                                    node(seaPort, Seq.with(
+                                    node(perilousHarbor, Seq.with(
                                     new SectorComplete(biomassFacility),
                                     new SectorComplete(frontier),
                                     new Research(navalFactory),
@@ -680,7 +666,7 @@ public class SerpuloTechTree{
 
                                         node(extractionOutpost, Seq.with(
                                         new SectorComplete(windsweptIslands),
-                                        new SectorComplete(seaPort),
+                                        new SectorComplete(perilousHarbor),
                                         new SectorComplete(facility32m),
                                         new Research(groundFactory),
                                         new Research(nova),

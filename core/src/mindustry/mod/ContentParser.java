@@ -119,7 +119,15 @@ public class ContentParser{
             }
             return result;
         });
-        put(Color.class, (type, data) -> Color.valueOf(data.asString()));
+        put(Color.class, (type, data) -> {
+            if(data.isNumber()){
+                int len =  data.asString().length();
+                if(len != 6 && len != 8){
+                    warn("@Colors should strings, not numbers. Make sure you have quotes around the value, or they will not be parsed correctly: '@'", currentContent == null ? "" : "[" + currentContent.minfo.sourceFile.name() + "]: ", data);
+                }
+            }
+            return Color.valueOf(data.asString());
+        });
         put(StatusEffect.class, (type, data) -> {
             if(data.isString()){
                 StatusEffect result = locate(ContentType.status, data.asString());
@@ -395,11 +403,20 @@ public class ContentParser{
         }
 
         @Override
+        protected Object newInstance(Class type){
+            Object o = super.newInstance(type);
+            onNewInstance(o, type);
+            return o;
+        }
+
+        @Override
         public <T> T readValue(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
             T t = internalRead(type, elementType, jsonData, keyType);
             if(t != null && !Reflect.isWrapper(t.getClass()) && (type == null || !type.isPrimitive())){
                 checkNullFields(t);
-                listeners.each(hook -> hook.parsed(type, jsonData, t));
+                if(jsonData.isObject()){
+                    listeners.each(hook -> hook.parsed(type, jsonData, t));
+                }
             }
             return t;
         }
@@ -1344,6 +1361,8 @@ public class ContentParser{
     void warn(String string, Object... format){
         Log.warn(string, format);
     }
+
+    void onNewInstance(Object object, Class<?> type){}
 
     public Json getJson(){
         checkInit();
