@@ -89,10 +89,10 @@ public class LAssembler{
         //parse hex/binary syntax
         if(symbol.startsWith("0b")) return parseLong(false, symbol, 2, 2, symbol.length());
         if(symbol.startsWith("+0b")) return parseLong(false, symbol, 2, 3, symbol.length());
-        if(symbol.startsWith("-0b")) return parseLong(true,symbol,  2, 3, symbol.length());
-        if(symbol.startsWith("0x")) return parseLong(false,symbol,  16, 2, symbol.length());
-        if(symbol.startsWith("+0x")) return parseLong(false,symbol,  16, 3, symbol.length());
-        if(symbol.startsWith("-0x")) return parseLong(true,symbol,  16, 3, symbol.length());
+        if(symbol.startsWith("-0b")) return parseLong(true, symbol, 2, 3, symbol.length());
+        if(symbol.startsWith("0x")) return parseLong(false, symbol, 16, 2, symbol.length());
+        if(symbol.startsWith("+0x")) return parseLong(false, symbol, 16, 3, symbol.length());
+        if(symbol.startsWith("-0x")) return parseLong(true, symbol, 16, 3, symbol.length());
         if(symbol.startsWith("%[") && symbol.endsWith("]") && symbol.length() > 3) return parseNamedColor(symbol);
         if(symbol.startsWith("%") && (symbol.length() == 7 || symbol.length() == 9)) return parseColor(symbol);
 
