@@ -2332,6 +2332,8 @@ public class Blocks{
         conduit = new Conduit("conduit"){{
             requirements(Category.liquid, with(Items.metaglass, 1));
             liquidCapacity = 20f;
+            liquidFlowRate = 2f;
+            bidirectional = true;
             health = 45;
             explosivenessScale = flammabilityScale = 10f/20f;
         }};
@@ -2339,7 +2341,8 @@ public class Blocks{
         pulseConduit = new Conduit("pulse-conduit"){{
             requirements(Category.liquid, with(Items.titanium, 2, Items.metaglass, 1));
             liquidCapacity = 40f;
-            liquidPressure = 1.025f;
+            liquidFlowRate = 4f;
+            bidirectional = false;
             health = 90;
             explosivenessScale = flammabilityScale = 16f/40f;
         }};
@@ -2347,7 +2350,8 @@ public class Blocks{
         platedConduit = new ArmoredConduit("plated-conduit"){{
             requirements(Category.liquid, with(Items.thorium, 2, Items.metaglass, 1, Items.plastanium, 1));
             liquidCapacity = 50f;
-            liquidPressure = 1.025f;
+            liquidFlowRate = 3.5f;
+            bidirectional = true;
             health = 220;
             explosivenessScale = flammabilityScale = 16f/50f;
         }};
@@ -2422,7 +2426,8 @@ public class Blocks{
             botColor = Pal.darkestMetal;
             leaks = true;
             liquidCapacity = 50f;
-            liquidPressure = 1.03f;
+            liquidFlowRate = 3.5f;
+            bidirectional = true;
             health = 250;
             researchCostMultiplier = 3;
             underBullets = true;

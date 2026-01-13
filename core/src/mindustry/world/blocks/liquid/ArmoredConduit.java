@@ -21,7 +21,11 @@ public class ArmoredConduit extends Conduit{
     public class ArmoredConduitBuild extends ConduitBuild{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
-            //TODO the proximity check is a super hacky solution for block-to-conduit through a junction...
+            // If bidirectional, accept from any direction (let parent handle it)
+            if(bidirectional){
+                return super.acceptLiquid(source, liquid);
+            }
+            // If unidirectional, only accept from front or from conduits/bridges/junctions
             return super.acceptLiquid(source, liquid) && (tile == null || source.block instanceof Conduit || source.block instanceof DirectionLiquidBridge || source.block instanceof LiquidJunction ||
                 source.tile.absoluteRelativeTo(tile.x, tile.y) == rotation || !source.proximity.contains(this));
         }

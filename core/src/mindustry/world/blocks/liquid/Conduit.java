@@ -41,6 +41,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
     /** If true, the liquid region is padded at corners, so it doesn't stick out. */
     public boolean padCorners = true;
     public boolean leaks = true;
+    /** If true, this conduit can flow in both directions based on demand. */
+    public boolean bidirectional = false;
     public @Nullable Block junctionReplacement, bridgeReplacement, rotBridgeReplacement;
 
     public Conduit(String name){
@@ -222,8 +224,15 @@ public class Conduit extends LiquidBlock implements Autotiler{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
             noSleep();
-            return (liquids.current() == liquid || liquids.currentAmount() < 0.2f)
-                && (tile == null || source == this || (source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation);
+            boolean liquidCompatible = (liquids.current() == liquid || liquids.currentAmount() < 0.2f);
+
+            if(bidirectional){
+                // Accept from any direction when bidirectional
+                return liquidCompatible;
+            }else{
+                // Only accept from rear when unidirectional
+                return liquidCompatible && (tile == null || source == this || (source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation);
+            }
         }
 
         @Override
@@ -231,7 +240,19 @@ public class Conduit extends LiquidBlock implements Autotiler{
             smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
 
             if(liquids.currentAmount() > 0.0001f && timer(timerFlow, 1)){
-                moveLiquidForward(leaks, liquids.current());
+                if(bidirectional){
+                    if(leaks){
+                        Tile next = tile.nearby(rotation);
+                        if(next != null && next.build == null && !next.block().solid && !next.block().hasLiquids){
+                            float leakAmount = liquids.get(liquids.current()) / 1.5f;
+                            Puddles.deposit(next, tile, liquids.current(), leakAmount, true, true);
+                            liquids.remove(liquids.current(), leakAmount);
+                        }
+                    }
+                    dumpLiquid(liquids.current());
+                }else{
+                    moveLiquidForward(leaks, liquids.current());
+                }
                 noSleep();
             }else{
                 sleep();

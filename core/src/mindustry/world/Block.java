@@ -74,8 +74,11 @@ public class Block extends UnlockableContent implements Senseable{
     public int itemCapacity = 10;
     /** maximum total liquids this block can carry if hasLiquids = true. Default value is 10, scales with max liquid consumption in ConsumeLiquid */
     public float liquidCapacity = -1f;
-    /** higher numbers increase liquid output speed; TODO remove and replace with better liquids system */
+    /** Deprecated: No longer used. Flow rates are now controlled by liquidFlowRate instead. Kept for mod compatibility. */
+    @Deprecated
     public float liquidPressure = 1f;
+    /** Maximum liquid flow rate per frame for this block. -1 means unlimited. */
+    public float liquidFlowRate = -1f;
     /** If true, this block outputs to its facing direction, when applicable.
      * Used for blending calculations. */
     public boolean outputFacing = true;

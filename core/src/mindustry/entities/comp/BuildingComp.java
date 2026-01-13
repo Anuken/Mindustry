@@ -81,6 +81,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Nullable PowerModule power;
     @Nullable ItemModule items;
     @Nullable LiquidModule liquids;
+    @Nullable transient mindustry.world.blocks.liquid.LiquidNetwork liquidGraph;
 
     /** Base efficiency. Takes the minimum value of all consumers. */
     transient float efficiency;
@@ -113,6 +114,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 //reinit power graph
                 new PowerGraph().add(self());
             }
+            if(block.hasLiquids){
+                //reinit liquid graph
+                liquidGraph = new mindustry.world.blocks.liquid.LiquidNetwork();
+                liquidGraph.add(self());
+            }
         }
         proximity.clear();
         this.rotation = rotation;
@@ -140,7 +146,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         timer(new Interval(block.timers));
 
         if(block.hasItems) items = new ItemModule();
-        if(block.hasLiquids) liquids = new LiquidModule();
+        if(block.hasLiquids){
+            liquids = new LiquidModule();
+            liquidGraph = new mindustry.world.blocks.liquid.LiquidNetwork();
+            liquidGraph.add(self());
+        }
         if(block.hasPower){
             power = new PowerModule();
             power.graph.add(self());
@@ -906,6 +916,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void transferLiquid(Building next, float amount, Liquid liquid){
         float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid), amount);
 
+        // Apply flow rate caps
+        if(block.liquidFlowRate > 0) flow = Math.min(flow, block.liquidFlowRate);
+        if(next.block.liquidFlowRate > 0) flow = Math.min(flow, next.block.liquidFlowRate);
+
         if(next.acceptLiquid(self(), liquid)){
             next.handleLiquid(self(), liquid, flow);
             liquids.remove(liquid, flow);
@@ -934,11 +948,22 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(next.team == team && next.block.hasLiquids && liquids.get(liquid) > 0f){
             float ofract = next.liquids.get(liquid) / next.block.liquidCapacity;
-            float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
-            float flow = Math.min(Mathf.clamp((fract - ofract)) * (block.liquidCapacity), liquids.get(liquid));
-            flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid));
+            float fract = liquids.get(liquid) / block.liquidCapacity;
 
-            if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid)){
+            // Calculate maximum flow based on available liquid and space
+            float flow = Math.min(liquids.get(liquid), next.block.liquidCapacity - next.liquids.get(liquid));
+
+            // For percentage-based balancing: reduce flow based on fill difference
+            // This makes liquid naturally flow from higher % to lower %
+            if(fract > ofract){
+                flow = Math.min(flow, (fract - ofract) * block.liquidCapacity);
+            }
+
+            // Apply flow rate caps
+            if(block.liquidFlowRate > 0) flow = Math.min(flow, block.liquidFlowRate);
+            if(next.block.liquidFlowRate > 0) flow = Math.min(flow, next.block.liquidFlowRate);
+
+            if(flow > 0f && next.acceptLiquid(self(), liquid)){
                 next.handleLiquid(self(), liquid, flow);
                 liquids.remove(liquid, flow);
                 return flow;
@@ -1132,6 +1157,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(power != null){
             powerGraphRemoved();
         }
+        if(liquids != null && liquidGraph != null){
+            liquidGraphRemoved();
+        }
     }
 
     /** Called after this building is created in the world. May be called multiple times, or when adjacent buildings change. */
@@ -1139,6 +1167,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void onProximityAdded(){
         if(power != null){
             updatePowerGraph();
+        }
+        if(liquids != null && liquidGraph != null){
+            updateLiquidGraph();
         }
     }
 
@@ -1155,6 +1186,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    public void updateLiquidGraph(){
+        for(Building other : getLiquidConnections(tempBuilds)){
+            if(other.liquidGraph != null){
+                other.liquidGraph.addGraph(liquidGraph);
+            }
+        }
+    }
+
     public void powerGraphRemoved(){
         if(power == null) return;
 
@@ -1166,6 +1205,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
         power.links.clear();
+    }
+
+    public void liquidGraphRemoved(){
+        if(liquidGraph == null) return;
+        liquidGraph.remove(self());
     }
 
     public boolean conductsTo(Building other){
@@ -1190,6 +1234,27 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             if(link != null && link.build != null && link.build.power != null && link.build.team == team) out.add(link.build);
         }
         return out;
+    }
+
+    public Seq<Building> getLiquidConnections(Seq<Building> out){
+        out.clear();
+        if(liquids == null) return out;
+
+        for(Building other : proximity){
+            if(other != null && other.liquids != null && other.team == team
+            && (block.hasLiquids && other.block.hasLiquids)
+            && liquidsConnectTo(other) && other.liquidsConnectTo(self())){
+                out.add(other);
+            }
+        }
+        return out;
+    }
+
+    public boolean liquidsConnectTo(Building other){
+        // Bridges don't connect to the network
+        if(block instanceof mindustry.world.blocks.liquid.LiquidBridge) return false;
+        if(other.block instanceof mindustry.world.blocks.liquid.LiquidBridge) return false;
+        return block.hasLiquids && other.block.hasLiquids;
     }
 
     public float getProgressIncrease(float baseTime){
