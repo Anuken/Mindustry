@@ -65,7 +65,7 @@ public class Blocks{
     //new metal floors
     metalTiles1, metalTiles2, metalTiles3, metalTiles4, metalTiles5, metalTiles6, metalTiles7, metalTiles8, metalTiles9, metalTiles10, metalTiles11, metalTiles12, metalTiles13,
     //new metal walls
-    metalWall1, metalWall2, metalWall3, metalWall4,
+    metalWall1, metalWall2, metalWall3,
 
     //colored
     coloredFloor, coloredWall,
@@ -81,7 +81,7 @@ public class Blocks{
     oreBeryllium, oreTungsten, oreCrystalThorium, wallOreThorium,
 
     //wall ores
-    wallOreBeryllium, graphiticWall, wallOreTungsten,
+    wallOreBeryllium, graphiticWall, wallOreGraphite, wallOreTungsten,
 
     //crafting
     siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -1024,7 +1024,10 @@ public class Blocks{
             variants = 3;
         }};
 
-        //TODO merge with standard ore?
+        wallOreGraphite = new OreBlock("ore-wall-graphite", Items.graphite){{
+            wallOre = true;
+        }};
+
         wallOreTungsten = new OreBlock("ore-wall-tungsten", Items.tungsten){{
             wallOre = true;
         }};
@@ -1412,9 +1415,9 @@ public class Blocks{
             ambientSound = Sounds.loopExtract;
             ambientSoundVolume = 0.06f;
 
-            heatRequirement = 6f;
-
-            outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
+            maxEfficiency = 1f;
+            heatRequirement = 24f;
+            outputLiquid = new LiquidStack(Liquids.nitrogen, 16f / 60f);
 
             researchCost = with(Items.silicon, 2000, Items.oxide, 900, Items.beryllium, 2400);
         }};
@@ -1531,7 +1534,7 @@ public class Blocks{
             requirements(Category.crafting, with(Items.tungsten, 110, Items.thorium, 150, Items.oxide, 60));
             craftEffect = Fx.none;
             outputItem = new ItemStack(Items.carbide, 1);
-            craftTime = 60f * 2.25f;
+            craftTime = 60f * 2.25f/4f;
             size = 3;
             itemCapacity = 20;
             hasPower = hasItems = true;
@@ -1539,7 +1542,8 @@ public class Blocks{
             ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.09f;
 
-            heatRequirement = 10f;
+            heatRequirement = 40f;
+            maxEfficiency = 1f;
 
             consumeItems(with(Items.tungsten, 2, Items.graphite, 3));
             consumePower(2f);
@@ -1582,8 +1586,9 @@ public class Blocks{
             size = 3;
 
             itemCapacity = 20;
-            heatRequirement = 10f;
-            craftTime = 60f * 3f;
+            heatRequirement = 40f;
+            maxEfficiency = 1f;
+            craftTime = 60f * 3f/4f;
             liquidCapacity = 80f * 5;
 
             ambientSound = Sounds.loopSmelter;
@@ -1607,14 +1612,15 @@ public class Blocks{
             }});
 
             consumeItem(Items.silicon, 3);
-            consumeLiquid(Liquids.slag, 40f / 60f);
+            consumeLiquid(Liquids.slag, 160f / 60f);
             consumePower(1.5f);
         }};
 
         cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
             requirements(Category.crafting, with(Items.carbide, 50, Items.silicon, 80, Items.beryllium, 90));
 
-            heatRequirement = 5f;
+            heatRequirement = 20f;
+            maxEfficiency = 1f;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.cyanogen),
             new DrawParticles(){{
@@ -1634,9 +1640,9 @@ public class Blocks{
             ambientSoundVolume = 0.08f;
 
             liquidCapacity = 80f;
-            outputLiquid = new LiquidStack(Liquids.cyanogen, 3f / 60f);
+            outputLiquid = new LiquidStack(Liquids.cyanogen, 12f / 60f);
 
-            consumeLiquid(Liquids.arkycite, 40f / 60f);
+            consumeLiquid(Liquids.arkycite, 160f / 60f);
             consumeItem(Items.graphite);
             consumePower(2f);
         }};
@@ -1647,8 +1653,9 @@ public class Blocks{
             size = 3;
 
             itemCapacity = 40;
-            heatRequirement = 8f;
-            craftTime = 60f * 2f;
+            heatRequirement = 32f;
+            maxEfficiency = 1f;
+            craftTime = 60f * 2f / 4f;
             liquidCapacity = 10f * 4;
 
             ambientSound = Sounds.loopTech;
@@ -1670,7 +1677,7 @@ public class Blocks{
             }});
 
             consumeItems(with(Items.thorium, 2, Items.sand, 6));
-            consumeLiquid(Liquids.ozone, 2f / 60f);
+            consumeLiquid(Liquids.ozone, 8f / 60f);
             consumePower(8f);
         }};
 
@@ -2113,6 +2120,7 @@ public class Blocks{
             speed = 74f;
             arrowSpacing = 6f;
             bufferCapacity = 14;
+            crushFragile = true;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
@@ -2224,6 +2232,7 @@ public class Blocks{
             speed = 4f;
             buildCostMultiplier = 2f;
             researchCostMultiplier = 0.3f;
+            crushFragile = true;
         }};
 
         ductUnloader = new DirectionalUnloader("duct-unloader"){{
@@ -2482,6 +2491,7 @@ public class Blocks{
             maxNodes = 10;
             laserRange = 6;
             underBullets = true;
+            crushFragile = true;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{
@@ -2651,7 +2661,7 @@ public class Blocks{
             range = 10;
             fogRadius = 1;
             researchCost = with(Items.beryllium, 5);
-            buildCostMultiplier = 2.5f;
+            crushFragile = true;
 
             consumePowerBuffered(1000f);
         }};
@@ -5094,8 +5104,8 @@ public class Blocks{
             }};
 
             consumePower(5f);
-            heatRequirement = 10f;
-            maxHeatEfficiency = 2f;
+            heatRequirement = 20f;
+            maxHeatEfficiency = 1f;
 
             newTargetInterval = 40f;
 
@@ -5105,8 +5115,8 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             size = 4;
             envEnabled |= Env.space;
-            reload = 100f;
-            cooldownTime = reload;
+            reload = 50f;
+            cooldownTime = 100f;
             recoil = 3f;
             range = 368;
             shootCone = 20f;
@@ -6171,8 +6181,8 @@ public class Blocks{
             }};
 
             velocityRnd = 0.15f;
-            heatRequirement = 72f;
-            maxHeatEfficiency = 2f;
+            heatRequirement = 144f;
+            maxHeatEfficiency = 1f;
             warmupMaintainTime = 120f;
             consumePower(40f);
             unitSort = UnitSorts.strongest;
@@ -6185,7 +6195,7 @@ public class Blocks{
 
             outlineColor = Pal.darkOutline;
             envEnabled |= Env.space;
-            reload = 7f;
+            reload = 3.5f;
             range = 410;
             trackingRange = range * 1.4f;
             shootCone = 100f;
