@@ -62,6 +62,10 @@ public class DataPatcher{
         return cont;
     }
 
+    public boolean isPatched(Object object){
+        return usedpatches.contains(object);
+    }
+
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
     public void apply(Seq<String> patchArray) throws Exception{
         if(applied){
