@@ -43,7 +43,7 @@ public class SerpuloTechTree{
                         node(itemBridge, () -> {
                             node(titaniumConveyor, Seq.with(new SectorComplete(craters)), () -> {
                                 node(phaseConveyor, () -> {
-                                    node(massDriver, () -> {
+                                    node(massDriver, Seq.with(new SectorComplete(tarFields)), () -> {
 
                                     });
                                 });
@@ -139,7 +139,7 @@ public class SerpuloTechTree{
                             });
 
                             node(plastaniumCompressor, Seq.with(new SectorComplete(windsweptIslands)), () -> {
-                                node(phaseWeaver, Seq.with(new SectorComplete(tarFields)), () -> {
+                                node(phaseWeaver, Seq.with(new SectorComplete(impact0078)), () -> {
 
                                 });
                             });
@@ -149,7 +149,7 @@ public class SerpuloTechTree{
                             node(pulverizer, () -> {
                                 node(incinerator, () -> {
                                     node(melter, () -> {
-                                        node(surgeSmelter, () -> {
+                                        node(surgeSmelter, Seq.with(new SectorComplete(coastline)), () -> {
 
                                         });
 
@@ -222,7 +222,7 @@ public class SerpuloTechTree{
                             node(mendProjector, () -> {
                                 node(forceProjector, Seq.with(new SectorComplete(impact0078)), () -> {
                                     node(overdriveProjector, Seq.with(new SectorComplete(impact0078)), () -> {
-                                        node(overdriveDome, Seq.with(new SectorComplete(impact0078)), () -> {
+                                        node(overdriveDome, Seq.with(new SectorComplete(desolateRift)), () -> {
 
                                         });
                                     });
@@ -326,7 +326,7 @@ public class SerpuloTechTree{
                                 });
                             });
 
-                            node(tsunami, () -> {
+                            node(tsunami, Seq.with(new SectorComplete(navalFortress)), () -> {
 
                             });
                         });
@@ -439,8 +439,8 @@ public class SerpuloTechTree{
 
                 node(additiveReconstructor, Seq.with(new SectorComplete(fungalPass)), () -> {
                     node(multiplicativeReconstructor, Seq.with(new SectorComplete(frontier)), () -> {
-                        node(exponentialReconstructor, () -> {
-                            node(tetrativeReconstructor, () -> {
+                        node(exponentialReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
+                            node(tetrativeReconstructor, Seq.with(new SectorComplete(mycelialBastion)), () -> {
 
                             });
                         });
@@ -533,7 +533,6 @@ public class SerpuloTechTree{
                                     new Research(navalFactory),
                                     new Research(payloadConveyor)
                                     ), () -> {
-
 
                                         node(testingGrounds, Seq.with(
                                         new SectorComplete(coastline),
