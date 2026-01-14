@@ -668,14 +668,15 @@ public class SerpuloTechTree{
                                         new SectorComplete(windsweptIslands),
                                         new SectorComplete(perilousHarbor),
                                         new SectorComplete(facility32m),
-                                        new Research(groundFactory),
-                                        new Research(nova),
-                                        new Research(airFactory),
-                                        new Research(mono)
+
+                                        new Research(multiplicativeReconstructor),
+                                        new Research(risso),
+                                        new Research(minke),
+                                        new Research(fortress)
                                         ), () -> {
                                             node(atolls, Seq.with(
                                             new SectorComplete(extractionOutpost),
-                                            new Research(multiplicativeReconstructor),
+                                            new Research(poly),
                                             new Research(mega)
                                             ), () -> {
 
