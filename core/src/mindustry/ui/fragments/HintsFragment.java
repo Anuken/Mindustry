@@ -167,48 +167,143 @@ public class HintsFragment{
 
     public enum DefaultHint implements Hint{
         desktopMove(visibleDesktop, () -> Core.input.axis(Binding.moveX) != 0 || Core.input.axis(Binding.moveY) != 0),
+
         zoom(visibleDesktop, () -> Core.input.axis(KeyCode.scroll) != 0),
-        breaking(() -> isTutorial.get() && state.rules.defaultTeam.data().getCount(Blocks.conveyor) > 5, () -> ui.hints.events.contains("break")),
-        desktopShoot(visibleDesktop, () -> isSerpulo() && Vars.state.enemies > 0, () -> player.shooting),
-        depositItems(() -> !player.dead() && player.unit().hasItem(), () -> !player.dead() && !player.unit().hasItem()),
-        desktopPause(visibleDesktop, () -> isTutorial.get() && !Vars.net.active() && state.wave >= 2, () -> Core.input.keyTap(Binding.pause)),
-        unitControl(() -> isSerpulo() && state.rules.defaultTeam.data().units.size > 2 && !net.active() && !player.dead(), () -> !player.dead() && !player.unit().spawnedByCore),
-        unitSelectControl(() -> isSerpulo() && state.rules.defaultTeam.data().units.size > 3 && !net.active() && !player.dead(),
-            () -> control.input.commandMode && control.input.selectedUnits.size > 0 && control.input.selectedUnits.first().controller() instanceof CommandAI ai && ai.targetPos != null),
-        respawn(visibleMobile, () -> !player.dead() && !player.unit().spawnedByCore, () -> !player.dead() && player.unit().spawnedByCore),
-        launch(() -> (isTutorial.get() || Vars.state.rules.sector == SectorPresets.onset.sector) && state.rules.sector.isCaptured(), () -> ui.planet.isShown()),
-        schematicSelect(visibleDesktop, () -> ui.hints.placedBlocks.contains(Blocks.router) || ui.hints.placedBlocks.contains(Blocks.ductRouter), () -> Core.input.keyRelease(Binding.schematicSelect) || Core.input.keyTap(Binding.pick)),
-        conveyorPathfind(() -> control.input.block == Blocks.titaniumConveyor, () -> Core.input.keyRelease(Binding.diagonalPlacement) || (mobile && Core.settings.getBool("swapdiagonal"))),
-        boost(visibleDesktop, () -> !player.dead() && player.unit().type.canBoost, () -> Core.input.keyDown(Binding.boost)),
-        blockInfo(() -> control.input.block == Blocks.graphitePress, () -> ui.content.isShown()),
-        derelict(() -> ui.hints.events.contains("derelictmouse") && !isTutorial.get(), () -> ui.hints.events.contains("derelictbreak")),
-        payloadPickup(() -> isSerpulo() && !player.dead() && player.unit() instanceof Payloadc p && p.payloads().isEmpty(), () -> player.unit() instanceof Payloadc p && p.payloads().any()),
-        payloadDrop(() -> !player.dead() && player.unit() instanceof Payloadc p && p.payloads().any(), () -> player.unit() instanceof Payloadc p && p.payloads().isEmpty()),
-        waveFire(() -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(), () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0),
-        generator(() -> control.input.block == Blocks.combustionGenerator, () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)),
-        rebuildSelect(() -> state.rules.defaultTeam.data().plans.size >= 10, () -> control.input.isRebuildSelecting()),
-        guardian(() -> state.boss() != null && isSerpulo() && state.boss().armor >= 4, () -> state.boss() == null),
-        cannotUpgrade(() -> ui.hints.events.contains("cannotupgrade"), () -> false),
+
+        breaking(
+            () -> isTutorial.get() && state.rules.defaultTeam.data().getCount(Blocks.conveyor) > 5,
+            () -> ui.hints.events.contains("break")
+        ),
+
+        desktopShoot(visibleDesktop,
+            () -> isSerpulo() && Vars.state.enemies > 0,
+            () -> player.shooting
+        ),
+
+        depositItems(
+            () -> !player.dead() && player.unit().hasItem(),
+            () -> !player.dead() && !player.unit().hasItem()
+        ),
+
+        desktopPause(visibleDesktop,
+            () -> isTutorial.get() && !Vars.net.active() && state.wave >= 2,
+            () -> Core.input.keyTap(Binding.pause)
+        ),
+
+        unitControl(
+            () -> isSerpulo() && state.rules.defaultTeam.data().units.size > 2 && !net.active() && !player.dead(),
+            () -> !player.dead() && !player.unit().spawnedByCore
+        ),
+
+        unitSelectControl(
+            //if the player is on fungal pass or has *ever* played fungal pass, don't show this hint, it's redundant.
+            //in general, this should only be necessary if the player is doing a custom game or sequence-broke somehow
+            () -> isSerpulo() && state.rules.defaultTeam.data().units.size > 3 && !net.active() && !player.dead() && state.getSector() != SectorPresets.fungalPass.sector && SectorPresets.fungalPass.sector.save == null,
+            () -> control.input.commandMode && control.input.selectedUnits.size > 0 && control.input.selectedUnits.first().controller() instanceof CommandAI ai && ai.targetPos != null
+        ),
+
+        respawn(visibleMobile,
+            () -> !player.dead() && !player.unit().spawnedByCore,
+            () -> !player.dead() && player.unit().spawnedByCore
+        ),
+
+        launch(
+            () -> (isTutorial.get() || Vars.state.rules.sector == SectorPresets.onset.sector) && state.rules.sector.isCaptured(),
+            () -> ui.planet.isShown()
+        ),
+
+        schematicSelect(visibleDesktop,
+            () -> ui.hints.placedBlocks.contains(Blocks.router) || ui.hints.placedBlocks.contains(Blocks.ductRouter),
+            () -> Core.input.keyRelease(Binding.schematicSelect) || Core.input.keyTap(Binding.pick)
+        ),
+
+        conveyorPathfind(
+            () -> control.input.block == Blocks.titaniumConveyor,
+            () -> Core.input.keyRelease(Binding.diagonalPlacement) || (mobile && Core.settings.getBool("swapdiagonal"))
+        ),
+
+        boost(visibleDesktop,
+            () -> !player.dead() && player.unit().type.canBoost,
+            () -> Core.input.keyDown(Binding.boost)
+        ),
+
+        blockInfo(
+            () -> control.input.block == Blocks.graphitePress,
+            () -> ui.content.isShown()
+        ),
+
+        derelict(
+            () -> ui.hints.events.contains("derelictmouse") && !isTutorial.get(),
+            () -> ui.hints.events.contains("derelictbreak")
+        ),
+
+        payloadPickup(
+            () -> isSerpulo() && !player.dead() && player.unit() instanceof Payloadc p && p.payloads().isEmpty(),
+            () -> player.unit() instanceof Payloadc p && p.payloads().any()
+        ),
+
+        payloadDrop(
+            () -> !player.dead() && player.unit() instanceof Payloadc p && p.payloads().any(),
+            () -> player.unit() instanceof Payloadc p && p.payloads().isEmpty()
+        ),
+
+        waveFire(
+            () -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(),
+            () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0
+        ),
+
+        generator(
+            () -> control.input.block == Blocks.combustionGenerator,
+            () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)
+        ),
+
+        rebuildSelect(
+            () -> state.rules.defaultTeam.data().plans.size >= 10,
+            () -> control.input.isRebuildSelecting()
+        ),
+
+        guardian(
+            () -> state.boss() != null && isSerpulo() && state.boss().armor >= 4,
+            () -> state.boss() == null
+        ),
+
+        cannotUpgrade(
+            () -> ui.hints.events.contains("cannotupgrade"),
+            () -> false
+        ),
+
         factoryControl(() -> !(state.isCampaign() && state.rules.sector.preset == SectorPresets.onset) &&
-            state.rules.defaultTeam.data().getBuildings(Blocks.tankFabricator).size + state.rules.defaultTeam.data().getBuildings(Blocks.groundFactory).size > 0, () -> ui.hints.events.contains("factorycontrol")),
+            state.rules.defaultTeam.data().getBuildings(Blocks.tankFabricator).size + state.rules.defaultTeam.data().getBuildings(Blocks.groundFactory).size > 0,
+            () -> ui.hints.events.contains("factorycontrol")
+        ),
+
         coreUpgrade(() -> state.isCampaign() && state.rules.sector.planet == Planets.serpulo && Blocks.coreFoundation.unlocked()
             && state.rules.defaultTeam.core() != null
             && state.rules.defaultTeam.core().block == Blocks.coreShard
             && state.rules.defaultTeam.core().items.has(Blocks.coreFoundation.requirements),
             () -> ui.hints.placedBlocks.contains(Blocks.coreFoundation)),
-        serpuloCoreZone(() -> state.isCampaign() && state.getPlanet() == Planets.serpulo && Vars.indexer.isBlockPresent(Blocks.coreZone) &&
-            (!state.rules.attackMode || state.stats.getDestroyed(Blocks.coreShard) + state.stats.getDestroyed(Blocks.coreFoundation) + state.stats.getDestroyed(Blocks.coreNucleus) > 0),
+
+        serpuloCoreZone(
+            () -> state.isCampaign() && state.getPlanet() == Planets.serpulo && Vars.indexer.isBlockPresent(Blocks.coreZone) &&
+                (!state.rules.attackMode || state.stats.getDestroyed(Blocks.coreShard) + state.stats.getDestroyed(Blocks.coreFoundation) + state.stats.getDestroyed(Blocks.coreNucleus) > 0),
             () -> state.rules.defaultTeam.cores().size > 1),
 
-        presetLaunch(() -> state.isCampaign()
-            && state.getSector().preset == null,
-            () -> state.isCampaign() && state.getSector().preset == SectorPresets.frozenForest),
+        presetLaunch(
+            () -> state.isCampaign() && state.getSector().preset == null,
+            () -> state.isCampaign() && state.getSector().preset == SectorPresets.frozenForest
+        ),
+
         presetDifficulty(() -> state.isCampaign()
             && state.getSector().preset == null
             && state.getSector().threat >= 0.5f
             && !SectorPresets.tarFields.sector.isCaptured(), //appear only when the player hasn't progressed much in the game yet
-            () -> state.isCampaign() && state.getSector().preset != null),
-        coreIncinerate(() -> state.isCampaign() && state.rules.defaultTeam.core() != null && state.rules.defaultTeam.core().items.get(Items.copper) >= state.rules.defaultTeam.core().storageCapacity - 10, () -> false)
+            () -> state.isCampaign() && state.getSector().preset != null
+        ),
+
+        coreIncinerate(
+            () -> state.isCampaign() && state.rules.defaultTeam.core() != null && state.rules.defaultTeam.core().items.get(Items.copper) >= state.rules.defaultTeam.core().storageCapacity - 10,
+            () -> false
+        )
         ;
 
         @Nullable
