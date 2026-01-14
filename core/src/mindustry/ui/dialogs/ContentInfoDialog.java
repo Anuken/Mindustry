@@ -49,7 +49,7 @@ public class ContentInfoDialog extends BaseDialog{
         if(state.isGame() && state.patcher.isPatched(content)){
             table.table(t -> {
                 t.image(Icon.info).color(Pal.lightishGray);
-                t.add("@database.modified").color(Pal.lightishGray).padLeft(4f);
+                t.add("@database.patched").color(Pal.lightishGray).padLeft(4f);
             }).pad(4f).left();
 
             table.row();
