@@ -40,7 +40,7 @@ public class ConstructBlock extends Block{
         super("build" + size);
         this.size = size;
         update = true;
-        health = 10;
+        health = 10 * (size * size);
         consumesTap = true;
         solidifes = true;
         generateIcons = false;
