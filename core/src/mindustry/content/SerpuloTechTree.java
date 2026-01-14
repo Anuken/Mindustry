@@ -653,7 +653,7 @@ public class SerpuloTechTree{
                                 new Research(mace),
                                 new Research(mono)
                                 ), () -> {
-                                    node(seaPort, Seq.with(
+                                    node(perilousHarbor, Seq.with(
                                     new SectorComplete(biomassFacility),
                                     new SectorComplete(frontier),
                                     new Research(navalFactory),
@@ -666,7 +666,7 @@ public class SerpuloTechTree{
 
                                         node(extractionOutpost, Seq.with(
                                         new SectorComplete(windsweptIslands),
-                                        new SectorComplete(seaPort),
+                                        new SectorComplete(perilousHarbor),
                                         new SectorComplete(facility32m),
                                         new Research(groundFactory),
                                         new Research(nova),
@@ -680,23 +680,6 @@ public class SerpuloTechTree{
                                             ), () -> {
 
                                             });
-
-                                            //TODO: removed for now
-                                        /*node(polarAerodrome, Seq.with(
-                                        new SectorComplete(fungalPass),
-                                        new SectorComplete(desolateRift),
-                                        new SectorComplete(overgrowth),
-                                        new Research(multiplicativeReconstructor),
-                                        new Research(zenith),
-                                        new Research(swarmer),
-                                        new Research(cyclone),
-                                        new Research(blastDrill),
-                                        new Research(blastDrill),
-                                        new Research(massDriver)
-                                        ), () -> {
-
-                                        });
-                                        */
                                         });
                                     });
 
