@@ -172,6 +172,12 @@ public class Logic implements ApplicationListener{
             }
         });
 
+        Events.on(BlockDestroyEvent.class, e -> {
+            if(e.tile.team() != state.rules.defaultTeam){
+                state.stats.destroyedBlockCount.increment(e.tile.block());
+            }
+        });
+
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit.team() != state.rules.defaultTeam){
                 state.stats.enemyUnitsDestroyed ++;
