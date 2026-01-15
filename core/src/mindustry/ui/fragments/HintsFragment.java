@@ -281,12 +281,14 @@ public class HintsFragment{
             && state.rules.defaultTeam.core() != null
             && state.rules.defaultTeam.core().block == Blocks.coreShard
             && state.rules.defaultTeam.core().items.has(Blocks.coreFoundation.requirements),
-            () -> ui.hints.placedBlocks.contains(Blocks.coreFoundation)),
+            () -> ui.hints.placedBlocks.contains(Blocks.coreFoundation)
+        ),
 
         serpuloCoreZone(
             () -> state.isCampaign() && state.getPlanet() == Planets.serpulo && Vars.indexer.isBlockPresent(Blocks.coreZone) &&
                 (!state.rules.attackMode || state.stats.getDestroyed(Blocks.coreShard) + state.stats.getDestroyed(Blocks.coreFoundation) + state.stats.getDestroyed(Blocks.coreNucleus) > 0),
-            () -> state.rules.defaultTeam.cores().size > 1),
+            () -> state.rules.defaultTeam.cores().size > 1
+        ),
 
         presetLaunch(
             () -> state.isCampaign() && state.getSector().preset == null,

@@ -42,6 +42,8 @@ public class SectorPreset extends UnlockableContent{
     /** Sectors that prevent this sector from being landed on until they are completed. */
     public Seq<Sector> shieldSectors = new Seq<>();
 
+    private @Nullable String fileName;
+
     public SectorPreset(String name, Planet planet, int sector){
         this(name, null, planet, sector);
     }
@@ -62,12 +64,14 @@ public class SectorPreset extends UnlockableContent{
         if(mod != null){
             this.minfo.mod = mod;
         }
-        //this.name can change based on the mod being loaded, so if a fileName is not specified, make sure to use the newly assigned this.name
-        this.generator = new FileMapGenerator(fileName == null ? this.name : fileName, this);
+        this.fileName = fileName;
     }
 
     public void initialize(Planet planet, int sector){
         this.planet = planet;
+        if(generator == null){
+            this.generator = new FileMapGenerator(fileName == null ? this.name : fileName, this);
+        }
         this.originalPosition = sector;
         //auto remap based on data
         var data = planet.getData();
