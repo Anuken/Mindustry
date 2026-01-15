@@ -465,6 +465,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public int treadFrames = 18;
     /** how much of a top part of a tread sprite is "cut off" relative to the pattern; this is corrected for */
     public int treadPullOffset = 0;
+    /** if true, 'fragile' blocks will instantly be crushed in a 1x1 area around the tank */
+    public boolean crushFragile = false;
 
     //SEGMENTED / CRAWL UNITS (this is WIP content!)
 
