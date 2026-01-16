@@ -740,10 +740,10 @@ public class JoinDialog extends BaseDialog{
             return Core.bundle.get("server.outdated");
         }else if(host.version < Version.build && Version.build != -1){
             return Core.bundle.get("server.outdated") + "\n" +
-            Core.bundle.format("server.version", host.version, "");
+            Core.bundle.format("server.version", host.version, host.versionType);
         }else if(host.version > Version.build && Version.build != -1){
             return Core.bundle.get("server.outdated.client") + "\n" +
-            Core.bundle.format("server.version", host.version, "");
+            Core.bundle.format("server.version", host.version, host.versionType);
         }else if(host.version == Version.build && Version.type.equals(host.versionType)){
             //not important
             return "";
