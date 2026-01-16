@@ -1149,7 +1149,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(address != -1 && op.test(value, compare)){
                 //No possible way to change result of condition in the same tick, so this should be safe.
-                if(address + 1 == exec.counter.numval) exec.yield = true;
+                if(address + 1 == (int)exec.counter.numval) exec.yield = true;
                 exec.counter.numval = address;
             }
         }
