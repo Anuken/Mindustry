@@ -39,4 +39,9 @@ public class ServerGroup{
     String key(){
         return "server-" + (name.isEmpty() ? addresses.length == 0 ? "" : addresses[0] : name);
     }
+    
+    @Override
+    public String toString(){
+    	return name;
+    }
 }

@@ -407,10 +407,6 @@ public class JoinDialog extends BaseDialog{
         //otherwise use the cached list + the extra servers that may have been included by mods
         var servers = fetchedServers ? defaultServers : tmpServers.clear().addAll(cachedServers).addAll(defaultServers);
         
-        //The system delays sending pings ~100ms
-        //when there are multiple asynchronous calls
-        //so shuffle to every server has a chance to be on top
-        servers.shuffle();
         for(int i = 0; i < servers.size; i ++){
             ServerGroup group = servers.get(i);
             boolean hidden = group.hidden();
@@ -698,6 +694,12 @@ public class JoinDialog extends BaseDialog{
 
             String text = result.getResultAsString();
             Seq<ServerGroup> servers = parseServerString(text);
+            
+            //The system delays sending pings >100ms
+            //when there are multiple asynchronous calls
+            //so shuffle to every server has a chance to be on top
+            servers.shuffle();
+            
             //modify default servers on main thread
             Core.app.post(() -> {
                 if(fetchedServers) return;
