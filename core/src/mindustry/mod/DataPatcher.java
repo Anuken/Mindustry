@@ -5,11 +5,14 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.Json.*;
 import arc.util.serialization.*;
+import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.part.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -54,8 +57,13 @@ public class DataPatcher{
             }
         };
         cont.allowClassResolution = false;
+        cont.allowAssetLoading = false;
 
         return cont;
+    }
+
+    public boolean isPatched(Object object){
+        return usedpatches.contains(object);
     }
 
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
@@ -68,8 +76,6 @@ public class DataPatcher{
         applied = true;
         contentLoader = Vars.content.copy();
         patches.clear();
-
-        Log.info(patchArray.toString("\n"));
 
         for(String patch : patchArray){
             PatchSet set = new PatchSet(patch, new JsonValue("error"));
@@ -128,6 +134,13 @@ public class DataPatcher{
     }
 
     void created(Object object, Object parent){
+        if(object instanceof Weapon weapon){
+            weapon.init();
+        }else if(object instanceof Content cont){
+            cont.init();
+            cont.postInit();
+        }
+
         if(!Vars.headless){
             if(object instanceof DrawPart part && parent instanceof MappableContent cont){
                 part.load(cont.name);
@@ -137,15 +150,8 @@ public class DataPatcher{
                 draw.load(block);
             }else if(object instanceof Weapon weapon){
                 weapon.load();
-                weapon.init();
             }else if(object instanceof Content cont){
-                cont.init();
-                cont.postInit();
                 cont.load();
-            }
-        }else{
-            if(object instanceof Weapon weapon){
-                weapon.init();
             }
         }
     }
@@ -180,12 +186,7 @@ public class DataPatcher{
         if(object == root){
             if(value instanceof JsonValue jval && jval.isObject()){
                 for(var child : jval){
-                    Object[] otherResolve = resolve(object, jval.name, null);
-                    if(otherResolve != null && otherResolve[0] instanceof ObjectMap map && map.containsKey(child.name)){
-                        assign(otherResolve[0], child.name, child, (FieldData)otherResolve[1], object, field);
-                    }else{
-                        Log.warn("Content not found: @.@", field, child.name);
-                    }
+                    assign(root, field + "." + child.name, child, null, null, null);
                 }
             }else{
                 warn("Content '@' cannot be assigned.", field);
@@ -356,7 +357,14 @@ public class DataPatcher{
             var fields = parser.getJson().getFields(actualType);
             var fdata = fields.get(field);
             var fobj = object;
-            if(fdata != null){
+
+            if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("controller")){
+                var fmeta = fields.get("controller");
+                assignValue(object, "controller", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), (Func<Unit, UnitController>)(u -> parser.resolveController(jsv.asString()).get()), true);
+            }else if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("aiController")){
+                var fmeta = fields.get("aiController");
+                assignValue(object, "aiController", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), parser.resolveController(jsv.asString()), true);
+            }else if(fdata != null){
                 if(checkField(fdata.field)) return;
 
                 assignValue(object, field, new FieldData(fdata), () -> Reflect.get(fobj, fdata.field), fv -> {
@@ -367,10 +375,10 @@ public class DataPatcher{
                     Reflect.set(fobj, fdata.field, fv);
                 }, value, true);
             }else if(value instanceof JsonValue jsv && object instanceof Block bl && jsv.isObject() && field.equals("consumes")){
-                modifiedField(bl, "consumeBuilder", Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy());
-                modifiedField(bl, "consumers", Reflect.<Consume[]>get(Block.class, bl, "consumers"));
+                Seq<Consume> prevBuilder = Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy();
                 boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
                 reset(() -> {
+                    Reflect.set(Block.class, bl, "consumeBuilder", prevBuilder);
                     bl.reinitializeConsumers();
                     bl.hasItems = hadItems;
                     bl.hasLiquids = hadLiquids;
@@ -550,14 +558,14 @@ public class DataPatcher{
 
     static Object copyArray(Object object){
         if(object instanceof int[] i) return i.clone();
-        if(object instanceof long[] i) return i.clone();
-        if(object instanceof short[] i) return i.clone();
-        if(object instanceof byte[] i) return i.clone();
-        if(object instanceof boolean[] i) return i.clone();
-        if(object instanceof char[] i) return i.clone();
-        if(object instanceof float[] i) return i.clone();
-        if(object instanceof double[] i) return i.clone();
-        return ((Object[])object).clone();
+        else if(object instanceof long[] i) return i.clone();
+        else if(object instanceof short[] i) return i.clone();
+        else if(object instanceof byte[] i) return i.clone();
+        else if(object instanceof boolean[] i) return i.clone();
+        else if(object instanceof char[] i) return i.clone();
+        else if(object instanceof float[] i) return i.clone();
+        else if(object instanceof double[] i) return i.clone();
+        else return ((Object[])object).clone();
     }
 
     public static class PatchSet{
@@ -570,6 +578,12 @@ public class DataPatcher{
         public PatchSet(String patch, JsonValue json){
             this.patch = patch;
             this.json = json;
+        }
+
+        @Override
+        public String toString(){
+            //the json can be a single 'error' value if it failed to parse
+            return !json.isObject() ? patch : json.prettyPrint(OutputType.minimal, 2);
         }
     }
 

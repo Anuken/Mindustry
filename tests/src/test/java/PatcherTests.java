@@ -139,6 +139,26 @@ public class PatcherTests{
     }
 
     @Test
+    void consumeApply() throws Exception{
+        Vars.state.patcher.apply(Seq.with(
+        """
+        block.conveyor.consumes: {power: 1}
+        """
+        ));
+
+        assertNoWarnings();
+        assertTrue(Blocks.conveyor.hasPower);
+        assertNotNull(Blocks.conveyor.consPower);
+        assertEquals(1, Blocks.conveyor.consumers.length);
+
+        resetAfter();
+
+        assertFalse(Blocks.conveyor.hasPower);
+        assertNull(Blocks.conveyor.consPower);
+        assertEquals(0, Blocks.conveyor.consumers.length);
+    }
+
+    @Test
     void unitWeapons() throws Exception{
         UnitTypes.dagger.checkStats();
         UnitTypes.dagger.stats.add(Stat.charge, 999);
@@ -406,6 +426,32 @@ public class PatcherTests{
 
         assertEquals(0, Blocks.grass.attributes.get(Attribute.oil));
         assertEquals(0, Blocks.grass.attributes.get(Attribute.heat));
+    }
+
+    @Test
+    void singleValue() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        block: {
+         graphite-press.craftTime: 1
+        }
+        """));
+
+        assertNoWarnings();
+        assertEquals(1f, ((GenericCrafter)Blocks.graphitePress).craftTime);
+    }
+
+    @Test
+    void singleValue2() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        block: {
+         graphite-press: {
+            craftTime: 1
+         }
+        }
+        """));
+
+        assertNoWarnings();
+        assertEquals(1f, ((GenericCrafter)Blocks.graphitePress).craftTime);
     }
 
     @Test

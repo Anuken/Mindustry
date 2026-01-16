@@ -29,7 +29,7 @@ public class MendProjector extends Block{
     public float phaseBoost = 12f;
     public float phaseRangeBoost = 50f;
     public float useTime = 400f;
-    public Sound mendSound = Sounds.healAbility;
+    public Sound mendSound = Sounds.healWave;
     public float mendSoundVolume = 0.5f;
 
     private boolean any = false;
@@ -98,7 +98,7 @@ public class MendProjector extends Block{
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, optionalEfficiency, 0.1f);
 
-            if(optionalEfficiency > 0 && timer(timerUse, useTime) && canHeal){
+            if(optionalEfficiency > 0 && timer(timerUse, useTime / timeScale) && canHeal){
                 consume();
             }
 

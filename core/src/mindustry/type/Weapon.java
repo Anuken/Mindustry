@@ -132,15 +132,13 @@ public class Weapon implements Cloneable{
     /** volume of active sound */
     public float activeSoundVolume = 1f;
     /** sound used for shooting */
-    public Sound shootSound = Sounds.pew;
+    public Sound shootSound = Sounds.shoot;
     /** volume of the shoot sound */
     public float shootSoundVolume = 1f;
     /** sound used when this weapon first fires; for continuous weapons only */
     public Sound initialShootSound = Sounds.none;
     /** sound used for weapons that have a delay */
     public Sound chargeSound = Sounds.none;
-    /** sound played when there is nothing to shoot */
-    public Sound noAmmoSound = Sounds.noammo;
     /** displayed region (autoloaded) */
     public TextureRegion region;
     /** heat region, must be same size as region (optional) */
@@ -419,7 +417,7 @@ public class Weapon implements Cloneable{
 
         //flip weapon shoot side for alternating weapons
         boolean wasFlipped = mount.side;
-        if(otherSide != -1 && alternate && mount.side == flipSprite && mount.reload <= reload / 2f && lastReload > reload / 2f){
+        if(otherSide >= 0 && alternate && mount.side == flipSprite && otherSide < unit.mounts.length && mount.reload <= reload / 2f && lastReload > reload / 2f){
             unit.mounts[otherSide].side = !unit.mounts[otherSide].side;
             mount.side = !mount.side;
         }
@@ -428,6 +426,8 @@ public class Weapon implements Cloneable{
             Vars.control.sound.loop(activeSound, unit, activeSoundVolume);
         }
 
+        float velLen = unit.isRemote() ? unit.vel.len() : unit.deltaLen() / Time.delta;
+
         //shoot if applicable
         if(mount.shoot && //must be shooting
         can && //must be able to shoot
@@ -435,7 +435,7 @@ public class Weapon implements Cloneable{
         (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
         (!alternate || wasFlipped == flipSprite) &&
         mount.warmup >= minWarmup && //must be warmed up
-        unit.vel.len() >= minShootVelocity && //check velocity requirements
+        velLen >= minShootVelocity && //check velocity requirements
         (mount.reload <= 0.0001f || (alwaysContinuous && mount.bullet == null)) && //reload has to be 0, or it has to be an always-continuous weapon
         (alwaysShooting || Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone)) //has to be within the cone
         ){

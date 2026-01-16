@@ -46,6 +46,15 @@ public class ContentInfoDialog extends BaseDialog{
 
         table.row();
 
+        if(state.isGame() && state.patcher.isPatched(content)){
+            table.table(t -> {
+                t.image(Icon.info).color(Pal.lightishGray);
+                t.add("@database.patched").color(Pal.lightishGray).padLeft(4f);
+            }).pad(4f).left();
+
+            table.row();
+        }
+
         if(content.description != null){
             var any = content.stats.toMap().size > 0;
 
@@ -100,7 +109,7 @@ public class ContentInfoDialog extends BaseDialog{
                 if(contentClass.isAnonymousClass()) contentClass = contentClass.getSuperclass();
 
                 Core.app.openURI("https://mindustrygame.github.io/wiki/Modding%20Classes/" + contentClass.getSimpleName());
-            }).margin(8f).pad(4f).size(300f, 50f).row();
+            }).margin(8f).pad(4f).padTop(8f).size(300f, 50f).row();
         }
 
         content.displayExtra(table);

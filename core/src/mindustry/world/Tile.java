@@ -2,6 +2,7 @@ package mindustry.world;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
@@ -337,6 +338,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         circle(radius, (x, y) -> cons.get(world.rawTile(x, y)));
     }
 
+    public Color getFloorColor(){
+        return floor.getColor(this);
+    }
+
     public void recacheWall(){
         if(!headless && !world.isGenerating()){
             renderer.blocks.recacheWall(this);
@@ -452,7 +457,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     /** @return whether the floor on this tile deals damage or can be drowned on. */
     public boolean dangerous(){
-        return !block.solid && (floor.isDeep() || floor.damageTaken > 0);
+        return !block.solid && (floor.isDeep() || floor.damages());
     }
 
     /**

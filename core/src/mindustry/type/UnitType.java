@@ -295,7 +295,13 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** override for unit shield colour. */
     public @Nullable Color shieldColor;
     /** sound played when this unit explodes (*not* when it is shot down) */
-    public Sound deathSound = Sounds.bang;
+    public Sound deathSound = Sounds.unset;
+    /** volume of death sound */
+    public float deathSoundVolume = 1f;
+    /** sound played when the unit wreck is shot down */
+    public Sound wreckSound = Sounds.unset;
+    /** volume of wreck falling sound */
+    public float wreckSoundVolume = 1f;
     /** sound played on loop when this unit is around. */
     public Sound loopSound = Sounds.none;
     /** volume of loop sound */
@@ -308,6 +314,12 @@ public class UnitType extends UnlockableContent implements Senseable{
     public float stepSoundPitch = 1f, stepSoundPitchRange = 0.1f;
     /** sound looped when tank moves */
     public Sound tankMoveSound = Sounds.tankMove;
+    /** sound looped when the unit moves; volume depends on velocity */
+    public Sound moveSound = Sounds.none;
+    /** volume of movement sound */
+    public float moveSoundVolume = 1f;
+    /** pitch of movement sound based on velocity */
+    public float moveSoundPitchMin = 1f, moveSoundPitchMax = 1f;
     /** volume of tank move sfx */
     public float tankMoveVolume = 0.5f;
     /** effect that this unit emits when falling */
@@ -377,7 +389,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** if true, harder materials will take longer to mine */
     public boolean mineHardnessScaling = true;
     /** continuous sound emitted when mining. */
-    public Sound mineSound = Sounds.minebeam;
+    public Sound mineSound = Sounds.loopMineBeam;
     /** volume of mining sound. */
     public float mineSoundVolume = 0.6f;
     /** Target items to mine. Used in MinerAI */
@@ -453,6 +465,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public int treadFrames = 18;
     /** how much of a top part of a tread sprite is "cut off" relative to the pattern; this is corrected for */
     public int treadPullOffset = 0;
+    /** if true, 'fragile' blocks will instantly be crushed in a 1x1 area around the tank */
+    public boolean crushFragile = false;
 
     //SEGMENTED / CRAWL UNITS (this is WIP content!)
 
@@ -515,6 +529,21 @@ public class UnitType extends UnlockableContent implements Senseable{
         // This is the default Vanilla behavior - it won't work properly for mods (see comment in `init()`)!
         constructor = EntityMapping.map(this.name);
         selectionSize = 30f;
+    }
+
+    @Override
+    public void postInit(){
+        if(databaseTag == null || databaseTag.isEmpty()){
+            if(flying){
+                databaseTag = "unit-air";
+            }else if(naval){
+                databaseTag = "unit-naval";
+            }else{
+                databaseTag = "unit-ground";
+            }
+        }
+
+        super.postInit();
     }
 
     public UnitController createController(Unit unit){
@@ -895,6 +924,17 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(flying){
             envEnabled |= Env.space;
+        }
+
+        if(deathSound == Sounds.unset){
+            deathSound =
+                hitSize < 12f ? Sounds.unitExplode1 :
+                hitSize < 22f ? Sounds.unitExplode2 :
+                Sounds.unitExplode3;
+        }
+
+        if(wreckSound == Sounds.unset){
+            wreckSound = hitSize >= 22f ? Sounds.wreckFallBig : Sounds.wreckFall;
         }
 
         if(lightRadius == -1){
@@ -1477,6 +1517,9 @@ public class UnitType extends UnlockableContent implements Senseable{
         Draw.z(z);
 
         if(unit instanceof Crawlc c){
+            if(isPayload){
+                c.segmentRot(c.rotation());
+            }
             drawCrawl(c);
         }
 
