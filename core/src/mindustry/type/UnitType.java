@@ -1301,6 +1301,10 @@ public class UnitType extends UnlockableContent implements Senseable{
         initPathType();
     }
 
+    public void beforeParse(){
+        totalRequirements = cachedRequirements = firstRequirements = null;
+    }
+
     /** @return the time required to build this unit, as a value that takes into account reconstructors */
     public float getBuildTime(){
         getTotalRequirements();
