@@ -532,7 +532,7 @@ public class ContentParser{
                     child.isString() ? new ConsumeItems(new ItemStack[]{parser.readValue(ItemStack.class, child)}) :
                     parser.readValue(ConsumeItems.class, child));
                 case "itemsBoost" -> block.consume(child.isArray() ? new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
-                        parser.readValue(ConsumeItems.class, child)).boost();
+                    parser.readValue(ConsumeItems.class, child)).boost();
 
                 case "liquidFlammable" -> block.consume((Consume)parser.readValue(ConsumeLiquidFlammable.class, child));
                 case "liquid" -> block.consume((Consume)parser.readValue(ConsumeLiquid.class, child));
@@ -541,7 +541,7 @@ public class ContentParser{
                     parser.readValue(ConsumeLiquids.class, child));
                 case "coolant" -> block.consume((Consume)parser.readValue(ConsumeCoolant.class, child));
                 case "liquidsBoost" -> block.consume(child.isArray() ? new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
-                        parser.readValue(ConsumeLiquids.class, child)).boost();
+                    parser.readValue(ConsumeLiquids.class, child)).boost();
                 case "power" -> {
                     if(child.isNumber()){
                         block.consumePower(child.asFloat());
