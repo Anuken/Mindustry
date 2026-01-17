@@ -264,6 +264,11 @@ public class AIController implements UnitController{
         return Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag));
     }
 
+    public Teamc targetFlagActive(float x, float y, BlockFlag flag, boolean enemy){
+        if(unit.team == Team.derelict) return null;
+        return Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag), t -> ((t.items != null && t.items.any()) || t.status() != BlockStatus.noInput) && t.block.targetable);
+    }
+
     public Teamc target(float x, float y, float range, boolean air, boolean ground){
         return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground && (unit.type.targetUnderBlocks || !t.block.underBullets));
     }

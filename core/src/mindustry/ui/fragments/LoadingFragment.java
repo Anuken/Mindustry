@@ -4,11 +4,13 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
 import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
@@ -17,6 +19,7 @@ public class LoadingFragment{
     private TextButton button;
     private Bar bar;
     private Label nameLabel;
+    private @Nullable Runnable cancelListener;
     private float progValue;
 
     public void build(Group parent){
@@ -40,7 +43,16 @@ public class LoadingFragment{
 
             bar = t.add(new Bar()).pad(3).padTop(6).size(500f, 40f).visible(false).get();
             t.row();
-            button = t.button("@cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
+            button = t.button("@cancel", () -> {
+                if(cancelListener != null){
+                    cancelListener.run();
+                }
+            }).pad(20).size(250f, 70f).visible(false).get();
+            button.keyDown(key -> {
+                if(cancelListener != null && (key == KeyCode.back || key == KeyCode.escape)){
+                    cancelListener.run();
+                }
+            });
             table = t;
         });
     }
@@ -68,8 +80,8 @@ public class LoadingFragment{
 
     public void setButton(Runnable listener){
         button.visible = true;
-        button.getListeners().remove(button.getListeners().size - 1);
-        button.clicked(listener);
+        button.requestKeyboard();
+        cancelListener = listener;
     }
 
     public void setText(String text){
@@ -83,6 +95,7 @@ public class LoadingFragment{
 
     public void show(String text){
         button.visible = false;
+        cancelListener = null;
         nameLabel.setColor(Color.white);
         bar.visible = false;
         table.clearActions();
@@ -98,6 +111,9 @@ public class LoadingFragment{
         table.toFront();
         table.touchable = Touchable.disabled;
         table.actions(Actions.fadeOut(0.5f), Actions.visible(false));
+        if(Core.scene.getKeyboardFocus() == button){
+            Core.scene.setKeyboardFocus(null);
+        }
     }
 
     private void text(String text){

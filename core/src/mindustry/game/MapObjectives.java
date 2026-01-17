@@ -313,6 +313,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void validate(){
             if(content == null) content = Items.copper;
         }
+
+        @Override
+        public String toString(){
+            return "research: " + content;
+        }
     }
 
     /** Produce a specific piece of content in the tech tree (essentially research with different text). */
@@ -338,6 +343,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public void validate(){
             if(content == null) content = Items.copper;
+        }
+
+        @Override
+        public String toString(){
+            return "produce: " + content;
         }
     }
 
@@ -367,6 +377,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void validate(){
             if(item == null) item = Items.copper;
         }
+
+        @Override
+        public String toString(){
+            return "item: " + item + " x"  + amount;
+        }
     }
 
     /** Get a certain item in your core (through a block, not manually.) */
@@ -394,6 +409,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public void validate(){
             if(item == null) item = Items.copper;
+        }
+
+        @Override
+        public String toString(){
+            return "coreItem: " + item + " x"  + amount;
         }
     }
 
@@ -423,6 +443,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void validate(){
             if(block == null) block = Blocks.conveyor;
         }
+
+        @Override
+        public String toString(){
+            return "buildCount: " + block + " x"  + count;
+        }
     }
 
     /** Produce a certain amount of a unit. */
@@ -451,6 +476,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void validate(){
             if(unit == null) unit = UnitTypes.dagger;
         }
+
+        @Override
+        public String toString(){
+            return "unitCount: " + unit + " x"  + count;
+        }
     }
 
     /** Produce a certain amount of units. */
@@ -471,6 +501,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.format("objective.destroyunits", count - state.stats.enemyUnitsDestroyed);
+        }
+
+        @Override
+        public String toString(){
+            return "destroyUnits: " + count;
         }
     }
 
@@ -539,6 +574,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             return null;
         }
+
+        @Override
+        public String toString(){
+            return "timer: " + duration;
+        }
     }
 
     public static class DestroyBlockObjective extends MapObjective{
@@ -568,6 +608,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public void validate(){
             if(block == null) block = Blocks.router;
+        }
+
+        @Override
+        public String toString(){
+            return "destroyBlock: " + block  + ":" + team + " " + pos;
         }
     }
 
@@ -609,6 +654,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void validate(){
             if(block == null) block = Blocks.router;
         }
+
+        @Override
+        public String toString(){
+            return "destroyBlocks: " + block + ":" + team + " " + Arrays.toString(positions);
+        }
     }
 
     /** Command any unit to do anything. Always compete in headless mode. */
@@ -621,6 +671,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.get("objective.command");
+        }
+
+        @Override
+        public String toString(){
+            return "commandMode";
         }
     }
 
@@ -653,6 +708,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 return text;
             }
         }
+
+        @Override
+        public String toString(){
+            return "flag: " + flag;
+        }
     }
 
     /** Destroy all enemy core(s). */
@@ -665,6 +725,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.get("objective.destroycore");
+        }
+
+        @Override
+        public String toString(){
+            return "destroyCore";
         }
     }
 
