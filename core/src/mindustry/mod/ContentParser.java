@@ -546,12 +546,18 @@ public class ContentParser{
                     }
                 }
                 case "powerBuffered" -> block.consumePowerBuffered(child.asFloat());
-                case "itemsBoost" -> block.consume(
-                        child.isArray()? new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
-                        parser.readValue(ConsumeItems.class, child)).boost();
-                case "liquidsBoost" -> block.consume(
-                        child.isArray() ? new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
-                        parser.readValue(ConsumeLiquids.class, child)).boost();
+                case "itemsBoost" -> {
+                    var con = child.isArray() ? new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
+                            parser.readValue(ConsumeItems.class, child);
+                    con.booster = true;
+                    block.consume(con);
+                }
+                case "liquidsBoost" -> {
+                    var con = child.isArray() ? new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
+                            parser.readValue(ConsumeLiquids.class, child);
+                    con.booster = true;
+                    block.consume(con);
+                }
                 default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
             }
         }
