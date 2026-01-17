@@ -531,6 +531,8 @@ public class ContentParser{
                     child.isArray() ? new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
                     child.isString() ? new ConsumeItems(new ItemStack[]{parser.readValue(ItemStack.class, child)}) :
                     parser.readValue(ConsumeItems.class, child));
+                case "itemsBoost" -> block.consume(child.isArray() ? new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
+                        parser.readValue(ConsumeItems.class, child)).boost();
 
                 case "liquidFlammable" -> block.consume((Consume)parser.readValue(ConsumeLiquidFlammable.class, child));
                 case "liquid" -> block.consume((Consume)parser.readValue(ConsumeLiquid.class, child));
@@ -538,6 +540,8 @@ public class ContentParser{
                     child.isArray() ? new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
                     parser.readValue(ConsumeLiquids.class, child));
                 case "coolant" -> block.consume((Consume)parser.readValue(ConsumeCoolant.class, child));
+                case "liquidsBoost" -> block.consume(child.isArray() ? new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
+                        parser.readValue(ConsumeLiquids.class, child)).boost();
                 case "power" -> {
                     if(child.isNumber()){
                         block.consumePower(child.asFloat());
@@ -546,18 +550,6 @@ public class ContentParser{
                     }
                 }
                 case "powerBuffered" -> block.consumePowerBuffered(child.asFloat());
-                case "itemsBoost" -> {
-                    var con = child.isArray() ? new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
-                            parser.readValue(ConsumeItems.class, child);
-                    con.booster = true;
-                    block.consume(con);
-                }
-                case "liquidsBoost" -> {
-                    var con = child.isArray() ? new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
-                            parser.readValue(ConsumeLiquids.class, child);
-                    con.booster = true;
-                    block.consume(con);
-                }
                 default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
             }
         }
