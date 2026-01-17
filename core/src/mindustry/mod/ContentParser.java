@@ -519,8 +519,7 @@ public class ContentParser{
                         }
                     }
                 }
-                case "item" -> block.consumeItem(child.isString() ? find(ContentType.item, child.asString()) :
-                    parser.readValue(Item.class, child));
+                case "item" -> block.consumeItem(find(ContentType.item, child.asString()));
                 case "itemCharged" -> block.consume((Consume)parser.readValue(ConsumeItemCharged.class, child));
                 case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
                 case "itemRadioactive" -> block.consume((Consume)parser.readValue(ConsumeItemRadioactive.class, child));
