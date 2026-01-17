@@ -539,7 +539,7 @@ public class Vars implements Loadable{
         }
 
         StringMap globalBundle = new StringMap();
-        PropertiesUtils.load(globalBundle, files.internal("bundles/global.properties").reader(512, "UTF-8"));
+        PropertiesUtils.load(globalBundle, files.internal("bundles/global.properties").reader("UTF-8"));
         bundle.getProperties().putAll(globalBundle);
     }
 }
