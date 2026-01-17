@@ -519,7 +519,8 @@ public class ContentParser{
                         }
                     }
                 }
-                case "item" -> block.consumeItem(find(ContentType.item, child.asString()));
+                case "item" -> block.consumeItem(child.isString() ? find(ContentType.item, child.asString()) :
+                    parser.readValue(Item.class, child));
                 case "itemCharged" -> block.consume((Consume)parser.readValue(ConsumeItemCharged.class, child));
                 case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
                 case "itemRadioactive" -> block.consume((Consume)parser.readValue(ConsumeItemRadioactive.class, child));
@@ -547,12 +548,10 @@ public class ContentParser{
                 case "powerBuffered" -> block.consumePowerBuffered(child.asFloat());
                 case "itemsBoost" -> block.consume(
                         child.isArray()? new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
-                        child.isString() ? new ConsumeItems(new ItemStack[]{parser.readValue(ItemStack.class, child)}) :
                         parser.readValue(ConsumeItems.class, child)).boost();
                 case "liquidsBoost" -> block.consume(
                         child.isArray() ? new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
                         parser.readValue(ConsumeLiquids.class, child)).boost();
-                //case "heat" -> block.consume((Consume)parser.readValue(ConsumeHeat.class, child));
                 default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
             }
         }
