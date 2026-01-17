@@ -734,6 +734,12 @@ public class Block extends UnlockableContent implements Senseable{
         setBars();
         offset = ((size + 1) % 2) * tilesize / 2f;
         sizeOffset = -((size - 1) / 2);
+
+        if (consumers.length != 0){
+            for (var consume : consumers) {
+                consume.apply(this);
+            }
+        }
     }
 
     public boolean consumesItem(Item item){

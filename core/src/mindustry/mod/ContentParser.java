@@ -559,29 +559,6 @@ public class ContentParser{
         value.remove("consumes");
     }
 
-    public void readBlockCanInputItems(Block block, JsonValue value){
-        for(JsonValue child : value) {
-            switch(child.name) {
-                case "add" -> {
-                    if (child.isArray()) {
-                        for (Item it : parser.readValue(Item[].class, child)) {
-                            block.itemFilter[it.id] = true;
-                        }
-                    } else block.itemFilter[parser.readValue(Item.class, child).id] = true;
-                }
-                case "rem" -> {
-                    if (child.isArray()) {
-                        for (Item it : parser.readValue(Item[].class, child)) {
-                            block.itemFilter[it.id] = false;
-                        }
-                    } else block.itemFilter[parser.readValue(Item.class, child).id] = false;
-                }
-                default -> throw new IllegalArgumentException("Unknown can input item type: '" + child.name + "' for block '" + block.name + "'.");
-            }
-        }
-        value.remove("canInputItems");
-    }
-
     private ObjectMap<ContentType, TypeParser<?>> parsers = ObjectMap.of(
         ContentType.block, (TypeParser<Block>)(mod, name, value) -> {
             readBundle(ContentType.block, name, value);
@@ -605,11 +582,6 @@ public class ContentParser{
                 if(value.has("consumes") && value.get("consumes").isObject()){
                     readBlockConsumers(block, value.get("consumes"));
                     value.remove("consumes");
-                }
-
-                if(value.has("canInputItems") && value.get("canInputItems").isObject()){
-                    readBlockCanInputItems(block, value.get("canInputItems"));
-                    value.remove("canInputItems");
                 }
 
                 readFields(block, value, true);
