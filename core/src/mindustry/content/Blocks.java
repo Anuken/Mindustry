@@ -3432,12 +3432,11 @@ public class Blocks{
                     keepVelocity = false;
                     hittable = false;
                 }},
-                Items.pyratite, new BulletType(4f, 27f){{
+                Items.pyratite, new BulletType(4f, 30f){{
                     ammoMultiplier = 6f;
                     hitSize = 7f;
                     lifetime = 18f;
                     pierce = true;
-                    pierceArmor = true;
                     collidesAir = false;
                     statusDuration = 60f * 10;
                     shootEffect = Fx.shootPyraFlame;
