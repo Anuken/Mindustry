@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.graphics.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -101,6 +102,12 @@ public class ContentInfoDialog extends BaseDialog{
         if(content.details != null){
             table.add("[gray]" + (content.unlocked() || !content.hideDetails ? content.details : Iconc.lock + " " + Core.bundle.get("unlock.incampaign"))).pad(6).padTop(20).width(400f).wrap().fillX();
             table.row();
+        }
+
+        //TODO: move this into a final end-game credit sequence. this is temporary and thus not localized
+        if(content.credit != null){
+            table.row();
+            table.add("Created by: " + content.credit).color(Color.gray).padTop(40f).row();
         }
 
         if(settings.getBool("console")){
