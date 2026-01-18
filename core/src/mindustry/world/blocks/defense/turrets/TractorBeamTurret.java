@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 
 public class TractorBeamTurret extends BaseTurret{
     public final int timerTarget = timers++;
-    public float retargetTime = 5f;
+    public float retargetTime = 15f;
 
     public float shootCone = 6f;
     public float shootLength = 5f;
@@ -29,7 +29,7 @@ public class TractorBeamTurret extends BaseTurret{
     public boolean targetAir = true, targetGround = false;
     public Color laserColor = Color.white;
     public StatusEffect status = StatusEffects.none;
-    public float statusDuration = 300;
+    public float statusDuration = 360;
 
     public Sound shootSound = Sounds.beamParallax;
     public float shootSoundVolume = 0.9f;
@@ -85,7 +85,7 @@ public class TractorBeamTurret extends BaseTurret{
 
             //retarget
             if(timer(timerTarget, retargetTime)){
-                target = Units.closestEnemy(team, x, y, range, u -> u.checkTarget(targetAir, targetGround));
+                target = Units.nominalEnemy(team, x, y, range, u -> u.checkTarget(targetAir, targetGround));
             }
 
             //consume coolant
