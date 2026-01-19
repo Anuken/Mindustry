@@ -473,7 +473,7 @@ public class LExecutor{
                         }
                     }
                     case itemDrop -> {
-                        if(!exec.timeoutDone(unit, LogicAI.transferDelay)) return;
+                        if(p1.obj() != Blocks.air && !exec.timeoutDone(unit, LogicAI.transferDelay)) return;
 
                         //clear item when dropping to @air
                         if(p1.obj() == Blocks.air){
@@ -481,7 +481,6 @@ public class LExecutor{
                             if(!net.client()){
                                 unit.clearItem();
                             }
-                            exec.updateTimeout(unit);
                         }else{
                             Building build = p1.building();
                             int dropped = Math.min(unit.stack.amount, p2.numi());
