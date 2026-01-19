@@ -364,7 +364,7 @@ public class UnitTypes{
             speed = 0.55f;
             hitSize = 8f;
             health = 120f;
-            buildSpeed = 0.3f;
+            buildSpeed = 0.5f;
             armor = 1f;
 
             abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
@@ -396,7 +396,7 @@ public class UnitTypes{
             speed = 0.7f;
             hitSize = 11f;
             health = 320f;
-            buildSpeed = 0.5f;
+            buildSpeed = 0.85f;
             armor = 4f;
             riseSpeed = 0.07f;
 
@@ -430,7 +430,7 @@ public class UnitTypes{
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
                     //Does not actually do anything; Just here to make stats work
-                    healPercent = 2f;
+                    healAmount = 18f;
 
                     lightningType = new BulletType(0.0001f, 0f){{
                         lifetime = Fx.lightning.lifetime;
@@ -439,7 +439,7 @@ public class UnitTypes{
                         status = StatusEffects.shocked;
                         statusDuration = 10f;
                         hittable = false;
-                        healPercent = 1.6f;
+                        healAmount = 18f;
                         collidesTeam = true;
                     }};
                 }};
@@ -450,7 +450,7 @@ public class UnitTypes{
             mineTier = 3;
             boostMultiplier = 2f;
             health = 640f;
-            buildSpeed = 1.1f;
+            buildSpeed = 2f;
             canBoost = true;
             armor = 9f;
             mechLandShake = 2f;
@@ -498,7 +498,7 @@ public class UnitTypes{
 
             rotateSpeed = 1.8f;
             mechFrontSway = 1f;
-            buildSpeed = 3f;
+            buildSpeed = 6f;
 
             mechStepParticles = true;
             stepShake = 0.15f;
@@ -574,6 +574,7 @@ public class UnitTypes{
                 shootY = 6f;
                 beamWidth = 0.8f;
                 repairSpeed = 1.4f;
+                unitSort = UnitSorts.leastHealth;
 
                 bullet = new BulletType(){{
                     maxRange = 120f;
@@ -907,6 +908,7 @@ public class UnitTypes{
                     lightningLength = 10;
                     smokeEffect = Fx.shootBigSmoke2;
                     shake = 5f;
+                    maxRange = 190f;
 
                     status = StatusEffects.sapped;
                     statusDuration = 60f * 10;
@@ -1381,17 +1383,21 @@ public class UnitTypes{
             accel = 0.1f;
             range = 130f;
             health = 400;
-            buildSpeed = 0.5f;
+            buildSpeed = 0.35f;
             engineOffset = 6.5f;
             hitSize = 9f;
             lowAltitude = true;
+            itemCapacity = 20;
 
             ammoType = new PowerAmmoType(900);
             mineTier = 2;
             mineSpeed = 3.5f;
             wreckSoundVolume = 0.9f;
 
-            abilities.add(new RepairFieldAbility(5f, 60f * 8, 50f));
+            abilities.add(new RepairFieldAbility(5f, 60f * 6f, 50f)
+            {{
+                sameTypeHealMult = 0.75f;
+            }});
 
             weapons.add(new Weapon("poly-weapon"){{
                 top = false;
@@ -1417,7 +1423,7 @@ public class UnitTypes{
                     frontColor = Color.white;
                     hitSound = Sounds.none;
 
-                    healPercent = 5.5f;
+                    healAmount = 45f;
                     collidesTeam = true;
                     reflectable = false;
                     backColor = Pal.heal;
@@ -1443,7 +1449,7 @@ public class UnitTypes{
             hitSize = 16.05f;
             engineSize = 3f;
             payloadCapacity = (2 * 2) * tilePayload;
-            buildSpeed = 2.6f;
+            buildSpeed = 2.2f;
             isEnemy = false;
 
             ammoType = new PowerAmmoType(1100);
@@ -1457,7 +1463,7 @@ public class UnitTypes{
                 rotate = true;
                 bullet = new LaserBoltBulletType(5.2f, 10){{
                     lifetime = 35f;
-                    healPercent = 5.5f;
+                    healAmount = 45f;
                     collidesTeam = true;
                     backColor = Pal.heal;
                     frontColor = Color.white;
@@ -1495,7 +1501,7 @@ public class UnitTypes{
             faceTarget = false;
             hitSize = 36f;
             payloadCapacity = (3 * 3) * tilePayload;
-            buildSpeed = 2.5f;
+            buildSpeed = 6f;
             buildBeamOffset = 23;
             range = 140f;
             targetAir = false;
@@ -1570,7 +1576,7 @@ public class UnitTypes{
             faceTarget = false;
             hitSize = 66f;
             payloadCapacity = (5.5f * 5.5f) * tilePayload;
-            buildSpeed = 4f;
+            buildSpeed = 10f;
             drawShields = false;
             lowAltitude = true;
             buildBeamOffset = 43;
@@ -2315,7 +2321,7 @@ public class UnitTypes{
             waveTrailY = -17f;
             trailScl = 3.2f;
 
-            buildSpeed = 3f;
+            buildSpeed = 6f;
             rotateToBuilding = false;
             range = maxRange = 180f;
 
@@ -2364,7 +2370,7 @@ public class UnitTypes{
             waveTrailY = -32f;
             trailScl = 3.5f;
 
-            buildSpeed = 3.5f;
+            buildSpeed = 10f;
             rotateToBuilding = false;
 
             for(float mountY : new float[]{-117/4f, 50/4f}){
@@ -2521,7 +2527,7 @@ public class UnitTypes{
             flying = true;
             mineSpeed = 6.5f;
             mineTier = 1;
-            buildSpeed = 0.5f;
+            buildSpeed = 1f;
             drag = 0.05f;
             speed = 3f;
             rotateSpeed = 15f;
@@ -2569,7 +2575,7 @@ public class UnitTypes{
             flying = true;
             mineSpeed = 7f;
             mineTier = 1;
-            buildSpeed = 0.75f;
+            buildSpeed = 1.25f;
             drag = 0.05f;
             speed = 3.3f;
             rotateSpeed = 17f;
@@ -2619,7 +2625,7 @@ public class UnitTypes{
             flying = true;
             mineSpeed = 8f;
             mineTier = 2;
-            buildSpeed = 1f;
+            buildSpeed = 1.5f;
             drag = 0.05f;
             speed = 3.55f;
             rotateSpeed = 19f;
