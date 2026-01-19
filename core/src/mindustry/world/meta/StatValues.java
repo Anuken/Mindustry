@@ -640,11 +640,8 @@ public class StatValues{
                     }
 
                     if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
-                        if(type.continuousDamage() > 0){
-                            bt.add(Core.bundle.format("bullet.damage", type.continuousDamage()) + StatUnit.perSecond.localized());
-                        }else{
-                            bt.add(Core.bundle.format("bullet.damage", type.damage));
-                        }
+                        bt.add(Core.bundle.format("bullet.damage", type.damage) + (type.continuousDamage() > 0 ? 
+                        "[lightgray] ~ [stat]" + Strings.autoFixed(type.continuousDamage(), 0) + "[lightgray] " + StatUnit.perSecond.localized() : ""));
                     }
 
                     if(type.buildingDamageMultiplier != 1){
