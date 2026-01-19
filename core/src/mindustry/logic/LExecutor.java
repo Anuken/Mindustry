@@ -989,8 +989,8 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(target.building() instanceof LogicDisplayBuild d && d.isValid() && (d.team == exec.team || exec.privileged)){
                 d.flushCommands(exec.graphicsBuffer);
-                exec.graphicsBuffer.clear();
             }
+            exec.graphicsBuffer.clear();
         }
     }
 
