@@ -2062,6 +2062,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             //totalLiquids is inherently bad design, but unfortunately it is useful for conduits/tanks
             case totalLiquids -> liquids == null ? 0 : liquids.currentAmount();
             case totalPower -> power == null || block.consPower == null ? 0 : power.status * (block.consPower.buffered ? block.consPower.capacity : 1f);
+            case totalPowerNodes -> power == null || block.consPower == null ? 0 : power.links.size;
             case itemCapacity -> block.hasItems ? block.itemCapacity : 0;
             case liquidCapacity -> block.hasLiquids ? block.liquidCapacity : 0;
             case powerCapacity -> block.consPower != null ? block.consPower.capacity : 0f;
@@ -2085,6 +2086,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case firstItem -> items == null ? null : items.first();
             case config -> block.configSenseable() ? config() : null;
             case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type : getPayload() instanceof BuildPayload p2 ? p2.block() : null;
+            default -> noSensed;
+        };
+    }
+
+    @Override
+    public Object senseObject(LAccess sensor, int pos){
+        return switch(sensor){
+            case currentPowerNode -> power != null && pos >= 0 && pos < power.links.size ? world.build(power.links.get(pos)) : null;
             default -> noSensed;
         };
     }
