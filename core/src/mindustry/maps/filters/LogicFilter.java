@@ -56,7 +56,7 @@ public class LogicFilter extends GenerateFilter{
         //executions are limited to prevent infinite generation
         for(int i = 1; i < maxInstructionsExecution; i++){
             if(!loop && (executor.counter.numval >= executor.instructions.length || executor.counter.numval < 0)) break;
-            executor.runOnce();
+            executor.runOnce((double)(maxInstructionsExecution - i));
         }
     }
 
