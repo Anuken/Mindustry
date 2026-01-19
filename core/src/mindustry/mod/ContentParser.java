@@ -616,6 +616,7 @@ public class ContentParser{
 
             currentContent = unit;
             read(() -> {
+                unit.beforeParse();
                 //add reconstructor type
                 if(value.has("requirements")){
                     JsonValue rec = value.remove("requirements");

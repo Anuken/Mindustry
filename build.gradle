@@ -113,7 +113,7 @@ allprojects{
             def output = 'en\n'
             def bundles = new File(project(':core').projectDir, 'assets/bundles/')
             bundles.list().sort().each{ name ->
-                if(name == "bundle.properties") return
+                if(name == "bundle.properties" || name == "global.properties") return
                 output += name.substring("bundle".length() + 1, name.lastIndexOf('.')) + "\n"
             }
             new File(project(':core').projectDir, 'assets/locales').text = output

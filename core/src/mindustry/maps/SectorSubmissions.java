@@ -94,6 +94,7 @@ public class SectorSubmissions{
 
         var preset = new SectorPreset("sector-" + planet.name + "-" + id, "hidden/" + id, planet, id);
 
+        if(preset.credit == null) preset.credit = author;
         preset.requireUnlock = false;
         if(difficulty > 0f) preset.difficulty = difficulty;
 
