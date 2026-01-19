@@ -113,6 +113,8 @@ public class BulletType extends Content implements Cloneable{
     public float knockback;
     /** Should knockback follow the bullet's direction */
     public boolean impact;
+    /** Chance of applying the status effect on hit. Note that the bullet will not have the below 'status' if the chance is not met, StatusEffects.none will be used instead. */
+    public float statusChance = 1f;
     /** Status effect applied on hit. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
@@ -496,7 +498,7 @@ public class BulletType extends Content implements Cloneable{
             Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
             if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
             unit.impulse(Tmp.v3);
-            unit.apply(status, statusDuration);
+            unit.apply(b.status, statusDuration);
 
             Events.fire(bulletDamageEvent.set(unit, b));
         }
@@ -578,8 +580,8 @@ public class BulletType extends Content implements Cloneable{
         if(splashDamageRadius > 0 && !b.absorbed){
             Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), splashDamagePierce, collidesAir, collidesGround, scaledSplashDamage, b);
 
-            if(status != StatusEffects.none){
-                Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
+            if(b.status != StatusEffects.none){
+                Damage.status(b.team, x, y, splashDamageRadius, b.status, statusDuration, collidesAir, collidesGround);
             }
 
             if(heals()){
@@ -961,9 +963,10 @@ public class BulletType extends Content implements Cloneable{
         bullet.mover = mover;
         bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
         //reset trail
-        if(bullet.trail != null){
-            bullet.trail.clear();
-        }
+        if(bullet.trail != null) bullet.trail.clear();
+        bullet.status = status;
+        // remove the status if it fails the chance
+        if(statusChance < 1f && !Mathf.chance(statusChance)) bullet.status = StatusEffects.none;
         bullet.add();
 
         if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel());
