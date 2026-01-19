@@ -170,6 +170,8 @@ public class ConstructBlock extends Block{
 
         public float progress = 0;
         public float buildCost;
+        public float previousHealth;
+        public float damaged;
         public @Nullable Object lastConfig;
         public @Nullable Unit lastBuilder;
         public boolean wasConstructing, activeDeconstruct;
@@ -293,9 +295,11 @@ public class ConstructBlock extends Block{
             maxProgress = core == null || team.rules().infiniteResources ? maxProgress : checkRequired(core.items, maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
+            scaleHealth(progress);
 
             if(progress >= 1f || state.rules.infiniteResources){
                 boolean canFinish = true;
+                scaleHealth(1f);
 
                 //look at leftover resources to consume, get them from the core if necessary, delay building if not
                 if(!infinite){
@@ -367,6 +371,7 @@ public class ConstructBlock extends Block{
             }
 
             progress = Mathf.clamp(progress - amount);
+            scaleHealth(progress);
 
             if(progress <= current.deconstructThreshold || state.rules.infiniteResources){
                 //add any leftover items that weren't obtained due to rounding errors
@@ -428,6 +433,14 @@ public class ConstructBlock extends Block{
         @Override
         public float progress(){
             return progress;
+        }
+
+        public void scaleHealth(float progress){
+            float maxHealth = tile.build.maxHealth = current.constructHealthMultiplier() > 0f ? current.constructHealthMultiplier() : tile.block() instanceof ConstructBlock b ? b.health : 10f;
+
+            if(previousHealth > tile.build.health + 0.001f) damaged += previousHealth - tile.build.health;
+            previousHealth = tile.build.health = progress * maxHealth - damaged;
+            tile.build.health = Mathf.clamp(tile.build.health, 0f, maxHealth);
         }
 
         public void setConstruct(Block previous, Block block){
