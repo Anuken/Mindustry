@@ -105,7 +105,7 @@ public class ApplicationTests{
                 public void init(){
                     super.init();
                     begins[0] = true;
-                    testMap = maps.loadInternalMap("groundZero");
+                    testMap = maps.loadInternalMap("serpulo/groundZero");
                     Thread.currentThread().interrupt();
                 }
             };

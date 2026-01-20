@@ -529,11 +529,11 @@ public class LogicBlock extends Block{
 
                 while(accumulator >= 1f){
                     executor.runOnce();
-                    accumulator --;
                     if(executor.yield){
                         executor.yield = false;
                         break;
                     }
+                    accumulator --;
                 }
             }
         }
