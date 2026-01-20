@@ -32,7 +32,7 @@ public class ContinuousBulletType extends BulletType{
     @Override
     public float continuousDamage(){
         if(!continuous) return -1f;
-        return 60f / damageInterval;
+        return damage / damageInterval * 60f;
     }
 
     @Override
