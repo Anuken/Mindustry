@@ -427,7 +427,7 @@ public class BulletType extends Content implements Cloneable{
         return Math.max(Mathf.zero(drag) ? speed * lifetime : speed * (1f - Mathf.pow(1f - drag, lifetime)) / drag, maxRange);
     }
 
-    /** @return continuous damage interval per second, or -1 if not continuous. */
+    /** @return continuous damage in damage/sec, or -1 if not continuous. */
     public float continuousDamage(){
         return -1f;
     }
