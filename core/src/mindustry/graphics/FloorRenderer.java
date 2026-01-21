@@ -322,30 +322,33 @@ public class FloorRenderer{
         vidx = 0;
 
         Batch current = Core.batch;
-        Core.batch = batch;
 
-        for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
-            for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
-                Tile tile = world.tile(tilex, tiley);
-                Floor floor;
+        try{
+            Core.batch = batch;
 
-                if(tile == null){
-                    continue;
-                }else{
-                    floor = tile.floor();
-                }
+            for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
+                for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize; tiley++){
+                    Tile tile = world.tile(tilex, tiley);
+                    Floor floor;
 
-                if(tile.block().cacheLayer == layer && layer == CacheLayer.walls && !(tile.isDarkened() && tile.data >= 5)){
-                    tile.block().drawBase(tile);
-                }else if(floor.cacheLayer == layer && (ignoreWalls || world.isAccessible(tile.x, tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
-                    floor.drawBase(tile);
-                }else if(floor.cacheLayer != layer && layer != CacheLayer.walls){
-                    floor.drawNonLayer(tile, layer);
+                    if(tile == null){
+                        continue;
+                    }else{
+                        floor = tile.floor();
+                    }
+
+                    if(tile.block().cacheLayer == layer && layer == CacheLayer.walls && !(tile.isDarkened() && tile.data >= 5)){
+                        tile.block().drawBase(tile);
+                    }else if(floor.cacheLayer == layer && (ignoreWalls || world.isAccessible(tile.x, tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
+                        floor.drawBase(tile);
+                    }else if(floor.cacheLayer != layer && layer != CacheLayer.walls){
+                        floor.drawNonLayer(tile, layer);
+                    }
                 }
             }
+        }finally{
+            Core.batch = current;
         }
-
-        Core.batch = current;
 
         int floats = vidx;
         ChunkMesh mesh = new ChunkMesh(true, floats / vertexSize, 0, attributes,
@@ -438,7 +441,7 @@ public class FloorRenderer{
             vidx += spriteSize;
 
             //fixes graphical artifacting due to low precision positions/UVs. TODO: test for issues
-            final float grow = 0.01f;
+            final float grow = 0.03f;
             x -= grow;
             y -= grow;
             width += grow*2f;

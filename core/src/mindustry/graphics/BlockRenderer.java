@@ -125,8 +125,7 @@ public class BlockRenderer{
 
         shadows.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
         shadows.resize(world.width(), world.height());
-        shadows.begin();
-        Core.graphics.clear(Color.white);
+        shadows.begin(Color.white);
         Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
 
         Draw.color(blendShadowColor);
@@ -161,8 +160,7 @@ public class BlockRenderer{
     public void updateShadows(boolean ignoreBuildings, boolean ignoreTerrain){
         shadows.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
         shadows.resize(world.width(), world.height());
-        shadows.begin();
-        Core.graphics.clear(Color.white);
+        shadows.begin(Color.white);
         Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
 
         Draw.color(blendShadowColor);
@@ -182,10 +180,9 @@ public class BlockRenderer{
         darkEvents.clear();
         dark.getTexture().setFilter(TextureFilter.linear);
         dark.resize(world.width(), world.height());
-        dark.begin();
-
         //fill darkness with black when map area is limited
-        Core.graphics.clear(state.rules.limitMapArea ? Color.black : Color.white);
+        dark.begin(state.rules.limitMapArea ? Color.black : Color.white);
+
         Draw.proj().setOrtho(0, 0, dark.getWidth(), dark.getHeight());
 
         //clear out initial starting area

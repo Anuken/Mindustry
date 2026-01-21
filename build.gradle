@@ -44,7 +44,7 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
-        rhinoVersion = '73a812444ac388ac2d94013b5cadc8f70b7ea027'
+        rhinoVersion = '54b75cbd1207ef1fd5cff517cbd188e763c85baa'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -113,7 +113,7 @@ allprojects{
             def output = 'en\n'
             def bundles = new File(project(':core').projectDir, 'assets/bundles/')
             bundles.list().sort().each{ name ->
-                if(name == "bundle.properties") return
+                if(name == "bundle.properties" || name == "global.properties") return
                 output += name.substring("bundle".length() + 1, name.lastIndexOf('.')) + "\n"
             }
             new File(project(':core').projectDir, 'assets/locales').text = output
@@ -327,7 +327,7 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
-        api "org.lz4:lz4-java:1.8.0"
+        api "at.yawk.lz4:lz4-java:1.10.2"
         api arcModule("arc-core")
         api arcModule("extensions:flabel")
         api arcModule("extensions:freetype")

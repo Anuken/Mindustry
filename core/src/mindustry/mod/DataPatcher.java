@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.Json.*;
 import arc.util.serialization.*;
+import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -59,6 +60,10 @@ public class DataPatcher{
         cont.allowAssetLoading = false;
 
         return cont;
+    }
+
+    public boolean isPatched(Object object){
+        return usedpatches.contains(object);
     }
 
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
@@ -129,6 +134,13 @@ public class DataPatcher{
     }
 
     void created(Object object, Object parent){
+        if(object instanceof Weapon weapon){
+            weapon.init();
+        }else if(object instanceof Content cont){
+            cont.init();
+            cont.postInit();
+        }
+
         if(!Vars.headless){
             if(object instanceof DrawPart part && parent instanceof MappableContent cont){
                 part.load(cont.name);
@@ -138,15 +150,8 @@ public class DataPatcher{
                 draw.load(block);
             }else if(object instanceof Weapon weapon){
                 weapon.load();
-                weapon.init();
             }else if(object instanceof Content cont){
-                cont.init();
-                cont.postInit();
                 cont.load();
-            }
-        }else{
-            if(object instanceof Weapon weapon){
-                weapon.init();
             }
         }
     }
@@ -370,10 +375,10 @@ public class DataPatcher{
                     Reflect.set(fobj, fdata.field, fv);
                 }, value, true);
             }else if(value instanceof JsonValue jsv && object instanceof Block bl && jsv.isObject() && field.equals("consumes")){
-                modifiedField(bl, "consumeBuilder", Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy());
-                modifiedField(bl, "consumers", Reflect.<Consume[]>get(Block.class, bl, "consumers"));
+                Seq<Consume> prevBuilder = Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy();
                 boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
                 reset(() -> {
+                    Reflect.set(Block.class, bl, "consumeBuilder", prevBuilder);
                     bl.reinitializeConsumers();
                     bl.hasItems = hadItems;
                     bl.hasLiquids = hadLiquids;
@@ -553,14 +558,14 @@ public class DataPatcher{
 
     static Object copyArray(Object object){
         if(object instanceof int[] i) return i.clone();
-        if(object instanceof long[] i) return i.clone();
-        if(object instanceof short[] i) return i.clone();
-        if(object instanceof byte[] i) return i.clone();
-        if(object instanceof boolean[] i) return i.clone();
-        if(object instanceof char[] i) return i.clone();
-        if(object instanceof float[] i) return i.clone();
-        if(object instanceof double[] i) return i.clone();
-        return ((Object[])object).clone();
+        else if(object instanceof long[] i) return i.clone();
+        else if(object instanceof short[] i) return i.clone();
+        else if(object instanceof byte[] i) return i.clone();
+        else if(object instanceof boolean[] i) return i.clone();
+        else if(object instanceof char[] i) return i.clone();
+        else if(object instanceof float[] i) return i.clone();
+        else if(object instanceof double[] i) return i.clone();
+        else return ((Object[])object).clone();
     }
 
     public static class PatchSet{
@@ -573,6 +578,12 @@ public class DataPatcher{
         public PatchSet(String patch, JsonValue json){
             this.patch = patch;
             this.json = json;
+        }
+
+        @Override
+        public String toString(){
+            //the json can be a single 'error' value if it failed to parse
+            return !json.isObject() ? patch : json.prettyPrint(OutputType.minimal, 2);
         }
     }
 

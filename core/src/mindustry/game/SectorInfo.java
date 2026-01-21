@@ -208,7 +208,10 @@ public class SectorInfo{
                 this.items.set(content.item(i), items.get(i));
             }
 
-            spawnPosition = entity.pos();
+            //don't change the spawn position after the sector spawn is set by the generator once
+            if(spawnPosition == 0){
+                spawnPosition = entity.pos();
+            }
         }
 
         waveSpacing = state.rules.waveSpacing;
