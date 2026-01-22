@@ -1,10 +1,5 @@
 package mindustry.input;
 
-import static arc.Core.*;
-import static mindustry.Vars.*;
-
-import java.util.*;
-
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
