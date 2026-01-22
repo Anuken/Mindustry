@@ -41,7 +41,7 @@ public class Rules{
     /** Whether is waiting for players enabled in PvP. */
     public boolean pvpAutoPause = true;
     /** Whether pause is enabled or not in singleplayer */
-    public boolean pauseEnabled = true;
+    public boolean pauseDisabled = false;
     /** Whether to pause the wave timer until all enemies are destroyed. */
     public boolean waitEnemies = false;
     /** Determines if gamemode is attack mode. */
