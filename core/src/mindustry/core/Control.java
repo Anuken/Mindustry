@@ -155,7 +155,7 @@ public class Control implements ApplicationListener, Loadable{
 
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> app.post(() -> {
-            if(state.rules.pvp && !net.active()){
+            if(state.rules.pvp && !net.active() && state.rules.pauseEnabled){
                 try{
                     net.host(port);
                     player.admin = true;
@@ -258,7 +258,7 @@ public class Control implements ApplicationListener, Loadable{
                             if(ccore != null){
                                 anyBuilds = true;
 
-                                if(!net.active()){
+                                if(!net.active() && state.rules.pauseEnabled){
                                     build.pickedUp();
                                     build.tile.remove();
 
@@ -607,7 +607,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void pause(){
-        if(settings.getBool("backgroundpause", true) && !net.active()){
+        if(settings.getBool("backgroundpause", true) && !net.active() && state.rules.pauseEnabled){
             backgroundPaused = true;
             wasPaused = state.is(State.paused);
             if(state.is(State.playing)) state.set(State.paused);
@@ -616,7 +616,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void resume(){
-        if(state.is(State.paused) && !wasPaused && settings.getBool("backgroundpause", true) && !net.active()){
+        if(state.is(State.paused) && !wasPaused && settings.getBool("backgroundpause", true) && !net.active() && state.rules.pauseEnabled){
             state.set(State.playing);
         }
         backgroundPaused = false;
@@ -711,7 +711,7 @@ public class Control implements ApplicationListener, Loadable{
                 core.items.each((i, a) -> i.unlock());
             }
 
-            if(backgroundPaused && settings.getBool("backgroundpause") && !net.active()){
+            if(backgroundPaused && settings.getBool("backgroundpause") && !net.active() && state.rules.pauseEnabled){
                 state.set(State.paused);
             }
 
@@ -720,7 +720,7 @@ public class Control implements ApplicationListener, Loadable{
                 state.set(State.playing);
             }
 
-            if(!net.client() && Core.input.keyTap(Binding.pause) && !(state.isCampaign() && state.afterGameOver) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            if(!net.client() && state.rules.pauseEnabled && Core.input.keyTap(Binding.pause) && !(state.isCampaign() && state.afterGameOver) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.isPaused() ? State.playing : State.paused);
             }
 
@@ -733,7 +733,7 @@ public class Control implements ApplicationListener, Loadable{
                     ui.chatfrag.hide();
                 }else if(!ui.paused.isShown() && !scene.hasDialog()){
                     ui.paused.show();
-                    if(!net.active()){
+                    if(!net.active() && state.rules.pauseEnabled){
                         state.set(State.paused);
                     }
                 }

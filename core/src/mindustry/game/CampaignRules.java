@@ -13,11 +13,13 @@ public class CampaignRules{
     public boolean legacyLaunchPads;
     public boolean rtsAI;
     public boolean clearSectorOnLose;
+    public boolean pauseEnabled;
 
     public void apply(Planet planet, Rules rules){
         rules.staticFog = rules.fog = fog;
         rules.showSpawns = showSpawns;
         rules.randomWaveAI = randomWaveAI;
+        rules.pauseEnabled = pauseEnabled;
         rules.objectiveTimerMultiplier = difficulty.waveTimeMultiplier;
         if(planet.showRtsAIRule){
             boolean enabled = rtsAI && rules.attackMode; //if attackMode becomes false (waves enabled), turn off RTS AI

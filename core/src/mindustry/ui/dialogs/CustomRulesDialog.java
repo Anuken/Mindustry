@@ -216,6 +216,7 @@ public class CustomRulesDialog extends BaseDialog{
 
 
         category("environment");
+        check("@rules.pauseEnabled", b -> rules.pauseEnabled = b, () -> rules.pauseEnabled);
         check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
         check("@rules.fire", b -> rules.fire = b, () -> rules.fire);
         check("@rules.fog", b -> rules.fog = b, () -> rules.fog);

@@ -359,13 +359,13 @@ public class HudFragment{
                     .name("schematics");
 
                     select.button(Icon.pause, style, () -> {
-                        if(net.active()){
+                        if(net.active() || !state.rules.pauseEnabled){
                             ui.listfrag.toggle();
                         }else{
                             state.set(state.isPaused() ? State.playing : State.paused);
                         }
                     }).name("pause").update(i -> {
-                        if(net.active()){
+                        if(net.active() || !state.rules.pauseEnabled){
                             i.getStyle().imageUp = Icon.players;
                         }else{
                             i.setDisabled(false);
@@ -1137,7 +1137,7 @@ public class HudFragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && state.rules.waveSending && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning();
+        return state.rules.waves && state.rules.waveSending && ((net.server() || player.admin) || !net.active()) && state.rules.pauseEnabled && state.enemies == 0 && !spawner.isSpawning();
     }
 
 }
