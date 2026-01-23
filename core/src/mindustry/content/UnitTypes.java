@@ -3106,6 +3106,7 @@ public class UnitTypes{
                             float fin = 0.05f + (j + 1) / (float)count;
                             float spd = speed;
                             float life = lifetime / Mathf.lerp(fin, 1f, 0.5f);
+                            boolean show = j == 0 && i > 0;
                             spawnBullets.add(new BasicBulletType(spd * fin, 60){{
                                 drag = 0.002f;
                                 width = 12f;
@@ -3115,6 +3116,7 @@ public class UnitTypes{
                                 hitSize = 5f;
                                 pierceCap = 2;
                                 pierce = true;
+                                showStats = show;
                                 pierceBuilding = true;
                                 hitColor = backColor = trailColor = Color.valueOf("feb380");
                                 frontColor = Color.white;

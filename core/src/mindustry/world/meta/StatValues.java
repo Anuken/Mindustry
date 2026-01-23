@@ -767,6 +767,27 @@ public class StatValues{
                         bt.row();
                         bt.add(coll);
                     }
+
+                    if(type.spawnBullets != null && type.spawnBullets.size > 0){
+                        bt.row();
+
+                        Table sc = new Table();
+                        for(BulletType spawn : type.spawnBullets){
+                            if(spawn.showStats) ammo(ObjectMap.of(t, spawn), true, false).display(sc);
+                        }
+                        Collapser coll = new Collapser(sc, true);
+                        coll.setDuration(0.1f);
+
+                        bt.table(st -> {
+                            st.left().defaults().left();
+
+                            st.add(Core.bundle.format("bullet.spawnBullets", type.spawnBullets.size));
+                            if(sc.getChildren().size > 0) st.button(Icon.downOpen, Styles.emptyi, () -> coll.toggle(false)).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(8).padLeft(16f).expandX();
+                        });
+                        bt.row();
+                        bt.add(coll);
+                    }
+
                 }).padLeft(5).padTop(5).padBottom(compact ? 0 : 5).growX().margin(compact ? 0 : 10);
                 table.row();
             }

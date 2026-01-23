@@ -1,6 +1,6 @@
 package mindustry.world.blocks.defense;
 
-import arc.Core;
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -41,7 +41,7 @@ public class ShockMine extends Block{
     public void setStats(){
         super.setStats();
         stats.add(Stat.damage, table -> {
-            table.add((String)(Core.bundle.format("bullet.lightning", tendrils,  Strings.autoFixed(damage, 2)).replace("[stat]", "[white]")));
+            table.add((String)(Core.bundle.format("bullet.lightning", tendrils, Strings.autoFixed(damage, 2)).replace("[stat]", "[white]")));
         });
     } 
 
