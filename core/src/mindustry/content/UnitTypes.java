@@ -812,7 +812,7 @@ public class UnitTypes{
 
         arkyid = new UnitType("arkyid"){{
             drag = 0.1f;
-            speed = 0.62f;
+            speed = 0.75f;
             hitSize = 23f;
             health = 8000;
             armor = 6f;
@@ -844,8 +844,8 @@ public class UnitTypes{
 
             BulletType sapper = new SapBulletType(){{
                 sapStrength = 0.85f;
-                length = 55f;
-                damage = 40;
+                length = 66f;
+                damage = 48;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
@@ -898,9 +898,10 @@ public class UnitTypes{
                     knockback = 0.8f;
                     lifetime = 70f;
                     width = height = 19f;
+                    suppressionRange = 90f;
                     collidesTiles = true;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 70f;
+                    splashDamageRadius = 90f;
                     splashDamage = 65f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
