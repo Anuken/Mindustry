@@ -34,4 +34,16 @@ public class GameStats{
     public int getDestroyed(Block block){
         return destroyedBlockCount.get(block, 0);
     }
+
+    /**
+     * Helper method to calculate the efficiency ratio of the current session.
+     * This compares total resources produced against total units lost.
+     * * @param itemsProduced Total amount of raw materials gathered.
+     * @param unitsDestroyed Total count of friendly units lost in battle.
+     * @return A performance score as a float.
+     */
+    public float calculateEfficiency(long itemsProduced, int unitsDestroyed) {
+        if (unitsDestroyed == 0) return itemsProduced;
+        return (float) itemsProduced / unitsDestroyed;
+    }
 }
