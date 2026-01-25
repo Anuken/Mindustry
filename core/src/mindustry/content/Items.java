@@ -70,18 +70,18 @@ public class Items{
         plastanium = new Item("plastanium", Color.valueOf("cbd97f")){{
             flammability = 0.1f;
             explosiveness = 0.2f;
-            cost = 1.3f;
+            cost = 2f;
             healthScaling = 0.1f;
         }};
 
         phaseFabric = new Item("phase-fabric", Color.valueOf("f4ba6e")){{
-            cost = 1.3f;
+            cost = 2.2f;
             radioactivity = 0.6f;
             healthScaling = 0.25f;
         }};
 
         surgeAlloy = new Item("surge-alloy", Color.valueOf("f3e979")){{
-            cost = 1.2f;
+            cost = 4.25f;
             charge = 0.75f;
             healthScaling = 0.25f;
         }};
