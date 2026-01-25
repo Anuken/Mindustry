@@ -18,8 +18,10 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.Attributes;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.meta.Attribute;
 
 import java.util.*;
 
@@ -189,6 +191,14 @@ public class Logic implements ApplicationListener{
                 state.stats.unitsCreated++;
             }
         });
+
+        Events.on(FogWeatherEvent.class,
+                e -> {
+                    for(Unit u : Groups.unit)
+                    {
+                        u.type.updateFogRadius(e.multiplier);
+                    }
+                });
     }
 
     private void checkOverlappingPlans(Team team, Tile tile){
@@ -328,6 +338,19 @@ public class Logic implements ApplicationListener{
                 Call.createWeather(entry.weather, entry.intensity, duration, Tmp.v1.x, Tmp.v1.y);
             }
         }
+    }
+
+    void updateFogFromWeather(){
+        float fogMultiplier = 1f;
+
+        for(WeatherState entry : Groups.weather){
+            float mult = entry.weather.attrs.get(Attribute.fogVisibilityMultiplier);
+            if(mult != 0f){
+                fogMultiplier *= mult;
+            }
+        }
+
+        Events.fire(new FogWeatherEvent(fogMultiplier));
     }
 
     @Remote(called = Loc.server)
@@ -499,10 +522,15 @@ public class Logic implements ApplicationListener{
                     runWave();
                 }
 
+
                 //apply weather attributes
                 state.envAttrs.clear();
                 state.envAttrs.add(state.rules.attributes);
                 Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
+
+                //apply fog effects
+                updateFogFromWeather();
+
 
                 PerfCounter.entityUpdate.begin();
                 Groups.update();
