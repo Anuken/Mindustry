@@ -4073,7 +4073,6 @@ public class Blocks{
             ammoPerShot = 2;
             velocityRnd = 0.2f;
 
-            scaleLifetimeOffset = 1f / 9f;
             recoil = 6f;
             shake = 2f;
             range = 290f;
@@ -4083,6 +4082,7 @@ public class Blocks{
             scaledHealth = 130;
             depositCooldown = 2.0f;
             shootSound = Sounds.shootRipple;
+            unitSort = UnitSorts.grouped(290f * Mathf.sinDeg(11f));
         }};
 
         cyclone = new ItemTurret("cyclone"){{
@@ -4784,6 +4784,7 @@ public class Blocks{
             minWarmup = 0.85f;
 
             newTargetInterval = 40f;
+            unitSort = UnitSorts.grouped(40f);
             shootWarmupSpeed = 0.07f;
             warmupMaintainTime = 120f;
 
