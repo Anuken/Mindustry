@@ -192,8 +192,8 @@ public class StatusEffects{
 
         corroded = new StatusEffect("corroded"){{
             color = Color.valueOf("e4ffd6");
-            intervalDamage = 25f;
-            intervalDamageTime = 30f;
+            intervalDamage = 20f;
+            intervalDamageTime = 15f;
 
             effectChance = 0.1f;
             effect = Fx.corrosionVapor;
