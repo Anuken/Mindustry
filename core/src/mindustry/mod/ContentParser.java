@@ -690,7 +690,34 @@ public class ContentParser{
             read(() -> readFields(liquid, value));
             return liquid;
         },
-        ContentType.status, parser(ContentType.status, StatusEffect::new),
+        ContentType.status, (TypeParser<StatusEffect>)(mod, name, value) -> {
+            StatusEffect status;
+            if(locate(ContentType.status, name) != null){
+                status = locate(ContentType.status, name);
+                readBundle(ContentType.status, name, value);
+            }else{
+                readBundle(ContentType.status, name, value);
+                status = new StatusEffect(mod + "-" + name);
+            }
+            currentContent = status;
+            read(() -> readFields(status, value));
+
+            status.init(() -> {
+                var oldOpposite = status.opposites.copy();
+                status.opposites.clear();
+                status.opposite(oldOpposite.toSeq().toArray(StatusEffect.class));
+
+                var oldAffinities = status.affinities.copy();
+                status.affinities.clear();
+                for(StatusEffect affinity: oldAffinities){
+                    status.affinity(affinity, (unit, result, time) -> {
+                        unit.damagePierce(status.transitionDamage);
+                    });
+                }
+            });
+
+            return status;
+        },
         ContentType.sector, (TypeParser<SectorPreset>)(mod, name, value) -> {
             if(value.isString()){
                 return locate(ContentType.sector, name);
