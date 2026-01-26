@@ -528,7 +528,7 @@ public class SerpuloTechTree{
                                     });
 
                                     node(coastline, Seq.with(
-                                    new SectorComplete(windsweptIslands),
+                                    new SectorComplete(tarFields),
                                     new SectorComplete(saltFlats),
                                     new Research(navalFactory),
                                     new Research(payloadConveyor)
