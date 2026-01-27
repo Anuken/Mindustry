@@ -11,6 +11,7 @@ public class UnitSorts{
     closest = Unit::dst2,
     farthest = (u, x, y) -> -u.dst2(x, y),
     strongest = (u, x, y) -> -u.maxHealth + Mathf.dst2(u.x, u.y, x, y) / 6400f,
+    leastHealth = (u, x, y) -> (u.health / u.maxHealth) * 1000f + Mathf.dst2(u.x, u.y, x, y) / 6400f,
     weakest = (u, x, y) -> u.maxHealth + Mathf.dst2(u.x, u.y, x, y) / 6400f;
 
     public static BuildingPriorityf

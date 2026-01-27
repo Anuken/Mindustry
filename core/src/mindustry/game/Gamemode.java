@@ -20,7 +20,6 @@ public enum Gamemode{
     attack(rules -> {
         rules.attackMode = true;
         rules.waveTimer = true;
-
         rules.waveSpacing = 2f * Time.toMinutes;
         rules.waveTeam.rules().infiniteResources = true;
     }, map -> map.teams.size > 1),
@@ -31,6 +30,7 @@ public enum Gamemode{
         rules.buildSpeedMultiplier = 1f;
         rules.unitBuildSpeedMultiplier = 2f;
         rules.attackMode = true;
+        rules.unitCrashDamageMultiplier = 1.75f;
     }, map -> map.teams.size > 1),
     editor(true, rules -> {
         rules.infiniteResources = true;
