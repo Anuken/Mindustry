@@ -2476,6 +2476,7 @@ public class UnitTypes{
                     trailInterval = 3f;
                     splashDamage = 70f;
                     splashDamageRadius = rad;
+                    splashDamagePierce = true;
                     hitShake = 4f;
                     trailRotation = true;
                     status = StatusEffects.electrified;
