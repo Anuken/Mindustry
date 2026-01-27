@@ -179,6 +179,12 @@ public class DatabaseDialog extends BaseDialog{
                                     setColor(Color.scarlet);
                                     touchable = Touchable.disabled;
                                 }}).size(8 * 4).pad(3);
+                            }else if(state.isGame() && state.patcher.isPatched(unlock)){
+                                list.stack(image, new Table(){{
+                                    right().bottom().touchable = Touchable.disabled;
+                                    // Interpolated color (lerp lightishGray and white) for better contrast
+                                    image(Icon.fileSmall).size(12f).color(Tmp.c1.set(Color.white).a(0.5f));
+                                }}).size(8 * 4).pad(3);
                             }else{
                                 list.add(image).size(8 * 4).pad(3);
                             }

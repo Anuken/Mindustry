@@ -441,7 +441,7 @@ public class FloorRenderer{
             vidx += spriteSize;
 
             //fixes graphical artifacting due to low precision positions/UVs. TODO: test for issues
-            final float grow = 0.01f;
+            final float grow = 0.03f;
             x -= grow;
             y -= grow;
             width += grow*2f;

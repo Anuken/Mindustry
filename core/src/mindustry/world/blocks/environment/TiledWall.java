@@ -50,7 +50,7 @@ public class TiledWall extends StaticWall{
 
     @Override
     public void blockChanged(Tile tile){
-        super.blockChanged(tile);
+        if(headless) return;
 
         if(!world.isGenerating() && TiledState.changes(state(tile)) != world.tileChanges){
             scan(tile);
