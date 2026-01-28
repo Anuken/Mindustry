@@ -20,6 +20,7 @@ public class StatUnit{
     itemsSecond = new StatUnit("itemsSecond"),
     liquidUnits = new StatUnit("liquidUnits", "[sky]" + Iconc.liquid + "[]"),
     powerUnits = new StatUnit("powerUnits", "[accent]" + Iconc.power + "[]"),
+    powerEquilibrium = new StatUnit("powerEquilibrium"),
     heatUnits = new StatUnit("heatUnits", "[red]" + Iconc.waves + "[]"),
     degrees = new StatUnit("degrees"),
     seconds = new StatUnit("seconds"),
