@@ -102,7 +102,7 @@ public class NuclearReactor extends PowerGenerator{
             productionEfficiency = fullness;
 
             if(fuel > 0 && enabled){
-                //max delta to 1 for better low fps stability (increases heat slower). Could pontentially lead to exploits?
+                //max delta to 1 for better low fps stability (increases heat slower). Could potentially lead to exploits?
                 heat += heatLastFrame = fullness * heating * Math.min(delta(), 1f);
 
                 if(timer(timerFuel, itemDuration / (timeScale + (heat > heatLastFrame ? 1f * heat * heatConsumeRate : 0f)))){
