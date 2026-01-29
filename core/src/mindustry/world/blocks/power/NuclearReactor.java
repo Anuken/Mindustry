@@ -90,6 +90,7 @@ public class NuclearReactor extends PowerGenerator{
 
     public class NuclearReactorBuild extends GeneratorBuild implements HeatBlock{
         public float heat;
+        public float heatLastFrame;
         public float heatProgress;
         public float flash;
         public float smoothLight;
@@ -101,9 +102,10 @@ public class NuclearReactor extends PowerGenerator{
             productionEfficiency = fullness;
 
             if(fuel > 0 && enabled){
-                heat += fullness * heating * Math.min(delta(), 4f);
+                //max delta to 1 for better low fps stability (increases heat slower). Could pontential lead to exploits?
+                heat += heatLastFrame = fullness * heating * Math.min(delta(), 1f);
 
-                if(timer(timerFuel, itemDuration / (timeScale + 1f * heat * heatConsumeRate))){
+                if(timer(timerFuel, itemDuration / (timeScale + (heat > heatLastFrame ? 1f * heat * heatConsumeRate : 0f)))){
                     consume();
                 }
             }else{
