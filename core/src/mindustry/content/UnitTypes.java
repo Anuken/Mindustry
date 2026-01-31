@@ -842,6 +842,12 @@ public class UnitTypes{
             shadowElevation = 0.65f;
             groundLayer = Layer.legUnit;
 
+            abilities.add(
+                new LiquidRegenAbility(){{
+                    setLiquidStats(Liquids.cryofluid, 2f);
+                    setLiquidStats(Liquids.water, 2f);
+                }});
+
             BulletType sapper = new SapBulletType(){{
                 sapStrength = 0.85f;
                 length = 66f;
@@ -4327,7 +4333,6 @@ public class UnitTypes{
             rotateSpeed = 1.7f;
             segments = 4;
             drawBody = false;
-            hidden = true;
             crushDamage = 2f;
             aiController = HugAI::new;
             targetAir = false;
