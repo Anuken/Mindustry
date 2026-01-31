@@ -92,10 +92,8 @@ public class LiquidRegenAbility extends Ability{
                                 
                                 if(healed){
                                     float speed = liqSlurpSpeed.get(puddle.liquid);
-                                    float regen = liqRegenPerSlurp.get(puddle.liquid);
-                                    float fractionTaken = Math.min(puddle.amount, (speed * Time.delta));
                                     puddle.amount -= Math.min(puddle.amount, speed * Time.delta);
-                                    unit.heal(fractionTaken * regen);
+                                    unit.heal(Math.min(puddle.amount, (speed * Time.delta)) * liqRegenPerSlurp.get(puddle.liquid));
                                     
                                     if(Mathf.chanceDelta(liqSlurpEffectChance.get(puddle.liquid))){
                                         Tmp.v1.rnd(Mathf.random(unit.hitSize/2f));
