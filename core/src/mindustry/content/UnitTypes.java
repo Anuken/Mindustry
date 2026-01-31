@@ -851,7 +851,7 @@ public class UnitTypes{
             BulletType sapper = new SapBulletType(){{
                 sapStrength = 0.85f;
                 length = 66f;
-                damage = 48;
+                damage = 40;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
@@ -904,7 +904,6 @@ public class UnitTypes{
                     knockback = 0.8f;
                     lifetime = 70f;
                     width = height = 19f;
-                    suppressionRange = 90f;
                     collidesTiles = true;
                     ammoMultiplier = 4f;
                     splashDamageRadius = 90f;
