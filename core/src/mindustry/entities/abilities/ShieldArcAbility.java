@@ -165,8 +165,10 @@ public class ShieldArcAbility extends Ability{
         t.add(abilityStat("repairspeed", Strings.autoFixed(regen * 60f, 2)));
         t.row();
         t.add(abilityStat("cooldown", Strings.autoFixed(cooldown / 60f, 2)));
-        t.row();
-        t.add(abilityStat("deflectchance", Strings.autoFixed(chanceDeflect *100f, 2)));
+        if(chanceDeflect > 0f){
+            t.row();
+            t.add(abilityStat("deflectchance", Strings.autoFixed(chanceDeflect *100f, 2)));
+        }
     }
 
     @Override
