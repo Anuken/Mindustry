@@ -15,7 +15,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class PayloadBlock extends Block{
-    public float payloadSpeed = 0.7f, payloadRotateSpeed = 5f;
+    public float payloadSpeed = 0.7f, payloadRotateSpeed = 3f;
 
     public String regionSuffix = "";
     public TextureRegion topRegion, outRegion, inRegion;
@@ -101,7 +101,8 @@ public class PayloadBlock extends Block{
 
         @Override
         public boolean canControlSelect(Unit unit){
-            return !unit.spawnedByCore && unit.type.allowedInPayloads && this.payload == null && acceptUnitPayload(unit) && unit.within(this, size * tilesize * 0.75f + unit.hitSize);
+            return !unit.spawnedByCore && unit.type.allowedInPayloads && this.payload == null && acceptUnitPayload(unit) && 
+            (unit.isGrounded() && !unit.type.allowLegStep && solid) ? unit.within(this, size * tilesize * 0.7f + unit.hitSize / 2f) : unit.tileOn() != null && unit.tileOn().build == this;
         }
 
         @Override
@@ -177,7 +178,7 @@ public class PayloadBlock extends Block{
 
         public void updatePayload(){
             if(payload != null){
-                payload.set(x + payVector.x, y + payVector.y, payRotation);
+                payload.set(x + 0.5f + payVector.x, y + 0.5f + payVector.y, payRotation);
             }
         }
 
