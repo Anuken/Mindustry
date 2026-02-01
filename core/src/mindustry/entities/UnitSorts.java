@@ -17,12 +17,18 @@ public class UnitSorts{
     strongest = (u, x, y) -> -u.maxHealth + Mathf.dst2(u.x, u.y, x, y) / 6400f,
     weakest = (u, x, y) -> u.maxHealth + Mathf.dst2(u.x, u.y, x, y) / 6400f;
 
+    /**
+     * @param distanceWeight higher values make distance less important. Set to <= 0 to ignore distance.
+     */
     public static Sortf grouped(float radius){
+        return grouped(radius, -1f);
+    }
+    public static Sortf grouped(float radius, float distanceWeight){
         return (u, x, y) -> {
             updateClusters(radius);
             int key = (Mathf.floor(u.x / radius) << 16) | Mathf.floor(u.y / radius);
             //ignore distance since in less dense groups it almost always wins
-            return -clusterCount.get(key, 0);
+            return -clusterCount.get(key, 0) + (distanceWeight > 0 ? Mathf.dst2(u.x, u.y, x, y) / distanceWeight : 0f);
         };
     }
 
