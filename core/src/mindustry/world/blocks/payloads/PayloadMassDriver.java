@@ -147,6 +147,11 @@ public class PayloadMassDriver extends PayloadBlock{
         }
 
         @Override
+        public boolean acceptUnitPayload(Unit unit){
+            return true;
+        }
+
+        @Override
         public float buildRotation(){
             return rotation;
         }

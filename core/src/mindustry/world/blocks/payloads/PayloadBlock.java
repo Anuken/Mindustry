@@ -101,7 +101,7 @@ public class PayloadBlock extends Block{
 
         @Override
         public boolean canControlSelect(Unit unit){
-            return !unit.spawnedByCore && unit.type.allowedInPayloads && this.payload == null && acceptUnitPayload(unit) && unit.tileOn() != null && unit.tileOn().build == this;
+            return !unit.spawnedByCore && unit.type.allowedInPayloads && this.payload == null && acceptUnitPayload(unit) && unit.within(this, size * tilesize * 0.75f + unit.hitSize);
         }
 
         @Override
@@ -118,9 +118,13 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public void handlePayload(Building source, Payload payload){
+        public void handlePayload(Building source, Payload payload, @Nullable Unit unit){
+            if(unit != null){
+                this.payVector.set(unit.x, unit.y).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
+            }else{
+                this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
+            }
             this.payload = (T)payload;
-            this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
             this.payRotation = payload.rotation();
 
             updatePayload();
