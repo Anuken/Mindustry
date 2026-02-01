@@ -3433,7 +3433,7 @@ public class Blocks{
                     hittable = false;
                 }},
                 Items.pyratite, new BulletType(4f, 30f){{
-                    ammoMultiplier = 6f;
+                    ammoMultiplier = 10f;
                     hitSize = 7f;
                     lifetime = 18f;
                     pierce = true;
