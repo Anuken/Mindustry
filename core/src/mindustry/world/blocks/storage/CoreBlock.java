@@ -550,7 +550,14 @@ public class CoreBlock extends StorageBlock{
         @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.itemCapacity) return storageCapacity;
+            if(sensor == LAccess.maxUnits) return Units.getCap(team);
             return super.sense(sensor);
+        }
+
+        @Override
+        public double sense(Content content){
+            if(content instanceof UnitType type) return team.data().countType(type);
+            return super.sense(content);
         }
 
         @Override
@@ -622,6 +629,11 @@ public class CoreBlock extends StorageBlock{
                 //just create an explosion, no fire. this prevents immediate recapture
                 Damage.dynamicExplosion(x, y, 0, 0, 0, tilesize * block.size / 2f, state.rules.damageExplosions);
                 Fx.commandSend.at(x, y, 140f);
+
+                //make sure the sound still plays
+                if(!headless){
+                    playDestroySound();
+                }
             }else{
                 super.onDestroyed();
             }

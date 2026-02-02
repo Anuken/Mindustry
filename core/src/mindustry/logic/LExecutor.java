@@ -432,6 +432,13 @@ public class LExecutor{
                     }
                     case deconstruct -> {
                         if((state.rules.logicUnitDeconstruct || exec.privileged) && unit.canBuild()){
+                            //reset state of last request when necessary
+                            if(ai.plan.x != World.toTile(x1) || ai.plan.y != World.toTile(y1) || !ai.plan.breaking || unit.plans.isEmpty()){
+                                ai.plan.progress = 0;
+                                ai.plan.initialized = false;
+                                ai.plan.stuck = false;
+                            }
+
                             ai.plan.x = World.toTile(x1);
                             ai.plan.y = World.toTile(y1);
                             ai.plan.breaking = true;
@@ -931,30 +938,31 @@ public class LExecutor{
                             exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandPrint, packSign(curX + xOffset), packSign(curY + yOffset), next, 0, 0, 0));
                         }
                         curX += advance;
+
+                        if(exec.graphicsBuffer.size >= maxGraphicsBuffer) break;
                     }
 
                     exec.textBuffer.setLength(0);
                 }
             }else{
-                int num1 = p1.numi(), num4 = p4.numi(), xval = packSign(x.numi()), yval = packSign(y.numi());
+                int num1 = packSign(p1.numi()), num4 = packSign(p4.numi()), xval = packSign(x.numi()), yval = packSign(y.numi());
 
                 if(type == LogicDisplay.commandImage){
+                    int packed = -1;
                     if(p1.obj() instanceof UnlockableContent u){
-                        //TODO: with mods, this will overflow (ID >= 512), but that's better than the previous system, at least
-                        num1 = u.id;
-                        num4 = u.getContentType().ordinal();
-                    }else{
-                        num1 = -1;
-                        num4 = -1;
+                        packed = (u.id << 5) | (u.getContentType().ordinal() & 31);
+                    }else if(p1.obj() instanceof LogicDisplayBuild d){
+                        packed = (d.index << 5) | LogicDisplay.displayDrawType;
                     }
-                    //num1 = p1.obj() instanceof UnlockableContent u ? u.iconId : 0;
+                    num1 = packed & 0x3FF;
+                    num4 = packed >> 10;
                 }else if(type == LogicDisplay.commandScale){
                     xval = packSign((int)(x.numf() / LogicDisplay.scaleStep));
                     yval = packSign((int)(y.numf() / LogicDisplay.scaleStep));
                 }
 
                 //add graphics calls, cap graphics buffer size
-                exec.graphicsBuffer.add(DisplayCmd.get(type, xval, yval, packSign(num1), packSign(p2.numi()), packSign(p3.numi()), packSign(num4)));
+                exec.graphicsBuffer.add(DisplayCmd.get(type, xval, yval, num1, packSign(p2.numi()), packSign(p3.numi()), num4));
             }
         }
 
@@ -979,9 +987,6 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            //graphics on headless servers are useless.
-            if(Vars.headless) return;
-
             if(target.building() instanceof LogicDisplayBuild d && d.isValid() && (d.team == exec.team || exec.privileged)){
                 d.flushCommands(exec.graphicsBuffer);
                 exec.graphicsBuffer.clear();
@@ -1007,7 +1012,7 @@ public class LExecutor{
             if(value.isobj){
                 String strValue = toString(value.objval);
 
-                exec.textBuffer.append(strValue);
+                exec.textBuffer.append(strValue, 0, Math.min(strValue.length(), maxTextBuffer - exec.textBuffer.length()));
             }else{
                 //display integer version when possible
                 if(Math.abs(value.numval - Math.round(value.numval)) < 0.00001){
@@ -1119,7 +1124,6 @@ public class LExecutor{
             if(target.building() instanceof MessageBuild d && d.isValid() && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
-
             }
             exec.textBuffer.setLength(0);
 
@@ -1163,7 +1167,12 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(curTime >= value.num()){
+            if(value.num() <= 0){
+                // Just yield without executing the wait again
+                exec.yield = true;
+                // Start the next wait afresh ('value' might have been modified remotely by a different processor)
+                curTime = 0f;
+            }else if(curTime >= value.num()){
                 curTime = 0f;
             }else{
                 //skip back to self.
@@ -2060,7 +2069,7 @@ public class LExecutor{
                         marker.setTexture(exec.textBuffer.toString());
                         exec.textBuffer.setLength(0);
                     }else{
-                        marker.setTexture(PrintI.toString(p2.obj()));
+                        marker.setTexture(p2.obj());
                     }
                 }else{
                     marker.control(type, p1.numOrNan(), p2.numOrNan(), p3.numOrNan());
@@ -2131,10 +2140,10 @@ public class LExecutor{
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
-    public static void updateMarkerTexture(int id, String textureName){
+    public static void updateMarkerTexture(int id, Object texture){
         var marker = state.markers.get(id);
         if(marker != null){
-            marker.setTexture(textureName);
+            marker.setTexture(texture);
         }
     }
 

@@ -29,7 +29,7 @@ public abstract class UnlockableContent extends MappableContent{
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
     /** Localized description & details. May be null. */
-    public @Nullable String description, details;
+    public @Nullable String description, details, credit;
     /** Whether this content is always unlocked in the tech tree. */
     public boolean alwaysUnlocked = false;
     /** Whether to show the description in the research dialog preview. */
@@ -61,6 +61,19 @@ public abstract class UnlockableContent extends MappableContent{
      * If shownPlanets is also empty, it will use Serpulo as the "default" tab.
      * */
     public ObjectSet<UnlockableContent> databaseTabs = new ObjectSet<>();
+    /**
+     * Content category. Defines the primary category of content classification in core database.
+     * For example, "block", "liquid", "unit".
+     * Uses getContentType().name() as a fallback when the value is null or empty.
+     * */
+    public @Nullable String databaseCategory;
+    /**
+     * Category tags. Secondary category of content classification in core database.
+     * For example, "turret", "wall" under databaseCategory "block", "core-unit", "ground-unit" under databaseCategory "units".
+     * Uses "default" as a fallback when the value is null or empty. When using "default", no extra tag label are displayed.
+     * */
+    public @Nullable String databaseTag;
+
     /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
     @NoPatch
     public @Nullable TechNode techNode;
@@ -77,12 +90,16 @@ public abstract class UnlockableContent extends MappableContent{
         this.localizedName = Core.bundle.get(getContentType() + "." + this.name + ".name", this.name);
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
         this.details = Core.bundle.getOrNull(getContentType() + "." + this.name + ".details");
+        this.credit = Core.bundle.getOrNull(getContentType() + "." + this.name + ".credit");
         this.unlocked = Core.settings != null && Core.settings.getBool(this.name + "-unlocked", false);
     }
 
     @Override
     public void postInit(){
         super.postInit();
+
+        if(databaseCategory == null || databaseCategory.isEmpty()) databaseCategory = getContentType().name();
+        if(databaseTag == null || databaseTag.isEmpty()) databaseTag = "default";
 
         databaseTabs.addAll(shownPlanets);
     }

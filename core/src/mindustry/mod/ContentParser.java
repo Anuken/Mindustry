@@ -119,7 +119,15 @@ public class ContentParser{
             }
             return result;
         });
-        put(Color.class, (type, data) -> Color.valueOf(data.asString()));
+        put(Color.class, (type, data) -> {
+            if(data.isNumber()){
+                int len =  data.asString().length();
+                if(len != 6 && len != 8){
+                    warn("@Colors should strings, not numbers. Make sure you have quotes around the value, or they will not be parsed correctly: '@'", currentContent == null ? "" : "[" + currentContent.minfo.sourceFile.name() + "]: ", data);
+                }
+            }
+            return Color.valueOf(data.asString());
+        });
         put(StatusEffect.class, (type, data) -> {
             if(data.isString()){
                 StatusEffect result = locate(ContentType.status, data.asString());
@@ -608,6 +616,7 @@ public class ContentParser{
 
             currentContent = unit;
             read(() -> {
+                unit.beforeParse();
                 //add reconstructor type
                 if(value.has("requirements")){
                     JsonValue rec = value.remove("requirements");
@@ -687,17 +696,29 @@ public class ContentParser{
                 return locate(ContentType.sector, name);
             }
 
-            if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
+            SectorPreset preset;
+            SectorPreset found = locate(ContentType.sector, name);
 
-            SectorPreset out = new SectorPreset(mod + "-" + name, currentMod);
+            if(found != null){
+                preset = found;
+            }else{
+                if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
-            currentContent = out;
+                preset = new SectorPreset(mod + "-" + name, currentMod);
+            }
+
+            currentContent = preset;
             read(() -> {
-                Planet planet = locate(ContentType.planet, value.getString("planet", "serpulo"));
+                Planet planet = preset.planet == null ? Planets.serpulo : preset.planet;
+                if(value.has("planet")){
+                    planet = locate(ContentType.planet, value.getString("planet", "serpulo"));
 
-                if(planet == null) throw new RuntimeException("Planet '" + value.getString("planet") + "' not found.");
+                    if(planet == null) throw new RuntimeException("Planet '" + value.getString("planet") + "' not found.");
+                }
 
-                out.initialize(planet, value.getInt("sector", 0));
+                if(value.has("sector")){
+                    preset.initialize(planet, value.getInt("sector", 0));
+                }
 
                 value.remove("sector");
                 value.remove("planet");
@@ -705,7 +726,7 @@ public class ContentParser{
                 if(value.has("rules")){
                     JsonValue r = value.remove("rules");
                     if(!r.isObject()) throw new RuntimeException("Rules must be an object!");
-                    out.rules = rules -> {
+                    preset.rules = rules -> {
                         try{
                             //Use standard JSON, this is not content-parser relevant
                             JsonIO.json.readFields(rules, r);
@@ -715,9 +736,9 @@ public class ContentParser{
                     };
                 }
 
-                readFields(out, value);
+                readFields(preset, value);
             });
-            return out;
+            return preset;
         },
         ContentType.planet, (TypeParser<Planet>)(mod, name, value) -> {
             if(value.isString()) return locate(ContentType.planet, name);
