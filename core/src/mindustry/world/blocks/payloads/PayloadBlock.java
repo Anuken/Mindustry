@@ -121,7 +121,8 @@ public class PayloadBlock extends Block{
         @Override
         public void handlePayload(Building source, Payload payload, @Nullable Unit unit){
             if(unit != null){
-                this.payVector.set(unit.x, unit.y).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
+                float clampPos = size * tilesize * 0.7f + unit.hitSize / 2f;
+                this.payVector.set(unit.x, unit.y).sub(this).clamp(-clampPos, -clampPos, clampPos, clampPos);
             }else{
                 this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
             }
@@ -178,7 +179,7 @@ public class PayloadBlock extends Block{
 
         public void updatePayload(){
             if(payload != null){
-                payload.set(x + 0.5f + payVector.x, y + 0.5f + payVector.y, payRotation);
+                payload.set(x + payVector.x, y + payVector.y, payRotation);
             }
         }
 

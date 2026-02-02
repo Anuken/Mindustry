@@ -15,6 +15,7 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -66,7 +67,12 @@ public class Reconstructor extends UnitBlock{
     public void setBars(){
         super.setBars();
 
-        addBar("progress", (ReconstructorBuild entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
+        addBar("progress", (ReconstructorBuild e) -> new Bar(
+            () -> Core.bundle.format("bar.progress", Strings.autoFixed(e.fraction() * 100f, 0)),
+            () -> Pal.ammo,
+            e::fraction
+        ));
+
         addBar("units", (ReconstructorBuild e) ->
         new Bar(
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
@@ -169,6 +175,12 @@ public class Reconstructor extends UnitBlock{
         @Override
         public void onCommand(Vec2 target){
             commandPos = target;
+            if(command != null && command.snapToBuilding){
+                var build = world.buildWorld(target.x, target.y);
+                if(build != null && build.team == this.team){
+                    commandPos.set(build);
+                }
+            } 
         }
 
         @Override
@@ -178,7 +190,7 @@ public class Reconstructor extends UnitBlock{
 
         public boolean canSetCommand(){
             var output = unit();
-            return output != null && output.commands.size > 1 && output.allowChangeCommands;
+            return output == null || output.allowChangeCommands;
         }
 
         @Override
@@ -195,25 +207,20 @@ public class Reconstructor extends UnitBlock{
         public void buildConfiguration(Table table){
             var unit = unit();
 
-            if(unit == null){
-                deselect();
-                return;
-            }
-
             var group = new ButtonGroup<ImageButton>();
             group.setMinCheckCount(0);
-            int i = 0, columns = 4;
+            int i = 0, columns = 5;
 
             table.background(Styles.black6);
 
-            var list = unit().commands;
+            var list = unit == null ? Vars.content.unitCommands().copy() : unit().commands;
             for(var item : list){
                 ImageButton button = table.button(item.getIcon(), Styles.clearNoneTogglei, 40f, () -> {
                     configure(item);
                     deselect();
                 }).tooltip(item.localized()).group(group).get();
 
-                button.update(() -> button.setChecked(command == item || (command == null && unit.defaultCommand == item)));
+                button.update(() -> button.setChecked(command == item || (command == null && unit != null && unit.defaultCommand == item)));
 
                 if(++i % columns == 0){
                     table.row();
