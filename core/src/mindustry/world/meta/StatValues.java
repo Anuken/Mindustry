@@ -697,12 +697,30 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0 ? type.damage : type.lightningDamage));
                     }
 
-                    if(type instanceof LaserBulletType laser){
-                        if(laser.lightningSpacing > 0){
-                            int count = (int)(laser.length / laser.lightningSpacing) * 2 + 2;
-                            float damage = laser.lightningDamage < 0 ? laser.damage : laser.lightningDamage;
-                            sep(bt, Core.bundle.format("bullet.lightning", count, damage));
-                            sep(bt, "   " + Core.bundle.format("bullet.lightningspacing", Strings.autoFixed(laser.lightningSpacing / tilesize, 2), Strings.autoFixed(laser.lightningLength, 2)));
+                    if(type instanceof LaserBulletType b && b.lightningSpacing > 0){
+                        int count = (int)(b.length / b.lightningSpacing) * 2 + 2;
+                        float damage = b.lightningDamage < 0 ? b.damage : b.lightningDamage;
+                        sep(bt, Core.bundle.format("bullet.lightning", count, damage));
+                        sep(bt, "   " + Core.bundle.format("bullet.lightningspacing", Strings.autoFixed(b.lightningSpacing / tilesize, 2), Strings.autoFixed(b.lightningLength, 2)));
+                    }
+
+                    if(type instanceof EmpBulletType b && b.radius > 0f){
+                        sep(bt, Core.bundle.format("bullet.empradius", Strings.fixed(b.radius / tilesize, 1)));
+                        if(b.timeDuration > 0f && b.timeIncrease > 1f){
+                            sep(bt, Core.bundle.format("bullet.empboost", Strings.autoFixed(b.timeIncrease * 100f, 2),
+                            Strings.autoFixed(b.timeDuration / 60f, 1)) + " " + StatUnit.seconds.localized());
+                        }
+                        if(b.timeDuration > 0f && b.powerSclDecrease < 1f){
+                            sep(bt, Core.bundle.format("bullet.empslowdown", 
+                            (b.powerSclDecrease < 1f ? "[negstat]" : "") + Strings.autoFixed((b.powerSclDecrease - 1f) * 100f, 2),
+                            Strings.autoFixed(b.timeDuration / 60f, 1)) + " " + StatUnit.seconds.localized());
+                        }
+                        if(!Mathf.equal(b.powerDamageScl, 1f)){
+                            sep(bt, Core.bundle.format("bullet.empdamage", Strings.autoFixed(b.powerDamageScl * 100f, 2)));
+                        }
+                        if(b.hitUnits){
+                            sep(bt, Core.bundle.format("bullet.empunitdamage",
+                            (b.unitDamageScl < 1f ? "[negstat]" : "") + Strings.autoFixed(b.unitDamageScl * 100f, 2)));
                         }
                     }
 
