@@ -87,6 +87,7 @@ public class Build{
             tile.build.noSleep();
             Fx.rotateBlock.at(tile.build.x, tile.build.y, tile.build.block.size);
             Events.fire(new BuildRotateEvent(tile.build, unit, previous));
+            if(!headless) Sounds.blockRotate.at(tile.build, 1f + Mathf.range(0.1f), 1f);
             return;
         }
 
@@ -95,6 +96,10 @@ public class Build{
             tile.build.rotation = rotation;
             tile.build.changeTeam(team);
             tile.build.enabled = true;
+            if(tile.build.power != null){
+                tile.build.power.links.clear();
+                tile.build.powerGraphRemoved();
+            }
             tile.build.checkAllowUpdate();
             tile.build.updateProximity();
             tile.build.onRepaired();
@@ -104,7 +109,7 @@ public class Build{
             if(fogControl.isVisibleTile(team, tile.x, tile.y)){
                 result.placeEffect.at(tile.drawx(), tile.drawy(), result.size);
                 Fx.rotateBlock.at(tile.build.x, tile.build.y, tile.build.block.size);
-                //doesn't play a sound
+                ConstructBlock.playRepairSound(team, tile);
             }
 
             Events.fire(new BlockBuildEndEvent(tile, unit, team, false, tile.build.config()));
@@ -186,6 +191,10 @@ public class Build{
                 float mindst = Float.MAX_VALUE;
                 CoreBuild closest = null;
                 for(TeamData data : state.teams.active){
+                    if(!data.team.rules().protectCores){
+                        continue;
+                    }
+
                     for(CoreBuild tile : data.cores){
                         float dst = tile.dst2(x * tilesize + type.offset, y * tilesize + type.offset);
                         if(dst < mindst){
@@ -260,7 +269,7 @@ public class Build{
     }
 
     public static @Nullable Building getEnemyOverlap(Block block, Team team, int x, int y){
-        return indexer.findEnemyTile(team, x * tilesize + block.size, y * tilesize + block.size, block.placeOverlapRange + 4f, p -> true);
+        return indexer.findEnemyTile(team, x * tilesize + block.size, y * tilesize + block.size, block.placeOverlapRange + 4f, b -> b.team.rules().checkPlacement);
     }
 
     public static boolean contactsGround(int x, int y, Block block){

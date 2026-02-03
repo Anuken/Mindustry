@@ -727,6 +727,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     }
 
+    public boolean allowDeposit(){
+        return block.alwaysAllowDeposit || !state.rules.onlyDepositCore;
+    }
+
     /** Called when this block is dropped as a payload. */
     public void dropped(){
 
@@ -1448,7 +1452,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called when the block is destroyed. The tile is still intact at this stage. */
     public void onDestroyed(){
-
         float explosiveness = block.baseExplosiveness;
         float flammability = 0f;
         float power = 0f;
@@ -1472,7 +1475,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         if(block.hasLiquids && state.rules.damageExplosions){
-
             liquids.each(this::splashLiquid);
         }
 
@@ -1482,6 +1484,26 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(block.createRubble && !floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
         }
+
+        if(!headless){
+            playDestroySound();
+
+            if(explosiveness > 40f){
+                (Mathf.chance(0.5) ? Sounds.blockExplodeExplosive : Sounds.blockExplodeExplosiveAlt).at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }else if(flammability > 5f){
+                Sounds.blockExplodeFlammable.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }
+
+            if(power > 30000f){
+                Sounds.blockExplodeElectricBig.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }else if(power > 2000f){
+                Sounds.blockExplodeElectric.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }
+        }
+    }
+
+    public void playDestroySound(){
+        block.destroySound.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
     }
 
     public String getDisplayName(){
@@ -1505,7 +1527,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //TODO duplicated code?
         table.table(t -> {
             t.left();
-            t.add(new Image(block.getDisplayIcon(tile))).size(8 * 4);
+            t.add(new Image(block.getDisplayIcon(tile))).scaling(Scaling.fit).size(8 * 4);
             t.labelWrap(block.getDisplayName(tile)).left().width(190f).padLeft(5);
         }).growX().left();
 
@@ -1705,7 +1727,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         float damage = other.type.buildingDamage(other);
         if(!other.type.pierceArmor){
-            damage = Damage.applyArmor(damage, block.armor);
+            damage = Damage.applyArmor(damage, block.armor * other.type.armorMultiplier);
         }
 
         damage(other, other.team, damage);
@@ -2174,7 +2196,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void killed(){
         dead = true;
         Events.fire(new BlockDestroyEvent(tile));
-        block.destroySound.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax));
         onDestroyed();
         if(tile != emptyTile){
             tile.remove();

@@ -44,7 +44,7 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
-        rhinoVersion = '73a812444ac388ac2d94013b5cadc8f70b7ea027'
+        rhinoVersion = '54b75cbd1207ef1fd5cff517cbd188e763c85baa'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -113,7 +113,7 @@ allprojects{
             def output = 'en\n'
             def bundles = new File(project(':core').projectDir, 'assets/bundles/')
             bundles.list().sort().each{ name ->
-                if(name == "bundle.properties") return
+                if(name == "bundle.properties" || name == "global.properties") return
                 output += name.substring("bundle".length() + 1, name.lastIndexOf('.')) + "\n"
             }
             new File(project(':core').projectDir, 'assets/locales').text = output
@@ -223,7 +223,7 @@ configure(project(":annotations")){
 }
 
 //compile with java 8 compatibility for everything except the annotation project
-configure(subprojects - project(":annotations")){
+configure(subprojects - project(":annotations") - project(":tests")){
     tasks.withType(JavaCompile){
         options.compilerArgs.addAll(['--release', '8'])
     }
@@ -254,7 +254,7 @@ project(":desktop"){
 
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
-        implementation arcModule("backends:backend-sdl")
+        implementation arcModule("backends:backend-sdl3")
         annotationProcessor 'com.github.Anuken:jabel:0.9.0'
     }
 }
@@ -327,7 +327,7 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
-        api "org.lz4:lz4-java:1.8.0"
+        api "at.yawk.lz4:lz4-java:1.10.2"
         api arcModule("arc-core")
         api arcModule("extensions:flabel")
         api arcModule("extensions:freetype")
@@ -400,6 +400,12 @@ project(":tests"){
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.1"
     }
 
+    tasks.withType(JavaCompile){
+        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        options.compilerArgs.addAll(['--release', '17'])
+    }
+
     test{
         //fork every test so mods don't interact with each other
         forkEvery = 1
@@ -446,9 +452,10 @@ configure([":core", ":server"].collect{project(it)}){
         publications{
             maven(MavenPublication){
                 from components.java
-                if(project.name == "core"){
-                    artifact(tasks.named("assetsJar"))
-                }
+                //TODO: uncomment this once the jitpack packing is fixed (currently depends on a newer glibc version)
+                //if(project.name == "core"){
+                //    artifact(tasks.named("assetsJar"))
+                //}
             }
         }
     }

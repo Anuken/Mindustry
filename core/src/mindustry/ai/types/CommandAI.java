@@ -270,12 +270,11 @@ public class CommandAI extends AIController{
 
             Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
 
-
             //TODO: should the unit stop when it finds a target?
             if(
                 (hasStance(UnitStance.patrol) && !hasStance(UnitStance.pursueTarget) && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
                 (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
-                (command == UnitCommand.loopPayloadCommand && unit.within(targetPos, 10f))
+                (command == UnitCommand.loopPayloadCommand && unit.within(vecMovePos, 10f))
             ){
                 move = false;
             }
@@ -344,10 +343,14 @@ public class CommandAI extends AIController{
                 vecOut.set(vecMovePos);
             }
 
+            if(command == UnitCommand.loopPayloadCommand){
+                alwaysArrive = true;
+            }
+
             if(move){
                 if(unit.type.circleTarget && attackTarget != null){
                     target = attackTarget;
-                    circleAttack(80f);
+                    circleAttack(unit.type.circleTargetRadius);
                 }else{
                     moveTo(vecOut,
                     withinAttackRange ? engageRange :
@@ -362,7 +365,7 @@ public class CommandAI extends AIController{
                 attackTarget = null;
             }
 
-            if(unit.isFlying() && move && (attackTarget == null || !unit.within(attackTarget, unit.type.range))){
+            if(unit.isFlying() && move && !(unit.type.circleTarget && !unit.type.omniMovement) && (attackTarget == null || !unit.within(attackTarget, unit.type.range))){
                 unit.lookAt(vecMovePos);
             }else{
                 faceTarget();
@@ -379,7 +382,11 @@ public class CommandAI extends AIController{
             }
 
         }else if(target != null){
-            faceTarget();
+            if(unit.type.circleTarget && shouldFire()){
+                circleAttack(unit.type.circleTargetRadius);
+            }else{
+                faceTarget();
+            }
         }
     }
 

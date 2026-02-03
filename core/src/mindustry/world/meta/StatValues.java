@@ -509,7 +509,7 @@ public class StatValues{
                     if(!filter.get(liquid)) continue;
 
                     c.table(Styles.grayPanel, b -> {
-                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));;
+                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));
                         b.table(info -> {
                             info.add(liquid.localizedName).left().row();
                             info.add(Strings.autoFixed(amount * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
@@ -702,6 +702,16 @@ public class StatValues{
 
                     if(type.pierceArmor){
                         sep(bt, "@bullet.armorpierce");
+                    }
+
+                    if(type.armorMultiplier != 1f){
+                        if(type.armorMultiplier > 1f){
+                            sep(bt,  Core.bundle.format("bullet.armorweakness", (int)(type.armorMultiplier * 100)));
+                        }else if(Mathf.sign(type.armorMultiplier) == 1){
+                            sep(bt,  Core.bundle.format("bullet.armorpiercing", (int)((1 - type.armorMultiplier) * 100)));
+                        }else{
+                            sep(bt,  Core.bundle.format("bullet.antiarmor", (-type.armorMultiplier)));
+                        }
                     }
 
                     if(type.maxDamageFraction > 0){

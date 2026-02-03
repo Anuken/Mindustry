@@ -25,6 +25,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.*;
@@ -40,11 +41,11 @@ import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent implements Senseable{
     /** If true, buildings have an ItemModule. */
-    public boolean hasItems;
+    public @NoPatch boolean hasItems;
     /** If true, buildings have a LiquidModule. */
-    public boolean hasLiquids;
+    public @NoPatch boolean hasLiquids;
     /** If true, buildings have a PowerModule. */
-    public boolean hasPower;
+    public @NoPatch boolean hasPower;
     /** Flag for determining whether this block outputs liquid somewhere; used for connections. */
     public boolean outputsLiquid = false;
     /** Used by certain power blocks (nodes) to flag as non-consuming of power. True by default, even if this block has no power. */
@@ -63,12 +64,16 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean acceptsPayload = false;
     /** Visual flag use for blending of certain transportation blocks. */
     public boolean acceptsItems = false;
+    /** If true, this block won't be affected by the onlyDepositCore rule. */
+    public boolean alwaysAllowDeposit = false;
+    /** Cooldown, in seconds, applied to player item depositing when any item is deposited to this block. Overrides the itemDepositCooldown if non-negative. */
+    public float depositCooldown = -1f;
     /** If true, all item capacities of this block are separate instead of pooled as one number. */
     public boolean separateItemCapacity = false;
     /** maximum items this block can carry (usually, this is per-type of item) */
     public int itemCapacity = 10;
-    /** maximum total liquids this block can carry if hasLiquids = true */
-    public float liquidCapacity = 10f;
+    /** maximum total liquids this block can carry if hasLiquids = true. Default value is 10, scales with max liquid consumption in ConsumeLiquid */
+    public float liquidCapacity = -1f;
     /** higher numbers increase liquid output speed; TODO remove and replace with better liquids system */
     public float liquidPressure = 1f;
     /** If true, this block outputs to its facing direction, when applicable.
@@ -83,6 +88,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** if true, {@link #buildEditorConfig(Table)} will be called for configuring this block in the editor. */
     public boolean editorConfigurable;
     /** the last configuration value applied to this block. */
+    @NoPatch
     public @Nullable Object lastConfig;
     /** whether to save the last config and apply it to newly placed blocks */
     public boolean saveConfig = false;
@@ -91,8 +97,9 @@ public class Block extends UnlockableContent implements Senseable{
     /** if true, double-tapping this configurable block clears configuration. */
     public boolean clearOnDoubleTap = false;
     /** whether this block has a tile entity that updates */
+    @NoPatch
     public boolean update;
-    /** whether this block has health and can be destroyed */
+    /** whether this block has health and can be destroyed. note that setting this to false does nothing if update = true! */
     public boolean destructible;
     /** whether unloaders work on this block */
     public boolean unloadable = true;
@@ -203,6 +210,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** whether this block can be placed on edges of liquids. */
     public boolean floating = false;
     /** multiblock size */
+    @NoPatch //changing size often leads to catastrophic issues, so don't allow that
     public int size = 1;
     /** multiblock offset */
     public float offset = 0f;
@@ -216,6 +224,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float placeOverlapRange = 50f;
     /** Multiplier of damage dealt to this block by tanks. Does not apply to crawlers. */
     public float crushDamageMultiplier = 1f;
+    /** If true, this block is instantly destroyed by tanks with crushFragile set to true. */
+    public boolean crushFragile = false;
     /** Max of timers used. */
     public int timers = 0;
     /** Cache layer. Only used for 'cached' rendering. */
@@ -239,6 +249,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** Sound played when this block is configured. */
+    public Sound configureSound = Sounds.click;
     /** If true, this block does not have pointConfig with a transform called on map resize. */
     public boolean ignoreResizeConfig;
     /** If true, this building can be selected like a unit when commanding. */
@@ -303,11 +315,13 @@ public class Block extends UnlockableContent implements Senseable{
     /** Should the sound made when this block is deconstructed change in pitch. */
     public boolean breakPitchChange = true;
     /** Sound made when this block is built. */
-    public Sound placeSound = Sounds.place;
+    public Sound placeSound = Sounds.unset;
     /** Sound made when this block is deconstructed. */
-    public Sound breakSound = Sounds.breaks;
+    public Sound breakSound = Sounds.unset;
     /** Sounds made when this block is destroyed.*/
-    public Sound destroySound = Sounds.boom;
+    public Sound destroySound = Sounds.unset;
+    /** Volume of destruction sound. */
+    public float destroySoundVolume = 1f;
     /** Range of destroy sound. */
     public float destroyPitchMin = 1f, destroyPitchMax = 1f;
     /** How reflective this block is. */
@@ -316,6 +330,8 @@ public class Block extends UnlockableContent implements Senseable{
     public Color lightColor = Color.white.cpy();
     /** If true, drawLight() will be called for this block. */
     public boolean emitLight = false;
+    /** If true, this block obstructs light emitted by other blocks. */
+    public boolean obstructsLight = true;
     /** Radius of the light emitted by this block. */
     public float lightRadius = 60f;
 
@@ -370,21 +386,29 @@ public class Block extends UnlockableContent implements Senseable{
     /** Scroll position for certain blocks. */
     public float selectScroll;
     /** Building that is created for this block. Initialized in init() via reflection. Set manually if modded. */
+    @NoPatch
     public Prov<Building> buildType = null;
     /** Configuration handlers by type. */
+    @NoPatch
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
     /** Consumption filters. */
+    @NoPatch
     public boolean[] itemFilter = {}, liquidFilter = {};
     /** Array of consumers used by this block. Only populated after init(). */
+    @NoPatch
     public Consume[] consumers = {}, optionalConsumers = {}, nonOptionalConsumers = {}, updateConsumers = {};
     /** Set to true if this block has any consumers in its array. */
+    @NoPatch
     public boolean hasConsumers;
     /** The single power consumer, if applicable. */
+    @NoPatch
     public @Nullable ConsumePower consPower;
 
     /** Map of bars by name. */
+    @NoPatch
     protected OrderedMap<String, Func<Building, Bar>> barMap = new OrderedMap<>();
     /** List for building up consumption before init(). */
+    @NoPatch
     protected Seq<Consume> consumeBuilder = new Seq<>();
 
     protected TextureRegion[] generatedIcons;
@@ -543,6 +567,11 @@ public class Block extends UnlockableContent implements Senseable{
         return 0;
     }
 
+    public Color getColor(Tile tile){
+        int mc = minimapColor(tile);
+        return mc == 0 ? mapColor : Tmp.c3.set(mc);
+    }
+
     public boolean outputsItems(){
         return hasItems;
     }
@@ -696,6 +725,15 @@ public class Block extends UnlockableContent implements Senseable{
                 addLiquidBar(build -> build.liquids.current());
             }
         }
+    }
+
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+        barMap.clear();
+        setBars();
+        offset = ((size + 1) % 2) * tilesize / 2f;
+        sizeOffset = -((size - 1) / 2);
     }
 
     public boolean consumesItem(Item item){
@@ -1224,6 +1262,10 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
+        if(databaseTag == null || databaseTag.isEmpty()){
+            databaseTag = category.name();
+        }
+
         super.postInit();
     }
 
@@ -1232,6 +1274,27 @@ public class Block extends UnlockableContent implements Senseable{
     @CallSuper
     public void init(){
         super.init();
+
+        if(destroySound == Sounds.unset){
+            destroySound =
+                size >= 3 ? Sounds.blockExplode3 :
+                size >= 2 ? new RandomSound(Sounds.blockExplode2, Sounds.blockExplode2Alt) :
+                new RandomSound(Sounds.blockExplode1, Sounds.blockExplode1Alt);
+        }
+
+        if(placeSound == Sounds.unset){
+            placeSound =
+                size >= 3 ? Sounds.blockPlace3 :
+                size >= 2 ? Sounds.blockPlace2 :
+                Sounds.blockPlace1;
+        }
+
+        if(breakSound == Sounds.unset){
+            breakSound =
+                size >= 3 ? Sounds.blockBreak3 :
+                size >= 2 ? Sounds.blockBreak2 :
+                Sounds.blockBreak1;
+        }
 
         //disable standard shadow
         if(customShadow){
@@ -1277,6 +1340,21 @@ public class Block extends UnlockableContent implements Senseable{
         if(hasLiquids && drawLiquidLight){
             emitLight = true;
             lightClipSize = Math.max(lightClipSize, size * 30f * 2f);
+        }
+
+        //some blocks don't have hasLiquids, but have liquid consumers/liquid capacity
+        if(liquidCapacity < 0){
+            float consumeAmount = 1f;
+            for(var cons : consumeBuilder){
+                if(cons instanceof ConsumeLiquidBase liq){
+                    consumeAmount = Math.max(consumeAmount, liq.amount * 60f);
+                }else if(cons instanceof ConsumeLiquids liq){
+                    for(var stack : liq.liquids){
+                        consumeAmount = Math.max(consumeAmount, stack.amount * 60f);
+                    }
+                }
+            }
+            liquidCapacity = Mathf.round(10f * consumeAmount);
         }
 
         if(emitLight){
@@ -1336,6 +1414,22 @@ public class Block extends UnlockableContent implements Senseable{
 
         if(buildVisibility == BuildVisibility.sandboxOnly){
             hideDetails = false;
+        }
+    }
+
+    public void reinitializeConsumers(){
+        consumers = consumeBuilder.toArray(Consume.class);
+        consPower = (ConsumePower)Structs.find(consumers, c -> c instanceof ConsumePower);
+        optionalConsumers = consumeBuilder.select(consume -> consume.optional && !consume.ignore()).toArray(Consume.class);
+        nonOptionalConsumers = consumeBuilder.select(consume -> !consume.optional && !consume.ignore()).toArray(Consume.class);
+        updateConsumers = consumeBuilder.select(consume -> consume.update && !consume.ignore()).toArray(Consume.class);
+        hasConsumers = consumers.length > 0;
+        itemFilter = new boolean[content.items().size];
+        liquidFilter = new boolean[content.liquids().size];
+        if(outputsPower) hasPower = true;
+
+        for(Consume cons : consumers){
+            cons.apply(this);
         }
     }
 
