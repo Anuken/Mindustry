@@ -697,17 +697,26 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0 ? type.damage : type.lightningDamage));
                     }
 
+                    if(type instanceof LaserBulletType laser){
+                        if(laser.lightningSpacing > 0){
+                            int count = (int)(laser.length / laser.lightningSpacing) * 2 + 2;
+                            float damage = laser.lightningDamage < 0 ? laser.damage : laser.lightningDamage;
+                            sep(bt, Core.bundle.format("bullet.lightning", count, damage));
+                            sep(bt, "   " + Core.bundle.format("bullet.lightningspacing", Strings.autoFixed(laser.lightningSpacing / tilesize, 2), Strings.autoFixed(laser.lightningLength, 2)));
+                        }
+                    }
+
                     if(type.pierceArmor){
                         sep(bt, "@bullet.armorpierce");
                     }
 
                     if(type.armorMultiplier != 1f){
                         if(type.armorMultiplier > 1f){
-                            sep(bt,  Core.bundle.format("bullet.armorweakness", (int)(type.armorMultiplier * 100)));
+                            sep(bt, Core.bundle.format("bullet.armorweakness", (int)(type.armorMultiplier * 100)));
                         }else if(Mathf.sign(type.armorMultiplier) == 1){
-                            sep(bt,  Core.bundle.format("bullet.armorpiercing", (int)((1 - type.armorMultiplier) * 100)));
+                            sep(bt, Core.bundle.format("bullet.armorpiercing", (int)((1 - type.armorMultiplier) * 100)));
                         }else{
-                            sep(bt,  Core.bundle.format("bullet.antiarmor", (-type.armorMultiplier)));
+                            sep(bt, Core.bundle.format("bullet.antiarmor", (-type.armorMultiplier)));
                         }
                     }
 
