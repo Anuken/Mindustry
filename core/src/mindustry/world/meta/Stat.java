@@ -36,6 +36,7 @@ public class Stat implements Comparable<Stat>{
     lightningDamage = new Stat("lightningDamage"),
     abilities = new Stat("abilities"),
     canBoost = new Stat("canBoost"),
+    boostingSpeed = new Stat("boostingspeed"),
     maxUnits = new Stat("maxUnits"),
 
     damageMultiplier = new Stat("damageMultiplier"),

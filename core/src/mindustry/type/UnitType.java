@@ -809,6 +809,9 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(!flying){
             stats.add(Stat.canBoost, canBoost);
+            if(canBoost){
+                stats.add(Stat.boostingSpeed, boostMultiplier * speed * 60f / tilesize, StatUnit.tilesSecond);
+            }
         }
 
         if(mineTier >= 1){
