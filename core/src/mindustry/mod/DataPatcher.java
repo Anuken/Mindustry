@@ -77,6 +77,13 @@ public class DataPatcher{
         contentLoader = Vars.content.copy();
         patches.clear();
 
+        Attribute[] oldAttributes = Attribute.all.clone();
+        var oldAttributeMap = Attribute.map.copy();
+        reset(() -> {
+            Attribute.all = oldAttributes;
+            Attribute.map = oldAttributeMap;
+        });
+
         for(String patch : patchArray){
             PatchSet set = new PatchSet(patch, new JsonValue("error"));
             patches.add(set);

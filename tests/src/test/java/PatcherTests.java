@@ -525,6 +525,26 @@ public class PatcherTests{
     }
 
     @Test
+    void customAttribute() throws Exception{
+        int amount = Attribute.all.length;
+
+        Vars.state.patcher.apply(Seq.with("""
+        block.grass.attributes: {
+          frogs: 10
+        }
+        """));
+
+        assertTrue(Attribute.exists("frogs"));
+        assertEquals(amount + 1, Attribute.all.length);
+        assertEquals(10f, Blocks.grass.asFloor().attributes.get(Attribute.get("frogs")), 0.0001f);
+
+        Vars.logic.reset();
+
+        assertFalse(Attribute.exists("frogs"));
+        assertEquals(amount, Attribute.all.length);
+    }
+
+    @Test
     void addWeapon() throws Exception{
         int oldSize = UnitTypes.flare.weapons.size;
         Vars.state.patcher.apply(Seq.with("""

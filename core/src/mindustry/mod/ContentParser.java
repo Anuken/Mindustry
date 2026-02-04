@@ -43,6 +43,7 @@ import mindustry.type.*;
 import mindustry.type.ammo.*;
 import mindustry.type.weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import mindustry.world.consumers.*;
@@ -88,6 +89,14 @@ public class ContentParser{
             String attr = data.asString();
             if(Attribute.exists(attr)) return Attribute.get(attr);
             return Attribute.add(attr);
+        });
+        put(Attributes.class, (type, data) -> {
+            Attributes attr = new Attributes();
+            for(var child : data){
+                Attribute value = Attribute.exists(child.name) ? Attribute.get(child.name) : Attribute.add(child.name);
+                attr.set(value, child.asFloat());
+            }
+            return attr;
         });
         put(BuildVisibility.class, (type, data) -> field(BuildVisibility.class, data));
         put(Schematic.class, (type, data) -> {
