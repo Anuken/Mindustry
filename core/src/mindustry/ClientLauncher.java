@@ -312,31 +312,32 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void fileDropped(Fi file){
-        if(!OS.isIos){
-            if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
-                try{
-                    if(SaveIO.isSaveValid(file)){
-                        SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.defaultBufferSize))));
-                        if(meta.tags.containsKey("name")){
-                            //is map
-                            if(!ui.editor.isShown()){
-                                ui.editor.show();
-                            }
+        if(OS.isIos) return;
 
-                            ui.editor.beginEditMap(file);
-                        }else if(meta.rules.sector == null){ //don't allow importing campaign saves, they are broken
-                            SaveSlot slot = control.saves.importSave(file);
-                            ui.load.runLoadSave(slot);
-                        }else{
-                            ui.showErrorMessage("@save.nocampaign");
+        if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
+            try{
+                if(SaveIO.isSaveValid(file)){
+                    SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.defaultBufferSize))));
+                    if(meta.tags.containsKey("name")){
+                        //is map
+                        if(!ui.editor.isShown()){
+                            ui.editor.show();
                         }
+
+                        ui.editor.beginEditMap(file);
+                    }else if(meta.rules.sector == null){ //don't allow importing campaign saves, they are broken
+                        SaveSlot slot = control.saves.importSave(file);
+                        ui.load.runLoadSave(slot);
                     }else{
-                        ui.showErrorMessage("@save.import.invalid");
+                        ui.showErrorMessage("@save.nocampaign");
                     }
-                }catch(Throwable e){
-                    ui.showException("@save.import.fail", e);
+                }else{
+                    ui.showErrorMessage("@save.import.invalid");
                 }
+            }catch(Throwable e){
+                ui.showException("@save.import.fail", e);
             }
         }
+
     }
 }

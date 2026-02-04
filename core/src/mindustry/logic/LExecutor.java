@@ -2033,7 +2033,7 @@ public class LExecutor{
             if(positional){
                 sound.at(World.unconv(x.numf()), World.unconv(y.numf()), pitch.numf(), Math.min(volume.numf(), 2f), limit.bool());
             }else{
-                sound.play(Math.min(volume.numf() * (Core.settings.getInt("sfxvol") / 100f), 2f), pitch.numf(), pan.numf(), false, limit.bool());
+                sound.play(Math.min(volume.numf() * Core.audio.sfxVolume, 2f), pitch.numf(), pan.numf(), false, limit.bool());
             }
         }
     }
