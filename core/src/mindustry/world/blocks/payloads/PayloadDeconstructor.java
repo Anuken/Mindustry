@@ -1,6 +1,6 @@
 package mindustry.world.blocks.payloads;
 
-import arc.Core;
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;

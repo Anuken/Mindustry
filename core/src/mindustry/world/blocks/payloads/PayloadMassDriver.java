@@ -148,7 +148,7 @@ public class PayloadMassDriver extends PayloadBlock{
 
         @Override
         public boolean acceptUnitPayload(Unit unit){
-            return true;
+            return unit != null && unit.hitSize <= maxPayloadSize * tilesize;
         }
 
         @Override
