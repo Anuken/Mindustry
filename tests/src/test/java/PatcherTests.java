@@ -330,6 +330,16 @@ public class PatcherTests{
     }
 
     @Test
+    void assignStringToObject() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        unit.dagger.weapons: ["frog"]
+        """));
+
+        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(2, UnitTypes.dagger.weapons.size);
+    }
+
+    @Test
     void gibberish() throws Exception{
         Vars.state.patcher.apply(Seq.with("""
         }[35209509()jfkjhadsf,
