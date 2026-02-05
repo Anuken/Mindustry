@@ -278,7 +278,9 @@ public class ContentParser{
         });
         put(PlanetGenerator.class, (type, data) -> {
             var result = new AsteroidGenerator(); //only one type for now
-            readFields(result, data);
+            if(data.isObject()){
+                readFields(result, data);
+            }
             return result;
         });
         put(Mat3D.class, (type, data) -> {
@@ -436,6 +438,9 @@ public class ContentParser{
                     try{
                         return (T)classParsers.get(type).parse(type, jsonData);
                     }catch(Exception e){
+                        if(e instanceof RuntimeException rt){
+                            throw rt;
+                        }
                         throw new RuntimeException(e);
                     }
                 }
@@ -1223,6 +1228,7 @@ public class ContentParser{
     }
 
     void readFields(Object object, JsonValue jsonMap){
+        if(!jsonMap.isObject()) throw new SerializationException("Expecting an object, but found: '" + jsonMap + "'");
         JsonValue research = jsonMap.remove("research");
 
         toBeParsed.remove(object);
