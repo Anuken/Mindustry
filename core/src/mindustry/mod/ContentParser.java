@@ -28,6 +28,7 @@ import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
 import mindustry.entities.part.DrawPart.*;
 import mindustry.entities.pattern.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -42,6 +43,7 @@ import mindustry.type.*;
 import mindustry.type.ammo.*;
 import mindustry.type.weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import mindustry.world.consumers.*;
@@ -62,6 +64,8 @@ public class ContentParser{
     Seq<ParseListener> listeners = new Seq<>();
     /** If false, arbitrary class names cannot be resolved with Class.forName. */
     boolean allowClassResolution = true;
+    /** If false, sound asset loading is disabled. */
+    boolean allowAssetLoading = true;
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
         put(Effect.class, (type, data) -> {
@@ -85,6 +89,14 @@ public class ContentParser{
             String attr = data.asString();
             if(Attribute.exists(attr)) return Attribute.get(attr);
             return Attribute.add(attr);
+        });
+        put(Attributes.class, (type, data) -> {
+            Attributes attr = new Attributes();
+            for(var child : data){
+                Attribute value = Attribute.exists(child.name) ? Attribute.get(child.name) : Attribute.add(child.name);
+                attr.set(value, child.asFloat());
+            }
+            return attr;
         });
         put(BuildVisibility.class, (type, data) -> field(BuildVisibility.class, data));
         put(Schematic.class, (type, data) -> {
@@ -116,7 +128,15 @@ public class ContentParser{
             }
             return result;
         });
-        put(Color.class, (type, data) -> Color.valueOf(data.asString()));
+        put(Color.class, (type, data) -> {
+            if(data.isNumber()){
+                int len =  data.asString().length();
+                if(len != 6 && len != 8){
+                    warn("@Colors should strings, not numbers. Make sure you have quotes around the value, or they will not be parsed correctly: '@'", currentContent == null ? "" : "[" + currentContent.minfo.sourceFile.name() + "]: ", data);
+                }
+            }
+            return Color.valueOf(data.asString());
+        });
         put(StatusEffect.class, (type, data) -> {
             if(data.isString()){
                 StatusEffect result = locate(ContentType.status, data.asString());
@@ -258,7 +278,9 @@ public class ContentParser{
         });
         put(PlanetGenerator.class, (type, data) -> {
             var result = new AsteroidGenerator(); //only one type for now
-            readFields(result, data);
+            if(data.isObject()){
+                readFields(result, data);
+            }
             return result;
         });
         put(Mat3D.class, (type, data) -> {
@@ -298,11 +320,20 @@ public class ContentParser{
             if(data.isArray()) return new RandomSound(parser.readValue(Sound[].class, data));
 
             var field = fieldOpt(Sounds.class, data);
+
+            if(!allowAssetLoading && field == null){
+                warn("Sound not found: @", data.asString());
+                return Sounds.none;
+            }
             return field != null ? field : Vars.tree.loadSound(data.asString());
         });
         put(Music.class, (type, data) -> {
             var field = fieldOpt(Musics.class, data);
 
+            if(!allowAssetLoading && field == null){
+                warn("Music not found: @", data.asString());
+                return new Music();
+            }
             return field != null ? field : Vars.tree.loadMusic(data.asString());
         });
         put(Objectives.Objective.class, (type, data) -> {
@@ -383,11 +414,20 @@ public class ContentParser{
         }
 
         @Override
+        protected Object newInstance(Class type){
+            Object o = super.newInstance(type);
+            onNewInstance(o, type);
+            return o;
+        }
+
+        @Override
         public <T> T readValue(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
             T t = internalRead(type, elementType, jsonData, keyType);
             if(t != null && !Reflect.isWrapper(t.getClass()) && (type == null || !type.isPrimitive())){
                 checkNullFields(t);
-                listeners.each(hook -> hook.parsed(type, jsonData, t));
+                if(jsonData.isObject()){
+                    listeners.each(hook -> hook.parsed(type, jsonData, t));
+                }
             }
             return t;
         }
@@ -398,6 +438,9 @@ public class ContentParser{
                     try{
                         return (T)classParsers.get(type).parse(type, jsonData);
                     }catch(Exception e){
+                        if(e instanceof RuntimeException rt){
+                            throw rt;
+                        }
                         throw new RuntimeException(e);
                     }
                 }
@@ -587,6 +630,7 @@ public class ContentParser{
 
             currentContent = unit;
             read(() -> {
+                unit.beforeParse();
                 //add reconstructor type
                 if(value.has("requirements")){
                     JsonValue rec = value.remove("requirements");
@@ -602,16 +646,15 @@ public class ContentParser{
                     }else{
                         throw new IllegalArgumentException("Missing a valid 'block' in 'requirements'");
                     }
-
                 }
 
                 if(value.has("controller") || value.has("aiController")){
-                    unit.aiController = supply(resolve(value.getString("controller", value.getString("aiController", "")), FlyingAI.class));
+                    unit.aiController = resolveController(value.getString("controller", value.getString("aiController", "")));
                     value.remove("controller");
                 }
 
                 if(value.has("defaultController")){
-                    var sup = supply(resolve(value.getString("defaultController"), FlyingAI.class));
+                    var sup = resolveController(value.getString("defaultController"));
                     unit.controller = u -> sup.get();
                     value.remove("defaultController");
                 }
@@ -661,23 +704,62 @@ public class ContentParser{
             read(() -> readFields(liquid, value));
             return liquid;
         },
-        ContentType.status, parser(ContentType.status, StatusEffect::new),
+        ContentType.status, (TypeParser<StatusEffect>)(mod, name, value) -> {
+            StatusEffect status;
+            if(locate(ContentType.status, name) != null){
+                status = locate(ContentType.status, name);
+                readBundle(ContentType.status, name, value);
+            }else{
+                readBundle(ContentType.status, name, value);
+                status = new StatusEffect(mod + "-" + name);
+            }
+            currentContent = status;
+            read(() -> readFields(status, value));
+
+            status.init(() -> {
+                var oldOpposite = status.opposites.copy();
+                status.opposites.clear();
+                status.opposite(oldOpposite.toSeq().toArray(StatusEffect.class));
+
+                var oldAffinities = status.affinities.copy();
+                status.affinities.clear();
+                for(StatusEffect affinity: oldAffinities){
+                    status.affinity(affinity, (unit, result, time) -> {
+                        unit.damagePierce(status.transitionDamage);
+                    });
+                }
+            });
+
+            return status;
+        },
         ContentType.sector, (TypeParser<SectorPreset>)(mod, name, value) -> {
             if(value.isString()){
                 return locate(ContentType.sector, name);
             }
 
-            if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
+            SectorPreset preset;
+            SectorPreset found = locate(ContentType.sector, name);
 
-            SectorPreset out = new SectorPreset(mod + "-" + name, currentMod);
+            if(found != null){
+                preset = found;
+            }else{
+                if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
-            currentContent = out;
+                preset = new SectorPreset(mod + "-" + name, currentMod);
+            }
+
+            currentContent = preset;
             read(() -> {
-                Planet planet = locate(ContentType.planet, value.getString("planet", "serpulo"));
+                Planet planet = preset.planet == null ? Planets.serpulo : preset.planet;
+                if(value.has("planet")){
+                    planet = locate(ContentType.planet, value.getString("planet", "serpulo"));
 
-                if(planet == null) throw new RuntimeException("Planet '" + value.getString("planet") + "' not found.");
+                    if(planet == null) throw new RuntimeException("Planet '" + value.getString("planet") + "' not found.");
+                }
 
-                out.initialize(planet, value.getInt("sector", 0));
+                if(value.has("sector")){
+                    preset.initialize(planet, value.getInt("sector", 0));
+                }
 
                 value.remove("sector");
                 value.remove("planet");
@@ -685,7 +767,7 @@ public class ContentParser{
                 if(value.has("rules")){
                     JsonValue r = value.remove("rules");
                     if(!r.isObject()) throw new RuntimeException("Rules must be an object!");
-                    out.rules = rules -> {
+                    preset.rules = rules -> {
                         try{
                             //Use standard JSON, this is not content-parser relevant
                             JsonIO.json.readFields(rules, r);
@@ -695,9 +777,9 @@ public class ContentParser{
                     };
                 }
 
-                readFields(out, value);
+                readFields(preset, value);
             });
-            return out;
+            return preset;
         },
         ContentType.planet, (TypeParser<Planet>)(mod, name, value) -> {
             if(value.isString()) return locate(ContentType.planet, name);
@@ -1094,6 +1176,12 @@ public class ContentParser{
         }
     }
 
+    Prov<UnitController> resolveController(String type){
+        //this is used as a captured value to avoid parsing it multiple times
+        var controller = supply(resolve(type, FlyingAI.class));
+        return controller::get;
+    }
+
     Object field(Class<?> type, JsonValue value){
         return field(type, value.asString());
     }
@@ -1140,6 +1228,7 @@ public class ContentParser{
     }
 
     void readFields(Object object, JsonValue jsonMap){
+        if(!jsonMap.isObject()) throw new SerializationException("Expecting an object, but found: '" + jsonMap + "'");
         JsonValue research = jsonMap.remove("research");
 
         toBeParsed.remove(object);
@@ -1327,6 +1416,8 @@ public class ContentParser{
     void warn(String string, Object... format){
         Log.warn(string, format);
     }
+
+    void onNewInstance(Object object, Class<?> type){}
 
     public Json getJson(){
         checkInit();

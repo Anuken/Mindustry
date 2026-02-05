@@ -56,6 +56,7 @@ public class Control implements ApplicationListener, Loadable{
     private boolean hiscore = false;
     private boolean wasPaused = false, backgroundPaused = false;
     private Seq<Building> toBePlaced = new Seq<>(false);
+    private Seq<Object[]> toBePlacedConfigs = new Seq<>();
 
     public Control(){
         saves = new Saves();
@@ -119,6 +120,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(ResetEvent.class, event -> {
             player.reset();
             toBePlaced.clear();
+            toBePlacedConfigs.clear();
             indicators.clear();
 
             hiscore = false;
@@ -131,7 +133,7 @@ public class Control implements ApplicationListener, Loadable{
                 state.map.setHighScore(state.wave);
             }
 
-            Sounds.wave.play();
+            Sounds.waveSpawn.play();
         });
 
         Events.on(GameOverEvent.class, event -> {
@@ -216,9 +218,11 @@ public class Control implements ApplicationListener, Loadable{
                 if(settings.getInt("musicvol") > 0){
                     //TODO what to do if another core with different music is already playing?
                     Music music = core.landMusic();
-                    music.stop();
-                    music.play();
-                    music.setVolume(settings.getInt("musicvol") / 100f);
+                   if(music != null){
+                       music.stop();
+                       music.play();
+                       music.setVolume(settings.getInt("musicvol") / 100f);
+                   }
                 }
 
                 renderer.showLanding(core);
@@ -237,6 +241,15 @@ public class Control implements ApplicationListener, Loadable{
 
                     //TODO if the save is unloaded or map is hosted, these blocks do not get built.
                     boolean anyBuilds = false;
+                    float maxDelay = 0f;
+
+                    for(var build : state.rules.defaultTeam.data().buildings){
+                        //some blocks need to be configured later once everything is built
+                        if(build.block.delayLandingConfig){
+                            toBePlacedConfigs.add(new Object[]{build, build.config()});
+                        }
+                    }
+
                     for(var build : state.rules.defaultTeam.data().buildings.copy()){
                         if(!(build instanceof CoreBuild) && !build.block.privileged){
                             var ccore = build.closestCore();
@@ -249,8 +262,10 @@ public class Control implements ApplicationListener, Loadable{
                                     build.tile.remove();
 
                                     toBePlaced.add(build);
+                                    float delay = build.dst(ccore) / unitsPerTick + coreDelay;
+                                    maxDelay = Math.max(delay, maxDelay);
 
-                                    Time.run(build.dst(ccore) / unitsPerTick + coreDelay, () -> {
+                                    Time.run(delay, () -> {
                                         if(build.tile.build != build){
                                             placeLandBuild(build);
 
@@ -267,6 +282,7 @@ public class Control implements ApplicationListener, Loadable{
                     }
 
                     if(anyBuilds){
+                        Time.run(maxDelay + 1f, this::configurePlaced);
                         for(var ccore : state.rules.defaultTeam.data().cores){
                             Time.run(coreDelay, () -> {
                                 Fx.coreBuildShockwave.at(ccore.x, ccore.y, buildRadius);
@@ -290,7 +306,17 @@ public class Control implements ApplicationListener, Loadable{
             placeLandBuild(build);
         }
 
+        configurePlaced();
         toBePlaced.clear();
+    }
+
+    private void configurePlaced(){
+        for(Object[] obj : toBePlacedConfigs){
+            Building build = (Building)obj[0];
+            Object config = obj[1];
+            build.configureAny(config);
+        }
+        toBePlacedConfigs.clear();
     }
 
     private void placeLandBuild(Building build){
@@ -445,6 +471,10 @@ public class Control implements ApplicationListener, Loadable{
 
                             //set spawn for sector damage to use
                             Tile spawn = world.tile(spawnPos);
+                            if(spawn == null){
+                                playNewSector(origin, sector, reloader);
+                                return;
+                            }
                             spawn.setBlock(sector.planet.defaultCore, state.rules.defaultTeam);
 
                             //apply damage to simulate the sector being lost
@@ -476,7 +506,7 @@ public class Control implements ApplicationListener, Loadable{
                                     }
                                 }
 
-                                //copy over all buildings from the previous save, retaining config and health, and making them derelict. contents are not saved (derelict repair clears them anyway)
+                                //copy over all buildings from the previous save, retaining config and health, and making them derelict
                                 for(var build : previousBuildings){
                                     Tile tile = world.tile(build.tileX(), build.tileY());
                                     if(tile != null && tile.build == null && Build.validPlace(build.block, state.rules.defaultTeam, build.tileX(), build.tileY(), build.rotation, false, false)){

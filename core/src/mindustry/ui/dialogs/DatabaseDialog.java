@@ -22,6 +22,9 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class DatabaseDialog extends BaseDialog{
+    private final OrderedMap<String, OrderedMap<String, Seq<UnlockableContent>>> sortedContents = new OrderedMap<>();
+    private final OrderedMap<String, Seq<UnlockableContent>> tmpCategory = new OrderedMap<>();
+
     private TextField search;
     private Table all = new Table();
 
@@ -36,6 +39,7 @@ public class DatabaseDialog extends BaseDialog{
         addCloseButton();
         shown(() -> {
             checkTabList();
+            sortContents();
             if(state.isCampaign() && allTabs.contains(state.getPlanet())){
                 tab = state.getPlanet();
             }else if(state.isGame() && state.rules.planet != null && allTabs.contains(state.rules.planet)){
@@ -74,13 +78,27 @@ public class DatabaseDialog extends BaseDialog{
         }
     }
 
+    void sortContents(){
+        Seq<Content>[] allContent = Vars.content.getContentMap();
+        sortedContents.clear();
+        for(var contents : allContent){
+            for(var content : contents){
+                if(content instanceof UnlockableContent u){
+                    var categoryContents = sortedContents.get(u.databaseCategory, new OrderedMap<>());
+                    var taggedContents = categoryContents.get(u.databaseTag, new Seq<>());
+                    taggedContents.add(u);
+                    categoryContents.put(u.databaseTag, taggedContents);
+                    sortedContents.put(u.databaseCategory, categoryContents);
+                }
+            }
+        }
+    }
+
     void rebuild(){
         checkTabList();
 
         all.clear();
         var text = search.getText().toLowerCase();
-
-        Seq<Content>[] allContent = Vars.content.getContentMap();
 
         all.table(t -> {
             int i = 0;
@@ -96,71 +114,121 @@ public class DatabaseDialog extends BaseDialog{
             }
         }).row();
 
-        for(int j = 0; j < allContent.length; j++){
-            ContentType type = ContentType.all[j];
+        boolean hasResult = false;
 
-            Seq<UnlockableContent> array = allContent[j]
-                .select(c -> c instanceof UnlockableContent u && !u.isHidden() && !u.hideDatabase && (tab == Planets.sun || u.allDatabaseTabs || u.databaseTabs.contains(tab)) &&
-                    (text.isEmpty() || u.localizedName.toLowerCase().contains(text))).as();
+        for(int i = 0; i < sortedContents.size; i++){
+            String categoryName = sortedContents.orderedKeys().get(i);
+            OrderedMap<String, Seq<UnlockableContent>> categoryContents = sortedContents.get(categoryName);
 
-            if(array.size == 0) continue;
+            tmpCategory.clear();
 
-            //sorting only makes sense when in-game; otherwise, banned blocks can't exist
-            if(state.isGame()){
-                array.sort(Structs.comps(Structs.comparingBool(UnlockableContent::isBanned), Structs.comparingInt(u -> u.id)));
+            boolean categoryHasResult = false;
+
+            for(int j = 0; j < categoryContents.size; j++){
+                String tagName = categoryContents.orderedKeys().get(j);
+                Seq<UnlockableContent> array = categoryContents.get(tagName).select(u ->
+                !u.isHidden() && !u.hideDatabase &&
+                (tab == Planets.sun || u.allDatabaseTabs || u.databaseTabs.contains(tab)) &&
+                (text.isEmpty() || u.localizedName.toLowerCase().contains(text))).as();
+                if(array.isEmpty()) continue;
+
+                hasResult = true;
+                categoryHasResult = true;
+
+                //sorting only makes sense when in-game; otherwise, banned blocks can't exist
+                if(state.isGame()){
+                    array.sort(Structs.comps(Structs.comparingBool(UnlockableContent::isBanned), Structs.comparingInt(u -> u.id)));
+                }
+
+                tmpCategory.put(tagName, array);
             }
 
-            all.add("@content." + type.name() + ".name").growX().left().color(Pal.accent);
+            if(tmpCategory.isEmpty() || !categoryHasResult) continue;
+
+            all.add("@database-category." + categoryName).growX().left().color(Pal.accent);
             all.row();
-            all.image().growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
+            all.image().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent).growX();
             all.row();
-            all.table(list -> {
-                list.left();
 
-                int cols = (int)Mathf.clamp((Core.graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 12), 1, 22);
-                int count = 0;
+            all.table(sub -> {
+                for(int j = 0; j < tmpCategory.size; j++){
+                    String tagName = categoryContents.orderedKeys().get(j);
+                    Seq<UnlockableContent> array = tmpCategory.get(tagName);
+                    if(array == null || array.isEmpty()) continue;
 
-                for(var unlock : array){
-                    Image image = unlocked(unlock) ? new Image(new TextureRegionDrawable(unlock.uiIcon), mobile ? Color.white : Color.lightGray).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
-
-                    //banned cross
-                    if(state.isGame() && unlock.isBanned()){
-                        list.stack(image, new Image(Icon.cancel){{
-                            setColor(Color.scarlet);
-                            touchable = Touchable.disabled;
-                        }}).size(8 * 4).pad(3);
-                    }else{
-                        list.add(image).size(8 * 4).pad(3);
+                    if(!"default".equals(tagName)){
+                        sub.table(tag -> {
+                            tag.add("@database-tag." + tagName).left().color(Pal.gray);
+                            tag.image().growX().pad(5).height(3).color(Pal.gray);
+                        }).pad(4, 8, 4, 8).growX();
+                        sub.row();
                     }
 
-                    ClickListener listener = new ClickListener();
-                    image.addListener(listener);
-                    if(!mobile && unlocked(unlock)){
-                        image.addListener(new HandCursorListener());
-                        image.update(() -> image.color.lerp(!listener.isOver() ? Color.lightGray : Color.white, Mathf.clamp(0.4f * Time.delta)));
-                    }
+                    sub.table(list -> {
+                        list.left();
 
-                    if(unlocked(unlock)){
-                        image.clicked(() -> {
-                            if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(unlock.name) != 0){
-                                Core.app.setClipboardText((char)Fonts.getUnicode(unlock.name) + "");
-                                ui.showInfoFade("@copied");
+                        int cols = (int)Mathf.clamp((Core.graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 12), 1, 22);
+                        int count = 0;
+
+                        for(var unlock : array){
+                            Image image = unlocked(unlock) ? new Image(new TextureRegionDrawable(unlock.uiIcon), mobile ? Color.white : Color.lightGray).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
+
+                            //banned cross
+                            if(state.isGame() && unlock.isBanned()){
+                                list.stack(image, new Image(Icon.cancel){{
+                                    setColor(Color.scarlet);
+                                    touchable = Touchable.disabled;
+                                }}).size(8 * 4).pad(3);
+                            }else if(state.isGame() && state.patcher.isPatched(unlock)){
+                                list.stack(image, new Table(){{
+                                    right().bottom().touchable = Touchable.disabled;
+                                    // Interpolated color (lerp lightishGray and white) for better contrast
+                                    image(Icon.fileSmall).size(12f).color(Tmp.c1.set(Color.white).a(0.5f));
+                                }}).size(8 * 4).pad(3);
                             }else{
-                                ui.content.show(unlock);
+                                list.add(image).size(8 * 4).pad(3);
                             }
-                        });
-                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName + (settings.getBool("console") ? "\n[gray]" + unlock.name : ""))));
-                    }
 
-                    if((++count) % cols == 0){
-                        list.row();
-                    }
+                            ClickListener listener = new ClickListener();
+                            image.addListener(listener);
+                            if(!mobile && unlocked(unlock)){
+                                image.addListener(new HandCursorListener());
+                                image.update(() -> image.color.lerp(!listener.isOver() ? Color.lightGray : Color.white, Mathf.clamp(0.4f * Time.delta)));
+                            }
+
+                            if(unlocked(unlock)){
+                                image.clicked(() -> {
+                                    if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(unlock.name) != 0){
+                                        Core.app.setClipboardText((char)Fonts.getUnicode(unlock.name) + "");
+                                        ui.showInfoFade("@copied");
+                                    }else{
+                                        ui.content.show(unlock);
+                                    }
+                                });
+                                image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName + (settings.getBool("console") ? "\n[gray]" + unlock.name : ""))));
+                            }
+
+                            if((++count) % cols == 0){
+                                list.row();
+                            }
+                        }
+
+                        for(int k = 0; k < cols - count; k++){
+                            Image image = new Image();
+                            image.setColor(Color.clear);
+                            list.add(image).size(8 * 4).pad(3);
+                        }
+                    });
+                    sub.row();
                 }
+
+
             }).growX().left().padBottom(10);
+
             all.row();
         }
 
-        if(all.getChildren().isEmpty()){
+        if(!hasResult){
             all.add("@none.found");
         }
     }

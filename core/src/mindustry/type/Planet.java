@@ -115,8 +115,6 @@ public class Planet extends UnlockableContent{
     public boolean allowLaunchSchematics = false;
     /** Whether to allow users to specify the resources they take to this map. */
     public boolean allowLaunchLoadout = false;
-    /** Whether to allow sectors to simulate waves in the background. */
-    public boolean allowWaveSimulation = false;
     /** Whether to simulate sector invasions from enemy bases. */
     public boolean allowSectorInvasion = false;
     /** If true, legacy launch pads can be enabled. */
@@ -164,6 +162,8 @@ public class Planet extends UnlockableContent{
     /** Loads the planet grid outline mesh. Clientside only. */
     public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineRad * radius);
 
+    /** Planets that are allowed to update at the same time as this one for background calculations. */
+    public ObjectSet<Planet> updateGroup = new ObjectSet<>();
     /** Global difficulty/modifier settings for this planet's campaign. */
     public CampaignRules campaignRules = new CampaignRules();
     /** Defaults applied to the rules. */
@@ -251,7 +251,6 @@ public class Planet extends UnlockableContent{
 
     public void applyDefaultRules(CampaignRules rules){
         JsonIO.copy(campaignRuleDefaults, rules);
-        rules.sectorInvasion = allowSectorInvasion;
     }
 
     public @Nullable Sector getLastSector(){
@@ -341,7 +340,7 @@ public class Planet extends UnlockableContent{
                 sum += 0.88f;
             }
 
-            sector.threat = sector.preset == null || !sector.preset.requireUnlock ?
+            sector.threat = sector.preset == null || (!sector.preset.requireUnlock && sector.preset.difficulty == 0f) ?
                 Math.max(Math.min(sum / 5f, 1.2f), 0.3f) : //low threat sectors are pointless
                 Mathf.clamp(sector.preset.difficulty / 10f);
         }
@@ -550,8 +549,7 @@ public class Planet extends UnlockableContent{
             Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(curr.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
             Tmp.v32.set(next.v).sub(sector.tile.v).setLength(next.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
 
-            batch.tri(curr.v, next.v, Tmp.v31, color);
-            batch.tri(Tmp.v31, next.v, Tmp.v32, color);
+            batch.quad(curr.v, next.v, Tmp.v32, Tmp.v31, color);
 
             sector.tile.v.scl(1f / arad);
             next.v.scl(1f / arad);
@@ -629,7 +627,9 @@ public class Planet extends UnlockableContent{
             batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f).add(normal, -stroke));
         }
+        Gl.disable(Gl.cullFace);
         batch.flush(Gl.triangleStrip);
+        Gl.enable(Gl.cullFace);
     }
 
     public Vec3 lookAt(Sector sector, Vec3 out){

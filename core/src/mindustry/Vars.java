@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.async.*;
 import mindustry.core.*;
@@ -50,7 +51,7 @@ public class Vars implements Loadable{
     /** Min game version for all mods. */
     public static final int minModGameVersion = 136;
     /** Min game version for java mods specifically - this is higher, as Java mods have more breaking changes. */
-    public static final int minJavaModGameVersion = 147;
+    public static final int minJavaModGameVersion = 154;
     /** If true, a button to view sector submission threads is shown. */
     public static boolean showSectorSubmissions = true;
     /** If true, the BE server list is always used. */
@@ -80,7 +81,7 @@ public class Vars implements Loadable{
     /** Link to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
     /** Link to the wiki's patch guide.*/
-    public static final String patchesGuideURL = "https://mindustrygame.github.io/wiki/contentpatches/";
+    public static final String patchesGuideURL = "https://mindustrygame.github.io/wiki/datapatches/";
     /** URLs to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String[] serverJsonBeURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_be.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_be.json"};
     /** URLs to the JSON file containing all the stable servers.  */
@@ -536,5 +537,9 @@ public class Vars implements Loadable{
                 }
             }
         }
+
+        StringMap globalBundle = new StringMap();
+        PropertiesUtils.load(globalBundle, files.internal("bundles/global.properties").reader("UTF-8"));
+        bundle.getProperties().putAll(globalBundle);
     }
 }

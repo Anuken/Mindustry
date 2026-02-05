@@ -50,10 +50,22 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
 
                 treadEffectTime = 0f;
             }
+
+            control.sound.loop(type.tankMoveSound, this, type.tankMoveVolume);
         }
 
         lastDeepFloor = null;
         boolean anyNonDeep = false;
+
+        if(type.crushFragile && !disarmed){
+            for(int i = 0; i < 8; i++){
+                Point2 offset = Geometry.d8[i];
+                var other = Vars.world.buildWorld(x + offset.x * tilesize, y + offset.y * tilesize);
+                if(other != null && other.team != team && other.block.crushFragile){
+                    other.damage(team, 999999999f);
+                }
+            }
+        }
 
         //calculate overlapping tiles so it slows down when going "over" walls
         int r = Math.max((int)(hitSize * 0.75f / tilesize), 0);

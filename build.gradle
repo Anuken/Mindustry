@@ -44,7 +44,7 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
-        rhinoVersion = '73a812444ac388ac2d94013b5cadc8f70b7ea027'
+        rhinoVersion = '54b75cbd1207ef1fd5cff517cbd188e763c85baa'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -113,7 +113,7 @@ allprojects{
             def output = 'en\n'
             def bundles = new File(project(':core').projectDir, 'assets/bundles/')
             bundles.list().sort().each{ name ->
-                if(name == "bundle.properties") return
+                if(name == "bundle.properties" || name == "global.properties") return
                 output += name.substring("bundle".length() + 1, name.lastIndexOf('.')) + "\n"
             }
             new File(project(':core').projectDir, 'assets/locales').text = output
@@ -186,7 +186,7 @@ allprojects{
         maven{ url 'https://jitpack.io' }
     }
 
-    task clearCache{
+    tasks.register('clearCache'){
         doFirst{
             delete{
                 delete "$rootDir/core/assets/cache"
@@ -254,7 +254,7 @@ project(":desktop"){
 
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
-        implementation arcModule("backends:backend-sdl")
+        implementation arcModule("backends:backend-sdl3")
         annotationProcessor 'com.github.Anuken:jabel:0.9.0'
     }
 }
@@ -273,7 +273,7 @@ project(":core"){
 
     compileJava.options.fork = true
 
-    task preGen{
+    tasks.register('preGen'){
         outputs.upToDateWhen{ false }
         generateLocales()
         writeVersion()
@@ -281,7 +281,7 @@ project(":core"){
         writePlugins()
     }
 
-    task copyChangelog{
+    tasks.register('copyChangelog'){
         doLast{
             def props = loadVersionProps()
             def androidVersion = props['androidBuildCode'].toInteger() - 2
@@ -289,9 +289,9 @@ project(":core"){
             def notice = "[This is a truncated changelog, see Github for full notes]"
             def maxLength = 460
 
-            def androidLogList = [notice] + loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
+            def androidLogList = [notice] + loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]") }
             def result = ""
-            androidLogList.forEach{line ->
+            androidLogList.forEach{ line ->
                 if(result.length() + line.length() + 1 < maxLength){
                     result += line + "\n"
                 }
@@ -305,19 +305,21 @@ project(":core"){
         }
     }
 
-    task sourcesJar(type: Jar, dependsOn: classes){
+    tasks.register('sourcesJar', Jar){
+        dependsOn classes
         archiveClassifier = 'sources'
         from sourceSets.main.allSource
     }
 
-    task assetsJar(type: Jar, dependsOn: ":tools:pack"){
+    tasks.register('assetsJar', Jar){
+        dependsOn ":tools:pack"
         archiveClassifier = 'assets'
         from files("assets"){
             exclude "config", "cache", "music", "sounds", "sprites/fallback"
         }
     }
 
-    task musicJar(type: Jar){
+    tasks.register('musicJar', Jar){
         archiveClassifier = 'music'
         from files("assets"){
             include "music/*", "sounds/*"
@@ -327,7 +329,7 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
-        api "org.lz4:lz4-java:1.8.0"
+        api "at.yawk.lz4:lz4-java:1.10.2"
         api arcModule("arc-core")
         api arcModule("extensions:flabel")
         api arcModule("extensions:freetype")
@@ -452,16 +454,17 @@ configure([":core", ":server"].collect{project(it)}){
         publications{
             maven(MavenPublication){
                 from components.java
-                if(project.name == "core"){
-                    artifact(tasks.named("assetsJar"))
-                }
+                //TODO: uncomment this once the jitpack packing is fixed (currently depends on a newer glibc version)
+                //if(project.name == "core"){
+                //    artifact(tasks.named("assetsJar"))
+                //}
             }
         }
     }
 }
 
-task deployAll{
-    task cleanDeployOutput{
+tasks.register('deployAll'){
+    tasks.register('cleanDeployOutput'){
         doFirst{
             if(getBuildVersion() == "custom build" || getBuildVersion() == "") throw new IllegalArgumentException("----\n\nSET A BUILD NUMBER FIRST!\n\n----")
             if(!project.hasProperty("release")) throw new IllegalArgumentException("----\n\nSET THE RELEASE PROJECT PROPERTY FIRST!\n\n----")
@@ -483,11 +486,11 @@ task deployAll{
     }
 }
 
-task resolveDependencies{
+tasks.register('resolveDependencies'){
     doLast{
         rootProject.allprojects{ project ->
             Set<Configuration> configurations = project.buildscript.configurations + project.configurations
-            configurations.findAll{c -> c.canBeResolved}.forEach{c -> c.resolve()}
+            configurations.findAll{ c -> c.canBeResolved }.forEach{ c -> c.resolve() }
         }
     }
 }
