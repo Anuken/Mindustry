@@ -186,7 +186,7 @@ allprojects{
         maven{ url 'https://jitpack.io' }
     }
 
-    task clearCache{
+    tasks.register('clearCache'){
         doFirst{
             delete{
                 delete "$rootDir/core/assets/cache"
@@ -273,7 +273,7 @@ project(":core"){
 
     compileJava.options.fork = true
 
-    task preGen{
+    tasks.register('preGen'){
         outputs.upToDateWhen{ false }
         generateLocales()
         writeVersion()
@@ -281,7 +281,7 @@ project(":core"){
         writePlugins()
     }
 
-    task copyChangelog{
+    tasks.register('copyChangelog'){
         doLast{
             def props = loadVersionProps()
             def androidVersion = props['androidBuildCode'].toInteger() - 2
@@ -289,9 +289,9 @@ project(":core"){
             def notice = "[This is a truncated changelog, see Github for full notes]"
             def maxLength = 460
 
-            def androidLogList = [notice] + loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
+            def androidLogList = [notice] + loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]") }
             def result = ""
-            androidLogList.forEach{line ->
+            androidLogList.forEach{ line ->
                 if(result.length() + line.length() + 1 < maxLength){
                     result += line + "\n"
                 }
@@ -305,19 +305,21 @@ project(":core"){
         }
     }
 
-    task sourcesJar(type: Jar, dependsOn: classes){
+    tasks.register('sourcesJar', Jar){
+        dependsOn classes
         archiveClassifier = 'sources'
         from sourceSets.main.allSource
     }
 
-    task assetsJar(type: Jar, dependsOn: ":tools:pack"){
+    tasks.register('assetsJar', Jar){
+        dependsOn ":tools:pack"
         archiveClassifier = 'assets'
         from files("assets"){
             exclude "config", "cache", "music", "sounds", "sprites/fallback"
         }
     }
 
-    task musicJar(type: Jar){
+    tasks.register('musicJar', Jar){
         archiveClassifier = 'music'
         from files("assets"){
             include "music/*", "sounds/*"
@@ -461,8 +463,8 @@ configure([":core", ":server"].collect{project(it)}){
     }
 }
 
-task deployAll{
-    task cleanDeployOutput{
+tasks.register('deployAll'){
+    tasks.register('cleanDeployOutput'){
         doFirst{
             if(getBuildVersion() == "custom build" || getBuildVersion() == "") throw new IllegalArgumentException("----\n\nSET A BUILD NUMBER FIRST!\n\n----")
             if(!project.hasProperty("release")) throw new IllegalArgumentException("----\n\nSET THE RELEASE PROJECT PROPERTY FIRST!\n\n----")
@@ -484,11 +486,11 @@ task deployAll{
     }
 }
 
-task resolveDependencies{
+tasks.register('resolveDependencies'){
     doLast{
         rootProject.allprojects{ project ->
             Set<Configuration> configurations = project.buildscript.configurations + project.configurations
-            configurations.findAll{c -> c.canBeResolved}.forEach{c -> c.resolve()}
+            configurations.findAll{ c -> c.canBeResolved }.forEach{ c -> c.resolve() }
         }
     }
 }
