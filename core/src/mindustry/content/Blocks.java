@@ -2537,6 +2537,7 @@ public class Blocks{
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
+            itemDurationMultipliers.put(Items.pyratite, 3f);
 
             drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion());
         }};
@@ -2566,6 +2567,7 @@ public class Blocks{
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
+            itemDurationMultipliers.put(Items.pyratite, 3f);
 
             drawer = new DrawMulti(
             new DrawDefault(),
@@ -3440,8 +3442,8 @@ public class Blocks{
                     keepVelocity = false;
                     hittable = false;
                 }},
-                Items.pyratite, new BulletType(4f, 60f){{
-                    ammoMultiplier = 6f;
+                Items.pyratite, new BulletType(4f, 30f){{
+                    ammoMultiplier = 10f;
                     hitSize = 7f;
                     lifetime = 18f;
                     pierce = true;
