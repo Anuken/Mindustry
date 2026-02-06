@@ -39,6 +39,9 @@ public class Reconstructor extends UnitBlock{
     public Sound createSound = Sounds.unitCreate;
     public float createSoundVolume = 1f;
 
+    //adds moveCommand and enterPayloadCommand
+    public static Seq<UnitCommand> list = new Seq<UnitCommand>().with(Vars.content.unitCommand(0),Vars.content.unitCommand(6));
+
     public Reconstructor(String name){
         super(name);
         regionRotated1 = 1;
@@ -213,8 +216,8 @@ public class Reconstructor extends UnitBlock{
 
             table.background(Styles.black6);
 
-            var list = unit == null ? Vars.content.unitCommands().copy() : unit().commands;
-            for(var item : list){
+            Seq<UnitCommand> lastList = unit == null ? list : unit().commands;
+            for(var item : lastList){
                 ImageButton button = table.button(item.getIcon(), Styles.clearNoneTogglei, 40f, () -> {
                     configure(item);
                     deselect();
