@@ -7,6 +7,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.event.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
@@ -19,6 +20,7 @@ import mindustry.ctype.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -30,6 +32,9 @@ import static mindustry.Vars.*;
 
 /** Utilities for displaying certain stats in a table. */
 public class StatValues{
+
+    //only allocate once
+    public static TextureRegionDrawable arrowNote = new TextureRegionDrawable(Icon.arrowNoteSmall);
 
     public static StatValue string(String value, Object... args){
         String result = Strings.format(value, args);
@@ -701,7 +706,7 @@ public class StatValues{
                         int count = (int)(b.length / b.lightningSpacing) * 2 + 2;
                         float damage = b.lightningDamage < 0 ? b.damage : b.lightningDamage;
                         sep(bt, Core.bundle.format("bullet.lightning", count, damage));
-                        sep(bt, "   " + Core.bundle.format("bullet.lightningspacing", Strings.autoFixed(b.lightningSpacing / tilesize, 2), Strings.autoFixed(b.lightningLength, 2)));
+                        note(bt, Core.bundle.format("bullet.lightninginterval", Strings.autoFixed(b.lightningSpacing / tilesize, 2), Strings.autoFixed(b.lightningLength, 2))).left();
                     }
 
                     if(type instanceof EmpBulletType b && b.radius > 0f){
@@ -825,6 +830,17 @@ public class StatValues{
     private static Cell<?> sep(Table table, String text){
         table.row();
         return table.add(text);
+    }
+
+    //add a note under a value
+    private static Cell<?> note(Table table, String text){
+        table.row();
+        return table.table(t -> {
+            arrowNote.setMinWidth(15f);
+            arrowNote.setMinHeight(15f);
+            t.image(arrowNote).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
+            t.add(text);
+        });
     }
 
     //for AmmoListValue
