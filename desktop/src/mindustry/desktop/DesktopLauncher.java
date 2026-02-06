@@ -6,6 +6,7 @@ import arc.backend.sdl.*;
 import arc.discord.*;
 import arc.discord.DiscordRPC.*;
 import arc.files.*;
+import arc.func.*;
 import arc.math.*;
 import arc.profiling.*;
 import arc.struct.*;
@@ -14,7 +15,7 @@ import arc.util.Log.*;
 import arc.util.serialization.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
-import mindustry.core.*;
+import mindustry.core.Version;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -24,7 +25,10 @@ import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.service.*;
 import mindustry.type.*;
+import mindustry.ui.dialogs.*;
+import org.lwjgl.*;
 import org.lwjgl.sdl.*;
+import org.lwjgl.system.*;
 
 import java.io.*;
 
@@ -290,6 +294,56 @@ public class DesktopLauncher extends ClientLauncher{
                 message(causeString + "\nThe logs have been saved in:\n" + file.getAbsolutePath() + "\n" + fc.getClass().getSimpleName().replace("Exception", "") + (fc.getMessage() == null ? "" : ":\n" + fc.getMessage()));
             }
         });
+    }
+
+    @Override
+    public void showNativeFileChooser(boolean open, String title, Cons<Fi> cons, String... shownExtensions){
+        String[] ext = shownExtensions == null || shownExtensions.length == 0 ? new String[]{""} : shownExtensions;
+
+        SDL_DialogFileFilter.Buffer filters = SDL_DialogFileFilter.calloc(ext.length);
+        try(MemoryStack stack = MemoryStack.stackPush()){
+            for(int i = 0; i < ext.length; i++){
+                String extName = ext[i];
+
+                var filter = SDL_DialogFileFilter.calloc(stack)
+                .name(MemoryUtil.memUTF8(extName.isEmpty() ? "All Files" : "." + extName + " files"))
+                .pattern(MemoryUtil.memUTF8(extName.isEmpty() ? "*" : extName));
+
+                filters.put(i, filter);
+            }
+        }
+        SDL_DialogFileCallbackI callback = (userData, files, filter) -> {
+            if(files != 0){
+                PointerBuffer pointerBuffer = MemoryUtil.memPointerBuffer(files, 1);
+                long firstFile = pointerBuffer.get();
+                if(firstFile != 0){
+                    String result = MemoryUtil.memUTF8(firstFile);
+
+                    if(result.isEmpty() || result.equals("\n")) return;
+                    if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
+                    if(result.contains("\n")) return;
+
+                    Fi file = Core.files.absolute(result);
+                    Core.app.post(() -> {
+                        FileChooser.setLastDirectory(file.isDirectory() ? file : file.parent());
+
+                        if(!open){
+                            cons.get(file.parent().child(file.nameWithoutExtension() + "." + ext[0]));
+                        }else{
+                            cons.get(file);
+                        }
+                    });
+                }
+            }
+        };
+
+        if(open){
+            SDLDialog.SDL_ShowOpenFileDialog(callback, 0, ((SdlApplication)Core.app).getWindow(), filters, FileChooser.getLastDirectory().absolutePath(), false);
+        }else{
+            SDLDialog.SDL_ShowSaveFileDialog(callback, 0, ((SdlApplication)Core.app).getWindow(), filters, FileChooser.getLastDirectory().absolutePath());
+        }
+
+        filters.free();
     }
 
     @Override
