@@ -297,7 +297,16 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
-    public void showNativeFileChooser(boolean open, String title, Cons<Fi> cons, String... shownExtensions){
+    public void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
+        showNativeFileChooser(open, cons, extension);
+    }
+
+    @Override
+    public void showMultiFileChooser(Cons<Fi> cons, String... extensions){
+        showNativeFileChooser(true, cons, extensions);
+    }
+
+    void showNativeFileChooser(boolean open, Cons<Fi> cons, String... shownExtensions){
         String[] ext = shownExtensions == null || shownExtensions.length == 0 ? new String[]{""} : shownExtensions;
 
         SDL_DialogFileFilter.Buffer filters = SDL_DialogFileFilter.calloc(ext.length);
@@ -340,7 +349,7 @@ public class DesktopLauncher extends ClientLauncher{
         if(open){
             SDLDialog.SDL_ShowOpenFileDialog(callback, 0, ((SdlApplication)Core.app).getWindow(), filters, FileChooser.getLastDirectory().absolutePath(), false);
         }else{
-            SDLDialog.SDL_ShowSaveFileDialog(callback, 0, ((SdlApplication)Core.app).getWindow(), filters, FileChooser.getLastDirectory().absolutePath());
+            SDLDialog.SDL_ShowSaveFileDialog(callback, 0, ((SdlApplication)Core.app).getWindow(), filters, FileChooser.getLastDirectory().absolutePath() + "/" + "export." + ext[0]);
         }
 
         filters.free();
