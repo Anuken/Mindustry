@@ -198,7 +198,7 @@ public class NetClient implements ApplicationListener{
     public static void sound(Sound sound, float volume, float pitch, float pan){
         if(sound == null || headless) return;
 
-        sound.play(Mathf.clamp(volume, 0, 8f) * Core.settings.getInt("sfxvol") / 100f, Mathf.clamp(pitch, 0f, 20f), pan, false, false);
+        sound.play(Mathf.clamp(volume, 0, 8f) * Core.audio.sfxVolume, Mathf.clamp(pitch, 0f, 20f), pan, false, false);
     }
 
     @Remote(variants = Variant.both, unreliable = true, called = Loc.server)

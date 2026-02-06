@@ -31,7 +31,6 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.power.PowerNode.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -245,8 +244,8 @@ public class Control implements ApplicationListener, Loadable{
                     float maxDelay = 0f;
 
                     for(var build : state.rules.defaultTeam.data().buildings){
-                        //power nodes need to be configured later once everything is built
-                        if(build instanceof PowerNodeBuild){
+                        //some blocks need to be configured later once everything is built
+                        if(build.block.delayLandingConfig){
                             toBePlacedConfigs.add(new Object[]{build, build.config()});
                         }
                     }
