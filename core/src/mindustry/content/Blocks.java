@@ -2099,11 +2099,11 @@ public class Blocks{
         }};
 
         junction = new Junction("junction"){{
-            requirements(Category.distribution, with(Items.copper, 2));
+            requirements(Category.distribution, with(Items.copper, 3));
             speed = 26;
             capacity = 6;
             health = 30;
-            buildCostMultiplier = 6f;
+            buildCostMultiplier = 4f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
