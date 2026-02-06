@@ -1158,8 +1158,6 @@ public class LExecutor{
 
         public float curTime;
 
-        public boolean yielded;
-
         public WaitI(LVar value){
             this.value = value;
         }
@@ -1174,16 +1172,13 @@ public class LExecutor{
                 exec.yield = true;
                 // Start the next wait afresh ('value' might have been modified remotely by a different processor)
                 curTime = 0f;
-            }else if(value.num() <= ((LogicBlock)exec.build.block).maxInstructionScale / 60f){
-                // Waiting for at most maxInstructionScale ticks to build up the accumulator
-                // Ensure even short waits yield at least once, for backwards compatibility
-                if(!yielded || exec.build.accumulator < value.num() * exec.build.ipt * 60f){
-                    exec.counter.numval --;
-                    exec.yield = yielded = true;
-                }else{
-                    yielded = false;
-                }
-            }else if(curTime >= value.num()){
+                return;
+            }
+
+            // Make sure the wait also fills the accumulator accordingly
+            int maxAccumulator = ((LogicBlock)exec.build.block).maxInstructionScale * exec.build.ipt;
+            float requiredAccumulator = Math.min((float) (value.num() * exec.build.ipt * 60f), maxAccumulator);
+            if(curTime >= value.num() && exec.build.accumulator >= requiredAccumulator){
                 curTime = 0f;
             }else{
                 //skip back to self.
