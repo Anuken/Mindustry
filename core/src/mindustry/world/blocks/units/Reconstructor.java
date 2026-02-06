@@ -163,6 +163,7 @@ public class Reconstructor extends UnitBlock{
     public class ReconstructorBuild extends UnitBuild{
         public @Nullable Vec2 commandPos;
         public @Nullable UnitCommand command;
+        public @Nullable Seq<UnitCommand> lastList = list;
 
         boolean constructing;
 
@@ -216,7 +217,9 @@ public class Reconstructor extends UnitBlock{
 
             table.background(Styles.black6);
 
-            Seq<UnitCommand> lastList = unit == null ? list : unit().commands;
+            if(unit != null){
+                lastList = unit().commands;
+            }
             for(var item : lastList){
                 ImageButton button = table.button(item.getIcon(), Styles.clearNoneTogglei, 40f, () -> {
                     configure(item);
