@@ -199,8 +199,9 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.unitminespeedmultiplier", f -> rules.unitMineSpeedMultiplier = f, () -> rules.unitMineSpeedMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0f, 50f);
         number("@rules.unitcostmultiplier", f -> rules.unitCostMultiplier = f, () -> rules.unitCostMultiplier);
-        check("@rules.logicunitbuild", b -> rules.logicUnitBuild = b, () -> rules.logicUnitBuild);
-        check("@rules.logicunitdeconstruct", b -> rules.logicUnitDeconstruct = b, () -> rules.logicUnitDeconstruct);
+        check("@rules.logicunitcontrol", b -> rules.logicUnitControl = b, () -> rules.logicUnitControl);
+        check("@rules.logicunitbuild", b -> rules.logicUnitBuild = b, () -> rules.logicUnitBuild, () -> rules.logicUnitControl);
+        check("@rules.logicunitdeconstruct", b -> rules.logicUnitDeconstruct = b, () -> rules.logicUnitDeconstruct, () -> rules.logicUnitControl);
 
         if(Core.bundle.get("bannedunits").toLowerCase().contains(ruleSearch)){
             current.button("@bannedunits", () -> bannedUnits.show(rules.bannedUnits)).left().width(300f).row();
