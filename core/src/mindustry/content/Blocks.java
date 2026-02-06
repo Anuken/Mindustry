@@ -3738,21 +3738,22 @@ public class Blocks{
         salvo = new ItemTurret("salvo"){{
             requirements(Category.turret, with(Items.copper, 100, Items.graphite, 80, Items.titanium, 50));
             ammo(
-                Items.copper,  new BasicBulletType(2.5f, 11){{
+                Items.copper,  new BasicBulletType(2.5f, 15){{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
-                    ammoMultiplier = 2;
+                    ammoMultiplier = 4;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
                     hitColor = backColor = trailColor = Pal.copperAmmoBack;
                     frontColor = Pal.copperAmmoFront;
                 }},
-                Items.graphite, new BasicBulletType(3.5f, 20){{
+                Items.graphite, new BasicBulletType(3.5f, 31){{
                     width = 9f;
                     height = 12f;
                     ammoMultiplier = 4;
                     lifetime = 60f;
+                    reloadMultiplier = 0.8f;
 
                     rangeChange = 4f * 8f;
 
@@ -3760,7 +3761,7 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.graphiteAmmoBack;
                     frontColor = Pal.graphiteAmmoFront;
                 }},
-                Items.pyratite, new BasicBulletType(3.2f, 18){{
+                Items.pyratite, new BasicBulletType(3.2f, 25){{
                     width = 10f;
                     height = 12f;
                     frontColor = hitColor = Pal.lightishOrange;
@@ -3770,13 +3771,13 @@ public class Blocks{
 
                     ammoMultiplier = 5;
 
-                    splashDamage = 12f;
+                    splashDamage = 15f;
                     splashDamageRadius = 22f;
 
                     makeFire = true;
                     lifetime = 60f;
                 }},
-                Items.silicon, new BasicBulletType(3f, 15, "bullet"){{
+                Items.silicon, new BasicBulletType(3f, 23, "bullet"){{
                     width = 8f;
                     height = 10f;
                     homingPower = 0.2f;
@@ -3790,13 +3791,14 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.siliconAmmoBack;
                     frontColor = Pal.siliconAmmoFront;
                 }},
-                Items.thorium, new BasicBulletType(4f, 29, "bullet"){{
+                Items.thorium, new BasicBulletType(4f, 28, "bullet"){{
                     width = 8f;
                     height = 13f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
                     ammoMultiplier = 4;
                     lifetime = 60f;
+                    armorMultiplier = 0.8f;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
                     backColor = hitColor = trailColor = Pal.thoriumAmmoBack;
@@ -3820,7 +3822,7 @@ public class Blocks{
 
             size = 2;
             range = 190f;
-            reload = 31f;
+            reload = 29f;
             consumeAmmoOnce = false;
             ammoEjectBack = 3f;
             recoil = 0f;
