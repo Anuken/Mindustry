@@ -33,8 +33,8 @@ import static mindustry.Vars.*;
 /** Utilities for displaying certain stats in a table. */
 public class StatValues{
 
-    //only allocate once
-    public static TextureRegionDrawable arrowNote = new TextureRegionDrawable(Icon.arrowNoteSmall);
+    //only allocate once, dont break unit tests
+    public static @Nullable TextureRegionDrawable noteIcon = Icon.arrowNoteSmall != null ? new TextureRegionDrawable(Icon.arrowNoteSmall) : null;
 
     public static StatValue string(String value, Object... args){
         String result = Strings.format(value, args);
@@ -836,9 +836,11 @@ public class StatValues{
     private static Cell<?> note(Table table, String text){
         table.row();
         return table.table(t -> {
-            arrowNote.setMinWidth(15f);
-            arrowNote.setMinHeight(15f);
-            t.image(arrowNote).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
+            if(noteIcon != null){
+                noteIcon.setMinWidth(15f);
+                noteIcon.setMinHeight(15f);
+                t.image(noteIcon).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
+            }
             t.add(text);
         });
     }
