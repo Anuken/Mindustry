@@ -691,7 +691,6 @@ public class UnitTypes{
                     splashDamageRadius = 44f;
                     instantDisappear = true;
                     splashDamage = 80f;
-                    buildingDamageMultiplier = 0.68f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
