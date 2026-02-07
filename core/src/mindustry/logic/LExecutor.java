@@ -146,8 +146,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(!exec.privileged && !state.rules.logicUnitControl)
-                return;
+            if(!exec.privileged && !state.rules.logicUnitControl) return;
 
             if(exec.binds == null || exec.binds.length != content.units().size){
                 exec.binds = new int[content.units().size];
@@ -200,8 +199,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(!exec.privileged && !state.rules.logicUnitControl)
-                return;
+            if(!exec.privileged && !state.rules.logicUnitControl) return;
 
             Object unitObj = exec.unit.obj();
             LogicAI ai = UnitControlI.checkLogicAI(exec, unitObj);
@@ -313,8 +311,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(!exec.privileged && !state.rules.logicUnitControl)
-                return;
+            if(!exec.privileged && !state.rules.logicUnitControl) return;
 
             Object unitObj = exec.unit.obj();
             LogicAI ai = checkLogicAI(exec, unitObj);
