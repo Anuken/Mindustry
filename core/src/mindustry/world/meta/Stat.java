@@ -60,6 +60,7 @@ public class Stat implements Comparable<Stat>{
     powerRange = new Stat("powerRange", StatCat.power),
     powerConnections = new Stat("powerConnections", StatCat.power),
     basePowerGeneration = new Stat("basePowerGeneration", StatCat.power),
+    meltdownTime = new Stat("meltdownTime", StatCat.power), 
 
     tiles = new Stat("tiles", StatCat.crafting),
     input = new Stat("input", StatCat.crafting),

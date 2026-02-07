@@ -77,6 +77,16 @@ public class NuclearReactor extends PowerGenerator{
     public void setStats(){
         super.setStats();
 
+        stats.add(Stat.meltdownTime, table -> {
+            float avg = (itemDuration / 60f) / (1f + heatConsumeRate / 2f);
+            float val = 30f * heating * itemCapacity * avg;
+            float time = itemCapacity * avg * (1f - Mathf.sqrt(1f - 1f / val));
+            if(val > 1f){
+                table.add(Strings.autoFixed(time, 2) + " " + StatUnit.seconds.localized() + " " + Core.bundle.format("bar.whenfull"));
+            }else{
+                table.add(Core.bundle.format("bar.nevermelts"));
+            }
+        });
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
