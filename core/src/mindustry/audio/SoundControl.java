@@ -26,6 +26,8 @@ public class SoundControl{
     /** music used explicitly after boss spawns */
     public Seq<Music> bossMusic = Seq.with();
 
+    public AudioBus uiBus = new AudioBus();
+
     protected Music lastRandomPlayed;
     protected Interval timer = new Interval(4);
     protected long lastPlayed;
@@ -33,7 +35,6 @@ public class SoundControl{
     protected float fade;
     protected boolean silenced;
 
-    protected AudioBus uiBus = new AudioBus();
     protected boolean wasPlaying;
     protected AudioFilter filter = new BiquadFilter(){{
         set(0, 500, 1);

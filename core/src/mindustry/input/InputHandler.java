@@ -1,6 +1,7 @@
 package mindustry.input;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -1624,22 +1625,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(withText){
             Font font = Fonts.outline;
             font.setColor(col2);
-            var ints = font.usesIntegerPositions();
+            boolean ints = font.usesIntegerPositions();
             font.setUseIntegerPositions(false);
-            var z = Draw.z();
+            float z = Draw.z();
             Draw.z(Layer.endPixeled);
             font.getData().setScale(1 / renderer.camerascale);
-            var snapToCursor = Core.settings.getBool("selectionsizeoncursor");
-            var textOffset = Core.settings.getInt("selectionsizeoncursoroffset", 5);
             int width = (int)((result.x2 - result.x) / 8);
             int height = (int)((result.y2 - result.y) / 8);
             int area = width * height;
 
-            // FINISHME: When not snapping to cursor, perhaps it would be best to choose the corner closest to the cursor that's at least a block away?
             font.draw(width + "x" + height + " (" + area + ")",
-            snapToCursor ? input.mouseWorldX() + textOffset * (4 / renderer.camerascale) : result.x2,
-            snapToCursor ? input.mouseWorldY() - textOffset * (4 / renderer.camerascale) : result.y
-            );
+            input.mouseWorldX() + 5 * (4 / renderer.camerascale),
+            input.mouseWorldY() - 5 * (4 / renderer.camerascale));
             font.setColor(Color.white);
             font.getData().setScale(1);
             font.setUseIntegerPositions(ints);
@@ -1841,7 +1838,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if((!config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
             || (config.isShown() && config.getSelected().onConfigureBuildTapped(build) && build.shouldShowConfigure(player))){
+                AudioBus oldBus = build.block.configureSound.bus;
+                build.block.configureSound.bus = control.sound.uiBus;
                 build.block.configureSound.at(build);
+                build.block.configureSound.bus = oldBus;
                 config.showConfig(build);
             }
             //otherwise...

@@ -398,7 +398,7 @@ public class UnitTypes{
             health = 320f;
             buildSpeed = 0.5f;
             armor = 4f;
-            riseSpeed = 0.07f;
+            riseSpeed = descentSpeed = 0.07f;
 
             mineTier = 2;
             mineSpeed = 3f;
@@ -454,7 +454,7 @@ public class UnitTypes{
             canBoost = true;
             armor = 9f;
             mechLandShake = 2f;
-            riseSpeed = 0.05f;
+            riseSpeed = descentSpeed = 0.05f;
 
             mechFrontSway = 0.55f;
             ammoType = new PowerAmmoType(1500);
@@ -510,7 +510,7 @@ public class UnitTypes{
             engineOffset = 12f;
             engineSize = 6f;
             lowAltitude = true;
-            riseSpeed = 0.02f;
+            riseSpeed = descentSpeed = 0.02f;
 
             health = 8200f;
             armor = 9f;
@@ -691,6 +691,7 @@ public class UnitTypes{
                     splashDamageRadius = 44f;
                     instantDisappear = true;
                     splashDamage = 80f;
+                    buildingDamageMultiplier = 0.68f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
