@@ -2628,10 +2628,11 @@ public class Blocks{
             ambientSound = Sounds.loopThoriumReactor;
             ambientSoundVolume = 0.11f;
             size = 3;
-            health = 700;
+            health = 1400;
             itemDuration = 360f;
             powerProduction = 15f;
-            heating = 0.02f;
+            heating = 0.005f;
+            coolantPower = 0.125f;
 
             consumeItem(Items.thorium);
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);
