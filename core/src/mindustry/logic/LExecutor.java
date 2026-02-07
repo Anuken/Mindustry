@@ -67,6 +67,28 @@ public class LExecutor{
         Events.on(ResetEvent.class, e -> unitTimeouts.clear());
     }
 
+    public static void runLogicScript(String code){
+        runLogicScript(code, 100_000, false);
+    }
+
+    public static void runLogicScript(String code, int maxInstructions, boolean loop){
+        LExecutor executor = new LExecutor();
+        executor.privileged = true;
+
+        try{
+            //assembler has no variables, all the standard ones are null
+            executor.load(LAssembler.assemble(code, true));
+        }catch(Throwable ignored){
+            return;
+        }
+
+        //executions are limited to prevent a game freeze
+        for(int i = 1; i < maxInstructions; i++){
+            if((!loop && executor.counter.numval >= executor.instructions.length || executor.counter.numval < 0) || executor.yield) break;
+            executor.runOnce();
+        }
+    }
+
     boolean timeoutDone(Unit unit, float delay){
         return Time.time >= unitTimeouts.get(unit.id) + delay;
     }
