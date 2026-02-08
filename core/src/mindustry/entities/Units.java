@@ -100,6 +100,17 @@ public class Units{
         unit.remove();
     }
 
+    /** Kill this unit without releasing harmful reactions */
+    @Remote(called = Loc.server)
+    public static void unitSafeDeath(Unit unit){
+        if(unit == null) return;
+        unit.type.deathExplosionEffect.at(unit.x, unit.y, unit.hitSize / 8f);
+        float shake = unit.type.deathShake < 0 ? unit.hitSize / 3f : unit.type.deathShake;
+        Effect.shake(shake, shake, unit);
+        unit.type.deathSound.at(unit, 1f, unit.type.deathSoundVolume);
+        unit.remove();
+    }
+
     /** @return whether a new instance of a unit of this team can be created. */
     public static boolean canCreate(Team team, UnitType type){
         return !type.useUnitCap || (team.data().countType(type) < getCap(team) && !type.isBanned());

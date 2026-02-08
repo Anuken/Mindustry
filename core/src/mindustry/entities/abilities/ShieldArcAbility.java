@@ -75,13 +75,10 @@ public class ShieldArcAbility extends Ability{
             (Tmp.v1.set(unit).add(unit.deltaX, unit.deltaY).within(paramPos, paramField.radius + paramField.width) || unit.within(paramPos, paramField.radius + paramField.width)) &&
             (Angles.within(paramPos.angleTo(unit), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(unit.x + unit.deltaX, unit.y + unit.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
 
-            if(unit.isMissile() && unit.killable() && paramField.missileUnitMultiplier >= 0f){
-
-                unit.remove();
-                unit.type.deathSound.at(unit);
-                unit.type.deathExplosionEffect.at(unit);
+            if(unit.isMissile() && paramField.missileUnitMultiplier >= 0f){
+                Call.unitSafeDeath(unit);
                 Fx.absorb.at(unit);
-                Fx.circleColorSpark.at(unit.x, unit.y,paramUnit.team.color);
+                paramField.pushEffect.at(unit.x, unit.y,paramUnit.team.color);
 
                 // consider missile hp and gamerule to damage the shield
                 paramField.data -= unit.health() * paramField.missileUnitMultiplier * Vars.state.rules.unitDamage(unit.team);
@@ -98,8 +95,8 @@ public class ShieldArcAbility extends Ability{
                     // get out
                     unit.move(Tmp.v1.set(unit).sub(paramUnit).setLength(overlapDst + 0.01f));
 
-                    if(Mathf.chanceDelta(0.5f*Time.delta)){
-                        Fx.circleColorSpark.at(unit.x,unit.y,paramUnit.team.color);
+                    if(Mathf.chanceDelta(0.3f * Time.delta)){
+                        paramField.pushEffect.at(unit.x, unit.y, paramUnit.team.color);
                     }
                 }
             }
@@ -142,6 +139,7 @@ public class ShieldArcAbility extends Ability{
     public boolean offsetRegion = false;
     /** If true, enemy units are pushed out. */
     public boolean pushUnits = true;
+    public Effect pushEffect = Fx.circleColorSpark;
 
     /** State. */
     protected float widthScale, alpha;
