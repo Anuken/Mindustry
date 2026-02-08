@@ -115,6 +115,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean teamPassable;
     /** if true, this block cannot be hit by bullets unless explicitly targeted. */
     public boolean underBullets;
+    /** if true, this block can be hit but will not be accounted for in pierce calculations */
+    public boolean pierceable = false;
     /** whether this is rotatable */
     public boolean rotate;
     /** if rotate is true and this is false, the region won't rotate when drawing */
