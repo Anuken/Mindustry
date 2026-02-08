@@ -100,7 +100,7 @@ public class Units{
         unit.remove();
     }
 
-    /** Kill this unit without releasing harmful reactions */
+    /** Kill this unit without releasing harmful reactions, only death effects (no dynamicExplosion, wrecks, shootOnDeath, etc) */
     @Remote(called = Loc.server)
     public static void unitSafeDeath(Unit unit){
         if(unit == null) return;
