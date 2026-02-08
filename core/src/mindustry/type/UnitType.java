@@ -77,7 +77,9 @@ public class UnitType extends UnlockableContent implements Senseable{
     rippleScale = 1f,
     /** boosting rise speed as fraction */
     riseSpeed = 0.08f,
-    /** how fast this unit falls when not boosting */
+    /** boosting descent speed as fraction */
+    descentSpeed = 0.08f,
+    /** how fast this unit falls upon death */
     fallSpeed = 0.018f,
     /** how many ticks it takes this missile to accelerate to full speed */
     missileAccelTime = 0f,
@@ -1299,6 +1301,10 @@ public class UnitType extends UnlockableContent implements Senseable{
         pathCost = null;
         pathCostId = -1;
         initPathType();
+    }
+
+    public void beforeParse(){
+        totalRequirements = cachedRequirements = firstRequirements = null;
     }
 
     /** @return the time required to build this unit, as a value that takes into account reconstructors */

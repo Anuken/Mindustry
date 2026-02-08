@@ -38,13 +38,18 @@ public class ShieldArcAbility extends Ability{
 
                 if(penX > penY){
                     b.vel.x *= -1;
+                    b.vel.y *= paramField.reflectVel;
                 }else{
                     b.vel.y *= -1;
+                    b.vel.x *= paramField.reflectVel;
                 }
 
                 b.owner = paramUnit;
                 b.team = paramUnit.team;
-                b.time += 1f;
+                b.time = b.lifetime * paramField.reflectTime;
+                if(paramField.reflectBuildingDamage > 0f){
+                    b.buildingDamageMultiplier = paramField.reflectBuildingDamage;
+                }
 
             }else{
                 b.absorb();
@@ -124,6 +129,12 @@ public class ShieldArcAbility extends Ability{
     public float width = 6f;
     /** Bullet deflection chance. -1 to disable */
     public float chanceDeflect = -1f;
+    /** Multiplier for reflected bullet building damage. -1 to disable */
+    public float reflectBuildingDamage = 1f;
+    /** Velocity multiplier for reflected bullets on the opposite axis. Negative values = concave, positive values = convex */
+    public float reflectVel = 1f;
+    /** Time multiplier for reflected bullets. */
+    public float reflectTime = 1f - 0.5f;
     /** Deflection sound. */
     public Sound deflectSound = Sounds.none;
     public Sound breakSound = Sounds.shieldBreakSmall;
@@ -154,8 +165,10 @@ public class ShieldArcAbility extends Ability{
         t.add(abilityStat("repairspeed", Strings.autoFixed(regen * 60f, 2)));
         t.row();
         t.add(abilityStat("cooldown", Strings.autoFixed(cooldown / 60f, 2)));
-        t.row();
-        t.add(abilityStat("deflectchance", Strings.autoFixed(chanceDeflect *100f, 2)));
+        if(chanceDeflect > 0f){
+            t.row();
+            t.add(abilityStat("deflectchance", Strings.autoFixed(chanceDeflect *100f, 2)));
+        }
     }
 
     @Override
