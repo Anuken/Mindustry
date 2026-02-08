@@ -17,13 +17,14 @@ import static mindustry.Vars.*;
 
 public class CommandAI extends AIController{
     protected static final int maxCommandQueueSize = 50, avoidInterval = 10;
-    protected static final Vec2 vecOut = new Vec2(), vecMovePos = new Vec2();
+    protected static final Vec2 vecOut = new Vec2(), vecMovePos = new Vec2(), movePos = new Vec2();
     protected static final boolean[] noFound = {false};
     protected static final UnitPayload tmpPayload = new UnitPayload(null);
     protected static final int transferStateNone = 0, transferStateLoad = 1, transferStateUnload = 2;
 
     public Seq<Position> commandQueue = new Seq<>(5);
     public @Nullable Vec2 targetPos;
+    public @Nullable Building targetBuild; 
     public @Nullable Teamc attackTarget;
     /** Group of units that were all commanded to reach the same point. */
     public @Nullable UnitGroup group;
@@ -214,12 +215,14 @@ public class CommandAI extends AIController{
             }
         }
 
-        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.buildOn() != null && (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
-            var build = unit.buildOn();
-            tmpPayload.unit = unit;
-            if(build.team == unit.team && build.acceptPayload(build, tmpPayload)){
-                Call.unitEnteredPayload(unit, build);
-                return; //no use updating after this, the unit is gone!
+        if(!net.client() && command == UnitCommand.enterPayloadCommand && (targetPos == null ? unit.buildOn() != null : targetBuild != null)){
+            var build = targetPos == null ? unit.buildOn() : targetBuild;
+            if(build.canControlSelect(unit)){
+                tmpPayload.unit = unit;
+                if(build.team == unit.team && build.acceptPayload(build, tmpPayload)){
+                    Call.unitEnteredPayload(unit, build);
+                    return; //no use updating after this, the unit is gone!
+                }
             }
         }
 
@@ -260,20 +263,26 @@ public class CommandAI extends AIController{
 
         if(targetPos != null){
             boolean move = true, isFinalPoint = commandQueue.size == 0;
-            vecOut.set(targetPos);
-            vecMovePos.set(targetPos);
+            movePos.set(targetPos);
+            targetBuild = world.buildWorld(targetPos.x, targetPos.y);
+            if(unit.isGrounded() && targetBuild != null && targetBuild.tile.solid() && targetBuild.block.acceptsUnitPayloads && unit.type.pathCostId != ControlPathfinder.costIdLegs && !ramming){
+                Tile best = targetBuild.findClosestEdge(unit, Tile::solid);
+                if(best != null){
+                    movePos.set(best);
+                }
+            }
+            vecOut.set(movePos);
+            vecMovePos.set(movePos);
 
             //the enter payload command requires an exact position
             if(group != null && group.valid && groupIndex < group.units.size && command != UnitCommand.enterPayloadCommand){
                 vecMovePos.add(group.positions[groupIndex * 2], group.positions[groupIndex * 2 + 1]);
             }
 
-            Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
-
             //TODO: should the unit stop when it finds a target?
             if(
                 (hasStance(UnitStance.patrol) && !hasStance(UnitStance.pursueTarget) && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
-                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
+                (command == UnitCommand.enterPayloadCommand && unit.within(movePos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
                 (command == UnitCommand.loopPayloadCommand && unit.within(vecMovePos, 10f))
             ){
                 move = false;
@@ -315,7 +324,7 @@ public class CommandAI extends AIController{
                     noFound[0] = false;
                     vecOut.set(vecMovePos);
                 }else{
-                    move &= controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                    move &= controlPath.getPathPosition(unit, vecMovePos, movePos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
 
                     //TODO: what to do when there's a target and it can't be reached?
                     /*

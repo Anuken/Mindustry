@@ -120,7 +120,11 @@ public class UnitAssembler extends PayloadBlock{
             removeBar("liquid");
         }
 
-        addBar("progress", (UnitAssemblerBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
+        addBar("progress", (UnitAssemblerBuild e) -> new Bar(
+            () -> Core.bundle.format("bar.progress", Strings.autoFixed(e.progress * 100f, 0)),
+            () -> Pal.ammo,
+            () -> e.progress
+        ));
 
         addBar("units", (UnitAssemblerBuild e) ->
             new Bar(() ->
