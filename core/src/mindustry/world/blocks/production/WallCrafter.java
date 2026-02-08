@@ -57,7 +57,7 @@ public class WallCrafter extends Block{
         rotate = true;
         update = true;
         solid = true;
-       ignoreLineRotation = true;
+        ignoreLineRotation = true;
         regionRotated1 = 1;
 
         envEnabled |= Env.space;
