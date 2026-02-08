@@ -8,6 +8,8 @@ public enum LAccess{
     firstItem,
     totalLiquids,
     totalPower,
+    totalPowerNodes,
+    totalBridgeNodes,
     itemCapacity,
     liquidCapacity,
     powerCapacity,
@@ -28,6 +30,8 @@ public enum LAccess{
     progress,
     timescale,
     rotation,
+    currentPowerNode,
+    currentBridgeLink,
     x,
     y,
     velocityX,
@@ -76,7 +80,10 @@ public enum LAccess{
     shoot("x", "y", "shoot"),
     shootp(true, "unit", "shoot"),
     config(true, "to"),
-    color("to");
+    color("to"),
+    powerConfig(true,"to", "mode"),
+    bridgeConfig(true, "to", "mode"),
+    ;
 
     public final String[] params;
     public final boolean isObj;
@@ -84,6 +91,7 @@ public enum LAccess{
     public static final LAccess[]
         all = values(),
         senseable = Seq.select(all, t -> t.params.length <= 1).toArray(LAccess.class),
+        senseable2 = {currentPowerNode, currentBridgeLink}, //I named it like this is because this sensor has 2 arguments instead of 1.,
         controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class),
         settable = {x, y, velocityX, velocityY, rotation, speed, armor, health, shield, team, flag, totalPower, payloadType};
 
