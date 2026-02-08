@@ -27,7 +27,7 @@ public class NeoplasmUnitType extends UnitType{
         }});
 
         abilities.add(new LiquidRegenAbility(){{
-            liquid = Liquids.neoplasm;
+            liquids = liquids.add(Liquids.neoplasm);
             slurpEffect = Fx.neoplasmHeal;
         }});
 
