@@ -241,6 +241,8 @@ public class BulletType extends Content implements Cloneable{
     public Effect healEffect = Fx.healBlockFull;
     /** Bullets spawned when this bullet is created. Rarely necessary, used for visuals. */
     public Seq<BulletType> spawnBullets = new Seq<>();
+    /** Whether to display the stats of the spawned bullet. */
+    public boolean showStats = false;
     /** Random angle spread of spawn bullets. */
     public float spawnBulletRandomSpread = 0f;
     /** Unit spawned _instead of_ this bullet. Useful for missiles. */
