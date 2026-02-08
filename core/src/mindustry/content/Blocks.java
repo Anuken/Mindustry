@@ -2648,6 +2648,7 @@ public class Blocks{
             ambientSound = Sounds.loopPulse;
             ambientSoundVolume = 0.08f;
             liquidCapacity = 80f;
+            constructHealthMultiplier = 0.5f;
 
             consumePower(25f);
             consumeItem(Items.blastCompound);
@@ -2809,6 +2810,7 @@ public class Blocks{
             requirements(Category.power, with(Items.tungsten, 750, Items.carbide, 300, Items.oxide, 150, Items.silicon, 500, Items.phaseFabric, 150, Items.surgeAlloy, 200));
 
             size = 5;
+            constructHealthMultiplier = 0.5f;
             liquidCapacity = 80f;
             outputLiquid = new LiquidStack(Liquids.neoplasm, 20f / 60f);
             explodeOnFull = true;
@@ -3140,6 +3142,7 @@ public class Blocks{
             isFirstTier = true;
             unitType = UnitTypes.alpha;
             health = 1100;
+            constructHealthMultiplier = 0.65f;
             itemCapacity = 4000;
             size = 3;
             buildCostMultiplier = 2f;
@@ -3152,6 +3155,7 @@ public class Blocks{
 
             unitType = UnitTypes.beta;
             health = 3500;
+            constructHealthMultiplier = 0.65f;
             itemCapacity = 9000;
             size = 4;
             thrusterLength = 34/4f;
@@ -3165,6 +3169,7 @@ public class Blocks{
 
             unitType = UnitTypes.gamma;
             health = 6000;
+            constructHealthMultiplier = 0.65f;
             itemCapacity = 13000;
             size = 5;
             thrusterLength = 40/4f;
@@ -3180,6 +3185,7 @@ public class Blocks{
             isFirstTier = true;
             unitType = UnitTypes.evoke;
             health = 4500;
+            constructHealthMultiplier = 0.65f;
             itemCapacity = 2000;
             size = 4;
             thrusterLength = 34/4f;
@@ -3200,6 +3206,7 @@ public class Blocks{
 
             unitType = UnitTypes.incite;
             health = 16000;
+            constructHealthMultiplier = 0.65f;
             itemCapacity = 3000;
             size = 5;
             thrusterLength = 40/4f;
@@ -3218,6 +3225,7 @@ public class Blocks{
 
             unitType = UnitTypes.emanate;
             health = 30000;
+            constructHealthMultiplier = 0.65f;
             itemCapacity = 4000;
             size = 6;
             thrusterLength = 48/4f;
@@ -4246,6 +4254,7 @@ public class Blocks{
             coolantMultiplier = 0.4f;
             liquidCapacity = 60f;
             scaledHealth = 150;
+            constructHealthMultiplier = 0.5f;
 
             coolant = consumeCoolant(1f);
             depositCooldown = 2.0f;
@@ -4313,6 +4322,7 @@ public class Blocks{
             shootSound = Sounds.shootSpectre;
 
             scaledHealth = 160;
+            constructHealthMultiplier = 0.5f;
             coolant = consumeCoolant(1f);
 
             depositCooldown = 2.0f;
@@ -4350,6 +4360,7 @@ public class Blocks{
             }};
 
             scaledHealth = 200;
+            constructHealthMultiplier = 0.5f;
             liquidCapacity = 60f;
             coolant = consumeCoolant(0.5f);
             consumePower(17f);
@@ -5613,6 +5624,7 @@ public class Blocks{
             range = 1350;
             shootCone = 1f;
             scaledHealth = 220;
+            constructHealthMultiplier = 0.5f;
             rotateSpeed = 0.9f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
@@ -5880,6 +5892,7 @@ public class Blocks{
             trackingRange = range * 1.4f;
             shootCone = 30f;
             scaledHealth = 350;
+            constructHealthMultiplier = 0.5f;
             rotateSpeed = 1.5f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
@@ -6223,6 +6236,7 @@ public class Blocks{
             trackingRange = range * 1.4f;
             shootCone = 100f;
             scaledHealth = 370;
+            constructHealthMultiplier = 0.5f;
             rotateSpeed = 2.6f;
             recoil = 0.5f;
             recoilTime = 30f;
@@ -6310,6 +6324,7 @@ public class Blocks{
             requirements(Category.units, with(Items.lead, 2000, Items.silicon, 1000, Items.titanium, 2000, Items.thorium, 750, Items.plastanium, 450, Items.phaseFabric, 600));
 
             size = 7;
+            constructHealthMultiplier = 0.5f;
             consumePower(13f);
             consumeItems(with(Items.silicon, 850, Items.titanium, 750, Items.plastanium, 650));
             consumeLiquid(Liquids.cryofluid, 1f);
@@ -6332,6 +6347,7 @@ public class Blocks{
             requirements(Category.units, with(Items.lead, 4000, Items.silicon, 3000, Items.thorium, 1000, Items.plastanium, 600, Items.phaseFabric, 600, Items.surgeAlloy, 800));
 
             size = 9;
+            constructHealthMultiplier = 0.5f;
             consumePower(25f);
             consumeItems(with(Items.silicon, 1000, Items.plastanium, 600, Items.surgeAlloy, 500, Items.phaseFabric, 350));
             consumeLiquid(Liquids.cryofluid, 3f);
