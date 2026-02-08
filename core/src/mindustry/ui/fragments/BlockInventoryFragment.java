@@ -26,11 +26,12 @@ import static mindustry.Vars.*;
 public class BlockInventoryFragment{
     private static final float holdWithdraw = 20f;
     private static final float holdShrink = 120f;
+    public boolean swap;
 
     Table table = new Table();
     Building build;
     float holdTime = 0f, emptyTime;
-    boolean holding, held;
+    boolean holding, held, swapped;
     float[] shrinkHoldTimes = new float[content.items().size];
     Item lastItem;
 
@@ -54,6 +55,7 @@ public class BlockInventoryFragment{
         if(build == null || !build.block.isAccessible() || build.items == null || build.items.total() == 0){
             return;
         }
+        swapped = !swapped && swap;
         rebuild(true);
     }
 
@@ -230,9 +232,13 @@ public class BlockInventoryFragment{
     }
 
     private void updateTablePosition(){
-        Vec2 v = Core.input.mouseScreen(build.x + build.block.size * tilesize / 2f, build.y + build.block.size * tilesize / 2f);
+        Vec2 v = Core.input.mouseScreen(build.x + (swapped ? -build.block.size : build.block.size) * tilesize / 2f, build.y + build.block.size * tilesize / 2f);
         table.pack();
-        table.setPosition(v.x, v.y, Align.topLeft);
+        if(swapped){
+            table.setPosition(v.x, v.y, Align.topRight);
+        }else{
+            table.setPosition(v.x, v.y, Align.topLeft);
+        }
     }
 
     private Element itemImage(TextureRegion region, Prov<CharSequence> text){

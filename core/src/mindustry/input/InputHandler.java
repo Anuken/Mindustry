@@ -1867,6 +1867,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             consumed = true;
         }else if(build.interactable(player.team()) && build.block.synthetic() && (!consumed || build.block.allowConfigInventory)){
             if(build.block.hasItems && build.items.total() > 0){
+                inv.swap = build.block.swapConfigInventory;
                 inv.showFor(build);
                 consumed = true;
                 showedInventory = true;
