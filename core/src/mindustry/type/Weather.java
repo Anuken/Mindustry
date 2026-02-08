@@ -32,6 +32,7 @@ public class Weather extends UnlockableContent{
     public float soundVol = 0.1f, soundVolMin = 0f;
     public float soundVolOscMag = 0f, soundVolOscScl = 20f;
     public boolean hidden = false;
+    public float fogRadiusMultiplier = 1f;
 
     //internals
     public Prov<WeatherState> type = WeatherState::create;
