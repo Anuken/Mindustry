@@ -95,8 +95,6 @@ public class ForceProjector extends Block{
     @Override
     public void afterPatch() {
         super.afterPatch();
-        itemConsumer.apply(this);
-        coolantConsumer.apply(this);
     }
 
     @Override
