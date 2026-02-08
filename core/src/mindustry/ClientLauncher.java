@@ -12,6 +12,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.audio.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -197,6 +198,45 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
         assets.loadRun("baseparts", BaseRegistry.class, () -> {}, () -> bases.load());
+        
+        //add item/liquid color mappings
+        Events.on(ContentInitEvent.class, e -> {
+            Colors.put("COPPER", Items.copper.color);
+            Colors.put("LEAD", Items.lead.color);
+            Colors.put("METAGLASS", Items.metaglass.color);
+            Colors.put("GRAPHITE", Items.graphite.color);
+            Colors.put("SAND", Items.sand.color);
+            Colors.put("COAL", Items.coal.color);
+            Colors.put("TITANIUM", Items.titanium.color);
+            Colors.put("THORIUM", Items.thorium.color);
+            Colors.put("SCRAP", Items.scrap.color);
+            Colors.put("SILICON", Items.silicon.color);
+            Colors.put("PLASTANIUM", Items.plastanium.color);
+            Colors.put("PHASE", Items.phaseFabric.color);
+            Colors.put("SURGE", Items.surgeAlloy.color);
+            Colors.put("SPOREPOD", Items.sporePod.color);
+            Colors.put("BLAST", Items.blastCompound.color);
+            Colors.put("PYRATITE", Items.pyratite.color);
+
+            Colors.put("BERYLLIUM", Items.beryllium.color);
+            Colors.put("TUNGSTEN", Items.tungsten.color);
+            Colors.put("OXIDE", Items.oxide.color);
+            Colors.put("CARBIDE", Items.carbide.color);
+
+            Colors.put("WATER", Liquids.water.color);
+            Colors.put("SLAG", Liquids.slag.color);
+            Colors.put("OIL", Liquids.oil.color);
+            Colors.put("CRYOFLUID", Liquids.cryofluid.color);
+
+            Colors.put("NEOPLASM", Liquids.neoplasm.color);
+            Colors.put("ARKYCITE", Liquids.arkycite.color);
+            Colors.put("OZONE", Liquids.ozone.color);
+            Colors.put("HYDROGEN", Liquids.hydrogen.color);
+            Colors.put("NITROGEN", Liquids.nitrogen.color);
+            Colors.put("CYANOGEN", Liquids.cyanogen.color);
+
+            Colors.getColors().copy().each((key, val) -> Colors.put(key.toLowerCase().replace("_", ""), val));
+        });
     }
 
     @Override
