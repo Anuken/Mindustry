@@ -15,6 +15,7 @@ import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.StatusEffect;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
@@ -30,6 +31,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     IntSeq collided = new IntSeq(6);
     BulletType type;
     Vec2 vel = new Vec2();
+    StatusEffect status;
 
     Object data;
     float fdata;
