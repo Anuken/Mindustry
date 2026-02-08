@@ -67,6 +67,28 @@ public class LExecutor{
         Events.on(ResetEvent.class, e -> unitTimeouts.clear());
     }
 
+    public static void runLogicScript(String code){
+        runLogicScript(code, 100_000, false);
+    }
+
+    public static void runLogicScript(String code, int maxInstructions, boolean loop){
+        LExecutor executor = new LExecutor();
+        executor.privileged = true;
+
+        try{
+            //assembler has no variables, all the standard ones are null
+            executor.load(LAssembler.assemble(code, true));
+        }catch(Throwable ignored){
+            return;
+        }
+
+        //executions are limited to prevent a game freeze
+        for(int i = 1; i < maxInstructions; i++){
+            if((!loop && executor.counter.numval >= executor.instructions.length || executor.counter.numval < 0) || executor.yield) break;
+            executor.runOnce();
+        }
+    }
+
     boolean timeoutDone(Unit unit, float delay){
         return Time.time >= unitTimeouts.get(unit.id) + delay;
     }
@@ -146,6 +168,8 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
+            if(!exec.privileged && !state.rules.logicUnitControl) return;
+
             if(exec.binds == null || exec.binds.length != content.units().size){
                 exec.binds = new int[content.units().size];
             }
@@ -197,6 +221,8 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
+            if(!exec.privileged && !state.rules.logicUnitControl) return;
+
             Object unitObj = exec.unit.obj();
             LogicAI ai = UnitControlI.checkLogicAI(exec, unitObj);
 
@@ -307,6 +333,8 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
+            if(!exec.privileged && !state.rules.logicUnitControl) return;
+
             Object unitObj = exec.unit.obj();
             LogicAI ai = checkLogicAI(exec, unitObj);
 
@@ -989,8 +1017,8 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(target.building() instanceof LogicDisplayBuild d && d.isValid() && (d.team == exec.team || exec.privileged)){
                 d.flushCommands(exec.graphicsBuffer);
-                exec.graphicsBuffer.clear();
             }
+            exec.graphicsBuffer.clear();
         }
     }
 
@@ -2033,7 +2061,7 @@ public class LExecutor{
             if(positional){
                 sound.at(World.unconv(x.numf()), World.unconv(y.numf()), pitch.numf(), Math.min(volume.numf(), 2f), limit.bool());
             }else{
-                sound.play(Math.min(volume.numf() * (Core.settings.getInt("sfxvol") / 100f), 2f), pitch.numf(), pan.numf(), false, limit.bool());
+                sound.play(Math.min(volume.numf() * Core.audio.sfxVolume, 2f), pitch.numf(), pan.numf(), false, limit.bool());
             }
         }
     }

@@ -57,7 +57,7 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
         lastDeepFloor = null;
         boolean anyNonDeep = false;
 
-        if(type.crushFragile){
+        if(type.crushFragile && !disarmed){
             for(int i = 0; i < 8; i++){
                 Point2 offset = Geometry.d8[i];
                 var other = Vars.world.buildWorld(x + offset.x * tilesize, y + offset.y * tilesize);

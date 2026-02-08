@@ -905,6 +905,16 @@ public class Fx{
         Drawf.light(e.x, e.y, 20f, e.color, 0.6f * e.fout());
     }),
 
+    squareWaveEffect =  new Effect(14, 40f, e -> {
+        rand.setSeed(e.id);
+        color(Color.white, e.color, rand.random(0.8f, 1.5f) * e.fin());
+        stroke(rand.random(0.4f, 0.8f) + e.fout() * 2);
+        float rot = rand.random(45f, 180f) * e.fin();
+        float rotation = rand.random(0, 1) > 0.5f ? rot : -rot;
+        Lines.square(e.x, e.y, e.fin() * rand.random(4f, 11f) + 4f, e.rotation + rand.random(360f) + rotation);
+        Drawf.light(e.x, e.y, 23f, e.color, e.fout() * 0.7f);
+    }),
+
     hitFuse = new Effect(14, e -> {
         color(Color.white, Pal.surge, e.fin());
 
