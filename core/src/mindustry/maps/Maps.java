@@ -40,6 +40,8 @@ public class Maps{
     private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "domain", "veins", "glacier", "passage"};
     /** Maps tagged as PvP */
     private static String[] pvpMaps = {"veins", "glacier", "passage"};
+    /** If true, the defaultMapNames are prefixed with default/ */
+    private static boolean useDefaultFolder = true;
 
     /** All maps stored in an ordered array. */
     private Seq<Map> maps = new Seq<>();
@@ -126,7 +128,7 @@ public class Maps{
         //defaults; must work
         try{
             for(String name : defaultMapNames){
-                Fi file = Core.files.internal("maps/" + name + "." + mapExtension);
+                Fi file = Core.files.internal((useDefaultFolder ? "maps/default/" : "maps/") + name + "." + mapExtension);
                 loadMap(file, false);
             }
         }catch(IOException e){
@@ -238,10 +240,13 @@ public class Maps{
                 }
 
                 Pixmap pix = MapIO.generatePreview(world.tiles);
-                mainExecutor.submit(() -> map.previewFile().writePng(pix));
                 writeCache(map);
 
                 map.texture = new Texture(pix);
+                mainExecutor.submit(() -> {
+                    map.previewFile().writePng(pix);
+                    pix.dispose();
+                });
             }
             maps.add(map);
             maps.sort();

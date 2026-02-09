@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.Json.*;
 import arc.util.serialization.*;
+import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -61,6 +62,10 @@ public class DataPatcher{
         return cont;
     }
 
+    public boolean isPatched(Object object){
+        return usedpatches.contains(object);
+    }
+
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
     public void apply(Seq<String> patchArray) throws Exception{
         if(applied){
@@ -71,6 +76,13 @@ public class DataPatcher{
         applied = true;
         contentLoader = Vars.content.copy();
         patches.clear();
+
+        Attribute[] oldAttributes = Attribute.all.clone();
+        var oldAttributeMap = Attribute.map.copy();
+        reset(() -> {
+            Attribute.all = oldAttributes;
+            Attribute.map = oldAttributeMap;
+        });
 
         for(String patch : patchArray){
             PatchSet set = new PatchSet(patch, new JsonValue("error"));
@@ -372,20 +384,22 @@ public class DataPatcher{
             }else if(value instanceof JsonValue jsv && object instanceof Block bl && jsv.isObject() && field.equals("consumes")){
                 Seq<Consume> prevBuilder = Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy();
                 boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
-                reset(() -> {
+                Runnable resetCons = () -> {
                     Reflect.set(Block.class, bl, "consumeBuilder", prevBuilder);
                     bl.reinitializeConsumers();
                     bl.hasItems = hadItems;
                     bl.hasLiquids = hadLiquids;
                     bl.hasPower = hadPower;
                     bl.acceptsItems = acceptedItems;
-                });
+                };
+                reset(resetCons);
 
                 try{
                     bl.hasPower = false; //if a block doesn't have a power consumer, hasPower should be false. if it does, it will get set to true in reinitializeConsumers
                     parser.readBlockConsumers(bl, jsv);
                     bl.reinitializeConsumers();
                 }catch(Throwable e){
+                    resetCons.run();
                     Log.err(e);
                     warn("Failed to read consumers for '@': @", bl, Strings.getSimpleMessage(e));
                 }
@@ -553,14 +567,14 @@ public class DataPatcher{
 
     static Object copyArray(Object object){
         if(object instanceof int[] i) return i.clone();
-        if(object instanceof long[] i) return i.clone();
-        if(object instanceof short[] i) return i.clone();
-        if(object instanceof byte[] i) return i.clone();
-        if(object instanceof boolean[] i) return i.clone();
-        if(object instanceof char[] i) return i.clone();
-        if(object instanceof float[] i) return i.clone();
-        if(object instanceof double[] i) return i.clone();
-        return ((Object[])object).clone();
+        else if(object instanceof long[] i) return i.clone();
+        else if(object instanceof short[] i) return i.clone();
+        else if(object instanceof byte[] i) return i.clone();
+        else if(object instanceof boolean[] i) return i.clone();
+        else if(object instanceof char[] i) return i.clone();
+        else if(object instanceof float[] i) return i.clone();
+        else if(object instanceof double[] i) return i.clone();
+        else return ((Object[])object).clone();
     }
 
     public static class PatchSet{
@@ -573,6 +587,12 @@ public class DataPatcher{
         public PatchSet(String patch, JsonValue json){
             this.patch = patch;
             this.json = json;
+        }
+
+        @Override
+        public String toString(){
+            //the json can be a single 'error' value if it failed to parse
+            return !json.isObject() ? patch : json.prettyPrint(OutputType.minimal, 2);
         }
     }
 

@@ -145,9 +145,7 @@ public class Logic implements ApplicationListener{
 
         Events.on(BlockDestroyEvent.class, e -> {
             if(e.tile.build instanceof CoreBuild core && core.team.isAI() && state.rules.coreDestroyClear){
-                Core.app.post(() -> {
-                    core.team.data().timeDestroy(core.x, core.y, state.rules.enemyCoreBuildRadius);
-                });
+                Core.app.post(() -> core.team.data().timeDestroy(core.x, core.y, state.rules.enemyCoreBuildRadius));
             }
         });
 
@@ -171,6 +169,12 @@ public class Logic implements ApplicationListener{
         Events.on(BlockDestroyEvent.class, e -> {
             if(e.tile.team() == state.rules.defaultTeam){
                 state.stats.buildingsDestroyed ++;
+            }
+        });
+
+        Events.on(BlockDestroyEvent.class, e -> {
+            if(e.tile.team() != state.rules.defaultTeam){
+                state.stats.destroyedBlockCount.increment(e.tile.block());
             }
         });
 
@@ -204,7 +208,8 @@ public class Logic implements ApplicationListener{
     public void play(){
         state.set(State.playing);
         //grace period of 2x wave time before game starts
-        state.wavetime = (state.rules.initialWaveSpacing <= 0 ? state.rules.waveSpacing * 2 : state.rules.initialWaveSpacing) * (state.isCampaign() ? state.getPlanet().campaignRules.difficulty.waveTimeMultiplier : 1f);;
+        state.wavetime = (state.rules.initialWaveSpacing <= 0 ? state.rules.waveSpacing * 2 : state.rules.initialWaveSpacing) * (state.isCampaign() ? state.getPlanet().campaignRules.difficulty.waveTimeMultiplier : 1f);
+        state.stats = new GameStats();
         Events.fire(new PlayEvent());
 
         //add starting items

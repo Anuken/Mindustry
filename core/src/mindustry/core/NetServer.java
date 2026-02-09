@@ -170,7 +170,8 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.isIDBanned(uuid)){
+            //there's no reason to tell users that their name is inappropriate, as they may try to bypass it
+            if(admins.isIDBanned(uuid) || admins.isNameBanned(packet.name)){
                 con.kick(KickReason.banned);
                 return;
             }
@@ -646,7 +647,7 @@ public class NetServer implements ApplicationListener{
     float xVelocity, float yVelocity,
     Tile mining,
     boolean boosting, boolean shooting, boolean chatting, boolean building,
-    @Nullable Queue<BuildPlan> plans,
+    Block selectedBlock, int selectedRotation, @Nullable Queue<BuildPlan> plans,
     float viewX, float viewY, float viewWidth, float viewHeight
     ){
         NetConnection con = player.con;
@@ -685,6 +686,8 @@ public class NetServer implements ApplicationListener{
         player.typing = chatting;
         player.shooting = shooting;
         player.boosting = boosting;
+        player.selectedBlock = selectedBlock;
+        player.selectedRotation = selectedRotation;
 
         @Nullable var unit = player.unit();
 

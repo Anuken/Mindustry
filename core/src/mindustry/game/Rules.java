@@ -64,7 +64,7 @@ public class Rules{
     public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
-    /** EXPERIMENTAL! If true, air and ground units target random things each wave instead of only the core/generators. */
+    /** If true, air and ground units target random things each wave instead of only the core/generators. */
     public boolean randomWaveAI = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */
     public boolean unitPayloadUpdate = false;
@@ -90,6 +90,8 @@ public class Rules{
     public float unitMineSpeedMultiplier = 1f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
     public boolean ghostBlocks = true;
+    /** Whether to allow logic to control units. */
+    public boolean logicUnitControl = true;
     /** Whether to allow units to build with logic. */
     public boolean logicUnitBuild = true;
     /** Whether to allow units to deconstruct blocks with logic. */
