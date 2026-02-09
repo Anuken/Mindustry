@@ -1,7 +1,6 @@
 package mindustry.maps.filters;
 
 import arc.scene.ui.layout.*;
-import mindustry.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.maps.filters.FilterOption.*;
@@ -38,26 +37,10 @@ public class LogicFilter extends GenerateFilter{
 
     @Override
     public void apply(Tiles tiles, GenerateInput in){
-        LExecutor executor = new LExecutor();
-        executor.privileged = true;
-
-        try{
-            //assembler has no variables, all the standard ones are null
-            executor.load(LAssembler.assemble(code, true));
-        }catch(Throwable ignored){
-            //if loading code
-            return;
-        }
-
         //this updates map width/height global variables
         logicVars.update();
 
-        //NOTE: all tile operations will call setNet for tiles, but that should have no overhead during world loading
-        //executions are limited to prevent infinite generation
-        for(int i = 1; i < maxInstructionsExecution; i++){
-            if(!loop && (executor.counter.numval >= executor.instructions.length || executor.counter.numval < 0)) break;
-            executor.runOnce();
-        }
+        LExecutor.runLogicScript(code, maxInstructionsExecution, loop);
     }
 
     @Override

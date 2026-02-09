@@ -382,7 +382,7 @@ public class PayloadMassDriver extends PayloadBlock{
             Drawf.shadow(region, tx - (size / 2f), ty - (size / 2f), r);
 
             Tmp.v1.trns(turretRotation, 0, -(curSize/2f - grabWidth));
-            Tmp.v2.trns(rotation, -Math.max(curSize/2f - grabHeight - length, 0f), 0f);
+            Tmp.v2.trns(turretRotation, -Math.max(curSize/2f - grabHeight - length, 0f), 0f);
             float rx = tx + Tmp.v1.x + Tmp.v2.x, ry = ty + Tmp.v1.y + Tmp.v2.y;
             float lx = tx - Tmp.v1.x + Tmp.v2.x, ly = ty - Tmp.v1.y + Tmp.v2.y;
 

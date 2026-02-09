@@ -98,7 +98,7 @@ public class MendProjector extends Block{
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, optionalEfficiency, 0.1f);
 
-            if(optionalEfficiency > 0 && timer(timerUse, useTime) && canHeal){
+            if(optionalEfficiency > 0 && timer(timerUse, useTime / timeScale) && canHeal){
                 consume();
             }
 
