@@ -980,7 +980,7 @@ public class LExecutor{
                     if(p1.obj() instanceof UnlockableContent u){
                         packed = (u.id << 5) | (u.getContentType().ordinal() & 31);
                     }else if(p1.obj() instanceof LogicDisplayBuild d){
-                        packed = (d.index << 5) | LogicDisplay.displayDrawType;
+                        packed = (d.rootDisplay.index << 5) | LogicDisplay.displayDrawType;
                     }
                     num1 = packed & 0x3FF;
                     num4 = packed >> 10;
