@@ -284,8 +284,6 @@ public class Turret extends ReloadTurret{
         public @Nullable float[] curRecoils;
         public float shootWarmup, charge, warmupHold = 0f;
         public int totalShots, barrelCounter;
-        public float excessReload = 0;
-        public int reloadShots = 0;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
@@ -491,6 +489,8 @@ public class Turret extends ReloadTurret{
                 shootWarmup = Mathf.lerpDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
             }
 
+            wasShooting = false;
+
             curRecoil = Mathf.approachDelta(curRecoil, 0, 1 / recoilTime);
             if(recoils > 0){
                 if(curRecoils == null) curRecoils = new float[recoils];
@@ -523,10 +523,7 @@ public class Turret extends ReloadTurret{
             if(reloadWhileCharging || !charging()){
                 updateReload();
                 updateCooling();
-                capReload();
             }
-
-            wasShooting = false;
 
             if(state.rules.fog){
                 float newRange = hasAmmo() ? peekAmmo().rangeChange : 0f;
@@ -694,30 +691,11 @@ public class Turret extends ReloadTurret{
             return queuedBullets > 0 && shoot.firstShotDelay > 0;
         }
 
-        @Override
-        protected boolean canReload(){
-            //keep reloading as the turret keeps shooting
-            return reloadShots < 1 || wasShooting;
-        }
-
         protected void updateReload(){
-            if(!canReload()) return;
             reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
-        }
 
-        protected void capReload(){
-            //cap reload for visual reasons, need to store the excess reload to keep the firerate consistent
-            if(canReload() && reloadCounter >= reload){
-                reloadShots += (int)(reloadCounter / reload);
-                excessReload += reloadCounter % reload;
-            }
+            //cap reload for visual reasons
             reloadCounter = Math.min(reloadCounter, reload);
-            reloadShots = Math.min(reloadShots, 5);
-
-            if(!wasShooting){
-                reloadShots = 0;
-                excessReload = 0;
-            }
         }
 
         @Override
@@ -727,14 +705,12 @@ public class Turret extends ReloadTurret{
 
         protected void updateShooting(){
 
-            if(reloadShots > 0 && !charging() && shootWarmup >= minWarmup){
+            if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
                 shoot(type);
 
-                reloadCounter = excessReload;
-                excessReload = 0;
-                reloadShots--;
+                reloadCounter %= reload;
             }
         }
 

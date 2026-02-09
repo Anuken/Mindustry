@@ -180,7 +180,7 @@ platforms.each{ platform ->
                     }
                 }
 
-                //packr is broken and won't let me add one hyphen,so I have to do that myself later
+                //packr is broken and won't let me add one hyphen, so I have to do that myself later
                 outputJsonFile.text = outputJsonFile.text.replace("-enable-native-access=ALL-UNNAMED", "--enable-native-access=ALL-UNNAMED")
             }
 
