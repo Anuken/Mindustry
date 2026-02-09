@@ -176,8 +176,8 @@ public class UnitTypes{
                 bullet = new ArtilleryBulletType(2f, 20, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
-                    lifetime = 120f - (35f - 4f) / 2f;
-                    rangeOverride = 240f;
+                    lifetime = 120f - (35f - 8f) / 2f;
+                    maxRange = 240f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
