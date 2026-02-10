@@ -2828,7 +2828,7 @@ public class UnitTypes{
                 y = -1f;
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
-                bullet = new BasicBulletType(7f, 10){{
+                bullet = new BasicBulletType(7f, 100){{
                     sprite = "missile-large";
                     width = 7.5f;
                     height = 13f;
