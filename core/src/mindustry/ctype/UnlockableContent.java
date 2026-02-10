@@ -29,7 +29,7 @@ public abstract class UnlockableContent extends MappableContent{
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
     /** Localized description & details. May be null. */
-    public @Nullable String description, details;
+    public @Nullable String description, details, credit;
     /** Whether this content is always unlocked in the tech tree. */
     public boolean alwaysUnlocked = false;
     /** Whether to show the description in the research dialog preview. */
@@ -90,6 +90,7 @@ public abstract class UnlockableContent extends MappableContent{
         this.localizedName = Core.bundle.get(getContentType() + "." + this.name + ".name", this.name);
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
         this.details = Core.bundle.getOrNull(getContentType() + "." + this.name + ".details");
+        this.credit = Core.bundle.getOrNull(getContentType() + "." + this.name + ".credit");
         this.unlocked = Core.settings != null && Core.settings.getBool(this.name + "-unlocked", false);
     }
 

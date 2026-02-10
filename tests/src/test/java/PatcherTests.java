@@ -330,6 +330,16 @@ public class PatcherTests{
     }
 
     @Test
+    void assignStringToObject() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        unit.dagger.weapons: ["frog"]
+        """));
+
+        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(2, UnitTypes.dagger.weapons.size);
+    }
+
+    @Test
     void gibberish() throws Exception{
         Vars.state.patcher.apply(Seq.with("""
         }[35209509()jfkjhadsf,
@@ -522,6 +532,26 @@ public class PatcherTests{
         Vars.logic.reset();
 
         assertEquals(oldDamage, UnitTypes.dagger.weapons.first().bullet.damage);
+    }
+
+    @Test
+    void customAttribute() throws Exception{
+        int amount = Attribute.all.length;
+
+        Vars.state.patcher.apply(Seq.with("""
+        block.grass.attributes: {
+          frogs: 10
+        }
+        """));
+
+        assertTrue(Attribute.exists("frogs"));
+        assertEquals(amount + 1, Attribute.all.length);
+        assertEquals(10f, Blocks.grass.asFloor().attributes.get(Attribute.get("frogs")), 0.0001f);
+
+        Vars.logic.reset();
+
+        assertFalse(Attribute.exists("frogs"));
+        assertEquals(amount, Attribute.all.length);
     }
 
     @Test
