@@ -497,7 +497,6 @@ public class PlacementFragment{
                                 usedStances.clear();
                                 commands.clear();
                                 stances.clear();
-
                                 Arrays.fill(counts, 0);
 
                                 for(var unit : units){
