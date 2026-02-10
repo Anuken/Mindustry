@@ -177,7 +177,7 @@ public class BulletType extends Content implements Cloneable{
     public boolean despawnHit = false;
     /** If true, this bullet will create bullets when it hits anything, not just when it despawns. */
     public boolean fragOnHit = true;
-    /** If false, this bullet will not create fraags when absorbed by a shield. */
+    /** If false, this bullet will not create frags when absorbed by a shield. */
     public boolean fragOnAbsorb = true;
     /** If true, unit armor is ignored in damage calculations. */
     public boolean pierceArmor = false;
@@ -443,23 +443,28 @@ public class BulletType extends Content implements Cloneable{
     /** If direct is false, this is an indirect hit and the tile was already damaged.
      * TODO this is a mess. */
     public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct){
-        if(makeFire && build.team != b.team){
-            Fires.create(build.tile);
-        }
-
-        if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
-            healEffect.at(build.x, build.y, 0f, healColor, build.block);
-            build.heal(healPercent / 100f * build.maxHealth + healAmount);
-            healSound.at(build, 1f + Mathf.range(0.1f), healSoundVolume);
-
-            hit(b);
-        }else if(build.team != b.team && direct){
-            hit(b);
-
-            if(lifesteal > 0f && b.owner instanceof Healthc o){
-                float result = Math.max(Math.min(build.health, damage), 0);
-                o.heal(result * lifesteal);
+        if(!build.block.pierceable){
+            if(makeFire && build.team != b.team){
+                Fires.create(build.tile);
             }
+
+            if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
+                healEffect.at(build.x, build.y, 0f, healColor, build.block);
+                build.heal(healPercent / 100f * build.maxHealth + healAmount);
+                healSound.at(build, 1f + Mathf.range(0.1f), healSoundVolume);
+
+                hit(b);
+            }else if(build.team != b.team && direct){
+                hit(b);
+
+                if(lifesteal > 0f && b.owner instanceof Healthc o){
+                    float result = Math.max(Math.min(build.health, damage), 0);
+                    o.heal(result * lifesteal);
+                }
+            }
+        }else{
+            createHitEffects(b, b.x, b.y);
+            createSplashDamage(b, b.x, b.y);
         }
 
         handlePierce(b, initialHealth, x, y);
@@ -531,10 +536,7 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void hit(Bullet b, float x, float y){
-        hitEffect.at(x, y, b.rotation(), hitColor);
-        hitSound.at(x, y, hitSoundPitch + Mathf.range(hitSoundPitchRange), hitSoundVolume);
-
-        Effect.shake(hitShake, hitShake, b);
+        createHitEffects(b, x, y);
 
         if(fragOnHit){
             if(delayFrags && fragBullet != null && fragBullet.delayFrags){
@@ -557,6 +559,13 @@ public class BulletType extends Content implements Cloneable{
         for(int i = 0; i < lightning; i++){
             Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
         }
+    }
+
+    public void createHitEffects(Bullet b, float x, float y){
+        hitEffect.at(x, y, b.rotation(), hitColor);
+        hitSound.at(x, y, hitSoundPitch + Mathf.range(hitSoundPitchRange), hitSoundVolume);
+
+        Effect.shake(hitShake, hitShake, b);
     }
 
     public void createIncend(Bullet b, float x, float y){
