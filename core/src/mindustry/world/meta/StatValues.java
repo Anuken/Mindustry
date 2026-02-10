@@ -236,7 +236,7 @@ public class StatValues{
         if(amount != 0){
             stack.add(new Table(t -> {
                 t.left().bottom();
-                t.add(amount >= 1000 ? UI.formatAmount(amount) : amount + "").style(Styles.outlineLabel);
+                t.add(amount >= 1000 ? UI.formatAmount(amount) : amount + "").name("stack amount").style(Styles.outlineLabel);
                 t.pack();
             }));
         }

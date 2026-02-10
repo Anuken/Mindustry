@@ -176,8 +176,8 @@ public class UnitTypes{
                 bullet = new ArtilleryBulletType(2f, 20, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
-                    lifetime = 120f - 35f / 2f;
-                    rangeOverride = 240f;
+                    lifetime = 120f - (35f - 8f) / 2f;
+                    maxRange = 240f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
@@ -398,7 +398,7 @@ public class UnitTypes{
             health = 320f;
             buildSpeed = 0.5f;
             armor = 4f;
-            riseSpeed = 0.07f;
+            riseSpeed = descentSpeed = 0.07f;
 
             mineTier = 2;
             mineSpeed = 3f;
@@ -454,7 +454,7 @@ public class UnitTypes{
             canBoost = true;
             armor = 9f;
             mechLandShake = 2f;
-            riseSpeed = 0.05f;
+            riseSpeed = descentSpeed = 0.05f;
 
             mechFrontSway = 0.55f;
             ammoType = new PowerAmmoType(1500);
@@ -510,7 +510,7 @@ public class UnitTypes{
             engineOffset = 12f;
             engineSize = 6f;
             lowAltitude = true;
-            riseSpeed = 0.02f;
+            riseSpeed = descentSpeed = 0.02f;
 
             health = 8200f;
             armor = 9f;
@@ -691,6 +691,7 @@ public class UnitTypes{
                     splashDamageRadius = 44f;
                     instantDisappear = true;
                     splashDamage = 80f;
+                    buildingDamageMultiplier = 0.68f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
@@ -2825,7 +2826,7 @@ public class UnitTypes{
                 y = -1f;
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
-                bullet = new BasicBulletType(7f, 120){{
+                bullet = new BasicBulletType(7f, 10){{
                     sprite = "missile-large";
                     width = 7.5f;
                     height = 13f;
@@ -2890,7 +2891,7 @@ public class UnitTypes{
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.shootTank;
                 layerOffset = 0.0001f;
-                reload = 70f;
+                reload = 80f;
                 shootY = 71f / 4f;
                 shake = 5f;
                 recoil = 4f;
@@ -2903,17 +2904,18 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 190){{
+                bullet = new BasicBulletType(8f, 150f){{
                     sprite = "missile-large";
                     width = 9.5f;
-                    height = 13f;
-                    lifetime = 18f;
+                    height = 18f;
+                    lifetime = 16f;
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
                     smokeEffect = Fx.shootSmokeTitan;
                     pierceCap = 2;
                     pierce = true;
                     pierceBuilding = true;
+
                     hitColor = backColor = trailColor = Color.valueOf("feb380");
                     frontColor = Color.white;
                     trailWidth = 3.1f;
@@ -2921,19 +2923,21 @@ public class UnitTypes{
                     hitEffect = despawnEffect = Fx.blastExplosion;
                     splashDamageRadius = 20f;
                     splashDamage = 50f;
+                    maxRange = 190f;
 
                     fragOnHit = false;
+                    pierceFragCap = 1;
                     fragRandomSpread = 0f;
                     fragSpread = 10f;
                     fragBullets = 5;
                     fragVelocityMin = 1f;
                     despawnSound = Sounds.explosionDull;
 
-                    fragBullet = new BasicBulletType(8f, 35){{
+                    fragBullet = new BasicBulletType(8f, 35f){{
                         sprite = "missile-large";
                         width = 8f;
-                        height = 12f;
-                        lifetime = 15f;
+                        height = 16f;
+                        lifetime = 10f;
                         hitSize = 4f;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
                         frontColor = Color.white;
@@ -2950,7 +2954,7 @@ public class UnitTypes{
             for(float f : new float[]{34f / 4f, -36f / 4f}){
                 int fi = i ++;
                 weapons.add(new Weapon("vanquish-point-weapon"){{
-                    reload = 35f + fi * 5;
+                    reload = 22 + fi * 5;
                     x = 48f / 4f;
                     y = f;
                     shootY = 5.5f;
@@ -2959,16 +2963,21 @@ public class UnitTypes{
                     rotateSpeed = 2f;
                     shootSound = Sounds.shootStell;
 
-                    bullet = new BasicBulletType(4.5f, 25){{
+                    bullet = new BasicBulletType(12f, 50f){{
+                        sprite = "missile-large";
                         width = 6.5f;
                         height = 11f;
+                        shrinkY = 0f;
+                        shrinkX = 0.2f;
+                        lifetime = 15f;
                         shootEffect = Fx.sparkShoot;
                         smokeEffect = Fx.shootBigSmoke;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
                         frontColor = Color.white;
-                        trailWidth = 1.5f;
-                        trailLength = 4;
-                        hitEffect = despawnEffect = Fx.hitBulletColor;
+                        trailWidth = 2.5f;
+                        trailLength = 5;
+                        hitEffect = Fx.blastExplosion;
+                        despawnEffect = Fx.hitBulletColor;
                     }};
                 }});
             }
@@ -3357,7 +3366,7 @@ public class UnitTypes{
             drag = 0.1f;
             hitSize = 21f;
             rotateSpeed = 3f;
-            health = 2900;
+            health = 2700;
             armor = 7f;
             fogRadius = 40f;
             stepShake = 0f;
@@ -3472,9 +3481,9 @@ public class UnitTypes{
                         trailColor = engineColor = Pal.techBlue;
                         engineSize = 1.75f;
                         engineLayer = Layer.effect;
-                        speed = 3.7f;
+                        speed = 3.35f;
                         maxRange = 6f;
-                        lifetime = 60f * 1.5f;
+                        lifetime = 60f * 1.66f;
                         outlineColor = Pal.darkOutline;
                         health = 55;
                         lowAltitude = true;
@@ -3495,8 +3504,9 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
+                            shootOnDeathEffect = Fx.massiveExplosion;
                             bullet = new ExplosionBulletType(140f, 25f){{
-                                shootEffect = new MultiEffect(Fx.massiveExplosion, new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
+                                shootEffect = new MultiEffect(new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
                                     colorFrom = colorTo = Pal.techBlue;
                                     sizeTo = 40f;
                                     lifetime = 12f;
@@ -3532,9 +3542,9 @@ public class UnitTypes{
                 region = "tecta-shield";
                 radius = 45f;
                 angle = 82f;
-                regen = 40f / 60f;
+                regen = 45f / 60f;
                 cooldown = 60f * 8f;
-                max = 2200f;
+                max = 2500f;
                 y = -20f;
                 width = 8f;
                 whenShooting = false;
@@ -3580,14 +3590,14 @@ public class UnitTypes{
                 velocityRnd = 0.33f;
                 heatColor = Color.red;
 
-                bullet = new MissileBulletType(4.2f, 60){{
+                bullet = new MissileBulletType(4.2f, 51){{
                     homingPower = 0.2f;
                     weaveMag = 4;
                     weaveScale = 4;
                     lifetime = 55f;
                     shootEffect = Fx.shootBig2;
                     smokeEffect = Fx.shootSmokeTitan;
-                    splashDamage = 70f;
+                    splashDamage = 60f;
                     splashDamageRadius = 30f;
                     frontColor = Color.white;
                     hitSound = Sounds.none;
@@ -3678,7 +3688,7 @@ public class UnitTypes{
                 shadow = 10f;
 
                 shootStatus = StatusEffects.slow;
-                shootStatusDuration = reload + 1f;
+                shootStatusDuration = reload + 170f;
 
                 shoot.shots = 1;
                 heatColor = Color.red;
@@ -3900,13 +3910,31 @@ public class UnitTypes{
                     width = 7f;
                     height = 12f;
                     lifetime = 18f;
+                    //floating point inaccuracy makes 0.6f show as -39%
+                    buildingDamageMultiplier = 0.599999f;
                     shootEffect = Fx.sparkShoot;
                     smokeEffect = Fx.shootBigSmoke;
                     hitColor = backColor = trailColor = Pal.suppress;
                     frontColor = Color.white;
                     trailWidth = 1.5f;
                     trailLength = 5;
-                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                    hitEffect = despawnEffect = new MultiEffect(Fx.hitSquaresColor, Fx.squareWaveEffect);
+
+                    fragOnDespawn = false;
+                    fragBullets = 2;
+                    fragBullet = new BasicBulletType(3f, 15){{
+                        width = 5f;
+                        height = 8f;
+                        lifetime = 14f;
+                        fragVelocityMax = 1f;
+                        fragVelocityMin = 0.7f;
+                        buildingDamageMultiplier = 0.5f;
+                        hitColor = backColor = trailColor = Pal.suppress;
+                        frontColor = Color.white;
+                        trailWidth = 1.2f;
+                        trailLength = 4;
+                        hitEffect = despawnEffect = Fx.hitBulletColor;
+                    }};
                 }};
             }});
         }};
@@ -4045,7 +4073,7 @@ public class UnitTypes{
             health = 6000f;
             armor = 4f;
             hitSize = 36f;
-            payloadCapacity = Mathf.sqr(3f) * tilePayload;
+            payloadCapacity = Mathf.sqr(4f) * tilePayload;
             researchCostMultiplier = 0f;
             targetAir = false;
 
@@ -4120,8 +4148,9 @@ public class UnitTypes{
                                 mirror = false;
                                 reload = 1f;
                                 shootOnDeath = true;
-                                bullet = new ExplosionBulletType(110f, 25f) {{
-                                    shootEffect = Fx.massiveExplosion;
+                                shootOnDeathEffect = Fx.massiveExplosion;
+                                bullet = new ExplosionBulletType(110f, 25f){{
+                                    shootEffect = new WrapEffect(Fx.shootQuellPulse, Pal.suppress);
                                     collidesAir = false;
                                 }};
                             }});
@@ -4262,14 +4291,15 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
+                            shootOnDeathEffect = Fx.massiveExplosion;
                             bullet = new ExplosionBulletType(140f, 25f){{
                                 collidesAir = false;
                                 suppressionRange = 140f;
                                 shootEffect = new ExplosionEffect(){{
                                     lifetime = 50f;
                                     waveStroke = 5f;
-                                    waveLife = 8f;
-                                    waveColor = Color.white;
+                                    waveLife = 12f;
+                                    waveColor = Pal.sap.cpy().mul(1.8f);
                                     sparkColor = smokeColor = Pal.suppress;
                                     waveRad = 40f;
                                     smokeSize = 4f;
