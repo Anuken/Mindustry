@@ -241,6 +241,8 @@ public class BulletType extends Content implements Cloneable{
     public Effect healEffect = Fx.healBlockFull;
     /** Bullets spawned when this bullet is created. Rarely necessary, used for visuals. */
     public Seq<BulletType> spawnBullets = new Seq<>();
+    /** Whether to display the stats of the spawned bullet. */
+    public boolean showStats = false;
     /** Random angle spread of spawn bullets. */
     public float spawnBulletRandomSpread = 0f;
     /** Unit spawned _instead of_ this bullet. Useful for missiles. */
@@ -411,6 +413,9 @@ public class BulletType extends Content implements Cloneable{
         if(spawnUnit != null){
             return spawnUnit.estimateDps();
         }
+        if(despawnUnit != null){
+            return despawnUnit.estimateDps();
+        }
 
         float sum = (damage + splashDamage*0.75f) * (pierce ? pierceCap == -1 ? 2 : Mathf.clamp(pierceCap, 1, 2) : 1f);
         if(fragBullet != null && fragBullet != this){
@@ -426,6 +431,7 @@ public class BulletType extends Content implements Cloneable{
     protected float calculateRange(){
         if(rangeOverride > 0) return rangeOverride;
         if(spawnUnit != null) return spawnUnit.lifetime * spawnUnit.speed;
+        if(despawnUnit != null) return despawnUnit.lifetime * despawnUnit.speed;
         return Math.max(Mathf.zero(drag) ? speed * lifetime : speed * (1f - Mathf.pow(1f - drag, lifetime)) / drag, maxRange);
     }
 

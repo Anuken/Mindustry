@@ -176,8 +176,8 @@ public class UnitTypes{
                 bullet = new ArtilleryBulletType(2f, 20, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
-                    lifetime = 120f - 35f / 2f;
-                    rangeOverride = 240f;
+                    lifetime = 120f - (35f - 8f) / 2f;
+                    maxRange = 240f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
@@ -2368,64 +2368,6 @@ public class UnitTypes{
             buildSpeed = 3.5f;
             rotateToBuilding = false;
 
-            for(float mountY : new float[]{-117/4f, 50/4f}){
-                for(float sign : Mathf.signs){
-                    weapons.add(new Weapon("plasma-laser-mount"){{
-                        shadow = 20f;
-                        controllable = false;
-                        autoTarget = true;
-                        mirror = false;
-                        shake = 3f;
-                        shootY = 7f;
-                        rotate = true;
-                        x = 84f/4f * sign;
-                        y = mountY;
-
-                        targetInterval = 20f;
-                        targetSwitchInterval = 35f;
-
-                        rotateSpeed = 3.5f;
-                        reload = 170f;
-                        recoil = 1f;
-                        shootSound = Sounds.beamPlasmaSmall;
-                        initialShootSound = Sounds.shootBeamPlasmaSmall;
-                        continuous = true;
-                        cooldownTime = reload;
-                        immunities.add(StatusEffects.burning);
-
-                        bullet = new ContinuousLaserBulletType(){{
-                            maxRange = 90f;
-                            damage = 27f;
-                            length = 95f;
-                            hitEffect = Fx.hitMeltHeal;
-                            drawSize = 200f;
-                            lifetime = 155f;
-                            shake = 1f;
-
-                            shootEffect = Fx.shootHeal;
-                            smokeEffect = Fx.none;
-                            width = 4f;
-                            largeHit = false;
-
-                            incendChance = 0.03f;
-                            incendSpread = 5f;
-                            incendAmount = 1;
-
-                            healPercent = 0.4f;
-                            collidesTeam = true;
-
-                            colors = new Color[]{Pal.heal.cpy().a(.2f), Pal.heal.cpy().a(.5f), Pal.heal.cpy().mul(1.2f), Color.white};
-                        }};
-                    }});
-                }
-            }
-            abilities.add(new SuppressionFieldAbility(){{
-                orbRadius = 5;
-                particleSize = 3;
-                y = -10f;
-                particles = 10;
-                color = particleColor = effectColor = Pal.heal;
-            }});
             weapons.add(new Weapon("emp-cannon-mount"){{
                 rotate = true;
 
@@ -2508,6 +2450,66 @@ public class UnitTypes{
                     });
                 }};
             }});
+
+            for(float mountY : new float[]{-117/4f, 50/4f}){
+                for(float sign : Mathf.signs){
+                    weapons.add(new Weapon("plasma-laser-mount"){{
+                        shadow = 20f;
+                        controllable = false;
+                        autoTarget = true;
+                        mirror = false;
+                        shake = 3f;
+                        shootY = 7f;
+                        rotate = true;
+                        x = 84f/4f * sign;
+                        y = mountY;
+
+                        targetInterval = 20f;
+                        targetSwitchInterval = 35f;
+
+                        rotateSpeed = 3.5f;
+                        reload = 170f;
+                        recoil = 1f;
+                        shootSound = Sounds.beamPlasmaSmall;
+                        initialShootSound = Sounds.shootBeamPlasmaSmall;
+                        continuous = true;
+                        cooldownTime = reload;
+                        immunities.add(StatusEffects.burning);
+
+                        bullet = new ContinuousLaserBulletType(){{
+                            maxRange = 90f;
+                            damage = 27f;
+                            length = 95f;
+                            hitEffect = Fx.hitMeltHeal;
+                            drawSize = 200f;
+                            lifetime = 155f;
+                            shake = 1f;
+
+                            shootEffect = Fx.shootHeal;
+                            smokeEffect = Fx.none;
+                            width = 4f;
+                            largeHit = false;
+
+                            incendChance = 0.03f;
+                            incendSpread = 5f;
+                            incendAmount = 1;
+
+                            healPercent = 0.4f;
+                            collidesTeam = true;
+
+                            colors = new Color[]{Pal.heal.cpy().a(.2f), Pal.heal.cpy().a(.5f), Pal.heal.cpy().mul(1.2f), Color.white};
+                        }};
+                    }});
+                }
+            }
+            abilities.add(new SuppressionFieldAbility(){{
+                orbRadius = 5;
+                particleSize = 3;
+                y = -10f;
+                particles = 10;
+                color = particleColor = effectColor = Pal.heal;
+            }});
+
         }};
 
         //endregion
@@ -3115,6 +3117,7 @@ public class UnitTypes{
                             float fin = 0.05f + (j + 1) / (float)count;
                             float spd = speed;
                             float life = lifetime / Mathf.lerp(fin, 1f, 0.5f);
+                            boolean show = j == 0 && i > 0;
                             spawnBullets.add(new BasicBulletType(spd * fin, 60){{
                                 drag = 0.002f;
                                 width = 12f;
@@ -3124,6 +3127,7 @@ public class UnitTypes{
                                 hitSize = 5f;
                                 pierceCap = 2;
                                 pierce = true;
+                                showStats = show;
                                 pierceBuilding = true;
                                 hitColor = backColor = trailColor = Color.valueOf("feb380");
                                 frontColor = Color.white;
@@ -3504,8 +3508,9 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
+                            shootOnDeathEffect = Fx.massiveExplosion;
                             bullet = new ExplosionBulletType(140f, 25f){{
-                                shootEffect = new MultiEffect(Fx.massiveExplosion, new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
+                                shootEffect = new MultiEffect(new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
                                     colorFrom = colorTo = Pal.techBlue;
                                     sizeTo = 40f;
                                     lifetime = 12f;
@@ -4147,8 +4152,9 @@ public class UnitTypes{
                                 mirror = false;
                                 reload = 1f;
                                 shootOnDeath = true;
-                                bullet = new ExplosionBulletType(110f, 25f) {{
-                                    shootEffect = Fx.massiveExplosion;
+                                shootOnDeathEffect = Fx.massiveExplosion;
+                                bullet = new ExplosionBulletType(110f, 25f){{
+                                    shootEffect = new WrapEffect(Fx.shootQuellPulse, Pal.suppress);
                                     collidesAir = false;
                                 }};
                             }});
@@ -4289,14 +4295,15 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
+                            shootOnDeathEffect = Fx.massiveExplosion;
                             bullet = new ExplosionBulletType(140f, 25f){{
                                 collidesAir = false;
                                 suppressionRange = 140f;
                                 shootEffect = new ExplosionEffect(){{
                                     lifetime = 50f;
                                     waveStroke = 5f;
-                                    waveLife = 8f;
-                                    waveColor = Color.white;
+                                    waveLife = 12f;
+                                    waveColor = Pal.sap.cpy().mul(1.8f);
                                     sparkColor = smokeColor = Pal.suppress;
                                     waveRad = 40f;
                                     smokeSize = 4f;

@@ -268,8 +268,10 @@ public class LogicDisplay extends Block{
             super.remove();
 
             if(index != -1){
-                displays.get(displays.size - 1).index = index;
-                displays.remove(index);
+                LogicDisplayBuild last = displays.get(displays.size - 1);
+                last.index = index;
+                displays.set(index, last);
+                displays.remove(displays.size - 1);
                 index = -1;
             }
 

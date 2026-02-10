@@ -59,6 +59,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     transient String lastCommanded;
     transient float shadowAlpha = -1f, healTime;
     transient int lastFogPos;
+    /** Only used in suicide units */
+    transient boolean hasTarget;
     private transient float resupplyTime = Mathf.random(10f);
     private transient boolean wasPlayer;
     private transient boolean wasHealed;
@@ -111,10 +113,17 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public void updateBoosting(boolean boost){
+        updateBoosting(boost, false);
+    }
+
+    public void updateBoosting(boolean boost, boolean event){
         if(!type.canBoost || dead) return;
 
         boolean shouldBoost = boost || onSolid() || (isFlying() && !canLand());
         elevation = Mathf.approachDelta(elevation, type.canBoost ? Mathf.num(shouldBoost) : 0f, shouldBoost ? type.riseSpeed : type.descentSpeed);
+        if(event){
+            Events.fire(Trigger.unitCommandBoost);
+        }
     }
 
     /** Move based on preferred unit movement type. */
@@ -876,6 +885,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         for(WeaponMount mount : mounts){
             if(mount.weapon.shootOnDeath && !(mount.weapon.bullet.killShooter && mount.totalShots > 0)){
+                if(mount.weapon.shootOnDeathEffect != null && !hasTarget){
+                    mount.allowShootEffects = false;
+                    mount.weapon.shootOnDeathEffect.at(x, y, rotation);
+                }
                 mount.reload = 0f;
                 mount.shoot = true;
                 mount.weapon.update(self(), mount);
