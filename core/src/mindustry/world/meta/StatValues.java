@@ -34,7 +34,7 @@ import static mindustry.Vars.*;
 public class StatValues{
 
     //only allocate once, dont break unit tests
-    public static @Nullable TextureRegionDrawable noteIcon = Icon.arrowNoteSmall != null ? new TextureRegionDrawable(Icon.arrowNoteSmall) : null;
+    static @Nullable TextureRegionDrawable noteIcon = Icon.arrowNoteSmall != null ? new TextureRegionDrawable(Icon.arrowNoteSmall) : null;
 
     public static StatValue string(String value, Object... args){
         String result = Strings.format(value, args);
