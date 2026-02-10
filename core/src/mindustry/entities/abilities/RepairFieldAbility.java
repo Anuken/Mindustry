@@ -43,11 +43,15 @@ public class RepairFieldAbility extends Ability{
         super.addStats(t);
         t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
         t.row();
-        t.add(abilityStat("repairspeed", Strings.autoFixed(amount * 60f / reload, 2)));
+        t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
         t.row();
+        if(amount > 0){
+            t.add(Core.bundle.format("bullet.healamount", Strings.autoFixed(amount, 2)) + "[lightgray] ~ []" + abilityStat("repairspeed", Strings.autoFixed(amount * 60f / reload, 2)));
+            t.row();
+        }
         if(healPercent > 0f){
             t.row();
-            t.add(Core.bundle.format("bullet.healpercent", Strings.autoFixed(healPercent, 2)));
+            t.add(Core.bundle.format("bullet.healpercent", Strings.autoFixed(healPercent, 2)) + "[lightgray] ~ []" + abilityStat("repairspeed", Strings.autoFixed(healPercent * 60f / reload, 2) + "%"));
         }
         if(sameTypeHealMult != 1f){
             t.row();

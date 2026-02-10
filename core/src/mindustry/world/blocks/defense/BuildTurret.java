@@ -13,6 +13,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -263,6 +264,22 @@ public class BuildTurret extends BaseTurret{
                     unit.plans().add(req);
                 }
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case buildX, buildY -> unit.sense(sensor);
+                default -> super.sense(sensor);
+            };
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            return switch(sensor){
+                case building, breaking -> unit.senseObject(sensor);
+                default -> super.senseObject(sensor);
+            };
         }
     }
 }
