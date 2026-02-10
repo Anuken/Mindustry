@@ -3504,8 +3504,9 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
+                            shootOnDeathEffect = Fx.massiveExplosion;
                             bullet = new ExplosionBulletType(140f, 25f){{
-                                shootEffect = new MultiEffect(Fx.massiveExplosion, new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
+                                shootEffect = new MultiEffect(new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
                                     colorFrom = colorTo = Pal.techBlue;
                                     sizeTo = 40f;
                                     lifetime = 12f;
@@ -4147,8 +4148,9 @@ public class UnitTypes{
                                 mirror = false;
                                 reload = 1f;
                                 shootOnDeath = true;
-                                bullet = new ExplosionBulletType(110f, 25f) {{
-                                    shootEffect = Fx.massiveExplosion;
+                                shootOnDeathEffect = Fx.massiveExplosion;
+                                bullet = new ExplosionBulletType(110f, 25f){{
+                                    shootEffect = new WrapEffect(Fx.shootQuellPulse, Pal.suppress);
                                     collidesAir = false;
                                 }};
                             }});
@@ -4289,14 +4291,15 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
+                            shootOnDeathEffect = Fx.massiveExplosion;
                             bullet = new ExplosionBulletType(140f, 25f){{
                                 collidesAir = false;
                                 suppressionRange = 140f;
                                 shootEffect = new ExplosionEffect(){{
                                     lifetime = 50f;
                                     waveStroke = 5f;
-                                    waveLife = 8f;
-                                    waveColor = Color.white;
+                                    waveLife = 12f;
+                                    waveColor = Pal.sap.cpy().mul(1.8f);
                                     sparkColor = smokeColor = Pal.suppress;
                                     waveRad = 40f;
                                     smokeSize = 4f;
