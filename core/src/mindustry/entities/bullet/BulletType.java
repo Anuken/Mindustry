@@ -539,7 +539,7 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void hit(Bullet b, float x, float y){
-        hit(b, b.x, b.y, true);
+        hit(b, x, y, true);
     }
 
     public void hit(Bullet b, float x, float y, boolean createFrags){
