@@ -103,6 +103,10 @@ public class Weapon implements Cloneable{
     public float velocityRnd = 0f;
     /** extra velocity that is added as a fraction */
     public float extraVelocity = 0f;
+    /** fraction of lifetime that is random */
+    public float lifeRnd = 0f;
+    /** extra lifetime that is added as a fraction */
+    public float extraLife = 0f;
     /** The half-radius of the cone in which shooting will start. */
     public float shootCone = 5f;
     /** Cone in which the weapon can rotate relative to its mount. */
@@ -505,7 +509,8 @@ public class Weapon implements Cloneable{
         bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset + ySpread),
         bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset + ySpread),
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
-        lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
+        baseLife = (1f - lifeRnd) + Mathf.random(lifeRnd) + extraLife,
+        lifeScl = bullet.scaleLife ? baseLife * Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : baseLife,
         angle = shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
 
         Entityc shooter = unit.controller() instanceof MissileAI ai ? ai.shooter : unit; //Pass the missile's shooter down to its bullets
