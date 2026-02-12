@@ -721,7 +721,8 @@ public class Turret extends ReloadTurret{
             reloadCounter = Math.min(reloadCounter, reload);
             reloadShots = Math.min(reloadShots, 5);
 
-            if(!wasShooting){
+            //if it isn't constantly firing, do not keep excess reload
+            if(!wasShooting || shootWarmup < minWarmup){
                 reloadShots = 0;
                 excessReload = 0;
             }
