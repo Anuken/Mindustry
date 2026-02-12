@@ -95,8 +95,8 @@ public class ShieldArcAbility extends Ability{
                 float overlapDst = reach - unit.dst(paramPos.x,paramPos.y);
 
                 if(overlapDst > 0){
-                    //stop
-                    unit.vel.setZero();
+                    //stop, but dont kidnap players
+                    if(!unit.isPlayer()) unit.vel.setZero();
                     // get out
                     unit.move(Tmp.v1.set(unit).sub(paramUnit).setLength(overlapDst + 0.01f));
 
