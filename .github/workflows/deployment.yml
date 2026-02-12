@@ -19,6 +19,8 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 17
+    - name: Fetch latest Arc
+      run: git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
     - name: Set env
       run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
     - name: Add Arc release

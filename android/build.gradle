@@ -122,8 +122,13 @@ dependencies{
     implementation arcModule("backends:backend-android")
     implementation 'com.jakewharton.android.repackaged:dalvik-dx:9.0.0_r3'
 
-    natives "com.github.Anuken.Arc:natives-android:$arcHash"
-    natives "com.github.Anuken.Arc:natives-freetype-android:$arcHash"
+    if(localArc){
+        natives arcModule(":natives-android")
+        natives arcModule(":natives-freetype-android")
+    }else{
+        natives "com.github.Anuken.Arc:natives-android:$arcHash"
+        natives "com.github.Anuken.Arc:natives-freetype-android:$arcHash"
+    }
 
     def version, highestVersion
     new File((String)findSdkDir(), "/platforms").eachFileMatch ~/android-\d+/, {
@@ -136,6 +141,9 @@ dependencies{
 }
 
 task copyAndroidNatives(){
+    if(localArc){
+        dependsOn "com.github.Anuken:natives-android:jar", "com.github.Anuken:natives-freetype-android:jar"
+    }
     configurations.natives.files.each{ jar ->
         copy{
             from zipTree(jar)
