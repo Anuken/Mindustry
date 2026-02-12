@@ -84,8 +84,8 @@ public class DatabaseDialog extends BaseDialog{
         for(var contents : allContent){
             for(var content : contents){
                 if(content instanceof UnlockableContent u){
-                    var categoryContents = sortedContents.get(u.databaseCategory, new OrderedMap<>());
-                    var taggedContents = categoryContents.get(u.databaseTag, new Seq<>());
+                    var categoryContents = sortedContents.get(u.databaseCategory == null ? u.getContentType().name() : u.databaseCategory, new OrderedMap<>());
+                    var taggedContents = categoryContents.get(u.databaseTag == null ? "default" : u.databaseTag, new Seq<>());
                     taggedContents.add(u);
                     categoryContents.put(u.databaseTag, taggedContents);
                     sortedContents.put(u.databaseCategory, categoryContents);
