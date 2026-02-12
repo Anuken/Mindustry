@@ -92,11 +92,13 @@ public class ShieldArcAbility extends Ability{
             }else if(paramField.pushUnits && !(!unit.isFlying() && paramUnit.isFlying())){
 
                 float reach = paramField.radius + paramField.width;
-                float overlapDst = reach - unit.dst(paramPos.x,paramPos.y);
+                float overlapDst = reach - unit.dst(paramPos.x, paramPos.y);
 
                 if(overlapDst > 0){
-                    //stop
-                    unit.vel.setZero();
+                    //only nullify velocity if it's heading towards the shield
+                    if(Angles.angleDist(unit.angleTo(paramPos), unit.vel.angle()) < 90f){
+                        unit.vel.setZero();
+                    }
                     // get out
                     unit.move(Tmp.v1.set(unit).sub(paramUnit).setLength(overlapDst + 0.01f));
 
