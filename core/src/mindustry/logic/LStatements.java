@@ -553,10 +553,11 @@ public class LStatements{
     @RegisterStatement("sensor")
     public static class SensorStatement extends LStatement{
         public String to = "result";
-        public String from = "block1", type = "@copper";
+        public String from = "block1", type = "@copper", at = "0";
 
         private transient int selected = 0;
         private transient TextField tfield;
+        private transient boolean lookupMode = false;
 
         @Override
         public void build(Table table){
@@ -660,6 +661,17 @@ public class LStatements{
             table.add(" in ").self(this::param);
 
             field(table, from, str -> from = str);
+
+            Boolp vis = () -> {
+                for(int i=0; i<LAccess.senseable2.length; i++){
+                    if("@".concat(LAccess.senseable2[i].name()).equals(type)) return true;
+                }
+                return false;
+            };
+
+            row(table);
+            table.add(" at ").visible(vis);
+            field(table, at, str -> at = str).visible(vis);
         }
 
         private void stype(String text){
@@ -669,7 +681,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SenseI(builder.var(from), builder.var(to), builder.var(type));
+            return new SenseI(builder.var(from), builder.var(to), builder.var(type), builder.var(at));
         }
 
         @Override

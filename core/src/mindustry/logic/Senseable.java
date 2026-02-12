@@ -14,4 +14,8 @@ public interface Senseable{
     default Object senseObject(LAccess sensor){
         return noSensed;
     }
+
+    default Object senseObject(LAccess sensor, int pos){
+        return noSensed;
+    }
 }

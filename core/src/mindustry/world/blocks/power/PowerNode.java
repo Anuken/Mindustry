@@ -15,6 +15,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.logic.LAccess;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -33,6 +34,7 @@ public class PowerNode extends PowerBlock{
     public @Load(value = "@-laser-end", fallback = "laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
     public int maxNodes = 3;
+    public final int checkLink = timers ++;
     public boolean autolink = true, drawRange = true, sameBlockConnection = false;
     public float laserScale = 0.25f;
     public float powerLayer = Layer.power;
@@ -508,6 +510,16 @@ public class PowerNode extends PowerBlock{
                 out[i] = Point2.unpack(power.links.get(i)).sub(tile.x, tile.y);
             }
             return out;
+        }
+
+        @Override
+        public void control(LAccess type, Object p1, double p2, double p3, double p4) {
+            if(type == LAccess.powerConfig && p1 instanceof Building other && linkValid(this, other) && !Mathf.zero(p2) ^ linked(other)){
+                if(!Mathf.zero(p4)){
+                    if(!timer(checkLink, 30f)) return;
+                }
+                configureAny(other.pos());
+            }
         }
     }
 }

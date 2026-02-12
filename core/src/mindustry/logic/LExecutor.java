@@ -23,12 +23,16 @@ import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.distribution.ItemBridge;
+import mindustry.world.blocks.distribution.ItemBridge.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.power.*;
+import mindustry.world.blocks.power.PowerNode.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -574,6 +578,7 @@ public class LExecutor{
                 }
 
                 if(type.isObj && p1.isobj){
+                    if(type == LAccess.powerConfig || type == LAccess.bridgeConfig) b.control(type, p1.obj(), p2.num(), p3.num(), exec.privileged ? 1 : 0); //this pass the processor's privileged parameter into only these 2 control modes
                     b.control(type, p1.obj(), p2.num(), p3.num(), p4.num());
                 }else{
                     b.control(type, p1.num(), p2.num(), p3.num(), p4.num());
@@ -651,12 +656,13 @@ public class LExecutor{
     }
 
     public static class SenseI implements LInstruction{
-        public LVar from, to, type;
+        public LVar from, to, type, at;
 
-        public SenseI(LVar from, LVar to, LVar type){
+        public SenseI(LVar from, LVar to, LVar type, LVar at){
             this.from = from;
             this.to = to;
             this.type = type;
+            this.at = at;
         }
 
         public SenseI(){
@@ -680,12 +686,17 @@ public class LExecutor{
                     Object objOut = se.senseObject(la);
 
                     if(objOut == Senseable.noSensed){
-                        //numeric output
-                        to.setnum(se.sense(la));
-                    }else{
-                        //object output
-                        to.setobj(objOut);
+                        objOut = se.senseObject(la, at.numi());
+
+                        if(objOut == Senseable.noSensed){
+                            //numeric output
+                            to.setnum(se.sense(la));
+                            return;
+                        }
                     }
+
+                    //object output
+                    to.setobj(objOut);
                 }
             }else{
                 if(target instanceof CharSequence seq && (sense == LAccess.size || sense == LAccess.bufferSize)){
