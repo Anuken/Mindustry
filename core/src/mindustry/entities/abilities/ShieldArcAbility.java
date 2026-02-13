@@ -89,7 +89,7 @@ public class ShieldArcAbility extends Ability{
                 paramField.data -= unit.health() * paramField.missileUnitMultiplier * Vars.state.rules.unitDamage(unit.team);
                 paramField.alpha = 1f;
 
-            }else if(paramField.pushUnits && !(!unit.isFlying() && paramUnit.isFlying())){
+            }else if(paramField.pushUnits && (paramField.pushDiffLayer || paramUnit.isFlying() == unit.isFlying())){
 
                 float reach = paramField.radius + paramField.width;
                 float overlapDst = reach - unit.dst(paramPos.x, paramPos.y);
@@ -152,6 +152,8 @@ public class ShieldArcAbility extends Ability{
     public boolean offsetRegion = false;
     /** If true, enemy units are pushed out. */
     public boolean pushUnits = true;
+    /** If pushUnits is true, allow ground units to push air or air units to push ground */
+    public boolean pushDiffLayer = true;
     public Effect pushEffect = Fx.circleColorSpark;
 
     /** State. */
