@@ -4,7 +4,7 @@ buildscript{
     ext{
         arcHash = property("archash")
 
-        localArc = !project.hasProperty("release") && new File(rootDir.parent, 'Arc').exists() && !project.hasProperty("noLocalArc")
+        localArc = new File(rootDir.parent, 'Arc').exists() && !project.hasProperty("noLocalArc")
 
         arcModule = { String name ->
             //skip to last submodule
@@ -253,7 +253,7 @@ project(":desktop"){
 
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
-        implementation arcModule("backends:backend-sdl3")
+        implementation arcModule("backends:backend-sdl")
         annotationProcessor 'com.github.Anuken:jabel:0.9.0'
     }
 }
