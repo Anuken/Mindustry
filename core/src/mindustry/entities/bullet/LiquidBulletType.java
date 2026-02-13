@@ -91,7 +91,7 @@ public class LiquidBulletType extends BulletType{
     }
 
     @Override
-    public void hit(Bullet b, float hitx, float hity){
+    public void hit(Bullet b, float hitx, float hity, boolean createFrags){
         hitEffect.at(hitx, hity, liquid.color);
         Puddles.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
 
