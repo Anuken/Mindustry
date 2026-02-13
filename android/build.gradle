@@ -40,9 +40,11 @@ android{
             renderscript.srcDirs = ['src']
             res.srcDirs = ['res']
             assets.srcDirs = ['assets', 'src/main/assets', '../core/assets/']
-            jniLibs.srcDirs = ['libs']
+
             if(localArc){
                 jniLibs.srcDirs += ['../../Arc/natives/natives-android/libs', '../../Arc/natives/natives-freetype-android/libs']
+            }else{
+                jniLibs.srcDirs = ['libs']
             }
         }
 

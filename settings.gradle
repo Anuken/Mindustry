@@ -20,7 +20,7 @@ if(hasSdk){
     println("No Android SDK found. Skipping Android module.")
 }
 
-if(!hasProperty("release") && !hasProperty("noLocalArc")){
+if(!hasProperty("noLocalArc")){
     if(new File(rootDir.parent, 'Arc').exists()){
         println("Compiling with localArc")
         includeBuild("../Arc")
