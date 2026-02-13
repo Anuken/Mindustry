@@ -169,8 +169,8 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean canBreak(Tile tile){
-        //removing the last core in sandbox will trigger a sector lost screen
-        return state.isEditor() || state.rules.infiniteResources;
+        //always keep at least 1 core in sandbox to not lose the save
+        return state.isEditor() || (state.rules.infiniteResources && tile.block() instanceof CoreBlock && state.teams.cores(tile.team()).size > 1);
     }
 
     @Override
