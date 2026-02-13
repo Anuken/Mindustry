@@ -169,8 +169,8 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean canBreak(Tile tile){
-        //always keep at least 1 core in sandbox to not lose the save
-        return state.isEditor() || (state.rules.infiniteResources && tile.block() instanceof CoreBlock && state.teams.cores(tile.team()).size > 1);
+        //always keep at least 1 core to not lose the save
+        return state.isEditor() || (state.rules.buildCoresAllowed && tile.block() instanceof CoreBlock && state.teams.cores(tile.team()).size > 1);
     }
 
     @Override
@@ -182,8 +182,8 @@ public class CoreBlock extends StorageBlock{
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         if(tile == null) return false;
-        //in the editor and sandbox, you can place them anywhere for convenience
-        if(state.isEditor() || state.rules.infiniteResources) return true;
+        //in the editor or with gamerule, you can place them anywhere for convenience
+        if(state.isEditor() || state.rules.buildCoresAllowed) return true;
 
         CoreBuild core = team.core();
 
