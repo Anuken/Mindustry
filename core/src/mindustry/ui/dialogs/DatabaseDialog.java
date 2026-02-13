@@ -84,11 +84,15 @@ public class DatabaseDialog extends BaseDialog{
         for(var contents : allContent){
             for(var content : contents){
                 if(content instanceof UnlockableContent u){
-                    var categoryContents = sortedContents.get(u.databaseCategory == null ? u.getContentType().name() : u.databaseCategory, new OrderedMap<>());
-                    var taggedContents = categoryContents.get(u.databaseTag == null ? "default" : u.databaseTag, new Seq<>());
+                    //some mods don't initialize these properly
+                    String cat = u.databaseCategory == null ? u.getContentType().name() : u.databaseCategory;
+                    String tag = u.databaseTag == null ? "default" : u.databaseTag;
+
+                    var categoryContents = sortedContents.get(cat, new OrderedMap<>());
+                    var taggedContents = categoryContents.get(tag, new Seq<>());
                     taggedContents.add(u);
-                    categoryContents.put(u.databaseTag, taggedContents);
-                    sortedContents.put(u.databaseCategory, categoryContents);
+                    categoryContents.put(tag, taggedContents);
+                    sortedContents.put(cat, categoryContents);
                 }
             }
         }
