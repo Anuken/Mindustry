@@ -179,6 +179,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     public static abstract class MapObjective{
         public boolean hidden;
         public @Nullable @Multiline String details;
+        public @Nullable @LogicCode String completionLogicCode;
         public @Unordered String[] flagsAdded = {};
         public @Unordered String[] flagsRemoved = {};
         public ObjectiveMarker[] markers = {};
@@ -207,9 +208,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             state.rules.objectiveFlags.removeAll(flagsRemoved);
             state.rules.objectiveFlags.addAll(flagsAdded);
             completed = true;
+
+            if(completionLogicCode != null && !completionLogicCode.isEmpty()){
+                LExecutor.runLogicScript(completionLogicCode);
+            }
         }
 
-        /** @return True if all {@link #parents} are completed, rendering this objective able to execute. */
+        /** @return true if all {@link #parents} are completed, rendering this objective able to execute. */
         public final boolean dependencyFinished(){
             if(depFinished) return true;
 
@@ -220,7 +225,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             return depFinished = true;
         }
 
-        /** @return True if this objective is done (practically, has been removed from the executor). */
+        /** @return true if this objective is done (practically, has been removed from the executor). */
         public final boolean isCompleted(){
             return completed;
         }
@@ -1492,6 +1497,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     @Target(FIELD)
     @Retention(RUNTIME)
     public @interface Multiline{}
+
+    /** For {@link String}; indicates that text corresponds to logic code. */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface LogicCode{}
 
     /** For {@code float}; multiplies the UI input by 60. */
     @Target(FIELD)

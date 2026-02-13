@@ -238,8 +238,7 @@ public class LStatements{
 
                         row(s);
 
-                        s.add("align ");
-                        fields(s, "align", p1, v -> p1 = v);
+                        fields(s, "align", p1, v -> p1 = v).width(170f);
                         fieldAlignSelect(s, () -> p1, v -> {
                             p1 = v;
                             rebuild(table);

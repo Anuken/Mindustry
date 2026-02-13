@@ -77,7 +77,9 @@ public class UnitType extends UnlockableContent implements Senseable{
     rippleScale = 1f,
     /** boosting rise speed as fraction */
     riseSpeed = 0.08f,
-    /** how fast this unit falls when not boosting */
+    /** boosting descent speed as fraction */
+    descentSpeed = 0.08f,
+    /** how fast this unit falls upon death */
     fallSpeed = 0.018f,
     /** how many ticks it takes this missile to accelerate to full speed */
     missileAccelTime = 0f,
@@ -792,8 +794,10 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
 
         if(legSplashDamage > 0 && legSplashRange > 0){
-            stats.add(Stat.legSplashDamage, legSplashDamage, StatUnit.perLeg);
-            stats.add(Stat.legSplashRange, Strings.autoFixed(legSplashRange / tilesize, 1), StatUnit.blocks);
+            stats.add(Stat.legSplashDamage, table -> {
+                table.add((String)(Core.bundle.format("bullet.splashdamage", Strings.autoFixed(legSplashDamage, 2),
+                    Strings.autoFixed(legSplashRange / tilesize, 2))).replace("[stat]", "[white]") + " " + StatUnit.perLeg.localized());
+            });
         }
 
         stats.add(Stat.targetsAir, targetAir);
@@ -807,6 +811,9 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(!flying){
             stats.add(Stat.canBoost, canBoost);
+            if(canBoost){
+                stats.add(Stat.boostingSpeed, boostMultiplier * speed * 60f / tilesize, StatUnit.tilesSecond);
+            }
         }
 
         if(mineTier >= 1){
