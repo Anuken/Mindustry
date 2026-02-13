@@ -715,8 +715,8 @@ public class Turret extends ReloadTurret{
         protected void capReload(){
             //cap reload for visual reasons, need to store the excess reload to keep the firerate consistent
             if(canReload() && reloadCounter >= reload){
-                reloadShots += (int)(reloadCounter / reload);
                 excessReload += reloadCounter % reload;
+                reloadShots = (int)(excessReload / reload);
             }
             reloadCounter = Math.min(reloadCounter, reload);
             reloadShots = Math.min(reloadShots, 5);
@@ -738,11 +738,13 @@ public class Turret extends ReloadTurret{
             if(reloadShots > 0 && !charging() && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
-                shoot(type);
-
+                while(reloadShots > 0){
+                    shoot(type);
+                    reloadShots--;
+                }
+                
                 reloadCounter = excessReload;
                 excessReload = 0;
-                reloadShots--;
             }
         }
 
