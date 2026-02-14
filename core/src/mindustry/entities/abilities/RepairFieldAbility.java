@@ -14,6 +14,8 @@ import static mindustry.Vars.*;
 public class RepairFieldAbility extends Ability{
     public float amount = 1, reload = 100, range = 60, healPercent = 0f;
     public Effect healEffect = Fx.heal;
+    /** Set to <0 to disable limit */
+    public int maxTargets = -1;
     public Effect activeEffect = Fx.healWaveDynamic;
     public Sound sound = Sounds.healWave;
     public float soundVolume = 0.5f;
@@ -23,6 +25,7 @@ public class RepairFieldAbility extends Ability{
 
     protected float timer;
     protected boolean wasHealed = false;
+    protected int targets;
 
     RepairFieldAbility(){}
 
@@ -48,6 +51,10 @@ public class RepairFieldAbility extends Ability{
         if(amount > 0){
             t.add(Core.bundle.format("bullet.healamount", Strings.autoFixed(amount, 2)) + "[lightgray] ~ []" + abilityStat("repairspeed", Strings.autoFixed(amount * 60f / reload, 2)));
             t.row();
+        }       
+        if(maxTargets > 0){
+            t.add(abilityStat("maxtargets", maxTargets));
+            t.row();
         }
         if(healPercent > 0f){
             t.row();
@@ -65,8 +72,11 @@ public class RepairFieldAbility extends Ability{
 
         if(timer >= reload){
             wasHealed = false;
+            targets = 0;
 
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
+                targets++;
+                if(maxTargets > 0 && targets > maxTargets) return;
                 if(other.damaged()){
                     healEffect.at(other, parentizeEffects);
                     wasHealed = true;
