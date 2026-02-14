@@ -22,7 +22,9 @@ public class Attribute{
     /** Used for sand extraction. */
     sand = add("sand"),
     /** Used for erekir vents only. */
-    steam = add("steam");
+    steam = add("steam"),
+    /** used to determine how weather effects vision in fog */
+    fogVisibilityMultiplier = add("fogVisibilityMultiplier");
 
     public final int id;
     public final String name;
