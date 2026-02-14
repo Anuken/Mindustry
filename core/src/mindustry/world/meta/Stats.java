@@ -1,10 +1,17 @@
 package mindustry.world.meta;
 
+import arc.Core;
+import arc.scene.ui.layout.Cell;
+import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.Vars;
+import mindustry.gen.Icon;
 import mindustry.mod.*;
 import mindustry.type.*;
+
+import java.util.Locale;
 
 /** Hold and organizes a list of block stats. */
 @NoPatch
@@ -130,5 +137,22 @@ public class Stats{
             dirty = false;
         }
         return map;
+    }
+
+    public void statInfo(Cell<?> cell, Stat stat){
+        if(cell == null || stat == null) return;
+
+        String key = "stat." + stat.name.toLowerCase(Locale.ROOT);
+        if(Core.bundle.has(key + ".info")){
+            if(Vars.mobile && !Core.graphics.isPortrait()){ //disabled in portrait - broken and goes offscreen
+                Table table = new Table();
+                table.add(cell.get()).left().expandX().fillX();
+                cell.clearElement();
+                table.button(Icon.infoSmall, () -> Vars.ui.showInfo("@" + key + ".info")).size(32f).right();
+                cell.setElement(table).left().expandX().fillX();
+            }else{
+                cell.tooltip("@" + key + ".info");
+            }
+        }
     }
 }

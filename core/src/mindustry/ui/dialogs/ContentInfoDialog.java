@@ -88,7 +88,7 @@ public class ContentInfoDialog extends BaseDialog{
             for(Stat stat : map.keys()){
                 table.table(inset -> {
                     inset.left();
-                    inset.add("[lightgray]" + stat.localized() + ":[] ").left().top();
+                    stats.statInfo(inset.add("[lightgray]" + stat.localized() + ":[] ").left().top(), stat);
                     Seq<StatValue> arr = map.get(stat);
                     for(StatValue value : arr){
                         value.display(inset);
