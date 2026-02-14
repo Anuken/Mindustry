@@ -75,6 +75,8 @@ public class Turret extends ReloadTurret{
     public float minWarmup = 0f;
     /** If true, this turret will accurately target moving targets with respect to shoot.firstShotDelay. */
     public boolean accurateDelay = true;
+    /** Whether shoot.firstShotDelay should be affected (reduced) by timescale */
+    public boolean shotDelayTimescale = true;
     /** If false, this turret can't move while charging. */
     public boolean moveWhileCharging = true;
     /** If false, this turret can't reload while charging */
@@ -445,7 +447,7 @@ public class Turret extends ReloadTurret{
 
             //when delay is accurate, assume unit has moved by chargeTime already
             if(accurateDelay && !moveWhileCharging && pos instanceof Hitboxc h){
-                offset.set(h.deltaX(), h.deltaY()).scl(shoot.firstShotDelay / Time.delta);
+                offset.set(h.deltaX(), h.deltaY()).scl(shoot.firstShotDelay / (shotDelayTimescale ? delta() : Time.delta));
             }
 
             if(predictTarget && bullet.speed >= 0.01f){
@@ -506,7 +508,7 @@ public class Turret extends ReloadTurret{
                 }
             }
             heat = Mathf.approachDelta(heat, 0, 1 / cooldownTime);
-            charge = charging() ? Mathf.approachDelta(charge, 1, 1 / shoot.firstShotDelay) : 0;
+            charge = charging() ? Mathf.approachDelta(charge, 1, (1 / shoot.firstShotDelay) * (shotDelayTimescale ? timeScale : 1f)) : 0;
 
             unit.tile(this);
             unit.rotation(rotation);
@@ -738,7 +740,7 @@ public class Turret extends ReloadTurret{
                 int barrel = barrelCounter;
 
                 if(delay > 0f){
-                    Time.run(delay, () -> {
+                    Time.run((shotDelayTimescale ? delay / timeScale : delay), () -> {
                         //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
                         int prev = barrelCounter;
                         barrelCounter = barrel;
