@@ -19,6 +19,7 @@ public enum LogicRule{
     dragMultiplier,
     ban,
     unban,
+    pvpAutoPause,
 
     //team specific
     buildSpeed,

@@ -1624,6 +1624,7 @@ public class LExecutor{
                         state.rules.bannedUnits.remove(u);
                     }
                 }
+                case pvpAutoPause -> state.rules.pvpAutoPause = value.bool();
                 case unitHealth, unitBuildSpeed, unitMineSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     Team team = p1.team();
                     if(team != null){
