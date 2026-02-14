@@ -82,42 +82,48 @@ public abstract class LStatement{
     }
 
     protected String sanitize(String value){
-        if(value.length() == 0){
-            return "";
-        }else if(value.length() == 1){
-            if(value.charAt(0) == '"' || value.charAt(0) == ';' || value.charAt(0) == ' '){
-                return "invalid";
+        char tailSpace = !value.isEmpty() ? value.charAt(value.length() - 1) : 0;
+        value = value.trim();
+        if(value.isEmpty()){
+            //no more shifting by leaving fields empty
+            return "null";
+        }
+        boolean string = true;
+        if(value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"' && value.length() >= 2){
+            for(int i = value.length() - 2; i > 0; i--){
+                if(value.charAt(i) != '\\') break;
+                string = !string;
             }
         }else{
-            StringBuilder res = new StringBuilder(value.length());
-            if(value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"'){
-                res.append('\"');
-                //strip out extra quotes
-                for(int i = 1; i < value.length() - 1; i++){
-                    if(value.charAt(i) == '"'){
-                        res.append('\'');
-                    }else{
-                        res.append(value.charAt(i));
-                    }
-                }
-                res.append('\"');
-            }else{
-                //otherwise, strip out semicolons, spaces and quotes
-                for(int i = 0; i < value.length(); i++){
-                    char c = value.charAt(i);
-                    res.append(switch(c){
-                        case ';' -> 's';
-                        case '"' -> '\'';
-                        case ' ' -> '_';
-                        default -> c;
-                    });
-                }
-            }
-
-            return res.toString();
+            string = false;
         }
 
-        return value;
+        StringBuilder res = new StringBuilder(value.length());
+        //Escape everything that might result in undefined behaviour during parsing.
+        //Spaces (and tabs), Semicolons, Hashtags, double quotes in the middle of strings can cause undefined behaviour.
+        boolean escaped = false;
+        for(int i = 0; i < value.length(); i++){
+            char c = value.charAt(i);
+            res.append(switch(c){
+                case ' ', '\t', ';', '#' -> {
+                    if(!escaped && !string){
+                        res.append('\\');
+                    }
+                    yield c;
+                }
+                case '"' -> {
+                    if(string && i > 0 && i < value.length() - 1){
+                        res.append('\\');
+                    }
+                    yield c;
+                }
+                default -> c;
+            });
+            escaped = c == '\\' ? !escaped : false;
+        }
+        if(res.charAt(res.length() - 1) == '\\' && escaped) res.append(tailSpace <= ' ' ? tailSpace : '\\');
+
+        return res.toString();
     }
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
