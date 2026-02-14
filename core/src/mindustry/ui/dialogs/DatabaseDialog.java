@@ -84,11 +84,15 @@ public class DatabaseDialog extends BaseDialog{
         for(var contents : allContent){
             for(var content : contents){
                 if(content instanceof UnlockableContent u){
-                    var categoryContents = sortedContents.get(u.databaseCategory, new OrderedMap<>());
-                    var taggedContents = categoryContents.get(u.databaseTag, new Seq<>());
+                    //some mods don't initialize these properly
+                    String cat = u.databaseCategory == null ? u.getContentType().name() : u.databaseCategory;
+                    String tag = u.databaseTag == null ? "default" : u.databaseTag;
+
+                    var categoryContents = sortedContents.get(cat, new OrderedMap<>());
+                    var taggedContents = categoryContents.get(tag, new Seq<>());
                     taggedContents.add(u);
-                    categoryContents.put(u.databaseTag, taggedContents);
-                    sortedContents.put(u.databaseCategory, categoryContents);
+                    categoryContents.put(tag, taggedContents);
+                    sortedContents.put(cat, categoryContents);
                 }
             }
         }
@@ -178,6 +182,12 @@ public class DatabaseDialog extends BaseDialog{
                                 list.stack(image, new Image(Icon.cancel){{
                                     setColor(Color.scarlet);
                                     touchable = Touchable.disabled;
+                                }}).size(8 * 4).pad(3);
+                            }else if(state.isGame() && state.patcher.isPatched(unlock)){
+                                list.stack(image, new Table(){{
+                                    right().bottom().touchable = Touchable.disabled;
+                                    // Interpolated color (lerp lightishGray and white) for better contrast
+                                    image(Icon.fileSmall).size(12f).color(Tmp.c1.set(Color.white).a(0.5f));
                                 }}).size(8 * 4).pad(3);
                             }else{
                                 list.add(image).size(8 * 4).pad(3);

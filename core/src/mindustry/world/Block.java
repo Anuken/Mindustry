@@ -224,6 +224,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float placeOverlapRange = 50f;
     /** Multiplier of damage dealt to this block by tanks. Does not apply to crawlers. */
     public float crushDamageMultiplier = 1f;
+    /** If true, this block is instantly destroyed by tanks with crushFragile set to true. */
+    public boolean crushFragile = false;
     /** Max of timers used. */
     public int timers = 0;
     /** Cache layer. Only used for 'cached' rendering. */
@@ -247,6 +249,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** Sound played when this block is configured. */
+    public Sound configureSound = Sounds.click;
     /** If true, this block does not have pointConfig with a transform called on map resize. */
     public boolean ignoreResizeConfig;
     /** If true, this building can be selected like a unit when commanding. */
@@ -257,6 +261,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */
     public boolean logicConfigurable = false;
+    /** If true, configuration is delayed when playing the landing block buildup animation. This may be removed in the future! */
+    public boolean delayLandingConfig;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
@@ -563,6 +569,11 @@ public class Block extends UnlockableContent implements Senseable{
         return 0;
     }
 
+    public Color getColor(Tile tile){
+        int mc = minimapColor(tile);
+        return mc == 0 ? mapColor : Tmp.c3.set(mc);
+    }
+
     public boolean outputsItems(){
         return hasItems;
     }
@@ -725,6 +736,12 @@ public class Block extends UnlockableContent implements Senseable{
         setBars();
         offset = ((size + 1) % 2) * tilesize / 2f;
         sizeOffset = -((size - 1) / 2);
+
+        if(consumeBuilder.size != 0){
+            for(var consume : consumeBuilder){
+                consume.apply(this);
+            }
+        }
     }
 
     public boolean consumesItem(Item item){
@@ -1417,6 +1434,7 @@ public class Block extends UnlockableContent implements Senseable{
         hasConsumers = consumers.length > 0;
         itemFilter = new boolean[content.items().size];
         liquidFilter = new boolean[content.liquids().size];
+        if(outputsPower) hasPower = true;
 
         for(Consume cons : consumers){
             cons.apply(this);

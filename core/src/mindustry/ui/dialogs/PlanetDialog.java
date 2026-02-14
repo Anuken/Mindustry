@@ -414,13 +414,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     boolean canSelect(Sector sector){
         if(mode == select) return sector.hasBase() && launchSector != null && sector.planet == launchSector.planet;
 
-        if(mode == planetLaunch && sector.hasBase()){
-            return false;
-        }
+        if(mode == planetLaunch && sector.hasBase()) return false;
 
         if(sector.planet.generator == null) return false;
 
+        if(sector.isShielded()) return false;
+
         if(sector.hasBase() || sector.id == sector.planet.startSector) return true;
+
         //preset sectors can only be selected once unlocked
         if(sector.preset != null && sector.preset.requireUnlock){
             TechNode node = sector.preset.techNode;
@@ -444,9 +445,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     @Override
     public void renderSectors(Planet planet){
 
-        //draw all sector stuff
         if(state.uiAlpha > 0.01f){
             for(Sector sec : planet.sectors){
+                if(sec == selected) continue;
+
                 if(canSelect(sec) || sec.unlocked() || debugSelect){
 
                     Color color =
@@ -458,7 +460,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     null;
 
                     if(color != null){
-                        planets.drawSelection(sec, Tmp.c1.set(color).mul(0.8f).a(state.uiAlpha), 0.026f, -0.001f);
+                        var destColor = Tmp.c1.set(color).mul(0.8f).a(state.uiAlpha);
+                        if(!sec.isCaptured() && sec.preset != null && sec.preset.showHidden){
+                            planets.drawSpecialSelection(sec, destColor, 0.026f, -0.001f);
+                        }else{
+                            planets.drawSelection(sec, destColor, 0.026f, -0.001f);
+                        }
                     }
                 }else{
                     planets.fill(sec, Tmp.c1.set(shadowColor).mul(1, 1, 1, state.uiAlpha), -0.001f);
@@ -474,7 +481,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         //draw hover border
         if(hovered != null){
-            planets.fill(hovered, hoverColor.write(Tmp.c1).mulA(state.uiAlpha), -0.001f);
+            planets.fill(hovered, hoverColor.write(Tmp.c1).mulA(state.uiAlpha), -0.003f);
             planets.drawBorders(hovered, borderColor, state.uiAlpha);
         }
 
@@ -502,6 +509,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(state.uiAlpha > 0.001f){
             for(Sector sec : planet.sectors){
+
+                //draw shield arc
+                if(sec.shieldTarget != null && !sec.isCaptured() && !sec.shieldTarget.isCaptured()){
+                    planets.drawArcLine(planet, sec.tile.v, sec.shieldTarget.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Tmp.c3.set(Tmp.c2).mulA(0.5f), 0.15f, 110f, 25, 0.006f);
+                }
+
                 if(sec.hasBase()){
                     //draw vulnerable sector attack arc
                     if(planet.campaignRules.sectorInvasion){
@@ -536,8 +549,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 var preficon = sec.icon();
                 var icon =
                     sec.isAttacked() ? Fonts.getLargeIcon("warning") :
-                    !sec.hasBase() && sec.preset != null && sec.preset.requireUnlock && sec.preset.unlocked() && preficon == null ?
-                    (sec.preset != null && sec.preset.requireUnlock && sec.preset.unlocked() ? sec.preset.uiIcon : Fonts.getLargeIcon("terrain")) :
+                    !sec.hasBase() && sec.preset != null && ((sec.preset.requireUnlock && sec.preset.unlocked()) || (sec.preset.showHidden && mode == planetLaunch)) && preficon == null ?
+                    (sec.preset != null && ((sec.preset.requireUnlock && sec.preset.unlocked()) || sec.preset.showHidden) ? sec.preset.uiIcon : Fonts.getLargeIcon("terrain")) :
                     sec.preset != null && sec.preset.requireUnlock && sec.preset.locked() && sec.preset.techNode != null && (sec.preset.techNode.parent == null || !sec.preset.techNode.parent.content.locked()) ? Fonts.getLargeIcon("lock") :
                     preficon;
                 var color = sec.isAttacked() ? Team.sharded.color : Color.white;
