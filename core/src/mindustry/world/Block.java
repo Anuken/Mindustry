@@ -257,6 +257,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean commandable;
     /** If true, the building inventory can be shown with the config. */
     public boolean allowConfigInventory = true;
+    /** If true, the building inventory will swap sides on the x axis each time it is tapped */
+    public boolean swapConfigInventory = false;
     /** Defines how large selection menus, such as that of sorters, should be. */
     public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */
