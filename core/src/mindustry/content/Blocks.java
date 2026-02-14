@@ -3986,6 +3986,8 @@ public class Blocks{
                     frontColor = Pal.siliconAmmoFront;
                     lifeScaleRandMax = 1.08f;
                     lifeScaleRandMin = 0.95f;
+
+                    unitSort = UnitSorts.closest;
                 }},
                 Items.pyratite, new ArtilleryBulletType(3f, 48){{
                     hitEffect = new MultiEffect(Fx.blastExplosion, Fx.shockwave);
@@ -4664,6 +4666,8 @@ public class Blocks{
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.3f;
+
+                unitSort = UnitSorts.grouped(60f);
             }},
             Items.carbide, new ArtilleryBulletType(3.25f, 700, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosionSmall, Fx.titanSmokeSmall);
@@ -4701,6 +4705,8 @@ public class Blocks{
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.2f;
                 fragLifeMin = 1.5f;
+
+                unitSort = UnitSorts.strongest;
 
                 fragBullets = 12;
                     fragBullet = new ArtilleryBulletType(0.5f, 50, "shell"){{
@@ -4759,6 +4765,8 @@ public class Blocks{
                 buildingDamageMultiplier = 0.25f;
                 status = StatusEffects.corroded;
                 statusDuration = 300f;
+
+                unitSort = UnitSorts.grouped(100f);
             }}
             );
 
@@ -4774,7 +4782,6 @@ public class Blocks{
             minWarmup = 0.85f;
 
             newTargetInterval = 40f;
-            unitSort = UnitSorts.grouped(40f);
             shootWarmupSpeed = 0.07f;
             warmupMaintainTime = 120f;
 
