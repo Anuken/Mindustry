@@ -1,17 +1,16 @@
 package mindustry.world.meta;
 
-import arc.Core;
-import arc.scene.ui.layout.Cell;
-import arc.scene.ui.layout.Table;
+import arc.*;
+import arc.scene.ui.layout.*;
 import arc.struct.ObjectMap.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.Vars;
-import mindustry.gen.Icon;
+import mindustry.*;
+import mindustry.gen.*;
 import mindustry.mod.*;
 import mindustry.type.*;
 
-import java.util.Locale;
+import java.util.*;
 
 /** Hold and organizes a list of block stats. */
 @NoPatch
