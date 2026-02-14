@@ -87,6 +87,7 @@ public class RailBulletType extends BulletType{
 
     @Override
     public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct){
-        handlePierce(b, initialHealth, x, y);
+        float health = build.block.pierceable ? 0f : initialHealth;
+        handlePierce(b, health, x, y);
     }
 }
