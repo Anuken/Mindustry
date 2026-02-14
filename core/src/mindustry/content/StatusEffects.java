@@ -59,6 +59,7 @@ public class StatusEffects{
 
         slow = new StatusEffect("slow"){{
             color = Pal.lightishGray;
+            effect = Fx.freezing;
             speedMultiplier = 0.4f;
 
             init(() -> opposite(fast));
