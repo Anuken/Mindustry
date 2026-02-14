@@ -25,6 +25,8 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 17
+    - name: Fetch latest Arc
+      run: git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
     - name: Update bundles

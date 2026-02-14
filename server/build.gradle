@@ -7,7 +7,8 @@ ext.getServerFolder = {
     return "../deploy/${appName}-server-${getVersionString()}"
 }
 
-task run(dependsOn: classes, type: JavaExec){
+tasks.register('run', JavaExec){
+    dependsOn classes
     mainClass = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
@@ -17,11 +18,12 @@ task run(dependsOn: classes, type: JavaExec){
         args Eval.me(appArgs)
     }
     if(project.hasProperty("jvmArgs")){
-        jvmArgs((List<String>)Eval.me(project.getProperties()["jvmArgs"]))
+        jvmArgs((List<String>) Eval.me(project.getProperties()["jvmArgs"]))
     }
 }
 
-task debug(dependsOn: classes, type: JavaExec){
+tasks.register('debug', JavaExec){
+    dependsOn classes
     mainClass = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
@@ -30,10 +32,11 @@ task debug(dependsOn: classes, type: JavaExec){
     debug = true
 }
 
-task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
+tasks.register('dist', Jar){
+    dependsOn configurations.runtimeClasspath
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
-    from {configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }}
+    from{ configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) } }
     from files(project.assetsDir)
     exclude("sprites/**")
     exclude("music/**")
@@ -47,6 +50,7 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     exclude("icons/icon.icns")
     exclude("icons/icon.ico")
     exclude("icons/icon_64.png")
+    exclude("**hs_err**.log")
 
     duplicatesStrategy = 'exclude'
 
@@ -55,7 +59,7 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     }
 }
 
-task dzip(type: Zip){
+tasks.register('dzip', Zip){
     from getServerFolder()
     archiveFileName = "${generateDeployName('server')}.zip"
     destinationDirectory = file("../deploy/")
@@ -63,7 +67,7 @@ task dzip(type: Zip){
     finalizedBy 'cleanup'
 }
 
-task cleanup{
+tasks.register('cleanup'){
     doLast{
         delete{
             delete getServerFolder()
@@ -71,7 +75,7 @@ task cleanup{
     }
 }
 
-task deploy{
+tasks.register('deploy'){
     dependsOn "dist"
 
     finalizedBy 'dzip'

@@ -38,7 +38,7 @@ public class ShieldRegenFieldAbility extends Ability{
         t.row();
         t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
         t.row();
-        t.add(abilityStat("pulseregen", Strings.autoFixed(amount, 2)));
+        t.add(abilityStat("pulseregen", Strings.autoFixed(amount, 2)) + "[lightgray] ~ []" + abilityStat("regen", Strings.autoFixed(amount * 60f / reload, 2)));
         t.row();
         t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
     }

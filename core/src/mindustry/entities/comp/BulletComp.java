@@ -45,6 +45,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     transient @Nullable Tile aimTile;
     transient float aimX, aimY;
     transient float originX, originY;
+    transient float buildingDamageMultiplier;
     transient @Nullable Mover mover;
     transient boolean absorbed, hit;
     transient @Nullable Trail trail;
