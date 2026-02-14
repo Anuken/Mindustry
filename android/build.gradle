@@ -3,7 +3,6 @@ buildscript{
         mavenLocal()
         mavenCentral()
         google()
-        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
 
     dependencies{
@@ -40,7 +39,12 @@ android{
             renderscript.srcDirs = ['src']
             res.srcDirs = ['res']
             assets.srcDirs = ['assets', 'src/main/assets', '../core/assets/']
-            jniLibs.srcDirs = ['libs']
+
+            if(localArc){
+                jniLibs.srcDirs += ['../../Arc/natives/natives-android/libs', '../../Arc/natives/natives-freetype-android/libs']
+            }else{
+                jniLibs.srcDirs = ['libs']
+            }
         }
 
         androidTest.setRoot('tests')
@@ -122,8 +126,10 @@ dependencies{
     implementation arcModule("backends:backend-android")
     implementation 'com.jakewharton.android.repackaged:dalvik-dx:9.0.0_r3'
 
-    natives "com.github.Anuken.Arc:natives-android:$arcHash"
-    natives "com.github.Anuken.Arc:natives-freetype-android:$arcHash"
+    if(!localArc){
+        natives "com.github.Anuken.Arc:natives-android:$arcHash"
+        natives "com.github.Anuken.Arc:natives-freetype-android:$arcHash"
+    }
 
     def version, highestVersion
     new File((String)findSdkDir(), "/platforms").eachFileMatch ~/android-\d+/, {
@@ -136,11 +142,13 @@ dependencies{
 }
 
 task copyAndroidNatives(){
-    configurations.natives.files.each{ jar ->
-        copy{
-            from zipTree(jar)
-            into file("libs/")
-            include "**"
+    if(!localArc){
+        configurations.natives.files.each{ jar ->
+            copy{
+                from zipTree(jar)
+                into file("libs/")
+                include "**"
+            }
         }
     }
 }

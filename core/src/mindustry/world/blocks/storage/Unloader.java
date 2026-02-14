@@ -143,7 +143,7 @@ public class Unloader extends Block{
                 if(!other.interactable(team)) continue; //avoid blocks of the wrong team
 
                 //partial check
-                boolean canLoad = !(other instanceof CoreBuild || (other instanceof StorageBuild sb && sb.linkedCore != null));
+                boolean canLoad = !(other instanceof CoreBuild || other instanceof StorageBuild);
                 boolean canUnload = other.canUnload() && (allowCoreUnload || canLoad) && other.items != null;
 
                 if(canLoad || canUnload){ //avoid blocks that can neither give nor receive items

@@ -90,6 +90,8 @@ public class Rules{
     public float unitMineSpeedMultiplier = 1f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
     public boolean ghostBlocks = true;
+    /** Whether to allow logic to control units. */
+    public boolean logicUnitControl = true;
     /** Whether to allow units to build with logic. */
     public boolean logicUnitBuild = true;
     /** Whether to allow units to deconstruct blocks with logic. */

@@ -523,18 +523,20 @@ public class LogicBlock extends Block{
             if(state.rules.disableWorldProcessors && privileged) return;
 
             if(enabled && executor.initialized()){
-                accumulator += edelta() * ipt;
-
                 if(accumulator > maxInstructionScale * ipt) accumulator = maxInstructionScale * ipt;
 
                 while(accumulator >= 1f){
                     executor.runOnce();
-                    accumulator --;
                     if(executor.yield){
                         executor.yield = false;
                         break;
                     }
+                    accumulator --;
                 }
+
+                // Do not move in front of the loop, otherwise the curTime accumulated in WaitI
+                // may get out of sync with the accumulator increase.
+                accumulator += edelta() * ipt;
             }
         }
 
