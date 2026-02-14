@@ -603,14 +603,22 @@ public class StatValues{
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map){
-        return ammo(map, false, false);
+        return ammo(map, false, false, null);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, Cons2<Table, BulletType> cons){
+        return ammo(map, false, false, cons);
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit){
-        return ammo(map, false, showUnit);
+        return ammo(map, false, showUnit, null);
     }
 
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean nested, boolean showUnit){
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit, Cons2<Table, BulletType> cons){
+        return ammo(map, false, showUnit, cons);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean nested, boolean showUnit, Cons2<Table, BulletType> cons){
         return table -> {
 
             table.row();
@@ -624,7 +632,7 @@ public class StatValues{
                 BulletType type = map.get(t);
 
                 if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
-                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false).display(table);
+                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false, cons).display(table);
                     continue;
                 }
 
@@ -764,11 +772,13 @@ public class StatValues{
                         sep(bt, "@bullet.notargetsbuildings");
                     }
 
+                    if(cons != null) cons.get(bt, type);
+
                     if(type.intervalBullet != null){
                         bt.row();
 
                         Table ic = new Table();
-                        ammo(ObjectMap.of(t, type.intervalBullet), true, false).display(ic);
+                        ammo(ObjectMap.of(t, type.intervalBullet), true, false, cons).display(ic);
                         Collapser coll = new Collapser(ic, true);
                         coll.setDuration(0.1f);
 
@@ -786,7 +796,7 @@ public class StatValues{
                         bt.row();
 
                         Table fc = new Table();
-                        ammo(ObjectMap.of(t, type.fragBullet), true, false).display(fc);
+                        ammo(ObjectMap.of(t, type.fragBullet), true, false, cons).display(fc);
                         Collapser coll = new Collapser(fc, true);
                         coll.setDuration(0.1f);
 
@@ -827,7 +837,7 @@ public class StatValues{
     }
 
     //for AmmoListValue
-    private static Cell<?> sep(Table table, String text){
+    public static Cell<?> sep(Table table, String text){
         table.row();
         return table.add(text);
     }
@@ -846,7 +856,7 @@ public class StatValues{
     }
 
     //for AmmoListValue
-    private static String ammoStat(float val){
+    public static String ammoStat(float val){
         return (val > 0 ? "[stat]+" : "[negstat]") + Strings.autoFixed(val, 1);
     }
 
