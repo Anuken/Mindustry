@@ -2537,6 +2537,10 @@ public class Blocks{
             ambientSoundVolume = 0.03f;
             generateEffect = Fx.generatespark;
 
+            explosionShake = 1f;
+            explosionScorchSize = 1;
+            explosionIgnitionChance = 0.2f;
+
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
             itemDurationMultipliers.put(Items.pyratite, 3f);
@@ -2566,6 +2570,10 @@ public class Blocks{
 
             ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.06f;
+
+            explosionShake = 1f;
+            explosionScorchSize = 2;
+            explosionIgnitionChance = 0.2f;
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
@@ -2636,6 +2644,10 @@ public class Blocks{
             itemDuration = 360f;
             powerProduction = 15f;
             heating = 0.02f;
+
+            explosionShake = 4f;
+            explosionScorchSize = 8;
+            explosionIgnitionChance = 0.5f;
 
             consumeItem(Items.thorium);
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);
