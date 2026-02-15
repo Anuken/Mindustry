@@ -58,7 +58,7 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean conductivePower = false;
     /** If true, this block can output payloads; affects blending. */
     public boolean outputsPayload = false;
-    /** If true, this block can input payloads; affects unit payload enter behavior. */
+    /** If true, this block can input payloads. Affects unit payload enter and pathfinding behaviors. */
     public boolean acceptsUnitPayloads = false;
     /** If true, payloads will attempt to move into this block. */
     public boolean acceptsPayload = false;
@@ -113,6 +113,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean solidifes;
     /** if true, this counts as a non-solid block to this team. */
     public boolean teamPassable;
+    /** if true, units will attempt to pathfind to this block even if its tile is normally impassable. */
+    public boolean pathfindTarget = false;
     /** if true, this block cannot be hit by bullets unless explicitly targeted. */
     public boolean underBullets;
     /** whether this is rotatable */

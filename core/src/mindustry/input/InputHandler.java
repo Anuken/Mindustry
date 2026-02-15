@@ -646,7 +646,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(build.acceptPayload(build, unitPay)){
             Fx.unitDrop.at(build);
-            build.handlePayload(build, unitPay);
+            build.handlePayload(build, unitPay, unit);
         }
     }
 
