@@ -29,15 +29,21 @@ abstract class StatusComp implements Posc{
     @Import float maxHealth;
 
     /** Apply a status effect for 1 tick (for permanent effects) **/
-    public void apply(StatusEffect effect){ apply(effect, 1); }
+    public void apply(StatusEffect effect){ apply(effect, 1, 1f); }
+
+    public void apply(StatusEffect effect, float duration){ apply(effect, duration, 1f); }
 
     /** Adds a status effect to this unit. */
-    public void apply(StatusEffect effect, float duration){
+    public void apply(StatusEffect effect, float duration, float chance){
         if(effect == StatusEffects.none || effect == null || isImmune(effect)) return; //don't apply empty or immune effects
 
         // Don't apply if the chance fails
         // TODO: Multiple applications if chance > 1f ?
-        if(!Mathf.chance(effect.applyChance)) return;
+        if(!Mathf.chance(chance)) {
+            Log.info("Status effect @ failed to apply", effect.localizedName);
+            return;
+        }
+        Log.info("StatusEffect @ applied successfully, chance was: @", effect.localizedName, chance);
 
         //unlock status effects regardless of whether they were applied to friendly units
         if(state.isCampaign()){

@@ -41,8 +41,6 @@ public class StatusEffect extends UnlockableContent{
     public boolean intervalDamagePierce = false;
     /** Chance of visual effect(s) appearing. */
     public float effectChance = 0.15f;
-    /** Chance of the StatusEffect being applied */
-    public float applyChance = 1f;
     /** Should the effect be given a parent. */
     public boolean parentizeEffect;
     /** If true, the effect never disappears. */
