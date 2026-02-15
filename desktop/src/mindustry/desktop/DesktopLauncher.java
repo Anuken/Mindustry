@@ -45,6 +45,10 @@ public class DesktopLauncher extends ClientLauncher{
         try{
             Vars.loadLogger();
 
+            check32Bit();
+
+            checkJavaVersion();
+
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
@@ -108,6 +112,42 @@ public class DesktopLauncher extends ClientLauncher{
             }});
         }catch(Throwable e){
             handleCrash(e);
+        }
+    }
+
+    static void checkJavaVersion(){
+        if(OS.javaVersionNumber < 17){
+            //this is technically a lie: Java 25 isn't actually required (17 is), but I want people to get the highest available version they can.
+            //Java 25 *might* be required in the future for FFM bindings.
+            ErrorDialog.show("Java 25 is required to run Mindustry. Your version: " + OS.javaVersionNumber + "\n" +
+            "\n" +
+            "Please uninstall your current Java version, and download Java 25.\n" +
+            "\n" +
+            "It is recommended to download Java from adoptium.net.\n" +
+            "Do not download from java.com, as that will give you Java 8 by default.");
+        }
+    }
+
+    static void check32Bit(){
+        if(OS.isWindows && !OS.is64Bit){
+            try{
+                Version.init();
+            }catch(Throwable ignored){
+            }
+
+            boolean steam = Version.modifier != null && Version.modifier.contains("steam");
+            String versionWarning = "";
+
+            if(steam){
+                versionWarning = "\n\nIf you are unable to upgrade, consider switching to the legacy v7 branch on Steam, which is the last release that supported 32-bit windows:\n(properties -> betas -> select version-7.0 in the drop-down box).";
+            }else if(OS.javaVersion.equals("1.8.0_151-1-ojdkbuild")){ //version string of JVM packaged with the 32-bit version of the game on itch/steam
+                versionWarning = "\n\nMake sure you have downloaded the 64-bit version of the game, not the 32-bit one.";
+            }else if(OS.javaVersionNumber < 25){
+                //technically, java 25 isn't required yet, but it might be in the future, so tell users to get that one
+                versionWarning = "\n\nYour current Java version is: " + OS.javaVersionNumber + ". To run the game, upgrade to Java 25 on a 64-bit machine.";
+            }
+
+            ErrorDialog.show("You are running a 32-bit installation of Windows and/or a 32-bit JVM. 32-bit windows is no longer supported." + versionWarning);
         }
     }
 
