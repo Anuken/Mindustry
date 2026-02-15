@@ -39,11 +39,7 @@ abstract class StatusComp implements Posc{
 
         // Don't apply if the chance fails
         // TODO: Multiple applications if chance > 1f ?
-        if(!Mathf.chance(chance)) {
-            Log.info("Status effect @ failed to apply", effect.localizedName);
-            return;
-        }
-        Log.info("StatusEffect @ applied successfully, chance was: @", effect.localizedName, chance);
+        if(!Mathf.chance(chance)) return;
 
         //unlock status effects regardless of whether they were applied to friendly units
         if(state.isCampaign()){
