@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.graphics.*;
+import arc.math.Mathf;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
@@ -28,13 +29,15 @@ abstract class StatusComp implements Posc{
     @Import float maxHealth;
 
     /** Apply a status effect for 1 tick (for permanent effects) **/
-    public void apply(StatusEffect effect){
-        apply(effect, 1);
-    }
+    public void apply(StatusEffect effect){ apply(effect, 1); }
 
     /** Adds a status effect to this unit. */
     public void apply(StatusEffect effect, float duration){
         if(effect == StatusEffects.none || effect == null || isImmune(effect)) return; //don't apply empty or immune effects
+
+        // Don't apply if the chance fails
+        // TODO: Multiple applications if chance > 1f ?
+        if(!Mathf.chance(effect.applyChance)) return;
 
         //unlock status effects regardless of whether they were applied to friendly units
         if(state.isCampaign()){

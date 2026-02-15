@@ -39,8 +39,10 @@ public class StatusEffect extends UnlockableContent{
     public float intervalDamage;
     /** If true, interval damage is armor piercing. */
     public boolean intervalDamagePierce = false;
-    /** Chance of effect appearing. */
+    /** Chance of visual effect(s) appearing. */
     public float effectChance = 0.15f;
+    /** Chance of the StatusEffect being applied */
+    public float applyChance = 1f;
     /** Should the effect be given a parent. */
     public boolean parentizeEffect;
     /** If true, the effect never disappears. */
