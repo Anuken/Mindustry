@@ -18,6 +18,7 @@ import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -533,6 +534,7 @@ public class UnitAssembler extends PayloadBlock{
             unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
             unit.rotation = rotdeg();
             var targetBuild = unit.buildOn();
+            Events.fire(new UnitCreateEvent(unit, this));
             //'source' is the target build instead of this building; this is because some blocks only accept things from certain angles, and this is a non-standard payload
             var payload = new UnitPayload(unit);
             if(targetBuild != null && targetBuild.team == team && targetBuild.acceptPayload(targetBuild, payload)){
