@@ -263,7 +263,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                         return;
                     }
                 }else{
-                    boolean remove = false;
+                    boolean remove = false, doRemove = false;
                     float health = build.health;
 
                     if(build.team != team){
@@ -278,13 +278,16 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
                         if(!type.pierceBuilding){
                             hit = true;
-                            remove();
+                            doRemove = true;
                         }else{
                             collided.add(build.id);
                         }
                     }
 
                     type.hitTile(self(), build, x * tilesize, y * tilesize, health, true);
+                    if(doRemove){
+                        remove();
+                    }
 
                     //stop raycasting when building is hit
                     if(type.pierceBuilding) return;
