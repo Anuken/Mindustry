@@ -434,8 +434,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     @Nullable Sector findLauncher(Sector to){
         if(mode == planetLaunch || to.planet.generator == null) return launchSector;
 
-        Sector candidate = to.planet.generator.findLaunchCandidate(to, launchSector);
-        return candidate == null && launchSector != null && (mode == planetLaunch || !launchSector.isAttacked()) ? launchSector : candidate;
+        Sector actualLaunchSector = (launchSector != null && launchSector.planet == to.planet ? launchSector : null);
+
+        Sector candidate = to.planet.generator.findLaunchCandidate(to, actualLaunchSector);
+        return candidate == null && actualLaunchSector != null && (mode == planetLaunch || !actualLaunchSector.isAttacked()) ? actualLaunchSector : candidate;
     }
 
     boolean showing(){
@@ -1275,7 +1277,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
 
-        boolean locked = sector.preset != null && sector.preset.locked() && !sector.hasBase() && sector.preset.techNode != null;
+        boolean locked = isLocked(sector);
 
         if(locked){
             stable.table(r -> {
@@ -1329,7 +1331,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
             }
 
-            boolean noCandidate = sector != sector.planet.getStartSector() && !sector.hasBase() && findLauncher(sector) == null;
+            boolean noCandidate = hasNoCandidate(sector);
 
             stable.button(
                 mode == select ? "@sectors.select" :
@@ -1347,11 +1349,16 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.act(0f);
     }
 
-    boolean canPlaySector(Sector sector){
-        boolean noCandidate = sector != sector.planet.getStartSector() && !sector.hasBase() && findLauncher(sector) == null;
-        boolean locked = sector.preset != null && sector.preset.locked() && !sector.hasBase() && sector.preset.techNode != null;
+    boolean hasNoCandidate(Sector sector){
+        return sector != sector.planet.getStartSector() && !sector.hasBase() && findLauncher(sector) == null;
+    }
 
-        return !locked && !noCandidate;
+    boolean isLocked(Sector sector){
+        return sector.preset != null && sector.preset.locked() && !sector.hasBase() && sector.preset.techNode != null;
+    }
+
+    boolean canPlaySector(Sector sector){
+        return !isLocked(sector) && !hasNoCandidate(sector);
     }
 
     void playSelected(){
