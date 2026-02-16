@@ -1,7 +1,7 @@
 package mindustry.desktop;
 
+import arc.backend.sdl.jni.*;
 import arc.util.*;
-import org.lwjgl.sdl.*;
 
 import javax.swing.*;
 
@@ -12,7 +12,7 @@ public class ErrorDialog{
         Log.err(text);
         try{
             //will fail in the future on 32-bit platforms as no natives will be loaded
-            SDLMessageBox.SDL_ShowSimpleMessageBox(SDLMessageBox.SDL_MESSAGEBOX_ERROR, "it's over", text, 0);
+            SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "it's over", text);
         }catch(Throwable error){
             try{
                 //usually won't work on packaged JVMs, but I won't be distributing those with 32 bit windows anyway
