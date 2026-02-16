@@ -77,15 +77,6 @@ public class Control implements ApplicationListener, Loadable{
                 });
             }
             checkAutoUnlocks();
-
-            if((OS.isWindows && !OS.is64Bit && !Core.settings.getBool("nowarn32bit", false))){
-                BaseDialog dialog = new BaseDialog("@warn.32bit.title");
-                dialog.buttons.button("@ok", dialog::hide).size(120f, 64f);
-                dialog.cont.add("@warn.32bit").labelAlign(Align.center, Align.center).wrap().grow().row();
-                dialog.cont.check("@dontshowagain", val -> Core.settings.put("nowarn32bit", val));
-
-                dialog.show();
-            }
         });
 
         Events.on(StateChangeEvent.class, event -> {
