@@ -56,6 +56,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         //lz4 chokes on direct buffers, so copy the bytes over
                         int len = snet.readP2PPacket(from, readBuffer, 0);
                         readBuffer.limit(len);
+                        readCopyBuffer.limit(readBuffer.capacity());
                         readCopyBuffer.position(0);
                         readCopyBuffer.put(readBuffer);
                         readCopyBuffer.limit(len);
