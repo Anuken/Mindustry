@@ -10,7 +10,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.Vars;
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -534,7 +534,6 @@ public class UnitAssembler extends PayloadBlock{
             unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
             unit.rotation = rotdeg();
             var targetBuild = unit.buildOn();
-            Events.fire(new UnitCreateEvent(unit, this));
             //'source' is the target build instead of this building; this is because some blocks only accept things from certain angles, and this is a non-standard payload
             var payload = new UnitPayload(unit);
             if(targetBuild != null && targetBuild.team == team && targetBuild.acceptPayload(targetBuild, payload)){
@@ -549,6 +548,8 @@ public class UnitAssembler extends PayloadBlock{
             progress = 0f;
             Fx.unitAssemble.at(spawn.x, spawn.y, rotdeg() - 90f, plan.unit);
             blocks.clear();
+
+            Events.fire(new UnitCreateEvent(unit, this));
         }
 
         @Override
