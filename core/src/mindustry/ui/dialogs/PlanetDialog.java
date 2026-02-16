@@ -624,7 +624,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     public void tap(InputEvent event, float x, float y, int count, KeyCode button){
                         if(showing() || button != KeyCode.mouseLeft) return;
 
-                        if(hovered != null && selected == hovered && count == 2){
+                        if(hovered != null && selected == hovered && count == 2 && canPlaySector(hovered)){
                             playSelected();
                         }
 
@@ -1345,6 +1345,13 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.setPosition(x, y, Align.center);
 
         stable.act(0f);
+    }
+
+    boolean canPlaySector(Sector sector){
+        boolean noCandidate = sector != sector.planet.getStartSector() && !sector.hasBase() && findLauncher(sector) == null;
+        boolean locked = sector.preset != null && sector.preset.locked() && !sector.hasBase() && sector.preset.techNode != null;
+
+        return !locked && !noCandidate;
     }
 
     void playSelected(){
