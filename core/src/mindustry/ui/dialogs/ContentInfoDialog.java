@@ -81,7 +81,7 @@ public class ContentInfoDialog extends BaseDialog{
             if(map.size == 0) continue;
 
             if(stats.useCategories){
-                table.add("@category." + cat.name).color(Pal.accent).fillX();
+                table.add(cat.localized()).color(Pal.accent).fillX();
                 table.row();
             }
 
