@@ -29,9 +29,13 @@ abstract class StatusComp implements Posc{
     @Import float maxHealth;
 
     /** Apply a status effect for 1 tick (for permanent effects) **/
-    public void apply(StatusEffect effect){ apply(effect, 1, 1f); }
+    public void apply(StatusEffect effect){
+        apply(effect, 1, 1f);
+    }
 
-    public void apply(StatusEffect effect, float duration){ apply(effect, duration, 1f); }
+    public void apply(StatusEffect effect, float duration){
+        apply(effect, duration, 1f);
+    }
 
     /** Adds a status effect to this unit. */
     public void apply(StatusEffect effect, float duration, float chance){
