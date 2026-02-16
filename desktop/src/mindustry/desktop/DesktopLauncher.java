@@ -42,10 +42,11 @@ public class DesktopLauncher extends ClientLauncher{
 
     public static void main(String[] arg){
         try{
+            Version.init();
             Vars.loadLogger();
+            Vars.loadFileLogger(new Fi(Version.isSteam ? "saves" : OS.getAppDataDirectoryString(appName)).child("last_log.txt"));
 
             check32Bit();
-
             checkJavaVersion();
 
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
@@ -129,15 +130,9 @@ public class DesktopLauncher extends ClientLauncher{
 
     static void check32Bit(){
         if(OS.isWindows && !OS.is64Bit){
-            try{
-                Version.init();
-            }catch(Throwable ignored){
-            }
-
-            boolean steam = Version.modifier != null && Version.modifier.contains("steam");
             String versionWarning = "";
 
-            if(steam){
+            if(Version.isSteam){
                 versionWarning = "\n\nIf you are unable to upgrade, consider switching to the legacy v7 branch on Steam, which is the last release that supported 32-bit windows:\n(properties -> betas -> select version-7.0 in the drop-down box).";
             }else if(OS.javaVersion.equals("1.8.0_151-1-ojdkbuild")){ //version string of JVM packaged with the 32-bit version of the game on itch/steam
                 versionWarning = "\n\nMake sure you have downloaded the 64-bit version of the game, not the 32-bit one.";
@@ -152,9 +147,6 @@ public class DesktopLauncher extends ClientLauncher{
 
     public DesktopLauncher(String[] args){
         this.args = args;
-
-        Version.init();
-        boolean useSteam = Version.modifier.contains("steam");
 
         if(useDiscord){
             Threads.daemon(() -> {
@@ -172,8 +164,7 @@ public class DesktopLauncher extends ClientLauncher{
             });
         }
 
-        if(useSteam){
-
+        if(Version.isSteam){
             Events.on(ClientLoadEvent.class, event -> {
                 if(steamError != null){
                     Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> {
