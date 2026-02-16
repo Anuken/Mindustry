@@ -1643,6 +1643,7 @@ public class Blocks{
 
             liquidCapacity = 80f;
             outputLiquid = new LiquidStack(Liquids.cyanogen, 12f / 60f);
+            craftTime = 80f / 4f;
 
             consumeLiquid(Liquids.arkycite, 160f / 60f);
             consumeItem(Items.graphite);
