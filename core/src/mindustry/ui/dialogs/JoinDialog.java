@@ -61,12 +61,6 @@ public class JoinDialog extends BaseDialog{
 
         loadServers();
 
-        //mobile players don't get information >:(
-        boolean infoButton = !steam && !mobile;
-
-        if(infoButton) buttons.add().width(60f);
-        buttons.add().growX().width(-1);
-
         addCloseButton(mobile ? 190f : 210f);
 
         buttons.button("@server.add", Icon.add, () -> {
@@ -74,8 +68,13 @@ public class JoinDialog extends BaseDialog{
             add.show();
         });
 
-        buttons.add().growX().width(-1);
-        if(infoButton) buttons.button("?", () -> ui.showInfo("@join.info")).size(60f, 64f);
+        //mobile players don't get information >:(
+        if(!steam && !mobile){
+            buttons.addChild(new Table(t -> {
+                t.setFillParent(true);
+                t.right().bottom().button("?", () -> ui.showInfo("@join.info")).size(60f, 64f);
+            }));
+        }
 
         add = new BaseDialog("@joingame.title");
         add.cont.add("@joingame.ip").padRight(5f).left();
