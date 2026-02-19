@@ -215,7 +215,7 @@ public class CommandAI extends AIController{
             }
         }
 
-        if(!net.client() && command == UnitCommand.enterPayloadCommand && (targetPos == null ? unit.buildOn() != null : targetBuild != null)){
+        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.type.allowedInPayloads && (targetPos == null ? unit.buildOn() != null : targetBuild != null)){
             var build = targetPos == null ? unit.buildOn() : targetBuild;
             if(build.canControlSelect(unit)){
                 tmpPayload.unit = unit;
