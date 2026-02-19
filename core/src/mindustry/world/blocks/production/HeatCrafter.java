@@ -53,7 +53,7 @@ public class HeatCrafter extends GenericCrafter{
 
         @Override
         public boolean shouldConsume(){
-            return (heatRequirement <= 0f || heat > 0) && super.canConsume();
+            return (heatRequirement <= 0f || heat > 0) && super.shouldConsume();
         }
 
         @Override

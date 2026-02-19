@@ -42,7 +42,11 @@ public abstract class BlockProducer extends PayloadBlock{
 
             if(block != null){
                 ItemStack[] clone = stacks.get(block, () -> ItemStack.copy(block.requirements));
+                if(clone.length != block.requirements.length){
+                    stacks.put(block, clone = ItemStack.copy(block.requirements));
+                }
                 for(int i = 0; i < clone.length; i++){
+                    clone[i].item = block.requirements[i].item;
                     clone[i].amount = Mathf.ceil(block.requirements[i].amount * state.rules.buildCostMultiplier);
                 }
                 return clone;

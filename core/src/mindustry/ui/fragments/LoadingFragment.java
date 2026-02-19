@@ -109,8 +109,10 @@ public class LoadingFragment{
     public void hide(){
         table.clearActions();
         table.toFront();
+        button.visible = false;
         table.touchable = Touchable.disabled;
         table.actions(Actions.fadeOut(0.5f), Actions.visible(false));
+
         if(Core.scene.getKeyboardFocus() == button){
             Core.scene.setKeyboardFocus(null);
         }

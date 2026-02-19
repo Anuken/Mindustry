@@ -56,8 +56,10 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         //lz4 chokes on direct buffers, so copy the bytes over
                         int len = snet.readP2PPacket(from, readBuffer, 0);
                         readBuffer.limit(len);
+                        readCopyBuffer.limit(readBuffer.capacity());
                         readCopyBuffer.position(0);
                         readCopyBuffer.put(readBuffer);
+                        readCopyBuffer.limit(len);
                         readCopyBuffer.position(0);
                         int fromID = from.getAccountID();
                         Object output = serializer.read(readCopyBuffer);
@@ -201,7 +203,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             smat.setLobbyMemberLimit(currentLobby, Core.settings.getInt("playerlimit"));
         }
     }
-    
+
     void updateWave(){
         if(currentLobby != null && net.server()){
             smat.setLobbyData(currentLobby, "mapname", state.map.name());
