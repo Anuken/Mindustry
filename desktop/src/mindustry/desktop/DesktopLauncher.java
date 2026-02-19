@@ -73,8 +73,22 @@ public class DesktopLauncher extends ClientLauncher{
                     if(arg[i].charAt(0) == '-'){
                         String name = arg[i].substring(1);
                         switch(name){
-                            case "width" -> width = Strings.parseInt(arg[i + 1], width);
-                            case "height" -> height = Strings.parseInt(arg[i + 1], height);
+                            case "width" -> {
+                                int newWidth = Strings.parseInt(arg[i + 1], width);
+                                if(newWidth!=0){
+                                    width=newWidth;
+                                }else{
+                                    Log.warn("Cannot set width to 0. Width has been set to "+width+" pixels.");
+                                }
+                            }
+                            case "height" -> {
+                                int newHeight = Strings.parseInt(arg[i + 1], height);
+                                if(newHeight!=0){
+                                    height=newHeight;
+                                }else{
+                                    Log.warn("Cannot set height to 0. Height has been set to "+height+" pixels.");
+                                }
+                            }
                             case "gl" -> {
                                 String str = arg[i + 1];
                                 if(str.contains(".")){
