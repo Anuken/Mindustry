@@ -3,9 +3,12 @@ package mindustry.desktop;
 import arc.*;
 import arc.Files.*;
 import arc.backend.sdl.*;
+import arc.backend.sdl.jni.*;
 import arc.discord.*;
 import arc.discord.DiscordRPC.*;
+import arc.filedialogs.*;
 import arc.files.*;
+import arc.func.*;
 import arc.math.*;
 import arc.profiling.*;
 import arc.struct.*;
@@ -24,7 +27,7 @@ import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.service.*;
 import mindustry.type.*;
-import org.lwjgl.sdl.*;
+import mindustry.ui.dialogs.*;
 
 import java.io.*;
 
@@ -39,7 +42,12 @@ public class DesktopLauncher extends ClientLauncher{
 
     public static void main(String[] arg){
         try{
+            Version.init();
             Vars.loadLogger();
+            Vars.loadFileLogger(new Fi(Version.isSteam ? "saves" : OS.getAppDataDirectoryString(appName)).child("last_log.txt"));
+
+            check32Bit();
+            checkJavaVersion();
 
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
@@ -107,11 +115,38 @@ public class DesktopLauncher extends ClientLauncher{
         }
     }
 
+    static void checkJavaVersion(){
+        if(OS.javaVersionNumber < 17){
+            //this is technically a lie: Java 25 isn't actually required (17 is), but I want people to get the highest available version they can.
+            //Java 25 *might* be required in the future for FFM bindings.
+            ErrorDialog.show("Java 25 is required to run Mindustry. Your version: " + OS.javaVersionNumber + "\n" +
+            "\n" +
+            "Please uninstall your current Java version, and download Java 25.\n" +
+            "\n" +
+            "It is recommended to download Java from adoptium.net.\n" +
+            "Do not download from java.com, as that will give you Java 8 by default.");
+        }
+    }
+
+    static void check32Bit(){
+        if(OS.isWindows && !OS.is64Bit){
+            String versionWarning = "";
+
+            if(Version.isSteam){
+                versionWarning = "\n\nIf you are unable to upgrade, consider switching to the legacy v7 branch on Steam, which is the last release that supported 32-bit windows:\n(properties -> betas -> select version-7.0 in the drop-down box).";
+            }else if(OS.javaVersion.equals("1.8.0_151-1-ojdkbuild")){ //version string of JVM packaged with the 32-bit version of the game on itch/steam
+                versionWarning = "\n\nMake sure you have downloaded the 64-bit version of the game, not the 32-bit one.";
+            }else if(OS.javaVersionNumber < 25){
+                //technically, java 25 isn't required yet, but it might be in the future, so tell users to get that one
+                versionWarning = "\n\nYour current Java version is: " + OS.javaVersionNumber + ". To run the game, upgrade to Java 25 on a 64-bit machine.";
+            }
+
+            ErrorDialog.show("You are running a 32-bit installation of Windows and/or a 32-bit JVM. 32-bit windows is no longer supported." + versionWarning);
+        }
+    }
+
     public DesktopLauncher(String[] args){
         this.args = args;
-
-        Version.init();
-        boolean useSteam = Version.modifier.contains("steam");
 
         if(useDiscord){
             Threads.daemon(() -> {
@@ -129,8 +164,7 @@ public class DesktopLauncher extends ClientLauncher{
             });
         }
 
-        if(useSteam){
-
+        if(Version.isSteam){
             Events.on(ClientLoadEvent.class, event -> {
                 if(steamError != null){
                     Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> {
@@ -293,6 +327,138 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
+    public void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
+        showNativeFileChooser(title, open, cons, extension);
+    }
+
+    @Override
+    public void showMultiFileChooser(Cons<Fi> cons, String... extensions){
+        showNativeFileChooser("@open", true, cons, extensions);
+    }
+
+    void showNativeFileChooser(String title, boolean open, Cons<Fi> cons, String... shownExtensions){
+        String formatted = (title.startsWith("@") ? Core.bundle.get(title.substring(1)) : title).replaceAll("\"", "'");
+
+        //this should never happen unless someone is being dumb with the parameters
+        String[] ext = shownExtensions == null || shownExtensions.length == 0 ? new String[]{""} : shownExtensions;
+
+        if(OS.isLinux){
+            showZenity(open, formatted, shownExtensions, cons, () -> Platform.defaultFileDialog(open, title, ext[0], cons));
+            return;
+        }
+
+        //native file dialog
+        Threads.daemon(() -> {
+            try{
+                FileDialogs.loadNatives();
+
+                String result;
+                String[] patterns = new String[ext.length];
+                for(int i = 0; i < ext.length; i++){
+                    patterns[i] = "*." + ext[i];
+                }
+
+                //on MacOS, .msav is not properly recognized until I put garbage into the array?
+                if(patterns.length == 1 && OS.isMac && open){
+                    patterns = new String[]{"", "*." + ext[0]};
+                }
+
+                if(open){
+                    result = FileDialogs.openFileDialog(formatted, FileChooser.getLastDirectory().absolutePath(), patterns, "." + ext[0] + " files", false);
+                }else{
+                    result = FileDialogs.saveFileDialog(formatted, FileChooser.getLastDirectory().child("file." + ext[0]).absolutePath(), patterns, "." + ext[0] + " files");
+                }
+
+                if(result == null) return;
+
+                if(result.length() > 1 && result.contains("\n")){
+                    result = result.split("\n")[0];
+                }
+
+                //cancelled selection, ignore result
+                if(result.isEmpty() || result.equals("\n")) return;
+                if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
+                if(result.contains("\n")) throw new IOException("invalid input: \"" + result + "\"");
+
+                Fi file = Core.files.absolute(result);
+                Core.app.post(() -> {
+                    FileChooser.setLastDirectory(file.isDirectory() ? file : file.parent());
+
+                    if(!open){
+                        cons.get(file.parent().child(file.nameWithoutExtension() + "." + ext[0]));
+                    }else{
+                        cons.get(file);
+                    }
+                });
+            }catch(Throwable error){
+                Log.err("Failure to execute native file chooser", error);
+                Core.app.post(() -> {
+                    if(ext.length > 1){
+                        showMultiFileChooser(cons, ext);
+                    }else{
+                        Platform.defaultFileDialog(open, formatted, ext[0], cons);
+                    }
+                });
+            }
+        });
+    }
+
+
+    /** attempt to use the native file picker with zenity, or runs the fallback Runnable if the operation fails */
+    static void showZenity(boolean open, String title, String[] extensions, Cons<Fi> cons, Runnable fallback){
+        Threads.daemon(() -> {
+            try{
+                String formatted = (title.startsWith("@") ? Core.bundle.get(title.substring(1)) : title).replaceAll("\"", "'");
+
+                String last = FileChooser.getLastDirectory().absolutePath();
+                if(!last.endsWith("/")) last += "/";
+
+                //zenity doesn't support filtering by extension
+                Seq<String> args = Seq.with("zenity",
+                "--file-selection",
+                "--title=" + formatted,
+                "--filename=" + last,
+                "--confirm-overwrite",
+                "--file-filter=" + Seq.with(extensions).toString(" ", s -> "*." + s),
+                "--file-filter=All files | *" //allow anything if the user wants
+                );
+
+                if(!open){
+                    args.add("--save");
+                }
+
+                String result = OS.exec(args.toArray(String.class));
+                //first line.
+                if(result.length() > 1 && result.contains("\n")){
+                    result = result.split("\n")[0];
+                }
+
+                //cancelled selection, ignore result
+                if(result.isEmpty() || result.equals("\n")) return;
+
+                if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
+                if(result.contains("\n")) throw new IOException("invalid input: \"" + result + "\"");
+
+                Fi file = Core.files.absolute(result);
+                Core.app.post(() -> {
+                    FileChooser.setLastDirectory(file.isDirectory() ? file : file.parent());
+
+                    if(!open){
+                        cons.get(file.parent().child(file.nameWithoutExtension() + "." + extensions[0]));
+                    }else{
+                        cons.get(file);
+                    }
+                });
+            }catch(Exception e){
+                Log.err(e);
+                Log.warn("zenity not found, using non-native file dialog. Consider installing `zenity` for native file dialogs.");
+                Core.app.post(fallback);
+            }
+        });
+    }
+
+
+    @Override
     public Seq<Fi> getWorkshopContent(Class<? extends Publishable> type){
         return !steam ? super.getWorkshopContent(type) : SVars.workshop.getWorkshopFiles(type);
     }
@@ -414,6 +580,6 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     private static void message(String message){
-        SDLMessageBox.SDL_ShowSimpleMessageBox(SDLMessageBox.SDL_MESSAGEBOX_ERROR, "oh no", message, 0);
+        SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
     }
 }

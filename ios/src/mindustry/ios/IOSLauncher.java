@@ -139,6 +139,11 @@ public class IOSLauncher extends IOSApplication.Delegate{
             }
 
             @Override
+            public void showMultiFileChooser(Cons<Fi> cons, String... extensions){
+                showFileChooser(true, extensions[0], cons);
+            }
+
+            @Override
             public Context getScriptContext(){
                 Context context = Context.getCurrentContext();
                 if(context == null) context = Context.enter();

@@ -31,7 +31,6 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.power.PowerNode.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -78,15 +77,6 @@ public class Control implements ApplicationListener, Loadable{
                 });
             }
             checkAutoUnlocks();
-
-            if((OS.isWindows && !OS.is64Bit && !Core.settings.getBool("nowarn32bit", false))){
-                BaseDialog dialog = new BaseDialog("@warn.32bit.title");
-                dialog.buttons.button("@ok", dialog::hide).size(120f, 64f);
-                dialog.cont.add("@warn.32bit").labelAlign(Align.center, Align.center).wrap().grow().row();
-                dialog.cont.check("@dontshowagain", val -> Core.settings.put("nowarn32bit", val));
-
-                dialog.show();
-            }
         });
 
         Events.on(StateChangeEvent.class, event -> {
@@ -245,8 +235,8 @@ public class Control implements ApplicationListener, Loadable{
                     float maxDelay = 0f;
 
                     for(var build : state.rules.defaultTeam.data().buildings){
-                        //power nodes need to be configured later once everything is built
-                        if(build instanceof PowerNodeBuild){
+                        //some blocks need to be configured later once everything is built
+                        if(build.block.delayLandingConfig){
                             toBePlacedConfigs.add(new Object[]{build, build.config()});
                         }
                     }

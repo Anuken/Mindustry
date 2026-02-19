@@ -47,6 +47,10 @@ public class MapObjectivesDialog extends BaseDialog{
 
             if(field != null && field.isAnnotationPresent(Multiline.class)){
                 cont.area(get.get(), set).height(100f).growX();
+            }else if(field != null && field.isAnnotationPresent(LogicCode.class)){
+                cont.button(b -> b.image(Icon.pencil).size(iconSmall), () -> {
+                    ui.logic.show(get.get(), null, true, set::get);
+                }).pad(4f);
             }else{
                 cont.field(get.get(), set).growX();
             }

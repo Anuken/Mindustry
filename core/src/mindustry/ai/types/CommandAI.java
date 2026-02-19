@@ -214,7 +214,9 @@ public class CommandAI extends AIController{
             }
         }
 
-        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.buildOn() != null && (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
+        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.type.allowedInPayloads && unit.buildOn() != null &&
+            (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
+
             var build = unit.buildOn();
             tmpPayload.unit = unit;
             if(build.team == unit.team && build.acceptPayload(build, tmpPayload)){

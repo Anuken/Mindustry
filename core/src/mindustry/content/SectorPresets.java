@@ -145,7 +145,7 @@ public class SectorPresets{
         }};
 
         fallenVessel = new SectorPreset("fallenVessel", serpulo, -1){{
-            captureWave = 121;
+            captureWave = 70;
             difficulty = 9;
         }};
 
