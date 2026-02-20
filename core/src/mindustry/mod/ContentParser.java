@@ -91,6 +91,9 @@ public class ContentParser{
             return Attribute.add(attr);
         });
         put(Attributes.class, (type, data) -> {
+            if(!data.isObject()){
+                throw new IllegalArgumentException("Attribute definitions must be objects, e.g. {heat: 10}");
+            }
             Attributes attr = new Attributes();
             for(var child : data){
                 Attribute value = Attribute.exists(child.name) ? Attribute.get(child.name) : Attribute.add(child.name);
