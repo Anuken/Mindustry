@@ -289,12 +289,12 @@ public class DataPatcher{
                         var copy = s.copy();
                         reset(() -> s.set(copy));
 
-                        assignValue(object, field, metadata, () -> s.get(i), val -> s.set(i, val), value, false);
+                        assignValue(object, field, metadata, () -> s.get(i), val -> s.set(i, val), value, true);
                     }else{
                         modifiedField(parentObject, parentField, copyArray(object));
 
                         var fobj = object;
-                        assignValue(object, field, metadata, () -> Array.get(fobj, i), val -> Array.set(fobj, i, val), value, false);
+                        assignValue(object, field, metadata, () -> Array.get(fobj, i), val -> Array.set(fobj, i, val), value, true);
                     }
                 }
             }else if(object instanceof ObjectSet set && field.equals("+")){
@@ -503,7 +503,16 @@ public class DataPatcher{
                 return null;
             }
 
-            return new Object[]{object instanceof Seq s ? s.get(i) : Array.get(object, i), null};
+            Object prev = object instanceof Seq s ? s.get(i) : Array.get(object, i);
+            reset(() -> {
+                if(object instanceof Seq seq){
+                    seq.set(i, prev);
+                }else{
+                    Array.set(object, i, prev);
+                }
+            });
+
+            return new Object[]{prev, metadata != null ? new FieldData(object instanceof Seq<?> ? metadata.elementType : metadata.type.getComponentType(), null, null) : null};
         }else if(object instanceof ObjectMap map){
             Object key = convertKeyType(field, metadata.keyType);
             if(key == null){
@@ -558,6 +567,15 @@ public class DataPatcher{
                     }
                 });
             }
+        }else if(target instanceof Seq<?> || target.getClass().isArray()){
+            int i = Integer.parseInt(field);
+            resetters.add(() -> {
+                if(target instanceof Seq seq){
+                    seq.set(i, value);
+                }else{
+                    Array.set(target, i, value);
+                }
+            });
         }else{
             warn("Missing field " + field + " for object " + target);
         }
