@@ -86,6 +86,10 @@ public class Stats{
         add(stat, StatValues.blocks(attr, floating, scale, startZero));
     }
 
+    public void add(Stat stat, Attribute attr, boolean floating, float scale1, float scale2, @Nullable Seq<ItemStack> outputs, float timePeriod, boolean startZero){
+        add(stat, StatValues.blocks(attr, floating, scale1, scale2, outputs, timePeriod, startZero));
+    }
+
     /** Adds a single string value with this stat. */
     public void add(Stat stat, String format, Object... args){
         add(stat, StatValues.string(format, args));
