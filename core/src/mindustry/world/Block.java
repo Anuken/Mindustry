@@ -187,6 +187,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float scaledHealth = -1;
     /** building health; -1 to use scaledHealth */
     public int health = -1;
+    /** Buildplan health multiplier as a fraction of its health. If this value is <0, it defaults to 10 hp */
+    public float constructHealthMultiplier = -1f;
     /** damage absorption, similar to unit armor */
     public float armor = 0f;
     /** base block explosiveness */
@@ -586,6 +588,10 @@ public class Block extends UnlockableContent implements Senseable{
     /** @return whether this block can be broken on the specified tile. */
     public boolean canBreak(Tile tile){
         return true;
+    }
+
+    public float constructHealthMultiplier(){
+    return constructHealthMultiplier > 0f ? health * constructHealthMultiplier : 10f;
     }
 
     public boolean rotatedOutput(int x, int y){
