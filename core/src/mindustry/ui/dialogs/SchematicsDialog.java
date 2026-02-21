@@ -755,14 +755,16 @@ public class SchematicsDialog extends BaseDialog{
 
         public void show(Schematic schem){
             cont.clear();
-            title.setText("[[" + Core.bundle.get("schematic") + "] " +schem.name());
+            title.setText("[[" + Core.bundle.get("schematic") + "] " + schem.name());
 
-            cont.add(Core.bundle.format("schematic.info", schem.width, schem.height, schem.tiles.size)).color(Color.lightGray).row();
-            cont.table(tags -> buildTags(schem, tags)).fillX().left().row();
-            cont.add(new SchematicImage(schem)).maxSize(800f).row();
+            Table inner = new Table();
+
+            inner.add(Core.bundle.format("schematic.info", schem.width, schem.height, schem.tiles.size)).color(Color.lightGray).row();
+            inner.table(tags -> buildTags(schem, tags)).fillX().left().row();
+            inner.add(new SchematicImage(schem)).maxSize(800f).row();
 
             ItemSeq arr = schem.requirements();
-            cont.table(r -> {
+            inner.table(r -> {
                 int i = 0;
                 for(ItemStack s : arr){
                     r.image(s.item.uiIcon).left().size(iconMed);
@@ -776,12 +778,10 @@ public class SchematicsDialog extends BaseDialog{
                         r.row();
                     }
                 }
-            });
-            cont.row();
+            }).row();
             float cons = schem.powerConsumption() * 60, prod = schem.powerProduction() * 60;
             if(!Mathf.zero(cons) || !Mathf.zero(prod)){
-                cont.table(t -> {
-
+                inner.table(t -> {
                     if(!Mathf.zero(prod)){
                         t.image(Icon.powerSmall).color(Pal.powerLight).padRight(3);
                         t.add("+" + Strings.autoFixed(prod, 2)).color(Pal.powerLight).left();
@@ -795,8 +795,17 @@ public class SchematicsDialog extends BaseDialog{
                         t.image(Icon.powerSmall).color(Pal.remove).padRight(3);
                         t.add("-" + Strings.autoFixed(cons, 2)).color(Pal.remove).left();
                     }
-                });
+                }).row();
             }
+
+            if(!schem.description().isEmpty()){
+                inner.row();
+                inner.add("[lightgray]" + schem.description()).wrap().width(500f).padTop(20).left();
+            }
+
+            cont.pane(p -> {
+                p.add(inner).growX();
+            }).grow().scrollX(false).scrollY(true);
 
             buttons.clearChildren();
             buttons.defaults().size(Core.graphics.isPortrait() ? 150f : 210f, 64f);
