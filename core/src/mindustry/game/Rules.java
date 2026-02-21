@@ -84,7 +84,7 @@ public class Rules{
     public float unitDamageMultiplier = 1f;
     /** How much health units start with. */
     public float unitHealthMultiplier = 1f;
-    /** How much damage unit crash damage deals. (Compounds with unitDamageMultiplier) */
+    /** How much damage unit crash and unit explosive damage deals. (Compounds with unitDamageMultiplier) */
     public float unitCrashDamageMultiplier = 1f;
     /** How fast units can mine. */
     public float unitMineSpeedMultiplier = 1f;

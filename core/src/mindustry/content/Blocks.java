@@ -2081,8 +2081,8 @@ public class Blocks{
         conveyor = new Conveyor("conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1));
             health = 45;
-            speed = 0.03f;
-            displayedSpeed = 4.2f;
+            speed = 0.046f;
+            displayedSpeed = 6.5f;
             buildCostMultiplier = 2f;
             researchCost = with(Items.copper, 5);
         }};
@@ -2113,7 +2113,7 @@ public class Blocks{
             speed = 26;
             capacity = 6;
             health = 30;
-            buildCostMultiplier = 6f;
+            buildCostMultiplier = 4f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
@@ -3946,16 +3946,21 @@ public class Blocks{
 
             ammo(
                 Items.titanium, new ShrapnelBulletType(){{
-                    length = brange;
-                    damage = 66f;
-                    ammoMultiplier = 4f;
+                    length = brange + 64f;
+                    rangeChange = 64f;
+                    damage = 50f;
+                    ammoMultiplier = 2f;
                     width = 17f;
                     reloadMultiplier = 1.3f;
+                    pierceCap = 4;
+                    serrations = 9;
+                    serrationSpacing = 20f;
+                    shootPattern = new ShootSpread(3, 10f);
                 }},
                 Items.thorium, new ShrapnelBulletType(){{
                     length = brange;
                     damage = 105f;
-                    ammoMultiplier = 5f;
+                    ammoMultiplier = 2f;
                     toColor = Pal.thoriumPink;
                     shootEffect = smokeEffect = Fx.thoriumShoot;
                 }}
