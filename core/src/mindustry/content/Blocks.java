@@ -3572,7 +3572,7 @@ public class Blocks{
         }};
 
         lancer = new PowerTurret("lancer"){{
-            requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 60, Items.titanium, 30));
+            requirements(Category.turret, with(Items.copper, 80, Items.lead, 90, Items.silicon, 80, Items.titanium, 40));
             range = 165f;
 
             shoot.firstShotDelay = 40f;
@@ -3592,7 +3592,7 @@ public class Blocks{
             coolant = consumeCoolant(0.2f);
             chargeSound = Sounds.chargeLancer;
 
-            consumePower(6f);
+            consumePower(8f);
 
             shootType = new LaserBulletType(140){{
                 colors = new Color[]{Pal.lancerLaser.cpy().a(0.4f), Pal.lancerLaser, Color.white};
