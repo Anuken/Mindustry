@@ -55,9 +55,8 @@ public class ItemBridge extends Block{
         noUpdateDisabled = true;
         allowDiagonal = false;
         copyConfig = false;
-        //disabled as to not be annoying
-        allowConfigInventory = false;
         ignoreResizeConfig = true;
+        swapConfigInventory = true;
         priority = TargetPriority.transport;
         delayLandingConfig = true;
 
