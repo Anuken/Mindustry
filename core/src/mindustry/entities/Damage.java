@@ -469,13 +469,15 @@ public class Damage{
     }
 
     /** Applies a status effect to all enemy units in a range. */
-    public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground){
+    public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground, float chance){
         Cons<Unit> cons = entity -> {
             if(entity.team == team || !entity.checkTarget(air, ground) || !entity.hittable() || !entity.within(x, y, radius)){
                 return;
             }
 
-            entity.apply(effect, duration);
+            // Should the chance be per unit or for the whole shot?
+            // current: per unit
+            entity.apply(effect, duration, chance);
         };
 
         rect.setSize(radius * 2).setCenter(x, y);
