@@ -4004,6 +4004,8 @@ public class Blocks{
                     frontColor = Pal.siliconAmmoFront;
                     lifeScaleRandMax = 1.08f;
                     lifeScaleRandMin = 0.95f;
+
+                    unitSort = UnitSorts.closest;
                 }},
                 Items.pyratite, new ArtilleryBulletType(3f, 48){{
                     hitEffect = new MultiEffect(Fx.blastExplosion, Fx.shockwave);
@@ -4081,7 +4083,6 @@ public class Blocks{
             ammoPerShot = 2;
             velocityRnd = 0.2f;
 
-            scaleLifetimeOffset = 1f / 9f;
             recoil = 6f;
             shake = 2f;
             range = 290f;
@@ -4091,6 +4092,7 @@ public class Blocks{
             scaledHealth = 130;
             depositCooldown = 2.0f;
             shootSound = Sounds.shootRipple;
+            unitSort = UnitSorts.grouped(290f * Mathf.sinDeg(11f));
         }};
 
         cyclone = new ItemTurret("cyclone"){{
@@ -4682,6 +4684,8 @@ public class Blocks{
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.3f;
+
+                unitSort = UnitSorts.grouped(60f);
             }},
             Items.carbide, new ArtilleryBulletType(3.25f, 700, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosionSmall, Fx.titanSmokeSmall);
@@ -4719,6 +4723,8 @@ public class Blocks{
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.2f;
                 fragLifeMin = 1.5f;
+
+                unitSort = UnitSorts.strongest;
 
                 fragBullets = 12;
                     fragBullet = new ArtilleryBulletType(0.5f, 50, "shell"){{
@@ -4796,6 +4802,8 @@ public class Blocks{
                         buildingDamageMultiplier = 0f;
                     }};
                 }};
+
+                unitSort = UnitSorts.grouped(100f);
             }}
             );
 
