@@ -383,6 +383,20 @@ public class EventType{
     }
 
     /**
+     * Called when a bullet has been created.
+     * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
+     * Do not modify any tiles inside listeners that use this tile.
+     * */
+    public static class BulletCreateEvent{
+        public Bullet bullet;
+
+        public BulletCreateEvent set(Bullet bullet){
+            this.bullet = bullet;
+            return this;
+        }
+    }
+
+    /**
      * Called *before* a tile has changed.
      * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
      * Do not modify any tiles inside listeners that use this tile.

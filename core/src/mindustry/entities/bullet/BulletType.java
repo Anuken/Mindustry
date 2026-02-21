@@ -28,6 +28,7 @@ import static mindustry.Vars.*;
 
 public class BulletType extends Content implements Cloneable{
     static final UnitDamageEvent bulletDamageEvent = new UnitDamageEvent();
+    static final BulletCreateEvent bulletCreateEvent = new BulletCreateEvent();
 
     /** Lifetime in ticks. */
     public float lifetime = 40f;
@@ -984,6 +985,7 @@ public class BulletType extends Content implements Cloneable{
     @Remote(called = Loc.server, unreliable = true)
     public static void createBullet(BulletType type, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
         if(type == null) return;
-        type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
+        var bullet = type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
+        Events.fire(bulletCreateEvent.set(bullet));
     }
 }
