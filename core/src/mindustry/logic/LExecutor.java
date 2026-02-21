@@ -1306,15 +1306,18 @@ public class LExecutor{
             switch(action){
                 case pan -> {
                     control.input.logicCutscene = true;
+                    control.input.logicCutsceneInteract = p4.bool();
                     control.input.logicCamPan.set(World.unconv(p1.numf()), World.unconv(p2.numf()));
                     control.input.logicCamSpeed = p3.numf();
                 }
                 case zoom -> {
                     control.input.logicCutscene = true;
+                    control.input.logicCutsceneInteract = p2.bool();
                     control.input.logicCutsceneZoom = Mathf.clamp(p1.numf());
                 }
                 case stop -> {
                     control.input.logicCutscene = false;
+                    control.input.logicCutsceneInteract = false;
                 }
             }
         }

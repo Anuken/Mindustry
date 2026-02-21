@@ -1776,7 +1776,7 @@ public class LStatements{
     @RegisterStatement("cutscene")
     public static class CutsceneStatement extends LStatement{
         public CutsceneAction action = CutsceneAction.pan;
-        public String p1 = "100", p2 = "100", p3 = "0.06", p4 = "0";
+        public String p1 = "100", p2 = "100", p3 = "0.06", p4 = "false";
 
         @Override
         public void build(Table table){
@@ -1790,6 +1790,12 @@ public class LStatements{
                 b.label(() -> action.name()).growX().wrap().labelAlign(Align.center);
                 b.clicked(() -> showSelect(b, CutsceneAction.all, action, o -> {
                     action = o;
+
+                    if(action == CutsceneAction.pan){
+                        p2 = "100";
+                    }else if(action == CutsceneAction.zoom){
+                        p2 = "false";
+                    }
                     rebuild(table);
                 }));
             }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
@@ -1805,10 +1811,16 @@ public class LStatements{
 
                     table.add(" speed ");
                     fields(table, p3, str -> p3 = str);
+
+                    table.add(" allow input ");
+                    fields(table, p4, str -> p4 = str);
                 }
                 case zoom -> {
                     table.add(" level ");
                     fields(table, p1, str -> p1 = str);
+
+                    table.add(" allow input ");
+                    fields(table, p2, str -> p2 = str);
                 }
             }
         }
