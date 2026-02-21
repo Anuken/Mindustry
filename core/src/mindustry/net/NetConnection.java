@@ -17,6 +17,10 @@ public abstract class NetConnection{
     public @Nullable Player player;
     public boolean kicked = false;
     public long syncTime;
+    public long lastPingSerial;
+    public long lastPingAt;
+    /** Ping, in milliseconds. */
+    public long ping;
 
     /** When this connection was established. */
     public long connectTime = Time.millis();

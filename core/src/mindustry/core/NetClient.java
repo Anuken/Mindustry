@@ -326,12 +326,31 @@ public class NetClient implements ApplicationListener{
 
     @Remote(targets = Loc.client, priority = PacketPriority.high)
     public static void ping(Player player, long time){
-        Call.pingResponse(player.con, time);
+        if(player.con.lastPingAt != 0){
+            player.con.lastPingAt = Time.millis();
+            player.con.lastPingSerial = Mathf.random(Long.MAX_VALUE);
+        }
+        Call.pingResponse(player.con, time, player.con.lastPingSerial);
     }
 
-    @Remote(variants = Variant.one)
-    public static void pingResponse(long time){
-        netClient.ping = Time.timeSinceMillis(time);
+    @Remote(targets = Loc.server, variants = Variant.one)
+    public static void pingResponse(long clientTime, long serial){
+        netClient.ping = Time.timeSinceMillis(clientTime);
+        Call.pingEnd(serial);
+    }
+
+    @Remote(targets = Loc.client)
+    public static void pingEnd(Player player, long serial){
+        if(serial != player.con.lastPingSerial){
+            Log.debug("Skipping ping from {} due to serial mismatch", player.plainName());
+            return;
+        }
+        if(player.con.lastPingAt == 0){
+            Log.debug("Skipping ping from {} due to server not waiting for one", player.plainName());
+            return;
+        }
+        player.con.ping = Time.timeSinceMillis(player.con.lastPingAt);
+        player.con.lastPingAt = 0;
     }
 
     @Remote(variants = Variant.one)
