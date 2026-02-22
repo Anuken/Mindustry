@@ -1643,6 +1643,7 @@ public class Blocks{
 
             liquidCapacity = 80f;
             outputLiquid = new LiquidStack(Liquids.cyanogen, 12f / 60f);
+            craftTime = 80f / 4f;
 
             consumeLiquid(Liquids.arkycite, 160f / 60f);
             consumeItem(Items.graphite);
@@ -3746,7 +3747,8 @@ public class Blocks{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
-                    ammoMultiplier = 4;
+                    ammoMultiplier = 5;
+                    armorMultiplier = 1.5f;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
                     hitColor = backColor = trailColor = Pal.copperAmmoBack;

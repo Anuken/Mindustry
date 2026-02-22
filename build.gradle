@@ -244,6 +244,8 @@ project(":desktop"){
         implementation project(":core")
         implementation arcModule("extensions:profiling")
         implementation arcModule("extensions:discord")
+        implementation arcModule("natives:natives-filedialogs")
+        implementation arcModule("extensions:filedialogs")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
 

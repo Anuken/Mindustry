@@ -1066,7 +1066,11 @@ public class UnitType extends UnlockableContent implements Senseable{
         //assign default commands.
         if(commands.size == 0){
 
-            commands.add(UnitCommand.moveCommand, UnitCommand.enterPayloadCommand);
+            commands.add(UnitCommand.moveCommand);
+
+            if(allowedInPayloads){
+                commands.add(UnitCommand.enterPayloadCommand);
+            }
 
             if(canBoost){
                 commands.add(UnitCommand.boostCommand);
