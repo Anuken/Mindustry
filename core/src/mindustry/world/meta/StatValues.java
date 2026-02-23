@@ -735,7 +735,7 @@ public class StatValues{
 
                     if(type.armorMultiplier != 1f){
                         if(type.armorMultiplier > 1f){
-                            sep(bt, Core.bundle.format("bullet.armorweakness", (int)(type.armorMultiplier * 100)));
+                            sep(bt, Core.bundle.format("bullet.armorweakness", (type.armorMultiplier)));
                         }else if(Mathf.sign(type.armorMultiplier) == 1){
                             sep(bt, Core.bundle.format("bullet.armorpiercing", (int)((1 - type.armorMultiplier) * 100)));
                         }else{
