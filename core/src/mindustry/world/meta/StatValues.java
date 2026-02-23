@@ -733,7 +733,7 @@ public class StatValues{
                         sep(bt, "@bullet.armorpierce");
                     }
 
-                    if(type.armorMultiplier != 1f){
+                    if(type.armorMultiplier != 1f && !type.pierceArmor){
                         if(type.armorMultiplier > 1f){
                             sep(bt, Core.bundle.format("bullet.armorweakness", (type.armorMultiplier)));
                         }else if(Mathf.sign(type.armorMultiplier) == 1){
