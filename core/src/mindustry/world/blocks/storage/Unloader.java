@@ -101,10 +101,10 @@ public class Unloader extends Block{
             if(unloadCore != 0) return unloadCore;
             int unloadPriority = Boolean.compare(x.canUnload && !x.canLoad, y.canUnload && !y.canLoad); //priority to receive if it cannot give
             if(unloadPriority != 0) return unloadPriority;
-            int loadPriority = Boolean.compare(x.canUnload || !x.canLoad, y.canUnload || !y.canLoad); //priority to give if it cannot receive
-            if(loadPriority != 0) return loadPriority;
             int loadFactor = Float.compare(x.loadFactor, y.loadFactor);
             if(loadFactor != 0) return loadFactor;
+            int loadPriority = Boolean.compare(x.canUnload || !x.canLoad, y.canUnload || !y.canLoad); //priority to give if it cannot receive
+            if(loadPriority != 0) return loadPriority;
             return Integer.compare(y.lastUsed, x.lastUsed); //inverted
         };
 
