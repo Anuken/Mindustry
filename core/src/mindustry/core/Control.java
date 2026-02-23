@@ -31,6 +31,7 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -494,6 +495,14 @@ public class Control implements ApplicationListener, Loadable{
                                     Tile tile = world.tile(build.tileX(), build.tileY());
                                     if(tile != null && tile.build == null && Build.validPlace(build.block, Team.derelict, build.tileX(), build.tileY(), build.rotation, false, false)){
                                         tile.setBlock(build.block, Team.derelict, build.rotation, () -> build);
+                                    }
+                                }
+
+                                //all the derelict power graphs are invalid
+                                for(var build : previousBuildings){
+                                    if(build.power != null){
+                                        build.power.graph = new PowerGraph();
+                                        build.power.links.clear();
                                     }
                                 }
 
