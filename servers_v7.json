@@ -255,6 +255,14 @@
       "mdt.nekopark.cloud:6567"
     ]
   },
+    {
+    "name": "MonthZifang",
+    "address": [
+      "monthzifang:6567",
+      "monthzifang:6568",
+      "monthzifang:6569"
+    ]
+  },
   {
     "name": "Erepulo",
     "address": [
