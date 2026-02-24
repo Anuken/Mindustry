@@ -97,6 +97,7 @@ public class SoundPriority{
         set(-2f, mechStep, mechStepHeavy, walkerStep, walkerStepSmall, walkerStepTiny, mechStepSmall);
 
         explosionCore.setFalloffOffset(100f);
+        blockExplodeElectricBig.setFalloffOffset(70f);
     }
 
     static void max(int max, Sound... sounds){

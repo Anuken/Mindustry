@@ -34,7 +34,7 @@ public class ArcNetProvider implements NetProvider{
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
     Thread serverThread;
 
-    private static final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
+    private static final LZ4SafeDecompressor decompressor = LZ4Factory.fastestInstance().safeDecompressor();
     private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 
     private volatile int playerLimitCache, packetSpamLimit;
@@ -439,13 +439,14 @@ public class ArcNetProvider implements NetProvider{
                     byteBuffer.position(byteBuffer.position() + buffer.position());
                 }else{
                     //decompress otherwise
-                    int read = decompressor.decompress(byteBuffer, byteBuffer.position(), buffer, 0, length);
+                    int compressedLength = byteBuffer.limit() - byteBuffer.position();
+                    decompressor.decompress(byteBuffer, byteBuffer.position(), compressedLength, buffer, 0, length);
 
                     buffer.position(0);
                     buffer.limit(length);
                     packet.read(reads.get(), length);
                     //move buffer forward based on bytes read by decompressor
-                    byteBuffer.position(byteBuffer.position() + read);
+                    byteBuffer.position(byteBuffer.position() + compressedLength);
                 }
 
                 return packet;

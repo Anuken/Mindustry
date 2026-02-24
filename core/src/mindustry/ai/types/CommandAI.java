@@ -214,7 +214,9 @@ public class CommandAI extends AIController{
             }
         }
 
-        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.buildOn() != null && (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
+        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.type.allowedInPayloads && unit.buildOn() != null &&
+            (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
+
             var build = unit.buildOn();
             tmpPayload.unit = unit;
             if(build.team == unit.team && build.acceptPayload(build, tmpPayload)){
@@ -274,7 +276,7 @@ public class CommandAI extends AIController{
             if(
                 (hasStance(UnitStance.patrol) && !hasStance(UnitStance.pursueTarget) && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
                 (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
-                (command == UnitCommand.loopPayloadCommand && unit.within(targetPos, 10f))
+                (command == UnitCommand.loopPayloadCommand && unit.within(vecMovePos, 10f))
             ){
                 move = false;
             }
@@ -341,6 +343,10 @@ public class CommandAI extends AIController{
                 }
             }else{
                 vecOut.set(vecMovePos);
+            }
+
+            if(command == UnitCommand.loopPayloadCommand){
+                alwaysArrive = true;
             }
 
             if(move){

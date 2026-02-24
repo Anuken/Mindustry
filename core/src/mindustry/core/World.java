@@ -32,18 +32,18 @@ public class World{
 
     public Tiles tiles = new Tiles(0, 0);
     /** The number of times tiles have changed in this session. Used for blocks that need to poll world state, but not frequently. */
-    public int tileChanges = -1;
+    public int tileChanges = 1, floorChanges = 1;
 
     private boolean generating, invalidMap;
     private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
 
     public World(){
-        Events.on(TileChangeEvent.class, e -> {
-            tileChanges ++;
-        });
+        Events.on(TileChangeEvent.class, e -> tileChanges ++);
+        Events.on(TileFloorChangeEvent.class, e -> floorChanges ++);
 
         Events.on(WorldLoadEvent.class, e -> {
             tileChanges = -1;
+            floorChanges = -1;
 
             //make each building check if it can update in the given map area
             for(var build : Groups.build){

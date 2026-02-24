@@ -588,7 +588,7 @@ public class Renderer implements ApplicationListener{
         camera.height = h;
         camera.position.x = w / 2f + tilesize / 2f;
         camera.position.y = h / 2f + tilesize / 2f;
-        buffer.begin();
+        buffer.begin(Color.clear);
         draw();
         Draw.flush();
         byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);

@@ -198,6 +198,7 @@ public class GenericCrafter extends Block{
                     }
                 }
             }
+
             if(outputLiquids != null && !ignoreLiquidFullness){
                 boolean allFull = true;
                 for(var output : outputLiquids){

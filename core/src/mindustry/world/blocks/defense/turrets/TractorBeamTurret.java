@@ -76,6 +76,11 @@ public class TractorBeamTurret extends BaseTurret{
 
         @Override
         public void updateTile(){
+            if(activationTimer > 0){
+                activationTimer -= Time.delta;
+                return;
+            }
+
             float eff = efficiency * coolantMultiplier, edelta = eff * delta();
 
             //retarget

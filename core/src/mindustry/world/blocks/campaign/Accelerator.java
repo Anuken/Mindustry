@@ -142,6 +142,10 @@ public class Accelerator extends Block{
             return progress;
         }
 
+        public boolean isCoreBuilt(){
+            return progress >= 1f;
+        }
+
         @Override
         public void draw(){
             super.draw();
@@ -251,6 +255,10 @@ public class Accelerator extends Block{
             ui.planet.showPlanetLaunch(state.rules.sector, launchCandidates == null ? state.rules.sector.planet.launchCandidates : launchCandidates, sector -> {
                 if(canLaunch()){
                     consume();
+                    ItemSeq resources = new ItemSeq();
+                    resources.add(items);
+                    items.clear();
+
                     power.graph.useBatteries(powerBufferRequirement);
                     progress = 0f;
 
@@ -262,6 +270,7 @@ public class Accelerator extends Block{
                         sector.planet.unlockedOnLand.each(UnlockableContent::unlock);
 
                         universe.clearLoadoutInfo();
+                        universe.updateLaunchResources(resources);
                         universe.updateLoadout((CoreBlock)launchBlock);
 
                         control.playSector(sector);
@@ -274,7 +283,7 @@ public class Accelerator extends Block{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return capacities[item.id];
+            return capacities[item.id] + (isCoreBuilt() ? launchBlock.itemCapacity : 0);
         }
 
         @Override

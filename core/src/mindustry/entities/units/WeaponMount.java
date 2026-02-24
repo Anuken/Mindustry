@@ -32,6 +32,8 @@ public class WeaponMount{
     public float aimX, aimY;
     /** whether to shoot right now */
     public boolean shoot = false;
+    /** whether to allow any shooting effects */
+    public boolean allowShootEffects = true;
     /** whether to rotate to face the target right now */
     public boolean rotate = false;
     /** extra state for alternating weapons */

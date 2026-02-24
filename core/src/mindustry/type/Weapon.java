@@ -157,6 +157,8 @@ public class Weapon implements Cloneable{
     public float shootStatusDuration = 60f * 5f;
     /** whether this weapon should fire when its owner dies */
     public boolean shootOnDeath = false;
+    /** If not null and shootOnDeath == true, overrides the weapon's shoot effect only when its owner dies. */
+    public @Nullable Effect shootOnDeathEffect = null;
     /** extra animated parts */
     public Seq<DrawPart> parts = new Seq<>(DrawPart.class);
 
@@ -426,6 +428,8 @@ public class Weapon implements Cloneable{
             Vars.control.sound.loop(activeSound, unit, activeSoundVolume);
         }
 
+        float velLen = unit.isRemote() ? unit.vel.len() : unit.deltaLen() / Time.delta;
+
         //shoot if applicable
         if(mount.shoot && //must be shooting
         can && //must be able to shoot
@@ -433,7 +437,7 @@ public class Weapon implements Cloneable{
         (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
         (!alternate || wasFlipped == flipSprite) &&
         mount.warmup >= minWarmup && //must be warmed up
-        unit.vel.len() >= minShootVelocity && //check velocity requirements
+        velLen >= minShootVelocity && //check velocity requirements
         (mount.reload <= 0.0001f || (alwaysContinuous && mount.bullet == null)) && //reload has to be 0, or it has to be an always-continuous weapon
         (alwaysShooting || Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone)) //has to be within the cone
         ){
@@ -514,9 +518,11 @@ public class Weapon implements Cloneable{
             initialShootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax), shootSoundVolume);
         }
 
-        ejectEffect.at(mountX, mountY, angle * Mathf.sign(this.x));
-        bullet.shootEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
-        bullet.smokeEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
+        if(mount.allowShootEffects){
+            ejectEffect.at(mountX, mountY, angle * Mathf.sign(this.x));
+            bullet.shootEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
+            bullet.smokeEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
+        }
 
         unit.vel.add(Tmp.v1.trns(shootAngle + 180f, bullet.recoil));
         Effect.shake(shake, shake, bulletX, bulletY);

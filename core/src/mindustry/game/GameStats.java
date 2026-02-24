@@ -19,9 +19,19 @@ public class GameStats{
     public int unitsCreated;
     /** Record of blocks that have been placed by count. Used for objectives only. */
     public ObjectIntMap<Block> placedBlockCount = new ObjectIntMap<>();
+    /** Record of enemy blocks that have been destroyed (from any source) by count. */
+    public ObjectIntMap<Block> destroyedBlockCount = new ObjectIntMap<>();
     /**
      * Record of items that have entered the core through transport blocks. Used for objectives only.
      * This can easily be ""spoofed"" with unloaders, so don't use it for anything remotely important.
      * */
     public ObjectIntMap<Item> coreItemCount = new ObjectIntMap<>();
+
+    public int getPlaced(Block block){
+        return placedBlockCount.get(block, 0);
+    }
+
+    public int getDestroyed(Block block){
+        return destroyedBlockCount.get(block, 0);
+    }
 }

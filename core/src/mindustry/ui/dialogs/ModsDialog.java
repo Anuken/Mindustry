@@ -37,6 +37,7 @@ public class ModsDialog extends BaseDialog{
     private ObjectMap<String, TextureRegion> textureCache = new ObjectMap<>();
 
     private float modImportProgress;
+    private boolean cancelledImport;
     private String searchtxt = "";
     private @Nullable Seq<ModListing> modList;
     private boolean orderDate = true;
@@ -486,7 +487,7 @@ public class ModsDialog extends BaseDialog{
             }
 
             for(ModListing mod : listings){
-                if(((mod.hasJava || mod.hasScripts) && Vars.ios) ||
+                if(((mod.hasJava || mod.hasScripts && !mod.iosCompatible) && Vars.ios) ||
                     (!Strings.matches(searchtxt, mod.name) && !Strings.matches(searchtxt, mod.repo))
                 ) continue;
 
@@ -643,8 +644,13 @@ public class ModsDialog extends BaseDialog{
             Floatc cons = len <= 0 ? f -> {} : p -> modImportProgress = p;
 
             try(var stream = file.write(false)){
-                Streams.copyProgress(result.getResultAsStream(), stream, len, 4096, cons);
+                Streams.copyProgress(result.getResultAsStream(), stream, len, 4096, p -> {
+                    if(cancelledImport) throw new RuntimeException("cancelled");
+                    cons.get(p);
+                });
             }
+
+            if(cancelledImport) return;
 
             var mod = mods.importMod(file);
             mod.setRepo(repo);
@@ -659,6 +665,7 @@ public class ModsDialog extends BaseDialog{
                 }
             });
         }catch(Throwable e){
+            if(cancelledImport) return;
             modError(e);
         }
     }
@@ -673,13 +680,19 @@ public class ModsDialog extends BaseDialog{
 
     public void githubImportMod(String repo, boolean isJava, @Nullable String release){
         modImportProgress = 0f;
+        cancelledImport = false;
         ui.loadfrag.show("@downloading");
         ui.loadfrag.setProgress(() -> modImportProgress);
+        ui.loadfrag.setButton(() -> {
+            ui.loadfrag.hide();
+            cancelledImport = true;
+        });
 
         if(isJava){
             githubImportJavaMod(repo, release);
         }else{
             Http.get(ghApi + "/repos/" + repo, res -> {
+                if(cancelledImport) return;
                 var json = Jval.read(res.getResultAsString());
                 String mainBranch = json.getString("default_branch");
                 String language = json.getString("language", "<none>");
@@ -708,6 +721,7 @@ public class ModsDialog extends BaseDialog{
     private void githubImportJavaMod(String repo, @Nullable String release){
         //grab latest release
         Http.get(ghApi + "/repos/" + repo + "/releases/" + (release == null ? "latest" : release), res -> {
+            if(cancelledImport) return;
             var json = Jval.read(res.getResultAsString());
             var assets = json.get("assets").asArray();
 
@@ -719,7 +733,10 @@ public class ModsDialog extends BaseDialog{
                 //grab actual file
                 var url = asset.getString("browser_download_url");
 
-                Http.get(url, result -> handleMod(repo, result), this::importFail);
+                Http.get(url, result -> {
+                    if(cancelledImport) return;
+                    handleMod(repo, result);
+                }, this::importFail);
             }else{
                 throw new ArcRuntimeException("No JAR file found in releases. Make sure you have a valid jar file in the mod's latest Github Release.");
             }
@@ -729,10 +746,13 @@ public class ModsDialog extends BaseDialog{
     private void githubImportBranch(String branch, String repo, @Nullable String release){
         if(release != null) {
             Http.get(ghApi + "/repos/" + repo + "/releases/" + release, res -> {
+                if(cancelledImport) return;
                 String zipUrl = Jval.read(res.getResultAsString()).getString("zipball_url");
                 Http.get(zipUrl, loc -> {
+                    if(cancelledImport) return;
                     if(loc.getHeader("Location") != null){
                         Http.get(loc.getHeader("Location"), result -> {
+                            if(cancelledImport) return;
                             handleMod(repo, result);
                         }, this::importFail);
                     }else{
@@ -742,8 +762,10 @@ public class ModsDialog extends BaseDialog{
             });
         }else{
             Http.get(ghApi + "/repos/" + repo + "/zipball/" + branch, loc -> {
+                if(cancelledImport) return;
                 if(loc.getHeader("Location") != null){
                     Http.get(loc.getHeader("Location"), result -> {
+                        if(cancelledImport) return;
                         handleMod(repo, result);
                     }, this::importFail);
                 }else{
