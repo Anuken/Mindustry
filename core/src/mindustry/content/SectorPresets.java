@@ -177,7 +177,6 @@ public class SectorPresets{
         //region erekir
 
         onset = new SectorPreset("onset", erekir, 10){{
-            addStartingItems = true;
             alwaysUnlocked = true;
             difficulty = 1;
         }};
