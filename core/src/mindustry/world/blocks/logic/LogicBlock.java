@@ -764,6 +764,8 @@ public class LogicBlock extends Block{
                 write.s(waitIndices.get(i));
                 write.f(waitValues.get(i));
             }
+
+            write.f(accumulator);
         }
 
         @Override
@@ -823,6 +825,8 @@ public class LogicBlock extends Block{
                     waitIndices.add(index);
                     waitValues.add(value);
                 }
+
+                accumulator = read.f();
             }
 
             loadBlock = () -> updateCode(code, false, asm -> {
@@ -843,7 +847,7 @@ public class LogicBlock extends Block{
                     }
                 }
 
-                //wait times can only be applied once the instructions are loaded an exist
+                //wait times can only be applied once the instructions are loaded and exist
                 for(int i = 0; i < waitIndices.size; i++){
                     int waitIndex = waitIndices.get(i);
                     if(waitIndex >= 0 && waitIndex < asm.instructions.length && asm.instructions[waitIndex] instanceof WaitI wait){
