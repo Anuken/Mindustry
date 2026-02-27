@@ -474,46 +474,53 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
-        boolean wasDead = entity instanceof Unit u && u.dead;
+        boolean wasDead = false;
 
         if(entity instanceof Healthc h){
-            float damage = b.damage;
-            float shield = entity instanceof Shieldc s ? Math.max(s.shield(), 0f) : 0f;
-            if(maxDamageFraction > 0){
-                float cap = h.maxHealth() * maxDamageFraction + shield;
-                damage = Math.min(damage, cap);
-                //cap health to effective health for handlePierce to handle it properly
-                health = Math.min(health, cap);
-            }else{
-                health += shield;
-            }
-            if(lifesteal > 0f && b.owner instanceof Healthc o){
-                float result = Math.max(Math.min(h.health(), damage), 0);
-                o.heal(result * lifesteal);
-            }
-            if(pierceArmor){
-                h.damagePierce(damage);
-            }else if(armorMultiplier != 1){
-                h.damageArmorMult(damage, armorMultiplier);
-            }else{
-                h.damage(damage);
+            wasDead = h.dead();
+
+            if(!wasDead){
+                float damage = b.damage;
+                float shield = entity instanceof Shieldc s ? Math.max(s.shield(), 0f) : 0f;
+                if(maxDamageFraction > 0){
+                    float cap = h.maxHealth() * maxDamageFraction + shield;
+                    damage = Math.min(damage, cap);
+                    //cap health to effective health for handlePierce to handle it properly
+                    health = Math.min(health, cap);
+                }else{
+                    health += shield;
+                }
+                if(lifesteal > 0f && b.owner instanceof Healthc o){
+                    float result = Math.max(Math.min(h.health(), damage), 0);
+                    o.heal(result * lifesteal);
+                }
+                if(pierceArmor){
+                    h.damagePierce(damage);
+                }else if(armorMultiplier != 1){
+                    h.damageArmorMult(damage, armorMultiplier);
+                }else{
+                    h.damage(damage);
+                }
             }
         }
 
         if(entity instanceof Unit unit){
-            Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
-            if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
-            unit.impulse(Tmp.v3);
-            unit.apply(status, statusDuration);
+            if(!unit.dead){
+                Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
+                if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
+                unit.impulse(Tmp.v3);
+                unit.apply(status, statusDuration);
+            }
 
-            Events.fire(bulletDamageEvent.set(unit, b));
+            if(!wasDead){
+                Events.fire(bulletDamageEvent.set(unit, b));
+                if(unit.dead)
+                    Events.fire(new UnitBulletDestroyEvent(unit, b));
+            }
         }
 
-        if(!wasDead && entity instanceof Unit unit && unit.dead){
-            Events.fire(new UnitBulletDestroyEvent(unit, b));
-        }
-
-        handlePierce(b, health, entity.x(), entity.y());
+        if(!wasDead)
+            handlePierce(b, health, entity.x(), entity.y());
     }
 
     public void handlePierce(Bullet b, float initialHealth, float x, float y){
