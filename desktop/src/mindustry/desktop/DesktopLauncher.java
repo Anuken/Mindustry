@@ -56,6 +56,9 @@ public class DesktopLauncher extends ClientLauncher{
                 coreProfile = true;
                 width = 900;
                 height = 700;
+                this.appName = "Mindustry";
+                this.appIdentifier = "io.anuke.mindustry";
+                this.appVersion = Version.buildString();
 
                 //on Windows, Intel drivers might be buggy with OpenGL 3.x, so only use 2.x. See https://github.com/Anuken/Mindustry/issues/11041
                 if(IntelGpuCheck.wasIntel()){
