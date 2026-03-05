@@ -71,7 +71,10 @@ public class Fonts{
             incremental = true;
             //most people will never see the monospace font, so don't pre-bake anything
             characters = "\u0000 ";
-        }})).loaded = f -> Fonts.monospace = f;
+        }})).loaded = f -> {
+            Fonts.monospace = f;
+            f.addFallback(Fonts.def);
+        };
 
         Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
