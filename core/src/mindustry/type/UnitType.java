@@ -795,7 +795,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(legSplashDamage > 0 && legSplashRange > 0){
             stats.add(Stat.legSplashDamage, table -> {
-                table.add((String)(Core.bundle.format("bullet.splashdamage", Strings.autoFixed(legSplashDamage, 2),
+                table.add((Core.bundle.format("bullet.splashdamage", Strings.autoFixed(legSplashDamage, 2),
                     Strings.autoFixed(legSplashRange / tilesize, 2))).replace("[stat]", "[white]") + " " + StatUnit.perLeg.localized());
             });
         }

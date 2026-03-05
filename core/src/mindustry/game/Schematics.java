@@ -172,7 +172,7 @@ public class Schematics implements Loadable{
     public void savePreview(Schematic schematic, Fi file){
         FrameBuffer buffer = getBuffer(schematic);
         Draw.flush();
-        buffer.begin(Color.clear);
+        buffer.begin();
         Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, buffer.getWidth(), buffer.getHeight());
         file.writePng(pixmap);
         buffer.end();
