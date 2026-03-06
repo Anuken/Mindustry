@@ -660,7 +660,12 @@ public class UnitType extends UnlockableContent implements Senseable{
                 }
             }
         }else{
-            out.addAll(stances);
+            var command = unit.controller() instanceof CommandAI ai ? ai.command : null;
+            for(var stance : stances){
+                if(stance.isCompatible(command)){
+                    out.add(stance);
+                }
+            }
         }
     }
 
@@ -1073,7 +1078,6 @@ public class UnitType extends UnlockableContent implements Senseable{
             }
 
             if(canBoost){
-                commands.add(UnitCommand.boostCommand);
 
                 if(buildSpeed > 0f){
                     commands.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
@@ -1111,6 +1115,9 @@ public class UnitType extends UnlockableContent implements Senseable{
                 stances.addAll(UnitStance.stop, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
                 if(!flying){
                     stances.add(UnitStance.ram);
+                }
+                if(canBoost){
+                    stances.add(UnitStance.boost);
                 }
             }else{
                 stances.addAll(UnitStance.stop, UnitStance.patrol);
