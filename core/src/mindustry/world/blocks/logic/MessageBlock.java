@@ -181,6 +181,7 @@ public class MessageBlock extends Block{
         public double sense(LAccess sensor){
             return switch(sensor){
                 case bufferSize -> message.length();
+                case config -> message.toString()
                 default -> super.sense(sensor);
             };
         }
