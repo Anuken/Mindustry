@@ -17,7 +17,7 @@ buildscript{
         mavenLocal()
         mavenCentral()
         google()
-        maven{ url 'https://jitpack.io' }
+        maven{ url = 'https://jitpack.io' }
     }
 
     dependencies{
@@ -180,8 +180,8 @@ allprojects{
     repositories{
         mavenLocal()
         mavenCentral()
-        maven{ url "https://central.sonatype.com/repository/maven-snapshots" }
-        maven{ url 'https://jitpack.io' }
+        maven{ url = "https://central.sonatype.com/repository/maven-snapshots" }
+        maven{ url = 'https://jitpack.io' }
     }
 
     task clearCache{
@@ -396,6 +396,7 @@ project(":tests"){
         testImplementation arcModule("backends:backend-headless")
         testImplementation "org.json:json:20230618"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.1"
+        testRuntimeOnly "org.junit.platform:junit-platform-launcher"
     }
 
     tasks.withType(JavaCompile){

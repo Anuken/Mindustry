@@ -12,18 +12,21 @@ import mindustry.input.*;
 import mindustry.type.*;
 
 public class UnitStance extends MappableContent{
-    public static UnitStance stop, holdFire, pursueTarget, patrol, ram, mineAuto;
+    public static UnitStance stop, holdFire, pursueTarget, patrol, ram, boost, mineAuto;
 
     /** Name of UI icon (from Icon class). */
     public String icon;
     /** Key to press for this stance. */
     public @Nullable KeyBind keybind;
+    /** Commands that are mutually exclusive to this stance. This is used for convenience, for writing only! */
+    public Seq<UnitCommand> incompatibleCommands = new Seq<>();
     /** Stances that are mutually exclusive to this stance. This is used for convenience, for writing only! */
     public Seq<UnitStance> incompatibleStances = new Seq<>();
-    /** Incompatible stances as a bitset for easier operations. This is where incompatibility is actually stored. */
-    public Bits incompatibleBits = new Bits(32);
     /** If true, this stance can be toggled on or off. */
     public boolean toggle = true;
+
+    /** Incompatible stances as a bitset for easier operations. This is where incompatibility is actually stored. */
+    public Bits incompatibleStanceBits = new Bits(32), incompatibleCommandBits = new Bits(32);
 
     public UnitStance(String name, String icon, KeyBind keybind, boolean toggle){
         super(name);
@@ -42,9 +45,17 @@ public class UnitStance extends MappableContent{
 
         for(var stance : incompatibleStances){
             if(stance == this) continue;
-            incompatibleBits.set(stance.id);
-            stance.incompatibleBits.set(id);
+            incompatibleStanceBits.set(stance.id);
+            stance.incompatibleStanceBits.set(id);
         }
+
+        for(var command : incompatibleCommands){
+            incompatibleCommandBits.set(command.id);
+        }
+    }
+
+    public boolean isCompatible(@Nullable UnitCommand other){
+        return other == null || !incompatibleCommandBits.get(other.id);
     }
 
     public String localized(){
@@ -75,6 +86,9 @@ public class UnitStance extends MappableContent{
         pursueTarget = new UnitStance("pursuetarget", "right", Binding.unitStancePursueTarget);
         patrol = new UnitStance("patrol", "refresh", Binding.unitStancePatrol);
         ram = new UnitStance("ram", "rightOpen", Binding.unitStanceRam);
+        boost = new UnitStance("boost", "up", Binding.unitStanceBoost){{
+            incompatibleCommands.addAll(UnitCommand.rebuildCommand, UnitCommand.repairCommand, UnitCommand.assistCommand);
+        }};
         mineAuto = new UnitStance("mineauto", "settings", null, false);
 
         //Only vanilla items are supported for now

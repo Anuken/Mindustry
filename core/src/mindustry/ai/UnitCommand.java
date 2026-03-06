@@ -13,7 +13,7 @@ import mindustry.input.*;
 
 /** Defines a pattern of behavior that an RTS-controlled unit should follow. Shows up in the command UI. */
 public class UnitCommand extends MappableContent{
-    public static UnitCommand moveCommand, repairCommand, rebuildCommand, assistCommand, mineCommand, boostCommand, enterPayloadCommand, loadUnitsCommand, loadBlocksCommand, unloadPayloadCommand, loopPayloadCommand;
+    public static UnitCommand moveCommand, repairCommand, rebuildCommand, assistCommand, mineCommand, enterPayloadCommand, loadUnitsCommand, loadBlocksCommand, unloadPayloadCommand, loopPayloadCommand;
 
     /** Name of UI icon (from Icon class). */
     public final String icon;
@@ -83,11 +83,6 @@ public class UnitCommand extends MappableContent{
         });
         mineCommand = new UnitCommand("mine", "production", Binding.unitCommandMine, u -> new MinerAI()){{
             refreshOnSelect = true;
-        }};
-        boostCommand = new UnitCommand("boost", "up", Binding.unitCommandBoost, u -> new BoostAI()){{
-            switchToMove = false;
-            drawTarget = true;
-            resetTarget = false;
         }};
         enterPayloadCommand = new UnitCommand("enterPayload", "downOpen", Binding.unitCommandEnterPayload, u -> new BoostAI()){{
             switchToMove = false;
