@@ -51,6 +51,7 @@ public class Binding{
     unitStancePursueTarget = KeyBind.add("unit_stance_pursue_target", KeyCode.unset),
     unitStancePatrol = KeyBind.add("unit_stance_patrol", KeyCode.unset),
     unitStanceRam = KeyBind.add("unit_stance_ram", KeyCode.unset),
+    unitStanceBoost = KeyBind.add("unit_stance_boost", KeyCode.unset),
 
     unitCommandMove = KeyBind.add("unit_command_move", KeyCode.unset),
     unitCommandRepair = KeyBind.add("unit_command_repair", KeyCode.unset),

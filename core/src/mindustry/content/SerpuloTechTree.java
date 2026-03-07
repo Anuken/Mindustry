@@ -352,7 +352,7 @@ public class SerpuloTechTree{
                     node(mace, () -> {
                         node(fortress, () -> {
                             node(scepter, () -> {
-                                node(reign, () -> {
+                                node(reign, Seq.with(new SectorComplete(desolateRift)), () -> {
 
                                 });
                             });

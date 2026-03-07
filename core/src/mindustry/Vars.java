@@ -28,6 +28,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.service.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -301,7 +302,6 @@ public class Vars implements Loadable{
         Groups.init();
 
         if(loadLocales){
-            //load locales
             String[] stra = Core.files.internal("locales").readString().split("\n");
             locales = new Locale[stra.length];
             for(int i = 0; i < locales.length; i++){
@@ -551,5 +551,9 @@ public class Vars implements Loadable{
         StringMap globalBundle = new StringMap();
         PropertiesUtils.load(globalBundle, files.internal("bundles/global.properties").reader("UTF-8"));
         bundle.getProperties().putAll(globalBundle);
+
+        if(!headless){
+            app.post(Fonts::loadExtraFonts);
+        }
     }
 }
