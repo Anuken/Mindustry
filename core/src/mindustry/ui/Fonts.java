@@ -72,10 +72,8 @@ public class Fonts{
             incremental = true;
             //most people will never see the monospace font, so don't pre-bake anything
             characters = "\u0000 ";
-        }})).loaded = f -> {
-            Fonts.monospace = f;
-            f.addFallback(Fonts.def);
-        };
+            fallback.add(() -> Fonts.def);
+        }})).loaded = f -> Fonts.monospace = f;
 
         Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
@@ -189,7 +187,7 @@ public class Fonts{
 
         stringIcons.put("alphachan", stringIcons.get("alphaaaa"));
 
-        //TODO: mod emojis  can't work because most mod icons are not on the UI page!
+        //TODO: mod emojis can't work because most mod icons are not on the UI page!
         /*
         if(Vars.mods.list().contains(m -> m.shouldBeEnabled())){
             ContentType[] types = {ContentType.liquid, ContentType.item, ContentType.block, ContentType.status, ContentType.unit};
