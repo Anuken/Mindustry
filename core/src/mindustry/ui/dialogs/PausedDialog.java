@@ -36,7 +36,13 @@ public class PausedDialog extends BaseDialog{
             }).size(70f).tooltip("@customize").visible(() -> state.rules.allowEditRules && (net.server() || !net.active()));
         })).grow().row();
 
-        shown(this::rebuild);
+        shown(() -> {
+            rebuild();
+
+            if(state.isCampaign()){
+                state.getPlanet().saveStats();
+            }
+        });
 
         addCloseListener();
     }
