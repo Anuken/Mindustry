@@ -192,12 +192,12 @@ public class Logic implements ApplicationListener{
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit.team() != state.rules.defaultTeam){
+            if(e.unit.team != state.rules.defaultTeam){
                 state.stats.enemyUnitsDestroyed ++;
+            }
 
-                if(checkCampaignStats()){
-                    state.getPlanet().stats().enemyUnitsDestroyed.increment(e.unit.type);
-                }
+            if(checkCampaignStats()){
+                (e.unit.team != state.rules.defaultTeam ? state.getPlanet().stats().enemyUnitsDestroyed : state.getPlanet().stats().unitsDestroyed).increment(e.unit.type);
             }
         });
 

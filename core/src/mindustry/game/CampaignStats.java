@@ -12,6 +12,8 @@ public class CampaignStats{
     public ObjectIntMap<Block> enemyBuildingsDestroyed = new ObjectIntMap<>();
     /** Player team units produced by type. */
     public ObjectIntMap<UnitType> unitsProduced = new ObjectIntMap<>();
+    /** Player team units destroyed by type. */
+    public ObjectIntMap<UnitType> unitsDestroyed = new ObjectIntMap<>();
     /** Record of blocks that have been placed by count. */
     public ObjectIntMap<Block> buildingsBuilt = new ObjectIntMap<>();
     /** Record of blocks that have been placed by count. */
