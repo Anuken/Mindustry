@@ -4,6 +4,7 @@ import arc.*;
 import arc.func.*;
 import arc.input.*;
 import arc.scene.style.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.ctype.*;
@@ -27,12 +28,14 @@ public class UnitCommand extends MappableContent{
     public boolean resetTarget = true;
     /** Whether to snap the command destination to ally buildings. */
     public boolean snapToBuilding = false;
-    /** */
+    /** If true, the unit will arrive at this command's exact endpoint. */
     public boolean exactArrival = false;
     /** If true, this command refreshes the list of stances when selected TODO: do not use, this will likely be removed later!*/
     public boolean refreshOnSelect = false;
     /** Key to press for this command. */
     public @Nullable KeyBind keybind = null;
+    /** Extra stances that are available when this command is selected. These ignore incompatibleStances. */
+    public Seq<UnitStance> extraStances = new Seq<>();
 
     public UnitCommand(String name, String icon, Func<Unit, AIController> controller){
         super(name);
