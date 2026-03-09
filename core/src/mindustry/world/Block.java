@@ -553,7 +553,7 @@ public class Block extends UnlockableContent implements Senseable{
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
-            .sumf(other -> !floating && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
+            .sumf(other -> !floating && !placeableLiquid && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
