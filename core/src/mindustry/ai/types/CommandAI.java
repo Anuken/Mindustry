@@ -63,6 +63,7 @@ public class CommandAI extends AIController{
         }
     }
 
+    @Override
     public boolean hasStance(@Nullable UnitStance stance){
         return stance != null && stances.get(stance.id);
     }

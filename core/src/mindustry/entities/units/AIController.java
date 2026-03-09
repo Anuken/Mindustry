@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.async.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -51,6 +52,13 @@ public class AIController implements UnitController{
         updateVisuals();
         updateTargeting();
         updateMovement();
+    }
+
+    public boolean hasStance(@Nullable UnitStance stance){
+        if(unit.controller() instanceof AIController ai){
+            return ai.hasStance(stance);
+        }
+        return false;
     }
 
     /** Called when the parent CommandAI changes its stance. */

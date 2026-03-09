@@ -12,7 +12,7 @@ import mindustry.input.*;
 import mindustry.type.*;
 
 public class UnitStance extends MappableContent{
-    public static UnitStance stop, holdFire, pursueTarget, patrol, ram, boost, mineAuto;
+    public static UnitStance stop, holdFire, pursueTarget, patrol, ram, boost, holdPosition, mineAuto;
 
     /** Name of UI icon (from Icon class). */
     public String icon;
@@ -84,16 +84,22 @@ public class UnitStance extends MappableContent{
         stop = new UnitStance("stop", "cancel", Binding.cancelOrders, false);
         holdFire = new UnitStance("holdfire", "none", Binding.unitStanceHoldFire);
         pursueTarget = new UnitStance("pursuetarget", "right", Binding.unitStancePursueTarget);
-        patrol = new UnitStance("patrol", "refresh", Binding.unitStancePatrol);
+        patrol = new UnitStance("patrol", "refresh", Binding.unitStancePatrol){{
+            incompatibleCommands.addAll(UnitCommand.repairCommand, UnitCommand.assistCommand, UnitCommand.rebuildCommand);
+        }};
         ram = new UnitStance("ram", "rightOpen", Binding.unitStanceRam);
         boost = new UnitStance("boost", "up", Binding.unitStanceBoost){{
             incompatibleCommands.addAll(UnitCommand.rebuildCommand, UnitCommand.repairCommand, UnitCommand.assistCommand);
         }};
+        holdPosition = new UnitStance("holdposition", "effect", Binding.unitStanceHoldPosition);
         mineAuto = new UnitStance("mineauto", "settings", null, false);
 
         //Only vanilla items are supported for now
         for(Item item : Vars.content.items()){
             new ItemUnitStance(item);
         }
+
+        Seq.with(UnitCommand.repairCommand, UnitCommand.assistCommand, UnitCommand.rebuildCommand)
+        .each(c -> c.extraStances.add(holdPosition));
     }
 }
