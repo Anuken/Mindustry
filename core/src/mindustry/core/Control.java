@@ -187,7 +187,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(GameOverEvent.class, e -> {
             if(state.isCampaign() && !net.client() && !headless){
 
-                //save gameover sate immediately
+                //save gameover state immediately
                 if(saves.getCurrent() != null){
                     saves.getCurrent().save();
                 }
@@ -285,7 +285,12 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(SaveWriteEvent.class, e -> forcePlaceAll());
+        Events.on(SaveWriteEvent.class, e -> {
+            if(!net.client() && state.isCampaign()){
+                state.getPlanet().saveStats();
+            }
+            forcePlaceAll();
+        });
         Events.on(HostEvent.class, e -> forcePlaceAll());
         Events.on(HostEvent.class, e -> {
             state.set(State.playing);

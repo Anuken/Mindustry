@@ -64,4 +64,20 @@ public class Attributes implements JsonSerializable{
             System.arraycopy(last, 0, arr, 0, Math.min(last.length, arr.length));
         }
     }
+
+    @Override
+    public String toString(){
+        StringBuilder res = new StringBuilder();
+        res.append("Attributes{");
+        boolean any = false;
+        for(int i = 0; i < arr.length; i++){
+            if(arr[i] != 0){
+                res.append(Attribute.all[i]).append(": ").append(arr[i]).append(", ");
+                any = true;
+            }
+        }
+        if(any) res.setLength(res.length() - 2);
+        res.append("}");
+        return res.toString();
+    }
 }
