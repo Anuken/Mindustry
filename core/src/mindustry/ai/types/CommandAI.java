@@ -63,6 +63,7 @@ public class CommandAI extends AIController{
         }
     }
 
+    @Override
     public boolean hasStance(@Nullable UnitStance stance){
         return stance != null && stances.get(stance.id);
     }
@@ -79,7 +80,7 @@ public class CommandAI extends AIController{
         //this happens when an older save reads the default "shoot" stance, or any other removed stance
         if(stance == UnitStance.stop) return;
 
-        stances.andNot(stance.incompatibleBits);
+        stances.andNot(stance.incompatibleStanceBits);
         stances.set(stance.id);
         stanceChanged();
     }
@@ -156,8 +157,17 @@ public class CommandAI extends AIController{
             commandController.updateUnit();
         }else{
             defaultBehavior();
-            //boosting control is not supported, so just don't.
-            unit.updateBoosting(false);
+            if(hasStance(UnitStance.boost) && unit.type.canBoost){
+                //auto land when near target
+                if(attackTarget != null && unit.within(attackTarget, unit.range())){
+                    unit.updateBoosting(false);
+                }else{
+                    unit.updateBoosting(true, true);
+                }
+            }else{
+                //boosting control is not supported, so just don't.
+                unit.updateBoosting(false);
+            }
         }
     }
 

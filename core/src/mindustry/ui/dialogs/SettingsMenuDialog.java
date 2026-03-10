@@ -134,6 +134,7 @@ public class SettingsMenuDialog extends BaseDialog{
             t.button("@settings.clearcampaignsaves", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm", "@settings.clearcampaignsaves.confirm", () -> {
                     for(var planet : content.planets()){
+                        planet.clearStats();
                         for(var sec : planet.sectors){
                             sec.clearInfo();
                             if(sec.save != null){
