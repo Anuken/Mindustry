@@ -20,6 +20,8 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public abstract class PlanetGenerator extends BasicGenerator implements HexMesher{
+    protected static @Nullable ItemSeq tmpItems;
+
     public int baseSeed = 0;
     public int seed = 0;
 
@@ -52,6 +54,44 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
     /** @return whether to allow landing on the specified procedural sector */
     public boolean allowLanding(Sector sector){
         return sector.planet.allowLaunchToNumbered && (sector.hasBase() || sector.near().contains(Sector::hasBase));
+    }
+
+    public @Nullable Sector findLaunchCandidate(Sector destination, @Nullable Sector selected){
+        if(!destination.allowLaunchLoadout() && destination.preset != null){
+            if(tmpItems == null) tmpItems = new ItemSeq();
+            tmpItems.clear();
+
+            var rules = destination.preset.generator.map.rules();
+            for(var stack : rules.loadout){
+                if(stack.item.isOnPlanet(destination.planet)){
+                    tmpItems.add(stack.item, stack.amount);
+                }
+            }
+
+            //currently played (selected) sector has all the resources
+            if(selected != null && selected.planet == destination.planet && selected.hasBase() && selected.items().has(tmpItems) && !selected.isAttacked()){
+                return selected;
+            }else{
+                //find the closest sector that has resources (ranked by distance, not item quantity)
+                return destination.planet.sectors.min(s -> s.hasBase() && !s.isAttacked() && s.items().has(tmpItems), s -> s.tile.v.dst(destination.tile.v));
+            }
+        }else{
+            Sector launchSector = selected != null && selected.planet == destination.planet && selected.hasBase() && !selected.isAttacked() ? selected : null;
+            //directly nearby.
+            if(destination.near().contains(launchSector)) return launchSector;
+
+            Sector launchFrom = launchSector;
+            if(launchFrom == null || destination.preset == null){
+                //TODO pick one with the most resources
+                launchFrom = destination.near().find(s -> s.hasBase() && !s.isAttacked());
+                if(launchFrom == null && destination.preset != null){
+                    if(launchSector != null) return launchSector;
+                    launchFrom = destination.planet.sectors.min(s -> s.hasBase() && !s.isAttacked(), s -> s.tile.v.dst2(destination.tile.v));
+                }
+            }
+
+            return launchFrom;
+        }
     }
 
     /** @return whether to allow landing on the specified procedural sector */
@@ -138,13 +178,13 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         return res % 2 == 0 ? res : res + 1;
     }
 
-    public void generate(Tiles tiles, Sector sec, int seed){
+    public void generate(Tiles tiles, Sector sec, WorldParams params){
         this.tiles = tiles;
-        this.seed = seed + baseSeed;
+        this.seed = params.seedOffset + baseSeed;
         this.sector = sec;
         this.width = tiles.width;
         this.height = tiles.height;
-        this.rand.setSeed(sec.id + seed + baseSeed);
+        this.rand.setSeed(sec.id + params.seedOffset + baseSeed);
 
         TileGen gen = new TileGen();
         for(int y = 0; y < height; y++){
@@ -157,6 +197,6 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
             }
         }
 
-        generate(tiles);
+        generate(tiles, params);
     }
 }

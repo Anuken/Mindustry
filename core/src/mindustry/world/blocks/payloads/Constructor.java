@@ -43,6 +43,7 @@ public class Constructor extends BlockProducer{
         super.setStats();
 
         stats.add(Stat.output, "@x@ ~ @x@", minBlockSize, minBlockSize, maxBlockSize, maxBlockSize);
+        stats.addPercent(Stat.buildSpeed, buildSpeed);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class MapIO{
             SaveVersion ver = SaveIO.getSaveWriter(version);
             if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
             StringMap tags = new StringMap();
-            ver.region("meta", stream, counter, in -> tags.putAll(ver.readStringMap(in)));
+            ver.readRegion("meta", stream, counter, in -> tags.putAll(ver.readStringMap(in)));
             return new Map(file, tags.getInt("width"), tags.getInt("height"), tags, custom, version, Version.build);
         }
     }
@@ -71,7 +71,7 @@ public class MapIO{
             int version = stream.readInt();
             SaveVersion ver = SaveIO.getSaveWriter(version);
             if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
-            ver.region("meta", stream, counter, ver::readStringMap);
+            ver.readRegion("meta", stream, counter, ver::readStringMap);
 
             Pixmap floors = new Pixmap(map.width, map.height);
             Pixmap walls = new Pixmap(map.width, map.height);
@@ -96,8 +96,9 @@ public class MapIO{
                 }
             };
 
-            ver.region("content", stream, counter, ver::readContentHeader);
-            ver.region("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext(){
+            ver.readRegion("content", stream, counter, ver::readContentHeader);
+            if(ver.version >= 11) ver.readRegion("content", stream, counter, ver::skipContentPatches);
+            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext(){
                 @Override public void resize(int width, int height){}
                 @Override public boolean isGenerating(){return false;}
                 @Override public void begin(){

@@ -40,6 +40,20 @@ public class ContentLoader{
         }
     }
 
+    public ContentLoader copy(){
+        var result = new ContentLoader();
+        result.initialization.addAll(initialization);
+        result.lastAdded = lastAdded;
+        result.currentMod = currentMod;
+        result.temporaryMapper = temporaryMapper;
+        result.nameMap.putAll(nameMap);
+        for(int i = 0; i < contentMap.length; i++){
+            result.contentMap[i].addAll(contentMap[i]);
+            result.contentNameMap[i].putAll(contentNameMap[i]);
+        }
+        return result;
+    }
+
     /** Creates all base types. */
     public void createBaseContent(){
         UnitCommand.loadAll();
@@ -246,6 +260,10 @@ public class ContentLoader{
 
     public <T extends Content> Seq<T> getBy(ContentType type){
         return (Seq<T>)contentMap[type.ordinal()];
+    }
+
+    public <T extends Content> ObjectMap<String, T> getNamesBy(ContentType type){
+        return (ObjectMap<String, T>)contentNameMap[type.ordinal()];
     }
 
     //utility methods, just makes things a bit shorter

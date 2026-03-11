@@ -215,7 +215,7 @@ public class Damage{
 
         //return either the length when not enough things were pierced,
         //or the last pierced object if there were enough blockages
-        return Math.min(distances.size < pierceCap || pierceCap < 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
+        return Math.min(distances.size < pierceCap || pierceCap <= 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
     }
 
     /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */

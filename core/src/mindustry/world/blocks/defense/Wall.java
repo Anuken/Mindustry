@@ -20,7 +20,7 @@ public class Wall extends Block{
     public float lightningDamage = 20f;
     public int lightningLength = 17;
     public Color lightningColor = Pal.surge;
-    public Sound lightningSound = Sounds.spark;
+    public Sound lightningSound = Sounds.shootArc;
 
     /** Bullet deflection chance. -1 to disable */
     public float chanceDeflect = -1f;
@@ -52,6 +52,12 @@ public class Wall extends Block{
             stats.add(Stat.lightningChance, lightningChance * 100f, StatUnit.percent);
             stats.add(Stat.lightningDamage, lightningDamage, StatUnit.none);
         }
+    }
+
+    @Override
+    public void init(){
+        if(size == 2 && destroySound == Sounds.unset) destroySound = Sounds.blockExplodeWall;
+        super.init();
     }
 
     @Override

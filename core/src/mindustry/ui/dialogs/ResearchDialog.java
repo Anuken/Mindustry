@@ -218,7 +218,7 @@ public class ResearchDialog extends BaseDialog{
                 //first, find a planets associated with the current tech tree
                 rootPlanets.clear();
                 for(var planet : content.planets()){
-                    if(planet.techTree == lastNode){
+                    if(planet.techTree == lastNode || lastNode.planet == planet){
                         rootPlanets.add(planet);
                     }
                 }
@@ -231,7 +231,7 @@ public class ResearchDialog extends BaseDialog{
                 //add global counts of each sector
                 for(Planet planet : rootPlanets){
                     for(Sector sector : planet.sectors){
-                        if(sector.hasBase()){
+                        if(sector.hasBase() && !sector.isFrozen()){
                             ItemSeq cached = sector.items();
                             cache.put(sector, cached);
                             cached.each((item, amount) -> {
@@ -602,7 +602,7 @@ public class ResearchDialog extends BaseDialog{
             treeLayout();
             rebuild();
             Core.scene.act();
-            Sounds.unlock.play();
+            Sounds.uiUnlock.play();
             Events.fire(new ResearchEvent(node.content));
         }
 

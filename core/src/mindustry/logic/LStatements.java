@@ -238,8 +238,7 @@ public class LStatements{
 
                         row(s);
 
-                        s.add("align ");
-                        fields(s, "align", p1, v -> p1 = v);
+                        fields(s, "align", p1, v -> p1 = v).width(170f);
                         fieldAlignSelect(s, () -> p1, v -> {
                             p1 = v;
                             rebuild(table);
@@ -1128,12 +1127,12 @@ public class LStatements{
 
             table.button(b -> {
                 b.label(() -> type.name());
-                b.clicked(() -> showSelect(b, LUnitControl.all, type, t -> {
-                    if(t == LUnitControl.build && !Vars.state.rules.logicUnitBuild){
-                        Vars.ui.showInfo("@logic.nounitbuild");
-                    }else{
-                        type = t;
-                    }
+                b.clicked(() -> showSelect(b, Structs.filter(LUnitControl.class, LUnitControl.all, t ->
+                    t == LUnitControl.build ? state.rules.logicUnitBuild :
+                    t == LUnitControl.deconstruct ? state.rules.logicUnitDeconstruct :
+                    true
+                ), type, t -> {
+                    type = t;
                     rebuild(table);
                 }, 2, cell -> cell.size(120, 50)));
             }, Styles.logict, () -> {}).size(120, 40).color(table.color).left().padLeft(2);

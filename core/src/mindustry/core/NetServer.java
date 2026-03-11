@@ -52,7 +52,7 @@ public class NetServer implements ApplicationListener{
         if(state.rules.pvp){
             //find team with minimum amount of players and auto-assign player to that.
             TeamData re = state.teams.getActive().min(data -> {
-                if((state.rules.waveTeam == data.team && state.rules.waves) || !data.hasCore() || data.team == Team.derelict) return Integer.MAX_VALUE;
+                if((state.rules.waveTeam == data.team && state.rules.waves) || !data.hasCore() || data.team == Team.derelict || !data.team.rules().protectCores) return Integer.MAX_VALUE;
 
                 int count = 0;
                 for(Player other : players){
@@ -116,6 +116,7 @@ public class NetServer implements ApplicationListener{
     private ReusableByteOutStream syncStream = new ReusableByteOutStream();
     /** Data stream for writing player sync data to. */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
+    private Writes dataStreamWrites = new Writes(dataStream);
     /** Packet handlers for custom types of messages. */
     private ObjectMap<String, Seq<Cons2<Player, String>>> customPacketHandlers = new ObjectMap<>();
     /** Packet handlers for custom types of messages - binary version. */
@@ -169,7 +170,8 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.isIDBanned(uuid)){
+            //there's no reason to tell users that their name is inappropriate, as they may try to bypass it
+            if(admins.isIDBanned(uuid) || admins.isNameBanned(packet.name)){
                 con.kick(KickReason.banned);
                 return;
             }
@@ -645,7 +647,7 @@ public class NetServer implements ApplicationListener{
     float xVelocity, float yVelocity,
     Tile mining,
     boolean boosting, boolean shooting, boolean chatting, boolean building,
-    @Nullable Queue<BuildPlan> plans,
+    Block selectedBlock, int selectedRotation, @Nullable Queue<BuildPlan> plans,
     float viewX, float viewY, float viewWidth, float viewHeight
     ){
         NetConnection con = player.con;
@@ -684,6 +686,8 @@ public class NetServer implements ApplicationListener{
         player.typing = chatting;
         player.shooting = shooting;
         player.boosting = boosting;
+        player.selectedBlock = selectedBlock;
+        player.selectedRotation = selectedRotation;
 
         @Nullable var unit = player.unit();
 
@@ -728,7 +732,7 @@ public class NetServer implements ApplicationListener{
             long elapsed = Math.min(Time.timeSinceMillis(con.lastReceivedClientTime), 1500);
             float maxSpeed = unit.speed();
 
-            float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.2f;
+            float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
             //ignore the position if the player thinks they're dead, or the unit is wrong
             boolean ignorePosition = dead || unit.id != unitID;
@@ -938,7 +942,7 @@ public class NetServer implements ApplicationListener{
 
                 dataStream.writeInt(build.pos());
                 dataStream.writeShort(build.block.id);
-                build.writeSync(Writes.get(dataStream));
+                build.writeSync(dataStreamWrites);
 
                 if(syncStream.size() > maxSnapshotSize){
                     dataStream.close();
@@ -993,7 +997,7 @@ public class NetServer implements ApplicationListener{
             dataStream.writeInt(entity.id()); //write id
             dataStream.writeByte(entity.classId() & 0xFF); //write type ID
             entity.beforeWrite();
-            entity.writeSync(Writes.get(dataStream)); //write entity
+            entity.writeSync(dataStreamWrites); //write entity itself
 
             sent++;
 

@@ -106,7 +106,7 @@ public class StatusEffect extends UnlockableContent{
 
         if(intervalDamageTime > 0f && intervalDamage > 0){
             stats.add(Stat.damage, intervalDamage);
-            stats.add(Stat.damage, 60f / intervalDamageTime, StatUnit.perSecond);
+            stats.add(Stat.frequency, 60f / intervalDamageTime, StatUnit.perSecond);
         }
 
         boolean reacts = false;
@@ -176,13 +176,13 @@ public class StatusEffect extends UnlockableContent{
         transitions.put(effect, handler);
     }
 
-    protected void affinity(StatusEffect effect, TransitionHandler handler){
+    public void affinity(StatusEffect effect, TransitionHandler handler){
         affinities.add(effect);
         effect.affinities.add(this);
         trans(effect, handler);
     }
 
-    protected void opposite(StatusEffect... effect){
+    public void opposite(StatusEffect... effect){
         for(var other : effect){
             handleOpposite(other);
             other.handleOpposite(this);

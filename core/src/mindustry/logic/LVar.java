@@ -115,4 +115,8 @@ public class LVar{
         return Double.isNaN(d) || Double.isInfinite(d);
     }
 
+    @Override
+    public String toString(){
+        return name + ": " + (isobj ? objval : numval) + (constant ? " [const]" : "");
+    }
 }

@@ -29,7 +29,7 @@ public class RuneOverlay extends OverlayFloor{
     public static String bytesToString(byte[] data){
         StringBuilder result = new StringBuilder();
         for(byte b : data){
-            result.append((char)(b & 0xff + unicodeOffset));
+            result.append((char)((b & 0xff) + unicodeOffset));
         }
         return result.toString();
     }

@@ -16,7 +16,6 @@ public class SerpuloTechTree{
         Planets.serpulo.techTree = nodeRoot("serpulo", coreShard, () -> {
 
             node(conveyor, () -> {
-
                 node(junction, () -> {
                     node(router, () -> {
                         node(advancedLaunchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
@@ -44,7 +43,7 @@ public class SerpuloTechTree{
                         node(itemBridge, () -> {
                             node(titaniumConveyor, Seq.with(new SectorComplete(craters)), () -> {
                                 node(phaseConveyor, () -> {
-                                    node(massDriver, () -> {
+                                    node(massDriver, Seq.with(new SectorComplete(tarFields)), () -> {
 
                                     });
                                 });
@@ -73,7 +72,6 @@ public class SerpuloTechTree{
             });
 
             node(mechanicalDrill, () -> {
-
                 node(mechanicalPump, () -> {
                     node(conduit, () -> {
                         node(liquidJunction, () -> {
@@ -141,7 +139,7 @@ public class SerpuloTechTree{
                             });
 
                             node(plastaniumCompressor, Seq.with(new SectorComplete(windsweptIslands)), () -> {
-                                node(phaseWeaver, Seq.with(new SectorComplete(tarFields)), () -> {
+                                node(phaseWeaver, Seq.with(new SectorComplete(impact0078)), () -> {
 
                                 });
                             });
@@ -151,7 +149,7 @@ public class SerpuloTechTree{
                             node(pulverizer, () -> {
                                 node(incinerator, () -> {
                                     node(melter, () -> {
-                                        node(surgeSmelter, () -> {
+                                        node(surgeSmelter, Seq.with(new SectorComplete(coastline)), () -> {
 
                                         });
 
@@ -177,7 +175,7 @@ public class SerpuloTechTree{
 
                                         });
 
-                                        node(logicDisplayTile, () -> {
+                                        node(tileLogicDisplay, () -> {
 
                                         });
                                     });
@@ -224,7 +222,7 @@ public class SerpuloTechTree{
                             node(mendProjector, () -> {
                                 node(forceProjector, Seq.with(new SectorComplete(impact0078)), () -> {
                                     node(overdriveProjector, Seq.with(new SectorComplete(impact0078)), () -> {
-                                        node(overdriveDome, Seq.with(new SectorComplete(impact0078)), () -> {
+                                        node(overdriveDome, Seq.with(new SectorComplete(desolateRift)), () -> {
 
                                         });
                                     });
@@ -328,7 +326,7 @@ public class SerpuloTechTree{
                                 });
                             });
 
-                            node(tsunami, () -> {
+                            node(tsunami, Seq.with(new SectorComplete(navalFortress)), () -> {
 
                             });
                         });
@@ -354,7 +352,7 @@ public class SerpuloTechTree{
                     node(mace, () -> {
                         node(fortress, () -> {
                             node(scepter, () -> {
-                                node(reign, () -> {
+                                node(reign, Seq.with(new SectorComplete(desolateRift)), () -> {
 
                                 });
                             });
@@ -441,8 +439,8 @@ public class SerpuloTechTree{
 
                 node(additiveReconstructor, Seq.with(new SectorComplete(fungalPass)), () -> {
                     node(multiplicativeReconstructor, Seq.with(new SectorComplete(frontier)), () -> {
-                        node(exponentialReconstructor, () -> {
-                            node(tetrativeReconstructor, () -> {
+                        node(exponentialReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
+                            node(tetrativeReconstructor, Seq.with(new SectorComplete(mycelialBastion)), () -> {
 
                             });
                         });
@@ -510,6 +508,7 @@ public class SerpuloTechTree{
                                                 new SectorComplete(overgrowth),
                                                 new SectorComplete(extractionOutpost),
                                                 new SectorComplete(saltFlats),
+                                                new SectorComplete(mycelialBastion),
                                                 new Research(risso),
                                                 new Research(minke),
                                                 new Research(bryde),
@@ -523,41 +522,18 @@ public class SerpuloTechTree{
                                                 new Research(exponentialReconstructor),
                                                 new Research(tetrativeReconstructor)
                                                 ), () -> {
-                                                    node(geothermalStronghold, Seq.with(
-                                                    new Research(omura),
-                                                    new Research(navanax),
-                                                    new Research(eclipse),
-                                                    new Research(oct),
-                                                    new Research(reign),
-                                                    new Research(corvus),
-                                                    new Research(toxopid)
-                                                    ), () -> {
 
-                                                    });
-
-                                                    node(cruxscape, Seq.with(
-                                                    new Research(omura),
-                                                    new Research(navanax),
-                                                    new Research(eclipse),
-                                                    new Research(oct),
-                                                    new Research(reign),
-                                                    new Research(corvus),
-                                                    new Research(toxopid)
-                                                    ), () -> {
-
-                                                    });
                                                 });
                                             });
                                         });
                                     });
 
                                     node(coastline, Seq.with(
-                                    new SectorComplete(windsweptIslands),
+                                    new SectorComplete(tarFields),
                                     new SectorComplete(saltFlats),
                                     new Research(navalFactory),
                                     new Research(payloadConveyor)
                                     ), () -> {
-
 
                                         node(testingGrounds, Seq.with(
                                         new SectorComplete(coastline),
@@ -580,6 +556,14 @@ public class SerpuloTechTree{
                                         new Research(cyclone),
                                         new Research(ripple)
                                         ), () -> {
+                                            node(sunkenPier, Seq.with(
+                                            new SectorComplete(navalFortress),
+                                            new SectorComplete(coastline),
+                                            new Research(multiplicativeReconstructor)
+                                            ), () -> {
+
+                                            });
+
                                             node(weatheredChannels, Seq.with(
                                             new SectorComplete(impact0078),
                                             new SectorComplete(navalFortress),
@@ -587,7 +571,15 @@ public class SerpuloTechTree{
                                             new Research(surgeSmelter),
                                             new Research(overdriveProjector)
                                             ), () -> {
+                                                node(fallenVessel, Seq.with(
+                                                new SectorComplete(desolateRift),
+                                                new SectorComplete(mycelialBastion),
+                                                new Research(sei),
+                                                new Research(meltdown),
+                                                new Research(spectre)
+                                                ), () -> {
 
+                                                });
                                             });
                                         });
                                     });
@@ -661,7 +653,7 @@ public class SerpuloTechTree{
                                 new Research(mace),
                                 new Research(mono)
                                 ), () -> {
-                                    node(seaPort, Seq.with(
+                                    node(perilousHarbor, Seq.with(
                                     new SectorComplete(biomassFacility),
                                     new SectorComplete(frontier),
                                     new Research(navalFactory),
@@ -674,37 +666,21 @@ public class SerpuloTechTree{
 
                                         node(extractionOutpost, Seq.with(
                                         new SectorComplete(windsweptIslands),
-                                        new SectorComplete(seaPort),
+                                        new SectorComplete(perilousHarbor),
                                         new SectorComplete(facility32m),
-                                        new Research(groundFactory),
-                                        new Research(nova),
-                                        new Research(airFactory),
-                                        new Research(mono)
+
+                                        new Research(multiplicativeReconstructor),
+                                        new Research(risso),
+                                        new Research(minke),
+                                        new Research(fortress)
                                         ), () -> {
                                             node(atolls, Seq.with(
                                             new SectorComplete(extractionOutpost),
-                                            new Research(multiplicativeReconstructor),
+                                            new Research(poly),
                                             new Research(mega)
                                             ), () -> {
 
                                             });
-
-                                            //TODO: removed for now
-                                        /*node(polarAerodrome, Seq.with(
-                                        new SectorComplete(fungalPass),
-                                        new SectorComplete(desolateRift),
-                                        new SectorComplete(overgrowth),
-                                        new Research(multiplicativeReconstructor),
-                                        new Research(zenith),
-                                        new Research(swarmer),
-                                        new Research(cyclone),
-                                        new Research(blastDrill),
-                                        new Research(blastDrill),
-                                        new Research(massDriver)
-                                        ), () -> {
-
-                                        });
-                                        */
                                         });
                                     });
 

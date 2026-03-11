@@ -35,12 +35,18 @@
     </forceLinkClasses>
     <libs>
         <lib>z</lib>
-        <lib>libs/libarc.a</lib>
         <lib>libs/libarc-freetype.a</lib>
     </libs>
     <frameworks>
+        <framework>arc</framework>
         <framework>UIKit</framework>
-        <framework>OpenGLES</framework>
+        <framework>MetalANGLEKit</framework>
+
+        <framework>libGLESv2</framework>
+        <framework>libEGL</framework>
+        <framework>libfeature_support</framework>
+
+        <framework>Metal</framework>
         <framework>QuartzCore</framework>
         <framework>CoreGraphics</framework>
         <framework>CoreAudio</framework>

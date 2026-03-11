@@ -50,13 +50,25 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
 
                 treadEffectTime = 0f;
             }
+
+            control.sound.loop(type.tankMoveSound, this, type.tankMoveVolume);
         }
 
         lastDeepFloor = null;
         boolean anyNonDeep = false;
 
+        if(type.crushFragile && !disarmed){
+            for(int i = 0; i < 8; i++){
+                Point2 offset = Geometry.d8[i];
+                var other = Vars.world.buildWorld(x + offset.x * tilesize, y + offset.y * tilesize);
+                if(other != null && other.team != team && other.block.crushFragile){
+                    other.damage(team, 999999999f);
+                }
+            }
+        }
+
         //calculate overlapping tiles so it slows down when going "over" walls
-        int r = Math.max((int)(hitSize * 0.6f / tilesize), 0);
+        int r = Math.max((int)(hitSize * 0.75f / tilesize), 0);
 
         int solids = 0, total = (r*2+1)*(r*2+1);
         for(int dx = -r; dx <= r; dx++){
@@ -77,7 +89,8 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
                     && Math.max(Math.abs(dx), Math.abs(dy)) <= r - 1){
 
                     if(t.build != null && t.build.team != team){
-                        t.build.damage(team, type.crushDamage * Time.delta * t.block().crushDamageMultiplier * state.rules.unitDamage(team));
+                        t.build.damage(team, type.crushDamage * Time.delta * t.block().crushDamageMultiplier * state.rules.unitDamage(team)
+                                * ((speedMultiplier- 1) / 5 + 1));
                     }else if(t.block().unitMoveBreakable){
                         ConstructBlock.deconstructFinish(t, t.block(), self());
                     }
@@ -104,7 +117,7 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
     public float floorSpeedMultiplier(){
         Floor on = isFlying() || type.hovering ? Blocks.air.asFloor() : floorOn();
         //TODO take into account extra blocks
-        return on.speedMultiplier * speedMultiplier * lastSlowdown;
+        return (float)Math.pow(on.speedMultiplier, type.floorMultiplier) * speedMultiplier * lastSlowdown;
     }
 
     @Replace

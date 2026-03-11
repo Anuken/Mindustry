@@ -31,7 +31,7 @@ public class TractorBeamTurret extends BaseTurret{
     public StatusEffect status = StatusEffects.none;
     public float statusDuration = 300;
 
-    public Sound shootSound = Sounds.tractorbeam;
+    public Sound shootSound = Sounds.beamParallax;
     public float shootSoundVolume = 0.9f;
 
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
@@ -76,6 +76,11 @@ public class TractorBeamTurret extends BaseTurret{
 
         @Override
         public void updateTile(){
+            if(activationTimer > 0){
+                activationTimer -= Time.delta;
+                return;
+            }
+
             float eff = efficiency * coolantMultiplier, edelta = eff * delta();
 
             //retarget

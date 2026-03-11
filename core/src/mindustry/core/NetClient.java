@@ -13,6 +13,7 @@ import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -61,6 +62,7 @@ public class NetClient implements ApplicationListener{
     /** Byte stream for reading in snapshots. */
     private ReusableByteInStream byteStream = new ReusableByteInStream();
     private DataInputStream dataStream = new DataInputStream(byteStream);
+    private Reads dataStreamReads = new Reads(dataStream);
     /** Packet handlers for custom types of messages. */
     private ObjectMap<String, Seq<Cons<String>>> customPacketHandlers = new ObjectMap<>();
     /** Packet handlers for custom types of messages, in binary. */
@@ -197,7 +199,7 @@ public class NetClient implements ApplicationListener{
     public static void sound(Sound sound, float volume, float pitch, float pan){
         if(sound == null || headless) return;
 
-        sound.play(Mathf.clamp(volume, 0, 8f) * Core.settings.getInt("sfxvol") / 100f, Mathf.clamp(pitch, 0f, 20f), pan, false, false);
+        sound.play(Mathf.clamp(volume, 0, 8f) * Core.audio.sfxVolume, Mathf.clamp(pitch, 0f, 20f), pan, false, false);
     }
 
     @Remote(variants = Variant.both, unreliable = true, called = Loc.server)
@@ -230,7 +232,7 @@ public class NetClient implements ApplicationListener{
     public static void sendMessage(String message, @Nullable String unformatted, @Nullable Player playersender){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message);
-            Sounds.chatMessage.play();
+            Sounds.uiChat.play();
         }
 
         if(playersender != null && unformatted != null){
@@ -247,7 +249,7 @@ public class NetClient implements ApplicationListener{
     public static void sendMessage(String message){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message);
-            Sounds.chatMessage.play();
+            Sounds.uiChat.play();
         }
     }
 
@@ -485,9 +487,10 @@ public class NetClient implements ApplicationListener{
             netClient.lastSnapshotTimestamp = Time.millis();
             netClient.byteStream.setBytes(data);
             DataInputStream input = netClient.dataStream;
+            Reads reads = netClient.dataStreamReads;
 
             for(int j = 0; j < amount; j++){
-                readSyncEntity(input, Reads.get(input));
+                readSyncEntity(input, reads);
             }
         }catch(Exception e){
             //don't disconnect, just log it
@@ -511,6 +514,7 @@ public class NetClient implements ApplicationListener{
         try{
             netClient.byteStream.setBytes(data);
             DataInputStream input = netClient.dataStream;
+            Reads reads = netClient.dataStreamReads;
 
             for(int i = 0; i < amount; i++){
                 int pos = input.readInt();
@@ -524,7 +528,7 @@ public class NetClient implements ApplicationListener{
                     Log.warn("Block ID mismatch at @: @ != @. Skipping block snapshot.", tile, tile.build.block.id, block);
                     break;
                 }
-                tile.build.readSync(Reads.get(input), tile.build.version());
+                tile.build.readSync(reads, tile.build.version());
             }
         }catch(Exception e){
             Log.err(e);
@@ -696,7 +700,7 @@ public class NetClient implements ApplicationListener{
             unit == null ? 0f : unit.vel.x, unit == null ? 0f : unit.vel.y,
             dead ? null : unit.mineTile,
             player.boosting, player.shooting, ui.chatfrag.shown(), control.input.isBuilding,
-            player.isBuilder() && unit != null ? unit.plans : null,
+            player.selectedBlock, player.selectedRotation, player.isBuilder() && unit != null ? unit.plans : null,
             Core.camera.position.x, Core.camera.position.y,
             Core.camera.width, Core.camera.height
             );

@@ -9,17 +9,24 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.ai.*;
+import mindustry.audio.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Saves.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.ui.*;
+
+import java.io.*;
+import java.util.zip.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -54,12 +61,20 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         //debug GL information
         Log.info("[GL] Version: @", graphics.getGLVersion());
         Log.info("[GL] Max texture size: @", maxTextureSize);
-        Log.info("[GL] Using @ context.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
-        if(gl30 == null) Log.warn("[GL] Your device or video drivers do not support OpenGL 3. This will cause performance issues.");
-        if(NvGpuInfo.hasMemoryInfo()){
-            Log.info("[GL] Total available VRAM: @mb", NvGpuInfo.getMaxMemoryKB()/1024);
-        }
+        Log.info("[GL] Using @ API.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
+
+        IntelGpuCheck.init(graphics.getGLVersion().vendorString);
+
+        boolean isIntel = IntelGpuCheck.wasIntel();
+
+        if(isIntel && !graphics.isGL30Available()) Log.warn("[GL] Intel GPU detected on previous launch. Due to memory corruption issues, OpenGL 3 support has been disabled for Intel GPUs. See issue #11041.");
+
+        if(gl30 == null && !isIntel) Log.warn("[GL] Your device or video drivers do not support OpenGL 3. This will cause performance issues.");
+
+        if(NvGpuInfo.hasMemoryInfo()) Log.info("[GL] Total available VRAM: @mb", NvGpuInfo.getMaxMemoryKB()/1024);
+
         if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
+
         Log.info("[JAVA] Version: @", OS.javaVersion);
         if(Core.app.isAndroid()){
             Log.info("[ANDROID] API level: @", Core.app.getVersion());
@@ -209,7 +224,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     public void update(){
         PerfCounter.update.begin();
 
-        int targetfps = Core.settings.getInt("fpscap", 120);
+        int targetfps = ios ? 0 : Core.settings.getInt("fpscap", 120);
         boolean changed = lastTargetFps != targetfps && lastTargetFps != -1;
         boolean limitFps = targetfps > 0 && targetfps <= 240;
 
@@ -228,13 +243,14 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             if(assets.update(1000 / loadingFPS)){
                 loader.dispose();
                 loader = null;
-                Log.info("Total time to load: @ms", Time.timeSinceMillis(beginTime));
+                SoundPriority.init();
                 for(ApplicationListener listener : modules){
                     listener.init();
                 }
                 mods.eachClass(Mod::init);
                 finished = true;
                 Events.fire(new ClientLoadEvent());
+                Log.info("Total time to load: @ms", Time.timeSinceMillis(beginTime));
                 clientLoaded = true;
                 super.resize(graphics.getWidth(), graphics.getHeight());
                 app.post(() -> app.post(() -> app.post(() -> app.post(() -> {
@@ -292,5 +308,36 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         if(finished){
             super.pause();
         }
+    }
+
+    @Override
+    public void fileDropped(Fi file){
+        if(OS.isIos) return;
+
+        if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
+            try{
+                if(SaveIO.isSaveValid(file)){
+                    SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.defaultBufferSize))));
+                    if(meta.tags.containsKey("name")){
+                        //is map
+                        if(!ui.editor.isShown()){
+                            ui.editor.show();
+                        }
+
+                        ui.editor.beginEditMap(file);
+                    }else if(meta.rules.sector == null){ //don't allow importing campaign saves, they are broken
+                        SaveSlot slot = control.saves.importSave(file);
+                        ui.load.runLoadSave(slot);
+                    }else{
+                        ui.showErrorMessage("@save.nocampaign");
+                    }
+                }else{
+                    ui.showErrorMessage("@save.import.invalid");
+                }
+            }catch(Throwable e){
+                ui.showException("@save.import.fail", e);
+            }
+        }
+
     }
 }

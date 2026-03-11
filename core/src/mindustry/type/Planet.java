@@ -115,8 +115,6 @@ public class Planet extends UnlockableContent{
     public boolean allowLaunchSchematics = false;
     /** Whether to allow users to specify the resources they take to this map. */
     public boolean allowLaunchLoadout = false;
-    /** Whether to allow sectors to simulate waves in the background. */
-    public boolean allowWaveSimulation = false;
     /** Whether to simulate sector invasions from enemy bases. */
     public boolean allowSectorInvasion = false;
     /** If true, legacy launch pads can be enabled. */
@@ -125,6 +123,8 @@ public class Planet extends UnlockableContent{
     public boolean clearSectorOnLose = false;
     /** Multiplier for enemy rebuild speeds; only applied in campaign (not standard rules) */
     public float enemyBuildSpeedMultiplier = 1f;
+    /** If true, the enemy team always has infinite items. */
+    public boolean enemyInfiniteItems = true;
     /** If true, enemy cores are replaced with spawnpoints on this planet (for invasions) */
     public boolean enemyCoreSpawnReplace = false;
     /** If true, blocks in the radius of the core will be removed and "built up" in a shockwave upon landing. */
@@ -158,10 +158,15 @@ public class Planet extends UnlockableContent{
     /** Content (usually planet-specific) that is unlocked upon landing here. */
     public Seq<UnlockableContent> unlockedOnLand = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
-    public Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
+    public Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlitWhite, 2), cloudMeshLoader = () -> null;
     /** Loads the planet grid outline mesh. Clientside only. */
     public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineRad * radius);
 
+    /** If set, this planet will have the same stats as its parent. Use for shared campaigns. */
+    public @Nullable Planet statParent;
+
+    /** Planets that are allowed to update at the same time as this one for background calculations. */
+    public ObjectSet<Planet> updateGroup = new ObjectSet<>();
     /** Global difficulty/modifier settings for this planet's campaign. */
     public CampaignRules campaignRules = new CampaignRules();
     /** Defaults applied to the rules. */
@@ -175,6 +180,9 @@ public class Planet extends UnlockableContent{
     public boolean loadPlanetData = false;
     /** Data indicating attack sector positions and sector mappings. */
     public @Nullable PlanetData data;
+
+    /** Statistics of this planet campaign. If statParent is not null, this planet shares the same stats as the parent. */
+    private CampaignStats campaignStats = new CampaignStats();
 
     public Planet(String name, Planet parent, float radius){
         super(name);
@@ -226,6 +234,34 @@ public class Planet extends UnlockableContent{
         campaignRules = Core.settings.getJson(name + "-campaign-rules", CampaignRules.class, () -> campaignRules);
     }
 
+    public CampaignStats stats(){
+        return statParent != null ? statParent.campaignStats : campaignStats;
+    }
+
+    public void loadStats(){
+        //there is no need to load stats if the parent's ones are used
+        if(statParent == null){
+            campaignStats = Core.settings.getJson(name + "-campaign-stats", CampaignStats.class, CampaignStats::new);
+        }
+    }
+
+    public void saveStats(){
+        if(statParent != null && statParent != this){
+            statParent.saveStats();
+        }else{
+            Core.settings.putJson(name + "-campaign-stats", campaignStats);
+        }
+    }
+
+    public void clearStats(){
+        if(statParent != null && statParent != this){
+            statParent.clearStats();
+        }else{
+            campaignStats = new CampaignStats();
+            saveStats();
+        }
+    }
+
     public @Nullable Sector getStartSector(){
         return sectors.size == 0 ? null : sectors.get(startSector);
     }
@@ -249,7 +285,6 @@ public class Planet extends UnlockableContent{
 
     public void applyDefaultRules(CampaignRules rules){
         JsonIO.copy(campaignRuleDefaults, rules);
-        rules.sectorInvasion = allowSectorInvasion;
     }
 
     public @Nullable Sector getLastSector(){
@@ -339,7 +374,7 @@ public class Planet extends UnlockableContent{
                 sum += 0.88f;
             }
 
-            sector.threat = sector.preset == null || !sector.preset.requireUnlock ?
+            sector.threat = sector.preset == null || (!sector.preset.requireUnlock && sector.preset.difficulty == 0f) ?
                 Math.max(Math.min(sum / 5f, 1.2f), 0.3f) : //low threat sectors are pointless
                 Mathf.clamp(sector.preset.difficulty / 10f);
         }
@@ -390,6 +425,7 @@ public class Planet extends UnlockableContent{
     public void init(){
         applyDefaultRules(campaignRules);
         loadRules();
+        loadStats();
 
         if(techTree == null){
             techTree = TechTree.roots.find(n -> n.planet == this);
@@ -548,8 +584,7 @@ public class Planet extends UnlockableContent{
             Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(curr.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
             Tmp.v32.set(next.v).sub(sector.tile.v).setLength(next.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
 
-            batch.tri(curr.v, next.v, Tmp.v31, color);
-            batch.tri(Tmp.v31, next.v, Tmp.v32, color);
+            batch.quad(curr.v, next.v, Tmp.v32, Tmp.v31, color);
 
             sector.tile.v.scl(1f / arad);
             next.v.scl(1f / arad);
@@ -627,7 +662,9 @@ public class Planet extends UnlockableContent{
             batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f).add(normal, -stroke));
         }
+        Gl.disable(Gl.cullFace);
         batch.flush(Gl.triangleStrip);
+        Gl.enable(Gl.cullFace);
     }
 
     public Vec3 lookAt(Sector sector, Vec3 out){

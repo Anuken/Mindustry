@@ -13,6 +13,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
+import java.util.regex.*;
+
 import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
 
@@ -24,6 +26,7 @@ public class Administration{
     public Seq<String> subnetBans = new Seq<>();
     public ObjectSet<String> dosBlacklist = new ObjectSet<>();
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
+    public Seq<Pattern> bannedNames = new Seq<>();
 
     private boolean modified, loaded;
     /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not modify directly. */
@@ -129,6 +132,11 @@ public class Administration{
 
     public boolean isSubnetBanned(String ip){
         return subnetBans.contains(ip::startsWith);
+    }
+
+    public void addNameBan(String regex) throws PatternSyntaxException{
+        bannedNames.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
+        save();
     }
 
     /** Adds a chat filter. This will transform the chat messages of every player.
@@ -376,6 +384,10 @@ public class Administration{
         return getCreateInfo(uuid).banned;
     }
 
+    public boolean isNameBanned(String name){
+        return bannedNames.size > 0 && bannedNames.contains(p -> p.matcher(name).find());
+    }
+
     public boolean isAdmin(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
         return info.admin && usid.equals(info.adminUsid);
@@ -464,6 +476,7 @@ public class Administration{
             Core.settings.putJson("ip-bans", String.class, bannedIPs);
             Core.settings.putJson("whitelist-ids", String.class, whitelist);
             Core.settings.putJson("banned-subnets", String.class, subnetBans);
+            Core.settings.putJson("banned-names", String.class, bannedNames.map(Pattern::pattern));
             modified = false;
         }
     }
@@ -477,6 +490,14 @@ public class Administration{
         bannedIPs = Core.settings.getJson("ip-bans", Seq.class, Seq::new);
         whitelist = Core.settings.getJson("whitelist-ids", Seq.class, Seq::new);
         subnetBans = Core.settings.getJson("banned-subnets", Seq.class, Seq::new);
+
+        Seq<String> nameRegexes = Core.settings.getJson("banned-names", Seq.class, String.class, Seq::new);
+        for(var regex : nameRegexes){
+            try{
+                bannedNames.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
+            }catch(Exception ignored){
+            }
+        }
     }
 
     /**

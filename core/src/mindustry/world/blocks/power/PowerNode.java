@@ -35,12 +35,14 @@ public class PowerNode extends PowerBlock{
     public int maxNodes = 3;
     public boolean autolink = true, drawRange = true, sameBlockConnection = false;
     public float laserScale = 0.25f;
+    public float powerLayer = Layer.power;
     public Color laserColor1 = Color.white;
     public Color laserColor2 = Pal.powerLight;
 
     public PowerNode(String name){
         super(name);
         configurable = true;
+        ignoreResizeConfig = true;
         consumesPower = false;
         outputsPower = false;
         canOverdrive = false;
@@ -49,6 +51,7 @@ public class PowerNode extends PowerBlock{
         drawDisabled = false;
         envEnabled |= Env.space;
         destructible = true;
+        delayLandingConfig = true;
 
         //nodes do not even need to update
         update = false;
@@ -479,7 +482,7 @@ public class PowerNode extends PowerBlock{
 
             if(Mathf.zero(Renderer.laserOpacity) || isPayload() || team == Team.derelict) return;
 
-            Draw.z(Layer.power);
+            Draw.z(powerLayer);
             setupColor(power.graph.getSatisfaction());
 
             for(int i = 0; i < power.links.size; i++){

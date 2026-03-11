@@ -77,37 +77,9 @@ public class Logic implements ApplicationListener{
                     SectorInfo info = state.rules.sector.info;
                     info.write();
 
-                    //only simulate waves if the planet allows it
-                    if(state.rules.sector.planet.allowWaveSimulation){
-                        //how much wave time has passed
-                        int wavesPassed = info.wavesPassed;
-
-                        //wave has passed, remove all enemies, they are assumed to be dead
-                        if(wavesPassed > 0){
-                            Groups.unit.each(u -> {
-                                if(u.team == state.rules.waveTeam){
-                                    u.remove();
-                                }
-                            });
-                        }
-
-                        //simulate passing of waves
-                        if(wavesPassed > 0){
-                            //simulate wave counter moving forward
-                            state.wave += wavesPassed;
-                            state.wavetime = state.rules.waveSpacing * state.getPlanet().campaignRules.difficulty.waveTimeMultiplier;
-
-                            SectorDamage.applyCalculatedDamage();
-                        }
-                    }
-
                     state.getSector().planet.applyRules(state.rules);
 
-                    //reset values
-                    info.damage = 0f;
-                    info.wavesPassed = 0;
                     info.hasCore = true;
-                    info.secondsPassed = 0;
 
                     state.rules.sector.saveInfo();
                 }
@@ -134,10 +106,13 @@ public class Logic implements ApplicationListener{
                 //enable building AI on campaign unless the preset disables it
 
                 state.rules.coreIncinerates = true;
+                state.rules.infiniteResources = false;
                 state.rules.allowEditRules = false;
                 state.rules.allowEditWorldProcessors = false;
-                state.rules.waveTeam.rules().infiniteResources = true;
-                state.rules.waveTeam.rules().fillItems = true;
+                if(state.getPlanet().enemyInfiniteItems){
+                    state.rules.waveTeam.rules().infiniteResources = true;
+                    state.rules.waveTeam.rules().fillItems = true;
+                }
                 state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
             }
 
@@ -160,6 +135,10 @@ public class Logic implements ApplicationListener{
             if(!net.client() && e.sector.planet.generator != null){
                 e.sector.planet.generator.onSectorCaptured(e.sector);
             }
+
+            if(checkCampaignStats()){
+                state.getPlanet().stats().sectorsCaptured ++;
+            }
         });
 
         Events.on(SectorLoseEvent.class, e -> {
@@ -170,9 +149,7 @@ public class Logic implements ApplicationListener{
 
         Events.on(BlockDestroyEvent.class, e -> {
             if(e.tile.build instanceof CoreBuild core && core.team.isAI() && state.rules.coreDestroyClear){
-                Core.app.post(() -> {
-                    core.team.data().timeDestroy(core.x, core.y, state.rules.enemyCoreBuildRadius);
-                });
+                Core.app.post(() -> core.team.data().timeDestroy(core.x, core.y, state.rules.enemyCoreBuildRadius));
             }
         });
 
@@ -184,11 +161,16 @@ public class Logic implements ApplicationListener{
         }));
 
         Events.on(BlockBuildEndEvent.class, e -> {
-            if(e.team == state.rules.defaultTeam){
+
+            if((e.team == state.rules.defaultTeam || e.unit != null && e.unit.team == state.rules.defaultTeam)){
                 if(e.breaking){
                     state.stats.buildingsDeconstructed++;
                 }else{
                     state.stats.buildingsBuilt++;
+                }
+
+                if(checkCampaignStats()){
+                    (e.breaking ? state.getPlanet().stats().buildingsDeconstructed : state.getPlanet().stats().buildingsBuilt).increment(e.tile.block());
                 }
             }
         });
@@ -196,20 +178,54 @@ public class Logic implements ApplicationListener{
         Events.on(BlockDestroyEvent.class, e -> {
             if(e.tile.team() == state.rules.defaultTeam){
                 state.stats.buildingsDestroyed ++;
+
+                if(checkCampaignStats()){
+                    state.getPlanet().stats().buildingsDestroyed.increment(e.tile.block());
+                }
+            }else{ //...should derelict blocks count as 'destroyed'? technically, they could be destroyed by the enemy, but that is very rare
+                state.stats.destroyedBlockCount.increment(e.tile.block());
+
+                if(checkCampaignStats()){
+                    state.getPlanet().stats().enemyBuildingsDestroyed.increment(e.tile.block());
+                }
             }
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit.team() != state.rules.defaultTeam){
+            if(e.unit.team != state.rules.defaultTeam){
                 state.stats.enemyUnitsDestroyed ++;
+            }
+
+            if(checkCampaignStats()){
+                (e.unit.team != state.rules.defaultTeam ? state.getPlanet().stats().enemyUnitsDestroyed : state.getPlanet().stats().unitsDestroyed).increment(e.unit.type);
             }
         });
 
         Events.on(UnitCreateEvent.class, e -> {
             if(e.unit.team == state.rules.defaultTeam){
                 state.stats.unitsCreated++;
+
+                if(checkCampaignStats()){
+                    state.getPlanet().stats().unitsProduced.increment(e.unit.type);
+                }
             }
         });
+
+        Events.on(WaveEvent.class, e -> {
+            if(checkCampaignStats()){
+                state.getPlanet().stats().wavesLasted ++;
+            }
+        });
+
+        Events.on(GameOverEvent.class, e -> {
+            if(checkCampaignStats()){
+                state.getPlanet().stats().sectorsLost ++;
+            }
+        });
+    }
+
+    private boolean checkCampaignStats(){
+        return state.isCampaign() && !net.client();
     }
 
     private void checkOverlappingPlans(Team team, Tile tile){
@@ -229,7 +245,8 @@ public class Logic implements ApplicationListener{
     public void play(){
         state.set(State.playing);
         //grace period of 2x wave time before game starts
-        state.wavetime = (state.rules.initialWaveSpacing <= 0 ? state.rules.waveSpacing * 2 : state.rules.initialWaveSpacing) * (state.isCampaign() ? state.getPlanet().campaignRules.difficulty.waveTimeMultiplier : 1f);;
+        state.wavetime = (state.rules.initialWaveSpacing <= 0 ? state.rules.waveSpacing * 2 : state.rules.initialWaveSpacing) * (state.isCampaign() ? state.getPlanet().campaignRules.difficulty.waveTimeMultiplier : 1f);
+        state.stats = new GameStats();
         Events.fire(new PlayEvent());
 
         //add starting items
@@ -257,6 +274,7 @@ public class Logic implements ApplicationListener{
 
     public void reset(){
         State prev = state.getState();
+        state.patcher.unapply();
         //recreate gamestate - sets state to menu
         state = new GameState();
         //fire change event, since it was technically changed

@@ -2,7 +2,6 @@ package mindustry.core;
 
 import arc.*;
 import arc.assets.loaders.TextureLoader.*;
-import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -568,11 +567,6 @@ public class Renderer implements ApplicationListener{
         launching = true;
         landTime = landCore.launchDuration();
 
-        Music music = landCore.launchMusic();
-        music.stop();
-        music.play();
-        music.setVolume(settings.getInt("musicvol") / 100f);
-
         landCore.beginLaunch(true);
     }
 
@@ -594,7 +588,7 @@ public class Renderer implements ApplicationListener{
         camera.height = h;
         camera.position.x = w / 2f + tilesize / 2f;
         camera.position.y = h / 2f + tilesize / 2f;
-        buffer.begin();
+        buffer.begin(Color.clear);
         draw();
         Draw.flush();
         byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
