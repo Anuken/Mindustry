@@ -42,6 +42,7 @@ public class PowerNode extends PowerBlock{
     public PowerNode(String name){
         super(name);
         configurable = true;
+        ignoreResizeConfig = true;
         consumesPower = false;
         outputsPower = false;
         canOverdrive = false;
