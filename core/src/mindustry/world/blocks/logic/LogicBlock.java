@@ -699,7 +699,7 @@ public class LogicBlock extends Block{
 
         @Override
         public byte version(){
-            return 4;
+            return 5;
         }
 
         @Override
@@ -806,7 +806,7 @@ public class LogicBlock extends Block{
                 ipt = Mathf.clamp(read.s(), 1, maxInstructionsPerTick);
             }
 
-            if(!privileged && revision >= 4){
+            if(!privileged && revision >= 5){
                 short iptR = read.s();
                 if (iptR != 0) {
                     ipt = Mathf.clamp(iptR, 1, instructionsPerTick);
