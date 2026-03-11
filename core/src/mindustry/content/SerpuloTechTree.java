@@ -352,7 +352,7 @@ public class SerpuloTechTree{
                     node(mace, () -> {
                         node(fortress, () -> {
                             node(scepter, () -> {
-                                node(reign, () -> {
+                                node(reign, Seq.with(new SectorComplete(desolateRift)), () -> {
 
                                 });
                             });
@@ -508,6 +508,7 @@ public class SerpuloTechTree{
                                                 new SectorComplete(overgrowth),
                                                 new SectorComplete(extractionOutpost),
                                                 new SectorComplete(saltFlats),
+                                                new SectorComplete(mycelialBastion),
                                                 new Research(risso),
                                                 new Research(minke),
                                                 new Research(bryde),

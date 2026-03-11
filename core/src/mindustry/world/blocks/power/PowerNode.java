@@ -44,6 +44,7 @@ public class PowerNode extends PowerBlock{
     public PowerNode(String name){
         super(name);
         configurable = true;
+        ignoreResizeConfig = true;
         consumesPower = false;
         outputsPower = false;
         canOverdrive = false;
@@ -52,6 +53,7 @@ public class PowerNode extends PowerBlock{
         drawDisabled = false;
         envEnabled |= Env.space;
         destructible = true;
+        delayLandingConfig = true;
 
         //nodes do not even need to update
         update = false;

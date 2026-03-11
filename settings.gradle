@@ -20,10 +20,12 @@ if(hasSdk){
     println("No Android SDK found. Skipping Android module.")
 }
 
-if(!hasProperty("release") && !hasProperty("noLocalArc")){
+if(!hasProperty("noLocalArc")){
     if(new File(rootDir.parent, 'Arc').exists()){
         println("Compiling with localArc")
         includeBuild("../Arc")
+    }else{
+        println("Local Arc not found. Cloning https://github.com/Anuken/Arc to a directory next to Mindustry is highly recommended, as jitpack is unreliable.")
     }
 
     if(new File(rootDir.parent, 'Mindustry-Debug').exists()){

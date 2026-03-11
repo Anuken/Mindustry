@@ -157,6 +157,8 @@ public class Weapon implements Cloneable{
     public float shootStatusDuration = 60f * 5f;
     /** whether this weapon should fire when its owner dies */
     public boolean shootOnDeath = false;
+    /** If not null and shootOnDeath == true, overrides the weapon's shoot effect only when its owner dies. */
+    public @Nullable Effect shootOnDeathEffect = null;
     /** extra animated parts */
     public Seq<DrawPart> parts = new Seq<>(DrawPart.class);
 
@@ -516,9 +518,11 @@ public class Weapon implements Cloneable{
             initialShootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax), shootSoundVolume);
         }
 
-        ejectEffect.at(mountX, mountY, angle * Mathf.sign(this.x));
-        bullet.shootEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
-        bullet.smokeEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
+        if(mount.allowShootEffects){
+            ejectEffect.at(mountX, mountY, angle * Mathf.sign(this.x));
+            bullet.shootEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
+            bullet.smokeEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
+        }
 
         unit.vel.add(Tmp.v1.trns(shootAngle + 180f, bullet.recoil));
         Effect.shake(shake, shake, bulletX, bulletY);

@@ -1341,6 +1341,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @CallSuper
     public void onRepaired(){
         placed();
+        if(block.flags.contains(BlockFlag.hasFogRadius)){
+            fogControl.forceUpdate(team, self());
+        }
     }
 
     public boolean isCommandable(){

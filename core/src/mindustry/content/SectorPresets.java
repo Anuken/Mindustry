@@ -145,7 +145,7 @@ public class SectorPresets{
         }};
 
         fallenVessel = new SectorPreset("fallenVessel", serpulo, -1){{
-            captureWave = 121;
+            captureWave = 70;
             difficulty = 9;
         }};
 
@@ -177,7 +177,6 @@ public class SectorPresets{
         //region erekir
 
         onset = new SectorPreset("onset", erekir, 10){{
-            addStartingItems = true;
             alwaysUnlocked = true;
             difficulty = 1;
         }};
