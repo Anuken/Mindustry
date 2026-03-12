@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.async.*;
 import mindustry.core.*;
@@ -27,6 +28,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.service.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -300,7 +302,6 @@ public class Vars implements Loadable{
         Groups.init();
 
         if(loadLocales){
-            //load locales
             String[] stra = Core.files.internal("locales").readString().split("\n");
             locales = new Locale[stra.length];
             for(int i = 0; i < locales.length; i++){
@@ -440,8 +441,18 @@ public class Vars implements Loadable{
 
         settings.setAppName(appName);
 
+        loadFileLogger(settings.getDataDirectory().child("last_log.txt"));
+    }
+
+    public static void loadFileLogger(Fi file){
+        if(loadedFileLogger) return;
+
+        if(!file.parent().exists()){
+            file.parent().mkdirs();
+        }
+
         try{
-            Writer writer = settings.getDataDirectory().child("last_log.txt").writer(false);
+            Writer writer = file.writer(false);
             LogHandler log = Log.logger;
             Log.logger = (level, text) -> {
                 log.log(level, text);
@@ -466,7 +477,7 @@ public class Vars implements Loadable{
         settings.setJson(JsonIO.json);
         settings.setAppName(appName);
 
-        if(steam || (Version.modifier != null && Version.modifier.contains("steam"))){
+        if(steam || Version.isSteam){
             settings.setDataDirectory(Core.files.local("saves/"));
         }
 
@@ -535,6 +546,14 @@ public class Vars implements Loadable{
                     bundle.getProperties().put(s, Strings.stripColors(defBundle.get(s)).replaceAll("\\S", router));
                 }
             }
+        }
+
+        StringMap globalBundle = new StringMap();
+        PropertiesUtils.load(globalBundle, files.internal("bundles/global.properties").reader("UTF-8"));
+        bundle.getProperties().putAll(globalBundle);
+
+        if(!headless){
+            app.post(Fonts::loadExtraFonts);
         }
     }
 }

@@ -550,7 +550,14 @@ public class CoreBlock extends StorageBlock{
         @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.itemCapacity) return storageCapacity;
+            if(sensor == LAccess.maxUnits) return Units.getCap(team);
             return super.sense(sensor);
+        }
+
+        @Override
+        public double sense(Content content){
+            if(content instanceof UnitType type) return team.data().countType(type);
+            return super.sense(content);
         }
 
         @Override
@@ -651,7 +658,7 @@ public class CoreBlock extends StorageBlock{
         public void playDestroySound(){
             if(team.data().cores.size <= 1 && player != null && player.team() == team && state.rules.canGameOver){
                 //play at full volume when doing a game over
-                block.destroySound.play(block.destroySoundVolume, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), 0f);
+                block.destroySound.play(block.destroySoundVolume * Core.audio.sfxVolume, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), 0f);
             }else{
                 super.playDestroySound();
             }

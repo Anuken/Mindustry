@@ -2,6 +2,7 @@ package mindustry.world;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
@@ -335,6 +336,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public void circle(int radius, Cons<Tile> cons){
         circle(radius, (x, y) -> cons.get(world.rawTile(x, y)));
+    }
+
+    public Color getFloorColor(){
+        return floor.getColor(this);
     }
 
     public void recacheWall(){

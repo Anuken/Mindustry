@@ -1,6 +1,7 @@
 package mindustry.input;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -37,7 +38,6 @@ import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
@@ -118,6 +118,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     private Seq<BuildPlan> plansOut = new Seq<>(BuildPlan.class);
     private QuadTree<BuildPlan> playerPlanTree = new QuadTree<>(new Rect());
+    private QuadTree<BuildPlan> selectPlanTree = new QuadTree<>(new Rect());
 
     public final BlockInventoryFragment inv;
     public final BlockConfigFragment config;
@@ -125,24 +126,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     private WidgetGroup group = new WidgetGroup();
 
-    private final Eachable<BuildPlan> allPlans = cons -> {
-        if(!player.dead()){
-            player.unit().plans().each(cons);
-        }
-        selectPlans.each(cons);
-        linePlans.each(cons);
-    };
-
-    private final Eachable<BuildPlan> allSelectLines = cons -> {
-        selectPlans.each(cons);
-        linePlans.each(cons);
-    };
+    protected Eachable<BuildPlan> allPlans, allSelectLines, allRenderPlansConfig;
 
     public InputHandler(){
         group.touchable = Touchable.childrenOnly;
         inv = new BlockInventoryFragment();
         config = new BlockConfigFragment();
         planConfig = new PlanConfigFragment();
+
+        createPlanLists();
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit != null && e.unit.isPlayer() && e.unit.getPlayer().isLocal() && e.unit.type.weapons.contains(w -> w.bullet.killShooter)){
@@ -152,6 +144,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Events.on(WorldLoadEvent.class, e -> {
             playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
+            selectPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
+            createPlanLists();
         });
 
         Events.on(ResetEvent.class, e -> {
@@ -340,11 +334,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     unit.lastCommanded = player.coloredName();
                     if(ai.commandQueue.size <= 0){
                         ai.group = null;
-                    }
-
-                    //remove when other player command
-                    if(!headless && player != Vars.player){
-                        control.input.selectedUnits.remove(unit);
                     }
 
                     toAdd.add(unit);
@@ -858,6 +847,27 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.deathTimer = Player.deathDelay + 1f; //for instant respawn
     }
 
+    protected void createPlanLists(){
+        allPlans = new QueryEachable(playerPlanTree, linePlans){
+            @Override
+            public BuildPlan find(int x, int y, int size, Boolf<BuildPlan> check){
+                BuildPlan plan = super.find(x, y, size, check);
+                if(plan != null) return plan;
+
+                return selectPlanTree.find(x * tilesize - tilesize/2f * size, y * tilesize - tilesize/2f * size, size * tilesize, size * tilesize, check);
+            }
+        };
+        allSelectLines = new QueryEachable(null, selectPlans, linePlans);
+        allRenderPlansConfig = new QueryEachable(playerPlanTree, selectPlans);
+    }
+
+    public void updateSelectQuadtree(){
+        selectPlanTree.clear();
+        for(var plan : selectPlans){
+            selectPlanTree.insert(plan);
+        }
+    }
+
     /** Adds an input lock; if this function returns true, input is locked. Used for mod 'cutscenes' or custom camera panning. */
     public void addLock(Boolp lock){
         inputLocks.add(lock);
@@ -948,6 +958,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(locked()){
             block = null;
         }
+
+        player.selectedBlock = block;
+        player.selectedRotation = rotation;
 
         wasShooting = player.shooting;
 
@@ -1331,6 +1344,43 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    public void drawBuildPlans(){
+        if(!player.isBuilder()) return;
+
+        Unit u = player.unit();
+        BuildPlan current = u.buildPlan();
+
+        camera.bounds(Tmp.r1);
+        plansOut.clear();
+        playerPlanTree.intersect(Tmp.r1, plansOut);
+
+        for(BuildPlan plan : plansOut){
+            if(plan.progress > 0.01f || (current == plan && plan.initialized && (u.within(plan.x * tilesize, plan.y * tilesize, u.type.buildRange) || state.isEditor()))) continue;
+
+            plan.animScale = 1f;
+            if(plan.breaking){
+                drawBreaking(plan);
+            }else{
+                plan.block.drawPlan(plan, allPlans, Build.validPlace(plan.block, player.team(), plan.x, plan.y, plan.rotation) || planMatches(plan), 1f);
+            }
+        }
+
+        camera.bounds(Tmp.r3);
+
+        Draw.reset();
+
+        //TODO: cannot query for links that are offscreen
+        for(BuildPlan plan : u.plans){
+            if(plan.progress > 0.01f || plan.breaking || (current == plan && plan.initialized && (u.within(plan.x * tilesize, plan.y * tilesize, u.type.buildRange) || state.isEditor()))) continue;
+
+            if(Tmp.r2.setCentered(plan.drawx(), plan.drawy(), plan.block.planConfigClipSize()).overlaps(Tmp.r3)){
+                Draw.mixcol(Color.white, 0.24f + Mathf.absin(Time.globalTime, 6f, 0.28f));
+                plan.block.drawPlanConfigTop(plan, allRenderPlansConfig);
+                Draw.reset();
+            }
+        }
+    }
+
     public void drawBottom(){
 
     }
@@ -1630,22 +1680,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(withText){
             Font font = Fonts.outline;
             font.setColor(col2);
-            var ints = font.usesIntegerPositions();
+            boolean ints = font.usesIntegerPositions();
             font.setUseIntegerPositions(false);
-            var z = Draw.z();
+            float z = Draw.z();
             Draw.z(Layer.endPixeled);
             font.getData().setScale(1 / renderer.camerascale);
-            var snapToCursor = Core.settings.getBool("selectionsizeoncursor");
-            var textOffset = Core.settings.getInt("selectionsizeoncursoroffset", 5);
             int width = (int)((result.x2 - result.x) / 8);
             int height = (int)((result.y2 - result.y) / 8);
             int area = width * height;
 
-            // FINISHME: When not snapping to cursor, perhaps it would be best to choose the corner closest to the cursor that's at least a block away?
             font.draw(width + "x" + height + " (" + area + ")",
-            snapToCursor ? input.mouseWorldX() + textOffset * (4 / renderer.camerascale) : result.x2,
-            snapToCursor ? input.mouseWorldY() - textOffset * (4 / renderer.camerascale) : result.y
-            );
+            input.mouseWorldX() + 5 * (4 / renderer.camerascale),
+            input.mouseWorldY() - 5 * (4 / renderer.camerascale));
             font.setColor(Color.white);
             font.getData().setScale(1);
             font.setUseIntegerPositions(ints);
@@ -1675,6 +1721,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 BuildPlan copy = plan.copy();
                 plan.block.onNewPlan(copy);
                 player.unit().addBuild(copy, false);
+                playerPlanTree.insert(copy);
             }
         }
     }
@@ -1685,6 +1732,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 BuildPlan copy = plan.copy();
                 plan.block.onNewPlan(copy);
                 player.unit().addBuild(copy);
+                playerPlanTree.insert(copy);
             }
         }
     }
@@ -1706,7 +1754,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawPlan(BuildPlan plan, boolean valid){
-        plan.block.drawPlan(plan, allPlans(), valid);
+        plan.block.drawPlan(plan, allPlans, valid);
     }
 
     /** Draws a placement icon for a specific block. */
@@ -1716,7 +1764,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             bplan.config = block.lastConfig;
         }
         bplan.animScale = 1f;
-        block.drawPlan(bplan, allPlans(), validPlace(x, y, block, rotation));
+        block.drawPlan(bplan, allPlans, validPlace(x, y, block, rotation));
     }
 
     /** Remove everything from the queue in a selection. */
@@ -1847,7 +1895,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if((!config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
             || (config.isShown() && config.getSelected().onConfigureBuildTapped(build) && build.shouldShowConfigure(player))){
-                Sounds.click.at(build);
+                AudioBus oldBus = build.block.configureSound.bus;
+                build.block.configureSound.bus = control.sound.uiBus;
+                build.block.configureSound.at(build);
+                build.block.configureSound.bus = oldBus;
                 config.showConfig(build);
             }
             //otherwise...
@@ -1945,7 +1996,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         && !player.dead()
         && player.unit().validMine(tile)
         && player.unit().acceptsItem(player.unit().getMineResult(tile))
-        && !((!Core.settings.getBool("doubletapmine") && tile.floor().playerUnmineable) && tile.overlay().itemDrop == null);
+        && !((!Core.settings.getBool("doubletapmine") && tile.floor().playerUnmineable) && tile.overlay().itemDrop == null)
+        && !((!Core.settings.getBool("doubletapmine") && tile.overlay().playerUnmineable) && tile.overlay().itemDrop != null);
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -2328,7 +2380,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Point2 next = i == points.size - 1 ? null : points.get(i + 1);
             line.x = point.x;
             line.y = point.y;
-            if((!overrideLineRotation || diagonal) && !(block != null && block.ignoreLineRotation)){
+            if((!overrideLineRotation || diagonal) && !(block != null && block.ignoreLineRotation && !mobile)){
                 int result = baseRotation;
                 if(next != null){
                     result = Tile.relativeTo(point.x, point.y, next.x, next.y);
@@ -2354,5 +2406,44 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     static class PlaceLine{
         public int x, y, rotation;
         public boolean last;
+    }
+
+    /**
+     * In the interest of preserving compatibility, this implementation replaces Eachable with its own methods, and requires blocks to cast it to use it properly.
+     * It's a massive hack.
+     * */
+    public static class QueryEachable implements Eachable<BuildPlan>{
+        final QuadTree<BuildPlan> tree;
+        final Seq[] fallback;
+
+        public QueryEachable(QuadTree<BuildPlan> tree, Seq<BuildPlan>... fallback){
+            this.tree = tree;
+            this.fallback = fallback;
+        }
+
+        @Override
+        public void each(Cons<? super BuildPlan> cons){
+            //you're not supposed to use this method anymore
+        }
+
+        public BuildPlan find(int x, int y, Boolf<BuildPlan> check){
+            return find(x, y, 1, check);
+        }
+
+        public BuildPlan find(int x, int y, int size, Boolf<BuildPlan> check){
+            if(tree != null){
+                BuildPlan plan = tree.find(x * tilesize - tilesize/2f * size, y * tilesize - tilesize/2f * size, size * tilesize, size * tilesize, check);
+                if(plan != null){
+                    return plan;
+                }
+            }
+            for(var fallback : fallback){
+                var result = fallback.find(check);
+                if(result != null){
+                    return (BuildPlan)result;
+                }
+            }
+            return null;
+        }
     }
 }

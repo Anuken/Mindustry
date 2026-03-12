@@ -57,6 +57,16 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
         lastDeepFloor = null;
         boolean anyNonDeep = false;
 
+        if(type.crushFragile && !disarmed){
+            for(int i = 0; i < 8; i++){
+                Point2 offset = Geometry.d8[i];
+                var other = Vars.world.buildWorld(x + offset.x * tilesize, y + offset.y * tilesize);
+                if(other != null && other.team != team && other.block.crushFragile){
+                    other.damage(team, 999999999f);
+                }
+            }
+        }
+
         //calculate overlapping tiles so it slows down when going "over" walls
         int r = Math.max((int)(hitSize * 0.75f / tilesize), 0);
 
@@ -79,7 +89,8 @@ abstract class TankComp implements Posc, Hitboxc, Unitc, ElevationMovec{
                     && Math.max(Math.abs(dx), Math.abs(dy)) <= r - 1){
 
                     if(t.build != null && t.build.team != team){
-                        t.build.damage(team, type.crushDamage * Time.delta * t.block().crushDamageMultiplier * state.rules.unitDamage(team));
+                        t.build.damage(team, type.crushDamage * Time.delta * t.block().crushDamageMultiplier * state.rules.unitDamage(team)
+                                * ((speedMultiplier- 1) / 5 + 1));
                     }else if(t.block().unitMoveBreakable){
                         ConstructBlock.deconstructFinish(t, t.block(), self());
                     }

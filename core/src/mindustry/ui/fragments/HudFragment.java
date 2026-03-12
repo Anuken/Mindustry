@@ -14,6 +14,7 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.input.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -53,6 +54,9 @@ public class HudFragment{
 
     private Seq<Block> blocksOut = new Seq<>();
     private Table hudLabel;
+
+    private static ObjectSet<String> favoriteBlocks = new ObjectSet<>();
+    private static String lastFavorited = null;
 
     private void addBlockSelection(Table cont){
         Table blockSelection = new Table();
@@ -100,12 +104,53 @@ public class HudFragment{
         rebuildBlockSelection(blockSelection, "");
     }
 
+    private static void loadFavorites(){
+        favoriteBlocks = Core.settings.getJson("editor-block-favorites", ObjectSet.class, String.class, ObjectSet::new);
+    }
+
+    private static void saveFavorites(){
+        Core.settings.putJson("editor-block-favorites", String.class, favoriteBlocks);
+    }
+
+    private static boolean isFavorite(Block block){
+        return favoriteBlocks.contains(block.name);
+    }
+
+    private static void toggleFavorite(Block block){
+        boolean isFav = favoriteBlocks.contains(block.name);
+        if(isFav){
+            favoriteBlocks.remove(block.name);
+            Sounds.uiFavorite.play(0.35f, 0.67f, 0f);
+        }else{
+            favoriteBlocks.add(block.name);
+            lastFavorited = block.name;
+            Sounds.uiFavorite.play(0.6f, 2.0f, 0f);
+        }
+        saveFavorites();
+    }
+    
     private void rebuildBlockSelection(Table blockSelection, String searchText){
         blockSelection.clear();
 
         blocksOut.clear();
-        blocksOut.addAll(Vars.content.blocks());
+        // Favorites first
+        for(Block block : Vars.content.blocks()){
+            if(isFavorite(block)){
+                blocksOut.add(block);
+            }
+        }
+
+        for(Block block : Vars.content.blocks()){
+            if(!isFavorite(block)){
+                blocksOut.add(block);
+            }
+        }
         blocksOut.sort((b1, b2) -> {
+            // These two block should stay at the top
+            if(b1 == Blocks.removeOre || b1 == Blocks.removeWall) return -1;
+            if(b2 == Blocks.removeOre || b2 == Blocks.removeWall) return 1;
+            int fav = Boolean.compare(isFavorite(b2), isFavorite(b1));
+            if(fav != 0) return fav;
             int synth = Boolean.compare(b1.synthetic(), b2.synthetic());
             if(synth != 0) return synth;
             int ore = Boolean.compare(b1 instanceof OverlayFloor && b1 != Blocks.removeOre, b2 instanceof OverlayFloor && b2 != Blocks.removeOre);
@@ -128,9 +173,54 @@ public class HudFragment{
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> control.input.block = block);
+            // Pc input for favorites
+            button.clicked(KeyCode.mouseRight, () -> {
+                if(block == Blocks.removeOre || block == Blocks.removeWall) return;
+                toggleFavorite(block);
+                rebuildBlockSelection(blockSelection, searchText);
+                control.input.block = block;
+            });
+            // Mobile double-click for favorites
+            button.addListener(new ClickListener(){
+                @Override
+                public void clicked(InputEvent event, float x, float y){
+                    if(mobile && getTapCount() == 2){
+                        if(block == Blocks.removeOre || block == Blocks.removeWall) return;
+                        toggleFavorite(block);
+                        rebuildBlockSelection(blockSelection, searchText);
+                        control.input.block = block;
+                    }
+                }
+            });
             button.resizeImage(8 * 4f);
             button.update(() -> button.setChecked(control.input.block == block));
-            blockSelection.add(button).size(48f).tooltip(block.localizedName);
+
+            Stack stack = new Stack();
+            stack.add(button);
+            if(isFavorite(block)){
+                Image favIcon = new Image(Icon.star);
+                favIcon.setColor(Color.gold);
+                favIcon.setOrigin(Align.center);
+
+                if(block.name.equals(lastFavorited)){
+                    favIcon.color.a = 0f;
+                    favIcon.setScale(0f);
+                    favIcon.addAction(Actions.parallel(
+                        Actions.scaleTo(0.7f, 0.7f, 0.2f),
+                        Actions.alpha(1f, 0.2f),
+                        Actions.run(() -> lastFavorited = null)
+                    ));
+                }else{
+                    favIcon.setScale(0.7f);
+                }
+                
+                Table overlay = new Table().align(Align.topRight);
+                overlay.touchable = Touchable.disabled;
+                overlay.add(favIcon).size(2f).pad(12f);
+
+                stack.add(overlay);
+            }
+            blockSelection.add(stack).size(48f).tooltip(block.localizedName);
 
             if(++i % 6 == 0){
                 blockSelection.row();
@@ -143,7 +233,7 @@ public class HudFragment{
     }
 
     public void build(Group parent){
-
+        loadFavorites();
         //warn about guardian/boss waves
         Events.on(WaveEvent.class, e -> {
             int max = 10;

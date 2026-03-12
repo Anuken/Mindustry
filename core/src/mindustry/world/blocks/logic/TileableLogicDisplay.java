@@ -211,9 +211,9 @@ public class TileableLogicDisplay extends LogicDisplay{
                         prevBuffers.clear();
                     }
                 });
-
-                processCommands();
             }
+
+            rootDisplay.processCommands();
 
             float offset = 0.001f + (rootDisplay.buffer == null ? 0f : (rootDisplay.buffer.hashCode() % 1_000_000) / 1_000_000f * 0.01f);
 

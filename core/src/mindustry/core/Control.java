@@ -31,7 +31,7 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.power.PowerNode.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -78,15 +78,6 @@ public class Control implements ApplicationListener, Loadable{
                 });
             }
             checkAutoUnlocks();
-
-            if((OS.isWindows && !OS.is64Bit && !Core.settings.getBool("nowarn32bit", false))){
-                BaseDialog dialog = new BaseDialog("@warn.32bit.title");
-                dialog.buttons.button("@ok", dialog::hide).size(120f, 64f);
-                dialog.cont.add("@warn.32bit").labelAlign(Align.center, Align.center).wrap().grow().row();
-                dialog.cont.check("@dontshowagain", val -> Core.settings.put("nowarn32bit", val));
-
-                dialog.show();
-            }
         });
 
         Events.on(StateChangeEvent.class, event -> {
@@ -196,7 +187,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(GameOverEvent.class, e -> {
             if(state.isCampaign() && !net.client() && !headless){
 
-                //save gameover sate immediately
+                //save gameover state immediately
                 if(saves.getCurrent() != null){
                     saves.getCurrent().save();
                 }
@@ -245,8 +236,8 @@ public class Control implements ApplicationListener, Loadable{
                     float maxDelay = 0f;
 
                     for(var build : state.rules.defaultTeam.data().buildings){
-                        //power nodes need to be configured later once everything is built
-                        if(build instanceof PowerNodeBuild){
+                        //some blocks need to be configured later once everything is built
+                        if(build.block.delayLandingConfig){
                             toBePlacedConfigs.add(new Object[]{build, build.config()});
                         }
                     }
@@ -294,7 +285,12 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(SaveWriteEvent.class, e -> forcePlaceAll());
+        Events.on(SaveWriteEvent.class, e -> {
+            if(!net.client() && state.isCampaign()){
+                state.getPlanet().saveStats();
+            }
+            forcePlaceAll();
+        });
         Events.on(HostEvent.class, e -> forcePlaceAll());
         Events.on(HostEvent.class, e -> {
             state.set(State.playing);
@@ -472,6 +468,10 @@ public class Control implements ApplicationListener, Loadable{
 
                             //set spawn for sector damage to use
                             Tile spawn = world.tile(spawnPos);
+                            if(spawn == null){
+                                playNewSector(origin, sector, reloader);
+                                return;
+                            }
                             spawn.setBlock(sector.planet.defaultCore, state.rules.defaultTeam);
 
                             //apply damage to simulate the sector being lost
@@ -500,6 +500,14 @@ public class Control implements ApplicationListener, Loadable{
                                     Tile tile = world.tile(build.tileX(), build.tileY());
                                     if(tile != null && tile.build == null && Build.validPlace(build.block, Team.derelict, build.tileX(), build.tileY(), build.rotation, false, false)){
                                         tile.setBlock(build.block, Team.derelict, build.rotation, () -> build);
+                                    }
+                                }
+
+                                //all the derelict power graphs are invalid
+                                for(var build : previousBuildings){
+                                    if(build.power != null){
+                                        build.power.graph = new PowerGraph();
+                                        build.power.links.clear();
                                     }
                                 }
 
@@ -692,6 +700,7 @@ public class Control implements ApplicationListener, Loadable{
 
         if(state.isGame()){
             input.update();
+            input.updateSelectQuadtree();
             if(!state.isPaused()){
                 indicators.update();
             }

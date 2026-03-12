@@ -23,7 +23,7 @@ public class SectorSubmissions{
 
     public static void registerSectors(){
 
-        registerSerpuloSector(76, "Skyon", "https://discord.com/channels/391020510269669376/1379926833411391580/1381831690183250056");
+        registerSerpuloSector(76, "Tyrant-classZzz", "https://discord.com/channels/391020510269669376/1379926833411391580/1479890094486716499");
         registerSerpuloSector(47, "tinport", "https://discord.com/channels/391020510269669376/1379926802591645820/1397649518203371544");
         registerSerpuloSector(225, "Summi", "https://discord.com/channels/391020510269669376/1379926925719376152/1399286858482978900");
         //111 has an alternate submission https://discord.com/channels/391020510269669376/1379926842659569864/1404825715244793938
@@ -65,6 +65,8 @@ public class SectorSubmissions{
         registerSerpuloSector(20, "Namero", "https://discord.com/channels/391020510269669376/1379926794114961634/1406768731471872162");
         registerSerpuloSector(162, "Bravo Tizmo", "https://discord.com/channels/391020510269669376/1379926884606808247/1443239231366500415");
         registerSerpuloSector(230, "Jamespire", "https://discord.com/channels/391020510269669376/1379926927585841163/1442675816084406305");
+        registerSerpuloSector(240, "hhhi17", "https://discord.com/channels/391020510269669376/1253758616117186590/1253758616117186590", -1, 8f);
+        registerSerpuloSector(202, "D&X", "https://discord.com/channels/391020510269669376/1253760205091635201/1253760205091635201", 33, 6f);
 
         /* UNUSED SECTORS:
         registerHiddenSectors(serpulo,
@@ -79,10 +81,10 @@ public class SectorSubmissions{
     }
 
     static void registerSerpuloSector(int id, String author, String mapFileLink){
-        registerSerpuloSector(id, author, mapFileLink, -1);
+        registerSerpuloSector(id, author, mapFileLink, -1, 0f);
     }
 
-    static void registerSerpuloSector(int id, String author, String mapFileLink, int captureWave){
+    static void registerSerpuloSector(int id, String author, String mapFileLink, int captureWave, float difficulty){
         Planet planet = Planets.serpulo;
         Sector sector = planet.sectors.get(id);
         MapSubmission sub = threadMap.get(sector, MapSubmission::new);
@@ -90,9 +92,11 @@ public class SectorSubmissions{
         sub.author = author;
         sub.mapFileLink = mapFileLink;
 
-        var preset = new SectorPreset("sector-" + planet.name + "-" + id, "hidden-serpulo/" + id, planet, id);
+        var preset = new SectorPreset("sector-" + planet.name + "-" + id, "hidden/" + id, planet, id);
 
+        if(preset.credit == null) preset.credit = author;
         preset.requireUnlock = false;
+        if(difficulty > 0f) preset.difficulty = difficulty;
 
         if(captureWave > 0){
             preset.captureWave = captureWave;

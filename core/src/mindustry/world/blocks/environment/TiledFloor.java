@@ -51,6 +51,9 @@ public class TiledFloor extends Floor{
 
     @Override
     public void floorChanged(Tile tile){
+        //TODO: none of this state needs to update on servers right now, but it could cause issues if blocks require a certain alignment
+        //either way, this wouldn't be called on map load on servers, so it's broken there
+        if(headless) return;
 
         if(!world.isGenerating() && TiledState.changes(state(tile)) != world.floorChanges){
             scan(tile);

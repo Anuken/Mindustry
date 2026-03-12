@@ -85,8 +85,7 @@ public class CanvasBlock extends Block{
 
             tempBlend = 0;
 
-            //O(N^2), awful
-            list.each(other -> {
+            findPlan(list, plan.x, plan.y, size + 1, other -> {
                 if(other.block == this){
                     for(int i = 0; i < 4; i++){
                         if(other.x == plan.x + Geometry.d4x(i) * size && other.y == plan.y + Geometry.d4y(i) * size){
@@ -94,6 +93,7 @@ public class CanvasBlock extends Block{
                         }
                     }
                 }
+                return false;
             });
 
             int blending = tempBlend;
