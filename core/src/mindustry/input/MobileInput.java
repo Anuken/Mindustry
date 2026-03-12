@@ -362,7 +362,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(plan.breaking){
                 drawSelected(plan.x, plan.y, tile.block(), Pal.remove);
             }else{
-                plan.block.drawPlan(plan, allPlans(), true);
+                plan.block.drawPlan(plan, allPlans, true);
             }
         }
 
@@ -381,7 +381,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
                         drawArrow(block, plan.x, plan.y, plan.rotation);
                     }
-                    plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation) && getPlan(plan.x, plan.y, plan.block.size, null) == null);
+                    plan.block.drawPlan(plan, allPlans, validPlace(plan.x, plan.y, plan.block, plan.rotation) && getPlan(plan.x, plan.y, plan.block.size, null) == null);
                     drawSelected(plan.x, plan.y, plan.block, Pal.accent);
                 }
                 linePlans.each(this::drawOverPlan);
@@ -464,7 +464,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(plan.breaking){
             drawSelected(plan.x, plan.y, plan.tile().block(), Pal.remove);
         }else{
-            plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation));
+            plan.block.drawPlan(plan, allPlans, validPlace(plan.x, plan.y, plan.block, plan.rotation));
             drawSelected(plan.x, plan.y, plan.block, Pal.accent);
         }
     }

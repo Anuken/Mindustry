@@ -23,6 +23,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.Schematic.*;
 import mindustry.gen.*;
 import mindustry.input.*;
+import mindustry.input.InputHandler.*;
 import mindustry.input.Placement.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
@@ -251,14 +252,16 @@ public class Schematics implements Loadable{
             //scale each plan to fit schematic
             Draw.trans().scale(resolution / tilesize, resolution / tilesize).translate(tilesize*1.5f, tilesize*1.5f);
 
+            QueryEachable eachPlans = new QueryEachable(null, plans);
+
             //draw plans
             plans.each(req -> {
                 req.animScale = 1f;
                 req.worldContext = false;
-                req.block.drawPlanRegion(req, plans);
+                req.block.drawPlanRegion(req, eachPlans);
             });
 
-            plans.each(req -> req.block.drawPlanConfigTop(req, plans));
+            plans.each(req -> req.block.drawPlanConfigTop(req, eachPlans));
 
             Draw.flush();
             Draw.trans().idt();

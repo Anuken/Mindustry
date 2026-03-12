@@ -85,6 +85,9 @@ public class UI implements ApplicationListener, Loadable{
 
     private @Nullable Element lastAnnouncement;
 
+    /** Maps popups to ids so that they can be removed or updated by id. */
+    private final ObjectMap<String, Table> popups = new ObjectMap<>();
+
     public UI(){
         Fonts.loadFonts();
     }
@@ -394,14 +397,21 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     /** Shows a label at some position on the screen. Does not fade. */
-    public void showInfoPopup(String info, float duration, int align, int top, int left, int bottom, int right){
+    public void showInfoPopup(String info, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
         Table table = new Table();
+        if(id != null){
+            Table old = popups.put(id, table);
+            if (old != null) old.remove();
+        }
         table.setFillParent(true);
         table.touchable = Touchable.disabled;
         table.update(() -> {
-            if(state.isMenu()) table.remove();
+            if(state.isMenu()){
+                table.remove();
+                if(id != null) popups.remove(id);
+            }
         });
-        table.actions(Actions.delay(duration), Actions.remove());
+        table.actions(Actions.delay(duration), Actions.remove(), Actions.run(() -> { if(id != null) popups.remove(id); }));
         table.align(align).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).pad(top, left, bottom, right);
         Core.scene.add(table);
     }

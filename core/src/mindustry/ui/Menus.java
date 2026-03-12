@@ -122,10 +122,29 @@ public class Menus{
     }
 
     @Remote(variants = Variant.both, unreliable = true)
-    public static void infoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
+    public static void infoPopup(String message, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
         if(message == null) return;
 
-        ui.showInfoPopup(message, duration, align, top, left, bottom, right);
+        ui.showInfoPopup(message, id, duration, align, top, left, bottom, right);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void infoPopupReliable(String message, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
+        infoPopup(message, id, duration, align, top, left, bottom, right);
+    }
+
+    /** @deprecated Prefer variants with ids to stop flickering popups. */
+    @Deprecated
+    @Remote(variants = Variant.both, unreliable = true)
+    public static void infoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
+        infoPopup(message, null, duration, align, top, left, bottom, right);
+    }
+
+    /** @deprecated Prefer variants with ids to stop flickering popups. */
+    @Deprecated
+    @Remote(variants = Variant.both)
+    public static void infoPopupReliable(String message, float duration, int align, int top, int left, int bottom, int right){
+        infoPopup(message, duration, align, top, left, bottom, right);
     }
 
     @Remote(variants = Variant.both, unreliable = true)
@@ -133,13 +152,6 @@ public class Menus{
         if(message == null) return;
 
         ui.showLabel(message, duration, worldx, worldy);
-    }
-
-    @Remote(variants = Variant.both)
-    public static void infoPopupReliable(String message, float duration, int align, int top, int left, int bottom, int right){
-        if(message == null) return;
-
-        ui.showInfoPopup(message, duration, align, top, left, bottom, right);
     }
 
     @Remote(variants = Variant.both)
