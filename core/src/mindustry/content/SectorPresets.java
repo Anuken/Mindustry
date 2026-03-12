@@ -8,10 +8,10 @@ import static mindustry.content.Planets.*;
 public class SectorPresets{
     public static SectorPreset
     groundZero,
-    craters, biomassFacility, taintedWoods, frozenForest, ruinousShores, facility32m, windsweptIslands, stainedMountains, tarFields,
+    crateredBattleground, biomassFacility, taintedWoods, frozenForest, ruinousShores, facility32m, windsweptIslands, stainedMountains, tarFields,
     frontier, fungalPass, infestedCanyons, atolls, sunkenPier, mycelialBastion, extractionOutpost, saltFlats, testingGrounds, overgrowth,
     impact0078, desolateRift, fallenVessel, nuclearComplex, planetaryTerminal,
-    coastline, navalFortress, weatheredChannels, perilousHarbor,
+    coastline, navalFortress, weatheredChannels, perilousHarbor, littoralShipyard,
 
     onset, aegis, lake, intersect, basin, atlas, split, marsh, peaks, ravine, caldera,
     stronghold, crevice, siege, crossroads, karst, origin;
@@ -53,7 +53,7 @@ public class SectorPresets{
             difficulty = 5;
         }};
 
-        craters = new SectorPreset("craters", serpulo, 18){{
+        crateredBattleground = new SectorPreset("crateredBattleground", serpulo, 18){{
             captureWave = 20;
             difficulty = 2;
         }};
@@ -152,6 +152,10 @@ public class SectorPresets{
         nuclearComplex = new SectorPreset("nuclearComplex", serpulo, 130){{
             captureWave = 50;
             difficulty = 7;
+        }};
+
+        littoralShipyard = new SectorPreset("littoralShipyard", serpulo, 204){{
+            difficulty = 9;
         }};
 
         planetaryTerminal = new SectorPreset("planetaryTerminal", serpulo, 93){{
