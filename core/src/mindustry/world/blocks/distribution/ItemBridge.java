@@ -1,5 +1,6 @@
 package mindustry.world.blocks.distribution;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -21,8 +22,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ItemBridge extends Block{
-    private static BuildPlan otherReq;
-
     public final int timerCheckMoved = timers ++;
 
     public int range;
@@ -75,17 +74,21 @@ public class ItemBridge extends Block{
         }
     }
 
+    static int currentFindX, currentFindY;
+    static BuildPlan currentPlan;
+    static final Boolf<BuildPlan> planFinder = other -> other.block == currentPlan.block && currentPlan != other && currentFindX == other.x && currentFindY == other.y;
+
     @Override
     public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
-        otherReq = null;
-        list.each(other -> {
-            if(other.block == this && plan != other && plan.config instanceof Point2 p && p.equals(other.x - plan.x, other.y - plan.y)){
-                otherReq = other;
-            }
-        });
+        if(plan.config instanceof Point2 p){
+            currentFindX = plan.x + p.x;
+            currentFindY = plan.y + p.y;
+            currentPlan = plan;
+            var otherReq = findPlan(list, currentFindX, currentFindY, planFinder);
 
-        if(otherReq != null){
-            drawBridge(plan, otherReq.drawx(), otherReq.drawy(), 0);
+            if(otherReq != null){
+                drawBridge(plan, otherReq.drawx(), otherReq.drawy(), 0);
+            }
         }
     }
 

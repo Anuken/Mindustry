@@ -1,5 +1,6 @@
 package mindustry.world.blocks.distribution;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -19,7 +20,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class DirectionBridge extends Block{
-    private static BuildPlan otherReq;
     private int otherDst = 0;
 
     public @Load("@-bridge") TextureRegion bridgeRegion;
@@ -56,23 +56,27 @@ public class DirectionBridge extends Block{
         Draw.rect(dirRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
     }
 
+    private BuildPlan currentPlan, otherPlan;
+    private Boolf<BuildPlan> planFinder = other -> {
+        if(other.block == this && currentPlan != other && Mathf.clamp(other.x - currentPlan.x, -1, 1) == Geometry.d4x(currentPlan.rotation) && Mathf.clamp(other.y - currentPlan.y, -1, 1) == Geometry.d4y(currentPlan.rotation)){
+            int dst = Math.max(Math.abs(other.x - currentPlan.x), Math.abs(other.y - currentPlan.y));
+            if(dst <= otherDst){
+                otherPlan = other;
+                otherDst = dst;
+            }
+        }
+        return false;
+    };
+
     @Override
     public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
-        otherReq = null;
         otherDst = range;
-        Point2 d = Geometry.d4(plan.rotation);
-        list.each(other -> {
-            if(other.block == this && plan != other && Mathf.clamp(other.x - plan.x, -1, 1) == d.x && Mathf.clamp(other.y - plan.y, -1, 1) == d.y){
-                int dst = Math.max(Math.abs(other.x - plan.x), Math.abs(other.y - plan.y));
-                if(dst <= otherDst){
-                    otherReq = other;
-                    otherDst = dst;
-                }
-            }
-        });
+        otherPlan = null;
+        currentPlan = plan;
+        findPlan(list, plan.x, plan.y, range * 2 + 1, planFinder);
 
-        if(otherReq != null){
-            drawBridge(plan.rotation, plan.drawx(), plan.drawy(), otherReq.drawx(), otherReq.drawy(), null);
+        if(otherPlan != null){
+            drawBridge(plan.rotation, plan.drawx(), plan.drawy(), otherPlan.drawx(), otherPlan.drawy(), null);
         }
     }
 

@@ -23,7 +23,6 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
-    protected static BuildPlan otherReq;
     protected static int returnInt = 0;
     protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     /** The maximum range of all power nodes on the map */
@@ -316,25 +315,22 @@ public class PowerNode extends PowerBlock{
         });
     }
 
+    static int currentFindX, currentFindY;
+    static BuildPlan currentPlan;
+    static final Boolf<BuildPlan> planFinder = other -> other.block != null
+        && (currentFindX >= other.x - ((other.block.size - 1) / 2) && currentFindY >= other.y - ((other.block.size - 1) / 2) && currentFindX <= other.x + other.block.size / 2 && currentFindY <= other.y + other.block.size / 2)
+        && other != currentPlan && other.block.hasPower;
+
     @Override
     public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
         if(plan.config instanceof Point2[] ps){
             setupColor(1f);
             for(Point2 point : ps){
-                int px = plan.x + point.x, py = plan.y + point.y;
-                otherReq = null;
-                list.each(other -> {
-                    if(other.block != null
-                        && (px >= other.x - ((other.block.size-1)/2) && py >= other.y - ((other.block.size-1)/2) && px <= other.x + other.block.size/2 && py <= other.y + other.block.size/2)
-                        && other != plan && other.block.hasPower){
-                        otherReq = other;
-                    }
-                });
+                currentFindX = plan.x + point.x;
+                currentFindY = plan.y + point.y;
+                currentPlan = plan;
 
-                //uncomment for debugging connection translation issues in schematics
-                //Draw.color(Color.red);
-                //Lines.line(plan.drawx(), plan.drawy(), px * tilesize, py * tilesize);
-                //Draw.color();
+                var otherReq = findPlan(list, currentFindX, currentFindY, planFinder);
 
                 if(otherReq == null || otherReq.block == null) continue;
 
@@ -342,6 +338,11 @@ public class PowerNode extends PowerBlock{
             }
             Draw.color();
         }
+    }
+
+    @Override
+    public float planConfigClipSize(){
+        return laserRange * tilesize * 2f + size * tilesize;
     }
 
     public boolean linkValid(Building tile, Building link){

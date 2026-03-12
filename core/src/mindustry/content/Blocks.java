@@ -3911,9 +3911,10 @@ public class Blocks{
             );
             size = 3;
             reload = 3f;
+            shoot = new ShootAlternate(4f);
             shoot.shots = 2;
             velocityRnd = 0.1f;
-            inaccuracy = 4f;
+            inaccuracy = 3f;
             recoil = 1f;
             shootCone = 45f;
             liquidCapacity = 40f;
