@@ -74,9 +74,9 @@ public class ItemBridge extends Block{
         }
     }
 
-    static int currentFindX, currentFindY;
-    static BuildPlan currentPlan;
-    static final Boolf<BuildPlan> planFinder = other -> other.block == currentPlan.block && currentPlan != other && currentFindX == other.x && currentFindY == other.y;
+    private static int currentFindX, currentFindY;
+    private static BuildPlan currentPlan;
+    private static final Boolf<BuildPlan> planFinder = other -> other.block == currentPlan.block && currentPlan != other && currentFindX == other.x && currentFindY == other.y;
 
     @Override
     public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){

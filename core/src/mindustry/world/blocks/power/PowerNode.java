@@ -315,9 +315,9 @@ public class PowerNode extends PowerBlock{
         });
     }
 
-    static int currentFindX, currentFindY;
-    static BuildPlan currentPlan;
-    static final Boolf<BuildPlan> planFinder = other -> other.block != null
+    private static int currentFindX, currentFindY;
+    private static BuildPlan currentPlan;
+    private static final Boolf<BuildPlan> planFinder = other -> other.block != null
         && (currentFindX >= other.x - ((other.block.size - 1) / 2) && currentFindY >= other.y - ((other.block.size - 1) / 2) && currentFindX <= other.x + other.block.size / 2 && currentFindY <= other.y + other.block.size / 2)
         && other != currentPlan && other.block.hasPower;
 

@@ -56,7 +56,7 @@ public class DirectionBridge extends Block{
         Draw.rect(dirRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
     }
 
-    private BuildPlan currentPlan, otherPlan;
+    private static BuildPlan currentPlan, otherPlan;
     private Boolf<BuildPlan> planFinder = other -> {
         if(other.block == this && currentPlan != other && Mathf.clamp(other.x - currentPlan.x, -1, 1) == Geometry.d4x(currentPlan.rotation) && Mathf.clamp(other.y - currentPlan.y, -1, 1) == Geometry.d4y(currentPlan.rotation)){
             int dst = Math.max(Math.abs(other.x - currentPlan.x), Math.abs(other.y - currentPlan.y));
