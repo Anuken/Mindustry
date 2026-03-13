@@ -497,8 +497,7 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("animatedwater", true);
 
         if(Shaders.shield != null){
-            //animated shields are off by default on android (generally lower spec devices)
-            graphics.checkPref("animatedshields", !android);
+            graphics.checkPref("animatedshields", true);
         }
 
         graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
