@@ -399,8 +399,8 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     /** Shows a label at some position on the screen. Does not fade. */
-    public void showInfoPopup(String info, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
-        if(info == null){ // null info allows deletion of old labels provided they have ids
+    public void showInfoPopup(@Nullable String info, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
+        if(info == null){ // null info allows deletion of old popups provided they have ids
             var table = popups.remove(id);
             if(table != null) table.remove();
             return;
@@ -424,7 +424,7 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     /** Shows a label in the world. This label is behind everything. Does not fade. */
-    public void showLabel(String info, int id, float duration, float worldx, float worldy){
+    public void showLabel(@Nullable String info, int id, float duration, float worldx, float worldy){
         if(info == null){ // null info allows deletion of old labels provided they have ids
             var table = labels.remove(id);
             if(table != null) table.remove();
