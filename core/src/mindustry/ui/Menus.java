@@ -122,41 +122,55 @@ public class Menus{
     }
 
     @Remote(variants = Variant.both, unreliable = true)
-    public static void infoPopup(String message, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
+    public static void infoPopup(@Nullable String message, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
         if(message == null) return;
 
         ui.showInfoPopup(message, id, duration, align, top, left, bottom, right);
     }
 
     @Remote(variants = Variant.both)
-    public static void infoPopupReliable(String message, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
+    public static void infoPopupReliable(@Nullable String message, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
         infoPopup(message, id, duration, align, top, left, bottom, right);
     }
 
     /** @deprecated Prefer variants with ids to stop flickering popups. */
     @Deprecated
     @Remote(variants = Variant.both, unreliable = true)
-    public static void infoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
+    public static void infoPopup(@Nullable String message, float duration, int align, int top, int left, int bottom, int right){
         infoPopup(message, null, duration, align, top, left, bottom, right);
     }
 
     /** @deprecated Prefer variants with ids to stop flickering popups. */
     @Deprecated
     @Remote(variants = Variant.both)
-    public static void infoPopupReliable(String message, float duration, int align, int top, int left, int bottom, int right){
+    public static void infoPopupReliable(@Nullable String message, float duration, int align, int top, int left, int bottom, int right){
         infoPopup(message, duration, align, top, left, bottom, right);
     }
 
     @Remote(variants = Variant.both, unreliable = true)
-    public static void label(String message, float duration, float worldx, float worldy){
+    public static void label(@Nullable String message, int id, float duration, float worldx, float worldy){
         if(message == null) return;
 
-        ui.showLabel(message, duration, worldx, worldy);
+        ui.showLabel(message, id, duration, worldx, worldy);
     }
 
     @Remote(variants = Variant.both)
-    public static void labelReliable(String message, float duration, float worldx, float worldy){
-        label(message, duration, worldx, worldy);
+    public static void labelReliable(@Nullable String message, int id, float duration, float worldx, float worldy){
+        label(message, id, duration, worldx, worldy);
+    }
+
+    /** @deprecated Prefer variants with ids to stop flickering labels. */
+    @Deprecated
+    @Remote(variants = Variant.both, unreliable = true)
+    public static void label(@Nullable String message, float duration, float worldx, float worldy){
+        label(message, -1, duration, worldx, worldy);
+    }
+
+    /** @deprecated Prefer variants with ids to stop flickering labels. */
+    @Deprecated
+    @Remote(variants = Variant.both)
+    public static void labelReliable(@Nullable String message, float duration, float worldx, float worldy){
+        label(message, -1, duration, worldx, worldy);
     }
 
     @Remote(variants = Variant.both)
