@@ -5,6 +5,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.ai.types.*;
 import mindustry.async.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -55,7 +56,7 @@ public class AIController implements UnitController{
     }
 
     public boolean hasStance(@Nullable UnitStance stance){
-        if(unit.controller() instanceof AIController ai){
+        if(unit.controller() instanceof CommandAI ai){
             return ai.hasStance(stance);
         }
         return false;

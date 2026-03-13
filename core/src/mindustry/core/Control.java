@@ -700,6 +700,7 @@ public class Control implements ApplicationListener, Loadable{
 
         if(state.isGame()){
             input.update();
+            input.updateSelectQuadtree();
             if(!state.isPaused()){
                 indicators.update();
             }
