@@ -180,6 +180,13 @@ public class Menus{
         ui.showConfirm(Core.bundle.format("linkopen", uri), () -> Core.app.openURI(uri));
     }
 
+    @Remote(variants = Variant.both)
+    public static void copyToClipboard(String text){
+        if(text == null) return;
+
+        ui.showConfirm(Core.bundle.format("clipboardcopy", text), () -> Core.app.setClipboardText(text));
+    }
+
     //internal use only
     @Remote
     public static void removeWorldLabel(int id){
