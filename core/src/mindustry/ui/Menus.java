@@ -148,15 +148,29 @@ public class Menus{
     }
 
     @Remote(variants = Variant.both, unreliable = true)
-    public static void label(String message, float duration, float worldx, float worldy){
+    public static void label(String message, int id, float duration, float worldx, float worldy){
         if(message == null) return;
 
-        ui.showLabel(message, duration, worldx, worldy);
+        ui.showLabel(message, id, duration, worldx, worldy);
     }
 
     @Remote(variants = Variant.both)
+    public static void labelReliable(String message, int id, float duration, float worldx, float worldy){
+        label(message, id, duration, worldx, worldy);
+    }
+
+    /** @deprecated Prefer variants with ids to stop flickering labels. */
+    @Deprecated
+    @Remote(variants = Variant.both, unreliable = true)
+    public static void label(String message, float duration, float worldx, float worldy){
+        label(message, -1, duration, worldx, worldy);
+    }
+
+    /** @deprecated Prefer variants with ids to stop flickering labels. */
+    @Deprecated
+    @Remote(variants = Variant.both)
     public static void labelReliable(String message, float duration, float worldx, float worldy){
-        label(message, duration, worldx, worldy);
+        label(message, -1, duration, worldx, worldy);
     }
 
     @Remote(variants = Variant.both)
