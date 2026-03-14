@@ -157,7 +157,7 @@ public class CommandAI extends AIController{
             commandController.updateUnit();
         }else{
             defaultBehavior();
-            if(hasStance(UnitStance.boost) && unit.type.canBoost){
+            if(shouldBoost() && unit.type.canBoost){
                 //auto land when near target
                 if(attackTarget != null && unit.within(attackTarget, unit.range())){
                     unit.updateBoosting(false);
@@ -169,6 +169,10 @@ public class CommandAI extends AIController{
                 unit.updateBoosting(false);
             }
         }
+    }
+
+    protected boolean shouldBoost(){
+        return hasStance(UnitStance.boost) || command == UnitCommand.enterPayloadCommand;
     }
 
     public void clearCommands(){
