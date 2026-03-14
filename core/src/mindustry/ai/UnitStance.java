@@ -89,7 +89,7 @@ public class UnitStance extends MappableContent{
         }};
         ram = new UnitStance("ram", "rightOpen", Binding.unitStanceRam);
         boost = new UnitStance("boost", "up", Binding.unitStanceBoost){{
-            incompatibleCommands.addAll(UnitCommand.rebuildCommand, UnitCommand.repairCommand, UnitCommand.assistCommand);
+            incompatibleCommands.addAll(UnitCommand.rebuildCommand, UnitCommand.repairCommand, UnitCommand.assistCommand, UnitCommand.enterPayloadCommand);
         }};
         holdPosition = new UnitStance("holdposition", "effect", Binding.unitStanceHoldPosition);
         mineAuto = new UnitStance("mineauto", "settings", null, false);
