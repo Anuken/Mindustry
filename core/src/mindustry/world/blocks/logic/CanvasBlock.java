@@ -47,7 +47,6 @@ public class CanvasBlock extends Block{
             if(build.data.length == bytes.length){
                 System.arraycopy(bytes, 0, build.data, 0, bytes.length);
                 build.invalidated = true;
-                build.updateTexture();
             }
         });
     }
@@ -154,25 +153,11 @@ public class CanvasBlock extends Block{
             }
         }
 
-        public void setPixel(int x, int y, int index){
-            if(x >= 0 && y >= 0 && x < canvasSize && y < canvasSize && index >= 0 && index < palette.length){
-                setByte(data, (y * canvasSize + x) * bitsPerPixel, index);
-                invalidated = true;
-            }
-        }
-
         public double getPixel(int pos){
             if(pos >= 0 && pos < canvasSize * canvasSize){
                 return getByte(data, pos * bitsPerPixel);
             }
             return Double.NaN;
-        }
-
-        public int getPixel(int x, int y){
-            if(x >= 0 && y >= 0 && x < canvasSize && y < canvasSize){
-                return getByte(data, (y * canvasSize + x) * bitsPerPixel);
-            }
-            return 0;
         }
 
         public void updateTexture(){
