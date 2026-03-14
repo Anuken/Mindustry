@@ -87,7 +87,7 @@ public class UnitCommand extends MappableContent{
         mineCommand = new UnitCommand("mine", "production", Binding.unitCommandMine, u -> new MinerAI()){{
             refreshOnSelect = true;
         }};
-        enterPayloadCommand = new UnitCommand("enterPayload", "downOpen", Binding.unitCommandEnterPayload, u -> new BoostAI()){{
+        enterPayloadCommand = new UnitCommand("enterPayload", "downOpen", Binding.unitCommandEnterPayload, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
