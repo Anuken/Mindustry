@@ -2557,9 +2557,11 @@ public class UnitTypes{
                     backColor = trailColor = Pal.yellowBoltFront;
                     hitColor = Pal.yellowBoltFront;
                     frontColor = Color.white;
+                    lightColor = Pal.yellowBoltFront;
 
                     lifetime = 60f;
                     buildingDamageMultiplier = 0.01f;
+                    homingPower = 0.02f;
                 }};
             }});
         }};
@@ -2606,9 +2608,11 @@ public class UnitTypes{
                     backColor = trailColor = Pal.yellowBoltFront;
                     hitColor = Pal.yellowBoltFront;
                     frontColor = Color.white;
+                    lightColor = Pal.yellowBoltFront;
 
                     lifetime = 60f;
                     buildingDamageMultiplier = 0.01f;
+                    homingPower = 0.03f;
                 }};
             }});
         }};
@@ -2659,6 +2663,7 @@ public class UnitTypes{
                     backColor = trailColor = Pal.yellowBoltFront;
                     hitColor = Pal.yellowBoltFront;
                     frontColor = Color.white;
+                    lightColor = Pal.yellowBoltFront;
 
                     lifetime = 70f;
                     buildingDamageMultiplier = 0.01f;
@@ -2828,7 +2833,7 @@ public class UnitTypes{
                 y = -1f;
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
-                bullet = new BasicBulletType(7f, 10){{
+                bullet = new BasicBulletType(7f, 120){{
                     sprite = "missile-large";
                     width = 7.5f;
                     height = 13f;

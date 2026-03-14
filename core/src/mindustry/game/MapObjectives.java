@@ -209,9 +209,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             state.rules.objectiveFlags.addAll(flagsAdded);
             completed = true;
 
-            if(completionLogicCode != null && !completionLogicCode.isEmpty()){
-                LExecutor.runLogicScript(completionLogicCode);
-            }
+            LExecutor.runLogicScript(completionLogicCode);
         }
 
         /** @return true if all {@link #parents} are completed, rendering this objective able to execute. */

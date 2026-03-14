@@ -535,6 +535,50 @@ public class PatcherTests{
     }
 
     @Test
+    void nestedArrays() throws Exception{
+
+        Vars.state.patcher.apply(Seq.with("""
+        {
+            "block.ship-refabricator.upgrades.0": {
+                "0": "dagger",
+                "1": "mace"
+            }
+        }
+        """));
+        assertNoWarnings();
+
+        assertEquals(UnitTypes.dagger, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[0]);
+        assertEquals(UnitTypes.mace, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[1]);
+
+        resetAfter();
+
+        assertEquals(UnitTypes.elude, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[0]);
+        assertEquals(UnitTypes.avert, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[1]);
+    }
+
+    @Test
+    void nestedArrays2() throws Exception{
+
+        Vars.state.patcher.apply(Seq.with("""
+        {
+            "block.ship-refabricator": {
+                "upgrades.0.0": "dagger",
+                "upgrades.0.1": "mace"
+            }
+        }
+        """));
+        assertNoWarnings();
+
+        assertEquals(UnitTypes.dagger, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[0]);
+        assertEquals(UnitTypes.mace, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[1]);
+
+        resetAfter();
+
+        assertEquals(UnitTypes.elude, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[0]);
+        assertEquals(UnitTypes.avert, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[1]);
+    }
+
+    @Test
     void customAttribute() throws Exception{
         int amount = Attribute.all.length;
 

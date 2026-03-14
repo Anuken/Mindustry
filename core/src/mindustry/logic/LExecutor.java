@@ -67,11 +67,13 @@ public class LExecutor{
         Events.on(ResetEvent.class, e -> unitTimeouts.clear());
     }
 
-    public static void runLogicScript(String code){
+    public static void runLogicScript(@Nullable String code){
         runLogicScript(code, 100_000, false);
     }
 
-    public static void runLogicScript(String code, int maxInstructions, boolean loop){
+    public static void runLogicScript(@Nullable String code, int maxInstructions, boolean loop){
+        if(code == null || code.isEmpty()) return;
+
         LExecutor executor = new LExecutor();
         executor.privileged = true;
 

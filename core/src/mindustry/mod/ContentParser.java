@@ -91,6 +91,9 @@ public class ContentParser{
             return Attribute.add(attr);
         });
         put(Attributes.class, (type, data) -> {
+            if(!data.isObject()){
+                throw new IllegalArgumentException("Attribute definitions must be objects, e.g. {heat: 10}");
+            }
             Attributes attr = new Attributes();
             for(var child : data){
                 Attribute value = Attribute.exists(child.name) ? Attribute.get(child.name) : Attribute.add(child.name);
@@ -762,7 +765,12 @@ public class ContentParser{
                 }
 
                 if(value.has("sector")){
-                    preset.initialize(planet, value.getInt("sector", 0));
+                    //clear old value
+                    Sector prev = preset.sector;
+                    if(prev != null && prev.preset == preset){
+                        prev.preset = null;
+                    }
+                    preset.initialize(planet, value.getInt("sector", 0), true);
                 }
 
                 value.remove("sector");

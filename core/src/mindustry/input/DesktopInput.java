@@ -159,7 +159,7 @@ public class DesktopInput extends InputHandler{
                 drawArrow(splan.block, splan.x, splan.y, splan.rotation, valid);
             }
 
-            splan.block.drawPlan(splan, allPlans(), valid);
+            splan.block.drawPlan(splan, allPlans, valid);
 
             drawSelected(splan.x, splan.y, splan.block, getPlan(splan.x, splan.y, splan.block.size, splan) != null ? Pal.remove : Pal.accent);
         }
@@ -214,7 +214,7 @@ public class DesktopInput extends InputHandler{
                     Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
                     bplan.set(cursorX, cursorY, rot, block);
                     bplan.config = block.lastConfig;
-                    block.drawPlanConfig(bplan, allPlans());
+                    block.drawPlanConfig(bplan, allPlans);
                     bplan.config = null;
                     Draw.reset();
                 }

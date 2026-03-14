@@ -281,6 +281,8 @@ public class ClassMap{
         classes.put("StaticWall", mindustry.world.blocks.environment.StaticWall.class);
         classes.put("SteamVent", mindustry.world.blocks.environment.SteamVent.class);
         classes.put("TallBlock", mindustry.world.blocks.environment.TallBlock.class);
+        classes.put("TiledFloor", mindustry.world.blocks.environment.TiledFloor.class);
+        classes.put("TiledWall", mindustry.world.blocks.environment.TiledWall.class);
         classes.put("TreeBlock", mindustry.world.blocks.environment.TreeBlock.class);
         classes.put("WobbleProp", mindustry.world.blocks.environment.WobbleProp.class);
         classes.put("HeatBlock", mindustry.world.blocks.heat.HeatBlock.class);
