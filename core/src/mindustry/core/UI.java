@@ -87,6 +87,8 @@ public class UI implements ApplicationListener, Loadable{
 
     /** Maps popups to ids so that they can be removed or updated by id. */
     private final ObjectMap<String, Table> popups = new ObjectMap<>();
+    /** Maps labels to ids so that they can be removed or updated by id. */
+    private final IntMap<Table> labels = new IntMap<>();
 
     public UI(){
         Fonts.loadFonts();
@@ -397,11 +399,16 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     /** Shows a label at some position on the screen. Does not fade. */
-    public void showInfoPopup(String info, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
+    public void showInfoPopup(@Nullable String info, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
+        if(info == null){ // null info allows deletion of old popups provided they have ids
+            var table = popups.remove(id);
+            if(table != null) table.remove();
+            return;
+        }
         Table table = new Table();
         if(id != null){
             Table old = popups.put(id, table);
-            if (old != null) old.remove();
+            if(old != null) old.remove();
         }
         table.setFillParent(true);
         table.touchable = Touchable.disabled;
@@ -417,15 +424,27 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     /** Shows a label in the world. This label is behind everything. Does not fade. */
-    public void showLabel(String info, float duration, float worldx, float worldy){
+    public void showLabel(@Nullable String info, int id, float duration, float worldx, float worldy){
+        if(info == null){ // null info allows deletion of old labels provided they have ids
+            var table = labels.remove(id);
+            if(table != null) table.remove();
+            return;
+        }
         var table = new Table(Styles.black3).margin(4);
+        if(id != -1){
+            Table old = labels.put(id, table);
+            if(old != null) old.remove();
+        }
         table.touchable = Touchable.disabled;
         table.update(() -> {
-            if(state.isMenu()) table.remove();
+            if(state.isMenu()){
+                table.remove();
+                if(id != -1) labels.remove(id);
+            }
             Vec2 v = Core.camera.project(worldx, worldy);
             table.setPosition(v.x, v.y, Align.center);
         });
-        table.actions(Actions.delay(duration), Actions.remove());
+        table.actions(Actions.delay(duration), Actions.remove(), Actions.run(() -> { if(id != -1) labels.remove(id); }));
         table.add(info).style(Styles.outlineLabel);
         table.pack();
         table.act(0f);
