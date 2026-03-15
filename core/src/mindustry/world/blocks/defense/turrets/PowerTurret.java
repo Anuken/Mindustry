@@ -48,6 +48,13 @@ public class PowerTurret extends Turret{
         }
 
         @Override
+        public boolean shouldConsume(){
+            //when the block is first placed, it shouldn't consume power/liquid just to "cool down" from the initial reload
+            //thus, it should only consume once it has actually shot at something
+            return isShooting() || (reloadCounter < reload && totalShots > 0);
+        }
+
+        @Override
         public boolean hasAmmo(){
             //you can always rotate, but never shoot if there's no power
             return true;

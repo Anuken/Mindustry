@@ -68,15 +68,21 @@ public class SectorPreset extends UnlockableContent{
     }
 
     public void initialize(Planet planet, int sector){
+        initialize(planet, sector, false);
+    }
+
+    public void initialize(Planet planet, int sector, boolean override){
         this.planet = planet;
         if(generator == null){
             this.generator = new FileMapGenerator(fileName == null ? this.name : fileName, this);
         }
         this.originalPosition = sector;
-        //auto remap based on data
-        var data = planet.getData();
-        if(data != null){
-            sector = data.presets.get(name, sector);
+        if(!override){
+            //auto remap based on data
+            var data = planet.getData();
+            if(data != null){
+                sector = data.presets.get(name, sector);
+            }
         }
         sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector == -1 ? 0 : sector);

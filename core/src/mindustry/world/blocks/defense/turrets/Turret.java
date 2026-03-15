@@ -351,9 +351,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public boolean shouldConsume(){
-            //when the block is first placed, it shouldn't consume power/liquid just to "cool down" from the initial reload
-            //thus, it should only consume once it has actually shot at something
-            return isShooting() || (reloadCounter < reload && totalShots > 0);
+            return isShooting() || reloadCounter < reload;
         }
 
         @Override

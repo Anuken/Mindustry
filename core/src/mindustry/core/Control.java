@@ -31,6 +31,7 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -186,7 +187,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(GameOverEvent.class, e -> {
             if(state.isCampaign() && !net.client() && !headless){
 
-                //save gameover sate immediately
+                //save gameover state immediately
                 if(saves.getCurrent() != null){
                     saves.getCurrent().save();
                 }
@@ -284,7 +285,12 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(SaveWriteEvent.class, e -> forcePlaceAll());
+        Events.on(SaveWriteEvent.class, e -> {
+            if(!net.client() && state.isCampaign()){
+                state.getPlanet().saveStats();
+            }
+            forcePlaceAll();
+        });
         Events.on(HostEvent.class, e -> forcePlaceAll());
         Events.on(HostEvent.class, e -> {
             state.set(State.playing);
@@ -497,6 +503,14 @@ public class Control implements ApplicationListener, Loadable{
                                     }
                                 }
 
+                                //all the derelict power graphs are invalid
+                                for(var build : previousBuildings){
+                                    if(build.power != null){
+                                        build.power.graph = new PowerGraph();
+                                        build.power.links.clear();
+                                    }
+                                }
+
                                 //copy over all buildings from the previous save, retaining config and health, and making them derelict
                                 for(var build : previousBuildings){
                                     Tile tile = world.tile(build.tileX(), build.tileY());
@@ -686,6 +700,7 @@ public class Control implements ApplicationListener, Loadable{
 
         if(state.isGame()){
             input.update();
+            input.updateSelectQuadtree();
             if(!state.isPaused()){
                 indicators.update();
             }
