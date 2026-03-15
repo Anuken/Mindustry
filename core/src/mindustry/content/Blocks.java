@@ -6883,7 +6883,7 @@ public class Blocks{
         }};
 
         largeCanvas = new CanvasBlock("large-canvas"){{
-            requirements(Category.logic, BuildVisibility.shown, with(Items.silicon, 15, Items.beryllium, 15, Items.tungsten, 10));
+            requirements(Category.logic, BuildVisibility.shown, with(Items.silicon, 15, Items.beryllium, 15, Items.surgeAlloy, 5));
 
             canvasSize = 24;
             padding = 7f / 4f * 2f;
