@@ -51,6 +51,14 @@ public class CanvasBlock extends Block{
         });
     }
 
+    public void setPaletteFromString(String value){
+        String[] split = value.split("\n");
+        palette = new int[split.length];
+        for(int i = 0; i < split.length; i++){
+            palette[i] = (Integer.parseInt(split[i], 16) << 8) | 0xff;
+        }
+    }
+
     @Override
     public void init(){
         super.init();
