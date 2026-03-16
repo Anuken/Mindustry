@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
@@ -23,22 +24,28 @@ public class CanvasEditDialog extends BaseDialog{
     static final float refreshTime = 60f * 2f;
 
     int curColor;
-    boolean fill, modified;
+    boolean fill, modified, grid = true;
     float time;
     CanvasBuild canvas;
+    CanvasBlock block;
     Pixmap pix;
+    Texture texture;
 
     public CanvasEditDialog(CanvasBuild canvas){
         super("");
         titleTable.remove();
         this.canvas = canvas;
-        CanvasBlock block = (CanvasBlock)canvas.block;
+        block = (CanvasBlock)canvas.block;
         int size = block.canvasSize;
         pix = block.makePixmap(canvas.data, new Pixmap(size, size));
-        Texture texture = new Texture(pix);
+        texture = new Texture(pix);
         curColor = block.palette[0];
 
-        addCloseButton();
+        addCloseButton(160f);
+
+        buttons.button("@import", Icon.image, () -> platform.showFileChooser(true, "png", this::importFrom));
+
+        buttons.button("@export", Icon.export, () -> platform.showFileChooser(false, "png", this::exportTo));
 
         hidden(() -> {
             save();
@@ -138,7 +145,7 @@ public class CanvasEditDialog extends BaseDialog{
                     Draw.rect(Tmp.tr1, x + width/2f, y + height/2f, width, height);
 
                     //draw grid
-                    {
+                    if(grid){
                         float xspace = (getWidth() / size);
                         float yspace = (getHeight() / size);
                         float s = 1f;
@@ -175,11 +182,17 @@ public class CanvasEditDialog extends BaseDialog{
 
         cont.row();
 
-        cont.add().size(60f);
+        cont.table(Tex.button, t -> {
+            t.button(Icon.grid, Styles.clearNoneTogglei, () -> grid = !grid).checked(grid).size(44f);
+        });
 
         cont.table(Tex.button, p -> {
             for(int i = 0; i < block.palette.length; i++){
                 int fi = i;
+
+                if(i % 8 == 0){
+                    p.row();
+                }
 
                 var button = p.button(Tex.whiteui, Styles.squareTogglei, 30, () -> {
                     curColor = block.palette[fi];
@@ -192,9 +205,67 @@ public class CanvasEditDialog extends BaseDialog{
             t.button(Icon.fill, Styles.clearNoneTogglei, () -> fill = !fill).size(44f);
         });
 
-        closeOnBack();
-
         buttons.defaults().size(150f, 64f);
+    }
+
+    void exportTo(Fi file){
+        try{
+            file.writePng(pix);
+        }catch(Exception e){
+            ui.showException(e);
+        }
+    }
+
+    void importFrom(Fi file){
+        try{
+            Pixmap source = new Pixmap(file);
+            int size = pix.width;
+            if(source.width > size || source.height > size){
+                float ratio = (float)Math.max(source.width, source.height) / size;
+                Pixmap dest = new Pixmap(size, size);
+                dest.draw(source, 0, 0, source.width, source.height, (size - (int)(source.width / ratio))/2, (size - (int)(source.height / ratio))/2, (int)(source.width / ratio), (int)(source.height / ratio));
+                source.dispose();
+                source = dest;
+            }else if(source.width < size || source.height < size){
+                pix.fill(block.palette[0]);
+                Pixmap dest = new Pixmap(size, size);
+                dest.draw(source, (size - source.width)/2, (size - source.height)/2);
+                source.dispose();
+                source = dest;
+            }
+            int sizeX = Math.min(source.width, pix.width), sizeY = Math.min(source.height, pix.height);
+            for(int x = 0; x < sizeX; x++){
+                for(int y = 0; y < sizeY; y++){
+                    int c = source.getRaw(x, y);
+                    pix.setRaw(x, y, findClosest(c));
+                }
+            }
+
+            texture.draw(pix);
+            modified = true;
+        }catch(Exception e){
+            ui.showException("@editor.errorload", e);
+        }
+    }
+
+    int findClosest(int color){
+        //blend the new color over the bg color for more accurate selection
+        if(Color.ai(color) < 255){
+            color = Pixmap.blend(block.palette[0], color);
+        }
+        Tmp.c1.set(color);
+        float nearestDst = 100f;
+        int nearest = 0;
+        for(int i = 0; i < block.palette.length; i++){
+            if(block.palette[i] == color) return color;
+            Tmp.c2.set(block.palette[i]);
+            float dst = Tmp.c1.dst(Tmp.c2);
+            if(dst < nearestDst){
+                nearest = i;
+                nearestDst = dst;
+            }
+        }
+        return block.palette[nearest];
     }
 
     void save(){
