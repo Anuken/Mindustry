@@ -54,11 +54,16 @@ public class SettingsMenuDialog extends BaseDialog{
             rebuildMenu();
         });
 
+        int[] lastRebuildSize = {Core.graphics.getWidth(), Core.graphics.getHeight()};
         onResize(() -> {
-            graphics.rebuild();
-            sound.rebuild();
-            game.rebuild();
-            updateScrollFocus();
+            if(lastRebuildSize[0] != Core.graphics.getWidth() || lastRebuildSize[1] != Core.graphics.getHeight()){
+                graphics.rebuild();
+                sound.rebuild();
+                game.rebuild();
+                updateScrollFocus();
+                lastRebuildSize[0] = Core.graphics.getWidth();
+                lastRebuildSize[1] = Core.graphics.getHeight();
+            }
         });
 
         cont.clearChildren();
@@ -374,6 +379,13 @@ public class SettingsMenuDialog extends BaseDialog{
             game.checkPref("console", false);
         }
 
+        graphics.sliderPref("uiEdgePadding", 0, 0, 100, s -> s + "px", s -> {
+            if(ui != null){
+                ui.updateMargins();
+                Core.scene.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+            }
+        });
+
         int[] lastUiScale = {settings.getInt("uiscale", 100)};
 
         graphics.sliderPref("uiscale", 100, 25, 300, 5, s -> {
@@ -674,8 +686,16 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         public SliderSetting sliderPref(String name, int def, int min, int max, int step, StringProcessor s){
+            return sliderPref(name, def, min, max, step, s, null);
+        }
+
+        public SliderSetting sliderPref(String name, int def, int min, int max, StringProcessor s, Intc changed){
+            return sliderPref(name, def, min, max, 1, s, changed);
+        }
+
+        public SliderSetting sliderPref(String name, int def, int min, int max, int step, StringProcessor s, Intc changed){
             SliderSetting res;
-            list.add(res = new SliderSetting(name, def, min, max, step, s));
+            list.add(res = new SliderSetting(name, def, min, max, step, s, changed));
             settings.defaults(name, def);
             rebuild();
             return res;
@@ -784,14 +804,16 @@ public class SettingsMenuDialog extends BaseDialog{
         public static class SliderSetting extends Setting{
             int def, min, max, step;
             StringProcessor sp;
+            Intc changed;
 
-            public SliderSetting(String name, int def, int min, int max, int step, StringProcessor s){
+            public SliderSetting(String name, int def, int min, int max, int step, StringProcessor s, Intc changed){
                 super(name);
                 this.def = def;
                 this.min = min;
                 this.max = max;
                 this.step = step;
                 this.sp = s;
+                this.changed = changed;
             }
 
             @Override
@@ -810,6 +832,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 slider.changed(() -> {
                     settings.put(name, (int)slider.getValue());
                     value.setText(sp.get((int)slider.getValue()));
+                    if(changed != null) changed.get((int)slider.getValue());
                 });
 
                 slider.change();
