@@ -380,7 +380,10 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         graphics.sliderPref("uiEdgePadding", 0, 0, 100, s -> s + "px", s -> {
-            if(ui != null) ui.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+            if(ui != null){
+                ui.updateMargins();
+                Core.scene.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+            }
         });
 
         int[] lastUiScale = {settings.getInt("uiscale", 100)};
@@ -687,11 +690,11 @@ public class SettingsMenuDialog extends BaseDialog{
             return sliderPref(name, def, min, max, step, s, null);
         }
 
-        public SliderSetting sliderPref(String name, int def, int min, int max, StringProcessor s, Cons<Integer> changed){
+        public SliderSetting sliderPref(String name, int def, int min, int max, StringProcessor s, Intc changed){
             return sliderPref(name, def, min, max, 1, s, changed);
         }
 
-        public SliderSetting sliderPref(String name, int def, int min, int max, int step, StringProcessor s, Cons<Integer> changed){
+        public SliderSetting sliderPref(String name, int def, int min, int max, int step, StringProcessor s, Intc changed){
             SliderSetting res;
             list.add(res = new SliderSetting(name, def, min, max, step, s, changed));
             settings.defaults(name, def);
@@ -802,9 +805,9 @@ public class SettingsMenuDialog extends BaseDialog{
         public static class SliderSetting extends Setting{
             int def, min, max, step;
             StringProcessor sp;
-            Cons<Integer> changed;
+            Intc changed;
 
-            public SliderSetting(String name, int def, int min, int max, int step, StringProcessor s, Cons<Integer> changed){
+            public SliderSetting(String name, int def, int min, int max, int step, StringProcessor s, Intc changed){
                 super(name);
                 this.def = def;
                 this.min = min;
