@@ -2081,9 +2081,8 @@ public class Blocks{
         conveyor = new Conveyor("conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1));
             health = 45;
-            speed = 0.03f;
-            displayedSpeed = 4.2f;
-            buildCostMultiplier = 2f;
+            speed = 0.046f;
+            displayedSpeed = 6.5f;
             researchCost = with(Items.copper, 5);
         }};
 
@@ -2113,7 +2112,7 @@ public class Blocks{
             speed = 26;
             capacity = 6;
             health = 30;
-            buildCostMultiplier = 6f;
+            buildCostMultiplier = 3f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
