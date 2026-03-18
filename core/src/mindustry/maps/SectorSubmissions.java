@@ -24,8 +24,8 @@ public class SectorSubmissions{
     public static void registerSectors(){
 
         registerSerpuloSector(76, "Tyrant-classZzz", "https://discord.com/channels/391020510269669376/1379926833411391580/1479890094486716499");
-        registerSerpuloSector(47, "tinport", "https://discord.com/channels/391020510269669376/1379926802591645820/1397649518203371544");
-        registerSerpuloSector(225, "Summi", "https://discord.com/channels/391020510269669376/1379926925719376152/1399286858482978900");
+        registerSerpuloSector(47, "tinport", "https://discord.com/channels/391020510269669376/1379926802591645820/1481778410018570274");
+        registerSerpuloSector(225, "Summi", "https://discord.com/channels/391020510269669376/1379926925719376152/1419026814826709103");
         //111 has an alternate submission https://discord.com/channels/391020510269669376/1379926842659569864/1404825715244793938
         registerSerpuloSector(111, "gausofid", "https://discord.com/channels/391020510269669376/1379926842659569864/1422257393042985114");
         registerSerpuloSector(176, "wpx", "https://discord.com/channels/391020510269669376/1379926887203213353/1390418885081043135");

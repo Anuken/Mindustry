@@ -304,6 +304,13 @@ project(":core"){
         }
     }
 
+    task depsJar(type: Jar, dependsOn: classes){
+        archiveClassifier = 'deps'
+        from files(sourceSets.main.output.classesDirs)
+        from{ configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) } }
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
     task sourcesJar(type: Jar, dependsOn: classes){
         archiveClassifier = 'sources'
         from sourceSets.main.allSource
