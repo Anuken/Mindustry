@@ -579,6 +579,21 @@ public class PatcherTests{
     }
 
     @Test
+    void arrayMulti() throws Exception{
+        int size = UnitTypes.emanate.weapons.size;
+
+        Vars.state.patcher.apply(Seq.with("""
+        {"name":"Patch0","unit":{"emanate":{"weapons":{"0":{"type":"Weapon","name":"toxopid-cannon"}},"weapons.+":[{"name":"sei-launcher"}]}}}
+        """));
+
+        assertEquals(UnitTypes.emanate.weapons.size, size + 1);
+
+        resetAfter();
+
+        assertEquals(UnitTypes.emanate.weapons.size, size);
+    }
+
+    @Test
     void customAttribute() throws Exception{
         int amount = Attribute.all.length;
 

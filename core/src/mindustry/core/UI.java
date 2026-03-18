@@ -117,11 +117,7 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene = new Scene();
         Core.input.addProcessor(Core.scene);
 
-        int[] insets = Core.graphics.getSafeInsets();
-        Core.scene.marginLeft = insets[0];
-        Core.scene.marginRight = insets[1];
-        Core.scene.marginTop = insets[2];
-        Core.scene.marginBottom = insets[3];
+        updateMargins();
 
         Tex.load();
         Icon.load();
@@ -248,15 +244,30 @@ public class UI implements ApplicationListener, Loadable{
         new FadeInFragment().build(group);
     }
 
-    @Override
-    public void resize(int width, int height){
-        if(Core.scene == null) return;
-
+    /** Updates scene margins based on safe insets and custom edge padding setting. */
+    public void updateMargins(){
         int[] insets = Core.graphics.getSafeInsets();
+        int customPadding = (int)Scl.scl(Core.settings.getInt("uiEdgePadding", 0));
+
         Core.scene.marginLeft = insets[0];
         Core.scene.marginRight = insets[1];
         Core.scene.marginTop = insets[2];
         Core.scene.marginBottom = insets[3];
+
+        if(Core.graphics.getHeight() > Core.graphics.getWidth()){
+            Core.scene.marginTop += customPadding;
+            Core.scene.marginBottom += customPadding;
+        }else{
+            Core.scene.marginLeft += customPadding;
+            Core.scene.marginRight += customPadding;
+        }
+    }
+
+    @Override
+    public void resize(int width, int height){
+        if(Core.scene == null) return;
+
+        updateMargins();
 
         Core.scene.resize(width, height);
         Events.fire(new ResizeEvent());
