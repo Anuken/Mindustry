@@ -317,6 +317,7 @@ project(":core"){
         from files("../../Arc/extensions/freetype/src/")
         from files("../server/src/")
 
+        exclude("META-INF/**")
         exclude("vfxshaders/**")
         exclude("maps/**")
         exclude("baseparts/**")
