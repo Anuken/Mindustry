@@ -162,6 +162,9 @@ public class Planet extends UnlockableContent{
     /** Loads the planet grid outline mesh. Clientside only. */
     public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineRad * radius);
 
+    /** If set, this planet will have the same stats as its parent. Use for shared campaigns. */
+    public @Nullable Planet statParent;
+
     /** Planets that are allowed to update at the same time as this one for background calculations. */
     public ObjectSet<Planet> updateGroup = new ObjectSet<>();
     /** Global difficulty/modifier settings for this planet's campaign. */
@@ -177,6 +180,9 @@ public class Planet extends UnlockableContent{
     public boolean loadPlanetData = false;
     /** Data indicating attack sector positions and sector mappings. */
     public @Nullable PlanetData data;
+
+    /** Statistics of this planet campaign. If statParent is not null, this planet shares the same stats as the parent. */
+    private CampaignStats campaignStats = new CampaignStats();
 
     public Planet(String name, Planet parent, float radius){
         super(name);
@@ -226,6 +232,34 @@ public class Planet extends UnlockableContent{
 
     public void loadRules(){
         campaignRules = Core.settings.getJson(name + "-campaign-rules", CampaignRules.class, () -> campaignRules);
+    }
+
+    public CampaignStats stats(){
+        return statParent != null ? statParent.campaignStats : campaignStats;
+    }
+
+    public void loadStats(){
+        //there is no need to load stats if the parent's ones are used
+        if(statParent == null){
+            campaignStats = Core.settings.getJson(name + "-campaign-stats", CampaignStats.class, CampaignStats::new);
+        }
+    }
+
+    public void saveStats(){
+        if(statParent != null && statParent != this){
+            statParent.saveStats();
+        }else{
+            Core.settings.putJson(name + "-campaign-stats", campaignStats);
+        }
+    }
+
+    public void clearStats(){
+        if(statParent != null && statParent != this){
+            statParent.clearStats();
+        }else{
+            campaignStats = new CampaignStats();
+            saveStats();
+        }
     }
 
     public @Nullable Sector getStartSector(){
@@ -391,6 +425,7 @@ public class Planet extends UnlockableContent{
     public void init(){
         applyDefaultRules(campaignRules);
         loadRules();
+        loadStats();
 
         if(techTree == null){
             techTree = TechTree.roots.find(n -> n.planet == this);
