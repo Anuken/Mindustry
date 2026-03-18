@@ -304,7 +304,7 @@ project(":core"){
         }
     }
 
-    task depsJar(type: Jar, dependsOn: [classes, ":server:classes"]){
+    task depsJar(type: Jar, dependsOn: [classes, ":server:jar"]){
         archiveClassifier = 'deps'
         from files(sourceSets.main.output.classesDirs)
         from{ configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) } }
