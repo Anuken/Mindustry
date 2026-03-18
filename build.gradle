@@ -304,10 +304,23 @@ project(":core"){
         }
     }
 
-    task depsJar(type: Jar, dependsOn: classes){
+    task depsJar(type: Jar, dependsOn: [classes, ":server:classes"]){
         archiveClassifier = 'deps'
         from files(sourceSets.main.output.classesDirs)
         from{ configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) } }
+        from zipTree("../server/build/libs/server-release.jar")
+        from files("src/")
+        from files("../../Arc/arc-core/src/")
+        from files("../../Arc/extensions/arcnet/src/")
+        from files("../../Arc/extensions/g3d/src/")
+        from files("../../Arc/extensions/flabel/src/")
+        from files("../../Arc/extensions/freetype/src/")
+        from files("../server/src/")
+
+        exclude("vfxshaders/**")
+        exclude("maps/**")
+        exclude("baseparts/**")
+        exclude("vfxshaders/**")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 
