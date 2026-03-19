@@ -963,6 +963,11 @@ public class ApplicationTests{
                     }
                 }
 
+                assertFalse(Vars.indexer.isBlockPresent(Blocks.powerSource), "Sector '" + zone + "' must not have power sources.");
+                assertFalse(Vars.indexer.isBlockPresent(Blocks.powerVoid), "Sector '" + zone + "' must not have power voids.");
+                assertFalse(Vars.indexer.isBlockPresent(Blocks.itemSource), "Sector '" + zone + "' must not have item sources.");
+                assertFalse(Vars.indexer.isBlockPresent(Blocks.liquidSource), "Sector '" + zone + "' must not have liquid sources.");
+
                 assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + zone + " (" + Team.sharded.cores() + ")");
 
                 assertTrue(hasSpawnPoint, "Sector \"" + zone.name + "\" has no spawn points.");
