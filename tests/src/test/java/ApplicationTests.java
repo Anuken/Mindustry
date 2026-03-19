@@ -904,6 +904,8 @@ public class ApplicationTests{
                 Time.setDeltaProvider(() -> 1f);
 
                 logic.reset();
+                //pathfinder pollutes queue with garbage, causing OOM
+                Reflect.<TaskQueue>get(HeadlessApplication.class, Core.app, "runnables").clear();
                 state.rules.sector = zone.sector;
                 world.loadGenerator(zone.generator.map.width, zone.generator.map.height, tiles -> zone.generator.generate(tiles, new WorldParams()));
                 zone.rules.get(state.rules);
