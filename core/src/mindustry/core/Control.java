@@ -729,6 +729,10 @@ public class Control implements ApplicationListener, Loadable{
                 state.set(state.isPaused() ? State.playing : State.paused);
             }
 
+            if(!net.client() && state.rules.pauseDisabled && Core.input.keyTap(Binding.pause) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown()){
+                ui.hudfrag.showPauseDisabled();
+            }
+
             if(state.isCampaign() && state.afterGameOver){
                 state.set(State.paused);
             }

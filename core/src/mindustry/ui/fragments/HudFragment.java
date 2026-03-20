@@ -51,6 +51,7 @@ public class HudFragment{
     private Table lastUnlockTable;
     private Table lastUnlockLayout;
     private long lastToast;
+    private float pauseDisableDur;
 
     private Seq<Block> blocksOut = new Seq<>();
     private Table hudLabel;
@@ -289,6 +290,19 @@ public class HudFragment{
             //.padLeft(dsize * 5 + 4f) to prevent alpha overlap on left
         });
 
+        //pause disabled table
+        parent.fill(t -> {
+            t.name = "pause-disabled";
+            t.top().visible(() -> pauseDisableDur > 0f && shown && !netServer.isWaitingForPlayers() && !state.isPaused()).touchable = Touchable.disabled;
+            t.update(() -> {
+                t.color.a = t.color.a > 0f && pauseDisableDur > 0f ? t.color.a - Time.delta / pauseDisableDur : 1f;
+                if(t.color.a <= 0f){
+                    pauseDisableDur = 0f;
+                }
+            });
+            t.table(Styles.black6, top -> top.label(() -> "@pause.disabled").style(Styles.outlineLabel).pad(8f)).height(pauseHeight).growX();
+        });
+
         //left/right gutter areas
         parent.fill((x, y, w, h) -> {
             x = 0f;
@@ -365,7 +379,7 @@ public class HudFragment{
                             state.set(state.isPaused() ? State.playing : State.paused);
                         }
                     }).name("pause").update(i -> {
-                        if(net.active() || state.rules.pauseDisabled){
+                        if(net.active()){
                             i.getStyle().imageUp = Icon.players;
                         }else{
                             i.setDisabled(false);
@@ -541,7 +555,7 @@ public class HudFragment{
 
             t.name = "coreinfo";
 
-            t.collapser(v -> v.add().height(pauseHeight), () -> state.isPaused() && !netServer.isWaitingForPlayers()).row();
+            t.collapser(v -> v.add().height(pauseHeight), () -> !netServer.isWaitingForPlayers() && (state.isPaused() || pauseDisableDur > 0f)).row();
 
             t.table(c -> {
                 //core items
@@ -720,6 +734,10 @@ public class HudFragment{
             //nesting actions() calls is necessary so the right prefHeight() is used
             Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interp.fade), Actions.remove())));
         });
+    }
+
+    public void showPauseDisabled(){
+        pauseDisableDur = 60f;
     }
 
     /** Show unlock notification for a new recipe. */
@@ -1137,7 +1155,7 @@ public class HudFragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && state.rules.waveSending && ((net.server() || player.admin) || !net.active()) && !state.rules.pauseDisabled && state.enemies == 0 && !spawner.isSpawning();
+        return state.rules.waves && state.rules.waveSending && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning();
     }
 
 }
