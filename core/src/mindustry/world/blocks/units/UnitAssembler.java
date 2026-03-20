@@ -377,7 +377,7 @@ public class UnitAssembler extends PayloadBlock{
         @Override
         public boolean shouldConsume(){
             //liquid is only consumed when building is being done
-            return enabled && !wasOccupied && Units.canCreate(team, plan().unit) && consPayload.efficiency(this) > 0 && consItem.efficiency(this) > 0;
+            return enabled && !wasOccupied && Units.canCreate(team, plan().unit) && consPayload.efficiency(this) > 0 && consItem.efficiency(this) > 0 && team.activateUnitFactories();
         }
 
         @Override
@@ -674,6 +674,12 @@ public class UnitAssembler extends PayloadBlock{
             Fx.shootPayloadDriver.at(payload.x(), payload.y(), rot);
             Fx.payloadDeposit.at(payload.x(), payload.y(), rot, new YeetData(spawn.cpy(), payload.content()));
             Sounds.shootPayload.at(x, y, 1f + Mathf.range(0.1f), 1f);
+        }
+
+        @Override
+        public BlockStatus status(){
+            if(!team.activateUnitFactories()) return BlockStatus.inactive;
+            return super.status();
         }
 
         @Override

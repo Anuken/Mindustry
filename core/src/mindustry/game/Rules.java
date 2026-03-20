@@ -334,6 +334,8 @@ public class Rules{
         /** Minimum "advantage" needed for a squad to attack. Higher -> more cautious. */
         public float rtsMinWeight = 1.2f;
 
+        /** Time until unit factories activate. This is used for enemy teams in attack maps. */
+        public float unitFactoryActivationDelay = 0f;
         /** How fast unit factories build units. */
         public float unitBuildSpeedMultiplier = 1f;
         /** How much damage units deal. */
