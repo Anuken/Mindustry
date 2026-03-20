@@ -40,6 +40,8 @@ public class Rules{
     public boolean pvp;
     /** Whether is waiting for players enabled in PvP. */
     public boolean pvpAutoPause = true;
+    /** Whether pause is enabled or not in singleplayer */
+    public boolean pauseDisabled = false;
     /** Whether to pause the wave timer until all enemies are destroyed. */
     public boolean waitEnemies = false;
     /** Determines if gamemode is attack mode. */
@@ -64,7 +66,7 @@ public class Rules{
     public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
-    /** EXPERIMENTAL! If true, air and ground units target random things each wave instead of only the core/generators. */
+    /** If true, air and ground units target random things each wave instead of only the core/generators. */
     public boolean randomWaveAI = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */
     public boolean unitPayloadUpdate = false;
@@ -90,8 +92,12 @@ public class Rules{
     public float unitMineSpeedMultiplier = 1f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
     public boolean ghostBlocks = true;
+    /** Whether to allow logic to control units. */
+    public boolean logicUnitControl = true;
     /** Whether to allow units to build with logic. */
     public boolean logicUnitBuild = true;
+    /** Whether to allow units to deconstruct blocks with logic. */
+    public boolean logicUnitDeconstruct = false;
     /** If true, world processors can be edited and placed on this map. */
     public boolean allowEditWorldProcessors = false;
     /** If true, world processors no longer update. Used for testing. */
@@ -118,6 +124,8 @@ public class Rules{
     public boolean cleanupDeadTeams = true;
     /** If true, items can only be deposited in the core. */
     public boolean onlyDepositCore = false;
+    /** If true, Serpulo unloaders can take items from the core. */
+    public boolean allowCoreUnloaders = true;
     /** Cooldown, in seconds, of item depositing for players. */
     public float itemDepositCooldown = 0.5f;
     /** If true, every enemy block in the radius of the (enemy) core is destroyed upon death. Used for campaign maps. */
@@ -193,7 +201,7 @@ public class Rules{
     /** Mission string displayed instead of wave/core counter. Null to disable. */
     public @Nullable String mission;
     /** Whether cores incinerate items when full, just like in the campaign. */
-    public boolean coreIncinerates = false;
+    public boolean coreIncinerates = true;
     /** If false, borders fade out into darkness. Only use with custom backgrounds!*/
     public boolean borderDarkness = true;
     /** If true, the map play area is cropped based on the rectangle below. */
@@ -246,7 +254,7 @@ public class Rules{
     }
 
     public float buildRadius(Team team){
-        return enemyCoreBuildRadius + teams.get(team).extraCoreBuildRadius;
+        return !teams.get(team).protectCores ? 0f : enemyCoreBuildRadius + teams.get(team).extraCoreBuildRadius;
     }
 
     public float unitBuildSpeed(Team team){
@@ -297,6 +305,10 @@ public class Rules{
     public static class TeamRule{
         /** Whether, when AI is enabled, ships should be spawned from the core. TODO remove / unnecessary? */
         public boolean aiCoreSpawn = true;
+        /** Whether the core no-build radius/polygonal protection applies to this team, unprotected teams are ignored by team assigner */
+        public boolean protectCores = true;
+        /** Whether the placeRangeCheck applies to this team */
+        public boolean checkPlacement = true;
         /** If true, blocks don't require power or resources. */
         public boolean cheat;
         /** If true, the core is always filled to capacity with all items. */
@@ -322,6 +334,8 @@ public class Rules{
         /** Minimum "advantage" needed for a squad to attack. Higher -> more cautious. */
         public float rtsMinWeight = 1.2f;
 
+        /** Time until unit factories activate. This is used for enemy teams in attack maps. */
+        public float unitFactoryActivationDelay = 0f;
         /** How fast unit factories build units. */
         public float unitBuildSpeedMultiplier = 1f;
         /** How much damage units deal. */
@@ -343,8 +357,18 @@ public class Rules{
         /** Extra spacing added to the no-build zone around the core. */
         public float extraCoreBuildRadius = 0f;
 
-
         //build cost disabled due to technical complexity
+
+        //for reading from json
+        public TeamRule(){
+        }
+
+        public TeamRule(Team team){
+            if(team == Team.derelict){
+                protectCores = false;
+                checkPlacement = false;
+            }
+        }
     }
 
     /** A simple map for storing TeamRules in an efficient way without hashing. */
@@ -353,7 +377,7 @@ public class Rules{
 
         public TeamRule get(Team team){
             TeamRule out = values[team.id];
-            return out == null ? (values[team.id] = new TeamRule()) : out;
+            return out == null ? (values[team.id] = new TeamRule(team)) : out;
         }
 
         @Override

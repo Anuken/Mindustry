@@ -29,7 +29,7 @@ public class ShockwaveTower extends Block{
     public float shake = 2f;
     //checking for bullets every frame is costly, so only do it at intervals even when ready.
     public float checkInterval = 8f;
-    public Sound shootSound = Sounds.bang;
+    public Sound shootSound = Sounds.shockwaveTower;
     public Color waveColor = Pal.accent, heatColor = Pal.turretHeat, shapeColor = Color.valueOf("f29c83");
     public float cooldownMultiplier = 1f;
     public Effect hitEffect = Fx.hitSquaresColor;
@@ -62,7 +62,7 @@ public class ShockwaveTower extends Block{
 
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, waveColor);
     }
-    
+
     public class ShockwaveTowerBuild extends Building{
         public float reloadCounter = Mathf.random(reload);
         public float heat = 0f;
@@ -82,7 +82,7 @@ public class ShockwaveTower extends Block{
                     heat = 1f;
                     reloadCounter = 0f;
                     waveEffect.at(x, y, range, waveColor);
-                    shootSound.at(this);
+                    shootSound.at(x, y, 1f + Mathf.range(0.15f), 1f);
                     Effect.shake(shake, shake, this);
                     float waveDamage = Math.min(bulletDamage, bulletDamage * falloffCount / targets.size);
 

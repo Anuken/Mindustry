@@ -392,11 +392,12 @@ public class TypeIO{
     }
 
     public static void writeBlock(Writes write, Block block){
-        write.s(block.id);
+        write.s(block == null ? -1 : block.id);
     }
 
     public static Block readBlock(Reads read){
-        return content.block(read.s());
+        short id = read.s();
+        return id == -1 ? null : content.block(id);
     }
 
     /** @return the maximum acceptable amount of plans to send over the network */
@@ -827,6 +828,39 @@ public class TypeIO{
 
     public static ItemStack readItems(Reads read){
         return new ItemStack(readItem(read), read.i());
+    }
+
+    public static void writeItemStacks(Writes write, ItemStack[] stacks){
+        write.s(stacks.length);
+        for(ItemStack stack : stacks){
+            writeItems(write, stack);
+        }
+    }
+
+    public static ItemStack[] readItemStacks(Reads read){
+        short count = read.s();
+        ItemStack[] stacks = new ItemStack[count];
+        for(int i = 0; i < count; i++)
+            stacks[i] = readItems(read);
+        return stacks;
+    }
+
+    public static void writeLiquidStacks(Writes write, LiquidStack[] stacks){
+        write.s(stacks.length);
+        for(LiquidStack stack : stacks){
+            writeLiquid(write, stack.liquid);
+            write.f(stack.amount);
+        }
+    }
+
+    public static LiquidStack[] readLiquidStacks(Reads read){
+        short count = read.s();
+        LiquidStack[] stacks = new LiquidStack[count];
+        for(int i = 0; i < count; i++){
+            Liquid liquid = readLiquid(read);
+            stacks[i] = new LiquidStack(liquid, read.f());
+        }
+        return stacks;
     }
 
     public static void writeTeam(Writes write, Team team){

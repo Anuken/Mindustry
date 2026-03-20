@@ -27,6 +27,7 @@ public class TileableLogicDisplay extends LogicDisplay{
     public int maxDisplayDimensions = 16;
     public @Load(value = "@-#", length = 47) TextureRegion[] tileRegion;
     public @Load("@-back") TextureRegion backRegion;
+    public int frameSize = 6;
 
     public TileableLogicDisplay(String name){
         super(name);
@@ -128,8 +129,8 @@ public class TileableLogicDisplay extends LogicDisplay{
         @Override
         public double sense(LAccess sensor){
             return switch(sensor){
-                case displayWidth -> tilesWidth * 32f - 12f;    // accounts for display frame (2 * 6 pixels)
-                case displayHeight -> tilesHeight * 32f - 12f;
+                case displayWidth -> tilesWidth * 32f - frameSize * 2;    // accounts for display frame (2 * 6 pixels)
+                case displayHeight -> tilesHeight * 32f - frameSize * 2;
                 default -> super.sense(sensor);
             };
         }
@@ -154,6 +155,13 @@ public class TileableLogicDisplay extends LogicDisplay{
                 if(other != null && other.block() == block && other.team() == team){
                     bits |= (1 << i);
                 }
+            }
+        }
+
+        @Override
+        public void getBufferRegion(TextureRegion region){
+            if(buffer != null){
+                region.set(buffer.getTexture(), 0, buffer.getTexture().height - frameSize*2, buffer.getTexture().width - frameSize*2, -(buffer.getTexture().height - frameSize*2));
             }
         }
 
@@ -203,9 +211,9 @@ public class TileableLogicDisplay extends LogicDisplay{
                         prevBuffers.clear();
                     }
                 });
-
-                processCommands();
             }
+
+            rootDisplay.processCommands();
 
             float offset = 0.001f + (rootDisplay.buffer == null ? 0f : (rootDisplay.buffer.hashCode() % 1_000_000) / 1_000_000f * 0.01f);
 
@@ -219,7 +227,7 @@ public class TileableLogicDisplay extends LogicDisplay{
                     int rtx = (tile.x - originX), rty = (tile.y - originY);
 
                     // Offset the region to account for display frame (6 pixels)
-                    Tmp.tr1.set(rootDisplay.buffer.getTexture(), rtx * 32 - 6, rty * 32 - 6, 32, 32);
+                    Tmp.tr1.set(rootDisplay.buffer.getTexture(), rtx * 32 - frameSize, rty * 32 - frameSize, 32, 32);
                     Draw.rect(Tmp.tr1, x, y, tilesize, -tilesize);
                 }
             });

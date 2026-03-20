@@ -88,7 +88,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     }
 
     public boolean allowNumberedLaunch(Sector s){
-        return s.hasBase() && (s.info.bestCoreType.size >= 4 || s.isBeingPlayed() && state.rules.defaultTeam.cores().contains(b -> b.block.size >= 4));
+        return s.hasBase() && !s.isAttacked() && (s.info.bestCoreType.size >= 4 || s.isBeingPlayed() && state.rules.defaultTeam.cores().contains(b -> b.block.size >= 4));
     }
 
     @Override

@@ -438,7 +438,7 @@ public class LCanvas extends Table{
                 addressLabel = t.add(index + "").style(Styles.outlineLabel).color(color).padRight(8).get();
 
                 //taken from foo's client
-                t.button(Icon.add, Styles.logici, () -> Vars.ui.logic.showAddDialog(statements.insertPosition + 1))
+                t.button(Icon.add, Styles.logici, () -> Vars.ui.logic.showAddDialog(index + 1))
                 .disabled(b -> canvas.statements.getChildren().size >= LExecutor.maxInstructions).size(24f).padRight(6);
 
                 t.button(Icon.copy, Styles.logici, () -> {

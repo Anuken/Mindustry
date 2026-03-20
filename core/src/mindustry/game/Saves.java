@@ -187,7 +187,11 @@ public class Saves{
         if(current != null && state.isGame()
         && !(state.isPaused() && Core.scene.hasDialog())){
             if(lastTimestamp != 0){
-                totalPlaytime += Time.timeSinceMillis(lastTimestamp);
+                long change = Time.timeSinceMillis(lastTimestamp);
+                totalPlaytime += change;
+                if(state.isCampaign()){
+                    state.getPlanet().stats().playtime += change;
+                }
             }
             lastTimestamp = Time.millis();
         }

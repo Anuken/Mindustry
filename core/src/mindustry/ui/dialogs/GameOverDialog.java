@@ -123,7 +123,7 @@ public class GameOverDialog extends BaseDialog{
         parent.add(new StatLabel(stat, value, delay)).top().pad(5).growX().height(50).row();
     }
 
-    private static class StatLabel extends Table {
+    private static class StatLabel extends Table{
         private float progress = 0;
 
         public StatLabel(String stat, int value, float delay){
@@ -141,8 +141,8 @@ public class GameOverDialog extends BaseDialog{
             Label valueLabel = new Label("", Styles.outlineLabel);
             valueLabel.setAlignment(Align.right);
 
-            add(statLabel).left().growX().padLeft(5);
-            add(valueLabel).right().growX().padRight(5);
+            add(statLabel).left().growX().uniformX().padLeft(5);
+            add(valueLabel).right().growX().uniformX().padRight(5);
 
             actions(
                 Actions.scaleTo(0, 1),

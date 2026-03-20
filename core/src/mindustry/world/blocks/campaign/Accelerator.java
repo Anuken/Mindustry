@@ -40,9 +40,11 @@ public class Accelerator extends Block{
     /** Override for planets that this block can launch to. If null, the planet's launch candidates are used. */
     public @Nullable Seq<Planet> launchCandidates;
 
-    //TODO: launching needs audio!
-
-    public Music launchMusic = Musics.coreLaunch;
+    public Sound lightningSound = new RandomSound(Sounds.acceleratorLightning1, Sounds.acceleratorLightning2, Sounds.shootArc);
+    public float lightningSoundVolume = 0.85f;
+    public Sound chargeSound = Sounds.acceleratorCharge;
+    public Sound launchSound = Sounds.acceleratorLaunch;
+    public Sound constructSound = Sounds.acceleratorConstruct;
     public float launchDuration = 120f;
     public float chargeDuration = 220f;
     public float buildDuration = 120f;
@@ -138,6 +140,10 @@ public class Accelerator extends Block{
         @Override
         public float progress(){
             return progress;
+        }
+
+        public boolean isCoreBuilt(){
+            return progress >= 1f;
         }
 
         @Override
@@ -249,6 +255,10 @@ public class Accelerator extends Block{
             ui.planet.showPlanetLaunch(state.rules.sector, launchCandidates == null ? state.rules.sector.planet.launchCandidates : launchCandidates, sector -> {
                 if(canLaunch()){
                     consume();
+                    ItemSeq resources = new ItemSeq();
+                    resources.add(items);
+                    items.clear();
+
                     power.graph.useBatteries(powerBufferRequirement);
                     progress = 0f;
 
@@ -260,6 +270,7 @@ public class Accelerator extends Block{
                         sector.planet.unlockedOnLand.each(UnlockableContent::unlock);
 
                         universe.clearLoadoutInfo();
+                        universe.updateLaunchResources(resources);
                         universe.updateLoadout((CoreBlock)launchBlock);
 
                         control.playSector(sector);
@@ -272,7 +283,7 @@ public class Accelerator extends Block{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return capacities[item.id];
+            return capacities[item.id] + (isCoreBuilt() ? launchBlock.itemCapacity : 0);
         }
 
         @Override
@@ -308,13 +319,7 @@ public class Accelerator extends Block{
 
         @Override
         public Music landMusic(){
-            //unused
-            return launchMusic;
-        }
-
-        @Override
-        public Music launchMusic(){
-            return launchMusic;
+            return null;
         }
 
         @Override
@@ -340,11 +345,14 @@ public class Accelerator extends Block{
                 }
             });
             Core.scene.add(image);
+            chargeSound.at(this);
+            constructSound.at(this);
 
             Time.run(chargeDuration, () -> {
                 Fx.coreLaunchConstruct.at(x, y, launchBlock.size);
                 Fx.launchAccelerator.at(x, y);
                 Effect.shake(10f, 14f, this);
+                launchSound.at(this);
 
                 for(int i = 0; i < launchLightning; i++){
                     float a = Mathf.random(360f);
@@ -354,7 +362,7 @@ public class Accelerator extends Block{
                 float spacing = 12f;
                 for(int i = 0; i < 13; i++){
                     int fi = i;
-                    Time.run(i * 1.1f, () -> {
+                    Time.run(i * 2f, () -> {
                         float radius = block.size/2f + 1 + spacing * fi;
                         int rays = Mathf.ceil(radius * Mathf.PI * 2f / 6f);
                         for(int r = 0; r < rays; r++){
@@ -369,8 +377,6 @@ public class Accelerator extends Block{
                         }
                     });
                 }
-
-
             });
         }
 
@@ -412,6 +418,7 @@ public class Accelerator extends Block{
             if(in > launchDuration){
                 if(Mathf.chanceDelta(lightningLaunchChance * Interp.pow3In.apply(chargeFout))){
                     float a = Mathf.random(360f);
+                    lightningSound.at(this, 1f + Mathf.range(0.1f), lightningSoundVolume);
                     Lightning.create(team, lightningColor, lightningDamage, x + Angles.trnsx(a, lightningOffset), y + Angles.trnsy(a, lightningOffset), a, Mathf.random(lightningLengthMin, lightningLengthMax));
                 }
             }

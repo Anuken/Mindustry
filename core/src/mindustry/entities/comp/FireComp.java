@@ -44,7 +44,7 @@ abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
         animation %= frames;
 
         if(!headless){
-            control.sound.loop(Sounds.fire, this, 0.07f);
+            control.sound.loop(Sounds.loopFire, this, 0.07f);
         }
 
         //faster updates -> disappears more quickly

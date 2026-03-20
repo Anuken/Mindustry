@@ -21,6 +21,7 @@ import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -37,6 +38,8 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient @Nullable NetConnection con;
     @ReadOnly Team team = Team.sharded;
     @SyncLocal boolean typing, shooting, boosting;
+    @SyncLocal @Nullable Block selectedBlock;
+    @SyncLocal int selectedRotation;
     @SyncLocal float mouseX, mouseY;
     /** command the unit had before it was controlled. */
     @Nullable @NoSync UnitCommand lastCommand;
@@ -167,7 +170,8 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
             //update some basic state to sync things
             if(unit.type.canBoost){
-                unit.elevation = Mathf.approachDelta(unit.elevation, unit.onSolid() || boosting || (unit.isFlying() && !unit.canLand()) ? 1f : 0f, unit.type.riseSpeed);
+                boolean shouldBoost = unit.onSolid() || boosting || (unit.isFlying() && !unit.canLand());
+                unit.elevation = Mathf.approachDelta(unit.elevation, shouldBoost ? 1f : 0f, shouldBoost ? unit.type.riseSpeed : unit.type.descentSpeed);
             }
         }else if((core = bestCore()) != null){
             //have a small delay before death to prevent the camera from jumping around too quickly

@@ -63,6 +63,7 @@ public class CommandAI extends AIController{
         }
     }
 
+    @Override
     public boolean hasStance(@Nullable UnitStance stance){
         return stance != null && stances.get(stance.id);
     }
@@ -79,7 +80,7 @@ public class CommandAI extends AIController{
         //this happens when an older save reads the default "shoot" stance, or any other removed stance
         if(stance == UnitStance.stop) return;
 
-        stances.andNot(stance.incompatibleBits);
+        stances.andNot(stance.incompatibleStanceBits);
         stances.set(stance.id);
         stanceChanged();
     }
@@ -156,9 +157,22 @@ public class CommandAI extends AIController{
             commandController.updateUnit();
         }else{
             defaultBehavior();
-            //boosting control is not supported, so just don't.
-            unit.updateBoosting(false);
+            if(shouldBoost() && unit.type.canBoost){
+                //auto land when near target
+                if(attackTarget != null && unit.within(attackTarget, unit.range())){
+                    unit.updateBoosting(false);
+                }else{
+                    unit.updateBoosting(true, true);
+                }
+            }else{
+                //boosting control is not supported, so just don't.
+                unit.updateBoosting(false);
+            }
         }
+    }
+
+    protected boolean shouldBoost(){
+        return hasStance(UnitStance.boost) || command == UnitCommand.enterPayloadCommand;
     }
 
     public void clearCommands(){
@@ -214,7 +228,9 @@ public class CommandAI extends AIController{
             }
         }
 
-        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.buildOn() != null && (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
+        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.type.allowedInPayloads && unit.buildOn() != null &&
+            (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
+
             var build = unit.buildOn();
             tmpPayload.unit = unit;
             if(build.team == unit.team && build.acceptPayload(build, tmpPayload)){
@@ -270,12 +286,11 @@ public class CommandAI extends AIController{
 
             Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
 
-
             //TODO: should the unit stop when it finds a target?
             if(
                 (hasStance(UnitStance.patrol) && !hasStance(UnitStance.pursueTarget) && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
                 (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
-                (command == UnitCommand.loopPayloadCommand && unit.within(targetPos, 10f))
+                (command == UnitCommand.loopPayloadCommand && unit.within(vecMovePos, 10f))
             ){
                 move = false;
             }
@@ -344,10 +359,14 @@ public class CommandAI extends AIController{
                 vecOut.set(vecMovePos);
             }
 
+            if(command == UnitCommand.loopPayloadCommand){
+                alwaysArrive = true;
+            }
+
             if(move){
                 if(unit.type.circleTarget && attackTarget != null){
                     target = attackTarget;
-                    circleAttack(80f);
+                    circleAttack(unit.type.circleTargetRadius);
                 }else{
                     moveTo(vecOut,
                     withinAttackRange ? engageRange :
@@ -362,7 +381,7 @@ public class CommandAI extends AIController{
                 attackTarget = null;
             }
 
-            if(unit.isFlying() && move && (attackTarget == null || !unit.within(attackTarget, unit.type.range))){
+            if(unit.isFlying() && move && !(unit.type.circleTarget && !unit.type.omniMovement) && (attackTarget == null || !unit.within(attackTarget, unit.type.range))){
                 unit.lookAt(vecMovePos);
             }else{
                 faceTarget();
@@ -379,7 +398,11 @@ public class CommandAI extends AIController{
             }
 
         }else if(target != null){
-            faceTarget();
+            if(unit.type.circleTarget && shouldFire()){
+                circleAttack(unit.type.circleTargetRadius);
+            }else{
+                faceTarget();
+            }
         }
     }
 

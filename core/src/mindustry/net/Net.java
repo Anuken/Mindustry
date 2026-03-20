@@ -36,7 +36,6 @@ public class Net{
     private final ObjectMap<Class<?>, Cons2<NetConnection, Object>> serverListeners = new ObjectMap<>();
     private final IntMap<StreamBuilder> streams = new IntMap<>();
     private final ExecutorService pingExecutor =
-        OS.isWindows && !OS.is64Bit ? Threads.boundedExecutor("Ping Servers", 5) : //on 32-bit windows, thread spam crashes
         OS.isIos ? Threads.boundedExecutor("Ping Servers", 32) : //on IOS, 256 threads can crash, so limit the amount
         Threads.unboundedExecutor();
 

@@ -24,6 +24,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 
 import java.io.*;
+import java.util.*;
 
 public class Fonts{
     private static final String mainFont = "fonts/font.woff";
@@ -71,6 +72,7 @@ public class Fonts{
             incremental = true;
             //most people will never see the monospace font, so don't pre-bake anything
             characters = "\u0000 ";
+            fallback.add(() -> Fonts.def);
         }})).loaded = f -> Fonts.monospace = f;
 
         Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
@@ -94,6 +96,26 @@ public class Fonts{
             //ASCII only
             characters = "\0ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890\"!`?'.,;:()[]{}<>|/@\\^$€-%+=#_&~*";
         }})).loaded = f -> Fonts.logic = f;
+    }
+
+    public static void loadExtraFonts(){
+        //Japanese needs to override the default font with its own characters - see https://heistak.github.io/your-code-displays-japanese-wrong/
+        if(Locale.getDefault().getLanguage().equals("ja")){
+            Core.assets.load("font_jp", Font.class, new FreeTypeFontLoaderParameter("fonts/font_jp.woff", new FreeTypeFontParameter(){{
+                size = 18;
+                incremental = true;
+                shadowColor = Color.darkGray;
+                shadowOffsetY = 2;
+                characters = "\u0000 ";
+            }})).loaded = f -> Fonts.def.data.setOverride(f.data);
+
+            Core.assets.load("font_jp_outline", Font.class, new FreeTypeFontLoaderParameter("fonts/font_jp.woff", new FreeTypeFontParameter(){{
+                size = 18;
+                incremental = true;
+                borderColor = Color.darkGray;
+                characters = "\u0000 ";
+            }})).loaded = f -> Fonts.outline.data.setOverride(f.data);
+        }
     }
 
     public static @Nullable String unicodeToName(int unicode){
@@ -165,7 +187,7 @@ public class Fonts{
 
         stringIcons.put("alphachan", stringIcons.get("alphaaaa"));
 
-        //TODO: mod emojis  can't work because most mod icons are not on the UI page!
+        //TODO: mod emojis can't work because most mod icons are not on the UI page!
         /*
         if(Vars.mods.list().contains(m -> m.shouldBeEnabled())){
             ContentType[] types = {ContentType.liquid, ContentType.item, ContentType.block, ContentType.status, ContentType.unit};
@@ -223,7 +245,7 @@ public class Fonts{
 
             @Override
             public Font loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
-                if(fileName.equals("outline")){
+                if(fileName.endsWith("outline")){
                     parameter.fontParameters.borderWidth = Scl.scl(2f);
                     parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
                 }

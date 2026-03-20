@@ -1,6 +1,7 @@
 package mindustry.maps.generators;
 
 import arc.math.geom.*;
+import arc.struct.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -18,12 +19,33 @@ public class FileMapGenerator implements WorldGenerator{
     public final SectorPreset preset;
 
     public FileMapGenerator(String mapName, SectorPreset preset){
-        //try to look for the prefixed map first, then the mod-specific one
-        this.map = maps != null ? maps.loadInternalMap(
-            preset.minfo.mod == null || Vars.tree.get("maps/" + mapName + "." + mapExtension).exists() ?
-                mapName :
-                mapName.substring(1 + preset.minfo.mod.name.length())
-        ) : null;
+        if(maps == null){
+            this.map = null;
+        }else{
+            Seq<String> candidates = new Seq<>(4);
+
+            //<planetname>/<mapname>.msav
+            candidates.add(preset.planet.name + "/" + mapName);
+
+            //<mapname>.msav (directly in maps folder)
+            candidates.add(mapName);
+
+            //for modded maps, try loading without the mod prefix
+            if(preset.minfo.mod != null){
+                String baseName = mapName.substring(1 + preset.minfo.mod.name.length());
+
+                //<planetname>/<mapname>.msav
+                candidates.add(preset.planet.name + "/" + baseName);
+
+                //<mapname>.msav (directly in maps folder)
+                candidates.add(baseName);
+            }
+
+            //find the first matching candidate to load
+            String fileName = candidates.find(name -> Vars.tree.get("maps/" + name + "." + mapExtension).exists());
+
+            this.map = maps.loadInternalMap(fileName == null ? candidates.first() : fileName);
+        }
 
         this.preset = preset;
     }

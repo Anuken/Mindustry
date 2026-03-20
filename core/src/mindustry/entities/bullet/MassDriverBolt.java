@@ -1,12 +1,10 @@
 package mindustry.entities.bullet;
 
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.distribution.MassDriver.*;
 
@@ -29,7 +27,7 @@ public class MassDriverBolt extends BasicBulletType{
     @Override
     public void update(Bullet b){
         super.update(b);
-        
+
         //data MUST be an instance of DriverBulletData
         if(!(b.data() instanceof DriverBulletData data)){
             hit(b);
@@ -88,8 +86,8 @@ public class MassDriverBolt extends BasicBulletType{
     }
 
     @Override
-    public void hit(Bullet b, float hitx, float hity){
-        super.hit(b, hitx, hity);
+    public void hit(Bullet b, float hitx, float hity, boolean createFrags){
+        super.hit(b, hitx, hity, createFrags);
         despawned(b);
         if(b.data() instanceof DriverBulletData data){
             float explosiveness = 0f;
