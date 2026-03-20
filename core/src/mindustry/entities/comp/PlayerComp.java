@@ -31,6 +31,7 @@ import static mindustry.Vars.*;
 @Component(base = true)
 abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Drawc{
     static final float deathDelay = 60f;
+    static final float pingDuration = 14f * 60f;
 
     @Import float x, y;
 
@@ -51,6 +52,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient String lastText = "";
     transient float textFadeTime;
     transient Ratekeeper itemDepositRate = new Ratekeeper();
+    transient float pingX, pingY, pingTime;
 
     transient private @Nullable Unit lastReadUnit;
     transient private int wrongReadUnits;
@@ -120,7 +122,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Replace
     public float clipSize(){
-        return unit == null ? 20 : unit.type.hitSize * 2f;
+        return Float.MAX_VALUE;
     }
 
     @Override
@@ -295,7 +297,55 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Override
     public void draw(){
-        if(unit == null || name == null || unit.inFogTo(Vars.player.team())) return;
+        drawPing();
+        drawName();
+    }
+
+    void drawPing(){
+        if(pingTime <= 0f || !renderer.showPings || name == null) return;
+
+        float alpha = Math.min(Interp.pow10Out.apply(Mathf.clamp(pingTime)), Interp.pow5Out.apply(Mathf.map(pingTime, 1f, 0.98f, 0f, 1f)));
+
+        Tmp.c1.set(color).a(alpha);
+
+        pingTime -= Time.delta / pingDuration;
+
+        Draw.z(Layer.playerName);
+        float z = Drawf.text();
+        float hover = Mathf.absin(5f, 1f);
+
+        Font font = Fonts.outline;
+        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+
+        boolean ints = font.usesIntegerPositions();
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(0.25f / Scl.scl(1f));
+        layout.setText(font, name);
+
+        float scaling = 1f + Mathf.clamp(Interp.pow5In.apply(Mathf.map(pingTime, 1f, 0.96f, 1f, 0f))) * 2.8f;
+
+        Drawf.square(pingX, pingY, 2f * scaling, 45f, Tmp.c1, Tmp.c3.set(Color.darkGray).mul(color).a(Tmp.c1.a));
+        Drawf.fillPoly(pingX, pingY + 9f + hover, 3, 3f, -90f, Tmp.c1, Tmp.c3);
+        font.setColor(Tmp.c1);
+        font.draw(name, pingX, pingY + 16f + hover, 0, Align.center, false);
+
+        Draw.reset();
+        Pools.free(layout);
+        font.getData().setScale(1f);
+        font.setColor(Color.white);
+        font.setUseIntegerPositions(ints);
+
+        Draw.z(z);
+    }
+
+    void drawName(){
+        //check clipping for name
+        if(unit == null || name == null) return;
+
+        float clip = unit.type.hitSize * 2f;
+        if(!Core.camera.bounds(Tmp.r1).overlaps(x - clip/2f, y - clip/2f, clip, clip)) return;
+
+        if(name == null || unit.inFogTo(Vars.player.team())) return;
 
         Draw.z(Layer.playerName);
         float z = Drawf.text();

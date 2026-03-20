@@ -133,15 +133,11 @@ public class Menus{
         infoPopup(message, id, duration, align, top, left, bottom, right);
     }
 
-    /** @deprecated Prefer variants with ids to stop flickering popups. */
-    @Deprecated
     @Remote(variants = Variant.both, unreliable = true)
     public static void infoPopup(@Nullable String message, float duration, int align, int top, int left, int bottom, int right){
         infoPopup(message, null, duration, align, top, left, bottom, right);
     }
 
-    /** @deprecated Prefer variants with ids to stop flickering popups. */
-    @Deprecated
     @Remote(variants = Variant.both)
     public static void infoPopupReliable(@Nullable String message, float duration, int align, int top, int left, int bottom, int right){
         infoPopup(message, duration, align, top, left, bottom, right);
@@ -159,15 +155,11 @@ public class Menus{
         label(message, id, duration, worldx, worldy);
     }
 
-    /** @deprecated Prefer variants with ids to stop flickering labels. */
-    @Deprecated
     @Remote(variants = Variant.both, unreliable = true)
     public static void label(@Nullable String message, float duration, float worldx, float worldy){
         label(message, -1, duration, worldx, worldy);
     }
 
-    /** @deprecated Prefer variants with ids to stop flickering labels. */
-    @Deprecated
     @Remote(variants = Variant.both)
     public static void labelReliable(@Nullable String message, float duration, float worldx, float worldy){
         label(message, -1, duration, worldx, worldy);

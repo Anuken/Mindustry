@@ -280,6 +280,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    @Remote(called = Loc.server, targets = Loc.both, forward = true)
+    public static void pingLocation(Player player, float x, float y){
+        if(player != null && Vars.player != null && player.team() == Vars.player.team()){
+            player.pingX = x;
+            player.pingY = y;
+            player.pingTime = 1f;
+        }
+    }
+
     public static void createItemTransfer(Item item, int amount, float x, float y, Position to, Runnable done){
         Fx.itemTransfer.at(x, y, amount, item.color, to);
         if(done != null){

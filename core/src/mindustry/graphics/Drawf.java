@@ -387,7 +387,11 @@ public class Drawf{
     }
 
     public static void square(float x, float y, float radius, float rotation, Color color){
-        Lines.stroke(3f, Pal.gray.write(Tmp.c3).a(color.a));
+        square(x, y, radius, rotation, color, Pal.gray.write(Tmp.c3).a(color.a));
+    }
+
+    public static void square(float x, float y, float radius, float rotation, Color color, Color bgColor){
+        Lines.stroke(3f, bgColor);
         Lines.square(x, y, radius + 1f, rotation);
         Lines.stroke(1f, color);
         Lines.square(x, y, radius + 1f, rotation);
@@ -409,6 +413,18 @@ public class Drawf{
         Lines.poly(x, y, sides, radius + 1f, rotation);
         Lines.stroke(1f, color);
         Lines.poly(x, y, sides, radius + 1f, rotation);
+        Draw.reset();
+    }
+
+    public static void fillPoly(float x, float y, int sides, float radius, float rotation, Color color){
+        fillPoly(x, y, sides, radius, rotation, color, Pal.gray);
+    }
+
+    public static void fillPoly(float x, float y, int sides, float radius, float rotation, Color color, Color bgColor){
+        Draw.color(bgColor, color.a);
+        Fill.poly(x, y, sides, radius + 2f, rotation);
+        Draw.color(color);
+        Fill.poly(x, y, sides, radius, rotation);
         Draw.reset();
     }
 

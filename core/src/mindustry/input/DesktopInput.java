@@ -475,6 +475,10 @@ public class DesktopInput extends InputHandler{
             }
         }
 
+        if(input.keyTap(Binding.ping) && !Core.scene.hasMouse()){
+            Call.pingLocation(Vars.player, input.mouseWorldX(), input.mouseWorldY());
+        }
+
         if(Core.input.keyRelease(Binding.select) && commandRect){
             selectUnitsRect();
         }
