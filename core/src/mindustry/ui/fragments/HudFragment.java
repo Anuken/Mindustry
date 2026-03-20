@@ -293,7 +293,7 @@ public class HudFragment{
         //pause disabled table
         parent.fill(t -> {
             t.name = "pause-disabled";
-            t.top().visible(() -> pauseDisableDur > 0f && shown && !netServer.isWaitingForPlayers() && !state.isPaused()).touchable = Touchable.disabled;
+            t.top().visible(() -> pauseDisableDur > 0f && shown && !netServer.isWaitingForPlayers() && !state.isPaused() && !(state.gameOver && state.isCampaign())).touchable = Touchable.disabled;
             t.update(() -> {
                 t.color.a = t.color.a > 0f && pauseDisableDur > 0f ? t.color.a - Time.delta / pauseDisableDur : 1f;
                 if(t.color.a <= 0f){
