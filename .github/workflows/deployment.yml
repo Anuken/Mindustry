@@ -50,7 +50,7 @@ jobs:
         cd ../Mindustry
     - name: Create artifacts
       run: |
-        ./gradlew desktop:dist server:dist core:mergedJavadoc -Pbuildversion=${RELEASE_VERSION:1}
+        ./gradlew desktop:dist server:dist core:depsJar core:mergedJavadoc -Pbuildversion=${RELEASE_VERSION:1}
     - name: Update docs
       run: |
         cd ../
@@ -90,3 +90,10 @@ jobs:
         file: server/build/libs/server-release.jar
         tag: ${{ github.ref }}
 
+    - name: Upload dependency JAR
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: core/build/libs/core-release-deps.jar
+        asset_name: dependencies.jar
+        tag: ${{ github.ref }}
