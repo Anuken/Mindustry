@@ -4,10 +4,12 @@ import arc.*;
 import arc.audio.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -20,8 +22,13 @@ public class RepairFieldAbility extends Ability{
     public boolean parentizeEffects = false;
     /** Multiplies healing to units of the same type by this amount. */
     public float sameTypeHealMult = 1f;
+    /** Maximum number of units healed. */
+    public int maxTargets = -1;
+    /** A random amount added to the timer. */
+    public float randomTimer = 0f;
 
     protected float timer;
+    private static final Seq<Unit> all = new Seq<>();
     protected boolean wasHealed = false;
 
     RepairFieldAbility(){}
@@ -57,6 +64,10 @@ public class RepairFieldAbility extends Ability{
             t.row();
             t.add(abilityStat("sametypehealmultiplier", (sameTypeHealMult < 1f ? "[negstat]" : "") + Strings.autoFixed(sameTypeHealMult * 100f, 2)));
         }
+        if(maxTargets > 0){
+            t.row();
+            t.add(abilityStat("maxtargets", maxTargets));
+        }
     }
 
     @Override
@@ -65,22 +76,32 @@ public class RepairFieldAbility extends Ability{
 
         if(timer >= reload){
             wasHealed = false;
-
+            
+            all.clear();
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
+                if(other.damaged()){
+                    all.add(other);
+                }
+            });
+            all.sort(u -> u.dst2(unit.x, unit.y) + ((sameTypeHealMult < 1f && u.type() == unit.type)? 6400f : 0f));
+            int len = Math.min(all.size, (maxTargets > -1)? maxTargets : all.size);
+
+            for(int i = 0; i < len; i++){
+                Unit other = all.get(i);
                 if(other.damaged()){
                     healEffect.at(other, parentizeEffects);
                     wasHealed = true;
                 }
-                float healMult = unit.type == other.type ? sameTypeHealMult : 1f;
+                float healMult = unit.type == other.type() ? sameTypeHealMult : 1f;
                 other.heal((amount + healPercent / 100f * other.maxHealth()) * healMult);
-            });
+            }
 
             if(wasHealed){
                 activeEffect.at(unit, range);
                 sound.at(unit, 1f + Mathf.range(0.1f), soundVolume);
             }
 
-            timer = 0f;
+            timer = Mathf.random(-randomTimer, randomTimer);
         }
     }
 }
