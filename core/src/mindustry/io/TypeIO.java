@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
@@ -515,6 +516,50 @@ public class TypeIO{
         }
 
         return reqs;
+    }
+
+    public static void writeClientPlans(Writes write, ClientBuildPlans plans){
+        if(plans == null){
+            write.s(0);
+            return;
+        }
+        write.s((short)plans.size);
+        //each plan should be ~7-12 bytes
+        for(BuildPlan plan : plans){
+            if(plan.breaking) throw new RuntimeException("Breaking plans should not be sent.");
+            write.i(Point2.pack(plan.x, plan.y));
+
+            write.s(plan.block.id);
+            if(plan.block.rotate){ //no need to write rotation for blocks that don't use it
+                write.b((byte)plan.rotation);
+            }
+            writeObject(write, validClientPlanConfig(plan.config) ? plan.config : null);
+        }
+    }
+
+    public static ClientBuildPlans readClientPlans(Reads read){
+        short amount = read.s();
+
+        if(amount == 0) return null;
+
+        var result = new ClientBuildPlans();
+        result.ensureCapacity(Math.min(amount, maxPlayerPreviewPlans));
+        for(int i = 0; i < amount; i++){
+            int x = read.us();
+            int y = read.us();
+            Block block = Vars.content.block(read.us());
+            int rotation = (block.rotate ? read.b() : 0);
+            Object config = TypeIO.readObject(read);
+            BuildPlan plan = new BuildPlan(x, y, rotation, block, validClientPlanConfig(config) ? config : null);
+            result.add(plan);
+        }
+
+        return result;
+    }
+
+    //for client plans, most configs aren't necessary (links are intentionally not displayed/sent)
+    static boolean validClientPlanConfig(Object o){
+        return o == null || o instanceof Number || o instanceof Content || o instanceof Team;
     }
 
     public static void writeController(Writes write, UnitController control){
@@ -1126,6 +1171,17 @@ public class TypeIO{
             return new String(bytes, charset);
         }else{
             return null;
+        }
+    }
+
+    /** wrapper for custom sync code */
+    public static class ClientBuildPlans extends Seq<BuildPlan>{
+        public ClientBuildPlans(){
+            super(BuildPlan.class);
+        }
+
+        public ClientBuildPlans(int capacity){
+            super(true, capacity, BuildPlan.class);
         }
     }
 

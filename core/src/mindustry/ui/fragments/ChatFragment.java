@@ -39,6 +39,7 @@ public class ChatFragment extends Table{
     private Seq<String> history = new Seq<>();
     private int historyPos = 0;
     private int scrollPos = 0;
+    private boolean lastFrameHadFocus;
 
     public ChatFragment(){
         super();
@@ -59,8 +60,9 @@ public class ChatFragment extends Table{
         });
 
         update(() -> {
+            boolean hasOtherFocus = scene.getKeyboardFocus() != null && !chatfield.hasKeyboard();
 
-            if(net.active() && input.keyTap(Binding.chat) && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null || ui.minimapfrag.shown()) && !ui.consolefrag.shown()){
+            if(net.active() && input.keyTap(Binding.chat) && (!hasOtherFocus && !lastFrameHadFocus || ui.minimapfrag.shown()) && !ui.consolefrag.shown()){
                 toggle();
             }
 
@@ -79,6 +81,8 @@ public class ChatFragment extends Table{
                 }
                 scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chatScroll), 0, Math.max(0, messages.size - messagesShown));
             }
+
+            lastFrameHadFocus = hasOtherFocus;
         });
 
         history.insert(0, "");
@@ -194,6 +198,26 @@ public class ChatFragment extends Table{
         }
     }
 
+    //ping format: "x,y [text]"
+    private void checkPing(String message){
+        int comma = message.indexOf(',');
+        if(comma != -1){
+            int space = message.indexOf(' ', comma + 1);
+            //handle a space after the comma
+            boolean extra = false;
+            if(space == comma + 1){
+                extra = true;
+                space = message.indexOf(' ', comma + 2);
+            }
+            if(space != -1){
+                int x = Strings.parseInt(message, 10, -1, 0, comma), y = Strings.parseInt(message, 10, -1, comma + 1 + (extra ? 1 : 0), space);
+                if(world.tiles.in(x, y)){
+                    Call.pingLocation(player, x * tilesize, y * tilesize, message.substring(space).trim());
+                }
+            }
+        }
+    }
+
     private void sendMessage(){
         String message = chatfield.getText().trim();
         clearChatInput();
@@ -204,6 +228,8 @@ public class ChatFragment extends Table{
         if(history.size < 2 || !history.get(1).equals(message)) history.insert(1, message);
 
         message = UI.formatIcons(message);
+
+        checkPing(message);
 
         Events.fire(new ClientChatEvent(message));
 

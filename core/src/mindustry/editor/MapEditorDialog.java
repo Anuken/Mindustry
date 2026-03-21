@@ -20,6 +20,7 @@ import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.*;
 import mindustry.game.MapObjectives.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -218,11 +219,22 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         });
 
                         for(int i = 0; i < steps; i++){
+                            for(TeamData data : state.teams.getActive()){
+                                if(data.team.rules().fillItems && data.cores.size > 0){
+                                    var core = data.cores.first();
+                                    content.items().each(it -> {
+                                        if(it.isOnPlanet(Vars.state.getPlanet()) && !it.isHidden()){
+                                            core.items.set(it, core.getMaximumAccepted(it));
+                                        }
+                                    });
+                                }
+                            }
                             Time.update();
                             for(var build : builds){
                                 build.update();
                             }
                             Groups.powerGraph.update();
+                            Groups.bullet.update(); //needed for mass drivers...
                         }
 
                         //spawned units will cause havoc, so clear them

@@ -80,7 +80,7 @@ public class ItemBridge extends Block{
 
     @Override
     public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
-        if(plan.config instanceof Point2 p){
+        if(plan.config instanceof Point2 p && (Math.abs(p.x) <= range && Math.abs(p.y) <= range && (p.x == 0 || p.y == 0))){
             currentFindX = plan.x + p.x;
             currentFindY = plan.y + p.y;
             currentPlan = plan;
