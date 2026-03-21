@@ -161,7 +161,8 @@ public class ArcNetProvider implements NetProvider{
                     try{
                         net.handleServerReceived(k, pack);
                     }catch(Throwable e){
-                        Log.err(e);
+                        k.connection.close(DcReason.error);
+                        Log.err("Closing connection due to error: " + k.address + " / " + k.uuid, e);
                     }
                 });
             }
