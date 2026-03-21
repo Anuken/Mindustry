@@ -19,6 +19,7 @@ public enum LogicRule{
     dragMultiplier,
     ban,
     unban,
+    pauseDisabled,
 
     //team specific
     buildSpeed,

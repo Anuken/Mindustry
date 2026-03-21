@@ -165,10 +165,35 @@ public class MinimapRenderer{
             Draw.reset();
         }
 
-        if(fullView && net.active()){
+        if(fullView){
             for(Player player : Groups.player){
-                if(!player.dead()){
+                if(!player.dead() && net.active()){
                     drawLabel(player.x, player.y, player.name, player.color, scaleFactor);
+                }
+                if(player.pingTime > 0f){
+
+                    float rad = 12f;
+
+                    Draw.color(Tmp.c1.set(player.color).mul(Color.darkGray));
+                    Lines.stroke(Scl.scl(scaleFactor * 9f));
+                    Lines.poly(player.pingX, player.pingY, 4, scaleFactor * rad, 0f);
+
+                    Fill.poly(player.pingX, player.pingY + scaleFactor * 30f, 3, scaleFactor * 16f, -90f);
+
+                    Draw.color(player.color);
+                    Lines.stroke(Scl.scl(scaleFactor * 3f));
+                    Lines.poly(player.pingX, player.pingY, 4, scaleFactor * rad, 0f);
+
+                    Fill.poly(player.pingX, player.pingY + scaleFactor * 30f, 3, scaleFactor * 10f, -90f);
+
+                    if(player.pingText != null){
+                        drawLabel(player.pingX, player.pingY + scaleFactor * 65f, player.name, player.color, scaleFactor * 0.7f, false);
+                        drawLabel(player.pingX, player.pingY + scaleFactor * 50f, player.pingText, Color.white, scaleFactor, false);
+                    }else{
+                        drawLabel(player.pingX, player.pingY + scaleFactor * 50f, player.name, player.color, scaleFactor, false);
+                    }
+
+                    Draw.color();
                 }
             }
         }
@@ -376,6 +401,10 @@ public class MinimapRenderer{
     }
 
     public void drawLabel(float x, float y, String text, Color color, float scaleFactor){
+        drawLabel(x, y, text, color ,scaleFactor, true);
+    }
+
+    public void drawLabel(float x, float y, String text, Color color, float scaleFactor, boolean bg){
         Font font = Fonts.outline;
         GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
@@ -383,14 +412,16 @@ public class MinimapRenderer{
         font.setUseIntegerPositions(false);
 
         l.setText(font, text, color, 90f * scaleFactor, Align.left, false);
-        float yOffset = 20f;
-        float margin = 3f * scaleFactor;
 
-        Draw.color(0f, 0f, 0f, 0.2f);
-        Fill.rect(x, y + yOffset - l.height/2f, l.width + margin, l.height + margin);
-        Draw.color();
+        if(bg){
+            float margin = 3f * scaleFactor;
+            Draw.color(0f, 0f, 0f, 0.2f);
+            Fill.rect(x, y + l.height/2f - l.height/2f, l.width + margin, l.height + margin);
+            Draw.color();
+        }
+
         font.setColor(color);
-        font.draw(text, x - l.width/2f, y + yOffset, 90f * scaleFactor, Align.left, false);
+        font.draw(text, x - l.width/2f, y + l.height/2f, 90f * scaleFactor, Align.left, false);
         font.setUseIntegerPositions(ints);
 
         font.getData().setScale(1f);
