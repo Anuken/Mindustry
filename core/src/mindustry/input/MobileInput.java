@@ -700,6 +700,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             commandTap(x, y, queueCommandMode);
         }else if(commandMode){
             tapCommandUnit();
+        }else if(count == 3 && net.active()){
+            Call.pingLocation(Vars.player, worldx, worldy, null);
         }else{
             //control units
             if(count == 2){

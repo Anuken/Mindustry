@@ -34,7 +34,7 @@ import static mindustry.Vars.*;
 @Component(base = true)
 abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Drawc{
     static final float deathDelay = 60f;
-    static final float pingDuration = 15f * 60f;
+    static final float pingDuration = 20f * 60f;
 
     @Import float x, y;
 
@@ -57,6 +57,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient float textFadeTime;
     transient Ratekeeper itemDepositRate = new Ratekeeper();
     transient float pingX, pingY, pingTime;
+    transient @Nullable String pingText;
 
     transient private @Nullable Unit lastReadUnit;
     transient private int wrongReadUnits;
@@ -313,9 +314,9 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     void drawPing(){
-        if(pingTime <= 0f || !renderer.showPings || name == null) return;
+        if(pingTime <= 0f || !renderer.showPings || name == null || team != Vars.player.team()) return;
 
-        float alpha = Math.min(Interp.pow10Out.apply(Mathf.clamp(pingTime)), Interp.pow5Out.apply(Mathf.map(pingTime, 1f, 0.98f, 0f, 1f)));
+        float alpha = Math.min(Interp.pow5Out.apply(Mathf.clamp(Mathf.map(pingTime, 1f / 20f, 0f, 1f, 0f))), Interp.pow5Out.apply(Mathf.map(pingTime, 1f, 0.98f, 0f, 1f)));
 
         Tmp.c1.set(color).a(alpha);
 
@@ -324,28 +325,19 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         Draw.z(Layer.playerName);
         float z = Drawf.text();
         float hover = Mathf.absin(5f, 1f);
-
-        Font font = Fonts.outline;
-        GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
-
-        boolean ints = font.usesIntegerPositions();
-        font.setUseIntegerPositions(false);
-        font.getData().setScale(0.25f / Scl.scl(1f));
-        layout.setText(font, name);
-
-        float scaling = 1f + Mathf.clamp(Interp.pow5In.apply(Mathf.map(pingTime, 1f, 0.96f, 1f, 0f))) * 2.8f;
+        float scaling = 1f + Mathf.clamp(Interp.pow5In.apply(Mathf.map(pingTime, 1f, 0.96f, 1f, 0f))) * 3f;
 
         Drawf.square(pingX, pingY, 2f * scaling, 45f, Tmp.c1, Tmp.c3.set(Color.darkGray).mul(color).a(Tmp.c1.a));
         Drawf.fillPoly(pingX, pingY + 9f + hover, 3, 3f, -90f, Tmp.c1, Tmp.c3);
-        font.setColor(Tmp.c1);
-        font.draw(name, pingX, pingY + 16f + hover, 0, Align.center, false);
+
+        if(pingText != null){
+            Drawf.text(name, pingX, pingY + 20f + hover, Tmp.c1, 0.7f);
+            Drawf.text(pingText, pingX, pingY + 16f + hover, Tmp.c2.set(1f, 1f, 1f, Tmp.c1.a));
+        }else{
+            Drawf.text(name, pingX, pingY + 16f + hover, Tmp.c1);
+        }
 
         Draw.reset();
-        Pools.free(layout);
-        font.getData().setScale(1f);
-        font.setColor(Color.white);
-        font.setUseIntegerPositions(ints);
-
         Draw.z(z);
     }
 

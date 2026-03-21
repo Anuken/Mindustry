@@ -283,11 +283,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
-    public static void pingLocation(Player player, float x, float y){
+    public static void pingLocation(Player player, float x, float y, @Nullable String text){
         if(player != null && Vars.player != null && player.team() == Vars.player.team()){
+            if(net.server() && !netServer.admins.allowAction(player, ActionType.pingLocation, event -> {
+                event.pingX = x;
+                event.pingY = y;
+                event.pingText = text;
+            })){
+                throw new ValidateException(player, "Player was not allowed to ping a location.");
+            }
+
             player.pingX = x;
             player.pingY = y;
             player.pingTime = 1f;
+            player.pingText = text == null || text.isEmpty() ? null :
+                ((text.length() > maxPingTextLength ? text.substring(0, maxPingTextLength) + "..." : text));
         }
     }
 
