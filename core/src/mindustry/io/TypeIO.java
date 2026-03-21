@@ -37,6 +37,7 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unused")
 @TypeIOHandler
 public class TypeIO{
+    private static final int maxArraySize = 1000, maxByteArraySize = 50_000;
 
     public static void writeObject(Writes write, Object object){
         if(object == null){
@@ -58,6 +59,7 @@ public class TypeIO{
             write.b((byte)map.getContentType().ordinal());
             write.s(map.id);
         }else if(object instanceof IntSeq arr){
+            if(arr.size > maxArraySize) throw new ArcRuntimeException("Array size too large: " + arr.size);
             write.b((byte)6);
             write.s((short)arr.size);
             for(int i = 0; i < arr.size; i++){
@@ -68,6 +70,8 @@ public class TypeIO{
             write.i(p.x);
             write.i(p.y);
         }else if(object instanceof Point2[] p){
+            //255 is the limit here, because it's a byte for some reason
+            if(p.length > 255) throw new ArcRuntimeException("Array size too large: " + p.length);
             write.b((byte)8);
             write.b(p.length);
             for(Point2 point2 : p){
@@ -93,10 +97,13 @@ public class TypeIO{
             write.b((byte)13);
             write.s(l.ordinal());
         }else if(object instanceof byte[] b){
+            if(b.length > maxByteArraySize) throw new ArcRuntimeException("Array size too large: " + b.length);
             write.b((byte)14);
             write.i(b.length);
             write.b(b);
         }else if(object instanceof boolean[] b){
+            if(b.length > maxArraySize) throw new ArcRuntimeException("Array size too large: " + b.length);
+
             write.b(16);
             write.i(b.length);
             for(boolean bool : b){
@@ -109,6 +116,8 @@ public class TypeIO{
             write.b(17);
             write.i(u.id);
         }else if(object instanceof Vec2[] vecs){
+            if(vecs.length > maxArraySize) throw new ArcRuntimeException("Array size too large: " + vecs.length);
+
             write.b(18);
             write.s(vecs.length);
             for(Vec2 v : vecs){
@@ -123,9 +132,13 @@ public class TypeIO{
             write.b((byte)20);
             write.b(t.id);
         }else if(object instanceof int[] i){
+            if(i.length > maxArraySize) throw new ArcRuntimeException("Array size too large: " + i.length);
+
             write.b((byte)21);
             writeInts(write, i);
         }else if(object instanceof Object[] objs){
+            if(objs.length > maxArraySize) throw new ArcRuntimeException("Array size too large: " + objs.length);
+
             write.b((byte)22);
             write.i(objs.length);
             for(Object obj : objs){
@@ -158,14 +171,15 @@ public class TypeIO{
             case 4 -> readString(read);
             case 5 -> mapper == null ? content.getByID(ContentType.all[read.b()], read.s()) : mapper.get(ContentType.all[read.b()], read.s());
             case 6 -> {
-                short length = read.s();
-                IntSeq arr = new IntSeq(length);
-                for(int i = 0; i < length; i ++) arr.add(read.i());
+                short len = read.s();
+                if(len > maxArraySize) throw new RuntimeException("Invalid array size: " + len);
+                IntSeq arr = new IntSeq(len);
+                for(int i = 0; i < len; i ++) arr.add(read.i());
                 yield arr;
             }
             case 7 -> new Point2(read.i(), read.i());
             case 8 -> {
-                byte len = read.b();
+                int len = read.ub();
                 Point2[] out = new Point2[len];
                 for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i());
                 yield out;
@@ -176,8 +190,10 @@ public class TypeIO{
             case 12 -> !box ? world.build(read.i()) : new BuildingBox(read.i());
             case 13 -> LAccess.all[read.s()];
             case 14 -> {
-                int blen = read.i();
-                byte[] bytes = new byte[blen];
+                int len = read.i();
+                if(len > maxByteArraySize) throw new RuntimeException("Invalid array size: " + len);
+
+                byte[] bytes = new byte[len];
                 read.b(bytes);
                 yield bytes;
             }
@@ -187,14 +203,18 @@ public class TypeIO{
                 yield null;
             }
             case 16 -> {
-                int boollen = read.i();
-                boolean[] bools = new boolean[boollen];
-                for(int i = 0; i < boollen; i ++) bools[i] = read.bool();
+                int len = read.i();
+                if(len > maxArraySize) throw new RuntimeException("Invalid array size: " + len);
+
+                boolean[] bools = new boolean[len];
+                for(int i = 0; i < len; i ++) bools[i] = read.bool();
                 yield bools;
             }
             case 17 -> !box ? Groups.unit.getByID(read.i()) : new UnitBox(read.i());
             case 18 -> {
                 int len = read.s();
+                if(len > maxArraySize) throw new RuntimeException("Invalid array size: " + len);
+
                 Vec2[] out = new Vec2[len];
                 for(int i = 0; i < len; i ++) out[i] = new Vec2(read.f(), read.f());
                 yield out;
@@ -203,9 +223,11 @@ public class TypeIO{
             case 20 -> Team.all[read.ub()];
             case 21 -> readInts(read);
             case 22 -> {
-                int objlen = read.i();
-                Object[] objs = new Object[objlen];
-                for(int i = 0; i < objlen; i++) objs[i] = readObject(read, box, mapper);
+                int len = read.i();
+                if(len > maxArraySize) throw new RuntimeException("Invalid array size: " + len);
+
+                Object[] objs = new Object[len];
+                for(int i = 0; i < len; i++) objs[i] = readObject(read, box, mapper);
                 yield objs;
             }
             case 23 -> content.unitCommand(read.us());
