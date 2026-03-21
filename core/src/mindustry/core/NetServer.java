@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -18,6 +19,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.TypeIO.*;
 import mindustry.logic.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
@@ -36,13 +38,14 @@ import static mindustry.Vars.*;
 public class NetServer implements ApplicationListener{
     /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
     private static final int maxSnapshotSize = 800;
-    private static final int timerBlockSync = 0, timerHealthSync = 1;
-    private static final float blockSyncTime = 60 * 6, healthSyncTime = 30;
+    private static final int timerBlockSync = 0, timerHealthSync = 1, timerPlanPreviewSync = 2;
+    private static final float blockSyncTime = 60 * 6, healthSyncTime = 30, planPreviewSyncTime = 30f;
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
     private static final Writes dataWrites = new Writes(null);
     private static final IntSeq hiddenIds = new IntSeq();
     private static final IntSeq healthSeq = new IntSeq(maxSnapshotSize / 4 + 1);
     private static final Vec2 vector = new Vec2();
+    private static final ClientBuildPlans plansOut = new ClientBuildPlans();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
     private static final float correctDist = tilesize * 14f;
 
@@ -635,20 +638,47 @@ public class NetServer implements ApplicationListener{
         return Float.isInfinite(f) || Float.isNaN(f);
     }
 
+    //sent from the client to the server in batches with the same incrementing groupId
+    @Remote(targets = Loc.client, unreliable = true, priority = PacketPriority.low)
+    public static void clientPlanSnapshot(Player player, int groupId, @Nullable ClientBuildPlans plans){
+        if(player == null) return;
+        if(groupId > player.lastPreviewPlanGroup){ //new group received, prepare to add plans for this group
+            player.previewPlans.clear();
+            player.lastPreviewPlanGroup = groupId;
+        }else if(groupId < player.lastPreviewPlanGroup){ //packet is outdated, likely sent out of order
+            return;
+        }
+
+        if(plans == null) return;
+
+        player.previewPlansDirty = true;
+
+        int added = Math.min(plans.size, maxPlayerPreviewPlans - player.previewPlans.size);
+        if(added > 0){
+            player.previewPlans.addAll(plans, 0, added);
+        }
+    }
+
+    //sent from the server to the client in batches with the same incrementing groupId
+    @Remote(targets = Loc.server, unreliable = true, priority = PacketPriority.low)
+    public static void clientPlanSnapshotReceived(Player player, int groupId, @Nullable ClientBuildPlans plans){
+        clientPlanSnapshot(player, groupId, plans);
+    }
+
     @Remote(targets = Loc.client, unreliable = true, priority = PacketPriority.high)
     public static void clientSnapshot(
-    Player player,
-    int snapshotID,
-    int unitID,
-    boolean dead,
-    float x, float y,
-    float pointerX, float pointerY,
-    float rotation, float baseRotation,
-    float xVelocity, float yVelocity,
-    Tile mining,
-    boolean boosting, boolean shooting, boolean chatting, boolean building,
-    Block selectedBlock, int selectedRotation, @Nullable Queue<BuildPlan> plans,
-    float viewX, float viewY, float viewWidth, float viewHeight
+        Player player,
+        int snapshotID,
+        int unitID,
+        boolean dead,
+        float x, float y,
+        float pointerX, float pointerY,
+        float rotation, float baseRotation,
+        float xVelocity, float yVelocity,
+        Tile mining,
+        boolean boosting, boolean shooting, boolean chatting, boolean building,
+        Block selectedBlock, int selectedRotation, @Nullable Queue<BuildPlan> plans,
+        float viewX, float viewY, float viewWidth, float viewHeight
     ){
         NetConnection con = player.con;
         if(con == null || snapshotID < con.lastReceivedClientSnapshot) return;
@@ -1124,9 +1154,50 @@ public class NetServer implements ApplicationListener{
 
                 buildHealthChanged.clear();
             }
+
+            //TODO: this system is a big bandwidth waster, it would be nicer to have a diff system instead
+            if(Groups.player.size() > 0 && timer.get(timerPlanPreviewSync, planPreviewSyncTime)){
+                Groups.player.each(player -> {
+                    int id = ++player.lastPreviewPlanGroupServer;
+                    plansOut.clear();
+
+                    if(player.previewPlans.isEmpty()){
+                        Call.clientPlanSnapshot(id, null);
+                    }else{
+                        BuildPlan[] items = player.previewPlans.items;
+                        int size = player.previewPlans.size;
+                        //max snapshot size = 800
+                        //max reasonable plan size = 12
+                        //divide the two to get the size of plan batches
+                        final int chunkSize = 800 / 12;
+
+                        if(size < chunkSize){
+                            plansOut.set(player.previewPlans);
+                            clientPlanSnapshotSend(player, id, plansOut);
+                        }else{
+                            for(int i = 0; i < size; i += chunkSize){
+                                int len = Math.min(i + chunkSize, size) - i;
+                                plansOut.ensureCapacity(len);
+                                System.arraycopy(items, i, plansOut.items, 0, len);
+                                plansOut.size = len;
+
+                                clientPlanSnapshotSend(player, id, plansOut);
+                            }
+                        }
+                    }
+                });
+            }
         }catch(IOException e){
             Log.err(e);
         }
+    }
+
+    static void clientPlanSnapshotSend(Player player, int groupId, ClientBuildPlans plans){
+        ClientPlanSnapshotReceivedCallPacket packet = new ClientPlanSnapshotReceivedCallPacket();
+        packet.groupId = groupId;
+        packet.plans = plans;
+        packet.player = player;
+        Vars.net.sendExcept(player.con, packet, false);
     }
 
     public class VoteSession{

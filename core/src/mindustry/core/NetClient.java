@@ -13,14 +13,15 @@ import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.io.*;
+import mindustry.io.TypeIO.*;
 import mindustry.logic.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
@@ -39,6 +40,8 @@ public class NetClient implements ApplicationListener{
     private static final float dataTimeout = 60 * 30;
     /** ticks between syncs, e.g. 5 means 60/5 = 12 syncs/sec*/
     private static final float playerSyncTime = 4;
+    /** ticks between plan syncs */
+    private static final float planSyncTime = 30;
     private static final Reads dataReads = new Reads(null);
     private static final JsonValue tmpJsonMap = new JsonValue(ValueType.object);
 
@@ -67,6 +70,7 @@ public class NetClient implements ApplicationListener{
     private ObjectMap<String, Seq<Cons<String>>> customPacketHandlers = new ObjectMap<>();
     /** Packet handlers for custom types of messages, in binary. */
     private ObjectMap<String, Seq<Cons<byte[]>>> customBinaryPacketHandlers = new ObjectMap<>();
+    private static final ClientBuildPlans plansOut = new ClientBuildPlans();
 
     public NetClient(){
 
@@ -708,6 +712,38 @@ public class NetClient implements ApplicationListener{
 
         if(timer.get(1, 60)){
             Call.ping(Time.millis());
+        }
+
+        if(timer.get(2, planSyncTime)){
+            int id = ++player.lastPreviewPlanGroup;
+
+            plansOut.clear();
+            control.input.getSyncedPlans(plansOut);
+            plansOut.truncate(maxPlayerPreviewPlans);
+
+            if(plansOut.isEmpty()){
+                Call.clientPlanSnapshot(id, null);
+            }else{
+                BuildPlan[] items = plansOut.items;
+                int size = plansOut.size;
+                //max snapshot size = 800
+                //max reasonable plan size = 12
+                //divide the two to get the size of plan batches
+                final int chunkSize = 800 / 12;
+
+                if(size < chunkSize){
+                    Call.clientPlanSnapshot(id, plansOut);
+                }else{
+                    for(int i = 0; i < size; i += chunkSize){
+                        int len = Math.min(i + chunkSize, size) - i;
+                        ClientBuildPlans cb = new ClientBuildPlans(len);
+                        System.arraycopy(items, i, cb.items, 0, len);
+                        cb.size = len;
+
+                        Call.clientPlanSnapshot(id, cb);
+                    }
+                }
+            }
         }
     }
 

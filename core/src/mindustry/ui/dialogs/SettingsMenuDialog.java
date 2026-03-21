@@ -505,6 +505,7 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("fps", false);
         graphics.checkPref("playerindicators", true);
         graphics.checkPref("showpings", true);
+        graphics.checkPref("showotherbuildplans", true);
         graphics.checkPref("indicators", true);
         graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);

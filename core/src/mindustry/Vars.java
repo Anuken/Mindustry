@@ -101,6 +101,8 @@ public class Vars implements Loadable{
     public static final int maxBlockSize = 16;
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
+    /** maximum number of preview plans for remote players */
+    public static final int maxPlayerPreviewPlans = 1000;
     /** max chat message length */
     public static final int maxTextLength = 150;
     /** max player name length in bytes */

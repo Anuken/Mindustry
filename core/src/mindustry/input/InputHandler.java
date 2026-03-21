@@ -125,8 +125,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public final PlanConfigFragment planConfig;
 
     private WidgetGroup group = new WidgetGroup();
+    private BuildPlan overlappingPlan = null;
+    private Player overlappingPlayer = null;
 
-    protected Eachable<BuildPlan> allPlans, allSelectLines, allRenderPlansConfig;
+    protected Eachable<BuildPlan> allPlans, allSelectLines, allRenderPlansConfig, allOtherPlayerPlans;
 
     public InputHandler(){
         group.touchable = Touchable.childrenOnly;
@@ -911,6 +913,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.shooting = false;
     }
 
+    public void getSyncedPlans(Seq<BuildPlan> out){
+        for(var plan : lastPlans){
+            if(!plan.breaking){
+                out.add(plan);
+            }
+        }
+    }
+
     public void update(){
         if(spectating != null && (!spectating.isValid() || spectating.team != player.team())){
             spectating = null;
@@ -1350,6 +1360,63 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(sel != null && !(!multiUnitSelect() && selectedUnits.size == 1 && selectedUnits.contains(sel))){
                 drawCommand(sel);
             }
+        }
+    }
+
+    //prevents allocation
+    private static BuildPlan sameQuadPlan;
+    private static final Boolf<BuildPlan> sameQuadPlanFinder = b -> b.block == sameQuadPlan.block && b.x == sameQuadPlan.x && b.y == sameQuadPlan.y;
+
+    /** Draws build plans of other players. */
+    public void drawOtherBuildPlans(){
+        Tmp.v3.set(input.mouseWorld());
+        overlappingPlan = null;
+        overlappingPlayer = null;
+
+        Groups.player.each(player -> {
+            if(player == Vars.player) return;
+
+            if(player.previewPlanTree == null){
+                player.previewPlanTree = new QuadTree<>(playerPlanTree.bounds);
+                player.planEachable = new QueryEachable(player.previewPlanTree);
+            }
+
+            if(player.previewPlansDirty){
+                player.previewPlansDirty = false;
+                //retain animation state
+                for(BuildPlan plan : player.previewPlans){
+                    sameQuadPlan = plan;
+                    BuildPlan prev = player.previewPlanTree.find(plan.drawx(), plan.drawy(), 1f, 1f, sameQuadPlanFinder);
+                    if(prev != null){
+                        plan.animScale = prev.animScale;
+                    }
+                }
+                player.previewPlanTree.clear();
+                for(BuildPlan plan : player.previewPlans){
+                    player.previewPlanTree.insert(plan);
+                }
+            }
+
+            BuildPlan current = player.isBuilder() ? player.unit().buildPlan() : null;
+            camera.bounds(Tmp.r1);
+
+            player.previewPlanTree.intersect(Tmp.r1.grow(tilesize * 2f), plan -> {
+                if(plan.block == null || plan.isDone() || (current != null && player.x == current.x && player.y == current.y && player.unit().activelyBuilding())) return;
+
+                if(Tmp.r2.setCentered(plan.drawx(), plan.drawy(), plan.block.size * tilesize).contains(Tmp.v3)){
+                    overlappingPlan = plan;
+                    overlappingPlayer= player;
+                }
+
+                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f * Time.delta);
+                plan.block.drawOtherPlayerPlan(plan, player.planEachable, overlappingPlan == plan ? 0.7f : 0.25f);
+            });
+        });
+
+        if(overlappingPlan != null){
+            Drawf.arrow(overlappingPlan.drawx(), overlappingPlan.drawy(), overlappingPlayer.x, overlappingPlayer.y, overlappingPlan.block.size * tilesize * 0.6f + tilesize/2f, 2f, overlappingPlayer.color);
+            Drawf.selected(overlappingPlan.x, overlappingPlan.y, overlappingPlan.block, overlappingPlayer.color);
+            overlappingPlan.block.drawPlaceText(overlappingPlayer.name, overlappingPlan.x, overlappingPlan.y, overlappingPlayer.color, false);
         }
     }
 

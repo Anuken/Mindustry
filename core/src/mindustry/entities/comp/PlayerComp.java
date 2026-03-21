@@ -4,7 +4,9 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.*;
@@ -17,6 +19,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.InputHandler.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
@@ -31,7 +34,7 @@ import static mindustry.Vars.*;
 @Component(base = true)
 abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Drawc{
     static final float deathDelay = 60f;
-    static final float pingDuration = 14f * 60f;
+    static final float pingDuration = 15f * 60f;
 
     @Import float x, y;
 
@@ -47,6 +50,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     boolean admin;
     String name = "frog";
     Color color = new Color();
+
     transient String locale = "en";
     transient float deathTimer;
     transient String lastText = "";
@@ -57,6 +61,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient private @Nullable Unit lastReadUnit;
     transient private int wrongReadUnits;
     transient @Nullable Unit justSwitchFrom, justSwitchTo;
+
+    transient int lastPreviewPlanGroup = -1, lastPreviewPlanGroupServer = -1;
+    transient Seq<BuildPlan> previewPlans = new Seq<>(BuildPlan.class);
+    transient @Nullable QuadTree<BuildPlan> previewPlanTree;
+    transient @Nullable QueryEachable planEachable;
+    transient boolean previewPlansDirty;
 
     public boolean isBuilder(){
         return unit != null && unit.canBuild();
@@ -104,6 +114,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         admin = typing = false;
         textFadeTime = 0f;
         x = y = 0f;
+        lastPreviewPlanGroup = 0;
         if(!dead()){
             unit.resetController();
             unit = null;

@@ -751,6 +751,16 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
+    public void getSyncedPlans(Seq<BuildPlan> out){
+        super.getSyncedPlans(out);
+        for(var plan : selectPlans){
+            if(!plan.breaking){
+                out.add(plan);
+            }
+        }
+    }
+
+    @Override
     public void update(){
         super.update();
 
