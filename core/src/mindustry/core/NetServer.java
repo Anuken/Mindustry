@@ -9,7 +9,6 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
-import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -660,7 +659,7 @@ public class NetServer implements ApplicationListener{
     }
 
     //sent from the server to the client in batches with the same incrementing groupId
-    @Remote(targets = Loc.server, unreliable = true, priority = PacketPriority.low)
+    @Remote(targets = Loc.server, unreliable = true, priority = PacketPriority.low, variants = Variant.one)
     public static void clientPlanSnapshotReceived(Player player, int groupId, @Nullable ClientBuildPlans plans){
         clientPlanSnapshot(player, groupId, plans);
     }
@@ -1193,11 +1192,13 @@ public class NetServer implements ApplicationListener{
     }
 
     static void clientPlanSnapshotSend(Player player, int groupId, ClientBuildPlans plans){
-        ClientPlanSnapshotReceivedCallPacket packet = new ClientPlanSnapshotReceivedCallPacket();
-        packet.groupId = groupId;
-        packet.plans = plans;
-        packet.player = player;
-        Vars.net.sendExcept(player.con, packet, false);
+
+        //only send to others of the same team
+        for(Player other : player.team().data().players){
+            if(other != player && !other.isLocal() && other.con != null && other.con.isConnected()){
+                Call.clientPlanSnapshotReceived(other.con, player, groupId, plans);
+            }
+        }
     }
 
     public class VoteSession{

@@ -1374,7 +1374,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         overlappingPlayer = null;
 
         Groups.player.each(player -> {
-            if(player == Vars.player) return;
+            if(player == Vars.player || player.team() != Vars.player.team()){
+                player.previewPlans.clear(); //don't keep irrelevant plans around
+                return;
+            }
 
             if(player.previewPlanTree == null){
                 player.previewPlanTree = new QuadTree<>(playerPlanTree.bounds);
