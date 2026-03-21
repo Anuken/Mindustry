@@ -765,7 +765,12 @@ public class ContentParser{
                 }
 
                 if(value.has("sector")){
-                    preset.initialize(planet, value.getInt("sector", 0));
+                    //clear old value
+                    Sector prev = preset.sector;
+                    if(prev != null && prev.preset == preset){
+                        prev.preset = null;
+                    }
+                    preset.initialize(planet, value.getInt("sector", 0), true);
                 }
 
                 value.remove("sector");

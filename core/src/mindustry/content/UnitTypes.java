@@ -2561,6 +2561,7 @@ public class UnitTypes{
 
                     lifetime = 60f;
                     buildingDamageMultiplier = 0.01f;
+                    homingPower = 0.02f;
                 }};
             }});
         }};
@@ -2611,6 +2612,7 @@ public class UnitTypes{
 
                     lifetime = 60f;
                     buildingDamageMultiplier = 0.01f;
+                    homingPower = 0.03f;
                 }};
             }});
         }};
