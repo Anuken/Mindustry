@@ -37,7 +37,7 @@ public class SectorSubmissions{
         registerSerpuloSector(16, "Namero", "https://discord.com/channels/391020510269669376/1379926788280680579/1409970152283312352");
         registerSerpuloSector(116, "Jamespire", "https://discord.com/channels/391020510269669376/1379926845058711734/1483297088426082336");
         registerSerpuloSector(69, "Oct", "https://discord.com/channels/391020510269669376/1379926831326822610/1406230980120940556");
-        registerSerpuloSector(92, "Skeledragon", "https://discord.com/channels/391020510269669376/1379926835621527615/1483974907720237159");
+        registerSerpuloSector(92, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926835621527615/1484550444369051772");
         registerSerpuloSector(197, "Hengryton Luck", "https://discord.com/channels/391020510269669376/1379926916911599676/1423257237341863966");
         registerSerpuloSector(67, "Ếch ngồi đáy giếng", "https://discord.com/channels/391020510269669376/1379926828696866898/1389981795386396768");
         //180 has an alternate submission that may be more appropriate in terms of difficulty: https://discord.com/channels/391020510269669376/1379926889648619580/1411534650412892185

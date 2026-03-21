@@ -4,7 +4,9 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.*;
@@ -17,6 +19,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.InputHandler.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
@@ -31,6 +34,7 @@ import static mindustry.Vars.*;
 @Component(base = true)
 abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Drawc{
     static final float deathDelay = 60f;
+    static final float pingDuration = 20f * 60f;
 
     @Import float x, y;
 
@@ -46,15 +50,24 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     boolean admin;
     String name = "frog";
     Color color = new Color();
+
     transient String locale = "en";
     transient float deathTimer;
     transient String lastText = "";
     transient float textFadeTime;
     transient Ratekeeper itemDepositRate = new Ratekeeper();
+    transient float pingX, pingY, pingTime;
+    transient @Nullable String pingText;
 
     transient private @Nullable Unit lastReadUnit;
     transient private int wrongReadUnits;
     transient @Nullable Unit justSwitchFrom, justSwitchTo;
+
+    transient int lastPreviewPlanGroup = -1, lastPreviewPlanGroupServer = -1;
+    transient Seq<BuildPlan> previewPlans = new Seq<>(BuildPlan.class);
+    transient @Nullable QuadTree<BuildPlan> previewPlanTree;
+    transient @Nullable QueryEachable planEachable;
+    transient boolean previewPlansDirty;
 
     public boolean isBuilder(){
         return unit != null && unit.canBuild();
@@ -102,6 +115,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         admin = typing = false;
         textFadeTime = 0f;
         x = y = 0f;
+        lastPreviewPlanGroup = 0;
         if(!dead()){
             unit.resetController();
             unit = null;
@@ -120,7 +134,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Replace
     public float clipSize(){
-        return unit == null ? 20 : unit.type.hitSize * 2f;
+        return Float.MAX_VALUE;
     }
 
     @Override
@@ -295,7 +309,46 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Override
     public void draw(){
-        if(unit == null || name == null || unit.inFogTo(Vars.player.team())) return;
+        drawPing();
+        drawName();
+    }
+
+    void drawPing(){
+        if(pingTime <= 0f || !renderer.showPings || name == null || team != Vars.player.team()) return;
+
+        float alpha = Math.min(Interp.pow5Out.apply(Mathf.clamp(Mathf.map(pingTime, 1f / 20f, 0f, 1f, 0f))), Interp.pow5Out.apply(Mathf.map(pingTime, 1f, 0.98f, 0f, 1f)));
+
+        Tmp.c1.set(color).a(alpha);
+
+        pingTime -= Time.delta / pingDuration;
+
+        Draw.z(Layer.playerName);
+        float z = Drawf.text();
+        float hover = Mathf.absin(5f, 1f);
+        float scaling = 1f + Mathf.clamp(Interp.pow5In.apply(Mathf.map(pingTime, 1f, 0.96f, 1f, 0f))) * 3f;
+
+        Drawf.square(pingX, pingY, 2f * scaling, 45f, Tmp.c1, Tmp.c3.set(Color.darkGray).mul(color).a(Tmp.c1.a));
+        Drawf.fillPoly(pingX, pingY + 9f + hover, 3, 3f, -90f, Tmp.c1, Tmp.c3);
+
+        if(pingText != null){
+            Drawf.text(name, pingX, pingY + 20f + hover, Tmp.c1, 0.7f);
+            Drawf.text(pingText, pingX, pingY + 16f + hover, Tmp.c2.set(1f, 1f, 1f, Tmp.c1.a));
+        }else{
+            Drawf.text(name, pingX, pingY + 16f + hover, Tmp.c1);
+        }
+
+        Draw.reset();
+        Draw.z(z);
+    }
+
+    void drawName(){
+        //check clipping for name
+        if(unit == null || name == null) return;
+
+        float clip = unit.type.hitSize * 2f;
+        if(!Core.camera.bounds(Tmp.r1).overlaps(x - clip/2f, y - clip/2f, clip, clip)) return;
+
+        if(name == null || unit.inFogTo(Vars.player.team())) return;
 
         Draw.z(Layer.playerName);
         float z = Drawf.text();
