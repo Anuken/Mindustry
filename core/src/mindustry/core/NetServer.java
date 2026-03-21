@@ -641,21 +641,7 @@ public class NetServer implements ApplicationListener{
     @Remote(targets = Loc.client, unreliable = true, priority = PacketPriority.low)
     public static void clientPlanSnapshot(Player player, int groupId, @Nullable ClientBuildPlans plans){
         if(player == null) return;
-        if(groupId > player.lastPreviewPlanGroup){ //new group received, prepare to add plans for this group
-            player.previewPlans.clear();
-            player.lastPreviewPlanGroup = groupId;
-        }else if(groupId < player.lastPreviewPlanGroup){ //packet is outdated, likely sent out of order
-            return;
-        }
-
-        if(plans == null) return;
-
-        player.previewPlansDirty = true;
-
-        int added = Math.min(plans.size, maxPlayerPreviewPlans - player.previewPlans.size);
-        if(added > 0){
-            player.previewPlans.addAll(plans, 0, added);
-        }
+        player.handlePreviewPlans(groupId, plans);
     }
 
     //sent from the server to the client in batches with the same incrementing groupId
@@ -1160,18 +1146,20 @@ public class NetServer implements ApplicationListener{
                     int id = ++player.lastPreviewPlanGroupServer;
                     plansOut.clear();
 
-                    if(player.previewPlans.isEmpty()){
-                        Call.clientPlanSnapshot(id, null);
+                    var plans = player.getPreviewPlans();
+
+                    if(plans.isEmpty()){
+                        clientPlanSnapshotSend(player, id, null);
                     }else{
-                        BuildPlan[] items = player.previewPlans.items;
-                        int size = player.previewPlans.size;
+                        BuildPlan[] items = plans.items;
+                        int size = plans.size;
                         //max snapshot size = 800
                         //max reasonable plan size = 12
                         //divide the two to get the size of plan batches
-                        final int chunkSize = 800 / 12;
+                        final int chunkSize = 900 / 12;
 
                         if(size < chunkSize){
-                            plansOut.set(player.previewPlans);
+                            plansOut.set(plans);
                             clientPlanSnapshotSend(player, id, plansOut);
                         }else{
                             for(int i = 0; i < size; i += chunkSize){

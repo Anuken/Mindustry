@@ -729,7 +729,7 @@ public class NetClient implements ApplicationListener{
                 //max snapshot size = 800
                 //max reasonable plan size = 12
                 //divide the two to get the size of plan batches
-                final int chunkSize = 800 / 12;
+                final int chunkSize = 900 / 12;
 
                 if(size < chunkSize){
                     Call.clientPlanSnapshot(id, plansOut);

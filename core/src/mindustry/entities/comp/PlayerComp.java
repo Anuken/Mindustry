@@ -64,10 +64,45 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient @Nullable Unit justSwitchFrom, justSwitchTo;
 
     transient int lastPreviewPlanGroup = -1, lastPreviewPlanGroupServer = -1;
-    transient Seq<BuildPlan> previewPlans = new Seq<>(BuildPlan.class);
+    transient long lastPreviewPlanTimestamp;
+    transient boolean receivingNewPlanGroup;
+    transient Seq<BuildPlan> previewPlansCurrent = new Seq<>(BuildPlan.class);
+    transient Seq<BuildPlan> previewPlansAssembling = new Seq<>(BuildPlan.class);
     transient @Nullable QuadTree<BuildPlan> previewPlanTree;
     transient @Nullable QueryEachable planEachable;
     transient boolean previewPlansDirty;
+
+    public Seq<BuildPlan> getPreviewPlans(){
+        long timeToCommit = 100; //ms needed after first plan is received to "commit" the plans.
+        if(Time.timeSinceMillis(lastPreviewPlanTimestamp) >= timeToCommit && receivingNewPlanGroup){
+            receivingNewPlanGroup = false;
+            previewPlansDirty = true;
+            previewPlansCurrent.set(previewPlansAssembling);
+            previewPlansAssembling.clear();
+        }
+
+        return previewPlansCurrent;
+    }
+
+    public void handlePreviewPlans(int groupId, Seq<BuildPlan> plans){
+        if(groupId > lastPreviewPlanGroup){ //new group received, prepare to add plans for this group
+            previewPlansAssembling.clear();
+            lastPreviewPlanGroup = groupId;
+            receivingNewPlanGroup = true;
+            lastPreviewPlanTimestamp = Time.millis();
+        }else if(groupId < lastPreviewPlanGroup){ //packet is outdated, likely sent out of order
+            return;
+        }else if(!receivingNewPlanGroup){ //the window has closed, no more plans will be received
+            return;
+        }
+
+        if(plans == null) return;
+
+        int added = Math.min(plans.size, maxPlayerPreviewPlans - previewPlansAssembling.size);
+        if(added > 0){
+            previewPlansAssembling.addAll(plans, 0, added);
+        }
+    }
 
     public boolean isBuilder(){
         return unit != null && unit.canBuild();
