@@ -150,7 +150,15 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         admin = typing = false;
         textFadeTime = 0f;
         x = y = 0f;
-        lastPreviewPlanGroup = 0;
+        lastPreviewPlanTimestamp = 0;
+        lastPreviewPlanGroup = -1;
+        lastPreviewPlanGroupServer = -1;
+        previewPlanTree = null;
+        planEachable = null;
+        previewPlansCurrent.clear();
+        previewPlansAssembling.clear();
+        receivingNewPlanGroup = false;
+        previewPlansDirty = false;
         if(!dead()){
             unit.resetController();
             unit = null;
