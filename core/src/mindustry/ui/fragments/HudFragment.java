@@ -285,7 +285,7 @@ public class HudFragment{
         parent.fill(t -> {
             float sidePad = mobile ? dsize * 5 + 4f : 0f;
             t.name = "paused";
-            t.top().visible(() -> state.isPaused() && shown && !netServer.isWaitingForPlayers() && !Core.graphics.isPortrait()).touchable = Touchable.disabled;
+            t.top().visible(() -> state.isPaused() && shown && !netServer.isWaitingForPlayers() && !(mobile && Core.graphics.isPortrait())).touchable = Touchable.disabled;
             t.table(Styles.black6, top -> {
                 top.label(() -> state.gameOver && state.isCampaign() ? "@sector.curlost" : "@paused")
                 .style(Styles.outlineLabel).pad(8f);

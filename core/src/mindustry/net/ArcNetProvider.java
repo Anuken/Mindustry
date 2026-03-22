@@ -161,8 +161,15 @@ public class ArcNetProvider implements NetProvider{
                     try{
                         net.handleServerReceived(k, pack);
                     }catch(Throwable e){
-                        k.connection.close(DcReason.error);
-                        Log.err("Closing connection due to error: " + k.address + " / " + k.uuid, e);
+                        long time = Time.millis();
+                        //only kick due to errors if there are two within a short span of time
+                        if(Time.timeSinceMillis(k.lastErrorTime) < 2000){
+                            k.connection.close(DcReason.error);
+                            Log.err("Closing connection due to error: " + k.address + " / " + k.uuid, e);
+                        }else{
+                            k.lastErrorTime = time;
+                            Log.err("Error reading packet from connection: " + k.address + " / " + k.uuid, e);
+                        }
                     }
                 });
             }
@@ -332,6 +339,8 @@ public class ArcNetProvider implements NetProvider{
 
     class ArcConnection extends NetConnection{
         public final Connection connection;
+
+        long lastErrorTime;
 
         public ArcConnection(String address, Connection connection){
             super(address);
