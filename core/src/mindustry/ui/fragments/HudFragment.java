@@ -129,7 +129,7 @@ public class HudFragment{
         }
         saveFavorites();
     }
-    
+
     private void rebuildBlockSelection(Table blockSelection, String searchText){
         blockSelection.clear();
 
@@ -214,7 +214,7 @@ public class HudFragment{
                 }else{
                     favIcon.setScale(0.7f);
                 }
-                
+
                 Table overlay = new Table().align(Align.topRight);
                 overlay.touchable = Touchable.disabled;
                 overlay.add(favIcon).size(2f).pad(12f);
@@ -283,17 +283,21 @@ public class HudFragment{
 
         //paused table
         parent.fill(t -> {
+            float sidePad = mobile ? dsize * 5 + 4f : 0f;
             t.name = "paused";
-            t.top().visible(() -> state.isPaused() && shown && !netServer.isWaitingForPlayers()).touchable = Touchable.disabled;
-            t.table(Styles.black6, top -> top.label(() -> state.gameOver && state.isCampaign() ? "@sector.curlost" : "@paused")
-                .style(Styles.outlineLabel).pad(8f)).height(pauseHeight).growX();
-            //.padLeft(dsize * 5 + 4f) to prevent alpha overlap on left
+            t.top().visible(() -> state.isPaused() && shown && !netServer.isWaitingForPlayers() && !Core.graphics.isPortrait()).touchable = Touchable.disabled;
+            t.table(Styles.black6, top -> {
+                top.label(() -> state.gameOver && state.isCampaign() ? "@sector.curlost" : "@paused")
+                .style(Styles.outlineLabel).pad(8f);
+                top.spacerX(() -> sidePad + Core.scene.marginLeft - Core.scene.marginRight);
+            }).height(pauseHeight).growX()
+            .padLeft(sidePad);
         });
 
         //pause disabled table
         parent.fill(t -> {
             t.name = "pause-disabled";
-            t.top().visible(() -> pauseDisableDur > 0f && shown && !netServer.isWaitingForPlayers() && !state.isPaused() && !(state.gameOver && state.isCampaign())).touchable = Touchable.disabled;
+            t.top().visible(() -> pauseDisableDur > 0f && shown && !mobile && !netServer.isWaitingForPlayers() && !state.isPaused() && !(state.gameOver && state.isCampaign())).touchable = Touchable.disabled;
             t.update(() -> {
                 t.color.a = t.color.a > 0f && pauseDisableDur > 0f ? t.color.a - Time.delta / pauseDisableDur : 1f;
                 if(t.color.a <= 0f){
@@ -309,6 +313,7 @@ public class HudFragment{
             y = 0f;
             w = Core.graphics.getWidth();
             h = Core.graphics.getHeight();
+            Draw.color();
             if(Core.scene.marginLeft > 0){
                 paneRight.draw(x, y, Core.scene.marginLeft, h);
             }
@@ -354,9 +359,19 @@ public class HudFragment{
                 //for better inset visuals
                 cont.rect((x, y, w, h) -> {
                     if(Core.scene.marginTop > 0){
+                        Draw.color();
                         Tex.paneRight.draw(x, y, w, Core.scene.marginTop);
                     }
                 }).fillX().row();
+
+                //paused in portrait mode
+                cont.label(() -> state.gameOver && state.isCampaign() ? "@sector.curlost" : "@paused")
+                .style(Styles.outlineLabel)
+                .labelAlign(Align.center)
+                .visible(() -> state.isPaused() && shown && !netServer.isWaitingForPlayers() && Core.graphics.isPortrait())
+                .touchable(Touchable.disabled).height(20f).padTop(-40f).fillX();
+
+                cont.row();
 
                 cont.table(select -> {
                     select.name = "mobile buttons";
