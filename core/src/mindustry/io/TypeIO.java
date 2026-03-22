@@ -612,7 +612,6 @@ public class TypeIO{
             case 2 -> read.l();
             case 3 -> read.f();
             case 5 -> content.getByID(ContentType.all[read.b()], read.s());
-            case 7 -> new Point2(read.i(), read.i()); //technically not allowed but harmless enough to leave here
             case 10 -> read.bool();
             case 11 -> read.d();
             default -> throw new IllegalArgumentException("Unknown plan config object type: " + type);

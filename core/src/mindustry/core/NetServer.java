@@ -1142,6 +1142,13 @@ public class NetServer implements ApplicationListener{
 
             //TODO: this system is a big bandwidth waster, it would be nicer to have a diff system instead
             if(Groups.player.size() > 0 && timer.get(timerPlanPreviewSync, planPreviewSyncTime)){
+
+                if(!headless){ //update local player's plans so that clients see it
+                    player.previewPlansCurrent.clear();
+                    control.input.getSyncedPlans(player.previewPlansCurrent);
+                    player.previewPlansCurrent.truncate(maxPlayerPreviewPlans);
+                }
+
                 Groups.player.each(player -> {
                     int id = ++player.lastPreviewPlanGroupServer;
                     plansOut.clear();

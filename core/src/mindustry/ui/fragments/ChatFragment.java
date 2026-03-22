@@ -60,9 +60,9 @@ public class ChatFragment extends Table{
         });
 
         update(() -> {
-            boolean hasOtherFocus = scene.getKeyboardFocus() != null && !chatfield.hasKeyboard();
+            boolean hasOtherFocus = (scene.getKeyboardFocus() != null && !chatfield.hasKeyboard()) && !(ui.minimapfrag.shown() && !(scene.getKeyboardFocus() instanceof TextField));
 
-            if(net.active() && input.keyTap(Binding.chat) && (!hasOtherFocus && !lastFrameHadFocus || ui.minimapfrag.shown()) && !ui.consolefrag.shown()){
+            if(net.active() && input.keyTap(Binding.chat) && !hasOtherFocus && !lastFrameHadFocus && !ui.consolefrag.shown()){
                 toggle();
             }
 
