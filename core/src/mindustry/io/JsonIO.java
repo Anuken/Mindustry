@@ -42,6 +42,15 @@ public class JsonIO{
             if(object instanceof MappableContent c) return c.name;
             return super.convertToString(object);
         }
+
+        @Override
+        protected <T> Class<T> resolveClass(String className){
+            Class<T> result = super.resolveClass(className);
+            if(Serializable.class.isAssignableFrom(result)){
+                return result;
+            }
+            throw new SerializationException("Class deserialization not allowed: " + result);
+        }
     };
 
     public static void writeBytes(Object value, Class<?> elementType, DataOutputStream output){
