@@ -283,7 +283,7 @@ public class HudFragment{
 
         //paused table
         parent.fill(t -> {
-            float sidePad = mobile ? dsize * 5 + 4f : 0f;
+            float sidePad = dsize * 5 + 4f;
             t.name = "paused";
             t.top().visible(() -> state.isPaused() && shown && !netServer.isWaitingForPlayers() && !(mobile && Core.graphics.isPortrait())).touchable = Touchable.disabled;
             t.table(Styles.black6, top -> {
