@@ -497,7 +497,6 @@ task deployAll{
     dependsOn cleanDeployOutput
     dependsOn "desktop:packrLinux64"
     dependsOn "desktop:packrWindows64"
-    dependsOn "desktop:packrWindows32"
     dependsOn "desktop:packrMacOS"
     if(versionModifier != "steam"){
         dependsOn "server:deploy"
