@@ -20,8 +20,17 @@ import static mindustry.Vars.*;
 public class SoundControl{
     public float finTime = 120f, foutTime = 120f, musicInterval = 3f * Time.toMinutes, musicChance = 0.8f, musicWaveChance = 0.46f;
 
+    /** music which should be playing at the current moment */
     public Seq<MusicEntry> activeMusicEntries = Seq.with();
+    /** music which can be randomly chosen to play during gameplay */
     public Seq<MusicEntry> randomMusicEntries = Seq.with();
+
+    /** normal, ambient music, plays at any time */
+    public Seq<Music> ambientMusic = Seq.with();
+    /** darker music, used in times of conflict */
+    public Seq<Music> darkMusic = Seq.with();
+    /** music used explicitly after boss spawns */
+    public Seq<Music> bossMusic = Seq.with();
 
     public AudioBus uiBus = new AudioBus();
 
@@ -69,8 +78,8 @@ public class SoundControl{
         current = null;
         fade = 0f;
 
-        Seq<Music> ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game6, Musics.game8, Musics.game9, Musics.fine),
-        darkMusic = Seq.with(Musics.game2, Musics.game5, Musics.game7, Musics.game4),
+        ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game6, Musics.game8, Musics.game9, Musics.fine);
+        darkMusic = Seq.with(Musics.game2, Musics.game5, Musics.game7, Musics.game4);
         bossMusic = Seq.with(Musics.boss1, Musics.boss2, Musics.game2, Musics.game5);
         activeMusicEntries = Seq.with(
             new MusicEntry(() -> ui.planet.state.planet.launchMusic, () -> state.isMenu() && ui.planet.isShown()),
