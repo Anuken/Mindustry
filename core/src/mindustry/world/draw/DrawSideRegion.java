@@ -10,7 +10,6 @@ import mindustry.world.*;
 public class DrawSideRegion extends DrawBlock{
     public TextureRegion top1, top2;
 
-
     @Override
     public void draw(Building build){
         Draw.rect(build.rotation > 1 ? top2 : top1, build.x, build.y, build.rotdeg());
