@@ -377,8 +377,9 @@ public class HudFragment{
                     select.name = "mobile buttons";
                     select.left();
                     select.defaults().size(dsize).left();
+                    select.background(Styles.black6);
 
-                    ImageButtonStyle style = Styles.cleari;
+                    ImageButtonStyle style = Styles.clearNonei;
 
                     select.button(Icon.menu, style, ui.paused::show).name("menu");
                     flip = select.button(Icon.upOpen, style, this::toggleMenus).get();
@@ -461,7 +462,7 @@ public class HudFragment{
 
                 @Override
                 public float getPrefHeight(){
-                    return Scl.scl(120f);
+                    return Scl.scl(123f);
                 }
             }).name("waves/editor");
 
