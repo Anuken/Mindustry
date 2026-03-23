@@ -78,9 +78,9 @@ public class SoundControl{
             new MusicEntry(Musics.menu, () -> state.isMenu())
         );
         randomMusicEntries = Seq.with(
-            new MusicEntry(() -> state.getPlanet().bossMusic.any() ? state.getPlanet().bossMusic.random(lastRandomPlayed) : bossMusic.random(lastRandomPlayed), () -> state.boss() != null || state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss)),
-            new MusicEntry(() -> state.getPlanet().darkMusic.any() ? state.getPlanet().darkMusic.random(lastRandomPlayed) : darkMusic.random(lastRandomPlayed), this::isDark),
-            new MusicEntry(() -> state.getPlanet().ambientMusic.any() ? state.getPlanet().ambientMusic.random(lastRandomPlayed) : ambientMusic.random(lastRandomPlayed), () -> true)
+            new MusicEntry(() -> state.getPlanet() != null && state.getPlanet().bossMusic.any() ? state.getPlanet().bossMusic.random(lastRandomPlayed) : bossMusic.random(lastRandomPlayed), () -> state.boss() != null || state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss)),
+            new MusicEntry(() -> state.getPlanet() != null && state.getPlanet().darkMusic.any() ? state.getPlanet().darkMusic.random(lastRandomPlayed) : darkMusic.random(lastRandomPlayed), this::isDark),
+            new MusicEntry(() -> state.getPlanet() != null && state.getPlanet().ambientMusic.any() ? state.getPlanet().ambientMusic.random(lastRandomPlayed) : ambientMusic.random(lastRandomPlayed), () -> true)
         );
 
         //setup UI bus for all sounds that are in the UI folder
