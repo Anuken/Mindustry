@@ -64,10 +64,45 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient @Nullable Unit justSwitchFrom, justSwitchTo;
 
     transient int lastPreviewPlanGroup = -1, lastPreviewPlanGroupServer = -1;
-    transient Seq<BuildPlan> previewPlans = new Seq<>(BuildPlan.class);
+    transient long lastPreviewPlanTimestamp;
+    transient boolean receivingNewPlanGroup;
+    transient Seq<BuildPlan> previewPlansCurrent = new Seq<>(BuildPlan.class);
+    transient Seq<BuildPlan> previewPlansAssembling = new Seq<>(BuildPlan.class);
     transient @Nullable QuadTree<BuildPlan> previewPlanTree;
     transient @Nullable QueryEachable planEachable;
     transient boolean previewPlansDirty;
+
+    public Seq<BuildPlan> getPreviewPlans(){
+        long timeToCommit = 100; //ms needed after first plan is received to "commit" the plans.
+        if(Time.timeSinceMillis(lastPreviewPlanTimestamp) >= timeToCommit && receivingNewPlanGroup){
+            receivingNewPlanGroup = false;
+            previewPlansDirty = true;
+            previewPlansCurrent.set(previewPlansAssembling);
+            previewPlansAssembling.clear();
+        }
+
+        return previewPlansCurrent;
+    }
+
+    public void handlePreviewPlans(int groupId, Seq<BuildPlan> plans){
+        if(groupId > lastPreviewPlanGroup){ //new group received, prepare to add plans for this group
+            previewPlansAssembling.clear();
+            lastPreviewPlanGroup = groupId;
+            receivingNewPlanGroup = true;
+            lastPreviewPlanTimestamp = Time.millis();
+        }else if(groupId < lastPreviewPlanGroup){ //packet is outdated, likely sent out of order
+            return;
+        }else if(!receivingNewPlanGroup){ //the window has closed, no more plans will be received
+            return;
+        }
+
+        if(plans == null) return;
+
+        int added = Math.min(plans.size, maxPlayerPreviewPlans - previewPlansAssembling.size);
+        if(added > 0){
+            previewPlansAssembling.addAll(plans, 0, added);
+        }
+    }
 
     public boolean isBuilder(){
         return unit != null && unit.canBuild();
@@ -115,7 +150,15 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         admin = typing = false;
         textFadeTime = 0f;
         x = y = 0f;
-        lastPreviewPlanGroup = 0;
+        lastPreviewPlanTimestamp = 0;
+        lastPreviewPlanGroup = -1;
+        lastPreviewPlanGroupServer = -1;
+        previewPlanTree = null;
+        planEachable = null;
+        previewPlansCurrent.clear();
+        previewPlansAssembling.clear();
+        receivingNewPlanGroup = false;
+        previewPlansDirty = false;
         if(!dead()){
             unit.resetController();
             unit = null;
@@ -261,11 +304,6 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             unit.team(team);
             unit.controller(this);
 
-            //this player just became remote, snap the interpolation so it doesn't go wild
-            if(unit.isRemote()){
-                unit.snapInterpolation();
-            }
-
             //reset selected block when switching units
             if(!headless && isLocal()){
                 control.input.block = null;
@@ -322,19 +360,21 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
         pingTime -= Time.delta / pingDuration;
 
+        float s = Scl.scl(4) / renderer.getDisplayScale();
+
         Draw.z(Layer.playerName);
         float z = Drawf.text();
         float hover = Mathf.absin(5f, 1f);
         float scaling = 1f + Mathf.clamp(Interp.pow5In.apply(Mathf.map(pingTime, 1f, 0.96f, 1f, 0f))) * 3f;
 
-        Drawf.square(pingX, pingY, 2f * scaling, 45f, Tmp.c1, Tmp.c3.set(Color.darkGray).mul(color).a(Tmp.c1.a));
-        Drawf.fillPoly(pingX, pingY + 9f + hover, 3, 3f, -90f, Tmp.c1, Tmp.c3);
+        Drawf.square(pingX, pingY, 2f * scaling * s, 45f, Tmp.c1, Tmp.c3.set(Color.darkGray).mul(color).a(Tmp.c1.a), s);
+        Drawf.fillPoly(pingX, pingY + 9f * s + hover * s, 3, 3f * s, -90f, Tmp.c1, Tmp.c3, s);
 
         if(pingText != null){
-            Drawf.text(name, pingX, pingY + 20f + hover, Tmp.c1, 0.7f);
-            Drawf.text(pingText, pingX, pingY + 16f + hover, Tmp.c2.set(1f, 1f, 1f, Tmp.c1.a));
+            Drawf.text(name, pingX, pingY + (20f + hover)*s, Tmp.c1, 0.7f * s);
+            Drawf.text(pingText, pingX, pingY + (16f + hover)*s, Tmp.c2.set(1f, 1f, 1f, Tmp.c1.a), s);
         }else{
-            Drawf.text(name, pingX, pingY + 16f + hover, Tmp.c1);
+            Drawf.text(name, pingX, pingY + (16f + hover)*s, Tmp.c1, s);
         }
 
         Draw.reset();

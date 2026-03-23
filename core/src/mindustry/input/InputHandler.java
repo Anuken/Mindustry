@@ -1384,8 +1384,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         overlappingPlayer = null;
 
         Groups.player.each(player -> {
+            var plans = player.getPreviewPlans();
             if(player == Vars.player || player.team() != Vars.player.team()){
-                player.previewPlans.clear(); //don't keep irrelevant plans around
+                plans.clear(); //don't keep irrelevant plans around
                 return;
             }
 
@@ -1397,7 +1398,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(player.previewPlansDirty){
                 player.previewPlansDirty = false;
                 //retain animation state
-                for(BuildPlan plan : player.previewPlans){
+                for(BuildPlan plan : plans){
                     sameQuadPlan = plan;
                     BuildPlan prev = player.previewPlanTree.find(plan.drawx(), plan.drawy(), 1f, 1f, sameQuadPlanFinder);
                     if(prev != null){
@@ -1405,7 +1406,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     }
                 }
                 player.previewPlanTree.clear();
-                for(BuildPlan plan : player.previewPlans){
+                for(BuildPlan plan : plans){
                     player.previewPlanTree.insert(plan);
                 }
             }

@@ -37,8 +37,11 @@ import static mindustry.Vars.*;
 public class NetServer implements ApplicationListener{
     /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
     private static final int maxSnapshotSize = 800;
-    private static final int timerBlockSync = 0, timerHealthSync = 1, timerPlanPreviewSync = 2;
-    private static final float blockSyncTime = 60 * 6, healthSyncTime = 30, planPreviewSyncTime = 30f;
+    private static final Timekeeper
+        blockSyncTime = Timekeeper.ofSeconds(6f),
+        healthSyncTime = Timekeeper.ofSeconds(0.5f),
+        planPreviewSyncTime = Timekeeper.ofSeconds(0.5f);
+
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
     private static final Writes dataWrites = new Writes(null);
     private static final IntSeq hiddenIds = new IntSeq();
@@ -99,7 +102,7 @@ public class NetServer implements ApplicationListener{
     };
 
     private boolean closing = false, pvpAutoPaused = true;
-    private Interval timer = new Interval(10);
+    //private Interval timer = new Interval(10);
     private IntSet buildHealthChanged = new IntSet();
 
     /** Current kick session. */
@@ -411,7 +414,7 @@ public class NetServer implements ApplicationListener{
                     }else if(found.team() != player.team()){
                         player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
-                        Timekeeper vtime = cooldowns.get(player.uuid(), () -> new Timekeeper(voteCooldown));
+                        Timekeeper vtime = cooldowns.get(player.uuid(), () -> Timekeeper.ofSeconds(voteCooldown));
 
                         if(!vtime.get()){
                             player.sendMessage("[scarlet]You must wait " + voteCooldown/60 + " minutes between votekicks.");
@@ -641,21 +644,7 @@ public class NetServer implements ApplicationListener{
     @Remote(targets = Loc.client, unreliable = true, priority = PacketPriority.low)
     public static void clientPlanSnapshot(Player player, int groupId, @Nullable ClientBuildPlans plans){
         if(player == null) return;
-        if(groupId > player.lastPreviewPlanGroup){ //new group received, prepare to add plans for this group
-            player.previewPlans.clear();
-            player.lastPreviewPlanGroup = groupId;
-        }else if(groupId < player.lastPreviewPlanGroup){ //packet is outdated, likely sent out of order
-            return;
-        }
-
-        if(plans == null) return;
-
-        player.previewPlansDirty = true;
-
-        int added = Math.min(plans.size, maxPlayerPreviewPlans - player.previewPlans.size);
-        if(added > 0){
-            player.previewPlans.addAll(plans, 0, added);
-        }
+        player.handlePreviewPlans(groupId, plans);
     }
 
     //sent from the server to the client in batches with the same incrementing groupId
@@ -1122,11 +1111,11 @@ public class NetServer implements ApplicationListener{
                 }
             });
 
-            if(Groups.player.size() > 0 && Core.settings.getBool("blocksync") && timer.get(timerBlockSync, blockSyncTime)){
+            if(Groups.player.size() > 0 && Core.settings.getBool("blocksync") && blockSyncTime.poll()){
                 writeBlockSnapshots();
             }
 
-            if(Groups.player.size() > 0 && buildHealthChanged.size > 0 && timer.get(timerHealthSync, healthSyncTime)){
+            if(Groups.player.size() > 0 && buildHealthChanged.size > 0 && healthSyncTime.poll()){
                 healthSeq.clear();
 
                 var iter = buildHealthChanged.iterator();
@@ -1155,23 +1144,32 @@ public class NetServer implements ApplicationListener{
             }
 
             //TODO: this system is a big bandwidth waster, it would be nicer to have a diff system instead
-            if(Groups.player.size() > 0 && timer.get(timerPlanPreviewSync, planPreviewSyncTime)){
+            if(Groups.player.size() > 0 && planPreviewSyncTime.poll()){
+
+                if(!headless){ //update local player's plans so that clients see it
+                    player.previewPlansCurrent.clear();
+                    control.input.getSyncedPlans(player.previewPlansCurrent);
+                    player.previewPlansCurrent.truncate(maxPlayerPreviewPlans);
+                }
+
                 Groups.player.each(player -> {
                     int id = ++player.lastPreviewPlanGroupServer;
                     plansOut.clear();
 
-                    if(player.previewPlans.isEmpty()){
-                        Call.clientPlanSnapshot(id, null);
+                    var plans = player.getPreviewPlans();
+
+                    if(plans.isEmpty()){
+                        clientPlanSnapshotSend(player, id, null);
                     }else{
-                        BuildPlan[] items = player.previewPlans.items;
-                        int size = player.previewPlans.size;
+                        BuildPlan[] items = plans.items;
+                        int size = plans.size;
                         //max snapshot size = 800
                         //max reasonable plan size = 12
                         //divide the two to get the size of plan batches
-                        final int chunkSize = 800 / 12;
+                        final int chunkSize = 900 / 12;
 
                         if(size < chunkSize){
-                            plansOut.set(player.previewPlans);
+                            plansOut.set(plans);
                             clientPlanSnapshotSend(player, id, plansOut);
                         }else{
                             for(int i = 0; i < size; i += chunkSize){

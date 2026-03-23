@@ -170,7 +170,7 @@ public class MinimapRenderer{
                 if(!player.dead() && net.active()){
                     drawLabel(player.x, player.y, player.name, player.color, scaleFactor);
                 }
-                if(player.pingTime > 0f){
+                if(player.pingTime > 0f && renderer.showPings){
 
                     float rad = 12f;
 

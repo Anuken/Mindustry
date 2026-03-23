@@ -2,16 +2,19 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.flabel.*;
+import arc.input.*;
 import arc.math.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.core.GameState.*;
-import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
@@ -96,6 +99,7 @@ public class GameOverDialog extends BaseDialog{
         }
 
         if(state.isCampaign()){
+            Sector prev = state.getSector();
             if(net.client()){
                 buttons.button("@gameover.disconnect", () -> {
                     logic.reset();
@@ -107,6 +111,23 @@ public class GameOverDialog extends BaseDialog{
                 buttons.button("@continue", () -> {
                     hide();
                     ui.planet.show();
+
+                    if(prev.info.attempts >= 2 && prev.planet.campaignRules.difficulty == Difficulty.normal && Core.settings.getBoolOnce("difficultyguide")){
+                        Time.runTask(10f, () -> {
+                            BaseDialog dialog = new BaseDialog("@difficulty.guide.title");
+                            dialog.setFillParent(false);
+                            dialog.cont.add("@difficulty.guide").width(mobile ? 400f : 500f).wrap().pad(10f).get().setAlignment(Align.center, Align.center);
+                            dialog.buttons.defaults().size(200f, 60f).pad(2f);
+                            dialog.buttons.button("@hide", Icon.cancel, dialog::hide);
+                            dialog.buttons.button("@difficulty.guide.confirm", Icon.book, () -> {
+                                dialog.hide();
+                                Vars.ui.campaignRules.show(prev.planet);
+                            });
+                            dialog.keyDown(KeyCode.escape, dialog::hide);
+                            dialog.keyDown(KeyCode.back, dialog::hide);
+                            dialog.show();
+                        });
+                    }
                 }).size(170f, 60f);
             }
         }else{
