@@ -4,6 +4,7 @@ import arc.*;
 import arc.audio.*;
 import arc.audio.Filters.*;
 import arc.files.*;
+import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -19,12 +20,8 @@ import static mindustry.Vars.*;
 public class SoundControl{
     public float finTime = 120f, foutTime = 120f, musicInterval = 3f * Time.toMinutes, musicChance = 0.8f, musicWaveChance = 0.46f;
 
-    /** normal, ambient music, plays at any time */
-    public Seq<Music> ambientMusic = Seq.with();
-    /** darker music, used in times of conflict  */
-    public Seq<Music> darkMusic = Seq.with();
-    /** music used explicitly after boss spawns */
-    public Seq<Music> bossMusic = Seq.with();
+    public Seq<MusicEntry> activeMusicEntries = Seq.with();
+    public Seq<MusicEntry> randomMusicEntries = Seq.with();
 
     public AudioBus uiBus = new AudioBus();
 
@@ -47,11 +44,7 @@ public class SoundControl{
 
         //only run music 10 seconds after a wave spawns
         Events.on(WaveEvent.class, e -> Time.run(Mathf.random(8f, 15f) * 60f, () -> {
-            boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
-
-            if(boss){
-                playOnce(bossMusic.random(lastRandomPlayed));
-            }else if(Mathf.chance(musicWaveChance)){
+            if(Mathf.chance(musicWaveChance)){
                 playRandom();
             }
         }));
@@ -75,9 +68,20 @@ public class SoundControl{
     protected void reload(){
         current = null;
         fade = 0f;
-        ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game6, Musics.game8, Musics.game9, Musics.fine);
-        darkMusic = Seq.with(Musics.game2, Musics.game5, Musics.game7, Musics.game4);
+
+        Seq<Music> ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game6, Musics.game8, Musics.game9, Musics.fine),
+        darkMusic = Seq.with(Musics.game2, Musics.game5, Musics.game7, Musics.game4),
         bossMusic = Seq.with(Musics.boss1, Musics.boss2, Musics.game2, Musics.game5);
+        activeMusicEntries = Seq.with(
+            new MusicEntry(() -> ui.planet.state.planet.launchMusic, () -> state.isMenu() && ui.planet.isShown()),
+            new MusicEntry(Musics.editor, () -> (state.isMenu() && ui.editor.isShown()) || state.isEditor()),
+            new MusicEntry(Musics.menu, () -> state.isMenu())
+        );
+        randomMusicEntries = Seq.with(
+            new MusicEntry(() -> state.getPlanet().bossMusic.any() ? state.getPlanet().bossMusic.random(lastRandomPlayed) : bossMusic.random(lastRandomPlayed), () -> state.boss() != null || state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss)),
+            new MusicEntry(() -> state.getPlanet().darkMusic.any() ? state.getPlanet().darkMusic.random(lastRandomPlayed) : darkMusic.random(lastRandomPlayed), this::isDark),
+            new MusicEntry(() -> state.getPlanet().ambientMusic.any() ? state.getPlanet().ambientMusic.random(lastRandomPlayed) : ambientMusic.random(lastRandomPlayed), () -> true)
+        );
 
         //setup UI bus for all sounds that are in the UI folder
         for(var sound : Core.assets.getAll(Sound.class, new Seq<>())){
@@ -159,18 +163,10 @@ public class SoundControl{
 
         Core.audio.setPaused(Core.audio.soundBus.id, state.isPaused());
 
-        if(state.isMenu()){
+        MusicEntry activeMusicEntry = activeMusicEntries.find(MusicEntry::shouldPlay);
+        if(activeMusicEntry != null){
             silenced = false;
-            if(ui.planet.isShown()){
-                play(ui.planet.state.planet.launchMusic);
-            }else if(ui.editor.isShown()){
-                play(Musics.editor);
-            }else{
-                play(Musics.menu);
-            }
-        }else if(state.rules.editor){
-            silenced = false;
-            play(Musics.editor);
+            play(activeMusicEntry.getMusic());
         }else{
             //this just fades out the last track to make way for ingame music
             silence();
@@ -233,12 +229,9 @@ public class SoundControl{
 
     /** Plays a random track.*/
     public void playRandom(){
-        if(state.boss() != null){
-            playOnce(bossMusic.random(lastRandomPlayed));
-        }else if(isDark()){
-            playOnce(darkMusic.random(lastRandomPlayed));
-        }else{
-            playOnce(ambientMusic.random(lastRandomPlayed));
+        MusicEntry randomMusicEntry = randomMusicEntries.find(MusicEntry::shouldPlay);
+        if(randomMusicEntry != null){
+            playOnce(randomMusicEntry.getMusic());
         }
     }
 
@@ -342,5 +335,27 @@ public class SoundControl{
 
         int soundID;
         float curVolume, totalVolume;
+    }
+
+    public static class MusicEntry{
+        public Prov<Music> musicProv;
+        public Boolp shouldPlay;
+
+        public MusicEntry(Prov<Music> musicProv, Boolp shouldPlay){
+            this.musicProv = musicProv;
+            this.shouldPlay = shouldPlay;
+        }
+
+        public MusicEntry(Music music, Boolp shouldPlay){
+            this(() -> music, shouldPlay);
+        }
+
+        public Music getMusic(){
+            return musicProv.get();
+        }
+
+        public boolean shouldPlay(){
+            return shouldPlay.get();
+        }
     }
 }
