@@ -145,6 +145,8 @@ public class Planet extends UnlockableContent{
     public Seq<Music> darkMusic = new Seq<>();
     /** Music used after a boss spawns. If empty, default music will be used. */
     public Seq<Music> bossMusic = new Seq<>();
+    /** For mods. This should return a random music track to be played during gameplay. */
+    public @Nullable Prov<Music> randomMusicHandler;
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system. */

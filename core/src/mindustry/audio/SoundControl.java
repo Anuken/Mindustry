@@ -87,6 +87,7 @@ public class SoundControl{
             new MusicEntry(Musics.menu, () -> state.isMenu())
         );
         randomMusicEntries = Seq.with(
+            new MusicEntry(() -> state.getPlanet() != null && state.getPlanet().randomMusicHandler != null ? state.getPlanet().randomMusicHandler.get() : null, () -> state.getPlanet() != null && state.getPlanet().randomMusicHandler != null),
             new MusicEntry(() -> state.getPlanet() != null && state.getPlanet().bossMusic.any() ? state.getPlanet().bossMusic.random(lastRandomPlayed) : bossMusic.random(lastRandomPlayed), () -> state.boss() != null || state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss)),
             new MusicEntry(() -> state.getPlanet() != null && state.getPlanet().darkMusic.any() ? state.getPlanet().darkMusic.random(lastRandomPlayed) : darkMusic.random(lastRandomPlayed), this::isDark),
             new MusicEntry(() -> state.getPlanet() != null && state.getPlanet().ambientMusic.any() ? state.getPlanet().ambientMusic.random(lastRandomPlayed) : ambientMusic.random(lastRandomPlayed), () -> true)
@@ -335,6 +336,14 @@ public class SoundControl{
     /** Fades out the current track, unless it has already been silenced. */
     protected void silence(){
         play(null);
+    }
+
+    public Music lastRandomPlayedMusic(){
+        return lastRandomPlayed;
+    }
+
+    public Music currentMusic(){
+        return current;
     }
 
     protected static class SoundData{
