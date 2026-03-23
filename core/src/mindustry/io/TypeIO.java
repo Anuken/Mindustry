@@ -834,6 +834,7 @@ public class TypeIO{
 
     public static MapObjectives readObjectives(Reads read){
         int length = read.i();
+        if(length >= 60_000) throw new RuntimeException("Objectives bytes too long: " + length);
         String string = new String(read.b(new byte[length]), charset);
         return JsonIO.read(MapObjectives.class, string);
     }
