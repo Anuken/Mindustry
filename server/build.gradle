@@ -38,6 +38,7 @@ tasks.register('dist', Jar){
     from files(sourceSets.main.output.resourcesDir)
     from{ configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) } }
     from files(project.assetsDir)
+    exclude("bloomshaders/**")
     exclude("sprites/**")
     exclude("music/**")
     exclude("sounds/**")

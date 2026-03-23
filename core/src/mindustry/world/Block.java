@@ -511,9 +511,12 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public float drawPlaceText(String text, int x, int y, boolean valid){
+        return drawPlaceText(text, x, y, valid ? Pal.accent : Pal.remove, true);
+    }
+
+    public float drawPlaceText(String text, int x, int y, Color color, boolean drawLine){
         if(renderer.pixelate) return 0;
 
-        Color color = valid ? Pal.accent : Pal.remove;
         Font font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
@@ -527,10 +530,12 @@ public class Block extends UnlockableContent implements Senseable{
         float dx = x * tilesize + offset, dy = y * tilesize + offset + size * tilesize / 2f + 3;
         font.draw(text, dx, dy + layout.height + 1, Align.center);
         dy -= 1f;
-        Lines.stroke(2f, Color.darkGray);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
-        Lines.stroke(1f, color);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+        if(drawLine){
+            Lines.stroke(2f, Color.darkGray);
+            Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+            Lines.stroke(1f, color);
+            Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+        }
 
         font.setUseIntegerPositions(ints);
         font.setColor(Color.white);
@@ -812,6 +817,16 @@ public class Block extends UnlockableContent implements Senseable{
         Draw.reset();
     }
 
+    public void drawOtherPlayerPlan(BuildPlan plan, Eachable<BuildPlan> list, float alpha){
+        Draw.mixcol(Color.white, Mathf.absin(Time.globalTime, 6f, 0.15f));
+        Draw.alpha(alpha);
+        float prevScale = Draw.scl;
+        Draw.scl *= plan.animScale;
+        drawPlanRegion(plan, list);
+        Draw.scl = prevScale;
+        Draw.reset();
+    }
+
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         drawDefaultPlanRegion(plan, list);
     }
@@ -819,12 +834,13 @@ public class Block extends UnlockableContent implements Senseable{
     /** this is a different method so subclasses can call it even after overriding the base */
     public void drawDefaultPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         TextureRegion reg = getPlanRegion(plan, list);
+        float a = Draw.getColorAlpha();
         Draw.rect(reg, plan.drawx(), plan.drawy(), !rotate || !rotateDraw ? 0 : plan.rotation * 90);
 
         if(plan.worldContext && player != null && teamRegion != null && teamRegion.found()){
             if(teamRegions[player.team().id] == teamRegion) Draw.color(player.team().color);
             Draw.rect(teamRegions[player.team().id], plan.drawx(), plan.drawy());
-            Draw.color();
+            Draw.color(1f, 1f, 1f, a);
         }
 
         drawPlanConfig(plan, list);
@@ -859,7 +875,7 @@ public class Block extends UnlockableContent implements Senseable{
         Color color = content instanceof Item i ? i.color : content instanceof Liquid l ? l.color : null;
         if(color == null) return;
 
-        Draw.color(color);
+        Draw.color(color, Draw.getColorAlpha());
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.color();
     }

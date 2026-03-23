@@ -77,6 +77,10 @@ public class OverlayRenderer{
 
         if(player.dead()) return;
 
+        if(renderer.showOtherBuildPlans){
+            input.drawOtherBuildPlans();
+        }
+
         if(player.isBuilder()){
             input.drawBuildPlans();
         }
