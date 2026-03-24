@@ -128,7 +128,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     private BuildPlan overlappingPlan = null;
     private Player overlappingPlayer = null;
 
-    protected Eachable<BuildPlan> allPlans, allSelectLines, allRenderPlansConfig, allOtherPlayerPlans;
+    protected Eachable<BuildPlan> allPlans, allSelectLines, allRenderPlansConfig;
 
     public InputHandler(){
         group.touchable = Touchable.childrenOnly;
