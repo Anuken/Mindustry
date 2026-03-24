@@ -5,10 +5,12 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 
 import java.util.*;
@@ -18,6 +20,31 @@ import static mindustry.Vars.*;
 public class Drawf{
     private static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
     private static final FloatSeq points = new FloatSeq();
+
+    public static void text(String text, float x, float y, Color color){
+        text(text, x, y, color, 1f, Align.center);
+    }
+
+    public static void text(String text, float x, float y, Color color, float scale){
+        text(text, x, y, color, scale, Align.center);
+    }
+
+    public static void text(String text, float x, float y, Color color, float scale, int align){
+        Font font = Fonts.outline;
+        boolean ints = font.usesIntegerPositions();
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(0.25f / Scl.scl(1f) * scale);
+        font.setColor(color);
+        font.getCache().clear();
+        font.getCache().addText(text, x, y, 0f, align, false);
+        if(color.a < 1f){
+            font.getCache().setAlphas(color.a);
+        }
+        font.getCache().draw();
+        font.getData().setScale(1f);
+        font.setColor(Color.white);
+        font.setUseIntegerPositions(ints);
+    }
 
     /** Bleeds a mod pixmap if linear filtering is enabled. */
     public static void checkBleed(Pixmap pixmap){
@@ -387,10 +414,18 @@ public class Drawf{
     }
 
     public static void square(float x, float y, float radius, float rotation, Color color){
-        Lines.stroke(3f, Pal.gray.write(Tmp.c3).a(color.a));
-        Lines.square(x, y, radius + 1f, rotation);
-        Lines.stroke(1f, color);
-        Lines.square(x, y, radius + 1f, rotation);
+        square(x, y, radius, rotation, color, Pal.gray.write(Tmp.c3).a(color.a));
+    }
+
+    public static void square(float x, float y, float radius, float rotation, Color color, Color bgColor){
+        square(x, y, radius, rotation, color, bgColor, 1f);
+    }
+
+    public static void square(float x, float y, float radius, float rotation, Color color, Color bgColor, float scaling){
+        Lines.stroke(3f * scaling, bgColor);
+        Lines.square(x, y, radius + 1f * scaling, rotation);
+        Lines.stroke(1f * scaling, color);
+        Lines.square(x, y, radius + 1f * scaling, rotation);
         Draw.reset();
     }
 
@@ -409,6 +444,18 @@ public class Drawf{
         Lines.poly(x, y, sides, radius + 1f, rotation);
         Lines.stroke(1f, color);
         Lines.poly(x, y, sides, radius + 1f, rotation);
+        Draw.reset();
+    }
+
+    public static void fillPoly(float x, float y, int sides, float radius, float rotation, Color color){
+        fillPoly(x, y, sides, radius, rotation, color, Pal.gray, 1f);
+    }
+
+    public static void fillPoly(float x, float y, int sides, float radius, float rotation, Color color, Color bgColor, float scl){
+        Draw.color(bgColor, color.a);
+        Fill.poly(x, y, sides, radius + 2f*scl, rotation);
+        Draw.color(color);
+        Fill.poly(x, y, sides, radius, rotation);
         Draw.reset();
     }
 

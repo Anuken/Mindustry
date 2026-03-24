@@ -78,12 +78,18 @@ public class UI implements ApplicationListener, Loadable{
     public LogicDialog logic;
     public FullTextDialog fullText;
     public CampaignCompleteDialog campaignComplete;
+    public CampaignRulesDialog campaignRules;
 
     public IntMap<Dialog> followUpMenus;
 
     public Cursor drillCursor, unloadCursor, targetCursor, repairCursor;
 
     private @Nullable Element lastAnnouncement;
+
+    /** Maps popups to ids so that they can be removed or updated by id. */
+    private final ObjectMap<String, Table> popups = new ObjectMap<>();
+    /** Maps labels to ids so that they can be removed or updated by id. */
+    private final IntMap<Table> labels = new IntMap<>();
 
     public UI(){
         Fonts.loadFonts();
@@ -112,11 +118,7 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene = new Scene();
         Core.input.addProcessor(Core.scene);
 
-        int[] insets = Core.graphics.getSafeInsets();
-        Core.scene.marginLeft = insets[0];
-        Core.scene.marginRight = insets[1];
-        Core.scene.marginTop = insets[2];
-        Core.scene.marginBottom = insets[3];
+        updateMargins();
 
         Tex.load();
         Icon.load();
@@ -219,6 +221,7 @@ public class UI implements ApplicationListener, Loadable{
         logic = new LogicDialog();
         fullText = new FullTextDialog();
         campaignComplete = new CampaignCompleteDialog();
+        campaignRules = new CampaignRulesDialog();
         followUpMenus = new IntMap<>();
 
         Group group = Core.scene.root;
@@ -243,15 +246,30 @@ public class UI implements ApplicationListener, Loadable{
         new FadeInFragment().build(group);
     }
 
-    @Override
-    public void resize(int width, int height){
-        if(Core.scene == null) return;
-
+    /** Updates scene margins based on safe insets and custom edge padding setting. */
+    public void updateMargins(){
         int[] insets = Core.graphics.getSafeInsets();
+        int customPadding = (int)Scl.scl(Core.settings.getInt("uiEdgePadding", 0));
+
         Core.scene.marginLeft = insets[0];
         Core.scene.marginRight = insets[1];
         Core.scene.marginTop = insets[2];
         Core.scene.marginBottom = insets[3];
+
+        if(Core.graphics.getHeight() > Core.graphics.getWidth()){
+            Core.scene.marginTop += customPadding;
+            Core.scene.marginBottom += customPadding;
+        }else{
+            Core.scene.marginLeft += customPadding;
+            Core.scene.marginRight += customPadding;
+        }
+    }
+
+    @Override
+    public void resize(int width, int height){
+        if(Core.scene == null) return;
+
+        updateMargins();
 
         Core.scene.resize(width, height);
         Events.fire(new ResizeEvent());
@@ -394,28 +412,52 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     /** Shows a label at some position on the screen. Does not fade. */
-    public void showInfoPopup(String info, float duration, int align, int top, int left, int bottom, int right){
+    public void showInfoPopup(@Nullable String info, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
+        if(info == null){ // null info allows deletion of old popups provided they have ids
+            var table = popups.remove(id);
+            if(table != null) table.remove();
+            return;
+        }
         Table table = new Table();
+        if(id != null){
+            Table old = popups.put(id, table);
+            if(old != null) old.remove();
+        }
         table.setFillParent(true);
         table.touchable = Touchable.disabled;
         table.update(() -> {
-            if(state.isMenu()) table.remove();
+            if(state.isMenu()){
+                table.remove();
+                if(id != null) popups.remove(id);
+            }
         });
-        table.actions(Actions.delay(duration), Actions.remove());
+        table.actions(Actions.delay(duration), Actions.remove(), Actions.run(() -> { if(id != null) popups.remove(id); }));
         table.align(align).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).pad(top, left, bottom, right);
         Core.scene.add(table);
     }
 
     /** Shows a label in the world. This label is behind everything. Does not fade. */
-    public void showLabel(String info, float duration, float worldx, float worldy){
+    public void showLabel(@Nullable String info, int id, float duration, float worldx, float worldy){
+        if(info == null){ // null info allows deletion of old labels provided they have ids
+            var table = labels.remove(id);
+            if(table != null) table.remove();
+            return;
+        }
         var table = new Table(Styles.black3).margin(4);
+        if(id != -1){
+            Table old = labels.put(id, table);
+            if(old != null) old.remove();
+        }
         table.touchable = Touchable.disabled;
         table.update(() -> {
-            if(state.isMenu()) table.remove();
+            if(state.isMenu()){
+                table.remove();
+                if(id != -1) labels.remove(id);
+            }
             Vec2 v = Core.camera.project(worldx, worldy);
             table.setPosition(v.x, v.y, Align.center);
         });
-        table.actions(Actions.delay(duration), Actions.remove());
+        table.actions(Actions.delay(duration), Actions.remove(), Actions.run(() -> { if(id != -1) labels.remove(id); }));
         table.add(info).style(Styles.outlineLabel);
         table.pack();
         table.act(0f);
