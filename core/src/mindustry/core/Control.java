@@ -31,6 +31,7 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -77,15 +78,6 @@ public class Control implements ApplicationListener, Loadable{
                 });
             }
             checkAutoUnlocks();
-
-            if((OS.isWindows && !OS.is64Bit && !Core.settings.getBool("nowarn32bit", false))){
-                BaseDialog dialog = new BaseDialog("@warn.32bit.title");
-                dialog.buttons.button("@ok", dialog::hide).size(120f, 64f);
-                dialog.cont.add("@warn.32bit").labelAlign(Align.center, Align.center).wrap().grow().row();
-                dialog.cont.check("@dontshowagain", val -> Core.settings.put("nowarn32bit", val));
-
-                dialog.show();
-            }
         });
 
         Events.on(StateChangeEvent.class, event -> {
@@ -154,7 +146,7 @@ public class Control implements ApplicationListener, Loadable{
 
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> app.post(() -> {
-            if(state.rules.pvp && !net.active()){
+            if(state.rules.pvp && !net.active() && !state.rules.pauseDisabled){
                 try{
                     net.host(port);
                     player.admin = true;
@@ -195,7 +187,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(GameOverEvent.class, e -> {
             if(state.isCampaign() && !net.client() && !headless){
 
-                //save gameover sate immediately
+                //save gameover state immediately
                 if(saves.getCurrent() != null){
                     saves.getCurrent().save();
                 }
@@ -257,7 +249,7 @@ public class Control implements ApplicationListener, Loadable{
                             if(ccore != null){
                                 anyBuilds = true;
 
-                                if(!net.active()){
+                                if(!net.active() && !state.rules.pauseDisabled){
                                     build.pickedUp();
                                     build.tile.remove();
 
@@ -293,7 +285,12 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(SaveWriteEvent.class, e -> forcePlaceAll());
+        Events.on(SaveWriteEvent.class, e -> {
+            if(!net.client() && state.isCampaign()){
+                state.getPlanet().saveStats();
+            }
+            forcePlaceAll();
+        });
         Events.on(HostEvent.class, e -> forcePlaceAll());
         Events.on(HostEvent.class, e -> {
             state.set(State.playing);
@@ -506,6 +503,14 @@ public class Control implements ApplicationListener, Loadable{
                                     }
                                 }
 
+                                //all the derelict power graphs are invalid
+                                for(var build : previousBuildings){
+                                    if(build.power != null){
+                                        build.power.graph = new PowerGraph();
+                                        build.power.links.clear();
+                                    }
+                                }
+
                                 //copy over all buildings from the previous save, retaining config and health, and making them derelict
                                 for(var build : previousBuildings){
                                     Tile tile = world.tile(build.tileX(), build.tileY());
@@ -606,7 +611,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void pause(){
-        if(settings.getBool("backgroundpause", true) && !net.active()){
+        if(settings.getBool("backgroundpause", true) && !net.active() && !state.rules.pauseDisabled){
             backgroundPaused = true;
             wasPaused = state.is(State.paused);
             if(state.is(State.playing)) state.set(State.paused);
@@ -615,7 +620,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void resume(){
-        if(state.is(State.paused) && !wasPaused && settings.getBool("backgroundpause", true) && !net.active()){
+        if(state.is(State.paused) && !wasPaused && settings.getBool("backgroundpause", true) && !net.active() && !state.rules.pauseDisabled){
             state.set(State.playing);
         }
         backgroundPaused = false;
@@ -695,6 +700,7 @@ public class Control implements ApplicationListener, Loadable{
 
         if(state.isGame()){
             input.update();
+            input.updateSelectQuadtree();
             if(!state.isPaused()){
                 indicators.update();
             }
@@ -710,7 +716,7 @@ public class Control implements ApplicationListener, Loadable{
                 core.items.each((i, a) -> i.unlock());
             }
 
-            if(backgroundPaused && settings.getBool("backgroundpause") && !net.active()){
+            if(backgroundPaused && settings.getBool("backgroundpause") && !net.active() && !state.rules.pauseDisabled){
                 state.set(State.paused);
             }
 
@@ -720,7 +726,11 @@ public class Control implements ApplicationListener, Loadable{
             }
 
             if(!net.client() && Core.input.keyTap(Binding.pause) && !(state.isCampaign() && state.afterGameOver) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
-                state.set(state.isPaused() ? State.playing : State.paused);
+                if(state.rules.pauseDisabled){
+                    ui.hudfrag.showPauseDisabled();
+                }else{
+                    state.set(state.isPaused() ? State.playing : State.paused);
+                }
             }
 
             if(state.isCampaign() && state.afterGameOver){
@@ -732,7 +742,7 @@ public class Control implements ApplicationListener, Loadable{
                     ui.chatfrag.hide();
                 }else if(!ui.paused.isShown() && !scene.hasDialog()){
                     ui.paused.show();
-                    if(!net.active()){
+                    if(!net.active() && !state.rules.pauseDisabled){
                         state.set(State.paused);
                     }
                 }

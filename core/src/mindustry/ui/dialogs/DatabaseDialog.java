@@ -1,6 +1,5 @@
 package mindustry.ui.dialogs;
 
-import arc.*;
 import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
@@ -17,6 +16,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+
+import java.util.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -133,7 +134,7 @@ public class DatabaseDialog extends BaseDialog{
                 Seq<UnlockableContent> array = categoryContents.get(tagName).select(u ->
                 !u.isHidden() && !u.hideDatabase &&
                 (tab == Planets.sun || u.allDatabaseTabs || u.databaseTabs.contains(tab)) &&
-                (text.isEmpty() || u.localizedName.toLowerCase().contains(text))).as();
+                (text.isEmpty() || u.localizedName.toLowerCase(Locale.ROOT).contains(text))).as();
                 if(array.isEmpty()) continue;
 
                 hasResult = true;
@@ -156,7 +157,7 @@ public class DatabaseDialog extends BaseDialog{
 
             all.table(sub -> {
                 for(int j = 0; j < tmpCategory.size; j++){
-                    String tagName = categoryContents.orderedKeys().get(j);
+                    String tagName = tmpCategory.orderedKeys().get(j);
                     Seq<UnlockableContent> array = tmpCategory.get(tagName);
                     if(array == null || array.isEmpty()) continue;
 
@@ -171,7 +172,7 @@ public class DatabaseDialog extends BaseDialog{
                     sub.table(list -> {
                         list.left();
 
-                        int cols = (int)Mathf.clamp((Core.graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 12), 1, 22);
+                        int cols = (int)Mathf.clamp((graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 12), 1, 22);
                         int count = 0;
 
                         for(var unlock : array){
@@ -202,8 +203,8 @@ public class DatabaseDialog extends BaseDialog{
 
                             if(unlocked(unlock)){
                                 image.clicked(() -> {
-                                    if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(unlock.name) != 0){
-                                        Core.app.setClipboardText((char)Fonts.getUnicode(unlock.name) + "");
+                                    if(input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(unlock.name) != 0){
+                                        app.setClipboardText((char)Fonts.getUnicode(unlock.name) + "");
                                         ui.showInfoFade("@copied");
                                     }else{
                                         ui.content.show(unlock);

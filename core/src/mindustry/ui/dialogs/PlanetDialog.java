@@ -72,7 +72,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     private Texture[] planetTextures;
     private Element mainView;
-    private CampaignRulesDialog campaignRules = new CampaignRulesDialog();
     private SectorSelectDialog selectDialog = new SectorSelectDialog();
 
     public PlanetDialog(){
@@ -414,7 +413,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     boolean canSelect(Sector sector){
         if(mode == select) return sector.hasBase() && launchSector != null && sector.planet == launchSector.planet;
 
-        if(mode == planetLaunch && sector.hasBase()) return false;
+        //sectors with addStartingItems = true can't be landed on, as they override the core and items of the interplanetary accelerator
+        //at the moment, this is only true of Ground Zero in vanilla
+        //TODO: maybe relax these restrictions and add better support for these sorts of "tutorial" starting sectors later
+        if(mode == planetLaunch && (sector.hasBase() || (sector.preset != null && sector.preset.addStartingItems))) return false;
 
         if(sector.planet.generator == null) return false;
 
@@ -434,8 +436,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     @Nullable Sector findLauncher(Sector to){
         if(mode == planetLaunch || to.planet.generator == null) return launchSector;
 
-        Sector candidate = to.planet.generator.findLaunchCandidate(to, launchSector);
-        return candidate == null && launchSector != null && (mode == planetLaunch || !launchSector.isAttacked()) ? launchSector : candidate;
+        Sector actualLaunchSector = (launchSector != null && launchSector.planet == to.planet ? launchSector : null);
+
+        Sector candidate = to.planet.generator.findLaunchCandidate(to, actualLaunchSector);
+        return candidate == null && actualLaunchSector != null && (mode == planetLaunch || !actualLaunchSector.isAttacked()) ? actualLaunchSector : candidate;
     }
 
     boolean showing(){
@@ -624,7 +628,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     public void tap(InputEvent event, float x, float y, int count, KeyCode button){
                         if(showing() || button != KeyCode.mouseLeft) return;
 
-                        if(hovered != null && selected == hovered && count == 2){
+                        if(hovered != null && selected == hovered && count == 2 && canPlaySector(hovered)){
                             playSelected();
                         }
 
@@ -729,7 +733,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             ScrollPane pane = new ScrollPane(null, Styles.smallPane);
             t.add(pane).colspan(2).row();
             t.button("@campaign.difficulty", Icon.bookSmall, () -> {
-                campaignRules.show(state.planet);
+                Vars.ui.campaignRules.show(state.planet);
             }).margin(12f).size(208f, 40f).padTop(12f).visible(() -> state.planet.allowCampaignRules && mode != planetLaunch).row();
             t.add().height(64f); //padding for close button
             Table starsTable = new Table(Styles.black);
@@ -1275,7 +1279,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
 
-        boolean locked = sector.preset != null && sector.preset.locked() && !sector.hasBase() && sector.preset.techNode != null;
+        boolean locked = isLocked(sector);
 
         if(locked){
             stable.table(r -> {
@@ -1329,7 +1333,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
             }
 
-            boolean noCandidate = sector != sector.planet.getStartSector() && !sector.hasBase() && findLauncher(sector) == null;
+            boolean noCandidate = hasNoCandidate(sector);
 
             stable.button(
                 mode == select ? "@sectors.select" :
@@ -1345,6 +1349,18 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.setPosition(x, y, Align.center);
 
         stable.act(0f);
+    }
+
+    boolean hasNoCandidate(Sector sector){
+        return sector != sector.planet.getStartSector() && !sector.hasBase() && findLauncher(sector) == null;
+    }
+
+    boolean isLocked(Sector sector){
+        return sector.preset != null && sector.preset.locked() && !sector.hasBase() && sector.preset.techNode != null;
+    }
+
+    boolean canPlaySector(Sector sector){
+        return !isLocked(sector) && !hasNoCandidate(sector);
     }
 
     void playSelected(){
