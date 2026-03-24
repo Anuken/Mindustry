@@ -120,7 +120,7 @@ public class SerpuloTechTree{
                         });
                     });
 
-                    node(pyratiteMixer, () -> {
+                    node(pyratiteMixer, Seq.with(new SectorComplete(crateredBattleground)), () -> {
                         node(blastMixer, Seq.with(new SectorComplete(facility32m)), () -> {
 
                         });

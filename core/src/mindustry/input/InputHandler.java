@@ -2353,24 +2353,36 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return validPlace(x, y, type, rotation, ignore, false);
     }
 
+    //static to avoid capture allocation
+    private static BuildPlan vpIgnore;
+    private static Block vpBlock;
+    private static int vpX, vpY;
+
+    private static final Boolf<BuildPlan> vpPredicate = plan ->
+        plan != vpIgnore
+        && !plan.breaking
+        && !(vpBlock.canReplace(plan.block) && plan.x == vpX && plan.y == vpY);
+
     public boolean validPlace(int x, int y, Block type, int rotation, @Nullable BuildPlan ignore, boolean ignoreUnits){
+        if(!(ignoreUnits ? Build.validPlaceIgnoreUnits(type, player.team(), x, y, rotation, true, true) : Build.validPlace(type, player.team(), x, y, rotation))){
+            return false;
+        }
+
         if(player.isBuilder() && player.unit().plans.size > 0){
             Tmp.r1.setCentered(x * tilesize + type.offset, y * tilesize + type.offset, type.size * tilesize);
             plansOut.clear();
             playerPlanTree.intersect(Tmp.r1, plansOut);
 
-            for(int i = 0; i < plansOut.size; i++){
-                var plan = plansOut.items[i];
-                if(plan != ignore
-                && !plan.breaking
-                && plan.block.bounds(plan.x, plan.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
-                && !(type.canReplace(plan.block) && Tmp.r1.equals(Tmp.r2))){
-                    return false;
-                }
-            }
+            float s = type.size * tilesize;
+            vpIgnore = ignore;
+            vpBlock = type;
+            vpX = x;
+            vpY = y;
+
+            return playerPlanTree.find(x * tilesize + type.offset - s / 2f, y * tilesize + type.offset - s / 2f, s, s, vpPredicate) == null;
         }
 
-        return ignoreUnits ? Build.validPlaceIgnoreUnits(type, player.team(), x, y, rotation, true, true) : Build.validPlace(type, player.team(), x, y, rotation);
+        return true;
     }
 
     public boolean validBreak(int x, int y){

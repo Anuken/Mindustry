@@ -302,7 +302,7 @@ public class BlockIndexer{
             returnBool = false;
 
             allBuildings(wx, wy, range, b -> {
-                if(pred.get(b)){
+                if(pred.get(b) && !b.block.privileged){
                     returnBool = true;
                     cons.get(b);
                 }
@@ -314,7 +314,7 @@ public class BlockIndexer{
             var buildings = team.data().buildingTree;
             if(buildings == null) return false;
             buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
-                if(b.within(wx, wy, range + b.hitSize() / 2f) && pred.get(b)){
+                if(b.within(wx, wy, range + b.hitSize() / 2f) && pred.get(b) && !b.block.privileged){
                     breturnArray.add(b);
                 }
             });
@@ -340,7 +340,7 @@ public class BlockIndexer{
         var buildings = team.data().buildingTree;
         if(buildings == null) return false;
         buildings.intersect(rect, b -> {
-            if(pred.get(b)){
+            if(pred.get(b) && !b.block.privileged){
                 breturnArray.add(b);
             }
         });
