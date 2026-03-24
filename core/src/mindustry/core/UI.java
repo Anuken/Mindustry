@@ -78,6 +78,7 @@ public class UI implements ApplicationListener, Loadable{
     public LogicDialog logic;
     public FullTextDialog fullText;
     public CampaignCompleteDialog campaignComplete;
+    public CampaignRulesDialog campaignRules;
 
     public IntMap<Dialog> followUpMenus;
 
@@ -220,6 +221,7 @@ public class UI implements ApplicationListener, Loadable{
         logic = new LogicDialog();
         fullText = new FullTextDialog();
         campaignComplete = new CampaignCompleteDialog();
+        campaignRules = new CampaignRulesDialog();
         followUpMenus = new IntMap<>();
 
         Group group = Core.scene.root;
