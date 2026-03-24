@@ -314,7 +314,7 @@ public class ModsDialog extends BaseDialog{
                                     }).size(50f);
                                 }
                             }).growX().right().padRight(-8f).padTop(-8f);
-                        }, Styles.flatBordert, () -> showMod(item)).size(w, h).growX().pad(4f);
+                        }, Styles.grayt, () -> showMod(item)).size(w, h).growX().pad(4f);
                         pane[0].row();
                     }
                 }
@@ -548,7 +548,7 @@ public class ModsDialog extends BaseDialog{
 
                     con.add(infoText).width(358f).wrap().grow().pad(4f, 2f, 4f, 6f).top().left().labelAlign(Align.topLeft);
 
-                }, Styles.flatBordert, () -> {
+                }, Styles.grayt, () -> {
                     var sel = new BaseDialog(mod.name);
                     sel.cont.pane(p -> p.add(mod.description + "\n\n[accent]" + Core.bundle.get("editor.author") + "[lightgray] " + mod.author)
                         .width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left)).grow();

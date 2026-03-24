@@ -286,8 +286,7 @@ public class DataPatcher{
                     }
 
                     if(object instanceof Seq s){
-                        var copy = s.copy();
-                        reset(() -> s.set(copy));
+                        modifiedField(parentObject, parentField, s.copy());
 
                         assignValue(object, field, metadata, () -> s.get(i), val -> s.set(i, val), value, true);
                     }else{
@@ -561,7 +560,7 @@ public class DataPatcher{
             if(usedpatches.add(record)){
                 resetters.add(() -> {
                     try{
-                        record.field.set(record.target, record.value);
+                        record.field.set(record.target, value);
                     }catch(Exception e){
                         throw new RuntimeException(e);
                     }
@@ -570,6 +569,7 @@ public class DataPatcher{
         }else if(target instanceof Seq<?> || target.getClass().isArray()){
             int i = Integer.parseInt(field);
             resetters.add(() -> {
+
                 if(target instanceof Seq seq){
                     seq.set(i, value);
                 }else{

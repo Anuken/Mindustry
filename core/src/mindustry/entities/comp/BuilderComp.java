@@ -328,7 +328,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         }
 
         //draw remote plans.
-        if(core != null && active && !isLocal() && !(tile.block() instanceof ConstructBlock)){
+        if(core != null && active && !isLocal() && !(tile.block() instanceof ConstructBlock) && !state.isPaused()){
             Draw.z(Layer.plans - 1f);
             drawPlan(plan, 0.5f);
             drawPlanTop(plan, 0.5f);
