@@ -114,6 +114,10 @@ public class Logic implements ApplicationListener{
                     state.rules.waveTeam.rules().fillItems = true;
                 }
                 state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
+
+                if(state.getPlanet().enemyFactoryActivationDelay > 0f && state.rules.waveTeam.rules().unitFactoryActivationDelay == 0f){
+                    state.rules.waveTeam.rules().unitFactoryActivationDelay = state.getPlanet().enemyFactoryActivationDelay;
+                }
             }
 
             //save settings

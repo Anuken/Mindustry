@@ -904,6 +904,8 @@ public class ApplicationTests{
                 Time.setDeltaProvider(() -> 1f);
 
                 logic.reset();
+                //pathfinder pollutes queue with garbage, causing OOM
+                Reflect.<TaskQueue>get(HeadlessApplication.class, Core.app, "runnables").clear();
                 state.rules.sector = zone.sector;
                 world.loadGenerator(zone.generator.map.width, zone.generator.map.height, tiles -> zone.generator.generate(tiles, new WorldParams()));
                 zone.rules.get(state.rules);
@@ -960,6 +962,11 @@ public class ApplicationTests{
                         assertNotEquals(0, total, "Sector " + zone + " has no spawned enemies at wave " + i);
                     }
                 }
+
+                assertFalse(Vars.indexer.isBlockPresent(Blocks.powerSource), "Sector '" + zone + "' must not have power sources.");
+                assertFalse(Vars.indexer.isBlockPresent(Blocks.powerVoid), "Sector '" + zone + "' must not have power voids.");
+                assertFalse(Vars.indexer.isBlockPresent(Blocks.itemSource), "Sector '" + zone + "' must not have item sources.");
+                assertFalse(Vars.indexer.isBlockPresent(Blocks.liquidSource), "Sector '" + zone + "' must not have liquid sources.");
 
                 assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + zone + " (" + Team.sharded.cores() + ")");
 

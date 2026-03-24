@@ -475,6 +475,14 @@ public class DesktopInput extends InputHandler{
             }
         }
 
+        if(input.keyTap(Binding.ping) && !Core.scene.hasMouse() && !scene.hasKeyboard()){
+            if(input.ctrl()){
+                ui.showTextInput("", "@ping.text", Vars.maxPingTextLength, "", result -> Call.pingLocation(Vars.player, input.mouseWorldX(), input.mouseWorldY(), UI.formatIcons(result)));
+            }else{
+                Call.pingLocation(Vars.player, input.mouseWorldX(), input.mouseWorldY(), null);
+            }
+        }
+
         if(Core.input.keyRelease(Binding.select) && commandRect){
             selectUnitsRect();
         }

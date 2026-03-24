@@ -123,6 +123,8 @@ public class Planet extends UnlockableContent{
     public boolean clearSectorOnLose = false;
     /** Multiplier for enemy rebuild speeds; only applied in campaign (not standard rules) */
     public float enemyBuildSpeedMultiplier = 1f;
+    /** Default activation delay for enemy factories, if not set in the campaign. */
+    public float enemyFactoryActivationDelay = 0;
     /** If true, the enemy team always has infinite items. */
     public boolean enemyInfiniteItems = true;
     /** If true, enemy cores are replaced with spawnpoints on this planet (for invasions) */

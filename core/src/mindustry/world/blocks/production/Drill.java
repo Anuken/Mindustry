@@ -97,7 +97,7 @@ public class Drill extends Block{
     }
 
     @Override
-    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
         if(!plan.worldContext) return;
         Tile tile = plan.tile();
         if(tile == null) return;
