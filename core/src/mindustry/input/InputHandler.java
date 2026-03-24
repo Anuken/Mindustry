@@ -1775,13 +1775,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             float z = Draw.z();
             Draw.z(Layer.endPixeled);
             font.getData().setScale(1 / renderer.camerascale);
-            int width = (int)((result.x2 - result.x) / 8);
-            int height = (int)((result.y2 - result.y) / 8);
+
+            int width = (int)((result.x2 - result.x) / tilesize);
+            int height = (int)((result.y2 - result.y) / tilesize);
             int area = width * height;
+            float offset = 5f / renderer.camerascale * tilesize;
 
             font.draw(width + "x" + height + " (" + area + ")",
-            input.mouseWorldX() + 5 * (4 / renderer.camerascale),
-            input.mouseWorldY() - 5 * (4 / renderer.camerascale));
+                input.mouseWorldX() + (input.mouseWorldX() > x1 * tilesize ? offset : -offset),
+                input.mouseWorldY() + (input.mouseWorldY() > y1 * tilesize ? offset : -offset));
+
             font.setColor(Color.white);
             font.getData().setScale(1);
             font.setUseIntegerPositions(ints);
