@@ -40,6 +40,8 @@ public class Rules{
     public boolean pvp;
     /** Whether is waiting for players enabled in PvP. */
     public boolean pvpAutoPause = true;
+    /** Whether pause is enabled or not in singleplayer */
+    public boolean pauseDisabled = false;
     /** Whether to pause the wave timer until all enemies are destroyed. */
     public boolean waitEnemies = false;
     /** Determines if gamemode is attack mode. */
@@ -332,6 +334,8 @@ public class Rules{
         /** Minimum "advantage" needed for a squad to attack. Higher -> more cautious. */
         public float rtsMinWeight = 1.2f;
 
+        /** Time until unit factories activate. This is used for enemy teams in attack maps. */
+        public float unitFactoryActivationDelay = 0f;
         /** How fast unit factories build units. */
         public float unitBuildSpeedMultiplier = 1f;
         /** How much damage units deal. */

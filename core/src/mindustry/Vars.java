@@ -101,8 +101,12 @@ public class Vars implements Loadable{
     public static final int maxBlockSize = 16;
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
+    /** maximum number of preview plans for remote players */
+    public static final int maxPlayerPreviewPlans = 1000;
     /** max chat message length */
     public static final int maxTextLength = 150;
+    /** max length of ping marker text */
+    public static final int maxPingTextLength = 40;
     /** max player name length in bytes */
     public static final int maxNameLength = 40;
     /** displayed item size when ingame. */
@@ -367,6 +371,8 @@ public class Vars implements Loadable{
         mobile = Core.app.isMobile() || testMobile;
         ios = Core.app.isIOS();
         android = Core.app.isAndroid();
+
+        becontrol.init();
 
         modDirectory.mkdirs();
 

@@ -437,7 +437,13 @@ public class UnitFactory extends UnitBlock{
         @Override
         public boolean shouldConsume(){
             if(currentPlan == -1) return false;
-            return enabled && payload == null;
+            return enabled && payload == null && team.activateUnitFactories();
+        }
+
+        @Override
+        public BlockStatus status(){
+            if(!team.activateUnitFactories()) return BlockStatus.inactive;
+            return super.status();
         }
 
         @Override

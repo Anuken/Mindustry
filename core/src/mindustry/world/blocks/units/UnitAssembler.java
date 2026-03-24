@@ -98,8 +98,8 @@ public class UnitAssembler extends PayloadBlock{
         //overlapping construction areas not allowed; grow by a tiny amount so edges can't overlap either.
         Rect rect = getRect(Tmp.r1, tile.worldx() + offset, tile.worldy() + offset, rotation).grow(0.1f);
         return
-            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
-            !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> ((ConstructBuild)b).current instanceof UnitAssembler && getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
+            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> b.block instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
+            !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> ((ConstructBuild)b).current instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
     }
 
     @Override
@@ -377,7 +377,7 @@ public class UnitAssembler extends PayloadBlock{
         @Override
         public boolean shouldConsume(){
             //liquid is only consumed when building is being done
-            return enabled && !wasOccupied && Units.canCreate(team, plan().unit) && consPayload.efficiency(this) > 0 && consItem.efficiency(this) > 0;
+            return enabled && !wasOccupied && Units.canCreate(team, plan().unit) && consPayload.efficiency(this) > 0 && consItem.efficiency(this) > 0 && team.activateUnitFactories();
         }
 
         @Override
@@ -674,6 +674,12 @@ public class UnitAssembler extends PayloadBlock{
             Fx.shootPayloadDriver.at(payload.x(), payload.y(), rot);
             Fx.payloadDeposit.at(payload.x(), payload.y(), rot, new YeetData(spawn.cpy(), payload.content()));
             Sounds.shootPayload.at(x, y, 1f + Mathf.range(0.1f), 1f);
+        }
+
+        @Override
+        public BlockStatus status(){
+            if(!team.activateUnitFactories()) return BlockStatus.inactive;
+            return super.status();
         }
 
         @Override
