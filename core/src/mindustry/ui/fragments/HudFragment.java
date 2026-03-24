@@ -389,16 +389,17 @@ public class HudFragment{
                     .name("schematics");
 
                     select.button(Icon.pause, style, () -> {
-                        if(net.active() || state.rules.pauseDisabled){
+                        if(net.active()){
                             ui.listfrag.toggle();
-                        }else{
+                        }else if(!state.rules.pauseDisabled){
                             state.set(state.isPaused() ? State.playing : State.paused);
                         }
                     }).name("pause").update(i -> {
                         if(net.active()){
+                            i.setDisabled(false);
                             i.getStyle().imageUp = Icon.players;
                         }else{
-                            i.setDisabled(false);
+                            i.setDisabled(state.rules.pauseDisabled);
                             i.getStyle().imageUp = state.isPaused() ? Icon.play : Icon.pause;
                         }
                     });
