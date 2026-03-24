@@ -71,7 +71,7 @@ public class SectorSubmissions{
         registerSerpuloSector(103, "enwyz", "https://discord.com/channels/391020510269669376/1379926839559979030/1429203869514207255");
         registerSerpuloSector(237, "Chocomint", "https://discord.com/channels/391020510269669376/1379926929636851812/1474447354982563840");
         registerSerpuloSector(138, "Lilith", "https://discord.com/channels/391020510269669376/1379926873152164004/1470268689201889464");
-        registerSerpuloSector(150, "Jamespire", "https://discord.com/channels/391020510269669376/1379926876457537547/1484013941477609543");
+        registerSerpuloSector(157, "Jamespire", "https://discord.com/channels/391020510269669376/1379926876457537547/1484013941477609543");
         registerSerpuloSector(247, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926976361533752/1431827990295220266");
         registerSerpuloSector(245, "Grushashusha", "https://discord.com/channels/391020510269669376/1379926971286290584/1485245072034365462");
 
