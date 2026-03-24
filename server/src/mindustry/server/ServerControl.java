@@ -10,6 +10,7 @@ import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
+import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
@@ -31,6 +32,7 @@ import java.net.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
+import java.util.regex.*;
 
 import static arc.util.ColorCodes.*;
 import static arc.util.Log.*;
@@ -72,6 +74,8 @@ public class ServerControl implements ApplicationListener{
     private PrintWriter socketOutput;
     private String suggested;
     private boolean autoPaused = false;
+    private Fi patchDirectory;
+    private Seq<String> contentPatches = new Seq<>();
 
     public Cons<GameOverEvent> gameOverListener = event -> {
         if(state.rules.waves){
@@ -112,7 +116,7 @@ public class ServerControl implements ApplicationListener{
             "bans", "",
             "admins", "",
             "shufflemode", "custom",
-            "globalrules", "{reactorExplosions: false, logicUnitBuild: false}"
+            "globalrules", "{reactorExplosions: false, logicUnitBuild: false, logicUnitDeconstruct: false}"
         );
 
         //update log level
@@ -191,12 +195,16 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        customMapDirectory.mkdirs();
-
         if(Version.build == -1){
             warn("&lyYour server is running a custom build, which means that client checking is disabled.");
             warn("&lyIt is highly advised to specify which version you're using by building with gradle args &lb&fb-Pbuildversion=&lr<build>");
         }
+
+        customMapDirectory.mkdirs();
+
+        patchDirectory = dataDirectory.child("patches");
+        patchDirectory.mkdirs();
+        loadPatchFiles();
 
         //set up default shuffle mode
         try{
@@ -314,6 +322,30 @@ public class ServerControl implements ApplicationListener{
 
             info("Server loaded. Type @ for help.", "'help'");
         });
+
+        Events.on(ContentPatchLoadEvent.class, event -> {
+            //NOTE: if patches change, and an older save is loaded, the patches will be applied twice; the old ones won't be removed.
+            for(String patch : contentPatches){
+                event.patches.addUnique(patch);
+            }
+        });
+    }
+
+    void loadPatchFiles(){
+        contentPatches.clear();
+        Seq<Fi> patches = patchDirectory.findAll(f -> f.extEquals("json") || f.extEquals("hjson") || f.extEquals("json5")).sort();
+
+        for(Fi patch : patches){
+            try{
+                contentPatches.add(Jval.read(patch.readString()).toString(Jformat.plain));
+            }catch(Throwable e){
+                Log.err("Invalid patch file: " + patch.name(), e);
+            }
+        }
+
+        if(contentPatches.size > 0){
+            Log.info("Loaded @ content patch files.", contentPatches.size);
+        }
     }
 
     protected void registerCommands(){
@@ -434,6 +466,13 @@ public class ServerControl implements ApplicationListener{
                 info("No maps found.");
             }
             info("Map directory: &fi@", customMapDirectory.file().getAbsoluteFile().toString());
+        });
+
+        handler.register("reloadpatches", "Reload all patch files from disk.", arg -> {
+            loadPatchFiles();
+            if(contentPatches.isEmpty()){
+                err("No valid content patch files found.");
+            }
         });
 
         handler.register("reloadmaps", "Reload all maps from disk.", arg -> {
@@ -687,6 +726,50 @@ public class ServerControl implements ApplicationListener{
 
                     netServer.admins.removeSubnetBan(arg[1]);
                     info("Unbanned @**", arg[1]);
+                }else{
+                    err("Incorrect usage. Provide add/remove as the second argument.");
+                }
+            }
+        });
+
+        handler.register("name-ban", "[add/remove/clear] [regex]", "Ban a name by case-insensitive regex.", arg -> {
+            var names = netServer.admins.bannedNames;
+
+            if(arg.length == 0){
+                info("Name regexes banned: @", names.isEmpty() ? "<none>" : "");
+                for(Pattern subnet : names){
+                    info("&lw\t" + subnet.pattern());
+                }
+            }else if(arg.length == 1){
+                if(arg[0].equals("clear")){
+                    names.clear();
+                    netServer.admins.save();
+                }else{
+                    err("You must provide a name regex to add or remove.");
+                }
+            }else{
+                if(arg[0].equals("add")){
+                    if(names.contains(p -> p.pattern().equals(arg[1]))){
+                        err("That name regex is already banned.");
+                        return;
+                    }
+
+                    try{
+                        netServer.admins.addNameBan(arg[1]);
+                        info("Banned names by regex: @", arg[1]);
+                    }catch(Exception e){
+                        err("Invalid regex: @", Strings.getSimpleMessage(e));
+                    }
+                }else if(arg[0].equals("remove")){
+                    int target = names.indexOf(p -> p.pattern().equals(arg[1]));
+                    if(target == -1){
+                        err("That name isn't banned.");
+                        return;
+                    }
+
+                    names.remove(target);
+                    netServer.admins.save();
+                    info("Unbanned regex: @", arg[1]);
                 }else{
                     err("Incorrect usage. Provide add/remove as the second argument.");
                 }

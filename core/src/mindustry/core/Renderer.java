@@ -2,7 +2,6 @@ package mindustry.core;
 
 import arc.*;
 import arc.assets.loaders.TextureLoader.*;
-import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -40,7 +39,7 @@ public class Renderer implements ApplicationListener{
     public @Nullable Bloom bloom;
     public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, animateWater, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false;
+    public boolean animateShields, animateWater, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false, showPings = true, showOtherBuildPlans = true;
     public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in, used by cutscenes */
     public float minZoom = 1.5f, maxZoom = 6f;
@@ -174,6 +173,8 @@ public class Renderer implements ApplicationListener{
         maxZoomInGame = settings.getFloat("maxzoomingamemultiplier", 1) * maxZoom;
         minZoomInGame = minZoom / settings.getFloat("minzoomingamemultiplier", 1);
         drawLight = settings.getBool("drawlight", true);
+        showPings = settings.getBool("showpings", true);
+        showOtherBuildPlans = settings.getBool("showotherbuildplans", true);
         pixelate = settings.getBool("pixelate");
 
         //don't bother drawing landing animation if core is null
@@ -568,11 +569,6 @@ public class Renderer implements ApplicationListener{
         launching = true;
         landTime = landCore.launchDuration();
 
-        Music music = landCore.launchMusic();
-        music.stop();
-        music.play();
-        music.setVolume(settings.getInt("musicvol") / 100f);
-
         landCore.beginLaunch(true);
     }
 
@@ -594,7 +590,7 @@ public class Renderer implements ApplicationListener{
         camera.height = h;
         camera.position.x = w / 2f + tilesize / 2f;
         camera.position.y = h / 2f + tilesize / 2f;
-        buffer.begin();
+        buffer.begin(Color.clear);
         draw();
         Draw.flush();
         byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);

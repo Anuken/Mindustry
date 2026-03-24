@@ -32,18 +32,18 @@ public class World{
 
     public Tiles tiles = new Tiles(0, 0);
     /** The number of times tiles have changed in this session. Used for blocks that need to poll world state, but not frequently. */
-    public int tileChanges = -1;
+    public int tileChanges = 1, floorChanges = 1;
 
     private boolean generating, invalidMap;
     private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
 
     public World(){
-        Events.on(TileChangeEvent.class, e -> {
-            tileChanges ++;
-        });
+        Events.on(TileChangeEvent.class, e -> tileChanges ++);
+        Events.on(TileFloorChangeEvent.class, e -> floorChanges ++);
 
         Events.on(WorldLoadEvent.class, e -> {
             tileChanges = -1;
+            floorChanges = -1;
 
             //make each building check if it can update in the given map area
             for(var build : Groups.build){
@@ -133,15 +133,13 @@ public class World{
         return tile;
     }
 
-    @Nullable
-    public Building build(int x, int y){
+    public @Nullable Building build(int x, int y){
         Tile tile = tile(x, y);
         if(tile == null) return null;
         return tile.build;
     }
 
-    @Nullable
-    public Building build(int pos){
+    public @Nullable Building build(int pos){
         Tile tile = tile(pos);
         if(tile == null) return null;
         return tile.build;
@@ -151,14 +149,16 @@ public class World{
         return tiles.getn(x, y);
     }
 
-    @Nullable
-    public Tile tileWorld(float x, float y){
+    public @Nullable Tile tileWorld(float x, float y){
         return tile(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
-    @Nullable
-    public Building buildWorld(float x, float y){
+    public @Nullable Building buildWorld(float x, float y){
         return build(Math.round(x / tilesize), Math.round(y / tilesize));
+    }
+
+    public @Nullable Building buildWorld(Position pos){
+        return buildWorld(pos.getX(), pos.getY());
     }
 
     /** Convert from world to logic tile coordinates. Whole numbers are at centers of tiles. */

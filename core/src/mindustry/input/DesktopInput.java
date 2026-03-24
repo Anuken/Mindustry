@@ -69,6 +69,13 @@ public class DesktopInput extends InputHandler{
     }
 
     @Override
+    public void reset(){
+        super.reset();
+        shouldShoot = false;
+        deleting = false;
+    }
+
+    @Override
     public void buildUI(Group group){
         //building and respawn hints
         group.fill(t -> {
@@ -152,7 +159,7 @@ public class DesktopInput extends InputHandler{
                 drawArrow(splan.block, splan.x, splan.y, splan.rotation, valid);
             }
 
-            splan.block.drawPlan(splan, allPlans(), valid);
+            splan.block.drawPlan(splan, allPlans, valid);
 
             drawSelected(splan.x, splan.y, splan.block, getPlan(splan.x, splan.y, splan.block.size, splan) != null ? Pal.remove : Pal.accent);
         }
@@ -207,7 +214,7 @@ public class DesktopInput extends InputHandler{
                     Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
                     bplan.set(cursorX, cursorY, rot, block);
                     bplan.config = block.lastConfig;
-                    block.drawPlanConfig(bplan, allPlans());
+                    block.drawPlanConfig(bplan, allPlans);
                     bplan.config = null;
                     Draw.reset();
                 }
@@ -468,6 +475,14 @@ public class DesktopInput extends InputHandler{
             }
         }
 
+        if(input.keyTap(Binding.ping) && !Core.scene.hasMouse() && !scene.hasKeyboard()){
+            if(input.ctrl()){
+                ui.showTextInput("", "@ping.text", Vars.maxPingTextLength, "", result -> Call.pingLocation(Vars.player, input.mouseWorldX(), input.mouseWorldY(), UI.formatIcons(result)));
+            }else{
+                Call.pingLocation(Vars.player, input.mouseWorldX(), input.mouseWorldY(), null);
+            }
+        }
+
         if(Core.input.keyRelease(Binding.select) && commandRect){
             selectUnitsRect();
         }
@@ -538,10 +553,14 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
             tappedOne = false;
 
+            Tile selected = tileAt(Core.input.mouseX(), Core.input.mouseY());
+
             if(commandMode){
                 commandRect = true;
                 commandRectX = input.mouseWorldX();
                 commandRectY = input.mouseWorldY();
+            }else if(selected != null){
+                tileTapped(selected.build);
             }
         }
     }

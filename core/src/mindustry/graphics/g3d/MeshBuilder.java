@@ -15,7 +15,7 @@ public class MeshBuilder{
     public static Mesh buildIcosphere(int divisions, float radius){
         MeshResult result = Icosphere.create(divisions);
 
-        Mesh mesh = begin(result.vertices.size / 3, result.indices.size, false, false);
+        Mesh mesh = begin(result.vertices.size / 3, result.indices.size, false, false, false);
 
         if(result.vertices.size >= 65535) throw new RuntimeException("Due to index size limits, only meshes with a maximum of 65535 vertices are supported. If you want more than that, make your own non-indexed mesh builder.");
 
@@ -193,6 +193,10 @@ public class MeshBuilder{
     }
 
     private static Mesh begin(int vertices, int indices, boolean normal, boolean emissive){
+        return begin(vertices, indices, normal, emissive, true);
+    }
+
+    private static Mesh begin(int vertices, int indices, boolean normal, boolean emissive, boolean color){
         Seq<VertexAttribute> attributes = Seq.with(
         VertexAttribute.position3
         );
@@ -202,7 +206,9 @@ public class MeshBuilder{
             attributes.add(packNormals ? VertexAttribute.packedNormal : VertexAttribute.normal);
         }
 
-        attributes.add(VertexAttribute.color);
+        if(color){
+            attributes.add(VertexAttribute.color);
+        }
 
         if(emissive){
             attributes.add(new VertexAttribute(4, GL20.GL_UNSIGNED_BYTE, true, "a_emissive"));
@@ -269,8 +275,8 @@ public class MeshBuilder{
             if(floats.length > 5) floats[5] = emissive;
         }else{
             floats[3] = normal.x;
-            floats[4] = normal.x;
-            floats[5] = normal.x;
+            floats[4] = normal.y;
+            floats[5] = normal.z;
 
             floats[6] = color;
             if(floats.length > 7) floats[7] = emissive;

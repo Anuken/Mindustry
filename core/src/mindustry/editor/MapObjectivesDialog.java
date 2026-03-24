@@ -47,6 +47,10 @@ public class MapObjectivesDialog extends BaseDialog{
 
             if(field != null && field.isAnnotationPresent(Multiline.class)){
                 cont.area(get.get(), set).height(100f).growX();
+            }else if(field != null && field.isAnnotationPresent(LogicCode.class)){
+                cont.button(b -> b.image(Icon.pencil).size(iconSmall), () -> {
+                    ui.logic.show(get.get(), null, true, set::get);
+                }).pad(4f);
             }else{
                 cont.field(get.get(), set).growX();
             }
@@ -288,6 +292,11 @@ public class MapObjectivesDialog extends BaseDialog{
                 b.label(() -> LStatement.alignToName.get(get.get(), "center"));
                 b.clicked(() -> LStatement.showAlignSelect(b, get.get(), set::get, align.hor(), align.ver()));
             }, () -> {});
+        });
+
+        setInterpreter(TextureHolder.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
+            cont.field(String.valueOf(get.get().value), s -> get.get().value = s).growX();
         });
 
         // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] from using it.
@@ -545,10 +554,7 @@ public class MapObjectivesDialog extends BaseDialog{
         if(
         objectives.any() && (
         // If the objectives were previously programmatically made...
-        objectives.contains(obj -> obj.editorX == -1 || obj.editorY == -1) ||
-        // ... or some idiot somehow made it not work...
-        objectives.contains(obj -> !canvas.tilemap.createTile(obj))
-        )){
+        objectives.contains(obj -> obj.editorX == -999 || obj.editorY == -999))){
             // ... then rebuild the structure.
             canvas.clearObjectives();
 
@@ -573,6 +579,8 @@ public class MapObjectivesDialog extends BaseDialog{
                     if(i >= objectives.size) break loop;
                 }
             }
+        }else{
+            objectives.each(o -> canvas.tilemap.createTile(o.editorX, o.editorY, o, true));
         }
 
         canvas.objectives.set(objectives);

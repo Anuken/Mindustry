@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import mindustry.*;
 import mindustry.editor.*;
@@ -35,7 +36,13 @@ public class PausedDialog extends BaseDialog{
             }).size(70f).tooltip("@customize").visible(() -> state.rules.allowEditRules && (net.server() || !net.active()));
         })).grow().row();
 
-        shown(this::rebuild);
+        shown(() -> {
+            rebuild();
+
+            if(state.isCampaign()){
+                state.getPlanet().saveStats();
+            }
+        });
 
         addCloseListener();
     }
@@ -53,10 +60,14 @@ public class PausedDialog extends BaseDialog{
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
-            cont.button("@objective", Icon.info, () -> ui.fullText.show("@objective", state.rules.sector.preset.description))
-            .visible(() -> state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.description != null).padTop(-60f);
+            boolean showObjective = state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.description != null;
+
+            if(showObjective){
+                cont.button("@objective", Icon.info, () -> ui.fullText.show("@objective", state.rules.sector != null && state.rules.sector.preset != null ? state.rules.sector.preset.description : "oh dear")).padTop(-60f);
+            }
 
             cont.button("@abandon", Icon.cancel, () -> ui.planet.abandonSectorConfirm(state.rules.sector, this::hide)).padTop(-60f)
+            .colspan(showObjective ? 1 : 2).width(showObjective ? dw : dw * 2 + 10f)
             .disabled(b -> net.client() || state.gameOver).visible(() -> state.rules.sector != null).row();
 
             cont.button("@back", Icon.left, this::hide).name("back");
@@ -101,7 +112,17 @@ public class PausedDialog extends BaseDialog{
 
                 cont.row();
 
-                cont.buttonRow("@load", Icon.download, load::show).disabled(b -> net.active());
+                cont.buttonRow("@load", Icon.download, () -> {
+                    if(net.active()){
+                        ui.database.show();
+                    }else{
+                        load.show();
+                    }
+                }).update(t -> {
+                    Image image = (Image)t.getChildren().first();
+                    image.setDrawable(net.active() ? Icon.book : Icon.download);
+                    t.setText(net.active() ? "@database" : "@load");
+                });
             }else if(state.isCampaign()){
                 cont.buttonRow("@research", Icon.tree, ui.research::show);
 

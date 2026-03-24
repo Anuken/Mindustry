@@ -20,6 +20,7 @@ import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
 import mindustry.logic.*;
+import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -34,6 +35,10 @@ public class LogicBlock extends Block{
     private static final int maxByteLen = 1024 * 100;
     private static final int maxLinks = 6000;
     public static final int maxNameLength = 32;
+
+    private static final IntSet usedBuildings = new IntSet();
+    private static final IntSeq waitIndices = new IntSeq();
+    private static final FloatSeq waitValues = new FloatSeq();
 
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
@@ -268,6 +273,7 @@ public class LogicBlock extends Block{
                         stream.readInt();
                     }
                 }else{
+                    usedBuildings.clear();
                     for(int i = 0; i < total; i++){
                         String name = stream.readUTF();
                         short x = stream.readShort(), y = stream.readShort();
@@ -280,6 +286,9 @@ public class LogicBlock extends Block{
                         Building build = world.build(x, y);
 
                         if(build != null){
+                            if(!usedBuildings.add(build.id)){
+                                continue;
+                            }
                             String bestName = getLinkName(build.block);
                             if(!name.startsWith(bestName)){
                                 name = findLinkName(build.block);
@@ -517,18 +526,20 @@ public class LogicBlock extends Block{
             if(state.rules.disableWorldProcessors && privileged) return;
 
             if(enabled && executor.initialized()){
-                accumulator += edelta() * ipt;
-
                 if(accumulator > maxInstructionScale * ipt) accumulator = maxInstructionScale * ipt;
 
                 while(accumulator >= 1f){
                     executor.runOnce();
-                    accumulator --;
                     if(executor.yield){
                         executor.yield = false;
                         break;
                     }
+                    accumulator --;
                 }
+
+                // Do not move in front of the loop, otherwise the curTime accumulated in WaitI
+                // may get out of sync with the accumulator increase.
+                accumulator += edelta() * ipt;
             }
         }
 
@@ -692,7 +703,7 @@ public class LogicBlock extends Block{
 
         @Override
         public byte version(){
-            return 3;
+            return 4;
         }
 
         @Override
@@ -738,6 +749,23 @@ public class LogicBlock extends Block{
 
             TypeIO.writeString(write, tag);
             write.s(iconTag);
+
+            waitIndices.clear();
+            waitValues.clear();
+            for(int i = 0; i < executor.instructions.length; i ++){
+                if(executor.instructions[i] instanceof WaitI wait){
+                    waitValues.add(wait.curTime);
+                    waitIndices.add(i);
+                }
+            }
+
+            write.s(waitIndices.size);
+            for(int i = 0; i < waitIndices.size; i++){
+                write.s(waitIndices.get(i));
+                write.f(waitValues.get(i));
+            }
+
+            write.f(accumulator);
         }
 
         @Override
@@ -776,6 +804,31 @@ public class LogicBlock extends Block{
             //skip memory, it isn't used anymore
             read.skip(memory * 8);
 
+            if(privileged && revision >= 2){
+                ipt = Mathf.clamp(read.s(), 1, maxInstructionsPerTick);
+            }
+
+            if(revision >= 3){
+                tag = TypeIO.readString(read);
+                iconTag = (char)read.us();
+            }
+
+            IntSeq waitIndices = new IntSeq();
+            FloatSeq waitValues = new FloatSeq();
+
+            //read wait times into list for processing once the asm is loaded
+            if(revision >= 4){
+                int waits = read.us();
+                for(int i = 0; i < waits; i++){
+                    int index = read.us();
+                    float value = read.f();
+                    waitIndices.add(index);
+                    waitValues.add(value);
+                }
+
+                accumulator = read.f();
+            }
+
             loadBlock = () -> updateCode(code, false, asm -> {
                 //load up the variables that were stored
                 for(int i = 0; i < varcount; i++){
@@ -793,16 +846,15 @@ public class LogicBlock extends Block{
                         }
                     }
                 }
+
+                //wait times can only be applied once the instructions are loaded and exist
+                for(int i = 0; i < waitIndices.size; i++){
+                    int waitIndex = waitIndices.get(i);
+                    if(waitIndex >= 0 && waitIndex < asm.instructions.length && asm.instructions[waitIndex] instanceof WaitI wait){
+                        wait.curTime = waitValues.get(i);
+                    }
+                }
             });
-
-            if(privileged && revision >= 2){
-                ipt = Mathf.clamp(read.s(), 1, maxInstructionsPerTick);
-            }
-
-            if(revision >= 3){
-                tag = TypeIO.readString(read);
-                iconTag = (char)read.us();
-            }
 
         }
     }

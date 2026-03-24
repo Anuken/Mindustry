@@ -57,6 +57,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public float speed = 1.1f,
     /** multiplier for speed when boosting */
     boostMultiplier = 1f,
+    /** how affected this unit is by terrain */
+    floorMultiplier = 1f,
     /** body rotation speed in degrees/t */
     rotateSpeed = 5f,
     /** mech base rotation speed in degrees/t*/
@@ -75,7 +77,9 @@ public class UnitType extends UnlockableContent implements Senseable{
     rippleScale = 1f,
     /** boosting rise speed as fraction */
     riseSpeed = 0.08f,
-    /** how fast this unit falls when not boosting */
+    /** boosting descent speed as fraction */
+    descentSpeed = 0.08f,
+    /** how fast this unit falls upon death */
     fallSpeed = 0.018f,
     /** how many ticks it takes this missile to accelerate to full speed */
     missileAccelTime = 0f,
@@ -91,6 +95,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     mineRange = 70f,
     /** range at which this unit can build */
     buildRange = Vars.buildingRange,
+    /** radius for circleTarget, if true */
+    circleTargetRadius = 80f,
     /** multiplier for damage this (flying) unit deals when crashing on enemy things */
     crashDamageMultiplier = 1f,
     /** multiplier for health that this flying unit has for its wreck, based on its max health. */
@@ -291,11 +297,33 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** override for unit shield colour. */
     public @Nullable Color shieldColor;
     /** sound played when this unit explodes (*not* when it is shot down) */
-    public Sound deathSound = Sounds.bang;
+    public Sound deathSound = Sounds.unset;
+    /** volume of death sound */
+    public float deathSoundVolume = 1f;
+    /** sound played when the unit wreck is shot down */
+    public Sound wreckSound = Sounds.unset;
+    /** volume of wreck falling sound */
+    public float wreckSoundVolume = 1f;
     /** sound played on loop when this unit is around. */
     public Sound loopSound = Sounds.none;
     /** volume of loop sound */
     public float loopSoundVolume = 0.5f;
+    /** sound played when this mech/insect unit does a step */
+    public Sound stepSound = Sounds.mechStepSmall;
+    /** volume of step sound */
+    public float stepSoundVolume = 0.5f;
+    /** base pitch of step sound */
+    public float stepSoundPitch = 1f, stepSoundPitchRange = 0.1f;
+    /** sound looped when tank moves */
+    public Sound tankMoveSound = Sounds.tankMove;
+    /** sound looped when the unit moves; volume depends on velocity */
+    public Sound moveSound = Sounds.none;
+    /** volume of movement sound */
+    public float moveSoundVolume = 1f;
+    /** pitch of movement sound based on velocity */
+    public float moveSoundPitchMin = 1f, moveSoundPitchMax = 1f;
+    /** volume of tank move sfx */
+    public float tankMoveVolume = 0.5f;
     /** effect that this unit emits when falling */
     public Effect fallEffect = Fx.fallSmoke;
     /** effect created at engine when unit falls. */
@@ -363,7 +391,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** if true, harder materials will take longer to mine */
     public boolean mineHardnessScaling = true;
     /** continuous sound emitted when mining. */
-    public Sound mineSound = Sounds.minebeam;
+    public Sound mineSound = Sounds.loopMineBeam;
     /** volume of mining sound. */
     public float mineSoundVolume = 0.6f;
     /** Target items to mine. Used in MinerAI */
@@ -439,8 +467,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public int treadFrames = 18;
     /** how much of a top part of a tread sprite is "cut off" relative to the pattern; this is corrected for */
     public int treadPullOffset = 0;
-    /** how affected this unit is by terrain */
-    public float floorMultiplier = 1f;
+    /** if true, 'fragile' blocks will instantly be crushed in a 1x1 area around the tank */
+    public boolean crushFragile = false;
 
     //SEGMENTED / CRAWL UNITS (this is WIP content!)
 
@@ -503,6 +531,21 @@ public class UnitType extends UnlockableContent implements Senseable{
         // This is the default Vanilla behavior - it won't work properly for mods (see comment in `init()`)!
         constructor = EntityMapping.map(this.name);
         selectionSize = 30f;
+    }
+
+    @Override
+    public void postInit(){
+        if(databaseTag == null || databaseTag.isEmpty()){
+            if(flying){
+                databaseTag = "unit-air";
+            }else if(naval){
+                databaseTag = "unit-naval";
+            }else{
+                databaseTag = "unit-ground";
+            }
+        }
+
+        super.postInit();
     }
 
     public UnitController createController(Unit unit){
@@ -605,8 +648,12 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** Adds all available unit stances based on the unit's current state. This can change based on the command of the unit. */
     public void getUnitStances(Unit unit, Seq<UnitStance> out){
+        if(!(unit.controller() instanceof CommandAI ai)) return;
+
+        var current = ai.currentCommand();
+
         //return mining stances based on present items
-        if(unit.controller() instanceof CommandAI ai && ai.currentCommand() == UnitCommand.mineCommand){
+        if(current == UnitCommand.mineCommand){
             out.add(UnitStance.mineAuto);
             for(Item item : indexer.getAllPresentOres()){
                 if(unit.canMine(item) && ((mineFloor && indexer.hasOre(item)) || (mineWalls && indexer.hasWallOre(item)))){
@@ -617,8 +664,15 @@ public class UnitType extends UnlockableContent implements Senseable{
                 }
             }
         }else{
-            out.addAll(stances);
+            for(var stance : stances){
+                if(stance.isCompatible(current)){
+                    out.add(stance);
+                }
+            }
         }
+
+        //there might be duplicates, but that shouldn't cause issues
+        out.addAll(current.extraStances);
     }
 
     public boolean allowStance(Unit unit, UnitStance stance){
@@ -750,6 +804,13 @@ public class UnitType extends UnlockableContent implements Senseable{
             stats.add(Stat.crushDamage, crushDamage * 60f * 5f, StatUnit.perSecond);
         }
 
+        if(legSplashDamage > 0 && legSplashRange > 0){
+            stats.add(Stat.legSplashDamage, table -> {
+                table.add((Core.bundle.format("bullet.splashdamage", Strings.autoFixed(legSplashDamage, 2),
+                    Strings.autoFixed(legSplashRange / tilesize, 2))).replace("[stat]", "[white]") + " " + StatUnit.perLeg.localized());
+            });
+        }
+
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
 
@@ -761,6 +822,9 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(!flying){
             stats.add(Stat.canBoost, canBoost);
+            if(canBoost){
+                stats.add(Stat.boostingSpeed, boostMultiplier * speed * 60f / tilesize, StatUnit.tilesSecond);
+            }
         }
 
         if(mineTier >= 1){
@@ -829,6 +893,28 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
     }
 
+    void initPathType(){
+        if(flowfieldPathType == -1){
+            flowfieldPathType =
+            naval ? Pathfinder.costNaval :
+            allowLegStep ? Pathfinder.costLegs :
+            flying ? Pathfinder.costNone :
+            hovering ? Pathfinder.costHover :
+            Pathfinder.costGround;
+        }
+
+        if(pathCost == null){
+            pathCost =
+            naval ? ControlPathfinder.costNaval :
+            allowLegStep ? ControlPathfinder.costLegs :
+            hovering ? ControlPathfinder.costHover :
+            ControlPathfinder.costGround;
+        }
+
+        pathCostId = ControlPathfinder.costTypes.indexOf(pathCost);
+        if(pathCostId == -1) pathCostId = 0;
+    }
+
     @CallSuper
     @Override
     public void init(){
@@ -852,28 +938,21 @@ public class UnitType extends UnlockableContent implements Senseable{
             }
         }
 
-        if(flowfieldPathType == -1){
-            flowfieldPathType =
-                naval ? Pathfinder.costNaval :
-                allowLegStep ? Pathfinder.costLegs :
-                flying ? Pathfinder.costNone :
-                hovering ? Pathfinder.costHover :
-                Pathfinder.costGround;
-        }
-
-        if(pathCost == null){
-            pathCost =
-                naval ? ControlPathfinder.costNaval :
-                allowLegStep ? ControlPathfinder.costLegs :
-                hovering ? ControlPathfinder.costHover :
-                ControlPathfinder.costGround;
-        }
-
-        pathCostId = ControlPathfinder.costTypes.indexOf(pathCost);
-        if(pathCostId == -1) pathCostId = 0;
+        initPathType();
 
         if(flying){
             envEnabled |= Env.space;
+        }
+
+        if(deathSound == Sounds.unset){
+            deathSound =
+                hitSize < 12f ? Sounds.unitExplode1 :
+                hitSize < 22f ? Sounds.unitExplode2 :
+                Sounds.unitExplode3;
+        }
+
+        if(wreckSound == Sounds.unset){
+            wreckSound = hitSize >= 22f ? Sounds.wreckFallBig : Sounds.wreckFall;
         }
 
         if(lightRadius == -1){
@@ -998,10 +1077,13 @@ public class UnitType extends UnlockableContent implements Senseable{
         //assign default commands.
         if(commands.size == 0){
 
-            commands.add(UnitCommand.moveCommand, UnitCommand.enterPayloadCommand);
+            commands.add(UnitCommand.moveCommand);
+
+            if(allowedInPayloads){
+                commands.add(UnitCommand.enterPayloadCommand);
+            }
 
             if(canBoost){
-                commands.add(UnitCommand.boostCommand);
 
                 if(buildSpeed > 0f){
                     commands.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
@@ -1039,6 +1121,9 @@ public class UnitType extends UnlockableContent implements Senseable{
                 stances.addAll(UnitStance.stop, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
                 if(!flying){
                     stances.add(UnitStance.ram);
+                }
+                if(canBoost){
+                    stances.add(UnitStance.boost);
                 }
             }else{
                 stances.addAll(UnitStance.stop, UnitStance.patrol);
@@ -1228,6 +1313,22 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
     }
 
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+        totalRequirements = cachedRequirements = firstRequirements = null;
+
+        //this will technically reset any assigned values, but in vanilla, they're not reassigned anyway
+        flowfieldPathType = -1;
+        pathCost = null;
+        pathCostId = -1;
+        initPathType();
+    }
+
+    public void beforeParse(){
+        totalRequirements = cachedRequirements = firstRequirements = null;
+    }
+
     /** @return the time required to build this unit, as a value that takes into account reconstructors */
     public float getBuildTime(){
         getTotalRequirements();
@@ -1330,7 +1431,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(stacks != null){
             ItemStack[] out = new ItemStack[stacks.length];
             for(int i = 0; i < out.length; i++){
-                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1.1) * researchCostMultiplier)));
+                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(stacks[i].amount * researchCostMultiplier)));
             }
 
             //remove zero-requirements for automatic unlocks
@@ -1444,6 +1545,9 @@ public class UnitType extends UnlockableContent implements Senseable{
         Draw.z(z);
 
         if(unit instanceof Crawlc c){
+            if(isPayload){
+                c.segmentRot(c.rotation());
+            }
             drawCrawl(c);
         }
 

@@ -118,7 +118,10 @@ public class PayloadConveyor extends Block{
             }else{
                 next = null;
             }
+            checkBlocked();
+        }
 
+        void checkBlocked(){
             int ntrns = 1 + size/2;
             Tile next = tile.nearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
             blocked = (next != null && next.solid() && !(next.block().outputsPayload || next.block().acceptsPayload)) || (this.next != null && this.next.payloadCheck(rotation));
@@ -156,6 +159,7 @@ public class PayloadConveyor extends Block{
                 boolean had = item != null;
 
                 if(valid && stepAccepted != curStep && item != null){
+                    checkBlocked();
                     if(next != null){
                         //trigger update forward
                         next.updateTile();
@@ -261,7 +265,7 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void unitOn(Unit unit){
-            if(!pushUnits || !enabled) return;
+            if(!pushUnits || !enabled || (lastInterp == 0f)) return;
 
             //calculate derivative of units moved last frame
             float delta = (curInterp - lastInterp) * size * tilesize;

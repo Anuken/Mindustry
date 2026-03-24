@@ -79,10 +79,9 @@ public class Drill extends Block{
         solid = true;
         group = BlockGroup.drills;
         hasLiquids = true;
-        liquidCapacity = 5f;
         hasItems = true;
-        ambientSound = Sounds.drill;
-        ambientSoundVolume = 0.018f;
+        ambientSound = Sounds.loopDrill;
+        ambientSoundVolume = 0.019f;
         //drills work in space I guess
         envEnabled |= Env.space;
         flags = EnumSet.of(BlockFlag.drill);
@@ -98,7 +97,7 @@ public class Drill extends Block{
     }
 
     @Override
-    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
         if(!plan.worldContext) return;
         Tile tile = plan.tile();
         if(tile == null) return;
@@ -106,7 +105,7 @@ public class Drill extends Block{
         countOre(tile);
         if(returnItem == null || !drawMineItem) return;
 
-        Draw.color(returnItem.color);
+        Draw.tint(returnItem.color);
         Draw.rect(itemRegion, plan.drawx(), plan.drawy());
         Draw.color();
     }

@@ -1,5 +1,6 @@
 package mindustry.entities.comp;
 
+import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
@@ -12,6 +13,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 
@@ -163,7 +165,10 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Unitc{
             l.moving = move;
             l.stage = moving ? stageF % 1f : Mathf.lerpDelta(l.stage, 0f, 0.1f);
 
-            Floor floor = Vars.world.floorWorld(l.base.x, l.base.y);
+            Tile tile = Vars.world.tileWorld(l.base.x, l.base.y);
+            Color floorColor = tile == null ? Color.clear : tile.getFloorColor();
+            Floor floor = tile == null ? Blocks.air.asFloor() : tile.floor();
+
             if(floor.isDeep()){
                 deeps ++;
                 lastDeepFloor = floor;
@@ -175,10 +180,11 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Unitc{
                 if(!move && (moving || !type.legContinuousMove) && i % div == l.group){
                     if(!headless && !inFogTo(player.team())){
                         if(floor.isLiquid){
-                            floor.walkEffect.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
+                            floor.walkEffect.at(l.base.x, l.base.y, type.rippleScale, floorColor);
                             floor.walkSound.at(x, y, 1f, floor.walkSoundVolume);
                         }else{
-                            Fx.unitLandSmall.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
+                            Fx.unitLandSmall.at(l.base.x, l.base.y, type.rippleScale, floorColor);
+                            type.stepSound.at(l.base.x, l.base.y, type.stepSoundPitch + Mathf.range(type.stepSoundPitchRange), type.stepSoundVolume);
                         }
 
                         //shake when legs contact ground
@@ -190,7 +196,6 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Unitc{
                     if(type.legSplashDamage > 0 && !disarmed){
                         Damage.damage(team, l.base.x, l.base.y, type.legSplashRange, type.legSplashDamage * state.rules.unitDamage(team), false, true);
 
-                        var tile = Vars.world.tileWorld(l.base.x, l.base.y);
                         if(tile != null && tile.block().unitMoveBreakable){
                             ConstructBlock.deconstructFinish(tile, tile.block(), self());
                         }
