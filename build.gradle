@@ -27,8 +27,8 @@ buildscript{
 }
 
 plugins{
-    id "org.jetbrains.kotlin.jvm" version "2.1.10"
-    id "org.jetbrains.kotlin.kapt" version "2.1.10"
+    id "org.jetbrains.kotlin.jvm" version "2.3.20"
+    id "org.jetbrains.kotlin.kapt" version "2.3.20"
 }
 
 allprojects{
