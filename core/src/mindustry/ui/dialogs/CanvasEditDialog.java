@@ -58,6 +58,10 @@ public class CanvasEditDialog extends BaseDialog{
 
         //update at an interval so that people can see what is being drawn
         update(() -> {
+            if(!canvas.isValid()){
+                hide();
+            }
+
             time += Time.delta;
 
             if(time >= refreshTime){
@@ -269,7 +273,7 @@ public class CanvasEditDialog extends BaseDialog{
     }
 
     void save(){
-        if(modified){
+        if(modified && canvas.isValid()){
             canvas.configure(canvas.packPixmap(pix));
             modified = false;
         }
