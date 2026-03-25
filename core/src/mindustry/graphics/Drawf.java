@@ -501,6 +501,10 @@ public class Drawf{
     }
 
     public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale){
+        laser(line, start, end, x, y, x2, y2, scale, true);
+    }
+
+    public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale, boolean light){
         float scl = 8f * scale * Draw.scl, rot = Mathf.angle(x2 - x, y2 - y);
         float vx = Mathf.cosDeg(rot) * scl, vy = Mathf.sinDeg(rot) * scl;
 
@@ -511,7 +515,7 @@ public class Drawf{
         Lines.line(line, x + vx, y + vy, x2 - vx, y2 - vy, false);
         Lines.stroke(1f);
 
-        light(x, y, x2, y2);
+        if(light) light(x, y, x2, y2);
     }
 
     public static void tri(float x, float y, float width, float length, float rotation){
