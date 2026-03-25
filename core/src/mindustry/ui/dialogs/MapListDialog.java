@@ -112,73 +112,72 @@ public abstract class MapListDialog extends BaseDialog{
         if(showBuiltIn) mapList.addAll(maps.defaultMaps());
         if(showModded) mapList.addAll(maps.moddedMaps());
 
-        mapList = mapList.distinct();
+        mapList.distinct();
 
-        if(mapList != null){
-            if(prioritizeModded){
-                Seq<Map> ordered = new Seq<>();
-                ordered.addAll(mapList.select(m -> m.mod != null)).sortComparing(m -> m.mod.meta.displayName);
-                ordered.addAll(mapList.select(m -> m.mod == null));
-                mapList = ordered;
+        if(prioritizeModded){
+            Seq<Map> ordered = new Seq<>();
+            ordered.addAll(mapList.select(m -> m.mod != null).sortComparing(m -> m.mod.meta.displayName));
+            ordered.addAll(mapList.select(m -> m.mod == null).sortComparing(m -> m.plainName()));
+            mapList = ordered;
+        }else if(prioritizeCustom){
+            Seq<Map> ordered = new Seq<>();
+            ordered.addAll(mapList.select(m -> m.custom)).sortComparing(m -> m.plainName());
+            ordered.addAll(mapList.select(m -> !m.custom).sortComparing(m -> m.plainName()));
+            mapList = ordered;
+        }else{
+            mapList.sortComparing(m -> m.plainName());
+        }
+        for(Map map : mapList){
+
+            boolean invalid = false;
+            for(Gamemode mode : modes){
+                invalid |= !mode.valid(map);
             }
-            if(prioritizeCustom){
-                Seq<Map> ordered = new Seq<>();
-                ordered.addAll(mapList.select(m -> m.custom)).sortComparing(m -> m.plainName());
-                ordered.addAll(mapList.select(m -> !m.custom));
-                mapList = ordered;
+            if(invalid || (searchString != null
+                && !map.plainName().toLowerCase().contains(searchString)
+                && (!searchAuthor || !map.plainAuthor().toLowerCase().contains(searchString))
+                && (!searchDescription || !map.plainDescription().toLowerCase().contains(searchString))
+                && (!searchModname || !(map.mod == null ? "" : Strings.stripColors(map.mod.meta.displayName).toLowerCase()).contains(searchString)))){
+                continue;
             }
-            for(Map map : mapList){
 
-                boolean invalid = false;
-                for(Gamemode mode : modes){
-                    invalid |= !mode.valid(map);
-                }
-                if(invalid || (searchString != null
-                    && !map.plainName().toLowerCase().contains(searchString)
-                    && (!searchAuthor || !map.plainAuthor().toLowerCase().contains(searchString))
-                    && (!searchDescription || !map.plainDescription().toLowerCase().contains(searchString))
-                    && (!searchModname || !(map.mod == null ? "" : Strings.stripColors(map.mod.meta.displayName).toLowerCase()).contains(searchString)))){
-                    continue;
-                }
+            noMapsShown = false;
 
-                noMapsShown = false;
+            if(i % maxwidth == 0){
+                mapTable.row();
+            }
 
-                if(i % maxwidth == 0){
-                    mapTable.row();
-                }
+            TextButton button = mapTable.button("", Styles.grayt, () -> showMap(map)).width(mapsize).bottom().pad(8).get();
+            button.clearChildren();
+            button.margin(9);
+            button.bottom();
 
-                TextButton button = mapTable.button("", Styles.grayt, () -> showMap(map)).width(mapsize).bottom().pad(8).get();
-                button.clearChildren();
-                button.margin(9);
-                button.bottom();
-
-                //TODO hide in editor?
-                button.table(t -> {
-                    t.left();
-                    for(Gamemode mode : Gamemode.all){
-                        TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()) + "Small");
-                        if(mode.valid(map) && Core.atlas.isFound(icon.getRegion())){
-                            t.image(icon).size(16f).pad(4f);
-                        }
+            //TODO hide in editor?
+            button.table(t -> {
+                t.left();
+                for(Gamemode mode : Gamemode.all){
+                    TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()) + "Small");
+                    if(mode.valid(map) && Core.atlas.isFound(icon.getRegion())){
+                        t.image(icon).size(16f).pad(4f);
                     }
-                    if(t.getChildren().size == 0){
-                        t.add().size(16f).pad(4f);
-                    }
-                }).left().row();
-
-                button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
-                button.row();
-                button.image().growX().pad(4).color(Pal.gray);
-                button.row();
-                button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
-
-                if(displayType){
-                    button.row();
-                    button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName : "@builtin").color(Color.gray).padTop(3);
                 }
+                if(t.getChildren().size == 0){
+                    t.add().size(16f).pad(4f);
+                }
+            }).left().row();
 
-                i++;
+            button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
+            button.row();
+            button.image().growX().pad(4).color(Pal.gray);
+            button.row();
+            button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
+
+            if(displayType){
+                button.row();
+                button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName : "@builtin").color(Color.gray).padTop(3);
             }
+
+            i++;
         }
 
         if(noMapsShown){
