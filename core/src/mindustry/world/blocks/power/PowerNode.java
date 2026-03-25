@@ -179,7 +179,7 @@ public class PowerNode extends PowerBlock{
     }
 
     public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2){
-        drawLaser(x1, y1, x2, y1, size1, size2, true);
+        drawLaser(x1, y1, x2, y2, size1, size2, true);
     }
 
     public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2, boolean light){
