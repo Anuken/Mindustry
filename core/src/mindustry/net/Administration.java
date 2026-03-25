@@ -13,6 +13,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
+import java.io.*;
 import java.util.regex.*;
 
 import static mindustry.Vars.*;
@@ -611,7 +612,7 @@ public class Administration{
         }
     }
 
-    public static class PlayerInfo{
+    public static class PlayerInfo implements Serializable{
         public String id;
         public String lastName = "<unknown>", lastIP = "<unknown>";
         public Seq<String> ips = new Seq<>();
