@@ -1157,7 +1157,7 @@ public class HudFragment{
                 if(applied != null){
                     for(StatusEffect effect : content.statusEffects()){
                         if(applied.get(effect.id) && !effect.isHidden()){
-                            t.image(effect.uiIcon).size(iconMed).get()
+                            t.image(effect.uiIcon).scaling(Scaling.fit).size(iconMed).get()
                             .addListener(new Tooltip(l -> l.label(() ->
                                 player.dead() ? "" : effect.localizedName + " [lightgray]" + UI.formatTime(player.unit().getDuration(effect))).style(Styles.outlineLabel)));
                         }
