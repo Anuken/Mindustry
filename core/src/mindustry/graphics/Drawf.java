@@ -418,10 +418,14 @@ public class Drawf{
     }
 
     public static void square(float x, float y, float radius, float rotation, Color color, Color bgColor){
-        Lines.stroke(3f, bgColor);
-        Lines.square(x, y, radius + 1f, rotation);
-        Lines.stroke(1f, color);
-        Lines.square(x, y, radius + 1f, rotation);
+        square(x, y, radius, rotation, color, bgColor, 1f);
+    }
+
+    public static void square(float x, float y, float radius, float rotation, Color color, Color bgColor, float scaling){
+        Lines.stroke(3f * scaling, bgColor);
+        Lines.square(x, y, radius + 1f * scaling, rotation);
+        Lines.stroke(1f * scaling, color);
+        Lines.square(x, y, radius + 1f * scaling, rotation);
         Draw.reset();
     }
 
@@ -444,12 +448,12 @@ public class Drawf{
     }
 
     public static void fillPoly(float x, float y, int sides, float radius, float rotation, Color color){
-        fillPoly(x, y, sides, radius, rotation, color, Pal.gray);
+        fillPoly(x, y, sides, radius, rotation, color, Pal.gray, 1f);
     }
 
-    public static void fillPoly(float x, float y, int sides, float radius, float rotation, Color color, Color bgColor){
+    public static void fillPoly(float x, float y, int sides, float radius, float rotation, Color color, Color bgColor, float scl){
         Draw.color(bgColor, color.a);
-        Fill.poly(x, y, sides, radius + 2f, rotation);
+        Fill.poly(x, y, sides, radius + 2f*scl, rotation);
         Draw.color(color);
         Fill.poly(x, y, sides, radius, rotation);
         Draw.reset();
@@ -497,6 +501,10 @@ public class Drawf{
     }
 
     public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale){
+        laser(line, start, end, x, y, x2, y2, scale, true);
+    }
+
+    public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale, boolean light){
         float scl = 8f * scale * Draw.scl, rot = Mathf.angle(x2 - x, y2 - y);
         float vx = Mathf.cosDeg(rot) * scl, vy = Mathf.sinDeg(rot) * scl;
 
@@ -507,7 +515,7 @@ public class Drawf{
         Lines.line(line, x + vx, y + vy, x2 - vx, y2 - vy, false);
         Lines.stroke(1f);
 
-        light(x, y, x2, y2);
+        if(light) light(x, y, x2, y2);
     }
 
     public static void tri(float x, float y, float width, float length, float rotation){

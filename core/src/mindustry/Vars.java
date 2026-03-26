@@ -372,6 +372,8 @@ public class Vars implements Loadable{
         ios = Core.app.isIOS();
         android = Core.app.isAndroid();
 
+        becontrol.init();
+
         modDirectory.mkdirs();
 
         Events.on(ContentInitEvent.class, e -> {

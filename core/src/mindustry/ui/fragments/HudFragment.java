@@ -283,9 +283,9 @@ public class HudFragment{
 
         //paused table
         parent.fill(t -> {
-            float sidePad = mobile ? dsize * 5 + 4f : 0f;
+            float sidePad = dsize * 5 + 4f;
             t.name = "paused";
-            t.top().visible(() -> state.isPaused() && shown && !netServer.isWaitingForPlayers() && !Core.graphics.isPortrait()).touchable = Touchable.disabled;
+            t.top().visible(() -> state.isPaused() && shown && !netServer.isWaitingForPlayers() && !(mobile && Core.graphics.isPortrait())).touchable = Touchable.disabled;
             t.table(Styles.black6, top -> {
                 top.label(() -> state.gameOver && state.isCampaign() ? "@sector.curlost" : "@paused")
                 .style(Styles.outlineLabel).pad(8f);
@@ -377,8 +377,9 @@ public class HudFragment{
                     select.name = "mobile buttons";
                     select.left();
                     select.defaults().size(dsize).left();
+                    select.background(Styles.black6);
 
-                    ImageButtonStyle style = Styles.cleari;
+                    ImageButtonStyle style = Styles.clearNonei;
 
                     select.button(Icon.menu, style, ui.paused::show).name("menu");
                     flip = select.button(Icon.upOpen, style, this::toggleMenus).get();
@@ -388,16 +389,17 @@ public class HudFragment{
                     .name("schematics");
 
                     select.button(Icon.pause, style, () -> {
-                        if(net.active() || state.rules.pauseDisabled){
+                        if(net.active()){
                             ui.listfrag.toggle();
-                        }else{
+                        }else if(!state.rules.pauseDisabled){
                             state.set(state.isPaused() ? State.playing : State.paused);
                         }
                     }).name("pause").update(i -> {
                         if(net.active()){
+                            i.setDisabled(false);
                             i.getStyle().imageUp = Icon.players;
                         }else{
-                            i.setDisabled(false);
+                            i.setDisabled(state.rules.pauseDisabled);
                             i.getStyle().imageUp = state.isPaused() ? Icon.play : Icon.pause;
                         }
                     });
@@ -461,7 +463,7 @@ public class HudFragment{
 
                 @Override
                 public float getPrefHeight(){
-                    return Scl.scl(120f);
+                    return Scl.scl(123f);
                 }
             }).name("waves/editor");
 

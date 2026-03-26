@@ -183,7 +183,15 @@ public class TypeIO{
             case 1 -> read.i();
             case 2 -> read.l();
             case 3 -> read.f();
-            case 4 -> readString(read);
+            case 4 -> {
+                byte exists = read.b();
+                if(exists != 0){
+                    //in a safe context, strings can only be 1000 chars
+                    yield read.str(safe ? 1000 : 0);
+                }else{
+                    yield null;
+                }
+            }
             case 5 -> mapper == null ? content.getByID(ContentType.all[read.b()], read.s()) : mapper.get(ContentType.all[read.b()], read.s());
             case 6 -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
@@ -826,6 +834,7 @@ public class TypeIO{
 
     public static MapObjectives readObjectives(Reads read){
         int length = read.i();
+        if(length >= 60_000) throw new RuntimeException("Objectives bytes too long: " + length);
         String string = new String(read.b(new byte[length]), charset);
         return JsonIO.read(MapObjectives.class, string);
     }

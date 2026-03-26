@@ -30,6 +30,7 @@ public class Net{
     private boolean active;
     private boolean clientLoaded;
     private @Nullable StreamBuilder currentStream;
+    private Ratekeeper clientUdpErrorRate = new Ratekeeper();
 
     private final Seq<Packet> packetQueue = new Seq<>();
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
@@ -75,7 +76,12 @@ public class Net{
 
     public void handleException(Throwable e){
         if(e instanceof ArcNetException){
-            Core.app.post(() -> showError(new IOException("mismatch", e)));
+            //allow occasional UDP network errors
+            if(net.client() && e.getMessage() != null && e.getMessage().contains("UDP deserialization") && clientUdpErrorRate.allow(8000, 2)){
+                Log.err("UDP network error", e);
+            }else{
+                Core.app.post(() -> showError(new IOException("mismatch", e)));
+            }
         }else if(e instanceof ClosedChannelException){
             Core.app.post(() -> showError(new IOException("alreadyconnected", e)));
         }else{
@@ -196,6 +202,7 @@ public class Net{
 
     public void reset(){
         closeServer();
+        clientUdpErrorRate.reset();
         netClient.disconnectNoReset();
     }
 
@@ -265,6 +272,10 @@ public class Net{
      * Call to handle a packet being received for the client.
      */
     public void handleClientReceived(Packet object){
+        if(!object.allow(false)){
+            return;
+        }
+
         object.handled();
 
         if(object instanceof StreamBegin b){
@@ -305,6 +316,9 @@ public class Net{
      * Call to handle a packet being received for the server.
      */
     public void handleServerReceived(NetConnection connection, Packet object){
+        if(!object.allow(true)){
+            return;
+        }
 
         try{
             if(connection.hasConnected || object.getPriority() == Packet.priorityHigh){
