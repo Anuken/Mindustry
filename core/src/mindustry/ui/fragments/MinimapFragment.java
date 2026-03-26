@@ -158,7 +158,7 @@ public class MinimapFragment{
 
     public Vec2 convert(float relativeX, float relativeY){
         Rect r = getRectBounds();
-        return Tmp.v1.set(relativeX, relativeY).sub(r.x, r.y).scl(1f / r.width, 1f / r.height).scl(world.unitWidth(), world.unitHeight()).sub(tilesize/2f, tilesize/2f);
+        return Tmp.v1.set(relativeX, relativeY).sub(r.x - scene.marginLeft, r.y - scene.marginBottom).scl(1f / r.width, 1f / r.height).scl(world.unitWidth(), world.unitHeight()).sub(tilesize/2f, tilesize/2f);
     }
 
     public boolean shown(){
