@@ -268,7 +268,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     public boolean showCancel(){
-        return !player.dead() && (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !hasSchematic();
+        return !player.dead() && (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !hasSchematic() && !ui.consolefrag.shown();
     }
 
     public boolean hasSchematic(){
@@ -298,7 +298,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(() -> !hasSchematic() && !(state.isEditor() && Core.settings.getBool("editor-blocks-shown")));
+            t.visible(() -> !hasSchematic() && !ui.consolefrag.shown() && !(state.isEditor()&& Core.settings.getBool("editor-blocks-shown")));
             t.bottom().left();
 
             t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
@@ -325,7 +325,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(this::hasSchematic);
+            t.visible(() -> hasSchematic() && !ui.consolefrag.shown());
             t.bottom().left();
             t.table(Tex.pane, b -> {
                 b.defaults().size(50f);

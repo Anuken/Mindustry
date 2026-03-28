@@ -371,9 +371,7 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }
 
-        if(!mobile){
-            game.checkPref("console", false);
-        }
+        game.checkPref("console", false);
 
         graphics.sliderPref("uiEdgePadding", 0, 0, 100, s -> s + "px", s -> {
             if(ui != null){
