@@ -391,6 +391,7 @@ public class HudFragment{
                     }).update(i -> {
                         if(Core.settings.getBool("console")){
                             i.getStyle().imageUp = Icon.terminal;
+                            shown = true; //force shown when console is enabled, because there is no other way to show/hide
                         }else{
                             i.getStyle().imageUp = shown ? Icon.downOpen : Icon.upOpen;
                         }

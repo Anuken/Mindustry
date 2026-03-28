@@ -54,6 +54,11 @@ public class ConsoleFragment extends Table{
                 clearChatInput();
             }
 
+            //there is no button to hide the console outside of the in-game state
+            if(mobile && !state.isGame()){
+                shown = false;
+            }
+
             return shown;
         });
 
