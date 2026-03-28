@@ -54,10 +54,7 @@ public class ConsoleFragment extends Table{
                 clearChatInput();
             }
 
-            //there is no button to hide the console outside of the in-game state
-            if(mobile && !state.isGame()){
-                shown = false;
-            }
+            if(mobile) open = false;
 
             return shown;
         });
@@ -132,6 +129,9 @@ public class ConsoleFragment extends Table{
                     Log.err(e);
                 }
             })).size(s).padLeft(4f);
+
+            button(Icon.cancel, Styles.cleari, () -> shown = false).size(s).padLeft(4f);
+
         }else{
             add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
         }
