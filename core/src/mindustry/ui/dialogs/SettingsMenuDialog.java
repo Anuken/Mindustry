@@ -332,10 +332,6 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }*/
 
-        if(!mobile){
-            game.checkPref("crashreport", true);
-        }
-
         game.checkPref("communityservers", true, val -> {
             defaultServers.clear();
             if(val){
