@@ -412,7 +412,7 @@ public class HudFragment{
                             i.setDisabled(false);
                             i.getStyle().imageUp = Icon.players;
                         }else{
-                            i.setDisabled(state.rules.pauseDisabled);
+                            i.setDisabled(state.rules.pauseDisabled || (state.isCampaign() && state.afterGameOver));
                             i.getStyle().imageUp = state.isPaused() ? Icon.play : Icon.pause;
                         }
                     });
