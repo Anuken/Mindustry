@@ -337,7 +337,7 @@ public class Mods implements Loadable{
 
             packer.printStats();
 
-            Events.fire(new AtlasPackEvent());
+            Events.fire(new AtlasPackEvent(packer));
 
             packer.dispose();
 
