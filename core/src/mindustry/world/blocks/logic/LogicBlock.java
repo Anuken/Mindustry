@@ -86,16 +86,21 @@ public class LogicBlock extends Block{
             var lbuild = world.build(pos);
             int x = lbuild.tileX(), y = lbuild.tileY();
 
-            LogicLink link = entity.links.find(l -> l.x == x && l.y == y);
+            //find all links pointing to the target building
+            Seq<LogicLink> toRemove = entity.links.select(link -> {
+                Building lb = world.build(link.x, link.y);
+                return lb == lbuild;
+            });
 
-            if(link != null){
-                entity.links.remove(link);
+            if(!toRemove.isEmpty()){
+                //if links already exist, remove all links pointing to this building
+                entity.links.removeAll(toRemove);
                 //disable when unlinking
                 if(lbuild.block.autoResetEnabled && lbuild.lastDisabler == entity){
                     lbuild.enabled = true;
                 }
             }else{
-                entity.links.remove(l -> world.build(l.x, l.y) == lbuild);
+                //add link
                 entity.links.add(new LogicLink(x, y, entity.findLinkName(lbuild.block), true));
             }
 
