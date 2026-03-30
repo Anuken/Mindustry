@@ -92,6 +92,7 @@ public class CanvasEditDialog extends BaseDialog{
 
                             if(button == KeyCode.mouseLeft){
                                 if(fill){
+                                    if(!pix.in(cx, cy)) return false;
                                     stack.clear();
                                     int src = curColor;
                                     int dst = pix.get(cx, cy);
@@ -135,7 +136,7 @@ public class CanvasEditDialog extends BaseDialog{
                 }
 
                 void draw(int x, int y){
-                    if(pix.get(x, y) != curColor){
+                    if(pix.in(x, y) && pix.get(x, y) != curColor){
                         pix.set(x, y, curColor);
                         Pixmaps.drawPixel(texture, x, y, curColor);
                         modified = true;
