@@ -864,12 +864,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         float power = item().charge * Mathf.pow(stack().amount, 1.11f) * 160f;
 
         if(!spawnedByCore){
-            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, (bounds() + type.legLength/1.7f) / 2f, state.rules.damageExplosions && state.rules.unitCrashDamage(team) > 0, item().flammability > 1, team, type.deathExplosionEffect);
+            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, (bounds() + type.legLength/1.7f) / 2f, state.rules.damageExplosions && state.rules.unitCrashDamage(team) > 0, item().flammability > 1, team, type.deathExplosionEffect, 0f);
         }else{
             type.deathExplosionEffect.at(x, y, bounds() / 2f / 8f);
         }
 
-        float shake = type.deathShake < 0 ? hitSize / 3f : type.deathShake;
+        float shake = type.deathShake < 0 ? 3f + hitSize / 3f : type.deathShake;
 
         if(type.createScorch){
             Effect.scorch(x, y, (int)(hitSize / 5));

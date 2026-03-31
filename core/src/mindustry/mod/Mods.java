@@ -32,7 +32,8 @@ import static mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
-    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry");
+    //it would be nice to parse semver and have syntax like "<1.0.5" here, but mods clearly don't use semver and it's an inconsistent mess
+    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry", "schema", "scheme-size:1.0.5", "scheme-size:1.0.4", "scheme-size:1.0.3", "scheme-size:1.0.1", "scheme-size:1.0.0", "scheme-size:1.1.0", "scheme-size:1.0.4.1");
 
     private Json json = new Json();
     private @Nullable Scripts scripts;
@@ -80,7 +81,9 @@ public class Mods implements Loadable{
             Fi file = mod.root.child(directory);
             if(file.exists()){
                 for(Fi child : file.list()){
-                    cons.get(mod, child);
+                    if(!child.isDirectory()){
+                        cons.get(mod, child);
+                    }
                 }
             }
         });
@@ -334,7 +337,7 @@ public class Mods implements Loadable{
 
             packer.printStats();
 
-            Events.fire(new AtlasPackEvent());
+            Events.fire(new AtlasPackEvent(packer));
 
             packer.dispose();
 
@@ -1181,7 +1184,8 @@ public class Mods implements Loadable{
                 !skipModLoading() &&
                 Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
                 Version.isAtLeast(meta.minGameVersion) &&
-                (meta.getMinMajor() >= minJavaModGameVersion || headless) &&
+                (meta.getMinMajor() >= minJavaModGameVersion || headless || meta.legacyCompatible) &&
+                !meta.isBlacklisted() &&
                 !skipModCode &&
                 initialize
             ){
@@ -1319,12 +1323,12 @@ public class Mods implements Loadable{
 
         /** Some mods are known to cause issues with the game; this detects and returns whether a mod is manually blacklisted. */
         public boolean isBlacklisted(){
-            return blacklistedMods.contains(name);
+            return meta.isBlacklisted();
         }
 
         /** @return whether this mod is outdated, i.e. not compatible with v8. */
         public boolean isOutdated(){
-            return getMinMajor() < (isJava() ? minJavaModGameVersion : minModGameVersion);
+            return getMinMajor() < (isJava() ? minJavaModGameVersion : minModGameVersion) && !meta.legacyCompatible;
         }
 
         public int getMinMajor(){
@@ -1425,8 +1429,15 @@ public class Mods implements Loadable{
         public float texturescale = 1.0f;
         /** If true, bleeding is skipped and no content icons are generated. */
         public boolean pregenerated;
-        /** If set, load the mod content in this order by content names */
+        /** If set, load the mod content in this order by content names. */
         public String[] contentOrder;
+        /** Mod from an older major version that is compatible with the latest one as well. */
+        public boolean legacyCompatible;
+
+        /** Some mods are known to cause issues with the game; this detects and returns whether a mod is manually blacklisted. */
+        public boolean isBlacklisted(){
+            return blacklistedMods.contains(name) || blacklistedMods.contains(name + ":" + version);
+        }
 
         public String shortDescription(){
             return Strings.truncate(subtitle == null ? (description == null || description.length() > maxModSubtitleLength ? "" : description) : subtitle, maxModSubtitleLength, "...");

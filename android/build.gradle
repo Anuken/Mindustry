@@ -3,7 +3,6 @@ buildscript{
         mavenLocal()
         mavenCentral()
         google()
-        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
 
     dependencies{
@@ -17,7 +16,7 @@ configurations{ natives }
 
 repositories{
     mavenCentral()
-    maven{ url "https://maven.google.com" }
+    maven{ url = "https://maven.google.com" }
 }
 
 task deploy(type: Copy){
@@ -40,9 +39,11 @@ android{
             renderscript.srcDirs = ['src']
             res.srcDirs = ['res']
             assets.srcDirs = ['assets', 'src/main/assets', '../core/assets/']
-            jniLibs.srcDirs = ['libs']
+
             if(localArc){
                 jniLibs.srcDirs += ['../../Arc/natives/natives-android/libs', '../../Arc/natives/natives-freetype-android/libs']
+            }else{
+                jniLibs.srcDirs = ['libs']
             }
         }
 
@@ -70,7 +71,7 @@ android{
         }
         props.store(file('../core/assets/version.properties').newWriter(), null)
 
-        multiDexEnabled true
+        multiDexEnabled = true
     }
 
     compileOptions{
@@ -113,7 +114,7 @@ android{
     if(project.hasProperty("RELEASE_STORE_FILE") || System.getenv("CI") == "true"){
         buildTypes{
             release{
-                signingConfig signingConfigs.release
+                signingConfig = signingConfigs.release
             }
         }
     }
