@@ -310,7 +310,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.research", content.emoji(), content.localizedName);
+            return Core.bundle.format("objective.research", content.emoji() + " ", content.localizedName);
         }
 
         @Override
@@ -341,7 +341,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.produce", content.emoji(), content.localizedName);
+            return Core.bundle.format("objective.produce", content.emoji() + " ", content.localizedName);
         }
 
         @Override
@@ -374,7 +374,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.item", state.rules.defaultTeam.items().get(item), amount, item.emoji(), item.localizedName);
+            return Core.bundle.format("objective.item", state.rules.defaultTeam.items().get(item), amount, item.emoji()  + " ", item.localizedName);
         }
 
         @Override
@@ -407,7 +407,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.coreitem", state.stats.coreItemCount.get(item), amount, item.emoji(), item.localizedName);
+            return Core.bundle.format("objective.coreitem", state.stats.coreItemCount.get(item), amount, item.emoji() + " ", item.localizedName);
         }
 
         @Override
@@ -440,7 +440,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.build", count - state.stats.placedBlockCount.get(block, 0), block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.build", count - state.stats.placedBlockCount.get(block, 0), block.emoji() + " ", block.localizedName);
         }
 
         @Override
@@ -473,7 +473,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.buildunit", count - state.rules.defaultTeam.data().countType(unit), unit.emoji(), unit.localizedName);
+            return Core.bundle.format("objective.buildunit", count - state.rules.defaultTeam.data().countType(unit), unit.emoji() + " ", unit.localizedName);
         }
 
         @Override
@@ -606,7 +606,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.destroyblock", block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.destroyblock", block.emoji() + " ", block.localizedName);
         }
 
         @Override
@@ -651,7 +651,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.destroyblocks", progress(), positions.length, block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.destroyblocks", progress(), positions.length, block.emoji() + " ", block.localizedName);
         }
 
         @Override
