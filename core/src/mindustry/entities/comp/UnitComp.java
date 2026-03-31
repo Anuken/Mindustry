@@ -825,7 +825,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             //boost if possible
             if(type.canBoost){
                 elevation = 1f;
-            }else if(!net.client()){
+            }else if(!net.client() && !(!headless && isRemote())){
                 kill();
             }
         }
