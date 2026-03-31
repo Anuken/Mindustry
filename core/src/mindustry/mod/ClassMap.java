@@ -480,6 +480,7 @@ public class ClassMap{
         classes.put("ConsumePowerDynamic", mindustry.world.consumers.ConsumePowerDynamic.class);
         classes.put("DrawArcSmelt", mindustry.world.draw.DrawArcSmelt.class);
         classes.put("DrawBlock", mindustry.world.draw.DrawBlock.class);
+        classes.put("DrawBlockParts", mindustry.world.draw.DrawBlockParts.class);
         classes.put("DrawBlurSpin", mindustry.world.draw.DrawBlurSpin.class);
         classes.put("DrawBubbles", mindustry.world.draw.DrawBubbles.class);
         classes.put("DrawCells", mindustry.world.draw.DrawCells.class);

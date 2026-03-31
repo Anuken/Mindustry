@@ -198,6 +198,8 @@ public class SoundControl{
             return;
         }
 
+        if(state.isPaused()) return;
+
         float avol = Core.settings.getInt("ambientvol", 100) / 100f;
 
         sounds.each((sound, data) -> {

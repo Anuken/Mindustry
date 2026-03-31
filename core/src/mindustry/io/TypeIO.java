@@ -820,7 +820,7 @@ public class TypeIO{
     public static Rules readRules(Reads read){
         int length = read.i();
         //this is only called clientside, but the byte limit is reasonable either way...
-        if(length > maxByteArraySize) throw new ArcRuntimeException("Rules too long");
+        if(length > 100_000) throw new ArcRuntimeException("Rules too long");
         String string = new String(read.b(new byte[length]), charset);
         return JsonIO.read(Rules.class, string);
     }

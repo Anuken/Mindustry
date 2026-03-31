@@ -213,6 +213,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }).size(300f, 64f).disabled(b -> selected[0] == null);
 
                 app.post(diag::show);
+            }else if(hadSerpuloRemaps && settings.getBoolOnce("serpulo-remaps-notice")){
+                var diag = new BaseDialog("@campaign.rework.title");
+                diag.cont.add("@campaign.rework.serpulo").labelAlign(Align.center).growX().wrap().maxWidth(500f);
+                diag.buttons.button("@ok", Icon.ok, diag::hide).size(280f, 64f);
+
+                app.post(diag::show);
             }
         });
 
@@ -224,11 +230,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 minFilter = magFilter = TextureFilter.linear;
             }}).loaded = t -> planetTextures[fi] = t;
             assets.finishLoadingAsset(names[i]);
-        }
-
-        //unlock defaults for older campaign saves (TODO move? where to?)
-        if(content.planets().contains(p -> p.sectors.contains(Sector::hasBase)) || Blocks.scatter.unlocked() || Blocks.router.unlocked()){
-            Seq.with(Blocks.junction, Blocks.mechanicalDrill, Blocks.conveyor, Blocks.duo, Items.copper, Items.lead).each(UnlockableContent::quietUnlock);
         }
     }
 
