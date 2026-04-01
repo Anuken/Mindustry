@@ -51,6 +51,7 @@ public class BlockInventoryFragment{
             return;
         }
         this.build = t;
+        Call.requestBlockSnapshot(t.pos());
         if(build == null || !build.block.isAccessible() || build.items == null || build.items.total() == 0){
             return;
         }
