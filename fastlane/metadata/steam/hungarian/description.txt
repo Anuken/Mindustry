@@ -20,7 +20,7 @@ Játszd végig a hadjáratokat egyedül vagy vállvetve a barátaiddal a platfor
 [*] Védd meg építményeidet a hullámokban támadó ellenségektől
 [*] Stratégiailag helyezd el a lövegtornyokat, hogy elpusztítsd a támadóidat, mielőtt elérnék a támaszpontodat
 [*] Lásd el a lövegtornyokat lőszerrel, hűtőfolyadékkal és árammal
-[*] Erősítsd meg a védelmedet erőpajzs- és foltozókivetítőkkel vagy más támogató épületekkel
+[*] Erősítsd meg a védelmedet pajzs- és foltozó vetítőkkel vagy más fenntartó épületekkel
 [/list]
 
 [img]{STEAM_APP_IMAGE}/extras/rts3.png[/img]
@@ -40,7 +40,7 @@ Játszd végig a hadjáratokat egyedül vagy vállvetve a barátaiddal a platfor
 [*] Hódítsd meg a Serpulo és az Erekir bolygót, miközben 35 kézzel készített pályán és 250+ procedurálisan előállított szektoron keresztül haladsz
 [*] Foglalj el területeket és építs gyárakat, hogy nyersanyagokat termelhess miközben más szektorokban játszol
 [*] Védd meg az elfoglalt szektorokat az időszakos invázióktól
-[*] Koordináld az erőforrások elosztását a szektorok között az indítóállások felhasználásával
+[*] Koordináld az erőforrások elosztását a szektorok között az kilövőállások felhasználásával
 [*] Fedezz fel új épületeket, gyárakat a fejlődés elősegítése érdekében
 [*] Hívd meg a barátaidat, hogy együtt teljesítsétek a küldetéseket
 [*] Sajátítsd el a 250-nél is több technológiai épület használatát

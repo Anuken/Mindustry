@@ -24,6 +24,9 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
     public float fontSize = 1f, z = Layer.playerName + 1;
     /** Flags are packed into a byte for sync efficiency; see the flag static values. */
     public byte flags = flagBackground | flagOutline;
+    //TODO: add this in 157
+    /** If not null, this label gets set to the parent position with x, y used as offsets. */
+    //public @Nullable Entityc parent;
 
     @Replace
     public float clipSize(){
@@ -32,6 +35,13 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
 
     @Override
     public void draw(){
+        //TODO: add this in 157
+        /*
+        float x = this.x, y = this.y;
+        if(parent instanceof Posc p){
+            x += p.x();
+            y += p.y();
+        }*/
         drawAt(text, x, y, z, flags, fontSize, Align.center, (flags & flagAlignLeft) != 0 ? Align.left : (flags & flagAlignRight) != 0 ? Align.right : Align.center);
     }
 

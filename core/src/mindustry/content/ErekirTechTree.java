@@ -95,7 +95,9 @@ public class ErekirTechTree{
                     });
 
                     node(reinforcedMessage, Seq.with(new OnSector(aegis)), () -> {
-                        node(canvas);
+                        node(canvas, () -> {
+                            node(largeCanvas);
+                        });
                     });
                 });
 

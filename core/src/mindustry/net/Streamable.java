@@ -12,6 +12,11 @@ public class Streamable extends Packet{
         return priorityHigh;
     }
 
+    @Override
+    public boolean allow(boolean server){
+        return !server;
+    }
+
     public static class StreamBuilder{
         public final int id;
         public final byte type;

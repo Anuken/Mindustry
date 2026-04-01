@@ -36,6 +36,7 @@ public class Stat implements Comparable<Stat>{
     lightningDamage = new Stat("lightningDamage"),
     abilities = new Stat("abilities"),
     canBoost = new Stat("canBoost"),
+    boostingSpeed = new Stat("boostingspeed"),
     maxUnits = new Stat("maxUnits"),
 
     damageMultiplier = new Stat("damageMultiplier"),
@@ -60,6 +61,7 @@ public class Stat implements Comparable<Stat>{
     powerRange = new Stat("powerRange", StatCat.power),
     powerConnections = new Stat("powerConnections", StatCat.power),
     basePowerGeneration = new Stat("basePowerGeneration", StatCat.power),
+    warmupTime = new Stat("warmupTime", StatCat.power),
 
     tiles = new Stat("tiles", StatCat.crafting),
     input = new Stat("input", StatCat.crafting),
@@ -84,7 +86,6 @@ public class Stat implements Comparable<Stat>{
     reload = new Stat("reload", StatCat.function),
     crushDamage = new Stat("crushDamage", StatCat.function),
     legSplashDamage = new Stat("legSplashDamage", StatCat.function),
-    legSplashRange = new Stat("legSplashRange", StatCat.function),
     targetsAir = new Stat("targetsAir", StatCat.function),
     targetsGround = new Stat("targetsGround", StatCat.function),
     damage = new Stat("damage", StatCat.function),

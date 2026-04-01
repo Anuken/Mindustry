@@ -24,6 +24,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.input.InputHandler.*;
 import mindustry.logic.*;
 import mindustry.mod.*;
 import mindustry.type.*;
@@ -261,6 +262,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */
     public boolean logicConfigurable = false;
+    /** If true, configuration is delayed when playing the landing block buildup animation. This may be removed in the future! */
+    public boolean delayLandingConfig;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
@@ -508,9 +511,12 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public float drawPlaceText(String text, int x, int y, boolean valid){
+        return drawPlaceText(text, x, y, valid ? Pal.accent : Pal.remove, true);
+    }
+
+    public float drawPlaceText(String text, int x, int y, Color color, boolean drawLine){
         if(renderer.pixelate) return 0;
 
-        Color color = valid ? Pal.accent : Pal.remove;
         Font font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
@@ -524,10 +530,12 @@ public class Block extends UnlockableContent implements Senseable{
         float dx = x * tilesize + offset, dy = y * tilesize + offset + size * tilesize / 2f + 3;
         font.draw(text, dx, dy + layout.height + 1, Align.center);
         dy -= 1f;
-        Lines.stroke(2f, Color.darkGray);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
-        Lines.stroke(1f, color);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+        if(drawLine){
+            Lines.stroke(2f, Color.darkGray);
+            Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+            Lines.stroke(1f, color);
+            Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+        }
 
         font.setUseIntegerPositions(ints);
         font.setColor(Color.white);
@@ -551,7 +559,7 @@ public class Block extends UnlockableContent implements Senseable{
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
-            .sumf(other -> !floating && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
+            .sumf(other -> !floating && !placeableLiquid && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
@@ -734,6 +742,12 @@ public class Block extends UnlockableContent implements Senseable{
         setBars();
         offset = ((size + 1) % 2) * tilesize / 2f;
         sizeOffset = -((size - 1) / 2);
+
+        if(consumeBuilder.size != 0){
+            for(var consume : consumeBuilder){
+                consume.apply(this);
+            }
+        }
     }
 
     public boolean consumesItem(Item item){
@@ -803,6 +817,16 @@ public class Block extends UnlockableContent implements Senseable{
         Draw.reset();
     }
 
+    public void drawOtherPlayerPlan(BuildPlan plan, Eachable<BuildPlan> list, float alpha){
+        Draw.mixcol(Color.white, Mathf.absin(Time.globalTime, 6f, 0.15f));
+        Draw.alpha(alpha);
+        float prevScale = Draw.scl;
+        Draw.scl *= plan.animScale;
+        drawPlanRegion(plan, list);
+        Draw.scl = prevScale;
+        Draw.reset();
+    }
+
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         drawDefaultPlanRegion(plan, list);
     }
@@ -810,15 +834,27 @@ public class Block extends UnlockableContent implements Senseable{
     /** this is a different method so subclasses can call it even after overriding the base */
     public void drawDefaultPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         TextureRegion reg = getPlanRegion(plan, list);
+        float a = Draw.getColorAlpha();
         Draw.rect(reg, plan.drawx(), plan.drawy(), !rotate || !rotateDraw ? 0 : plan.rotation * 90);
 
         if(plan.worldContext && player != null && teamRegion != null && teamRegion.found()){
-            if(teamRegions[player.team().id] == teamRegion) Draw.color(player.team().color);
+            if(teamRegions[player.team().id] == teamRegion) Draw.color(player.team().color, a);
             Draw.rect(teamRegions[player.team().id], plan.drawx(), plan.drawy());
-            Draw.color();
+            Draw.color(1f, 1f, 1f, a);
         }
 
         drawPlanConfig(plan, list);
+    }
+
+    public static BuildPlan findPlan(Eachable<BuildPlan> list, int x, int y, Boolf<BuildPlan> predicate){
+        return findPlan(list, x, y, 1, predicate);
+    }
+
+    public static BuildPlan findPlan(Eachable<BuildPlan> list, int x, int y, int size, Boolf<BuildPlan> predicate){
+        if(list instanceof QueryEachable q){
+            return q.find(x, y, size, predicate);
+        }
+        return null;
     }
 
     public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
@@ -839,7 +875,7 @@ public class Block extends UnlockableContent implements Senseable{
         Color color = content instanceof Item i ? i.color : content instanceof Liquid l ? l.color : null;
         if(color == null) return;
 
-        Draw.color(color);
+        Draw.color(color, Draw.getColorAlpha());
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.color();
     }
@@ -850,6 +886,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
 
+    }
+
+    public float planConfigClipSize(){
+        return clipSize;
     }
 
     /** Transforms the internal position of this config using the specified function, and return the result. */
