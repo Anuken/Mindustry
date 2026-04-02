@@ -404,6 +404,7 @@ public class Control implements ApplicationListener, Loadable{
             if(playtest) state.playtestingMap = map;
             state.rules.sector = null;
             state.rules.editor = false;
+            Events.fire(new RulesLoadEvent(state.rules));
             logic.play();
             if(settings.getBool("savecreate") && !world.isInvalidMap() && !playtest){
                 control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
@@ -543,6 +544,7 @@ public class Control implements ApplicationListener, Loadable{
                             });
                         }
                     }else{
+                        Events.fire(new RulesLoadEvent(state.rules, true));
                         state.set(State.playing);
                         reloader.end();
                     }
@@ -577,6 +579,7 @@ public class Control implements ApplicationListener, Loadable{
             beforePlay.run();
         }
 
+        Events.fire(new RulesLoadEvent(state.rules));
         logic.play();
         control.saves.saveSector(sector);
         Events.fire(new SectorLaunchEvent(sector));

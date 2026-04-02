@@ -498,6 +498,22 @@ public class EventType{
         }
     }
 
+    /** Called when all rules of the current map are loaded. */
+    public static class RulesLoadEvent{
+        public final Rules rules;
+        public final boolean fromSave;
+
+        public RulesLoadEvent(Rules rules){
+            this.rules = rules;
+            this.fromSave = false;
+        }
+
+        public RulesLoadEvent(Rules rules, boolean fromSave){
+            this.rules = rules;
+            this.fromSave = fromSave;
+        }
+    }
+
     /**
      * Called when block building begins by placing down the ConstructBlock.
      * The tile's block will nearly always be a ConstructBlock.

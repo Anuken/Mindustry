@@ -427,6 +427,7 @@ public class ServerControl implements ApplicationListener{
                 try{
                     world.loadMap(result, result.applyRules(lastMode));
                     state.rules = result.applyRules(preset);
+                    Events.fire(new RulesLoadEvent(state.rules));
                     logic.play();
 
                     info("Map loaded.");
@@ -1232,6 +1233,7 @@ public class ServerControl implements ApplicationListener{
                 run.run();
 
                 state.rules = state.map.applyRules(lastMode);
+                Events.fire(new RulesLoadEvent(state.rules));
                 logic.play();
 
                 reloader.end();
