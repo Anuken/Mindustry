@@ -7,6 +7,7 @@ import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
@@ -153,6 +154,7 @@ public class Saves{
 
         //process remaps later to allow swaps of sectors
         for(var remap : remaps){
+            if(remap.sourceSector.planet == Planets.serpulo) Vars.hadSerpuloRemaps = true;
             var remapTarget = remap.destSector;
 
             //overwrite the target sector's info with the save's info
@@ -187,7 +189,11 @@ public class Saves{
         if(current != null && state.isGame()
         && !(state.isPaused() && Core.scene.hasDialog())){
             if(lastTimestamp != 0){
-                totalPlaytime += Time.timeSinceMillis(lastTimestamp);
+                long change = Time.timeSinceMillis(lastTimestamp);
+                totalPlaytime += change;
+                if(state.isCampaign()){
+                    state.getPlanet().stats().playtime += change;
+                }
             }
             lastTimestamp = Time.millis();
         }

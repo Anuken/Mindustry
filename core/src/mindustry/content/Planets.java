@@ -129,6 +129,7 @@ public class Planets{
                 new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Pal.spore, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f)
             );
 
+            enemyFactoryActivationDelay = 60f * 60f * 2f;
             launchCapacityMultiplier = 0.5f;
             sectorSeed = 2;
             allowWaves = true;
@@ -137,8 +138,6 @@ public class Planets{
             allowLaunchSchematics = true;
             enemyCoreSpawnReplace = true;
             allowLaunchLoadout = true;
-            //doesn't play well with configs
-            prebuildBase = false;
             ruleSetter = r -> {
                 r.waveTeam = Team.crux;
                 r.placeRangeCheck = false;

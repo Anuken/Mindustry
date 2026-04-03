@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.graphics.MultiPacker;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
@@ -46,6 +47,7 @@ public class EventType{
         unitCommandChange,
         unitCommandPosition,
         unitCommandAttack,
+        unitCommandBoost,
         importMod,
         draw,
         drawOver,
@@ -86,7 +88,13 @@ public class EventType{
     /** Called *after* all content has been initialized. */
     public static class ContentInitEvent{}
     /** Called *after* all content has been added to the atlas, but before its pixmaps are disposed. */
-    public static class AtlasPackEvent{}
+    public static class AtlasPackEvent{
+        public final MultiPacker multiPacker;
+
+        public AtlasPackEvent(MultiPacker multiPacker){
+          this.multiPacker = multiPacker;
+        }
+    }
     /** Called *after* all mod content has been loaded, but before it has been initialized. */
     public static class ModContentLoadEvent{}
     /** Called when the client game is first loaded. */
@@ -555,7 +563,7 @@ public class EventType{
     }
 
     /** Called right before a block is destroyed.
-     * The tile entity of the tile in this event cannot be null when this happens.*/
+     * The building of the tile in this event cannot be null when this happens.*/
     public static class BlockDestroyEvent{
         public final Tile tile;
 

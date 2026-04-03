@@ -269,7 +269,7 @@ public class JoinDialog extends BaseDialog{
                 t.left();
                 t.setColor(color);
 
-                t.add(host.name + "   " + versionString).style(Styles.outlineLabel).padLeft(10f).width(twidth).left().ellipsis(true);
+                t.add((host.name + "   " + versionString).replace('\n', ' ')).style(Styles.outlineLabel).padLeft(10f).width(twidth).left().ellipsis(true);
             }).growX().height(36f).row();
         }
 
@@ -298,7 +298,7 @@ public class JoinDialog extends BaseDialog{
             t.add("[lightgray]" + (Core.bundle.format("players" + (host.players == 1 && host.playerLimit <= 0 ? ".single" : ""),
                 (host.players == 0 ? "[lightgray]" : "[accent]") + host.players + (host.playerLimit > 0 ? "[lightgray]/[accent]" + host.playerLimit : "")+ "[lightgray]"))).left().row();
 
-            t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + (host.modeName == null ? host.mode.toString() : host.modeName)).width(twidth).left().ellipsis(true).row();
+            t.add(("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + (host.modeName == null ? host.mode.toString() : host.modeName)).replace('\n', ' ')).width(twidth).left().ellipsis(true).row();
 
             if(host.ping > 0){
                 t.add(Iconc.chartBar + " " + host.ping + "ms").style(Styles.outlineLabel).color(Pal.gray).left();
@@ -439,10 +439,10 @@ public class JoinDialog extends BaseDialog{
                     }
 
                     if(!serverSearch.isEmpty() && !(group.name.toLowerCase().contains(serverSearch)
-                        || res.name.toLowerCase().contains(serverSearch)
-                        || res.description.toLowerCase().contains(serverSearch)
-                        || res.mapname.toLowerCase().contains(serverSearch)
-                        || (res.modeName != null && res.modeName.toLowerCase().contains(serverSearch)))) return;
+                        || Strings.stripColors(res.name.toLowerCase()).contains(serverSearch)
+                        || Strings.stripColors(res.description.toLowerCase()).contains(serverSearch)
+                        || Strings.stripColors(res.mapname.toLowerCase()).contains(serverSearch)
+                        || (res.modeName != null && Strings.stripColors(res.modeName.toLowerCase()).contains(serverSearch)))) return;
 
                     if(groupTable[0] == null){
                         addHeader(groupTable, group, hidden, favorite, true);
@@ -582,7 +582,7 @@ public class JoinDialog extends BaseDialog{
         local.button(b -> buildServer(host, b, true, true), style, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             safeConnect(host.address, host.port, host.version);
-        }).width(w).top().left().growY();
+        }).width(w).top().left().pad(2f).growY();
     }
 
     public void connect(String ip, int port){
@@ -740,10 +740,10 @@ public class JoinDialog extends BaseDialog{
             return Core.bundle.get("server.outdated");
         }else if(host.version < Version.build && Version.build != -1){
             return Core.bundle.get("server.outdated") + "\n" +
-            Core.bundle.format("server.version", host.version, "");
+            Core.bundle.format("server.version", host.version, host.versionType);
         }else if(host.version > Version.build && Version.build != -1){
             return Core.bundle.get("server.outdated.client") + "\n" +
-            Core.bundle.format("server.version", host.version, "");
+            Core.bundle.format("server.version", host.version, host.versionType);
         }else if(host.version == Version.build && Version.type.equals(host.versionType)){
             //not important
             return "";

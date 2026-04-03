@@ -139,6 +139,26 @@ public class PatcherTests{
     }
 
     @Test
+    void consumeApply() throws Exception{
+        Vars.state.patcher.apply(Seq.with(
+        """
+        block.conveyor.consumes: {power: 1}
+        """
+        ));
+
+        assertNoWarnings();
+        assertTrue(Blocks.conveyor.hasPower);
+        assertNotNull(Blocks.conveyor.consPower);
+        assertEquals(1, Blocks.conveyor.consumers.length);
+
+        resetAfter();
+
+        assertFalse(Blocks.conveyor.hasPower);
+        assertNull(Blocks.conveyor.consPower);
+        assertEquals(0, Blocks.conveyor.consumers.length);
+    }
+
+    @Test
     void unitWeapons() throws Exception{
         UnitTypes.dagger.checkStats();
         UnitTypes.dagger.stats.add(Stat.charge, 999);
@@ -307,6 +327,16 @@ public class PatcherTests{
 
         assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
         assertEquals(1, Blocks.conveyor.size);
+    }
+
+    @Test
+    void assignStringToObject() throws Exception{
+        Vars.state.patcher.apply(Seq.with("""
+        unit.dagger.weapons: ["frog"]
+        """));
+
+        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(2, UnitTypes.dagger.weapons.size);
     }
 
     @Test
@@ -502,6 +532,85 @@ public class PatcherTests{
         Vars.logic.reset();
 
         assertEquals(oldDamage, UnitTypes.dagger.weapons.first().bullet.damage);
+    }
+
+    @Test
+    void nestedArrays() throws Exception{
+
+        Vars.state.patcher.apply(Seq.with("""
+        {
+            "block.ship-refabricator.upgrades.0": {
+                "0": "dagger",
+                "1": "mace"
+            }
+        }
+        """));
+        assertNoWarnings();
+
+        assertEquals(UnitTypes.dagger, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[0]);
+        assertEquals(UnitTypes.mace, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[1]);
+
+        resetAfter();
+
+        assertEquals(UnitTypes.elude, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[0]);
+        assertEquals(UnitTypes.avert, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[1]);
+    }
+
+    @Test
+    void nestedArrays2() throws Exception{
+
+        Vars.state.patcher.apply(Seq.with("""
+        {
+            "block.ship-refabricator": {
+                "upgrades.0.0": "dagger",
+                "upgrades.0.1": "mace"
+            }
+        }
+        """));
+        assertNoWarnings();
+
+        assertEquals(UnitTypes.dagger, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[0]);
+        assertEquals(UnitTypes.mace, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[1]);
+
+        resetAfter();
+
+        assertEquals(UnitTypes.elude, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[0]);
+        assertEquals(UnitTypes.avert, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[1]);
+    }
+
+    @Test
+    void arrayMulti() throws Exception{
+        int size = UnitTypes.emanate.weapons.size;
+
+        Vars.state.patcher.apply(Seq.with("""
+        {"name":"Patch0","unit":{"emanate":{"weapons":{"0":{"type":"Weapon","name":"toxopid-cannon"}},"weapons.+":[{"name":"sei-launcher"}]}}}
+        """));
+
+        assertEquals(UnitTypes.emanate.weapons.size, size + 1);
+
+        resetAfter();
+
+        assertEquals(UnitTypes.emanate.weapons.size, size);
+    }
+
+    @Test
+    void customAttribute() throws Exception{
+        int amount = Attribute.all.length;
+
+        Vars.state.patcher.apply(Seq.with("""
+        block.grass.attributes: {
+          frogs: 10
+        }
+        """));
+
+        assertTrue(Attribute.exists("frogs"));
+        assertEquals(amount + 1, Attribute.all.length);
+        assertEquals(10f, Blocks.grass.asFloor().attributes.get(Attribute.get("frogs")), 0.0001f);
+
+        Vars.logic.reset();
+
+        assertFalse(Attribute.exists("frogs"));
+        assertEquals(amount, Attribute.all.length);
     }
 
     @Test

@@ -207,7 +207,7 @@ public class ForceProjector extends Block{
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
 
-            if(phaseValid && !broken && timer(timerUse, phaseUseTime) && efficiency > 0){
+            if(phaseValid && !broken && timer(timerUse, phaseUseTime / timeScale) && efficiency > 0){
                 consume();
             }
 

@@ -31,6 +31,7 @@ public class Sector{
 
     public @Nullable SaveSlot save;
     public @Nullable SectorPreset preset;
+    public @Nullable Sector shieldTarget;
     public SectorInfo info = new SectorInfo();
 
     /** Number 0-1 indicating the difficulty based on nearby bases. */
@@ -121,6 +122,10 @@ public class Sector{
         Core.settings.remove(planet.name + "-s-" + id + "-info");
     }
 
+    public boolean isShielded(){
+        return preset != null && preset.shieldSectors.size > 0 && preset.shieldSectors.contains(s -> !s.isCaptured());
+    }
+
     public boolean isAttacked(){
         if(isBeingPlayed()) return state.rules.waves || state.rules.attackMode;
         return save != null && (info.waves || info.attack) && info.hasCore;
@@ -137,7 +142,7 @@ public class Sector{
 
     /** @return whether the enemy has a generated base here. */
     public boolean hasEnemyBase(){
-        return ((generateEnemyBase && preset == null) || (preset != null && preset.captureWave == 0)) && (save == null || info.attack);
+        return ((generateEnemyBase && preset == null) || (preset != null && preset.captureWave == 0)) && (save == null || info.attack || !hasBase());
     }
 
     public boolean isBeingPlayed(){
@@ -146,7 +151,9 @@ public class Sector{
     }
 
     public String name(){
-        if(preset != null && info.name == null && preset.requireUnlock) return preset.localizedName;
+        if(preset != null && info.name == null && (preset.requireUnlock || preset.showHidden)){
+            return preset.localizedName;
+        }
         //single-sector "planets" use their own name for the sector name.
         if(info.name == null && planet.sectors.size == 1){
             return planet.localizedName;
@@ -161,7 +168,7 @@ public class Sector{
 
     @Nullable
     public TextureRegion icon(){
-        return info.contentIcon != null ? info.contentIcon.uiIcon : info.icon == null ? (preset != null && preset.requireUnlock && preset.uiIcon.found() && preset.unlocked() ? preset.uiIcon : null) : Fonts.getLargeIcon(info.icon);
+        return info.contentIcon != null ? info.contentIcon.uiIcon : info.icon == null ? (preset != null && preset.requireUnlock && preset.unlocked() && preset.uiIcon.found() ? preset.uiIcon : null) : Fonts.getLargeIcon(info.icon);
     }
 
     @Nullable

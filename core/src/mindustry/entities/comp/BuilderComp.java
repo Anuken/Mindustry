@@ -155,7 +155,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             if(!within(tile, finalPlaceDst)) continue;
 
             if(!headless){
-                Vars.control.sound.loop(Sounds.loopBuild, tile, 1f);
+                Vars.control.sound.loop(Sounds.loopBuild, tile, 1.3f);
             }
 
             if(!(tile.build instanceof ConstructBuild cb)){
@@ -218,23 +218,6 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             current.stuck = Mathf.equal(current.progress, entity.progress);
             current.progress = entity.progress;
         }
-    }
-
-    /** Draw all current build plans. Does not draw the beam effect, only the positions. */
-    void drawBuildPlans(){
-
-        for(int i = 0; i < 2; i++){
-            for(BuildPlan plan : plans){
-                if(plan.progress > 0.01f || (buildPlan() == plan && plan.initialized && (within(plan.x * tilesize, plan.y * tilesize, type.buildRange) || state.isEditor()))) continue;
-                if(i == 0){
-                    drawPlan(plan, 1f);
-                }else{
-                    drawPlanTop(plan, 1f);
-                }
-            }
-        }
-
-        Draw.reset();
     }
 
     void drawPlan(BuildPlan plan, float alpha){
@@ -345,7 +328,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         }
 
         //draw remote plans.
-        if(core != null && active && !isLocal() && !(tile.block() instanceof ConstructBlock)){
+        if(core != null && active && !isLocal() && !(tile.block() instanceof ConstructBlock) && !state.isPaused()){
             Draw.z(Layer.plans - 1f);
             drawPlan(plan, 0.5f);
             drawPlanTop(plan, 0.5f);

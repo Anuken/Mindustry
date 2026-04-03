@@ -32,7 +32,8 @@ import static mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
-    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry");
+    //it would be nice to parse semver and have syntax like "<1.0.5" here, but mods clearly don't use semver and it's an inconsistent mess
+    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry", "schema", "scheme-size:1.0.5", "scheme-size:1.0.4", "scheme-size:1.0.3", "scheme-size:1.0.1", "scheme-size:1.0.0", "scheme-size:1.1.0", "scheme-size:1.0.4.1");
 
     private Json json = new Json();
     private @Nullable Scripts scripts;
@@ -80,7 +81,9 @@ public class Mods implements Loadable{
             Fi file = mod.root.child(directory);
             if(file.exists()){
                 for(Fi child : file.list()){
-                    cons.get(mod, child);
+                    if(!child.isDirectory()){
+                        cons.get(mod, child);
+                    }
                 }
             }
         });
@@ -154,12 +157,16 @@ public class Mods implements Loadable{
             Seq<Fi> sprites = mod.root.child("sprites").findAll(f -> f.extension().equals("png"));
             Seq<Fi> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
 
+            if(sprites.isEmpty() && overrides.isEmpty()) return;
+
             packSprites(packer, sprites, mod, true, tasks, textureResize);
             packSprites(packer, overrides, mod, false, tasks, textureResize);
 
             Log.debug("Packed @ images for mod '@'.", sprites.size + overrides.size, mod.meta.name);
             totalSprites[0] += sprites.size + overrides.size;
         });
+
+        if(tasks.isEmpty()) return;
 
         for(var result : tasks){
             try{
@@ -178,10 +185,9 @@ public class Mods implements Loadable{
             }
         }
 
-       Log.debug("Total sprites: @", totalSprites[0]);
+        Log.debug("Total sprites: @", totalSprites[0]);
 
         TextureFilter filter = Core.settings.getBool("linear", true) ? TextureFilter.linear : TextureFilter.nearest;
-        Texture[] whiteToDispose = {null};
 
         class RegionEntry{
             String name;
@@ -228,15 +234,20 @@ public class Mods implements Loadable{
             }
         }
 
+        Pixmap[] whitePixmap = {null};
+        Texture[] whiteTex = {null};
+
         waitForMain(() -> {
+            whitePixmap[0] = Pixmaps.blankPixmap();
+            whiteTex[0] = new Texture(whitePixmap[0]);
+            var whiteRegion = new AtlasRegion(whiteTex[0], 0, 0, 1, 1);
+
             Core.atlas.dispose();
 
             //dead shadow-atlas for getting regions, but not pixmaps
             var shadow = Core.atlas;
             //dummy texture atlas that returns the 'shadow' regions; used for mod loading
             Core.atlas = new TextureAtlas(){
-                boolean foundWhite;
-                AtlasRegion whiteRegion;
 
                 {
                     //needed for the correct operation of the found() method in the TextureRegion
@@ -245,13 +256,7 @@ public class Mods implements Loadable{
 
                 @Override
                 public AtlasRegion white(){
-                    if(Core.app.isOnMainThread() && !foundWhite){
-                        Pixmap pixmap = Pixmaps.blankPixmap();
-                        Texture tex = new Texture(pixmap);
-                        whiteToDispose[0] = tex;
-                        return whiteRegion = new AtlasRegion(tex, 0, 0, 1, 1);
-                    }
-                    return super.white();
+                    return whiteRegion;
                 }
 
                 @Override
@@ -308,9 +313,8 @@ public class Mods implements Loadable{
         }
 
         waitForMain(() -> {
-            if(whiteToDispose[0] != null){
-                whiteToDispose[0].dispose();
-            }
+            whitePixmap[0].dispose();
+            whiteTex[0].dispose();
 
             //replace old atlas data
             Core.atlas = packer.flush(filter, new TextureAtlas(){
@@ -333,7 +337,7 @@ public class Mods implements Loadable{
 
             packer.printStats();
 
-            Events.fire(new AtlasPackEvent());
+            Events.fire(new AtlasPackEvent(packer));
 
             packer.dispose();
 
@@ -1108,7 +1112,6 @@ public class Mods implements Loadable{
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods. */
     private LoadedMod loadMod(Fi sourceFile, boolean overwrite, boolean initialize) throws Exception{
-        Time.mark();
 
         ZipFi rootZip = null;
 
@@ -1181,7 +1184,8 @@ public class Mods implements Loadable{
                 !skipModLoading() &&
                 Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
                 Version.isAtLeast(meta.minGameVersion) &&
-                (meta.getMinMajor() >= minJavaModGameVersion || headless) &&
+                (meta.getMinMajor() >= minJavaModGameVersion || headless || meta.legacyCompatible) &&
+                !meta.isBlacklisted() &&
                 !skipModCode &&
                 initialize
             ){
@@ -1228,7 +1232,7 @@ public class Mods implements Loadable{
             }
 
             if(!headless && Core.settings.getBool("mod-" + baseName + "-enabled", true)){
-                Log.info("Loaded mod '@' in @ms", meta.name, Time.elapsed());
+                Log.info("Loading mod: @", meta.name);
             }
 
             return new LoadedMod(sourceFile, zip, mainMod, loader, meta);
@@ -1319,12 +1323,12 @@ public class Mods implements Loadable{
 
         /** Some mods are known to cause issues with the game; this detects and returns whether a mod is manually blacklisted. */
         public boolean isBlacklisted(){
-            return blacklistedMods.contains(name);
+            return meta.isBlacklisted();
         }
 
         /** @return whether this mod is outdated, i.e. not compatible with v8. */
         public boolean isOutdated(){
-            return getMinMajor() < (isJava() ? minJavaModGameVersion : minModGameVersion);
+            return getMinMajor() < (isJava() ? minJavaModGameVersion : minModGameVersion) && !meta.legacyCompatible;
         }
 
         public int getMinMajor(){
@@ -1419,12 +1423,21 @@ public class Mods implements Loadable{
         public boolean hidden;
         /** If true, this mod should be loaded as a Java class mod. This is technically optional, but highly recommended. */
         public boolean java;
+        /** If true, this script mod is compatible with iOS. Only set this to true if you don't use extend()/JavaAdapter. */
+        public boolean iosCompatible;
         /** To rescale textures with a different size. Represents the size in pixels of the sprite of a 1x1 block. */
         public float texturescale = 1.0f;
         /** If true, bleeding is skipped and no content icons are generated. */
         public boolean pregenerated;
-        /** If set, load the mod content in this order by content names */
+        /** If set, load the mod content in this order by content names. */
         public String[] contentOrder;
+        /** Mod from an older major version that is compatible with the latest one as well. */
+        public boolean legacyCompatible;
+
+        /** Some mods are known to cause issues with the game; this detects and returns whether a mod is manually blacklisted. */
+        public boolean isBlacklisted(){
+            return blacklistedMods.contains(name) || blacklistedMods.contains(name + ":" + version);
+        }
 
         public String shortDescription(){
             return Strings.truncate(subtitle == null ? (description == null || description.length() > maxModSubtitleLength ? "" : description) : subtitle, maxModSubtitleLength, "...");
@@ -1486,7 +1499,7 @@ public class Mods implements Loadable{
         disabled,
     }
 
-    public static class ModResolutionContext {
+    public static class ModResolutionContext{
         public final ObjectMap<String, Seq<ModDependency>> dependencies = new ObjectMap<>();
         public final ObjectSet<String> visited = new ObjectSet<>();
         public final OrderedSet<String> ordered = new OrderedSet<>();

@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.graphics.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -46,6 +47,15 @@ public class ContentInfoDialog extends BaseDialog{
 
         table.row();
 
+        if(state.isGame() && state.patcher.isPatched(content)){
+            table.table(t -> {
+                t.image(Icon.info).color(Pal.lightishGray);
+                t.add("@database.patched").color(Pal.lightishGray).padLeft(4f);
+            }).pad(4f).left();
+
+            table.row();
+        }
+
         if(content.description != null){
             var any = content.stats.toMap().size > 0;
 
@@ -71,14 +81,14 @@ public class ContentInfoDialog extends BaseDialog{
             if(map.size == 0) continue;
 
             if(stats.useCategories){
-                table.add("@category." + cat.name).color(Pal.accent).fillX();
+                table.add(cat.localized()).color(Pal.accent).fillX();
                 table.row();
             }
 
             for(Stat stat : map.keys()){
                 table.table(inset -> {
                     inset.left();
-                    inset.add("[lightgray]" + stat.localized() + ":[] ").left().top();
+                    stats.statInfo(inset.add("[lightgray]" + stat.localized() + ":[] ").left().top(), stat);
                     Seq<StatValue> arr = map.get(stat);
                     for(StatValue value : arr){
                         value.display(inset);
@@ -94,13 +104,19 @@ public class ContentInfoDialog extends BaseDialog{
             table.row();
         }
 
+        //TODO: move this into a final end-game credit sequence. this is temporary and thus not localized
+        if(content.credit != null){
+            table.row();
+            table.add("Created by: " + content.credit).color(Color.gray).padTop(40f).row();
+        }
+
         if(settings.getBool("console")){
             table.button("@viewfields", Icon.link, Styles.grayt, () -> {
                 Class<?> contentClass = content.getClass();
                 if(contentClass.isAnonymousClass()) contentClass = contentClass.getSuperclass();
 
                 Core.app.openURI("https://mindustrygame.github.io/wiki/Modding%20Classes/" + contentClass.getSimpleName());
-            }).margin(8f).pad(4f).size(300f, 50f).row();
+            }).margin(8f).pad(4f).padTop(16f).size(300f, 50f).row();
         }
 
         content.displayExtra(table);

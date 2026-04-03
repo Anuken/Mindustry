@@ -34,7 +34,7 @@ public class ArcNetProvider implements NetProvider{
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
     Thread serverThread;
 
-    private static final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
+    private static final LZ4SafeDecompressor decompressor = LZ4Factory.fastestInstance().safeDecompressor();
     private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 
     private volatile int playerLimitCache, packetSpamLimit;
@@ -161,7 +161,15 @@ public class ArcNetProvider implements NetProvider{
                     try{
                         net.handleServerReceived(k, pack);
                     }catch(Throwable e){
-                        Log.err(e);
+                        long time = Time.millis();
+                        //only kick due to errors if there are two within a short span of time
+                        if(Time.timeSinceMillis(k.lastErrorTime) < 2000){
+                            k.connection.close(DcReason.error);
+                            Log.err("Closing connection due to error: " + k.address + " / " + k.uuid, e);
+                        }else{
+                            k.lastErrorTime = time;
+                            Log.err("Error reading packet from connection: " + k.address + " / " + k.uuid, e);
+                        }
                     }
                 });
             }
@@ -332,6 +340,8 @@ public class ArcNetProvider implements NetProvider{
     class ArcConnection extends NetConnection{
         public final Connection connection;
 
+        long lastErrorTime;
+
         public ArcConnection(String address, Connection connection){
             super(address);
             this.connection = connection;
@@ -425,6 +435,7 @@ public class ArcNetProvider implements NetProvider{
             }else{
                 //read length int, followed by compressed lz4 data
                 Packet packet = Net.newPacket(id);
+                if(!packet.allow(net.server())) throw new RuntimeException("Invalid packet type for endpoint: " + packet.getClass());
                 var buffer = decompressBuffer.get();
                 int length = byteBuffer.getShort() & 0xffff;
                 byte compression = byteBuffer.get();
@@ -439,13 +450,14 @@ public class ArcNetProvider implements NetProvider{
                     byteBuffer.position(byteBuffer.position() + buffer.position());
                 }else{
                     //decompress otherwise
-                    int read = decompressor.decompress(byteBuffer, byteBuffer.position(), buffer, 0, length);
+                    int compressedLength = byteBuffer.limit() - byteBuffer.position();
+                    decompressor.decompress(byteBuffer, byteBuffer.position(), compressedLength, buffer, 0, length);
 
                     buffer.position(0);
                     buffer.limit(length);
                     packet.read(reads.get(), length);
                     //move buffer forward based on bytes read by decompressor
-                    byteBuffer.position(byteBuffer.position() + read);
+                    byteBuffer.position(byteBuffer.position() + compressedLength);
                 }
 
                 return packet;

@@ -31,7 +31,7 @@ public class Map implements Comparable<Map>, Publishable{
     /** Map width/height, shorts. */
     public int width, height;
     /** Preview texture. */
-    public Texture texture;
+    public @Nullable Texture texture;
     /** Build that this map was created in. -1 = unknown or custom build. */
     public int build;
     /** All teams present on this map.*/
@@ -123,7 +123,7 @@ public class Map implements Comparable<Map>, Publishable{
         }
         return maps.readFilters(tags.get("genfilters", ""));
     }
-    
+
     public String name(){
         return tag("name");
     }
@@ -135,7 +135,7 @@ public class Map implements Comparable<Map>, Publishable{
     public String description(){
         return tag("description");
     }
-    
+
     public String plainName() {
         return Strings.stripColors(name());
     }
@@ -165,13 +165,13 @@ public class Map implements Comparable<Map>, Publishable{
     public void addSteamID(String id){
         tags.put("steamid", id);
         editor.tags.put("steamid", id);
-        
+
         try{
             ui.editor.save();
         }catch(Exception e){
             Log.err(e);
         }
-        
+
         Events.fire(new MapPublishEvent());
     }
 
@@ -179,7 +179,7 @@ public class Map implements Comparable<Map>, Publishable{
     public void removeSteamID(){
         tags.remove("steamid");
         editor.tags.remove("steamid");
-        
+
         try{
             ui.editor.save();
         }catch(Exception e){
@@ -225,7 +225,7 @@ public class Map implements Comparable<Map>, Publishable{
     public boolean prePublish(){
         tags.put("author", player.name);
         editor.tags.put("author", player.name);
-        
+
         ui.editor.save();
         return true;
     }

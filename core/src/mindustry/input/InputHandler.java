@@ -1,6 +1,7 @@
 package mindustry.input;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -117,31 +118,25 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     private Seq<BuildPlan> plansOut = new Seq<>(BuildPlan.class);
     private QuadTree<BuildPlan> playerPlanTree = new QuadTree<>(new Rect());
+    private QuadTree<BuildPlan> selectPlanTree = new QuadTree<>(new Rect());
 
     public final BlockInventoryFragment inv;
     public final BlockConfigFragment config;
     public final PlanConfigFragment planConfig;
 
     private WidgetGroup group = new WidgetGroup();
+    private BuildPlan overlappingPlan = null;
+    private Player overlappingPlayer = null;
 
-    private final Eachable<BuildPlan> allPlans = cons -> {
-        if(!player.dead()){
-            player.unit().plans().each(cons);
-        }
-        selectPlans.each(cons);
-        linePlans.each(cons);
-    };
-
-    private final Eachable<BuildPlan> allSelectLines = cons -> {
-        selectPlans.each(cons);
-        linePlans.each(cons);
-    };
+    protected Eachable<BuildPlan> allPlans, allSelectLines, allRenderPlansConfig;
 
     public InputHandler(){
         group.touchable = Touchable.childrenOnly;
         inv = new BlockInventoryFragment();
         config = new BlockConfigFragment();
         planConfig = new PlanConfigFragment();
+
+        createPlanLists();
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit != null && e.unit.isPlayer() && e.unit.getPlayer().isLocal() && e.unit.type.weapons.contains(w -> w.bullet.killShooter)){
@@ -151,6 +146,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Events.on(WorldLoadEvent.class, e -> {
             playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
+            selectPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
+            createPlanLists();
         });
 
         Events.on(ResetEvent.class, e -> {
@@ -285,6 +282,23 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    @Remote(called = Loc.server, targets = Loc.both, forward = true)
+    public static void pingLocation(Player player, float x, float y, @Nullable String text){
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.pingLocation, event -> {
+            event.pingX = x;
+            event.pingY = y;
+            event.pingText = text;
+        })) throw new ValidateException(player, "Player was not allowed to ping a location.");
+
+        if(player != null && Vars.player != null && player.team() == Vars.player.team()){
+            player.pingX = x;
+            player.pingY = y;
+            player.pingTime = 1f;
+            player.pingText = text == null || text.isEmpty() ? null :
+                ((text.length() > maxPingTextLength ? text.substring(0, maxPingTextLength) + "..." : text));
+        }
+    }
+
     public static void createItemTransfer(Item item, int amount, float x, float y, Position to, Runnable done){
         Fx.itemTransfer.at(x, y, amount, item.color, to);
         if(done != null){
@@ -339,11 +353,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     unit.lastCommanded = player.coloredName();
                     if(ai.commandQueue.size <= 0){
                         ai.group = null;
-                    }
-
-                    //remove when other player command
-                    if(!headless && player != Vars.player){
-                        control.input.selectedUnits.remove(unit);
                     }
 
                     toAdd.add(unit);
@@ -857,6 +866,27 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.deathTimer = Player.deathDelay + 1f; //for instant respawn
     }
 
+    protected void createPlanLists(){
+        allPlans = new QueryEachable(playerPlanTree, linePlans){
+            @Override
+            public BuildPlan find(int x, int y, int size, Boolf<BuildPlan> check){
+                BuildPlan plan = super.find(x, y, size, check);
+                if(plan != null) return plan;
+
+                return selectPlanTree.find(x * tilesize - tilesize/2f * size, y * tilesize - tilesize/2f * size, size * tilesize, size * tilesize, check);
+            }
+        };
+        allSelectLines = new QueryEachable(null, selectPlans, linePlans);
+        allRenderPlansConfig = new QueryEachable(playerPlanTree, selectPlans);
+    }
+
+    public void updateSelectQuadtree(){
+        selectPlanTree.clear();
+        for(var plan : selectPlans){
+            selectPlanTree.insert(plan);
+        }
+    }
+
     /** Adds an input lock; if this function returns true, input is locked. Used for mod 'cutscenes' or custom camera panning. */
     public void addLock(Boolp lock){
         inputLocks.add(lock);
@@ -889,6 +919,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         lastUnit = null;
         lastPlans.clear();
         player.shooting = false;
+    }
+
+    public void getSyncedPlans(Seq<BuildPlan> out){
+        for(var plan : lastPlans){
+            if(!plan.breaking){
+                out.add(plan);
+            }
+        }
     }
 
     public void update(){
@@ -948,6 +986,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             block = null;
         }
 
+        player.selectedBlock = block;
+        player.selectedRotation = rotation;
+
         wasShooting = player.shooting;
 
         //only reset the controlled type and control a unit after the timer runs out
@@ -995,8 +1036,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Call.requestUnitPayload(player, target);
         }else{
             Building build = world.buildWorld(pay.x(), pay.y());
+            if(build == null) return;
+            Payload current = build.getPayload();
 
-            if(build != null && state.teams.canInteract(unit.team, build.team)){
+            if(state.teams.canInteract(unit.team, build.team) &&
+                ((current != null && pay.canPickupPayload(current)) || (build.block.buildVisibility != BuildVisibility.hidden && build.canPickup() && pay.canPickup(build)))){
                 Call.requestBuildPayload(player, build);
             }
         }
@@ -1004,7 +1048,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void tryDropPayload(){
         Unit unit = player.unit();
-        if(!(unit instanceof Payloadc)) return;
+        if(!(unit instanceof Payloadc pay) || !pay.canDropPayload()) return;
 
         Call.requestDropPayload(player, player.x, player.y);
     }
@@ -1330,6 +1374,104 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    //prevents allocation
+    private static BuildPlan sameQuadPlan;
+    private static final Boolf<BuildPlan> sameQuadPlanFinder = b -> b.block == sameQuadPlan.block && b.x == sameQuadPlan.x && b.y == sameQuadPlan.y;
+
+    /** Draws build plans of other players. */
+    public void drawOtherBuildPlans(){
+        Tmp.v3.set(input.mouseWorld());
+        overlappingPlan = null;
+        overlappingPlayer = null;
+
+        Groups.player.each(player -> {
+            var plans = player.getPreviewPlans();
+            if(player == Vars.player || player.team() != Vars.player.team()){
+                plans.clear(); //don't keep irrelevant plans around
+                return;
+            }
+
+            if(player.previewPlanTree == null){
+                player.previewPlanTree = new QuadTree<>(playerPlanTree.bounds);
+                player.planEachable = new QueryEachable(player.previewPlanTree);
+            }
+
+            if(player.previewPlansDirty){
+                player.previewPlansDirty = false;
+                //retain animation state
+                for(BuildPlan plan : plans){
+                    sameQuadPlan = plan;
+                    BuildPlan prev = player.previewPlanTree.find(plan.drawx(), plan.drawy(), 1f, 1f, sameQuadPlanFinder);
+                    if(prev != null){
+                        plan.animScale = prev.animScale;
+                    }
+                }
+                player.previewPlanTree.clear();
+                for(BuildPlan plan : plans){
+                    player.previewPlanTree.insert(plan);
+                }
+            }
+
+            BuildPlan current = player.isBuilder() ? player.unit().buildPlan() : null;
+            camera.bounds(Tmp.r1);
+
+            player.previewPlanTree.intersect(Tmp.r1.grow(tilesize * 2f), plan -> {
+                if(plan.block == null || plan.isDone() || (current != null && player.x == current.x && player.y == current.y && player.unit().activelyBuilding())) return;
+
+                if(Tmp.r2.setCentered(plan.drawx(), plan.drawy(), plan.block.size * tilesize).contains(Tmp.v3)){
+                    overlappingPlan = plan;
+                    overlappingPlayer= player;
+                }
+
+                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f * Time.delta);
+                plan.block.drawOtherPlayerPlan(plan, player.planEachable, overlappingPlan == plan ? 0.7f : 0.25f);
+            });
+        });
+
+        if(overlappingPlan != null){
+            Drawf.arrow(overlappingPlan.drawx(), overlappingPlan.drawy(), overlappingPlayer.x, overlappingPlayer.y, overlappingPlan.block.size * tilesize * 0.6f + tilesize/2f, 2f, overlappingPlayer.color);
+            Drawf.selected(overlappingPlan.x, overlappingPlan.y, overlappingPlan.block, overlappingPlayer.color);
+            overlappingPlan.block.drawPlaceText(overlappingPlayer.name, overlappingPlan.x, overlappingPlan.y, overlappingPlayer.color, false);
+        }
+    }
+
+    public void drawBuildPlans(){
+        if(!player.isBuilder()) return;
+
+        Unit u = player.unit();
+        BuildPlan current = u.buildPlan();
+
+        camera.bounds(Tmp.r1);
+        plansOut.clear();
+        playerPlanTree.intersect(Tmp.r1, plansOut);
+
+        for(BuildPlan plan : plansOut){
+            if(plan.progress > 0.01f || (current == plan && plan.initialized && (u.within(plan.x * tilesize, plan.y * tilesize, u.type.buildRange) || state.isEditor()))) continue;
+
+            plan.animScale = 1f;
+            if(plan.breaking){
+                drawBreaking(plan);
+            }else{
+                plan.block.drawPlan(plan, allPlans, Build.validPlace(plan.block, player.team(), plan.x, plan.y, plan.rotation) || planMatches(plan), 1f);
+            }
+        }
+
+        camera.bounds(Tmp.r3);
+
+        Draw.reset();
+
+        //TODO: cannot query for links that are offscreen
+        for(BuildPlan plan : u.plans){
+            if(plan.progress > 0.01f || plan.breaking || (current == plan && plan.initialized && (u.within(plan.x * tilesize, plan.y * tilesize, u.type.buildRange) || state.isEditor()))) continue;
+
+            if(Tmp.r2.setCentered(plan.drawx(), plan.drawy(), plan.block.planConfigClipSize()).overlaps(Tmp.r3)){
+                Draw.mixcol(Color.white, 0.24f + Mathf.absin(Time.globalTime, 6f, 0.28f));
+                plan.block.drawPlanConfigTop(plan, allRenderPlansConfig);
+                Draw.reset();
+            }
+        }
+    }
+
     public void drawBottom(){
 
     }
@@ -1629,22 +1771,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(withText){
             Font font = Fonts.outline;
             font.setColor(col2);
-            var ints = font.usesIntegerPositions();
+            boolean ints = font.usesIntegerPositions();
             font.setUseIntegerPositions(false);
-            var z = Draw.z();
+            float z = Draw.z();
             Draw.z(Layer.endPixeled);
             font.getData().setScale(1 / renderer.camerascale);
-            var snapToCursor = Core.settings.getBool("selectionsizeoncursor");
-            var textOffset = Core.settings.getInt("selectionsizeoncursoroffset", 5);
-            int width = (int)((result.x2 - result.x) / 8);
-            int height = (int)((result.y2 - result.y) / 8);
-            int area = width * height;
 
-            // FINISHME: When not snapping to cursor, perhaps it would be best to choose the corner closest to the cursor that's at least a block away?
+            int width = (int)((result.x2 - result.x) / tilesize);
+            int height = (int)((result.y2 - result.y) / tilesize);
+            int area = width * height;
+            float offset = 5f / renderer.camerascale * tilesize;
+
             font.draw(width + "x" + height + " (" + area + ")",
-            snapToCursor ? input.mouseWorldX() + textOffset * (4 / renderer.camerascale) : result.x2,
-            snapToCursor ? input.mouseWorldY() - textOffset * (4 / renderer.camerascale) : result.y
-            );
+                input.mouseWorldX() + (input.mouseWorldX() > x1 * tilesize ? offset : -offset),
+                input.mouseWorldY() + (input.mouseWorldY() > y1 * tilesize ? offset : -offset));
+
             font.setColor(Color.white);
             font.getData().setScale(1);
             font.setUseIntegerPositions(ints);
@@ -1674,6 +1815,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 BuildPlan copy = plan.copy();
                 plan.block.onNewPlan(copy);
                 player.unit().addBuild(copy, false);
+                playerPlanTree.insert(copy);
             }
         }
     }
@@ -1684,6 +1826,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 BuildPlan copy = plan.copy();
                 plan.block.onNewPlan(copy);
                 player.unit().addBuild(copy);
+                playerPlanTree.insert(copy);
             }
         }
     }
@@ -1705,7 +1848,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawPlan(BuildPlan plan, boolean valid){
-        plan.block.drawPlan(plan, allPlans(), valid);
+        plan.block.drawPlan(plan, allPlans, valid);
     }
 
     /** Draws a placement icon for a specific block. */
@@ -1715,7 +1858,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             bplan.config = block.lastConfig;
         }
         bplan.animScale = 1f;
-        block.drawPlan(bplan, allPlans(), validPlace(x, y, block, rotation));
+        block.drawPlan(bplan, allPlans, validPlace(x, y, block, rotation));
     }
 
     /** Remove everything from the queue in a selection. */
@@ -1846,7 +1989,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if((!config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
             || (config.isShown() && config.getSelected().onConfigureBuildTapped(build) && build.shouldShowConfigure(player))){
-                Sounds.click.at(build);
+                AudioBus oldBus = build.block.configureSound.bus;
+                build.block.configureSound.bus = control.sound.uiBus;
+                build.block.configureSound.at(build);
+                build.block.configureSound.bus = oldBus;
                 config.showConfig(build);
             }
             //otherwise...
@@ -1944,7 +2090,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         && !player.dead()
         && player.unit().validMine(tile)
         && player.unit().acceptsItem(player.unit().getMineResult(tile))
-        && !((!Core.settings.getBool("doubletapmine") && tile.floor().playerUnmineable) && tile.overlay().itemDrop == null);
+        && !((!Core.settings.getBool("doubletapmine") && tile.floor().playerUnmineable) && tile.overlay().itemDrop == null)
+        && !((!Core.settings.getBool("doubletapmine") && tile.overlay().playerUnmineable) && tile.overlay().itemDrop != null);
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -2154,13 +2301,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build != null && build.acceptStack(stack.item, stack.amount, player.unit()) > 0 && build.interactable(player.team()) &&
         build.block.hasItems && player.unit().stack().amount > 0 && build.interactable(player.team())){
 
-            if(build.allowDeposit() && itemDepositCooldown <= 0f){
+            if(build.allowDeposit() && canDepositItem(build)){
                 Call.transferInventory(player, build);
                 itemDepositCooldown = state.rules.itemDepositCooldown;
             }
         }else{
             Call.dropItem(player.angleTo(x, y));
         }
+    }
+
+    public boolean canDepositItem(Building build){
+        //takes advantage of itemDepositCooldown being able to be negative, allows the cooldown to be different for each building
+        if(build.block.depositCooldown >= 0){
+            return itemDepositCooldown - state.rules.itemDepositCooldown <= -build.block.depositCooldown;
+        }
+        return itemDepositCooldown <= 0;
     }
 
     public void rebuildArea(int x1, int y1, int x2, int y2){
@@ -2202,24 +2357,36 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return validPlace(x, y, type, rotation, ignore, false);
     }
 
+    //static to avoid capture allocation
+    private static BuildPlan vpIgnore;
+    private static Block vpBlock;
+    private static int vpX, vpY;
+
+    private static final Boolf<BuildPlan> vpPredicate = plan ->
+        plan != vpIgnore
+        && !plan.breaking
+        && !(vpBlock.canReplace(plan.block) && plan.x == vpX && plan.y == vpY);
+
     public boolean validPlace(int x, int y, Block type, int rotation, @Nullable BuildPlan ignore, boolean ignoreUnits){
+        if(!(ignoreUnits ? Build.validPlaceIgnoreUnits(type, player.team(), x, y, rotation, true, true) : Build.validPlace(type, player.team(), x, y, rotation))){
+            return false;
+        }
+
         if(player.isBuilder() && player.unit().plans.size > 0){
             Tmp.r1.setCentered(x * tilesize + type.offset, y * tilesize + type.offset, type.size * tilesize);
             plansOut.clear();
             playerPlanTree.intersect(Tmp.r1, plansOut);
 
-            for(int i = 0; i < plansOut.size; i++){
-                var plan = plansOut.items[i];
-                if(plan != ignore
-                && !plan.breaking
-                && plan.block.bounds(plan.x, plan.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
-                && !(type.canReplace(plan.block) && Tmp.r1.equals(Tmp.r2))){
-                    return false;
-                }
-            }
+            float s = type.size * tilesize;
+            vpIgnore = ignore;
+            vpBlock = type;
+            vpX = x;
+            vpY = y;
+
+            return playerPlanTree.find(x * tilesize + type.offset - s / 2f, y * tilesize + type.offset - s / 2f, s, s, vpPredicate) == null;
         }
 
-        return ignoreUnits ? Build.validPlaceIgnoreUnits(type, player.team(), x, y, rotation, true, true) : Build.validPlace(type, player.team(), x, y, rotation);
+        return true;
     }
 
     public boolean validBreak(int x, int y){
@@ -2319,7 +2486,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Point2 next = i == points.size - 1 ? null : points.get(i + 1);
             line.x = point.x;
             line.y = point.y;
-            if((!overrideLineRotation || diagonal) && !(block != null && block.ignoreLineRotation)){
+            if((!overrideLineRotation || diagonal) && !(block != null && block.ignoreLineRotation && !mobile)){
                 int result = baseRotation;
                 if(next != null){
                     result = Tile.relativeTo(point.x, point.y, next.x, next.y);
@@ -2345,5 +2512,44 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     static class PlaceLine{
         public int x, y, rotation;
         public boolean last;
+    }
+
+    /**
+     * In the interest of preserving compatibility, this implementation replaces Eachable with its own methods, and requires blocks to cast it to use it properly.
+     * It's a massive hack.
+     * */
+    public static class QueryEachable implements Eachable<BuildPlan>{
+        final QuadTree<BuildPlan> tree;
+        final Seq[] fallback;
+
+        public QueryEachable(QuadTree<BuildPlan> tree, Seq<BuildPlan>... fallback){
+            this.tree = tree;
+            this.fallback = fallback;
+        }
+
+        @Override
+        public void each(Cons<? super BuildPlan> cons){
+            //you're not supposed to use this method anymore
+        }
+
+        public BuildPlan find(int x, int y, Boolf<BuildPlan> check){
+            return find(x, y, 1, check);
+        }
+
+        public BuildPlan find(int x, int y, int size, Boolf<BuildPlan> check){
+            if(tree != null){
+                BuildPlan plan = tree.find(x * tilesize - tilesize/2f * size, y * tilesize - tilesize/2f * size, size * tilesize, size * tilesize, check);
+                if(plan != null){
+                    return plan;
+                }
+            }
+            for(var fallback : fallback){
+                var result = fallback.find(check);
+                if(result != null){
+                    return (BuildPlan)result;
+                }
+            }
+            return null;
+        }
     }
 }
