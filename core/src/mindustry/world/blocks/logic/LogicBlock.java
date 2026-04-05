@@ -559,6 +559,9 @@ public class LogicBlock extends Block{
                 }
                 if(output.constant) return;
                 output.set(ret);
+            }else{
+                int index = position.numi();
+                output.setobj(index >= 0 && index < executor.links.length ? executor.links[index] : null);
             }
         }
 
