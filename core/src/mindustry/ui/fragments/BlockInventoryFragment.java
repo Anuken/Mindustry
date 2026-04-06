@@ -24,8 +24,8 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class BlockInventoryFragment{
-      public static  int  cols  =8 ;//Each row shows 8 items.
- //  private final int  cols  =8 ;
+    public int cols = 8 ;//Each row shows 8 items.
+ // private final int  cols  =8 ;
     private static final float holdWithdraw = 20f;
     private static final float holdShrink = 120f;
 
