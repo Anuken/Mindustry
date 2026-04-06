@@ -38,6 +38,7 @@ public class ArcNetProvider implements NetProvider{
     private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 
     private volatile int playerLimitCache, packetSpamLimit;
+    private Ratekeeper clientUdpErrorRate = new Ratekeeper();
 
     public ArcNetProvider(){
         ArcNet.errorHandler = e -> {
@@ -57,7 +58,17 @@ public class ArcNetProvider implements NetProvider{
             packetSpamLimit = Config.packetSpamLimit.num();
         });
 
-        client = new Client(8192, 16384, new PacketSerializer());
+        client = new Client(8192, 16384, new PacketSerializer()){
+            @Override
+            public void handleNetException(ArcNetException e){
+                //allow occasional UDP network errors
+                if(net.client() && e.getMessage() != null && e.getMessage().contains("UDP deserialization") && clientUdpErrorRate.allow(5000, 2)){
+                    Log.err("UDP network error", e);
+                }else{
+                    super.handleNetException(e);
+                }
+            }
+        };
         client.setDiscoveryPacket(packetSupplier);
         client.addListener(new NetListener(){
             @Override
@@ -198,6 +209,8 @@ public class ArcNetProvider implements NetProvider{
 
     @Override
     public void connectClient(String ip, int port, Runnable success){
+        clientUdpErrorRate.reset();
+
         Threads.daemon(() -> {
             try{
                 //just in case
@@ -223,6 +236,7 @@ public class ArcNetProvider implements NetProvider{
 
     @Override
     public void disconnectClient(){
+        clientUdpErrorRate.reset();
         client.close();
     }
 
