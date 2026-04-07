@@ -243,7 +243,7 @@ public class ChatFragment extends Table{
             shown = true;
             if(mobile){
                 TextInput input = new TextInput();
-                input.maxLength = maxTextLength;
+                input.maxLength = chatfield.getMaxLength();
                 input.accepted = text -> {
                     chatfield.setText(text);
                     sendMessage();
