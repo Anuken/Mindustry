@@ -52,8 +52,8 @@ public class FloorRenderer{
 
     private IndexData indexData;
     private ChunkMesh[][][] cache;
+    private boolean[][] dirty;
     private IntSet drawnLayerSet = new IntSet();
-    private IntSet recacheSet = new IntSet();
     private IntSeq drawnLayers = new IntSeq();
     private ObjectSet<CacheLayer> used = new ObjectSet<>();
 
@@ -130,10 +130,17 @@ public class FloorRenderer{
     }
 
     public void recacheTile(int x, int y){
-        recacheSet.add(Point2.pack(x / chunksize, y / chunksize));
+        int cx = x/chunksize, cy = y/chunksize;
+        if(cx >= 0 && cy >= 0 && cx < dirty.length && cy < dirty[0].length){
+            dirty[cx][cy] = true;
+        }
     }
 
     public void drawFloor(){
+        drawFloor(true, false);
+    }
+
+    public void drawFloor(boolean processChanges, boolean cacheIgnoreWalls){
         if(cache == null){
             return;
         }
@@ -161,8 +168,9 @@ public class FloorRenderer{
 
                 if(!Structs.inBounds(x, y, cache)) continue;
 
-                if(cache[x][y].length == 0){
-                    cacheChunk(x, y, false);
+                if(cache[x][y].length == 0 || (dirty[x][y] && processChanges)){
+                    dirty[x][y] = false;
+                    cacheChunk(x, y, cacheIgnoreWalls);
                 }
 
                 ChunkMesh[] chunk = cache[x][y];
@@ -190,23 +198,6 @@ public class FloorRenderer{
         }
 
         underwaterDraw.clear();
-    }
-
-    public void checkChanges(){
-        checkChanges(false);
-    }
-
-    public void checkChanges(boolean ignoreWalls){
-        if(recacheSet.size > 0){
-            //recache one chunk at a time
-            IntSetIterator iterator = recacheSet.iterator();
-            while(iterator.hasNext){
-                int chunk = iterator.next();
-                cacheChunk(Point2.x(chunk), Point2.y(chunk), ignoreWalls);
-            }
-
-            recacheSet.clear();
-        }
     }
 
     public void drawUnderwater(Runnable run){
@@ -380,9 +371,9 @@ public class FloorRenderer{
             }
         }
 
-        recacheSet.clear();
         int chunksx = Mathf.ceil((float)(world.width()) / chunksize), chunksy = Mathf.ceil((float)(world.height()) / chunksize);
         cache = new ChunkMesh[chunksx][chunksy][dynamic ? 0 : CacheLayer.all.length];
+        dirty = new boolean[chunksx][chunksy];
 
         texture = Core.atlas.find("grass1").texture;
         error = Core.atlas.find("env-error");
