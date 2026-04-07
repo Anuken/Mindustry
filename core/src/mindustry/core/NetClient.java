@@ -320,7 +320,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    @Remote(called = Loc.server, variants = Variant.both)
+    @Remote(called = Loc.client, variants = Variant.both)
     public static void setMaxTextLength(int length){
         Vars.ui.chatfrag.setMaxTextLength(length);
     }
