@@ -36,7 +36,13 @@ public class PausedDialog extends BaseDialog{
             }).size(70f).tooltip("@customize").visible(() -> state.rules.allowEditRules && (net.server() || !net.active()));
         })).grow().row();
 
-        shown(this::rebuild);
+        shown(() -> {
+            rebuild();
+
+            if(state.isCampaign()){
+                state.getPlanet().saveStats();
+            }
+        });
 
         addCloseListener();
     }
@@ -54,10 +60,14 @@ public class PausedDialog extends BaseDialog{
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
-            cont.button("@objective", Icon.info, () -> ui.fullText.show("@objective", state.rules.sector.preset.description))
-            .visible(() -> state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.description != null).padTop(-60f);
+            boolean showObjective = state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.description != null;
+
+            if(showObjective){
+                cont.button("@objective", Icon.info, () -> ui.fullText.show("@objective", state.rules.sector != null && state.rules.sector.preset != null ? state.rules.sector.preset.description : "oh dear")).padTop(-60f);
+            }
 
             cont.button("@abandon", Icon.cancel, () -> ui.planet.abandonSectorConfirm(state.rules.sector, this::hide)).padTop(-60f)
+            .colspan(showObjective ? 1 : 2).width(showObjective ? dw : dw * 2 + 10f)
             .disabled(b -> net.client() || state.gameOver).visible(() -> state.rules.sector != null).row();
 
             cont.button("@back", Icon.left, this::hide).name("back");

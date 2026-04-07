@@ -17,7 +17,7 @@ buildscript{
         mavenLocal()
         mavenCentral()
         google()
-        maven{ url 'https://jitpack.io' }
+        maven{ url = 'https://jitpack.io' }
     }
 
     dependencies{
@@ -27,8 +27,8 @@ buildscript{
 }
 
 plugins{
-    id "org.jetbrains.kotlin.jvm" version "2.1.10"
-    id "org.jetbrains.kotlin.kapt" version "2.1.10"
+    id "org.jetbrains.kotlin.jvm" version "2.3.20"
+    id "org.jetbrains.kotlin.kapt" version "2.3.20"
 }
 
 allprojects{
@@ -180,8 +180,8 @@ allprojects{
     repositories{
         mavenLocal()
         mavenCentral()
-        maven{ url "https://central.sonatype.com/repository/maven-snapshots" }
-        maven{ url 'https://jitpack.io' }
+        maven{ url = "https://central.sonatype.com/repository/maven-snapshots" }
+        maven{ url = 'https://jitpack.io' }
     }
 
     task clearCache{
@@ -302,6 +302,27 @@ project(":core"){
         }
     }
 
+    task depsJar(type: Jar, dependsOn: [classes, ":server:dist"]){
+        archiveClassifier = 'deps'
+        from files(sourceSets.main.output.classesDirs)
+        from{ configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) } }
+        from zipTree("../server/build/libs/server-release.jar")
+        from files("src/")
+        from files("../../Arc/arc-core/src/")
+        from files("../../Arc/extensions/arcnet/src/")
+        from files("../../Arc/extensions/g3d/src/")
+        from files("../../Arc/extensions/flabel/src/")
+        from files("../../Arc/extensions/freetype/src/")
+        from files("../server/src/")
+
+        exclude("META-INF/**")
+        exclude("vfxshaders/**")
+        exclude("maps/**")
+        exclude("baseparts/**")
+        exclude("vfxshaders/**")
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
     task sourcesJar(type: Jar, dependsOn: classes){
         archiveClassifier = 'sources'
         from sourceSets.main.allSource
@@ -394,6 +415,7 @@ project(":tests"){
         testImplementation arcModule("backends:backend-headless")
         testImplementation "org.json:json:20230618"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.1"
+        testRuntimeOnly "org.junit.platform:junit-platform-launcher"
     }
 
     tasks.withType(JavaCompile){
@@ -405,6 +427,7 @@ project(":tests"){
     test{
         //fork every test so mods don't interact with each other
         forkEvery = 1
+        jvmArgs = ["-XX:+HeapDumpOnOutOfMemoryError"]
         useJUnitPlatform()
         workingDir = new File("../core/assets")
         testLogging{
@@ -448,10 +471,6 @@ configure([":core", ":server"].collect{project(it)}){
         publications{
             maven(MavenPublication){
                 from components.java
-                //TODO: uncomment this once the jitpack packing is fixed (currently depends on a newer glibc version)
-                //if(project.name == "core"){
-                //    artifact(tasks.named("assetsJar"))
-                //}
             }
         }
     }
@@ -472,7 +491,6 @@ task deployAll{
     dependsOn cleanDeployOutput
     dependsOn "desktop:packrLinux64"
     dependsOn "desktop:packrWindows64"
-    dependsOn "desktop:packrWindows32"
     dependsOn "desktop:packrMacOS"
     if(versionModifier != "steam"){
         dependsOn "server:deploy"

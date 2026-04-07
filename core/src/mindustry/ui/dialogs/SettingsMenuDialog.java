@@ -54,11 +54,16 @@ public class SettingsMenuDialog extends BaseDialog{
             rebuildMenu();
         });
 
+        int[] lastRebuildSize = {Core.graphics.getWidth(), Core.graphics.getHeight()};
         onResize(() -> {
-            graphics.rebuild();
-            sound.rebuild();
-            game.rebuild();
-            updateScrollFocus();
+            if(lastRebuildSize[0] != Core.graphics.getWidth() || lastRebuildSize[1] != Core.graphics.getHeight()){
+                graphics.rebuild();
+                sound.rebuild();
+                game.rebuild();
+                updateScrollFocus();
+                lastRebuildSize[0] = Core.graphics.getWidth();
+                lastRebuildSize[1] = Core.graphics.getHeight();
+            }
         });
 
         cont.clearChildren();
@@ -134,6 +139,7 @@ public class SettingsMenuDialog extends BaseDialog{
             t.button("@settings.clearcampaignsaves", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm", "@settings.clearcampaignsaves.confirm", () -> {
                     for(var planet : content.planets()){
+                        planet.clearStats();
                         for(var sec : planet.sectors){
                             sec.clearInfo();
                             if(sec.save != null){
@@ -326,10 +332,6 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }*/
 
-        if(!mobile){
-            game.checkPref("crashreport", true);
-        }
-
         game.checkPref("communityservers", true, val -> {
             defaultServers.clear();
             if(val){
@@ -369,9 +371,14 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }
 
-        if(!mobile){
-            game.checkPref("console", false);
-        }
+        game.checkPref("console", false);
+
+        graphics.sliderPref("uiEdgePadding", 0, 0, 100, s -> s + "px", s -> {
+            if(ui != null){
+                ui.updateMargins();
+                Core.scene.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+            }
+        });
 
         int[] lastUiScale = {settings.getInt("uiscale", 100)};
 
@@ -425,20 +432,13 @@ public class SettingsMenuDialog extends BaseDialog{
 
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
-            graphics.checkPref("fullscreen", false, b -> {
-                if(b){
-                    Core.graphics.setFullscreen();
-                }else{
-                    Core.graphics.setWindowedMode(Core.graphics.getWidth(), Core.graphics.getHeight());
-                }
-            });
+            graphics.checkPref("fullscreen", false, b -> Core.graphics.setFullscreen(b));
 
             Core.graphics.setVSync(Core.settings.getBool("vsync"));
 
             if(Core.settings.getBool("fullscreen")){
-                Core.app.post(() -> Core.graphics.setFullscreen());
+                Core.app.post(() -> Core.graphics.setFullscreen(true));
             }
-
         }else if(!ios){
             graphics.checkPref("landscape", false, b -> {
                 if(b){
@@ -454,7 +454,7 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         graphics.checkPref("effects", true);
-        graphics.checkPref("atmosphere", !mobile);
+        graphics.checkPref("atmosphere", true);
         graphics.checkPref("drawlight", true);
         graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("blockstatus", false);
@@ -473,13 +473,14 @@ public class SettingsMenuDialog extends BaseDialog{
         }
         graphics.checkPref("fps", false);
         graphics.checkPref("playerindicators", true);
+        graphics.checkPref("showpings", true);
+        graphics.checkPref("showotherbuildplans", true);
         graphics.checkPref("indicators", true);
         graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);
 
         if(Shaders.shield != null){
-            //animated shields are off by default on android (generally lower spec devices)
-            graphics.checkPref("animatedshields", !android);
+            graphics.checkPref("animatedshields", true);
         }
 
         graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
@@ -656,8 +657,16 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         public SliderSetting sliderPref(String name, int def, int min, int max, int step, StringProcessor s){
+            return sliderPref(name, def, min, max, step, s, null);
+        }
+
+        public SliderSetting sliderPref(String name, int def, int min, int max, StringProcessor s, Intc changed){
+            return sliderPref(name, def, min, max, 1, s, changed);
+        }
+
+        public SliderSetting sliderPref(String name, int def, int min, int max, int step, StringProcessor s, Intc changed){
             SliderSetting res;
-            list.add(res = new SliderSetting(name, def, min, max, step, s));
+            list.add(res = new SliderSetting(name, def, min, max, step, s, changed));
             settings.defaults(name, def);
             rebuild();
             return res;
@@ -766,14 +775,16 @@ public class SettingsMenuDialog extends BaseDialog{
         public static class SliderSetting extends Setting{
             int def, min, max, step;
             StringProcessor sp;
+            Intc changed;
 
-            public SliderSetting(String name, int def, int min, int max, int step, StringProcessor s){
+            public SliderSetting(String name, int def, int min, int max, int step, StringProcessor s, Intc changed){
                 super(name);
                 this.def = def;
                 this.min = min;
                 this.max = max;
                 this.step = step;
                 this.sp = s;
+                this.changed = changed;
             }
 
             @Override
@@ -792,6 +803,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 slider.changed(() -> {
                     settings.put(name, (int)slider.getValue());
                     value.setText(sp.get((int)slider.getValue()));
+                    if(changed != null) changed.get((int)slider.getValue());
                 });
 
                 slider.change();

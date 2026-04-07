@@ -248,7 +248,7 @@ public class BeamDrill extends Block{
             float multiplier = Mathf.lerp(1f, optionalBoostIntensity, optionalEfficiency);
             float drillTime = getDrillTime(lastItem);
             boostWarmup = Mathf.lerpDelta(boostWarmup, optionalEfficiency, 0.1f);
-            lastDrillSpeed = (facingAmount * multiplier * timeScale) / drillTime;
+            lastDrillSpeed = (facingAmount * multiplier * timeScale) / drillTime * efficiency;
 
             time += edelta() * multiplier;
 

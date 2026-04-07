@@ -439,10 +439,10 @@ public class JoinDialog extends BaseDialog{
                     }
 
                     if(!serverSearch.isEmpty() && !(group.name.toLowerCase().contains(serverSearch)
-                        || res.name.toLowerCase().contains(serverSearch)
-                        || res.description.toLowerCase().contains(serverSearch)
-                        || res.mapname.toLowerCase().contains(serverSearch)
-                        || (res.modeName != null && res.modeName.toLowerCase().contains(serverSearch)))) return;
+                        || Strings.stripColors(res.name.toLowerCase()).contains(serverSearch)
+                        || Strings.stripColors(res.description.toLowerCase()).contains(serverSearch)
+                        || Strings.stripColors(res.mapname.toLowerCase()).contains(serverSearch)
+                        || (res.modeName != null && Strings.stripColors(res.modeName.toLowerCase()).contains(serverSearch)))) return;
 
                     if(groupTable[0] == null){
                         addHeader(groupTable, group, hidden, favorite, true);
@@ -582,7 +582,7 @@ public class JoinDialog extends BaseDialog{
         local.button(b -> buildServer(host, b, true, true), style, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             safeConnect(host.address, host.port, host.version);
-        }).width(w).top().left().growY();
+        }).width(w).top().left().pad(2f).growY();
     }
 
     public void connect(String ip, int port){

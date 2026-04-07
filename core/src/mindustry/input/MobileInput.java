@@ -268,7 +268,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     public boolean showCancel(){
-        return !player.dead() && (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !hasSchematic();
+        return !player.dead() && (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !hasSchematic() && !ui.consolefrag.shown();
     }
 
     public boolean hasSchematic(){
@@ -281,18 +281,24 @@ public class MobileInput extends InputHandler implements GestureListener{
         group.fill(t -> {
             t.visible(this::showCancel);
             t.bottom().left();
-            t.button("@cancel", Icon.cancel, Styles.clearTogglet, () -> {
+            t.button(Icon.cancel, Styles.cleari, () -> {
                 if(!player.dead()){
                     player.unit().clearBuilding();
                 }
                 selectPlans.clear();
                 mode = none;
                 block = null;
-            }).width(155f).checked(b -> false).height(50f).margin(12f);
+            }).width(155f/2f).height(50f).margin(12f);
+
+            t.button(Icon.pause, Styles.clearTogglei, () -> isBuilding = !isBuilding).width(155f/2f).checked(b -> {
+                boolean paused = !isBuilding;
+                b.getStyle().imageUp = !paused ? Icon.pause : Icon.play;
+                return paused;
+            }).height(50f).margin(12f);
         });
 
         group.fill(t -> {
-            t.visible(() -> !hasSchematic() && !(state.isEditor() && Core.settings.getBool("editor-blocks-shown")));
+            t.visible(() -> !hasSchematic() && !ui.consolefrag.shown() && !(state.isEditor()&& Core.settings.getBool("editor-blocks-shown")));
             t.bottom().left();
 
             t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
@@ -313,13 +319,13 @@ public class MobileInput extends InputHandler implements GestureListener{
             //for better looking insets
             t.rect((x, y, w, h) -> {
                 if(Core.scene.marginBottom > 0){
-                    Tex.paneRight.draw(x, 0, w, y);
+                    Styles.black6.draw(x, 0, w, y);
                 }
             }).fillX().row();
         });
 
         group.fill(t -> {
-            t.visible(this::hasSchematic);
+            t.visible(() -> hasSchematic() && !ui.consolefrag.shown());
             t.bottom().left();
             t.table(Tex.pane, b -> {
                 b.defaults().size(50f);
@@ -362,7 +368,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(plan.breaking){
                 drawSelected(plan.x, plan.y, tile.block(), Pal.remove);
             }else{
-                plan.block.drawPlan(plan, allPlans(), true);
+                plan.block.drawPlan(plan, allPlans, true);
             }
         }
 
@@ -381,7 +387,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
                         drawArrow(block, plan.x, plan.y, plan.rotation);
                     }
-                    plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation) && getPlan(plan.x, plan.y, plan.block.size, null) == null);
+                    plan.block.drawPlan(plan, allPlans, validPlace(plan.x, plan.y, plan.block, plan.rotation) && getPlan(plan.x, plan.y, plan.block.size, null) == null);
                     drawSelected(plan.x, plan.y, plan.block, Pal.accent);
                 }
                 linePlans.each(this::drawOverPlan);
@@ -464,7 +470,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(plan.breaking){
             drawSelected(plan.x, plan.y, plan.tile().block(), Pal.remove);
         }else{
-            plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation));
+            plan.block.drawPlan(plan, allPlans, validPlace(plan.x, plan.y, plan.block, plan.rotation));
             drawSelected(plan.x, plan.y, plan.block, Pal.accent);
         }
     }
@@ -700,6 +706,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             commandTap(x, y, queueCommandMode);
         }else if(commandMode){
             tapCommandUnit();
+        }else if(count == 3 && net.active()){
+            Call.pingLocation(Vars.player, worldx, worldy, null);
         }else{
             //control units
             if(count == 2){
@@ -748,6 +756,16 @@ public class MobileInput extends InputHandler implements GestureListener{
     public void reset(){
         super.reset();
         manualShooting = down = false;
+    }
+
+    @Override
+    public void getSyncedPlans(Seq<BuildPlan> out){
+        super.getSyncedPlans(out);
+        for(var plan : selectPlans){
+            if(!plan.breaking){
+                out.add(plan);
+            }
+        }
     }
 
     @Override
