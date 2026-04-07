@@ -105,7 +105,7 @@ public class ChatFragment extends Table{
         fieldlabel.setStyle(fieldlabel.getStyle());
 
         chatfield = new TextField("", new TextFieldStyle(scene.getStyle(TextFieldStyle.class)));
-        chatfield.setMaxLength(Vars.maxTextLength);
+        chatfield.setMaxLength(maxTextLength);
         chatfield.getStyle().background = null;
         chatfield.getStyle().fontColor = Color.white;
         chatfield.setStyle(chatfield.getStyle());
@@ -316,6 +316,14 @@ public class ChatFragment extends Table{
         fadetime = Math.min(fadetime, messagesShown) + 1f;
 
         if(scrollPos > 0) scrollPos++;
+    }
+
+    public void setMaxTextLength(int length){
+        chatfield.setMaxLength(length);
+    }
+
+    public void resetMaxTextLength(){
+        chatfield.setMaxLength(maxTextLength);
     }
 
     private enum ChatMode{

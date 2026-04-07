@@ -298,6 +298,8 @@ public class NetServer implements ApplicationListener{
 
             con.player = player;
 
+            if (Config.maxMessageLength.num() != maxTextLength) Call.setMaxTextLength(con, Config.maxMessageLength.num());
+
             //playing in pvp mode automatically assigns players to teams
             player.team(assignTeam(player));
 

@@ -523,6 +523,7 @@ public class Administration{
         interactRateWindow = new Config("interactRateWindow", "Block interaction rate limit window, in seconds.", 6),
         interactRateLimit = new Config("interactRateLimit", "Block interaction rate limit.", 25),
         interactRateKick = new Config("interactRateKick", "How many times a player must interact inside the window to get kicked.", 60),
+        maxMessageLength = new Config("maxMessageLength", "Max chat message length.", maxTextLength, () -> Call.setMaxTextLength(Config.maxMessageLength.num())),
         messageRateLimit = new Config("messageRateLimit", "Message rate limit in seconds. 0 to disable.", 0),
         messageSpamKick = new Config("messageSpamKick", "How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
         packetSpamLimit = new Config("packetSpamLimit", "Limit for packet count sent within 3sec that will lead to a blacklist + kick.", 300),
