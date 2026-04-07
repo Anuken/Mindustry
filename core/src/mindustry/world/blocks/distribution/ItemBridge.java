@@ -36,6 +36,7 @@ public class ItemBridge extends Block{
     public float arrowSpacing = 4f, arrowOffset = 2f, arrowPeriod = 0.4f;
     public float arrowTimeScl = 6.2f;
     public float bridgeWidth = 6.5f;
+    public boolean noAcceptDisabled = false;
 
     //for autolink
     public @Nullable ItemBridgeBuild lastBuild;
@@ -429,7 +430,7 @@ public class ItemBridge extends Block{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
             return
-                hasLiquids && team == source.team &&
+                hasLiquids && team == source.team && (!noAcceptDisabled || enabled) &&
                 (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f) &&
                 checkAccept(source, world.tile(link));
         }

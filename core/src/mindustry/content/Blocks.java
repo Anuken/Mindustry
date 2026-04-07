@@ -2393,6 +2393,7 @@ public class Blocks{
             hasPower = false;
             liquidCapacity = 100f;
             explosivenessScale = flammabilityScale = 20f/100f;
+            noAcceptDisabled = true;
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
@@ -2406,6 +2407,7 @@ public class Blocks{
             pulse = true;
             explosivenessScale = flammabilityScale = 20f/100f;
             liquidCapacity = 100f;
+            noAcceptDisabled = true;
             consumePower(0.30f);
         }};
 
