@@ -188,14 +188,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
         //this is gated behind a property, because it's (1) not useful to most people, (2) confusing and (3) may crash or otherwise bug out
         if(OS.hasProp("mindustry.editor.simulate.button")){
 
-            menu.cont.button("@editor.simulate", Icon.logic, () -> {
+            menu.cont.button("Simulate", Icon.logic, () -> {
                 menu.hide();
 
-                BaseDialog dialog = new BaseDialog("@editor.simulate");
+                BaseDialog dialog = new BaseDialog("Simulate");
 
                 int[] seconds = {60 * 1};
 
-                dialog.cont.add(Core.bundle.get("editor.simulate.seconds"));
+                dialog.cont.add("Seconds: ");
                 dialog.cont.field(seconds[0] + "", text -> seconds[0] = Strings.parseInt(text, 1)).valid(s -> Strings.parseInt(s, 9999999) < 10f * 60f);
 
                 dialog.addCloseButton();
@@ -336,7 +336,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.rules.sector = null;
             state.rules.fog = false;
             state.map = new Map(StringMap.of(
-                "name", Core.bundle.get("editor.playtesting"),
+                "name", "Editor Playtesting",
                 "width", editor.width(),
                 "height", editor.height()
             ));
