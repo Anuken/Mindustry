@@ -176,7 +176,7 @@ public class Blocks{
 
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, tileLogicDisplay, memoryCell, memoryBank,
-    canvas, reinforcedMessage,
+    canvas, largeCanvas, reinforcedMessage,
     worldProcessor, worldCell, worldMessage, worldSwitch,
 
     //campaign
@@ -3911,9 +3911,10 @@ public class Blocks{
             );
             size = 3;
             reload = 3f;
+            shoot = new ShootAlternate(4f);
             shoot.shots = 2;
             velocityRnd = 0.1f;
-            inaccuracy = 4f;
+            inaccuracy = 3f;
             recoil = 1f;
             shootCone = 45f;
             liquidCapacity = 40f;
@@ -6879,6 +6880,35 @@ public class Blocks{
             padding = 7f / 4f * 2f;
 
             size = 2;
+        }};
+
+        largeCanvas = new CanvasBlock("large-canvas"){{
+            requirements(Category.logic, BuildVisibility.shown, with(Items.silicon, 15, Items.beryllium, 15, Items.surgeAlloy, 5));
+
+            canvasSize = 24;
+            padding = 7f / 4f * 2f;
+
+            size = 3;
+
+            //Palette: https://lospec.com/palette-list/woodspark
+            setPaletteFromString("""
+            452b3f
+            8a5865
+            e08d51
+            fabf61
+            f5eeb0
+            2c5e3b
+            609c4f
+            c6cc54
+            78c2d6
+            5479b0
+            56546e
+            839fa6
+            e0d3c8
+            f05b5b
+            8f325f
+            eb6c98
+            """);
         }};
 
         reinforcedMessage = new MessageBlock("reinforced-message"){{

@@ -619,12 +619,17 @@ public class LExecutor{
         public void run(LExecutor exec){
             Object targetObj = target.obj();
             if(targetObj instanceof LReadable read){
-                if(!read.readable(exec)) return;
+                if(!read.readable(exec)){
+                    output.setobj(null);
+                    return;
+                }
                 read.read(position, output);
             }else{
                 int address = position.numi();
                 if(targetObj instanceof CharSequence str){
                     output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
+                }else{
+                    output.setobj(null);
                 }
             }
         }
@@ -1600,6 +1605,7 @@ public class LExecutor{
                 case unitCap -> state.rules.unitCap = Math.max(value.numi(), 0);
                 case lighting -> state.rules.lighting = value.bool();
                 case canGameOver -> state.rules.canGameOver = value.bool();
+                case pauseDisabled -> state.rules.pauseDisabled = value.bool();
                 case mapArea -> {
                     int x = p1.numi(), y = p2.numi(), w = p3.numi(), h = p4.numi();
                     if(!checkMapArea(x, y, w, h, false)){

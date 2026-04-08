@@ -6,10 +6,10 @@ include 'desktop', 'core', 'server', 'ios', 'annotations', 'tools', 'tests'
 
 def hasSdk = System.getenv("ANDROID_HOME") != null
 
+def localProperties = new Properties()
 if(new File(settingsDir, 'local.properties').exists()){
-	def properties = new Properties()
-	properties.load(new File(settingsDir, 'local.properties').newDataInputStream())
-	if(properties.containsKey("sdk.dir")) hasSdk = true
+    localProperties.load(new File(settingsDir, 'local.properties').newDataInputStream())
+	if(localProperties.containsKey("sdk.dir")) hasSdk = true
 }
 
 if(System.getenv("JITPACK") == "true") hasSdk = false
@@ -18,6 +18,10 @@ if(hasSdk){
     include 'android'
 }else{
     println("No Android SDK found. Skipping Android module.")
+}
+
+if(hasProperty("localRhino") || localProperties.getOrDefault("localRhino", "false") == "true"){
+    includeBuild("../rhino")
 }
 
 if(!hasProperty("noLocalArc")){

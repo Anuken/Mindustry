@@ -149,11 +149,11 @@ public class DesktopLauncher extends ClientLauncher{
         this.args = args;
 
         if(useDiscord){
+            Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::close));
             Threads.daemon(() -> {
                 try{
                     DiscordRPC.connect(discordID);
                     Log.info("Initialized Discord rich presence.");
-                    Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::close));
                 }catch(NoDiscordClientException none){
                     //don't log if no client is found
                     useDiscord = false;

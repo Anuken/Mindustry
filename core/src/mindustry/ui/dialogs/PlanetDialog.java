@@ -72,7 +72,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     private Texture[] planetTextures;
     private Element mainView;
-    private CampaignRulesDialog campaignRules = new CampaignRulesDialog();
     private SectorSelectDialog selectDialog = new SectorSelectDialog();
 
     public PlanetDialog(){
@@ -214,6 +213,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }).size(300f, 64f).disabled(b -> selected[0] == null);
 
                 app.post(diag::show);
+            }else if(hadSerpuloRemaps && settings.getBoolOnce("serpulo-remaps-notice")){
+                var diag = new BaseDialog("@campaign.rework.title");
+                diag.cont.add("@campaign.rework.serpulo").labelAlign(Align.center).growX().wrap().maxWidth(500f);
+                diag.buttons.button("@ok", Icon.ok, diag::hide).size(280f, 64f);
+
+                app.post(diag::show);
             }
         });
 
@@ -225,11 +230,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 minFilter = magFilter = TextureFilter.linear;
             }}).loaded = t -> planetTextures[fi] = t;
             assets.finishLoadingAsset(names[i]);
-        }
-
-        //unlock defaults for older campaign saves (TODO move? where to?)
-        if(content.planets().contains(p -> p.sectors.contains(Sector::hasBase)) || Blocks.scatter.unlocked() || Blocks.router.unlocked()){
-            Seq.with(Blocks.junction, Blocks.mechanicalDrill, Blocks.conveyor, Blocks.duo, Items.copper, Items.lead).each(UnlockableContent::quietUnlock);
         }
     }
 
@@ -414,7 +414,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     boolean canSelect(Sector sector){
         if(mode == select) return sector.hasBase() && launchSector != null && sector.planet == launchSector.planet;
 
-        if(mode == planetLaunch && sector.hasBase()) return false;
+        //sectors with addStartingItems = true can't be landed on, as they override the core and items of the interplanetary accelerator
+        //at the moment, this is only true of Ground Zero in vanilla
+        //TODO: maybe relax these restrictions and add better support for these sorts of "tutorial" starting sectors later
+        if(mode == planetLaunch && (sector.hasBase() || (sector.preset != null && sector.preset.addStartingItems))) return false;
 
         if(sector.planet.generator == null) return false;
 
@@ -513,8 +516,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             for(Sector sec : planet.sectors){
 
                 //draw shield arc
-                if(sec.shieldTarget != null && !sec.isCaptured() && !sec.shieldTarget.isCaptured()){
-                    planets.drawArcLine(planet, sec.tile.v, sec.shieldTarget.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Tmp.c3.set(Tmp.c2).mulA(0.5f), 0.15f, 110f, 25, 0.006f);
+                if(sec.shieldTarget != null && !sec.isCaptured() && !sec.shieldTarget.isCaptured() && (planet.generator.allowLanding(sec) || planet.generator.allowLanding(sec.shieldTarget))){
+                    planets.drawArcLine(planet, sec.tile.v, sec.shieldTarget.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Tmp.c3.set(Tmp.c2).mulA(0.5f), 0.3f, 110f, 25, 0.006f);
                 }
 
                 if(sec.hasBase()){
@@ -731,7 +734,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             ScrollPane pane = new ScrollPane(null, Styles.smallPane);
             t.add(pane).colspan(2).row();
             t.button("@campaign.difficulty", Icon.bookSmall, () -> {
-                campaignRules.show(state.planet);
+                Vars.ui.campaignRules.show(state.planet);
             }).margin(12f).size(208f, 40f).padTop(12f).visible(() -> state.planet.allowCampaignRules && mode != planetLaunch).row();
             t.add().height(64f); //padding for close button
             Table starsTable = new Table(Styles.black);

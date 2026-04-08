@@ -63,6 +63,7 @@ public class CommandAI extends AIController{
         }
     }
 
+    @Override
     public boolean hasStance(@Nullable UnitStance stance){
         return stance != null && stances.get(stance.id);
     }
@@ -79,7 +80,7 @@ public class CommandAI extends AIController{
         //this happens when an older save reads the default "shoot" stance, or any other removed stance
         if(stance == UnitStance.stop) return;
 
-        stances.andNot(stance.incompatibleBits);
+        stances.andNot(stance.incompatibleStanceBits);
         stances.set(stance.id);
         stanceChanged();
     }
@@ -156,9 +157,22 @@ public class CommandAI extends AIController{
             commandController.updateUnit();
         }else{
             defaultBehavior();
-            //boosting control is not supported, so just don't.
-            unit.updateBoosting(false);
+            if(shouldBoost() && unit.type.canBoost){
+                //auto land when near target
+                if((attackTarget != null && unit.within(attackTarget, unit.range())) || (hasStance(UnitStance.patrol) && target != null && unit.within(target, unit.range()))){
+                    unit.updateBoosting(false);
+                }else{
+                    unit.updateBoosting(true, true);
+                }
+            }else{
+                //boosting control is not supported, so just don't.
+                unit.updateBoosting(false);
+            }
         }
+    }
+
+    protected boolean shouldBoost(){
+        return hasStance(UnitStance.boost) || command == UnitCommand.enterPayloadCommand;
     }
 
     public void clearCommands(){
@@ -176,7 +190,7 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
-        if(!unit.type.autoFindTarget && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
+        if(!unit.type.autoFindTarget && !hasStance(UnitStance.patrol) && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
             return null;
         }
         return super.findMainTarget(x, y, range, air, ground);

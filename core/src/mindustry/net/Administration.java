@@ -13,6 +13,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
+import java.io.*;
 import java.util.regex.*;
 
 import static mindustry.Vars.*;
@@ -611,7 +612,7 @@ public class Administration{
         }
     }
 
-    public static class PlayerInfo{
+    public static class PlayerInfo implements Serializable{
         public String id;
         public String lastName = "<unknown>", lastIP = "<unknown>";
         public Seq<String> ips = new Seq<>();
@@ -704,6 +705,10 @@ public class Administration{
         /** valid only for command building events */
         public @Nullable int[] buildingPositions;
 
+        /** valid only for location pings */
+        public @Nullable String pingText;
+        public float pingX, pingY;
+
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
             this.type = type;
@@ -733,7 +738,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn, pickupBlock, dropPayload
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn, pickupBlock, dropPayload, pingLocation
     }
 
 }
