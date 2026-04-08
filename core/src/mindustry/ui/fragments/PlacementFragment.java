@@ -126,6 +126,7 @@ public class PlacementFragment{
         toggler.remove();
         build(group);
         toggler.setZIndex(index);
+        lastDisplayState = null;
     }
 
     boolean updatePick(InputHandler input){

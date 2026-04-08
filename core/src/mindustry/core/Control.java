@@ -683,11 +683,7 @@ public class Control implements ApplicationListener, Loadable{
 
         if(Core.input.keyTap(Binding.fullscreen)){
             boolean full = settings.getBool("fullscreen");
-            if(full){
-                graphics.setWindowedMode(graphics.getWidth(), graphics.getHeight());
-            }else{
-                graphics.setFullscreen();
-            }
+            graphics.setFullscreen(!full);
             settings.put("fullscreen", !full);
         }
 

@@ -1046,7 +1046,7 @@ public class HudFragment{
                     String text = obj.text();
                     if(text != null && !text.isEmpty()){
                         if(!first) builder.append("\n[white]");
-                        builder.append(text);
+                        builder.append(UI.formatIcons(text));
 
                         first = false;
                     }
