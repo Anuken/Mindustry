@@ -488,7 +488,7 @@ public class MapObjectivesDialog extends BaseDialog{
                 buttons.defaults().size(160f, 64f).pad(2f);
                 buttons.button("@back", Icon.left, MapObjectivesDialog.this::hide);
                 buttons.button("@add", Icon.add, () -> getProvider(MapObjective.class).get(new TypeInfo(MapObjective.class), canvas::query));
-                buttons.button("@mod.dependencies.download", Icon.paste, () -> {
+                buttons.button("@editor.paste", Icon.paste, () -> {
                     Core.app.setClipboardText(JsonIO.write(new MapObjectives(canvas.objectives)));
                     for(var obj : JsonIO.read(MapObjectives.class, Core.app.getClipboardText()).all){
                         if(obj.editorX == canvas.pasteX && obj.editorY == canvas.pasteY){
@@ -496,7 +496,7 @@ public class MapObjectivesDialog extends BaseDialog{
                         }
                     };
                     if(copy == null){
-                        ui.showErrorMessage("@save.import.invalid");
+                        ui.showErrorMessage("@error.objectivecopy");
                     }else{
                         canvas.tilemap.createTile(copy.editorX, copy.editorY, copy, true);
                         canvas.objectives.add(copy);
