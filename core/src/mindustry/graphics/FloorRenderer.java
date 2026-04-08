@@ -130,6 +130,7 @@ public class FloorRenderer{
     }
 
     public void recacheTile(int x, int y){
+        if(dirty == null) return;
         int cx = x/chunksize, cy = y/chunksize;
         if(cx >= 0 && cy >= 0 && cx < dirty.length && cy < dirty[0].length){
             dirty[cx][cy] = true;
