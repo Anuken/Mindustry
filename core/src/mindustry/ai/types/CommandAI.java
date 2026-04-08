@@ -159,7 +159,7 @@ public class CommandAI extends AIController{
             defaultBehavior();
             if(shouldBoost() && unit.type.canBoost){
                 //auto land when near target
-                if(attackTarget != null && unit.within(attackTarget, unit.range())){
+                if((attackTarget != null && unit.within(attackTarget, unit.range())) || (hasStance(UnitStance.patrol) && target != null && unit.within(target, unit.range()))){
                     unit.updateBoosting(false);
                 }else{
                     unit.updateBoosting(true, true);
@@ -190,7 +190,7 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
-        if(!unit.type.autoFindTarget && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
+        if(!unit.type.autoFindTarget && !hasStance(UnitStance.patrol) && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
             return null;
         }
         return super.findMainTarget(x, y, range, air, ground);

@@ -79,10 +79,6 @@ public class EventType{
     public static class TurnEvent{}
     /** Called when the player places a line, mobile or desktop.*/
     public static class LineConfirmEvent{}
-    /** Called when a turret receives ammo, but only when the tutorial is active! */
-    public static class TurretAmmoDeliverEvent{}
-    /** Called when a core receives ammo, but only when the tutorial is active! */
-    public static class CoreItemDeliverEvent{}
     /** Called when the player opens info for a specific block.*/
     public static class BlockInfoEvent{}
     /** Called *after* all content has been initialized. */

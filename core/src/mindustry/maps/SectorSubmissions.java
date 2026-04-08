@@ -68,12 +68,15 @@ public class SectorSubmissions{
         registerSerpuloSector(202, "D&X", "https://discord.com/channels/391020510269669376/1253760205091635201/1253760205091635201", 33, 6f);
 
         //megabases
-        registerSerpuloSector(103, "enwyz", "https://discord.com/channels/391020510269669376/1379926839559979030/1429203869514207255");
-        registerSerpuloSector(237, "Chocomint", "https://discord.com/channels/391020510269669376/1379926929636851812/1474447354982563840");
-        registerSerpuloSector(138, "Lilith", "https://discord.com/channels/391020510269669376/1379926873152164004/1470268689201889464");
-        registerSerpuloSector(157, "Jamespire", "https://discord.com/channels/391020510269669376/1379926876457537547/1484013941477609543");
+        registerSerpuloSector(246, "enwyz", "https://discord.com/channels/391020510269669376/1379926839559979030/1429203869514207255");
+        registerSerpuloSector(244, "Chocomint", "https://discord.com/channels/391020510269669376/1379926929636851812/1474447354982563840");
+        registerSerpuloSector(242, "Lilith", "https://discord.com/channels/391020510269669376/1379926873152164004/1470268689201889464");
+        registerSerpuloSector(243, "Jamespire", "https://discord.com/channels/391020510269669376/1379926876457537547/1484013941477609543");
         registerSerpuloSector(247, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926976361533752/1431827990295220266");
         registerSerpuloSector(245, "Grushashusha", "https://discord.com/channels/391020510269669376/1379926971286290584/1485245072034365462");
+        registerSerpuloSector(27, "Stormrider", "https://discord.com/channels/391020510269669376/1379926798833287289/1451252137224044722");
+
+        Planets.serpulo.sectors.get(27).preset.shieldSectors.addAll(Planets.serpulo.sectors.get(246), Planets.serpulo.sectors.get(244), Planets.serpulo.sectors.get(242));
 
         /* UNUSED SECTORS:
         registerHiddenSectors(serpulo,
