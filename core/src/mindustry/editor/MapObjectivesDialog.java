@@ -39,6 +39,8 @@ public class MapObjectivesDialog extends BaseDialog{
     /** Maps annotation type with its field parsers. Non-annotated fields are mapped with {@link Override}. */
     private static final ObjectMap<Class<? extends Annotation>, ObjectMap<Class<?>, FieldInterpreter<?>>> interpreters = new ObjectMap<>();
 
+    private MapObjective copy = null;
+
     static{
         // Default un-annotated field interpreters.
         setProvider(String.class, (type, cons) -> cons.get(""));
@@ -486,6 +488,20 @@ public class MapObjectivesDialog extends BaseDialog{
                 buttons.defaults().size(160f, 64f).pad(2f);
                 buttons.button("@back", Icon.left, MapObjectivesDialog.this::hide);
                 buttons.button("@add", Icon.add, () -> getProvider(MapObjective.class).get(new TypeInfo(MapObjective.class), canvas::query));
+                buttons.button("@mod.dependencies.download", Icon.paste, () -> {
+                    Core.app.setClipboardText(JsonIO.write(new MapObjectives(canvas.objectives)));
+                    for(var obj : JsonIO.read(MapObjectives.class, Core.app.getClipboardText()).all){
+                        if(obj.editorX == canvas.pasteX && obj.editorY == canvas.pasteY){
+                            copy = obj;
+                        }
+                    };
+                    if(copy == null){
+                        ui.showErrorMessage("@save.import.invalid");
+                    }else{
+                        canvas.tilemap.createTile(copy.editorX, copy.editorY, copy, true);
+                        canvas.objectives.add(copy);
+                    }
+                });
                 buttons.button("@waves.edit", Icon.edit, () -> {
                     BaseDialog dialog = new BaseDialog("@waves.edit");
                     dialog.addCloseButton();
