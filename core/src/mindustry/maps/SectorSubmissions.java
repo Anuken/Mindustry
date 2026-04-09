@@ -5,6 +5,8 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.type.*;
 
+import static mindustry.content.Planets.*;
+
 /** Class for temporarily (?) storing links to map submissions on Discord. */
 public class SectorSubmissions{
     private static ObjectMap<Sector, MapSubmission> threadMap = new ObjectMap<>();
@@ -74,9 +76,30 @@ public class SectorSubmissions{
         registerSerpuloSector(243, "Jamespire", "https://discord.com/channels/391020510269669376/1379926876457537547/1484013941477609543");
         registerSerpuloSector(247, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926976361533752/1431827990295220266");
         registerSerpuloSector(245, "Grushashusha", "https://discord.com/channels/391020510269669376/1379926971286290584/1485245072034365462");
-        registerSerpuloSector(27, "Stormrider", "https://discord.com/channels/391020510269669376/1379926798833287289/1451252137224044722");
+        registerSerpuloSector(27, "Stormrider", "https://discord.com/channels/391020510269669376/1379926798833287289/1451252137224044722", -1, 10)
+        .showHidden = true;
 
         Planets.serpulo.sectors.get(27).preset.shieldSectors.addAll(Planets.serpulo.sectors.get(246), Planets.serpulo.sectors.get(244), Planets.serpulo.sectors.get(242));
+
+        //TODO: until further notice, these sectors won't have a special name or icon. is that fine?
+        new SectorPreset("fallenVessel", serpulo, -1){{
+            requireUnlock = false;
+            //showHidden = true;
+            captureWave = 70;
+            difficulty = 9;
+        }};
+
+        new SectorPreset("geothermalStronghold", serpulo, 264){{
+            requireUnlock = false;
+            difficulty = 10;
+            //showHidden = true;
+        }};
+
+        new SectorPreset("cruxscape", serpulo, 54){{
+            requireUnlock = false;
+            difficulty = 10;
+            //showHidden = true;
+        }};
 
         /* UNUSED SECTORS:
         registerHiddenSectors(serpulo,
@@ -90,11 +113,11 @@ public class SectorSubmissions{
         );*/
     }
 
-    static void registerSerpuloSector(int id, String author, String mapFileLink){
-        registerSerpuloSector(id, author, mapFileLink, -1, 0f);
+    static SectorPreset registerSerpuloSector(int id, String author, String mapFileLink){
+        return registerSerpuloSector(id, author, mapFileLink, -1, 0f);
     }
 
-    static void registerSerpuloSector(int id, String author, String mapFileLink, int captureWave, float difficulty){
+    static SectorPreset registerSerpuloSector(int id, String author, String mapFileLink, int captureWave, float difficulty){
         Planet planet = Planets.serpulo;
         Sector sector = planet.sectors.get(id);
         MapSubmission sub = threadMap.get(sector, MapSubmission::new);
@@ -113,6 +136,8 @@ public class SectorSubmissions{
         }else{
             sector.generateEnemyBase = true;
         }
+
+        return preset;
     }
 
     static void registerThread(int id, String link){

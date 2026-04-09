@@ -238,7 +238,7 @@ public class SerpuloTechTree{
                         node(steamGenerator, Seq.with(new SectorComplete(crateredBattleground)), () -> {
                             node(thermalGenerator, () -> {
                                 node(differentialGenerator, () -> {
-                                    node(thoriumReactor, Seq.with(new Research(Liquids.cryofluid)), () -> {
+                                    node(thoriumReactor, Seq.with(new Research(Liquids.cryofluid), new OnSector(nuclearComplex)), () -> {
                                         node(impactReactor, () -> {
 
                                         });
@@ -423,7 +423,7 @@ public class SerpuloTechTree{
 
                             node(retusa, Seq.with(new SectorComplete(windsweptIslands)), () -> {
                                 node(oxynoe, Seq.with(new SectorComplete(coastline)), () -> {
-                                    node(cyerce, () -> {
+                                    node(cyerce, Seq.with(new SectorComplete(perilousHarbor)), () -> {
                                         node(aegires, () -> {
                                             node(navanax, Seq.with(new SectorComplete(navalFortress)), () -> {
 
@@ -573,16 +573,6 @@ public class SerpuloTechTree{
                                             new Research(surgeSmelter),
                                             new Research(overdriveProjector)
                                             ), () -> {
-                                                node(fallenVessel, Seq.with(
-                                                new SectorComplete(desolateRift),
-                                                new SectorComplete(mycelialBastion),
-                                                new SectorComplete(littoralShipyard),
-                                                new Research(sei),
-                                                new Research(meltdown),
-                                                new Research(spectre)
-                                                ), () -> {
-
-                                                });
                                             });
                                         });
                                     });
