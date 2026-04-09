@@ -372,6 +372,8 @@ public class Mods implements Loadable{
             baseName = file.nameWithoutExtension(),
             regionName = baseName.contains(".") ? baseName.substring(0, baseName.indexOf(".")) : baseName;
 
+            if(baseName.isEmpty()) continue; //fixes #11855 in case anyone tries to do it again
+
             if(!prefix && !Core.atlas.has(regionName)){
                 Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite.", regionName, mod.name);
             }
