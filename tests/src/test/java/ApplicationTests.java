@@ -14,6 +14,7 @@ import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.maps.*;
@@ -898,25 +899,32 @@ public class ApplicationTests{
         Seq<DynamicTest> out = new Seq<>();
         if(world == null) world = new World();
 
-        for(SectorPreset zone : content.sectors()){
+        for(SectorPreset sector : content.sectors()){
 
-            out.add(dynamicTest(zone.name, () -> {
+            out.add(dynamicTest(sector.name, () -> {
                 Time.setDeltaProvider(() -> 1f);
 
                 logic.reset();
                 //pathfinder pollutes queue with garbage, causing OOM
                 Reflect.<TaskQueue>get(HeadlessApplication.class, Core.app, "runnables").clear();
-                state.rules.sector = zone.sector;
-                world.loadGenerator(zone.generator.map.width, zone.generator.map.height, tiles -> zone.generator.generate(tiles, new WorldParams()));
-                zone.rules.get(state.rules);
+                state.rules.sector = sector.sector;
+                world.loadGenerator(sector.generator.map.width, sector.generator.map.height, tiles -> sector.generator.generate(tiles, new WorldParams()));
+                sector.rules.get(state.rules);
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;
 
-                assertFalse(state.rules.infiniteResources || Team.sharded.rules().infiniteResources, "Sector " + zone.name + " must not have infinite resources.");
-                assertFalse(state.rules.allowEditRules, "Sector " + zone.name + " must not have rule editing enabled.");
-                assertFalse(state.rules.allowEditWorldProcessors, "Sector " + zone.name + " must not have world processor editing enabled.");
-                assertEquals(Team.sharded, state.rules.defaultTeam, "Sector " + zone.name + " must have the Sharded player team.");
-                assertEquals(Vars.state.getPlanet() == Planets.serpulo ? Team.crux : Team.malis, state.rules.waveTeam, "Sector " + zone.name + " must have the correct enemy team.");
+                assertFalse(state.rules.infiniteResources || Team.sharded.rules().infiniteResources, "Sector " + sector.name + " must not have infinite resources.");
+                assertFalse(state.rules.allowEditRules, "Sector " + sector.name + " must not have rule editing enabled.");
+                assertFalse(state.rules.allowEditWorldProcessors, "Sector " + sector.name + " must not have world processor editing enabled.");
+                assertEquals(Team.sharded, state.rules.defaultTeam, "Sector " + sector.name + " must have the Sharded player team.");
+                assertEquals(Vars.state.getPlanet() == Planets.serpulo ? Team.crux : Team.malis, state.rules.waveTeam, "Sector " + sector.name + " must have the correct enemy team.");
+
+                Seq<TimerObjective> timers = state.rules.objectives.all.select(m -> m instanceof TimerObjective && !m.hidden && ((TimerObjective)m).text != null &&
+                !((TimerObjective)m).text.isEmpty() && !((TimerObjective)m).text.contains("@")).as();
+
+                if(!timers.isEmpty()){
+                    fail("Sector " + sector.name + " has unlocalized objectives: " + timers.toString(", ", t -> "'" + t.text + "'"));
+                }
 
                 for(Tile tile : world.tiles){
                     if(tile.drop() != null){
@@ -948,7 +956,7 @@ public class ApplicationTests{
                     if(state.rules.attackMode){
                         bossWave = 100;
                     }else{
-                        assertNotEquals(0, bossWave, "Sector " + zone.name + " doesn't have a boss/end wave.");
+                        assertNotEquals(0, bossWave, "Sector " + sector.name + " doesn't have a boss/end wave.");
                     }
 
                     if(state.rules.winWave > 0) bossWave = state.rules.winWave - 1;
@@ -959,19 +967,19 @@ public class ApplicationTests{
                             total += spawn.getSpawned(i - 1);
                         }
 
-                        assertNotEquals(0, total, "Sector " + zone + " has no spawned enemies at wave " + i);
+                        assertNotEquals(0, total, "Sector " + sector + " has no spawned enemies at wave " + i);
                     }
                 }
 
-                assertFalse(Vars.indexer.isBlockPresent(Blocks.powerSource), "Sector '" + zone + "' must not have power sources.");
-                assertFalse(Vars.indexer.isBlockPresent(Blocks.powerVoid), "Sector '" + zone + "' must not have power voids.");
-                assertFalse(Vars.indexer.isBlockPresent(Blocks.itemSource), "Sector '" + zone + "' must not have item sources.");
-                assertFalse(Vars.indexer.isBlockPresent(Blocks.liquidSource), "Sector '" + zone + "' must not have liquid sources.");
+                assertFalse(Vars.indexer.isBlockPresent(Blocks.powerSource), "Sector '" + sector + "' must not have power sources.");
+                assertFalse(Vars.indexer.isBlockPresent(Blocks.powerVoid), "Sector '" + sector + "' must not have power voids.");
+                assertFalse(Vars.indexer.isBlockPresent(Blocks.itemSource), "Sector '" + sector + "' must not have item sources.");
+                assertFalse(Vars.indexer.isBlockPresent(Blocks.liquidSource), "Sector '" + sector + "' must not have liquid sources.");
 
-                assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + zone + " (" + Team.sharded.cores() + ")");
+                assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + sector + " (" + Team.sharded.cores() + ")");
 
-                assertTrue(hasSpawnPoint, "Sector \"" + zone.name + "\" has no spawn points.");
-                assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && state.rules.waveTeam.data().hasCore()), "Sector \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());
+                assertTrue(hasSpawnPoint, "Sector \"" + sector.name + "\" has no spawn points.");
+                assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && state.rules.waveTeam.data().hasCore()), "Sector \"" + sector.name + "\" has no enemy spawn points: " + spawner.countSpawns());
             }));
         }
 

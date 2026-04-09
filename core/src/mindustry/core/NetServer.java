@@ -640,6 +640,20 @@ public class NetServer implements ApplicationListener{
         return Float.isInfinite(f) || Float.isNaN(f);
     }
 
+    @Remote(targets = Loc.client, priority = PacketPriority.low, unreliable = true)
+    public static void requestBlockSnapshot(Player player, int pos){
+        Building build = world.build(pos);
+        if(build != null && build.team == player.team()){
+            netServer.syncStream.reset();
+            netServer.dataStreamWrites.i(build.pos());
+            netServer.dataStreamWrites.s(build.block.id);
+            build.writeSync(netServer.dataStreamWrites);
+
+            Call.blockSnapshot(player.con, (short)1, netServer.syncStream.toByteArray());
+            netServer.syncStream.reset();
+        }
+    }
+
     //sent from the client to the server in batches with the same incrementing groupId
     @Remote(targets = Loc.client, unreliable = true, priority = PacketPriority.low)
     public static void clientPlanSnapshot(Player player, int groupId, @Nullable ClientBuildPlans plans){
