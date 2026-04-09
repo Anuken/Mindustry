@@ -135,6 +135,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean collideTerrain = false;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
+    /** If keepVelocity = true, whether to reduce lifetime proportionally to the added speed, making range consistent. */
+    public boolean scaleKeepVelocity = false;
     /** Whether to scale lifetime (not actually velocity!) to disappear at the target position. Used for artillery. */
     public boolean scaleLife;
     /** Whether this bullet can be hit by point defense. */
@@ -833,6 +835,7 @@ public class BulletType extends Content implements Cloneable{
 
         if(fragBullet != null){
             fragBullet.keepVelocity = false;
+            fragBullet.scaleKeepVelocity = false;
         }
 
         if(lightningType == null){
@@ -973,7 +976,15 @@ public class BulletType extends Content implements Cloneable{
         }
         bullet.add();
 
-        if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel());
+        if(keepVelocity && owner instanceof Velc v){
+            float len = bullet.vel.len();
+            bullet.vel.add(v.vel());
+
+            if(scaleKeepVelocity){
+                float newLen = bullet.vel.len();
+                if(newLen > 0f) bullet.lifetime *= len / newLen;
+            }
+        }
         return bullet;
     }
 
