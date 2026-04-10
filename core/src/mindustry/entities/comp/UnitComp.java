@@ -684,6 +684,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             }
         }
 
+        if(Float.isNaN(health)){
+            health = 0f;
+            kill();
+        }
+
         //update drown/flying state
 
         Floor floor = floorOn();
