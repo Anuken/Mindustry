@@ -29,6 +29,10 @@ public class Drawf{
         text(text, x, y, 0f, color, scale, Align.center);
     }
 
+    public static void text(String text, float x, float y, Color color, float scale, int align){
+        text(text, x, y, 0f, color, scale, align);
+    }
+
     public static void text(String text, float x, float y, float rotation, Color color, float scale, int align){
         Font font = Fonts.outline;
         boolean ints = font.usesIntegerPositions();
