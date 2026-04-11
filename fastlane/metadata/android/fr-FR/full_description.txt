@@ -24,7 +24,7 @@ Mindustry est un jeu de construction d'usines, avec des éléments de tower defe
 - Plus de 50 types de drones, de mechs et de vaisseaux
 
 
-<h2>Parties personnalisés &amp; multijoueur multiplateforme</h2>
+<h2>Parties personnalisées &amp; multijoueur multiplateforme</h2>
 
 - 16+ cartes intégrées pour les parties personnalisées, en plus des deux campagnes complètes
 - Jouez en coop, en PvP ou en mode bac à sable
