@@ -40,7 +40,6 @@ public class Drawf{
         font.getData().setScale(0.25f / Scl.scl(1f) * scale);
         font.setColor(color);
         font.getCache().clear();
-        font.getCache().addText(text, x, y, 0f, align, false);
         GlyphLayout layout = font.getCache().addText(text, x, y, 0f, align, false);
         if(rotation != 0){
             float verticalFraction = (align & Align.bottom) != 0 ? 1f : (align & Align.top) != 0 ? 0f: 0.5f;
