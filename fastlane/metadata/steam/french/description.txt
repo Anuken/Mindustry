@@ -1,4 +1,4 @@
-Mindustry est un jeu de construction d'usines avec des éléments de tower defense et de STR. Créez des chaînes d'approvisionnement élaborées pour alimenter vos tourelles en munitions, produire des matériaux de construction et fabriquer des unités. Donnez des ordres à vos unités pour capturer des bases ennemies et développez votre production. Défendez votre noyau contre des vagues d'ennemis.
+Mindustry est un jeu de construction d'usines, avec des éléments de tower defense et de RTS. Créez des chaînes d'approvisionnement élaborées pour alimenter vos tourelles, produire des matériaux de construction et fabriquer des unités. Donnez des ordres à vos unités pour capturer des bases ennemies et développez votre production. Défendez votre noyau contre des vagues d'ennemis.
 
 Jouez à la campagne en solo ou avec vos amis en coopération multijoueur multiplateforme, et défiez-les dans des matchs PvP par équipes.
 
@@ -7,20 +7,20 @@ Jouez à la campagne en solo ou avec vos amis en coopération multijoueur multip
 [h2]Construction d'usines[/h2]
 
 [list]
-[*] Créez des chaînes d'approvisionnement élaborées avec des convoyeurs pour alimenter vos tourelles en munitions et produire des matériaux destinés à la construction
+[*] Créez des chaînes d'approvisionnement élaborées avec des convoyeurs pour alimenter vos tourelles et produire des matériaux destinés à la construction
 [*] Utilisez des blocs de production pour créer une grande variété de matériaux avancés
-[*] Distribuez des liquides et gérez des défis permanents, comme des incendies ou des raids d'ennemis volants
-[*] Tirez le meilleur parti de votre production en fournissant des liquides de refroidissement et des lubrifiants optionnels
+[*] Distribuez des liquides et gérez des défis permanents, comme des incendies ou des raids aériens
+[*] Tirez le meilleur parti de votre production en fournissant des liquides de refroidissement et des lubrifiants
 [*] Produisez une grande variété d'unités pour gérer automatiquement votre base ou attaquer les bases ennemies
 [/list]
 
 [h2]Défense de tourelles[/h2]
 
 [list]
-[*] Défendez vos structures contre des vagues d'ennemis
+[*] Défendez vos structures contre des vagues ennemies
 [*] Placez vos tourelles de manière stratégique pour les détruire avant qu'elles n'atteignent votre noyau
 [*] Alimentez vos tourelles en munitions, en liquide de refroidissement et en énergie
-[*] Renforcez vos défenses avec des boucliers alimentés, des projecteurs de régénération et d'autres bâtiments de soutien
+[*] Renforcez vos défenses avec des boucliers, des projecteurs de régénération et d'autres bâtiments de soutien
 [/list]
 
 [img]{STEAM_APP_IMAGE}/extras/rts3.png[/img]
@@ -29,22 +29,22 @@ Jouez à la campagne en solo ou avec vos amis en coopération multijoueur multip
 
 [list]
 [*] Mettez en place des chaînes d'assemblage pour construire des armées d'unités mécanisées
-[*] Utilisez vos unités pour affronter des bases ennemies pleinement fonctionnelles
+[*] Utilisez vos unités pour affronter des bases ennemies
 [*] Capturez davantage de territoire pour placer plus de noyaux et obtenir des ressources supplémentaires pour vous développer
 [/list]
 
 [h2]Campagne[/h2]
 
 [list]
-[*] Jouez à deux campagnes planétaires distinctes
+[*] Jouez à la campagne sur 2 planètes distinctes
 [*] Conquérez les planètes Serpulo et Erekir en progressant à travers 35 cartes faites à la main et plus de 250 secteurs générés procéduralement
 [*] Capturez des territoires et installez des usines pour produire des ressources pendant que vous jouez sur d'autres secteurs
 [*] Défendez vos secteurs contre des invasions périodiques
 [*] Coordonnez la distribution des ressources entre les secteurs via des rampes de lancement
 [*] Recherchez de nouveaux blocs pour poursuivre votre progression
 [*] Invitez vos amis à accomplir des missions ensemble
-[*] Plus de 250 blocs technologiques à maîtriser
-[*] Plus de 50 types différents de drones, de mechs et de vaisseaux
+[*] Plus de 250 blocs à débloquer
+[*] Plus de 50 types de drones, de mechs et de vaisseaux
 [*] Plus de 80 succès à débloquer
 [/list]
 
@@ -57,6 +57,6 @@ Jouez à la campagne en solo ou avec vos amis en coopération multijoueur multip
 [*] Les serveurs communautaires prennent en charge des plugins pour des cartes et des modes de jeu personnalisés
 [*] Créez un serveur dédié public ou invitez vos amis dans votre session privée
 [*] Règles de jeu personnalisables : modifiez le coût des blocs, les statistiques des ennemis, les objets de départ, le rythme des vagues et plus encore
-[*] L'éditeur de cartes intégré vous permet de créer vos propres cartes à jouer et à partager avec la communauté
+[*] L'éditeur de cartes intégré vous permet de créer vos propres cartes, pour y jouer et pour partager avec la communauté
 [*] Parcourez des mods créés par la communauté pour ajouter ou remixer encore plus de contenu
 [/list]

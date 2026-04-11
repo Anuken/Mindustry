@@ -1,1 +1,1 @@
-Un jeu de gestion d'usines ouvert avec des éléments de STR et de tower defense
+Un jeu de construction d'usines, avec du tower defense et du RTS
