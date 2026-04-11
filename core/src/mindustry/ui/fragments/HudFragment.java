@@ -412,7 +412,7 @@ public class HudFragment{
                             i.setDisabled(false);
                             i.getStyle().imageUp = Icon.players;
                         }else{
-                            i.setDisabled(state.rules.pauseDisabled);
+                            i.setDisabled(state.rules.pauseDisabled || (state.isCampaign() && state.afterGameOver));
                             i.getStyle().imageUp = state.isPaused() ? Icon.play : Icon.pause;
                         }
                     });
@@ -1046,7 +1046,7 @@ public class HudFragment{
                     String text = obj.text();
                     if(text != null && !text.isEmpty()){
                         if(!first) builder.append("\n[white]");
-                        builder.append(text);
+                        builder.append(UI.formatIcons(text));
 
                         first = false;
                     }

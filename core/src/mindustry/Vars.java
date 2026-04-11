@@ -54,7 +54,7 @@ public class Vars implements Loadable{
     /** Min game version for java mods specifically - this is higher, as Java mods have more breaking changes. */
     public static final int minJavaModGameVersion = 154;
     /** If true, a button to view sector submission threads is shown. */
-    public static boolean showSectorSubmissions = true;
+    public static boolean showSectorSubmissions = false;
     /** If true, the BE server list is always used. */
     public static boolean forceBeServers = false;
     /** If true, mod code and scripts do not run. For internal testing only. This WILL break mods if enabled. */
@@ -179,6 +179,8 @@ public class Vars implements Loadable{
     public static float maxDeltaClient = 6f, maxDeltaServer = 10f;
     /** whether the graphical game client has loaded */
     public static boolean clientLoaded = false;
+    /** whether the serpulo campaign sectors were remapped (older save) */
+    public static boolean hadSerpuloRemaps = false;
     /** max GL texture size */
     public static int maxTextureSize = 2048;
     /** Maximum schematic size.*/

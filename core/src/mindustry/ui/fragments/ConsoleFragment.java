@@ -29,7 +29,7 @@ public class ConsoleFragment extends Table{
     private Font font;
     private GlyphLayout layout = new GlyphLayout();
     private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = mobile ? Scl.scl(60) : Scl.scl(50);
-    private Color shadowColor = new Color(0, 0, 0, mobile ? 0.7f : 0.4f);
+    private Color shadowColor = new Color(0, 0, 0, 0.7f);
     private float textspacing = Scl.scl(10);
     private Seq<String> history = new Seq<>();
     private int historyPos = 0;

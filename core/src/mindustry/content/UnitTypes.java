@@ -1176,7 +1176,7 @@ public class UnitTypes{
                     shrinkY = 0f;
                     drag = -0.003f;
                     homingRange = 60f;
-                    keepVelocity = false;
+                    scaleKeepVelocity = true;
                     splashDamageRadius = 25f;
                     splashDamage = 15f;
                     lifetime = 50f;
@@ -1411,7 +1411,7 @@ public class UnitTypes{
                     weaveMag = 4;
                     weaveScale = 4;
                     lifetime = 50f;
-                    keepVelocity = false;
+                    scaleKeepVelocity = true;
                     shootEffect = Fx.shootHeal;
                     smokeEffect = Fx.hitLaser;
                     hitEffect = despawnEffect = Fx.hitLaser;
@@ -2546,7 +2546,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootAlpha;
 
                 bullet = new LaserBoltBulletType(2.5f, 11){{
-                    keepVelocity = false;
+                    scaleKeepVelocity = true;
                     width = 1.5f;
                     height = 4.5f;
                     hitEffect = despawnEffect = Fx.hitBulletColor;
@@ -2597,7 +2597,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootAlpha;
 
                 bullet = new LaserBoltBulletType(3f, 11){{
-                    keepVelocity = false;
+                    scaleKeepVelocity = true;
                     width = 1.5f;
                     height = 4.5f;
                     hitEffect = despawnEffect = Fx.hitBulletColor;
@@ -2652,7 +2652,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootAlpha;
 
                 bullet = new LaserBoltBulletType(3.5f, 11){{
-                    keepVelocity = false;
+                    scaleKeepVelocity = true;
                     width = 1.5f;
                     height = 5f;
                     hitEffect = despawnEffect = Fx.hitBulletColor;

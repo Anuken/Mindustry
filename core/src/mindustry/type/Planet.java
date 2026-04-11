@@ -175,6 +175,8 @@ public class Planet extends UnlockableContent{
     public CampaignRules campaignRuleDefaults = new CampaignRules();
     /** Sets up rules on game load for any sector on this planet. */
     public Cons<Rules> ruleSetter = r -> {};
+    /** Replaces specific blocks on the map upon sector capture. Used for metal floor tiles on Serpulo. Unstable API, may be removed! */
+    public ObjectMap<Block, Block> sectorCaptureReplacements = new ObjectMap<>();
     /** If true, RTS AI can be customized. */
     public boolean showRtsAIRule = false;
 
