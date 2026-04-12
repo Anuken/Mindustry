@@ -34,8 +34,12 @@ public class Drill extends Block{
     public int tier;
     /** Base time to drill one ore, in frames. */
     public float drillTime = 300;
-    /** How many times faster the drill will progress when boosted by liquid. */
+    /** How many times faster the drill will progress when boosted by liquid. Final multiplier will be squared. */
     public float liquidBoostIntensity = 1.6f;
+    /** Liquid boosters collected from consumers in init(). */
+    public Seq<ConsumeLiquidBase> liquidBoosters = new Seq<>();
+    /** Per-liquid drill speed multipliers for liquid boosters. Defaults to liquidBoostIntensity. */
+    public ObjectFloatMap<Liquid> liquidMultipliers = new ObjectFloatMap<>();
     /** Speed at which the drill speeds up. */
     public float warmupSpeed = 0.015f;
     /** Special exemption item that this drill can't mine. */
@@ -94,6 +98,14 @@ public class Drill extends Block{
             blockedItems = Seq.with(blockedItem);
         }
         if(drillEffectRnd < 0) drillEffectRnd = size;
+
+        liquidBoosters.clear();
+        for(var cons : consumers){
+            if(cons instanceof ConsumeLiquidBase liq && cons.booster){
+                cons.update = false;
+                liquidBoosters.add(liq);
+            }
+        }
     }
 
     @Override
@@ -180,13 +192,45 @@ public class Drill extends Block{
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
 
-        if(liquidBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
+        if(liquidBoosters.size > 0){
             stats.remove(Stat.booster);
-            stats.add(Stat.booster,
-                StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
-                consBase.amount,
-                liquidBoostIntensity * liquidBoostIntensity, false, consBase::consumes)
-            );
+
+            if(liquidBoosters.size == 1 && liquidMultipliers.isEmpty()){
+                var consBase = liquidBoosters.first();
+                stats.add(Stat.booster,
+                    StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
+                    consBase.amount,
+                    liquidBoostIntensity * liquidBoostIntensity, false, consBase::consumes)
+                );
+            }else{
+                stats.add(Stat.booster, table -> {
+                    table.row();
+                    table.table(c -> {
+                        ObjectSet<Liquid> list = new ObjectSet<>();
+                        for(var cons : liquidBoosters){
+                            for(var liquid : content.liquids()){
+                                if(!cons.consumes(liquid) || !list.add(liquid)) continue;
+
+                                float speed = Mathf.pow(liquidMultipliers.get(liquid, liquidBoostIntensity), 2f);
+                                if(speed == 1f || cons.amount <= 0f) continue;
+
+                                c.table(Styles.grayPanel, b -> {
+                                    b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> StatValues.withTooltip(i, liquid, false));
+                                    b.table(info -> {
+                                        info.add(liquid.localizedName).left().row();
+                                        info.add(Strings.autoFixed(cons.amount * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
+                                    });
+
+                                    b.table(bt -> {
+                                        bt.right().defaults().padRight(3).left();
+                                        bt.add((speed > 1f ? "[stat]" : "[negstat]") + Strings.autoFixed(speed, 2) + "[lightgray]" + StatUnit.timesSpeed.localized());
+                                    }).right().grow().pad(10f).padRight(15f);
+                                }).growX().pad(5).row();
+                            }
+                        }
+                    }).growX().colspan(table.getColumns()).row();
+                });
+            }
         }
     }
 
@@ -258,6 +302,29 @@ public class Drill extends Block{
             return efficiency * (size * size) / 4f;
         }
 
+        public float liquidBoost(){
+            float result = 1f;
+            ConsumeLiquidBase best = null;
+
+            for(var cons : liquidBoosters){
+                Liquid liquid = cons instanceof ConsumeLiquid cl ? cl.liquid :
+                    cons instanceof ConsumeLiquidFilter filter ? filter.getConsumed(this) : null;
+                if(liquid == null) continue;
+
+                float boost = Mathf.lerp(1f, liquidMultipliers.get(liquid, liquidBoostIntensity), cons.efficiency(this));
+                if(boost > result){
+                    result = boost;
+                    best = cons;
+                }
+            }
+
+            if(best != null){
+                best.update(this);
+            }
+
+            return result;
+        }
+
         @Override
         public void drawSelect(){
             drawItemSelection(dominantItem);
@@ -298,7 +365,7 @@ public class Drill extends Block{
             float delay = getDrillTime(dominantItem);
 
             if(items.total() < itemCapacity && dominantItems > 0 && efficiency > 0){
-                float speed = Mathf.lerp(1f, liquidBoostIntensity, optionalEfficiency) * efficiency;
+                float speed = liquidBoost() * efficiency;
 
                 lastDrillSpeed = (speed * dominantItems * warmup) / delay;
                 warmup = Mathf.approachDelta(warmup, speed, warmupSpeed);
