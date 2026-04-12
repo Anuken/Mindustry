@@ -3,7 +3,7 @@ package mindustry.mod;
 import arc.files.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.graphics.MultiPacker;
+import mindustry.graphics.*;
 
 public abstract class Mod{
 
