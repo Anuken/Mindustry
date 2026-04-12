@@ -22,21 +22,29 @@ public class Drawf{
     private static final FloatSeq points = new FloatSeq();
 
     public static void text(String text, float x, float y, Color color){
-        text(text, x, y, color, 1f, Align.center);
+        text(text, x, y, 0f, color, 1f, Align.center);
     }
 
     public static void text(String text, float x, float y, Color color, float scale){
-        text(text, x, y, color, scale, Align.center);
+        text(text, x, y, 0f, color, scale, Align.center);
     }
 
     public static void text(String text, float x, float y, Color color, float scale, int align){
+        text(text, x, y, 0f, color, scale, align);
+    }
+
+    public static void text(String text, float x, float y, float rotation, Color color, float scale, int align){
         Font font = Fonts.outline;
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
         font.getData().setScale(0.25f / Scl.scl(1f) * scale);
         font.setColor(color);
         font.getCache().clear();
-        font.getCache().addText(text, x, y, 0f, align, false);
+        GlyphLayout layout = font.getCache().addText(text, x, y, 0f, align, false);
+        if(rotation != 0){
+            float verticalFraction = (align & Align.bottom) != 0 ? 1f : (align & Align.top) != 0 ? 0f: 0.5f;
+            font.getCache().setRotation(rotation, x, y - layout.height * verticalFraction);
+        }
         if(color.a < 1f){
             font.getCache().setAlphas(color.a);
         }
