@@ -41,6 +41,7 @@ import java.util.concurrent.*;
 import static arc.Core.*;
 
 public class Vars implements Loadable{
+
     /** Whether the game failed to launch last time. */
     public static boolean failedToLaunch = false;
     /** Whether to load locales.*/
