@@ -107,7 +107,7 @@ public class ContentInfoDialog extends BaseDialog{
         //TODO: move this into a final end-game credit sequence. this is temporary and thus not localized
         if(content.credit != null){
             table.row();
-            table.add("Created by: " + content.credit).color(Color.gray).padTop(40f).row();
+            table.add(Core.bundle.format("content.createdby", content.credit)).color(Color.gray).padTop(40f).row();
         }
 
         if(settings.getBool("console")){
