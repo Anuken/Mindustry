@@ -162,6 +162,8 @@ public class Mods implements Loadable{
             packSprites(packer, sprites, mod, true, tasks, textureResize);
             packSprites(packer, overrides, mod, false, tasks, textureResize);
 
+            if(mod.main != null) mod.main.packSprites(packer);
+
             Log.debug("Packed @ images for mod '@'.", sprites.size + overrides.size, mod.meta.name);
             totalSprites[0] += sprites.size + overrides.size;
         });
