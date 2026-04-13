@@ -2928,8 +2928,7 @@ public class Blocks{
 
             consumePower(3f);
             consumeLiquid(Liquids.water, 0.1f).boost();
-            liquidMultipliers.put(Liquids.cryofluid, 2f);
-            consumeLiquid(Liquids.cryofluid, 0.1f).boost();
+            consumeLiquid(Liquids.cryofluid, 0.1f).boost(2f);
         }}; 
 
         waterExtractor = new SolidPump("water-extractor"){{

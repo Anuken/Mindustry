@@ -14,6 +14,8 @@ public abstract class Consume{
     public boolean booster;
     /** If false, this consumer will still be checked, but it will need to updated manually. */
     public boolean update = true;
+    /** Optional booster multiplier used by some blocks. */
+    public float boosterMultiplier = -1f;
     /** Multiplier for costs. Does not work for power consumers. */
     public Floatf<Building> multiplier = b -> 1f;
 
@@ -32,6 +34,12 @@ public abstract class Consume{
 
     public Consume boost(){
         return optional(true, true);
+    }
+
+    public Consume boost(float multiplier){
+        optional(true, true);
+        boosterMultiplier = multiplier;
+        return this;
     }
 
     public Consume update(boolean update){
