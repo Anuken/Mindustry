@@ -831,6 +831,19 @@ public class ContentParser{
                 };
             }
 
+            if(value.has("rules")){
+                JsonValue r = value.remove("rules");
+                if(!r.isObject()) throw new RuntimeException("Rules must be an object!");
+                planet.ruleSetter = rules -> {
+                    try{
+                        //Use standard JSON, this is not content-parser relevant
+                        JsonIO.json.readFields(rules, r);
+                    }catch(Throwable e){ //Try not to crash here, as that would be catastrophic and confusing
+                        Log.err(e);
+                    }
+                };
+            }
+
             //always one sector right now...
             planet.sectors.add(new Sector(planet, Ptile.empty));
 
