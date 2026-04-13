@@ -142,11 +142,11 @@
 		"NEW_ACHIEVEMENT_26_19_NAME"	"Où est le manuel ?"
 		"NEW_ACHIEVEMENT_26_19_DESC"	"Rechercher le Micro Processeur."
 		"NEW_ACHIEVEMENT_26_20_NAME"	"Panne totale"
-		"NEW_ACHIEVEMENT_26_20_DESC"	"Atteindre une puissance de -10 k/s dans un réseau."
+		"NEW_ACHIEVEMENT_26_20_DESC"	"Atteindre une puissance négative de -10 k/s dans un réseau électrique."
 		"NEW_ACHIEVEMENT_26_21_NAME"	"Surtension"
-		"NEW_ACHIEVEMENT_26_21_DESC"	"Atteindre une puissance positive de 100 k/s."
+		"NEW_ACHIEVEMENT_26_21_DESC"	"Atteindre une puissance positive de 100 k/s dans un réseau électrique"
 		"NEW_ACHIEVEMENT_26_22_NAME"	"Grande capacité"
-		"NEW_ACHIEVEMENT_26_22_DESC"	"Avoir 1 million de puissance stockée dans les batteries d'un réseau."
+		"NEW_ACHIEVEMENT_26_22_DESC"	"Avoir 1 million d'unités d'énergie stockées dans les batteries d'un réseau électrique."
 		"NEW_ACHIEVEMENT_26_23_NAME"	"Mauvaise idée"
 		"NEW_ACHIEVEMENT_26_23_DESC"	"Insérer du composé explosif dans un générateur à combustion."
 		"NEW_ACHIEVEMENT_26_24_NAME"	"Contamination"
@@ -178,6 +178,6 @@
 		"NEW_ACHIEVEMENT_29_5_NAME"	"Neutralisé"
 		"NEW_ACHIEVEMENT_29_5_DESC"	"Utiliser une Tour à Ondes de Choc pour absorber les balles entrantes."
 		"NEW_ACHIEVEMENT_29_6_NAME"	"Malheureusement,"
-		"NEW_ACHIEVEMENT_29_6_DESC"	"Utiliser l'emoji :alphachan: dans le chat multijoueur. Ou pas, c'est votre choix."
+		"NEW_ACHIEVEMENT_29_6_DESC"	"Utiliser l'émoji :alphachan: dans le chat multijoueur. Ou pas, c'est votre choix."
 	}
 }

@@ -44,11 +44,11 @@ Jouez à la campagne en solo ou avec vos amis en coopération multijoueur multip
 [*] Recherchez de nouveaux blocs pour poursuivre votre progression
 [*] Invitez vos amis à accomplir des missions ensemble
 [*] Plus de 250 blocs à débloquer
-[*] Plus de 50 types de drones, de mechs et de vaisseaux
+[*] Plus de 50 types de drones, de mécas et de vaisseaux
 [*] Plus de 80 succès à débloquer
 [/list]
 
-[h2]Communauté et modding[/h2]
+[h2]Communauté et création de mods[/h2]
 
 [list]
 [*] Utilisez le Steam Workshop pour parcourir des cartes et des schémas créés par la communauté
