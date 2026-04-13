@@ -316,8 +316,8 @@ public class SerpuloTechTree{
                     });
                 });
 
-                node(scorch, () -> {
-                    node(arc, () -> {
+                node(arc, () -> {
+                    node(scorch, () -> {
                         node(wave, () -> {
                             node(parallax, () -> {
                                 node(segment, () -> {
@@ -409,7 +409,7 @@ public class SerpuloTechTree{
                         });
                     });
 
-                    node(navalFactory, Seq.with(new OnSector(windsweptIslands)), () -> {
+                    node(navalFactory, Seq.with(new SectorComplete(ruinousShores)), () -> {
                         node(risso, () -> {
                             node(minke, () -> {
                                 node(bryde, () -> {
