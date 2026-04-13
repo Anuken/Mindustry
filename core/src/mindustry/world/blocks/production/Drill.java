@@ -194,10 +194,10 @@ public class Drill extends Block{
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
 
-        if(liquidBoosters.size > 0){
+        if(liquidBoosters.size > 0 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
             stats.remove(Stat.booster);
 
-            if(liquidBoosters.size == 1){
+            if(liquidBoosters.size == 1 && liquidBoostIntensity != 1){
                 var cons = liquidBoosters.first();
                 float speed = liquidSpeedMultiplier(cons);
                 stats.add(Stat.booster,
