@@ -10,17 +10,17 @@ Jouez à la campagne en solo ou avec vos amis en coopération multijoueur multip
 [*] Créez des chaînes d'approvisionnement élaborées avec des convoyeurs pour alimenter vos tourelles et produire des matériaux destinés à la construction
 [*] Utilisez des blocs de production pour créer une grande variété de matériaux avancés
 [*] Distribuez des liquides et gérez des défis permanents, comme des incendies ou des raids aériens
-[*] Tirez le meilleur parti de votre production en fournissant des liquides de refroidissement et des lubrifiants
+[*] Tirez le meilleur parti de votre production en fournissant des liquides de refroidissement
 [*] Produisez une grande variété d'unités pour gérer automatiquement votre base ou attaquer les bases ennemies
 [/list]
 
-[h2]Défense de tourelles[/h2]
+[h2]Défense avec des tourelles[/h2]
 
 [list]
 [*] Défendez vos structures contre des vagues ennemies
-[*] Placez vos tourelles de manière stratégique pour les détruire avant qu'elles n'atteignent votre noyau
+[*] Placez vos tourelles de manière stratégique pour détruire les vagues ennemies avant qu'elles n'atteignent votre noyau
 [*] Alimentez vos tourelles en munitions, en liquide de refroidissement et en énergie
-[*] Renforcez vos défenses avec des boucliers, des projecteurs de régénération et d'autres bâtiments de soutien
+[*] Renforcez vos défenses avec des boucliers, des bâtiments de réparation et d'autres bâtiments de soutien
 [/list]
 
 [img]{STEAM_APP_IMAGE}/extras/rts3.png[/img]

@@ -6,7 +6,7 @@ Mindustry est un jeu de construction d'usines, avec des éléments de tower defe
 - Défendez vos structures contre des vagues ennemies
 - Jouez avec vos amis en coop multijoueur multiplateforme, ou affrontez-les dans des matchs PvP par équipes
 - Distribuez des liquides et faites face à des défis permanents, comme des incendies ou des raids aériens
-- Tirez le meilleur parti de votre production en fournissant des liquides de refroidissement et des lubrifiants
+- Tirez le meilleur parti de votre production en fournissant des liquides de refroidissement
 - Produisez une grande variété d'unités pour gérer automatiquement votre base ou attaquer les bases ennemies
 - Mettez en place des chaînes d'assemblage pour construire des armées d'unités mécanisées
 - Utilisez vos unités pour affronter des bases ennemies
