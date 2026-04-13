@@ -29,7 +29,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
     public final float unitSize = Scl.scl(48f);
 
     public Seq<MapObjective> objectives = new Seq<>();
-    public int pasteX, pasteY;
+    public int pasteX = -999, pasteY = -999;
     public ObjectiveTilemap tilemap;
 
     protected MapObjective query;
@@ -387,10 +387,14 @@ public class MapObjectivesCanvas extends WidgetGroup{
                             dialog.addCloseButton();
                             dialog.show();
                         });
-                        b.button(Icon.copySmall, () -> { 
-                            pasteX = obj.editorX;
-                            pasteY = obj.editorY;
-                        }); // Object position can be used as an ID.
+
+                        if(mobile){
+                            b.button(Icon.copySmall, () -> { 
+                                pasteX = obj.editorX;
+                                pasteY = obj.editorY;
+                            }); // Object position can be used as an ID.
+                        }
+                        
                         b.button(Icon.trashSmall, () -> removeTile(this));
                     }).left().grow();
                 }).growX().height(unitSize / Scl.scl(1f) * 2).get().addCaptureListener(mover = new Mover());
