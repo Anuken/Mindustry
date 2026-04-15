@@ -926,6 +926,9 @@ public class ApplicationTests{
                     fail("Sector " + sector.name + " has unlocalized objectives: " + timers.toString(", ", t -> "'" + t.text + "'"));
                 }
 
+                //TODO: some Erekir sectors (origin, caldera) modify the cap, why?
+                //assertEquals(0, state.rules.unitCap, "Sector " + sector.name + " must not modify the unit cap.");
+
                 for(Tile tile : world.tiles){
                     if(tile.drop() != null){
                         resources.add(tile.drop());

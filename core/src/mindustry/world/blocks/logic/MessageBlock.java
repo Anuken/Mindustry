@@ -107,13 +107,13 @@ public class MessageBlock extends Block{
         public void buildConfiguration(Table table){
             table.button(Icon.pencil, Styles.cleari, () -> {
                 if(mobile){
-                    var contents = this.message.toString();
+                    var contents = message;
                     Core.input.getTextInput(new TextInput(){{
-                        text = contents;
+                        text = contents.toString();
                         multiline = true;
                         maxLength = maxTextLength;
                         accepted = str -> {
-                            if(!str.equals(text)) configure(str);
+                            if(!str.contentEquals(contents)) configure(str);
                         };
                     }});
                 }else{
@@ -136,7 +136,7 @@ public class MessageBlock extends Block{
                     dialog.cont.row();
                     dialog.cont.label(() -> a.getText().length() + " / " + maxTextLength).color(Color.lightGray);
                     dialog.buttons.button("@ok", () -> {
-                        if(!a.getText().equals(message.toString())) configure(a.getText());
+                        if(!a.getText().contentEquals(message)) configure(a.getText());
                         dialog.hide();
                     }).size(130f, 60f);
                     dialog.update(() -> {

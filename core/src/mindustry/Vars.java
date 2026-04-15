@@ -521,7 +521,7 @@ public class Vars implements Loadable{
             Log.info("NOTE: external translation bundle has been loaded.");
 
             if(!headless){
-                Time.run(10f, () -> ui.showInfo("Note: You have successfully loaded an external translation bundle.\n[accent]" + handle.absolutePath()));
+                Time.run(10f, () -> ui.showInfo(Core.bundle.format("bundle.external", handle.absolutePath())));
             }
         }catch(Throwable e){
             //no external bundle found

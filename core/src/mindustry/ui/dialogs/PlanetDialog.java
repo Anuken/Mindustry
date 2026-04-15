@@ -1197,7 +1197,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         stable.table(title -> {
             title.add("[accent]" + sector.name() + (debugSelect && (sector.info.name != null || sector.preset != null) ? " [lightgray](" + sector.id + ")" : "")).padLeft(3);
-            if(sector.preset == null){
+            if(sector.preset == null || (!sector.preset.requireUnlock)){
                 title.add().growX();
 
                 title.button(Icon.pencilSmall, Styles.clearNonei, () -> {
