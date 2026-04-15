@@ -2259,7 +2259,7 @@ public class LStatements{
     @RegisterStatement("playsound")
     public static class PlaySoundStatement extends LStatement{
         public boolean positional;
-        public String id = "@sfx-pew", volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy", limit = "true";
+        public String id = "@sfx-shoot", volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy", limit = "true";
 
         @Override
         public void build(Table table){

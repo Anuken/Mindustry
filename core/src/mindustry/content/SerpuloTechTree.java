@@ -458,7 +458,6 @@ public class SerpuloTechTree{
                     new Research(mender),
                     new Research(combustionGenerator)
                     ), () -> {
-
                         node(ruinousShores, Seq.with(
                         new SectorComplete(crateredBattleground),
                         new Research(graphitePress),
@@ -472,7 +471,6 @@ public class SerpuloTechTree{
                             new Research(siliconSmelter),
                             new Research(steamGenerator)
                             ), () -> {
-
                                 node(saltFlats, Seq.with(
                                 new SectorComplete(windsweptIslands),
                                 new SectorComplete(fungalPass),
