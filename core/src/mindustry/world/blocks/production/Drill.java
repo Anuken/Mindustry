@@ -36,8 +36,6 @@ public class Drill extends Block{
     public float drillTime = 300;
     /** How many times faster the drill will progress when boosted by liquid. Final multiplier will be squared. */
     public float liquidBoostIntensity = 1.6f;
-    /** Liquid boosters collected from consumers in init(). */
-    public Seq<ConsumeLiquidBase> liquidBoosters = new Seq<>();
     /** Speed at which the drill speeds up. */
     public float warmupSpeed = 0.015f;
     /** Special exemption item that this drill can't mine. */
@@ -66,7 +64,7 @@ public class Drill extends Block{
 
     /** Multipliers of drill speed for each item. Defaults to 1. */
     public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
-
+    public Seq<ConsumeLiquidBase> liquidBoosters = new Seq<>();
     public boolean drawRim = false;
     public boolean drawSpinSprite = true;
     public Color heatColor = Color.valueOf("ff5512");
