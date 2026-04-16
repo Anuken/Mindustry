@@ -289,7 +289,7 @@ public class CommandAI extends AIController{
             //TODO: should the unit stop when it finds a target?
             if(
                 (hasStance(UnitStance.patrol) && !hasStance(UnitStance.pursueTarget) && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
-                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
+                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && !unit.type.circleTarget && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
                 (command == UnitCommand.loopPayloadCommand && unit.within(vecMovePos, 10f))
             ){
                 move = false;
