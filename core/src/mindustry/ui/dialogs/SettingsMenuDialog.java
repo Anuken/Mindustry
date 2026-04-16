@@ -342,6 +342,7 @@ public class SettingsMenuDialog extends BaseDialog{
         game.checkPref("savecreate", true);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
+        game.checkPref("smartconveyorbridges", true);
         game.checkPref("hints", true);
         game.checkPref("logichints", true);
 
@@ -390,7 +391,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         graphics.sliderPref("screenshake", 4, 0, 8, i -> (i / 4f) + "x");
 
-        graphics.sliderPref("bloomintensity", 6, 0, 16, i -> (int)(i/4f * 100f) + "%");
+        graphics.sliderPref("bloomintensity", 6, 0, 16, i -> (int)(i / 4f * 100f) + "%");
         graphics.sliderPref("bloomblur", 2, 1, 16, i -> i + "x");
 
         graphics.sliderPref("fpscap", 240, 10, 245, 5, s -> {
