@@ -1851,6 +1851,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
+            if(exec.build == null) return;
             exec.build.ipt = Mathf.clamp(amount.numi(), 1, ((LogicBlock)exec.build.block).maxInstructionsPerTick);
             if(exec.ipt != null){
                 exec.ipt.numval = exec.build.ipt;
@@ -1889,7 +1890,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(!variable.constant && Time.timeSinceMillis(variable.syncTime) > syncInterval){
+            if(!variable.constant && Time.timeSinceMillis(variable.syncTime) > syncInterval && exec.build != null){
                 variable.syncTime = Time.millis();
                 Call.syncVariable(exec.build, variable.id, variable.isobj ? variable.objval : variable.numval);
             }
