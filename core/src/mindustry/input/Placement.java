@@ -1,5 +1,7 @@
 package mindustry.input;
 
+import java.util.Arrays;
+
 import arc.*;
 import arc.func.*;
 import arc.math.*;
@@ -12,6 +14,57 @@ import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 
+interface BridgePlacer{
+    boolean unlockedNow();
+
+    boolean positionsValid(int x1, int y1, int x2, int y2);
+
+    void applyToPlans(BuildPlan cur, BuildPlan other);
+}
+
+class ItemBridgePlacer implements BridgePlacer{
+    private final ItemBridge bridge;
+
+    ItemBridgePlacer(ItemBridge bridge){
+        this.bridge = bridge;
+    }
+
+    public boolean unlockedNow(){
+        return bridge.unlockedNow();
+    }
+
+    public boolean positionsValid(int x1, int y1, int x2, int y2){
+        return bridge.positionsValid(x1, y1, x2, y2);
+    }
+
+    public void applyToPlans(BuildPlan cur, BuildPlan other){
+        cur.block = bridge;
+        other.block = bridge;
+        other.config = new Point2(cur.x - other.x, cur.y - other.y);
+    }
+}
+
+class DirectionBridgePlacer implements BridgePlacer{
+    private final DirectionBridge bridge;
+
+    DirectionBridgePlacer(DirectionBridge bridge){
+        this.bridge = bridge;
+    }
+
+    public boolean unlockedNow(){
+        return bridge.unlockedNow();
+    }
+
+    public boolean positionsValid(int x1, int y1, int x2, int y2){
+        return bridge.positionsValid(x1, y1, x2, y2);
+    }
+
+    public void applyToPlans(BuildPlan cur, BuildPlan other){
+        cur.block = bridge;
+        other.block = bridge;
+    }
+}
+
 public class Placement{
     private static final Seq<BuildPlan> plans1 = new Seq<>();
     private static final Seq<Point2> tmpPoints = new Seq<>(), tmpPoints2 = new Seq<>();
@@ -19,6 +72,7 @@ public class Placement{
     private static final NormalizeDrawResult drawResult = new NormalizeDrawResult();
     private static final Bresenham2 bres = new Bresenham2();
     private static final Seq<Point2> points = new Seq<>();
+    private static final IntSeq tmpInts = new IntSeq(), tmpInts2 = new IntSeq();
 
     //for pathfinding
     private static final IntFloatMap costs = new IntFloatMap();
@@ -97,7 +151,7 @@ public class Placement{
         boolean addedLast = false;
 
         outer:
-        for(int i = 0; i < base.size;){
+        for(int i = 0; i < base.size; ){
             var point = base.get(i);
             result.add(point);
             if(i == base.size - 1) addedLast = true;
@@ -115,7 +169,7 @@ public class Placement{
             }
 
             //if it got here, that means nothing was found. try to proceed to the next node anyway
-            i ++;
+            i++;
         }
 
         if(!addedLast && !base.isEmpty()) result.add(base.peek());
@@ -132,7 +186,7 @@ public class Placement{
         calculateBridges(plans, bridge, false, t -> false);
     }
 
-    public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge, boolean hasJunction, Boolf<Block> avoid){
+    private static void calculateBridges(Seq<BuildPlan> plans, BridgePlacer bridge, boolean hasJunction, Boolf<Block> avoid){
         if(isSidePlace(plans) || plans.size == 0) return;
 
         //check for orthogonal placement + unlocked state
@@ -141,138 +195,114 @@ public class Placement{
         }
 
         Boolf<BuildPlan> placeable = plan ->
-            (plan.placeable(player.team()) || (plan.tile() != null && plan.tile().block() == plan.block)) &&  //don't count the same block as inaccessible
-           !(plan != plans.first() && plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
+        (plan.placeable(player.team()) || (plan.tile() != null && plan.tile().block() == plan.block)) &&  //don't count the same block as inaccessible
+        !(plan != plans.first() && plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
 
         var result = plans1.clear();
-        var rotated = plans.first().tile() != null && plans.first().tile().absoluteRelativeTo(plans.peek().x, plans.peek().y) == Mathf.mod(plans.first().rotation + 2, 4);
 
-        outer:
-        for(int i = 0; i < plans.size;){
+        // Use DP for smarter bridge placement
+        final int conveyorCost = 3;
+        final int junctionCost = 30;
+        final int bridgeCost = 200;
+        final int bridgeOverEmptyPenalty = 5;
+        final int infCost = Integer.MAX_VALUE / 2; // Avoid overflow when adding
+
+        int N = plans.size;
+        var dp = tmpInts.setSize(2 * N);
+        var parent = tmpInts2.setSize(2 * N);
+        Arrays.fill(dp, 0, 2 * N, infCost);
+        Arrays.fill(parent, 0, 2 * N, -1);
+        dp[0] = 0;
+        dp[N] = bridgeCost;
+
+        for(int i = 1; i < N; i++){
             var cur = plans.get(i);
-            result.add(cur);
+            boolean canPlace = placeable.get(cur);
+            boolean needJunction = hasJunction && (cur.tile() == null || avoid.get(cur.tile().block()));
 
-            //gap found
-            if(i < plans.size - 1 && placeable.get(cur) && !placeable.get(plans.get(i + 1))){
-                boolean wereSame = true;
+            if(!canPlace && !needJunction){
+                continue;
+            }
 
-                //find the closest valid position within range
-                for(int j = i + 1; j < plans.size; j++){
-                    var other = plans.get(j);
-
-                    //out of range now, set to current position and keep scanning forward for next occurrence
-                    if(!bridge.positionsValid(cur.x, cur.y, other.x, other.y)){
-                        //add 'missed' conveyors
-                        for(int k = i + 1; k < j; k++){
-                            result.add(plans.get(k));
-                        }
-                        i = j;
-                        continue outer;
-                    }else if(placeable.get(other)){
-
-                        if(wereSame && hasJunction){
-                            //the gap is fake, it's just conveyors that can be replaced with junctions
-                            i ++;
-                            continue outer;
-                        }else{
-                            //found a link, assign bridges
-                            cur.block = bridge;
-                            other.block = bridge;
-                            if(rotated){
-                                other.config = new Point2(cur.x - other.x,  cur.y - other.y);
-                            }else{
-                                cur.config = new Point2(other.x - cur.x, other.y - cur.y);
-                            }
-
-                            i = j;
-                            continue outer;
-                        }
-                    }
-
-                    if(other.tile() != null && !avoid.get(other.tile().block())){
-                        wereSame = false;
-                    }
-                }
-
-                //if it got here, that means nothing was found. this likely means there's a bunch of stuff at the end; add it and bail out
-                for(int j = i + 1; j < plans.size; j++){
-                    result.add(plans.get(j));
-                }
-                break;
+            if(canPlace){
+                dp[i] = dp[i - 1] + conveyorCost;
             }else{
-                i ++;
+                dp[i] = dp[i - 1] + junctionCost;
+            }
+            parent[i] = i - 1;
+
+            if(dp[i] < infCost && canPlace){
+                dp[N + i] = dp[i] + bridgeCost;
+                parent[N + i] = i - 1;
+            }
+
+            // Consider bridges from all previous positions
+            if(i >= 2 && canPlace){
+                int emptyPenalty = 0;
+                if(placeable.get(plans.get(i - 1))){
+                    emptyPenalty += bridgeOverEmptyPenalty;
+                }
+
+                for(int j = i - 2; j >= 0; j--){
+                    var other = plans.get(j);
+                    if(!bridge.positionsValid(cur.x, cur.y, other.x, other.y)){
+                        break; // No need to check further back if this one is out of range
+                    }
+
+                    if(placeable.get(other)){
+                        int cost = dp[N + j] + bridgeCost + emptyPenalty;
+                        if(dp[N + i] > cost){
+                            dp[N + i] = cost;
+                            parent[N + i] = j;
+                        }
+                        emptyPenalty += bridgeOverEmptyPenalty;
+                    }
+                }
+            }
+
+            if(dp[N + i] < dp[i]){
+                dp[i] = dp[N + i];
+                parent[i] = parent[N + i];
+            }
+
+            if(canPlace && dp[i] >= infCost){
+                // Unable to connect, restart a new segment
+                dp[i] = 0;
+                dp[N + i] = bridgeCost;
             }
         }
 
+        // Backtrack to assign bridges
+        int bridgeMode = 0;
+        for(int i = N - 1; i >= 0; ){
+            var cur = plans.get(i);
+            int p = parent[bridgeMode + i];
+
+            if(p == -1 || p == i - 1){
+                // No connection, connected by conveyor, or junction, no bridge needed
+                result.add(cur);
+                bridgeMode = 0;
+                i--;
+            }else{
+                // Connected by bridge, assign it
+                var other = plans.get(p);
+                bridge.applyToPlans(cur, other);
+                result.add(cur);
+                i = p;
+                bridgeMode = N;
+            }
+        }
+
+        result.reverse();
         plans.set(result);
     }
 
+    public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge, boolean hasJunction, Boolf<Block> avoid){
+        calculateBridges(plans, new ItemBridgePlacer(bridge), hasJunction, avoid);
+    }
+
     public static void calculateBridges(Seq<BuildPlan> plans, DirectionBridge bridge, boolean hasJunction, Boolf<Block> avoid){
-        if(isSidePlace(plans) || plans.size == 0) return;
-
-        //check for orthogonal placement + unlocked state
-        if(!(plans.first().x == plans.peek().x || plans.first().y == plans.peek().y) || !bridge.unlockedNow()){
-            return;
-        }
-
-        Boolf<BuildPlan> placeable = plan ->
-            (plan.placeable(player.team()) || (plan.tile() != null && plan.tile().block() == plan.block)) &&  //don't count the same block as inaccessible
-            !(plan != plans.first() && plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
-
-        var result = plans1.clear();
-
-        outer:
-        for(int i = 0; i < plans.size;){
-            var cur = plans.get(i);
-            result.add(cur);
-
-            //gap found
-            if(i < plans.size - 1 && placeable.get(cur) && !placeable.get(plans.get(i + 1))){
-                boolean wereSame = true;
-
-                //find the closest valid position within range
-                for(int j = i + 1; j < plans.size; j++){
-                    var other = plans.get(j);
-
-                    //out of range now, set to current position and keep scanning forward for next occurrence
-                    if(!bridge.positionsValid(cur.x, cur.y, other.x, other.y)){
-                        //add 'missed' conveyors
-                        for(int k = i + 1; k < j; k++){
-                            result.add(plans.get(k));
-                        }
-                        i = j;
-                        continue outer;
-                    }else if(placeable.get(other)){
-
-                        if(wereSame && hasJunction){
-                            //the gap is fake, it's just conveyors that can be replaced with junctions
-                            i ++;
-                            continue outer;
-                        }else{
-                            //found a link, assign bridges
-                            cur.block = bridge;
-                            other.block = bridge;
-                            i = j;
-                            continue outer;
-                        }
-                    }
-
-                    if(other.tile() != null && !avoid.get(other.tile().block())){
-                        wereSame = false;
-                    }
-                }
-
-                //if it got here, that means nothing was found. this likely means there's a bunch of stuff at the end; add it and bail out
-                for(int j = i + 1; j < plans.size; j++){
-                    result.add(plans.get(j));
-                }
-                break;
-            }else{
-                i ++;
-            }
-        }
-
-        plans.set(result);
+        calculateBridges(plans, new DirectionBridgePlacer(bridge), hasJunction, avoid);
     }
 
     private static float tileHeuristic(Tile tile, Tile other){
