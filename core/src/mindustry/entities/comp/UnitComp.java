@@ -301,6 +301,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case size -> hitSize / tilesize;
             case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
             case selectedRotation -> controller instanceof Player p ? p.selectedRotation : 0;
+            case pingX -> controller instanceof Player p && p.isPinging() ? p.pingX : Float.NaN;
+            case pingY -> controller instanceof Player p && p.isPinging() ? p.pingY : Float.NaN;
             default -> Float.NaN;
         };
     }
@@ -319,6 +321,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case building -> isBuilding() && !buildPlan().breaking ? buildPlan().tile().build : null;
             case breaking -> isBuilding() && buildPlan().breaking ? buildPlan().tile().build : null;
             case selectedBlock -> controller instanceof Player p ? p.selectedBlock : null;
+            case pingText -> controller instanceof Player p && p.isPinging() ? p.pingText : null;
             default -> noSensed;
         };
     }
