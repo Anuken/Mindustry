@@ -978,7 +978,8 @@ public class BulletType extends Content implements Cloneable{
 
         if(keepVelocity && owner instanceof Velc v){
             float len = bullet.vel.len();
-            bullet.vel.add(v.vel());
+            //only add velocity, never substract
+            if(v.vel().dot(bullet.vel) / len > 0f) bullet.vel.add(v.vel());
 
             if(scaleKeepVelocity){
                 float newLen = bullet.vel.len();

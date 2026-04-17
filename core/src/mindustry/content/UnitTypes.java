@@ -2639,7 +2639,7 @@ public class UnitTypes{
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;
-                reload = 1f;
+                reload = 15f;
                 x = 1f;
                 y = 2f;
                 shoot = new ShootSpread(){{
