@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.net.*;
 import mindustry.ui.*;
 
 import java.util.*;
@@ -89,6 +90,10 @@ public class HostDialog extends BaseDialog{
         ui.loadfrag.show("@hosting");
         Time.runTask(5f, () -> {
             try{
+                if(steam){
+                    SteamAdmin.fetch();
+                }
+
                 net.host(Core.settings.getInt("port", port));
                 player.admin = true;
                 Events.fire(new HostEvent());
@@ -100,8 +105,6 @@ public class HostDialog extends BaseDialog{
                         Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("@public.beta"));
                     }
                 }
-
-
             }catch(Exception e){
                 ui.showException(e.getMessage() != null && e.getMessage().toLowerCase(Locale.ROOT).contains("address already in use") ? "@server.error.addressinuse" : "@server.error", e);
             }

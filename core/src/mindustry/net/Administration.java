@@ -378,7 +378,7 @@ public class Administration{
     }
 
     public boolean isIPBanned(String ip){
-        return bannedIPs.contains(ip, false) || (findByIP(ip) != null && findByIP(ip).banned);
+        return bannedIPs.contains(ip, false) || (findByIP(ip) != null && findByIP(ip).banned) || (steam && ip.startsWith("steam") && SteamAdmin.isBanned(ip));
     }
 
     public boolean isIDBanned(String uuid){

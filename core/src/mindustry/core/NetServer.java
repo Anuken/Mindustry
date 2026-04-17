@@ -273,7 +273,7 @@ public class NetServer implements ApplicationListener{
             }
 
             Player player = Player.create();
-            player.admin = admins.isAdmin(uuid, packet.usid);
+            player.admin = admins.isAdmin(uuid, packet.usid) || (steam && con.address.startsWith("steam:") && SteamAdmin.isAdmin(con.address));
             player.con = con;
             player.con.usid = packet.usid;
             player.con.uuid = uuid;
