@@ -108,7 +108,6 @@ public class Logic implements ApplicationListener{
 
                 state.rules.coreIncinerates = true;
                 state.rules.infiniteResources = false;
-                state.rules.waveTimer = true; //there is no reason to ever disable the timer as that would be sandbox-like behavior
                 state.rules.allowEditRules = false;
                 state.rules.allowEditWorldProcessors = false;
                 if(state.getPlanet().enemyInfiniteItems){

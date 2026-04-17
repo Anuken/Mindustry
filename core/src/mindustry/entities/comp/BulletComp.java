@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -9,12 +10,14 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
@@ -22,7 +25,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Bulletc.class}, pooled = true, serialize = false)
 @Component(base = true)
-abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Bulletc, Timerc{
+abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Bulletc, Timerc, Senseable, Settable{
     @Import Team team;
     @Import Entityc owner;
     @Import float x, y, damage, lastX, lastY, time, lifetime;
@@ -338,5 +341,62 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Override
     public float rotation(){
         return vel.isZero(0.001f) ? rotation : vel.angle();
+    }
+
+
+    @Override
+    public double sense(LAccess sensor){
+        return switch(sensor){
+            case rotation -> rotation;
+            case health -> damage;
+            case maxHealth -> type.damage;
+            case x -> World.conv(x);
+            case y -> World.conv(y);
+            case velocityX -> vel.x * 60f / tilesize;
+            case velocityY -> vel.y * 60f / tilesize;
+            case dead -> !isAdded() ? 1 : 0;
+            case team -> team.id;
+            case range -> type.range;
+            case shootX -> World.conv(aimX());
+            case shootY -> World.conv(aimY());
+            case speed -> type.speed * 60f / tilesize;
+            case size -> type.hitSize / tilesize;
+            case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
+            case lifetime -> this.lifetime;
+            case time -> this.time;
+            default -> Float.NaN;
+        };
+    }
+
+    @Override
+    public void setProp(LAccess prop, double value){
+        switch(prop){
+            case health -> damage = (float)value;
+            case x -> x = World.unconv((float)value);
+            case y -> y = World.unconv((float)value);
+            case velocityX -> vel.x = (float)(value * tilesize / 60d);
+            case velocityY -> vel.y = (float)(value * tilesize / 60d);
+            case rotation -> rotation = (float)value;
+            case team -> this.team = Team.get((int)value);
+            case speed -> vel.setLength((float)value * 8f);
+            case lifetime -> this.lifetime = (float)value;
+            case time -> this.time = (float)value;
+        }
+    }
+
+    @Override
+    public void setProp(UnlockableContent content, double value){
+
+    }
+
+    @Override
+    public void setProp(LAccess prop, Object value){
+        switch(prop){
+            case team -> {
+                if(value instanceof Team t){
+                    team = t;
+                }
+            }
+        }
     }
 }
