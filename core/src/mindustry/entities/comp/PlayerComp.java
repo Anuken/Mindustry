@@ -356,6 +356,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         drawName();
     }
 
+    public boolean isPinging(){
+        return pingTime > 0f;
+    }
+
     void drawPing(){
         if(pingTime <= 0f || !renderer.showPings || name == null || team != Vars.player.team()) return;
 
