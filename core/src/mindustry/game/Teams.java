@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -370,6 +371,26 @@ public class Teams{
                 }
             }
             finishScheduleDerelict();
+
+            //do block replacements in a radius
+            var sector = state.getSector();
+            if(sector != null){
+                boolean any = false;
+                for(var entry : sector.planet.sectorCaptureReplacements){
+                    if(indexer.isBlockPresent(entry.key)){
+                        any = true;
+                    }
+                }
+                if(any){
+                    Geometry.circle(World.toTile(x), World.toTile(y), world.width(), world.height(), Mathf.round(range / tilesize), (tx, ty) -> {
+                        Tile t = world.rawTile(tx, ty);
+                        Block result = sector.planet.sectorCaptureReplacements.get(t.floor());
+                        if(result != null && !cores.contains(c -> c.within(t, range))){
+                            t.setFloor(result.asFloor());
+                        }
+                    });
+                }
+            }
         }
 
         private void scheduleDerelict(Building build){

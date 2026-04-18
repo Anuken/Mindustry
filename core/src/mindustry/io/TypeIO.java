@@ -421,6 +421,14 @@ public class TypeIO{
         return val == 255 || val >= content.unitStances().size ? UnitStance.stop : content.unitStance(val);
     }
 
+    public static void writePosEntity(Writes write, Posc entity){
+        write.i(entity == null ? -1 : entity.id());
+    }
+
+    public static Posc readPosEntity(Reads read){
+        return (Posc)Groups.sync.getByID(read.i());
+    }
+
     public static void writeEntity(Writes write, Entityc entity){
         write.i(entity == null ? -1 : entity.id());
     }

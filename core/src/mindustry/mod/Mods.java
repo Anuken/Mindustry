@@ -162,6 +162,8 @@ public class Mods implements Loadable{
             packSprites(packer, sprites, mod, true, tasks, textureResize);
             packSprites(packer, overrides, mod, false, tasks, textureResize);
 
+            if(mod.main != null) mod.main.packSprites(packer);
+
             Log.debug("Packed @ images for mod '@'.", sprites.size + overrides.size, mod.meta.name);
             totalSprites[0] += sprites.size + overrides.size;
         });
@@ -371,6 +373,8 @@ public class Mods implements Loadable{
             String
             baseName = file.nameWithoutExtension(),
             regionName = baseName.contains(".") ? baseName.substring(0, baseName.indexOf(".")) : baseName;
+
+            if(baseName.isEmpty()) continue; //fixes #11855 in case anyone tries to do it again
 
             if(!prefix && !Core.atlas.has(regionName)){
                 Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite.", regionName, mod.name);
