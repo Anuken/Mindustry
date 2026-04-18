@@ -41,7 +41,7 @@ public class SteamAdmin{
 
     public static boolean isBanned(String id){
         if(id.startsWith("steam:")) id = id.substring("steam:".length());
-        return data.banned.contains(id);
+        return data.bans.contains(id);
     }
 
     public static boolean isAdmin(String id){
@@ -50,7 +50,7 @@ public class SteamAdmin{
     }
 
     static class SteamAdminData{
-        ObjectSet<String> banned = new ObjectSet<>();
+        ObjectSet<String> bans = new ObjectSet<>();
         ObjectSet<String> admins = new ObjectSet<>();
     }
 }
