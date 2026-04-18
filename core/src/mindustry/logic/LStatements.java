@@ -1523,6 +1523,7 @@ public class LStatements{
                 }, 4, c -> c.width(150f)));
             }, Styles.logict, () -> {}).size(150f, 40f).pad(4f).color(table.color);
             table.table(Styles.none, t -> {
+                t.setColor(table.color);
                 t.add(" name");
                 field(t, name, str -> name = str).width(200f);
             });
