@@ -1466,7 +1466,7 @@ public class LStatements{
             fields(table, "index", index, str -> index = str);
             row(table);
             fields(table, "x", x, str -> x = str);
-            fields(table, "y", x, str -> x = str);
+            fields(table, "y", y, str -> y = str);
             table.row();
             fields(table, "rotation", rotation, str -> rotation = str);
             fields(table, "team", team, str -> team = str);
