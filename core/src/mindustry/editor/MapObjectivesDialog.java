@@ -42,8 +42,6 @@ public class MapObjectivesDialog extends BaseDialog{
     /** Maps annotation type with its field parsers. Non-annotated fields are mapped with {@link Override}. */
     private static final ObjectMap<Class<? extends Annotation>, ObjectMap<Class<?>, FieldInterpreter<?>>> interpreters = new ObjectMap<>();
 
-    private MapObjective copy = null;
-
     static{
         // Default un-annotated field interpreters.
         setProvider(String.class, (type, cons) -> cons.get(""));
@@ -526,6 +524,7 @@ public class MapObjectivesDialog extends BaseDialog{
 
                 if(mobile){
                     buttons.button("@editor.paste", Icon.paste, () -> {
+                        MapObjective copy = null;
                         Core.app.setClipboardText(JsonIO.write(new MapObjectives(canvas.objectives)));
                         for(var obj : JsonIO.read(MapObjectives.class, Core.app.getClipboardText()).all){
                             if(obj.editorX == canvas.pasteX && obj.editorY == canvas.pasteY){
@@ -589,7 +588,7 @@ public class MapObjectivesDialog extends BaseDialog{
 
         if(Core.input.keyDown(KeyCode.controlLeft) || Core.input.keyDown(KeyCode.controlRight)){
             if(Core.input.keyTap(KeyCode.v)){
-                copy = null;
+                MapObjective copy = null;
                 Core.app.setClipboardText(JsonIO.write(new MapObjectives(canvas.objectives)));
                 for(var obj : JsonIO.read(MapObjectives.class, Core.app.getClipboardText()).all){
                     if(obj.editorX == canvas.pasteX && obj.editorY == canvas.pasteY){
