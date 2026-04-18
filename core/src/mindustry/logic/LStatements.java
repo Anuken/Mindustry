@@ -1522,12 +1522,14 @@ public class LStatements{
                     build(table);
                 }, 4, c -> c.width(150f)));
             }, Styles.logict, () -> {}).size(150f, 40f).pad(4f).color(table.color);
-            table.add("name").left();
-            field(table, name, str -> name = str).left();
+            table.table(Styles.none, t -> {
+                t.add(" name");
+                field(t, name, str -> name = str);
+            }).growX();
             if(op == PatchSerEnum.addPatch){
                 table.row().add("statement");
                 arg = "\"unit.dagger.localizedName: 'DAGGER!'\"";
-                field(table, arg, str -> arg = str).width(800f);
+                field(table, arg, str -> arg = str).growX();
             }
             if(op == PatchSerEnum.clone){
                 table.add("to");
