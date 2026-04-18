@@ -89,6 +89,8 @@ public class Vars implements Loadable{
     public static final String[] serverJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_v8.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_v8.json"};
     /** URLs to the JSON files containing the list of mods.  */
     public static final String[] modJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrymods/mods.json"};
+    /** URLs to the JSON file containing players banned from Steam.  */
+    public static final String[] steamBansURLs = {"https://raw.githubusercontent.com/Anuken/MindustrySteamBans/master/data.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrysteambans/data.json"};
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
