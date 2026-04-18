@@ -1564,6 +1564,27 @@ public class LExecutor{
         }
     }
 
+    public static class PatchOpI implements LExecutor.LInstruction {
+        public PatchSerEnum op;
+        public LVar name, content;
+
+        public PatchOpI(PatchSerEnum op, LVar name, LVar content) {
+            this.content = content;
+            this.op = op;
+            this.name = name;
+        }
+
+        @Override
+        public void run(LExecutor exec) {
+            if(net.client())return;
+            // These contents are a simplified version of an original method I had.
+            op.op.get(
+                    name.obj() == null ? "null" : name.obj().toString(),
+                    name.obj() == null ? "null" : name.obj().toString()
+            );
+        }
+    }
+
     public static class SenseWeatherI implements LExecutor.LInstruction{
         public LVar type, to;
 
