@@ -7,6 +7,7 @@ import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
@@ -46,6 +47,20 @@ public class Saves{
         });
     }
 
+    private void clearOldMegabaseSectors(){
+        IntSet serpuloRemoval = IntSet.with(27, 245, 244, 243, 242, 247, 246, 237, 150, 157, 138, 251, 103);
+
+        //clear old megabase sectors from the beta period
+        saves.removeAll(s -> {
+            if(s.getSector() != null && s.getSector().planet == Planets.serpulo && serpuloRemoval.contains(s.getSector().id) && s.meta.build < 157 && s.meta.build > 146){
+                s.getSector().clearInfo();
+                s.file.delete();
+                return true;
+            }
+            return false;
+        });
+    }
+
     public void load(){
         saves.clear();
 
@@ -69,6 +84,8 @@ public class Saves{
                 Log.err(e);
             }
         }
+
+        clearOldMegabaseSectors();
 
         lastSectorSave = saves.find(s -> s.isSector() && s.getName().equals(Core.settings.getString("last-sector-save", "<none>")));
 
@@ -153,6 +170,7 @@ public class Saves{
 
         //process remaps later to allow swaps of sectors
         for(var remap : remaps){
+            if(remap.sourceSector.planet == Planets.serpulo) Vars.hadSerpuloRemaps = true;
             var remapTarget = remap.destSector;
 
             //overwrite the target sector's info with the save's info

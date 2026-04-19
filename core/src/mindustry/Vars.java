@@ -54,7 +54,7 @@ public class Vars implements Loadable{
     /** Min game version for java mods specifically - this is higher, as Java mods have more breaking changes. */
     public static final int minJavaModGameVersion = 154;
     /** If true, a button to view sector submission threads is shown. */
-    public static boolean showSectorSubmissions = true;
+    public static boolean showSectorSubmissions = false;
     /** If true, the BE server list is always used. */
     public static boolean forceBeServers = false;
     /** If true, mod code and scripts do not run. For internal testing only. This WILL break mods if enabled. */
@@ -89,6 +89,8 @@ public class Vars implements Loadable{
     public static final String[] serverJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_v8.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_v8.json"};
     /** URLs to the JSON files containing the list of mods.  */
     public static final String[] modJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrymods/mods.json"};
+    /** URLs to the JSON file containing players banned from Steam.  */
+    public static final String[] steamBansURLs = {"https://raw.githubusercontent.com/Anuken/MindustrySteamBans/master/data.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrysteambans/data.json"};
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
@@ -101,8 +103,12 @@ public class Vars implements Loadable{
     public static final int maxBlockSize = 16;
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
+    /** maximum number of preview plans for remote players */
+    public static final int maxPlayerPreviewPlans = 1000;
     /** max chat message length */
     public static final int maxTextLength = 150;
+    /** max length of ping marker text */
+    public static final int maxPingTextLength = 40;
     /** max player name length in bytes */
     public static final int maxNameLength = 40;
     /** displayed item size when ingame. */
@@ -175,6 +181,8 @@ public class Vars implements Loadable{
     public static float maxDeltaClient = 6f, maxDeltaServer = 10f;
     /** whether the graphical game client has loaded */
     public static boolean clientLoaded = false;
+    /** whether the serpulo campaign sectors were remapped (older save) */
+    public static boolean hadSerpuloRemaps = false;
     /** max GL texture size */
     public static int maxTextureSize = 2048;
     /** Maximum schematic size.*/
@@ -368,6 +376,8 @@ public class Vars implements Loadable{
         ios = Core.app.isIOS();
         android = Core.app.isAndroid();
 
+        becontrol.init();
+
         modDirectory.mkdirs();
 
         Events.on(ContentInitEvent.class, e -> {
@@ -513,7 +523,7 @@ public class Vars implements Loadable{
             Log.info("NOTE: external translation bundle has been loaded.");
 
             if(!headless){
-                Time.run(10f, () -> ui.showInfo("Note: You have successfully loaded an external translation bundle.\n[accent]" + handle.absolutePath()));
+                Time.run(10f, () -> ui.showInfo(Core.bundle.format("bundle.external", handle.absolutePath())));
             }
         }catch(Throwable e){
             //no external bundle found

@@ -155,6 +155,26 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         return false;
     }
 
+    boolean canDropPayload(){
+        if(payloads.isEmpty()) return false;
+
+        Payload payload = payloads.peek();
+        Tile on = tileOn();
+
+        if(on != null && on.build != null && on.build.team == team && on.build.acceptPayload(on.build, payload)) return true;
+
+        if(payload instanceof BuildPayload b){
+            Building tile = b.build;
+            int tx = World.toTile(x - tile.block.offset), ty = World.toTile(y - tile.block.offset);
+            on = Vars.world.tile(tx, ty);
+            return on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false);
+        }else if(payload instanceof UnitPayload p){
+            var u = p.unit;
+            return !(!u.canPass(World.toTile(x + Tmp.v1.x), World.toTile(y + Tmp.v1.y)) || Units.count(x, y, u.physicSize(), o -> o.isGrounded() && o.hitSize > 14f) > 1);
+        }
+        return false;
+    }
+
     boolean dropUnit(UnitPayload payload){
         Unit u = payload.unit;
 

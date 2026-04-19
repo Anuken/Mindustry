@@ -18,6 +18,7 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -114,6 +115,10 @@ public class Logic implements ApplicationListener{
                     state.rules.waveTeam.rules().fillItems = true;
                 }
                 state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
+
+                if(state.getPlanet().enemyFactoryActivationDelay > 0f && state.rules.waveTeam.rules().unitFactoryActivationDelay == 0f){
+                    state.rules.waveTeam.rules().unitFactoryActivationDelay = state.getPlanet().enemyFactoryActivationDelay;
+                }
             }
 
             //save settings
@@ -130,6 +135,26 @@ public class Logic implements ApplicationListener{
         Events.on(SectorCaptureEvent.class, e -> {
             if(!net.client() && e.sector == state.getSector() && e.sector.isBeingPlayed()){
                 state.rules.waveTeam.data().destroyToDerelict();
+            }
+
+            if(e.sector.planet.sectorCaptureReplacements.size > 0){
+                boolean any = false;
+                //faster mapping, avoids objectmap per-tile
+                Floor[] map = new Floor[content.blocks().size];
+                for(var entry : e.sector.planet.sectorCaptureReplacements){
+                    if(indexer.isBlockPresent(entry.key)){
+                        map[entry.key.id] = entry.value.asFloor();
+                        any = true;
+                    }
+                }
+                if(any){
+                    world.tiles.eachTile(t -> {
+                        Floor result = map[t.floor().id];
+                        if(result != null){
+                            t.setFloor(result);
+                        }
+                    });
+                }
             }
 
             if(!net.client() && e.sector.planet.generator != null){
@@ -285,7 +310,6 @@ public class Logic implements ApplicationListener{
         Events.fire(new ResetEvent());
         world.tiles = new Tiles(0, 0);
 
-        //save settings on reset
         Core.settings.manualSave();
     }
 

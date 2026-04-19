@@ -38,6 +38,7 @@ public class ArcNetProvider implements NetProvider{
     private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 
     private volatile int playerLimitCache, packetSpamLimit;
+    private Ratekeeper clientUdpErrorRate = new Ratekeeper();
 
     public ArcNetProvider(){
         ArcNet.errorHandler = e -> {
@@ -57,7 +58,17 @@ public class ArcNetProvider implements NetProvider{
             packetSpamLimit = Config.packetSpamLimit.num();
         });
 
-        client = new Client(8192, 16384, new PacketSerializer());
+        client = new Client(8192, 16384, new PacketSerializer()){
+            @Override
+            public void handleNetException(ArcNetException e){
+                //allow occasional UDP network errors
+                if(net.client() && e.getMessage() != null && e.getMessage().contains("UDP deserialization") && clientUdpErrorRate.allow(5000, 5)){
+                    Log.err("UDP network error", e);
+                }else{
+                    super.handleNetException(e);
+                }
+            }
+        };
         client.setDiscoveryPacket(packetSupplier);
         client.addListener(new NetListener(){
             @Override
@@ -161,7 +172,15 @@ public class ArcNetProvider implements NetProvider{
                     try{
                         net.handleServerReceived(k, pack);
                     }catch(Throwable e){
-                        Log.err(e);
+                        long time = Time.millis();
+                        //only kick due to errors if there are two within a short span of time
+                        if(Time.timeSinceMillis(k.lastErrorTime) < 2000){
+                            k.connection.close(DcReason.error);
+                            Log.err("Closing connection due to error: " + k.address + " / " + k.uuid, e);
+                        }else{
+                            k.lastErrorTime = time;
+                            Log.err("Error reading packet from connection: " + k.address + " / " + k.uuid, e);
+                        }
                     }
                 });
             }
@@ -190,6 +209,8 @@ public class ArcNetProvider implements NetProvider{
 
     @Override
     public void connectClient(String ip, int port, Runnable success){
+        clientUdpErrorRate.reset();
+
         Threads.daemon(() -> {
             try{
                 //just in case
@@ -215,6 +236,7 @@ public class ArcNetProvider implements NetProvider{
 
     @Override
     public void disconnectClient(){
+        clientUdpErrorRate.reset();
         client.close();
     }
 
@@ -332,6 +354,8 @@ public class ArcNetProvider implements NetProvider{
     class ArcConnection extends NetConnection{
         public final Connection connection;
 
+        long lastErrorTime;
+
         public ArcConnection(String address, Connection connection){
             super(address);
             this.connection = connection;
@@ -409,6 +433,9 @@ public class ArcNetProvider implements NetProvider{
 
         @Override
         public Object read(ByteBuffer byteBuffer){
+            //fixes invalid 0-length packets on some servers
+            if(byteBuffer.limit() == 0) return null;
+
             if(debug){
                 if(Time.timeSinceMillis(lastDownload) >= 1000){
                     lastDownload = Time.millis();
@@ -425,6 +452,7 @@ public class ArcNetProvider implements NetProvider{
             }else{
                 //read length int, followed by compressed lz4 data
                 Packet packet = Net.newPacket(id);
+                if(!packet.allow(net.server())) throw new RuntimeException("Invalid packet type for endpoint: " + packet.getClass());
                 var buffer = decompressBuffer.get();
                 int length = byteBuffer.getShort() & 0xffff;
                 byte compression = byteBuffer.get();

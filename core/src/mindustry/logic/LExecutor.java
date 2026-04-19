@@ -14,6 +14,7 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.MapObjectives.*;
@@ -23,6 +24,7 @@ import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
@@ -619,12 +621,17 @@ public class LExecutor{
         public void run(LExecutor exec){
             Object targetObj = target.obj();
             if(targetObj instanceof LReadable read){
-                if(!read.readable(exec)) return;
+                if(!read.readable(exec)){
+                    output.setobj(null);
+                    return;
+                }
                 read.read(position, output);
             }else{
                 int address = position.numi();
                 if(targetObj instanceof CharSequence str){
                     output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
+                }else{
+                    output.setobj(null);
                 }
             }
         }
@@ -1194,11 +1201,11 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
+            if(exec.build == null) return;
             exec.build.ipt = Mathf.clamp(amount.numi(), 1, exec.build.block.privileged ? ((LogicBlock)exec.build.block).maxInstructionsPerTick : ((LogicBlock)exec.build.block).instructionsPerTick);
             if(exec.ipt != null){
                 exec.ipt.numval = exec.build.ipt;
             }
-
         }
     }
 
@@ -1519,7 +1526,65 @@ public class LExecutor{
         }
     }
 
-    public static class SenseWeatherI implements LInstruction{
+    public static class SpawnBulletI implements LInstruction{
+        public LVar result, from, weapon, x, y, rotation, team, owner, damage, velocityScl, lifeScl, aimX, aimY;
+
+        public SpawnBulletI(LVar result, LVar from, LVar index, LVar x, LVar y, LVar rotation, LVar team, LVar owner, LVar damage, LVar velocityScl, LVar lifeScl, LVar aimX, LVar aimY){
+            this.result = result;
+            this.from = from;
+            this.weapon = index;
+            this.x = x;
+            this.y = y;
+            this.rotation = rotation;
+            this.team = team;
+            this.owner = owner;
+            this.damage = damage;
+            this.velocityScl = velocityScl;
+            this.lifeScl = lifeScl;
+            this.aimX = aimX;
+            this.aimY = aimY;
+        }
+
+        public SpawnBulletI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Team teamVal = team.team();
+
+            Object fromVal = from.obj();
+            Entityc ownerVal = owner.obj() instanceof Entityc e ? e : null;
+            if(teamVal == null && ownerVal instanceof Teamc t) teamVal = t.team();
+            if(teamVal == null) teamVal = Team.derelict;
+            BulletType type;
+
+            if(fromVal instanceof UnitType u){
+                int index = weapon.numi();
+                type = index < 0 || index >= u.weapons.size ? null : u.weapons.get(index).bullet;
+            }else if(fromVal instanceof ItemTurret t){
+                var item = weapon.obj() instanceof Item i ? i : null;
+                type = item == null ? null : t.ammoTypes.get(item);
+            }else if(fromVal instanceof LiquidTurret t){
+                var item = weapon.obj() instanceof Liquid i ? i : null;
+                type = item == null ? null : t.ammoTypes.get(item);
+            }else if(fromVal instanceof ContinuousLiquidTurret t){
+                var item = weapon.obj() instanceof Liquid i ? i : null;
+                type = item == null ? null : t.ammoTypes.get(item);
+            }else if(fromVal instanceof PowerTurret t){
+                type = t.shootType;
+            }else if(fromVal instanceof ContinuousTurret t){
+                type = t.shootType;
+            }else{
+                return;
+            }
+
+            if(type == null) return;
+
+            result.setobj(type.create(ownerVal, teamVal, World.unconv(x.numf()), World.unconv(y.numf()), rotation.numf(), damage.numf(), velocityScl.numf(), lifeScl.numf(), null, null, World.unconv(aimX.numf()), World.unconv(aimY.numf())));
+        }
+    }
+
+    public static class SenseWeatherI implements LExecutor.LInstruction{
         public LVar type, to;
 
         public SenseWeatherI(LVar type, LVar to){
@@ -1620,6 +1685,7 @@ public class LExecutor{
                 case unitCap -> state.rules.unitCap = Math.max(value.numi(), 0);
                 case lighting -> state.rules.lighting = value.bool();
                 case canGameOver -> state.rules.canGameOver = value.bool();
+                case pauseDisabled -> state.rules.pauseDisabled = value.bool();
                 case mapArea -> {
                     int x = p1.numi(), y = p2.numi(), w = p3.numi(), h = p4.numi();
                     if(!checkMapArea(x, y, w, h, false)){
@@ -1884,7 +1950,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(!variable.constant && Time.timeSinceMillis(variable.syncTime) > syncInterval){
+            if(!variable.constant && Time.timeSinceMillis(variable.syncTime) > syncInterval && exec.build != null){
                 variable.syncTime = Time.millis();
                 Call.syncVariable(exec.build, variable.id, variable.isobj ? variable.objval : variable.numval);
             }
