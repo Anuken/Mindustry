@@ -614,6 +614,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             addChild(table);
                             lastTable[0] = table;
                         });
+                        
+                        if(!mobile){
+                            button.clicked(l -> l.setButton(KeyCode.mouseMiddle), e -> {
+                                tool.mode = -1;
+                            });
+                        }
                     }
 
 
