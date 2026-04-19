@@ -629,7 +629,20 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     mode.setAlignment(Align.topLeft, Align.topLeft);
                     mode.touchable = Touchable.disabled;
 
-                    tools.stack(button, mode);
+
+                    if(tool.altModes.length > 0){
+                        Table corner = new Table();
+                        corner.bottom().right();
+                        corner.touchable = Touchable.disabled;
+
+                        Image indicator = new Image(new TextureRegionDrawable(Core.atlas.find("select-arrow")), Scaling.fill);
+                        indicator.setColor(Color.lightGray);
+                        corner.add(indicator).size(12f).padRight(4f).padBottom(4f);
+
+                        tools.stack(button, corner, mode);
+                    }else{
+                        tools.stack(button, mode);
+                    }
                 };
 
                 tools.defaults().size(size, size);
