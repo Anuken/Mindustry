@@ -2,6 +2,7 @@ package mindustry.logic;
 
 import arc.*;
 import arc.audio.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -47,7 +48,7 @@ public class LExecutor{
     /** Non-constant variables used for network sync */
     public LVar[] vars = {};
 
-    public LVar counter, unit, thisv, ipt;
+    public LVar counter, unit, thisv, ipt, queryResult;
 
     public int[] binds;
     public boolean yield;
@@ -131,6 +132,7 @@ public class LExecutor{
         unit = builder.getVar("@unit");
         thisv = builder.getVar("@this");
         ipt = builder.putConst("@ipt", build != null ? build.ipt : 0);
+        if(builder.privileged) queryResult = builder.putConst("@queries", null);
     }
 
     //region utility
@@ -630,6 +632,8 @@ public class LExecutor{
                 int address = position.numi();
                 if(targetObj instanceof CharSequence str){
                     output.setnum(address < 0 || address >= str.length() ? Double.NaN : (int)str.charAt(address));
+                }else if(targetObj instanceof Seq<?> seq){
+                    output.setobj(address < 0 || address >= seq.size ? null : seq.get(address));
                 }else{
                     output.setobj(null);
                 }
@@ -637,7 +641,7 @@ public class LExecutor{
         }
     }
 
-    public static class WriteI implements LInstruction{
+    public static class WriteI implements LExecutor.LInstruction{
         public LVar target, position, value;
 
         public WriteI(LVar target, LVar position, LVar value){
@@ -697,10 +701,16 @@ public class LExecutor{
                     }
                 }
             }else{
-                if(target instanceof CharSequence seq && (sense == LAccess.size || sense == LAccess.bufferSize)){
-                    to.setnum(seq.length());
-                    return;
+                if(sense == LAccess.size || sense == LAccess.bufferSize){
+                    if(target instanceof CharSequence seq){
+                        to.setnum(seq.length());
+                        return;
+                    }else if(target instanceof Seq<?> seq){
+                        to.setnum(seq.size);
+                        return;
+                    }
                 }
+
                 to.setobj(null);
             }
         }
@@ -1395,6 +1405,96 @@ public class LExecutor{
 
     //endregion
     //region privileged / world instructions
+
+    public static class QueryI implements LInstruction{
+        private static Seq<Object> paramSeq;
+        private static Team paramTeam;
+        private static final Cons<Bullet> bulletCons = o -> {
+            if(o.team == paramTeam){
+                paramSeq.add(o);
+            }
+        };
+
+        public boolean circle;
+        public QueryType type = QueryType.unit;
+        public LVar team, x, y, width, height;
+
+        public QueryI(boolean circle, QueryType type, LVar team, LVar x, LVar y, LVar width, LVar height){
+            this.circle = circle;
+            this.type = type;
+            this.team = team;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.queryResult == null) return;
+            Seq<Object> results = exec.queryResult.obj() instanceof Seq s ? s : null;
+            if(results == null){
+                results = new Seq<>(false);
+                exec.queryResult.setconst(results);
+            }
+
+            float x = this.x.numfWorld(), y = this.y.numfWorld(), w = this.width.numfWorld(), h = this.height.numfWorld();
+            float radius = w, circleX = x, circleY = y;
+            if(circle){
+                x -= radius;
+                y -= radius;
+                w = radius * 2f;
+                h = radius * 2f;
+            }
+
+            results.clear();
+            Team team = this.team.team();
+
+            if(type == QueryType.bullet) return; //TODO: bugged due to bullets being pooled, need a way to have references to them cleaned up after death.
+
+            switch(type){
+                case unit -> {
+                    if(team != null){
+                        team.data().tree().intersect(x, y, w, h, results.as());
+                    }else{
+                        for(var other : state.teams.present){
+                            other.tree().intersect(x, y, w, h, results.as());
+                        }
+                    }
+                }
+                case bullet -> {
+                    if(team != null){
+                        paramTeam = team;
+                        paramSeq = results;
+                        ((QuadTree<Bullet>)Groups.bullet.tree()).intersect(x, y, w, h, bulletCons);
+                    }else{
+                        Groups.bullet.tree().intersect(x, y, w, h, results.as());
+                    }
+                }
+                case building -> {
+                    if(team != null){
+                        if(team.data().buildingTree == null) return;
+                        team.data().buildingTree.intersect(x, y, w, h, results.as());
+                    }else{
+                        for(var other : state.teams.present){
+                            if(other.buildingTree != null){
+                                other.buildingTree.intersect(x, y, w, h, results.as());
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(circle){
+                switch(type){
+                    //TODO: lambda capture causes garbage?
+                    case unit -> results.<Unit>as().removeAll(u -> !u.within(circleX, circleY, radius + u.hitSize/2f));
+                    case bullet -> results.<Bullet>as().removeAll(u -> !u.within(circleX, circleY, radius + u.hitSize/2f));
+                    case building -> results.<Building>as().removeAll(u -> !u.within(circleX, circleY, radius + u.hitSize()/2f));
+                }
+            }
+        }
+    }
 
     public static class GetBlockI implements LInstruction{
         public LVar x, y;
