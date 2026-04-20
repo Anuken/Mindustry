@@ -1298,6 +1298,62 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("query")
+    public static class QueryStatement extends LStatement{
+        public boolean circle;
+        public QueryType type = QueryType.unit;
+        public String team = "null", x = "0", y = "0", w = "10", h = "10";
+
+        @Override
+        public void build(Table table){
+            table.clearChildren();
+
+            table.button(circle ? "circle" : "rect", Styles.logict, () -> {
+                circle = !circle;
+                build(table);
+            }).size(80f, 40f).pad(4f).color(table.color);
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, QueryType.queryable, type, o -> {
+                    type = o;
+                    build(table);
+                }));
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+
+            fields(table, "team", team, str -> team = str);
+
+            row(table);
+
+            fields(table, "x", x, str -> x = str);
+            fields(table, "y", y, str -> y = str);
+
+            table.row();
+
+            if(circle){
+                fields(table, "radius", w, str -> w = str);
+            }else{
+                fields(table, "width", w, str -> w = str);
+                fields(table, "height", h, str -> h = str);
+            }
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new QueryI(circle, type, builder.var(team), builder.var(x), builder.var(y), builder.var(w), builder.var(h));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
     @RegisterStatement("getblock")
     public static class GetBlockStatement extends LStatement{
         public TileLayer layer = TileLayer.block;
