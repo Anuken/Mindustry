@@ -111,7 +111,11 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         Events.run(Trigger.newGame, this::updateWave);
 
         Events.on(PlayerIpBanEvent.class, e -> updateBans(e.ip));
-        Events.on(PlayerIpUnbanEvent.class, e -> updateBans(e.ip));
+        Events.on(PlayerUnbanEvent.class, e -> {
+            // updateBans works off of ip ban list. Unbanning a player does not unban their ip but since this is steam, their "ip" is just their steam id (which is their uuid as well) prefixed with steam:
+            netServer.admins.unbanPlayerIP("steam:" + e.uuid);
+            updateBans(null);
+        });
     }
 
     public boolean isSteamClient(){

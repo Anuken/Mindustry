@@ -40,13 +40,13 @@ public class SteamAdmin{
     }
 
     public static boolean isBanned(String id){
-        if(id.startsWith("steam:")) id = id.substring("steam:".length());
-        return data.bans.contains(id);
+        if(!id.startsWith("steam:")) return false;
+        return data.bans.contains(id.substring("steam:".length()));
     }
 
     public static boolean isAdmin(String id){
-        if(id.startsWith("steam:")) id = id.substring("steam:".length());
-        return data.admins.contains(id);
+        if(!id.startsWith("steam:")) return false;
+        return data.admins.contains(id.substring("steam:".length()));
     }
 
     static class SteamAdminData{
