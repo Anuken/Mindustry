@@ -641,7 +641,7 @@ public class LExecutor{
         }
     }
 
-    public static class WriteI implements LExecutor.LInstruction{
+    public static class WriteI implements LInstruction{
         public LVar target, position, value;
 
         public WriteI(LVar target, LVar position, LVar value){
