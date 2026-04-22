@@ -1169,7 +1169,7 @@ public class LExecutor{
 
             if(target.building() instanceof MessageBuild d && d.isValid() && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
                 d.message.setLength(0);
-                d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
+                d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), ((MessageBlock)d.block).maxTextLength));
             }
             exec.textBuffer.setLength(0);
 
