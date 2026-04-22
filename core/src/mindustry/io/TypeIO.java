@@ -188,8 +188,8 @@ public class TypeIO{
             case 4 -> {
                 byte exists = read.b();
                 if(exists != 0){
-                    //in a safe context, strings can only be 1000 chars
-                    yield read.str(safe ? 1000 : 0);
+                    //in a safe context, strings can only be 1200 chars
+                    yield read.str(safe ? 1200 : 0);
                 }else{
                     yield null;
                 }

@@ -25,9 +25,9 @@ import static mindustry.Vars.*;
 
 public class MessageBlock extends Block{
     private static final int maxByteLength = 999;
-    //maximum UTF-8 length per char is 4, so 4*250 = 1000 bytes, the max byte array size
+    /** maximum UTF-8 length per char is 4, so 4*300 = 1200 bytes, the max string byte size */
     @NoPatch
-    public int maxTextLength = 250;
+    public int maxTextLength = 300;
     public int maxNewlines = 24;
 
     public MessageBlock(String name){
