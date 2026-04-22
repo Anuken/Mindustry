@@ -94,7 +94,7 @@ public enum EditorTool{
             });
         }
     },
-    fill(KeyCode.g, "replaceall", "fillteams", "fillerase", "fillcliffs"){
+    fill(KeyCode.g, "replaceall", "fillteams", "fillerase", "fillcliffs", "fillunderliquid"){
         {
             edit = true;
         }
