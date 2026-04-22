@@ -1415,18 +1415,21 @@ public class LExecutor{
             }
         };
 
-        public boolean circle;
+        public QueryShape shape = QueryShape.rect;
         public QueryType type = QueryType.unit;
         public LVar team, x, y, width, height;
 
-        public QueryI(boolean circle, QueryType type, LVar team, LVar x, LVar y, LVar width, LVar height){
-            this.circle = circle;
+        public QueryI(QueryShape shape, QueryType type, LVar team, LVar x, LVar y, LVar width, LVar height){
+            this.shape = shape;
             this.type = type;
             this.team = team;
             this.x = x;
             this.y = y;
             this.width = width;
             this.height = height;
+        }
+
+        public QueryI(){
         }
 
         @Override
@@ -1440,6 +1443,7 @@ public class LExecutor{
 
             float x = this.x.numfWorld(), y = this.y.numfWorld(), w = this.width.numfWorld(), h = this.height.numfWorld();
             float radius = w, circleX = x, circleY = y;
+            boolean circle = shape == QueryShape.circle;
             if(circle){
                 x -= radius;
                 y -= radius;
