@@ -3,6 +3,7 @@ package mindustry.net;
 import arc.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -14,9 +15,28 @@ public class SteamAdmin{
     private static final float checkInterval = 60f * 5f;
 
     public static void fetch(){
+        fetch(false);
+    }
+
+    public static void fetch(boolean cacheBust){
         if(!Vars.steam) return;
 
-        fetch(Vars.steamBansURLs[0], () -> fetch(Vars.steamBansURLs[1], () -> {}));
+        if(cacheBust){ //specific commit avoids the 5 minute cache on the /master/ ref
+            Http.get(Vars.ghApi + "/repos/Anuken/MindustrySteamBans/commits?path=data.json&per_page=1").submit(res -> { //fetch latest commit from api
+                try{
+                    fetchImpl(Vars.steamBansURLs[0].replace("master", Jval.read(res.getResultAsString()).asArray().first().getString("sha")));
+                }catch(Exception e){
+                    Log.err("Failed to fetch latest commit", e);
+                    fetchImpl(Vars.steamBansURLs[0]);
+                }
+            });
+        }else{
+            fetchImpl(Vars.steamBansURLs[0]);
+        }
+    }
+
+    private static void fetchImpl(String githubURL){
+        fetch(githubURL, () -> fetch(Vars.steamBansURLs[1], () -> {}));
         if(!scheduled){
             scheduled = true;
             Timer.schedule(SteamAdmin::fetch, checkInterval, checkInterval);

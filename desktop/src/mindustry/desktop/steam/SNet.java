@@ -309,8 +309,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
     @Override
     public void onLobbyChatUpdate(SteamID lobby, SteamID who, SteamID changer, ChatMemberStateChange change){
-        Log.info("lobby @: @ caused @'s change: @", lobby.getAccountID(), who.getAccountID(), changer.getAccountID(), change);
-        if(change == ChatMemberStateChange.Entered && SteamAdmin.isAdmin("steam:" + who.getAccountID())) SteamAdmin.fetch(); //fetch on admin join
+        Log.info("lobby @: @ caused @'s change: @", lobby.getAccountID(), changer.getAccountID(), who.getAccountID(), change);
+        if(change == ChatMemberStateChange.Entered && SteamAdmin.isAdmin("steam:" + who.getAccountID())) SteamAdmin.fetch(true); //fetch on admin join
         if(change == ChatMemberStateChange.Disconnected || change == ChatMemberStateChange.Left){
             if(net.client()){
                 //host left, leave as well
