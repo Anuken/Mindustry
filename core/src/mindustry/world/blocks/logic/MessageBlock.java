@@ -24,10 +24,9 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class MessageBlock extends Block{
-    private static final int maxByteLength = 999;
-    /** maximum UTF-8 length per char is 4, so 4*300 = 1200 bytes, the max string byte size */
+    /** writeUTF maximum UTF-8 length per char is 3, so 3*400 = 1200 bytes, the max string byte size */
     @NoPatch
-    public int maxTextLength = 300;
+    public int maxTextLength = 400;
     public int maxNewlines = 24;
 
     public MessageBlock(String name){
