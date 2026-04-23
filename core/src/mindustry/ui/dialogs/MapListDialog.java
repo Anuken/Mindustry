@@ -263,7 +263,7 @@ public abstract class MapListDialog extends BaseDialog{
                                 t.table(Tex.button, in -> {
                                     in.defaults().width(300f).height(60f);
 
-                                    in.button("@editor.filters.anyplanet", ui.getIcon("planet"), Styles.flatTogglet, iconMed, () -> {
+                                    in.button("@rules.anyenv", ui.getIcon("planet"), Styles.flatTogglet, iconMed, () -> {
                                         if(planets.contains(Planets.sun.name)){
                                             planets.remove(Planets.sun.name);
                                         }else{
