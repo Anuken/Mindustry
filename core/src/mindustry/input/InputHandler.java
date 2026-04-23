@@ -128,7 +128,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     private BuildPlan overlappingPlan = null;
     private Player overlappingPlayer = null;
 
-    protected Eachable<BuildPlan> allPlans, allSelectLines, allRenderPlansConfig, allOtherPlayerPlans;
+    protected Eachable<BuildPlan> allPlans, allSelectLines, allRenderPlansConfig;
 
     public InputHandler(){
         group.touchable = Touchable.childrenOnly;
@@ -284,15 +284,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void pingLocation(Player player, float x, float y, @Nullable String text){
-        if(player != null && Vars.player != null && player.team() == Vars.player.team()){
-            if(net.server() && !netServer.admins.allowAction(player, ActionType.pingLocation, event -> {
-                event.pingX = x;
-                event.pingY = y;
-                event.pingText = text;
-            })){
-                throw new ValidateException(player, "Player was not allowed to ping a location.");
-            }
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.pingLocation, event -> {
+            event.pingX = x;
+            event.pingY = y;
+            event.pingText = text;
+        })) throw new ValidateException(player, "Player was not allowed to ping a location.");
 
+        if(player != null && Vars.player != null && player.team() == Vars.player.team()){
             player.pingX = x;
             player.pingY = y;
             player.pingTime = 1f;
@@ -409,6 +407,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
             event.unitIDs = unitIds;
+            event.unitCommand = command;
         })){
             throw new ValidateException(player, "Player cannot command units.");
         }
@@ -1038,8 +1037,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Call.requestUnitPayload(player, target);
         }else{
             Building build = world.buildWorld(pay.x(), pay.y());
+            if(build == null) return;
+            Payload current = build.getPayload();
 
-            if(build != null && state.teams.canInteract(unit.team, build.team)){
+            if(state.teams.canInteract(unit.team, build.team) &&
+                ((current != null && pay.canPickupPayload(current)) || (build.block.buildVisibility != BuildVisibility.hidden && build.canPickup() && pay.canPickup(build)))){
                 Call.requestBuildPayload(player, build);
             }
         }
@@ -1047,7 +1049,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void tryDropPayload(){
         Unit unit = player.unit();
-        if(!(unit instanceof Payloadc)) return;
+        if(!(unit instanceof Payloadc pay) || !pay.canDropPayload()) return;
 
         Call.requestDropPayload(player, player.x, player.y);
     }
@@ -2070,9 +2072,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean tryRepairDerelict(Tile selected){
-        if(!player.dead() && selected != null && !state.rules.editor && player.team() != Team.derelict && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict &&
-            Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
-
+        if(canRepairDerelict(selected)){
             player.unit().addBuild(new BuildPlan(selected.build.tileX(), selected.build.tileY(), selected.build.rotation, selected.block(), selected.build.config()));
             return true;
         }

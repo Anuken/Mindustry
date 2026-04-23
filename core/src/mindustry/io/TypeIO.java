@@ -147,6 +147,8 @@ public class TypeIO{
         }else if(object instanceof UnitCommand command){
             write.b(23);
             write.s(command.id);
+        }else if(object instanceof Bullet b || object instanceof Seq<?> s){ //write bullets as null
+            write.b((byte)0);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -186,8 +188,8 @@ public class TypeIO{
             case 4 -> {
                 byte exists = read.b();
                 if(exists != 0){
-                    //in a safe context, strings can only be 1000 chars
-                    yield read.str(safe ? 1000 : 0);
+                    //in a safe context, strings can only be 1200 chars
+                    yield read.str(safe ? 1200 : 0);
                 }else{
                     yield null;
                 }
@@ -419,6 +421,14 @@ public class TypeIO{
         int val = read.ub();
         //never returns null
         return val == 255 || val >= content.unitStances().size ? UnitStance.stop : content.unitStance(val);
+    }
+
+    public static void writePosEntity(Writes write, Posc entity){
+        write.i(entity == null ? -1 : entity.id());
+    }
+
+    public static Posc readPosEntity(Reads read){
+        return (Posc)Groups.sync.getByID(read.i());
     }
 
     public static void writeEntity(Writes write, Entityc entity){
@@ -820,7 +830,7 @@ public class TypeIO{
     public static Rules readRules(Reads read){
         int length = read.i();
         //this is only called clientside, but the byte limit is reasonable either way...
-        if(length > maxByteArraySize) throw new ArcRuntimeException("Rules too long");
+        if(length > 100_000) throw new ArcRuntimeException("Rules too long");
         String string = new String(read.b(new byte[length]), charset);
         return JsonIO.read(Rules.class, string);
     }

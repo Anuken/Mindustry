@@ -382,7 +382,20 @@ public class HudFragment{
                     ImageButtonStyle style = Styles.clearNonei;
 
                     select.button(Icon.menu, style, ui.paused::show).name("menu");
-                    flip = select.button(Icon.upOpen, style, this::toggleMenus).get();
+                    flip = select.button(Icon.upOpen, style, () -> {
+                        if(Core.settings.getBool("console")){
+                            ui.consolefrag.toggleMobile();
+                        }else{
+                            toggleMenus();
+                        }
+                    }).update(i -> {
+                        if(Core.settings.getBool("console")){
+                            i.getStyle().imageUp = Icon.terminal;
+                            shown = true; //force shown when console is enabled, because there is no other way to show/hide
+                        }else{
+                            i.getStyle().imageUp = shown ? Icon.downOpen : Icon.upOpen;
+                        }
+                    }).get();
                     flip.name = "flip";
 
                     select.button(Icon.paste, style, ui.schematics::show)
@@ -399,7 +412,7 @@ public class HudFragment{
                             i.setDisabled(false);
                             i.getStyle().imageUp = Icon.players;
                         }else{
-                            i.setDisabled(state.rules.pauseDisabled);
+                            i.setDisabled(state.rules.pauseDisabled || (state.isCampaign() && state.afterGameOver));
                             i.getStyle().imageUp = state.isPaused() ? Icon.play : Icon.pause;
                         }
                     });
@@ -501,7 +514,6 @@ public class HudFragment{
             editorMain.table(Tex.buttonEdge4, t -> {
                 t.name = "teams";
 
-
                 t.top().table(teams -> {
                     teams.left();
                     for(Team team : Team.baseTeams){
@@ -585,6 +597,14 @@ public class HudFragment{
 
                 //'core is under attack' table
                 c.collapser(top -> top.background(Styles.black6).add("@coreattack").pad(8)
+                .with(co -> {
+                    co.tapped(() -> {
+                        if(control.lastDamagedCore != null){
+                            control.input.panCamera(Tmp.v1.set(control.lastDamagedCore));
+                        }
+                    });
+                    co.addListener(new HandCursorListener());
+                })
                 .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time, 2f, 1f))), true,
                 () -> {
                     if(!shown || state.isPaused()) return false;
@@ -848,10 +868,6 @@ public class HudFragment{
     }
 
     private void toggleMenus(){
-        if(flip != null){
-            flip.getStyle().imageUp = shown ? Icon.downOpen : Icon.upOpen;
-        }
-
         shown = !shown;
     }
 
@@ -1038,7 +1054,7 @@ public class HudFragment{
                     String text = obj.text();
                     if(text != null && !text.isEmpty()){
                         if(!first) builder.append("\n[white]");
-                        builder.append(text);
+                        builder.append(UI.formatIcons(text));
 
                         first = false;
                     }
@@ -1157,7 +1173,7 @@ public class HudFragment{
                 if(applied != null){
                     for(StatusEffect effect : content.statusEffects()){
                         if(applied.get(effect.id) && !effect.isHidden()){
-                            t.image(effect.uiIcon).size(iconMed).get()
+                            t.image(effect.uiIcon).scaling(Scaling.fit).size(iconMed).get()
                             .addListener(new Tooltip(l -> l.label(() ->
                                 player.dead() ? "" : effect.localizedName + " [lightgray]" + UI.formatTime(player.unit().getDuration(effect))).style(Styles.outlineLabel)));
                         }

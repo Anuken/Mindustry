@@ -3442,7 +3442,6 @@ public class Blocks{
                     hitEffect = Fx.hitFlameSmall;
                     despawnEffect = Fx.none;
                     status = StatusEffects.burning;
-                    keepVelocity = false;
                     hittable = false;
                 }},
                 Items.pyratite, new BulletType(4f, 30f){{
@@ -3635,6 +3634,7 @@ public class Blocks{
                     shieldDamageMultiplier = 0.2f;
                 }};
             }};
+            researchCostMultiplier = 1/3f;
             reload = 35f;
             shootCone = 40f;
             rotateSpeed = 8f;

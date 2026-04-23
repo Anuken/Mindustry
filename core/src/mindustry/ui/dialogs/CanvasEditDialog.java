@@ -58,6 +58,10 @@ public class CanvasEditDialog extends BaseDialog{
 
         //update at an interval so that people can see what is being drawn
         update(() -> {
+            if(!canvas.isValid()){
+                hide();
+            }
+
             time += Time.delta;
 
             if(time >= refreshTime){
@@ -88,6 +92,7 @@ public class CanvasEditDialog extends BaseDialog{
 
                             if(button == KeyCode.mouseLeft){
                                 if(fill){
+                                    if(!pix.in(cx, cy)) return false;
                                     stack.clear();
                                     int src = curColor;
                                     int dst = pix.get(cx, cy);
@@ -131,7 +136,7 @@ public class CanvasEditDialog extends BaseDialog{
                 }
 
                 void draw(int x, int y){
-                    if(pix.get(x, y) != curColor){
+                    if(pix.in(x, y) && pix.get(x, y) != curColor){
                         pix.set(x, y, curColor);
                         Pixmaps.drawPixel(texture, x, y, curColor);
                         modified = true;
@@ -269,7 +274,7 @@ public class CanvasEditDialog extends BaseDialog{
     }
 
     void save(){
-        if(modified){
+        if(modified && canvas.isValid()){
             canvas.configure(canvas.packPixmap(pix));
             modified = false;
         }

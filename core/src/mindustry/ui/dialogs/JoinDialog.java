@@ -582,7 +582,7 @@ public class JoinDialog extends BaseDialog{
         local.button(b -> buildServer(host, b, true, true), style, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             safeConnect(host.address, host.port, host.version);
-        }).width(w).top().left().growY();
+        }).width(w).top().left().pad(2f).growY();
     }
 
     public void connect(String ip, int port){

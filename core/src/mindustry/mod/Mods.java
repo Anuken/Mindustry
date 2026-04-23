@@ -32,7 +32,8 @@ import static mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
-    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry");
+    //it would be nice to parse semver and have syntax like "<1.0.5" here, but mods clearly don't use semver and it's an inconsistent mess
+    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry", "schema", "scheme-size:1.0.5", "scheme-size:1.0.4", "scheme-size:1.0.3", "scheme-size:1.0.1", "scheme-size:1.0.0", "scheme-size:1.1.0", "scheme-size:1.0.4.1");
 
     private Json json = new Json();
     private @Nullable Scripts scripts;
@@ -160,6 +161,8 @@ public class Mods implements Loadable{
 
             packSprites(packer, sprites, mod, true, tasks, textureResize);
             packSprites(packer, overrides, mod, false, tasks, textureResize);
+
+            if(mod.main != null) mod.main.packSprites(packer);
 
             Log.debug("Packed @ images for mod '@'.", sprites.size + overrides.size, mod.meta.name);
             totalSprites[0] += sprites.size + overrides.size;
@@ -336,7 +339,7 @@ public class Mods implements Loadable{
 
             packer.printStats();
 
-            Events.fire(new AtlasPackEvent());
+            Events.fire(new AtlasPackEvent(packer));
 
             packer.dispose();
 
@@ -370,6 +373,8 @@ public class Mods implements Loadable{
             String
             baseName = file.nameWithoutExtension(),
             regionName = baseName.contains(".") ? baseName.substring(0, baseName.indexOf(".")) : baseName;
+
+            if(baseName.isEmpty()) continue; //fixes #11855 in case anyone tries to do it again
 
             if(!prefix && !Core.atlas.has(regionName)){
                 Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite.", regionName, mod.name);
@@ -1184,6 +1189,7 @@ public class Mods implements Loadable{
                 Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
                 Version.isAtLeast(meta.minGameVersion) &&
                 (meta.getMinMajor() >= minJavaModGameVersion || headless || meta.legacyCompatible) &&
+                !meta.isBlacklisted() &&
                 !skipModCode &&
                 initialize
             ){
@@ -1321,7 +1327,7 @@ public class Mods implements Loadable{
 
         /** Some mods are known to cause issues with the game; this detects and returns whether a mod is manually blacklisted. */
         public boolean isBlacklisted(){
-            return blacklistedMods.contains(name);
+            return meta.isBlacklisted();
         }
 
         /** @return whether this mod is outdated, i.e. not compatible with v8. */
@@ -1431,6 +1437,11 @@ public class Mods implements Loadable{
         public String[] contentOrder;
         /** Mod from an older major version that is compatible with the latest one as well. */
         public boolean legacyCompatible;
+
+        /** Some mods are known to cause issues with the game; this detects and returns whether a mod is manually blacklisted. */
+        public boolean isBlacklisted(){
+            return blacklistedMods.contains(name) || blacklistedMods.contains(name + ":" + version);
+        }
 
         public String shortDescription(){
             return Strings.truncate(subtitle == null ? (description == null || description.length() > maxModSubtitleLength ? "" : description) : subtitle, maxModSubtitleLength, "...");

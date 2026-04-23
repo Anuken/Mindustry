@@ -159,7 +159,7 @@ public class CommandAI extends AIController{
             defaultBehavior();
             if(shouldBoost() && unit.type.canBoost){
                 //auto land when near target
-                if(attackTarget != null && unit.within(attackTarget, unit.range())){
+                if((attackTarget != null && unit.within(attackTarget, unit.range())) || (hasStance(UnitStance.patrol) && target != null && unit.within(target, unit.range()))){
                     unit.updateBoosting(false);
                 }else{
                     unit.updateBoosting(true, true);
@@ -190,7 +190,7 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
-        if(!unit.type.autoFindTarget && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
+        if(!unit.type.autoFindTarget && !hasStance(UnitStance.patrol) && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
             return null;
         }
         return super.findMainTarget(x, y, range, air, ground);
@@ -286,17 +286,15 @@ public class CommandAI extends AIController{
 
             Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
 
-            //TODO: should the unit stop when it finds a target?
             if(
                 (hasStance(UnitStance.patrol) && !hasStance(UnitStance.pursueTarget) && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
-                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
+                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && !unit.type.circleTarget && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
                 (command == UnitCommand.loopPayloadCommand && unit.within(vecMovePos, 10f))
             ){
                 move = false;
             }
 
             if(unit.isGrounded() && !ramming){
-                //TODO: blocking enable or disable?
                 if(timer.get(timerTarget3, avoidInterval)){
                     Vec2 dstPos = Tmp.v1.trns(unit.rotation, unit.hitSize/2f);
                     float max = unit.hitSize/2f;
