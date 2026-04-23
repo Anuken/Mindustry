@@ -55,7 +55,6 @@ public enum LogicOp{
     asin("asin", d -> Math.asin(d) * Mathf.doubleRadDeg),
     acos("acos", d -> Math.acos(d) * Mathf.doubleRadDeg),
     atan("atan", d -> Math.atan(d) * Mathf.doubleRadDeg),
-
     ;
 
     public static final LogicOp[] all = values();
