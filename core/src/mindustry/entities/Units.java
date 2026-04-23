@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 public class Units{
     private static final Rect hitrect = new Rect();
     private static Unit result;
-    private static float cdist, cpriority;
+    private static float cdist, cpriority, chealth, cspeedMultiplier, chealthMultiplier;
     private static int intResult;
     private static Building buildResult;
 
@@ -302,6 +302,32 @@ public class Units{
             if(dst2 < range*range && (result == null || dst2 < cdist || e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority){
                 result = e;
                 cdist = dst2;
+                cpriority = e.type.targetPriority;
+            }
+        });
+
+        return result;
+    }
+
+    /** Returns the nominal enemy of this team. Filter by predicate. */
+    public static Unit nominalEnemy(Team team, float x, float y, float range, Boolf<Unit> predicate){
+        if(team == Team.derelict) return null;
+
+        result = null;
+        cpriority = -99999f;
+        chealth = -2f;
+        cspeedMultiplier = 0.1f;
+        chealthMultiplier = 0.1f;
+
+        nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
+            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.targetable(team) || e.inFogTo(team)) return;
+
+            float dst2 = e.dst2(x, y) - (e.hitSize * e.hitSize);
+            if(dst2 < range*range && (result == null || e.health >= chealth ||e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority && e.healthMultiplier >= chealthMultiplier && e.speedMultiplier >= cspeedMultiplier){
+                result = e;
+                chealth = e.health;
+                chealthMultiplier = e.healthMultiplier;
+                cspeedMultiplier = e.speedMultiplier;
                 cpriority = e.type.targetPriority;
             }
         });
