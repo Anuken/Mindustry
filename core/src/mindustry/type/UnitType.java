@@ -1449,6 +1449,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public double sense(LAccess sensor){
         return switch(sensor){
             case health, maxHealth -> health;
+            case armor -> armor;
+            case range -> World.conv(maxRange);
             case size -> hitSize / tilesize;
             case itemCapacity -> itemCapacity;
             case speed -> speed * 60f / tilesize;
