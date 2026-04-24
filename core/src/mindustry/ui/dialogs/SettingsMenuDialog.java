@@ -140,12 +140,17 @@ public class SettingsMenuDialog extends BaseDialog{
                 ui.showConfirm("@confirm", "@settings.clearcampaignsaves.confirm", () -> {
                     for(var planet : content.planets()){
                         planet.clearStats();
+                        boolean any = false;
                         for(var sec : planet.sectors){
                             sec.clearInfo();
                             if(sec.save != null){
+                                any = true;
                                 sec.save.delete();
                                 sec.save = null;
                             }
+                        }
+                        if(any){
+                            planet.reloadMeshAsync();
                         }
                     }
 

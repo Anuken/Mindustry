@@ -641,7 +641,7 @@ public class LExecutor{
         }
     }
 
-    public static class WriteI implements LExecutor.LInstruction{
+    public static class WriteI implements LInstruction{
         public LVar target, position, value;
 
         public WriteI(LVar target, LVar position, LVar value){
@@ -1169,7 +1169,7 @@ public class LExecutor{
 
             if(target.building() instanceof MessageBuild d && d.isValid() && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
                 d.message.setLength(0);
-                d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
+                d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), ((MessageBlock)d.block).maxTextLength));
             }
             exec.textBuffer.setLength(0);
 
@@ -1415,18 +1415,21 @@ public class LExecutor{
             }
         };
 
-        public boolean circle;
+        public QueryShape shape = QueryShape.rect;
         public QueryType type = QueryType.unit;
         public LVar team, x, y, width, height;
 
-        public QueryI(boolean circle, QueryType type, LVar team, LVar x, LVar y, LVar width, LVar height){
-            this.circle = circle;
+        public QueryI(QueryShape shape, QueryType type, LVar team, LVar x, LVar y, LVar width, LVar height){
+            this.shape = shape;
             this.type = type;
             this.team = team;
             this.x = x;
             this.y = y;
             this.width = width;
             this.height = height;
+        }
+
+        public QueryI(){
         }
 
         @Override
@@ -1440,6 +1443,7 @@ public class LExecutor{
 
             float x = this.x.numfWorld(), y = this.y.numfWorld(), w = this.width.numfWorld(), h = this.height.numfWorld();
             float radius = w, circleX = x, circleY = y;
+            boolean circle = shape == QueryShape.circle;
             if(circle){
                 x -= radius;
                 y -= radius;

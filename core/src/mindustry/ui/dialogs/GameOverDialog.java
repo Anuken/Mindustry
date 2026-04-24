@@ -112,7 +112,7 @@ public class GameOverDialog extends BaseDialog{
                     hide();
                     ui.planet.show();
 
-                    if(prev.info.attempts >= 2 && prev.planet.campaignRules.difficulty == Difficulty.normal && Core.settings.getBoolOnce("difficultyguide")){
+                    if(prev.planet.allowCampaignRules && prev.info.attempts >= 2 && prev.planet.campaignRules.difficulty == Difficulty.normal && Core.settings.getBoolOnce("difficultyguide")){
                         Time.runTask(10f, () -> {
                             BaseDialog dialog = new BaseDialog("@difficulty.guide.title");
                             dialog.setFillParent(false);
