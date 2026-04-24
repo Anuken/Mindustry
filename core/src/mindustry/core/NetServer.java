@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -135,7 +136,11 @@ public class NetServer implements ApplicationListener{
             Events.fire(new ConnectionEvent(con));
 
             if(admins.isIPBanned(connect.addressTCP) || admins.isSubnetBanned(connect.addressTCP)){
-                con.kick(KickReason.banned);
+                if(Vars.steam && SteamAdmin.isBanned(connect.addressTCP)){
+                    con.kick("You have been banned from Steam lobbies for disruptive and shameful behavior.");
+                }else{
+                    con.kick(KickReason.banned);
+                }
             }
         });
 
@@ -273,7 +278,7 @@ public class NetServer implements ApplicationListener{
             }
 
             Player player = Player.create();
-            player.admin = admins.isAdmin(uuid, packet.usid);
+            player.admin = admins.isAdmin(uuid, packet.usid) || (steam && SteamAdmin.isAdmin(con.address));
             player.con = con;
             player.con.usid = packet.usid;
             player.con.uuid = uuid;
@@ -555,6 +560,12 @@ public class NetServer implements ApplicationListener{
 
             String message = Strings.format("&lb@&fi&lk has disconnected. [&lb@&fi&lk] (@)", player.plainName(), player.uuid(), reason);
             if(Config.showConnectMessages.bool()) info(message);
+        }
+
+        //force despawn the player unit upon disconnection in case the game is paused
+        Unit u = player.unit();
+        if(u != null && u.spawnedByCore && !u.dead){
+            Call.unitDespawn(u);
         }
 
         player.remove();
@@ -890,6 +901,13 @@ public class NetServer implements ApplicationListener{
         }
 
         Events.fire(new PlayerJoin(player));
+
+        //plugins may have kicked the player immediately in PlayerJoinEvent, so don't respawn if that happens
+        if(!player.con.kicked){
+            //instantly respawn the player upon connection, even if the game is paused
+            player.deathTimer = Player.deathDelay;
+            player.update();
+        }
     }
 
     public boolean isWaitingForPlayers(){

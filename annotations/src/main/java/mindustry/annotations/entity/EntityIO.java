@@ -237,8 +237,8 @@ public class EntityIO{
             st("$L(write, $L)", network ? serializer.getNetWriter(type, null) : serializer.writers.get(type), field);
         }else if(serializer.mutatorReaders.containsKey(type) && !write && !field.replace(" = ", "").contains(" ") && !field.isEmpty()){
             st("$L$L(read, $L)", field, serializer.mutatorReaders.get(type), field.replace(" = ", ""));
-        }else if(serializer.readers.containsKey(type) && !write){
-            st("$L$L(read)", field, serializer.readers.get(type));
+        }else if((serializer.readers.containsKey(type) || (network && serializer.netReaders.containsKey(type))) && !write){
+            st("$L$L(read)", field, network ? serializer.getNetReader(type, null) : serializer.readers.get(type));
         }else if(type.endsWith("[]")){ //it's a 1D array
             String rawType = type.substring(0, type.length() - 2);
 

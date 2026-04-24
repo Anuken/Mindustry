@@ -1298,6 +1298,62 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("query")
+    public static class QueryStatement extends LStatement{
+        public QueryShape shape = QueryShape.circle;
+        public QueryType type = QueryType.unit;
+        public String team = "null", x = "0", y = "0", w = "10", h = "10";
+
+        @Override
+        public void build(Table table){
+            table.clearChildren();
+
+            table.button(shape == QueryShape.circle ? "circle" : "rect", Styles.logict, () -> {
+                shape = shape == QueryShape.circle ? QueryShape.rect : QueryShape.circle;
+                build(table);
+            }).size(80f, 40f).pad(4f).color(table.color);
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, QueryType.queryable, type, o -> {
+                    type = o;
+                    build(table);
+                }));
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+
+            fields(table, "team", team, str -> team = str);
+
+            row(table);
+
+            fields(table, "x", x, str -> x = str);
+            fields(table, "y", y, str -> y = str);
+
+            table.row();
+
+            if(shape == QueryShape.circle){
+                fields(table, "radius", w, str -> w = str);
+            }else{
+                fields(table, "width", w, str -> w = str);
+                fields(table, "height", h, str -> h = str);
+            }
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new QueryI(shape, type, builder.var(team), builder.var(x), builder.var(y), builder.var(w), builder.var(h));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
     @RegisterStatement("getblock")
     public static class GetBlockStatement extends LStatement{
         public TileLayer layer = TileLayer.block;
@@ -1442,6 +1498,57 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SpawnUnitI(builder.var(type), builder.var(x), builder.var(y), builder.var(rotation), builder.var(team), builder.var(result));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("bullet")
+    public static class SpawnBulletStatement extends LStatement{
+        public String result = "result", from = "@dagger", index = "0", x = "x", y = "y", rotation = "angle", team = "null", owner = "null", damage = "-1", velocityScl = "1", lifeScl = "1", aimX = "-1", aimY = "-1";
+
+        @Override
+        public void build(Table table){
+            fields(table, result, str -> result = str);
+
+            table.add(" = bullet ");
+
+            row(table);
+
+            fields(table, "from", from, str -> from = str);
+            fields(table, "index", index, str -> index = str);
+            row(table);
+            fields(table, "x", x, str -> x = str);
+            fields(table, "y", y, str -> y = str);
+            table.row();
+            fields(table, "rotation", rotation, str -> rotation = str);
+            fields(table, "team", team, str -> team = str);
+            row(table);
+            fields(table, "owner", owner, str -> owner = str);
+            fields(table, "damage", damage, str -> damage = str);
+            table.row();
+            fields(table, "velocityScl", velocityScl, str -> velocityScl = str);
+            fields(table, "lifeScl", lifeScl, str -> lifeScl = str);
+            row(table);
+            fields(table, "aimX", aimX, str -> aimX = str);
+            fields(table, "aimY", aimY, str -> aimY = str);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SpawnBulletI(
+                builder.var(result), builder.var(from), builder.var(index), builder.var(x), builder.var(y), builder.var(rotation),
+                builder.var(team), builder.var(owner), builder.var(damage), builder.var(velocityScl), builder.var(lifeScl),
+                builder.var(aimX), builder.var(aimY)
+            );
         }
 
         @Override
