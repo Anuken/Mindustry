@@ -29,8 +29,6 @@ import mindustry.ui.*;
 import java.io.*;
 import java.util.zip.*;
 
-import javax.swing.Icon;
-
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
