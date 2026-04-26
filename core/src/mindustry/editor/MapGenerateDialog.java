@@ -3,8 +3,10 @@ package mindustry.editor;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
@@ -36,9 +38,15 @@ public class MapGenerateDialog extends BaseDialog{
     Seq<GenerateFilter> filters = new Seq<>();
     int scaling = mobile ? 3 : 1;
     Table filterTable;
+    BorderImage preview;
 
     Future<?> result;
     boolean generating;
+    boolean updateQueued;
+    MirrorFilter dragging;
+    Rect dragRect = new Rect();
+    Vec2 dragAxis = new Vec2();
+    long lastDrag;
 
     long[] buffer1, buffer2;
     Cons<Seq<GenerateFilter>> applier;
@@ -192,6 +200,55 @@ public class MapGenerateDialog extends BaseDialog{
         editor.clearOp();
     }
 
+    MirrorFilter hit(float x, float y){
+        if(preview == null) return null;
+
+        MirrorFilter.drawRect(preview, dragRect);
+        if(dragRect.width <= 0f || dragRect.height <= 0f) return null;
+
+        MirrorFilter out = null;
+        float dst = Float.MAX_VALUE;
+        float pad = Scl.scl(16f);
+        int amount = 0;
+
+        for(var filter : filters){
+            if(filter instanceof MirrorFilter){
+                MirrorFilter mirror = (MirrorFilter)filter;
+                float px = dragRect.x + Mathf.clamp(mirror.axisX, 0f, 1f) * dragRect.width;
+                float py = dragRect.y + Mathf.clamp(mirror.axisY, 0f, 1f) * dragRect.height;
+
+                dragAxis.trnsExact(mirror.angle - 90f, 1f);
+                float ndst = Math.abs((x - px) * dragAxis.y - (y - py) * dragAxis.x);
+                if(ndst < dst){
+                    dst = ndst;
+                    out = mirror;
+                }
+                amount++;
+            }
+        }
+
+        if(out != null && dst <= pad) return out;
+        if(amount == 1 && out != null && x >= dragRect.x - pad && y >= dragRect.y - pad && x <= dragRect.x + dragRect.width + pad && y <= dragRect.y + dragRect.height + pad) return out;
+        return null;
+    }
+
+    void drag(float x, float y){
+        if(preview == null || dragging == null) return;
+
+        MirrorFilter.drawRect(preview, dragRect);
+        if(dragRect.width <= 0f || dragRect.height <= 0f) return;
+
+        dragging.axisX = Mathf.clamp((x - dragRect.x) / dragRect.width, 0f, 1f);
+        dragging.axisY = Mathf.clamp((y - dragRect.y) / dragRect.height, 0f, 1f);
+    }
+
+    void dragUpdate(boolean force){
+        long now = Time.millis();
+        if(!force && now - lastDrag < 33L) return;
+        lastDrag = now;
+        update();
+    }
+
     void setup(){
         if(pixmap != null){
             pixmap.dispose();
@@ -206,7 +263,7 @@ public class MapGenerateDialog extends BaseDialog{
         cont.clear();
         cont.table(t -> {
             t.margin(8f);
-            t.stack(new BorderImage(texture){
+            preview = new BorderImage(texture){
                 {
                     setScaling(Scaling.fit);
                 }
@@ -218,10 +275,39 @@ public class MapGenerateDialog extends BaseDialog{
                         filter.draw(this);
                     }
                 }
-            }, new Stack(){{
+            };
+            preview.addListener(new InputListener(){
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                    if(button != KeyCode.mouseLeft) return false;
+
+                    dragging = hit(x, y);
+                    if(dragging == null) return false;
+
+                    drag(x, y);
+                    dragUpdate(true);
+                    return true;
+                }
+
+                @Override
+                public void touchDragged(InputEvent event, float x, float y, int pointer){
+                    if(dragging == null) return;
+                    drag(x, y);
+                    dragUpdate(false);
+                }
+
+                @Override
+                public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
+                    if(dragging == null) return;
+                    drag(x, y);
+                    dragUpdate(true);
+                    dragging = null;
+                }
+            });
+            t.stack(preview, new Stack(){{
                 add(new Image(Styles.black8));
                 add(new Image(Icon.refresh, Scaling.none));
-                visible(() -> generating && !updateEditorOnChange);
+                visible(() -> generating && !updateEditorOnChange && dragging == null);
             }}).uniformX().grow().padRight(10);
             t.pane(p -> filterTable = p.marginRight(6)).update(pane -> {
                 if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
@@ -394,6 +480,8 @@ public class MapGenerateDialog extends BaseDialog{
         buffer1 = null;
         buffer2 = null;
         generating = false;
+        preview = null;
+        dragging = null;
         if(pixmap != null){
             pixmap.dispose();
             texture.dispose();
@@ -407,18 +495,24 @@ public class MapGenerateDialog extends BaseDialog{
     void update(){
 
         if(generating){
+            updateQueued = true;
             return;
         }
 
-        var copy = filters.copy();
+        Seq<GenerateFilter> copy = new Seq<>(filters.size);
+        for(var filter : filters){
+            copy.add(filter.copy());
+        }
+
+        generating = true;
+        updateQueued = false;
 
         result = mainExecutor.submit(() -> {
             try{
                 int w = pixmap.width;
                 world.setGenerating(true);
-                generating = true;
 
-                if(!filters.isEmpty()){
+                if(!copy.isEmpty()){
                     //write to buffer1 for reading
                     for(int px = 0; px < pixmap.width; px++){
                         for(int py = 0; py < pixmap.height; py++){
@@ -446,7 +540,7 @@ public class MapGenerateDialog extends BaseDialog{
                     for(int py = 0; py < pixmap.height; py++){
                         int color;
                         //get result from buffer1 if there's filters left, otherwise get from editor directly
-                        if(filters.isEmpty()){
+                        if(copy.isEmpty()){
                             Tile tile = editor.tile(px * scaling, py * scaling);
                             color = MapIO.colorFor(tile.block(), tile.floor(), tile.overlay(), Team.derelict);
                         }else{
@@ -459,14 +553,23 @@ public class MapGenerateDialog extends BaseDialog{
 
                 Core.app.post(() -> {
                     if(pixmap == null || texture == null){
+                        generating = false;
                         return;
                     }
                     texture.draw(pixmap);
                     generating = false;
+                    if(updateQueued){
+                        update();
+                    }
                 });
             }catch(Exception e){
                 generating = false;
                 Log.err(e);
+                Core.app.post(() -> {
+                    if(updateQueued){
+                        update();
+                    }
+                });
             }
             world.setGenerating(false);
         });

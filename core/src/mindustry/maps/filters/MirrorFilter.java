@@ -1,6 +1,7 @@
 package mindustry.maps.filters;
 
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -15,6 +16,7 @@ public class MirrorFilter extends GenerateFilter{
 
     public int angle = 45;
     public boolean rotate = false;
+    public float axisX = 0.5f, axisY = 0.5f;
 
     @Override
     public FilterOption[] options(){
@@ -34,8 +36,8 @@ public class MirrorFilter extends GenerateFilter{
         v1.trnsExact(angle - 90, 1f);
         v2.set(v1).scl(-1f);
 
-        v1.add(in.width/2f - 0.5f, in.height/2f - 0.5f);
-        v2.add(in.width/2f - 0.5f, in.height/2f - 0.5f);
+        v1.add(coord(axisX, in.width), coord(axisY, in.height));
+        v2.add(coord(axisX, in.width), coord(axisY, in.height));
 
         v3.set(in.x, in.y);
 
@@ -54,23 +56,41 @@ public class MirrorFilter extends GenerateFilter{
     @Override
     public void draw(Image image){
         super.draw(image);
-        float imageGetWidth = image.getWidth()/2f;
-        float imageGetHeight = image.getHeight()/2f;
-        float size = Math.max(imageGetWidth, imageGetHeight);
+        drawRect(image, Tmp.r1);
+        if(Tmp.r1.width <= 0f || Tmp.r1.height <= 0f) return;
 
-        Vec2 vsize = Scaling.fit.apply(image.getDrawable().getMinWidth(), image.getDrawable().getMinHeight(), imageGetWidth, imageGetHeight);
+        float px = Tmp.r1.x + Mathf.clamp(axisX, 0f, 1f) * Tmp.r1.width;
+        float py = Tmp.r1.y + Mathf.clamp(axisY, 0f, 1f) * Tmp.r1.height;
 
-        Tmp.v1.trns(angle - 90, size);
-        clipHalfLine(Tmp.v1, -vsize.x, -vsize.y, vsize.x, vsize.y);
+        Tmp.v1.trns(angle - 90, 1f);
+        clipHalfLine(Tmp.v1, Tmp.r1.x - px, Tmp.r1.y - py, Tmp.r1.x + Tmp.r1.width - px, Tmp.r1.y + Tmp.r1.height - py);
         Tmp.v2.set(Tmp.v1).scl(-1f); //opposite of v1
 
-        //adding back the coordinates of the center of the image
-        Tmp.v1.add(imageGetWidth + image.x, imageGetHeight + image.y);
-        Tmp.v2.add(imageGetWidth + image.x, imageGetHeight + image.y);
+        Tmp.v1.add(px + image.x, py + image.y);
+        Tmp.v2.add(px + image.x, py + image.y);
 
         Lines.stroke(Scl.scl(3f), Pal.accent);
         Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
+        Draw.color(Pal.accent);
+        Fill.circle(px + image.x, py + image.y, Scl.scl(4f));
+        Draw.color(Pal.darkestGray);
+        Fill.circle(px + image.x, py + image.y, Scl.scl(1.8f));
         Draw.reset();
+    }
+
+    public static void drawRect(Image image, Rect out){
+        if(image == null || image.getDrawable() == null || out == null){
+            if(out != null) out.set(0f, 0f, 0f, 0f);
+            return;
+        }
+
+        Vec2 size = Scaling.fit.apply(image.getDrawable().getMinWidth(), image.getDrawable().getMinHeight(), image.getWidth(), image.getHeight());
+        out.set((image.getWidth() - size.x)/2f, (image.getHeight() - size.y)/2f, size.x, size.y);
+    }
+
+    float coord(float axis, int size){
+        if(size <= 1) return 0f;
+        return Mathf.clamp(axis, 0f, 1f) * (size - 1f);
     }
 
     void mirror(int width, int height, Vec2 p, float x0, float y0, float x1, float y1){
