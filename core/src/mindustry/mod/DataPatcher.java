@@ -94,9 +94,12 @@ public class DataPatcher{
                     JsonValue req = value.get("requiredPlanets");
                     value.remove("requiredPlanets");
 
-                    String[] planets = req.isArray() ? req.asStringArray() : new String[]{ req.asString() };
-                    if(!Structs.contains(planets, Vars.state.rules.planet.name)){
-                        continue;
+                    //this should be ignored unless this instance is a dedicated server
+                    if(Vars.headless){
+                        String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
+                        if(!Structs.contains(planets, Vars.state.rules.planet.name)){
+                            continue;
+                        }
                     }
                 }
 
