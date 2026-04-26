@@ -36,6 +36,7 @@ public class MirrorFilter extends GenerateFilter{
         v1.trnsExact(angle - 90, 1f);
         v2.set(v1).scl(-1f);
 
+        //place the mirror line at the configured normalized pivot
         v1.add(coord(axisX, in.width), coord(axisY, in.height));
         v2.add(coord(axisX, in.width), coord(axisY, in.height));
 
@@ -85,6 +86,7 @@ public class MirrorFilter extends GenerateFilter{
         }
 
         Vec2 size = Scaling.fit.apply(image.getDrawable().getMinWidth(), image.getDrawable().getMinHeight(), image.getWidth(), image.getHeight());
+        //account for fit scaling so handles stay on the actual map area
         out.set((image.getWidth() - size.x)/2f, (image.getHeight() - size.y)/2f, size.x, size.y);
     }
 

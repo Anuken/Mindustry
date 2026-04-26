@@ -211,6 +211,7 @@ public class MapGenerateDialog extends BaseDialog{
         float pad = Scl.scl(16f);
         int amount = 0;
 
+        //pick the closest mirror line to the cursor
         for(var filter : filters){
             if(filter instanceof MirrorFilter){
                 MirrorFilter mirror = (MirrorFilter)filter;
@@ -238,6 +239,7 @@ public class MapGenerateDialog extends BaseDialog{
         MirrorFilter.drawRect(preview, dragRect);
         if(dragRect.width <= 0f || dragRect.height <= 0f) return;
 
+        //convert preview coordinates back into normalized axis coordinates
         dragging.axisX = Mathf.clamp((x - dragRect.x) / dragRect.width, 0f, 1f);
         dragging.axisY = Mathf.clamp((y - dragRect.y) / dragRect.height, 0f, 1f);
     }
@@ -500,6 +502,7 @@ public class MapGenerateDialog extends BaseDialog{
         }
 
         Seq<GenerateFilter> copy = new Seq<>(filters.size);
+        //copy filters so preview generation doesn't race with UI edits
         for(var filter : filters){
             copy.add(filter.copy());
         }
@@ -559,6 +562,7 @@ public class MapGenerateDialog extends BaseDialog{
                     texture.draw(pixmap);
                     generating = false;
                     if(updateQueued){
+                        //run one more pass if changes came in while generating
                         update();
                     }
                 });
