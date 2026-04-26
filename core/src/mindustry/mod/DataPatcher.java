@@ -87,10 +87,19 @@ public class DataPatcher{
 
         for(String patch : patchArray){
             PatchSet set = new PatchSet(patch, new JsonValue("error"));
-            patches.add(set);
 
             try{
                 JsonValue value = parser.getJson().fromJson(null, Jval.read(patch).toString(Jformat.plain));
+                if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
+                    JsonValue req = value.get("requiredPlanets");
+                    value.remove("requiredPlanets");
+
+                    String[] planets = req.isArray() ? req.asStringArray() : new String[]{ req.asString() };
+                    if(!Structs.contains(planets, Vars.state.rules.planet.name)){
+                        continue;
+                    }
+                }
+
                 set.json = value;
                 currentlyApplying = set;
                 visitStack.clear();
@@ -109,6 +118,8 @@ public class DataPatcher{
 
                 Log.err("Failed to apply patch: " + patch, e);
             }
+
+            patches.add(set);
         }
 
         afterCallbacks.each(Runnable::run);
