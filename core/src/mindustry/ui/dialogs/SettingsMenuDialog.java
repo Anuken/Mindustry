@@ -23,6 +23,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.type.Planet;
 import mindustry.ui.*;
 
 import java.io.*;
@@ -40,6 +41,8 @@ public class SettingsMenuDialog extends BaseDialog{
     private Table prefs;
     private Table menu;
     private BaseDialog dataDialog;
+    private BaseDialog planetDataDialog;
+    private Planet planet = Planets.serpulo;
     private Seq<SettingsCategory> categories = new Seq<>();
 
     public SettingsMenuDialog(){
@@ -85,6 +88,83 @@ public class SettingsMenuDialog extends BaseDialog{
         prefs.clearChildren();
         prefs.add(menu);
 
+        planetDataDialog = new BaseDialog("@settings.data");
+        planetDataDialog.addCloseButton();
+
+        planetDataDialog.cont.table(Tex.button, t -> {
+            t.defaults().size(280f, 60f).left();
+            TextButtonStyle style = Styles.flatt;
+
+            t.button(bundle.format("settings.planetselect", "[#" + planet.iconColor + "]" + planet.localizedName), Icon.planet, style, () -> {
+                BaseDialog dialog = new BaseDialog("");
+                dialog.cont.pane(p -> {
+                    p.background(Tex.button).margin(1f);
+                    int i = 0;
+
+                    for(var plan : content.planets()){
+                        if(plan.generator == null || plan.sectors.size == 0 || !plan.accessible) continue;
+
+                        p.button(plan.localizedName, Styles.flatTogglet, () -> {
+                            planet = plan;
+                            dialog.hide();
+                        }).size(110f, 45f).checked(planet == plan);
+
+                        if(++i % 4 == 0){
+                            p.row();
+                        }
+                    }
+                });
+                dialog.setFillParent(false);
+                dialog.addCloseButton();
+                dialog.show();
+            }).marginLeft(4).get().getLabel().setText(() -> bundle.format("settings.planetselect", "[#" + planet.iconColor + "]" + planet.localizedName));
+
+            t.row();
+
+            t.button("@settings.clearplanetresearch", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm", bundle.format("settings.clearplanetresearch.confirm", planet.localizedName), () -> {
+                    universe.clearLoadoutInfo();
+                    for(TechNode node : TechTree.all){
+                        if(node.planet == planet) node.reset();
+                    }
+                    content.each(c -> {
+                        if(c instanceof UnlockableContent u && u.databaseTabs.contains(planet)){
+                            u.clearUnlock();
+                        }
+                    });
+                    settings.remove("unlocks");
+                });
+            }).marginLeft(4);
+
+            t.row();
+
+            t.button("@settings.clearplanetcampaignsaves", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm", bundle.format("settings.clearplanetcampaignsaves.confirm", planet.localizedName), () -> {
+                    planet.clearStats();
+                    boolean any = false;
+                    for(var sec : planet.sectors){
+                        sec.clearInfo();
+                        if(sec.save != null){
+                            any = true;
+                            sec.save.delete();
+                            sec.save = null;
+                        }
+                    }
+                    if(any){
+                        planet.reloadMeshAsync();
+                    }
+
+                    for(var slot : control.saves.getSaveSlots().copy()){
+                        if(slot.isSector() && slot.getSector().planet == planet){
+                            slot.delete();
+                        }
+                    }
+                });
+            }).marginLeft(4);
+
+            t.row();
+        });
+
         dataDialog = new BaseDialog("@settings.data");
         dataDialog.addCloseButton();
 
@@ -110,6 +190,8 @@ public class SettingsMenuDialog extends BaseDialog{
             })).marginLeft(4);
 
             t.row();
+
+            t.button("@settings.clearplanetdata", Icon.trash, style, () -> planetDataDialog.show()).marginLeft(4).row();
 
             t.button("@settings.clearsaves", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm", "@settings.clearsaves.confirm", () -> {
