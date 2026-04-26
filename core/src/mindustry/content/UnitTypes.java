@@ -360,14 +360,18 @@ public class UnitTypes{
 
         nova = new UnitType("nova"){{
             canBoost = true;
-            boostMultiplier = 1.5f;
+            boostMultiplier = 2f;
             speed = 0.55f;
             hitSize = 8f;
-            health = 120f;
+            health = 240f;
             buildSpeed = 0.3f;
             armor = 1f;
 
-            abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
+            abilities.add(new RepairFieldAbility(30f, 60f * 2, 100f){{
+                sameTypeHealMult = 0.10f;
+                maxTargets = 6;
+                randomTimer = 60f;
+            }});
             ammoType = new PowerAmmoType(1000);
 
             weapons.add(new Weapon("heal-weapon"){{
@@ -383,6 +387,9 @@ public class UnitTypes{
                 bullet = new LaserBoltBulletType(5.2f, 13){{
                     lifetime = 30f;
                     healPercent = 5f;
+                    pierce = true;
+                    pierceBuilding = true;
+                    pierceCap = 2;
                     collidesTeam = true;
                     backColor = Pal.heal;
                     frontColor = Color.white;
