@@ -115,7 +115,7 @@ public class ItemTurret extends Turret{
 
             var orderedKeys = ammoParts.keys().toSeq().sort();
             for(Item i : orderedKeys){
-                realDrawers.put(i, new DrawTurret(){{
+                realDrawers.put(i, new DrawTurret(dt.basePrefix){{
                     parts.addAll(dt.parts);
                     parts.addAll(ammoParts.get(i));
                 }});
