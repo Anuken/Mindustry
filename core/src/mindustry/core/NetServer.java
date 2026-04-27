@@ -651,6 +651,17 @@ public class NetServer implements ApplicationListener{
         return Float.isInfinite(f) || Float.isNaN(f);
     }
 
+    public static void syncBuilding(Building build){
+        if(build == null) return;
+        netServer.syncStream.reset();
+        netServer.dataStreamWrites.i(build.pos());
+        netServer.dataStreamWrites.s(build.block.id);
+        build.writeSync(netServer.dataStreamWrites);
+
+        Call.blockSnapshot((short)1, netServer.syncStream.toByteArray());
+        netServer.syncStream.reset();
+    }
+
     @Remote(targets = Loc.client, priority = PacketPriority.low, unreliable = true)
     public static void requestBlockSnapshot(Player player, int pos){
         Building build = world.build(pos);

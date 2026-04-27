@@ -505,7 +505,7 @@ public class EntityProcess extends BaseProcessor{
                         //SPECIAL CASE: I/O code
                         //note that serialization is generated even for non-serializing entities for manual usage
                         if((first.name().equals("read") || first.name().equals("write"))){
-                            io.write(mbuilder, first.name().equals("write"));
+                            io.write(mbuilder, first.name().equals("write"), allFields);
                             specialIO = true;
                         }
 
