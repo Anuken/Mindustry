@@ -25,7 +25,7 @@ public class ItemTurret extends Turret{
     public ObjectMap<Item, BulletType> ammoTypes = new OrderedMap<>();
 
     /** Whether to add parts for each ammoType */
-    public boolean drawersMatchedAmmoType = false;
+    public boolean drawerMatchedAmmoType = false;
     public ObjectMap<Item, Seq<DrawPart>> ammoParts = new OrderedMap<>();
     private ObjectMap<Item, DrawTurret> realDrawers = new OrderedMap<>();
 
@@ -110,7 +110,7 @@ public class ItemTurret extends Turret{
     @Override
     public void load(){
         super.load();
-        if(drawersMatchedAmmoType && ammoParts.size > 0){
+        if(drawerMatchedAmmoType && ammoParts.size > 0){
             if(!(drawer instanceof DrawTurret dt)) return;
 
             var orderedKeys = ammoParts.keys().toSeq().sort();
@@ -146,7 +146,7 @@ public class ItemTurret extends Turret{
 
         @Override
         public void draw(){
-            if(drawersMatchedAmmoType && realDrawers.size > 0){
+            if(drawerMatchedAmmoType && realDrawers.size > 0){
                 if(ammo.size > 0){
                     realDrawers.get(((ItemEntry)ammo.peek()).item).draw(this);
                     return;
