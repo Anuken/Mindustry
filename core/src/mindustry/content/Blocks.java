@@ -5551,53 +5551,6 @@ public class Blocks{
             }}
             );
 
-            drawer = new DrawTurret("reinforced-"){{
-                parts.add(new RegionPart("-blade"){{
-                    progress = PartProgress.warmup;
-                    heatProgress = PartProgress.warmup;
-                    heatColor = Color.red;
-                    moveRot = -22f;
-                    moveX = 0f;
-                    moveY = -5f;
-                    mirror = true;
-                    children.add(new RegionPart("-side"){{
-                        progress = PartProgress.warmup.delay(0.6f);
-                        heatProgress = PartProgress.recoil;
-                        heatColor = Color.red;
-                        mirror = true;
-                        under = false;
-                        moveY = -4f;
-                        moveX = 1f;
-
-                        moves.add(new PartMove(PartProgress.recoil, 1f, 6f, -40f));
-                    }});
-                }},
-                new RegionPart("-mid"){{
-                    progress = PartProgress.recoil;
-                    heatProgress = PartProgress.warmup.add(-0.2f).add(p -> Mathf.sin(9f, 0.2f) * p.warmup);
-                    mirror = false;
-                    under = true;
-                    moveY = -5f;
-                }}
-                /*
-                new RegionPart("-missile"){{
-                    progress = PartProgress.reload.curve(Interp.pow2In);
-
-                    colorTo = new Color(1f, 1f, 1f, 0f);
-                    color = Color.white;
-                    mixColorTo = Pal.accent;
-                    mixColor = new Color(1f, 1f, 1f, 0f);
-                    outline = false;
-                    under = true;
-
-                    layerOffset = -0.01f;
-
-                    moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
-                }}
-                */
-                );
-            }};
-
             ammoDrawers(
                 Items.carbide, Seq.with(new RegionPart("-missile"){{
                     progress = PartProgress.reload.curve(Interp.pow2In);
@@ -5639,6 +5592,36 @@ public class Blocks{
                     moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
                 }})
             );
+
+            drawer = new DrawTurret("reinforced-"){{
+                parts.add(new RegionPart("-blade"){{
+                    progress = PartProgress.warmup;
+                    heatProgress = PartProgress.warmup;
+                    heatColor = Color.red;
+                    moveRot = -22f;
+                    moveX = 0f;
+                    moveY = -5f;
+                    mirror = true;
+                    children.add(new RegionPart("-side"){{
+                        progress = PartProgress.warmup.delay(0.6f);
+                        heatProgress = PartProgress.recoil;
+                        heatColor = Color.red;
+                        mirror = true;
+                        under = false;
+                        moveY = -4f;
+                        moveX = 1f;
+
+                        moves.add(new PartMove(PartProgress.recoil, 1f, 6f, -40f));
+                    }});
+                }},
+                new RegionPart("-mid"){{
+                    progress = PartProgress.recoil;
+                    heatProgress = PartProgress.warmup.add(-0.2f).add(p -> Mathf.sin(9f, 0.2f) * p.warmup);
+                    mirror = false;
+                    under = true;
+                    moveY = -5f;
+                }});
+            }};
 
             drawersMatchedAmmoType = true;
 
