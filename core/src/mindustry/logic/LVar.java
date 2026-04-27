@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.util.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 
@@ -63,6 +64,11 @@ public class LVar{
 
     public float numf(){
         return isobj ? objval != null ? 1 : 0 : invalid(numval) ? 0 : (float)numval;
+    }
+
+    /** @return float number converted from tile (logic) to world coordinates */
+    public float numfWorld(){
+        return World.unconv(numf());
     }
 
     /** Get float value from variable, convert null to NaN to handle it differently in some instructions */

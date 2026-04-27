@@ -111,7 +111,11 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         Events.run(Trigger.newGame, this::updateWave);
 
         Events.on(PlayerIpBanEvent.class, e -> updateBans(e.ip));
-        Events.on(PlayerIpUnbanEvent.class, e -> updateBans(e.ip));
+        Events.on(PlayerUnbanEvent.class, e -> {
+            // updateBans works off of ip ban list. Unbanning a player does not unban their ip but since this is steam, their "ip" is just their steam id (which is their uuid as well) prefixed with steam:
+            netServer.admins.unbanPlayerIP("steam:" + e.uuid);
+            updateBans(null);
+        });
     }
 
     public boolean isSteamClient(){
@@ -305,7 +309,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
     @Override
     public void onLobbyChatUpdate(SteamID lobby, SteamID who, SteamID changer, ChatMemberStateChange change){
-        Log.info("lobby @: @ caused @'s change: @", lobby.getAccountID(), who.getAccountID(), changer.getAccountID(), change);
+        Log.info("lobby @: @ caused @'s change: @", lobby.getAccountID(), changer.getAccountID(), who.getAccountID(), change);
+        if(net.server() && change == ChatMemberStateChange.Entered && SteamAdmin.isAdmin("steam:" + who.getAccountID())) SteamAdmin.fetch(true); //fetch on admin join
         if(change == ChatMemberStateChange.Disconnected || change == ChatMemberStateChange.Left){
             if(net.client()){
                 //host left, leave as well

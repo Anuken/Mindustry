@@ -316,7 +316,7 @@ public class SerpuloTechTree{
                     });
                 });
 
-                node(arc, () -> {
+                node(arc, Seq.with(new OnSector(frozenForest)), () -> {
                     node(scorch, () -> {
                         node(wave, () -> {
                             node(parallax, () -> {

@@ -202,7 +202,7 @@ public class CallGenerator{
                 builder.addStatement("$L = READ.$L()", varName, pname);
             }else{
                 //else, try and find a serializer
-                String ser = serializer.readers.get(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(ent.element.e, var.mirror(), false));
+                String ser = serializer.getNetReader(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(ent.element.e, var.mirror(), false));
 
                 if(ser == null){ //make sure a serializer exists!
                     BaseProcessor.err("No read method to read class type '" + typeName + "' in method " + ent.targetMethod + "; " + serializer.readers, var);
