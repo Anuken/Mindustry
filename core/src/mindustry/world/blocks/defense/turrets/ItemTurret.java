@@ -147,12 +147,9 @@ public class ItemTurret extends Turret{
         @Override
         public void draw(){
             if(drawersMatchedAmmoType && realDrawers.size > 0){
-                var ammos = ammoTypes.keys().toSeq().sort();
-                for(Item i : ammos){
-                    if(ammoTypes.get(i) == peekAmmo()){
-                        realDrawers.get(i).draw(this);
-                        return;
-                    }
+                if(ammo.size > 0){
+                    realDrawers.get(((ItemEntry)ammo.peek()).item).draw(this);
+                    return;
                 }
             }
             super.draw();
