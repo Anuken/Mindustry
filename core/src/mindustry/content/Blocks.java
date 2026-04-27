@@ -2081,8 +2081,8 @@ public class Blocks{
         conveyor = new Conveyor("conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1));
             health = 45;
-            speed = 0.03f;
-            displayedSpeed = 4.2f;
+            speed = 0.046f;
+            displayedSpeed = 6.5f;
             buildCostMultiplier = 2f;
             researchCost = with(Items.copper, 5);
         }};
@@ -2113,7 +2113,7 @@ public class Blocks{
             speed = 26;
             capacity = 6;
             health = 30;
-            buildCostMultiplier = 6f;
+            buildCostMultiplier = 4f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
@@ -3754,7 +3754,7 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.copperAmmoBack;
                     frontColor = Pal.copperAmmoFront;
                 }},
-                Items.graphite, new BasicBulletType(3.5f, 31){{
+                Items.graphite, new BasicBulletType(3.5f, 28){{
                     width = 9f;
                     height = 12f;
                     ammoMultiplier = 4;
@@ -3767,7 +3767,7 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.graphiteAmmoBack;
                     frontColor = Pal.graphiteAmmoFront;
                 }},
-                Items.pyratite, new BasicBulletType(3.2f, 25){{
+                Items.pyratite, new BasicBulletType(3.2f, 26){{
                     width = 10f;
                     height = 12f;
                     frontColor = hitColor = Pal.lightishOrange;
@@ -3797,7 +3797,7 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.siliconAmmoBack;
                     frontColor = Pal.siliconAmmoFront;
                 }},
-                Items.thorium, new BasicBulletType(4f, 28, "bullet"){{
+                Items.thorium, new BasicBulletType(4f, 26, "bullet"){{
                     width = 8f;
                     height = 13f;
                     shootEffect = Fx.shootBig;
@@ -3947,16 +3947,21 @@ public class Blocks{
 
             ammo(
                 Items.titanium, new ShrapnelBulletType(){{
-                    length = brange;
-                    damage = 66f;
-                    ammoMultiplier = 4f;
+                    length = brange + 64f;
+                    rangeChange = 64f;
+                    damage = 50f;
+                    ammoMultiplier = 2f;
                     width = 17f;
                     reloadMultiplier = 1.3f;
+                    pierceCap = 4;
+                    serrations = 9;
+                    serrationSpacing = 20f;
+                    shootPattern = new ShootSpread(3, 10f);
                 }},
                 Items.thorium, new ShrapnelBulletType(){{
                     length = brange;
                     damage = 105f;
-                    ammoMultiplier = 5f;
+                    ammoMultiplier = 2f;
                     toColor = Pal.thoriumPink;
                     shootEffect = smokeEffect = Fx.thoriumShoot;
                 }}
