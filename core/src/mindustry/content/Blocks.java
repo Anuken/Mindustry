@@ -5578,7 +5578,9 @@ public class Blocks{
                     mirror = false;
                     under = true;
                     moveY = -5f;
-                }}, new RegionPart("-missile"){{
+                }}
+                /*
+                new RegionPart("-missile"){{
                     progress = PartProgress.reload.curve(Interp.pow2In);
 
                     colorTo = new Color(1f, 1f, 1f, 0f);
@@ -5591,8 +5593,54 @@ public class Blocks{
                     layerOffset = -0.01f;
 
                     moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
-                }});
+                }}
+                */
+                );
             }};
+
+            ammoDrawers(
+                Items.carbide, Seq.with(new RegionPart("-missile"){{
+                    progress = PartProgress.reload.curve(Interp.pow2In);
+
+                    colorTo = new Color(1f, 1f, 1f, 0f);
+                    color = Color.white;
+                    mixColorTo = Pal.accent;
+                    mixColor = new Color(1f, 1f, 1f, 0f);
+                    outline = false;
+                    under = true;
+                    layerOffset = -0.01f;
+
+                    moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                }}),
+                Items.phaseFabric, Seq.with(new RegionPart("-missile-phase"){{
+                    progress = PartProgress.reload.curve(Interp.pow2In);
+
+                    colorTo = new Color(1f, 1f, 1f, 0f);
+                    color = Color.white;
+                    mixColorTo = Pal.accent;
+                    mixColor = new Color(1f, 1f, 1f, 0f);
+                    outline = false;
+                    under = true;
+                    layerOffset = -0.01f;
+
+                    moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                }}),
+                Items.surgeAlloy, Seq.with(new RegionPart("-missile-surge"){{
+                    progress = PartProgress.reload.curve(Interp.pow2In);
+
+                    colorTo = new Color(1f, 1f, 1f, 0f);
+                    color = Color.white;
+                    mixColorTo = Pal.accent;
+                    mixColor = new Color(1f, 1f, 1f, 0f);
+                    outline = false;
+                    under = true;
+                    layerOffset = -0.01f;
+
+                    moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                }})
+            );
+
+            drawersMatchedAmmoType = true;
 
             recoil = 0.5f;
 

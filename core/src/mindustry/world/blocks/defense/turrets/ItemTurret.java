@@ -8,6 +8,7 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.part.DrawPart;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -15,12 +16,18 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.DrawTurret;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class ItemTurret extends Turret{
     public ObjectMap<Item, BulletType> ammoTypes = new OrderedMap<>();
+
+    /** Whether to add parts for each ammoType */
+    public boolean drawersMatchedAmmoType = false;
+    public ObjectMap<Item, Seq<DrawPart>> ammoParts = new OrderedMap<>();
+    private ObjectMap<Item, DrawTurret> realDrawers = new OrderedMap<>();
 
     public ItemTurret(String name){
         super(name);
@@ -43,6 +50,8 @@ public class ItemTurret extends Turret{
             limitRange(entry.value, margin);
         }
     }
+
+    public void ammoDrawers(Object... objects){ ammoParts = OrderedMap.of(objects); }
 
     @Override
     public void setStats(){
@@ -98,6 +107,23 @@ public class ItemTurret extends Turret{
         super.init();
     }
 
+    @Override
+    public void load(){
+        super.load();
+        if(drawersMatchedAmmoType && ammoParts.size > 0){
+            if(!(drawer instanceof DrawTurret dt)) return;
+
+            var orderedKeys = ammoParts.keys().toSeq().sort();
+            for(Item i : orderedKeys){
+                realDrawers.put(i, new DrawTurret(){{
+                    parts.addAll(dt.parts);
+                    parts.addAll(ammoParts.get(i));
+                }});
+                realDrawers.get(i).load(this);
+            }
+        }
+    }
+
     public class ItemTurretBuild extends TurretBuild{
 
         @Override
@@ -116,6 +142,20 @@ public class ItemTurret extends Turret{
                 case currentAmmoType -> ammo.size > 0 ? ((ItemEntry)ammo.peek()).item : null;
                 default -> super.senseObject(sensor);
             };
+        }
+
+        @Override
+        public void draw(){
+            if(drawersMatchedAmmoType && realDrawers.size > 0){
+                var ammos = ammoTypes.keys().toSeq().sort();
+                for(Item i : ammos){
+                    if(ammoTypes.get(i) == peekAmmo()){
+                        realDrawers.get(i).draw(this);
+                        return;
+                    }
+                }
+            }
+            super.draw();
         }
 
         @Override
