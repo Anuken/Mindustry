@@ -1382,7 +1382,7 @@ public class UnitTypes{
             accel = 0.1f;
             range = 130f;
             health = 400;
-            buildSpeed = 0.5f;
+            buildSpeed = 0.4f;
             engineOffset = 6.5f;
             hitSize = 9f;
             lowAltitude = true;
