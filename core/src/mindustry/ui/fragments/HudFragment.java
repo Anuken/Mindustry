@@ -597,6 +597,14 @@ public class HudFragment{
 
                 //'core is under attack' table
                 c.collapser(top -> top.background(Styles.black6).add("@coreattack").pad(8)
+                .with(co -> {
+                    co.tapped(() -> {
+                        if(control.lastDamagedCore != null){
+                            control.input.panCamera(Tmp.v1.set(control.lastDamagedCore));
+                        }
+                    });
+                    co.addListener(new HandCursorListener());
+                })
                 .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time, 2f, 1f))), true,
                 () -> {
                     if(!shown || state.isPaused()) return false;

@@ -115,7 +115,7 @@ public class GameService{
             installMod.complete();
         }
 
-        if(Core.bundle.get("yes").equals("router")){
+        if(Core.bundle.get("ok").equals(Blocks.router.emoji()+Blocks.router.emoji())){
             routerLanguage.complete();
         }
 

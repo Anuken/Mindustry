@@ -16,7 +16,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     /** weapon mount array, never null */
     @SyncLocal WeaponMount[] mounts = {};
     @ReadOnly transient boolean isRotate;
-    transient float aimX, aimY;
+    @NoSerialize float aimX, aimY;
     boolean isShooting;
     float ammo;
 
