@@ -21,6 +21,7 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.editor.*;
 import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -1729,10 +1730,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @return whether the bullet should be removed. */
     public boolean collision(Bullet other){
         boolean wasDead = health <= 0;
+        BulletType t = other.type;
 
         float damage = other.type.buildingDamage(other);
-        if(!other.type.pierceArmor){
-            damage = Damage.applyArmor(damage, block.armor * other.type.armorMultiplier);
+        if(!t.pierceArmor){
+            damage = Damage.applyArmor(damage, block.armor * t.armorMultiplier * t.blockArmorMultiplier);
         }
 
         damage(other, other.team, damage);
