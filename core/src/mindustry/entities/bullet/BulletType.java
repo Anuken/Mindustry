@@ -185,8 +185,10 @@ public class BulletType extends Content implements Cloneable{
     public boolean fragOnAbsorb = true;
     /** If true, unit armor is ignored in damage calculations. */
     public boolean pierceArmor = false;
-    /** Multiplies the unit armor used in damage calculations. Used for armor weakness, armor piercing, and anti-armor. */
+    /** Multiplies the unit/building armor used in damage calculations. Used for armor weakness, armor piercing, and anti-armor. */
     public float armorMultiplier = 1f;
+    /** Multiplies only the building armor used in damage calculations. */
+    public float blockArmorMultiplier = 1f;
     /** If true, the bullet will "stick" to enemies and get deactivated on collision. */
     public boolean sticky = false;
     /** Extra time added to bullet when it sticks to something. */

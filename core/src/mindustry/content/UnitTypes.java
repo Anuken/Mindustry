@@ -3915,12 +3915,13 @@ public class UnitTypes{
                 mirror = false;
                 shoot = new ShootHelix();
 
-                bullet = new BasicBulletType(5f, 34){{
+                bullet = new BasicBulletType(5f, 22f / 0.75f){{
                     width = 7f;
                     height = 12f;
                     lifetime = 18f;
                     //floating point inaccuracy makes 0.6f show as -39%
                     buildingDamageMultiplier = 0.599999f;
+                    blockArmorMultiplier = 0.5f;
                     shootEffect = Fx.sparkShoot;
                     smokeEffect = Fx.shootBigSmoke;
                     hitColor = backColor = trailColor = Pal.suppress;
@@ -3931,13 +3932,12 @@ public class UnitTypes{
 
                     fragOnDespawn = false;
                     fragBullets = 2;
-                    fragBullet = new BasicBulletType(3f, 15){{
+                    fragBullet = new BasicBulletType(3f, 10){{
                         width = 5f;
                         height = 8f;
                         lifetime = 14f;
                         fragVelocityMax = 1f;
                         fragVelocityMin = 0.7f;
-                        buildingDamageMultiplier = 0.5f;
                         hitColor = backColor = trailColor = Pal.suppress;
                         frontColor = Color.white;
                         trailWidth = 1.2f;
