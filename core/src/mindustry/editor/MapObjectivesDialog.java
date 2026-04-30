@@ -3,6 +3,8 @@ package mindustry.editor;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.input.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
@@ -14,6 +16,7 @@ import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.game.MapObjectives.*;
+import mindustry.editor.MapObjectivesCanvas.ObjectiveTilemap.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -38,6 +41,8 @@ public class MapObjectivesDialog extends BaseDialog{
     private static final ObjectMap<Class<?>, FieldProvider<?>> providers = new ObjectMap<>();
     /** Maps annotation type with its field parsers. Non-annotated fields are mapped with {@link Override}. */
     private static final ObjectMap<Class<? extends Annotation>, ObjectMap<Class<?>, FieldInterpreter<?>>> interpreters = new ObjectMap<>();
+
+    private MapObjective copy = null;
 
     static{
         // Default un-annotated field interpreters.
@@ -520,6 +525,21 @@ public class MapObjectivesDialog extends BaseDialog{
                 });
 
                 if(mobile){
+                    buttons.button("@editor.paste", Icon.paste, () -> {
+                        copy = null;
+                        Core.app.setClipboardText(JsonIO.write(new MapObjectives(canvas.objectives)));
+                        for(var obj : JsonIO.read(MapObjectives.class, Core.app.getClipboardText()).all){
+                            if(obj.editorX == canvas.pasteX && obj.editorY == canvas.pasteY){
+                                copy = obj;
+                            }
+                        };
+                        if(copy == null){
+                            ui.showErrorMessage("@error.objectivecopy");
+                        }else{
+                            canvas.tilemap.createTile(copy.editorX, copy.editorY, copy, true);
+                            canvas.objectives.add(copy);
+                        }
+                    }).visible(() -> copy != null || canvas.pasteX != -999 || canvas.pasteY != -999);
                     buttons.button("@cancel", Icon.cancel, canvas::stopQuery).visible(() -> canvas.isQuerying());
                     buttons.button("@ok", Icon.ok, canvas::placeQuery).visible(() -> canvas.isQuerying());
                 }
@@ -538,6 +558,58 @@ public class MapObjectivesDialog extends BaseDialog{
             out.get(canvas.objectives);
             out = arr -> {};
         });
+
+        update(() -> {
+            if(hasKeyboard()){
+                doInput();
+            }
+        });
+    }
+
+    private void doInput(){
+        if(Core.input.keyDown(KeyCode.controlLeft) || Core.input.keyDown(KeyCode.controlRight)){
+            if(Core.input.keyTap(KeyCode.c)){
+                Vec2 pos = screenToLocalCoordinates(Core.input.mouse());
+                canvas.pasteX = Mathf.round((pos.x - canvas.objWidth * canvas.unitSize / 2f) / canvas.unitSize);
+                canvas.pasteY = Mathf.floor((pos.y - canvas.unitSize) / canvas.unitSize);
+                boolean copied = false;
+                Tmp.r1.set(canvas.pasteX, canvas.pasteY, 1, 1).grow(-0.001f);
+                for(var obj : canvas.objectives){
+                    if(Tmp.r2.set(obj.editorX - 2, obj.editorY - 1, canvas.objWidth, canvas.objHeight).overlaps(Tmp.r1)){
+                        copied = true;
+                        canvas.pasteX = obj.editorX;
+                        canvas.pasteY = obj.editorY;
+                    }
+                }
+
+                if(!copied){
+                    ui.showErrorMessage("@error.objectivecopy");
+                }
+            }
+        }
+
+        if(Core.input.keyDown(KeyCode.controlLeft) || Core.input.keyDown(KeyCode.controlRight)){
+            if(Core.input.keyTap(KeyCode.v)){
+                copy = null;
+                Core.app.setClipboardText(JsonIO.write(new MapObjectives(canvas.objectives)));
+                for(var obj : JsonIO.read(MapObjectives.class, Core.app.getClipboardText()).all){
+                    if(obj.editorX == canvas.pasteX && obj.editorY == canvas.pasteY){
+                        copy = obj;
+                    }
+                };
+                Vec2 pos = screenToLocalCoordinates(Core.input.mouse());
+                int tx = Mathf.round((pos.x - canvas.objWidth * canvas.unitSize / 2f) / canvas.unitSize);
+                int ty = Mathf.floor((pos.y - canvas.unitSize) / canvas.unitSize);
+                if(copy == null || !canvas.tilemap.validPlace(tx, ty, null)){
+                    ui.showErrorMessage("@error.objectivecopy");
+                }else{
+                    copy.editorX = tx;
+                    copy.editorY = ty;
+                    canvas.tilemap.createTile(tx, ty, copy, true);
+                    canvas.objectives.add(copy);
+                }
+            }
+        }
     }
 
     public void show(Seq<MapObjective> objectives, Cons<Seq<MapObjective>> out){
