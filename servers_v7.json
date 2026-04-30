@@ -31,20 +31,6 @@
     ]
   },
   {
-    "name": "thedimas",
-    "address": [
-      "130.162.212.232",
-      "130.162.212.232:6503",
-      "130.162.212.232:6505",
-      "130.162.212.232:6507",
-      "130.162.212.232:6508",
-      "130.162.212.232:6509",
-      "130.162.212.232:6510",
-      "130.162.212.232:6511",
-      "130.162.212.232:6513"
-    ]
-  },
-  {
     "name": "KMWStudios",
     "address": [
       "kislota.kmwstudios.org:28102",
@@ -110,7 +96,7 @@
   },
   {
     "name": "OmniCorp Classic",
-    "address": ["omnidustry.ru:6567", "omnidustry.ru:6568", "omnidustry.ru:6569", "omnidustry.ru:6570", "omnidustry.ru:6571", "omnidustry.ru:6572", "omnidustry.ru:6573", "omnidustry.ru:6574", "omnidustry.ru:6575", "omnidustry.ru:6576"]
+    "address": ["omnidustry.ru:6570"]
   },
   {
     "name": "Eradication Mindustry",
@@ -127,13 +113,6 @@
       "122.180.249.217:7001",
       "20.186.12.170:7000",
       "20.2.202.238:7000"
-    ]
-  },
-  {
-    "name": "Conservatory",
-    "address": [
-      "165.232.137.170:6567",
-      "165.232.137.170:6568"
     ]
   },
   {
