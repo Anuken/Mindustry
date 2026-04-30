@@ -3614,13 +3614,14 @@ public class Blocks{
         arc = new PowerTurret("arc"){{
             requirements(Category.turret, with(Items.copper, 50, Items.lead, 50));
             shootType = new LightningBulletType(){{
-                damage = 20;
+                damage = 12;
                 lightningLength = 25;
                 collidesAir = false;
                 ammoMultiplier = 1f;
 
                 //for visual stats only.
-                buildingDamageMultiplier = 0.25f;
+                buildingDamageMultiplier = 0.4f;
+                pierceCap = 5;
 
                 lightningType = new BulletType(0.0001f, 0f){{
                     lifetime = Fx.lightning.lifetime;
@@ -3630,7 +3631,7 @@ public class Blocks{
                     hittable = false;
                     lightColor = Color.white;
                     collidesAir = false;
-                    buildingDamageMultiplier = 0.25f;
+                    buildingDamageMultiplier = 0.4f;
                     shieldDamageMultiplier = 0.2f;
                 }};
             }};
@@ -3646,8 +3647,10 @@ public class Blocks{
             size = 1;
             health = 260;
             shootSound = Sounds.shootArc;
+            
             consumePower(3.3f);
             coolant = consumeCoolant(0.1f);
+            coolantMultiplier = 20f;
         }};
 
         parallax = new TractorBeamTurret("parallax"){{
