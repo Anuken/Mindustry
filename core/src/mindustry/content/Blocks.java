@@ -2445,6 +2445,7 @@ public class Blocks{
         reinforcedBridgeConduit = new DirectionLiquidBridge("reinforced-bridge-conduit"){{
             requirements(Category.liquid, with(Items.graphite, 8, Items.beryllium, 20));
             range = 4;
+            floating = true;
             hasPower = false;
             liquidCapacity = 120f;
             researchCostMultiplier = 1;
@@ -2675,7 +2676,7 @@ public class Blocks{
             requirements(Category.power, with(Items.beryllium, 30, Items.oxide, 10, Items.silicon, 10));
             size = 3;
             consumesPower = outputsPower = true;
-            range = 23;
+            range = 30;
             scaledHealth = 90;
             fogRadius = 2;
 
@@ -2683,7 +2684,7 @@ public class Blocks{
         }};
 
         beamLink = new LongPowerNode("beam-link"){{
-            requirements(Category.power, with(Items.beryllium, 250, Items.silicon, 250, Items.oxide, 150, Items.carbide, 75, Items.surgeAlloy, 75, Items.phaseFabric, 75));
+            requirements(Category.power, with(Items.beryllium, 120, Items.silicon, 120, Items.oxide, 75, Items.carbide, 50, Items.surgeAlloy, 25, Items.phaseFabric, 25));
             size = 3;
             maxNodes = 1;
             laserRange = 500f;
@@ -3094,6 +3095,7 @@ public class Blocks{
             researchCostMultiplier = 0.5f;
 
             drillMultipliers.put(Items.beryllium, 2f);
+            drillMultipliers.put(Items.sand, 2f);
             liquidBoostIntensity = 1.75f;
 
             fogRadius = 4;
@@ -3125,6 +3127,7 @@ public class Blocks{
             fogRadius = 5;
 
             drillMultipliers.put(Items.beryllium, 2f);
+            drillMultipliers.put(Items.sand, 2f);
             liquidBoostIntensity = 2f;
 
             //TODO different requirements
@@ -6605,7 +6608,7 @@ public class Blocks{
             regionSuffix = "-dark";
             size = 5;
             reload = 130f;
-            chargeTime = 100f;
+            chargeTime = 50f;
             range = 2100f;
             maxPayloadSize = 4f;
             consumePower(3f);
@@ -6640,17 +6643,19 @@ public class Blocks{
             filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.carbideWallLarge, Blocks.reinforcedSurgeWallLarge, Blocks.reinforcedLiquidContainer, Blocks.reinforcedContainer, Blocks.beamNode);
         }};
 
-        //yes this block is pretty much useless
         largeConstructor = new Constructor("large-constructor"){{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 100, Items.tungsten, 200, Items.thorium, 80));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.75f;
+            buildSpeed = 3f;
             maxBlockSize = 4;
-            minBlockSize = 3;
+            minBlockSize = 1;
             size = 5;
 
-            consumePower(3f);
+            consumePower(6f);
+            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.carbideWallLarge, Blocks.reinforcedSurgeWallLarge, Blocks.shieldedWall,
+                Blocks.reinforcedLiquidContainer, Blocks.reinforcedLiquidTank, Blocks.reinforcedContainer, Blocks.reinforcedVault, Blocks.beamNode, Blocks.beamTower);
+        }};
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
