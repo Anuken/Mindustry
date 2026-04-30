@@ -4685,21 +4685,21 @@ public class Blocks{
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.3f;
             }},
-            Items.carbide, new ArtilleryBulletType(3.25f, 700, "shell"){{
+            Items.carbide, new ArtilleryBulletType(4f, 650, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosionSmall, Fx.titanSmokeSmall);
                 despawnEffect = Fx.none;
                 knockback = 3f;
-                lifetime = 140f;
+                lifetime = 115f;
                 height = 28f;
                 width = 15f;
                 splashDamageRadius = 36f;
-                splashDamage = 750f;
+                splashDamage = 650f;
                 rangeChange = 10f*8f;
                 reloadMultiplier = 0.8f;
                 scaledSplashDamage = true;
                 backColor = hitColor = trailColor = Color.valueOf("ab8ec5");
                 frontColor = Color.white;
-                ammoMultiplier = 1f;
+                ammoMultiplier = 2f;
                 hitSound = Sounds.explosionTitan;
 
                 status = StatusEffects.blasted;
@@ -4723,7 +4723,7 @@ public class Blocks{
                 fragLifeMin = 1.5f;
 
                 fragBullets = 12;
-                    fragBullet = new ArtilleryBulletType(0.5f, 50, "shell"){{
+                    fragBullet = new ArtilleryBulletType(1f, 50, "shell"){{
                         hitEffect = new MultiEffect(Fx.titanExplosionFrag, Fx.titanLightSmall, new WaveEffect(){{
                             lifetime = 8f;
                             strokeFrom = 1f;
@@ -4733,7 +4733,7 @@ public class Blocks{
                         despawnEffect = Fx.hitBulletColor;
                         width = 8f;
                         height = 12f;
-                        lifetime = 50f;
+                        lifetime = 25f;
                         knockback = 0.5f;
                         splashDamageRadius = 22f;
                         splashDamage = 50f;
@@ -5319,7 +5319,7 @@ public class Blocks{
                 shootEffect = Fx.shootBig;
                 smokeEffect = Fx.shootSmokeMissileColor;
                 hitColor = Color.valueOf("ffd37f");
-                ammoMultiplier = 5f;
+                ammoMultiplier = 2f;
                 reloadMultiplier = 0.8f;
 
                 spawnUnit = new MissileUnitType("scathe-missile-phase"){{
@@ -5355,7 +5355,7 @@ public class Blocks{
 
                     fogRadius = 6f;
 
-                    health = 500;
+                    health = 350;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -5364,9 +5364,10 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(320f, 120f){{
+                        bullet = new ExplosionBulletType(280f, 90f){{
+                            //mirror stats
                             reloadMultiplier = 0.8f;
-                            ammoMultiplier = 5f;
+                            ammoMultiplier = 2f;
 
                             hitColor = engineColor;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
@@ -5390,7 +5391,7 @@ public class Blocks{
                                 width = height = 18f;
                                 collidesTiles = false;
                                 splashDamageRadius = 56f;
-                                splashDamage = 120f;
+                                splashDamage = 90f;
                                 backColor = trailColor = hitColor = engineColor;
                                 frontColor = Color.white;
                                 smokeEffect = Fx.shootBigSmoke2;
@@ -5414,7 +5415,7 @@ public class Blocks{
                         interval = 15f;
                     }});
 
-                    abilities.add(new ForceFieldAbility(120f, 0f, 3000f, 999999999f));
+                    abilities.add(new ForceFieldAbility(120f, 0f, 2600f, 999999999f));
 
                 }};
             }},
