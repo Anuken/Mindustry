@@ -18,11 +18,6 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     @ReadOnly transient boolean isRotate;
     @NoSerialize float aimX, aimY;
     boolean isShooting;
-    @NoSync float ammo;
-
-    float ammof(){
-        return ammo / type.ammoCapacity;
-    }
 
     void setWeaponRotation(float rotation){
         for(WeaponMount mount : mounts){

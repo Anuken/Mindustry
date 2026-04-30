@@ -64,8 +64,6 @@ public class Rules{
     public boolean damageExplosions = true;
     /** Whether fire (and neoplasm spread) is enabled. */
     public boolean fire = true;
-    /** Whether units use and require ammo. */
-    public boolean unitAmmo = false;
     /** If true, air and ground units target random things each wave instead of only the core/generators. */
     public boolean randomWaveAI = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */
@@ -315,8 +313,6 @@ public class Rules{
         public boolean fillItems;
         /** If true, resources are not consumed when building. */
         public boolean infiniteResources;
-        /** If true, this team has infinite unit ammo. */
-        public boolean infiniteAmmo;
         /** EXPERIMENTAL, DO NOT USE: Pre-built base AI. Gives the illusion of intelligent design of pre-building an attack base. */
         public boolean prebuildAi;
 

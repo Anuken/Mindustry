@@ -142,7 +142,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     public boolean displayAmmo(){
-        return unit instanceof BlockUnitc || state.rules.unitAmmo;
+        return unit instanceof BlockUnitc;
     }
 
     public void reset(){

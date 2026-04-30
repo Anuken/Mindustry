@@ -18,7 +18,6 @@ import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.type.ammo.*;
 import mindustry.type.unit.*;
 import mindustry.type.weapons.*;
 import mindustry.world.meta.*;
@@ -123,7 +122,6 @@ public class UnitTypes{
             hitSize = 10f;
             health = 550;
             armor = 4f;
-            ammoType = new ItemAmmoType(Items.coal);
             immunities.add(StatusEffects.burning);
 
             weapons.add(new Weapon("flamethrower"){{
@@ -159,7 +157,6 @@ public class UnitTypes{
             health = 900;
             armor = 9f;
             mechFrontSway = 0.55f;
-            ammoType = new ItemAmmoType(Items.graphite);
             stepSound = Sounds.mechStepSmall;
             stepSoundPitch = 0.8f;
             stepSoundVolume = 0.65f;
@@ -196,7 +193,6 @@ public class UnitTypes{
             health = 9000;
             armor = 10f;
             mechFrontSway = 1f;
-            ammoType = new ItemAmmoType(Items.thorium);
 
             mechStepParticles = true;
             stepShake = 0.15f;
@@ -302,7 +298,6 @@ public class UnitTypes{
             drownTimeMultiplier = 1.6f;
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
-            ammoType = new ItemAmmoType(Items.thorium);
             stepSound = Sounds.mechStepHeavy;
             stepSoundPitch = 0.9f;
             stepSoundVolume = 0.45f;
@@ -368,7 +363,6 @@ public class UnitTypes{
             armor = 1f;
 
             abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
-            ammoType = new PowerAmmoType(1000);
 
             weapons.add(new Weapon("heal-weapon"){{
                 top = false;
@@ -404,7 +398,6 @@ public class UnitTypes{
             mineSpeed = 3f;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
-            ammoType = new PowerAmmoType(1300);
 
             weapons.add(new Weapon("heal-shotgun-weapon"){{
                 top = false;
@@ -457,7 +450,6 @@ public class UnitTypes{
             riseSpeed = descentSpeed = 0.05f;
 
             mechFrontSway = 0.55f;
-            ammoType = new PowerAmmoType(1500);
             stepSound = Sounds.mechStepSmall;
             stepSoundPitch = 0.9f;
             stepSoundVolume = 0.6f;
@@ -502,7 +494,6 @@ public class UnitTypes{
 
             mechStepParticles = true;
             stepShake = 0.15f;
-            ammoType = new PowerAmmoType(2500);
             drownTimeMultiplier = 1.3f;
 
             speed = 0.44f;
@@ -600,7 +591,6 @@ public class UnitTypes{
             legForwardScl = 0.58f;
             hovering = true;
             shadowElevation = 0.2f;
-            ammoType = new PowerAmmoType(4000);
             groundLayer = Layer.legUnit;
 
             speed = 0.3f;
@@ -667,7 +657,6 @@ public class UnitTypes{
             health = 150;
             mechSideSway = 0.25f;
             range = 40f;
-            ammoType = new ItemAmmoType(Items.coal);
             stepSound = Sounds.walkerStepTiny;
             stepSoundVolume = 0.2f;
 
@@ -718,7 +707,6 @@ public class UnitTypes{
             legMoveSpace = 1.4f;
             hovering = true;
             armor = 3f;
-            ammoType = new ItemAmmoType(Items.coal);
 
             shadowElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
@@ -756,7 +744,6 @@ public class UnitTypes{
             legBaseOffset = 2f;
             hovering = true;
             armor = 5f;
-            ammoType = new PowerAmmoType(1000);
 
             shadowElevation = 0.3f;
             groundLayer = Layer.legUnit;
@@ -829,7 +816,6 @@ public class UnitTypes{
             legLengthScl = 0.96f;
             rippleScale = 2f;
             legSpeed = 0.2f;
-            ammoType = new PowerAmmoType(2000);
 
             stepSound = Sounds.walkerStep;
             stepSoundVolume = 0.85f;
@@ -937,7 +923,6 @@ public class UnitTypes{
             legLengthScl = 0.93f;
             rippleScale = 3f;
             legSpeed = 0.19f;
-            ammoType = new ItemAmmoType(Items.graphite, 8);
 
             legSplashDamage = 80;
             legSplashRange = 60;
@@ -1109,7 +1094,6 @@ public class UnitTypes{
             itemCapacity = 0;
             targetFlags = new BlockFlag[]{BlockFlag.factory, null};
             circleTarget = true;
-            ammoType = new ItemAmmoType(Items.graphite);
             omniMovement = false;
             rotateSpeed = 4.5f;
             circleTargetRadius = 40f;
@@ -1158,7 +1142,6 @@ public class UnitTypes{
             targetFlags = new BlockFlag[]{BlockFlag.launchPad, BlockFlag.storage, BlockFlag.battery, null};
             engineOffset = 12f;
             engineSize = 3f;
-            ammoType = new ItemAmmoType(Items.graphite);
 
             weapons.add(new Weapon("zenith-missiles"){{
                 reload = 40f;
@@ -1204,7 +1187,6 @@ public class UnitTypes{
             engineSize = 5.3f;
             hitSize = 46f;
             targetFlags = new BlockFlag[]{BlockFlag.generator, BlockFlag.core, null};
-            ammoType = new ItemAmmoType(Items.thorium);
 
             loopSound = Sounds.loopHover;
 
@@ -1281,7 +1263,6 @@ public class UnitTypes{
             hitSize = 58f;
             armor = 13f;
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
-            ammoType = new ItemAmmoType(Items.thorium);
 
             loopSound = Sounds.loopHover;
 
@@ -1366,8 +1347,6 @@ public class UnitTypes{
             controlSelectGlobal = false;
             wreckSoundVolume = deathSoundVolume = 0.7f;
 
-            ammoType = new PowerAmmoType(500);
-
             mineTier = 1;
             mineSpeed = 2.5f;
         }};
@@ -1387,7 +1366,6 @@ public class UnitTypes{
             hitSize = 9f;
             lowAltitude = true;
 
-            ammoType = new PowerAmmoType(900);
             mineTier = 2;
             mineSpeed = 3.5f;
             wreckSoundVolume = 0.9f;
@@ -1447,8 +1425,6 @@ public class UnitTypes{
             buildSpeed = 2.6f;
             isEnemy = false;
 
-            ammoType = new PowerAmmoType(1100);
-
             weapons.add(
             new Weapon("heal-weapon-mount"){{
                 shootSound = Sounds.shootLaser;
@@ -1501,8 +1477,6 @@ public class UnitTypes{
             range = 140f;
             targetAir = false;
             targetFlags = new BlockFlag[]{BlockFlag.battery, BlockFlag.factory, null};
-
-            ammoType = new PowerAmmoType(3000);
 
             loopSound = Sounds.loopHover;
 
@@ -1575,7 +1549,6 @@ public class UnitTypes{
             drawShields = false;
             lowAltitude = true;
             buildBeamOffset = 43;
-            ammoCapacity = 1;
 
             loopSound = Sounds.loopHover;
 
@@ -1657,7 +1630,6 @@ public class UnitTypes{
             accel = 0.3f;
             rotateSpeed = 2.6f;
             faceTarget = false;
-            ammoType = new ItemAmmoType(Items.graphite);
 
             moveSoundVolume = 0.55f;
             moveSoundPitchMin = moveSoundPitchMax = 0.9f;
@@ -1720,7 +1692,6 @@ public class UnitTypes{
             hitSize = 20f;
             armor = 7f;
             faceTarget = false;
-            ammoType = new ItemAmmoType(Items.graphite);
 
             moveSoundVolume = 0.7f;
             moveSoundPitchMin = moveSoundPitchMax = 0.77f;
@@ -1787,7 +1758,6 @@ public class UnitTypes{
                 inaccuracy = 5f;
                 velocityRnd = 0.1f;
                 shootSound = Sounds.shootMissileShort;
-                ammoType = new ItemAmmoType(Items.thorium);
 
                 ejectEffect = Fx.none;
                 bullet = new MissileBulletType(2.7f, 12){{
@@ -1821,7 +1791,6 @@ public class UnitTypes{
             accel = 0.2f;
             rotateSpeed = 1.3f;
             faceTarget = false;
-            ammoType = new ItemAmmoType(Items.thorium);
 
             moveSoundVolume = 1f;
             moveSound = Sounds.shipMoveBig;
@@ -1915,7 +1884,6 @@ public class UnitTypes{
             accel = 0.19f;
             rotateSpeed = 0.9f;
             faceTarget = false;
-            ammoType = new PowerAmmoType(4000);
 
             moveSoundVolume = 1.1f;
             moveSound = Sounds.shipMoveBig;
@@ -1970,7 +1938,6 @@ public class UnitTypes{
             trailScl = 1.3f;
             faceTarget = false;
             range = 100f;
-            ammoType = new PowerAmmoType(900);
             armor = 3f;
 
             moveSoundVolume = 0.4f;
@@ -2085,7 +2052,6 @@ public class UnitTypes{
             waveTrailX = 5.5f;
             waveTrailY = -4f;
             trailScl = 1.9f;
-            ammoType = new ItemAmmoType(Items.coal);
 
             abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
 
@@ -2158,7 +2124,6 @@ public class UnitTypes{
             hitSize = 20f;
             armor = 6f;
             faceTarget = false;
-            ammoType = new ItemAmmoType(Items.graphite);
 
             moveSoundVolume = 0.7f;
             moveSoundPitchMin = moveSoundPitchMax = 0.77f;
@@ -2301,8 +2266,6 @@ public class UnitTypes{
             accel = 0.2f;
             rotateSpeed = 1.4f;
             faceTarget = false;
-            ammoType = new PowerAmmoType(3500);
-            ammoCapacity = 40;
 
             moveSoundVolume = 1f;
             moveSound = Sounds.shipMoveBig;
@@ -2354,7 +2317,6 @@ public class UnitTypes{
             accel = 0.2f;
             rotateSpeed = 1.1f;
             faceTarget = false;
-            ammoType = new PowerAmmoType(4500);
 
             moveSoundVolume = 1.1f;
             moveSound = Sounds.shipMoveBig;
@@ -3571,8 +3533,6 @@ public class UnitTypes{
             legExtension = -5f;
             legBaseOffset = 5f;
 
-            ammoType = new PowerAmmoType(2000);
-
             legSplashDamage = 32;
             legSplashRange = 30;
             drownTimeMultiplier = 0.5f;
@@ -3665,8 +3625,6 @@ public class UnitTypes{
             legBaseOffset = 19f;
             legStraightLength = 0.9f;
             legMaxLength = 1.2f;
-
-            ammoType = new PowerAmmoType(2000);
 
             legSplashDamage = 32;
             legSplashRange = 32;

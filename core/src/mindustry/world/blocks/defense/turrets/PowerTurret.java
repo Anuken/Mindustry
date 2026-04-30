@@ -27,7 +27,7 @@ public class PowerTurret extends Turret{
 
         @Override
         public void updateTile(){
-            unit.ammo(power == null ? 0f : power.status * unit.type().ammoCapacity);
+            unit.ammo(power == null ? 0f : power.status);
 
             super.updateTile();
         }

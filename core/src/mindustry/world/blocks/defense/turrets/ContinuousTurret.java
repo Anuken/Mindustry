@@ -81,7 +81,7 @@ public class ContinuousTurret extends Turret{
                 ammoFract = Math.min(ammoFract, liquids.get(cons.liquid) / liquidCapacity);
             }
 
-            unit.ammo(unit.type().ammoCapacity * ammoFract);
+            unit.ammo(ammoFract);
 
             bullets.removeAll(b -> !b.bullet.isAdded() || b.bullet.type == null || b.bullet.owner != this);
 
