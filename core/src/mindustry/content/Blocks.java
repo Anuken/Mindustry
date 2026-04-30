@@ -4417,7 +4417,8 @@ public class Blocks{
                 trailEffect = Fx.disperseTrail;
                 trailInterval = 2f;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
-                rangeChange = 7f*8f;
+                rangeChange = (7f + 8.1f / 2f) * 8f;
+                extraRangeMargin = -8.1f * 8f;
                 buildingDamageMultiplier = 0.3f;
                 trailRotation = true;
                 shootSound = Sounds.shootBreachCarbide;
