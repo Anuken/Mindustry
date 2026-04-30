@@ -733,13 +733,25 @@ public class StatValues{
                         sep(bt, "@bullet.armorpierce");
                     }
 
-                    if(type.armorMultiplier != 1f && !type.pierceArmor){
-                        if(type.armorMultiplier > 1f){
-                            sep(bt, Core.bundle.format("bullet.armorweakness", (type.armorMultiplier)));
-                        }else if(Mathf.sign(type.armorMultiplier) == 1){
-                            sep(bt, Core.bundle.format("bullet.partialarmorpierce", (int)((1 - type.armorMultiplier) * 100)));
-                        }else{
-                            sep(bt, Core.bundle.format("bullet.antiarmor", (-type.armorMultiplier)));
+                    if(!type.pierceArmor){
+                        if(type.armorMultiplier != 1f){
+                            if(type.armorMultiplier > 1f){
+                                sep(bt, Core.bundle.format("bullet.armorweakness", (type.armorMultiplier)));
+                            }else if(Mathf.sign(type.armorMultiplier) == 1){
+                                sep(bt, Core.bundle.format("bullet.partialarmorpierce", (int)((1 - type.armorMultiplier) * 100)));
+                            }else{
+                                sep(bt, Core.bundle.format("bullet.antiarmor", (-type.armorMultiplier)));
+                            }
+                        }
+
+                        if(type.blockArmorMultiplier != 1f){
+                            if(type.blockArmorMultiplier > 1f){
+                                sep(bt, Core.bundle.format("bullet.blockarmorweakness", (type.blockArmorMultiplier)));
+                            }else if(Mathf.sign(type.blockArmorMultiplier) == 1){
+                                sep(bt, Core.bundle.format("bullet.blockpartialarmorpierce", (int)((1 - type.blockArmorMultiplier) * 100)));
+                            }else{
+                                sep(bt, Core.bundle.format("bullet.blockantiarmor", (-type.blockArmorMultiplier)));
+                            }
                         }
                     }
 
