@@ -3179,7 +3179,7 @@ public class UnitTypes{
             drag = 0.11f;
             hitSize = 9f;
             rotateSpeed = 3f;
-            health = 680;
+            health = 690;
             armor = 4f;
             legStraightness = 0.3f;
             stepShake = 0f;
@@ -3220,7 +3220,7 @@ public class UnitTypes{
                 cooldownTime = 42f;
                 heatColor = Pal.turretHeat;
 
-                bullet = new ArtilleryBulletType(3f, 40){{
+                bullet = new ArtilleryBulletType(3f, 46){{
                     shootEffect = new MultiEffect(Fx.shootSmallColor, new Effect(9, e -> {
                         color(Color.white, e.color, e.fin());
                         stroke(0.7f + e.fout());
@@ -3237,7 +3237,7 @@ public class UnitTypes{
                     lifetime = 46f;
                     width = height = 9f;
                     splashDamageRadius = 19f;
-                    splashDamage = 30f;
+                    splashDamage = 35f;
 
                     trailLength = 27;
                     trailWidth = 2.5f;

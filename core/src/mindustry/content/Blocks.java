@@ -6653,9 +6653,6 @@ public class Blocks{
             size = 5;
 
             consumePower(6f);
-            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.carbideWallLarge, Blocks.reinforcedSurgeWallLarge, Blocks.shieldedWall,
-                Blocks.reinforcedLiquidContainer, Blocks.reinforcedLiquidTank, Blocks.reinforcedContainer, Blocks.reinforcedVault, Blocks.beamNode, Blocks.beamTower);
-        }};
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
