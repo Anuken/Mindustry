@@ -1300,7 +1300,7 @@ public class LStatements{
 
     @RegisterStatement("query")
     public static class QueryStatement extends LStatement{
-        public boolean circle;
+        public QueryShape shape = QueryShape.circle;
         public QueryType type = QueryType.unit;
         public String team = "null", x = "0", y = "0", w = "10", h = "10";
 
@@ -1308,8 +1308,8 @@ public class LStatements{
         public void build(Table table){
             table.clearChildren();
 
-            table.button(circle ? "circle" : "rect", Styles.logict, () -> {
-                circle = !circle;
+            table.button(shape == QueryShape.circle ? "circle" : "rect", Styles.logict, () -> {
+                shape = shape == QueryShape.circle ? QueryShape.rect : QueryShape.circle;
                 build(table);
             }).size(80f, 40f).pad(4f).color(table.color);
 
@@ -1330,7 +1330,7 @@ public class LStatements{
 
             table.row();
 
-            if(circle){
+            if(shape == QueryShape.circle){
                 fields(table, "radius", w, str -> w = str);
             }else{
                 fields(table, "width", w, str -> w = str);
@@ -1345,7 +1345,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new QueryI(circle, type, builder.var(team), builder.var(x), builder.var(y), builder.var(w), builder.var(h));
+            return new QueryI(shape, type, builder.var(team), builder.var(x), builder.var(y), builder.var(w), builder.var(h));
         }
 
         @Override
