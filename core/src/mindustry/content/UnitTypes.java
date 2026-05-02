@@ -1783,7 +1783,7 @@ public class UnitTypes{
 
         sei = new UnitType("sei"){{
             health = 11000;
-            armor = 22f;
+            armor = 20f;
 
             speed = 0.73f;
             drag = 0.17f;
