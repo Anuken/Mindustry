@@ -764,7 +764,7 @@ public class UnitTypes{
                 y = -1.5f;
 
                 bullet = new SapBulletType(){{
-                    sapStrength = 0.5f;
+                    sapStrength = 0.4f;
                     length = 75f;
                     damage = 23;
                     shootEffect = Fx.shootSmall;
@@ -784,7 +784,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootSap;
 
                 bullet = new SapBulletType(){{
-                    sapStrength = 0.8f;
+                    sapStrength = 0.7f;
                     length = 40f;
                     damage = 18;
                     shootEffect = Fx.shootSmall;
