@@ -860,8 +860,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(!isAdded() || !killable()) return;
 
         float explosiveness = (2f + item().explosiveness * stack().amount * 1.53f) * type.itemExplosiveness;
-        float flammability = item().flammability * stack().amount / 1.9f;
-        float power = item().charge * Mathf.pow(stack().amount, 1.11f) * 160f;
+        float flammability = (item().flammability * stack().amount / 1.9f) * type.itemFlammability;
+        float power = (item().charge * Mathf.pow(stack().amount, 1.11f) * 160f) * type.itemCharge;
 
         if(!spawnedByCore){
             Damage.dynamicExplosion(x, y, flammability, explosiveness, power, (bounds() + type.legLength/1.7f) / 2f, state.rules.damageExplosions && state.rules.unitCrashDamage(team) > 0, item().flammability > 1, team, type.deathExplosionEffect, 0f);

@@ -376,8 +376,8 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** amount of items this unit can carry; <0 to determine based on hitSize. */
     public int itemCapacity = -1;
-    /** multiplier for explosion damage dealt by carried items when killed */
-    public float itemExplosiveness = 0.001f;
+    /** multiplier for effects dealt by carried items when killed */
+    public float itemExplosiveness = 0.001f, itemFlammability = 1f, itemCharge = 0.5f;
     /** @deprecated only kept for compatibility with some turrets that query this field! Remove this from your code immediately! */
     @Deprecated
     public int ammoCapacity = 1;
