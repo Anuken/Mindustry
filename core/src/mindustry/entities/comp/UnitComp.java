@@ -859,7 +859,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void destroy(){
         if(!isAdded() || !killable()) return;
 
-        float explosiveness = 2f + item().explosiveness * stack().amount * 1.53f;
+        float explosiveness = (2f + item().explosiveness * stack().amount * 1.53f) * type.itemExplosiveness;
         float flammability = item().flammability * stack().amount / 1.9f;
         float power = item().charge * Mathf.pow(stack().amount, 1.11f) * 160f;
 

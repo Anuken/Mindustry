@@ -97,7 +97,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** radius for circleTarget, if true */
     circleTargetRadius = 80f,
     /** multiplier for damage this (flying) unit deals when crashing on enemy things */
-    crashDamageMultiplier = 1f,
+    crashDamageMultiplier = 0f,
     /** multiplier for health that this flying unit has for its wreck, based on its max health. */
     wreckHealthMultiplier = 0.25f,
     /** a VERY ROUGH estimate of unit DPS; initialized in init() */
@@ -376,6 +376,8 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** amount of items this unit can carry; <0 to determine based on hitSize. */
     public int itemCapacity = -1;
+    /** multiplier for explosion damage dealt by carried items when killed */
+    public float itemExplosiveness = 0.001f;
     /** @deprecated only kept for compatibility with some turrets that query this field! Remove this from your code immediately! */
     @Deprecated
     public int ammoCapacity = 1;
