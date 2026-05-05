@@ -21,6 +21,7 @@ import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.entities.abilities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -1014,6 +1015,28 @@ public class HudFragment{
 
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : playerHasPayloads.get() ? playerPayloadCapacityUsed.get() : player.unit().healthf(), () -> !(player.displayAmmo() || playerHasPayloads.get()), false)).width(bw).growY().padLeft(pad).update(b -> {
                 b.color.set(player.displayAmmo() ? Pal.ammo : playerHasPayloads.get() ? Pal.items : Pal.health);
+            });
+
+            Floatp unitShieldFrac = () -> {
+                if(player.dead()) return 0f;
+                for(var ability : player.unit().abilities){
+                    if(ability instanceof ForceFieldAbility f) return f.max <= 0f ? 0f : player.unit().shield / f.max;
+                    if(ability instanceof ShieldArcAbility s) return s.max <= 0f ? 0f : s.data / s.max;
+                }
+                return 0f;
+            };
+
+            Boolp unitHasShield = () -> {
+                if(player.dead()) return false;
+                for(var ability : player.unit().abilities){
+                    if(ability instanceof ForceFieldAbility || ability instanceof ShieldArcAbility) return true;
+                }
+                return false;
+            };
+
+            t.add(new SideBar(unitShieldFrac, () -> true, false)).width(bw).growY().padLeft(pad).update(b -> {
+                b.color.set(player.unit().type.shieldColor(player.unit()));
+                b.visible(unitHasShield::get);
             });
 
             t.getChildren().get(1).toFront();
