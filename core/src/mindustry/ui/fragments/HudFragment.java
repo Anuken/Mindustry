@@ -1020,22 +1020,19 @@ public class HudFragment{
             Floatp unitShieldFrac = () -> {
                 if(player.dead()) return 0f;
                 for(var ability : player.unit().abilities){
-                    if(ability instanceof ForceFieldAbility f) return f.max <= 0f ? 0f : player.unit().shield / f.max;
-                    if(ability instanceof ShieldArcAbility s) return s.max <= 0f ? 0f : s.data / s.max;
+                    if(ability instanceof ForceFieldAbility f){
+                        return f.max <= 0f ? 0f : player.unit().shield / f.max;
+                    }
+                    if(ability instanceof ShieldArcAbility s){
+                        return s.max <= 0f ? 0f : s.data / s.max;
+                    }
                 }
                 return 0f;
             };
-
-            Boolp unitHasShield = () -> {
-                if(player.dead()) return false;
-                for(var ability : player.unit().abilities){
-                    if(ability instanceof ForceFieldAbility || ability instanceof ShieldArcAbility) return true;
-                }
-                return false;
-            };
+            Boolp unitHasShield = () -> !player.dead() && player.unit() != null && Structs.contains(player.unit().abilities, a -> a instanceof ForceFieldAbility || a instanceof ShieldArcAbility);
 
             t.add(new SideBar(unitShieldFrac, () -> true, false)).width(bw).growY().padLeft(pad).update(b -> {
-                b.color.set(player.unit().type.shieldColor(player.unit()));
+                b.color.set(!player.dead() ? player.unit().type.shieldColor(player.unit()) : Color.white);
                 b.visible(unitHasShield::get);
             });
 
