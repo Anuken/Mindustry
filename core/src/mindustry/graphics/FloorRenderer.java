@@ -225,6 +225,10 @@ public class FloorRenderer{
     }
 
     public void drawLayer(CacheLayer layer){
+        drawLayer(layer, false);
+    }
+
+    public void drawLayer(CacheLayer layer, boolean checkChanges){
         if(cache == null){
             return;
         }
@@ -246,6 +250,11 @@ public class FloorRenderer{
 
                 if(!Structs.inBounds(x, y, cache) || cache[x][y].length == 0){
                     continue;
+                }
+
+                if(dirty[x][y] && checkChanges){
+                    dirty[x][y] = false;
+                    cacheChunk(x, y, false);
                 }
 
                 var mesh = cache[x][y][layer.id];

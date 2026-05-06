@@ -156,10 +156,8 @@ public class ItemTurret extends Turret{
         }
 
         @Override
-        public void updateTile(){
-            unit.ammo((float)unit.type().ammoCapacity * totalAmmo / maxAmmo);
-
-            super.updateTile();
+        public float getAmmoFraction(){
+            return (float)totalAmmo / maxAmmo;
         }
 
         @Override
