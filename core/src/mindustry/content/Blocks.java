@@ -5623,7 +5623,7 @@ public class Blocks{
                 }});
             }};
 
-            drawerMatchedAmmoType = true;
+            addPartsForAmmo = true;
 
             recoil = 0.5f;
 
