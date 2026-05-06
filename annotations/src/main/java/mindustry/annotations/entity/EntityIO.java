@@ -125,7 +125,7 @@ public class EntityIO{
 
     boolean fieldHasAnno(RevisionField field, Seq<Svar> allFields, Class<? extends Annotation> type){
         Svar var = allFields.find(s -> s.name().equals(field.name));
-        return var == null || var.has(type);
+        return var != null && var.has(type);
     }
 
     void writeSync(MethodSpec.Builder method, boolean write, Seq<Svar> allFields) throws Exception{
