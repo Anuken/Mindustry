@@ -70,10 +70,13 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
+        public float getAmmoFraction(){
+            return liquids.currentAmount() / liquidCapacity;
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
-
-            unit.ammo(liquids.currentAmount() / liquidCapacity);
 
             //only allow the turret to begin firing when it can fire for 4 continuous updates
             if(liquids.currentAmount() >= liquidConsumed * 4f){

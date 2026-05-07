@@ -72,16 +72,19 @@ public class ContinuousTurret extends Turret{
         }
 
         @Override
-        public void updateTile(){
-            super.updateTile();
-
+        public float getAmmoFraction(){
             //TODO unclean way of calculating ammo fraction to display
             float ammoFract = efficiency;
             if(findConsumer(f -> f instanceof ConsumeLiquidBase) instanceof ConsumeLiquid cons){
                 ammoFract = Math.min(ammoFract, liquids.get(cons.liquid) / liquidCapacity);
             }
 
-            unit.ammo(ammoFract);
+            return ammoFract;
+        }
+
+        @Override
+        public void updateTile(){
+            super.updateTile();
 
             bullets.removeAll(b -> !b.bullet.isAdded() || b.bullet.type == null || b.bullet.owner != this);
 

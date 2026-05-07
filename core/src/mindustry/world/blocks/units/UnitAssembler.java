@@ -40,6 +40,7 @@ public class UnitAssembler extends PayloadBlock{
     public @Load("@-side2") TextureRegion sideRegion2;
 
     public int areaSize = 11;
+    /** Note: The spawned unit MUST have AssemblerAI as a controller and 'tether' (BuildingTetherComp) as a unit component. */
     public UnitType droneType = UnitTypes.assemblyDrone;
     public int dronesCreated = 4;
     public float droneConstructTime = 60f * 4f;
@@ -462,14 +463,20 @@ public class UnitAssembler extends PayloadBlock{
             if(units.size < dronesCreated && enabled && (droneProgress += delta() * state.rules.unitBuildSpeed(team) * powerStatus / droneConstructTime) >= 1f){
                 if(!net.client()){
                     var unit = droneType.create(team);
-                    if(unit instanceof BuildingTetherc bt){
-                        bt.building(this);
+                    //If a unit isn't using AssemblerAI, it's bugged, likely because of an incorrect data patch or mod.
+                    //In that case, just ignore it and don't spawn anything
+                    if(unit.controller() instanceof AssemblerAI){
+                        if(unit instanceof BuildingTetherc bt){
+                            bt.building(this);
+                        }
+                        unit.set(x, y);
+                        unit.rotation = 90f;
+                        unit.add();
+                        units.add(unit);
+                        Call.assemblerDroneSpawned(tile, unit.id);
+                    }else{
+                        droneProgress = 0f;
                     }
-                    unit.set(x, y);
-                    unit.rotation = 90f;
-                    unit.add();
-                    units.add(unit);
-                    Call.assemblerDroneSpawned(tile, unit.id);
                 }
             }
 

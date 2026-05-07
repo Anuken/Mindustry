@@ -361,7 +361,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     void drawPing(){
-        if(pingTime <= 0f || !renderer.showPings || name == null || team != Vars.player.team()) return;
+        if(pingTime <= 0f || !renderer.showPings || name == null || (!state.rules.showOtherTeamPings && team != Vars.player.team())) return;
 
         float alpha = Math.min(Interp.pow5Out.apply(Mathf.clamp(Mathf.map(pingTime, 1f / 20f, 0f, 1f, 0f))), Interp.pow5Out.apply(Mathf.map(pingTime, 1f, 0.98f, 0f, 1f)));
 

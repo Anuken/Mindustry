@@ -145,10 +145,13 @@ public class PayloadAmmoTurret extends Turret{
         }
 
         @Override
+        public float getAmmoFraction(){
+            return (float)totalAmmo / maxAmmo;
+        }
+
+        @Override
         public void updateTile(){
             totalAmmo = payloads.total();
-            unit.ammo((float)totalAmmo / maxAmmo);
-
             super.updateTile();
         }
 

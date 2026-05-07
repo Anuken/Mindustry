@@ -90,6 +90,8 @@ public class Rules{
     public float unitMineSpeedMultiplier = 1f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
     public boolean ghostBlocks = true;
+    /** If true, pings of players from other teams will be shown. */
+    public boolean showOtherTeamPings = false;
     /** Whether to allow logic to control units. */
     public boolean logicUnitControl = true;
     /** Whether to allow units to build with logic. */
