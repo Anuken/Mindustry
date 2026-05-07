@@ -292,7 +292,7 @@ public class UnitTypes{
             hitSize = 30f;
             rotateSpeed = 1.65f;
             health = 24000;
-            armor = 36f;
+            armor = 30f;
             mechStepParticles = true;
             stepShake = 0.75f;
             drownTimeMultiplier = 1.6f;
@@ -906,7 +906,7 @@ public class UnitTypes{
             speed = 0.5f;
             hitSize = 26f;
             health = 22000;
-            armor = 26f;
+            armor = 24f;
             lightRadius = 140f;
             stepSound = Sounds.walkerStep;
             stepSoundVolume = 1.1f;
@@ -1182,7 +1182,7 @@ public class UnitTypes{
             flying = true;
             lowAltitude = true;
             health = 7200;
-            armor = 17f;
+            armor = 15f;
             engineOffset = 21;
             engineSize = 5.3f;
             hitSize = 46f;
@@ -1261,7 +1261,7 @@ public class UnitTypes{
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
-            armor = 24f;
+            armor = 22f;
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
 
             loopSound = Sounds.loopHover;
@@ -1457,7 +1457,7 @@ public class UnitTypes{
         }};
 
         quad = new UnitType("quad"){{
-            armor = 15f;
+            armor = 13f;
             health = 6000;
             speed = 1.2f;
             rotateSpeed = 2f;
@@ -1533,7 +1533,7 @@ public class UnitTypes{
         oct = new UnitType("oct"){{
             aiController = DefenderAI::new;
 
-            armor = 30f;
+            armor = 28f;
             health = 24000;
             speed = 0.8f;
             rotateSpeed = 1f;
@@ -1783,7 +1783,7 @@ public class UnitTypes{
 
         sei = new UnitType("sei"){{
             health = 11000;
-            armor = 20f;
+            armor = 16f;
 
             speed = 0.73f;
             drag = 0.17f;
@@ -1880,7 +1880,7 @@ public class UnitTypes{
             speed = 0.62f;
             drag = 0.18f;
             hitSize = 58f;
-            armor = 30f;
+            armor = 22f;
             accel = 0.19f;
             rotateSpeed = 0.9f;
             faceTarget = false;
@@ -2258,7 +2258,7 @@ public class UnitTypes{
 
         aegires = new UnitType("aegires"){{
             health = 12000;
-            armor = 20f;
+            armor = 15f;
 
             speed = 0.7f;
             drag = 0.17f;
@@ -2313,7 +2313,7 @@ public class UnitTypes{
             speed = 0.65f;
             drag = 0.17f;
             hitSize = 58f;
-            armor = 30f;
+            armor = 26f;
             accel = 0.2f;
             rotateSpeed = 1.1f;
             faceTarget = false;
