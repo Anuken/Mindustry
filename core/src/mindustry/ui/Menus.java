@@ -123,8 +123,6 @@ public class Menus{
 
     @Remote(variants = Variant.both, unreliable = true)
     public static void infoPopup(@Nullable String message, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
-        if(message == null) return;
-
         ui.showInfoPopup(message, id, duration, align, top, left, bottom, right);
     }
 
