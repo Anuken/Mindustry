@@ -145,8 +145,6 @@ public class Menus{
 
     @Remote(variants = Variant.both, unreliable = true)
     public static void label(@Nullable String message, int id, float duration, float worldx, float worldy){
-        if(message == null) return;
-
         ui.showLabel(message, id, duration, worldx, worldy);
     }
 
