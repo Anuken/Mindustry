@@ -40,7 +40,6 @@ import mindustry.maps.generators.*;
 import mindustry.maps.planet.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
-import mindustry.type.ammo.*;
 import mindustry.type.weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -190,19 +189,6 @@ public class ContentParser{
         });
         put(MassDriverBolt.class, (type, data) -> {
             MassDriverBolt result = (MassDriverBolt)make(MassDriverBolt.class);
-            readFields(result, data);
-            return result;
-        });
-        put(AmmoType.class, (type, data) -> {
-            //string -> item
-            //if liquid ammo support is added, this should scan for liquids as well
-            if(data.isString()) return new ItemAmmoType(find(ContentType.item, data.asString()));
-            //number -> power
-            if(data.isNumber()) return new PowerAmmoType(data.asFloat());
-
-            var bc = resolve(data.getString("type", ""), ItemAmmoType.class);
-            data.remove("type");
-            AmmoType result = make(bc);
             readFields(result, data);
             return result;
         });
