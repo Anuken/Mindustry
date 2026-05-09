@@ -81,7 +81,7 @@ public class LogicDisplay extends Block{
         clipSize = Math.max(clipSize, scaleFactor * Draw.scl * displaySize);
     }
 
-    public class LogicDisplayBuild extends Building{
+    public class LogicDisplayBuild extends Building implements LDrawable{
         //The root display (bottom left corner of display for tileable displays)
         public LogicDisplayBuild rootDisplay = this;
         public @Nullable FrameBuffer buffer;
@@ -119,6 +119,14 @@ public class LogicDisplay extends Block{
                 case operations -> rootDisplay.operations;
                 default -> super.sense(sensor);
             };
+        }
+
+        public boolean drawable(LExecutor exec){
+            return isValid() && (exec.privileged || (team == exec.team && !privileged));
+        }
+
+        public void draw(LongSeq graphicsBuffer){
+            flushCommands(graphicsBuffer);
         }
 
         public void flushCommands(LongSeq graphicsBuffer){
