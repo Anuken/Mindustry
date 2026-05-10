@@ -1,6 +1,6 @@
 package mindustry.logic;
 
-import arc.struct.LongSeq;
+import arc.struct.*;
 
 public interface LDrawable {
     boolean drawable(LExecutor exec);
