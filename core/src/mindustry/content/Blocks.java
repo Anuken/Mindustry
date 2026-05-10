@@ -3484,8 +3484,7 @@ public class Blocks{
                     width = height = 11f;
                     collidesTiles = false;
                     splashDamageRadius = 25f * 0.75f;
-                    splashDamage = 24f;
-                    scaledSplashDamage = true;
+                    splashDamage = 33f;
 
                     hitColor = backColor = trailColor = Pal.graphiteAmmoBack;
                     frontColor = Pal.graphiteAmmoFront;
@@ -3497,8 +3496,7 @@ public class Blocks{
                     width = height = 11f;
                     collidesTiles = false;
                     splashDamageRadius = 25f * 0.75f;
-                    splashDamage = 24f;
-                    scaledSplashDamage = true;
+                    splashDamage = 33f;
                     reloadMultiplier = 1.2f;
                     ammoMultiplier = 3f;
                     homingPower = 0.08f;
@@ -3518,8 +3516,7 @@ public class Blocks{
                     width = height = 13f;
                     collidesTiles = false;
                     splashDamageRadius = 25f * 0.75f;
-                    splashDamage = 35f;
-                    scaledSplashDamage = true;
+                    splashDamage = 45f;
                     status = StatusEffects.burning;
                     statusDuration = 60f * 12f;
                     frontColor = trailColor = hitColor = Pal.lightishOrange;
@@ -3984,8 +3981,7 @@ public class Blocks{
                     height = 14f;
                     collidesTiles = false;
                     splashDamageRadius = 30f * 0.75f;
-                    splashDamage = 50f;
-                    scaledSplashDamage = true;
+                    splashDamage = 70f;
 
                     backColor = hitColor = trailColor = Pal.graphiteAmmoBack;
                     frontColor = Pal.graphiteAmmoFront;
@@ -4001,8 +3997,7 @@ public class Blocks{
                     height = 14f;
                     collidesTiles = false;
                     splashDamageRadius = 30f * 0.75f;
-                    splashDamage = 50f;
-                    scaledSplashDamage = true;
+                    splashDamage = 70f;
                     reloadMultiplier = 1.2f;
                     ammoMultiplier = 3f;
                     homingPower = 0.08f;
@@ -4025,8 +4020,7 @@ public class Blocks{
                     height = 15f;
                     collidesTiles = false;
                     splashDamageRadius = 30f * 0.75f;
-                    splashDamage = 70f;
-                    scaledSplashDamage = true;
+                    splashDamage = 90f;
                     status = StatusEffects.burning;
                     statusDuration = 60f * 12f;
                     frontColor = Pal.lightishOrange;
@@ -4047,8 +4041,7 @@ public class Blocks{
                     collidesTiles = false;
                     ammoMultiplier = 4f;
                     splashDamageRadius = 50f * 0.75f;
-                    splashDamage = 70f;
-                    scaledSplashDamage = true;
+                    splashDamage = 90f;
 
                     status = StatusEffects.blasted;
                     lifeScaleRandMax = 1.08f;
@@ -4066,8 +4059,7 @@ public class Blocks{
                     height = 15f;
                     collidesTiles = false;
                     splashDamageRadius = 40f * 0.75f;
-                    splashDamage = 70f;
-                    scaledSplashDamage = true;
+                    splashDamage = 90f;
                     fragBullet = new BasicBulletType(2.5f, 14, "bullet"){{
                         width = 10f;
                         height = 12f;

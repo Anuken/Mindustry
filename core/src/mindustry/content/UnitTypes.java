@@ -180,7 +180,6 @@ public class UnitTypes{
                     collidesTiles = true;
                     splashDamageRadius = 35f;
                     splashDamage = 80f;
-                    scaledSplashDamage = true;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
                 }};
@@ -891,7 +890,6 @@ public class UnitTypes{
                     ammoMultiplier = 4f;
                     splashDamageRadius = 70f;
                     splashDamage = 65f;
-                    scaledSplashDamage = true;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
                     lightning = 3;
@@ -993,7 +991,6 @@ public class UnitTypes{
                     ammoMultiplier = 4f;
                     splashDamageRadius = 80f;
                     splashDamage = 75f;
-                    scaledSplashDamage = true;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
                     lightning = 5;
@@ -1019,7 +1016,6 @@ public class UnitTypes{
                         collidesTiles = false;
                         splashDamageRadius = 70f;
                         splashDamage = 40f;
-                        scaledSplashDamage = true;
                         backColor = Pal.sapBulletBack;
                         frontColor = lightningColor = Pal.sapBullet;
                         lightning = 2;
@@ -1692,7 +1688,6 @@ public class UnitTypes{
                     collidesTiles = false;
                     splashDamageRadius = 30f * 0.75f;
                     splashDamage = 40f;
-                    scaledSplashDamage = true;
                 }};
             }});
         }};
