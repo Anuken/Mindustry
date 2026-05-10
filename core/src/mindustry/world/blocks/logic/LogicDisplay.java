@@ -121,15 +121,13 @@ public class LogicDisplay extends Block{
             };
         }
 
+        @Override
         public boolean drawable(LExecutor exec){
             return isValid() && (exec.privileged || (team == exec.team && !privileged));
         }
 
+        @Override
         public void draw(LongSeq graphicsBuffer){
-            flushCommands(graphicsBuffer);
-        }
-
-        public void flushCommands(LongSeq graphicsBuffer){
             int added = Math.min(graphicsBuffer.size, LExecutor.maxDisplayBuffer - commands.size);
 
             for(int i = 0; i < added; i++){
