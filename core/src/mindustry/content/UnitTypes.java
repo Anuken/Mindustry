@@ -179,7 +179,7 @@ public class UnitTypes{
                     collides = true;
                     collidesTiles = true;
                     splashDamageRadius = 35f;
-                    splashDamage = 62f;
+                    splashDamage = 80f;
                     scaledSplashDamage = true;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
@@ -1168,7 +1168,7 @@ public class UnitTypes{
                     homingRange = 60f;
                     scaleKeepVelocity = true;
                     splashDamageRadius = 25f;
-                    splashDamage = 12f;
+                    splashDamage = 15f;
                     scaledSplashDamage = true;
                     lifetime = 50f;
                     trailColor = Pal.unitBack;
@@ -1204,7 +1204,7 @@ public class UnitTypes{
                 shrinkY = 0f;
                 drag = -0.01f;
                 splashDamageRadius = 20f;
-                splashDamage = 30f;
+                splashDamage = 37f;
                 scaledSplashDamage = true;
                 ammoMultiplier = 4f;
                 lifetime = 50f;
@@ -1278,7 +1278,7 @@ public class UnitTypes{
             BulletType fragBullet = new FlakBulletType(4f, 15){{
                 shootEffect = Fx.shootBig;
                 ammoMultiplier = 4f;
-                splashDamage = 60f;
+                splashDamage = 65f;
                 splashDamageRadius = 25f;
                 scaledSplashDamage = true;
                 collidesGround = true;
@@ -1533,7 +1533,7 @@ public class UnitTypes{
                     collides = false;
 
                     healPercent = 15f;
-                    splashDamage = 200f;
+                    splashDamage = 220f;
                     splashDamageRadius = 80f;
                     damage = splashDamage * 0.7f;
                     scaledSplashDamage = true;
@@ -1619,7 +1619,7 @@ public class UnitTypes{
                     drag = -0.003f;
                     homingRange = 60f;
                     splashDamageRadius = 25f;
-                    splashDamage = 9f;
+                    splashDamage = 10f;
                     scaledSplashDamage = true;
                     lifetime = 65f;
                     trailColor = Color.gray;
@@ -1691,7 +1691,7 @@ public class UnitTypes{
                     width = height = 11f;
                     collidesTiles = false;
                     splashDamageRadius = 30f * 0.75f;
-                    splashDamage = 30f;
+                    splashDamage = 40f;
                     scaledSplashDamage = true;
                 }};
             }});
@@ -1743,7 +1743,7 @@ public class UnitTypes{
                     width = 15f;
                     collidesTiles = false;
                     splashDamageRadius = 40f;
-                    splashDamage = 60f;
+                    splashDamage = 70f;
                     backColor = Pal.missileYellowBack;
                     frontColor = Pal.missileYellow;
                     trailEffect = Fx.artilleryTrail;
@@ -1851,7 +1851,7 @@ public class UnitTypes{
                     homingRange = 80f;
                     keepVelocity = false;
                     splashDamageRadius = 35f;
-                    splashDamage = 40f;
+                    splashDamage = 45f;
                     scaledSplashDamage = true;
                     lifetime = 62f;
                     trailColor = Pal.bulletYellowBack;
@@ -2044,7 +2044,7 @@ public class UnitTypes{
                     trailWidth = 3f;
                     trailLength = 8;
 
-                    splashDamage = 32f;
+                    splashDamage = 40f;
                     splashDamageRadius = 32f;
                     scaledSplashDamage = true;
                 }};
@@ -2196,7 +2196,7 @@ public class UnitTypes{
                     despawnSound = Sounds.explosion;
 
                     splashDamageRadius = 30f;
-                    splashDamage = 22f;
+                    splashDamage = 25f;
                     scaledSplashDamage = true;
 
                     lifetime = 80f;
@@ -2237,7 +2237,7 @@ public class UnitTypes{
                         keepVelocity = false;
                         shootEffect = Fx.shootHeal;
                         smokeEffect = Fx.hitLaser;
-                        splashDamage = 12f;
+                        splashDamage = 13f;
                         splashDamageRadius = 20f;
                         scaledSplashDamage = true;
                         frontColor = Color.white;
