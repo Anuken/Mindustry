@@ -1,5 +1,6 @@
 package mindustry.world.blocks.distribution;
 
+import arc.*;
 import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -63,7 +64,11 @@ public class MassDriver extends Block{
         super.setStats();
 
         stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
-        stats.add(Stat.reload, 60f / reload, StatUnit.perSecond);
+        stats.add(Stat.reload, table -> {
+            table.add((String)(Strings.autoFixed(60f / reload, 2) + StatUnit.perSecond.localized() + " ~ " + 
+                Strings.autoFixed(itemCapacity * (60f / reload), 2) + " " + StatUnit.itemsSecond.localized()));
+        });
+        stats.add(Stat.receiveRate, 60f, StatUnit.itemsSecond);
     }
 
     @Override
