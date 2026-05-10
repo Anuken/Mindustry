@@ -3414,12 +3414,8 @@ public class Blocks{
             size = 2;
             targetGround = false;
 
-            shoot = new ShootMulti(new ShootPattern(){{
-                shots = 2;
-                shotDelay = 5;
-            }}, new ShootPattern(){{
-                shots = 2;
-            }});
+            shoot.shotDelay = 4f;
+            shoot.shots = 3;
 
             recoil = 1f;
             rotateSpeed = 15f;
