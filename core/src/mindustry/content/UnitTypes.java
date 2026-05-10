@@ -890,7 +890,7 @@ public class UnitTypes{
                     collidesTiles = true;
                     ammoMultiplier = 4f;
                     splashDamageRadius = 70f;
-                    splashDamage = 60f;
+                    splashDamage = 65f;
                     scaledSplashDamage = true;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
