@@ -431,7 +431,7 @@ public class LogicBlock extends Block{
         //editor-only processors cannot be damaged or destroyed
         @Override
         public boolean collide(Bullet other){
-            return !privileged;
+            return !privileged || destructible;
         }
 
         @Override
@@ -441,7 +441,7 @@ public class LogicBlock extends Block{
 
         @Override
         public void damage(float damage){
-            if(!privileged){
+            if(!privileged || destructible){
                 super.damage(damage);
             }
         }
