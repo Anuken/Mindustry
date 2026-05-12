@@ -239,11 +239,11 @@ public class TileableLogicDisplay extends LogicDisplay{
         }
 
         @Override
-        public void flushCommands(LongSeq graphicsBuffer){
+        public void draw(LongSeq graphicsBuffer){
             if(isRoot()){
-                super.flushCommands(graphicsBuffer);
+                super.draw(graphicsBuffer);
             }else{
-                rootDisplay.flushCommands(graphicsBuffer);
+                rootDisplay.draw(graphicsBuffer);
             }
         }
 
