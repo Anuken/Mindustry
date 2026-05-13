@@ -75,8 +75,11 @@ public class ContinuousTurret extends Turret{
         public float getAmmoFraction(){
             //TODO unclean way of calculating ammo fraction to display
             float ammoFract = efficiency;
-            if(findConsumer(f -> f instanceof ConsumeLiquidBase) instanceof ConsumeLiquid cons){
-                ammoFract = Math.min(ammoFract, liquids.get(cons.liquid) / liquidCapacity);
+            if(findConsumer(f -> f instanceof ConsumeLiquidBase) instanceof ConsumeLiquidBase cons){
+                ammoFract = Math.min(ammoFract, liquids.currentAmount() / liquidCapacity);
+                if(liquids.currentAmount() > 0f && !cons.consumes(liquids.current())){
+                    ammoFract = 0f;
+                }
             }
 
             return ammoFract;
