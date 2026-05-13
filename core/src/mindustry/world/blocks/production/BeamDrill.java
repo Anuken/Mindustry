@@ -136,7 +136,7 @@ public class BeamDrill extends Block{
 
                     //find a booster ConsumeLiquidBase for this liquid
                     ConsumeLiquidBase consumer = findConsumer(f -> f instanceof ConsumeLiquidBase cons && cons.booster && cons.consumes(l));
-                    //if one doesn't exist, this liquid is not a booster
+                    //if one exists, this liquid is a booster
                     return (consumer != null);
                 })
             );
