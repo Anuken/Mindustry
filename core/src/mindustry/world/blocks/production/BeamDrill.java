@@ -132,10 +132,12 @@ public class BeamDrill extends Block{
                 StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
                 consBase.amount, optionalBoostIntensity, false,
                 l -> {
+                    if(!consumesLiquid(l)) return false;
+
                     //find a booster ConsumeLiquidBase for this liquid
                     ConsumeLiquidBase consumer = findConsumer(f -> f instanceof ConsumeLiquidBase cons && cons.booster && cons.consumes(l));
                     //if one doesn't exist, this liquid is not a booster
-                    return (consumesLiquid(l) && (consumer != null));
+                    return (consumer != null);
                 })
             );
         }
