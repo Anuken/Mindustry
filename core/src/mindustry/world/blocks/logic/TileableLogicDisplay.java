@@ -170,6 +170,7 @@ public class TileableLogicDisplay extends LogicDisplay{
             //don't even bother processing anything when displays are off.
             if(!Vars.renderer.drawDisplays) {
                 Draw.rect(backRegion, x, y);
+                Draw.rect(tileRegion[TileBitmask.values[bits]], x, y);
                 return;
             }
 
