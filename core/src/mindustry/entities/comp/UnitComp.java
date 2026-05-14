@@ -38,7 +38,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     static final float warpDst = 8f;
 
     @Import boolean dead, disarmed;
-    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, ammo, dragMultiplier, armorOverride, speedMultiplier;
+    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, dragMultiplier, armorOverride, speedMultiplier;
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
@@ -202,6 +202,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return rotation;
     }
 
+    public float ammof(){
+        return 1f;
+    }
+
     @Override
     public boolean displayable(){
         return type.hoverable;
@@ -265,8 +269,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case health -> health;
             case shield -> shield;
             case maxHealth -> maxHealth;
-            case ammo -> !state.rules.unitAmmo ? type.ammoCapacity : ammo;
-            case ammoCapacity -> type.ammoCapacity;
             case x -> World.conv(x);
             case y -> World.conv(y);
             case velocityX -> vel.x * 60f / tilesize;
@@ -744,16 +746,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(!type.supportsEnv(state.rules.env) && !dead){
             Call.unitEnvDeath(self());
             team.data().updateCount(type, -1);
-        }
-
-        if(state.rules.unitAmmo && ammo < type.ammoCapacity - 0.0001f){
-            resupplyTime += Time.delta;
-
-            //resupply only at a fixed interval to prevent lag
-            if(resupplyTime > 10f){
-                type.ammoType.resupply(self());
-                resupplyTime = 0f;
-            }
         }
 
         for(Ability a : abilities){

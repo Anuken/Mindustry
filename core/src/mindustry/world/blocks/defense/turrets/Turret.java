@@ -314,6 +314,11 @@ public class Turret extends ReloadTurret{
             }
         }
 
+        /** @return ammo as a fraction of capacity; used for direct turret control HUD */
+        public float getAmmoFraction(){
+            return 1f;
+        }
+
         @Override
         public float estimateDps(){
             if(!hasAmmo()) return 0f;
@@ -474,6 +479,10 @@ public class Turret extends ReloadTurret{
         @Override
         public void updateTile(){
             if(!validateTarget()) target = null;
+
+            if(unit.isPlayer()){ //there's no reason to update this when a player isn't controlling it
+                unit.ammo(getAmmoFraction());
+            }
 
             if(soundLoop != null){
                 soundLoop.update(x, y, shouldActiveSound(), activeSoundVolume());

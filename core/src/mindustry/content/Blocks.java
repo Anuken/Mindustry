@@ -4850,7 +4850,7 @@ public class Blocks{
         }};
 
         disperse = new ItemTurret("disperse"){{
-            requirements(Category.turret, with(Items.thorium, 50, Items.oxide, 150, Items.silicon, 200, Items.beryllium, 350));
+            requirements(Category.turret, with(Items.thorium, 50, Items.oxide, 50, Items.silicon, 200, Items.beryllium, 350));
 
             ammo(
             Items.tungsten, new BasicBulletType(){{
@@ -5067,7 +5067,7 @@ public class Blocks{
                 despawnEffect = hitEffect = new ExplosionEffect(){{
                     waveColor = Pal.surge;
                     smokeColor = Color.gray;
-                    sparkColor = Pal.sap;
+                    sparkColor = Pal.surge;
                     waveStroke = 4f;
                     waveRad = 40f;
                 }};
@@ -6914,6 +6914,7 @@ public class Blocks{
         reinforcedMessage = new MessageBlock("reinforced-message"){{
             requirements(Category.logic, with(Items.graphite, 10, Items.beryllium, 5));
             health = 100;
+            crushFragile = true;
         }};
 
         worldProcessor = new LogicBlock("world-processor"){{
