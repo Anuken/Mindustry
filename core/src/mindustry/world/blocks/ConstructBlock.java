@@ -212,8 +212,19 @@ public class ConstructBlock extends Block{
 
         @Override
         public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(progress);
-            return super.sense(sensor);
+            return switch(sensor){
+                case progress -> Mathf.clamp(progress);
+                case breaking -> activeDeconstruct ? 1 : 0;
+                default -> super.sense(sensor);
+            };
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            return switch(sensor){
+                case building -> current;
+                default -> super.senseObject(sensor);
+            };
         }
 
         @Override

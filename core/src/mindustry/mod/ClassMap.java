@@ -100,7 +100,6 @@ public class ClassMap{
         classes.put("Produce", mindustry.game.Objectives.Produce.class);
         classes.put("Research", mindustry.game.Objectives.Research.class);
         classes.put("SectorComplete", mindustry.game.Objectives.SectorComplete.class);
-        classes.put("AmmoType", mindustry.type.AmmoType.class);
         classes.put("Category", mindustry.type.Category.class);
         classes.put("CellLiquid", mindustry.type.CellLiquid.class);
         classes.put("ErrorContent", mindustry.type.ErrorContent.class);
@@ -126,8 +125,6 @@ public class ClassMap{
         classes.put("Weapon", mindustry.type.Weapon.class);
         classes.put("Weather", mindustry.type.Weather.class);
         classes.put("WeatherEntry", mindustry.type.Weather.WeatherEntry.class);
-        classes.put("ItemAmmoType", mindustry.type.ammo.ItemAmmoType.class);
-        classes.put("PowerAmmoType", mindustry.type.ammo.PowerAmmoType.class);
         classes.put("ErekirUnitType", mindustry.type.unit.ErekirUnitType.class);
         classes.put("MissileUnitType", mindustry.type.unit.MissileUnitType.class);
         classes.put("NeoplasmUnitType", mindustry.type.unit.NeoplasmUnitType.class);
@@ -281,6 +278,8 @@ public class ClassMap{
         classes.put("StaticWall", mindustry.world.blocks.environment.StaticWall.class);
         classes.put("SteamVent", mindustry.world.blocks.environment.SteamVent.class);
         classes.put("TallBlock", mindustry.world.blocks.environment.TallBlock.class);
+        classes.put("TiledFloor", mindustry.world.blocks.environment.TiledFloor.class);
+        classes.put("TiledWall", mindustry.world.blocks.environment.TiledWall.class);
         classes.put("TreeBlock", mindustry.world.blocks.environment.TreeBlock.class);
         classes.put("WobbleProp", mindustry.world.blocks.environment.WobbleProp.class);
         classes.put("HeatBlock", mindustry.world.blocks.heat.HeatBlock.class);
@@ -478,6 +477,7 @@ public class ClassMap{
         classes.put("ConsumePowerDynamic", mindustry.world.consumers.ConsumePowerDynamic.class);
         classes.put("DrawArcSmelt", mindustry.world.draw.DrawArcSmelt.class);
         classes.put("DrawBlock", mindustry.world.draw.DrawBlock.class);
+        classes.put("DrawBlockParts", mindustry.world.draw.DrawBlockParts.class);
         classes.put("DrawBlurSpin", mindustry.world.draw.DrawBlurSpin.class);
         classes.put("DrawBubbles", mindustry.world.draw.DrawBubbles.class);
         classes.put("DrawCells", mindustry.world.draw.DrawCells.class);

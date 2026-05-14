@@ -40,9 +40,9 @@ import mindustry.maps.generators.*;
 import mindustry.maps.planet.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
-import mindustry.type.ammo.*;
 import mindustry.type.weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.blocks.units.UnitFactory.*;
 import mindustry.world.consumers.*;
@@ -88,6 +88,17 @@ public class ContentParser{
             String attr = data.asString();
             if(Attribute.exists(attr)) return Attribute.get(attr);
             return Attribute.add(attr);
+        });
+        put(Attributes.class, (type, data) -> {
+            if(!data.isObject()){
+                throw new IllegalArgumentException("Attribute definitions must be objects, e.g. {heat: 10}");
+            }
+            Attributes attr = new Attributes();
+            for(var child : data){
+                Attribute value = Attribute.exists(child.name) ? Attribute.get(child.name) : Attribute.add(child.name);
+                attr.set(value, child.asFloat());
+            }
+            return attr;
         });
         put(BuildVisibility.class, (type, data) -> field(BuildVisibility.class, data));
         put(Schematic.class, (type, data) -> {
@@ -181,19 +192,6 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
-        put(AmmoType.class, (type, data) -> {
-            //string -> item
-            //if liquid ammo support is added, this should scan for liquids as well
-            if(data.isString()) return new ItemAmmoType(find(ContentType.item, data.asString()));
-            //number -> power
-            if(data.isNumber()) return new PowerAmmoType(data.asFloat());
-
-            var bc = resolve(data.getString("type", ""), ItemAmmoType.class);
-            data.remove("type");
-            AmmoType result = make(bc);
-            readFields(result, data);
-            return result;
-        });
         put(DrawBlock.class, (type, data) -> {
             if(data.isString()){
                 //try to instantiate
@@ -269,7 +267,9 @@ public class ContentParser{
         });
         put(PlanetGenerator.class, (type, data) -> {
             var result = new AsteroidGenerator(); //only one type for now
-            readFields(result, data);
+            if(data.isObject()){
+                readFields(result, data);
+            }
             return result;
         });
         put(Mat3D.class, (type, data) -> {
@@ -427,6 +427,9 @@ public class ContentParser{
                     try{
                         return (T)classParsers.get(type).parse(type, jsonData);
                     }catch(Exception e){
+                        if(e instanceof RuntimeException rt){
+                            throw rt;
+                        }
                         throw new RuntimeException(e);
                     }
                 }
@@ -530,6 +533,8 @@ public class ContentParser{
                     child.isArray() ? new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
                     child.isString() ? new ConsumeItems(new ItemStack[]{parser.readValue(ItemStack.class, child)}) :
                     parser.readValue(ConsumeItems.class, child));
+                case "itemsBoost" -> block.consume(child.isArray() ? new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
+                    parser.readValue(ConsumeItems.class, child)).boost();
 
                 case "liquidFlammable" -> block.consume((Consume)parser.readValue(ConsumeLiquidFlammable.class, child));
                 case "liquid" -> block.consume((Consume)parser.readValue(ConsumeLiquid.class, child));
@@ -537,6 +542,8 @@ public class ContentParser{
                     child.isArray() ? new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
                     parser.readValue(ConsumeLiquids.class, child));
                 case "coolant" -> block.consume((Consume)parser.readValue(ConsumeCoolant.class, child));
+                case "liquidsBoost" -> block.consume(child.isArray() ? new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
+                    parser.readValue(ConsumeLiquids.class, child)).boost();
                 case "power" -> {
                     if(child.isNumber()){
                         block.consumePower(child.asFloat());
@@ -690,8 +697,36 @@ public class ContentParser{
             read(() -> readFields(liquid, value));
             return liquid;
         },
-        ContentType.status, parser(ContentType.status, StatusEffect::new),
+        ContentType.status, (TypeParser<StatusEffect>)(mod, name, value) -> {
+            StatusEffect status;
+            if(locate(ContentType.status, name) != null){
+                status = locate(ContentType.status, name);
+                readBundle(ContentType.status, name, value);
+            }else{
+                readBundle(ContentType.status, name, value);
+                status = new StatusEffect(mod + "-" + name);
+            }
+            currentContent = status;
+            read(() -> readFields(status, value));
+
+            status.init(() -> {
+                var oldOpposite = status.opposites.copy();
+                status.opposites.clear();
+                status.opposite(oldOpposite.toSeq().toArray(StatusEffect.class));
+
+                var oldAffinities = status.affinities.copy();
+                status.affinities.clear();
+                for(StatusEffect affinity: oldAffinities){
+                    status.affinity(affinity, (unit, result, time) -> {
+                        unit.damagePierce(status.transitionDamage);
+                    });
+                }
+            });
+
+            return status;
+        },
         ContentType.sector, (TypeParser<SectorPreset>)(mod, name, value) -> {
+            readBundle(ContentType.sector, name, value);
             if(value.isString()){
                 return locate(ContentType.sector, name);
             }
@@ -717,7 +752,12 @@ public class ContentParser{
                 }
 
                 if(value.has("sector")){
-                    preset.initialize(planet, value.getInt("sector", 0));
+                    //clear old value
+                    Sector prev = preset.sector;
+                    if(prev != null && prev.preset == preset){
+                        prev.preset = null;
+                    }
+                    preset.initialize(planet, value.getInt("sector", 0), true);
                 }
 
                 value.remove("sector");
@@ -741,6 +781,7 @@ public class ContentParser{
             return preset;
         },
         ContentType.planet, (TypeParser<Planet>)(mod, name, value) -> {
+            readBundle(ContentType.planet, name, value);
             if(value.isString()) return locate(ContentType.planet, name);
 
             Planet parent = locate(ContentType.planet, value.getString("parent", ""));
@@ -774,6 +815,19 @@ public class ContentParser{
                     }catch(Exception e){
                         Log.err(e);
                         return null;
+                    }
+                };
+            }
+
+            if(value.has("rules")){
+                JsonValue r = value.remove("rules");
+                if(!r.isObject()) throw new RuntimeException("Rules must be an object!");
+                planet.ruleSetter = rules -> {
+                    try{
+                        //Use standard JSON, this is not content-parser relevant
+                        JsonIO.json.readFields(rules, r);
+                    }catch(Throwable e){ //Try not to crash here, as that would be catastrophic and confusing
+                        Log.err(e);
                     }
                 };
             }
@@ -1187,6 +1241,7 @@ public class ContentParser{
     }
 
     void readFields(Object object, JsonValue jsonMap){
+        if(!jsonMap.isObject()) throw new SerializationException("Expecting an object, but found: '" + jsonMap + "'");
         JsonValue research = jsonMap.remove("research");
 
         toBeParsed.remove(object);

@@ -658,7 +658,7 @@ public class CoreBlock extends StorageBlock{
         public void playDestroySound(){
             if(team.data().cores.size <= 1 && player != null && player.team() == team && state.rules.canGameOver){
                 //play at full volume when doing a game over
-                block.destroySound.play(block.destroySoundVolume, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), 0f);
+                block.destroySound.play(block.destroySoundVolume * Core.audio.sfxVolume, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), 0f);
             }else{
                 super.playDestroySound();
             }
@@ -712,6 +712,9 @@ public class CoreBlock extends StorageBlock{
 
             storageCapacity = itemCapacity + proximity.sum(e -> owns(e) ? e.block.itemCapacity : 0);
             proximity.each(this::owns, t -> {
+                if(t.items != items){
+                    items.add(t.items);
+                }
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });
@@ -790,7 +793,8 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void damage(float amount){
-            if(player != null && team == player.team()){
+            if(player != null && team == player.team() && control != null){
+                Vars.control.lastDamagedCore = this;
                 Events.fire(Trigger.teamCoreDamage);
             }
             super.damage(amount);

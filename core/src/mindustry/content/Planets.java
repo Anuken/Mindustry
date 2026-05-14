@@ -129,6 +129,7 @@ public class Planets{
                 new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Pal.spore, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f)
             );
 
+            enemyFactoryActivationDelay = 60f * 60f * 2f;
             launchCapacityMultiplier = 0.5f;
             sectorSeed = 2;
             allowWaves = true;
@@ -152,6 +153,11 @@ public class Planets{
             alwaysUnlocked = true;
             allowSelfSectorLaunch = true;
             landCloudColor = Pal.spore.cpy().a(0.5f);
+
+            sectorCaptureReplacements = ObjectMap.of(
+            Blocks.metalTiles12, Blocks.metalTiles11,
+            Blocks.metalTiles6, Blocks.metalTiles10
+            );
         }};
 
         verilus = makeAsteroid("verilus", sun, Blocks.stoneWall, Blocks.iceWall, -1, 0.5f, 12, 2f, gen -> {

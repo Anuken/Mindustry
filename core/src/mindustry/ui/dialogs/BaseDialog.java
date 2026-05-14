@@ -51,7 +51,8 @@ public class BaseDialog extends Dialog{
 
     protected void onResize(Runnable run){
         Events.on(ResizeEvent.class, event -> {
-            if(isShown() && Core.scene.getDialog() == this){
+            //ignore resize events while the Android text input dialog is shown - this does lead to buggy layout when rotated, but it's better than clearing the text. I don't know of a better solution to the problem
+            if(isShown() && Core.scene.getDialog() == this && !Core.input.isShowingTextInput()){
                 run.run();
                 updateScrollFocus();
             }

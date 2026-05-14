@@ -115,7 +115,7 @@ public class GameService{
             installMod.complete();
         }
 
-        if(Core.bundle.get("yes").equals("router")){
+        if(Core.bundle.get("ok").equals(Blocks.router.emoji()+Blocks.router.emoji())){
             routerLanguage.complete();
         }
 
@@ -177,6 +177,12 @@ public class GameService{
             }
         });
 
+        Events.run(Trigger.unitCommandBoost, () -> {
+           if(campaign()){
+                boostUnit.complete();
+            }
+        });
+
         Events.run(Trigger.newGame, () -> Core.app.post(() -> {
             if(campaign() && player.core() != null && player.core().items.total() >= 10 * 1000){
                 drop10kitems.complete();
@@ -196,7 +202,7 @@ public class GameService{
         });
 
         Events.on(BlockBuildEndEvent.class, e -> {
-            if(campaign() && e.unit != null && e.unit.isLocal() && !e.breaking){
+            if(campaign() && e.unit != null && e.unit.team == state.rules.defaultTeam && !e.breaking){
                 SStat.blocksBuilt.add();
 
                 if(e.tile.block() == Blocks.router && e.tile.build.proximity.contains(t -> t.block == Blocks.router)){
@@ -298,7 +304,7 @@ public class GameService{
         });
 
         Events.on(UnitCreateEvent.class, e -> {
-            if(campaign()){
+            if(campaign() && e.unit.team == state.rules.defaultTeam){
                 if(unitsBuilt.add(e.unit.type.name)){
                     SStat.unitTypesBuilt.max(content.units().count(u -> unitsBuilt.contains(u.name) && !u.isHidden()));
                     save();
@@ -309,6 +315,29 @@ public class GameService{
                 }
             }
         });
+
+        Events.on(SaveLoadEvent.class, e -> Core.app.post(() -> Core.app.post(() -> {
+            if(campaign()){
+                boolean added = false;
+                for(UnitType type : Vars.content.units()){
+                    var all = state.rules.defaultTeam.data().getUnits(type);
+                    if(all != null && all.size > 0){
+                        if(t5s.contains(type)){
+                            buildT5.complete();
+                        }
+
+                        if(unitsBuilt.add(type.name)){
+                            added = true;
+                        }
+                    }
+                }
+
+                if(added){
+                    SStat.unitTypesBuilt.max(content.units().count(u -> unitsBuilt.contains(u.name) && !u.isHidden()));
+                    save();
+                }
+            }
+        })));
 
         Events.on(UnitControlEvent.class, e -> {
             if(e.unit instanceof BlockUnitc unit && unit.tile().block == Blocks.router){

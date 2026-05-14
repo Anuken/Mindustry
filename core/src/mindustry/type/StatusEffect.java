@@ -172,17 +172,17 @@ public class StatusEffect extends UnlockableContent{
 
     }
 
-    protected void trans(StatusEffect effect, TransitionHandler handler){
+    public void trans(StatusEffect effect, TransitionHandler handler){
         transitions.put(effect, handler);
     }
 
-    protected void affinity(StatusEffect effect, TransitionHandler handler){
+    public void affinity(StatusEffect effect, TransitionHandler handler){
         affinities.add(effect);
         effect.affinities.add(this);
         trans(effect, handler);
     }
 
-    protected void opposite(StatusEffect... effect){
+    public void opposite(StatusEffect... effect){
         for(var other : effect){
             handleOpposite(other);
             other.handleOpposite(this);

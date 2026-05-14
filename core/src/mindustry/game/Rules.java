@@ -40,6 +40,8 @@ public class Rules{
     public boolean pvp;
     /** Whether is waiting for players enabled in PvP. */
     public boolean pvpAutoPause = true;
+    /** Whether pause is enabled or not in singleplayer */
+    public boolean pauseDisabled = false;
     /** Whether to pause the wave timer until all enemies are destroyed. */
     public boolean waitEnemies = false;
     /** Determines if gamemode is attack mode. */
@@ -62,8 +64,6 @@ public class Rules{
     public boolean damageExplosions = true;
     /** Whether fire (and neoplasm spread) is enabled. */
     public boolean fire = true;
-    /** Whether units use and require ammo. */
-    public boolean unitAmmo = false;
     /** If true, air and ground units target random things each wave instead of only the core/generators. */
     public boolean randomWaveAI = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */
@@ -90,6 +90,10 @@ public class Rules{
     public float unitMineSpeedMultiplier = 1f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
     public boolean ghostBlocks = true;
+    /** If true, pings of players from other teams will be shown. */
+    public boolean showOtherTeamPings = false;
+    /** Whether to allow logic to control units. */
+    public boolean logicUnitControl = true;
     /** Whether to allow units to build with logic. */
     public boolean logicUnitBuild = true;
     /** Whether to allow units to deconstruct blocks with logic. */
@@ -311,8 +315,6 @@ public class Rules{
         public boolean fillItems;
         /** If true, resources are not consumed when building. */
         public boolean infiniteResources;
-        /** If true, this team has infinite unit ammo. */
-        public boolean infiniteAmmo;
         /** EXPERIMENTAL, DO NOT USE: Pre-built base AI. Gives the illusion of intelligent design of pre-building an attack base. */
         public boolean prebuildAi;
 
@@ -330,6 +332,8 @@ public class Rules{
         /** Minimum "advantage" needed for a squad to attack. Higher -> more cautious. */
         public float rtsMinWeight = 1.2f;
 
+        /** Time until unit factories activate. This is used for enemy teams in attack maps. */
+        public float unitFactoryActivationDelay = 0f;
         /** How fast unit factories build units. */
         public float unitBuildSpeedMultiplier = 1f;
         /** How much damage units deal. */

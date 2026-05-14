@@ -20,6 +20,12 @@ Yes, there are occurrences of trailing spaces, extra newlines, empty indents, an
 
 I **especially** do not want to see PRs that apply any kind of automated analysis to the source code to "optimize" anything - my IDE can do that already. If the PR doesn't actually change anything useful, I'm not going to review or merge it.
 
+### Do not make AI "contributions".
+
+If I see a PR with significant amounts of code that's obviously written by AI, I will reject your PR, and you will be blocked. Don't waste my time with slop.
+
+Asking AI questions, and using that information to help you write code? Fine. Using it to actually write code? No.
+
 ## Style Guidelines
 
 ### Follow the formatting guidelines.

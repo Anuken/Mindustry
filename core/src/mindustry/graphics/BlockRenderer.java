@@ -550,7 +550,6 @@ public class BlockRenderer{
         }
 
         if(drawQuadtreeDebug){
-            //TODO remove
             Draw.z(Layer.overlayUI);
             Lines.stroke(1f, Color.green);
 

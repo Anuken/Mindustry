@@ -160,7 +160,7 @@ public class RtsAI{
         ay /= units.size;
 
         if(debug){
-            Vars.ui.showLabel("Squad: " + units.size, 2f, ax, ay);
+            Vars.ui.showLabel("Squad: " + units.size, -1, 2f, ax, ay);
         }
 
         Building defend = null;
@@ -192,7 +192,7 @@ public class RtsAI{
                 defend = best;
 
                 if(debug){
-                    Vars.ui.showLabel("Defend, dst = " + (int)(best.dst(ax, ay)), 8f, best.x, best.y);
+                    Vars.ui.showLabel("Defend, dst = " + (int)(best.dst(ax, ay)), -1, 8f, best.x, best.y);
                 }
 
                 if(best instanceof CoreBuild){

@@ -51,6 +51,13 @@ public enum LAccess{
     mineX,
     mineY,
     mining,
+    buildX,
+    buildY,
+    pingX,
+    pingY,
+    pingText,
+    building,
+    breaking,
     speed,
     team,
     type,
@@ -64,6 +71,10 @@ public enum LAccess{
     payloadCapacity,
     maxUnits,
     id,
+    selectedBlock,
+    selectedRotation,
+    bulletLifetime,
+    bulletTime,
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access
@@ -79,7 +90,7 @@ public enum LAccess{
         all = values(),
         senseable = Seq.select(all, t -> t.params.length <= 1).toArray(LAccess.class),
         controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class),
-        settable = {x, y, velocityX, velocityY, rotation, speed, armor, health, shield, team, flag, totalPower, payloadType};
+        settable = {x, y, velocityX, velocityY, rotation, speed, armor, health, shield, team, flag, totalPower, payloadType, bulletTime, bulletLifetime};
 
     LAccess(String... params){
         this.params = params;

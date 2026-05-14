@@ -63,6 +63,7 @@ public class CommandAI extends AIController{
         }
     }
 
+    @Override
     public boolean hasStance(@Nullable UnitStance stance){
         return stance != null && stances.get(stance.id);
     }
@@ -79,7 +80,7 @@ public class CommandAI extends AIController{
         //this happens when an older save reads the default "shoot" stance, or any other removed stance
         if(stance == UnitStance.stop) return;
 
-        stances.andNot(stance.incompatibleBits);
+        stances.andNot(stance.incompatibleStanceBits);
         stances.set(stance.id);
         stanceChanged();
     }
@@ -156,9 +157,22 @@ public class CommandAI extends AIController{
             commandController.updateUnit();
         }else{
             defaultBehavior();
-            //boosting control is not supported, so just don't.
-            unit.updateBoosting(false);
+            if(shouldBoost() && unit.type.canBoost){
+                //auto land when near target
+                if((attackTarget != null && unit.within(attackTarget, unit.range())) || (hasStance(UnitStance.patrol) && target != null && unit.within(target, unit.range()))){
+                    unit.updateBoosting(false);
+                }else{
+                    unit.updateBoosting(true, true);
+                }
+            }else{
+                //boosting control is not supported, so just don't.
+                unit.updateBoosting(false);
+            }
         }
+    }
+
+    protected boolean shouldBoost(){
+        return hasStance(UnitStance.boost) || command == UnitCommand.enterPayloadCommand;
     }
 
     public void clearCommands(){
@@ -176,7 +190,7 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
-        if(!unit.type.autoFindTarget && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
+        if(!unit.type.autoFindTarget && !hasStance(UnitStance.patrol) && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
             return null;
         }
         return super.findMainTarget(x, y, range, air, ground);
@@ -214,7 +228,9 @@ public class CommandAI extends AIController{
             }
         }
 
-        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.buildOn() != null && (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
+        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.type.allowedInPayloads && unit.buildOn() != null &&
+            (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
+
             var build = unit.buildOn();
             tmpPayload.unit = unit;
             if(build.team == unit.team && build.acceptPayload(build, tmpPayload)){
@@ -270,17 +286,15 @@ public class CommandAI extends AIController{
 
             Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
 
-            //TODO: should the unit stop when it finds a target?
             if(
                 (hasStance(UnitStance.patrol) && !hasStance(UnitStance.pursueTarget) && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
-                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
+                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && !unit.type.circleTarget && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
                 (command == UnitCommand.loopPayloadCommand && unit.within(vecMovePos, 10f))
             ){
                 move = false;
             }
 
             if(unit.isGrounded() && !ramming){
-                //TODO: blocking enable or disable?
                 if(timer.get(timerTarget3, avoidInterval)){
                     Vec2 dstPos = Tmp.v1.trns(unit.rotation, unit.hitSize/2f);
                     float max = unit.hitSize/2f;

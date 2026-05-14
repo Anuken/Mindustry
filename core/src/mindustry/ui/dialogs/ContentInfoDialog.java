@@ -81,14 +81,14 @@ public class ContentInfoDialog extends BaseDialog{
             if(map.size == 0) continue;
 
             if(stats.useCategories){
-                table.add("@category." + cat.name).color(Pal.accent).fillX();
+                table.add(cat.localized()).color(Pal.accent).fillX();
                 table.row();
             }
 
             for(Stat stat : map.keys()){
                 table.table(inset -> {
                     inset.left();
-                    inset.add("[lightgray]" + stat.localized() + ":[] ").left().top();
+                    stats.statInfo(inset.add("[lightgray]" + stat.localized() + ":[] ").left().top(), stat);
                     Seq<StatValue> arr = map.get(stat);
                     for(StatValue value : arr){
                         value.display(inset);
@@ -107,7 +107,7 @@ public class ContentInfoDialog extends BaseDialog{
         //TODO: move this into a final end-game credit sequence. this is temporary and thus not localized
         if(content.credit != null){
             table.row();
-            table.add("Created by: " + content.credit).color(Color.gray).padTop(40f).row();
+            table.add(Core.bundle.format("content.createdby", content.credit)).color(Color.gray).padTop(40f).row();
         }
 
         if(settings.getBool("console")){

@@ -23,7 +23,6 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
-    protected static BuildPlan otherReq;
     protected static int returnInt = 0;
     protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     /** The maximum range of all power nodes on the map */
@@ -42,6 +41,7 @@ public class PowerNode extends PowerBlock{
     public PowerNode(String name){
         super(name);
         configurable = true;
+        ignoreResizeConfig = true;
         consumesPower = false;
         outputsPower = false;
         canOverdrive = false;
@@ -50,6 +50,7 @@ public class PowerNode extends PowerBlock{
         drawDisabled = false;
         envEnabled |= Env.space;
         destructible = true;
+        delayLandingConfig = true;
 
         //nodes do not even need to update
         update = false;
@@ -178,11 +179,15 @@ public class PowerNode extends PowerBlock{
     }
 
     public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2){
+        drawLaser(x1, y1, x2, y2, size1, size2, true);
+    }
+
+    public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2, boolean light){
         float angle1 = Angles.angle(x1, y1, x2, y2),
             vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1),
             len1 = size1 * tilesize / 2f - 1.5f, len2 = size2 * tilesize / 2f - 1.5f;
 
-        Drawf.laser(laser, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, laserScale);
+        Drawf.laser(laser, laserEnd, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, laserScale, light);
     }
 
     protected boolean overlaps(float srcx, float srcy, Tile other, Block otherBlock, float range){
@@ -314,32 +319,34 @@ public class PowerNode extends PowerBlock{
         });
     }
 
+    private static int currentFindX, currentFindY;
+    private static BuildPlan currentPlan;
+    private static final Boolf<BuildPlan> planFinder = other -> other.block != null
+        && (currentFindX >= other.x - ((other.block.size - 1) / 2) && currentFindY >= other.y - ((other.block.size - 1) / 2) && currentFindX <= other.x + other.block.size / 2 && currentFindY <= other.y + other.block.size / 2)
+        && other != currentPlan && other.block.hasPower;
+
     @Override
     public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
         if(plan.config instanceof Point2[] ps){
             setupColor(1f);
             for(Point2 point : ps){
-                int px = plan.x + point.x, py = plan.y + point.y;
-                otherReq = null;
-                list.each(other -> {
-                    if(other.block != null
-                        && (px >= other.x - ((other.block.size-1)/2) && py >= other.y - ((other.block.size-1)/2) && px <= other.x + other.block.size/2 && py <= other.y + other.block.size/2)
-                        && other != plan && other.block.hasPower){
-                        otherReq = other;
-                    }
-                });
+                currentFindX = plan.x + point.x;
+                currentFindY = plan.y + point.y;
+                currentPlan = plan;
 
-                //uncomment for debugging connection translation issues in schematics
-                //Draw.color(Color.red);
-                //Lines.line(plan.drawx(), plan.drawy(), px * tilesize, py * tilesize);
-                //Draw.color();
+                var otherReq = findPlan(list, currentFindX, currentFindY, planFinder);
 
                 if(otherReq == null || otherReq.block == null) continue;
 
-                drawLaser(plan.drawx(), plan.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size);
+                drawLaser(plan.drawx(), plan.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size, false);
             }
             Draw.color();
         }
+    }
+
+    @Override
+    public float planConfigClipSize(){
+        return laserRange * tilesize * 2f + size * tilesize;
     }
 
     public boolean linkValid(Building tile, Building link){

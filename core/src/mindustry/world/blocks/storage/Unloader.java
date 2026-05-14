@@ -143,8 +143,8 @@ public class Unloader extends Block{
                 if(!other.interactable(team)) continue; //avoid blocks of the wrong team
 
                 //partial check
-                boolean canLoad = !(other instanceof CoreBuild || (other instanceof StorageBuild sb && sb.linkedCore != null));
-                boolean canUnload = other.canUnload() && (allowCoreUnload || canLoad) && other.items != null;
+                boolean canLoad = !(other instanceof CoreBuild || other instanceof StorageBuild);
+                boolean canUnload = other.canUnload() && (allowCoreUnload || canLoad || (other instanceof StorageBuild b && b.linkedCore == null)) && other.items != null;
 
                 if(canLoad || canUnload){ //avoid blocks that can neither give nor receive items
                     var pb = Pools.obtain(ContainerStat.class, ContainerStat::new);

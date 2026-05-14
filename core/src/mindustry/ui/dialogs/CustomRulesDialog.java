@@ -199,8 +199,9 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.unitminespeedmultiplier", f -> rules.unitMineSpeedMultiplier = f, () -> rules.unitMineSpeedMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0f, 50f);
         number("@rules.unitcostmultiplier", f -> rules.unitCostMultiplier = f, () -> rules.unitCostMultiplier);
-        check("@rules.logicunitbuild", b -> rules.logicUnitBuild = b, () -> rules.logicUnitBuild);
-        check("@rules.logicunitdeconstruct", b -> rules.logicUnitDeconstruct = b, () -> rules.logicUnitDeconstruct);
+        check("@rules.logicunitcontrol", b -> rules.logicUnitControl = b, () -> rules.logicUnitControl);
+        check("@rules.logicunitbuild", b -> rules.logicUnitBuild = b, () -> rules.logicUnitBuild, () -> rules.logicUnitControl);
+        check("@rules.logicunitdeconstruct", b -> rules.logicUnitDeconstruct = b, () -> rules.logicUnitDeconstruct, () -> rules.logicUnitControl);
 
         if(Core.bundle.get("bannedunits").toLowerCase().contains(ruleSearch)){
             current.button("@bannedunits", () -> bannedUnits.show(rules.bannedUnits)).left().width(300f).row();
@@ -216,6 +217,7 @@ public class CustomRulesDialog extends BaseDialog{
 
 
         category("environment");
+        check("@rules.pauseDisabled", b -> rules.pauseDisabled = b, () -> rules.pauseDisabled);
         check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
         check("@rules.fire", b -> rules.fire = b, () -> rules.fire);
         check("@rules.fog", b -> rules.fog = b, () -> rules.fog);
@@ -318,6 +320,7 @@ public class CustomRulesDialog extends BaseDialog{
                 check("@rules.fillitems", b -> teams.fillItems = b, () -> teams.fillItems);
                 number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
 
+                number("@rules.unitfactoryactivation", f -> teams.unitFactoryActivationDelay = f * 60f, () -> teams.unitFactoryActivationDelay / 60f);
                 number("@rules.unitdamagemultiplier", f -> teams.unitDamageMultiplier = f, () -> teams.unitDamageMultiplier);
                 number("@rules.unitcrashdamagemultiplier", f -> teams.unitCrashDamageMultiplier = f, () -> teams.unitCrashDamageMultiplier);
                 number("@rules.unitminespeedmultiplier", f -> teams.unitMineSpeedMultiplier = f, () -> teams.unitMineSpeedMultiplier);

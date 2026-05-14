@@ -56,8 +56,10 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         //lz4 chokes on direct buffers, so copy the bytes over
                         int len = snet.readP2PPacket(from, readBuffer, 0);
                         readBuffer.limit(len);
+                        readCopyBuffer.limit(readBuffer.capacity());
                         readCopyBuffer.position(0);
                         readCopyBuffer.put(readBuffer);
+                        readCopyBuffer.limit(len);
                         readCopyBuffer.position(0);
                         int fromID = from.getAccountID();
                         Object output = serializer.read(readCopyBuffer);
@@ -109,7 +111,11 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         Events.run(Trigger.newGame, this::updateWave);
 
         Events.on(PlayerIpBanEvent.class, e -> updateBans(e.ip));
-        Events.on(PlayerIpUnbanEvent.class, e -> updateBans(e.ip));
+        Events.on(PlayerUnbanEvent.class, e -> {
+            // updateBans works off of ip ban list. Unbanning a player does not unban their ip but since this is steam, their "ip" is just their steam id (which is their uuid as well) prefixed with steam:
+            netServer.admins.unbanPlayerIP("steam:" + e.uuid);
+            updateBans(null);
+        });
     }
 
     public boolean isSteamClient(){
@@ -201,7 +207,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             smat.setLobbyMemberLimit(currentLobby, Core.settings.getInt("playerlimit"));
         }
     }
-    
+
     void updateWave(){
         if(currentLobby != null && net.server()){
             smat.setLobbyData(currentLobby, "mapname", state.map.name());
@@ -268,9 +274,10 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         }
 
         int version = Strings.parseInt(smat.getLobbyData(steamIDLobby, "version"), -1);
+        boolean hidden = smat.getLobbyData(steamIDLobby, "hidden").equals("true");
 
         //check version
-        if(version != Version.build){
+        if(version != Version.build && !hidden){
             ui.loadfrag.hide();
             ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated) + "\n[]" +
                 Core.bundle.format("server.versions", Version.build, version));
@@ -302,7 +309,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
     @Override
     public void onLobbyChatUpdate(SteamID lobby, SteamID who, SteamID changer, ChatMemberStateChange change){
-        Log.info("lobby @: @ caused @'s change: @", lobby.getAccountID(), who.getAccountID(), changer.getAccountID(), change);
+        Log.info("lobby @: @ caused @'s change: @", lobby.getAccountID(), changer.getAccountID(), who.getAccountID(), change);
+        if(net.server() && change == ChatMemberStateChange.Entered && SteamAdmin.isAdmin("steam:" + who.getAccountID())) SteamAdmin.fetch(true); //fetch on admin join
         if(change == ChatMemberStateChange.Disconnected || change == ChatMemberStateChange.Left){
             if(net.client()){
                 //host left, leave as well
