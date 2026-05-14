@@ -519,7 +519,7 @@ public class TypeIO{
     public static Queue<BuildPlan> readPlansQueue(Reads read){
         int used = read.i();
         if(used == -1) return null;
-        if(used >= maxArraySize) throw new RuntimeException("Queue too long: " + used);
+        //this is ONLY used in saves, so don't enforce a max size, it can be anything.
         var out = new Queue<BuildPlan>();
         for(int i = 0; i < used; i++){
             out.add(readPlan(read));
