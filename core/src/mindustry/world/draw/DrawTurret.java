@@ -5,7 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.UnlockableContent;
+import mindustry.ctype.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -18,9 +18,6 @@ import mindustry.world.blocks.defense.turrets.Turret.*;
 /** Extend to implement custom drawing behavior for a turret. */
 public class DrawTurret extends DrawBlock{
     protected static final Rand rand = new Rand();
-
-    /** Only use for ItemTurret (so far?)*/
-    public boolean drawPartsforAmmo = false;
 
     public Seq<DrawPart> parts = new Seq<>();
     public ObjectMap<UnlockableContent, Seq<DrawPart>> ammoParts = new ObjectMap<>();
@@ -39,7 +36,9 @@ public class DrawTurret extends DrawBlock{
     }
 
     /** Format: [unlockableContent1, seq1, unlockableContent2, seq2...] */
-    public void setAmmoParts(Object... objects){ ammoParts = OrderedMap.of(objects); }
+    public void setAmmoParts(Object... objects){
+        ammoParts = OrderedMap.of(objects);
+    }
 
     @Override
     public void getRegionsToOutline(Block block, Seq<TextureRegion> out){
@@ -47,7 +46,7 @@ public class DrawTurret extends DrawBlock{
             part.getOutlines(out);
         }
 
-        if(drawPartsforAmmo){
+        if(ammoParts.size > 0){
             for(var parts : ammoParts.values()){
                 for(var part : parts){
                     part.getOutlines(out);
@@ -106,10 +105,10 @@ public class DrawTurret extends DrawBlock{
                 part.draw(params);
             }
 
-            if(drawPartsforAmmo && tb instanceof ItemTurret.ItemTurretBuild itb && itb.ammo.size > 0){
-                var parts = ammoParts.get(((ItemTurret.ItemEntry)itb.ammo.peek()).item);
+            if(ammoParts.size > 0 && tb.getAmmoContent() != null){
+                var parts = ammoParts.get(tb.getAmmoContent());
                 for(var part : parts){
-                    params.setRecoil(part.recoilIndex >= 0 && itb.curRecoils != null ? itb.curRecoils[part.recoilIndex] : itb.curRecoil);
+                    params.setRecoil(part.recoilIndex >= 0 && tb.curRecoils != null ? tb.curRecoils[part.recoilIndex] : tb.curRecoil);
                     part.draw(params);
                 }
             }
@@ -154,7 +153,7 @@ public class DrawTurret extends DrawBlock{
             part.load(block.name);
         }
 
-        if(drawPartsforAmmo){
+        if(ammoParts.size > 0){
             for(var parts : ammoParts.values()){
                 for(var part : parts){
                     part.turretShading = true;

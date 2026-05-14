@@ -2,6 +2,7 @@ package mindustry.world.blocks.defense.turrets;
 
 import arc.struct.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
@@ -67,6 +68,14 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         @Override
         public boolean shouldActiveSound(){
             return wasShooting && enabled;
+        }
+
+        @Override
+        public UnlockableContent getAmmoContent(){
+            if(liquids != null){
+                return liquids.currentAmount() > 0f ? liquids.current() : null;
+            }
+            return null;
         }
 
         @Override

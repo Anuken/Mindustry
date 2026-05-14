@@ -5552,7 +5552,6 @@ public class Blocks{
             );
 
             drawer = new DrawTurret("reinforced-"){{
-                drawPartsforAmmo = true;
                 parts.add(new RegionPart("-blade"){{
                     progress = PartProgress.warmup;
                     heatProgress = PartProgress.warmup;

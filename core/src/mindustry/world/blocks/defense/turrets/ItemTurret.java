@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -116,6 +117,11 @@ public class ItemTurret extends Turret{
                 case currentAmmoType -> ammo.size > 0 ? ((ItemEntry)ammo.peek()).item : null;
                 default -> super.senseObject(sensor);
             };
+        }
+
+        @Override
+        public UnlockableContent getAmmoContent(){
+            return ammo.size > 0 ? ((ItemEntry)ammo.peek()).item : null;
         }
 
         @Override
