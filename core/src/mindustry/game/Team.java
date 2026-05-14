@@ -123,6 +123,11 @@ public class Team implements Comparable<Team>, Senseable{
         return isAI() && !rules().rtsAi;
     }
 
+    /** @return whether unit factories should be active, according to the game rule. */
+    public boolean activateUnitFactories(){
+        return state.tick >= rules().unitFactoryActivationDelay;
+    }
+
     public Seq<CoreBuild> cores(){
         return state.teams.cores(this);
     }

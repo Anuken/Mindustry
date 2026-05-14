@@ -40,7 +40,6 @@ import mindustry.maps.generators.*;
 import mindustry.maps.planet.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
-import mindustry.type.ammo.*;
 import mindustry.type.weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -91,6 +90,9 @@ public class ContentParser{
             return Attribute.add(attr);
         });
         put(Attributes.class, (type, data) -> {
+            if(!data.isObject()){
+                throw new IllegalArgumentException("Attribute definitions must be objects, e.g. {heat: 10}");
+            }
             Attributes attr = new Attributes();
             for(var child : data){
                 Attribute value = Attribute.exists(child.name) ? Attribute.get(child.name) : Attribute.add(child.name);
@@ -187,19 +189,6 @@ public class ContentParser{
         });
         put(MassDriverBolt.class, (type, data) -> {
             MassDriverBolt result = (MassDriverBolt)make(MassDriverBolt.class);
-            readFields(result, data);
-            return result;
-        });
-        put(AmmoType.class, (type, data) -> {
-            //string -> item
-            //if liquid ammo support is added, this should scan for liquids as well
-            if(data.isString()) return new ItemAmmoType(find(ContentType.item, data.asString()));
-            //number -> power
-            if(data.isNumber()) return new PowerAmmoType(data.asFloat());
-
-            var bc = resolve(data.getString("type", ""), ItemAmmoType.class);
-            data.remove("type");
-            AmmoType result = make(bc);
             readFields(result, data);
             return result;
         });
@@ -737,6 +726,7 @@ public class ContentParser{
             return status;
         },
         ContentType.sector, (TypeParser<SectorPreset>)(mod, name, value) -> {
+            readBundle(ContentType.sector, name, value);
             if(value.isString()){
                 return locate(ContentType.sector, name);
             }
@@ -762,7 +752,12 @@ public class ContentParser{
                 }
 
                 if(value.has("sector")){
-                    preset.initialize(planet, value.getInt("sector", 0));
+                    //clear old value
+                    Sector prev = preset.sector;
+                    if(prev != null && prev.preset == preset){
+                        prev.preset = null;
+                    }
+                    preset.initialize(planet, value.getInt("sector", 0), true);
                 }
 
                 value.remove("sector");
@@ -786,6 +781,7 @@ public class ContentParser{
             return preset;
         },
         ContentType.planet, (TypeParser<Planet>)(mod, name, value) -> {
+            readBundle(ContentType.planet, name, value);
             if(value.isString()) return locate(ContentType.planet, name);
 
             Planet parent = locate(ContentType.planet, value.getString("parent", ""));
@@ -819,6 +815,19 @@ public class ContentParser{
                     }catch(Exception e){
                         Log.err(e);
                         return null;
+                    }
+                };
+            }
+
+            if(value.has("rules")){
+                JsonValue r = value.remove("rules");
+                if(!r.isObject()) throw new RuntimeException("Rules must be an object!");
+                planet.ruleSetter = rules -> {
+                    try{
+                        //Use standard JSON, this is not content-parser relevant
+                        JsonIO.json.readFields(rules, r);
+                    }catch(Throwable e){ //Try not to crash here, as that would be catastrophic and confusing
+                        Log.err(e);
                     }
                 };
             }

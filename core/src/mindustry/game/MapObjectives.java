@@ -26,6 +26,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.logic.CanvasBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 
+import java.io.*;
 import java.lang.annotation.*;
 import java.util.*;
 
@@ -176,7 +177,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     /** Base abstract class for any in-map objective. */
-    public static abstract class MapObjective{
+    public static abstract class MapObjective implements Serializable{
         public boolean hidden;
         public @Nullable @Multiline String details;
         public @Nullable @LogicCode String completionLogicCode;
@@ -209,9 +210,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             state.rules.objectiveFlags.addAll(flagsAdded);
             completed = true;
 
-            if(completionLogicCode != null && !completionLogicCode.isEmpty()){
-                LExecutor.runLogicScript(completionLogicCode);
-            }
+            LExecutor.runLogicScript(completionLogicCode);
         }
 
         /** @return true if all {@link #parents} are completed, rendering this objective able to execute. */
@@ -739,7 +738,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay. */
-    public static abstract class ObjectiveMarker implements JsonSerializable{
+    public static abstract class ObjectiveMarker implements JsonSerializable, Serializable{
         /** Internal use only! Do not access. */
         public transient int arrayIndex;
 

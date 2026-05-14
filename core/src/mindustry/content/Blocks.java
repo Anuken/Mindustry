@@ -176,7 +176,7 @@ public class Blocks{
 
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, tileLogicDisplay, memoryCell, memoryBank,
-    canvas, reinforcedMessage,
+    canvas, largeCanvas, reinforcedMessage,
     worldProcessor, worldCell, worldMessage, worldSwitch,
 
     //campaign
@@ -3442,7 +3442,6 @@ public class Blocks{
                     hitEffect = Fx.hitFlameSmall;
                     despawnEffect = Fx.none;
                     status = StatusEffects.burning;
-                    keepVelocity = false;
                     hittable = false;
                 }},
                 Items.pyratite, new BulletType(4f, 30f){{
@@ -3635,6 +3634,7 @@ public class Blocks{
                     shieldDamageMultiplier = 0.2f;
                 }};
             }};
+            researchCostMultiplier = 1/3f;
             reload = 35f;
             shootCone = 40f;
             rotateSpeed = 8f;
@@ -3911,9 +3911,10 @@ public class Blocks{
             );
             size = 3;
             reload = 3f;
+            shoot = new ShootAlternate(4f);
             shoot.shots = 2;
             velocityRnd = 0.1f;
-            inaccuracy = 4f;
+            inaccuracy = 3f;
             recoil = 1f;
             shootCone = 45f;
             liquidCapacity = 40f;
@@ -4849,7 +4850,7 @@ public class Blocks{
         }};
 
         disperse = new ItemTurret("disperse"){{
-            requirements(Category.turret, with(Items.thorium, 50, Items.oxide, 150, Items.silicon, 200, Items.beryllium, 350));
+            requirements(Category.turret, with(Items.thorium, 50, Items.oxide, 50, Items.silicon, 200, Items.beryllium, 350));
 
             ammo(
             Items.tungsten, new BasicBulletType(){{
@@ -5066,7 +5067,7 @@ public class Blocks{
                 despawnEffect = hitEffect = new ExplosionEffect(){{
                     waveColor = Pal.surge;
                     smokeColor = Color.gray;
-                    sparkColor = Pal.sap;
+                    sparkColor = Pal.surge;
                     waveStroke = 4f;
                     waveRad = 40f;
                 }};
@@ -6881,9 +6882,39 @@ public class Blocks{
             size = 2;
         }};
 
+        largeCanvas = new CanvasBlock("large-canvas"){{
+            requirements(Category.logic, BuildVisibility.shown, with(Items.silicon, 15, Items.beryllium, 15, Items.surgeAlloy, 5));
+
+            canvasSize = 24;
+            padding = 7f / 4f * 2f;
+
+            size = 3;
+
+            //Palette: https://lospec.com/palette-list/woodspark
+            setPaletteFromString("""
+            452b3f
+            8a5865
+            e08d51
+            fabf61
+            f5eeb0
+            2c5e3b
+            609c4f
+            c6cc54
+            78c2d6
+            5479b0
+            56546e
+            839fa6
+            e0d3c8
+            f05b5b
+            8f325f
+            eb6c98
+            """);
+        }};
+
         reinforcedMessage = new MessageBlock("reinforced-message"){{
             requirements(Category.logic, with(Items.graphite, 10, Items.beryllium, 5));
             health = 100;
+            crushFragile = true;
         }};
 
         worldProcessor = new LogicBlock("world-processor"){{

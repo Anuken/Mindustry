@@ -314,7 +314,7 @@ public class ModsDialog extends BaseDialog{
                                     }).size(50f);
                                 }
                             }).growX().right().padRight(-8f).padTop(-8f);
-                        }, Styles.flatBordert, () -> showMod(item)).size(w, h).growX().pad(4f);
+                        }, Styles.grayt, () -> showMod(item)).size(w, h).growX().pad(4f);
                         pane[0].row();
                     }
                 }
@@ -544,11 +544,11 @@ public class ModsDialog extends BaseDialog{
                     "\n[lightgray]\uE809 " + mod.stars +
 
                     (!Version.isAtLeast(mod.minGameVersion) ? "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion) :
-                    ((mod.hasJava && Strings.parseDouble(mod.minGameVersion, 0) < minJavaModGameVersion) ? "\n" + Core.bundle.get("mod.incompatiblemod") : ""));
+                    ((mod.hasJava && Strings.parseDouble(mod.minGameVersion, 0) < minJavaModGameVersion && !mod.legacyCompatible) ? "\n" + Core.bundle.get("mod.incompatiblemod") : ""));
 
                     con.add(infoText).width(358f).wrap().grow().pad(4f, 2f, 4f, 6f).top().left().labelAlign(Align.topLeft);
 
-                }, Styles.flatBordert, () -> {
+                }, Styles.grayt, () -> {
                     var sel = new BaseDialog(mod.name);
                     sel.cont.pane(p -> p.add(mod.description + "\n\n[accent]" + Core.bundle.get("editor.author") + "[lightgray] " + mod.author)
                         .width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left)).grow();
@@ -574,7 +574,7 @@ public class ModsDialog extends BaseDialog{
 
                     sel.buttons.button("@mods.browser.view-releases", Icon.zoom, () -> {
                         BaseDialog load = new BaseDialog("");
-                        load.cont.add("[accent]Fetching Releases...");
+                        load.cont.add("[accent]" + Core.bundle.get("mods.browser.fetching"));
                         load.show();
                         Http.get(ghApi + "/repos/" + mod.repo + "/releases", res -> {
                             var json = Jval.read(res.getResultAsString());

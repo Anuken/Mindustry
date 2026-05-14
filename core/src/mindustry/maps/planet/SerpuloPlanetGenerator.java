@@ -61,6 +61,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     );
 
     float water = 2f / arr[0].length;
+    //megabase position
     Vec3 basePos = new Vec3(0.9341721, 0.0, 0.3568221);
 
     float rawHeight(Vec3 position){
@@ -112,7 +113,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     @Override
     public void getLockedText(Sector hovered, StringBuilder out){
         if((hovered.preset == null || !hovered.preset.requireUnlock) && hovered.near().contains(Sector::hasBase)){
-            out.append("[red]").append(Iconc.cancel).append("[]").append(Blocks.coreFoundation.emoji()).append(Core.bundle.get("sector.foundationrequired"));
+            if(hovered.isShielded()){
+                out.append("[red]").append(Iconc.defense).append("[]").append(Core.bundle.get("sector.shielded"));
+            }else{
+                out.append("[red]").append(Iconc.cancel).append("[]").append(Blocks.coreFoundation.emoji()).append(Core.bundle.get("sector.foundationrequired"));
+            }
         }else{
             super.getLockedText(hovered, out);
         }
@@ -126,7 +131,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
     @Override
     public void getColor(Vec3 position, Color out){
-        Block block = getBlock(position);
+        Block block = getBlock(position, true);
         //replace salt with sand color
         if(block == Blocks.salt) block = Blocks.sand;
         out.set(block.mapColor).a(1f - block.albedo);
@@ -157,7 +162,8 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         if(lightScl < 1f) lightScl = Interp.pow5Out.apply(lightScl);
 
         float freq = 0.05f;
-        if(position.dst(basePos) < 0.55f ?
+        //TODO: once the old megabase returns, change it to 0.55f
+        if(position.dst(basePos) < 0.3f ?
 
             dst*metalDstScl + Simplex.noise3d(seed + 1, 3, 0.4, 5.5f, position.x, position.y + 200f, position.z)*0.08f + ((basePos.dst(position) + 0.00f) % freq < freq/2f ? 1f : 0f) * 0.07f < 0.08f/* || dst <= 0.0001f*/ :
             dst*metalDstScl + Simplex.noise3d(seed, 3, 0.4, 9f, position.x, position.y + 370f, position.z)*0.06f < 0.045){
@@ -174,7 +180,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
     @Override
     public void genTile(Vec3 position, TileGen tile){
-        tile.floor = getBlock(position);
+        tile.floor = getBlock(position, false);
         if(tile.floor == Blocks.darkPanel6) tile.floor = Blocks.darkPanel3;
         tile.block = tile.floor.asFloor().wall;
 
@@ -185,7 +191,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
     static double metalDstScl = 0.25;
 
-    Block getBlock(Vec3 position){
+    Block getBlock(Vec3 position, boolean visualOnly){
         float height = rawHeight(position);
         float px = position.x * scl, py = position.y * scl, pz = position.z * scl;
 
@@ -202,7 +208,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         if(tar > 0.5f){
             return tars.get(res, res);
         }else{
-            if(position.within(basePos, 0.65f)){
+            if(visualOnly && position.within(basePos, 0.65f)){
 
                 float dst = 999f;
 

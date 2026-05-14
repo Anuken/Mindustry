@@ -14,7 +14,7 @@ public class LAssembler{
     private static final long invalidNumNegative = Long.MIN_VALUE;
     private static final long invalidNumPositive = Long.MAX_VALUE;
 
-    private boolean privileged;
+    public boolean privileged;
     /** Maps names to variable. */
     public OrderedMap<String, LVar> vars = new OrderedMap<>();
     /** All instructions to be executed. */
@@ -31,7 +31,6 @@ public class LAssembler{
 
     public static LAssembler assemble(String data, boolean privileged){
         LAssembler asm = new LAssembler();
-
         Seq<LStatement> st = read(data, privileged);
 
         asm.privileged = privileged;

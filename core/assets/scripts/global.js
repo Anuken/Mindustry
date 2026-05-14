@@ -98,7 +98,6 @@ importPackage(Packages.mindustry.mod)
 importPackage(Packages.mindustry.net)
 importPackage(Packages.mindustry.service)
 importPackage(Packages.mindustry.type)
-importPackage(Packages.mindustry.type.ammo)
 importPackage(Packages.mindustry.type.unit)
 importPackage(Packages.mindustry.type.weapons)
 importPackage(Packages.mindustry.type.weather)
@@ -197,8 +196,6 @@ const ModContentLoadEvent = Packages.mindustry.game.EventType.ModContentLoadEven
 const AtlasPackEvent = Packages.mindustry.game.EventType.AtlasPackEvent
 const ContentInitEvent = Packages.mindustry.game.EventType.ContentInitEvent
 const BlockInfoEvent = Packages.mindustry.game.EventType.BlockInfoEvent
-const CoreItemDeliverEvent = Packages.mindustry.game.EventType.CoreItemDeliverEvent
-const TurretAmmoDeliverEvent = Packages.mindustry.game.EventType.TurretAmmoDeliverEvent
 const LineConfirmEvent = Packages.mindustry.game.EventType.LineConfirmEvent
 const TurnEvent = Packages.mindustry.game.EventType.TurnEvent
 const WaveEvent = Packages.mindustry.game.EventType.WaveEvent

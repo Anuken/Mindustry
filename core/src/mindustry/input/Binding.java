@@ -28,6 +28,7 @@ public class Binding{
     rotatePlaced = KeyBind.add("rotateplaced", KeyCode.r),
     diagonalPlacement = KeyBind.add("diagonal_placement", KeyCode.controlLeft),
     pick = KeyBind.add("pick", KeyCode.mouseMiddle),
+    ping = KeyBind.add("ping", KeyCode.p),
 
     rebuildSelect = KeyBind.add("rebuild_select", KeyCode.b),
     schematicSelect = KeyBind.add("schematic_select", KeyCode.f),
@@ -51,6 +52,8 @@ public class Binding{
     unitStancePursueTarget = KeyBind.add("unit_stance_pursue_target", KeyCode.unset),
     unitStancePatrol = KeyBind.add("unit_stance_patrol", KeyCode.unset),
     unitStanceRam = KeyBind.add("unit_stance_ram", KeyCode.unset),
+    unitStanceBoost = KeyBind.add("unit_stance_boost", KeyCode.unset),
+    unitStanceHoldPosition = KeyBind.add("unit_stance_hold_position", KeyCode.unset),
 
     unitCommandMove = KeyBind.add("unit_command_move", KeyCode.unset),
     unitCommandRepair = KeyBind.add("unit_command_repair", KeyCode.unset),
@@ -93,7 +96,7 @@ public class Binding{
     planetMap = KeyBind.add("planet_map", KeyCode.n),
     blockInfo = KeyBind.add("block_info", KeyCode.f1),
     toggleMenus = KeyBind.add("toggle_menus", KeyCode.c),
-    screenshot = KeyBind.add("screenshot", KeyCode.p),
+    screenshot = KeyBind.add("screenshot", KeyCode.f12),
     togglePowerLines = KeyBind.add("toggle_power_lines", KeyCode.f5),
     toggleBlockStatus = KeyBind.add("toggle_block_status", KeyCode.f6),
     playerList = KeyBind.add("player_list", KeyCode.tab, "multiplayer"),

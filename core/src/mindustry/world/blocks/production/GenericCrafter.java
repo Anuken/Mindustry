@@ -136,6 +136,16 @@ public class GenericCrafter extends Block{
     }
 
     @Override
+    public void afterPatch(){
+        super.afterPatch();
+
+        outputsLiquid = outputLiquids != null;
+
+        if(outputItems != null) hasItems = true;
+        if(outputLiquids != null) hasLiquids = true;
+    }
+
+    @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         drawer.drawPlan(this, plan, list);
     }

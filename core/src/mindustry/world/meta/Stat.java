@@ -86,7 +86,6 @@ public class Stat implements Comparable<Stat>{
     reload = new Stat("reload", StatCat.function),
     crushDamage = new Stat("crushDamage", StatCat.function),
     legSplashDamage = new Stat("legSplashDamage", StatCat.function),
-    legSplashRange = new Stat("legSplashRange", StatCat.function),
     targetsAir = new Stat("targetsAir", StatCat.function),
     targetsGround = new Stat("targetsGround", StatCat.function),
     damage = new Stat("damage", StatCat.function),
@@ -100,6 +99,7 @@ public class Stat implements Comparable<Stat>{
     activationTime = new Stat("activationTime", StatCat.function),
     moduleTier = new Stat("moduletier", StatCat.function),
     unitType = new Stat("unittype", StatCat.function),
+    receiveRate = new Stat("receiveRate", StatCat.function),
 
     booster = new Stat("booster", StatCat.optional),
     boostEffect = new Stat("boostEffect", StatCat.optional),

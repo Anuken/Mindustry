@@ -16,7 +16,7 @@ configurations{ natives }
 
 repositories{
     mavenCentral()
-    maven{ url "https://maven.google.com" }
+    maven{ url = "https://maven.google.com" }
 }
 
 task deploy(type: Copy){
@@ -71,7 +71,7 @@ android{
         }
         props.store(file('../core/assets/version.properties').newWriter(), null)
 
-        multiDexEnabled true
+        multiDexEnabled = true
     }
 
     compileOptions{
@@ -114,7 +114,7 @@ android{
     if(project.hasProperty("RELEASE_STORE_FILE") || System.getenv("CI") == "true"){
         buildTypes{
             release{
-                signingConfig signingConfigs.release
+                signingConfig = signingConfigs.release
             }
         }
     }

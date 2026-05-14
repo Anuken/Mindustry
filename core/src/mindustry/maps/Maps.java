@@ -94,7 +94,12 @@ public class Maps{
 
     /** Returns a list of only default maps. */
     public Seq<Map> defaultMaps(){
-        return maps.select(m -> !m.custom);
+        return maps.select(m -> !m.custom && m.mod == null);
+    }
+
+    /** Returns a list of only modded maps. */
+    public Seq<Map> moddedMaps(){
+        return maps.select(m -> m.mod != null);
     }
 
     public Map byName(String name){

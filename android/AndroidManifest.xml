@@ -14,7 +14,6 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:isGame="true"
             android:theme="@style/ArcTheme"
-            android:usesCleartextTraffic="true"
             android:appCategory="game"
             android:label="@string/app_name"
             android:fullBackupContent="@xml/backup_rules"
