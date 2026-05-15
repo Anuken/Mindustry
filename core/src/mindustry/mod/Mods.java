@@ -69,8 +69,10 @@ public class Mods implements Loadable{
         return result;
     }
 
-    /** @return a file named 'config.json' in the config folder for the specified mod.
-     * Call this in init(). */
+    /**
+     * @return a file named 'config.json' in the config folder for the specified mod.
+     * Call this in init().
+     */
     public Fi getConfig(Mod mod){
         return getConfigFolder(mod).child("config.json");
     }
@@ -355,13 +357,17 @@ public class Mods implements Loadable{
 
     private void loadIcon(LoadedMod mod){
         //try to load icon for each mod that can have one
-        if(mod.root.child("icon.png").exists() && !headless){
-            try{
-                mod.iconTexture = new Texture(mod.root.child("icon.png"));
-                mod.iconTexture.setFilter(TextureFilter.linear);
-            }catch(Throwable t){
-                Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
-            }
+        if(headless) return;
+
+        Fi icon = mod.root.child("icon.png");
+        if(!icon.exists()) icon = mod.root.child("preview.png");
+        if(!icon.exists()) return;
+
+        try{
+            mod.iconTexture = new Texture(icon);
+            mod.iconTexture.setFilter(TextureFilter.linear);
+        }catch(Throwable t){
+            Log.err("Failed to load icon for mod '@'.", mod.name, t);
         }
     }
 
@@ -430,10 +436,10 @@ public class Mods implements Loadable{
     private PageType getPage(Fi file){
         String path = file.path();
         return
-            path.contains("sprites/blocks/environment") || path.contains("sprites-override/blocks/environment") ? PageType.environment :
-            path.contains("sprites/rubble") || path.contains("sprites-override/rubble") ? PageType.rubble :
-            path.contains("sprites/ui") || path.contains("sprites-override/ui") ? PageType.ui :
-            PageType.main;
+        path.contains("sprites/blocks/environment") || path.contains("sprites-override/blocks/environment") ? PageType.environment :
+        path.contains("sprites/rubble") || path.contains("sprites-override/rubble") ? PageType.rubble :
+        path.contains("sprites/ui") || path.contains("sprites-override/ui") ? PageType.ui :
+        PageType.main;
     }
 
     /** Removes a mod file and marks it for requiring a restart. */
@@ -494,7 +500,7 @@ public class Mods implements Loadable{
         return failedToLaunch && Core.settings.getBool("modcrashdisable", true);
     }
 
-    /** Loads all mods from the folder, but does not call any methods on them.*/
+    /** Loads all mods from the folder, but does not call any methods on them. */
     public void load(){
         var candidates = new Seq<Fi>();
 
@@ -615,7 +621,7 @@ public class Mods implements Loadable{
                 //ignore special folders like bundles or sprites
                 if(file.isDirectory() && !specialFolders.contains(file.name())){
                     file.walk(f -> tree.addFile(mod.file.isDirectory() ? f.path().substring(1 + mod.file.path().length()) :
-                        zipFolder ? f.path().substring(parentName.length() + 1) : f.path(), f));
+                    zipFolder ? f.path().substring(parentName.length() + 1) : f.path(), f));
                 }
             }
 
@@ -653,7 +659,7 @@ public class Mods implements Loadable{
     private void checkWarnings(){
         //show 'scripts have errored' info
         if(scripts != null && scripts.hasErrored()){
-           ui.showErrorMessage("@mod.scripts.disable");
+            ui.showErrorMessage("@mod.scripts.disable");
         }
 
         //show list of errored content
@@ -987,7 +993,7 @@ public class Mods implements Loadable{
         return mods.select(l -> !l.meta.hidden && l.enabled()).map(l -> l.name + ":" + l.meta.version);
     }
 
-    /** Makes a mod enabled or disabled. shifts it.*/
+    /** Makes a mod enabled or disabled. shifts it. */
     public void setEnabled(LoadedMod mod, boolean enabled){
         if(mod.enabled() != enabled){
             Core.settings.put("mod-" + mod.name + "-enabled", enabled);
@@ -998,8 +1004,10 @@ public class Mods implements Loadable{
         }
     }
 
-    /** @return the mods that the client is missing.
-     * The inputted array is changed to contain the extra mods that the client has but the server doesn't.*/
+    /**
+     * @return the mods that the client is missing.
+     * The inputted array is changed to contain the extra mods that the client has but the server doesn't.
+     */
     public Seq<String> getIncompatibility(Seq<String> out){
         Seq<String> mods = getModStrings();
         Seq<String> result = mods.copy();
@@ -1113,8 +1121,10 @@ public class Mods implements Loadable{
         return files.length == 1 && files[0].isDirectory() ? files[0] : fi;
     }
 
-    /** Loads a mod file+meta, but does not add it to the list.
-     * Note that directories can be loaded as mods. */
+    /**
+     * Loads a mod file+meta, but does not add it to the list.
+     * Note that directories can be loaded as mods.
+     */
     private LoadedMod loadMod(Fi sourceFile, boolean overwrite, boolean initialize) throws Exception{
 
         ZipFi rootZip = null;
@@ -1184,14 +1194,14 @@ public class Mods implements Loadable{
             //make sure the main class exists before loading it; if it doesn't just don't put it there
             //if the mod is explicitly marked as java, try loading it anyway
             if(
-                (mainFile.exists() || meta.java) &&
-                !skipModLoading() &&
-                Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
-                Version.isAtLeast(meta.minGameVersion) &&
-                (meta.getMinMajor() >= minJavaModGameVersion || headless || meta.legacyCompatible) &&
-                !meta.isBlacklisted() &&
-                !skipModCode &&
-                initialize
+            (mainFile.exists() || meta.java) &&
+            !skipModLoading() &&
+            Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
+            Version.isAtLeast(meta.minGameVersion) &&
+            (meta.getMinMajor() >= minJavaModGameVersion || headless || meta.legacyCompatible) &&
+            !meta.isBlacklisted() &&
+            !skipModCode &&
+            initialize
             ){
                 if(ios){
                     throw new ModLoadException("Java class mods are not supported on iOS.");
@@ -1203,11 +1213,11 @@ public class Mods implements Loadable{
 
                 //detect mods that incorrectly package mindustry in the jar
                 if((main.getSuperclass().getName().equals("mindustry.mod.Plugin") || main.getSuperclass().getName().equals("mindustry.mod.Mod")) &&
-                    main.getSuperclass().getClassLoader() != Mod.class.getClassLoader()){
+                main.getSuperclass().getClassLoader() != Mod.class.getClassLoader()){
                     throw new ModLoadException(
-                        "This mod/plugin has loaded Mindustry dependencies from its own class loader. " +
-                        "You are incorrectly including Mindustry dependencies in the mod JAR - " +
-                        "make sure Mindustry is declared as `compileOnly` in Gradle, and that the JAR is created with `runtimeClasspath`!"
+                    "This mod/plugin has loaded Mindustry dependencies from its own class loader. " +
+                    "You are incorrectly including Mindustry dependencies in the mod JAR - " +
+                    "make sure Mindustry is declared as `compileOnly` in Gradle, and that the JAR is created with `runtimeClasspath`!"
                     );
                 }
 
@@ -1412,7 +1422,7 @@ public class Mods implements Loadable{
         }
     }
 
-    /** Mod metadata information.*/
+    /** Mod metadata information. */
     public static class ModMeta{
         /** Name as defined in mod.json. Stripped of colors, but may contain spaces. */
         public String name;
