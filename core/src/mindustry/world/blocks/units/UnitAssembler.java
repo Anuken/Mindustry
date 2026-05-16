@@ -96,11 +96,11 @@ public class UnitAssembler extends PayloadBlock{
 
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
-        //overlapping construction areas not allowed; grow by a tiny amount so edges can't overlap either.
+        //overlapping construction areas not allowed unless it s being replaced; grow by a tiny amount so edges can't overlap either.
         Rect rect = getRect(Tmp.r1, tile.worldx() + offset, tile.worldy() + offset, rotation).grow(0.1f);
         return
-            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> b.block instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
-            !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> ((ConstructBuild)b).current instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
+            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> b != tile.build && b.block instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
+            !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> b != tile.build && ((ConstructBuild)b).current instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
     }
 
     @Override
