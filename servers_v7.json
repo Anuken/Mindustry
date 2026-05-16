@@ -282,4 +282,12 @@
       "183.131.51.178"
     ]
   }
+,
+  {
+    "name": "Mindustry TOKYO",
+    "address": [
+      "mindustry-tokyo.xvps.jp:6567",
+      "mindustry-tokyo.xvps.jp:6568"
+    ]
+  }
 ]
