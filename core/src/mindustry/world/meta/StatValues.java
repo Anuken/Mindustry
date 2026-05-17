@@ -658,7 +658,7 @@ public class StatValues{
                         String key = "block." + blockName + "." + content.name + ".info";
                         if(Core.bundle.has(key)){
                             bt.table(desc -> {
-                                desc.image(Icon.infoCircle.getRegion()).size(20).color(Color.lightGray).scaling(Scaling.fit).padRight(8).padLeft(12);
+                                desc.image(Icon.info.getRegion()).size(20).color(Color.lightGray).scaling(Scaling.fit).padRight(8).padLeft(12);
                                 desc.add("[lightgray]" + Core.bundle.get(key));
                             });
                             
