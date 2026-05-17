@@ -3389,8 +3389,6 @@ public class Blocks{
                     splashDamage = 20f;
                     splashDamageRadius = 20f;
                     scaledSplashDamage = true;
-                    pierce = true;
-                    pierceCap = 2;
                     armorMultiplier = 2;
                     fragBullets = 4;
                     fragBullet = new BasicBulletType(3f, 5){{
