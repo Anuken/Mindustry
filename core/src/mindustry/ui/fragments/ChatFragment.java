@@ -39,6 +39,7 @@ public class ChatFragment extends Table{
     private Seq<String> history = new Seq<>();
     private int historyPos = 0;
     private int scrollPos = 0;
+    private boolean lastFrameHadFocus;
 
     public ChatFragment(){
         super();
@@ -59,26 +60,29 @@ public class ChatFragment extends Table{
         });
 
         update(() -> {
+            boolean hasOtherFocus = (scene.getKeyboardFocus() != null && !chatfield.hasKeyboard()) && !(ui.minimapfrag.shown() && !(scene.getKeyboardFocus() instanceof TextField));
 
-            if(net.active() && input.keyTap(Binding.chat) && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null || ui.minimapfrag.shown()) && !ui.consolefrag.shown()){
+            if(net.active() && input.keyTap(Binding.chat) && !hasOtherFocus && !lastFrameHadFocus && !ui.consolefrag.shown()){
                 toggle();
             }
 
             if(shown){
-                if(input.keyTap(Binding.chat_history_prev) && historyPos < history.size - 1){
+                if(input.keyTap(Binding.chatHistoryPrev) && historyPos < history.size - 1){
                     if(historyPos == 0) history.set(0, chatfield.getText());
                     historyPos++;
                     updateChat();
                 }
-                if(input.keyTap(Binding.chat_history_next) && historyPos > 0){
+                if(input.keyTap(Binding.chatHistoryNext) && historyPos > 0){
                     historyPos--;
                     updateChat();
                 }
-                if(input.keyTap(Binding.chat_mode)){
+                if(input.keyTap(Binding.chatMode)){
                     nextMode();
                 }
-                scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size - messagesShown));
+                scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chatScroll), 0, Math.max(0, messages.size - messagesShown));
             }
+
+            lastFrameHadFocus = hasOtherFocus;
         });
 
         history.insert(0, "");
@@ -194,6 +198,26 @@ public class ChatFragment extends Table{
         }
     }
 
+    //ping format: "x,y [text]"
+    private void checkPing(String message){
+        int comma = message.indexOf(',');
+        if(comma != -1){
+            int space = message.indexOf(' ', comma + 1);
+            //handle a space after the comma
+            boolean extra = false;
+            if(space == comma + 1){
+                extra = true;
+                space = message.indexOf(' ', comma + 2);
+            }
+            if(space != -1){
+                int x = Strings.parseInt(message, 10, -1, 0, comma), y = Strings.parseInt(message, 10, -1, comma + 1 + (extra ? 1 : 0), space);
+                if(world.tiles.in(x, y)){
+                    Call.pingLocation(player, x * tilesize, y * tilesize, message.substring(space).trim());
+                }
+            }
+        }
+    }
+
     private void sendMessage(){
         String message = chatfield.getText().trim();
         clearChatInput();
@@ -201,9 +225,11 @@ public class ChatFragment extends Table{
         //avoid sending prefix-empty messages
         if(message.isEmpty() || (message.startsWith(mode.prefix) && message.substring(mode.prefix.length()).isEmpty())) return;
 
-        history.insert(1, message);
+        if(history.size < 2 || !history.get(1).equals(message)) history.insert(1, message);
 
         message = UI.formatIcons(message);
+
+        checkPing(message);
 
         Events.fire(new ClientChatEvent(message));
 

@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 import static mindustry.entities.Puddles.*;
 
 @EntityDef(value = {Puddlec.class}, pooled = true)
-@Component(base = true)
+@Component(base = true, genInterface = false)
 abstract class PuddleComp implements Posc, Puddlec, Drawc, Syncc{
     private static final Rect rect = new Rect(), rect2 = new Rect();
 

@@ -66,7 +66,7 @@ public class LCanvas extends Table{
 
     public static void tooltip(Cell<?> cell, String key){
         String lkey = key.toLowerCase().replace(" ", "");
-        if(Core.settings.getBool("logichints", true) && Core.bundle.has(lkey)){
+        if(Core.bundle.has(lkey)){
             var tip = new Tooltip(t -> t.background(Styles.black8).margin(4f).add("[lightgray]" + Core.bundle.get(lkey)).style(Styles.outlineLabel));
 
             //mobile devices need long-press tooltips
@@ -88,7 +88,6 @@ public class LCanvas extends Table{
             }else{
                 cell.get().addListener(tip);
             }
-
         }
     }
 
@@ -129,6 +128,10 @@ public class LCanvas extends Table{
 
     public void add(LStatement statement){
         statements.addChild(new StatementElem(statement));
+    }
+
+    public void addAt(int at, LStatement statement){
+        statements.addChildAt(at, new StatementElem(statement));
     }
 
     public String save(){
@@ -433,8 +436,12 @@ public class LCanvas extends Table{
 
                 addressLabel = t.add(index + "").style(Styles.outlineLabel).color(color).padRight(8).get();
 
+                //taken from foo's client
+                t.button(Icon.add, Styles.logici, () -> Vars.ui.logic.showAddDialog(index + 1))
+                .disabled(b -> canvas.statements.getChildren().size >= LExecutor.maxInstructions).size(24f).padRight(6);
+
                 t.button(Icon.copy, Styles.logici, () -> {
-                }).size(24f).padRight(6).get().tapped(this::copy);
+                }).size(24f).padRight(6).disabled(i -> canvas.statements.getChildren().size >= LExecutor.maxInstructions).get().tapped(this::copy);
 
                 t.button(Icon.cancel, Styles.logici, () -> {
                     remove();
@@ -447,6 +454,8 @@ public class LCanvas extends Table{
 
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                        //don't start dragging when pressing the menu buttons
+                        if(event.targetActor instanceof Image) return false;
 
                         if(button == KeyCode.mouseMiddle){
                             copy();

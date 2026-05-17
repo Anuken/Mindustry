@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -9,12 +10,14 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
@@ -22,14 +25,14 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Bulletc.class}, pooled = true, serialize = false)
 @Component(base = true)
-abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
+abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Bulletc, Timerc, Senseable, Settable{
     @Import Team team;
     @Import Entityc owner;
     @Import float x, y, damage, lastX, lastY, time, lifetime;
-    @Import Vec2 vel;
 
     IntSeq collided = new IntSeq(6);
     BulletType type;
+    Vec2 vel = new Vec2();
 
     Object data;
     float fdata;
@@ -39,11 +42,13 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     //setting this variable to true prevents lifetime from decreasing for a frame.
     transient boolean keepAlive;
+    transient boolean justSpawned = true;
     /** Unlike the owner, the shooter is the original entity that created this bullet. For a second-stage missile, the shooter would be the turret, but the owner would be the last missile stage.*/
     transient Entityc shooter;
     transient @Nullable Tile aimTile;
     transient float aimX, aimY;
     transient float originX, originY;
+    transient float buildingDamageMultiplier;
     transient @Nullable Mover mover;
     transient boolean absorbed, hit;
     transient @Nullable Trail trail;
@@ -151,6 +156,15 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void update(){
+        //for one frame, bullets do not move - this is because bullet.update() is called immediately after the weapon updates
+        //if the bullet moved immediately, it would spawn visually offset from the weapon at low FPS values
+        if(!justSpawned){
+            x += vel.x * Time.delta;
+            y += vel.y * Time.delta;
+            vel.scl(Math.max(1f - type.drag * Time.delta, 0));
+        }
+        justSpawned = false;
+
         if(mover != null){
             mover.move(self());
         }
@@ -252,7 +266,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                         return;
                     }
                 }else{
-                    boolean remove = false;
+                    boolean remove = false, doRemove = false;
                     float health = build.health;
 
                     if(build.team != team){
@@ -267,13 +281,16 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
                         if(!type.pierceBuilding){
                             hit = true;
-                            remove();
+                            doRemove = true;
                         }else{
                             collided.add(build.id);
                         }
                     }
 
                     type.hitTile(self(), build, x * tilesize, y * tilesize, health, true);
+                    if(doRemove){
+                        remove();
+                    }
 
                     //stop raycasting when building is hit
                     if(type.pierceBuilding) return;
@@ -324,5 +341,62 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Override
     public float rotation(){
         return vel.isZero(0.001f) ? rotation : vel.angle();
+    }
+
+
+    @Override
+    public double sense(LAccess sensor){
+        return switch(sensor){
+            case rotation -> rotation;
+            case health -> damage;
+            case maxHealth -> type.damage;
+            case x -> World.conv(x);
+            case y -> World.conv(y);
+            case velocityX -> vel.x * 60f / tilesize;
+            case velocityY -> vel.y * 60f / tilesize;
+            case dead -> !isAdded() ? 1 : 0;
+            case team -> team.id;
+            case range -> type.range;
+            case shootX -> World.conv(aimX());
+            case shootY -> World.conv(aimY());
+            case speed -> type.speed * 60f / tilesize;
+            case size -> type.hitSize / tilesize;
+            case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
+            case bulletLifetime -> this.lifetime;
+            case bulletTime -> this.time;
+            default -> Float.NaN;
+        };
+    }
+
+    @Override
+    public void setProp(LAccess prop, double value){
+        switch(prop){
+            case health -> damage = (float)value;
+            case x -> x = World.unconv((float)value);
+            case y -> y = World.unconv((float)value);
+            case velocityX -> vel.x = (float)(value * tilesize / 60d);
+            case velocityY -> vel.y = (float)(value * tilesize / 60d);
+            case rotation -> rotation = (float)value;
+            case team -> this.team = Team.get((int)value);
+            case speed -> vel.setLength((float)value * 8f);
+            case bulletLifetime -> this.lifetime = (float)value;
+            case bulletTime -> this.time = (float)value;
+        }
+    }
+
+    @Override
+    public void setProp(UnlockableContent content, double value){
+
+    }
+
+    @Override
+    public void setProp(LAccess prop, Object value){
+        switch(prop){
+            case team -> {
+                if(value instanceof Team t){
+                    team = t;
+                }
+            }
+        }
     }
 }

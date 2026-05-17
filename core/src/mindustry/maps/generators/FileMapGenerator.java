@@ -1,6 +1,7 @@
 package mindustry.maps.generators;
 
 import arc.math.geom.*;
+import arc.struct.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -9,6 +10,7 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -17,12 +19,33 @@ public class FileMapGenerator implements WorldGenerator{
     public final SectorPreset preset;
 
     public FileMapGenerator(String mapName, SectorPreset preset){
-        //try to look for the prefixed map first, then the mod-specific one
-        this.map = maps != null ? maps.loadInternalMap(
-            preset.minfo.mod == null || Vars.tree.get("maps/" + mapName + "." + mapExtension).exists() ?
-                mapName :
-                mapName.substring(1 + preset.minfo.mod.name.length())
-        ) : null;
+        if(maps == null){
+            this.map = null;
+        }else{
+            Seq<String> candidates = new Seq<>(4);
+
+            //<planetname>/<mapname>.msav
+            candidates.add(preset.planet.name + "/" + mapName);
+
+            //<mapname>.msav (directly in maps folder)
+            candidates.add(mapName);
+
+            //for modded maps, try loading without the mod prefix
+            if(preset.minfo.mod != null){
+                String baseName = mapName.substring(1 + preset.minfo.mod.name.length());
+
+                //<planetname>/<mapname>.msav
+                candidates.add(preset.planet.name + "/" + baseName);
+
+                //<mapname>.msav (directly in maps folder)
+                candidates.add(baseName);
+            }
+
+            //find the first matching candidate to load
+            String fileName = candidates.find(name -> Vars.tree.get("maps/" + name + "." + mapExtension).exists());
+
+            this.map = maps.loadInternalMap(fileName == null ? candidates.first() : fileName);
+        }
 
         this.preset = preset;
     }
@@ -38,7 +61,7 @@ public class FileMapGenerator implements WorldGenerator{
     }
 
     @Override
-    public void generate(Tiles tiles){
+    public void generate(Tiles tiles, WorldParams params){
         if(map == null) throw new RuntimeException("Generator has null map, cannot be used.");
 
         Sector sector = state.rules.sector;
@@ -72,6 +95,9 @@ public class FileMapGenerator implements WorldGenerator{
 
         boolean anyCores = false;
 
+        //TODO: unsure if indexer even works at this stage
+        Block coreTypeToUse = state.rules.defaultTeam.cores().isEmpty() ? sector.planet.defaultCore : state.rules.defaultTeam.core().block;
+
         for(Tile tile : tiles){
 
             if(tile.overlay() == Blocks.spawn){
@@ -83,8 +109,26 @@ public class FileMapGenerator implements WorldGenerator{
                 });
             }
 
-            if(tile.isCenter() && tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
-                if(state.rules.sector != null && state.rules.sector.allowLaunchLoadout()){
+            if(params.corePositionOverride != 0 && sector != null){
+                if(tile.pos() == params.corePositionOverride){
+                    if(sector.allowLaunchLoadout()){
+                        Schematics.placeLaunchLoadout(tile.x, tile.y);
+                    }else{
+                        //if there's an override and no loadout schematic is allowed, try to place a fitting core instead.
+                        tile.setBlock(coreTypeToUse, state.rules.defaultTeam, 0);
+                    }
+                    anyCores = true;
+
+                    if(preset.addStartingItems || !preset.planet.allowLaunchLoadout){
+                        tile.build.items.clear();
+                        tile.build.items.add(state.rules.loadout);
+                    }
+                }else if(tile.build instanceof CoreBuild && tile.team() == state.rules.defaultTeam && tile.build.pos() != params.corePositionOverride){
+                    //other cores placed must be cleared; they have been overridden
+                    tile.remove();
+                }
+            }else if(tile.isCenter() && tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
+                if(sector != null && sector.allowLaunchLoadout()){
                     Schematics.placeLaunchLoadout(tile.x, tile.y);
                 }
                 anyCores = true;

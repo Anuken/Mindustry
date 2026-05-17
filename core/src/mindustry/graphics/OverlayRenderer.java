@@ -50,8 +50,12 @@ public class OverlayRenderer{
 
         Seq<Vec2> pos = new Seq<>();
         Seq<CoreBuild> teams = new Seq<>();
-        for(TeamData team : state.teams.active){
-            for(CoreBuild b : team.cores){
+        for(TeamData data : state.teams.active){
+            if(!data.team.rules().protectCores){
+                continue;
+            }
+
+            for(CoreBuild b : data.cores){
                 teams.add(b);
                 pos.add(new Vec2(b.x, b.y));
             }
@@ -71,10 +75,14 @@ public class OverlayRenderer{
     public void drawBottom(){
         InputHandler input = control.input;
 
+        if(renderer.showOtherBuildPlans){
+            input.drawOtherBuildPlans();
+        }
+
         if(player.dead()) return;
 
         if(player.isBuilder()){
-            player.unit().drawBuildPlans();
+            input.drawBuildPlans();
         }
 
         input.drawBottom();
@@ -113,8 +121,6 @@ public class OverlayRenderer{
             }
         }
 
-        if(player.dead()) return; //dead players don't draw
-
         InputHandler input = control.input;
 
         Sized select = input.selectedUnit();
@@ -150,8 +156,10 @@ public class OverlayRenderer{
             tile.drawConfigure();
         }
 
-        input.drawTop();
+        if(!player.dead()) input.drawTop();
         input.drawUnitSelection();
+
+        if(player.dead()) return; //dead players don't draw
 
         buildFade = Mathf.lerpDelta(buildFade, input.isPlacing() || input.isUsingSchematic() ? 1f : 0f, 0.06f);
 
@@ -179,7 +187,7 @@ public class OverlayRenderer{
                 state.teams.eachEnemyCore(player.team(), core -> {
                     //it must be clear that there is a core here.
                     float br = state.rules.buildRadius(core.team);
-                    if(/*core.wasVisible && */Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(core.x, core.y, br * 2f))){
+                    if(/*core.wasVisible && */br > 0f && Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(core.x, core.y, br * 2f))){
                         Draw.color(Color.darkGray);
                         Lines.circle(core.x, core.y - 2,br);
                         Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time, 10f, 0.5f));
@@ -214,7 +222,7 @@ public class OverlayRenderer{
                    build.drawDisabled();
                 }
 
-                if(Core.input.keyDown(Binding.rotateplaced) && build.block.rotate && build.block.quickRotate && build.interactable(player.team())){
+                if(Core.input.keyDown(Binding.rotatePlaced) && build.block.rotate && build.block.quickRotate && build.interactable(player.team())){
                     control.input.drawArrow(build.block, build.tileX(), build.tileY(), build.rotation, true);
                     Draw.color(Pal.accent, 0.3f + Mathf.absin(4f, 0.2f));
                     Fill.square(build.x, build.y, build.block.size * tilesize/2f);
@@ -225,7 +233,7 @@ public class OverlayRenderer{
 
         input.drawOverSelect();
 
-        if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller != null && ai.controller.isValid()){
+        if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller != null && ai.controller.isValid() && (state.isEditor() || !ai.controller.block.privileged)){
             var build = ai.controller;
             Drawf.square(build.x, build.y, build.block.size * tilesize/2f + 2f);
             if(!unit.within(build, unit.hitSize * 2f)){
@@ -244,9 +252,9 @@ public class OverlayRenderer{
 
             Building build = world.buildWorld(v.x, v.y);
             if(input.canDropItem() && build != null && build.interactable(player.team()) && build.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(build, itemTransferRange) &&
-                input.itemDepositCooldown <= 0f){
+                input.canDepositItem(build)){
 
-                boolean invalid = (state.rules.onlyDepositCore && !(build instanceof CoreBuild));
+                boolean invalid = !build.allowDeposit();
 
                 Lines.stroke(3f, Pal.gray);
                 Lines.square(build.x, build.y, build.block.size * tilesize / 2f + 3 + Mathf.absin(Time.time, 5f, 1f));

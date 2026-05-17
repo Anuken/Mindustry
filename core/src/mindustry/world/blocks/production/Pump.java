@@ -41,30 +41,31 @@ public class Pump extends LiquidBlock{
         super.drawPlace(x, y, rotation, valid);
 
         Tile tile = world.tile(x, y);
-        if(tile == null) return;
 
-        float amount = 0f;
-        Liquid liquidDrop = null;
+        if(valid && tile != null){
+            float amount = 0f;
+            Liquid liquidDrop = null;
 
-        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-            if(canPump(other)){
-                if(liquidDrop != null && other.floor().liquidDrop != liquidDrop){
-                    liquidDrop = null;
-                    break;
+            for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
+                if(canPump(other)){
+                    if(liquidDrop != null && other.floor().liquidDrop != liquidDrop){
+                        liquidDrop = null;
+                        break;
+                    }
+                    liquidDrop = other.floor().liquidDrop;
+                    amount += other.floor().liquidMultiplier;
                 }
-                liquidDrop = other.floor().liquidDrop;
-                amount += other.floor().liquidMultiplier;
             }
-        }
 
-        if(liquidDrop != null){
-            float width = drawPlaceText(Core.bundle.formatFloat("bar.pumpspeed", amount * pumpAmount * 60f, 0), x, y, valid);
-            float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
-            float ratio = (float)liquidDrop.fullIcon.width / liquidDrop.fullIcon.height;
-            Draw.mixcol(Color.darkGray, 1f);
-            Draw.rect(liquidDrop.fullIcon, dx, dy - 1, s * ratio, s);
-            Draw.reset();
-            Draw.rect(liquidDrop.fullIcon, dx, dy, s * ratio, s);
+            if(liquidDrop != null){
+                float width = drawPlaceText(Core.bundle.formatFloat("bar.pumpspeed", amount * pumpAmount * 60f, 0), x, y, valid);
+                float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
+                float ratio = (float)liquidDrop.fullIcon.width / liquidDrop.fullIcon.height;
+                Draw.mixcol(Color.darkGray, 1f);
+                Draw.rect(liquidDrop.fullIcon, dx, dy - 1, s * ratio, s);
+                Draw.reset();
+                Draw.rect(liquidDrop.fullIcon, dx, dy, s * ratio, s);
+            }
         }
     }
 
@@ -166,12 +167,12 @@ public class Pump extends LiquidBlock{
                     consume();
                     consTimer %= 1f;
                 }
-                
+
                 warmup = Mathf.approachDelta(warmup, maxPump > 0.001f ? 1f : 0f, warmupSpeed);
             }else{
                 warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
             }
-            
+
             totalProgress += warmup * Time.delta;
 
             if(liquidDrop != null){
@@ -183,7 +184,7 @@ public class Pump extends LiquidBlock{
         public float warmup(){
             return warmup;
         }
-        
+
         @Override
         public float progress(){
             return Mathf.clamp(consTimer / consumeTime);

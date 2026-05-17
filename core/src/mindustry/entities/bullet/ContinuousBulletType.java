@@ -85,7 +85,7 @@ public class ContinuousBulletType extends BulletType{
         if(timescaleDamage && b.owner instanceof Building build){
              b.damage *= build.timeScale();
         }
-        Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), currentLength(b), largeHit, laserAbsorb, pierceCap);
+        Damage.collideLine(b, b.team, b.x, b.y, b.rotation(), currentLength(b), largeHit, laserAbsorb, pierceCap);
         b.damage = damage;
     }
 

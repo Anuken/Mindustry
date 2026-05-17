@@ -118,8 +118,7 @@ public class MultiPacker implements Disposable{
 
         environment(4096),
         ui(4096),
-        rubble(4096, 2048),
-        editor(4096, 2048);
+        rubble(4096, 2048);
 
         public static final PageType[] all = values();
 

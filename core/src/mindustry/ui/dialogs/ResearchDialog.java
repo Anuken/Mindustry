@@ -46,6 +46,7 @@ public class ResearchDialog extends BaseDialog{
 
     public ItemSeq items;
 
+    private final Seq<Planet> rootPlanets = new Seq<>(false, 4);
     private boolean showTechSelect;
     private boolean needsRebuild;
 
@@ -142,7 +143,7 @@ public class ResearchDialog extends BaseDialog{
         addCloseButton();
 
         keyDown(key -> {
-            if(key == Core.keybinds.get(Binding.research).key){
+            if(key == Binding.research.value.key){
                 Core.app.post(this::hide);
             }
         });
@@ -214,21 +215,30 @@ public class ResearchDialog extends BaseDialog{
             ObjectMap<Sector, ItemSeq> cache = new ObjectMap<>();
 
             {
-                //first, find a planet associated with the current tech tree
-                Planet rootPlanet = lastNode.planet != null ? lastNode.planet : content.planets().find(p -> p.techTree == lastNode);
+                //first, find a planets associated with the current tech tree
+                rootPlanets.clear();
+                for(var planet : content.planets()){
+                    if(planet.techTree == lastNode || lastNode.planet == planet){
+                        rootPlanets.add(planet);
+                    }
+                }
 
                 //if there is no root, fall back to serpulo
-                if(rootPlanet == null) rootPlanet = Planets.serpulo;
+                if(rootPlanets.size == 0){
+                    rootPlanets.add(Planets.serpulo);
+                }
 
                 //add global counts of each sector
-                for(Sector sector : rootPlanet.sectors){
-                    if(sector.hasBase()){
-                        ItemSeq cached = sector.items();
-                        cache.put(sector, cached);
-                        cached.each((item, amount) -> {
-                            values[item.id] += Math.max(amount, 0);
-                            total += Math.max(amount, 0);
-                        });
+                for(Planet planet : rootPlanets){
+                    for(Sector sector : planet.sectors){
+                        if(sector.hasBase() && !sector.isFrozen()){
+                            ItemSeq cached = sector.items();
+                            cache.put(sector, cached);
+                            cached.each((item, amount) -> {
+                                values[item.id] += Math.max(amount, 0);
+                                total += Math.max(amount, 0);
+                            });
+                        }
                     }
                 }
             }
@@ -488,11 +498,17 @@ public class ResearchDialog extends BaseDialog{
             }
 
             if(mobile){
-                tapped(() -> {
-                    Element e = Core.scene.getHoverElement();
-                    if(e == this){
-                        hoverNode = null;
-                        rebuild();
+                addListener(new InputListener(){
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                        if(pointer == -1) return false;
+                        Element e = Core.scene.hit(Core.input.mouseX(pointer), Core.input.mouseY(pointer), true);
+                        if(e == View.this){
+                            hoverNode = null;
+                            rebuild();
+                        }
+
+                        return false;
                     }
                 });
             }
@@ -586,7 +602,7 @@ public class ResearchDialog extends BaseDialog{
             treeLayout();
             rebuild();
             Core.scene.act();
-            Sounds.unlock.play();
+            Sounds.uiUnlock.play();
             Events.fire(new ResearchEvent(node.content));
         }
 
@@ -601,15 +617,21 @@ public class ResearchDialog extends BaseDialog{
             infoTable.remove();
             infoTable.clear();
             infoTable.update(null);
+            infoTable.touchable = Touchable.enabled;
 
             if(button == null) return;
 
             TechNode node = (TechNode)button.userObject;
 
-            infoTable.exited(() -> {
-                if(hoverNode == button && !infoTable.hasMouse() && !hoverNode.hasMouse()){
-                    hoverNode = null;
-                    rebuild();
+            infoTable.addListener(new InputListener(){
+                @Override
+                public void exit(InputEvent event, float x, float y, int pointer, Element fromActor){
+                    Element e = Core.scene.hit(Core.input.mouseX(pointer == -1 ? 0 : pointer), Core.input.mouseY(pointer == -1 ? 0 : pointer), true);
+
+                    if(hoverNode == button && !(e != null && (e == infoTable || e.isDescendantOf(infoTable) || e == hoverNode || e.isDescendantOf(hoverNode))) && (Core.app.isDesktop() || pointer == 0)){
+                        hoverNode = null;
+                        rebuild();
+                    }
                 }
             });
 
@@ -621,6 +643,7 @@ public class ResearchDialog extends BaseDialog{
             boolean selectable = selectable(node);
 
             infoTable.table(b -> {
+                b.left();
                 b.margin(0).left().defaults().left();
 
                 if(selectable){
@@ -712,7 +735,7 @@ public class ResearchDialog extends BaseDialog{
                     }else{
                         desc.add("@completed");
                     }
-                }).pad(9);
+                }).pad(9).left().growX();
 
                 if(mobile && locked(node) && !net.client()){
                     b.row();
@@ -725,11 +748,12 @@ public class ResearchDialog extends BaseDialog{
                         over = buttonDown;
                     }}, () -> spend(node)).disabled(i -> !canSpend(node)).growX().height(44f).colspan(3);
                 }
-            });
+            }).growX().left();
 
             infoTable.row();
             if(node.content.description != null && node.content.inlineDescription && selectable){
-                infoTable.table(t -> t.margin(3f).left().labelWrap(node.content.displayDescription()).color(Color.lightGray).growX()).fillX();
+                infoTable.table(t -> t.margin(3f).left().labelWrap(node.content.displayDescription()).color(Color.lightGray)
+                .minWidth(node.content.displayDescription().length() > 20 ? 270f : 0f).growX()).fillX();
             }
 
             addChild(infoTable);

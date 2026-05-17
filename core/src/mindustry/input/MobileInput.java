@@ -98,7 +98,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Building tile = world.buildWorld(x, y);
 
-            if((tile != null && player.team() != tile.team && (tile.team != Team.derelict || state.rules.coreCapture)) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
+            if((tile != null && (player.team() != tile.team && (tile.team != Team.derelict || state.rules.coreCapture)) && player.unit().type.canAttack) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
                 player.unit().mineTile = null;
                 target = tile;
             }
@@ -237,6 +237,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                             if(validPlace(plan.x, plan.y, plan.block, plan.rotation, null, true)){
                                 BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
                                 BuildPlan copy = plan.copy();
+                                plan.block.onNewPlan(copy);
 
                                 if(other == null){
                                     player.unit().addBuild(copy);
@@ -267,7 +268,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     public boolean showCancel(){
-        return !player.dead() && (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !hasSchematic();
+        return !player.dead() && (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !hasSchematic() && !ui.consolefrag.shown();
     }
 
     public boolean hasSchematic(){
@@ -280,18 +281,24 @@ public class MobileInput extends InputHandler implements GestureListener{
         group.fill(t -> {
             t.visible(this::showCancel);
             t.bottom().left();
-            t.button("@cancel", Icon.cancel, Styles.clearTogglet, () -> {
+            t.button(Icon.cancel, Styles.cleari, () -> {
                 if(!player.dead()){
                     player.unit().clearBuilding();
                 }
                 selectPlans.clear();
                 mode = none;
                 block = null;
-            }).width(155f).checked(b -> false).height(50f).margin(12f);
+            }).width(155f/2f).height(50f).margin(12f);
+
+            t.button(Icon.pause, Styles.clearTogglei, () -> isBuilding = !isBuilding).width(155f/2f).checked(b -> {
+                boolean paused = !isBuilding;
+                b.getStyle().imageUp = !paused ? Icon.pause : Icon.play;
+                return paused;
+            }).height(50f).margin(12f);
         });
 
         group.fill(t -> {
-            t.visible(() -> !hasSchematic() && !state.rules.editor);
+            t.visible(() -> !hasSchematic() && !ui.consolefrag.shown() && !(state.isEditor()&& Core.settings.getBool("editor-blocks-shown")));
             t.bottom().left();
 
             t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
@@ -312,13 +319,13 @@ public class MobileInput extends InputHandler implements GestureListener{
             //for better looking insets
             t.rect((x, y, w, h) -> {
                 if(Core.scene.marginBottom > 0){
-                    Tex.paneRight.draw(x, 0, w, y);
+                    Styles.black6.draw(x, 0, w, y);
                 }
             }).fillX().row();
         });
 
         group.fill(t -> {
-            t.visible(this::hasSchematic);
+            t.visible(() -> hasSchematic() && !ui.consolefrag.shown());
             t.bottom().left();
             t.table(Tex.pane, b -> {
                 b.defaults().size(50f);
@@ -361,7 +368,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(plan.breaking){
                 drawSelected(plan.x, plan.y, tile.block(), Pal.remove);
             }else{
-                plan.block.drawPlan(plan, allPlans(), true);
+                plan.block.drawPlan(plan, allPlans, true);
             }
         }
 
@@ -380,7 +387,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
                         drawArrow(block, plan.x, plan.y, plan.rotation);
                     }
-                    plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation) && getPlan(plan.x, plan.y, plan.block.size, null) == null);
+                    plan.block.drawPlan(plan, allPlans, validPlace(plan.x, plan.y, plan.block, plan.rotation) && getPlan(plan.x, plan.y, plan.block.size, null) == null);
                     drawSelected(plan.x, plan.y, plan.block, Pal.accent);
                 }
                 linePlans.each(this::drawOverPlan);
@@ -463,7 +470,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(plan.breaking){
             drawSelected(plan.x, plan.y, plan.tile().block(), Pal.remove);
         }else{
-            plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation));
+            plan.block.drawPlan(plan, allPlans, validPlace(plan.x, plan.y, plan.block, plan.rotation));
             drawSelected(plan.x, plan.y, plan.block, Pal.accent);
         }
     }
@@ -501,9 +508,9 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    public void useSchematic(Schematic schem){
+    public void useSchematic(Schematic schem, boolean checkHidden){
         selectPlans.clear();
-        selectPlans.addAll(schematics.toPlans(schem, World.toTile(Core.camera.position.x), World.toTile(Core.camera.position.y)));
+        selectPlans.addAll(schematics.toPlans(schem, World.toTile(Core.camera.position.x), World.toTile(Core.camera.position.y), checkHidden));
         lastSchematic = schem;
     }
 
@@ -540,7 +547,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 lastLineY = tileY;
             }else if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
                 //shoot on touch down when in keyboard mode
-                player.shooting = true;
+                player.shooting = !state.isEditor();
             }
         }
 
@@ -691,7 +698,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
             selectPlans.add(lastPlaced = new BuildPlan(cursor.x, cursor.y, rotation, block, block.nextConfig()));
-            block.onNewPlan(lastPlaced);
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasPlan(linked)){
             //add to selection queue if it's a valid BREAK position
             selectPlans.add(new BuildPlan(linked.x, linked.y));
@@ -700,6 +706,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             commandTap(x, y, queueCommandMode);
         }else if(commandMode){
             tapCommandUnit();
+        }else if(count == 3 && net.active()){
+            Call.pingLocation(Vars.player, worldx, worldy, null);
         }else{
             //control units
             if(count == 2){
@@ -745,6 +753,22 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
+    public void reset(){
+        super.reset();
+        manualShooting = down = false;
+    }
+
+    @Override
+    public void getSyncedPlans(Seq<BuildPlan> out){
+        super.getSyncedPlans(out);
+        for(var plan : selectPlans){
+            if(!plan.breaking){
+                out.add(plan);
+            }
+        }
+    }
+
+    @Override
     public void update(){
         super.update();
 
@@ -752,6 +776,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(!commandMode){
             queueCommandMode = false;
+        }else{
+            mode = none;
+            schematicMode = false;
         }
 
         //cannot rebuild and place at the same time
@@ -770,7 +797,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //validate commanding units
-        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid() || u.team != player.team());
+        selectedUnits.removeAll(u -> !u.allowCommand() || !u.isValid() || u.team != player.team());
 
         if(!commandMode){
             commandBuildings.clear();
@@ -778,14 +805,14 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //zoom camera
-        if(!locked  && !scene.hasKeyboard() && !scene.hasScroll() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
+        if(!locked  && !scene.hasKeyboard() && !scene.hasScroll() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotatePlaced) && (Core.input.keyDown(Binding.diagonalPlacement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
         if(!Core.settings.getBool("keyboard") && !locked && !scene.hasKeyboard()){
             //move camera around
             float camSpeed = 6f;
-            Vec2 delta = Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed);
+            Vec2 delta = Tmp.v1.setZero().add(Core.input.axis(Binding.moveX), Core.input.axis(Binding.moveY)).nor().scl(Time.delta * camSpeed);
             Core.camera.position.add(delta);
             if(!delta.isZero()){
                 spectating = null;
@@ -996,11 +1023,10 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         targetPos.set(Core.camera.position);
-        float attractDst = 15f;
 
+        float attractDst = 15f;
         float speed = unit.speed();
         float range = unit.hasWeapons() ? unit.range() : 0f;
-        float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
         boolean aimCursor = omni && player.shooting && type.hasWeapons() && !boosted && type.faceTarget;
 
@@ -1053,7 +1079,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         unit.movePref(movement);
 
         //update shooting if not building + not mining
-        if(!unit.activelyBuilding() && unit.mineTile == null){
+        if(!unit.activelyBuilding() && unit.mineTile == null && !state.isEditor()){
 
             //autofire targeting
             if(manualShooting){
@@ -1063,7 +1089,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 player.shooting = false;
                 if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
                     if(unit.type.canAttack){
-                        target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround);
+                        target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround && type.targetBuildingsMobile);
                     }
 
                     if(allowHealing && target == null){
@@ -1078,7 +1104,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //this may be a bad idea, aiming for a point far in front could work better, test it out
                 unit.aim(Core.input.mouseWorldX(), Core.input.mouseWorldY());
             }else{
-                Vec2 intercept = Predict.intercept(unit, target, bulletSpeed);
+                Vec2 intercept = player.unit().type.weapons.contains(w -> w.predictTarget) ? Predict.intercept(unit, target, type.weapons.first().bullet) : Tmp.v1.set(target);
 
                 player.mouseX = intercept.x;
                 player.mouseY = intercept.y;

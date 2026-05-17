@@ -46,9 +46,7 @@ public class Scripts implements Disposable{
             Object o = context.evaluateString(scope, text, "console.js", 1);
             if(o instanceof NativeJavaObject n) o = n.unwrap();
             if(o == null) o = "null";
-
             else if(o instanceof Undefined) o = "undefined";
-
             else if(o instanceof Object[] arr) o = Arrays.toString(arr);
             else if(o instanceof int[] arr) o = Arrays.toString(arr);
             else if(o instanceof float[] arr) o = Arrays.toString(arr);
@@ -57,6 +55,7 @@ public class Scripts implements Disposable{
             else if(o instanceof long[] arr) o = Arrays.toString(arr);
             else if(o instanceof char[] arr) o = Arrays.toString(arr);
             else if(o instanceof boolean[] arr) o = Arrays.toString(arr);
+            else if(o instanceof NativeArray arr) o = Arrays.toString(arr.toArray());
 
             var out = o.toString();
             return out == null ? "null" : out;

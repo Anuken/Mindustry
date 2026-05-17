@@ -13,6 +13,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.ui.*;
 
@@ -27,8 +28,8 @@ public class ConsoleFragment extends Table{
     private Label fieldlabel = new Label(">");
     private Font font;
     private GlyphLayout layout = new GlyphLayout();
-    private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = Scl.scl(50);
-    private Color shadowColor = new Color(0, 0, 0, 0.4f);
+    private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = mobile ? Scl.scl(60) : Scl.scl(50);
+    private Color shadowColor = new Color(0, 0, 0, 0.7f);
     private float textspacing = Scl.scl(10);
     private Seq<String> history = new Seq<>();
     private int historyPos = 0;
@@ -53,6 +54,8 @@ public class ConsoleFragment extends Table{
                 clearChatInput();
             }
 
+            if(mobile) open = false;
+
             return shown;
         });
 
@@ -62,18 +65,18 @@ public class ConsoleFragment extends Table{
             }
 
             if(open){
-                if(input.keyTap(Binding.chat_history_prev) && historyPos < history.size - 1){
+                if(input.keyTap(Binding.chatHistoryPrev) && historyPos < history.size - 1){
                     if(historyPos == 0) history.set(0, chatfield.getText());
                     historyPos++;
                     updateChat();
                 }
-                if(input.keyTap(Binding.chat_history_next) && historyPos > 0){
+                if(input.keyTap(Binding.chatHistoryNext) && historyPos > 0){
                     historyPos--;
                     updateChat();
                 }
             }
 
-            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size));
+            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chatScroll), 0, Math.max(0, messages.size));
         });
 
         history.insert(0, "");
@@ -102,7 +105,36 @@ public class ConsoleFragment extends Table{
 
         bottom().left().marginBottom(offsety).marginLeft(offsetx * 2).add(fieldlabel).padBottom(6f);
 
-        add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
+        if(mobile){
+            float s = 58f;
+            button(Icon.chat, Styles.cleari, () -> {
+                TextInput input = new TextInput();
+                input.accepted = text -> {
+                    chatfield.setText(text);
+                    sendMessage();
+                    clearChatInput();
+                    Core.input.setOnscreenKeyboardVisible(false);
+                };
+                Core.input.getTextInput(input);
+            }).left().padLeft(-offsetx * 2f - 5f).size(s);
+
+            button(Icon.upOpen, Styles.cleari, () -> scrollPos = Mathf.clamp(scrollPos + 1, 0, Math.max(0, messages.size))).disabled(b -> scrollPos >= messages.size).size(s).padLeft(4f);
+
+            button(Icon.downOpen, Styles.cleari, () -> scrollPos = Mathf.clamp(scrollPos - 1, 0, Math.max(0, messages.size))).disabled(b -> scrollPos <= 0).size(s).padLeft(4f);
+
+            button(Icon.fileText, Styles.cleari, () -> platform.showFileChooser(true, "js", file -> {
+                try{
+                    mods.getScripts().runConsole(file.readString());
+                }catch(Exception e){
+                    Log.err(e);
+                }
+            })).size(s).padLeft(4f);
+
+            button(Icon.cancel, Styles.cleari, () -> shown = false).size(s).padLeft(4f);
+
+        }else{
+            add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
+        }
     }
 
     protected void rect(float x, float y, float w, float h){
@@ -170,7 +202,7 @@ public class ConsoleFragment extends Table{
             return;
         }
 
-        history.insert(1, message);
+        if(history.size < 2 || !history.get(1).equals(message)) history.insert(1, message);
 
         addMessage("[lightgray]> " + message.replace("[", "[["));
         addMessage(mods.getScripts().runConsole(injectConsoleVariables() + message).replace("[", "[["));
@@ -185,7 +217,13 @@ public class ConsoleFragment extends Table{
         "var items = Vars.player.team().items();" +
         "var build = Vars.world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
         "var cursor = Vars.world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
+        "var cursorUnit = Units.closestEnemy(null, Core.input.mouseWorldX(), Core.input.mouseWorldY(), 70, u => true);" +
         "\n";
+    }
+
+    public void toggleMobile(){
+        shown = !shown;
+        open = false; //never true on mobile
     }
 
     public void toggle(){
@@ -194,19 +232,7 @@ public class ConsoleFragment extends Table{
             Events.fire(Trigger.openConsole);
             scene.setKeyboardFocus(chatfield);
             open = !open;
-            if(mobile){
-                TextInput input = new TextInput();
-                input.accepted = text -> {
-                    chatfield.setText(text);
-                    sendMessage();
-                    hide();
-                    Core.input.setOnscreenKeyboardVisible(false);
-                };
-                input.canceled = this::hide;
-                Core.input.getTextInput(input);
-            }else{
-                chatfield.fireClick();
-            }
+            chatfield.fireClick();
         }else{
             scene.setKeyboardFocus(null);
             open = !open;

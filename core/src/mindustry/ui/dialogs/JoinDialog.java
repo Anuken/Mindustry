@@ -25,6 +25,7 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class JoinDialog extends BaseDialog{
+    Seq<ServerGroup> tmpServers = new Seq<>();
     Seq<Server> servers = new Seq<>();
     Dialog add;
     Server renaming;
@@ -119,8 +120,6 @@ public class JoinDialog extends BaseDialog{
         });
 
         onResize(() -> {
-
-
             //only refresh on resize when the minimum dimension is smaller than the maximum preferred width
             //this means that refreshes on resize will only happen for small phones that need the list to fit in portrait mode
             //also resize if number of cols changes
@@ -270,7 +269,7 @@ public class JoinDialog extends BaseDialog{
                 t.left();
                 t.setColor(color);
 
-                t.add(host.name + "   " + versionString).style(Styles.outlineLabel).padLeft(10f).width(twidth).left().ellipsis(true);
+                t.add((host.name + "   " + versionString).replace('\n', ' ')).style(Styles.outlineLabel).padLeft(10f).width(twidth).left().ellipsis(true);
             }).growX().height(36f).row();
         }
 
@@ -299,7 +298,7 @@ public class JoinDialog extends BaseDialog{
             t.add("[lightgray]" + (Core.bundle.format("players" + (host.players == 1 && host.playerLimit <= 0 ? ".single" : ""),
                 (host.players == 0 ? "[lightgray]" : "[accent]") + host.players + (host.playerLimit > 0 ? "[lightgray]/[accent]" + host.playerLimit : "")+ "[lightgray]"))).left().row();
 
-            t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + (host.modeName == null ? host.mode.toString() : host.modeName)).width(twidth).left().ellipsis(true).row();
+            t.add(("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + (host.modeName == null ? host.mode.toString() : host.modeName)).replace('\n', ' ')).width(twidth).left().ellipsis(true).row();
 
             if(host.ping > 0){
                 t.add(Iconc.chartBar + " " + host.ping + "ms").style(Styles.outlineLabel).color(Pal.gray).left();
@@ -392,6 +391,10 @@ public class JoinDialog extends BaseDialog{
         global.clear();
         global.background(null);
 
+        if(!fetchedServers){
+            fetchServers();
+        }
+
         global.table(t -> {
             t.add("@search").padRight(10);
             t.field(serverSearch, text ->
@@ -400,8 +403,12 @@ public class JoinDialog extends BaseDialog{
             t.button(Icon.zoom, Styles.emptyi, this::refreshCommunity).size(54f);
         }).width((targetWidth() + 5f) * columns()).height(70f).pad(4).row();
 
-        for(int i = 0; i < defaultServers.size; i ++){
-            ServerGroup group = defaultServers.get((i + defaultServers.size/2) % defaultServers.size);
+        //if the servers have been fetched, use the fetched list
+        //otherwise use the cached list + the extra servers that may have been included by mods
+        var servers = fetchedServers ? defaultServers : tmpServers.clear().addAll(cachedServers).addAll(defaultServers);
+
+        for(int i = 0; i < servers.size; i ++){
+            ServerGroup group = servers.get((i + servers.size/2) % servers.size);
             boolean hidden = group.hidden();
             if(hidden && !showHidden){
                 continue;
@@ -412,7 +419,7 @@ public class JoinDialog extends BaseDialog{
             boolean favorite = group.favorite();
             if(group.prioritized){
                 addHeader(groupTable, group, hidden, favorite, false);
-            }else if (favorite){
+            }else if(favorite){
                 addHeader(groupTable, group, hidden, true, true);//weird behaviour if false?
             }
             //table containing all groups
@@ -432,10 +439,10 @@ public class JoinDialog extends BaseDialog{
                     }
 
                     if(!serverSearch.isEmpty() && !(group.name.toLowerCase().contains(serverSearch)
-                        || res.name.toLowerCase().contains(serverSearch)
-                        || res.description.toLowerCase().contains(serverSearch)
-                        || res.mapname.toLowerCase().contains(serverSearch)
-                        || (res.modeName != null && res.modeName.toLowerCase().contains(serverSearch)))) return;
+                        || Strings.stripColors(res.name.toLowerCase()).contains(serverSearch)
+                        || Strings.stripColors(res.description.toLowerCase()).contains(serverSearch)
+                        || Strings.stripColors(res.mapname.toLowerCase()).contains(serverSearch)
+                        || (res.modeName != null && Strings.stripColors(res.modeName.toLowerCase()).contains(serverSearch)))) return;
 
                     if(groupTable[0] == null){
                         addHeader(groupTable, group, hidden, favorite, true);
@@ -526,7 +533,7 @@ public class JoinDialog extends BaseDialog{
         inner.setColor(Pal.gray);
 
         button[0].clearChildren();
-        button[0].add(inner).growX();
+        button[0].add(inner).height(45f).growX();
 
         inner.add(host.name + "   " + versionString).left().padLeft(10f).wrap().style(Styles.outlineLabel).growX();
 
@@ -575,7 +582,7 @@ public class JoinDialog extends BaseDialog{
         local.button(b -> buildServer(host, b, true, true), style, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             safeConnect(host.address, host.port, host.version);
-        }).width(w).top().left().growY();
+        }).width(w).top().left().pad(2f).growY();
     }
 
     public void connect(String ip, int port){
@@ -655,6 +662,15 @@ public class JoinDialog extends BaseDialog{
         var urls = Version.type.equals("bleeding-edge") || Vars.forceBeServers ? serverJsonBeURLs : serverJsonURLs;
 
         if(Core.settings.getBool("communityservers", true)){
+            try{
+                if(!loadedServerCache && serverCacheFile.exists()){
+                    loadedServerCache = true;
+                    cachedServers.addAll(parseServerString(serverCacheFile.readString()));
+                }
+            }catch(Exception e){
+                Log.err("Failed to load cached server file", e);
+            }
+
             fetchServers(urls, 0);
         }
     }
@@ -662,9 +678,10 @@ public class JoinDialog extends BaseDialog{
     private static void fetchServers(String[] urls, int index){
         if(index >= urls.length) return;
 
-        //get servers
         Http.get(urls[index])
         .error(t -> {
+            if(fetchedServers) return;
+
             if(index < urls.length - 1){
                 //attempt fetching from the next URL upon failure
                 fetchServers(urls, index + 1);
@@ -673,26 +690,43 @@ public class JoinDialog extends BaseDialog{
             }
         })
         .submit(result -> {
-            Jval val = Jval.read(result.getResultAsString());
-            Seq<ServerGroup> servers = new Seq<>();
-            val.asArray().each(child -> {
-                String name = child.getString("name", "");
-                boolean prioritized = child.getBool("prioritized", false);
-                String[] addresses;
-                if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
-                    addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
-                }else{
-                    addresses = new String[]{child.getString("address", "<invalid>")};
-                }
-                servers.add(new ServerGroup(name, addresses, prioritized));
-            });
+            if(fetchedServers) return;
+
+            String text = result.getResultAsString();
+            Seq<ServerGroup> servers = parseServerString(text);
             //modify default servers on main thread
             Core.app.post(() -> {
-                servers.sort(s -> s.name == null ? Integer.MAX_VALUE : s.name.hashCode());
+                if(fetchedServers) return;
+
+                //cache the server list to a file, so it can be loaded in case of an outage later
+                try{
+                    serverCacheFile.writeString(text);
+                }catch(Exception e){
+                    Log.err("Failed to write server cache", e);
+                }
                 defaultServers.addAll(servers);
+                fetchedServers = true;
                 Log.info("Fetched @ community servers.", defaultServers.sum(s -> s.addresses.length));
             });
         });
+    }
+
+    private static Seq<ServerGroup> parseServerString(String str){
+        Jval val = Jval.read(str);
+        Seq<ServerGroup> servers = new Seq<>();
+        val.asArray().each(child -> {
+            String name = child.getString("name", "");
+            boolean prioritized = child.getBool("prioritized", false);
+            String[] addresses;
+            if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
+                addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
+            }else{
+                addresses = new String[]{child.getString("address", "<invalid>")};
+            }
+            servers.add(new ServerGroup(name, addresses, prioritized));
+        });
+        servers.sort(s -> s.name == null ? Integer.MAX_VALUE : s.name.hashCode());
+        return servers;
     }
 
     private void saveServers(){
@@ -706,10 +740,10 @@ public class JoinDialog extends BaseDialog{
             return Core.bundle.get("server.outdated");
         }else if(host.version < Version.build && Version.build != -1){
             return Core.bundle.get("server.outdated") + "\n" +
-            Core.bundle.format("server.version", host.version, "");
+            Core.bundle.format("server.version", host.version, host.versionType);
         }else if(host.version > Version.build && Version.build != -1){
             return Core.bundle.get("server.outdated.client") + "\n" +
-            Core.bundle.format("server.version", host.version, "");
+            Core.bundle.format("server.version", host.version, host.versionType);
         }else if(host.version == Version.build && Version.type.equals(host.versionType)){
             //not important
             return "";

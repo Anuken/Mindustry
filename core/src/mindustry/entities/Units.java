@@ -34,6 +34,18 @@ public class Units{
         return false;
     };
 
+    public static void notifyUnitSpawn(Unit unit){
+        if(net.server()){
+            Call.unitSpawn(new UnitSyncContainer(unit));
+        }
+    }
+
+    //syncs a unit spawn so that it appears immediately without waiting for a snapshot
+    @Remote(unreliable = true, priority = PacketPriority.low)
+    public static void unitSpawn(UnitSyncContainer container){
+        //doesn't actually do anything, reading calls add()
+    }
+
     @Remote(called = Loc.server)
     public static void unitCapDeath(Unit unit){
         if(unit != null){
@@ -85,6 +97,17 @@ public class Units{
     public static void unitDespawn(Unit unit){
         if(unit == null) return;
         Fx.unitDespawn.at(unit.x, unit.y, 0, unit);
+        unit.remove();
+    }
+
+    /** Removes a unit after spawning the death effects. */
+    @Remote(called = Loc.server)
+    public static void unitSafeDeath(Unit unit){
+        if(unit == null) return;
+        unit.type.deathExplosionEffect.at(unit.x, unit.y, unit.hitSize / 8f);
+        float shake = unit.type.deathShake < 0 ? unit.hitSize / 3f : unit.type.deathShake;
+        Effect.shake(shake, shake, unit);
+        unit.type.deathSound.at(unit, 1f, unit.type.deathSoundVolume);
         unit.remove();
     }
 
@@ -487,5 +510,16 @@ public class Units{
 
     public interface BuildingPriorityf{
         float priority(Building build);
+    }
+
+    public static class UnitSyncContainer{
+        public Unit unit;
+
+        public UnitSyncContainer(){
+        }
+
+        public UnitSyncContainer(Unit unit){
+            this.unit = unit;
+        }
     }
 }

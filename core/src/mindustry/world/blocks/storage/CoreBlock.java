@@ -13,6 +13,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -23,6 +24,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -45,6 +47,8 @@ public class CoreBlock extends StorageBlock{
     public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
     public float thrusterLength = 14f/4f, thrusterOffset = 0f;
     public boolean isFirstTier;
+    /** If false, players can't respawn at this core. */
+    public boolean allowSpawn = true;
     /** If true, this core type requires a core zone to upgrade. */
     public boolean requiresCoreZone;
     public boolean incinerateNonBuildable = false;
@@ -52,7 +56,9 @@ public class CoreBlock extends StorageBlock{
     public UnitType unitType = UnitTypes.alpha;
     public float landDuration = 160f;
     public Music landMusic = Musics.land;
-    public Music launchMusic = Musics.coreLaunch;
+    public float launchSoundVolume = 1f, landSoundVolume = 1f;
+    public Sound launchSound = Sounds.coreLaunch;
+    public Sound landSound = Sounds.coreLand;
     public Effect launchEffect = Fx.launch;
 
     public Interp landZoomInterp = Interp.pow3;
@@ -66,15 +72,20 @@ public class CoreBlock extends StorageBlock{
         solid = true;
         update = true;
         hasItems = true;
+        alwaysAllowDeposit = true;
         priority = TargetPriority.core;
         flags = EnumSet.of(BlockFlag.core);
         unitCapModifier = 10;
+        sync = false; //core items are synced elsewhere
         drawDisabled = false;
         canOverdrive = false;
+        commandable = true;
         envEnabled |= Env.space;
 
         //support everything
         replaceable = false;
+        destroySound = Sounds.explosionCore;
+        destroySoundVolume = 1.6f;
     }
 
     @Remote(called = Loc.server)
@@ -111,7 +122,6 @@ public class CoreBlock extends StorageBlock{
     public void setStats(){
         super.setStats();
 
-        stats.remove(Stat.buildTime);
         stats.add(Stat.unitType, table -> {
             table.row();
             table.table(Styles.grayPanel, b -> {
@@ -247,8 +257,29 @@ public class CoreBlock extends StorageBlock{
         public Team lastDamage = Team.derelict;
         public float iframes = -1f;
         public float thrusterTime = 0f;
+        public @Nullable Vec2 commandPos;
 
         protected float cloudSeed, landParticleTimer;
+
+        @Override
+        public boolean isCommandable(){
+            return team != state.rules.defaultTeam && state.rules.editor;
+        }
+
+        @Override
+        public Vec2 getCommandPosition(){
+            return commandPos;
+        }
+
+        @Override
+        public void onCommand(Vec2 target){
+            commandPos = target;
+        }
+
+        @Override
+        public boolean canUnload(){
+            return block.unloadable && state.rules.allowCoreUnloaders;
+        }
 
         @Override
         public void draw(){
@@ -280,11 +311,6 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public Music launchMusic(){
-            return launchMusic;
-        }
-
-        @Override
         public void beginLaunch(boolean launching){
             cloudSeed = Mathf.random(1f);
             if(launching){
@@ -292,6 +318,7 @@ public class CoreBlock extends StorageBlock{
             }
 
             if(!headless){
+                (launching ? launchSound : landSound).at(Core.camera.position, 1f, (launching ? launchSoundVolume : landSoundVolume));
                 // Add fade-in and fade-out foreground when landing or launching.
                 if(renderer.isLaunching()){
                     float margin = 30f;
@@ -523,7 +550,14 @@ public class CoreBlock extends StorageBlock{
         @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.itemCapacity) return storageCapacity;
+            if(sensor == LAccess.maxUnits) return Units.getCap(team);
             return super.sense(sensor);
+        }
+
+        @Override
+        public double sense(Content content){
+            if(content instanceof UnitType type) return team.data().countType(type);
+            return super.sense(content);
         }
 
         @Override
@@ -533,7 +567,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void onControlSelect(Unit unit){
-            if(!unit.isPlayer()) return;
+            if(!unit.isPlayer() || !allowSpawn) return;
             Player player = unit.getPlayer();
 
             Fx.spawn.at(player);
@@ -548,7 +582,7 @@ public class CoreBlock extends StorageBlock{
 
         public void requestSpawn(Player player){
             //do not try to respawn in unsupported environments at all
-            if(!unitType.supportsEnv(state.rules.env)) return;
+            if(!unitType.supportsEnv(state.rules.env) || !allowSpawn) return;
 
             Call.playerSpawn(tile, player);
         }
@@ -595,9 +629,17 @@ public class CoreBlock extends StorageBlock{
                 //just create an explosion, no fire. this prevents immediate recapture
                 Damage.dynamicExplosion(x, y, 0, 0, 0, tilesize * block.size / 2f, state.rules.damageExplosions);
                 Fx.commandSend.at(x, y, 140f);
+
+                //make sure the sound still plays
+                if(!headless){
+                    playDestroySound();
+                }
             }else{
                 super.onDestroyed();
             }
+
+            Effect.shockwaveDust(x, y, 40f + block.size * tilesize, 0.5f);
+            Fx.coreExplosion.at(x, y, team.color);
 
             //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
             if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1 && spawner.getSpawns().size == 0 && state.rules.sector.planet.enemyCoreSpawnReplace){
@@ -613,20 +655,31 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public void playDestroySound(){
+            if(team.data().cores.size <= 1 && player != null && player.team() == team && state.rules.canGameOver){
+                //play at full volume when doing a game over
+                block.destroySound.play(block.destroySoundVolume * Core.audio.sfxVolume, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), 0f);
+            }else{
+                super.playDestroySound();
+            }
+        }
+
+        @Override
         public void afterDestroyed(){
             super.afterDestroyed();
             if(state.rules.coreCapture){
                 if(!net.client()){
                     tile.setBlock(block, lastDamage);
-                }
 
-                //delay so clients don't destroy it afterwards
-                Core.app.post(() -> tile.setNet(block, lastDamage, 0));
-
-                //building does not exist on client yet
-                if(!net.client()){
                     //core is invincible for several seconds to prevent recapture
                     ((CoreBuild)tile.build).iframes = captureInvicibility;
+
+                    if(net.server()){
+                        //delay so clients don't destroy it afterwards
+                        Time.run(0f, () -> {
+                            tile.setNet(block, lastDamage, 0);
+                        });
+                    }
                 }
             }
         }
@@ -638,7 +691,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return items.get(item) < getMaximumAccepted(item);
+            return state.rules.coreIncinerates || items.get(item) < getMaximumAccepted(item);
         }
 
         @Override
@@ -659,6 +712,9 @@ public class CoreBlock extends StorageBlock{
 
             storageCapacity = itemCapacity + proximity.sum(e -> owns(e) ? e.block.itemCapacity : 0);
             proximity.each(this::owns, t -> {
+                if(t.items != items){
+                    items.add(t.items);
+                }
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });
@@ -737,7 +793,8 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void damage(float amount){
-            if(player != null && team == player.team()){
+            if(player != null && team == player.team() && control != null){
+                Vars.control.lastDamagedCore = this;
                 Events.fire(Trigger.teamCoreDamage);
             }
             super.damage(amount);
@@ -803,6 +860,25 @@ public class CoreBlock extends StorageBlock{
                 //create item incineration effect at random intervals
                 incinerateEffect(this, source);
                 noEffect = false;
+            }
+        }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            TypeIO.writeVecNullable(write, commandPos);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            if(revision >= 1){
+                commandPos = TypeIO.readVecNullable(read);
             }
         }
     }

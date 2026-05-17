@@ -110,7 +110,7 @@ public class Team implements Comparable<Team>, Senseable{
 
     /** @return whether this team is supposed to be AI-controlled. */
     public boolean isAI(){
-        return (state.rules.waves || state.rules.attackMode) && this != state.rules.defaultTeam && !state.rules.pvp;
+        return (state.rules.waves || state.rules.attackMode || state.isCampaign()) && this != state.rules.defaultTeam && !state.rules.pvp;
     }
 
     /** @return whether this team is solely comprised of AI (with no players possible). */
@@ -121,6 +121,11 @@ public class Team implements Comparable<Team>, Senseable{
     /** @return whether this team needs a flow field for "dumb" wave pathfinding. */
     public boolean needsFlowField(){
         return isAI() && !rules().rtsAi;
+    }
+
+    /** @return whether unit factories should be active, according to the game rule. */
+    public boolean activateUnitFactories(){
+        return state.tick >= rules().unitFactoryActivationDelay;
     }
 
     public Seq<CoreBuild> cores(){
@@ -163,8 +168,16 @@ public class Team implements Comparable<Team>, Senseable{
 
     @Override
     public double sense(LAccess sensor){
-        if(sensor == LAccess.id) return id;
-        if(sensor == LAccess.color) return color.toDoubleBits();
-        return Double.NaN;
+        return switch(sensor){
+            case id -> id;
+            case color -> color.toDoubleBits();
+            default -> Double.NaN;
+        };
+    }
+
+    @Override
+    public Object senseObject(LAccess sensor){
+        if(sensor == LAccess.name) return name;
+        return Senseable.noSensed;
     }
 }

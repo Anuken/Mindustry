@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.part.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -43,6 +44,15 @@ public class DrawTurret extends DrawBlock{
         }
 
         block.resetGeneratedIcons();
+    }
+
+    @Override
+    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
+        Draw.rect(base, plan.drawx(), plan.drawy());
+        Draw.rect(preview, plan.drawx(), plan.drawy(), block.rotate ? plan.rotation * 90f - 90f : 0f);
+        if(top.found()){
+            Draw.rect(top, plan.drawx(), plan.drawy(), block.rotate ? plan.rotation * 90f - 90f : 0f);
+        }
     }
 
     @Override

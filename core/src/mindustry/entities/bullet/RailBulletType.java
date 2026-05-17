@@ -59,7 +59,7 @@ public class RailBulletType extends BulletType{
         super.init(b);
 
         b.fdata = length;
-        Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), length, false, false, pierceCap);
+        Damage.collideLine(b, b.team, b.x, b.y, b.rotation(), length, false, false, pierceCap);
         float resultLen = b.fdata;
 
         Vec2 nor = Tmp.v1.trns(b.rotation(), 1f).nor();

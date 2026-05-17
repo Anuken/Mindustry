@@ -2,7 +2,6 @@ package mindustry.core;
 
 import arc.*;
 import arc.assets.loaders.TextureLoader.*;
-import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -40,7 +39,7 @@ public class Renderer implements ApplicationListener{
     public @Nullable Bloom bloom;
     public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false;
+    public boolean animateShields, animateWater, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false, showPings = true, showOtherBuildPlans = true;
     public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in, used by cutscenes */
     public float minZoom = 1.5f, maxZoom = 6f;
@@ -55,7 +54,7 @@ public class Renderer implements ApplicationListener{
     //currently landing core, null if there are no cores or it has finished landing.
     private @Nullable LaunchAnimator launchAnimator;
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
-    private float
+    public float
     //target camera scale that is lerp-ed to
     targetscale = Scl.scl(4),
     //current actual camera scale
@@ -101,7 +100,7 @@ public class Renderer implements ApplicationListener{
     public void init(){
         planets = new PlanetRenderer();
 
-        if(settings.getBool("bloom", !ios)){
+        if(settings.getBool("bloom", true)){
             setupBloom();
         }
 
@@ -167,12 +166,15 @@ public class Renderer implements ApplicationListener{
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
         animateShields = settings.getBool("animatedshields");
+        animateWater = settings.getBool("animatedwater");
         drawStatus = settings.getBool("blockstatus");
         enableEffects = settings.getBool("effects");
         drawDisplays = !settings.getBool("hidedisplays");
         maxZoomInGame = settings.getFloat("maxzoomingamemultiplier", 1) * maxZoom;
         minZoomInGame = minZoom / settings.getFloat("minzoomingamemultiplier", 1);
         drawLight = settings.getBool("drawlight", true);
+        showPings = settings.getBool("showpings", true);
+        showOtherBuildPlans = settings.getBool("showotherbuildplans", true);
         pixelate = settings.getBool("pixelate");
 
         //don't bother drawing landing animation if core is null
@@ -233,7 +235,7 @@ public class Renderer implements ApplicationListener{
                     case Gl.invalidFramebufferOperation -> "invalid framebuffer operation";
                     case Gl.invalidEnum -> "invalid enum";
                     case Gl.outOfMemory -> "out of memory";
-                    default -> "unknown error " + (error);
+                    default -> "unknown error (" + error + ")";
                 };
 
                 Log.err("[GL] Error: @", message);
@@ -310,14 +312,13 @@ public class Renderer implements ApplicationListener{
         graphics.clear(clearColor);
         Draw.reset();
 
-        if(settings.getBool("animatedwater") || animateShields){
+        if(animateWater || animateShields){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
         Draw.proj(camera);
 
         blocks.checkChanges();
-        blocks.floor.checkChanges();
         blocks.processBlocks();
 
         Draw.sort(true);
@@ -414,6 +415,10 @@ public class Renderer implements ApplicationListener{
         blocks.drawBlocks();
 
         Groups.draw.draw(Drawc::draw);
+
+        if(drawDebugHitboxes){
+            DebugCollisionRenderer.draw();
+        }
 
         Draw.reset();
         Draw.flush();
@@ -563,11 +568,6 @@ public class Renderer implements ApplicationListener{
         launching = true;
         landTime = landCore.launchDuration();
 
-        Music music = landCore.launchMusic();
-        music.stop();
-        music.play();
-        music.setVolume(settings.getInt("musicvol") / 100f);
-
         landCore.beginLaunch(true);
     }
 
@@ -589,7 +589,7 @@ public class Renderer implements ApplicationListener{
         camera.height = h;
         camera.position.x = w / 2f + tilesize / 2f;
         camera.position.y = h / 2f + tilesize / 2f;
-        buffer.begin();
+        buffer.begin(Color.clear);
         draw();
         Draw.flush();
         byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);

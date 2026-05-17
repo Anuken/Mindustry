@@ -96,8 +96,7 @@ public class DirectionalUnloader extends Block{
                                 front.handleItem(this, item);
                                 back.items.remove(item, 1);
                                 back.itemTaken(item);
-                                offset ++;
-                                offset %= itemc;
+                                offset = item.id + 1;
                                 break;
                             }
                         }

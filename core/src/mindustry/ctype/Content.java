@@ -3,9 +3,11 @@ package mindustry.ctype;
 import arc.files.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 
 /** Base class for a content type that is loaded in {@link mindustry.core.ContentLoader}. */
+@NoPatch
 public abstract class Content implements Comparable<Content>{
     public short id;
     /** Info on which mod this content was loaded from. */
@@ -27,6 +29,9 @@ public abstract class Content implements Comparable<Content>{
 
     /** Called after init(). */
     public void postInit(){}
+
+    /** Called after being patched. */
+    public void afterPatch(){}
 
     /**
      * Called after all content is created, only on non-headless versions.

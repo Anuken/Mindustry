@@ -31,7 +31,7 @@ public class LogicDialog extends BaseDialog{
     boolean privileged;
     @Nullable LExecutor executor;
     GlobalVarsDialog globalsDialog = new GlobalVarsDialog();
-    boolean wasRows, wasPortrait;
+    boolean wasRows, wasPortrait, forceRestart;
 
     public LogicDialog(){
         super("logic");
@@ -142,7 +142,14 @@ public class LogicDialog extends BaseDialog{
                         }catch(Throwable e){
                             ui.showException(e);
                         }
-                    }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
+                    }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null).row();
+
+                    t.button("@logic.restart", Icon.refresh, style, () -> {
+                        forceRestart = true;
+                        dialog.hide();
+                        hide();
+                    }).marginLeft(12f);
+
                 });
             });
 
@@ -214,7 +221,7 @@ public class LogicDialog extends BaseDialog{
                             update(() -> setColor(typeColor(s, color)));
                         }}, new Label(() -> " " + typeName(s) + " "){{
                             setStyle(Styles.outlineLabel);
-                        }});
+                        }}).minWidth(120f);
 
                         t.row();
 
@@ -247,6 +254,10 @@ public class LogicDialog extends BaseDialog{
     }
 
     public void showAddDialog(){
+        showAddDialog(-1);
+    }
+
+    public void showAddDialog(int position){
         BaseDialog dialog = new BaseDialog("@add");
         dialog.cont.table(table -> {
             String[] searchText = {""};
@@ -271,7 +282,7 @@ public class LogicDialog extends BaseDialog{
 
                     search.keyDown(KeyCode.enter, () -> {
                         if(!searchText[0].isEmpty() && matched[0] != null){
-                            canvas.add((LStatement)matched[0].get());
+                            canvas.addAt(position == -1 ? canvas.statements.getChildren().size : position, (LStatement)matched[0].get());
                             dialog.hide();
                         }
                     });
@@ -288,7 +299,9 @@ public class LogicDialog extends BaseDialog{
 
                     for(Prov<LStatement> prov : LogicIO.allStatements){
                         LStatement example = prov.get();
-                        if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged) || (!text.isEmpty() && !example.name().toLowerCase(Locale.ROOT).contains(text))) continue;
+                        if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged) ||
+                            (!text.isEmpty() && !example.name().toLowerCase(Locale.ROOT).contains(text) && !example.typeName().toLowerCase(Locale.ROOT).contains(text)) ||
+                            (!privileged && !state.rules.logicUnitControl && example.category() == LCategory.unit)) continue;
 
                         if(matched[0] == null){
                             matched[0] = prov;
@@ -318,7 +331,7 @@ public class LogicDialog extends BaseDialog{
                         style.font = Fonts.outline;
 
                         cat.button(example.name(), style, () -> {
-                            canvas.add(prov.get());
+                            canvas.addAt(position == -1 ? canvas.statements.getChildren().size : position, prov.get());
                             dialog.hide();
                         }).size(130f, 50f).self(c -> tooltip(c, "lst." + example.name())).top().left();
 
@@ -336,6 +349,7 @@ public class LogicDialog extends BaseDialog{
     public void show(String code, LExecutor executor, boolean privileged, Cons<String> modified){
         this.executor = executor;
         this.privileged = privileged;
+        this.forceRestart = false;
         canvas.statements.clearChildren();
         canvas.rebuild();
         canvas.privileged = privileged;
@@ -346,7 +360,7 @@ public class LogicDialog extends BaseDialog{
             canvas.load("");
         }
         this.consumer = result -> {
-            if(!result.equals(code)){
+            if(forceRestart || !result.equals(code)){
                 modified.get(result);
             }
         };

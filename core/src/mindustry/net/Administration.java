@@ -8,10 +8,14 @@ import arc.util.Log.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
+
+import java.io.*;
+import java.util.regex.*;
 
 import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
@@ -24,7 +28,7 @@ public class Administration{
     public Seq<String> subnetBans = new Seq<>();
     public ObjectSet<String> dosBlacklist = new ObjectSet<>();
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
-
+    public Seq<Pattern> bannedNames = new Seq<>();
 
     private boolean modified, loaded;
     /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not modify directly. */
@@ -92,6 +96,10 @@ public class Administration{
         dosBlacklist.add(address);
     }
 
+    public synchronized void unBlacklistDos(String address){
+        dosBlacklist.remove(address);
+    }
+
     public synchronized boolean isDosBlacklisted(String address){
         return dosBlacklist.contains(address);
     }
@@ -126,6 +134,11 @@ public class Administration{
 
     public boolean isSubnetBanned(String ip){
         return subnetBans.contains(ip::startsWith);
+    }
+
+    public void addNameBan(String regex) throws PatternSyntaxException{
+        bannedNames.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
+        save();
     }
 
     /** Adds a chat filter. This will transform the chat messages of every player.
@@ -366,11 +379,15 @@ public class Administration{
     }
 
     public boolean isIPBanned(String ip){
-        return bannedIPs.contains(ip, false) || (findByIP(ip) != null && findByIP(ip).banned);
+        return bannedIPs.contains(ip, false) || (findByIP(ip) != null && findByIP(ip).banned) || (steam && ip.startsWith("steam") && SteamAdmin.isBanned(ip));
     }
 
     public boolean isIDBanned(String uuid){
         return getCreateInfo(uuid).banned;
+    }
+
+    public boolean isNameBanned(String name){
+        return bannedNames.size > 0 && bannedNames.contains(p -> p.matcher(name).find());
     }
 
     public boolean isAdmin(String id, String usid){
@@ -461,6 +478,7 @@ public class Administration{
             Core.settings.putJson("ip-bans", String.class, bannedIPs);
             Core.settings.putJson("whitelist-ids", String.class, whitelist);
             Core.settings.putJson("banned-subnets", String.class, subnetBans);
+            Core.settings.putJson("banned-names", String.class, bannedNames.map(Pattern::pattern));
             modified = false;
         }
     }
@@ -474,6 +492,14 @@ public class Administration{
         bannedIPs = Core.settings.getJson("ip-bans", Seq.class, Seq::new);
         whitelist = Core.settings.getJson("whitelist-ids", Seq.class, Seq::new);
         subnetBans = Core.settings.getJson("banned-subnets", Seq.class, Seq::new);
+
+        Seq<String> nameRegexes = Core.settings.getJson("banned-names", Seq.class, String.class, Seq::new);
+        for(var regex : nameRegexes){
+            try{
+                bannedNames.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
+            }catch(Exception ignored){
+            }
+        }
     }
 
     /**
@@ -587,7 +613,7 @@ public class Administration{
         }
     }
 
-    public static class PlayerInfo{
+    public static class PlayerInfo implements Serializable{
         public String id;
         public String lastName = "<unknown>", lastIP = "<unknown>";
         public Seq<String> ips = new Seq<>();
@@ -676,9 +702,14 @@ public class Administration{
 
         /** valid only for command unit events */
         public @Nullable int[] unitIDs;
+        public @Nullable UnitCommand unitCommand;
 
         /** valid only for command building events */
         public @Nullable int[] buildingPositions;
+
+        /** valid only for location pings */
+        public @Nullable String pingText;
+        public float pingX, pingY;
 
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
@@ -709,7 +740,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn, pickupBlock, dropPayload
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn, pickupBlock, dropPayload, pingLocation
     }
 
 }

@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -58,7 +59,7 @@ public class Teams{
 
     public boolean anyEnemyCoresWithinBuildRadius(Team team, float x, float y){
         for(TeamData data : active){
-            if(team != data.team){
+            if(team != data.team && data.team.rules().protectCores){
                 for(CoreBuild tile : data.cores){
                     if(tile.within(x, y, state.rules.buildRadius(tile.team) + tilesize)){
                         return true;
@@ -71,7 +72,7 @@ public class Teams{
 
     public boolean anyEnemyCoresWithin(Team team, float x, float y, float radius){
         for(TeamData data : active){
-            if(team != data.team){
+            if(team != data.team && data.team.rules().protectCores){
                 for(CoreBuild tile : data.cores){
                     if(tile.within(x, y, radius)){
                         return true;
@@ -94,7 +95,12 @@ public class Teams{
 
     /** Returns team data by type. */
     public TeamData get(Team team){
-        return map[team.id] == null ? (map[team.id] = new TeamData(team)) : map[team.id];
+        var data = map[team.id];
+        if(data != null){
+            return data;
+        }else{
+            return map[team.id] = new TeamData(team);
+        }
     }
 
     public @Nullable TeamData getOrNull(Team team){
@@ -276,7 +282,7 @@ public class Teams{
         /** Enemies with cores or spawn points. */
         public Team[] coreEnemies = {};
         /** Planned blocks for drones. This is usually only blocks that have been broken. */
-        public Queue<BlockPlan> plans = new Queue<>();
+        public Queue<BlockPlan> plans = new Queue<>(16, BlockPlan.class);
 
         /** List of live cores of this team. */
         public final Seq<CoreBuild> cores = new Seq<>();
@@ -365,6 +371,26 @@ public class Teams{
                 }
             }
             finishScheduleDerelict();
+
+            //do block replacements in a radius
+            var sector = state.getSector();
+            if(sector != null){
+                boolean any = false;
+                for(var entry : sector.planet.sectorCaptureReplacements){
+                    if(indexer.isBlockPresent(entry.key)){
+                        any = true;
+                    }
+                }
+                if(any){
+                    Geometry.circle(World.toTile(x), World.toTile(y), world.width(), world.height(), Mathf.round(range / tilesize), (tx, ty) -> {
+                        Tile t = world.rawTile(tx, ty);
+                        Block result = sector.planet.sectorCaptureReplacements.get(t.floor());
+                        if(result != null && !cores.contains(c -> c.within(t, range))){
+                            t.setFloor(result.asFloor());
+                        }
+                    });
+                }
+            }
         }
 
         private void scheduleDerelict(Building build){
@@ -378,6 +404,8 @@ public class Teams{
             if(Mathf.chance(0.2)){
                 Time.run(Mathf.random(0f, 60f * 6f), build::kill);
             }
+            //don't bother checking previous for performance reasons
+            build.addPlan(false, true);
         }
 
         private void finishScheduleDerelict(){

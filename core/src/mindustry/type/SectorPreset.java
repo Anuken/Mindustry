@@ -2,6 +2,8 @@ package mindustry.type;
 
 import arc.*;
 import arc.func.*;
+import arc.struct.*;
+import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -24,6 +26,8 @@ public class SectorPreset extends UnlockableContent{
     public boolean isLastSector;
     /** If true, this sector must be unlocked before landing is permitted. */
     public boolean requireUnlock = true;
+    /** If true, the icon and name is shown, even when it's a 'hidden' always-unlocked sector. TODO: this field may be changed, not sure how it should work*/
+    public boolean showHidden = false;
     public boolean showSectorLandInfo = true;
     /** If true, uses this sector's launch fields instead */
     public boolean overrideLaunchDefaults = false;
@@ -33,32 +37,71 @@ public class SectorPreset extends UnlockableContent{
     public boolean allowLaunchLoadout = false;
     /** If true, switches to attack mode after waves end. */
     public boolean attackAfterWaves = false;
+    /** The original position of this sector; used for migration. Internal use for vanilla campaign only! */
+    public int originalPosition;
+    /** Sectors that prevent this sector from being landed on until they are completed. */
+    public Seq<Sector> shieldSectors = new Seq<>();
+
+    private @Nullable String fileName;
 
     public SectorPreset(String name, Planet planet, int sector){
-        this(name);
+        this(name, null, planet, sector);
+    }
+
+    public SectorPreset(String name, String fileName, Planet planet, int sector){
+        this(name, fileName, null);
         initialize(planet, sector);
     }
 
     /** Internal use only! */
     public SectorPreset(String name, LoadedMod mod){
+        this(name, null, mod);
+    }
+
+    /** Internal use only! */
+    public SectorPreset(String name, @Nullable String fileName, LoadedMod mod){
         super(name);
         if(mod != null){
             this.minfo.mod = mod;
         }
-        this.generator = new FileMapGenerator(this.name, this);
-    }
-
-    /** Internal use only! */
-    public SectorPreset(String name){
-       this(name, null);
+        this.fileName = fileName;
     }
 
     public void initialize(Planet planet, int sector){
-        this.planet = planet;
-        sector %= planet.sectors.size;
-        this.sector = planet.sectors.get(sector);
+        initialize(planet, sector, false);
+    }
 
-        planet.preset(sector, this);
+    public void initialize(Planet planet, int sector, boolean override){
+        this.planet = planet;
+        if(generator == null){
+            this.generator = new FileMapGenerator(fileName == null ? this.name : fileName, this);
+        }
+        this.originalPosition = sector;
+        if(!override){
+            //auto remap based on data
+            var data = planet.getData();
+            if(data != null){
+                sector = data.presets.get(name, sector);
+            }
+        }
+        sector %= planet.sectors.size;
+        this.sector = planet.sectors.get(sector == -1 ? 0 : sector);
+
+        if(sector != -1){
+            planet.preset(sector, this);
+        }else{
+            Log.warn("Preset '@' doesn't have a sector assigned.", name);
+        }
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        //note that sectors can only have one visual shield target
+        for(var other : shieldSectors){
+            other.shieldTarget = sector;
+        }
     }
 
     @Override

@@ -17,7 +17,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         super(name);
         hasLiquids = true;
         //TODO
-        loopSound = Sounds.minebeam;
+        loopSound = Sounds.loopMineBeam;
         shootSound = Sounds.none;
         smokeEffect = Fx.none;
         shootEffect = Fx.none;
@@ -31,20 +31,22 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
     @Override
     public void setStats(){
         super.setStats();
+        //mirror stats onto each bullet (purely visual)
+        ammoTypes.each((l, b) -> b.statLiquidConsumed = liquidConsumed);
 
-        stats.remove(Stat.ammo);
-        //TODO looks bad
-        stats.add(Stat.ammo, table -> {
-            table.row();
-            StatValues.number(liquidConsumed * 60f, StatUnit.perSecond, true).display(table);
-        });
-        stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
+        stats.replace(Stat.ammo, StatValues.ammo(ammoTypes));
     }
 
     @Override
     public void init(){
-        //TODO display ammoMultiplier.
         consume(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), liquidConsumed){
+
+            {
+                multiplier = b -> {
+                    var ammo = ammoTypes.get(b.liquids.current());
+                    return ammo == null ? 1f : 1f / ammo.ammoMultiplier;
+                };
+            }
 
             @Override
             public void display(Stats stats){
@@ -52,12 +54,15 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
             }
         });
 
-        ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+        if(targetGround){
+            ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+        }
 
         super.init();
     }
 
     public class ContinuousLiquidTurretBuild extends ContinuousTurretBuild{
+        boolean activated;
 
         @Override
         public boolean shouldActiveSound(){
@@ -65,10 +70,20 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
+        public float getAmmoFraction(){
+            return liquids.currentAmount() / liquidCapacity;
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
 
-            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
+            //only allow the turret to begin firing when it can fire for 4 continuous updates
+            if(liquids.currentAmount() >= liquidConsumed * 4f){
+                activated = true;
+            }else if(liquids.currentAmount() < liquidConsumed){
+                activated = false;
+            }
         }
 
         @Override
@@ -85,6 +100,11 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
+        public boolean shouldConsume(){
+            return super.shouldConsume() && activated;
+        }
+
+        @Override
         public BulletType useAmmo(){
             //does not consume ammo upon firing
             return peekAmmo();
@@ -97,7 +117,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         @Override
         public boolean hasAmmo(){
-            return hasCorrectAmmo() && ammoTypes.get(liquids.current()) != null && liquids.currentAmount() > 0f;
+            return hasCorrectAmmo() && ammoTypes.get(liquids.current()) != null && liquids.currentAmount() > 0f && activated;
         }
 
         public boolean hasCorrectAmmo(){

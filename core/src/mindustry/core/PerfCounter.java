@@ -8,6 +8,7 @@ public enum PerfCounter{
     frame,
     update,
     entityUpdate,
+    ui,
     render;
 
     public static final PerfCounter[] all = values();

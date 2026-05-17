@@ -12,7 +12,9 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-public abstract class GenerateFilter implements Cloneable{
+import java.io.*;
+
+public abstract class GenerateFilter implements Cloneable, Serializable{
     public int seed = 0;
 
     public void apply(Tiles tiles, GenerateInput in){
@@ -22,9 +24,7 @@ public abstract class GenerateFilter implements Cloneable{
             long[] buffer = new long[tiles.width * tiles.height];
 
             for(int i = 0; i < tiles.width * tiles.height; i++){
-                Tile tile = tiles.geti(i);
-
-                in.set(tile.x, tile.y, tile.block(), tile.floor(), tile.overlay());
+                in.set(tiles.geti(i));
                 apply(in);
 
                 buffer[i] = PackTile.get(in.block.id, in.floor.id, in.overlay.id);
@@ -48,7 +48,7 @@ public abstract class GenerateFilter implements Cloneable{
             }
         }else{
             for(Tile tile : tiles){
-                in.set(tile.x, tile.y, tile.block(), tile.floor(), tile.overlay());
+                in.set(tile);
                 apply(in);
 
                 if(in.floor instanceof Floor floor){
@@ -59,6 +59,7 @@ public abstract class GenerateFilter implements Cloneable{
                 if(!tile.block().synthetic() && !in.block.synthetic()){
                     tile.setBlock(in.block);
                 }
+                tile.setPackedData(in.packedData);
             }
         }
     }
@@ -148,15 +149,21 @@ public abstract class GenerateFilter implements Cloneable{
 
         /** output parameters */
         public Block floor, block, overlay;
+        public long packedData;
 
         TileProvider buffer;
 
-        public void set(int x, int y, Block block, Block floor, Block overlay){
+        public void set(int x, int y, Block block, Block floor, Block overlay, long packedData){
             this.floor = floor;
             this.block = block;
             this.overlay = overlay;
             this.x = x;
             this.y = y;
+            this.packedData = packedData;
+        }
+
+        public void set(Tile tile){
+            set(tile.x, tile.y, tile.block(), tile.floor(), tile.overlay(), tile.getPackedData());
         }
 
         public void begin(int width, int height, TileProvider buffer){

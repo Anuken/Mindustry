@@ -67,6 +67,7 @@ public enum Achievement{
 
     have10mItems(SStat.totalCampaignItems, 10_000_000),
     killEclipseDuo,
+    killMassDriver,
 
     completeErekir,
     completeSerpulo,

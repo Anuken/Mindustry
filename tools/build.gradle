@@ -6,6 +6,7 @@ import arc.func.Func2
 import arc.graphics.Color
 import arc.graphics.Pixmap
 import arc.packer.TexturePacker
+import arc.struct.IntMap
 import arc.struct.ObjectMap
 import arc.struct.OrderedMap
 import arc.struct.Seq
@@ -101,7 +102,7 @@ static void antialias(File file){
     new Fi(file).writePng(out)
 }
 
-task antialiasImages(){
+tasks.register('antialiasImages'){
     doLast{
         for(def img : project.getProperty("images").split(",")){
             println(project.getProperty("startdir") + "/" + img)
@@ -110,7 +111,7 @@ task antialiasImages(){
     }
 }
 
-task tileImages(){
+tasks.register('tileImages'){
     doLast{
         for(def img : project.getProperty("images").split(",")){
             println(project.getProperty("startdir") + "/" + img)
@@ -119,7 +120,8 @@ task tileImages(){
     }
 }
 
-task pack(dependsOn: [classes, configurations.runtimeClasspath]){
+tasks.register('pack'){
+    dependsOn = [classes, configurations.runtimeClasspath]
 
     doLast{
         //cleanup old sprites
@@ -135,8 +137,9 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
 
         //run generation task; generate all needed sprites
         file(genFolder).mkdirs()
-        javaexec{
-            main = "mindustry.tools.ImagePacker"
+
+        project.services.get(ExecOperations).javaexec{
+            mainClass = "mindustry.tools.ImagePacker"
             classpath = sourceSets.main.runtimeClasspath
             workingDir = genFolder
         }
@@ -187,7 +190,8 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
     }
 }
 
-task genSprites(dependsOn: classes, type: JavaExec){
+tasks.register('genSprites', JavaExec){
+    dependsOn classes
     finalizedBy 'antialiasGen'
 
     mainClass = "mindustry.tools.ImagePacker"
@@ -196,7 +200,8 @@ task genSprites(dependsOn: classes, type: JavaExec){
     workingDir = genFolder
 }
 
-task fontgen(dependsOn: classes, type: JavaExec){
+tasks.register('fontgen', JavaExec){
+    dependsOn classes
     /* icon font pipeline:
      1. take set of pre-defined icons and SVGs
      2. use Fontello API to get a font with these
@@ -231,30 +236,32 @@ task fontgen(dependsOn: classes, type: JavaExec){
         //TODO this is broken
 
         Log.info(OS.exec("fontforge", "-script",
-            Fi.get("core/assets-raw/fontgen/merge.pe").absolutePath(),
-            Fi.get("core/assets/fonts/font.woff").absolutePath(),
-            Fi.get("core/assets-raw/fontgen/out/font.woff").absolutePath())
+                Fi.get("core/assets-raw/fontgen/merge.pe").absolutePath(),
+                Fi.get("core/assets/fonts/font.woff").absolutePath(),
+                Fi.get("core/assets-raw/fontgen/out/font.woff").absolutePath())
         )
 
         Log.info("Done.")
     }
 }
 
-task icongen(dependsOn: classes, type: JavaExec){
+tasks.register('icongen', JavaExec){
+    dependsOn classes
     mainClass = "mindustry.tools.IconConverter"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = "../core/assets-raw"
 }
 
-task updateScripts(dependsOn: classes, type: JavaExec){
+tasks.register('updateScripts', JavaExec){
+    dependsOn classes
     mainClass = "mindustry.tools.ScriptMainGenerator"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = "../"
 }
 
-task updateBundles{
+tasks.register('updateBundles'){
     doLast{
         def uniEscape = { String string ->
             StringBuilder outBuffer = new StringBuilder()
@@ -262,12 +269,12 @@ task updateBundles{
             for(int i = 0; i < len; i++){
                 char ch = string.charAt(i)
                 if((ch > 61) && (ch < 127)){
-                    outBuffer.append(ch == (char)'\\' ? "\\\\" : ch)
+                    outBuffer.append(ch == (char) '\\' ? "\\\\" : ch)
                     continue
                 }
 
                 if(ch >= 0xE000 && ch <= 0xF8FF){
-                    String hex = Integer.toHexString((int)ch)
+                    String hex = Integer.toHexString((int) ch)
                     outBuffer.append("\\u")
                     for(int j = 0; j < 4 - hex.length(); j++){
                         outBuffer.append('0')
@@ -283,36 +290,31 @@ task updateBundles{
 
         OrderedMap<String, String> base = new OrderedMap<>()
         PropertiesUtils.load(base, Fi.get("core/assets/bundles/bundle.properties").reader())
-        Seq<String> removals = new Seq<>()
+
+        //map of line number to comment (or just empty string for blank line) content
+        IntMap<String> commentAndBlankLines = new IntMap<>()
+        var lines = Fi.get("core/assets/bundles/bundle.properties").reader().readLines()
+        int offset = 0
+        for(int i = 0; i < lines.size(); i++){
+            var line = lines.get(i)
+            if(i > 0 && lines.get(i - 1).endsWith("\\")) offset++ //multiline value escaped with \\ at end of line
+            else if(line.isEmpty() || line.startsWith("#")) commentAndBlankLines.put(i - offset, line)
+        }
 
         Log.info("Updating bundles...")
 
         Fi.get("core/assets/bundles").walk(child -> {
-            if(child.name().equals("bundle.properties") || child.toString().contains("output")) return
+            if(child.name() == "bundle.properties" || child.name() == "global.properties" || child.toString().contains("output")) return
+            if(project.hasProperty("bundle") && child.name() != project.property("bundle")) return
 
             Log.info("| @", child.nameWithoutExtension())
 
             OrderedMap<String, String> other = new OrderedMap<>()
 
-            //find the last known comment of each line
-            ObjectMap<String, String> comments = new ObjectMap<>()
-            StringBuilder curComment = new StringBuilder()
-
-            for(String line : Seq.with(child.readString().split("\n", -1))){
-                if(line.startsWith("#") || line.isEmpty()){
-                    curComment.append(line).append("\n")
-                }else if(line.contains("=")){
-                    String lastKey = line.substring(0, line.indexOf("=")).trim()
-                    if(curComment.length() != 0){
-                        comments.put(lastKey, curComment.toString())
-                        curComment.setLength(0)
-                    }
-                }
-            }
-
             ObjectMap<String, String> extras = new OrderedMap<>()
+            Seq<String> removals = new Seq<>()
+
             PropertiesUtils.load(other, child.reader())
-            removals.clear()
 
             for(String key : other.orderedKeys()){
                 if(!base.containsKey(key) && key.contains(".details") && false){
@@ -338,16 +340,18 @@ task updateBundles{
             }
 
             Func2<String, String, String> processor = (key, value) ->
-                    (comments.containsKey(key) ? comments.get(key) : "") + //append last known comment if present
-                            (key + " =" + (value.trim().isEmpty() ? "" : " ") + uniEscape(value)).replace("\n", "\\n") + "\n"
+                    (key + " =" + (value.trim().isEmpty() ? "" : " ") + uniEscape(value)).replace("\n", "\\n") + "\n"
             Fi output = child.sibling("output/" + child.name())
 
             if(added > 0) Log.info("&lc@ keys added.", added)
             if(removals.size + added > 0) Log.info("Writing bundle to @", output)
             StringBuilder result = new StringBuilder()
 
+            int i = 0
             //add everything ordered
             for(String key : base.orderedKeys().copy().add(extras.keys().toSeq())){
+                //append any comments or blank lines as needed to match the english bundle
+                while(commentAndBlankLines.containsKey(i++)) result.append(commentAndBlankLines.get(i - 1) + "\n")
                 if(other.get(key) == null) continue
 
                 result.append(processor.get(key, other.get(key)))

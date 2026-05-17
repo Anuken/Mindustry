@@ -59,7 +59,7 @@ public class Fires{
         if(tile != null){
             Fire fire = get(tile);
             if(fire != null){
-                fire.time(fire.time + intensity * Time.delta);
+                fire.time += intensity * Time.delta;
                 Fx.steam.at(fire);
                 if(fire.time >= fire.lifetime){
                     Events.fire(Trigger.fireExtinguish);

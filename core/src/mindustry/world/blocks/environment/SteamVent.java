@@ -47,11 +47,12 @@ public class SteamVent extends Floor{
     }
 
     @Override
-    public void drawBase(Tile tile){
-        parent.drawBase(tile);
+    public void drawMain(Tile tile){
+        if(parent instanceof Floor floor){
+            floor.drawMain(tile);
+        }
 
         if(checkAdjacent(tile)){
-            Mathf.rand.setSeed(tile.pos());
             Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx() - tilesize, tile.worldy() - tilesize);
         }
     }

@@ -1,0 +1,62 @@
+Mindustry là một trò chơi xây dựng nhà máy với yếu tố chiến thuật thời gian thực (RTS) và thủ thành. Tạo chuỗi cung cấp xịn xò để cấp đạn cho tháp súng của bạn, sản xuất tài nguyên dùng cho xây dựng, và chế tạo đơn vị. Ra lệnh cho đơn vị chiếm đóng căn cứ kẻ địch, và mở rộng sản xuất. Phòng thủ lõi của bạn khỏi các đợt tấn công của kẻ địch.
+
+Chơi chiến dịch một mình hoặc với bạn bè thông qua trò chơi hợp tác nhiều người chơi đa nền tảng, hoặc thử thách họ với trò chơi PvP chia đội.
+
+[img]{STEAM_APP_IMAGE}/extras/factory.gif[/img]
+
+[h2]Xây dựng Nhà máy[/h2]
+
+[list]
+[*] Tạo chuỗi cung cấp xịn xò để cấp đạn cho tháp súng của bạn, sản xuất tài nguyên dùng cho xây dựng
+[*] Dùng các khối sản xuất tạo một biến thể rộng của tài nguyên cao cấp
+[*] Phân phối chất lỏng và xử lý các tình huống bất ngờ, như cháy lan hoặc không quân kẻ địch tấn công
+[*] Nhận tối đa mức sản xuất bằng cách cung cấp chất làm mát và bôi trơn
+[*] Sản xuất nhiều biến thể của đơn vị để quản lý tự động căn cứ của bạn hoặc tấn công căn cứ kẻ địch
+[/list]
+
+[h2]Thủ thành[/h2]
+
+[list]
+[*] Phòng thủ công trình của bạn khỏi các đợt tấn công của kẻ địch
+[*] Đặt các tháp súng một cách chiến thuật để tiêu diệt chúng trước khi chúng đến được lõi củ bạn
+[*] Cung cấp tháp súng của bạn với dạn, chất làm mát và năng lượng
+[*] Tăng cường phòng thủ của bạn bằng các loại khiên năng lượng, máy chiếu hồi phục và các công trình hỗ trợ khác
+[/list]
+
+[img]{STEAM_APP_IMAGE}/extras/rts3.png[/img]
+
+[h2]Chiến thuật Thời gian Thực[/h2]
+
+[list]
+[*] Thiết lập dây chuyền lắp ráp tạo các đơn vị quân cơ giới
+[*] Dùng các đơn vị của bạn để bao vây đè bẹp căn cứ đủ chức năng của kẻ địch
+[*] Chiếm thêm đất để đặt thêm nhiều lõi và truy cập vào thêm nhiều loại tài nguyên để mở rộng
+[/list]
+
+[h2]Chiến dịch[/h2]
+
+[list]
+[*] Chơi qua hai chiến dịch hành tinh riêng biệt
+[*] Chinh phục hành tinh Serpulo và Erekir với trải nghiệm qua 35 bản đồ tạo sẵn và 250+ phân khu tạo ngẫu nhiên
+[*] Chiếm lĩnh vùng đất và thiết lập các nhà máy để sản xuất tài nguyên trong khi bạn chơi các phân khu khác
+[*] Phòng thủ phân khu của bạn khỏi các cuộc tấn công định kỳ
+[*] Chuyển tài nguyên qua các phân khu bằng bệ phóng
+[*] Nghiên cứu các khối mới để lấp đầy tiến trình
+[*] Mời bạn bè để cùng hoành thành nhiệm vụ
+[*] 250+ khối công nghệ để làm chủ
+[*] 50+ kiểu khác nhau của máy bay không người lái, máy móc và phi thuyền
+[*] 80+ thành tựu để hoàn thành
+[/list]
+
+[h2]Cộng đồng và Làm các bản tùy chỉnh (mod)[/h2]
+
+[list]
+[*] Dùng Steam Workshop để duyệt các bản đồ và bản thiết kế làm từ cộng đồng
+[*] Tham gia máy chủ cộng đồng công khai để chơi với các người chơi khác trên đa nền tảng
+[*] Chơi hợp tác, đối kháng hoặc tự do
+[*] Các trình cắm hỗ trợ trên máy chủ cộng đồng dành cho bản đồ và chế độ chơi tùy chỉnh
+[*] Tạo máy chủ chuyên dụng công khai của bạn, hoặc mời bạn bè vào phiên chơi riêng tư của bạn
+[*] Tùy chỉnh quy tắc trò chơi: Thay đổi phí của khối, thông số kẻ địch, vật phẩm khởi đầu, thời gian đợt và hơn thế nữa
+[*] Trình chỉnh sửa bản đồ có sẵn giúp bạn tự tạo bản đồ để chơi và chua sẻ với cộng đồng
+[*] Duyệt qua các mod làm từ cộng đồng để thêm vào hoặc phối lại nhiều nội dung hơn nữa
+[/list]

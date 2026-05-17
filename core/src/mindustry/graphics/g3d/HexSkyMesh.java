@@ -21,15 +21,15 @@ public class HexSkyMesh extends PlanetMesh{
             }
 
             @Override
-            public Color getColor(Vec3 position){
-                return color;
+            public void getColor(Vec3 position, Color out){
+                out.set(color);
             }
 
             @Override
             public boolean skip(Vec3 position){
                 return Simplex.noise3d(7 + seed, octaves, persistence, scl, position.x, position.y * 3f, position.z) >= thresh;
             }
-        }, divisions, false, planet.radius, radius), Shaders.clouds);
+        }, divisions, planet.radius, radius), Shaders.clouds);
 
         this.speed = speed;
     }

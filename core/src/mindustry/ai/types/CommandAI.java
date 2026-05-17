@@ -40,10 +40,10 @@ public class CommandAI extends AIController{
     protected float payloadPickupCooldown;
     protected int transferState = transferStateNone;
 
-    /** Stance, usually related to firing mode. */
-    public UnitStance stance = UnitStance.shoot;
     /** Current command this unit is following. */
-    public UnitCommand command = UnitCommand.moveCommand;
+    public UnitCommand command;
+    /** Stance, usually related to firing mode. Each bit is a stance ID. */
+    public Bits stances = new Bits(content.unitStances().size);
     /** Current controller instance based on command. */
     protected @Nullable AIController commandController;
     /** Last command type assigned. Used for detecting command changes. */
@@ -64,6 +64,47 @@ public class CommandAI extends AIController{
     }
 
     @Override
+    public boolean hasStance(@Nullable UnitStance stance){
+        return stance != null && stances.get(stance.id);
+    }
+
+    public void setStance(UnitStance stance, boolean enabled){
+         if(enabled){
+             setStance(stance);
+         }else{
+             disableStance(stance);
+         }
+    }
+
+    public void setStance(UnitStance stance){
+        //this happens when an older save reads the default "shoot" stance, or any other removed stance
+        if(stance == UnitStance.stop) return;
+
+        stances.andNot(stance.incompatibleStanceBits);
+        stances.set(stance.id);
+        stanceChanged();
+    }
+
+    public void disableStance(UnitStance stance){
+        stances.clear(stance.id);
+        stanceChanged();
+    }
+
+    public void stanceChanged(){
+        if(commandController != null && !(commandController instanceof CommandAI)){
+            commandController.stanceChanged();
+        }
+    }
+
+    @Override
+    public void init(){
+        if(command == null){
+            command = unit.type.defaultCommand == null && unit.type.commands.size > 0 ? unit.type.commands.first() : unit.type.defaultCommand;
+            if(command == null) command = UnitCommand.moveCommand;
+        }
+    }
+
+    @Override
     public boolean isLogicControllable(){
         return !hasCommand();
     }
@@ -74,16 +115,18 @@ public class CommandAI extends AIController{
 
     @Override
     public void updateUnit(){
-        //this should not be possible
-        if(stance == UnitStance.stop) stance = UnitStance.shoot;
+
+        if(command == UnitCommand.mineCommand && !hasStance(UnitStance.mineAuto) && !ItemUnitStance.all().contains(this::hasStance)){
+            setStance(UnitStance.mineAuto);
+        }
 
         //pursue the target if relevant
-        if(stance == UnitStance.pursueTarget && target != null && attackTarget == null && targetPos == null){
+        if(hasStance(UnitStance.pursueTarget) && !hasStance(UnitStance.patrol) && target != null && attackTarget == null && targetPos == null){
             commandTarget(target, false);
         }
 
         //pursue the target for patrol, keeping the current position
-        if(stance == UnitStance.patrol && target != null && attackTarget == null){
+        if(hasStance(UnitStance.patrol) && hasStance(UnitStance.pursueTarget) && target != null && attackTarget == null){
             //commanding a target overwrites targetPos, so add it to the queue
             if(targetPos != null){
                 commandQueue.add(targetPos.cpy());
@@ -114,9 +157,22 @@ public class CommandAI extends AIController{
             commandController.updateUnit();
         }else{
             defaultBehavior();
-            //boosting control is not supported, so just don't.
-            unit.updateBoosting(false);
+            if(shouldBoost() && unit.type.canBoost){
+                //auto land when near target
+                if((attackTarget != null && unit.within(attackTarget, unit.range())) || (hasStance(UnitStance.patrol) && target != null && unit.within(target, unit.range()))){
+                    unit.updateBoosting(false);
+                }else{
+                    unit.updateBoosting(true, true);
+                }
+            }else{
+                //boosting control is not supported, so just don't.
+                unit.updateBoosting(false);
+            }
         }
+    }
+
+    protected boolean shouldBoost(){
+        return hasStance(UnitStance.boost) || command == UnitCommand.enterPayloadCommand;
     }
 
     public void clearCommands(){
@@ -134,7 +190,7 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findMainTarget(float x, float y, float range, boolean air, boolean ground){
-        if(!unit.type.autoFindTarget && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
+        if(!unit.type.autoFindTarget && !hasStance(UnitStance.patrol) && !(targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range()))){
             return null;
         }
         return super.findMainTarget(x, y, range, air, ground);
@@ -172,7 +228,9 @@ public class CommandAI extends AIController{
             }
         }
 
-        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.buildOn() != null && (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
+        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.type.allowedInPayloads && unit.buildOn() != null &&
+            (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
+
             var build = unit.buildOn();
             tmpPayload.unit = unit;
             if(build.team == unit.team && build.acceptPayload(build, tmpPayload)){
@@ -194,6 +252,8 @@ public class CommandAI extends AIController{
             finishPath();
         }
 
+        boolean ramming = hasStance(UnitStance.ram);
+
         if(attackTarget != null){
             if(targetPos == null){
                 targetPos = new Vec2();
@@ -201,7 +261,7 @@ public class CommandAI extends AIController{
             }
             targetPos.set(attackTarget);
 
-            if(unit.isGrounded() && attackTarget instanceof Building build && build.tile.solid() && unit.type.pathCostId != ControlPathfinder.costIdLegs && stance != UnitStance.ram){
+            if(unit.isGrounded() && attackTarget instanceof Building build && build.tile.solid() && unit.type.pathCostId != ControlPathfinder.costIdLegs && !ramming){
                 Tile best = build.findClosestEdge(unit, Tile::solid);
                 if(best != null){
                     targetPos.set(best);
@@ -212,7 +272,7 @@ public class CommandAI extends AIController{
         boolean alwaysArrive = false;
 
         float engageRange = unit.type.range - 10f;
-        boolean withinAttackRange = attackTarget != null && unit.within(attackTarget, engageRange) && stance != UnitStance.ram;
+        boolean withinAttackRange = attackTarget != null && unit.within(attackTarget, engageRange) && !ramming;
 
         if(targetPos != null){
             boolean move = true, isFinalPoint = commandQueue.size == 0;
@@ -226,17 +286,15 @@ public class CommandAI extends AIController{
 
             Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
 
-            //TODO: should the unit stop when it finds a target?
             if(
-                (stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
-                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
-                (command == UnitCommand.loopPayloadCommand && unit.within(targetPos, 10f))
+                (hasStance(UnitStance.patrol) && !hasStance(UnitStance.pursueTarget) && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
+                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && !unit.type.circleTarget && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
+                (command == UnitCommand.loopPayloadCommand && unit.within(vecMovePos, 10f))
             ){
                 move = false;
             }
 
-            if(unit.isGrounded() && stance != UnitStance.ram){
-                //TODO: blocking enable or disable?
+            if(unit.isGrounded() && !ramming){
                 if(timer.get(timerTarget3, avoidInterval)){
                     Vec2 dstPos = Tmp.v1.trns(unit.rotation, unit.hitSize/2f);
                     float max = unit.hitSize/2f;
@@ -271,7 +329,7 @@ public class CommandAI extends AIController{
                     noFound[0] = false;
                     vecOut.set(vecMovePos);
                 }else{
-                    move = controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                    move &= controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
 
                     //TODO: what to do when there's a target and it can't be reached?
                     /*
@@ -299,15 +357,19 @@ public class CommandAI extends AIController{
                 vecOut.set(vecMovePos);
             }
 
+            if(command == UnitCommand.loopPayloadCommand){
+                alwaysArrive = true;
+            }
+
             if(move){
                 if(unit.type.circleTarget && attackTarget != null){
                     target = attackTarget;
-                    circleAttack(80f);
+                    circleAttack(unit.type.circleTargetRadius);
                 }else{
                     moveTo(vecOut,
                     withinAttackRange ? engageRange :
                     unit.isGrounded() ? 0f :
-                    attackTarget != null && stance != UnitStance.ram ? engageRange : 0f,
+                    attackTarget != null && !ramming ? engageRange : 0f,
                     unit.isFlying() ? 40f : 100f, false, null, isFinalPoint || alwaysArrive);
                 }
             }
@@ -317,7 +379,7 @@ public class CommandAI extends AIController{
                 attackTarget = null;
             }
 
-            if(unit.isFlying() && move && (attackTarget == null || !unit.within(attackTarget, unit.type.range))){
+            if(unit.isFlying() && move && !(unit.type.circleTarget && !unit.type.omniMovement) && (attackTarget == null || !unit.within(attackTarget, unit.type.range))){
                 unit.lookAt(vecMovePos);
             }else{
                 faceTarget();
@@ -334,7 +396,11 @@ public class CommandAI extends AIController{
             }
 
         }else if(target != null){
-            faceTarget();
+            if(unit.type.circleTarget && shouldFire()){
+                circleAttack(unit.type.circleTargetRadius);
+            }else{
+                faceTarget();
+            }
         }
     }
 
@@ -399,7 +465,7 @@ public class CommandAI extends AIController{
                 commandPosition(position);
             }
 
-            if(prev != null && (stance == UnitStance.patrol || command == UnitCommand.loopPayloadCommand)){
+            if(prev != null && (hasStance(UnitStance.patrol) || command == UnitCommand.loopPayloadCommand)){
                 commandQueue.add(prev.cpy());
             }
 
@@ -441,7 +507,7 @@ public class CommandAI extends AIController{
 
     @Override
     public boolean shouldFire(){
-        return stance != UnitStance.holdFire;
+        return !hasStance(UnitStance.holdFire);
     }
 
     @Override
@@ -496,6 +562,12 @@ public class CommandAI extends AIController{
 
         //this is an allocation, but it's relatively rarely called anyway, and outside mutations must be prevented
         targetPos = lastTargetPos = pos.cpy();
+        if(command != null && command.snapToBuilding){
+            var build = world.buildWorld(targetPos.x, targetPos.y);
+            if(build != null && build.team == unit.team){
+                targetPos.set(build);
+            }
+        }
         attackTarget = null;
         this.stopWhenInRange = stopWhenInRange;
     }

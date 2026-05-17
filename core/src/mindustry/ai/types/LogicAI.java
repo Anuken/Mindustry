@@ -20,8 +20,7 @@ public class LogicAI extends AIController{
     public LUnitControl control = LUnitControl.idle;
     public float moveX, moveY, moveRad;
     public float controlTimer = logicControlTimeout, targetTimer;
-    @Nullable
-    public Building controller;
+    public @Nullable Building controller;
     public BuildPlan plan = new BuildPlan();
 
     //special cache for instruction to store data
@@ -110,7 +109,8 @@ public class LogicAI extends AIController{
         }
 
         if(unit.type.canBoost && !unit.type.flying){
-            unit.elevation = Mathf.approachDelta(unit.elevation, Mathf.num(boost || unit.onSolid() || (unit.isFlying() && !unit.canLand())), unit.type.riseSpeed);
+            boolean shouldBoost = boost || unit.onSolid() || (unit.isFlying() && !unit.canLand());
+            unit.elevation = Mathf.approachDelta(unit.elevation, Mathf.num(shouldBoost), shouldBoost ? unit.type.riseSpeed : unit.type.descentSpeed);
         }
 
         //look where moving if there's nothing to aim at

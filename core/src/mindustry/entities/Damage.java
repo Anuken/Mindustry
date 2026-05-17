@@ -215,45 +215,45 @@ public class Damage{
 
         //return either the length when not enough things were pierced,
         //or the last pierced object if there were enough blockages
-        return Math.min(distances.size < pierceCap || pierceCap < 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
+        return Math.min(distances.size < pierceCap || pierceCap <= 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
     }
 
     /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
     public static float collideLaser(Bullet b, float length, boolean large, boolean laser, int pierceCap){
         float resultLength = findPierceLength(b, pierceCap, laser, length);
 
-        collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
+        collideLine(b, b.team, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
 
         b.fdata = resultLength;
 
         return resultLength;
     }
 
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
-        collideLine(hitter, team, effect, x, y, angle, length, false);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length){
+        collideLine(hitter, team, x, y, angle, length, false);
     }
 
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
-        collideLine(hitter, team, effect, x, y, angle, length, large, true);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large){
+        collideLine(hitter, team, x, y, angle, length, large, true);
     }
 
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser){
-        collideLine(hitter, team, effect, x, y, angle, length, large, laser, -1);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser){
+        collideLine(hitter, team, x, y, angle, length, large, laser, -1);
     }
 
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
         length = findLength(hitter, length, laser, pierceCap);
         hitter.fdata = length;
 
@@ -518,7 +518,7 @@ public class Damage{
             }
             //TODO better velocity displacement
             float dst = vec.set(unit.x - x, unit.y - y).len();
-            unit.vel.add(vec.setLength((1f - dst / radius) * 2f / unit.mass()));
+            unit.vel.add(vec.setLength((radius > 0f ? 1f - dst / radius : 1f) * 2f / unit.mass()));
 
             if(complete && damage >= 9999999f && unit.isPlayer()){
                 Events.fire(Trigger.exclusionDeath);
@@ -545,8 +545,10 @@ public class Damage{
         tileDamage(team, x, y, baseRadius, damage, null);
     }
 
-    public static void tileDamage(Team team, int x, int y, float baseRadius, float damage, @Nullable Bullet source){
-        Core.app.post(() -> {
+    public static void tileDamage(Team team, int tx, int ty, float baseRadius, float damage, @Nullable Bullet source){
+        Time.run(0f, () -> {
+            int x = Mathf.clamp(tx, -100, world.width() + 100), y = Mathf.clamp(ty, -100, world.height() + 100);
+
             var in = world.build(x, y);
             //spawned inside a multiblock. this means that damage needs to be dealt directly.
             //why? because otherwise the building would absorb everything in one cell, which means much less damage than a nearby explosion.
@@ -640,7 +642,7 @@ public class Damage{
 
     private static float calculateDamage(float dist, float radius, float damage){
         float falloff = 0.4f;
-        float scaled = Mathf.lerp(1f - dist / radius, 1f, falloff);
+        float scaled = radius <= 0.00001f ? 1f : Mathf.lerp(1f - dist / radius, 1f, falloff);
         return damage * scaled;
     }
 

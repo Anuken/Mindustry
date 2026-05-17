@@ -2,7 +2,7 @@ package mindustry.server;
 
 import arc.*;
 import arc.files.*;
-import arc.func.Cons;
+import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Timer;
@@ -10,6 +10,8 @@ import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
+import arc.util.serialization.Jval.*;
+import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
@@ -30,6 +32,7 @@ import java.net.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
+import java.util.regex.*;
 
 import static arc.util.ColorCodes.*;
 import static arc.util.Log.*;
@@ -71,6 +74,8 @@ public class ServerControl implements ApplicationListener{
     private PrintWriter socketOutput;
     private String suggested;
     private boolean autoPaused = false;
+    private Fi patchDirectory;
+    private Seq<String> contentPatches = new Seq<>();
 
     public Cons<GameOverEvent> gameOverListener = event -> {
         if(state.rules.waves){
@@ -111,7 +116,7 @@ public class ServerControl implements ApplicationListener{
             "bans", "",
             "admins", "",
             "shufflemode", "custom",
-            "globalrules", "{reactorExplosions: false, logicUnitBuild: false}"
+            "globalrules", "{reactorExplosions: false, logicUnitBuild: false, logicUnitDeconstruct: false}"
         );
 
         //update log level
@@ -190,12 +195,16 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        customMapDirectory.mkdirs();
-
         if(Version.build == -1){
             warn("&lyYour server is running a custom build, which means that client checking is disabled.");
             warn("&lyIt is highly advised to specify which version you're using by building with gradle args &lb&fb-Pbuildversion=&lr<build>");
         }
+
+        customMapDirectory.mkdirs();
+
+        patchDirectory = dataDirectory.child("patches");
+        patchDirectory.mkdirs();
+        loadPatchFiles();
 
         //set up default shuffle mode
         try{
@@ -247,11 +256,30 @@ public class ServerControl implements ApplicationListener{
                     }
                 }
             }
+
+            if(state.isGame()){ //run this only if the server's actually hosting
+                if(Config.autoPause.bool()){
+                    if(Groups.player.isEmpty()){
+                        autoPaused = true;
+                        state.set(State.paused);
+                    }else if(autoPaused){
+                        autoPaused = false;
+                        state.set(State.playing);
+                    }
+                }else if(autoPaused && Vars.state.isPaused()){ //unpause when the config is disabled
+                    state.set(State.playing);
+                    autoPaused = false;
+                }
+            }
         });
 
         Events.run(Trigger.socketConfigChanged, () -> {
             toggleSocket(false);
             toggleSocket(Config.socketInput.bool());
+        });
+
+        Events.on(ResetEvent.class, e -> {
+            autoPaused = false;
         });
 
         Events.on(PlayEvent.class, e -> {
@@ -295,30 +323,29 @@ public class ServerControl implements ApplicationListener{
             info("Server loaded. Type @ for help.", "'help'");
         });
 
-        Events.on(SaveLoadEvent.class, e -> {
-            Core.app.post(() -> {
-                if(Config.autoPause.bool() && Groups.player.size() == 0){
-                    state.set(State.paused);
-                    autoPaused = true;
-                }
-            });
-        });
-
-        Events.on(PlayerJoin.class, e -> {
-            if(state.isPaused() && autoPaused && Config.autoPause.bool()){
-                state.set(State.playing);
-                autoPaused = false;
+        Events.on(ContentPatchLoadEvent.class, event -> {
+            //NOTE: if patches change, and an older save is loaded, the patches will be applied twice; the old ones won't be removed.
+            for(String patch : contentPatches){
+                event.patches.addUnique(patch);
             }
         });
+    }
 
-        Events.on(PlayerLeave.class, e -> {
-            // The player list length is compared with 1 and not 0 here,
-            // because when PlayerLeave gets fired, the player hasn't been removed from the player list yet
-            if(!state.isPaused() && Config.autoPause.bool() && Groups.player.size() == 1){
-                state.set(State.paused);
-                autoPaused = true;
+    void loadPatchFiles(){
+        contentPatches.clear();
+        Seq<Fi> patches = patchDirectory.findAll(f -> f.extEquals("json") || f.extEquals("hjson") || f.extEquals("json5")).sort();
+
+        for(Fi patch : patches){
+            try{
+                contentPatches.add(Jval.read(patch.readString()).toString(Jformat.plain));
+            }catch(Throwable e){
+                Log.err("Invalid patch file: " + patch.name(), e);
             }
-        });
+        }
+
+        if(contentPatches.size > 0){
+            Log.info("Loaded @ content patch files.", contentPatches.size);
+        }
     }
 
     protected void registerCommands(){
@@ -386,29 +413,28 @@ public class ServerControl implements ApplicationListener{
                 }
             }else{
                 result = maps.getShuffleMode().next(preset, state.map);
-                info("Randomized next map to be @.", result.plainName());
+                if(result != null){
+                    info("Randomized next map to be @.", result.plainName());
+                }
             }
 
             info("Loading map...");
 
             logic.reset();
-            lastMode = preset;
-            Core.settings.put("lastServerMode", lastMode.name());
-            try{
-                world.loadMap(result, result.applyRules(lastMode));
-                state.rules = result.applyRules(preset);
-                logic.play();
+            if(result != null){
+                lastMode = preset;
+                Core.settings.put("lastServerMode", lastMode.name());
+                try{
+                    world.loadMap(result, result.applyRules(lastMode));
+                    state.rules = result.applyRules(preset);
+                    logic.play();
 
-                info("Map loaded.");
+                    info("Map loaded.");
 
-                netServer.openServer();
-
-                if(Config.autoPause.bool()){
-                    state.set(State.paused);
-                    autoPaused = true;
+                    netServer.openServer();
+                }catch(MapException e){
+                    err("@: @", e.map.plainName(), e.getMessage());
                 }
-            }catch(MapException e){
-                err("@: @", e.map.plainName(), e.getMessage());
             }
         });
 
@@ -440,6 +466,13 @@ public class ServerControl implements ApplicationListener{
                 info("No maps found.");
             }
             info("Map directory: &fi@", customMapDirectory.file().getAbsoluteFile().toString());
+        });
+
+        handler.register("reloadpatches", "Reload all patch files from disk.", arg -> {
+            loadPatchFiles();
+            if(contentPatches.isEmpty()){
+                err("No valid content patch files found.");
+            }
         });
 
         handler.register("reloadmaps", "Reload all maps from disk.", arg -> {
@@ -672,7 +705,7 @@ public class ServerControl implements ApplicationListener{
             if(arg.length == 0){
                 info("Subnets banned: @", netServer.admins.getSubnetBans().isEmpty() ? "<none>" : "");
                 for(String subnet : netServer.admins.getSubnetBans()){
-                    info("&lw  " + subnet);
+                    info("&lw\t" + subnet);
                 }
             }else if(arg.length == 1){
                 err("You must provide a subnet to add or remove.");
@@ -693,6 +726,50 @@ public class ServerControl implements ApplicationListener{
 
                     netServer.admins.removeSubnetBan(arg[1]);
                     info("Unbanned @**", arg[1]);
+                }else{
+                    err("Incorrect usage. Provide add/remove as the second argument.");
+                }
+            }
+        });
+
+        handler.register("name-ban", "[add/remove/clear] [regex]", "Ban a name by case-insensitive regex.", arg -> {
+            var names = netServer.admins.bannedNames;
+
+            if(arg.length == 0){
+                info("Name regexes banned: @", names.isEmpty() ? "<none>" : "");
+                for(Pattern subnet : names){
+                    info("&lw\t" + subnet.pattern());
+                }
+            }else if(arg.length == 1){
+                if(arg[0].equals("clear")){
+                    names.clear();
+                    netServer.admins.save();
+                }else{
+                    err("You must provide a name regex to add or remove.");
+                }
+            }else{
+                if(arg[0].equals("add")){
+                    if(names.contains(p -> p.pattern().equals(arg[1]))){
+                        err("That name regex is already banned.");
+                        return;
+                    }
+
+                    try{
+                        netServer.admins.addNameBan(arg[1]);
+                        info("Banned names by regex: @", arg[1]);
+                    }catch(Exception e){
+                        err("Invalid regex: @", Strings.getSimpleMessage(e));
+                    }
+                }else if(arg[0].equals("remove")){
+                    int target = names.indexOf(p -> p.pattern().equals(arg[1]));
+                    if(target == -1){
+                        err("That name isn't banned.");
+                        return;
+                    }
+
+                    names.remove(target);
+                    netServer.admins.save();
+                    info("Unbanned regex: @", arg[1]);
                 }else{
                     err("Incorrect usage. Provide add/remove as the second argument.");
                 }
@@ -1060,6 +1137,35 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("dos-ban", "[add/remove] [ip]", "Add or remove a DOS ban.", arg -> {
+            if(arg.length == 0){
+                info("DOS bans: @", netServer.admins.dosBlacklist.isEmpty() ? "<none>" : "");
+
+                netServer.admins.dosBlacklist.forEach(address -> {
+                    info("&lw\t" + address);
+                });
+                return;
+            }else if(arg.length == 1){
+                err("Expected either zero or two parameters, but only got one parameter.");
+                return;
+            }
+
+            String action = arg[0].toLowerCase();
+            String ip = arg[1];
+
+            if(action.equals("add")){
+                netServer.admins.blacklistDos(ip);
+                info("Dos banned: @", ip);
+                return;
+            }else if(action.equals("remove")){
+                netServer.admins.unBlacklistDos(ip);
+                info("Removed dos ban: @", ip);
+                return;
+            }
+
+            err("Unrecognized action: @", action);
+        });
+
         mods.eachClass(p -> p.registerServerCommands(handler));
     }
 
@@ -1117,7 +1223,7 @@ public class ServerControl implements ApplicationListener{
     public void play(boolean wait, Runnable run){
         inGameOverWait = true;
         cancelPlayTask();
-        
+
         Runnable reload = () -> {
             try{
                 WorldReloader reloader = new WorldReloader();

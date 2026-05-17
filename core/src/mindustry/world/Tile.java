@@ -2,6 +2,7 @@ package mindustry.world;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
@@ -17,6 +18,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.power.*;
 
 import static mindustry.Vars.*;
 
@@ -24,10 +26,19 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     private static final TileChangeEvent tileChange = new TileChangeEvent();
     private static final TilePreChangeEvent preChange = new TilePreChangeEvent();
     private static final TileFloorChangeEvent floorChange = new TileFloorChangeEvent();
-    private static final ObjectSet<Building> tileSet = new ObjectSet<>();
+    private static final TileOverlayChangeEvent overlayChange = new TileOverlayChangeEvent();;
 
-    /** Extra data for very specific blocks. */
-    public byte data;
+    private static final ObjectSet<Building> tileSet = new ObjectSet<>();
+    private static final IntSet staleGraphs = new IntSet();
+
+    /**
+     * Extra data for specific blocks. Only saved if Block#saveData is true.
+     * It is generally recommended that blocks only access data in their own category unless necessary - for example, a floor should not read/write overlay data.
+     * However, one byte may sometimes not be enough to hold enough data, in which case "overlapping" data storage is necessary.
+     * */
+    public byte data, floorData, overlayData;
+    /** Even more data for blocks. Use with caution; any floor/block can access this value. Due to 8-byte alignment of Java objects, this extra 4-byte field can be added with no additional cost.*/
+    public int extraData;
     /** Tile entity, usually null. */
     public @Nullable Building build;
     public short x, y;
@@ -156,6 +167,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return y * tilesize;
     }
 
+    //TODO: this method is misleading and buggy for non-center tiles
     public float drawx(){
         return block().offset + worldx();
     }
@@ -165,7 +177,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean isDarkened(){
-        return block.solid && ((!block.synthetic() && block.fillsTile) || block.checkForceDark(this));
+        return block.isDarkened(this);
     }
 
     public Floor floor(){
@@ -273,6 +285,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
         changed();
         changing = false;
+
+        block.blockChanged(this);
     }
 
     public void setBlock(Block type, Team team){
@@ -283,11 +297,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         setBlock(type, Team.derelict, 0);
     }
 
-    /** This resets the overlay! */
     public void setFloor(Floor type){
+        if(this.floor == type) return;
+
         var prev = this.floor;
         this.floor = type;
-        this.overlay = (Floor)Blocks.air;
 
         if(!headless && !world.isGenerating() && !isEditorTile()){
             renderer.blocks.removeFloorIndex(this);
@@ -301,22 +315,17 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             pathfinder.updateTile(this);
         }
 
-        if(!world.isGenerating() && prev != type){
+        if(!world.isGenerating()){
             Events.fire(floorChange.set(this, prev, type));
+        }
+
+        if(this.floor != prev){
+            this.floor.floorChanged(this);
         }
     }
 
     public boolean isEditorTile(){
         return false;
-    }
-
-    /** Sets the floor, preserving overlay.*/
-    public void setFloorUnder(Floor floor){
-        Block overlay = this.overlay;
-        setFloor(floor);
-        if(this.overlay != overlay){
-            setOverlay(overlay);
-        }
     }
 
     /** Sets the block to air. */
@@ -330,6 +339,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public void circle(int radius, Cons<Tile> cons){
         circle(radius, (x, y) -> cons.get(world.rawTile(x, y)));
+    }
+
+    public Color getFloorColor(){
+        return floor.getColor(this);
     }
 
     public void recacheWall(){
@@ -401,14 +414,19 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return floor.id;
     }
 
-    public void setOverlayID(short ore){
-        setOverlay(content.block(ore));
-    }
-
     public void setOverlay(Block block){
+        if(this.overlay == block) return;
+
+        var prev = this.overlay;
+
         this.overlay = (Floor)block;
 
         recache();
+
+        if(!world.isGenerating()){
+            Events.fire(overlayChange.set(this, prev, this.overlay));
+        }
+
         if(!world.isGenerating() && build != null){
             build.onProximityUpdate();
         }
@@ -420,7 +438,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public void clearOverlay(){
-        setOverlayID((short)0);
+        setOverlay(Blocks.air);
     }
 
     public boolean passable(){
@@ -442,7 +460,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     /** @return whether the floor on this tile deals damage or can be drowned on. */
     public boolean dangerous(){
-        return !block.solid && (floor.isDeep() || floor.damageTaken > 0);
+        return !block.solid && (floor.isDeep() || floor.damages());
     }
 
     /**
@@ -557,6 +575,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             null : null;
     }
 
+    public boolean shouldSaveData(){
+        return floor.saveData || overlay.saveData || block.saveData;
+    }
+
     public int staticDarkness(){
         return block.solid && block.fillsTile && !block.synthetic() ? data : 0;
     }
@@ -669,6 +691,19 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
+    /** @return all extra tile data, packed into a single long for data transfer convenience. */
+    public long getPackedData(){
+        return PackedTileData.get(extraData, data, floorData, overlayData);
+    }
+
+    /** Sets the packed data as obtained from {@link #getPackedData()}*/
+    public void setPackedData(long packed){
+        extraData = PackedTileData.extraData(packed);
+        data = PackedTileData.data(packed);
+        floorData = PackedTileData.floorData(packed);
+        overlayData = PackedTileData.overlayData(packed);
+    }
+
     @Override
     public void display(Table table){
 
@@ -769,10 +804,39 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     @Remote(called = Loc.server)
     public static void setTeams(int[] positions, Team team){
         if(positions == null) return;
+
+        staleGraphs.clear();
+
         for(int pos : positions){
-            Tile tile = world.tile(pos);
-            if(tile != null && tile.build != null){
-                tile.build.changeTeam(team);
+            var build = world.build(pos);
+            if(build != null){
+                if(build.power != null){
+                    staleGraphs.add(build.power.graph.getID());
+                }
+                build.changeTeam(team, false);
+            }
+        }
+
+        //update power graphs in a second pass
+        for(int pos : positions){
+            var build = world.build(pos);
+            if(build != null && build.power != null && staleGraphs.contains(build.power.graph.getID())){
+                for(int i = 0; i < build.power.links.size; i++){
+                    var other = world.build(build.power.links.items[i]);
+
+                    //only reflow links that were connected to the old power graph; ones that have a new one were already covered.
+                    if(other != null && other.team != team && other.power != null && staleGraphs.contains(other.power.graph.getID())){
+                        build.power.links.removeIndex(i);
+                        other.power.links.removeValue(build.pos());
+
+                        new PowerGraph().reflow(other);
+
+                        i --;
+                    }
+                }
+                new PowerGraph().reflow(build);
+
+                build.updatePowerGraph();
             }
         }
     }
@@ -794,5 +858,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                 indexer.notifyHealthChanged(build);
             }
         }
+    }
+
+    @Struct
+    class PackedTileDataStruct{
+        int extraData;
+        byte data, floorData, overlayData;
     }
 }

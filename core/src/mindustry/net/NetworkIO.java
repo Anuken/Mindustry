@@ -51,6 +51,7 @@ public class NetworkIO{
             player.write(new Writes(stream));
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
+            SaveIO.getSaveWriter().writeContentPatches(stream);
             SaveIO.getSaveWriter().writeMap(stream);
             SaveIO.getSaveWriter().writeTeamBlocks(stream);
             SaveIO.getSaveWriter().writeMarkers(stream);
@@ -84,6 +85,7 @@ public class NetworkIO{
             player.add();
 
             SaveIO.getSaveWriter().readContentHeader(stream);
+            SaveIO.getSaveWriter().readContentPatches(stream);
             SaveIO.getSaveWriter().readMap(stream, world.context);
             SaveIO.getSaveWriter().readTeamBlocks(stream);
             SaveIO.getSaveWriter().readMarkers(stream);
@@ -114,26 +116,28 @@ public class NetworkIO{
         buffer.putInt(netServer.admins.getPlayerLimit());
 
         writeString(buffer, description, 100);
-        if(state.rules.modeName != null){
-            writeString(buffer, state.rules.modeName, 50);
-        }
-        buffer.putInt(Core.settings.getInt("port", port));
+        writeString(buffer, state.rules.modeName == null ? "" : state.rules.modeName, 50);
+        buffer.putShort((short)Core.settings.getInt("port", port));
         return buffer;
     }
 
     public static Host readServerData(int ping, String hostAddress, ByteBuffer buffer){
         String host = readString(buffer);
         String map = readString(buffer);
+
         int players = buffer.getInt();
         int wave = buffer.getInt();
         int version = buffer.getInt();
         String vertype = readString(buffer);
-        Gamemode gamemode = Gamemode.all[buffer.get()];
+
+        byte mode = buffer.get();
+        Gamemode gamemode = Gamemode.all[mode < Gamemode.all.length ? mode : 0];
         int limit = buffer.getInt();
+
         String description = readString(buffer);
         String modeName = readString(buffer);
-        int hostPort = buffer.getInt();
-        hostPort = hostPort != 0 ? hostPort : Vars.port;
+        short port = buffer.getShort();
+        int hostPort = port != 0 ? port : Vars.port;
 
         return new Host(ping, host, hostAddress, hostPort, map, wave, players, version, vertype, gamemode, limit, description, modeName.isEmpty() ? null : modeName);
     }

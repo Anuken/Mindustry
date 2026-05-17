@@ -17,6 +17,7 @@ public class SuppressionFieldAbility extends Ability{
     protected static Rand rand = new Rand();
 
     public float reload = 60f * 1.5f;
+    public float maxDelay = 60f * 1.5f;
     public float range = 200f;
 
     public float orbRadius = 4.1f, orbMidScl = 0.33f, orbSinScl = 8f, orbSinMag = 1f;
@@ -55,9 +56,9 @@ public class SuppressionFieldAbility extends Ability{
     public void update(Unit unit){
         if(!active) return;
 
-        if((timer += Time.delta) >= reload){
+        if((timer += Time.delta) >= maxDelay){
             Tmp.v1.set(x, y).rotate(unit.rotation - 90f).add(unit);
-            Damage.applySuppression(unit.team, Tmp.v1.x, Tmp.v1.y, range, reload, reload, applyParticleChance, unit, effectColor);
+            Damage.applySuppression(unit.team, Tmp.v1.x, Tmp.v1.y, range, reload, maxDelay, applyParticleChance, unit, effectColor);
             timer = 0f;
         }
     }

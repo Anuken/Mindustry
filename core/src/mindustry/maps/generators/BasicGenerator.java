@@ -29,7 +29,7 @@ public abstract class BasicGenerator implements WorldGenerator{
     public Schematic defaultLoadout = Loadouts.basicShard;
 
     @Override
-    public void generate(Tiles tiles){
+    public void generate(Tiles tiles, WorldParams params){
         this.tiles = tiles;
         this.width = tiles.width;
         this.height = tiles.height;

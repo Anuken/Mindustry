@@ -1,10 +1,12 @@
 package mindustry.game;
 
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.graphics.MultiPacker;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
@@ -17,6 +19,7 @@ public class EventType{
     //events that occur very often
     public enum Trigger{
         shock,
+        cannotUpgrade,
         openConsole,
         blastFreeze,
         impactPower,
@@ -44,6 +47,7 @@ public class EventType{
         unitCommandChange,
         unitCommandPosition,
         unitCommandAttack,
+        unitCommandBoost,
         importMod,
         draw,
         drawOver,
@@ -75,16 +79,18 @@ public class EventType{
     public static class TurnEvent{}
     /** Called when the player places a line, mobile or desktop.*/
     public static class LineConfirmEvent{}
-    /** Called when a turret receives ammo, but only when the tutorial is active! */
-    public static class TurretAmmoDeliverEvent{}
-    /** Called when a core receives ammo, but only when the tutorial is active! */
-    public static class CoreItemDeliverEvent{}
     /** Called when the player opens info for a specific block.*/
     public static class BlockInfoEvent{}
     /** Called *after* all content has been initialized. */
     public static class ContentInitEvent{}
     /** Called *after* all content has been added to the atlas, but before its pixmaps are disposed. */
-    public static class AtlasPackEvent{}
+    public static class AtlasPackEvent{
+        public final MultiPacker multiPacker;
+
+        public AtlasPackEvent(MultiPacker multiPacker){
+          this.multiPacker = multiPacker;
+        }
+    }
     /** Called *after* all mod content has been loaded, but before it has been initialized. */
     public static class ModContentLoadEvent{}
     /** Called when the client game is first loaded. */
@@ -100,6 +106,15 @@ public class EventType{
     public static class WorldLoadBeginEvent{}
     /** Called when a game begins and the world tiles are initiated. About to updates tile proximity and sets up physics for the world(Before WorldLoadEvent) */
     public static class WorldLoadEndEvent{}
+
+    /** Called when a save loads custom patches. {@link #patches} can be modified in the event handler. */
+    public static class ContentPatchLoadEvent{
+        public final Seq<String> patches;
+
+        public ContentPatchLoadEvent(Seq<String> patches){
+            this.patches = patches;
+        }
+    }
 
     public static class SaveLoadEvent{
         public final boolean isMap;
@@ -415,6 +430,22 @@ public class EventType{
     }
 
     /**
+     * Called when a tile changes its overlay. Do not cache or use with a timer.
+     * Do not modify any tiles inside listener code.
+     * */
+    public static class TileOverlayChangeEvent{
+        public Tile tile;
+        public Floor previous, overlay;
+
+        public TileOverlayChangeEvent set(Tile tile, Floor previous, Floor overlay){
+            this.tile = tile;
+            this.previous = previous;
+            this.overlay = overlay;
+            return this;
+        }
+    }
+
+    /**
      * Called after a building's team changes.
      * Event object is reused, do not nest!
      * */
@@ -528,7 +559,7 @@ public class EventType{
     }
 
     /** Called right before a block is destroyed.
-     * The tile entity of the tile in this event cannot be null when this happens.*/
+     * The building of the tile in this event cannot be null when this happens.*/
     public static class BlockDestroyEvent{
         public final Tile tile;
 

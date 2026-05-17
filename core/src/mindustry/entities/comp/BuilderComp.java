@@ -114,11 +114,34 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             if(plans.size > 1){
                 int total = 0;
                 int size = plans.size;
-                BuildPlan plan;
-                while((!within((plan = buildPlan()).tile(), finalPlaceDst) || shouldSkip(plan, core)) && total < size){
+                float bestDst = Float.MAX_VALUE;
+                boolean foundAny = false;
+                int bestIndex = -1;
+                while(total < size){
+                    var plan = buildPlan();
+
+                    float dst = plan.dst2(this);
+                    boolean within = dst <= finalPlaceDst*finalPlaceDst;
+                    //if it's a valid plan within range, break out of the loop
+                    if(within && !shouldSkip(plan, core)){
+                        foundAny = true;
+                        break;
+                    }else if(within && dst < bestDst){ //it's still bad, but at least it's within build radius
+                        bestIndex = total;
+                        bestDst = dst;
+                    }
+
                     plans.removeFirst();
                     plans.addLast(plan);
                     total++;
+                }
+
+                //all the plans were useless, and the current one can't be reached. skip to the closest one, if applicable
+                if(!foundAny && bestIndex > 0 && !within(buildPlan(), finalPlaceDst)){
+                    //this is slow, but should be rare in practice
+                    for(int i = 0; i < bestIndex; i++){
+                        plans.addLast(plans.removeFirst());
+                    }
                 }
             }
 
@@ -132,11 +155,13 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             if(!within(tile, finalPlaceDst)) continue;
 
             if(!headless){
-                Vars.control.sound.loop(Sounds.build, tile, 0.15f);
+                Vars.control.sound.loop(Sounds.loopBuild, tile, 1.3f);
             }
 
+            boolean allowBuildCurrent = current.block != null && (state.isEditor() || (state.rules.waves && team == state.rules.waveTeam && current.block.isVisible()) || (current.block.unlockedNowHost() && current.block.environmentBuildable() && current.block.isPlaceable()));
+
             if(!(tile.build instanceof ConstructBuild cb)){
-                if(!current.initialized && !current.breaking && Build.validPlaceIgnoreUnits(current.block, team, current.x, current.y, current.rotation, true, true)){
+                if(!current.initialized && !current.breaking && Build.validPlaceIgnoreUnits(current.block, team, current.x, current.y, current.rotation, true, true) && allowBuildCurrent){
                     if(Build.checkNoUnitOverlap(current.block, current.x, current.y)){
                         boolean hasAll = infinite || current.isRotation(team) ||
                         //derelict repair
@@ -145,9 +170,9 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
                         !Structs.contains(current.block.requirements, i -> !core.items.has(i.item, Math.min(Mathf.round(i.amount * state.rules.buildCostMultiplier), 1)));
 
                         if(hasAll){
-                            Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation);
+                            Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation, current.block.instantBuild ? current.config : null);
 
-                            if(current.block.instantBuild){
+                            if(!net.client() && current.block.instantBuild){
                                 if(plans.size > 0){
                                     plans.removeFirst();
                                 }
@@ -188,30 +213,13 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             //otherwise, update it.
             if(current.breaking){
                 entity.deconstruct(self(), core, bs);
-            }else{
+            }else if(allowBuildCurrent){ //only allow building unlocked blocks
                 entity.construct(self(), core, bs, current.config);
             }
 
             current.stuck = Mathf.equal(current.progress, entity.progress);
             current.progress = entity.progress;
         }
-    }
-
-    /** Draw all current build plans. Does not draw the beam effect, only the positions. */
-    void drawBuildPlans(){
-
-        for(int i = 0; i < 2; i++){
-            for(BuildPlan plan : plans){
-                if(plan.progress > 0.01f || (buildPlan() == plan && plan.initialized && (within(plan.x * tilesize, plan.y * tilesize, type.buildRange) || state.isEditor()))) continue;
-                if(i == 0){
-                    drawPlan(plan, 1f);
-                }else{
-                    drawPlanTop(plan, 1f);
-                }
-            }
-        }
-
-        Draw.reset();
     }
 
     void drawPlan(BuildPlan plan, float alpha){
@@ -236,10 +244,10 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
 
     /** @return whether this plan should be skipped, in favor of the next one. */
     boolean shouldSkip(BuildPlan plan, @Nullable Building core){
-        //plans that you have at least *started* are considered
-        if(state.rules.infiniteResources || team.rules().infiniteResources || plan.breaking || core == null || plan.isRotation(team) || (isBuilding() && !within(plans.last(), type.buildRange))) return false;
+        if(state.rules.infiniteResources || team.rules().infiniteResources || plan.breaking || core == null || plan.isRotation(team) || plan.isDerelictRepair()) return false;
 
-        return (plan.stuck && !core.items.has(plan.block.requirements)) || (Structs.contains(plan.block.requirements, i -> !core.items.has(i.item, Math.min(i.amount, 15)) && Mathf.round(i.amount * state.rules.buildCostMultiplier) > 0) && !plan.initialized);
+        return (plan.stuck && !core.items.has(plan.block.requirements)) ||
+            (Structs.contains(plan.block.requirements, i -> !core.items.has(i.item, Math.min(i.amount, 15)) && Mathf.round(i.amount * state.rules.buildCostMultiplier) > 0));
     }
 
     void removeBuild(int x, int y, boolean breaking){
@@ -322,7 +330,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         }
 
         //draw remote plans.
-        if(core != null && active && !isLocal() && !(tile.block() instanceof ConstructBlock)){
+        if(core != null && active && !isLocal() && !(tile.block() instanceof ConstructBlock) && !state.isPaused()){
             Draw.z(Layer.plans - 1f);
             drawPlan(plan, 0.5f);
             drawPlanTop(plan, 0.5f);

@@ -35,10 +35,10 @@ import static mindustry.logic.GlobalVars.*;
 @Component(base = true)
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, Senseable, Settable{
     private static final Vec2 tmp1 = new Vec2(), tmp2 = new Vec2();
-    static final float warpDst = 30f;
+    static final float warpDst = 8f;
 
     @Import boolean dead, disarmed;
-    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, ammo, dragMultiplier, armorOverride, speedMultiplier;
+    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, dragMultiplier, armorOverride, speedMultiplier;
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
@@ -59,6 +59,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     transient String lastCommanded;
     transient float shadowAlpha = -1f, healTime;
     transient int lastFogPos;
+    /** Only used in suicide units */
+    transient boolean hasTarget;
     private transient float resupplyTime = Mathf.random(10f);
     private transient boolean wasPlayer;
     private transient boolean wasHealed;
@@ -102,7 +104,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public float floorSpeedMultiplier(){
         Floor on = isFlying() || type.hovering ? Blocks.air.asFloor() : floorOn();
-        return on.speedMultiplier * speedMultiplier;
+        return (float)Math.pow(on.speedMultiplier, type.floorMultiplier) * speedMultiplier;
     }
 
     /** Called when this unit was unloaded from a factory or spawn point. */
@@ -111,9 +113,17 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public void updateBoosting(boolean boost){
+        updateBoosting(boost, false);
+    }
+
+    public void updateBoosting(boolean boost, boolean event){
         if(!type.canBoost || dead) return;
 
-        elevation = Mathf.approachDelta(elevation, type.canBoost ? Mathf.num(boost || onSolid() || (isFlying() && !canLand())) : 0f, type.riseSpeed);
+        boolean shouldBoost = boost || onSolid() || (isFlying() && !canLand());
+        elevation = Mathf.approachDelta(elevation, type.canBoost ? Mathf.num(shouldBoost) : 0f, shouldBoost ? type.riseSpeed : type.descentSpeed);
+        if(event){
+            Events.fire(Trigger.unitCommandBoost);
+        }
     }
 
     /** Move based on preferred unit movement type. */
@@ -192,6 +202,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return rotation;
     }
 
+    public float ammof(){
+        return 1f;
+    }
+
     @Override
     public boolean displayable(){
         return type.hoverable;
@@ -255,8 +269,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case health -> health;
             case shield -> shield;
             case maxHealth -> maxHealth;
-            case ammo -> !state.rules.unitAmmo ? type.ammoCapacity : ammo;
-            case ammoCapacity -> type.ammoCapacity;
             case x -> World.conv(x);
             case y -> World.conv(y);
             case velocityX -> vel.x * 60f / tilesize;
@@ -275,6 +287,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case mining -> mining() ? 1 : 0;
             case mineX -> mining() ? mineTile.x : -1;
             case mineY -> mining() ? mineTile.y : -1;
+            case buildX -> isBuilding() ? buildPlan().x : -1;
+            case buildY -> isBuilding() ? buildPlan().y : -1;
             case armor -> armorOverride >= 0f ? armorOverride : armor;
             case flag -> flag;
             case speed -> type.speed * 60f / tilesize * speedMultiplier;
@@ -288,6 +302,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case payloadCapacity -> type.payloadCapacity / tilePayload;
             case size -> hitSize / tilesize;
             case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
+            case selectedRotation -> controller instanceof Player p ? p.selectedRotation : 0;
+            case pingX -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingX) : Float.NaN;
+            case pingY -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingY) : Float.NaN;
             default -> Float.NaN;
         };
     }
@@ -303,6 +320,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 (pay.payloads().isEmpty() ? null :
                 pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type :
                 pay.payloads().peek() instanceof BuildPayload p2 ? p2.block() : null) : null;
+            case building -> isBuilding() && !buildPlan().breaking ? buildPlan().tile().build : null;
+            case breaking -> isBuilding() && buildPlan().breaking ? buildPlan().tile().build : null;
+            case selectedBlock -> controller instanceof Player p ? p.selectedBlock : null;
+            case pingText -> controller instanceof Player p && p.isPinging() ? p.pingText : null;
             default -> noSensed;
         };
     }
@@ -473,6 +494,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller instanceof AIController;
     }
 
+    /** @return whether the unit *can* be commanded, even if its controller is not currently CommandAI. */
+    public boolean allowCommand(){
+        return controller instanceof CommandAI;
+    }
+
+    /** @return whether the unit has a CommandAI controller */
     public boolean isCommandable(){
         return controller instanceof CommandAI;
     }
@@ -519,11 +546,15 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public boolean playerControllable(){
-        return type.playerControllable;
+        return type.playerControllable && !(controller instanceof LogicAI ai && ai.controller != null && ai.controller.block.privileged);
     }
 
     public boolean targetable(Team targeter){
         return type.targetable(self(), targeter);
+    }
+
+    public boolean killable(){
+        return type.killable(self());
     }
 
     public boolean hittable(){
@@ -596,7 +627,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         if(floor != null && floor.isLiquid && floor.drownTime > 0 && canDrown()){
             lastDrownFloor = floor;
-            drownTime += Time.delta / floor.drownTime / type.drownTimeMultiplier;
+            drownTime += Time.delta / (hitSize / 8f * type.drownTimeMultiplier * floor.drownTime);
             if(Mathf.chanceDelta(0.05f)){
                 floor.drownUpdateEffect.at(x, y, hitSize, floor.mapColor);
             }
@@ -637,10 +668,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 //repel unit out of bounds
                 if(x < left) dx += (-(x - left)/warpDst);
                 if(y < bot) dy += (-(y - bot)/warpDst);
-                if(x > right) dx -= (x - right)/warpDst;
-                if(y > top) dy -= (y - top)/warpDst;
+                if(x > right - tilesize) dx -= (x - (right - tilesize))/warpDst;
+                if(y > top - tilesize) dy -= (y - (top - tilesize))/warpDst;
 
                 velAddNet(dx * Time.delta, dy * Time.delta);
+                float margin = tilesize * 1f;
+                x = Mathf.clamp(x, left - margin, right - tilesize + margin);
+                y = Mathf.clamp(y, bot - margin, top - tilesize + margin);
             }
 
             //clamp position if not flying
@@ -655,6 +689,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             }
         }
 
+        if(Float.isNaN(health)){
+            health = 0f;
+            kill();
+        }
+
         //update drown/flying state
 
         Floor floor = floorOn();
@@ -663,7 +702,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(isFlying() != wasFlying){
             if(wasFlying){
                 if(tile != null){
-                    Fx.unitLand.at(x, y, floor.isLiquid ? 1f : 0.5f, tile.floor().mapColor);
+                    Fx.unitLand.at(x, y, floor.isLiquid ? 1f : 0.5f, tile.getFloorColor());
                 }
             }
 
@@ -672,7 +711,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         if(!type.hovering && isGrounded() && type.emitWalkEffect){
             if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= (7f + hitSize()/8f)){
-                floor.walkEffect.at(x, y, hitSize() / 8f, floor.mapColor);
+                floor.walkEffect.at(x, y, hitSize() / 8f, tile != null ? tile.getFloorColor() : floor.mapColor);
                 splashTimer = 0f;
 
                 if(type.emitWalkSound){
@@ -694,24 +733,19 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             kill();
         }
 
-        if(!headless && type.loopSound != Sounds.none){
+        if(!headless){
             control.sound.loop(type.loopSound, this, type.loopSoundVolume);
+            if(type.moveSound != Sounds.none){
+                float progress = Mathf.clamp(vel.len() / type.speed);
+                float pitch = Mathf.lerp(type.moveSoundPitchMin,  type.moveSoundPitchMax, progress);
+                control.sound.loop(type.moveSound, this, type.moveSoundVolume * progress, pitch);
+            }
         }
 
         //check if environment is unsupported
         if(!type.supportsEnv(state.rules.env) && !dead){
             Call.unitEnvDeath(self());
             team.data().updateCount(type, -1);
-        }
-
-        if(state.rules.unitAmmo && ammo < type.ammoCapacity - 0.0001f){
-            resupplyTime += Time.delta;
-
-            //resupply only at a fixed interval to prevent lag
-            if(resupplyTime > 10f){
-                type.ammoType.resupply(self());
-                resupplyTime = 0f;
-            }
         }
 
         for(Ability a : abilities){
@@ -765,7 +799,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             //move down
             elevation -= type.fallSpeed * Time.delta;
 
-            if(isGrounded() || health <= -maxHealth){
+            if(isGrounded() || health <= -maxHealth * type.wreckHealthMultiplier){
                 Call.unitDestroy(id);
             }
         }
@@ -791,7 +825,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             //boost if possible
             if(type.canBoost){
                 elevation = 1f;
-            }else if(!net.client()){
+            }else if(!net.client() && !(!headless && isRemote())){
                 kill();
             }
         }
@@ -823,25 +857,25 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** Actually destroys the unit, removing it and creating explosions. **/
     public void destroy(){
-        if(!isAdded() || !type.killable) return;
+        if(!isAdded() || !killable()) return;
 
         float explosiveness = 2f + item().explosiveness * stack().amount * 1.53f;
         float flammability = item().flammability * stack().amount / 1.9f;
         float power = item().charge * Mathf.pow(stack().amount, 1.11f) * 160f;
 
         if(!spawnedByCore){
-            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, (bounds() + type.legLength/1.7f) / 2f, state.rules.damageExplosions && state.rules.unitCrashDamage(team) > 0, item().flammability > 1, team, type.deathExplosionEffect);
+            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, (bounds() + type.legLength/1.7f) / 2f, state.rules.damageExplosions && state.rules.unitCrashDamage(team) > 0, item().flammability > 1, team, type.deathExplosionEffect, 0f);
         }else{
             type.deathExplosionEffect.at(x, y, bounds() / 2f / 8f);
         }
 
-        float shake = type.deathShake < 0 ? hitSize / 3f : type.deathShake;
+        float shake = type.deathShake < 0 ? 3f + hitSize / 3f : type.deathShake;
 
         if(type.createScorch){
             Effect.scorch(x, y, (int)(hitSize / 5));
         }
         Effect.shake(shake, shake, this);
-        type.deathSound.at(this);
+        type.deathSound.at(this, 1f, type.deathSoundVolume);
 
         Events.fire(new UnitDestroyEvent(self()));
 
@@ -851,6 +885,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         for(WeaponMount mount : mounts){
             if(mount.weapon.shootOnDeath && !(mount.weapon.bullet.killShooter && mount.totalShots > 0)){
+                if(mount.weapon.shootOnDeathEffect != null && !hasTarget){
+                    mount.allowShootEffects = false;
+                    mount.weapon.shootOnDeathEffect.at(x, y, rotation);
+                }
                 mount.reload = 0f;
                 mount.shoot = true;
                 mount.weapon.update(self(), mount);
@@ -860,7 +898,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //if this unit crash landed (was flying), damage stuff in a radius
         if(type.flying && !spawnedByCore && type.createWreck && state.rules.unitCrashDamage(team) > 0){
             var shields = indexer.getEnemy(team, BlockFlag.shield);
-            float crashDamage = Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f * state.rules.unitCrashDamage(team);
+            float crashDamage = Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 2.5f * state.rules.unitCrashDamage(team);
             if(shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, crashDamage))){
                 Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, crashDamage, true, false, true);
             }
@@ -922,13 +960,15 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //don't waste time when the unit is already on the ground, just destroy it
         if(!type.flying || !type.createWreck){
             destroy();
+        }else{
+           type.wreckSound.at(this, 1f, type.wreckSoundVolume);
         }
     }
 
     @Override
     @Replace
     public void kill(){
-        if(dead || net.client() || !type.killable) return;
+        if(dead || net.client() || !killable()) return;
 
         //deaths are synced; this calls killed()
         Call.unitDeath(id);

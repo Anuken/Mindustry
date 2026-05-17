@@ -557,7 +557,7 @@ public class SchematicsDialog extends BaseDialog{
                     next.pack();
                     float w = next.getWidth() + Scl.scl(9f);
 
-                    if(w + sum >= Core.graphics.getWidth() * 0.9f){
+                    if(w*2f + sum >= Core.graphics.getWidth() * 0.9f){
                         p.add(current).row();
                         current = new Table();
                         current.left();

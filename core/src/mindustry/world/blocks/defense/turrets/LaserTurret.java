@@ -27,7 +27,9 @@ public class LaserTurret extends PowerTurret{
         super.setStats();
 
         stats.remove(Stat.booster);
-        stats.add(Stat.input, StatValues.boosters(reload, coolant.amount, coolantMultiplier, false, this::consumesLiquid));
+        if(coolant != null){
+            stats.add(Stat.input, StatValues.boosters(reload, coolant.amount, coolantMultiplier, false, this::consumesLiquid));
+        }
     }
 
     @Override

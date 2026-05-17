@@ -54,6 +54,7 @@ public class UnitSpawnAbility extends Ability{
             Events.fire(new UnitCreateEvent(u, null, unit));
             if(!Vars.net.client()){
                 u.add();
+                Units.notifyUnitSpawn(u);
             }
 
             timer = 0f;

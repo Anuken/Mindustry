@@ -1,7 +1,5 @@
 package mindustry.maps.generators;
 
-import arc.graphics.*;
-import arc.math.geom.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -10,34 +8,19 @@ import mindustry.world.*;
 public class BlankPlanetGenerator extends PlanetGenerator{
 
     @Override
-    public float getHeight(Vec3 position){
-        return 0;
-    }
-
-    @Override
-    public Color getColor(Vec3 position){
-        return Color.white;
-    }
-
-    @Override
-    public void generateSector(Sector sector){
-
-    }
-
-    @Override
     public void addWeather(Sector sector, Rules rules){
 
     }
 
     @Override
-    public void generate(Tiles tiles, Sector sec, int seed){
+    public void generate(Tiles tiles, Sector sec, WorldParams params){
         this.tiles = tiles;
         this.sector = sec;
-        this.rand.setSeed(sec.id + seed + baseSeed);
+        this.rand.setSeed(sec.id + params.seedOffset + baseSeed);
 
         tiles.fill();
 
-        generate(tiles);
+        generate(tiles, params);
     }
 
 }

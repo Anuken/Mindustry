@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
@@ -115,6 +116,14 @@ public class BlockIndexer{
             }
 
             updatePresentOres();
+
+            for(Team team : Team.all){
+                var data = state.teams.get(team);
+
+                if(team.rules().prebuildAi && data.hasCore()){
+                    PrebuildAI.sortPlans(data.plans);
+                }
+            }
         });
     }
 
@@ -132,7 +141,7 @@ public class BlockIndexer{
     }
 
     private void removeFloorIndex(Tile tile, Floor floor){
-        if(floor.flags.size == 0) return;
+        if(floor.flags.size == 0 || floorMap == null) return;
 
         for(var flag : floor.flags.array){
             getFlaggedFloors(flag).remove(tile);
@@ -140,7 +149,7 @@ public class BlockIndexer{
     }
 
     private void addFloorIndex(Tile tile, Floor floor){
-        if(floor.flags.size == 0 || !floor.shouldIndex(tile)) return;
+        if(floor.flags.size == 0 || !floor.shouldIndex(tile) || floorMap == null) return;
 
         for(var flag : floor.flags.array){
             getFlaggedFloors(flag).add(tile);
@@ -167,70 +176,100 @@ public class BlockIndexer{
                 }
             }
 
-            //no longer part of the building list
-            data.buildings.remove(build);
-            data.buildingTypes.get(build.block, () -> new Seq<>(false)).remove(build);
+            {
+                int buildIndex = build.indexerBuildIndex & 0xffff;
 
-            //update the unit cap when building is removed
+                //remove from building list based on cached index
+                if(buildIndex < data.buildings.size && data.buildings.get(buildIndex) == build){
+                    data.buildings.remove(buildIndex);
+                    //update index of the building placed in the new position
+                    if(buildIndex < data.buildings.size) data.buildings.get(buildIndex).indexerBuildIndex = (short)buildIndex;
+                }else{
+                    int index = data.buildings.indexOf(build);
+                    if(index != -1){
+                        data.buildings.remove(index);
+                        //update index of the building placed in the new position
+                        if(index < data.buildings.size) data.buildings.get(index).indexerBuildIndex = (short)index;
+                    }
+                }
+            }
+
+            {
+                var targetTypes = data.buildingTypes.get(build.block, () -> new Seq<>(false));
+                int buildTypeIndex = build.indexerBuildTypeIndex & 0xffff;
+
+                //remove from building list based on cached index
+                if(buildTypeIndex < targetTypes.size && targetTypes.get(buildTypeIndex) == build){
+                    targetTypes.remove(buildTypeIndex);
+                    //update index of the building placed in the new position
+                    if(buildTypeIndex < targetTypes.size) targetTypes.get(buildTypeIndex).indexerBuildTypeIndex = (short)buildTypeIndex;
+                }else{
+                    int index = targetTypes.indexOf(build);
+                    if(index != -1){
+                        targetTypes.remove(index);
+                        //update index of the building placed in the new position
+                        if(index < targetTypes.size) targetTypes.get(index).indexerBuildTypeIndex = (short)index;
+                    }
+                }
+            }
+
             data.unitCap -= tile.block().unitCapModifier;
 
-            //unregister building from building quadtree
             if(data.buildingTree != null){
                 data.buildingTree.remove(build);
             }
 
-            //remove indexed turret
             if(data.turretTree != null && build.block.attacks){
                 data.turretTree.remove(build);
             }
 
-            //unregister damaged buildings
+            //unregister damaged buildings if applicable
             if(build.wasDamaged && damagedTiles[team.id] != null){
                 damagedTiles[team.id].remove(build);
             }
 
-            //is no longer registered
             build.wasDamaged = false;
         }
     }
 
-    public void addIndex(Tile tile){
-        process(tile);
+    public void addIndex(Tile base){
+        process(base);
 
-        Item drop = tile.drop(), wallDrop = tile.wallDrop();
-        if(drop == null && wallDrop == null) return;
-        int qx = tile.x / quadrantSize, qy = tile.y / quadrantSize;
-        int pos = tile.pos();
+        base.getLinkedTiles(tile -> {
+            Item drop = tile.drop(), wallDrop = tile.wallDrop();
+            if(drop == null && wallDrop == null) return;
+            int qx = tile.x / quadrantSize, qy = tile.y / quadrantSize;
+            int pos = tile.pos();
 
-        if(tile.block() == Blocks.air){
-            if(drop != null){ //floor
-                if(ores[drop.id] == null) ores[drop.id] = new IntSeq[quadWidth][quadHeight];
-                if(ores[drop.id][qx][qy] == null) ores[drop.id][qx][qy] = new IntSeq(false, 16);
-                if(ores[drop.id][qx][qy].addUnique(pos)){
-                    int old = allOres.increment(drop); //increment ore count only if not already counted
-                    if(old == 0) updatePresentOres();
+            if(tile.block() == Blocks.air){
+                if(drop != null){ //floor
+                    if(ores[drop.id] == null) ores[drop.id] = new IntSeq[quadWidth][quadHeight];
+                    if(ores[drop.id][qx][qy] == null) ores[drop.id][qx][qy] = new IntSeq(false, 16);
+                    if(ores[drop.id][qx][qy].addUnique(pos)){
+                        int old = allOres.increment(drop); //increment ore count only if not already counted
+                        if(old == 0) updatePresentOres();
+                    }
+                }
+                if(wallDrop != null && wallOres != null && wallOres[wallDrop.id] != null && wallOres[wallDrop.id][qx][qy] != null && wallOres[wallDrop.id][qx][qy].removeValue(pos)){ //wall
+                    int old = allWallOres.increment(wallDrop, -1);
+                    if(old == 1) updatePresentOres();
+                }
+            }else{
+                if(wallDrop != null){ //wall
+                    if(wallOres[wallDrop.id] == null) wallOres[wallDrop.id] = new IntSeq[quadWidth][quadHeight];
+                    if(wallOres[wallDrop.id][qx][qy] == null) wallOres[wallDrop.id][qx][qy] = new IntSeq(false, 16);
+                    if(wallOres[wallDrop.id][qx][qy].addUnique(pos)){
+                        int old = allWallOres.increment(wallDrop); //increment ore count only if not already counted
+                        if(old == 0) updatePresentOres();
+                    }
+                }
+
+                if(drop != null && ores != null && ores[drop.id] != null && ores[drop.id][qx][qy] != null && ores[drop.id][qx][qy].removeValue(pos)){ //floor
+                    int old = allOres.increment(drop, -1);
+                    if(old == 1) updatePresentOres();
                 }
             }
-            if(wallDrop != null && wallOres != null && wallOres[wallDrop.id] != null && wallOres[wallDrop.id][qx][qy] != null && wallOres[wallDrop.id][qx][qy].removeValue(pos)){ //wall
-                int old = allWallOres.increment(wallDrop, -1);
-                if(old == 1) updatePresentOres();
-            }
-        }else{
-            if(wallDrop != null){ //wall
-                if(wallOres[wallDrop.id] == null) wallOres[wallDrop.id] = new IntSeq[quadWidth][quadHeight];
-                if(wallOres[wallDrop.id][qx][qy] == null) wallOres[wallDrop.id][qx][qy] = new IntSeq(false, 16);
-                if(wallOres[wallDrop.id][qx][qy].addUnique(pos)){
-                    int old = allWallOres.increment(wallDrop); //increment ore count only if not already counted
-                    if(old == 0) updatePresentOres();
-                }
-            }
-
-            if(drop != null && ores != null && ores[drop.id] != null&& ores[drop.id][qx][qy] != null && ores[drop.id][qx][qy].removeValue(pos)){ //floor
-                int old = allOres.increment(drop, -1);
-                if(old == 1) updatePresentOres();
-            }
-        }
-
+        });
     }
 
     /** @return whether a certain block is anywhere on this map. */
@@ -292,7 +331,7 @@ public class BlockIndexer{
             returnBool = false;
 
             allBuildings(wx, wy, range, b -> {
-                if(pred.get(b)){
+                if(pred.get(b) && !b.block.privileged){
                     returnBool = true;
                     cons.get(b);
                 }
@@ -304,7 +343,7 @@ public class BlockIndexer{
             var buildings = team.data().buildingTree;
             if(buildings == null) return false;
             buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
-                if(b.within(wx, wy, range + b.hitSize() / 2f) && pred.get(b)){
+                if(b.within(wx, wy, range + b.hitSize() / 2f) && pred.get(b) && !b.block.privileged){
                     breturnArray.add(b);
                 }
             });
@@ -330,7 +369,7 @@ public class BlockIndexer{
         var buildings = team.data().buildingTree;
         if(buildings == null) return false;
         buildings.intersect(rect, b -> {
-            if(pred.get(b)){
+            if(pred.get(b) && !b.block.privileged){
                 breturnArray.add(b);
             }
         });
@@ -553,9 +592,15 @@ public class BlockIndexer{
                 }
             }
 
+            var targetTypes = data.buildingTypes.get(tile.block(), () -> new Seq<>(false));
+
             //record in list of buildings
             data.buildings.add(tile.build);
-            data.buildingTypes.get(tile.block(), () -> new Seq<>(false)).add(tile.build);
+            targetTypes.add(tile.build);
+
+            //save indices for fast lookup
+            tile.build.indexerBuildIndex = (short)(data.buildings.size - 1);
+            tile.build.indexerBuildTypeIndex = (short)(targetTypes.size - 1);
 
             //update the unit cap when new tile is registered
             data.unitCap += tile.block().unitCapModifier;

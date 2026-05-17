@@ -11,10 +11,10 @@ import mindustry.logic.LExecutor.*;
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
 
-    private static final int invalidNumNegative = Integer.MIN_VALUE;
-    private static final int invalidNumPositive = Integer.MAX_VALUE;
+    private static final long invalidNumNegative = Long.MIN_VALUE;
+    private static final long invalidNumPositive = Long.MAX_VALUE;
 
-    private boolean privileged;
+    public boolean privileged;
     /** Maps names to variable. */
     public OrderedMap<String, LVar> vars = new OrderedMap<>();
     /** All instructions to be executed. */
@@ -31,7 +31,6 @@ public class LAssembler{
 
     public static LAssembler assemble(String data, boolean privileged){
         LAssembler asm = new LAssembler();
-
         Seq<LStatement> st = read(data, privileged);
 
         asm.privileged = privileged;
@@ -74,28 +73,35 @@ public class LAssembler{
         symbol = symbol.replace(' ', '_');
 
         //use a positive invalid number if number might be negative, else use a negative invalid number
-        int usedInvalidNum = symbol.length() > 0 && symbol.charAt(0) == '-' ? invalidNumPositive : invalidNumNegative;
-        double value = parseDouble(symbol, usedInvalidNum);
+        double value = parseDouble(symbol);
 
-        if(value == usedInvalidNum){
+        if(Double.isNaN(value)){
             return putVar(symbol);
         }else{
+            if(Double.isInfinite(value)) value = 0.0;
             //this creates a hidden const variable with the specified value
             return putConst("___" + value, value);
         }
     }
 
-    double parseDouble(String symbol, int invalidNum){
+    double parseDouble(String symbol){
         //parse hex/binary syntax
-        if(symbol.startsWith("0b")) return Strings.parseLong(symbol, 2, 2, symbol.length(), invalidNum);
-        if(symbol.startsWith("+0b")) return Strings.parseLong(symbol, 2, 3, symbol.length(), invalidNum);
-        if(symbol.startsWith("-0b")) return -Strings.parseLong(symbol, 2, 3, symbol.length(), invalidNum);//FIXME: breaks with Long.MIN_VALUE
-        if(symbol.startsWith("0x")) return Strings.parseLong(symbol, 16, 2, symbol.length(), invalidNum);
-        if(symbol.startsWith("+0x")) return Strings.parseLong(symbol, 16, 3, symbol.length(), invalidNum);
-        if(symbol.startsWith("-0x")) return -Strings.parseLong(symbol, 16, 3, symbol.length(), invalidNum);//FIXME: breaks with Long.MIN_VALUE
+        if(symbol.startsWith("0b")) return parseLong(false, symbol, 2, 2, symbol.length());
+        if(symbol.startsWith("+0b")) return parseLong(false, symbol, 2, 3, symbol.length());
+        if(symbol.startsWith("-0b")) return parseLong(true,symbol,  2, 3, symbol.length());
+        if(symbol.startsWith("0x")) return parseLong(false,symbol,  16, 2, symbol.length());
+        if(symbol.startsWith("+0x")) return parseLong(false,symbol,  16, 3, symbol.length());
+        if(symbol.startsWith("-0x")) return parseLong(true,symbol,  16, 3, symbol.length());
+        if(symbol.startsWith("%[") && symbol.endsWith("]") && symbol.length() > 3) return parseNamedColor(symbol);
         if(symbol.startsWith("%") && (symbol.length() == 7 || symbol.length() == 9)) return parseColor(symbol);
 
-        return Strings.parseDouble(symbol, invalidNum);
+        return Strings.parseDouble(symbol, Double.NaN);
+    }
+
+    double parseLong(boolean negative, String s, int radix, int start, int end) {
+        long usedInvalidNum = negative ? invalidNumPositive : invalidNumNegative;
+        long l = Strings.parseLong(s, radix, start, end, usedInvalidNum);
+        return l == usedInvalidNum ? Double.NaN : negative ? -l : l;
     }
 
     double parseColor(String symbol){
@@ -106,6 +112,12 @@ public class LAssembler{
         a = symbol.length() == 9 ? Strings.parseInt(symbol, 16, 0, 7, 9) : 255;
 
         return Color.toDoubleBits(r, g, b, a);
+    }
+
+    double parseNamedColor(String symbol){
+        Color color = Colors.get(symbol.substring(2, symbol.length() - 1));
+
+        return color == null ? Double.NaN : color.toDoubleBits();
     }
 
     /** Adds a constant value by name. */
