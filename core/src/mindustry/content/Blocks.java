@@ -3356,6 +3356,7 @@ public class Blocks{
                     splashDamage = 15f;
                     splashDamageRadius = 24f;
                     scaledSplashDamage = true;
+                    armorMultiplier = 2;
 
                     frontColor = Pal.scrapAmmoFront;
                     backColor = hitColor = Pal.scrapAmmoBack;
@@ -3371,6 +3372,7 @@ public class Blocks{
                     splashDamage = 17f;
                     splashDamageRadius = 15f;
                     scaledSplashDamage = true;
+                    armorMultiplier = 2;
                 }},
                 Items.metaglass, new FlakBulletType(4f, 3){{
                     backColor = trailColor = Pal.glassAmmoBack;
@@ -3387,6 +3389,9 @@ public class Blocks{
                     splashDamage = 20f;
                     splashDamageRadius = 20f;
                     scaledSplashDamage = true;
+                    pierce = true;
+                    pierceCap = 2;
+                    armorMultiplier = 2;
                     fragBullets = 4;
                     fragBullet = new BasicBulletType(3f, 5){{
                         width = 5f;
@@ -3414,8 +3419,8 @@ public class Blocks{
             size = 2;
             targetGround = false;
 
-            shoot.shotDelay = 3f;
-            shoot.shots = 4;
+            shoot.shotDelay = 5f;
+            shoot.shots = 2;
 
             recoil = 1f;
             rotateSpeed = 15f;
