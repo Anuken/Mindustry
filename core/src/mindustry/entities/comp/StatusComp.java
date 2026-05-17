@@ -60,7 +60,7 @@ abstract class StatusComp implements Posc{
 
         if(!effect.reactive){
             //otherwise, no opposites found, add direct effect
-            StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
+            StatusEntry entry = effect.entryType.get();
             entry.damageTime = 0f;
             entry.set(effect, duration);
             applied.set(effect.id);
