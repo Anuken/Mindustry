@@ -147,8 +147,8 @@ public class PayloadAmmoTurret extends Turret{
         @Override
         public UnlockableContent getAmmoContent(){
             if(!payloads.isEmpty()){
-                for(var content : ammoKeys) {
-                    if (payloads.contains(content)) {
+                for(var content : ammoKeys){
+                    if(payloads.contains(content)){
                         return content;
                     }
                 }
