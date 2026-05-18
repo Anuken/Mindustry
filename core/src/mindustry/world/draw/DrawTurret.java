@@ -46,11 +46,9 @@ public class DrawTurret extends DrawBlock{
             part.getOutlines(out);
         }
 
-        if(ammoParts.size > 0){
-            for(var parts : ammoParts.values()){
-                for(var part : parts){
-                    part.getOutlines(out);
-                }
+        for(var parts : ammoParts.values()){
+            for(var part : parts){
+                part.getOutlines(out);
             }
         }
 
@@ -107,7 +105,7 @@ public class DrawTurret extends DrawBlock{
 
             if(ammoParts.size > 0 && tb.getAmmoContent() != null){
                 var parts = ammoParts.get(tb.getAmmoContent());
-                if(parts != null) {
+                if(parts != null){
                     for (var part : parts) {
                         params.setRecoil(part.recoilIndex >= 0 && tb.curRecoils != null ? tb.curRecoils[part.recoilIndex] : tb.curRecoil);
                         part.draw(params);
@@ -155,12 +153,10 @@ public class DrawTurret extends DrawBlock{
             part.load(block.name);
         }
 
-        if(ammoParts.size > 0){
-            for(var parts : ammoParts.values()){
-                for(var part : parts){
-                    part.turretShading = true;
-                    part.load(block.name);
-                }
+        for(var parts : ammoParts.values()){
+            for(var part : parts){
+                part.turretShading = true;
+                part.load(block.name);
             }
         }
 

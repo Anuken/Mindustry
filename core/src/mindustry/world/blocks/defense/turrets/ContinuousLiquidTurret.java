@@ -72,10 +72,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         @Override
         public UnlockableContent getAmmoContent(){
-            if(liquids != null){
-                return liquids.currentAmount() > 0f ? liquids.current() : null;
-            }
-            return null;
+            return liquids != null && liquids.currentAmount() > 0f ? liquids.current() : null;
         }
 
         @Override
