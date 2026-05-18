@@ -1,5 +1,6 @@
 package mindustry.world.blocks.logic;
 
+import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.func.*;
@@ -33,6 +34,7 @@ import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
     private static final int maxByteLen = 1024 * 100;
+    private static final int maxCompressedLen = 16_000;
     private static final int maxLinks = 6000;
     public static final int maxNameLength = 32;
 
@@ -725,8 +727,13 @@ public class LogicBlock extends Block{
                 boolean prev = state.rules.editor;
                 //this is a hack to allow configuration to work correctly in the editor for privileged processors
                 if(forceEditor) state.rules.editor = true;
-                configure(compress(code, relativeConnections()));
-                state.rules.editor = prev;
+                byte[] bytes = compress(code, relativeConnections());
+                if(bytes.length >= maxCompressedLen){
+                    ui.showErrorMessage(Core.bundle.format("logic.error.toolong ", maxByteLen, bytes.length));
+                }else{
+                    configure(bytes);
+                    state.rules.editor = prev;
+                }
             });
         }
 
