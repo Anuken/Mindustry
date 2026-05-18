@@ -593,7 +593,6 @@ public class SchematicsDialog extends BaseDialog{
 
     void buildTags(Schematic schem, Table t, boolean name){
         t.clearChildren();
-        t.left();
 
         //sort by order in the main target array. the complexity of this is probably awful
         schem.labels.sort(s -> tags.indexOf(s));
@@ -760,7 +759,7 @@ public class SchematicsDialog extends BaseDialog{
             Table inner = new Table();
 
             inner.add(Core.bundle.format("schematic.info", schem.width, schem.height, schem.tiles.size)).color(Color.lightGray).row();
-            inner.table(tags -> buildTags(schem, tags)).fillX().left().row();
+            inner.table(tags -> buildTags(schem, tags)).fillX().pad(6).row();
             inner.add(new SchematicImage(schem)).maxSize(800f).row();
 
             ItemSeq arr = schem.requirements();
@@ -778,7 +777,7 @@ public class SchematicsDialog extends BaseDialog{
                         r.row();
                     }
                 }
-            }).row();
+            }).pad(6).row();
             float cons = schem.powerConsumption() * 60, prod = schem.powerProduction() * 60;
             if(!Mathf.zero(cons) || !Mathf.zero(prod)){
                 inner.table(t -> {
@@ -799,8 +798,7 @@ public class SchematicsDialog extends BaseDialog{
             }
 
             if(!schem.description().isEmpty()){
-                inner.row();
-                inner.add("[lightgray]" + schem.description()).wrap().width(500f).padTop(20).left();
+                inner.add("[lightgray]" + schem.description()).wrap().padTop(20).growX().maxWidth(500).padLeft(8).padRight(8).row();
             }
 
             cont.pane(p -> {
