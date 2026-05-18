@@ -4884,7 +4884,7 @@ public class Blocks{
             Items.thorium, new BasicBulletType(){{
                 damage = 90;
                 reloadMultiplier = 0.85f;
-                rangeChange = -120f;
+                rangeChange = -102f;
                 speed = 9.5f;
                 width = height = 16;
                 pierceCap = 2;
