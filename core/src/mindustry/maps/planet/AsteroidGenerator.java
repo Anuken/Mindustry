@@ -149,8 +149,8 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         //TODO ???
         //state.rules.hiddenBuildItems.addAll(Items.plastanium, Items.surgeAlloy);
-        //TODO maybe make this on by default everywhere
-        state.rules.showSpawns = true;
+        //TODO maybe make this off by default everywhere
+        state.rules.hideSpawns = false;
         //TODO better wavegen, do it by hand even
         state.rules.spawns = Waves.generate(0.5f, rand, false, true, false);
     }
