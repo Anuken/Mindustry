@@ -106,7 +106,7 @@ public class DrawTurret extends DrawBlock{
             if(ammoParts.size > 0 && tb.getAmmoContent() != null){
                 var parts = ammoParts.get(tb.getAmmoContent());
                 if(parts != null){
-                    for (var part : parts) {
+                    for (var part : parts){
                         params.setRecoil(part.recoilIndex >= 0 && tb.curRecoils != null ? tb.curRecoils[part.recoilIndex] : tb.curRecoil);
                         part.draw(params);
                     }
