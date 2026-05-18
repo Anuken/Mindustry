@@ -47,6 +47,10 @@ public class MapObjectivesDialog extends BaseDialog{
 
             if(field != null && field.isAnnotationPresent(Multiline.class)){
                 cont.area(get.get(), set).height(100f).growX();
+            }else if(field != null && field.isAnnotationPresent(LogicCode.class)){
+                cont.button(b -> b.image(Icon.pencil).size(iconSmall), () -> {
+                    ui.logic.show(get.get(), null, true, set::get);
+                }).pad(4f);
             }else{
                 cont.field(get.get(), set).growX();
             }
@@ -288,6 +292,11 @@ public class MapObjectivesDialog extends BaseDialog{
                 b.label(() -> LStatement.alignToName.get(get.get(), "center"));
                 b.clicked(() -> LStatement.showAlignSelect(b, get.get(), set::get, align.hor(), align.ver()));
             }, () -> {});
+        });
+
+        setInterpreter(TextureHolder.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
+            cont.field(String.valueOf(get.get().value), s -> get.get().value = s).growX();
         });
 
         // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] from using it.

@@ -30,7 +30,9 @@ public class Junction extends Block{
 
         //(60f / speed * capacity) returns 13.84 which is not the actual value (non linear, depends on fps)
         stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
-        stats.add(Stat.itemCapacity, capacity, StatUnit.items);
+        stats.add(Stat.itemCapacity, table -> {
+            table.add(Strings.autoFixed(capacity, 2) + " " + StatUnit.items.localized() + " " + StatUnit.perSide.localized());
+        });
     }
 
     @Override

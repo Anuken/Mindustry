@@ -97,7 +97,7 @@ public class KeybindDialog extends Dialog{
 
                 table.labelWrap(() -> {
                     Axis axis = keybind.value;
-                    return axis.key != null ? axis.key.toString() : axis.min + " [red]/[] " + axis.max;
+                    return axis.key != null ? axis.key.getName() : axis.min.getName() + " [red]/[] " + axis.max.getName();
                 }).color(Pal.accent).left().minWidth(90).fillX().padRight(20);
 
                 table.button("@settings.rebind", tstyle, () -> {
@@ -107,7 +107,10 @@ public class KeybindDialog extends Dialog{
                 }).size(bw, bh);
             }else{
                 table.add(bundle.get("keybind." + keybind.name + ".name", Strings.capitalize(keybind.name)), Color.white).left().padRight(40).padLeft(8);
-                table.label(() -> keybind.value.key.toString()).color(Pal.accent).left().minWidth(90).padRight(20);
+                table.add(keybind.value.key.getName()).update(l -> {
+                    l.setText(keybind.value.key.getName());
+                    l.setColor(keybind.value.key == KeyCode.unset ? Color.darkGray : Pal.accent);
+                }).color(Pal.accent).left().minWidth(90).padRight(20);
 
                 table.button("@settings.rebind", tstyle, () -> {
                     rebindAxis = false;

@@ -83,7 +83,7 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
                             }
 
                             if(Mathf.chanceDelta(0.025)){
-                                Fx.crawlDust.at(t.worldx(), t.worldy(), t.floor().mapColor);
+                                Fx.crawlDust.at(t.worldx(), t.worldy(), t.getFloorColor());
                             }
                         }else{
                             solids ++;

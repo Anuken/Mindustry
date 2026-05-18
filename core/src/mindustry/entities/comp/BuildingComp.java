@@ -21,6 +21,7 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.editor.*;
 import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -66,9 +67,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient Seq<Building> proximity = new Seq<>(true, 6, Building.class);
     transient int cdump;
     transient int rotation;
-    transient float payloadRotation;
     transient String lastAccessed;
-    transient boolean wasDamaged; //used only by the indexer
     transient float visualLiquid;
 
     /** TODO Each bit corresponds to a team ID. Only 64 are supported. Does not work on servers. */
@@ -102,6 +101,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     private transient boolean sleeping;
     private transient float sleepTime;
     private transient boolean initialized;
+
+    //used only by the indexer
+    transient boolean wasDamaged;
+    transient short indexerBuildIndex, indexerBuildTypeIndex;
 
     /** Sets this tile entity data to this and adds it if necessary. */
     public Building init(Tile tile, Team team, boolean shouldAdd, int rotation){
@@ -1341,6 +1344,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @CallSuper
     public void onRepaired(){
         placed();
+        if(block.flags.contains(BlockFlag.hasFogRadius)){
+            fogControl.forceUpdate(team, self());
+        }
     }
 
     public boolean isCommandable(){
@@ -1452,7 +1458,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called when the block is destroyed. The tile is still intact at this stage. */
     public void onDestroyed(){
-
         float explosiveness = block.baseExplosiveness;
         float flammability = 0f;
         float power = 0f;
@@ -1476,7 +1481,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         if(block.hasLiquids && state.rules.damageExplosions){
-
             liquids.each(this::splashLiquid);
         }
 
@@ -1486,6 +1490,26 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(block.createRubble && !floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
         }
+
+        if(!headless){
+            playDestroySound();
+
+            if(explosiveness > 40f){
+                (Mathf.chance(0.5) ? Sounds.blockExplodeExplosive : Sounds.blockExplodeExplosiveAlt).at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }else if(flammability > 5f){
+                Sounds.blockExplodeFlammable.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }
+
+            if(power > 30000f){
+                Sounds.blockExplodeElectricBig.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }else if(power > 2000f){
+                Sounds.blockExplodeElectric.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
+            }
+        }
+    }
+
+    public void playDestroySound(){
+        block.destroySound.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax), block.destroySoundVolume);
     }
 
     public String getDisplayName(){
@@ -1706,10 +1730,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @return whether the bullet should be removed. */
     public boolean collision(Bullet other){
         boolean wasDead = health <= 0;
+        BulletType t = other.type;
 
         float damage = other.type.buildingDamage(other);
-        if(!other.type.pierceArmor){
-            damage = Damage.applyArmor(damage, block.armor);
+        if(!t.pierceArmor){
+            damage = Damage.applyArmor(damage, block.armor * t.armorMultiplier * t.blockArmorMultiplier);
         }
 
         damage(other, other.team, damage);
@@ -1734,6 +1759,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Changes this building's team in a safe manner. */
     public void changeTeam(Team next){
+        changeTeam(next, true);
+    }
+
+    /** Changes this building's team in a safe manner. */
+    public void changeTeam(Team next, boolean updatePower){
         if(this.team == next) return;
         if(block.forceTeam != null) team = block.forceTeam;
 
@@ -1747,11 +1777,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         this.team = next;
 
-        if(power != null){
+        if(power != null && updatePower){
+            var oldGraph = power.graph;
             for(int i = 0; i < power.links.size; i++){
                 var other = world.build(power.links.items[i]);
 
-                if(other != null && other.team != team && other.power != null){
+                //only reflow links that were connected to the old power graph; ones that have a new one were already covered.
+                if(other != null && other.team != team && other.power != null && other.power.graph == oldGraph){
                     power.links.removeIndex(i);
                     other.power.links.removeValue(pos());
 
@@ -2178,7 +2210,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void killed(){
         dead = true;
         Events.fire(new BlockDestroyEvent(tile));
-        block.destroySound.at(tile, Mathf.random(block.destroyPitchMin, block.destroyPitchMax));
         onDestroyed();
         if(tile != emptyTile){
             tile.remove();

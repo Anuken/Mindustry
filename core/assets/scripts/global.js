@@ -98,7 +98,6 @@ importPackage(Packages.mindustry.mod)
 importPackage(Packages.mindustry.net)
 importPackage(Packages.mindustry.service)
 importPackage(Packages.mindustry.type)
-importPackage(Packages.mindustry.type.ammo)
 importPackage(Packages.mindustry.type.unit)
 importPackage(Packages.mindustry.type.weapons)
 importPackage(Packages.mindustry.type.weather)
@@ -158,6 +157,7 @@ const UnlockEvent = Packages.mindustry.game.EventType.UnlockEvent
 const StateChangeEvent = Packages.mindustry.game.EventType.StateChangeEvent
 const CoreChangeEvent = Packages.mindustry.game.EventType.CoreChangeEvent
 const BuildTeamChangeEvent = Packages.mindustry.game.EventType.BuildTeamChangeEvent
+const TileOverlayChangeEvent = Packages.mindustry.game.EventType.TileOverlayChangeEvent
 const TileFloorChangeEvent = Packages.mindustry.game.EventType.TileFloorChangeEvent
 const TileChangeEvent = Packages.mindustry.game.EventType.TileChangeEvent
 const TilePreChangeEvent = Packages.mindustry.game.EventType.TilePreChangeEvent
@@ -185,6 +185,7 @@ const LaunchItemEvent = Packages.mindustry.game.EventType.LaunchItemEvent
 const SectorInvasionEvent = Packages.mindustry.game.EventType.SectorInvasionEvent
 const SectorLoseEvent = Packages.mindustry.game.EventType.SectorLoseEvent
 const SaveLoadEvent = Packages.mindustry.game.EventType.SaveLoadEvent
+const ContentPatchLoadEvent = Packages.mindustry.game.EventType.ContentPatchLoadEvent
 const WorldLoadEndEvent = Packages.mindustry.game.EventType.WorldLoadEndEvent
 const WorldLoadBeginEvent = Packages.mindustry.game.EventType.WorldLoadBeginEvent
 const WorldLoadEvent = Packages.mindustry.game.EventType.WorldLoadEvent
@@ -195,8 +196,6 @@ const ModContentLoadEvent = Packages.mindustry.game.EventType.ModContentLoadEven
 const AtlasPackEvent = Packages.mindustry.game.EventType.AtlasPackEvent
 const ContentInitEvent = Packages.mindustry.game.EventType.ContentInitEvent
 const BlockInfoEvent = Packages.mindustry.game.EventType.BlockInfoEvent
-const CoreItemDeliverEvent = Packages.mindustry.game.EventType.CoreItemDeliverEvent
-const TurretAmmoDeliverEvent = Packages.mindustry.game.EventType.TurretAmmoDeliverEvent
 const LineConfirmEvent = Packages.mindustry.game.EventType.LineConfirmEvent
 const TurnEvent = Packages.mindustry.game.EventType.TurnEvent
 const WaveEvent = Packages.mindustry.game.EventType.WaveEvent

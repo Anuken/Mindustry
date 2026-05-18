@@ -69,25 +69,24 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
             }
 
             //currently played (selected) sector has all the resources
-            if(selected != null && selected.planet == destination.planet && selected.hasBase() && selected.items().has(tmpItems)){
+            if(selected != null && selected.planet == destination.planet && selected.hasBase() && selected.items().has(tmpItems) && !selected.isAttacked()){
                 return selected;
             }else{
                 //find the closest sector that has resources (ranked by distance, not item quantity)
-                return destination.planet.sectors.min(s -> s.hasBase() && s.items().has(tmpItems), s -> s.tile.v.dst(destination.tile.v));
+                return destination.planet.sectors.min(s -> s.hasBase() && !s.isAttacked() && s.items().has(tmpItems), s -> s.tile.v.dst(destination.tile.v));
             }
         }else{
-            Sector launchSector = selected != null && selected.planet == destination.planet && selected.hasBase() ? selected : null;
+            Sector launchSector = selected != null && selected.planet == destination.planet && selected.hasBase() && !selected.isAttacked() ? selected : null;
             //directly nearby.
             if(destination.near().contains(launchSector)) return launchSector;
 
             Sector launchFrom = launchSector;
             if(launchFrom == null || destination.preset == null){
                 //TODO pick one with the most resources
-                launchFrom = destination.near().find(Sector::hasBase);
+                launchFrom = destination.near().find(s -> s.hasBase() && !s.isAttacked());
                 if(launchFrom == null && destination.preset != null){
                     if(launchSector != null) return launchSector;
-                    launchFrom = destination.planet.sectors.min(s -> !s.hasBase() ? Float.MAX_VALUE : s.tile.v.dst2(destination.tile.v));
-                    if(!launchFrom.hasBase()) launchFrom = null;
+                    launchFrom = destination.planet.sectors.min(s -> s.hasBase() && !s.isAttacked(), s -> s.tile.v.dst2(destination.tile.v));
                 }
             }
 

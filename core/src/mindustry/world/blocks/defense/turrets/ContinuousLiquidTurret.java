@@ -2,6 +2,7 @@ package mindustry.world.blocks.defense.turrets;
 
 import arc.struct.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
@@ -17,7 +18,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         super(name);
         hasLiquids = true;
         //TODO
-        loopSound = Sounds.minebeam;
+        loopSound = Sounds.loopMineBeam;
         shootSound = Sounds.none;
         smokeEffect = Fx.none;
         shootEffect = Fx.none;
@@ -54,7 +55,9 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
             }
         });
 
-        ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+        if(targetGround){
+            ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+        }
 
         super.init();
     }
@@ -68,10 +71,18 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
+        public UnlockableContent getAmmoContent(){
+            return liquids != null && liquids.currentAmount() > 0f ? liquids.current() : null;
+        }
+
+        @Override
+        public float getAmmoFraction(){
+            return liquids.currentAmount() / liquidCapacity;
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
-
-            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
 
             //only allow the turret to begin firing when it can fire for 4 continuous updates
             if(liquids.currentAmount() >= liquidConsumed * 4f){
