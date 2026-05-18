@@ -182,7 +182,7 @@ public class LogicBlock extends Block{
 
     @Override
     public Object pointConfig(Object config, Cons<Point2> transformer){
-        if(config instanceof byte[] data){
+        if(config instanceof byte[] data && data.length <= maxCompressedLen){
 
             try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
                 //discard version for now
@@ -208,8 +208,8 @@ public class LogicBlock extends Block{
                 }
 
                 return compress(bytes, links);
-            }catch(IOException e){
-                Log.err(e);
+            }catch(IOException ignored){
+                //error should not be logged
             }
         }
         return config;
@@ -705,7 +705,7 @@ public class LogicBlock extends Block{
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && (privileged || (!other.block.privileged && other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(other instanceof ConstructBuild);
+            return other != null && other.isValid() && (privileged || (!other.block.privileged && other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(privileged && !state.rules.worldProcessorPlayerLink && other.team == state.rules.defaultTeam) && !(other instanceof ConstructBuild);
         }
 
         @Override
@@ -728,8 +728,8 @@ public class LogicBlock extends Block{
                 //this is a hack to allow configuration to work correctly in the editor for privileged processors
                 if(forceEditor) state.rules.editor = true;
                 byte[] bytes = compress(code, relativeConnections());
-                if(bytes.length >= maxCompressedLen){
-                    ui.showErrorMessage(Core.bundle.format("logic.error.toolong ", maxByteLen, bytes.length));
+                if(bytes.length > maxCompressedLen){
+                    ui.showErrorMessage(Core.bundle.format("logic.error.toolong", maxByteLen, bytes.length));
                 }else{
                     configure(bytes);
                     state.rules.editor = prev;
