@@ -712,6 +712,9 @@ public class CoreBlock extends StorageBlock{
 
             storageCapacity = itemCapacity + proximity.sum(e -> owns(e) ? e.block.itemCapacity : 0);
             proximity.each(this::owns, t -> {
+                if(t.items != items){
+                    items.add(t.items);
+                }
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });
@@ -790,7 +793,8 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void damage(float amount){
-            if(player != null && team == player.team()){
+            if(player != null && team == player.team() && control != null){
+                Vars.control.lastDamagedCore = this;
                 Events.fire(Trigger.teamCoreDamage);
             }
             super.damage(amount);
