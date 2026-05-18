@@ -37,7 +37,7 @@ public class LiquidTurret extends Turret{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
+        stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
     }
 
     @Override

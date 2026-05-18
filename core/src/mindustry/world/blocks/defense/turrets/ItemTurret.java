@@ -50,7 +50,7 @@ public class ItemTurret extends Turret{
         super.setStats();
 
         stats.remove(Stat.itemCapacity);
-        stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
+        stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
         stats.add(Stat.ammoCapacity, maxAmmo / ammoPerShot, StatUnit.shots);
     }
 
