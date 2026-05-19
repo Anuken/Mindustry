@@ -20,7 +20,7 @@ public class DrawTurret extends DrawBlock{
     protected static final Rand rand = new Rand();
 
     public Seq<DrawPart> parts = new Seq<>();
-    public ObjectMap<UnlockableContent, Seq<DrawPart>> ammoParts = new ObjectMap<>();
+    public ObjectMap<UnlockableContent, DrawPart[]> ammoParts = new ObjectMap<>();
     /** Prefix to use when loading base region. */
     public String basePrefix = "";
     /** Overrides the liquid to draw in the liquid region. */
@@ -37,7 +37,9 @@ public class DrawTurret extends DrawBlock{
 
     /** Format: [unlockableContent1, seq1, unlockableContent2, seq2...] */
     public void setAmmoParts(Object... objects){
-        ammoParts = OrderedMap.of(objects);
+        for(int i = 0; i < objects.length; i+= 2){
+            ammoParts.put((UnlockableContent)objects[i], ((Seq<DrawPart>)objects[i + 1]).toArray(DrawPart.class));
+        }
     }
 
     @Override
