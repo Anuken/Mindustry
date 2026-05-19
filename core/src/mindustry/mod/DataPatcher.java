@@ -40,6 +40,7 @@ public class DataPatcher{
 
     /** Currently active patches. Note that apply() should be called after modification. */
     public Seq<PatchSet> patches = new Seq<>();
+    public Seq<PatchImage> images = new Seq<>();
 
     static{
         for(var type : ContentType.all){
@@ -666,6 +667,19 @@ public class DataPatcher{
             ", elementType=" + elementType +
             ", keyType=" + keyType +
             '}';
+        }
+    }
+
+    public static class PatchImage{
+        public String name;
+        public int width, height;
+        public byte[] data;
+
+        public PatchImage(String name, int width, int height, byte[] data){
+            this.name = name;
+            this.width = width;
+            this.height = height;
+            this.data = data;
         }
     }
 

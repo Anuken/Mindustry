@@ -65,10 +65,10 @@ public abstract class SaveVersion extends SaveFileReader{
     @Override
     public void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
         readRegion("meta", stream, counter, in -> readMeta(in, context));
-        readRegion("content", stream, counter, this::readContentHeader);
+        if(version >= 12) readRegion("patches", stream, counter, this::readContentPatches);
 
         try{
-            if(version >= 11) readRegion("patches", stream, counter, this::readContentPatches);
+            readRegion("content", stream, counter, this::readContentHeader);
             readRegion("map", stream, counter, in -> readMap(in, context));
             readRegion("entities", stream, counter, this::readEntities);
             if(version >= 8) readRegion("markers", stream, counter, this::readMarkers);
@@ -80,8 +80,8 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void write(DataOutputStream stream, StringMap extraTags) throws IOException{
         writeRegion("meta", stream, out -> writeMeta(out, extraTags));
-        writeRegion("content", stream, this::writeContentHeader);
         writeRegion("patches", stream, this::writeContentPatches);
+        writeRegion("content", stream, this::writeContentHeader);
         writeRegion("map", stream, this::writeMap);
         writeRegion("entities", stream, this::writeEntities);
         writeRegion("markers", stream, this::writeMarkers);
@@ -527,6 +527,7 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void readContentPatches(DataInput stream) throws IOException{
+        //TODO: read images
         Seq<String> patches = new Seq<>();
 
         int amount = stream.readUnsignedByte();
@@ -551,6 +552,7 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void writeContentPatches(DataOutput stream) throws IOException{
+        //TODO: write images
         if(state.patcher.patches.size > 0){
             var patches = state.patcher.patches;
             stream.writeByte(patches.size);
