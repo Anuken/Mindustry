@@ -368,7 +368,7 @@ public class ConstructBlock extends Block{
                     if(core != null && requirements[i].item.unlockedNowHost()){ //only accept items that are unlocked
                         int accepting = Math.min(accumulated, core.storageCapacity - core.items.get(requirements[i].item));
                         //transfer items directly, as this is not production.
-                        core.items.add(requirements[i].item, accepting);
+                        if(!state.rules.infiniteResources) core.items.add(requirements[i].item, accepting);
                         itemsLeft[i] += accepting;
                         accumulator[i] -= accepting;
                     }else{
@@ -386,7 +386,7 @@ public class ConstructBlock extends Block{
                         int target = Mathf.round(requirements[i].amount * state.rules.buildCostMultiplier * state.rules.deconstructRefundMultiplier);
                         int remaining = target - itemsLeft[i];
 
-                        if(requirements[i].item.unlockedNowHost()){
+                        if(requirements[i].item.unlockedNowHost() && !state.rules.infiniteResources){
                             core.items.add(requirements[i].item, Mathf.clamp(remaining, 0, core.storageCapacity - core.items.get(requirements[i].item)));
                         }
                         itemsLeft[i] = target;

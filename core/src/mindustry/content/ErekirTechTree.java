@@ -333,7 +333,6 @@ public class ErekirTechTree{
                                 node(shipRefabricator, Seq.with(new OnSector(peaks)), () -> {
                                     node(UnitTypes.avert);
 
-                                    //TODO
                                     node(primeRefabricator, Seq.with(new OnSector(stronghold)), () -> {
                                         node(UnitTypes.precept);
                                         node(UnitTypes.anthicus);
