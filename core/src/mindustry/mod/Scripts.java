@@ -55,6 +55,7 @@ public class Scripts implements Disposable{
             else if(o instanceof long[] arr) o = Arrays.toString(arr);
             else if(o instanceof char[] arr) o = Arrays.toString(arr);
             else if(o instanceof boolean[] arr) o = Arrays.toString(arr);
+            else if(o instanceof NativeArray arr) o = Arrays.toString(arr.toArray());
 
             var out = o.toString();
             return out == null ? "null" : out;
