@@ -98,6 +98,8 @@ public class Rules{
     public boolean logicUnitBuild = true;
     /** Whether to allow units to deconstruct blocks with logic. */
     public boolean logicUnitDeconstruct = false;
+    /** If false, world processors can't link to player structures. This is used in the campaign; see issue #12091 */
+    public boolean worldProcessorPlayerLink = true;
     /** If true, world processors can be edited and placed on this map. */
     public boolean allowEditWorldProcessors = false;
     /** If true, world processors no longer update. Used for testing. */

@@ -1,5 +1,6 @@
 package mindustry.world.blocks.logic;
 
+import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.func.*;
@@ -33,6 +34,7 @@ import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
     private static final int maxByteLen = 1024 * 100;
+    private static final int maxCompressedLen = 16_000;
     private static final int maxLinks = 6000;
     public static final int maxNameLength = 32;
 
@@ -180,7 +182,7 @@ public class LogicBlock extends Block{
 
     @Override
     public Object pointConfig(Object config, Cons<Point2> transformer){
-        if(config instanceof byte[] data){
+        if(config instanceof byte[] data && data.length <= maxCompressedLen){
 
             try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
                 //discard version for now
@@ -206,8 +208,8 @@ public class LogicBlock extends Block{
                 }
 
                 return compress(bytes, links);
-            }catch(IOException e){
-                Log.err(e);
+            }catch(IOException ignored){
+                //error should not be logged
             }
         }
         return config;
@@ -703,7 +705,7 @@ public class LogicBlock extends Block{
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && (privileged || (!other.block.privileged && other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(other instanceof ConstructBuild);
+            return other != null && other.isValid() && (privileged || (!other.block.privileged && other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(privileged && !state.rules.worldProcessorPlayerLink && other.team == state.rules.defaultTeam) && !(other instanceof ConstructBuild);
         }
 
         @Override
@@ -725,8 +727,13 @@ public class LogicBlock extends Block{
                 boolean prev = state.rules.editor;
                 //this is a hack to allow configuration to work correctly in the editor for privileged processors
                 if(forceEditor) state.rules.editor = true;
-                configure(compress(code, relativeConnections()));
-                state.rules.editor = prev;
+                byte[] bytes = compress(code, relativeConnections());
+                if(bytes.length > maxCompressedLen){
+                    ui.showErrorMessage(Core.bundle.format("logic.error.toolong", maxByteLen, bytes.length));
+                }else{
+                    configure(bytes);
+                    state.rules.editor = prev;
+                }
             });
         }
 
