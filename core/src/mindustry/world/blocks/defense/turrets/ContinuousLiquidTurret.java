@@ -17,7 +17,6 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
     public ContinuousLiquidTurret(String name){
         super(name);
         hasLiquids = true;
-        //TODO
         loopSound = Sounds.loopMineBeam;
         shootSound = Sounds.none;
         smokeEffect = Fx.none;
