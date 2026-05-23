@@ -712,6 +712,9 @@ public class CoreBlock extends StorageBlock{
 
             storageCapacity = itemCapacity + proximity.sum(e -> owns(e) ? e.block.itemCapacity : 0);
             proximity.each(this::owns, t -> {
+                if(t.items != items){
+                    items.add(t.items);
+                }
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });
