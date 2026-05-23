@@ -337,6 +337,11 @@ public class CommandAI extends AIController{
                         move = true;
                         vecOut.set(targetPos);
                     }*/
+
+                    //do not wiggle in place
+                    if(unit.type.naval && move && unit.tileOn() == world.tileWorld(vecOut.x, vecOut.y)){
+                        move = false;
+                    }
                 }
 
                 //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
