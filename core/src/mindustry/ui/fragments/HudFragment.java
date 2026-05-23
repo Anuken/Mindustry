@@ -21,6 +21,7 @@ import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.entities.abilities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -455,7 +456,7 @@ public class HudFragment{
                     toggleMenus();
                 }
 
-                if(Core.input.keyTap(Binding.skipWave) && canSkipWave()){
+                if(Core.input.keyTap(Binding.skipWave) && canSkipWave() && !Core.scene.hasDialog() && !Core.scene.hasField()){
                     if(net.client() && player.admin){
                         Call.adminRequest(player, AdminAction.wave, null);
                     }else{
@@ -1006,14 +1007,30 @@ public class HudFragment{
                 }
             });
 
-            t.add(new SideBar(() -> player.dead() ? 0f : player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
+            Floatp unitShieldFrac = () -> {
+                if(player.dead()) return 0f;
+                for(var ability : player.unit().abilities){
+                    if(ability instanceof ForceFieldAbility f){
+                        return f.max <= 0f ? 0f : player.unit().shield / f.max;
+                    }
+                    if(ability instanceof ShieldArcAbility s){
+                        return s.max <= 0f ? 0f : s.data / s.max;
+                    }
+                }
+                return 0f;
+            };
+            Boolp unitHasShield = () -> !player.dead() && player.unit() != null && Structs.contains(player.unit().abilities, a -> a instanceof ForceFieldAbility || a instanceof ShieldArcAbility);
+
+            t.add(new SideBar(() -> player.dead() ? 0f : unitHasShield.get() ? unitShieldFrac.get() : player.unit().healthf(), () -> !unitHasShield.get(), true)).width(bw).growY().padRight(pad).update(b -> {
+                b.color.set(!player.dead() && unitHasShield.get() ? player.unit().type.shieldColor(player.unit()) : Pal.health);
+            });
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
 
             Boolp playerHasPayloads = () -> player.unit() instanceof Payloadc pay && !pay.payloads().isEmpty();
             Floatp playerPayloadCapacityUsed = () -> player.unit() instanceof Payloadc pay ? pay.payloadUsed() / player.unit().type().payloadCapacity : 0f;
 
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : playerHasPayloads.get() ? playerPayloadCapacityUsed.get() : player.unit().healthf(), () -> !(player.displayAmmo() || playerHasPayloads.get()), false)).width(bw).growY().padLeft(pad).update(b -> {
-                b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color() : playerHasPayloads.get() ? Pal.items : Pal.health);
+                b.color.set(player.displayAmmo() ? Pal.ammo : playerHasPayloads.get() ? Pal.items : Pal.health);
             });
 
             t.getChildren().get(1).toFront();

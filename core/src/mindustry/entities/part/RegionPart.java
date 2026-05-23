@@ -92,6 +92,7 @@ public class RegionPart extends DrawPart{
         float preXscl = Draw.xscl, preYscl = Draw.yscl;
         Draw.xscl *= xScl + gx;
         Draw.yscl *= yScl + gy;
+        float prevMixCol = Draw.getMixColorPacked(), prevCol = Draw.getColorPacked();
 
         for(int s = 0; s < len; s++){
             //use specific side if necessary
@@ -149,8 +150,8 @@ public class RegionPart extends DrawPart{
             Draw.xscl *= sign;
         }
 
-        Draw.color();
-        Draw.mixcol();
+        Draw.color(prevCol);
+        Draw.mixcol(prevMixCol);
 
         Draw.z(z);
 
