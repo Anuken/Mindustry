@@ -105,7 +105,7 @@ public class Drill extends Block{
         countOre(tile);
         if(returnItem == null || !drawMineItem) return;
 
-        Draw.color(returnItem.color);
+        Draw.tint(returnItem.color);
         Draw.rect(itemRegion, plan.drawx(), plan.drawy());
         Draw.color();
     }

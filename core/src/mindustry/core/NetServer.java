@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -37,8 +38,11 @@ import static mindustry.Vars.*;
 public class NetServer implements ApplicationListener{
     /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
     private static final int maxSnapshotSize = 800;
-    private static final int timerBlockSync = 0, timerHealthSync = 1, timerPlanPreviewSync = 2;
-    private static final float blockSyncTime = 60 * 6, healthSyncTime = 30, planPreviewSyncTime = 30f;
+    private static final Timekeeper
+        blockSyncTime = Timekeeper.ofSeconds(6f),
+        healthSyncTime = Timekeeper.ofSeconds(0.5f),
+        planPreviewSyncTime = Timekeeper.ofSeconds(0.5f);
+
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
     private static final Writes dataWrites = new Writes(null);
     private static final IntSeq hiddenIds = new IntSeq();
@@ -99,7 +103,7 @@ public class NetServer implements ApplicationListener{
     };
 
     private boolean closing = false, pvpAutoPaused = true;
-    private Interval timer = new Interval(10);
+    //private Interval timer = new Interval(10);
     private IntSet buildHealthChanged = new IntSet();
 
     /** Current kick session. */
@@ -132,7 +136,11 @@ public class NetServer implements ApplicationListener{
             Events.fire(new ConnectionEvent(con));
 
             if(admins.isIPBanned(connect.addressTCP) || admins.isSubnetBanned(connect.addressTCP)){
-                con.kick(KickReason.banned);
+                if(Vars.steam && SteamAdmin.isBanned(connect.addressTCP)){
+                    con.kick("You have been banned from Steam lobbies for disruptive and shameful behavior.");
+                }else{
+                    con.kick(KickReason.banned);
+                }
             }
         });
 
@@ -270,7 +278,7 @@ public class NetServer implements ApplicationListener{
             }
 
             Player player = Player.create();
-            player.admin = admins.isAdmin(uuid, packet.usid);
+            player.admin = admins.isAdmin(uuid, packet.usid) || (steam && SteamAdmin.isAdmin(con.address));
             player.con = con;
             player.con.usid = packet.usid;
             player.con.uuid = uuid;
@@ -411,7 +419,7 @@ public class NetServer implements ApplicationListener{
                     }else if(found.team() != player.team()){
                         player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
-                        Timekeeper vtime = cooldowns.get(player.uuid(), () -> new Timekeeper(voteCooldown));
+                        Timekeeper vtime = cooldowns.get(player.uuid(), () -> Timekeeper.ofSeconds(voteCooldown));
 
                         if(!vtime.get()){
                             player.sendMessage("[scarlet]You must wait " + voteCooldown/60 + " minutes between votekicks.");
@@ -554,6 +562,12 @@ public class NetServer implements ApplicationListener{
             if(Config.showConnectMessages.bool()) info(message);
         }
 
+        //force despawn the player unit upon disconnection in case the game is paused
+        Unit u = player.unit();
+        if(u != null && u.spawnedByCore && !u.dead){
+            Call.unitDespawn(u);
+        }
+
         player.remove();
         player.con.hasDisconnected = true;
     }
@@ -635,6 +649,31 @@ public class NetServer implements ApplicationListener{
 
     private static boolean invalid(float f){
         return Float.isInfinite(f) || Float.isNaN(f);
+    }
+
+    public static void syncBuilding(Building build){
+        if(build == null) return;
+        netServer.syncStream.reset();
+        netServer.dataStreamWrites.i(build.pos());
+        netServer.dataStreamWrites.s(build.block.id);
+        build.writeSync(netServer.dataStreamWrites);
+
+        Call.blockSnapshot((short)1, netServer.syncStream.toByteArray());
+        netServer.syncStream.reset();
+    }
+
+    @Remote(targets = Loc.client, priority = PacketPriority.low, unreliable = true)
+    public static void requestBlockSnapshot(Player player, int pos){
+        Building build = world.build(pos);
+        if(build != null && build.team == player.team()){
+            netServer.syncStream.reset();
+            netServer.dataStreamWrites.i(build.pos());
+            netServer.dataStreamWrites.s(build.block.id);
+            build.writeSync(netServer.dataStreamWrites);
+
+            Call.blockSnapshot(player.con, (short)1, netServer.syncStream.toByteArray());
+            netServer.syncStream.reset();
+        }
     }
 
     //sent from the client to the server in batches with the same incrementing groupId
@@ -873,6 +912,13 @@ public class NetServer implements ApplicationListener{
         }
 
         Events.fire(new PlayerJoin(player));
+
+        //plugins may have kicked the player immediately in PlayerJoinEvent, so don't respawn if that happens
+        if(!player.con.kicked){
+            //instantly respawn the player upon connection, even if the game is paused
+            player.deathTimer = Player.deathDelay;
+            player.update();
+        }
     }
 
     public boolean isWaitingForPlayers(){
@@ -1108,11 +1154,11 @@ public class NetServer implements ApplicationListener{
                 }
             });
 
-            if(Groups.player.size() > 0 && Core.settings.getBool("blocksync") && timer.get(timerBlockSync, blockSyncTime)){
+            if(Groups.player.size() > 0 && Core.settings.getBool("blocksync") && blockSyncTime.poll()){
                 writeBlockSnapshots();
             }
 
-            if(Groups.player.size() > 0 && buildHealthChanged.size > 0 && timer.get(timerHealthSync, healthSyncTime)){
+            if(Groups.player.size() > 0 && buildHealthChanged.size > 0 && healthSyncTime.poll()){
                 healthSeq.clear();
 
                 var iter = buildHealthChanged.iterator();
@@ -1141,7 +1187,14 @@ public class NetServer implements ApplicationListener{
             }
 
             //TODO: this system is a big bandwidth waster, it would be nicer to have a diff system instead
-            if(Groups.player.size() > 0 && timer.get(timerPlanPreviewSync, planPreviewSyncTime)){
+            if(Groups.player.size() > 0 && planPreviewSyncTime.poll()){
+
+                if(!headless){ //update local player's plans so that clients see it
+                    player.previewPlansCurrent.clear();
+                    control.input.getSyncedPlans(player.previewPlansCurrent);
+                    player.previewPlansCurrent.truncate(maxPlayerPreviewPlans);
+                }
+
                 Groups.player.each(player -> {
                     int id = ++player.lastPreviewPlanGroupServer;
                     plansOut.clear();

@@ -142,7 +142,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     public boolean displayAmmo(){
-        return unit instanceof BlockUnitc || state.rules.unitAmmo;
+        return unit instanceof BlockUnitc;
     }
 
     public void reset(){
@@ -150,7 +150,15 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         admin = typing = false;
         textFadeTime = 0f;
         x = y = 0f;
-        lastPreviewPlanGroup = 0;
+        lastPreviewPlanTimestamp = 0;
+        lastPreviewPlanGroup = -1;
+        lastPreviewPlanGroupServer = -1;
+        previewPlanTree = null;
+        planEachable = null;
+        previewPlansCurrent.clear();
+        previewPlansAssembling.clear();
+        receivingNewPlanGroup = false;
+        previewPlansDirty = false;
         if(!dead()){
             unit.resetController();
             unit = null;
@@ -297,7 +305,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             unit.controller(this);
 
             //this player just became remote, snap the interpolation so it doesn't go wild
-            if(unit.isRemote()){
+            if(unit.isRemote() && !net.client()){
                 unit.snapInterpolation();
             }
 
@@ -348,8 +356,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         drawName();
     }
 
+    public boolean isPinging(){
+        return pingTime > 0f;
+    }
+
     void drawPing(){
-        if(pingTime <= 0f || !renderer.showPings || name == null || team != Vars.player.team()) return;
+        if(pingTime <= 0f || !renderer.showPings || name == null || (!state.rules.showOtherTeamPings && team != Vars.player.team())) return;
 
         float alpha = Math.min(Interp.pow5Out.apply(Mathf.clamp(Mathf.map(pingTime, 1f / 20f, 0f, 1f, 0f))), Interp.pow5Out.apply(Mathf.map(pingTime, 1f, 0.98f, 0f, 1f)));
 
@@ -357,19 +369,21 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
         pingTime -= Time.delta / pingDuration;
 
+        float s = Scl.scl(4) / renderer.getDisplayScale();
+
         Draw.z(Layer.playerName);
         float z = Drawf.text();
         float hover = Mathf.absin(5f, 1f);
         float scaling = 1f + Mathf.clamp(Interp.pow5In.apply(Mathf.map(pingTime, 1f, 0.96f, 1f, 0f))) * 3f;
 
-        Drawf.square(pingX, pingY, 2f * scaling, 45f, Tmp.c1, Tmp.c3.set(Color.darkGray).mul(color).a(Tmp.c1.a));
-        Drawf.fillPoly(pingX, pingY + 9f + hover, 3, 3f, -90f, Tmp.c1, Tmp.c3);
+        Drawf.square(pingX, pingY, 2f * scaling * s, 45f, Tmp.c1, Tmp.c3.set(Color.darkGray).mul(color).a(Tmp.c1.a), s);
+        Drawf.fillPoly(pingX, pingY + 9f * s + hover * s, 3, 3f * s, -90f, Tmp.c1, Tmp.c3, s);
 
         if(pingText != null){
-            Drawf.text(name, pingX, pingY + 20f + hover, Tmp.c1, 0.7f);
-            Drawf.text(pingText, pingX, pingY + 16f + hover, Tmp.c2.set(1f, 1f, 1f, Tmp.c1.a));
+            Drawf.text(name, pingX, pingY + (20f + hover)*s, Tmp.c1, 0.7f * s);
+            Drawf.text(pingText, pingX, pingY + (16f + hover)*s, Tmp.c2.set(1f, 1f, 1f, Tmp.c1.a), s);
         }else{
-            Drawf.text(name, pingX, pingY + 16f + hover, Tmp.c1);
+            Drawf.text(name, pingX, pingY + (16f + hover)*s, Tmp.c1, s);
         }
 
         Draw.reset();

@@ -475,7 +475,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(input.keyTap(Binding.ping) && !Core.scene.hasMouse()){
+        if(input.keyTap(Binding.ping) && !Core.scene.hasMouse() && !scene.hasKeyboard()){
             if(input.ctrl()){
                 ui.showTextInput("", "@ping.text", Vars.maxPingTextLength, "", result -> Call.pingLocation(Vars.player, input.mouseWorldX(), input.mouseWorldY(), UI.formatIcons(result)));
             }else{

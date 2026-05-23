@@ -14,6 +14,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.logic.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -31,7 +32,8 @@ public class BuildTurret extends BaseTurret{
     public @Load("@-glow") TextureRegion glowRegion;
     public float buildSpeed = 1f;
     public float buildBeamOffset = 5f;
-    //created in init()
+    //created in init() - do not assign or edit this manually, edit buildSpeed and other fields instead
+    @NoPatch
     public @Nullable UnitType unitType;
     public float elevation = -1f;
     public Color heatColor = Pal.accent.cpy().a(0.9f);
@@ -64,6 +66,15 @@ public class BuildTurret extends BaseTurret{
             buildSpeed = BuildTurret.this.buildSpeed;
             constructor = BlockUnitUnit::create;
         }};
+    }
+
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+        unitType.rotateSpeed = rotateSpeed;
+        unitType.buildBeamOffset = buildBeamOffset;
+        unitType.buildRange = range;
+        unitType.buildSpeed = buildSpeed;
     }
 
     @Override
