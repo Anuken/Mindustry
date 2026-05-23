@@ -504,7 +504,7 @@ public class UnitTypes{
             riseSpeed = descentSpeed = 0.02f;
 
             health = 8200f;
-            armor = 18f;
+            armor = 16f;
             canBoost = true;
             mechLandShake = 4f;
             immunities = ObjectSet.with(StatusEffects.burning);
@@ -575,7 +575,7 @@ public class UnitTypes{
         corvus = new UnitType("corvus"){{
             hitSize = 29f;
             health = 18000f;
-            armor = 18f;
+            armor = 14f;
             stepShake = 1.5f;
             rotateSpeed = 1.5f;
             drownTimeMultiplier = 1.6f;
@@ -743,7 +743,7 @@ public class UnitTypes{
             legMoveSpace = 1.4f;
             legBaseOffset = 2f;
             hovering = true;
-            armor = 11f;
+            armor = 9f;
 
             shadowElevation = 0.3f;
             groundLayer = Layer.legUnit;
@@ -801,8 +801,8 @@ public class UnitTypes{
             drag = 0.1f;
             speed = 0.62f;
             hitSize = 23f;
-            health = 8000;
-            armor = 16f;
+            health = 6800;
+            armor = 18f;
 
             rotateSpeed = 2.7f;
 
@@ -829,7 +829,7 @@ public class UnitTypes{
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
-                sapStrength = 0.8f;
+                sapStrength = 0.85f;
                 length = 55f;
                 damage = 40;
                 shootEffect = Fx.shootSmall;
@@ -906,7 +906,7 @@ public class UnitTypes{
             speed = 0.5f;
             hitSize = 26f;
             health = 22000;
-            armor = 24f;
+            armor = 22f;
             lightRadius = 140f;
             stepSound = Sounds.walkerStep;
             stepSoundVolume = 1.1f;
@@ -1182,7 +1182,7 @@ public class UnitTypes{
             flying = true;
             lowAltitude = true;
             health = 7200;
-            armor = 15f;
+            armor = 17f;
             engineOffset = 21;
             engineSize = 5.3f;
             hitSize = 46f;
@@ -1457,7 +1457,7 @@ public class UnitTypes{
         }};
 
         quad = new UnitType("quad"){{
-            armor = 13f;
+            armor = 10f;
             health = 6000;
             speed = 1.2f;
             rotateSpeed = 2f;
@@ -1533,7 +1533,7 @@ public class UnitTypes{
         oct = new UnitType("oct"){{
             aiController = DefenderAI::new;
 
-            armor = 28f;
+            armor = 20f;
             health = 24000;
             speed = 0.8f;
             rotateSpeed = 1f;
@@ -1783,7 +1783,7 @@ public class UnitTypes{
 
         sei = new UnitType("sei"){{
             health = 11000;
-            armor = 16f;
+            armor = 12f;
 
             speed = 0.73f;
             drag = 0.17f;
@@ -1880,7 +1880,7 @@ public class UnitTypes{
             speed = 0.62f;
             drag = 0.18f;
             hitSize = 58f;
-            armor = 22f;
+            armor = 16f;
             accel = 0.19f;
             rotateSpeed = 0.9f;
             faceTarget = false;
@@ -2258,7 +2258,7 @@ public class UnitTypes{
 
         aegires = new UnitType("aegires"){{
             health = 12000;
-            armor = 15f;
+            armor = 12f;
 
             speed = 0.7f;
             drag = 0.17f;
@@ -2313,7 +2313,7 @@ public class UnitTypes{
             speed = 0.65f;
             drag = 0.17f;
             hitSize = 58f;
-            armor = 26f;
+            armor = 20f;
             accel = 0.2f;
             rotateSpeed = 1.1f;
             faceTarget = false;
