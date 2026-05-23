@@ -801,8 +801,8 @@ public class UnitTypes{
             drag = 0.1f;
             speed = 0.62f;
             hitSize = 23f;
-            health = 6800;
-            armor = 18f;
+            health = 8000;
+            armor = 14f;
 
             rotateSpeed = 2.7f;
 
