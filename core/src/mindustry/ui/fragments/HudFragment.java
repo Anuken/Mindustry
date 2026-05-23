@@ -456,7 +456,7 @@ public class HudFragment{
                     toggleMenus();
                 }
 
-                if(Core.input.keyTap(Binding.skipWave) && canSkipWave()){
+                if(Core.input.keyTap(Binding.skipWave) && canSkipWave() && !Core.scene.hasDialog() && !Core.scene.hasField(){
                     if(net.client() && player.admin){
                         Call.adminRequest(player, AdminAction.wave, null);
                     }else{
