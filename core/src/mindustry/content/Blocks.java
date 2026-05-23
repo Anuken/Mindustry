@@ -3353,10 +3353,9 @@ public class Blocks{
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 15f;
+                    splashDamage = 8f;
                     splashDamageRadius = 24f;
                     scaledSplashDamage = true;
-                    armorMultiplier = 2;
 
                     frontColor = Pal.scrapAmmoFront;
                     backColor = hitColor = Pal.scrapAmmoBack;
@@ -3369,10 +3368,9 @@ public class Blocks{
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 17f;
+                    splashDamage = 9f;
                     splashDamageRadius = 15f;
                     scaledSplashDamage = true;
-                    armorMultiplier = 2;
                 }},
                 Items.metaglass, new FlakBulletType(4f, 3){{
                     backColor = trailColor = Pal.glassAmmoBack;
@@ -3386,11 +3384,10 @@ public class Blocks{
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 20f;
+                    splashDamage = 10f;
                     splashDamageRadius = 20f;
                     scaledSplashDamage = true;
-                    armorMultiplier = 2;
-                    fragBullets = 4;
+                    fragBullets = 3;
                     fragBullet = new BasicBulletType(3f, 5){{
                         width = 5f;
                         height = 12f;

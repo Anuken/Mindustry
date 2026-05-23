@@ -1038,11 +1038,11 @@ public class UnitTypes{
 
         flare = new UnitType("flare"){{
             researchCostMultiplier = 0.5f;
-            speed = 2.7f;
+            speed = 1.8f;
             accel = 0.08f;
             drag = 0.04f;
             flying = true;
-            health = 70;
+            health = 52;
             engineOffset = 5.75f;
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
             hitSize = 9;
@@ -1081,8 +1081,8 @@ public class UnitTypes{
         }};
 
         horizon = new UnitType("horizon"){{
-            health = 340;
-            speed = 1.65f;
+            health = 255;
+            speed = 1.1f;
             accel = 0.08f;
             drag = 0.03f;
             flying = true;
@@ -1131,8 +1131,8 @@ public class UnitTypes{
         }};
 
         zenith = new UnitType("zenith"){{
-            health = 700;
-            speed = 1.7f;
+            health = 550;
+            speed = 1.2f;
             accel = 0.04f;
             drag = 0.016f;
             flying = true;
@@ -1366,7 +1366,7 @@ public class UnitTypes{
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 130f;
-            health = 400;
+            health = 200;
             buildSpeed = 0.5f;
             engineOffset = 6.5f;
             hitSize = 9f;
