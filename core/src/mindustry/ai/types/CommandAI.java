@@ -386,7 +386,9 @@ public class CommandAI extends AIController{
             }
 
             //reached destination, end pathfinding
-            if(attackTarget == null && unit.within(vecMovePos, command.exactArrival && commandQueue.size == 0 ? 1f : Math.max(5f, unit.hitSize / 2f))){
+            if(attackTarget == null && (unit.within(vecMovePos, command.exactArrival && commandQueue.size == 0 ? 1f : Math.max(5f, unit.hitSize / 2f)) ||
+                //for circling units, it doesn't need to reach the exact waypoint.
+                (unit.type.circleTarget && !command.exactArrival && Angles.angleDist(unit.angleTo(vecMovePos), unit.rotation) > 60f && unit.within(vecMovePos, Math.min(50f, 360f / unit.type.rotateSpeed * unit.type.speed / (Mathf.pi * 2f)))))){
                 finishPath();
             }
 
