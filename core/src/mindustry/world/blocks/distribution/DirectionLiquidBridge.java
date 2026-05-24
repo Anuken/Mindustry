@@ -25,8 +25,8 @@ public class DirectionLiquidBridge extends DirectionBridge{
         canOverdrive = false;
         liquidCapacity = 20f;
         hasLiquids = true;
+        regionRotated1 = 2;
     }
-
 
     @Override
     public TextureRegion[] icons(){

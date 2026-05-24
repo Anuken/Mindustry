@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ctype.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -19,6 +20,7 @@ public class DrawTurret extends DrawBlock{
     protected static final Rand rand = new Rand();
 
     public Seq<DrawPart> parts = new Seq<>();
+    public ObjectMap<UnlockableContent, DrawPart[]> ammoParts = new ObjectMap<>();
     /** Prefix to use when loading base region. */
     public String basePrefix = "";
     /** Overrides the liquid to draw in the liquid region. */
@@ -33,10 +35,23 @@ public class DrawTurret extends DrawBlock{
     public DrawTurret(){
     }
 
+    /** Format: [unlockableContent1, seq1, unlockableContent2, seq2...] */
+    public void setAmmoParts(Object... objects){
+        for(int i = 0; i < objects.length; i+= 2){
+            ammoParts.put((UnlockableContent)objects[i], ((Seq<DrawPart>)objects[i + 1]).toArray(DrawPart.class));
+        }
+    }
+
     @Override
     public void getRegionsToOutline(Block block, Seq<TextureRegion> out){
         for(var part : parts){
             part.getOutlines(out);
+        }
+
+        for(var parts : ammoParts.values()){
+            for(var part : parts){
+                part.getOutlines(out);
+            }
         }
 
         if(block.region.found() && !(block.outlinedIcon > 0 && block.outlinedIcon < block.getGeneratedIcons().length && block.getGeneratedIcons()[block.outlinedIcon].equals(block.region))){
@@ -89,6 +104,16 @@ public class DrawTurret extends DrawBlock{
                 params.setRecoil(part.recoilIndex >= 0 && tb.curRecoils != null ? tb.curRecoils[part.recoilIndex] : tb.curRecoil);
                 part.draw(params);
             }
+
+            if(ammoParts.size > 0 && tb.getAmmoContent() != null){
+                var parts = ammoParts.get(tb.getAmmoContent());
+                if(parts != null){
+                    for(var part : parts){
+                        params.setRecoil(part.recoilIndex >= 0 && tb.curRecoils != null ? tb.curRecoils[part.recoilIndex] : tb.curRecoil);
+                        part.draw(params);
+                    }
+                }
+            }
         }
     }
 
@@ -128,6 +153,13 @@ public class DrawTurret extends DrawBlock{
         for(var part : parts){
             part.turretShading = true;
             part.load(block.name);
+        }
+
+        for(var parts : ammoParts.values()){
+            for(var part : parts){
+                part.turretShading = true;
+                part.load(block.name);
+            }
         }
 
         //TODO test this for mods, e.g. exotic

@@ -337,6 +337,11 @@ public class CommandAI extends AIController{
                         move = true;
                         vecOut.set(targetPos);
                     }*/
+
+                    //do not wiggle in place
+                    if(unit.type.naval && move && unit.tileOn() == world.tileWorld(vecOut.x, vecOut.y)){
+                        move = false;
+                    }
                 }
 
                 //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
@@ -386,7 +391,10 @@ public class CommandAI extends AIController{
             }
 
             //reached destination, end pathfinding
-            if(attackTarget == null && unit.within(vecMovePos, command.exactArrival && commandQueue.size == 0 ? 1f : Math.max(5f, unit.hitSize / 2f))){
+            if(attackTarget == null && (unit.within(vecMovePos, command.exactArrival && commandQueue.size == 0 ? 1f : Math.max(5f, unit.hitSize / 2f)) ||
+                //for circling units, it doesn't need to reach the exact waypoint.
+                (!unit.type.omniMovement && !unit.type.rotateMoveFirst && !command.exactArrival && Angles.angleDist(unit.angleTo(vecMovePos), unit.rotation) > 60f &&
+                    unit.within(vecMovePos, Math.min(50f, 360f / unit.type.rotateSpeed * unit.type.speed / (Mathf.pi * 2f)))))){
                 finishPath();
             }
 

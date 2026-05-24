@@ -5592,6 +5592,47 @@ public class Blocks{
 
                     moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
                 }});
+                setAmmoParts(
+                    Items.carbide, Seq.with(new RegionPart("-missile"){{
+                        progress = PartProgress.reload.curve(Interp.pow2In);
+
+                        colorTo = new Color(1f, 1f, 1f, 0f);
+                        color = Color.white;
+                        mixColorTo = Pal.accent;
+                        mixColor = new Color(1f, 1f, 1f, 0f);
+                        outline = false;
+                        under = true;
+                        layerOffset = -0.01f;
+
+                        moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                    }}),
+                    Items.phaseFabric, Seq.with(new RegionPart("-missile-phase"){{
+                        progress = PartProgress.reload.curve(Interp.pow2In);
+
+                        colorTo = new Color(1f, 1f, 1f, 0f);
+                        color = Color.white;
+                        mixColorTo = Pal.accent;
+                        mixColor = new Color(1f, 1f, 1f, 0f);
+                        outline = false;
+                        under = true;
+                        layerOffset = -0.01f;
+
+                        moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                    }}),
+                    Items.surgeAlloy, Seq.with(new RegionPart("-missile-surge"){{
+                        progress = PartProgress.reload.curve(Interp.pow2In);
+
+                        colorTo = new Color(1f, 1f, 1f, 0f);
+                        color = Color.white;
+                        mixColorTo = Pal.accent;
+                        mixColor = new Color(1f, 1f, 1f, 0f);
+                        outline = false;
+                        under = true;
+                        layerOffset = -0.01f;
+
+                        moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                    }})
+                );
             }};
 
             recoil = 0.5f;
