@@ -4,6 +4,7 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
@@ -14,13 +15,13 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.input.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.entities.abilities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -907,18 +908,23 @@ public class HudFragment{
         table.marginTop(0).marginBottom(4).marginLeft(4);
 
         class SideBar extends Element{
-            public final Floatp amount;
-            public final boolean flip;
-            public final Boolp flash;
+            public Floatp amount;
+            public boolean flip, drawBack;
+            public Boolp flash;
 
             float last, blink, value;
 
-            public SideBar(Floatp amount, Boolp flash, boolean flip){
+            public SideBar(Floatp amount, Boolp flash, boolean flip, boolean drawBack, Color color){
                 this.amount = amount;
                 this.flip = flip;
                 this.flash = flash;
+                this.drawBack = drawBack;
 
-                setColor(Pal.health);
+                setColor(color);
+            }
+
+            public SideBar(Floatp amount, Boolp flash, boolean flip){
+                this(amount, flash, flip, true, Pal.health);
             }
 
             @Override
@@ -937,7 +943,7 @@ public class HudFragment{
 
                 if(Float.isNaN(value) || Float.isInfinite(value)) value = 1f;
 
-                drawInner(Pal.darkishGray, 1f);
+                if(drawBack) drawInner(Pal.darkishGray, 1f);
                 drawInner(Tmp.c1.set(color).lerp(Color.white, blink), value);
             }
 
@@ -1006,11 +1012,33 @@ public class HudFragment{
                 }
             });
 
-            t.add(new SideBar(() -> player.dead() ? 0f : player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
-            t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
-
+            float[] shieldFrac = {0};
             Boolp playerHasPayloads = () -> player.unit() instanceof Payloadc pay && !pay.payloads().isEmpty();
             Floatp playerPayloadCapacityUsed = () -> player.unit() instanceof Payloadc pay ? pay.payloadUsed() / player.unit().type().payloadCapacity : 0f;
+
+            t.stack(
+            //health
+            new SideBar(() -> player.dead() ? 0f : player.unit().healthf(), () -> true, true),
+            //shields
+            new SideBar(() -> player.dead() ? 0 : shieldFrac[0], () -> true, true, false, Pal.accent){{
+                visible(() -> {
+                    if(player.dead()) return false;
+                    drawBack = !playerHasPayloads.get();
+
+                    var ab = Structs.find(player.unit().abilities, a -> a instanceof ForceFieldAbility || a instanceof ShieldArcAbility);
+                    if(ab instanceof ForceFieldAbility ff){
+                        shieldFrac[0] = player.unit().shield / ff.max;
+                        return ff.max > 0;
+                    }else if(ab instanceof ShieldArcAbility sa){
+                        shieldFrac[0] = sa.data / sa.max;
+                        return sa.max > 0;
+                    }else{
+                        return false;
+                    }
+                });
+            }}).width(bw).growY().padRight(pad);
+
+            t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
 
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : playerHasPayloads.get() ? playerPayloadCapacityUsed.get() : player.unit().healthf(), () -> !(player.displayAmmo() || playerHasPayloads.get()), false)).width(bw).growY().padLeft(pad).update(b -> {
                 b.color.set(player.displayAmmo() ? Pal.ammo : playerHasPayloads.get() ? Pal.items : Pal.health);
