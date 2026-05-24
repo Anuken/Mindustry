@@ -719,7 +719,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
         Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
             callback.get(option);
-            if (!state.isGame()){
+            if(!state.isGame()){
                 myself.hide();
             }
         });
