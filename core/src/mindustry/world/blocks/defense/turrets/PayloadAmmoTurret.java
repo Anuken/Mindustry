@@ -145,6 +145,18 @@ public class PayloadAmmoTurret extends Turret{
         }
 
         @Override
+        public UnlockableContent getAmmoContent(){
+            if(!payloads.isEmpty()){
+                for(var content : ammoKeys){
+                    if(payloads.contains(content)){
+                        return content;
+                    }
+                }
+            }
+            return null;
+        }
+
+        @Override
         public float getAmmoFraction(){
             return (float)totalAmmo / maxAmmo;
         }
