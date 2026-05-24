@@ -1040,7 +1040,14 @@ public class HudFragment{
 
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
 
-            t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : playerHasPayloads.get() ? playerPayloadCapacityUsed.get() : player.unit().healthf(), () -> !(player.displayAmmo() || playerHasPayloads.get()), false)).width(bw).growY().padLeft(pad).update(b -> {
+            t.add(new SideBar(
+            () ->
+                player.dead() ? 0f :
+                player.displayAmmo() ? player.unit().ammof() :
+                playerHasPayloads.get() ? playerPayloadCapacityUsed.get() :
+                player.unit().healthf(),
+            () -> !(player.displayAmmo() || playerHasPayloads.get()), false)).width(bw).growY().padLeft(pad).update(b -> {
+
                 b.color.set(player.displayAmmo() ? Pal.ammo : playerHasPayloads.get() ? Pal.items : Pal.health);
             });
 
@@ -1200,10 +1207,10 @@ public class HudFragment{
 
                 if(applied != null){
                     for(StatusEffect effect : content.statusEffects()){
-                        if(applied.get(effect.id) && !effect.isHidden()){
+                        if(applied.get(effect.id) && effect.uiIcon.found()){
                             t.image(effect.uiIcon).scaling(Scaling.fit).size(iconMed).get()
                             .addListener(new Tooltip(l -> l.label(() ->
-                                player.dead() ? "" : effect.localizedName + " [lightgray]" + UI.formatTime(player.unit().getDuration(effect))).style(Styles.outlineLabel)));
+                                player.dead() ? "" : effect.localizedName + " [lightgray]" + (player.unit().getDuration(effect) >= Float.MAX_VALUE ? "∞" : UI.formatTime(player.unit().getDuration(effect)))).style(Styles.outlineLabel)));
                         }
                     }
 
