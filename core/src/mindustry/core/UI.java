@@ -717,7 +717,12 @@ public class UI implements ApplicationListener, Loadable{
     /** Shows a menu that hides when another followUp-menu is shown or when nothing is selected.
      * @see UI#showMenu(String, String, String[][], Intc) */
     public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
-        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> callback.get(option));
+        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
+            callback.get(option);
+            if (!state.isGame()){
+                myself.hide();
+            }
+        });
         dialog.closeOnBack(() -> {
             followUpMenus.remove(menuId);
             callback.get(-1);
