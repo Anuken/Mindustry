@@ -1009,6 +1009,7 @@ public class HudFragment{
                     Call.unitClear(player);
                     control.input.recentRespawnTimer = 1f;
                     control.input.controlledType = null;
+                    control.input.droppingItem = false;
                 }
             });
 
