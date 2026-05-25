@@ -26,25 +26,32 @@ public class Lightning{
 
     /** Create a lighting branch at a location. Use Team.derelict to damage everyone. */
     public static void create(BulletType bulletCreated, Team team, Color color, float damage, float x, float y, float targetAngle, int length){
-        createLightningInternal(null, bulletCreated, lastSeed++, team, color, damage, x, y, targetAngle, length);
+        createLightningInternal(null, bulletCreated, lastSeed++, team, color, damage, x, y, targetAngle, length, 1f);
     }
 
     /** Create a lighting branch at a location. Use Team.derelict to damage everyone. */
     public static void create(Team team, Color color, float damage, float x, float y, float targetAngle, int length){
-        createLightningInternal(null, Bullets.damageLightning, lastSeed++, team, color, damage, x, y, targetAngle, length);
+        createLightningInternal(null, Bullets.damageLightning, lastSeed++, team, color, damage, x, y, targetAngle, length, 1f);
+    }
+
+    /** Create a lighting branch at a location. Use Team.derelict to damage everyone. */
+    public static void create(Team team, Color color, float damage, float x, float y, float targetAngle, int length, float buildMult){
+        createLightningInternal(null, Bullets.damageLightning, lastSeed++, team, color, damage, x, y, targetAngle, length, buildMult);
     }
 
     /** Create a lighting branch at a location. Uses bullet parameters. */
     public static void create(Bullet bullet, Color color, float damage, float x, float y, float targetAngle, int length){
-        createLightningInternal(bullet, bullet == null || bullet.type.lightningType == null ? Bullets.damageLightning : bullet.type.lightningType, lastSeed++, bullet.team, color, damage, x, y, targetAngle, length);
+        createLightningInternal(bullet, bullet == null || bullet.type.lightningType == null ? Bullets.damageLightning : bullet.type.lightningType, lastSeed++, bullet.team, color, damage, x, y, targetAngle, length, 1f);
     }
 
-    private static void createLightningInternal(@Nullable Bullet hitter, BulletType hitCreate, int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
+    private static void createLightningInternal(@Nullable Bullet hitter, BulletType hitCreate, int seed, Team team, Color color, float damage, float x, float y, float rotation, int length, float buildMult){
         random.setSeed(seed);
         hit.clear();
 
         Seq<Vec2> lines = new Seq<>();
         bhit = false;
+        float baseBuildMult = hitCreate.buildingDamageMultiplier;
+        hitCreate.buildingDamageMultiplier *= buildMult;
 
         for(int i = 0; i < length / 2; i++){
             hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, hitter);
@@ -91,6 +98,7 @@ public class Lightning{
             }
         }
 
+        hitCreate.buildingDamageMultiplier = baseBuildMult;
         Fx.lightning.at(x, y, rotation, color, lines);
     }
 }
