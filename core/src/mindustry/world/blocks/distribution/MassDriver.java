@@ -206,7 +206,7 @@ public class MassDriver extends Block{
                         Angles.near(rotation, targetRotation, 2f) && Angles.near(other.rotation, targetRotation + 180f, 2f)){
                             //actually fire
                             fire(other);
-                            float timeToArrive = Math.min(bulletLifetime, dst(other) / bulletSpeed);
+                            float timeToArrive = Math.min(bulletLifetime / timeScale, dst(other) / (bulletSpeed * timeScale));
                             Time.run(timeToArrive, () -> {
                                 //remove waiting shooters, it's done firing
                                 other.waitingShooters.remove(this);
