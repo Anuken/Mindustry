@@ -864,6 +864,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Fx.spawn.at(player);
         player.clearUnit();
         player.checkSpawn();
+        droppingItem = false;
         player.deathTimer = Player.deathDelay + 1f; //for instant respawn
     }
 
