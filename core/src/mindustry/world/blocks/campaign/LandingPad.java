@@ -181,8 +181,8 @@ public class LandingPad extends Block{
                 }
 
                 waiting.each((item, pads) -> {
+                    pads.removeAll(l -> l.config != item);
                     if(pads.size > 0){
-                        pads.removeAll(l -> l.config != item);
                         pads.sort(p -> p.priority);
 
                         var first = pads.first();
