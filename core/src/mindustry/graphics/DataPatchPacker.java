@@ -16,7 +16,7 @@ import java.util.concurrent.*;
 
 /** Manages data patch images. */
 public class DataPatchPacker{
-    private static final String regionPrefix = "dp-";
+    public static final String regionPrefix = "dp-";
 
     private @Nullable TextureAtlas patchAtlas;
 
@@ -46,7 +46,7 @@ public class DataPatchPacker{
         TextureRegion envReserveRegion = Core.atlas.find("data-patch-reserved-env");
         PixmapPacker envPacker = anyEnv ? new PixmapPacker(envReserveRegion.width, envReserveRegion.height, 2, true) : null;
 
-        var tasks = new Seq<Future<PackResult>>();
+        var tasks = new Seq<Future<?>>();
         for(var image : images){
             tasks.add(Vars.mainExecutor.submit(() -> {
                 try{
@@ -58,16 +58,13 @@ public class DataPatchPacker{
                     }else{
                         packer.pack(name, pixmap);
                     }
-
-                    return new PackResult(name, pixmap);
                 }catch(Throwable e){
                     Log.err("Invalid patch image: " + image.path, e);
-                    return null;
                 }
             }));
         }
 
-        Threads.awaitAll(tasks.as());
+        Threads.awaitAll(tasks);
 
         TextureFilter filter = Core.settings.getBool("linear", !Vars.mobile) ? TextureFilter.linear : TextureFilter.nearest;
         patchAtlas = packer.generateTextureAtlas(filter, filter, false);

@@ -130,7 +130,7 @@ public class UI implements ApplicationListener, Loadable{
         Dialog.setHideAction(() -> sequence(fadeOut(0.1f)));
 
         Tooltips.getInstance().animations = false;
-        Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black6).margin(4f).add(text));
+        Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black8).margin(4f).add(text));
         if(mobile){
             Tooltips.getInstance().offsetY += Scl.scl(60f);
         }

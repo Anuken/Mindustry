@@ -1,0 +1,292 @@
+package mindustry.editor;
+
+import arc.*;
+import arc.files.*;
+import arc.graphics.*;
+import arc.graphics.g2d.TextureAtlas.*;
+import arc.graphics.g2d.*;
+import arc.scene.ui.*;
+import arc.scene.ui.TextButton.*;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.*;
+import mindustry.gen.*;
+import mindustry.mod.*;
+import mindustry.mod.DataPatcher.*;
+import mindustry.ui.*;
+import mindustry.ui.dialogs.*;
+
+import java.io.*;
+import java.util.concurrent.*;
+import java.util.zip.*;
+
+import static mindustry.Vars.*;
+import static mindustry.graphics.DataPatchPacker.*;
+
+public class MapPatchImagesDialog extends BaseDialog{
+    TextField searchField;
+    @Nullable String searchString;
+    Table inner;
+
+    public MapPatchImagesDialog(){
+        super("@editor.patches.images");
+
+        cont.table(search -> {
+            search.image(Icon.zoom);
+
+            searchField = search.field("", t -> {
+                searchString = t.length() > 0 ? t.toLowerCase() : null;
+                rebuild();
+            }).growX().get();
+            searchField.setMessageText("@search");
+        }).growX().row();
+
+        cont.pane(t -> inner = t).grow();
+
+        addCloseButton();
+
+        buttons.button("@add", Icon.add, () -> {
+            platform.showFileChooser(true, "png", result -> {
+                try{
+                    Pixmap pix = PixmapIO.readPNG(result);
+                    int width = pix.width;
+                    int height = pix.height;
+                    Pixmaps.bleed(pix);
+                    byte[] bytes = PixmapIO.writePngBytes(pix);
+                    pix.dispose();
+
+                    if(width > DataPatcher.maxImageSize || height > DataPatcher.maxImageSize){
+                        ui.showErrorMessage(Core.bundle.format("editor.patches.image.toolarge", width, height, DataPatcher.maxImageSize, DataPatcher.maxImageSize));
+                        return;
+                    }
+
+                    //path and name are the same here; there's no path context.
+                    String name = result.nameWithoutExtension();
+                    String path = name;
+                    var other = state.patcher.images.find(p -> (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
+                    if(other != null){
+                        ui.showErrorMessage(Core.bundle.format("editor.patches.image.exists", other.name + " (" + other.path + ")"));
+                        return;
+                    }
+
+                    state.patcher.images.add(new PatchImage(path, width, height, bytes));
+                    state.patcher.images.sort();
+                    state.patcher.applyImages(state.patcher.images);
+                    rebuild();
+                }catch(Exception e){
+                    ui.showException(e);
+                }
+            });
+        }).size(190f, 64f);
+
+        buttons.button("@edit", Icon.menu, () -> {
+            BaseDialog dialog = new BaseDialog("@waves.edit");
+            dialog.cont.pane(p -> {
+                p.margin(10f);
+                p.table(Tex.button, t -> {
+                    TextButtonStyle style = Styles.flatt;
+                    t.defaults().size(280f, 60f).left();
+                    t.button("@editor.patches.image.importzip", Icon.download, style, () -> platform.showFileChooser(true, "zip", file -> {
+                        dialog.hide();
+                        ui.loadAnd(() -> {
+                            try{
+                                Seq<Future<PatchImage>> images = new Seq<>();
+                                var errors = new CopyOnWriteArrayList<String>();
+
+                                Fi zipped = new ZipFi(file);
+                                zipped.walk(ifile -> {
+                                    if(ifile.extEquals("png")){
+                                        images.add(mainExecutor.submit(() -> {
+                                            try{
+                                                byte[] bytes = ifile.readBytes();
+                                                Pixmap pix = PixmapIO.readPNG(bytes);
+                                                int width = pix.width;
+                                                int height = pix.height;
+                                                Pixmaps.bleed(pix);
+                                                bytes = PixmapIO.writePngBytes(pix);
+                                                pix.dispose();
+
+                                                return new PatchImage(ifile.pathWithoutExtension(), width, height, bytes);
+                                            }catch(Throwable error){
+                                                errors.add("[accent]" + ifile.path() + "[white]: " + Strings.getSimpleMessage(error));
+                                                return null;
+                                            }
+                                        }));
+                                    }
+                                });
+
+                                Threads.awaitAll(images);
+                                zipped.delete(); //closes the zip file
+                                int imported = 0;
+
+                                for(var future : images){
+                                    var image = future.get();
+                                    if(image != null){
+                                        if(image.width > DataPatcher.maxImageSize || image.height > DataPatcher.maxImageSize){
+                                            errors.add("[accent]" + image.path + "[white]: " +Core.bundle.format("editor.patches.image.toolarge", width, height, DataPatcher.maxImageSize, DataPatcher.maxImageSize));
+                                            continue;
+                                        }
+
+                                        var other = state.patcher.images.find(op -> (op.path.equalsIgnoreCase(image.path) || op.name.equalsIgnoreCase(image.name)));
+                                        if(other != null){
+                                            errors.add("[accent]" + image.path + "[white]: " +Core.bundle.format("editor.patches.image.exists", other.name + " (" + other.path + ")").replace("\n", " "));
+                                            continue;
+                                        }
+                                        state.patcher.images.add(image);
+                                        imported ++;
+                                    }
+                                }
+
+                                state.patcher.images.sort();
+
+                                state.patcher.applyImages(state.patcher.images);
+                                rebuild();
+
+                                var idiag = new BaseDialog("@editor.patches.image.imports");
+                                if(imported > 0) idiag.cont.add(Core.bundle.format("editor.patches.image.imported", imported)).row();
+                                if(!errors.isEmpty()){
+                                    idiag.cont.add("@editor.patches.image.error").padBottom(10f).row();
+                                    idiag.cont.pane(ep -> {
+                                        ep.add(Seq.with(errors).toString("\n", s -> "[gray]- []" + s)).labelAlign(Align.left, Align.left).grow();
+                                    });
+                                }
+                                idiag.buttons.button("@ok", Icon.ok, idiag::hide).size(200f, 64f);
+                                idiag.show();
+                            }catch(Throwable e){
+                                ui.showException(e);
+                            }
+                        });
+                    })).marginLeft(12f).row();
+                    t.button("@editor.patches.image.exportzip", Icon.upload, style, () -> platform.showFileChooser(false, "zip", file -> {
+                        dialog.hide();
+                        try{
+                            try(OutputStream fos = file.write(false, 4096); ZipOutputStream zos = new ZipOutputStream(fos)){
+                                for(var image : state.patcher.images){
+                                    zos.putNextEntry(new ZipEntry(image.path + ".png"));
+                                    zos.write(image.data);
+                                    zos.closeEntry();
+                                }
+                            }
+                        }catch(Throwable e){
+                            ui.showException(e);
+                        }
+                    })).marginLeft(12f).row();
+                    t.button("@editor.patches.image.clearall", Icon.trash, style, () -> {
+                        dialog.hide();
+                        ui.showConfirm("@editor.patches.image.clearall.confirm", () -> {
+                            state.patcher.images.clear();
+                            state.patcher.applyImages(state.patcher.images);
+                            rebuild();
+                        });
+                    }).marginLeft(12f).row();
+                });
+            });
+
+            dialog.addCloseButton();
+            dialog.show();
+        });
+
+        shown(() -> {
+            searchString = null;
+            searchField.setText("");
+            rebuild();
+        });
+
+        makeButtonOverlay();
+    }
+
+    void rebuild(){
+        inner.clearChildren();
+        inner.top().left();
+
+        float size = 200f;
+        int cols = (int)Math.max(1, Core.graphics.getWidth() / Scl.scl(size + 12f));
+        int i = 0;
+        for(var image : Vars.state.patcher.images){
+            if(searchString != null && !image.path.toLowerCase().contains(searchString)) continue;
+            TextureRegion region = Core.atlas.find(regionPrefix + image.name, "nomap");
+            boolean found = Core.atlas.has(regionPrefix + image.name);
+
+            inner.table(Styles.grayPanel, t -> {
+                t.margin(5f);
+                t.top();
+                t.add(new BorderImage(region, 4f)).scaling(Scaling.fit).with(b -> b.drawAlpha = true).size(size - 10f).row();
+                t.add((found ? "" : "[red]⚠[] ") + image.name).tooltip(regionPrefix + image.name + "\n[lightgray]" + image.path).ellipsis(true).left().width(size - 10f).growX().row();
+                t.add(image.width + "x" + image.height).tooltip(String.format("%,d", image.data.length) + "[lightgray]b").color(Color.lightGray).left().growX().row();
+                t.table(b -> {
+                    b.left();
+                    b.defaults().size((size - 10f) / 4f);
+                    var istyle = Styles.emptyi;
+                    b.button(Icon.pencil, istyle, () -> {
+                        ui.showTextInput("@save.rename", "@editor.patches.path", image.path, res -> {
+                            Fi fi = new Fi(res);
+                            String name = fi.nameWithoutExtension();
+                            String path = fi.pathWithoutExtension();
+                            var other = state.patcher.images.find(p -> p != image && (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
+                            if(other != null){
+                                ui.showErrorMessage(Core.bundle.format("editor.patches.image.exists", other.name + " (" + other.path + ")"));
+                            }else{
+                                //move and rename associated atlas region
+                                if(region instanceof AtlasRegion at && at.name.equals(regionPrefix + image.name)){
+                                    var map = Core.atlas.getRegionMap();
+                                    map.remove(regionPrefix + image.name);
+                                    map.put(regionPrefix + name, at);
+                                    at.name = regionPrefix + name;
+                                }
+
+                                image.path = path;
+                                image.name = name;
+                                rebuild();
+                            }
+                        });
+                    });
+                    b.button(Icon.info, istyle, () -> {
+                        BaseDialog d = new BaseDialog("@editor.patches.image.info");
+                        float maxSize = Math.min(Core.graphics.getHeight(), Core.graphics.getHeight()) / Scl.scl(1f) * 0.8f - Scl.scl(64f + 60f);
+                        d.cont.top();
+                        d.cont.add(new BorderImage(region, 4f)).scaling(Scaling.fit).with(bi -> bi.drawAlpha = bi.forceNearest = true).size(maxSize).row();
+                        d.cont.row().defaults().left();
+                        boolean env = image.path.contains("blocks/environment/");
+                        if(!found){
+                            d.cont.add(Core.bundle.get("editor.patches.image.packfailed") + (env ? "\n" + Core.bundle.get("editor.patches.image.packfailed.env") : "")).row();
+                        }
+                        d.cont.add(Core.bundle.format("editor.patches.image.name", image.name)).row();
+                        d.cont.add(Core.bundle.format("editor.patches.image.region.name", regionPrefix + image.name)).row();
+                        d.cont.add(Core.bundle.format("editor.patches.image.path", image.name)).row();
+                        d.cont.add(Core.bundle.format("editor.patches.image.env", env)).row();
+                        d.cont.add(Core.bundle.format("editor.patches.image.size", image.width,  image.height)).row();
+                        d.cont.add(Core.bundle.format("editor.patches.image.filesize", String.format("%,d", image.data.length) + "[darkgray]b"));
+
+                        d.addCloseButton();
+                        d.show();
+                    });
+                    b.button(Icon.export, istyle, () -> {
+                        platform.showFileChooser(false, "png", out -> {
+                            try{
+                                out.writeBytes(image.data);
+                            }catch(Throwable e){
+                                ui.showException(e);
+                            }
+                        });
+                    });
+                    b.button(Icon.trash, istyle, () -> {
+                        ui.showConfirm("@editor.patches.image.delete.confirm", () -> {
+                            Core.atlas.getRegionMap().remove(regionPrefix + image.name);
+                            state.patcher.images.remove(image);
+                            rebuild();
+                        });
+                    }).padTop(2f);
+                }).growX();
+
+            }).pad(4f).width(size).uniformY();
+            if(++i % cols == 0){
+                inner.row();
+            }
+        }
+
+        if(inner.getChildren().isEmpty()){
+            inner.center().add("@none.found").pad(10f);
+        }
+    }
+}

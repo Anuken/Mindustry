@@ -206,7 +206,7 @@ public class ServerControl implements ApplicationListener{
 
         patchDirectory = dataDirectory.child("patches");
         patchDirectory.mkdirs();
-        patchImageDirectory = patchDirectory.child("images");
+        patchImageDirectory = patchDirectory.child("sprites");
         patchImageDirectory.mkdirs();
         loadPatchFiles();
 
@@ -365,6 +365,8 @@ public class ServerControl implements ApplicationListener{
                 Log.err("Invalid patch image file: " + image.path(), e);
             }
         }
+
+        contentPatchImages.sort();
 
         if(contentPatches.size > 0){
             Log.info("Loaded @ content patch files.", contentPatches.size);

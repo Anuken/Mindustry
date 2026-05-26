@@ -29,7 +29,8 @@ import java.util.*;
 /** The current implementation is awful. Consider it a proof of concept. */
 @SuppressWarnings("unchecked")
 public class DataPatcher{
-    private static final int maxImageSize = 1024;
+    public static final int maxImageSize = 1024;
+
     private static final Object root = new Object();
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
     private static ContentParser parser = createParser();
@@ -683,7 +684,7 @@ public class DataPatcher{
         }
     }
 
-    public static class PatchImage{
+    public static class PatchImage implements Comparable<PatchImage>{
         /** Image name without extension; does not contain packing prefix. */
         public String name;
         /** Image path, excluding extension. */
@@ -694,8 +695,9 @@ public class DataPatcher{
         public byte[] data;
 
         public PatchImage(String path, int width, int height, byte[] data){
-            this.name = new Fi(path).nameWithoutExtension();
-            this.path = path;
+            Fi file = new Fi(path);
+            this.name = file.nameWithoutExtension();
+            this.path = file.pathWithoutExtension();
             this.width = width;
             this.height = height;
             this.data = data;
@@ -719,6 +721,11 @@ public class DataPatcher{
                 if(width > maxImageSize || height > maxImageSize) throw new IOException("PNG is larger than maximum image size (" + maxImageSize + "x" + maxImageSize + ")");
             }
             return new PatchImage(relativePath, width, height, data);
+        }
+
+        @Override
+        public int compareTo(PatchImage patchImage){
+            return path.compareTo(patchImage.path);
         }
     }
 
