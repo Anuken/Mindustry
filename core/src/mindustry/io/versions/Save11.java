@@ -28,7 +28,7 @@ public class Save11 extends SaveVersion{
         readRegion("content", stream, counter, this::readContentHeader);
 
         try{
-            readRegion("patches", stream, counter, this::readContentPatches);
+            readRegion("patches", stream, counter, this::readDataPatches);
             readRegion("map", stream, counter, in -> readMap(in, context));
             readRegion("entities", stream, counter, this::readEntities);
             readRegion("markers", stream, counter, this::readMarkers);
@@ -40,7 +40,7 @@ public class Save11 extends SaveVersion{
 
     //old, simplified string-only data patches
     @Override
-    public void readContentPatches(DataInput stream) throws IOException{
+    public void readDataPatches(DataInput stream) throws IOException{
         Seq<String> patches = new Seq<>();
 
         int amount = stream.readUnsignedByte();

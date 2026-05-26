@@ -66,7 +66,7 @@ public abstract class SaveVersion extends SaveFileReader{
     @Override
     public void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
         readRegion("meta", stream, counter, in -> readMeta(in, context));
-        if(version >= 12) readRegion("patches", stream, counter, this::readContentPatches);
+        if(version >= 12) readRegion("patches", stream, counter, this::readDataPatches);
 
         try{
             readRegion("content", stream, counter, this::readContentHeader);
@@ -81,7 +81,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void write(DataOutputStream stream, StringMap extraTags) throws IOException{
         writeRegion("meta", stream, out -> writeMeta(out, extraTags));
-        writeRegion("patches", stream, this::writeContentPatches);
+        writeRegion("patches", stream, this::writeDataPatches);
         writeRegion("content", stream, this::writeContentHeader);
         writeRegion("map", stream, this::writeMap);
         writeRegion("entities", stream, this::writeEntities);
@@ -527,10 +527,10 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void readContentPatches(DataInput stream) throws IOException{
+    public void readDataPatches(DataInput stream) throws IOException{
         Seq<String> patches = new Seq<>();
 
-        int patchAmount = stream.readInt();
+        int patchAmount = stream.readShort();
         for(int i = 0; i < patchAmount; i++){
             int len = stream.readInt();
             byte[] bytes = new byte[len];
@@ -563,7 +563,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void writeContentPatches(DataOutput stream) throws IOException{
+    public void writeDataPatches(DataOutput stream) throws IOException{
         var patches = state.patcher.patches;
         stream.writeShort(patches.size);
         for(var patchset : patches){

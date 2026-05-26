@@ -14,6 +14,7 @@ import mindustry.ctype.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -44,6 +45,7 @@ public class DataPatcher{
     /** Currently active patches. Note that apply() should be called after modification. */
     public Seq<PatchSet> patches = new Seq<>();
     public Seq<PatchImage> images = new Seq<>();
+    public DataPatchPacker packer = new DataPatchPacker();
 
     static{
         for(var type : ContentType.all){
@@ -74,9 +76,7 @@ public class DataPatcher{
     public void applyImages(Seq<PatchImage> images){
         this.images = images;
 
-        if(!Vars.headless){
-            packImages();
-        }
+        if(!Vars.headless) packer.pack(images);
     }
 
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
@@ -143,6 +143,8 @@ public class DataPatcher{
     public void unapply(){
         if(!applied) return;
 
+        if(!Vars.headless) packer.unapply();
+
         Vars.content = contentLoader;
         applied = false;
 
@@ -160,10 +162,6 @@ public class DataPatcher{
         afterCallbacks.each(Runnable::run);
         afterCallbacks.clear();
         usedpatches.clear();
-    }
-
-    void packImages(){
-        //TODO
     }
 
     void visit(Object object){
