@@ -519,10 +519,18 @@ public abstract class SaveVersion extends SaveFileReader{
         readWorldEntities(stream, mapping);
     }
 
-    public void skipContentPatches(DataInput stream) throws IOException{
-        int amount = stream.readUnsignedByte();
+    public void skipDataPatches(DataInput stream) throws IOException{
+        int amount = stream.readShort();
         for(int i = 0; i < amount; i++){
             int len = stream.readInt();
+            stream.skipBytes(len);
+        }
+
+        int imageAmount = stream.readInt();
+        for(int i = 0; i < imageAmount; i++){
+            stream.readUTF(); //name
+            stream.skipBytes(4); //w h
+            int len = stream.readInt(); //byte data
             stream.skipBytes(len);
         }
     }
@@ -575,7 +583,7 @@ public abstract class SaveVersion extends SaveFileReader{
         var images = state.patcher.images;
         stream.writeInt(images.size);
         for(var image : images){
-            stream.writeUTF(image.name);
+            stream.writeUTF(image.path);
             stream.writeShort(image.width);
             stream.writeShort(image.height);
             stream.writeInt(image.data.length);

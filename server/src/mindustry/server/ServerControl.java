@@ -334,9 +334,9 @@ public class ServerControl implements ApplicationListener{
             }
 
             //add images that aren't already in the patch
-            ObjectSet<String> usedImages = event.images.map(i -> i.name).asSet();
+            ObjectSet<String> usedImages = event.images.map(i -> i.path).asSet();
             for(PatchImage image : contentPatchImages){
-                if(usedImages.add(image.name)){
+                if(usedImages.add(image.path)){
                     event.images.add(image);
                 }
             }

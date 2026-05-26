@@ -1,7 +1,6 @@
 package mindustry.graphics;
 
 import arc.*;
-import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
@@ -21,7 +20,11 @@ public class DataPatchPacker{
 
     private @Nullable TextureAtlas patchAtlas;
 
+    /** Packs a new set of images. If images are already packed, disposes of the old ones. */
     public void pack(Seq<PatchImage> images){
+        if(patchAtlas != null){
+            unapply();
+        }
         if(images.isEmpty()) return;
 
         Time.mark();
@@ -39,7 +42,7 @@ public class DataPatchPacker{
         PixmapPacker packer = new PixmapPacker(targetSize, targetSize, 2, true);
 
         //env regions are packed onto a special reserved region
-        boolean anyEnv = images.contains(p -> p.name.contains("blocks/environment/"));
+        boolean anyEnv = images.contains(p -> p.path.contains("blocks/environment/"));
         TextureRegion envReserveRegion = Core.atlas.find("data-patch-reserved-env");
         PixmapPacker envPacker = anyEnv ? new PixmapPacker(envReserveRegion.width, envReserveRegion.height, 2, true) : null;
 
@@ -48,9 +51,9 @@ public class DataPatchPacker{
             tasks.add(Vars.mainExecutor.submit(() -> {
                 try{
                     Pixmap pixmap = new Pixmap(image.data);
-                    String name = regionPrefix + new Fi(image.name).nameWithoutExtension();
+                    String name = regionPrefix + image.name;
 
-                    if(anyEnv && image.name.contains("blocks/environment/")){
+                    if(anyEnv && image.path.contains("blocks/environment/")){
                         envPacker.pack(name, pixmap);
                     }else{
                         packer.pack(name, pixmap);
@@ -58,7 +61,7 @@ public class DataPatchPacker{
 
                     return new PackResult(name, pixmap);
                 }catch(Throwable e){
-                    Log.err("Invalid patch image: " + image.name, e);
+                    Log.err("Invalid patch image: " + image.path, e);
                     return null;
                 }
             }));
@@ -107,7 +110,7 @@ public class DataPatchPacker{
 
         Core.atlas.getTextures().addAll(patchAtlas.getTextures());
         Core.atlas.getRegionMap().putAll(patchAtlas.getRegionMap());
-        //getRegions is intentionally not modified, it's a hassle to manage and O(n) to unapply. there's no point.
+        //getRegions is intentionally not modified, it's a hassle to manage, O(n) to unapply, and not used anywhere important. there's no point.
         //the drawable map isn't used, and thus not modified either
 
         Log.debug("[Patch Atlas] Time to pack: @ms", Time.elapsed());

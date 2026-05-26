@@ -684,15 +684,18 @@ public class DataPatcher{
     }
 
     public static class PatchImage{
-        /** Image path, excluding extension. */
+        /** Image name without extension; does not contain packing prefix. */
         public String name;
+        /** Image path, excluding extension. */
+        public String path;
         /** Size of encoded image. */
         public int width, height;
         /** Encoded PNG data. */
         public byte[] data;
 
-        public PatchImage(String name, int width, int height, byte[] data){
-            this.name = name;
+        public PatchImage(String path, int width, int height, byte[] data){
+            this.name = new Fi(path).nameWithoutExtension();
+            this.path = path;
             this.width = width;
             this.height = height;
             this.data = data;
