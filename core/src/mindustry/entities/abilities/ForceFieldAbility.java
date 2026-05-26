@@ -39,6 +39,7 @@ public class ForceFieldAbility extends Ability{
     protected float radiusScale, alpha;
     protected boolean wasBroken = true;
 
+    private float scaledMax = max;
     private static float realRad;
     private static Unit paramUnit;
     private static ForceFieldAbility paramField;
@@ -84,6 +85,9 @@ public class ForceFieldAbility extends Ability{
 
     @Override
     public void update(Unit unit){
+
+        //gamerules can change during gameplay
+        scaledMax = max * Vars.state.rules.unitHealth(unit.team);
         if(unit.shield <= 0f && !wasBroken){
             unit.shield -= cooldown * regen;
 
@@ -93,8 +97,10 @@ public class ForceFieldAbility extends Ability{
 
         wasBroken = unit.shield <= 0f;
 
-        if(unit.shield < max){
+        if(unit.shield < scaledMax){
             unit.shield += Time.delta * regen;
+        }else{
+            unit.shield = scaledMax;
         }
 
         alpha = Math.max(alpha - Time.delta/10f, 0f);
@@ -144,12 +150,12 @@ public class ForceFieldAbility extends Ability{
 
     @Override
     public void displayBars(Unit unit, Table bars){
-        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> unit.shield / max)).row();
+        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> unit.shield / scaledMax)).row();
     }
 
     @Override
     public void created(Unit unit){
-        unit.shield = max;
+        unit.shield = scaledMax;
     }
 
     public void checkRadius(Unit unit){
