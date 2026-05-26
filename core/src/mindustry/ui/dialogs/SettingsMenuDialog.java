@@ -547,9 +547,7 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
-        if(!mobile){
-            graphics.checkPref("coreitems", true);
-        }
+        graphics.checkPref("playerchat", true);
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("smoothcamera", true);
         if(!mobile){
