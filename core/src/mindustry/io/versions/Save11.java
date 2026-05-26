@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
+import mindustry.mod.DataPatcher.*;
 import mindustry.world.*;
 
 import java.io.*;
@@ -43,16 +44,20 @@ public class Save11 extends SaveVersion{
         Seq<String> patches = new Seq<>();
 
         int amount = stream.readUnsignedByte();
-        if(amount > 0){
-            for(int i = 0; i < amount; i++){
-                int len = stream.readInt();
-                byte[] bytes = new byte[len];
-                stream.readFully(bytes);
-                patches.add(new String(bytes, Strings.utf8));
-            }
+        for(int i = 0; i < amount; i++){
+            int len = stream.readInt();
+            byte[] bytes = new byte[len];
+            stream.readFully(bytes);
+            patches.add(new String(bytes, Strings.utf8));
         }
 
-        Events.fire(new ContentPatchLoadEvent(patches));
+        Seq<PatchImage> images = new Seq<>();
+
+        Events.fire(new ContentPatchLoadEvent(patches, images));
+
+        if(images.size > 0){
+            state.patcher.applyImages(images);
+        }
 
         if(patches.size > 0){
             try{
