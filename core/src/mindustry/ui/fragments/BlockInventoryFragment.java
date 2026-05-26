@@ -139,7 +139,7 @@ public class BlockInventoryFragment{
             }
         });
 
-        int cols = 3;
+        int cols = 8;
         int row = 0;
 
         table.margin(4f);
@@ -210,12 +210,13 @@ public class BlockInventoryFragment{
         updateTablePosition();
 
         table.visible = true;
-
+        //Reduce the UI appropriately.Avoid interface ui congestion caused by being too large.
+        float scaling =0.8f ;
         if(actions){
-            table.setScale(0f, 1f);
-            table.actions(Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
+            table.setScale(0f, scaling);
+            table.actions(Actions.scaleTo(scaling, scaling, 0.07f, Interp.pow3Out));
         }else{
-            table.setScale(1f, 1f);
+            table.setScale(scaling, scaling);
         }
     }
 
