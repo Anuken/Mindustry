@@ -1,5 +1,6 @@
 package mindustry.ui;
 
+import arc.Core;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import mindustry.*;
@@ -38,14 +39,14 @@ public class CoreItemsDisplay extends Table{
         });
 
         int i = 0;
-
+        int itemsPerRow = Core.graphics.getWidth() < 1600 ? 4 : 8;
         for(Item item : content.items()){
             if(usedItems.contains(item)){
                 image(item.uiIcon).size(iconSmall).padRight(3).tooltip(t -> t.background(Styles.black6).margin(4f).add(item.localizedName).style(Styles.outlineLabel));
                 //TODO leaks garbage
                 label(() -> core == null ? "0" : UI.formatAmount(core.items.get(item))).padRight(3).minWidth(52f).left().tooltip(t -> t.background(Styles.black6).margin(4f).label(() -> core == null ? "0" : core.items.get(item) + "").style(Styles.outlineLabel));
-
-                if(++i % 4 == 0){
+                //Change from 4 in each row to 8
+                if(++i % itemsPerRow == 0){
                     row();
                 }
             }
