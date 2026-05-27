@@ -24,8 +24,6 @@ public class RepairFieldAbility extends Ability{
     public float sameTypeHealMult = 1f;
     /** Maximum number of units healed. */
     public int maxTargets = -1;
-    /** A random amount added to the timer. */
-    public float randomTimer = 0f;
 
     /** If true, this ability will consider missing hp, number of targets, cooldowns...etc. */
     public boolean smartHeal = false;

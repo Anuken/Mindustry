@@ -365,7 +365,6 @@ public class UnitTypes{
             abilities.add(new RepairFieldAbility(30f, 60f * 2, 100f){{
                 sameTypeHealMult = 0.10f;
                 maxTargets = 6;
-                randomTimer = 60f;
             }});
 
             weapons.add(new Weapon("heal-weapon"){{
