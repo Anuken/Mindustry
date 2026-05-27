@@ -13,7 +13,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.mod.*;
-import mindustry.mod.DataPatcher.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 

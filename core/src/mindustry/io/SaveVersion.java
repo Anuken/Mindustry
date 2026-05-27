@@ -16,7 +16,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.maps.Map;
-import mindustry.mod.DataPatcher.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;

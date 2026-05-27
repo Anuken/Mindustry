@@ -10,7 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
-import mindustry.mod.DataPatcher.*;
+import mindustry.mod.*;
 
 import java.util.concurrent.*;
 

@@ -7,7 +7,7 @@ import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.MultiPacker;
-import mindustry.mod.DataPatcher.*;
+import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
