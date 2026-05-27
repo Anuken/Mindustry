@@ -401,6 +401,7 @@ project(":server"){
     dependencies{
         implementation project(":core")
         implementation arcModule("backends:backend-headless")
+        implementation 'org.jline:jline:4.0.0'
     }
 }
 

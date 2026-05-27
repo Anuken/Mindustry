@@ -5,7 +5,6 @@ import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.Timer;
 import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
@@ -18,21 +17,21 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
-import mindustry.maps.Map;
 import mindustry.maps.*;
 import mindustry.maps.Maps.*;
-import mindustry.mod.*;
 import mindustry.mod.Mods.*;
+import mindustry.mod.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.net.*;
 import mindustry.type.*;
+import org.jline.reader.*;
+import org.jline.reader.impl.completer.*;
 
 import java.io.*;
 import java.net.*;
 import java.time.*;
 import java.time.format.*;
-import java.util.*;
 import java.util.regex.*;
 
 import static arc.util.ColorCodes.*;
@@ -52,14 +51,6 @@ public class ServerControl implements ApplicationListener{
 
     private final Interval autosaveCount = new Interval();
 
-    public Runnable serverInput = () -> {
-        Scanner scan = new Scanner(System.in);
-        while(scan.hasNext()){
-            String line = scan.nextLine();
-            Core.app.post(() -> handleCommandString(line));
-        }
-    };
-
     /** The file to which the logs are currently being written. */
     public Fi currentLogFile;
 
@@ -78,6 +69,23 @@ public class ServerControl implements ApplicationListener{
     private Fi patchDirectory, patchImageDirectory;
     private Seq<String> contentPatches = new Seq<>();
     private Seq<PatchImage> contentPatchImages = new Seq<>();
+
+    private LineReader lineReader;
+
+    public Runnable serverInput = () -> {
+        while(true){
+            try{
+                String line = lineReader.readLine("> ");
+                if(!line.isEmpty()){
+                    Core.app.post(() -> handleCommandString(line));
+                }
+            }catch(EndOfFileException | UserInterruptException e){
+                Core.app.exit();
+            }catch(Exception e){
+                Core.app.post(() -> { throw new ArcRuntimeException(e); });
+            }
+        }
+    };
 
     public Cons<GameOverEvent> gameOverListener = event -> {
         if(state.rules.waves){
@@ -114,6 +122,10 @@ public class ServerControl implements ApplicationListener{
     }
 
     protected void setup(String[] args){
+        registerCommands();
+
+        lineReader = LineReaderBuilder.builder().completer(new StringsCompleter(handler.getCommandList().map(c -> c.text))).build();
+
         Core.settings.defaults(
             "bans", "",
             "admins", "",
@@ -135,7 +147,14 @@ public class ServerControl implements ApplicationListener{
             if(level1 == LogLevel.err) text = text.replace(reset, lightRed + bold);
 
             String result = bold + lightBlack + "[" + dateTime.format(LocalDateTime.now()) + "] " + reset + format(tags[level1.ordinal()] + " " + text + "&fr");
-            System.out.println(result);
+            if(lineReader.isReading()){
+                lineReader.callWidget(LineReader.CLEAR);
+                lineReader.getTerminal().writer().println(result);
+                lineReader.callWidget(LineReader.REDRAW_LINE);
+                lineReader.callWidget(LineReader.REDISPLAY);
+            }else{
+                lineReader.getTerminal().writer().println(result);
+            }
 
             if(Config.logging.bool()){
                 logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + formatColors(tags[level1.ordinal()] + " " + text + "&fr", false));
@@ -156,8 +175,6 @@ public class ServerControl implements ApplicationListener{
         };
 
         Time.setDeltaProvider(() -> Math.min(Core.graphics.getDeltaTime() * 60f, maxDeltaServer));
-
-        registerCommands();
 
         Core.app.post(() -> {
             //try to load auto-update save if possible
