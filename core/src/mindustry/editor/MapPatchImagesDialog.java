@@ -48,7 +48,7 @@ public class MapPatchImagesDialog extends BaseDialog{
         buttons.button("@add", Icon.add, () -> {
             platform.showFileChooser(true, "png", result -> {
                 try{
-                    Pixmap pix = PixmapIO.readPNG(result);
+                    Pixmap pix = new Pixmap(result);
                     int width = pix.width;
                     int height = pix.height;
                     Pixmaps.bleed(pix);
@@ -99,7 +99,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                                         images.add(mainExecutor.submit(() -> {
                                             try{
                                                 byte[] bytes = ifile.readBytes();
-                                                Pixmap pix = PixmapIO.readPNG(bytes);
+                                                Pixmap pix = new Pixmap(bytes);
                                                 int width = pix.width;
                                                 int height = pix.height;
                                                 Pixmaps.bleed(pix);
