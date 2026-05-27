@@ -1377,7 +1377,11 @@ public class UnitTypes{
             mineSpeed = 3.5f;
             wreckSoundVolume = 0.9f;
 
-            abilities.add(new RepairFieldAbility(5f, 60f * 8, 50f));
+            abilities.add(new RepairFieldAbility(){{
+                amount = 5f;
+                reload = 60f * 8f;
+                range = 50f;
+            }});
 
             weapons.add(new Weapon("poly-weapon"){{
                 top = false;
