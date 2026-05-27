@@ -520,7 +520,8 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void skipDataPatches(DataInput stream) throws IOException{
-        int amount = stream.readShort();
+        stream.readInt(); //version - ignored for now
+        int amount = stream.readInt();
         for(int i = 0; i < amount; i++){
             int len = stream.readInt();
             stream.skipBytes(len);
@@ -536,9 +537,11 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void readDataPatches(DataInput stream) throws IOException{
+        stream.readInt(); //version - ignored for now
+
         Seq<String> patches = new Seq<>();
 
-        int patchAmount = stream.readShort();
+        int patchAmount = stream.readInt();
         for(int i = 0; i < patchAmount; i++){
             int len = stream.readInt();
             byte[] bytes = new byte[len];
@@ -572,8 +575,10 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void writeDataPatches(DataOutput stream) throws IOException{
+        stream.writeInt(DataPatcher.patchFormatVersion);
+
         var patches = state.patcher.patches;
-        stream.writeShort(patches.size);
+        stream.writeInt(patches.size);
         for(var patchset : patches){
             byte[] bytes = patchset.patch.getBytes(Strings.utf8);
             stream.writeInt(bytes.length);

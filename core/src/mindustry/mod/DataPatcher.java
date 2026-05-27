@@ -28,6 +28,7 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class DataPatcher{
     public static final int maxImageSize = 1024;
+    public static final int patchFormatVersion = 1;
 
     private static final Object root = new Object();
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
