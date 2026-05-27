@@ -21,6 +21,7 @@ import mindustry.io.*;
 import mindustry.maps.Map;
 import mindustry.maps.*;
 import mindustry.maps.Maps.*;
+import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
@@ -74,8 +75,9 @@ public class ServerControl implements ApplicationListener{
     private PrintWriter socketOutput;
     private String suggested;
     private boolean autoPaused = false;
-    private Fi patchDirectory;
+    private Fi patchDirectory, patchImageDirectory;
     private Seq<String> contentPatches = new Seq<>();
+    private Seq<PatchImage> contentPatchImages = new Seq<>();
 
     public Cons<GameOverEvent> gameOverListener = event -> {
         if(state.rules.waves){
@@ -204,6 +206,8 @@ public class ServerControl implements ApplicationListener{
 
         patchDirectory = dataDirectory.child("patches");
         patchDirectory.mkdirs();
+        patchImageDirectory = patchDirectory.child("sprites");
+        patchImageDirectory.mkdirs();
         loadPatchFiles();
 
         //set up default shuffle mode
@@ -328,11 +332,20 @@ public class ServerControl implements ApplicationListener{
             for(String patch : contentPatches){
                 event.patches.addUnique(patch);
             }
+
+            //add images that aren't already in the patch
+            ObjectSet<String> usedImages = event.images.map(i -> i.path).asSet();
+            for(PatchImage image : contentPatchImages){
+                if(usedImages.add(image.path)){
+                    event.images.add(image);
+                }
+            }
         });
     }
 
     void loadPatchFiles(){
         contentPatches.clear();
+        contentPatchImages.clear();
         Seq<Fi> patches = patchDirectory.findAll(f -> f.extEquals("json") || f.extEquals("hjson") || f.extEquals("json5")).sort();
 
         for(Fi patch : patches){
@@ -343,8 +356,24 @@ public class ServerControl implements ApplicationListener{
             }
         }
 
+        Seq<Fi> imageFiles = patchImageDirectory.findAll(f -> f.extEquals("png"));
+
+        for(Fi image : imageFiles){
+            try{
+                contentPatchImages.add(PatchImage.fromFile(image.absolutePath().substring(patchImageDirectory.absolutePath().length() + 1), image));
+            }catch(Throwable e){
+                Log.err("Invalid patch image file: " + image.path(), e);
+            }
+        }
+
+        contentPatchImages.sort();
+
         if(contentPatches.size > 0){
             Log.info("Loaded @ content patch files.", contentPatches.size);
+        }
+
+        if(contentPatchImages.size > 0){
+            Log.info("Loaded @ content patch images.", contentPatchImages.size);
         }
     }
 
