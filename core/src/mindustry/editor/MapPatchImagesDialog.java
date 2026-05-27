@@ -149,6 +149,8 @@ public class MapPatchImagesDialog extends BaseDialog{
                                     idiag.cont.pane(ep -> {
                                         ep.add(Seq.with(errors).toString("\n", s -> "[gray]- []" + s)).labelAlign(Align.left, Align.left).grow();
                                     });
+                                }else if(imported == 0){
+                                    idiag.cont.add("@editor.patches.image.none");
                                 }
                                 idiag.buttons.button("@ok", Icon.ok, idiag::hide).size(200f, 64f);
                                 idiag.show();
