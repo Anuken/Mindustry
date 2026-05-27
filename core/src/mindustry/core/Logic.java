@@ -18,6 +18,7 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -99,21 +100,24 @@ public class Logic implements ApplicationListener{
         });
 
         Events.on(WorldLoadEvent.class, e -> {
-            //enable infinite ammo for wave team by default
-            state.rules.waveTeam.rules().infiniteAmmo = true;
 
             if(state.isCampaign()){
                 //enable building AI on campaign unless the preset disables it
-
                 state.rules.coreIncinerates = true;
                 state.rules.infiniteResources = false;
                 state.rules.allowEditRules = false;
                 state.rules.allowEditWorldProcessors = false;
+                state.rules.worldProcessorPlayerLink = false;
+
                 if(state.getPlanet().enemyInfiniteItems){
                     state.rules.waveTeam.rules().infiniteResources = true;
                     state.rules.waveTeam.rules().fillItems = true;
                 }
                 state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
+
+                if(state.getPlanet().enemyFactoryActivationDelay > 0f && state.rules.waveTeam.rules().unitFactoryActivationDelay == 0f){
+                    state.rules.waveTeam.rules().unitFactoryActivationDelay = state.getPlanet().enemyFactoryActivationDelay;
+                }
             }
 
             //save settings
@@ -130,6 +134,26 @@ public class Logic implements ApplicationListener{
         Events.on(SectorCaptureEvent.class, e -> {
             if(!net.client() && e.sector == state.getSector() && e.sector.isBeingPlayed()){
                 state.rules.waveTeam.data().destroyToDerelict();
+            }
+
+            if(e.sector.planet.sectorCaptureReplacements.size > 0){
+                boolean any = false;
+                //faster mapping, avoids objectmap per-tile
+                Floor[] map = new Floor[content.blocks().size];
+                for(var entry : e.sector.planet.sectorCaptureReplacements){
+                    if(indexer.isBlockPresent(entry.key)){
+                        map[entry.key.id] = entry.value.asFloor();
+                        any = true;
+                    }
+                }
+                if(any){
+                    world.tiles.eachTile(t -> {
+                        Floor result = map[t.floor().id];
+                        if(result != null){
+                            t.setFloor(result);
+                        }
+                    });
+                }
             }
 
             if(!net.client() && e.sector.planet.generator != null){

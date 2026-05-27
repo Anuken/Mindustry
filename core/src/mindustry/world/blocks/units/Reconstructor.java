@@ -249,6 +249,12 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
+        public BlockStatus status(){
+            if(!team.activateUnitFactories()) return BlockStatus.inactive;
+            return super.status();
+        }
+
+        @Override
         public int getMaximumAccepted(Item item){
             return Mathf.round(capacities[item.id] * state.rules.unitCost(team));
         }
@@ -352,7 +358,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean shouldConsume(){
-            return constructing && enabled;
+            return constructing && enabled && team.activateUnitFactories();
         }
 
         @Override
