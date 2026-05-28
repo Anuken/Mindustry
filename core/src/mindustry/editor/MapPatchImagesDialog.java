@@ -256,7 +256,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                         d.cont.add(Core.bundle.format("editor.patches.image.region.name", regionPrefix + image.name)).row();
                         d.cont.add(Core.bundle.format("editor.patches.image.path", image.name)).row();
                         d.cont.add(Core.bundle.format("editor.patches.image.env", env)).row();
-                        d.cont.add(Core.bundle.format("editor.patches.image.size", image.width,  image.height)).row();
+                        d.cont.add(Core.bundle.format("editor.patches.image.size", image.width, image.height)).row();
                         d.cont.add(Core.bundle.format("editor.patches.image.filesize", String.format("%,d", image.data.length) + "[darkgray]b"));
 
                         d.addCloseButton();
