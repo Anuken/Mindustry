@@ -355,13 +355,17 @@ public class Mods implements Loadable{
 
     private void loadIcon(LoadedMod mod){
         //try to load icon for each mod that can have one
-        if(mod.root.child("icon.png").exists() && !headless){
-            try{
-                mod.iconTexture = new Texture(mod.root.child("icon.png"));
-                mod.iconTexture.setFilter(TextureFilter.linear);
-            }catch(Throwable t){
-                Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
-            }
+        if(headless) return;
+
+        Fi icon = mod.root.child("icon.png");
+        if(!icon.exists()) icon = mod.root.child("preview.png");
+        if(!icon.exists()) return;
+
+        try{
+            mod.iconTexture = new Texture(icon);
+            mod.iconTexture.setFilter(TextureFilter.linear);
+        }catch(Throwable t){
+            Log.err("Failed to load icon for mod '@'.", mod.name, t);
         }
     }
 

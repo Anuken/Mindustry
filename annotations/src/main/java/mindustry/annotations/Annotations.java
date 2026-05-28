@@ -35,6 +35,10 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface NoSync{}
 
+    /** Indicates that a field should be synced, but not serialized */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface NoSerialize{}
 
     /** Indicates that a component field is imported from other components. This means it doesn't actually exist. */
     @Target({ElementType.FIELD})
