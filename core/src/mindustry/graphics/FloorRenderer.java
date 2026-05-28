@@ -30,6 +30,8 @@ import static mindustry.Vars.*;
  *
  * */
 public class FloorRenderer{
+    public static boolean growSprites = true;
+
     private static final VertexAttribute[] attributes = {VertexAttribute.packedPosition, VertexAttribute.color, VertexAttribute.packedTexCoords};
     private static final int
         chunksize = 30, //todo 32?
@@ -223,6 +225,10 @@ public class FloorRenderer{
     }
 
     public void drawLayer(CacheLayer layer){
+        drawLayer(layer, false);
+    }
+
+    public void drawLayer(CacheLayer layer, boolean checkChanges){
         if(cache == null){
             return;
         }
@@ -244,6 +250,11 @@ public class FloorRenderer{
 
                 if(!Structs.inBounds(x, y, cache) || cache[x][y].length == 0){
                     continue;
+                }
+
+                if(dirty[x][y] && checkChanges){
+                    dirty[x][y] = false;
+                    cacheChunk(x, y, false);
                 }
 
                 var mesh = cache[x][y][layer.id];
@@ -316,6 +327,7 @@ public class FloorRenderer{
         Batch current = Core.batch;
 
         try{
+            if(layer == CacheLayer.walls) growSprites = true;
             Core.batch = batch;
 
             for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
@@ -340,6 +352,7 @@ public class FloorRenderer{
             }
         }finally{
             Core.batch = current;
+            growSprites = false;
         }
 
         int floats = vidx;
@@ -433,9 +446,11 @@ public class FloorRenderer{
             vidx += spriteSize;
 
             //fixes graphical artifacting due to low precision positions/UVs. TODO: test for issues
-            final float grow = 0.03f;
+            final float grow = FloorRenderer.growSprites ? 0.04f : 0f;
             x -= grow;
             y -= grow;
+            originX += grow;
+            originY += grow;
             width += grow*2f;
             height += grow*2f;
 

@@ -119,7 +119,7 @@ public class EditorRenderer implements Disposable{
 
         renderer.blocks.floor.beginDraw();
         if(editor.showTerrain){
-            renderer.blocks.floor.drawLayer(CacheLayer.walls);
+            renderer.blocks.floor.drawLayer(CacheLayer.walls, doUpdate);
         }
         renderer.animateWater = prev;
 

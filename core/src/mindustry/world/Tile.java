@@ -18,6 +18,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.power.*;
 
 import static mindustry.Vars.*;
 
@@ -26,7 +27,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     private static final TilePreChangeEvent preChange = new TilePreChangeEvent();
     private static final TileFloorChangeEvent floorChange = new TileFloorChangeEvent();
     private static final TileOverlayChangeEvent overlayChange = new TileOverlayChangeEvent();;
+
     private static final ObjectSet<Building> tileSet = new ObjectSet<>();
+    private static final IntSet staleGraphs = new IntSet();
 
     /**
      * Extra data for specific blocks. Only saved if Block#saveData is true.
@@ -801,10 +804,39 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     @Remote(called = Loc.server)
     public static void setTeams(int[] positions, Team team){
         if(positions == null) return;
+
+        staleGraphs.clear();
+
         for(int pos : positions){
-            Tile tile = world.tile(pos);
-            if(tile != null && tile.build != null){
-                tile.build.changeTeam(team);
+            var build = world.build(pos);
+            if(build != null){
+                if(build.power != null){
+                    staleGraphs.add(build.power.graph.getID());
+                }
+                build.changeTeam(team, false);
+            }
+        }
+
+        //update power graphs in a second pass
+        for(int pos : positions){
+            var build = world.build(pos);
+            if(build != null && build.power != null && staleGraphs.contains(build.power.graph.getID())){
+                for(int i = 0; i < build.power.links.size; i++){
+                    var other = world.build(build.power.links.items[i]);
+
+                    //only reflow links that were connected to the old power graph; ones that have a new one were already covered.
+                    if(other != null && other.team != team && other.power != null && staleGraphs.contains(other.power.graph.getID())){
+                        build.power.links.removeIndex(i);
+                        other.power.links.removeValue(build.pos());
+
+                        new PowerGraph().reflow(other);
+
+                        i --;
+                    }
+                }
+                new PowerGraph().reflow(build);
+
+                build.updatePowerGraph();
             }
         }
     }

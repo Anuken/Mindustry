@@ -743,6 +743,9 @@ public class Block extends UnlockableContent implements Senseable{
         offset = ((size + 1) % 2) * tilesize / 2f;
         sizeOffset = -((size - 1) / 2);
 
+        itemFilter = new boolean[content.items().size];
+        liquidFilter = new boolean[content.liquids().size];
+
         if(consumeBuilder.size != 0){
             for(var consume : consumeBuilder){
                 consume.apply(this);

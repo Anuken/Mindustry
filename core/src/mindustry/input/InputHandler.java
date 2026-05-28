@@ -407,6 +407,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
             event.unitIDs = unitIds;
+            event.unitCommand = command;
         })){
             throw new ValidateException(player, "Player cannot command units.");
         }
@@ -731,7 +732,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Events.fire(new TapEvent(player, tile));
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server)
     public static void buildingControlSelect(Player player, Building build){
         if(player == null || build == null || player.dead()) return;
 
@@ -743,7 +744,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player.team() == build.team && build.canControlSelect(player.unit())){
             var before = player.unit();
 
-            build.onControlSelect(player.unit());
+            Call.unitBuildingControlSelect(player.unit(), build);
 
             if(!before.dead && before.spawnedByCore && !before.isPlayer()){
                 Call.unitDespawn(before);

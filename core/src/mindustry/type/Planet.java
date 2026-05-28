@@ -173,7 +173,7 @@ public class Planet extends UnlockableContent{
     public CampaignRules campaignRules = new CampaignRules();
     /** Defaults applied to the rules. */
     public CampaignRules campaignRuleDefaults = new CampaignRules();
-    /** Sets up rules on game load for any sector on this planet. */
+    /** Sets up rules on game load for any sector on this planet. In JSON mods, this field is called "rules", and expects an object. */
     public Cons<Rules> ruleSetter = r -> {};
     /** Replaces specific blocks on the map upon sector capture. Used for metal floor tiles on Serpulo. Unstable API, may be removed! */
     public ObjectMap<Block, Block> sectorCaptureReplacements = new ObjectMap<>();

@@ -50,8 +50,8 @@ public class NetworkIO{
             stream.writeInt(player.id);
             player.write(new Writes(stream));
 
+            SaveIO.getSaveWriter().writeDataPatches(stream);
             SaveIO.getSaveWriter().writeContentHeader(stream);
-            SaveIO.getSaveWriter().writeContentPatches(stream);
             SaveIO.getSaveWriter().writeMap(stream);
             SaveIO.getSaveWriter().writeTeamBlocks(stream);
             SaveIO.getSaveWriter().writeMarkers(stream);
@@ -84,8 +84,8 @@ public class NetworkIO{
             player.id = id;
             player.add();
 
+            SaveIO.getSaveWriter().readDataPatches(stream);
             SaveIO.getSaveWriter().readContentHeader(stream);
-            SaveIO.getSaveWriter().readContentPatches(stream);
             SaveIO.getSaveWriter().readMap(stream, world.context);
             SaveIO.getSaveWriter().readTeamBlocks(stream);
             SaveIO.getSaveWriter().readMarkers(stream);

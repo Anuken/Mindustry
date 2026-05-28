@@ -16,6 +16,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.maps.Map;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -65,10 +66,10 @@ public abstract class SaveVersion extends SaveFileReader{
     @Override
     public void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
         readRegion("meta", stream, counter, in -> readMeta(in, context));
-        readRegion("content", stream, counter, this::readContentHeader);
+        if(version >= 12) readRegion("patches", stream, counter, this::readDataPatches);
 
         try{
-            if(version >= 11) readRegion("patches", stream, counter, this::readContentPatches);
+            readRegion("content", stream, counter, this::readContentHeader);
             readRegion("map", stream, counter, in -> readMap(in, context));
             readRegion("entities", stream, counter, this::readEntities);
             if(version >= 8) readRegion("markers", stream, counter, this::readMarkers);
@@ -80,8 +81,8 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void write(DataOutputStream stream, StringMap extraTags) throws IOException{
         writeRegion("meta", stream, out -> writeMeta(out, extraTags));
+        writeRegion("patches", stream, this::writeDataPatches);
         writeRegion("content", stream, this::writeContentHeader);
-        writeRegion("patches", stream, this::writeContentPatches);
         writeRegion("map", stream, this::writeMap);
         writeRegion("entities", stream, this::writeEntities);
         writeRegion("markers", stream, this::writeMarkers);
@@ -518,28 +519,51 @@ public abstract class SaveVersion extends SaveFileReader{
         readWorldEntities(stream, mapping);
     }
 
-    public void skipContentPatches(DataInput stream) throws IOException{
-        int amount = stream.readUnsignedByte();
+    public void skipDataPatches(DataInput stream) throws IOException{
+        stream.readInt(); //version - ignored for now
+        int amount = stream.readInt();
         for(int i = 0; i < amount; i++){
             int len = stream.readInt();
             stream.skipBytes(len);
         }
+
+        int imageAmount = stream.readInt();
+        for(int i = 0; i < imageAmount; i++){
+            stream.readUTF(); //name
+            stream.skipBytes(4); //w h
+            int len = stream.readInt(); //byte data
+            stream.skipBytes(len);
+        }
     }
 
-    public void readContentPatches(DataInput stream) throws IOException{
+    public void readDataPatches(DataInput stream) throws IOException{
+        stream.readInt(); //version - ignored for now
+
         Seq<String> patches = new Seq<>();
 
-        int amount = stream.readUnsignedByte();
-        if(amount > 0){
-            for(int i = 0; i < amount; i++){
-                int len = stream.readInt();
-                byte[] bytes = new byte[len];
-                stream.readFully(bytes);
-                patches.add(new String(bytes, Strings.utf8));
-            }
+        int patchAmount = stream.readInt();
+        for(int i = 0; i < patchAmount; i++){
+            int len = stream.readInt();
+            byte[] bytes = new byte[len];
+            stream.readFully(bytes);
+            patches.add(new String(bytes, Strings.utf8));
         }
 
-        Events.fire(new ContentPatchLoadEvent(patches));
+        Seq<PatchImage> images = new Seq<>();
+        int imageAmount = stream.readInt();
+        for(int i = 0; i < imageAmount; i++){
+            String name = stream.readUTF();
+            short w = stream.readShort(), h = stream.readShort();
+            byte[] bytes = new byte[stream.readInt()];
+            stream.readFully(bytes);
+            images.add(new PatchImage(name, w, h, bytes));
+        }
+
+        Events.fire(new ContentPatchLoadEvent(patches, images));
+
+        if(images.size > 0){
+            state.patcher.applyImages(images);
+        }
 
         if(patches.size > 0){
             try{
@@ -550,17 +574,25 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void writeContentPatches(DataOutput stream) throws IOException{
-        if(state.patcher.patches.size > 0){
-            var patches = state.patcher.patches;
-            stream.writeByte(patches.size);
-            for(var patchset : patches){
-                byte[] bytes = patchset.patch.getBytes(Strings.utf8);
-                stream.writeInt(bytes.length);
-                stream.write(bytes);
-            }
-        }else{
-            stream.writeByte(0);
+    public void writeDataPatches(DataOutput stream) throws IOException{
+        stream.writeInt(DataPatcher.patchFormatVersion);
+
+        var patches = state.patcher.patches;
+        stream.writeInt(patches.size);
+        for(var patchset : patches){
+            byte[] bytes = patchset.patch.getBytes(Strings.utf8);
+            stream.writeInt(bytes.length);
+            stream.write(bytes);
+        }
+
+        var images = state.patcher.images;
+        stream.writeInt(images.size);
+        for(var image : images){
+            stream.writeUTF(image.path);
+            stream.writeShort(image.width);
+            stream.writeShort(image.height);
+            stream.writeInt(image.data.length);
+            stream.write(image.data);
         }
     }
 
@@ -587,7 +619,12 @@ public abstract class SaveVersion extends SaveFileReader{
         //manually fire the event here for older versions.
         if(version < 11){
             Seq<String> patches = new Seq<>();
-            Events.fire(new ContentPatchLoadEvent(patches));
+            Seq<PatchImage> images = new Seq<>();
+            Events.fire(new ContentPatchLoadEvent(patches, images));
+
+            if(images.size > 0){
+                state.patcher.applyImages(images);
+            }
 
             if(patches.size > 0){
                 try{
