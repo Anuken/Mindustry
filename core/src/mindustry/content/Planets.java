@@ -153,6 +153,11 @@ public class Planets{
             alwaysUnlocked = true;
             allowSelfSectorLaunch = true;
             landCloudColor = Pal.spore.cpy().a(0.5f);
+
+            sectorCaptureReplacements = ObjectMap.of(
+            Blocks.metalTiles12, Blocks.metalTiles11,
+            Blocks.metalTiles6, Blocks.metalTiles10
+            );
         }};
 
         verilus = makeAsteroid("verilus", sun, Blocks.stoneWall, Blocks.iceWall, -1, 0.5f, 12, 2f, gen -> {

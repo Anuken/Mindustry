@@ -435,6 +435,7 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyTap(Binding.respawn)){
                 controlledType = null;
                 recentRespawnTimer = 1f;
+                droppingItem = false;
                 Call.unitClear(player);
             }
         }
@@ -472,6 +473,14 @@ public class DesktopInput extends InputHandler{
             Tile selected = world.tileWorld(input.mouseWorldX(), input.mouseWorldY());
             if(selected != null){
                 Call.tileTap(player, selected);
+            }
+        }
+
+        if(input.keyTap(Binding.ping) && !Core.scene.hasMouse() && !scene.hasKeyboard()){
+            if(input.ctrl()){
+                ui.showTextInput("", "@ping.text", Vars.maxPingTextLength, "", result -> Call.pingLocation(Vars.player, input.mouseWorldX(), input.mouseWorldY(), UI.formatIcons(result)));
+            }else{
+                Call.pingLocation(Vars.player, input.mouseWorldX(), input.mouseWorldY(), null);
             }
         }
 

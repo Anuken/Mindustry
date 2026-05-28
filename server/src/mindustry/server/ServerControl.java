@@ -5,7 +5,6 @@ import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.Timer;
 import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
@@ -18,20 +17,21 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
-import mindustry.maps.Map;
 import mindustry.maps.*;
 import mindustry.maps.Maps.*;
 import mindustry.mod.Mods.*;
+import mindustry.mod.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.net.*;
 import mindustry.type.*;
+import org.jline.reader.*;
+import org.jline.reader.impl.completer.*;
 
 import java.io.*;
 import java.net.*;
 import java.time.*;
 import java.time.format.*;
-import java.util.*;
 import java.util.regex.*;
 
 import static arc.util.ColorCodes.*;
@@ -51,14 +51,6 @@ public class ServerControl implements ApplicationListener{
 
     private final Interval autosaveCount = new Interval();
 
-    public Runnable serverInput = () -> {
-        Scanner scan = new Scanner(System.in);
-        while(scan.hasNext()){
-            String line = scan.nextLine();
-            Core.app.post(() -> handleCommandString(line));
-        }
-    };
-
     /** The file to which the logs are currently being written. */
     public Fi currentLogFile;
 
@@ -74,8 +66,26 @@ public class ServerControl implements ApplicationListener{
     private PrintWriter socketOutput;
     private String suggested;
     private boolean autoPaused = false;
-    private Fi patchDirectory;
+    private Fi patchDirectory, patchImageDirectory;
     private Seq<String> contentPatches = new Seq<>();
+    private Seq<PatchImage> contentPatchImages = new Seq<>();
+
+    private LineReader lineReader;
+
+    public Runnable serverInput = () -> {
+        while(true){
+            try{
+                String line = lineReader.readLine("> ");
+                if(!line.isEmpty()){
+                    Core.app.post(() -> handleCommandString(line));
+                }
+            }catch(EndOfFileException | UserInterruptException e){
+                Core.app.exit();
+            }catch(Exception e){
+                Core.app.post(() -> { throw new ArcRuntimeException(e); });
+            }
+        }
+    };
 
     public Cons<GameOverEvent> gameOverListener = event -> {
         if(state.rules.waves){
@@ -112,6 +122,10 @@ public class ServerControl implements ApplicationListener{
     }
 
     protected void setup(String[] args){
+        registerCommands();
+
+        lineReader = LineReaderBuilder.builder().completer(new StringsCompleter(handler.getCommandList().map(c -> c.text))).build();
+
         Core.settings.defaults(
             "bans", "",
             "admins", "",
@@ -133,7 +147,14 @@ public class ServerControl implements ApplicationListener{
             if(level1 == LogLevel.err) text = text.replace(reset, lightRed + bold);
 
             String result = bold + lightBlack + "[" + dateTime.format(LocalDateTime.now()) + "] " + reset + format(tags[level1.ordinal()] + " " + text + "&fr");
-            System.out.println(result);
+            if(lineReader.isReading()){
+                lineReader.callWidget(LineReader.CLEAR);
+                lineReader.getTerminal().writer().println(result);
+                lineReader.callWidget(LineReader.REDRAW_LINE);
+                lineReader.callWidget(LineReader.REDISPLAY);
+            }else{
+                lineReader.getTerminal().writer().println(result);
+            }
 
             if(Config.logging.bool()){
                 logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + formatColors(tags[level1.ordinal()] + " " + text + "&fr", false));
@@ -154,8 +175,6 @@ public class ServerControl implements ApplicationListener{
         };
 
         Time.setDeltaProvider(() -> Math.min(Core.graphics.getDeltaTime() * 60f, maxDeltaServer));
-
-        registerCommands();
 
         Core.app.post(() -> {
             //try to load auto-update save if possible
@@ -204,6 +223,8 @@ public class ServerControl implements ApplicationListener{
 
         patchDirectory = dataDirectory.child("patches");
         patchDirectory.mkdirs();
+        patchImageDirectory = patchDirectory.child("sprites");
+        patchImageDirectory.mkdirs();
         loadPatchFiles();
 
         //set up default shuffle mode
@@ -328,11 +349,20 @@ public class ServerControl implements ApplicationListener{
             for(String patch : contentPatches){
                 event.patches.addUnique(patch);
             }
+
+            //add images that aren't already in the patch
+            ObjectSet<String> usedImages = event.images.map(i -> i.path).asSet();
+            for(PatchImage image : contentPatchImages){
+                if(usedImages.add(image.path)){
+                    event.images.add(image);
+                }
+            }
         });
     }
 
     void loadPatchFiles(){
         contentPatches.clear();
+        contentPatchImages.clear();
         Seq<Fi> patches = patchDirectory.findAll(f -> f.extEquals("json") || f.extEquals("hjson") || f.extEquals("json5")).sort();
 
         for(Fi patch : patches){
@@ -343,8 +373,24 @@ public class ServerControl implements ApplicationListener{
             }
         }
 
+        Seq<Fi> imageFiles = patchImageDirectory.findAll(f -> f.extEquals("png"));
+
+        for(Fi image : imageFiles){
+            try{
+                contentPatchImages.add(PatchImage.fromFile(image.absolutePath().substring(patchImageDirectory.absolutePath().length() + 1), image));
+            }catch(Throwable e){
+                Log.err("Invalid patch image file: " + image.path(), e);
+            }
+        }
+
+        contentPatchImages.sort();
+
         if(contentPatches.size > 0){
             Log.info("Loaded @ content patch files.", contentPatches.size);
+        }
+
+        if(contentPatchImages.size > 0){
+            Log.info("Loaded @ content patch images.", contentPatchImages.size);
         }
     }
 

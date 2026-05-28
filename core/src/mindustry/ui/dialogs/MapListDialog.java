@@ -2,16 +2,23 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.scene.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.scene.event.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.input.*;
 import mindustry.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.JsonIO;
 import mindustry.maps.*;
+import mindustry.content.Planets;
+import mindustry.type.Planet;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
@@ -21,6 +28,7 @@ public abstract class MapListDialog extends BaseDialog{
 
     private String searchString;
     private Seq<Gamemode> modes = new Seq<>();
+    private Seq<String> availablePlanets = new Seq<>();
     private Table mapTable = new Table();
     private TextField searchField;
 
@@ -34,6 +42,7 @@ public abstract class MapListDialog extends BaseDialog{
     prioritizeModded = Core.settings.getBool("editorprioritizemodded", false),
     prioritizeCustom = Core.settings.getBool("editorprioritizecustom", false),
     displayType;
+    private Seq<String> planets = Core.settings.getJson("editorfilterplanets", Seq.class, String.class, Seq::new);
 
     public MapListDialog(String title, boolean displayType){
         super(title);
@@ -58,6 +67,9 @@ public abstract class MapListDialog extends BaseDialog{
     abstract void showMap(Map map);
 
     void setup(){
+        availablePlanets = content.planets().select(p -> p.accessible).map(p -> p.name);
+        availablePlanets.add(Planets.sun.name);
+
         makeButtonOverlay();
 
         buttons.clearChildren();
@@ -107,78 +119,86 @@ public abstract class MapListDialog extends BaseDialog{
         int i = 0;
 
         Seq<Map> mapList = new Seq<>();
+        Seq<String> activePlanetFilters = planets.select(p -> availablePlanets.contains(p));
 
         if(showCustom) mapList.addAll(maps.customMaps());
         if(showBuiltIn) mapList.addAll(maps.defaultMaps());
         if(showModded) mapList.addAll(maps.moddedMaps());
 
-        mapList = mapList.distinct();
+        mapList.distinct();
 
-        if(mapList != null){
-            if(prioritizeModded){
-                Seq<Map> ordered = new Seq<>();
-                ordered.addAll(mapList.select(m -> m.mod != null)).sortComparing(m -> m.mod.meta.displayName);
-                ordered.addAll(mapList.select(m -> m.mod == null));
-                mapList = ordered;
+        if(prioritizeModded){
+            Seq<Map> ordered = new Seq<>();
+            ordered.addAll(mapList.select(m -> m.mod != null).sortComparing(m -> m.mod.meta.displayName));
+            ordered.addAll(mapList.select(m -> m.mod == null).sortComparing(m -> m.plainName()));
+            mapList = ordered;
+        }else if(prioritizeCustom){
+            Seq<Map> ordered = new Seq<>();
+            ordered.addAll(mapList.select(m -> m.custom)).sortComparing(m -> m.plainName());
+            ordered.addAll(mapList.select(m -> !m.custom).sortComparing(m -> m.plainName()));
+            mapList = ordered;
+        }else{
+            mapList.sortComparing(m -> m.plainName());
+        }
+        for(Map map : mapList){
+
+            boolean invalid = false;
+            for(Gamemode mode : modes){
+                invalid |= !mode.valid(map);
             }
-            if(prioritizeCustom){
-                Seq<Map> ordered = new Seq<>();
-                ordered.addAll(mapList.select(m -> m.custom)).sortComparing(m -> m.plainName());
-                ordered.addAll(mapList.select(m -> !m.custom));
-                mapList = ordered;
+
+            Rules rules = JsonIO.read(Rules.class, map.tags.get("rules", "{}"));
+
+            // Only filter through active planets. Preserve modded planets when the mod is disabled
+            if(!activePlanetFilters.isEmpty() && !activePlanetFilters.contains(rules.planet.name)){
+                continue;
             }
-            for(Map map : mapList){
 
-                boolean invalid = false;
-                for(Gamemode mode : modes){
-                    invalid |= !mode.valid(map);
-                }
-                if(invalid || (searchString != null
-                    && !map.plainName().toLowerCase().contains(searchString)
-                    && (!searchAuthor || !map.plainAuthor().toLowerCase().contains(searchString))
-                    && (!searchDescription || !map.plainDescription().toLowerCase().contains(searchString))
-                    && (!searchModname || !(map.mod == null ? "" : Strings.stripColors(map.mod.meta.displayName).toLowerCase()).contains(searchString)))){
-                    continue;
-                }
+            if(invalid || (searchString != null
+                && !map.plainName().toLowerCase().contains(searchString)
+                && (!searchAuthor || !map.plainAuthor().toLowerCase().contains(searchString))
+                && (!searchDescription || !map.plainDescription().toLowerCase().contains(searchString))
+                && (!searchModname || !(map.mod == null ? "" : Strings.stripColors(map.mod.meta.displayName).toLowerCase()).contains(searchString)))){
+                continue;
+            }
 
-                noMapsShown = false;
+            noMapsShown = false;
 
-                if(i % maxwidth == 0){
-                    mapTable.row();
-                }
+            if(i % maxwidth == 0){
+                mapTable.row();
+            }
 
-                TextButton button = mapTable.button("", Styles.grayt, () -> showMap(map)).width(mapsize).bottom().pad(8).get();
-                button.clearChildren();
-                button.margin(9);
-                button.bottom();
+            TextButton button = mapTable.button("", Styles.grayt, () -> showMap(map)).width(mapsize).bottom().pad(8).get();
+            button.clearChildren();
+            button.margin(9);
+            button.bottom();
 
-                //TODO hide in editor?
-                button.table(t -> {
-                    t.left();
-                    for(Gamemode mode : Gamemode.all){
-                        TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()) + "Small");
-                        if(mode.valid(map) && Core.atlas.isFound(icon.getRegion())){
-                            t.image(icon).size(16f).pad(4f);
-                        }
+            //TODO hide in editor?
+            button.table(t -> {
+                t.left();
+                for(Gamemode mode : Gamemode.all){
+                    TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()) + "Small");
+                    if(mode.valid(map) && Core.atlas.isFound(icon.getRegion())){
+                        t.image(icon).size(16f).pad(4f);
                     }
-                    if(t.getChildren().size == 0){
-                        t.add().size(16f).pad(4f);
-                    }
-                }).left().row();
-
-                button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
-                button.row();
-                button.image().growX().pad(4).color(Pal.gray);
-                button.row();
-                button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
-
-                if(displayType){
-                    button.row();
-                    button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName : "@builtin").color(Color.gray).padTop(3);
                 }
+                if(t.getChildren().size == 0){
+                    t.add().size(16f).pad(4f);
+                }
+            }).left().row();
 
-                i++;
+            button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
+            button.row();
+            button.image().growX().pad(4).color(Pal.gray);
+            button.row();
+            button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
+
+            if(displayType){
+                button.row();
+                button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName : "@builtin").color(Color.gray).padTop(3);
             }
+
+            i++;
         }
 
         if(noMapsShown){
@@ -209,8 +229,7 @@ public abstract class MapListDialog extends BaseDialog{
                             }
                         }
                     });
-                }).pad(5f);
-                tab.add().width(60f);
+                }).expandX().pad(5f);
                 // Priorities
                 tab.table(t -> {
                     t.add("@editor.filters.priorities").padBottom(6f).row();
@@ -233,6 +252,67 @@ public abstract class MapListDialog extends BaseDialog{
                             Core.settings.put("editorprioritizemodded", prioritizeModded);
                             rebuildMaps();
                         }).size(60f).checked(b-> showModded && prioritizeModded).tooltip("@editor.filters.prioritizemod").disabled(b -> !showModded);
+                    });
+                }).expandX().pad(5f);
+                // Planet selection dialog similar to the tech tree selection menu
+                tab.table(t -> {
+                    t.add("").padBottom(6f).row();
+                    t.table(Tex.button, but -> {
+                        ImageButton pButton = but.button(ui.getIcon("planet"), Styles.emptyTogglei, () -> {
+                            new BaseDialog("@editor.filters.planetselect"){{ cont.pane(t -> {
+                                t.table(Tex.button, in -> {
+                                    in.defaults().width(300f).height(60f);
+
+                                    in.button("@rules.anyenv", ui.getIcon("planet"), Styles.flatTogglet, iconMed, () -> {
+                                        if(planets.contains(Planets.sun.name)){
+                                            planets.remove(Planets.sun.name);
+                                        }else{
+                                            planets.add(Planets.sun.name);
+                                        }
+                                        rebuildMaps();
+                                        Core.settings.putJson("editorfilterplanets", String.class, planets);
+                                    }).marginLeft(12f).checked(planets.contains(Planets.sun.name)).row();
+
+                                    for(Planet planet : content.planets().select(p -> p.accessible)){
+                                        // Get the planet's custom icon. Defaults to the default colored planet icon
+                                        TextureRegion foundIcon = Core.atlas.find(planet.name + "-ui", planet.name);
+                                        TextureRegionDrawable picon = Core.atlas.isFound(foundIcon) ? new TextureRegionDrawable(foundIcon) : ((TextureRegionDrawable)ui.getIcon("planet").tint(planet.iconColor));
+                                        
+                                        in.button(planet.localizedName, picon, Styles.flatTogglet, iconMed, () -> {
+                                            if(planets.contains(planet.name)){
+                                                planets.remove(planet.name);
+                                            }else{
+                                                planets.add(planet.name);
+                                            }
+                                            rebuildMaps();
+                                            Core.settings.putJson("editorfilterplanets", String.class, planets);
+                                        }).marginLeft(12f).checked(planets.contains(planet.name)).row();
+                                    }
+                                });
+                            });
+                                addCloseButton();
+                            }}.show();
+                        }).size(60f).tooltip("@editor.filters.planetselect").checked(b -> planets.find(p -> availablePlanets.contains(p)) != null)
+                        .get();
+                        pButton.addListener(new ClickListener(KeyCode.mouseRight){
+                            @Override
+                            public void clicked(InputEvent event, float x, float y) {
+                                if(mobile) return;
+                                planets.removeAll(p -> availablePlanets.contains(p));
+                                Core.settings.putJson("editorfilterplanets", String.class, planets);
+                                rebuildMaps();
+                            }
+                        });
+                        pButton.addListener(new ElementGestureListener(){
+                            @Override
+                            public boolean longPress(Element e, float x, float y){
+                                if(!mobile) return false;
+                                planets.removeAll(p -> availablePlanets.contains(p));
+                                Core.settings.putJson("editorfilterplanets", String.class, planets);
+                                rebuildMaps();
+                                return true;
+                            }
+                        });
                     });
                 }).expandX().pad(5f);
             }).padBottom(10f);

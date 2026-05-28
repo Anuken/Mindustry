@@ -121,7 +121,7 @@ public class Router extends Block{
         public @Nullable Building getTileTarget(Item item, Tile from, Building src, boolean set){
             if(unit != null && isControlled()){
                 unit.health(health);
-                unit.ammo(unit.type().ammoCapacity * (items.total() > 0 ? 1f : 0f));
+                unit.ammo((items.total() > 0 ? 1f : 0f));
                 unit.team(team);
                 unit.set(x, y);
 

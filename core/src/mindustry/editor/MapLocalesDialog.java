@@ -143,9 +143,9 @@ public class MapLocalesDialog extends BaseDialog{
 
         // property addition
         cont.table(Tex.button, t -> {
-            TextField name = t.field("name", s -> {}).maxTextLength(64).fillX().padTop(10f).get();
+            TextField name = t.field(Core.bundle.get("locales.property.name"), s -> {}).maxTextLength(64).fillX().padTop(10f).get();
             t.row();
-            TextField value = t.area("text", s -> {}).maxTextLength(1000).fillX().height(140f).get();
+            TextField value = t.area(Core.bundle.get("locales.property.text"), s -> {}).maxTextLength(1000).fillX().height(140f).get();
             t.row();
 
             t.button("@add", Icon.add, () -> {

@@ -27,8 +27,8 @@ buildscript{
 }
 
 plugins{
-    id "org.jetbrains.kotlin.jvm" version "2.1.10"
-    id "org.jetbrains.kotlin.kapt" version "2.1.10"
+    id "org.jetbrains.kotlin.jvm" version "2.3.20"
+    id "org.jetbrains.kotlin.kapt" version "2.3.20"
 }
 
 allprojects{
@@ -39,7 +39,7 @@ allprojects{
 
     ext{
         versionNumber = '8'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'beta'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
@@ -193,7 +193,7 @@ allprojects{
     }
 
     tasks.withType(JavaCompile){
-        targetCompatibility = 8
+        targetCompatibility = JavaVersion.VERSION_17
         sourceCompatibility = JavaVersion.VERSION_17
         options.encoding = "UTF-8"
         options.compilerArgs += ["-Xlint:deprecation"]
@@ -223,7 +223,7 @@ configure(project(":annotations")){
 //compile with java 8 compatibility for everything except the annotation project
 configure(subprojects - project(":annotations") - project(":tests")){
     tasks.withType(JavaCompile){
-        options.compilerArgs.addAll(['--release', '8'])
+        options.compilerArgs.addAll(['--release', '17'])
     }
 
     tasks.withType(Javadoc){
@@ -254,7 +254,6 @@ project(":desktop"){
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
         implementation arcModule("backends:backend-sdl")
-        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
     }
 }
 
@@ -266,7 +265,7 @@ project(":core"){
     kapt{
         javacOptions{
             option("-source", "17")
-            option("-target", "1.8")
+            option("-target", "17")
         }
     }
 
@@ -358,7 +357,6 @@ project(":core"){
         if(localArc && debugged()) api arcModule("extensions:recorder")
         if(localArc) api arcModule(":extensions:packer")
 
-        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
         compileOnly project(":annotations")
         if(!project.hasProperty("noKapt")) kapt project(":annotations")
     }
@@ -403,7 +401,7 @@ project(":server"){
     dependencies{
         implementation project(":core")
         implementation arcModule("backends:backend-headless")
-        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
+        implementation 'org.jline:jline:4.0.0'
     }
 }
 
@@ -450,7 +448,6 @@ project(":tools"){
         implementation arcModule("backends:backend-headless")
 
         implementation("com.google.guava:guava:33.3.1-jre")
-        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
     }
 }
 
@@ -473,10 +470,6 @@ configure([":core", ":server"].collect{project(it)}){
         publications{
             maven(MavenPublication){
                 from components.java
-                //TODO: uncomment this once the jitpack packing is fixed (currently depends on a newer glibc version)
-                //if(project.name == "core"){
-                //    artifact(tasks.named("assetsJar"))
-                //}
             }
         }
     }
@@ -497,7 +490,6 @@ task deployAll{
     dependsOn cleanDeployOutput
     dependsOn "desktop:packrLinux64"
     dependsOn "desktop:packrWindows64"
-    dependsOn "desktop:packrWindows32"
     dependsOn "desktop:packrMacOS"
     if(versionModifier != "steam"){
         dependsOn "server:deploy"
