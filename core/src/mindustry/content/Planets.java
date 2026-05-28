@@ -80,6 +80,7 @@ public class Planets{
                 r.lighting = false;
                 r.coreDestroyClear = true;
                 r.onlyDepositCore = true;
+                r.unitCrashBuildDamageMultiplier = 1f;
             };
             campaignRuleDefaults.fog = true;
             campaignRuleDefaults.showSpawns = true;
