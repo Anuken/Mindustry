@@ -286,17 +286,15 @@ public class CommandAI extends AIController{
 
             Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
 
-            //TODO: should the unit stop when it finds a target?
             if(
                 (hasStance(UnitStance.patrol) && !hasStance(UnitStance.pursueTarget) && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
-                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
+                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && !unit.type.circleTarget && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
                 (command == UnitCommand.loopPayloadCommand && unit.within(vecMovePos, 10f))
             ){
                 move = false;
             }
 
             if(unit.isGrounded() && !ramming){
-                //TODO: blocking enable or disable?
                 if(timer.get(timerTarget3, avoidInterval)){
                     Vec2 dstPos = Tmp.v1.trns(unit.rotation, unit.hitSize/2f);
                     float max = unit.hitSize/2f;
@@ -339,6 +337,11 @@ public class CommandAI extends AIController{
                         move = true;
                         vecOut.set(targetPos);
                     }*/
+
+                    //do not wiggle in place
+                    if(unit.type.naval && move && unit.tileOn() == world.tileWorld(vecOut.x, vecOut.y)){
+                        move = false;
+                    }
                 }
 
                 //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
@@ -388,7 +391,10 @@ public class CommandAI extends AIController{
             }
 
             //reached destination, end pathfinding
-            if(attackTarget == null && unit.within(vecMovePos, command.exactArrival && commandQueue.size == 0 ? 1f : Math.max(5f, unit.hitSize / 2f))){
+            if(attackTarget == null && (unit.within(vecMovePos, command.exactArrival && commandQueue.size == 0 ? 1f : Math.max(5f, unit.hitSize / 2f)) ||
+                //for circling units, it doesn't need to reach the exact waypoint.
+                (!unit.type.omniMovement && !unit.type.rotateMoveFirst && !command.exactArrival && Angles.angleDist(unit.angleTo(vecMovePos), unit.rotation) > 60f &&
+                    unit.within(vecMovePos, Math.min(50f, 360f / unit.type.rotateSpeed * unit.type.speed / (Mathf.pi * 2f)))))){
                 finishPath();
             }
 

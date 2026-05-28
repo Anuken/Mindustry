@@ -47,7 +47,7 @@ public class ImpactReactor extends PowerGenerator{
 
         addBar("power", (GeneratorBuild entity) -> new Bar(() ->
         Core.bundle.format("bar.poweroutput",
-        Strings.fixed(Math.max(entity.getPowerProduction() - consPower.usage, 0) * 60 * entity.timeScale(), 1)),
+        Strings.fixed(Math.max(entity.getPowerProduction() - (consPower == null ? 0f : consPower.usage), 0) * 60 * entity.timeScale(), 1)),
         () -> Pal.powerBar,
         () -> entity.productionEfficiency));
     }
@@ -59,13 +59,16 @@ public class ImpactReactor extends PowerGenerator{
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
-        //exponential decay formula
-        float max = -(float)Math.log(0.001f) / warmupSpeed / 60f;
-        float equal = -(float)Math.log(1f - Mathf.pow(consPower.usage / powerProduction, 1f / 5f)) / warmupSpeed / 60f;
-        stats.add(Stat.warmupTime, t -> {
-            t.add(Strings.autoFixed(max, 2) + " " + StatUnit.seconds.localized() + (consPower != null ? 
+
+        if(consPower != null){
+            //exponential decay formula
+            float max = -(float)Math.log(0.001f) / warmupSpeed / 60f;
+            float equal = -(float)Math.log(1f - Mathf.pow(consPower.usage / powerProduction, 1f / 5f)) / warmupSpeed / 60f;
+            stats.add(Stat.warmupTime, t -> {
+                t.add(Strings.autoFixed(max, 2) + " " + StatUnit.seconds.localized() + (consPower != null ?
                 " ~ " + Strings.autoFixed(equal, 2) + " " + StatUnit.seconds.localized() + " " + StatUnit.powerEquilibrium.localized() : ""));
-        });
+            });
+        }
     }
 
     public class ImpactReactorBuild extends GeneratorBuild{
@@ -74,14 +77,14 @@ public class ImpactReactor extends PowerGenerator{
         @Override
         public void updateTile(){
             if(efficiency >= 0.9999f && power.status >= 0.99f){
-                boolean prevOut = getPowerProduction() <= consPower.requestedPower(this);
+                boolean prevOut = consPower != null && getPowerProduction() <= consPower.requestedPower(this);
 
                 warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed * timeScale);
                 if(Mathf.equal(warmup, 1f, 0.001f)){
                     warmup = 1f;
                 }
 
-                if(!prevOut && (getPowerProduction() > consPower.requestedPower(this))){
+                if(!prevOut && consPower != null && (getPowerProduction() > consPower.requestedPower(this))){
                     Events.fire(Trigger.impactPower);
                 }
 

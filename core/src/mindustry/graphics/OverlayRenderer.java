@@ -75,11 +75,11 @@ public class OverlayRenderer{
     public void drawBottom(){
         InputHandler input = control.input;
 
-        if(player.dead()) return;
-
         if(renderer.showOtherBuildPlans){
             input.drawOtherBuildPlans();
         }
+
+        if(player.dead()) return;
 
         if(player.isBuilder()){
             input.drawBuildPlans();

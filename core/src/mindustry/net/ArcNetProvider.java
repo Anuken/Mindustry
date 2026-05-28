@@ -58,11 +58,11 @@ public class ArcNetProvider implements NetProvider{
             packetSpamLimit = Config.packetSpamLimit.num();
         });
 
-        client = new Client(8192, 16384, new PacketSerializer()){
+        client = new Client(16384, 16384, new PacketSerializer()){
             @Override
             public void handleNetException(ArcNetException e){
                 //allow occasional UDP network errors
-                if(net.client() && e.getMessage() != null && e.getMessage().contains("UDP deserialization") && clientUdpErrorRate.allow(5000, 2)){
+                if(net.client() && e.getMessage() != null && e.getMessage().contains("UDP deserialization") && clientUdpErrorRate.allow(5000, 5)){
                     Log.err("UDP network error", e);
                 }else{
                     super.handleNetException(e);
@@ -433,6 +433,9 @@ public class ArcNetProvider implements NetProvider{
 
         @Override
         public Object read(ByteBuffer byteBuffer){
+            //fixes invalid 0-length packets on some servers
+            if(byteBuffer.limit() == 0) return null;
+
             if(debug){
                 if(Time.timeSinceMillis(lastDownload) >= 1000){
                     lastDownload = Time.millis();
