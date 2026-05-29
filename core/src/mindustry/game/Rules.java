@@ -88,6 +88,8 @@ public class Rules{
     public float unitCrashDamageMultiplier = 1f;
     /** How fast units can mine. */
     public float unitMineSpeedMultiplier = 1f;
+    /** Time until unit factories activate (global). */
+    public float unitFactoryActivationDelay = 0f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
     public boolean ghostBlocks = true;
     /** If true, pings of players from other teams will be shown. */
@@ -301,6 +303,10 @@ public class Rules{
 
     public boolean isBanned(UnitType unit){
         return unitWhitelist != bannedUnits.contains(unit);
+    }
+
+    public float unitActivationDelay(Team team){
+        return unitFactoryActivationDelay + teams.get(team).unitFactoryActivationDelay;
     }
 
     /** A team-specific ruleset. */
