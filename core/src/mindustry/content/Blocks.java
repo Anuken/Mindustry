@@ -4688,7 +4688,7 @@ public class Blocks{
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.3f;
             }},
-            Items.carbide, new ArtilleryBulletType(4f, 650, "shell"){{
+            Items.carbide, new ArtilleryBulletType(4f, 600, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosionSmall, Fx.titanSmokeSmall);
                 despawnEffect = Fx.none;
                 knockback = 3f;
