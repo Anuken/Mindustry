@@ -512,6 +512,46 @@ public class Fx{
         }
     }),
 
+    titanThorExplosion = new Effect(30f, 160f, e -> {
+        Color baseColor = Color.valueOf("e87878");
+
+        //shrapnel
+        rand.setSeed(e.id + 3);
+        Draw.z(Layer.effect + 0.001f);
+        for(int i = 0; i < 18; i++){
+            float angle = rand.random(360f);
+            float dist = rand.random(25f, 85f) * e.finpow();
+            float size = rand.random(0.4f, 1f) * e.foutpow() * 12f;
+            float tx = e.x + Mathf.cosDeg(angle) * dist;
+            float ty = e.y + Mathf.sinDeg(angle) * dist;
+
+            color(e.color, Pal.lightishGray, e.fin());
+            Drawf.tri(tx, ty, size, size * 5f * e.foutpow(), angle);
+            Drawf.tri(tx, ty, size, size * 2f * e.foutpow(), angle + 180f);
+
+            float tipX = tx + Mathf.cosDeg(angle) * size * 5f * e.foutpow();
+            float tipY = ty + Mathf.sinDeg(angle) * size * 5f * e.foutpow();
+            Drawf.light(tipX, tipY, size * 12f, e.color, 0.7f * e.foutpow());
+        }
+        Draw.z();
+
+        //shockwave
+        e.scaled(30f, i -> {
+            if(i.fin() < 0.35f) return;
+            float progress = (i.fin() - 0.35f) / 0.65f;
+            color(e.color, 1f - progress);
+            stroke((1f - progress) * 2.5f);
+            Lines.circle(e.x, e.y, 10f + progress * 90f);
+        });
+
+        //tint
+        e.scaled(15f, i -> {
+            color(baseColor, i.fout() * 0.25f);
+            Fill.circle(e.x, e.y, 80f * i.finpow());
+            Drawf.light(e.x, e.y, 120f, baseColor, 0.6f * i.fout());
+        });
+    }),
+
     titanSmoke = new Effect(300f, 300f, b -> {
         float intensity = 3f;
 
@@ -569,6 +609,35 @@ public class Fx{
                 });
             });
         }
+    }),
+
+    titanThorSmoke = new Effect(300f, 300f, b -> {
+        Color baseColor = Color.valueOf("e87878");
+        float intensity = 3f;
+
+        //smoke moves upwards
+        color(b.color, 0.7f);
+        for(int i = 0; i < 4; i++){
+            rand.setSeed(b.id * 2 + i);
+            float lenScl = rand.random(0.5f, 1f);
+            float upDrift = rand.random(15f, 50f);
+            int fi = i;
+            b.scaled(b.lifetime * lenScl, e -> {
+                randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 22f * intensity, (x, y, in, out) -> {
+                    float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                    float rad  = fout * ((2f + intensity) * 2.35f);
+                    float rise = e.fin(Interp.pow3Out) * upDrift;
+
+                    Fill.circle(e.x + x, e.y + y + rise, rad);
+                    Drawf.light(e.x + x, e.y + y + rise, rad * 2.5f, b.color, 0.5f);
+                });
+            });
+        }
+
+        b.scaled(b.lifetime * 0.3f, e -> {
+            color(baseColor, e.fout() * 0.12f);
+            Fill.circle(e.x, e.y, 100f * e.fin(Interp.pow3Out));
+        });
     }),
 
     coreExplosion = new Effect(55f, 240f, e -> {
@@ -733,6 +802,74 @@ public class Fx{
             Drawf.tri(e.x, e.y, e.fout() * 25f, e.foutpow() * 66f + 6f, e.rotation + s * 90f);
         }
     }),
+
+    scathePhaseRing = new Effect(50f, 110f, e -> {
+        rand.setSeed(e.id);
+        int shards = 14;
+        for(int i = 0; i < shards; i++){
+            float angle = (360f / shards) * i * rand.random(0.9f, 1f) + e.fin() * 60f;
+            float dist = e.finpow() * 110f;
+            float width = rand.random(0.5f, 1f) * 6f;
+            float length = 3f + e.fout() * rand.random(0.5f, 1f) * 25f; 
+            float tx = e.x + Mathf.cosDeg(angle) * dist;
+            float ty = e.y + Mathf.sinDeg(angle) * dist;
+
+            color(e.color, Color.white, e.fout());
+            Drawf.tri(tx, ty, width, length, angle);
+            Drawf.tri(tx, ty, width, length, angle + 180f);
+        }
+
+        rand.setSeed(e.id + 1);
+        for(int i = 0; i < 10; i++){
+            float angle = rand.random(360f);
+            float arcLen = rand.random(40f, 100f) * e.finpow();
+            float arcStroke = rand.random(0.5f, 2f) * e.fout();
+            float branchOff = rand.random(20f, 45f);
+
+            float flicker = Mathf.absin(e.fin() * (i + 1) * 28f, 1f, 1f);
+
+            color(Color.white, e.color, e.fin() * flicker);
+            stroke(arcStroke * flicker);
+            lineAngle(e.x, e.y, angle, arcLen);
+
+            float mx = e.x + Mathf.cosDeg(angle) * arcLen * 0.5f;
+            float my = e.y + Mathf.sinDeg(angle) * arcLen * 0.5f;
+            float branchLen = arcLen * 0.35f * e.fout();
+
+            for(int s : Mathf.signs){
+                color(e.color, e.fout() * 0.7f * flicker);
+                stroke(arcStroke * 0.5f * flicker);
+                lineAngle(mx, my, angle + branchOff * s, branchLen);
+
+                //branch tip glow
+                float tipX = mx + Mathf.cosDeg(angle + branchOff * s) * branchLen;
+                float tipY = my + Mathf.sinDeg(angle + branchOff * s) * branchLen;
+                color(Color.white, e.color, e.fout() * flicker);
+                Fill.circle(tipX, tipY, arcStroke * 1.5f * e.fout() * flicker);
+                Drawf.light(tipX, tipY, arcStroke * 8f, e.color, 0.5f * e.fout() * flicker);
+            }
+
+            //main tip glow
+            float tipX = e.x + Mathf.cosDeg(angle) * arcLen;
+            float tipY = e.y + Mathf.sinDeg(angle) * arcLen;
+            color(Color.white, e.color, e.fout() * flicker);
+            Fill.circle(tipX, tipY, arcStroke * 2f * e.fout() * flicker);
+            Drawf.light(tipX, tipY, arcStroke * 10f, e.color, 0.6f * e.fout() * flicker);
+        }
+
+        e.scaled(18f, i -> {
+            color(Color.white, e.color, i.fout());
+            stroke(i.fout() * 4f);
+            Lines.circle(e.x, e.y, 8f + i.fin() * 45f);
+        });
+
+        e.scaled(12f, i -> {
+            color(Color.white, i.fout() * 0.6f);
+            Fill.circle(e.x, e.y, 20f * i.fout());
+        });
+
+        Drawf.light(e.x, e.y, 180f, e.color, 0.95f * e.fout());
+    }).layer(Layer.bullet + 3f),
 
     dynamicSpikes = new Effect(40f, 100f, e -> {
         color(e.color);
@@ -1965,6 +2102,17 @@ public class Fx{
         Drawf.tri(e.x, e.y, w, 6f * e.fout(), e.rotation + 180f);
     }),
 
+    shootTitanLight = new Effect(10, e -> {
+        e.scaled(8f, i -> {
+            color(Color.white, Pal.lightOrange, i.fin());
+            float offset = 6f;
+            float dx = e.x + Angles.trnsx(e.rotation, offset);
+            float dy = e.y + Angles.trnsy(e.rotation, offset);
+            Fill.circle(dx, dy, 12f * i.fout());
+            Drawf.light(dx, dy, 40f, Pal.lightOrange, 0.9f * i.fout());
+        });
+    }),
+
     shootBigSmoke = new Effect(17f, e -> {
         color(Pal.lighterOrange, Color.lightGray, Color.gray, e.fin());
 
@@ -2029,6 +2177,38 @@ public class Fx{
             e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
                 color(e.color, Pal.lightishGray, b.fin());
                 Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 3.4f + 0.3f);
+            });
+        }
+    }),
+
+    shootSmokeTitanThor = new Effect(70f, e -> {
+        rand.setSeed(e.id);
+
+        //smoke
+        for(int i = 0; i < 13; i++){
+            v.trns(e.rotation + rand.range(30f), rand.random(e.finpow() * 40f));
+            float tint = rand.random(1f);
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                color(tint > 0.6f ? Color.valueOf("e87878") : e.color, Pal.lightishGray, b.fin());
+                Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 3.4f + 0.3f);
+            });
+        }
+
+        //debris
+        rand.setSeed(e.id + 2);
+        for(int i = 0; i < 5; i++){
+            float angle = e.rotation + 180f + rand.range(35f);
+            float dist = rand.random(15f, 45f) * e.finpow();
+            float size = rand.random(1.5f, 3.5f);
+            float spin = rand.range(180f) * e.fin();
+
+            float dx = e.x + Mathf.cosDeg(angle) * dist;
+            float dy = e.y + Mathf.sinDeg(angle) * dist;
+
+            e.scaled(e.lifetime * rand.random(0.4f, 0.85f), b -> {
+                color(Pal.lightOrange, Pal.lightishGray, b.fin());
+                Drawf.tri(dx, dy, size * b.fout(), size * 3f * b.fout(), angle + spin);
+                Drawf.tri(dx, dy, size * b.fout(), size * 3f * b.fout(), angle + spin + 180f);
             });
         }
     }),

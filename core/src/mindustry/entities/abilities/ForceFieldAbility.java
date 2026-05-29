@@ -30,13 +30,17 @@ public class ForceFieldAbility extends Ability{
     public int sides = 6;
     /** Rotation of shield. */
     public float rotation = 0f;
+    /** Multiplier on unit speed when its shield is hit. */
+    public float unitSlowdown = -1f;
+    /** Number of ticks unit slowdown is applied. */
+    public float slowdownTime = 20f;
 
     public Sound breakSound = Sounds.shieldBreakSmall;
     public Sound hitSound = Sounds.shieldHit;
     public float hitSoundVolume = 0.12f;
 
     /** State. */
-    protected float radiusScale, alpha;
+    protected float radiusScale, alpha, slowdownTimer;
     protected boolean wasBroken = true;
 
     private static float realRad;
@@ -49,8 +53,14 @@ public class ForceFieldAbility extends Ability{
             paramField.hitSound.at(b.x, b.y, 1f + Mathf.range(0.1f), paramField.hitSoundVolume);
             paramUnit.shield -= b.type().shieldDamage(b);
             paramField.alpha = 1f;
+            if(paramField.unitSlowdown > 0f){
+                paramUnit.speedMultiplier *= paramField.unitSlowdown;
+                paramField.slowdownTimer = 0f;
+            }
         }
     };
+
+    public ForceFieldAbility(){}
 
     public ForceFieldAbility(float radius, float regen, float max, float cooldown){
         this.radius = radius;
@@ -67,8 +77,6 @@ public class ForceFieldAbility extends Ability{
         this.sides = sides;
         this.rotation = rotation;
     }
-
-    ForceFieldAbility(){}
 
     @Override
     public void addStats(Table t){
@@ -92,6 +100,13 @@ public class ForceFieldAbility extends Ability{
         }
 
         wasBroken = unit.shield <= 0f;
+
+        if(unitSlowdown > 0f){
+            slowdownTimer += Time.delta;
+            if(slowdownTimer > slowdownTime){
+                unit.speedMultiplier = 1f;
+            }
+        }
 
         if(unit.shield < max){
             unit.shield += Time.delta * regen;

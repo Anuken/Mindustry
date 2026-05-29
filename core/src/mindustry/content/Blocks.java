@@ -4657,11 +4657,11 @@ public class Blocks{
 
             ammo(
             Items.thorium, new ArtilleryBulletType(2.5f, 350, "shell"){{
-                hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
+                hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanThorExplosion, Fx.titanThorSmoke);
                 despawnEffect = Fx.none;
                 knockback = 2f;
                 lifetime = 140f;
-                height = 19f;
+                height = 24f;
                 width = 17f;
                 splashDamageRadius = 65f;
                 splashDamage = 350f;
@@ -4674,14 +4674,14 @@ public class Blocks{
                 status = StatusEffects.blasted;
 
                 trailLength = 32;
-                trailWidth = 3.35f;
+                trailWidth = 3.5f;
                 trailSinScl = 2.5f;
                 trailSinMag = 0.5f;
                 trailEffect = Fx.none;
                 despawnShake = 7f;
 
-                shootEffect = Fx.shootTitan;
-                smokeEffect = Fx.shootSmokeTitan;
+                shootEffect = new MultiEffect(Fx.shootTitan, Fx.shootTitanLight);
+                smokeEffect = Fx.shootSmokeTitanThor;
 
                 trailInterp = v -> Math.max(Mathf.slope(v), 0.8f);
                 shrinkX = 0.2f;
@@ -5329,7 +5329,7 @@ public class Blocks{
                     speed = 2.5f;
                     maxRange = 6f;
                     lifetime = 60f * 9.77f;
-                    hitSize = 10f;
+                    hitSize = 14f;
                     outlineColor = Pal.darkOutline;
                     engineColor = trailColor = Color.valueOf("ffd37f");
                     engineLayer = Layer.effect;
@@ -5373,7 +5373,7 @@ public class Blocks{
                             ammoMultiplier = 2f;
 
                             hitColor = engineColor;
-                            shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
+                            shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, Fx.scathePhaseRing, new WaveEffect(){{
                                 lifetime = 10f;
                                 strokeFrom = 4f;
                                 sizeTo = 130f;
@@ -5415,11 +5415,16 @@ public class Blocks{
                         rotation = 180f;
                         y = -9f;
                         color = Color.grays(0.6f).lerp(Pal.redLight, 0.5f).a(0.4f);
-                        interval = 15f;
+                        interval = 20f;
                     }});
 
-                    abilities.add(new ForceFieldAbility(120f, 0f, 2600f, 999999999f));
-
+                    abilities.add(new ForceFieldAbility(){{
+                        radius = 120;
+                        regen = 0f;
+                        max = 2600f;
+                        cooldown = 999999999f;
+                        unitSlowdown = 0.5f;
+                    }});
                 }};
             }},
 
