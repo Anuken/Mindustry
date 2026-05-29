@@ -1503,10 +1503,12 @@ public class Blocks{
         }};
 
         smallHeatRedirector = new HeatConductor("small-heat-redirector"){{
-            requirements(Category.crafting, with(Items.surgeAlloy, 3, Items.graphite, 8));
+            requirements(Category.crafting, with(Items.surgeAlloy, 8, Items.graphite, 8, Items.tungsten, 6));
 
             researchCostMultiplier = 2f;
             researchCostMultipliers.put(Items.graphite, 7f);
+            hasPower = true;
+            consumesPower = outputsPower = false;
 
             group = BlockGroup.heat;
             size = 2;
