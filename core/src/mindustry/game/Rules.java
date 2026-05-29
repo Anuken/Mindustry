@@ -72,8 +72,8 @@ public class Rules{
     public boolean unitPayloadsExplode = false;
     /** Whether cores add to unit limit */
     public boolean unitCapVariable = true;
-    /** If true, unit spawn points are shown. */
-    public boolean showSpawns = false;
+    /** If true, unit spawn points are hidden. */
+    public boolean hideSpawns = true;
     /** Multiplies power output of solar panels. */
     public float solarMultiplier = 1f;
     /** How fast unit factories build units. */
