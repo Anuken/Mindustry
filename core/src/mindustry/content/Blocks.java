@@ -4882,9 +4882,9 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
             Items.thorium, new BasicBulletType(){{
-                damage = 90;
+                damage = 108f;
                 reloadMultiplier = 0.85f;
-                rangeChange = -102f;
+                rangeChange = -120f;
                 speed = 9.5f;
                 width = height = 16;
                 pierceCap = 2;
@@ -6608,7 +6608,7 @@ public class Blocks{
             regionSuffix = "-dark";
             size = 5;
             reload = 130f;
-            chargeTime = 50f;
+            chargeTime = 100f;
             range = 2100f;
             maxPayloadSize = 4f;
             consumePower(3f);
@@ -6643,16 +6643,17 @@ public class Blocks{
             filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.carbideWallLarge, Blocks.reinforcedSurgeWallLarge, Blocks.reinforcedLiquidContainer, Blocks.reinforcedContainer, Blocks.beamNode);
         }};
 
+        //yes this block is pretty much useless
         largeConstructor = new Constructor("large-constructor"){{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 100, Items.tungsten, 200, Items.thorium, 80));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 3f;
+            buildSpeed = 0.75f;
             maxBlockSize = 4;
-            minBlockSize = 1;
+            minBlockSize = 3;
             size = 5;
 
-            consumePower(6f);
+            consumePower(3f);
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
