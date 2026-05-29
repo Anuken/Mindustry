@@ -17,6 +17,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.maps.Map;
 import mindustry.mod.*;
+import mindustry.mod.data.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -520,79 +521,35 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void skipDataPatches(DataInput stream) throws IOException{
-        stream.readInt(); //version - ignored for now
-        int amount = stream.readInt();
-        for(int i = 0; i < amount; i++){
-            int len = stream.readInt();
-            stream.skipBytes(len);
-        }
+        int total = stream.readInt();
 
-        int imageAmount = stream.readInt();
-        for(int i = 0; i < imageAmount; i++){
-            stream.readUTF(); //name
-            stream.skipBytes(4); //w h
-            int len = stream.readInt(); //byte data
-            stream.skipBytes(len);
+        for(int i = 0; i < total; i++){
+            //TODO: generates a lot of garbage, but I guess that's fine?
+            DataAsset.readAsset(stream);
         }
     }
 
     public void readDataPatches(DataInput stream) throws IOException{
         stream.readInt(); //version - ignored for now
 
-        Seq<String> patches = new Seq<>();
+        int total = stream.readInt();
+        Seq<DataAsset> assets = new Seq<>(total);
 
-        int patchAmount = stream.readInt();
-        for(int i = 0; i < patchAmount; i++){
-            int len = stream.readInt();
-            byte[] bytes = new byte[len];
-            stream.readFully(bytes);
-            patches.add(new String(bytes, Strings.utf8));
+        for(int i = 0; i < total; i++){
+            assets.add(DataAsset.readAsset(stream));
         }
 
-        Seq<PatchImage> images = new Seq<>();
-        int imageAmount = stream.readInt();
-        for(int i = 0; i < imageAmount; i++){
-            String name = stream.readUTF();
-            short w = stream.readShort(), h = stream.readShort();
-            byte[] bytes = new byte[stream.readInt()];
-            stream.readFully(bytes);
-            images.add(new PatchImage(name, w, h, bytes));
-        }
-
-        Events.fire(new ContentPatchLoadEvent(patches, images));
-
-        if(images.size > 0){
-            state.patcher.applyImages(images);
-        }
-
-        if(patches.size > 0){
-            try{
-                state.patcher.apply(patches);
-            }catch(Throwable e){
-                Log.err("Failed to apply patches: " + patches, e);
-            }
-        }
+        //TODO: actually apply the assets
     }
 
     public void writeDataPatches(DataOutput stream) throws IOException{
         stream.writeInt(DataPatcher.patchFormatVersion);
 
-        var patches = state.patcher.patches;
-        stream.writeInt(patches.size);
-        for(var patchset : patches){
-            byte[] bytes = patchset.patch.getBytes(Strings.utf8);
-            stream.writeInt(bytes.length);
-            stream.write(bytes);
-        }
+        var assets = state.data.getAllAssets();
+        stream.writeInt(assets.size);
 
-        var images = state.patcher.images;
-        stream.writeInt(images.size);
-        for(var image : images){
-            stream.writeUTF(image.path);
-            stream.writeShort(image.width);
-            stream.writeShort(image.height);
-            stream.writeInt(image.data.length);
-            stream.write(image.data);
+        for(var asset : assets){
+            DataAsset.writeAsset(asset, stream);
         }
     }
 
@@ -618,21 +575,10 @@ public abstract class SaveVersion extends SaveFileReader{
         //HACK: versions below 11 don't read the patch chunk, which means the event for reading patches is never triggered.
         //manually fire the event here for older versions.
         if(version < 11){
-            Seq<String> patches = new Seq<>();
-            Seq<PatchImage> images = new Seq<>();
-            Events.fire(new ContentPatchLoadEvent(patches, images));
+            Seq<DataAsset> assets = new Seq<>();
+            Events.fire(new DataPatchLoadEvent(assets));
 
-            if(images.size > 0){
-                state.patcher.applyImages(images);
-            }
-
-            if(patches.size > 0){
-                try{
-                    state.patcher.apply(patches);
-                }catch(Throwable e){
-                    Log.err("Failed to apply patches: " + patches, e);
-                }
-            }
+            state.data.load(assets);
         }
     }
 

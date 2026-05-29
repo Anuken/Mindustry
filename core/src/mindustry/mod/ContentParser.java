@@ -309,6 +309,10 @@ public class ContentParser{
             if(data.isArray()) return new RandomSound(parser.readValue(Sound[].class, data));
 
             var field = fieldOpt(Sounds.class, data);
+            //try grabbing it from the asset manager directly (relevant for data patches)
+            if(field == null) field = Core.assets.getOrNull(data.name + ".ogg", Sound.class);
+            if(field == null) field = Core.assets.getOrNull(data.name + ".mp3", Sound.class);
+            if(field == null) field = Core.assets.getOrNull(data.name, Sound.class);
 
             if(!allowAssetLoading && field == null){
                 warn("Sound not found: @", data.asString());

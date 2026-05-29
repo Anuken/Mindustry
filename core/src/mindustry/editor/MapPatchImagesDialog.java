@@ -13,6 +13,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.mod.*;
+import mindustry.mod.data.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
@@ -21,7 +22,7 @@ import java.util.concurrent.*;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
-import static mindustry.graphics.DataPatchPacker.*;
+import static mindustry.mod.DataImagePacker.*;
 
 public class MapPatchImagesDialog extends BaseDialog{
     TextField searchField;
@@ -69,7 +70,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                         return;
                     }
 
-                    state.patcher.images.add(new PatchImage(path, width, height, bytes));
+                    state.patcher.images.add(new ImageAsset(path, width, height, bytes));
                     state.patcher.images.sort();
                     state.patcher.applyImages(state.patcher.images);
                     rebuild();
@@ -90,7 +91,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                         dialog.hide();
                         ui.loadAnd(() -> {
                             try{
-                                Seq<Future<PatchImage>> images = new Seq<>();
+                                Seq<Future<ImageAsset>> images = new Seq<>();
                                 var errors = new CopyOnWriteArrayList<String>();
 
                                 Fi zipped = new ZipFi(file);
@@ -106,7 +107,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                                                 bytes = PixmapIO.writePngBytes(pix);
                                                 pix.dispose();
 
-                                                return new PatchImage(ifile.pathWithoutExtension(), width, height, bytes);
+                                                return new ImageAsset(ifile.pathWithoutExtension(), width, height, bytes);
                                             }catch(Throwable error){
                                                 errors.add("[accent]" + ifile.path() + "[white]: " + Strings.getSimpleMessage(error));
                                                 return null;

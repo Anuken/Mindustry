@@ -1,4 +1,4 @@
-package mindustry.graphics;
+package mindustry.mod;
 
 import arc.*;
 import arc.graphics.*;
@@ -10,20 +10,20 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
-import mindustry.mod.*;
+import mindustry.mod.data.*;
 
 import java.util.concurrent.*;
 
 /** Manages data patch images. */
-public class DataPatchPacker{
+public class DataImagePacker{
     public static final String regionPrefix = "dp-";
 
     private @Nullable TextureAtlas patchAtlas;
 
     /** Packs a new set of images. If images are already packed, disposes of the old ones. */
-    public void pack(Seq<PatchImage> images){
+    public void pack(Seq<ImageAsset> images){
         if(patchAtlas != null){
-            unapply();
+            unload();
         }
         if(images.isEmpty()) return;
 
@@ -113,7 +113,7 @@ public class DataPatchPacker{
         Log.debug("[Patch Atlas] Time to pack: @ms", Time.elapsed());
     }
 
-    public void unapply(){
+    public void unload(){
         if(patchAtlas != null){
             for(var texture : patchAtlas.getTextures()){
                 patchAtlas.getTextures().remove(texture);

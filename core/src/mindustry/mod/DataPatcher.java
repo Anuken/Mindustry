@@ -5,7 +5,6 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.Json.*;
 import arc.util.serialization.*;
-import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -13,7 +12,7 @@ import mindustry.ctype.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
+import mindustry.mod.data.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -28,10 +27,11 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class DataPatcher{
     public static final int maxImageSize = 1024;
-    public static final int patchFormatVersion = 1;
+    public static final int patchFormatVersion = 2;
 
     private static final Object root = new Object();
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
+    private static DataPatcher currentDataPatcher;
     private static ContentParser parser = createParser();
 
     private boolean applied;
@@ -40,13 +40,7 @@ public class DataPatcher{
     private Seq<Runnable> resetters = new Seq<>();
     private Seq<Runnable> afterCallbacks = new Seq<>();
     private Seq<Object> visitStack = new Seq<>();
-    private @Nullable PatchSet currentlyApplying;
-    private DataPatchPacker packer = new DataPatchPacker();
-
-    /** Currently active patches. Note that apply() should be called after modification. */
-    public Seq<PatchSet> patches = new Seq<>();
-    /** Currently loaded patch images. */
-    public Seq<PatchImage> images = new Seq<>();
+    private @Nullable PatchAsset currentlyApplying;
 
     static{
         for(var type : ContentType.all){
@@ -59,8 +53,8 @@ public class DataPatcher{
             @Override
             void warn(String string, Object... format){
                 //forward warnings to the current patcher - this is a bit hacky, but I do not want to re-initialize the parser every time
-                if(Vars.state.patcher != null){
-                    Vars.state.patcher.warn(string, format);
+                if(currentDataPatcher!= null){
+                    currentDataPatcher.warn(string, format);
                 }
             }
         };
@@ -74,77 +68,73 @@ public class DataPatcher{
         return usedpatches.contains(object);
     }
 
-    public void applyImages(Seq<PatchImage> images){
-        this.images = images;
-
-        if(!Vars.headless) packer.pack(images);
-    }
-
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
-    public void apply(Seq<String> patchArray) throws Exception{
+    public void apply(Seq<PatchAsset> patchArray){
+        //if you're un-applying data patches, and it throws an error, just crash. this is not recoverable.
         if(applied){
             unapply();
             applied = false;
         }
 
-        applied = true;
-        contentLoader = Vars.content.copy();
-        patches.clear();
+        if(patchArray.isEmpty()) return;
 
-        Attribute[] oldAttributes = Attribute.all.clone();
-        var oldAttributeMap = Attribute.map.copy();
-        reset(() -> {
-            Attribute.all = oldAttributes;
-            Attribute.map = oldAttributeMap;
-        });
+        try{
+            currentDataPatcher = this;
+            applied = true;
+            contentLoader = Vars.content.copy();
 
-        for(String patch : patchArray){
-            PatchSet set = new PatchSet(patch, new JsonValue("error"));
+            Attribute[] oldAttributes = Attribute.all.clone();
+            var oldAttributeMap = Attribute.map.copy();
+            reset(() -> {
+                Attribute.all = oldAttributes;
+                Attribute.map = oldAttributeMap;
+            });
 
-            try{
-                JsonValue value = parser.getJson().fromJson(null, Jval.read(patch).toString(Jformat.plain));
-                if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
-                    JsonValue req = value.get("requiredPlanets");
-                    value.remove("requiredPlanets");
+            for(var set : patchArray){
 
-                    //this should be ignored unless this instance is a dedicated server
-                    if(Vars.headless){
-                        String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
-                        if(!Structs.contains(planets, Vars.state.rules.planet.name)){
-                            continue;
+                try{
+                    JsonValue value = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
+                    if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
+                        JsonValue req = value.get("requiredPlanets");
+                        value.remove("requiredPlanets");
+
+                        //this should be ignored unless this instance is a dedicated server
+                        if(Vars.headless){
+                            String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
+                            if(!Structs.contains(planets, Vars.state.rules.planet.name)){
+                                continue;
+                            }
                         }
                     }
+
+                    set.json = value;
+                    currentlyApplying = set;
+                    visitStack.clear();
+
+                    set.name = value.getString("name", "");
+                    value.remove("name"); //patchsets can have a name, ignore it if present
+                    for(var child : value){
+                        assign(root, child.name, child, null, null, null);
+                    }
+                    currentlyApplying = null;
+
+                }catch(Exception e){
+                    set.error = true;
+                    set.warnings.add(Strings.getSimpleMessage(e));
+                    currentlyApplying = null;
+
+                    Log.err("Failed to apply patch: " + set.patch, e);
                 }
-
-                set.json = value;
-                currentlyApplying = set;
-                visitStack.clear();
-
-                set.name = value.getString("name", "");
-                value.remove("name"); //patchsets can have a name, ignore it if present
-                for(var child : value){
-                    assign(root, child.name, child, null, null, null);
-                }
-                currentlyApplying = null;
-
-            }catch(Exception e){
-                set.error = true;
-                set.warnings.add(Strings.getSimpleMessage(e));
-                currentlyApplying = null;
-
-                Log.err("Failed to apply patch: " + patch, e);
             }
 
-            patches.add(set);
+            afterCallbacks.each(Runnable::run);
+        }catch(Exception e){
+            Log.err("Failed to apply data patches: " + patchArray.map(p -> p.patch));
         }
-
-        afterCallbacks.each(Runnable::run);
     }
 
     public void unapply(){
         if(!applied) return;
-
-        if(!Vars.headless) packer.unapply();
 
         Vars.content = contentLoader;
         applied = false;
@@ -640,30 +630,6 @@ public class DataPatcher{
         else if(object instanceof float[] i) return i.clone();
         else if(object instanceof double[] i) return i.clone();
         else return ((Object[])object).clone();
-    }
-
-    public static class PatchSet{
-        /** Raw string value, containing original formatting. */
-        public String patch;
-        /** Parsed JSON value. Can be an empty error value if parsing failed. */
-        public JsonValue json;
-        /** Named obtained from patch. */
-        public String name = "";
-        /** True if an error was encountered. */
-        public boolean error;
-        /** Warnings encountered during patching. */
-        public Seq<String> warnings = new Seq<>();
-
-        public PatchSet(String patch, JsonValue json){
-            this.patch = patch;
-            this.json = json;
-        }
-
-        @Override
-        public String toString(){
-            //the json can be a single 'error' value if it failed to parse
-            return !json.isObject() ? patch : json.prettyPrint(OutputType.minimal, 2);
-        }
     }
 
     private static class FieldData{

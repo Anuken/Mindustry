@@ -1,20 +1,17 @@
-package mindustry.mod;
+package mindustry.mod.data;
 
 import arc.files.*;
+import mindustry.mod.*;
 
 import java.io.*;
 
-public class PatchImage implements Comparable<PatchImage>{
-    /** Image name without extension; does not contain packing prefix. */
-    public String name;
-    /** Image path, excluding extension. */
-    public String path;
+public class ImageAsset extends DataAsset implements Comparable<ImageAsset>{
     /** Size of encoded image. */
     public int width, height;
     /** Encoded PNG data. */
     public byte[] data;
 
-    public PatchImage(String path, int width, int height, byte[] data){
+    public ImageAsset(String path, int width, int height, byte[] data){
         Fi file = new Fi(path);
         this.name = file.nameWithoutExtension();
         this.path = file.pathWithoutExtension();
@@ -23,7 +20,9 @@ public class PatchImage implements Comparable<PatchImage>{
         this.data = data;
     }
 
-    public static PatchImage fromFile(String relativePath, Fi file) throws IOException{
+    ImageAsset(){}
+
+    public static ImageAsset fromFile(String relativePath, Fi file) throws IOException{
         byte[] data = file.readBytes();
         int width, height;
         //perform basic validation and fetch size from IHDR chunk
@@ -40,11 +39,32 @@ public class PatchImage implements Comparable<PatchImage>{
             if(width <= 0 || height <= 0) throw new IOException("PNG size must be positive.");
             if(width > DataPatcher.maxImageSize || height > DataPatcher.maxImageSize) throw new IOException("PNG is larger than maximum image size (" + DataPatcher.maxImageSize + "x" + DataPatcher.maxImageSize + ")");
         }
-        return new PatchImage(relativePath, width, height, data);
+        return new ImageAsset(relativePath, width, height, data);
     }
 
     @Override
-    public int compareTo(PatchImage patchImage){
-        return path.compareTo(patchImage.path);
+    void read(DataInput stream) throws IOException{
+        width = stream.readShort();
+        height = stream.readShort();
+        data = new byte[stream.readInt()];
+        stream.readFully(data);
+    }
+
+    @Override
+    void write(DataOutput stream) throws IOException{
+        stream.writeShort(width);
+        stream.writeShort(height);
+        stream.writeInt(data.length);
+        stream.write(data);
+    }
+
+    @Override
+    public DataAssetType getType(){
+        return DataAssetType.image;
+    }
+
+    @Override
+    public int compareTo(ImageAsset imageAsset){
+        return path.compareTo(imageAsset.path);
     }
 }

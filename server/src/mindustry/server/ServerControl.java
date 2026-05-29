@@ -20,7 +20,7 @@ import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.maps.Maps.*;
 import mindustry.mod.Mods.*;
-import mindustry.mod.*;
+import mindustry.mod.data.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.net.*;
@@ -68,7 +68,7 @@ public class ServerControl implements ApplicationListener{
     private boolean autoPaused = false;
     private Fi patchDirectory, patchImageDirectory;
     private Seq<String> contentPatches = new Seq<>();
-    private Seq<PatchImage> contentPatchImages = new Seq<>();
+    private Seq<ImageAsset> contentPatchImages = new Seq<>();
 
     private LineReader lineReader;
 
@@ -344,7 +344,7 @@ public class ServerControl implements ApplicationListener{
             info("Server loaded. Type @ for help.", "'help'");
         });
 
-        Events.on(ContentPatchLoadEvent.class, event -> {
+        Events.on(DataPatchLoadEvent.class, event -> {
             //NOTE: if patches change, and an older save is loaded, the patches will be applied twice; the old ones won't be removed.
             for(String patch : contentPatches){
                 event.patches.addUnique(patch);
@@ -352,7 +352,7 @@ public class ServerControl implements ApplicationListener{
 
             //add images that aren't already in the patch
             ObjectSet<String> usedImages = event.images.map(i -> i.path).asSet();
-            for(PatchImage image : contentPatchImages){
+            for(ImageAsset image : contentPatchImages){
                 if(usedImages.add(image.path)){
                     event.images.add(image);
                 }
@@ -377,7 +377,7 @@ public class ServerControl implements ApplicationListener{
 
         for(Fi image : imageFiles){
             try{
-                contentPatchImages.add(PatchImage.fromFile(image.absolutePath().substring(patchImageDirectory.absolutePath().length() + 1), image));
+                contentPatchImages.add(ImageAsset.fromFile(image.absolutePath().substring(patchImageDirectory.absolutePath().length() + 1), image));
             }catch(Throwable e){
                 Log.err("Invalid patch image file: " + image.path(), e);
             }
