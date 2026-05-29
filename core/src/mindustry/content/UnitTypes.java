@@ -362,7 +362,7 @@ public class UnitTypes{
             buildSpeed = 0.3f;
             armor = 1f;
 
-            abilities.add(new RepairFieldAbility(60f, 60f * 4, 100f){{
+            abilities.add(new RepairFieldAbility(30f, 60f * 2, 100f){{
                 sameTypeHealMult = 0.10f;
                 maxTargets = 6;
 
