@@ -250,7 +250,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public BlockStatus status(){
-            if(!team.activateUnitFactories()) return BlockStatus.inactive;
+            if(!team.activateUnitFactories()) return BlockStatus.inactiveUnitFactory;
             return super.status();
         }
 
