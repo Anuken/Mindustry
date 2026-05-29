@@ -4882,7 +4882,7 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
             Items.thorium, new BasicBulletType(){{
-                damage = 108f;
+                damage = 100f;
                 reloadMultiplier = 0.85f;
                 rangeChange = -120f;
                 speed = 9.5f;
