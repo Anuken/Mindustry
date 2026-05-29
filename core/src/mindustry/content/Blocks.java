@@ -2091,7 +2091,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
             health = 65;
             speed = 0.08f;
-            displayedSpeed = 11f;
+            displayedSpeed = 10f;
         }};
 
         plastaniumConveyor = new StackConveyor("plastanium-conveyor"){{
@@ -4854,7 +4854,7 @@ public class Blocks{
         }};
 
         disperse = new ItemTurret("disperse"){{
-            requirements(Category.turret, with(Items.thorium, 50, Items.oxide, 150, Items.silicon, 200, Items.beryllium, 350));
+            requirements(Category.turret, with(Items.thorium, 50, Items.oxide, 50, Items.silicon, 200, Items.beryllium, 350));
 
             ammo(
             Items.tungsten, new BasicBulletType(){{
@@ -5071,7 +5071,7 @@ public class Blocks{
                 despawnEffect = hitEffect = new ExplosionEffect(){{
                     waveColor = Pal.surge;
                     smokeColor = Color.gray;
-                    sparkColor = Pal.sap;
+                    sparkColor = Pal.surge;
                     waveStroke = 4f;
                     waveRad = 40f;
                 }};
@@ -5597,6 +5597,47 @@ public class Blocks{
 
                     moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
                 }});
+                setAmmoParts(
+                    Items.carbide, Seq.with(new RegionPart("-missile"){{
+                        progress = PartProgress.reload.curve(Interp.pow2In);
+
+                        colorTo = new Color(1f, 1f, 1f, 0f);
+                        color = Color.white;
+                        mixColorTo = Pal.accent;
+                        mixColor = new Color(1f, 1f, 1f, 0f);
+                        outline = false;
+                        under = true;
+                        layerOffset = -0.01f;
+
+                        moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                    }}),
+                    Items.phaseFabric, Seq.with(new RegionPart("-missile-phase"){{
+                        progress = PartProgress.reload.curve(Interp.pow2In);
+
+                        colorTo = new Color(1f, 1f, 1f, 0f);
+                        color = Color.white;
+                        mixColorTo = Pal.accent;
+                        mixColor = new Color(1f, 1f, 1f, 0f);
+                        outline = false;
+                        under = true;
+                        layerOffset = -0.01f;
+
+                        moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                    }}),
+                    Items.surgeAlloy, Seq.with(new RegionPart("-missile-surge"){{
+                        progress = PartProgress.reload.curve(Interp.pow2In);
+
+                        colorTo = new Color(1f, 1f, 1f, 0f);
+                        color = Color.white;
+                        mixColorTo = Pal.accent;
+                        mixColor = new Color(1f, 1f, 1f, 0f);
+                        outline = false;
+                        under = true;
+                        layerOffset = -0.01f;
+
+                        moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                    }})
+                );
             }};
 
             recoil = 0.5f;
@@ -6919,6 +6960,7 @@ public class Blocks{
         reinforcedMessage = new MessageBlock("reinforced-message"){{
             requirements(Category.logic, with(Items.graphite, 10, Items.beryllium, 5));
             health = 100;
+            crushFragile = true;
         }};
 
         worldProcessor = new LogicBlock("world-processor"){{

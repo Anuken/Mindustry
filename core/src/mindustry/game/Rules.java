@@ -64,8 +64,6 @@ public class Rules{
     public boolean damageExplosions = true;
     /** Whether fire (and neoplasm spread) is enabled. */
     public boolean fire = true;
-    /** Whether units use and require ammo. */
-    public boolean unitAmmo = false;
     /** If true, air and ground units target random things each wave instead of only the core/generators. */
     public boolean randomWaveAI = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */
@@ -74,8 +72,8 @@ public class Rules{
     public boolean unitPayloadsExplode = false;
     /** Whether cores add to unit limit */
     public boolean unitCapVariable = true;
-    /** If true, unit spawn points are shown. */
-    public boolean showSpawns = false;
+    /** If true, unit spawn points are hidden. */
+    public boolean hideSpawns = true;
     /** Multiplies power output of solar panels. */
     public float solarMultiplier = 1f;
     /** How fast unit factories build units. */
@@ -90,14 +88,20 @@ public class Rules{
     public float unitCrashDamageMultiplier = 1f;
     /** How fast units can mine. */
     public float unitMineSpeedMultiplier = 1f;
+    /** Time until unit factories activate (global). */
+    public float unitFactoryActivationDelay = 0f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
     public boolean ghostBlocks = true;
+    /** If true, pings of players from other teams will be shown. */
+    public boolean showOtherTeamPings = false;
     /** Whether to allow logic to control units. */
     public boolean logicUnitControl = true;
     /** Whether to allow units to build with logic. */
     public boolean logicUnitBuild = true;
     /** Whether to allow units to deconstruct blocks with logic. */
     public boolean logicUnitDeconstruct = false;
+    /** If false, world processors can't link to player structures. This is used in the campaign; see issue #12091 */
+    public boolean worldProcessorPlayerLink = true;
     /** If true, world processors can be edited and placed on this map. */
     public boolean allowEditWorldProcessors = false;
     /** If true, world processors no longer update. Used for testing. */
@@ -301,6 +305,10 @@ public class Rules{
         return unitWhitelist != bannedUnits.contains(unit);
     }
 
+    public float unitActivationDelay(Team team){
+        return unitFactoryActivationDelay + teams.get(team).unitFactoryActivationDelay;
+    }
+
     /** A team-specific ruleset. */
     public static class TeamRule{
         /** Whether, when AI is enabled, ships should be spawned from the core. TODO remove / unnecessary? */
@@ -315,8 +323,6 @@ public class Rules{
         public boolean fillItems;
         /** If true, resources are not consumed when building. */
         public boolean infiniteResources;
-        /** If true, this team has infinite unit ammo. */
-        public boolean infiniteAmmo;
         /** EXPERIMENTAL, DO NOT USE: Pre-built base AI. Gives the illusion of intelligent design of pre-building an attack base. */
         public boolean prebuildAi;
 

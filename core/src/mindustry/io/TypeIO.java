@@ -314,6 +314,12 @@ public class TypeIO{
 
     public static Ability[] readAbilities(Reads read, Ability[] abilities){
         byte len = read.b();
+
+        if(len != abilities.length){
+            abilities = new Ability[len];
+            for(int i = 0; i < len; i++) abilities[i] = new EmptyDataAbility();
+        }
+
         for(int i = 0; i < len; i++){
             float data = read.f();
             if(abilities.length > i){
@@ -519,7 +525,7 @@ public class TypeIO{
     public static Queue<BuildPlan> readPlansQueue(Reads read){
         int used = read.i();
         if(used == -1) return null;
-        if(used >= maxArraySize) throw new RuntimeException("Queue too long: " + used);
+        //this is ONLY used in saves, so don't enforce a max size, it can be anything.
         var out = new Queue<BuildPlan>();
         for(int i = 0; i < used; i++){
             out.add(readPlan(read));

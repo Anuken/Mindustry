@@ -21,6 +21,7 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.editor.*;
 import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -1235,6 +1236,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Draw the block overlay that is shown when a cursor is over the block. */
     public void drawSelect(){
         block.drawOverlay(x, y, rotation);
+        if(status() == BlockStatus.inactiveUnitFactory){
+            block.drawPlaceText(Core.bundle.format("rules.unitfactoryactivation.objective", UI.formatTime((float)Math.max(0f, state.rules.unitActivationDelay(team) - state.tick))), tile.x, tile.y, false);
+        }
     }
 
     public void drawItemSelection(@Nullable UnlockableContent selection){
@@ -1729,10 +1733,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @return whether the bullet should be removed. */
     public boolean collision(Bullet other){
         boolean wasDead = health <= 0;
+        BulletType t = other.type;
 
         float damage = other.type.buildingDamage(other);
-        if(!other.type.pierceArmor){
-            damage = Damage.applyArmor(damage, block.armor * other.type.armorMultiplier);
+        if(!t.pierceArmor){
+            damage = Damage.applyArmor(damage, block.armor * t.armorMultiplier * t.blockArmorMultiplier);
         }
 
         damage(other, other.team, damage);

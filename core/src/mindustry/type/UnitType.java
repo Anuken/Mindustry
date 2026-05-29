@@ -29,7 +29,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
-import mindustry.type.ammo.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -377,10 +376,9 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** amount of items this unit can carry; <0 to determine based on hitSize. */
     public int itemCapacity = -1;
-    /** amount of ammo this unit can hold (if the rule is enabled); <0 to determine based on weapon fire rate. */
-    public int ammoCapacity = -1;
-    /** ammo this unit uses, if that system is enabled. */
-    public AmmoType ammoType = new ItemAmmoType(Items.copper);
+    /** @deprecated only kept for compatibility with some turrets that query this field! Remove this from your code immediately! */
+    @Deprecated
+    public int ammoCapacity = 1;
 
     /** max hardness of ore that this unit can mine (<0 to disable) */
     public int mineTier = -1;
@@ -562,7 +560,6 @@ public class UnitType extends UnlockableContent implements Senseable{
         for(var ability : unit.abilities){
             ability.created(unit);
         }
-        unit.ammo = ammoCapacity; //fill up on ammo upon creation
         unit.elevation = flying ? 1f : 0;
         unit.heal();
         if(unit instanceof TimedKillc u){
@@ -712,11 +709,6 @@ public class UnitType extends UnlockableContent implements Senseable{
             //TODO overlay shields
             bars.add(new Bar("stat.health", Pal.health, unit::healthf).blink(Color.white));
             bars.row();
-
-            if(state.rules.unitAmmo){
-                bars.add(new Bar(ammoType.icon() + " " + Core.bundle.get("stat.ammo"), ammoType.barColor(), () -> unit.ammo / ammoCapacity));
-                bars.row();
-            }
 
             for(Ability ability : unit.abilities){
                 ability.displayBars(unit, bars);
@@ -1128,15 +1120,6 @@ public class UnitType extends UnlockableContent implements Senseable{
             }else{
                 stances.addAll(UnitStance.stop, UnitStance.patrol);
             }
-        }
-
-        //dynamically create ammo capacity based on firing rate
-        if(ammoCapacity < 0){
-            float shotsPerSecond = weapons.sumf(w -> w.useAmmo ? 60f / w.reload : 0f);
-            //duration of continuous fire without reload
-            float targetSeconds = 35;
-
-            ammoCapacity = Math.max(1, (int)(shotsPerSecond * targetSeconds));
         }
 
         estimateDps();
