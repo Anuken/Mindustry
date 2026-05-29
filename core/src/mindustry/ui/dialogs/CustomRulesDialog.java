@@ -249,7 +249,6 @@ public class CustomRulesDialog extends BaseDialog{
             current.button("@rules.weather", this::weatherDialog).width(250f).left().row();
         }
 
-
         category("planet");
         if(Core.bundle.get("rules.title.planet").toLowerCase().contains(ruleSearch)){
             current.table(Tex.button, t -> {
@@ -270,6 +269,7 @@ public class CustomRulesDialog extends BaseDialog{
                 }
 
                 t.button("@rules.anyenv", style, () -> {
+                    rules.attributes.clear();
                     rules.env = Vars.defaultEnv;
                     rules.planet = Planets.sun;
                 }).group(group).checked(b -> rules.planet == Planets.sun);

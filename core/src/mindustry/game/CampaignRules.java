@@ -7,7 +7,7 @@ import mindustry.type.*;
 public class CampaignRules{
     public Difficulty difficulty = Difficulty.normal;
     public boolean fog;
-    public boolean showSpawns;
+    public boolean hideSpawns;
     public boolean sectorInvasion;
     public boolean randomWaveAI;
     public boolean legacyLaunchPads;
@@ -17,7 +17,7 @@ public class CampaignRules{
 
     public void apply(Planet planet, Rules rules){
         rules.staticFog = rules.fog = fog;
-        rules.showSpawns = showSpawns;
+        rules.hideSpawns = hideSpawns;
         rules.randomWaveAI = randomWaveAI;
         rules.pauseDisabled = pauseDisabled;
         rules.objectiveTimerMultiplier = difficulty.waveTimeMultiplier;
