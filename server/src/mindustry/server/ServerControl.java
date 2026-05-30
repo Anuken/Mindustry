@@ -362,7 +362,7 @@ public class ServerControl implements ApplicationListener{
         dataAssets.clear();
 
         //special folder prefix for server-loaded content. this helps avoid conflicts.
-        String prefix = "server/";
+        String prefix = "server-assets/";
 
         for(var type : DataAssetType.all){
             Fi folder = dataAssetDirectory.child(type.folder);

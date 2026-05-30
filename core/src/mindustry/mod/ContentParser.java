@@ -405,8 +405,9 @@ public class ContentParser{
     private Seq<Runnable> postreads = new Seq<>();
     private ObjectSet<Object> toBeParsed = new ObjectSet<>();
 
-    LoadedMod currentMod;
-    Content currentContent;
+    @Nullable LoadedMod currentMod;
+    @Nullable Content currentContent;
+    @Nullable Fi currentFile;
 
     private Json parser = new Json(){
         @Override
@@ -892,7 +893,7 @@ public class ContentParser{
             case "hover" -> ElevationMoveUnit::create;
             case "tether" -> BuildingTetherPayloadUnit::create;
             case "crawl" -> CrawlUnit::create;
-            default -> throw new RuntimeException("Invalid unit type: '" + value + "'. Must be 'flying/mech/legs/naval/payload/missile/tether/crawl'.");
+            default -> throw new IllegalArgumentException("Invalid unit type: '" + value.asString() + "'. Must be 'flying/mech/legs/naval/payload/missile/tether/crawl'.");
         };
     }
 
@@ -959,7 +960,9 @@ public class ContentParser{
     private void read(Runnable run){
         Content cont = currentContent;
         LoadedMod mod = currentMod;
+        Fi file = currentFile;
         reads.add(() -> {
+            this.currentFile = file;
             this.currentMod = mod;
             this.currentContent = cont;
             run.run();
@@ -991,7 +994,6 @@ public class ContentParser{
         try{
             run.run();
         }catch(Throwable t){
-            Log.err(t);
             //don't overwrite double errors
             markError(currentContent, t);
         }
@@ -1004,6 +1006,7 @@ public class ContentParser{
         postreads.clear();
         toBeParsed.clear();
         currentMod = null;
+        currentFile = null;
     }
 
     /**
@@ -1022,6 +1025,7 @@ public class ContentParser{
             json = json.replace("#", "\\#");
         }
 
+        currentFile = file;
         currentMod = mod;
 
         JsonValue value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
@@ -1040,6 +1044,7 @@ public class ContentParser{
         }
 
         currentMod = null;
+        currentFile = null;
         return c;
     }
 
@@ -1050,7 +1055,7 @@ public class ContentParser{
     }
 
     public void markError(Content content, LoadedMod mod, Fi file, Throwable error){
-        Log.err("Error for @ / @:\n@\n", content, file, Strings.getStackTrace(error));
+        Log.err("Error loading content: " + file, error);
 
         content.minfo.mod = mod;
         content.minfo.sourceFile = file;
@@ -1244,7 +1249,7 @@ public class ContentParser{
                 if(!field.field.isAnnotationPresent(Nullable.class) && field.field.get(object) == null && !implicitNullable.contains(field.field.getType())){
                     throw new RuntimeException("'" + field.field.getName() + "' in " +
                         ((object.getClass().isAnonymousClass() ? object.getClass().getSuperclass() : object.getClass()).getSimpleName()) +
-                        " is missing! Object = " + object + ", field = (" + field.field.getName() + " = " + field.field.get(object) + ")");
+                        " is missing! Object: " + object);
                 }
             }catch(Exception e){
                 throw new RuntimeException(e);
@@ -1349,10 +1354,12 @@ public class ContentParser{
 
             TechNode node = new TechNode(null, unlock, customRequirements == null ? ItemStack.empty : customRequirements);
             LoadedMod cur = currentMod;
+            Fi file = currentFile;
 
             postreads.add(() -> {
                 currentContent = unlock;
                 currentMod = cur;
+                currentFile = file;
 
                 //add custom objectives
                 if(research.has("objectives")){
@@ -1437,7 +1444,7 @@ public class ContentParser{
         }
 
         if(def != null){
-            if(warn) warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentContent == null && currentMod != null ? currentMod.name : "");
+            if(warn) warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentFile != null ? currentFile : currentMod != null ? currentMod.name : "");
             return def;
         }
         throw new IllegalArgumentException("Type not found: " + base);

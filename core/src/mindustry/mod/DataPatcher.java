@@ -141,25 +141,38 @@ public class DataPatcher{
             meta.internalName = "dp";
             LoadedMod mod = new LoadedMod(new Fi("dp"), new Fi(""), null, null, meta);
 
+            ContentLoader preLoad = Vars.content.copy();
+            boolean errored = false;
+
             for(var asset : content){
                 currentlyApplyingContent = asset;
+
+                if(!Structs.contains(ContentAsset.loadableContent, asset.type)){
+                    warn("Content @ is of type '@', which is not supported. Skipping.", asset.path, asset.type);
+                    continue;
+                }
+
                 Content current = Vars.content.getLastAdded();
                 Fi file = new Fi(asset.path);
 
                 //this is very important for resizing various arrays used in the game
-                if(asset.type == ContentType.item || asset.type == ContentType.liquid) needsArrayFix = true;
+                if(asset.type == ContentType.item || asset.type == ContentType.liquid){
+                    needsArrayFix = true;
+                }
 
                 //TODO: what to do when errors happen in general?
                 try{
                     //this binds the content but does not load it entirely
-                    Content loaded = parser.parse(mod, asset.name, asset.data, file, asset.type);
+                    parser.parse(mod, asset.name, asset.data, file, asset.type);
                 }catch(Throwable e){
-                    Log.err(e);
                     asset.warnings.add(Strings.getStackTrace(e));
 
                     //TODO: this warning is not very useful, nor is markError in general. What should be done here?
                     if(current != Vars.content.getLastAdded() && Vars.content.getLastAdded() != null){
+                        //markError should log it already
                         parser.markError(Vars.content.getLastAdded(), mod, file, e);
+                    }else{
+                        Log.err("Error loading content: " + asset.path, e);
                     }
                 }
             }
@@ -171,14 +184,37 @@ public class DataPatcher{
                 all.addAll(arr.select(c -> c.minfo.mod == mod));
             }
 
-            for(var cont : all) cont.init();
-            for(var cont : all) cont.postInit();
+            for(var cont : all){
+                try{
+                    cont.init();
+                }catch(Throwable t){
+                    parser.markError(cont, mod, cont.minfo.sourceFile, t);
+                }
+            }
+
+            for(var cont : all){
+                try{
+                    cont.postInit();
+                }catch(Throwable t){
+                    parser.markError(cont, mod, cont.minfo.sourceFile, t);
+                }
+            }
 
             if(!Vars.headless){
                 for(var cont : all){
-                    cont.loadIcon();
-                    cont.load();
+                    try{
+                        cont.loadIcon();
+                        cont.load();
+                    }catch(Throwable t){
+                        parser.markError(cont, mod, cont.minfo.sourceFile, t);
+                    }
                 }
+            }
+
+            if(all.contains(Content::hasErrored)){
+                Log.err("Errors were encountered loading content. Content will be unloaded.");
+                Vars.content = preLoad;
+                needsArrayFix = false;
             }
 
             if(needsArrayFix) fixContentArrays();

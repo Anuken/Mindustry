@@ -41,20 +41,23 @@ public class DataManager{
             assets.get(asset.getType(), Seq::new).add(asset);
         }
 
-        bundleLoader.load(getBundles());
-
         soundLoader.load(getSounds(), getMusic());
 
-        if(!Vars.headless) packer.pack(getImages());
+        if(!Vars.headless){
+            bundleLoader.load(getBundles());
+            packer.pack(getImages());
+        }
 
         patcher.apply(getPatches(), getContent());
     }
 
     public void unload(){
         patcher.unapply();
-        if(!Vars.headless) packer.unload();
+        if(!Vars.headless){
+            bundleLoader.unload();
+            packer.unload();
+        }
         soundLoader.unload();
-        bundleLoader.unload();
 
         assets.clear();
     }
