@@ -91,10 +91,16 @@ public class Damage{
     }
 
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam, Effect explosionFx, float baseShake){
+        dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, fire, ignoreTeam, explosionFx, baseShake, 1f);
+    }
+
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power,
+        float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam, Effect explosionFx, float baseShake, float buildMult){
+
         if(damage){
             for(int i = 0; i < Mathf.clamp(power / 700, 0, 8); i++){
                 int length = 5 + Mathf.clamp((int)(Mathf.pow(power, 0.98f) / 500), 1, 18);
-                Time.run(i * 0.8f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3 + Mathf.pow(power, 0.35f), x, y, Mathf.random(360f), length + Mathf.range(2)));
+                Time.run(i * 0.8f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3 + Mathf.pow(power, 0.35f), x, y, Mathf.random(360f), length + Mathf.range(2), buildMult));
             }
 
             if(fire){
@@ -111,7 +117,7 @@ public class Damage{
                 int f = i;
                 Time.run(i * 2f, () -> {
                     if(shields == null || shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, damagePerWave))){
-                        damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
+                        damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false, true, true, false, null, 1f, buildMult);
                     }
 
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
@@ -503,6 +509,11 @@ public class Damage{
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source, float armorMult){
+        damage(team, x, y, radius, damage, complete, air, ground, scaled, source, armorMult, 1);
+    }
+
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source, float armorMult, float buildMult){
         Cons<Unit> cons = unit -> {
             if(unit.team == team  || !unit.checkTarget(air, ground) || !unit.hittable() || !unit.within(x, y, radius + (scaled ? unit.hitSize / 2f : 0f))){
                 return;
@@ -543,9 +554,9 @@ public class Damage{
 
         if(ground){
             if(!complete){
-                tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage * (source == null ? 1f : source.type.buildingDamageMultiplier), source);
+                tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage * (source == null ? 1f : source.type.buildingDamageMultiplier) * buildMult, source);
             }else{
-                completeDamage(team, x, y, radius, damage * (source == null ? 1f : source.type.buildingDamageMultiplier));
+                completeDamage(team, x, y, radius, damage * (source == null ? 1f : source.type.buildingDamageMultiplier) * buildMult);
             }
         }
     }
