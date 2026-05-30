@@ -4661,7 +4661,7 @@ public class Blocks{
                 despawnEffect = Fx.none;
                 knockback = 2f;
                 lifetime = 140f;
-                height = 24f;
+                height = 20f;
                 width = 17f;
                 splashDamageRadius = 65f;
                 splashDamage = 350f;
@@ -4680,7 +4680,7 @@ public class Blocks{
                 trailEffect = Fx.none;
                 despawnShake = 7f;
 
-                shootEffect = new MultiEffect(Fx.shootTitan, Fx.shootTitanLight);
+                shootEffect = Fx.shootTitan;
                 smokeEffect = Fx.shootSmokeTitanThor;
 
                 trailInterp = v -> Math.max(Mathf.slope(v), 0.8f);
@@ -4716,7 +4716,7 @@ public class Blocks{
                 despawnShake = 7f;
 
                 shootEffect = Fx.shootTitan;
-                smokeEffect = Fx.shootSmokeTitan;
+                smokeEffect = Fx.shootSmokeTitanCarbide;
                 trailRotation = true;
 
                 trailInterp = v -> Math.max(Mathf.slope(v), 0.8f);
@@ -4749,7 +4749,7 @@ public class Blocks{
                     }};
             }},
             Items.oxide, new ArtilleryBulletType(2.5f, 300, "shell"){{
-                hitEffect = new MultiEffect(Fx.titanExplosionLarge, Fx.titanSmokeLarge, Fx.smokeAoeCloud);
+                hitEffect = new MultiEffect(Fx.titanOxideExplosion, Fx.titanSmokeLarge, Fx.smokeAoeCloud, Fx.smokeAoeAlpha);
                 despawnEffect = Fx.none;
                 knockback = 2f;
                 lifetime = 190f;
@@ -4774,7 +4774,7 @@ public class Blocks{
                 despawnShake = 7f;
 
                 shootEffect = Fx.shootTitan;
-                smokeEffect = Fx.shootSmokeTitan;
+                smokeEffect = Fx.shootSmokeTitanOxide;
 
                 trailInterp = v -> Math.max(Mathf.slope(v), 0.8f);
                 shrinkX = 0.2f;
@@ -5373,7 +5373,7 @@ public class Blocks{
                             ammoMultiplier = 2f;
 
                             hitColor = engineColor;
-                            shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, Fx.scathePhaseRing, new WaveEffect(){{
+                            shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosionLarge, Fx.scatheLight, Fx.scathePhaseRing, Fx.scathePhaseLines, new WaveEffect(){{
                                 lifetime = 10f;
                                 strokeFrom = 4f;
                                 sizeTo = 130f;
@@ -5419,6 +5419,7 @@ public class Blocks{
                     }});
 
                     abilities.add(new ForceFieldAbility(){{
+                        followUnitRot = true;
                         radius = 120;
                         regen = 0f;
                         max = 2600f;

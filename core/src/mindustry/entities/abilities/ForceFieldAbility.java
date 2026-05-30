@@ -30,9 +30,11 @@ public class ForceFieldAbility extends Ability{
     public int sides = 6;
     /** Rotation of shield. */
     public float rotation = 0f;
+    /** Whether the shield should follow the unit s rotation. */
+    public boolean followUnitRot = false;
     /** Multiplier on unit speed when its shield is hit. */
     public float unitSlowdown = -1f;
-    /** Number of ticks unit slowdown is applied. */
+    /** Number of ticks unit slowdown is applied after being hit. */
     public float slowdownTime = 20f;
 
     public Sound breakSound = Sounds.shieldBreakSmall;
@@ -47,7 +49,9 @@ public class ForceFieldAbility extends Ability{
     private static Unit paramUnit;
     private static ForceFieldAbility paramField;
     private static final Cons<Bullet> shieldConsumer = b -> {
-        if(b.team != paramUnit.team && b.type.absorbable && Intersector.isInRegularPolygon(paramField.sides, paramUnit.x, paramUnit.y, realRad, paramField.rotation, b.x(), b.y()) && paramUnit.shield > 0){
+        if(b.team != paramUnit.team && b.type.absorbable && Intersector.isInRegularPolygon(paramField.sides, paramUnit.x, paramUnit.y, realRad, paramField.rotation + 
+            (paramField.followUnitRot ? paramUnit.rotation : 0f), b.x(), b.y()) && paramUnit.shield > 0){
+
             b.absorb();
             Fx.absorb.at(b);
             paramField.hitSound.at(b.x, b.y, 1f + Mathf.range(0.1f), paramField.hitSoundVolume);
@@ -145,14 +149,14 @@ public class ForceFieldAbility extends Ability{
 
             if(Vars.renderer.animateShields){
                 Draw.z(Layer.shields + 0.001f * alpha);
-                Fill.poly(unit.x, unit.y, sides, realRad, rotation);
+                Fill.poly(unit.x, unit.y, sides, realRad, rotation + (followUnitRot ? unit.rotation : 0f));
             }else{
                 Draw.z(Layer.shields);
                 Lines.stroke(1.5f);
                 Draw.alpha(0.09f);
-                Fill.poly(unit.x, unit.y, sides, radius, rotation);
+                Fill.poly(unit.x, unit.y, sides, radius, rotation + (followUnitRot ? unit.rotation : 0f));
                 Draw.alpha(1f);
-                Lines.poly(unit.x, unit.y, sides, radius, rotation);
+                Lines.poly(unit.x, unit.y, sides, radius, rotation + (followUnitRot ? unit.rotation : 0f));
             }
         }
     }

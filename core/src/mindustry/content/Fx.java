@@ -2,6 +2,7 @@ package mindustry.content;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -24,6 +25,7 @@ import static mindustry.Vars.*;
 public class Fx{
     public static final Rand rand = new Rand();
     public static final Vec2 v = new Vec2();
+    public static Texture noiseAlphaCircle;
 
     public static final Effect
 
@@ -552,6 +554,37 @@ public class Fx{
         });
     }),
 
+    titanOxideExplosion = new Effect(45f, 220f, e -> {
+        Color baseColor = Color.valueOf("a0b380");
+
+        color(e.color);
+        stroke(e.fout() * 3f);
+        float circleRad = 6f + e.finpow() * 110f;
+        Lines.circle(e.x, e.y, circleRad);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 21; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 50f * rand.random(1f, 0.6f) + 2f, e.finpow() * 100f * lenRand + 6f);
+        }
+
+        //outwards smoke
+        rand.setSeed(e.id + 5);
+        for(int i = 0; i < 10; i++){
+            float angle = (360f / 10f) * i + rand.range(18f);
+            float dist = e.finpow() * 95f + rand.range(10f);
+            float size = rand.random(8f, 20f) * e.fout();
+            float px = e.x + Mathf.cosDeg(angle) * dist;
+            float py = e.y + Mathf.sinDeg(angle) * dist;
+
+            color(e.color, Pal.lightishGray, e.fin() * 0.4f);
+            alpha(e.fout() * 0.78f);
+            Fill.circle(px, py, size);
+            Drawf.light(px, py, size * 2.2f, e.color, e.fout() * 0.4f);
+        }
+    }),
+
     titanSmoke = new Effect(300f, 300f, b -> {
         float intensity = 3f;
 
@@ -625,7 +658,7 @@ public class Fx{
             b.scaled(b.lifetime * lenScl, e -> {
                 randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 22f * intensity, (x, y, in, out) -> {
                     float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
-                    float rad  = fout * ((2f + intensity) * 2.35f);
+                    float rad = fout * ((2f + intensity) * 2.35f);
                     float rise = e.fin(Interp.pow3Out) * upDrift;
 
                     Fill.circle(e.x + x, e.y + y + rise, rad);
@@ -638,6 +671,73 @@ public class Fx{
             color(baseColor, e.fout() * 0.12f);
             Fill.circle(e.x, e.y, 100f * e.fin(Interp.pow3Out));
         });
+    }),
+
+    shootSmokeTitanCarbide = new Effect(70f, e -> {
+        rand.setSeed(e.id);
+
+        //smoke
+        for(int i = 0; i < 13; i++){
+            v.trns(e.rotation + rand.range(30f), rand.random(e.finpow() * 40f));
+            float tint = rand.random(1f);
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                color(tint > 0.6f ? Color.valueOf("ab8ec5") : e.color, Pal.lightishGray, b.fin());
+                Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 3.4f + 0.3f);
+            });
+        }
+
+        //light wisps
+        rand.setSeed(e.id + 1);
+        for(int i = 0; i < 5; i++){
+            float dst = rand.random(10f, 35f);
+            float spread = rand.range(18f);
+            float size = rand.random(1.5f, 3.5f);
+            e.scaled(e.lifetime * rand.random(0.3f, 0.8f), b -> {
+                float drift = dst * b.finpow();
+                v.trns(e.rotation + spread, drift);
+                color(Color.valueOf("ab8ec5"), Pal.lightishGray, b.fin() * 0.7f);
+                alpha(b.fout() * 0.6f);
+                Fill.circle(e.x + v.x, e.y + v.y, size * b.fout() + 0.3f);
+            });
+        }
+
+        //sparks
+        rand.setSeed(e.id + 2);
+        for(int i = 0; i < 7; i++){
+            float angle = e.rotation + 180f + rand.range(35f);
+            float dist = rand.random(10f, 40f) * e.finpow();
+            float size = rand.random(0.8f, 2.2f);
+            float spin = rand.range(180f) * e.fin();
+            float freq = rand.random(15f, 35f);
+
+            float dx = e.x + Mathf.cosDeg(angle) * dist;
+            float dy = e.y + Mathf.sinDeg(angle) * dist;
+
+            e.scaled(e.lifetime * rand.random(0.15f, 0.5f), b -> {
+                float flicker = Mathf.absin(b.fin() * freq, 1f, 1f);
+                color(Color.white, Color.valueOf("ab8ec5"), b.fin());
+                alpha(b.fout() * flicker);
+                Drawf.tri(dx, dy, size * b.fout() * flicker, size * 4f * b.fout(), angle + spin);
+                Drawf.tri(dx, dy, size * b.fout() * flicker, size * 2f * b.fout(), angle + spin + 180f);
+                Drawf.light(dx, dy, size * 8f, Color.valueOf("ab8ec5"), b.fout() * flicker * 0.5f);
+            });
+        }
+
+        //frags
+        rand.setSeed(e.id + 3);
+        for(int i = 0; i < 6; i++){
+            float angle = rand.random(360f);
+            float dist = rand.random(5f, 20f);
+            float size = rand.random(1f, 3f);
+            float px = e.x + Mathf.cosDeg(angle) * dist;
+            float py = e.y + Mathf.sinDeg(angle) * dist;
+
+            e.scaled(e.lifetime * rand.random(0.2f, 0.55f), b -> {
+                color(Color.valueOf("ab8ec5"), Pal.lightishGray, b.fin());
+                alpha(b.fout() * 0.55f);
+                Fill.circle(px, py, size * b.fout() + 0.2f);
+            });
+        }
     }),
 
     coreExplosion = new Effect(55f, 240f, e -> {
@@ -671,12 +771,92 @@ public class Fx{
         }
     }),
 
-    smokeAoeCloud = new Effect(60f * 3f, 250f, e -> {
-        color(e.color, 0.65f);
+    smokeAoeCloud = new Effect(250f, 250f, e -> {
+        float fadeIn = Mathf.clamp(e.fin() / 0.1f), fadeOut = Mathf.clamp(e.fout() / 0.12f);
+        float a = fadeIn * fadeOut, radius = 90f;
 
-        randLenVectors(e.id, 80, 90f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, 6f * Mathf.clamp(e.fin() / 0.1f) * Mathf.clamp(e.fout() / 0.1f));
-        });
+        //perimeter smoke
+        rand.setSeed(e.id);
+        Draw.z(Layer.effect -0.01f);
+        for(int i = 0; i < 10; i++){
+            float angle = (360f / 9f) * i + rand.range(22f);
+            float dist = 68f + rand.range(10f);
+            float size = rand.random(14f, 27f);
+            float px = e.x + Mathf.cosDeg(angle) * dist;
+            float py = e.y + Mathf.sinDeg(angle) * dist;
+
+            color(e.color, Pal.lightishGray, rand.random(0.25f, 0.55f));
+            alpha(a * 0.4f);
+            Fill.circle(px, py, size * a);
+            Drawf.light(px, py, size * a * 2.5f, e.color, a * 0.4f);
+        }
+        Draw.z();
+
+        //inside smoke
+        rand.setSeed(e.id + 1);
+        for(int i = 0; i < 5; i++){
+            float angle = rand.random(360f);
+            float dist = rand.random(25f, 52f);
+            float size = rand.random(7f, 13f);
+            float px = e.x + Mathf.cosDeg(angle) * dist;
+            float py = e.y + Mathf.sinDeg(angle) * dist;
+
+            color(e.color, 0.55f);
+            alpha(a * 0.65f);
+            Fill.circle(px, py, size * a);
+            Drawf.light(px, py, size * a * 2f, e.color, a * 0.3f);
+        }
+
+        //small smoke
+        rand.setSeed(e.id + 2);
+        for(int i = 0; i < 6; i++){
+            float angle = rand.random(360f);
+            float dist = rand.random(50f, 85f);
+            float px = e.x + Mathf.cosDeg(angle) * dist;
+            float py = e.y + Mathf.sinDeg(angle) * dist;
+            float dotA = Mathf.clamp(e.fin() / 0.05f) * e.fout();
+
+            color(Color.valueOf("94c487"), e.color, 0.45f);
+            alpha(dotA * 0.9f);
+            Fill.circle(px, py, rand.random(3.5f, 7f) * dotA);
+            Drawf.light(px, py, 20f, e.color, dotA * 0.5f);
+        }
+
+        Draw.reset();
+    }),
+
+    smokeAoeAlpha = new Effect(60f * 3f, 250f, e -> {
+        float fadeIn = Mathf.clamp(e.fin() / 0.1f), fadeOut = Mathf.clamp(e.fout() / 0.12f);
+        float a = fadeIn * fadeOut, radius = 90f;
+
+        if(noiseAlphaCircle == null) noiseAlphaCircle = Core.assets.get("sprites/noiseAlphaCircle.png", Texture.class);
+        if(noiseAlphaCircle == null) return;
+
+        int layers = 3;
+        float opacity = a * 0.5f;
+        float layerAlphaM = 0.65f, layerColorM = 0.88f;
+
+        Draw.z(Layer.scorch);
+        float salpha = 1f, offset = 0f;
+        Color col = Tmp.c1.set(e.color);
+
+        for(int i = 0; i < layers; i++){
+            float rot = Time.time * (i % 2 == 0 ? 0.25f : -0.18f) + offset * 90f;
+            float pulse = 1f + Mathf.sin(Time.time * 0.1f + offset * 600f) * 0.06f;
+
+            Tmp.tr1.texture = noiseAlphaCircle;
+            Tmp.tr1.set(0f, 0f, 1f, 1f);
+
+            Draw.alpha(salpha * opacity);
+            Draw.tint(col);
+            Draw.rect(Tmp.tr1, e.x, e.y, radius * 2f * pulse, -(radius * 2f * pulse), rot);
+
+            salpha *= layerAlphaM;
+            offset += 0.29f;
+            col.mul(layerColorM);
+        }
+        Draw.z();
+        Draw.reset();
     }),
 
     missileTrailSmoke = new Effect(180f, 300f, b -> {
@@ -775,6 +955,24 @@ public class Fx{
         }
     }),
 
+    scatheExplosionLarge = new Effect(60f, 320f, e -> {
+        color(e.color);
+        stroke(e.fout() * 5f);
+        float circleRad = 6f + e.finpow() * 90f;
+        Lines.circle(e.x, e.y, circleRad);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 16; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            Tmp.v1.trns(angle, circleRad);
+
+            for(int s : Mathf.signs){
+                Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.foutpow() * 40f, e.fout() * 30f * lenRand + 6f, angle + 90f + s * 90f);
+            }
+        }
+    }),
+
     scatheLight = new Effect(60f, 160f, e -> {
         float circleRad = 6f + e.finpow() * 60f;
 
@@ -808,9 +1006,9 @@ public class Fx{
         int shards = 14;
         for(int i = 0; i < shards; i++){
             float angle = (360f / shards) * i * rand.random(0.9f, 1f) + e.fin() * 60f;
-            float dist = e.finpow() * 110f;
+            float dist = e.finpow() * 100f;
             float width = rand.random(0.5f, 1f) * 6f;
-            float length = 3f + e.fout() * rand.random(0.5f, 1f) * 25f; 
+            float length = 3f + e.fout() * rand.random(0.5f, 1f) * 32f; 
             float tx = e.x + Mathf.cosDeg(angle) * dist;
             float ty = e.y + Mathf.sinDeg(angle) * dist;
 
@@ -819,11 +1017,23 @@ public class Fx{
             Drawf.tri(tx, ty, width, length, angle + 180f);
         }
 
+
+        e.scaled(18f, i -> {
+            color(Color.white, e.color, i.fout());
+            stroke(i.fout() * 4f);
+            Lines.circle(e.x, e.y, 8f + i.fin() * 45f);
+        });
+
+        Drawf.light(e.x, e.y, 180f, e.color, 0.95f * e.fout());
+    }).layer(Layer.bullet + 3f),
+
+    scathePhaseLines = new Effect(35f, 110f, e -> {
+        //skinny long lines
         rand.setSeed(e.id + 1);
-        for(int i = 0; i < 10; i++){
+        for(int i = 0; i < 16; i++){
             float angle = rand.random(360f);
             float arcLen = rand.random(40f, 100f) * e.finpow();
-            float arcStroke = rand.random(0.5f, 2f) * e.fout();
+            float arcStroke = rand.random(0.5f, 2f) * e.fout() * 2f;
             float branchOff = rand.random(20f, 45f);
 
             float flicker = Mathf.absin(e.fin() * (i + 1) * 28f, 1f, 1f);
@@ -832,24 +1042,7 @@ public class Fx{
             stroke(arcStroke * flicker);
             lineAngle(e.x, e.y, angle, arcLen);
 
-            float mx = e.x + Mathf.cosDeg(angle) * arcLen * 0.5f;
-            float my = e.y + Mathf.sinDeg(angle) * arcLen * 0.5f;
-            float branchLen = arcLen * 0.35f * e.fout();
-
-            for(int s : Mathf.signs){
-                color(e.color, e.fout() * 0.7f * flicker);
-                stroke(arcStroke * 0.5f * flicker);
-                lineAngle(mx, my, angle + branchOff * s, branchLen);
-
-                //branch tip glow
-                float tipX = mx + Mathf.cosDeg(angle + branchOff * s) * branchLen;
-                float tipY = my + Mathf.sinDeg(angle + branchOff * s) * branchLen;
-                color(Color.white, e.color, e.fout() * flicker);
-                Fill.circle(tipX, tipY, arcStroke * 1.5f * e.fout() * flicker);
-                Drawf.light(tipX, tipY, arcStroke * 8f, e.color, 0.5f * e.fout() * flicker);
-            }
-
-            //main tip glow
+            //tip glow
             float tipX = e.x + Mathf.cosDeg(angle) * arcLen;
             float tipY = e.y + Mathf.sinDeg(angle) * arcLen;
             color(Color.white, e.color, e.fout() * flicker);
@@ -857,19 +1050,21 @@ public class Fx{
             Drawf.light(tipX, tipY, arcStroke * 10f, e.color, 0.6f * e.fout() * flicker);
         }
 
-        e.scaled(18f, i -> {
-            color(Color.white, e.color, i.fout());
-            stroke(i.fout() * 4f);
-            Lines.circle(e.x, e.y, 8f + i.fin() * 45f);
-        });
+        //thick short lines
+        rand.setSeed(e.id + 5);
+        for(int i = 0; i < 16; i++){
+            float angle = rand.random(360f);
+            float stroke = rand.random(3f, 6f) * e.fout() * 1.5f;
+            float len = rand.random(18f, 30f) * e.finpow();
+            float flicker = Mathf.absin(e.fin() * (i + 1) * 28f, 1f, 1f);
 
-        e.scaled(12f, i -> {
-            color(Color.white, i.fout() * 0.6f);
-            Fill.circle(e.x, e.y, 20f * i.fout());
-        });
+            color(Color.white, e.color, e.fout() * flicker);
+            stroke(stroke * flicker);
+            lineAngle(e.x, e.y, angle, len);
 
-        Drawf.light(e.x, e.y, 180f, e.color, 0.95f * e.fout());
-    }).layer(Layer.bullet + 3f),
+            Drawf.light(e.x + Mathf.cosDeg(angle) * len * 0.5f, e.y + Mathf.sinDeg(angle) * len * 0.5f, stroke * 6f, e.color, 0.5f * e.fout() * flicker);
+        }
+    }),
 
     dynamicSpikes = new Effect(40f, 100f, e -> {
         color(e.color);
@@ -2102,17 +2297,6 @@ public class Fx{
         Drawf.tri(e.x, e.y, w, 6f * e.fout(), e.rotation + 180f);
     }),
 
-    shootTitanLight = new Effect(10, e -> {
-        e.scaled(8f, i -> {
-            color(Color.white, Pal.lightOrange, i.fin());
-            float offset = 6f;
-            float dx = e.x + Angles.trnsx(e.rotation, offset);
-            float dy = e.y + Angles.trnsy(e.rotation, offset);
-            Fill.circle(dx, dy, 12f * i.fout());
-            Drawf.light(dx, dy, 40f, Pal.lightOrange, 0.9f * i.fout());
-        });
-    }),
-
     shootBigSmoke = new Effect(17f, e -> {
         color(Pal.lighterOrange, Color.lightGray, Color.gray, e.fin());
 
@@ -2209,6 +2393,40 @@ public class Fx{
                 color(Pal.lightOrange, Pal.lightishGray, b.fin());
                 Drawf.tri(dx, dy, size * b.fout(), size * 3f * b.fout(), angle + spin);
                 Drawf.tri(dx, dy, size * b.fout(), size * 3f * b.fout(), angle + spin + 180f);
+            });
+        }
+    }),
+
+    shootSmokeTitanOxide = new Effect(70f, e -> {
+        rand.setSeed(e.id);
+        Color baseColor = Color.valueOf("94c487");
+
+        //smoke
+        for(int i = 0; i < 13; i++){
+            v.trns(e.rotation + rand.range(30f), rand.random(e.finpow() * 40f));
+            float tint = rand.random(1f);
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                color(tint > 0.6f ? baseColor : e.color, Pal.lightishGray, b.fin());
+                Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 3.4f + 0.3f);
+            });
+        }
+
+        //outwards smoke
+        rand.setSeed(e.id + 2);
+        for(int i = 0; i < 5; i++){
+            float angle = e.rotation + 180f + rand.range(35f);
+            float maxDst = rand.random(15f, 45f);
+            float size = rand.random(2.5f, 5.5f);
+            float tint = rand.random(1f);
+
+            e.scaled(e.lifetime * rand.random(0.4f, 0.85f), b -> {
+                float dst = maxDst * b.finpow();
+                float dx = e.x + Mathf.cosDeg(angle) * dst;
+                float dy = e.y + Mathf.sinDeg(angle) * dst;
+
+                color(tint > 0.5f ? baseColor : e.color, Pal.lightishGray, b.fin());
+                alpha(b.fout() * 0.75f);
+                Fill.circle(dx, dy, (size + b.fin() * 3f) * b.fout() + 0.3f);
             });
         }
     }),
