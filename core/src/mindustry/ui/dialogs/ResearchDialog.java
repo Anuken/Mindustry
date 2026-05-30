@@ -26,6 +26,7 @@ import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.layout.*;
+import mindustry.ui.layout.BranchTreeLayout.TreeLocation;
 import mindustry.ui.layout.TreeLayout.*;
 
 import java.util.*;
@@ -256,8 +257,10 @@ public class ResearchDialog extends BaseDialog{
                     //% that gets removed from each sector
                     double percentage = (double)amount / get(item);
                     int[] counter = {amount};
+                    Sector curSector = state.isCampaign() ? state.rules.sector : null;
+                    
                     cache.each((sector, seq) -> {
-                        if(counter[0] == 0) return;
+                        if(counter[0] == 0 || sector == curSector) return;
 
                         //amount that will be removed
                         int toRemove = Math.min((int)Math.ceil(percentage * seq.get(item)), counter[0]);
@@ -268,6 +271,19 @@ public class ResearchDialog extends BaseDialog{
 
                         counter[0] -= toRemove;
                     });
+
+                    //only consume from the active sector last
+                    if(counter[0] > 0 && curSector != null){
+                        var seq = cache.get(curSector);
+                        if(seq != null){
+                            int toRemove = Math.min((int)Math.ceil(percentage * seq.get(item)), counter[0]);
+
+                            curSector.removeItem(item, toRemove);
+                            seq.remove(item, toRemove);
+
+                            counter[0] -= toRemove;
+                        }
+                    }
 
                     //negate again to display correct number
                     amount = -amount;
