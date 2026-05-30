@@ -5,16 +5,14 @@ import mindustry.mod.*;
 
 import java.io.*;
 
-public class ImageAsset extends DataAsset implements Comparable<ImageAsset>{
+public class ImageAsset extends DataAsset{
     /** Size of encoded image. */
     public int width, height;
     /** Encoded PNG data. */
     public byte[] data;
 
     public ImageAsset(String path, int width, int height, byte[] data){
-        Fi file = new Fi(path);
-        this.name = file.nameWithoutExtension();
-        this.path = file.pathWithoutExtension();
+        setPath(path);
         this.width = width;
         this.height = height;
         this.data = data;
@@ -22,7 +20,8 @@ public class ImageAsset extends DataAsset implements Comparable<ImageAsset>{
 
     ImageAsset(){}
 
-    public static ImageAsset fromFile(String relativePath, Fi file) throws IOException{
+    @Override
+    public void readFromFile(String relativePath, Fi file) throws IOException{
         byte[] data = file.readBytes();
         int width, height;
         //perform basic validation and fetch size from IHDR chunk
@@ -39,7 +38,11 @@ public class ImageAsset extends DataAsset implements Comparable<ImageAsset>{
             if(width <= 0 || height <= 0) throw new IOException("PNG size must be positive.");
             if(width > DataPatcher.maxImageSize || height > DataPatcher.maxImageSize) throw new IOException("PNG is larger than maximum image size (" + DataPatcher.maxImageSize + "x" + DataPatcher.maxImageSize + ")");
         }
-        return new ImageAsset(relativePath, width, height, data);
+
+        setPath(relativePath);
+        this.width = width;
+        this.height = height;
+        this.data = data;
     }
 
     @Override
@@ -61,10 +64,5 @@ public class ImageAsset extends DataAsset implements Comparable<ImageAsset>{
     @Override
     public DataAssetType getType(){
         return DataAssetType.image;
-    }
-
-    @Override
-    public int compareTo(ImageAsset imageAsset){
-        return path.compareTo(imageAsset.path);
     }
 }

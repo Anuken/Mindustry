@@ -4,11 +4,11 @@ import arc.*;
 import arc.func.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.gen.*;
+import mindustry.mod.data.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
@@ -38,7 +38,7 @@ public class MapPatchesDialog extends BaseDialog{
 
     private void setup(){
         list.clearChildren();
-        var patches = state.patcher.patches;
+        var patches = state.data.getPatches();
 
         if(patches.isEmpty()){
             list.add("@editor.patches.none");
@@ -134,20 +134,23 @@ public class MapPatchesDialog extends BaseDialog{
     }
 
     void addPatch(String patch, int replaceIndex){
-        var oldPatches = state.patcher.patches.copy();
+        var patches = state.data.getPatches();
+        var oldPatches = patches.copy();
+
         try{
             Jval.read(patch); //validation
-            Seq<String> patches = state.patcher.patches.map(p -> p.patch);
+
             if(replaceIndex == -1){
-                patches.add(patch);
+                patches.add(new PatchAsset(patch));
             }else{
-                patches.set(replaceIndex, patch);
+                patches.set(replaceIndex, new PatchAsset(patch));
             }
-            state.patcher.apply(patches);
+
+            state.data.reloadPatches(patches);
 
             setup();
         }catch(Exception e){
-            state.patcher.patches.set(oldPatches);
+            patches.set(oldPatches);
             ui.showException("@editor.patches.importerror", e);
         }
     }

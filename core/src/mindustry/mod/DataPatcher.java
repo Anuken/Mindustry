@@ -1,5 +1,6 @@
 package mindustry.mod;
 
+import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
@@ -12,6 +13,7 @@ import mindustry.ctype.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.mod.Mods.*;
 import mindustry.mod.data.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -35,12 +37,14 @@ public class DataPatcher{
     private static ContentParser parser = createParser();
 
     private boolean applied;
+    private boolean needsArrayFix;
     private ContentLoader contentLoader;
     private ObjectSet<Object> usedpatches = new ObjectSet<>();
     private Seq<Runnable> resetters = new Seq<>();
     private Seq<Runnable> afterCallbacks = new Seq<>();
     private Seq<Object> visitStack = new Seq<>();
-    private @Nullable PatchAsset currentlyApplying;
+    private @Nullable PatchAsset currentlyApplyingPatch;
+    private @Nullable ContentAsset currentlyApplyingContent;
 
     static{
         for(var type : ContentType.all){
@@ -60,6 +64,7 @@ public class DataPatcher{
         };
         cont.allowClassResolution = false;
         cont.allowAssetLoading = false;
+        cont.allowPatching = false;
 
         return cont;
     }
@@ -69,68 +74,117 @@ public class DataPatcher{
     }
 
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
-    public void apply(Seq<PatchAsset> patchArray){
+    public void apply(Seq<PatchAsset> patches, Seq<ContentAsset> content){
         //if you're un-applying data patches, and it throws an error, just crash. this is not recoverable.
         if(applied){
             unapply();
             applied = false;
         }
 
-        if(patchArray.isEmpty()) return;
+        if(patches.isEmpty() && content.isEmpty()) return;
 
-        try{
-            currentDataPatcher = this;
-            applied = true;
-            contentLoader = Vars.content.copy();
+        currentDataPatcher = this;
+        applied = true;
+        contentLoader = Vars.content.copy();
 
-            Attribute[] oldAttributes = Attribute.all.clone();
-            var oldAttributeMap = Attribute.map.copy();
-            reset(() -> {
-                Attribute.all = oldAttributes;
-                Attribute.map = oldAttributeMap;
-            });
+        Attribute[] oldAttributes = Attribute.all.clone();
+        var oldAttributeMap = Attribute.map.copy();
+        reset(() -> {
+            Attribute.all = oldAttributes;
+            Attribute.map = oldAttributeMap;
+        });
 
-            for(var set : patchArray){
+        //patches are read first.
+        for(var set : patches){
+            set.warnings.clear();
+            set.error = false;
 
-                try{
-                    JsonValue value = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
-                    if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
-                        JsonValue req = value.get("requiredPlanets");
-                        value.remove("requiredPlanets");
+            try{
+                JsonValue value = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
+                if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
+                    JsonValue req = value.get("requiredPlanets");
+                    value.remove("requiredPlanets");
 
-                        //this should be ignored unless this instance is a dedicated server
-                        if(Vars.headless){
-                            String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
-                            if(!Structs.contains(planets, Vars.state.rules.planet.name)){
-                                continue;
-                            }
+                    //this should be ignored unless this instance is a dedicated server
+                    if(Vars.headless){
+                        String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
+                        if(!Structs.contains(planets, Vars.state.rules.planet.name)){
+                            continue;
                         }
                     }
+                }
 
-                    set.json = value;
-                    currentlyApplying = set;
-                    visitStack.clear();
+                set.json = value;
+                currentlyApplyingPatch = set;
+                visitStack.clear();
 
-                    set.name = value.getString("name", "");
-                    value.remove("name"); //patchsets can have a name, ignore it if present
-                    for(var child : value){
-                        assign(root, child.name, child, null, null, null);
+                set.name = value.getString("name", "");
+                value.remove("name"); //patchsets can have a name, ignore it if present
+                for(var child : value){
+                    assign(root, child.name, child, null, null, null);
+                }
+                currentlyApplyingPatch = null;
+
+            }catch(Exception e){
+                set.error = true;
+                set.warnings.add(Strings.getSimpleMessage(e));
+                currentlyApplyingPatch = null;
+
+                Log.err("Failed to apply patch: " + set.patch, e);
+            }
+        }
+
+        if(!content.isEmpty()){
+            content.sort();
+            ModMeta meta = new ModMeta();
+            meta.name = "dp";
+            meta.internalName = "dp";
+            LoadedMod mod = new LoadedMod(new Fi("dp"), new Fi(""), null, null, meta);
+
+            for(var asset : content){
+                currentlyApplyingContent = asset;
+                Content current = Vars.content.getLastAdded();
+                Fi file = new Fi(asset.path);
+
+                //this is very important for resizing various arrays used in the game
+                if(asset.type == ContentType.item || asset.type == ContentType.liquid) needsArrayFix = true;
+
+                //TODO: what to do when errors happen in general?
+                try{
+                    //this binds the content but does not load it entirely
+                    Content loaded = parser.parse(mod, asset.name, asset.data, file, asset.type);
+                }catch(Throwable e){
+                    Log.err(e);
+                    asset.warnings.add(Strings.getStackTrace(e));
+
+                    //TODO: this warning is not very useful, nor is markError in general. What should be done here?
+                    if(current != Vars.content.getLastAdded() && Vars.content.getLastAdded() != null){
+                        parser.markError(Vars.content.getLastAdded(), mod, file, e);
                     }
-                    currentlyApplying = null;
-
-                }catch(Exception e){
-                    set.error = true;
-                    set.warnings.add(Strings.getSimpleMessage(e));
-                    currentlyApplying = null;
-
-                    Log.err("Failed to apply patch: " + set.patch, e);
                 }
             }
 
-            afterCallbacks.each(Runnable::run);
-        }catch(Exception e){
-            Log.err("Failed to apply data patches: " + patchArray.map(p -> p.patch));
+            parser.finishParsing();
+
+            Seq<Content> all = new Seq<>();
+            for(var arr : Vars.content.getContentMap()){
+                all.addAll(arr.select(c -> c.minfo.mod == mod));
+            }
+
+            for(var cont : all) cont.init();
+            for(var cont : all) cont.postInit();
+
+            if(!Vars.headless){
+                for(var cont : all){
+                    cont.loadIcon();
+                    cont.load();
+                }
+            }
+
+            if(needsArrayFix) fixContentArrays();
         }
+
+        afterCallbacks.each(Runnable::run);
     }
 
     public void unapply(){
@@ -153,6 +207,35 @@ public class DataPatcher{
         afterCallbacks.each(Runnable::run);
         afterCallbacks.clear();
         usedpatches.clear();
+
+        if(needsArrayFix) fixContentArrays();
+
+        needsArrayFix = false;
+    }
+
+    void fixContentArrays(){
+        int items = Vars.content.items().size, liquids = Vars.content.liquids().size;
+
+        //block item/liquid filter
+        for(var block : Vars.content.blocks()){
+            //don't waste time resizing arrays for blocks that can't use them
+            if(!block.synthetic()) continue;
+
+            block.checkContentArrayCapacity(items, liquids);
+        }
+
+        //resize capacities in the world (editor). this SHOULD be the only time when fixing arrays is necessary
+        if(!Vars.headless && Vars.ui != null && Vars.ui.editor != null && Vars.ui.editor.isShown()){
+            int wh = Vars.world.width() * Vars.world.height();
+            for(int i = 0; i < wh; i++){
+                var b = Vars.world.tiles.geti(i).build;
+                if(b != null && b.items != null) b.items.checkArrayCapacity(items);
+                if(b != null && b.liquids != null) b.liquids.checkArrayCapacity(items);
+            }
+        }
+
+        //TODO: this doesn't do anything about extensive ItemSeq usage across the codebase, which is limited to the campaign
+        //TODO: this also doesn't change sectors
     }
 
     void visit(Object object){
@@ -610,9 +693,9 @@ public class DataPatcher{
 
     void warn(String error, Object... fmt){
         String formatted = Strings.format(error, fmt);
-        if(currentlyApplying != null){
-            currentlyApplying.warnings.add(formatted);
-        }
+        if(currentlyApplyingPatch != null) currentlyApplyingPatch.warnings.add(formatted);
+        else if(currentlyApplyingContent != null) currentlyApplyingContent.warnings.add(formatted);
+
         Log.warn("[ContentPatcher] " + formatted);
     }
 

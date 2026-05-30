@@ -5,18 +5,20 @@ import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Timer;
 import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
-import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
+import mindustry.maps.Map;
 import mindustry.maps.*;
 import mindustry.maps.Maps.*;
 import mindustry.mod.Mods.*;
@@ -32,6 +34,7 @@ import java.io.*;
 import java.net.*;
 import java.time.*;
 import java.time.format.*;
+import java.util.*;
 import java.util.regex.*;
 
 import static arc.util.ColorCodes.*;
@@ -66,9 +69,8 @@ public class ServerControl implements ApplicationListener{
     private PrintWriter socketOutput;
     private String suggested;
     private boolean autoPaused = false;
-    private Fi patchDirectory, patchImageDirectory;
-    private Seq<String> contentPatches = new Seq<>();
-    private Seq<ImageAsset> contentPatchImages = new Seq<>();
+    private Fi patchDirectory, dataAssetDirectory;
+    private Seq<DataAsset> dataAssets = new Seq<>();
 
     private LineReader lineReader;
 
@@ -222,10 +224,9 @@ public class ServerControl implements ApplicationListener{
         customMapDirectory.mkdirs();
 
         patchDirectory = dataDirectory.child("patches");
-        patchDirectory.mkdirs();
-        patchImageDirectory = patchDirectory.child("sprites");
-        patchImageDirectory.mkdirs();
-        loadPatchFiles();
+        dataAssetDirectory = dataDirectory.child("assets");
+        dataAssetDirectory.mkdirs();
+        loadDataAssets();
 
         //set up default shuffle mode
         try{
@@ -345,52 +346,69 @@ public class ServerControl implements ApplicationListener{
         });
 
         Events.on(DataPatchLoadEvent.class, event -> {
-            //NOTE: if patches change, and an older save is loaded, the patches will be applied twice; the old ones won't be removed.
-            for(String patch : contentPatches){
-                event.patches.addUnique(patch);
-            }
-
-            //add images that aren't already in the patch
-            ObjectSet<String> usedImages = event.images.map(i -> i.path).asSet();
-            for(ImageAsset image : contentPatchImages){
-                if(usedImages.add(image.path)){
-                    event.images.add(image);
+            //load server data patches
+            for(var asset : dataAssets){
+                int index = event.assets.indexOf(d -> d.getType() == asset.getType() && d.path.equalsIgnoreCase(asset.path));
+                if(index == -1){
+                    event.assets.add(asset);
+                }else{
+                    event.assets.set(index, asset);
                 }
             }
         });
     }
 
-    void loadPatchFiles(){
-        contentPatches.clear();
-        contentPatchImages.clear();
-        Seq<Fi> patches = patchDirectory.findAll(f -> f.extEquals("json") || f.extEquals("hjson") || f.extEquals("json5")).sort();
+    void loadDataAssets(){
+        dataAssets.clear();
 
-        for(Fi patch : patches){
-            try{
-                contentPatches.add(Jval.read(patch.readString()).toString(Jformat.plain));
-            }catch(Throwable e){
-                Log.err("Invalid patch file: " + patch.name(), e);
+        //special folder prefix for server-loaded content. this helps avoid conflicts.
+        String prefix = "server/";
+
+        for(var type : DataAssetType.all){
+            Fi folder = dataAssetDirectory.child(type.folder);
+            folder.mkdirs();
+
+            //content has sub-dirs based on type, which need to be passed as context to the reader
+            if(type == DataAssetType.content){
+                for(ContentType ctype : ContentAsset.loadableContent){
+                    String lower = ctype.name().toLowerCase(Locale.ROOT);
+                    Fi subfolder = folder.child(lower + (lower.endsWith("s") ? "" : "s"));
+
+                    subfolder.mkdirs();
+
+                    Seq<Fi> files = subfolder.findAll(f -> type.extensions.contains(f.extension().toLowerCase(Locale.ROOT)));
+
+                    for(Fi file : files){
+                        try{
+                            ContentAsset asset = (ContentAsset)type.create();
+                            asset.readFromFile(prefix + file.absolutePath().substring(subfolder.absolutePath().length() + 1), file, ctype);
+                            dataAssets.add(asset);
+                        }catch(Throwable e){
+                            Log.err("Error loading content asset: " + file, e);
+                        }
+                    }
+                }
+            }else{
+                Seq<Fi> files = folder.findAll(f -> type.extensions.contains(f.extension().toLowerCase(Locale.ROOT)));
+                //add patches found in legacy 'patch' directory
+                if(type == DataAssetType.patch) files.addAll(patchDirectory.findAll(f -> type.extensions.contains(f.extension().toLowerCase(Locale.ROOT))));
+
+                for(Fi file : files){
+                    try{
+                        var asset = type.create();
+                        asset.readFromFile(prefix + file.absolutePath().substring(folder.absolutePath().length() + 1), file);
+                        dataAssets.add(asset);
+                    }catch(Throwable e){
+                        Log.err("Error loading data asset: " + file, e);
+                    }
+                }
             }
         }
 
-        Seq<Fi> imageFiles = patchImageDirectory.findAll(f -> f.extEquals("png"));
+        dataAssets.sort();
 
-        for(Fi image : imageFiles){
-            try{
-                contentPatchImages.add(ImageAsset.fromFile(image.absolutePath().substring(patchImageDirectory.absolutePath().length() + 1), image));
-            }catch(Throwable e){
-                Log.err("Invalid patch image file: " + image.path(), e);
-            }
-        }
-
-        contentPatchImages.sort();
-
-        if(contentPatches.size > 0){
-            Log.info("Loaded @ content patch files.", contentPatches.size);
-        }
-
-        if(contentPatchImages.size > 0){
-            Log.info("Loaded @ content patch images.", contentPatchImages.size);
+        if(dataAssets.size > 0){
+            Log.info("Loaded @ data asset files.", dataAssets.size);
         }
     }
 
@@ -515,8 +533,8 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("reloadpatches", "Reload all patch files from disk.", arg -> {
-            loadPatchFiles();
-            if(contentPatches.isEmpty()){
+            loadDataAssets();
+            if(dataAssets.isEmpty()){
                 err("No valid content patch files found.");
             }
         });

@@ -1,11 +1,18 @@
 package mindustry.mod.data;
 
+import arc.files.*;
 import arc.util.*;
 
 import java.io.*;
 
 public class BundleAsset extends DataAsset{
     public String string = "";
+
+    @Override
+    public void readFromFile(String path, Fi file) throws IOException{
+        setPath(path);
+        string = file.readString();
+    }
 
     @Override
     public DataAssetType getType(){

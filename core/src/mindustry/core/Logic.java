@@ -297,17 +297,17 @@ public class Logic implements ApplicationListener{
     }
 
     public void reset(){
-        State prev = state.getState();
-        state.data.unload();
-        //recreate gamestate - sets state to menu
-        state = new GameState();
-        //fire change event, since it was technically changed
-        Events.fire(new StateChangeEvent(prev, State.menu));
-
         Groups.clear();
         Time.clear();
         Events.fire(new ResetEvent());
         world.tiles = new Tiles(0, 0);
+
+        state.data.unload();
+        State prev = state.getState();
+        //recreate gamestate - sets state to menu
+        state = new GameState();
+        //fire change event, since it was technically changed
+        Events.fire(new StateChangeEvent(prev, State.menu));
 
         Core.settings.manualSave();
     }

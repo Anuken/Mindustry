@@ -61,18 +61,20 @@ public class MapPatchImagesDialog extends BaseDialog{
                         return;
                     }
 
+                    var images = getImages();
+
                     //path and name are the same here; there's no path context.
                     String name = result.nameWithoutExtension();
                     String path = name;
-                    var other = state.patcher.images.find(p -> (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
+                    var other = images.find(p -> (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
                     if(other != null){
                         ui.showErrorMessage(Core.bundle.format("editor.patches.image.exists", other.name + " (" + other.path + ")"));
                         return;
                     }
 
-                    state.patcher.images.add(new ImageAsset(path, width, height, bytes));
-                    state.patcher.images.sort();
-                    state.patcher.applyImages(state.patcher.images);
+                    images.add(new ImageAsset(path, width, height, bytes));
+                    images.sort();
+                    state.data.reloadImages(images);
                     rebuild();
                 }catch(Exception e){
                     ui.showException(e);
@@ -128,19 +130,19 @@ public class MapPatchImagesDialog extends BaseDialog{
                                             continue;
                                         }
 
-                                        var other = state.patcher.images.find(op -> (op.path.equalsIgnoreCase(image.path) || op.name.equalsIgnoreCase(image.name)));
+                                        var other = getImages().find(op -> (op.path.equalsIgnoreCase(image.path) || op.name.equalsIgnoreCase(image.name)));
                                         if(other != null){
                                             errors.add("[accent]" + image.path + "[white]: " +Core.bundle.format("editor.patches.image.exists", other.name + " (" + other.path + ")").replace("\n", " "));
                                             continue;
                                         }
-                                        state.patcher.images.add(image);
+                                        getImages().add(image);
                                         imported ++;
                                     }
                                 }
 
-                                state.patcher.images.sort();
+                                getImages().sort();
 
-                                state.patcher.applyImages(state.patcher.images);
+                                state.data.reloadImages(getImages());
                                 rebuild();
 
                                 var idiag = new BaseDialog("@editor.patches.image.imports");
@@ -164,7 +166,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                         dialog.hide();
                         try{
                             try(OutputStream fos = file.write(false, 4096); ZipOutputStream zos = new ZipOutputStream(fos)){
-                                for(var image : state.patcher.images){
+                                for(var image : getImages()){
                                     zos.putNextEntry(new ZipEntry(image.path + ".png"));
                                     zos.write(image.data);
                                     zos.closeEntry();
@@ -177,8 +179,8 @@ public class MapPatchImagesDialog extends BaseDialog{
                     t.button("@editor.patches.image.clearall", Icon.trash, style, () -> {
                         dialog.hide();
                         ui.showConfirm("@editor.patches.image.clearall.confirm", () -> {
-                            state.patcher.images.clear();
-                            state.patcher.applyImages(state.patcher.images);
+                            getImages().clear();
+                            state.data.reloadImages(getImages());
                             rebuild();
                         });
                     }).marginLeft(12f).row();
@@ -205,7 +207,7 @@ public class MapPatchImagesDialog extends BaseDialog{
         float size = 200f;
         int cols = (int)Math.max(1, Core.graphics.getWidth() / Scl.scl(size + 12f));
         int i = 0;
-        for(var image : Vars.state.patcher.images){
+        for(var image : getImages()){
             if(searchString != null && !image.path.toLowerCase().contains(searchString)) continue;
             TextureRegion region = Core.atlas.find(regionPrefix + image.name, "nomap");
             boolean found = Core.atlas.has(regionPrefix + image.name);
@@ -225,7 +227,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                             Fi fi = new Fi(res);
                             String name = fi.nameWithoutExtension();
                             String path = fi.pathWithoutExtension();
-                            var other = state.patcher.images.find(p -> p != image && (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
+                            var other = getImages().find(p -> p != image && (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
                             if(other != null){
                                 ui.showErrorMessage(Core.bundle.format("editor.patches.image.exists", other.name + " (" + other.path + ")"));
                             }else{
@@ -237,7 +239,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                                     at.name = regionPrefix + name;
                                 }
 
-                                image.path = path;
+                                image.setPath(path);
                                 image.name = name;
                                 rebuild();
                             }
@@ -275,7 +277,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                     b.button(Icon.trash, istyle, () -> {
                         ui.showConfirm("@editor.patches.image.delete.confirm", () -> {
                             Core.atlas.getRegionMap().remove(regionPrefix + image.name);
-                            state.patcher.images.remove(image);
+                            getImages().remove(image);
                             rebuild();
                         });
                     }).padTop(2f);
@@ -290,5 +292,9 @@ public class MapPatchImagesDialog extends BaseDialog{
         if(inner.getChildren().isEmpty()){
             inner.center().add("@none.found").pad(10f);
         }
+    }
+
+    private Seq<ImageAsset> getImages(){
+        return Vars.state.data.getImages();
     }
 }

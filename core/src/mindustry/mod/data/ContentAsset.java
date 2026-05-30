@@ -1,13 +1,33 @@
 package mindustry.mod.data;
 
+import arc.files.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 
 import java.io.*;
 
 public class ContentAsset extends DataAsset{
+    //Note: planets and sectors can't be loaded at the moment
+    public static final ContentType[] loadableContent = {ContentType.item, ContentType.block, ContentType.liquid, ContentType.status, ContentType.unit, ContentType.weather, ContentType.unitCommand, ContentType.unitStance};
+
+    /** Content type to be parsed as. */
     public ContentType type = ContentType.unit;
+    /** Raw string data to be parsed into JSON. */
     public String data = "";
+    /** Warnings encountered during deserialization. */
+    public Seq<String> warnings = new Seq<>();
+
+    public void readFromFile(String path, Fi file, ContentType type) throws IOException{
+        this.type = type;
+        setPath(path);
+        data = file.readString();
+    }
+
+    @Override
+    public void readFromFile(String path, Fi file) throws IOException{
+        throw new UnsupportedOperationException("Content needs an associated type. Use the other readFromFile method.");
+    }
 
     @Override
     public DataAssetType getType(){

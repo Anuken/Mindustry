@@ -145,6 +145,10 @@ public class LiquidModule extends BlockModule{
         return sum;
     }
 
+    public void checkArrayCapacity(int size){
+        if(liquids.length != size) liquids = Arrays.copyOf(liquids, size);
+    }
+
     @Override
     public void write(Writes write){
         int amount = 0;

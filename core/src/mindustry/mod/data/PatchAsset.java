@@ -1,9 +1,11 @@
 package mindustry.mod.data;
 
+import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonWriter.*;
+import arc.util.serialization.Jval.*;
 
 import java.io.*;
 
@@ -26,6 +28,13 @@ public class PatchAsset extends DataAsset{
     }
 
     PatchAsset(){}
+
+    @Override
+    public void readFromFile(String path, Fi file) throws IOException{
+        setPath(path);
+        //This minimizes the JSON. If this is problematic to you, don't use the readFromFile method.
+        patch = Jval.read(file.readString()).toString(Jformat.plain);
+    }
 
     @Override
     public DataAssetType getType(){

@@ -524,7 +524,6 @@ public abstract class SaveVersion extends SaveFileReader{
         int total = stream.readInt();
 
         for(int i = 0; i < total; i++){
-            //TODO: generates a lot of garbage, but I guess that's fine?
             DataAsset.readAsset(stream);
         }
     }
@@ -539,7 +538,9 @@ public abstract class SaveVersion extends SaveFileReader{
             assets.add(DataAsset.readAsset(stream));
         }
 
-        //TODO: actually apply the assets
+        Events.fire(new DataPatchLoadEvent(assets));
+
+        state.data.load(assets);
     }
 
     public void writeDataPatches(DataOutput stream) throws IOException{

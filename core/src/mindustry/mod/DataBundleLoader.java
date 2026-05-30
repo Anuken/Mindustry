@@ -1,32 +1,49 @@
 package mindustry.mod;
 
 import arc.*;
-import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.mod.data.*;
 
+import java.io.*;
+
 public class DataBundleLoader{
+    private ObjectMap<I18NBundle, ObjectMap<String, String>> originalProperties = new ObjectMap<>();
 
     public void load(Seq<BundleAsset> assets){
+        if(assets.isEmpty()) return;
+
+        ObjectMap<String, Seq<String>> localeToBundles = new ObjectMap<>();
+        for(var asset : assets){
+            localeToBundles.get(asset.name, Seq::new).add(asset.string);
+        }
+
         //add new keys to each bundle
         I18NBundle bundle = Core.bundle;
         while(bundle != null){
-            String str = bundle.getLocale().toString();
-            String locale = "bundle" + (str.isEmpty() ? "" : "_" + str);
-            for(Fi file : bundles.get(locale, Seq::new)){
-                try{
-                    PropertiesUtils.load(bundle.getProperties(), file.reader());
-                }catch(Throwable e){
-                    Log.err("Error loading bundle: " + file + "/" + locale, e);
+            String localeName = bundle.getLocale().toString();
+            String targetFileName = "bundle" + (localeName.isEmpty() ? "" : "_" + localeName);
+
+            var replacements = localeToBundles.get(targetFileName);
+            if(replacements != null){
+                originalProperties.put(bundle, bundle.getProperties().copy());
+
+                for(String str : replacements){
+                    try{
+                        PropertiesUtils.load(bundle.getProperties(), new StringReader(str));
+                    }catch(Throwable e){
+                        Log.err("Error loading bundles", e);
+                    }
                 }
             }
+
             bundle = bundle.getParent();
         }
     }
 
     public void unload(){
-
+        originalProperties.each((bundle, properties) -> bundle.getProperties().set(properties));
+        originalProperties.clear();
     }
 }

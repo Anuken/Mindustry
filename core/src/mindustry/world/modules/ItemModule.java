@@ -283,6 +283,10 @@ public class ItemModule extends BlockModule{
         total = 0;
     }
 
+    public void checkArrayCapacity(int size){
+        if(items.length != size) items = Arrays.copyOf(items, size);
+    }
+
     @Override
     public void write(Writes write){
         int amount = 0;
