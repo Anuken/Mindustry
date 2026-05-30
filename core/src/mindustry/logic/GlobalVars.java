@@ -28,7 +28,9 @@ public class GlobalVars{
     public static final Rand rand = new Rand();
 
     //non-constants that depend on state
-    private static LVar varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varWait, varServer, varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile;
+    private static LVar
+        varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varWait, varServer,
+        varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile, varClientMusicPlaying;
 
     private ObjectMap<String, LVar> vars = new ObjectMap<>();
     private Seq<VarEntry> varEntries = new Seq<>();
@@ -87,6 +89,7 @@ public class GlobalVars{
         varClientName = putEntry("@clientName", null, true);
         varClientTeam = putEntry("@clientTeam", 0, true);
         varClientMobile = putEntry("@clientMobile", 0, true);
+        varClientMusicPlaying = putEntry("@clientMusicPlaying", 0, true);
 
         //special enums
         put("@ctrlProcessor", ctrlProcessor);
@@ -212,6 +215,7 @@ public class GlobalVars{
             varClientName.objval = player.name();
             varClientTeam.numval = player.team().id;
             varClientMobile.numval = mobile ? 1 : 0;
+            varClientMusicPlaying.numval = control.sound.isPlaying() ? 1 : 0;
         }
     }
 

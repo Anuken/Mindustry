@@ -8,30 +8,37 @@ import mindustry.world.*;
 
 /** Do not rearrange, ever! */
 public enum ContentType{
-    item(Item.class),
-    block(Block.class),
-    mech_UNUSED(null),
-    bullet(BulletType.class),
-    liquid(Liquid.class),
-    status(StatusEffect.class),
-    unit(UnitType.class),
-    weather(Weather.class),
-    effect_UNUSED(null),
-    sector(SectorPreset.class),
-    loadout_UNUSED(null),
-    typeid_UNUSED(null),
-    error(null),
-    planet(Planet.class),
-    ammo_UNUSED(null),
-    team(TeamEntry.class),
-    unitCommand(UnitCommand.class),
-    unitStance(UnitStance.class);
+    item("items", Item.class),
+    block("items", Block.class),
+    mech_UNUSED,
+    bullet("bullets", BulletType.class),
+    liquid("liquids", Liquid.class),
+    status("statuses", StatusEffect.class),
+    unit("units", UnitType.class),
+    weather("weather", Weather.class),
+    effect_UNUSED,
+    sector("sectors", SectorPreset.class),
+    loadout_UNUSED,
+    typeid_UNUSED,
+    error,
+    planet("planets", Planet.class),
+    ammo_UNUSED(),
+    team("teams", TeamEntry.class),
+    unitCommand("unitCommands", UnitCommand.class),
+    unitStance("unitStances", UnitStance.class);
 
     public static final ContentType[] all = values();
 
     public final @Nullable Class<? extends Content> contentClass;
+    public final String folderName;
 
-    ContentType(Class<? extends Content> contentClass){
+    ContentType(){
+        this.contentClass = null;
+        this.folderName = "unused";
+    }
+
+    ContentType(String folderName, Class<? extends Content> contentClass){
         this.contentClass = contentClass;
+        this.folderName = folderName;
     }
 }

@@ -13,6 +13,7 @@ import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.audio.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -197,6 +198,15 @@ public class NetClient implements ApplicationListener{
     @Remote(targets = Loc.server, variants = Variant.both, unreliable = true)
     public static void clientPacketUnreliable(String type, String contents){
         clientPacketReliable(type, contents);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void playMusic(String musicName, boolean interrupt){
+        if(musicName == null || headless) return;
+
+        //play null = stop music
+        Music music = SoundControl.findMusic(musicName);
+        control.sound.playMusic(music, interrupt);
     }
 
     @Remote(variants = Variant.both, unreliable = true, called = Loc.server)

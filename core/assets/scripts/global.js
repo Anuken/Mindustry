@@ -95,6 +95,7 @@ importPackage(Packages.mindustry.maps.filters)
 importPackage(Packages.mindustry.maps.generators)
 importPackage(Packages.mindustry.maps.planet)
 importPackage(Packages.mindustry.mod)
+importPackage(Packages.mindustry.mod.data)
 importPackage(Packages.mindustry.net)
 importPackage(Packages.mindustry.service)
 importPackage(Packages.mindustry.type)
@@ -185,7 +186,7 @@ const LaunchItemEvent = Packages.mindustry.game.EventType.LaunchItemEvent
 const SectorInvasionEvent = Packages.mindustry.game.EventType.SectorInvasionEvent
 const SectorLoseEvent = Packages.mindustry.game.EventType.SectorLoseEvent
 const SaveLoadEvent = Packages.mindustry.game.EventType.SaveLoadEvent
-const ContentPatchLoadEvent = Packages.mindustry.game.EventType.ContentPatchLoadEvent
+const DataPatchLoadEvent = Packages.mindustry.game.EventType.DataPatchLoadEvent
 const WorldLoadEndEvent = Packages.mindustry.game.EventType.WorldLoadEndEvent
 const WorldLoadBeginEvent = Packages.mindustry.game.EventType.WorldLoadBeginEvent
 const WorldLoadEvent = Packages.mindustry.game.EventType.WorldLoadEvent

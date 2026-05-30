@@ -50,7 +50,7 @@ public class SoundControl{
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
 
             if(boss){
-                playOnce(bossMusic.random(lastRandomPlayed));
+                playOnce(getBossMusic().random(lastRandomPlayed));
             }else if(Mathf.chance(musicWaveChance)){
                 playRandom();
             }
@@ -175,7 +175,7 @@ public class SoundControl{
             //this just fades out the last track to make way for ingame music
             silence();
 
-            if(Core.settings.getBool("alwaysmusic")){
+            if(alwaysPlayMusic()){
                 if(current == null){
                     playRandom();
                 }
@@ -233,15 +233,46 @@ public class SoundControl{
         });
     }
 
+    public void playMusic(@Nullable Music music, boolean interrupt){
+        if(interrupt && current != null){
+            current.stop();
+            current = null;
+        }
+        playOnce(music);
+    }
+
+    public boolean isPlaying(){
+        return current != null && current.isPlaying();
+    }
+
     /** Plays a random track.*/
     public void playRandom(){
         if(state.boss() != null){
-            playOnce(bossMusic.random(lastRandomPlayed));
+            playOnce(getBossMusic().random(lastRandomPlayed));
         }else if(isDark()){
-            playOnce(darkMusic.random(lastRandomPlayed));
+            playOnce(getDarkMusic().random(lastRandomPlayed));
         }else{
-            playOnce(ambientMusic.random(lastRandomPlayed));
+            playOnce(getAmbientMusic().random(lastRandomPlayed));
         }
+    }
+
+    protected boolean alwaysPlayMusic(){
+        return state.rules.alwaysPlayMusic || Core.settings.getBool("alwaysmusic") || (state.getPlanet() != null && state.getPlanet().alwaysPlayMusic);
+    }
+
+    protected Seq<Music> getBossMusic(){
+        if(state.rules.darkMusic != null) return state.rules.darkMusic.map(MusicContainer::get).removeAll(m -> m == null);
+        return state.getPlanet() != null && state.getPlanet().darkMusic != null ? state.getPlanet().darkMusic : bossMusic;
+    }
+
+    protected Seq<Music> getAmbientMusic(){
+        if(state.rules.ambientMusic != null) return state.rules.ambientMusic.map(MusicContainer::get).removeAll(m -> m == null);
+        return state.getPlanet() != null && state.getPlanet().ambientMusic != null ? state.getPlanet().ambientMusic : ambientMusic;
+    }
+
+    protected Seq<Music> getDarkMusic(){
+        if(state.rules.darkMusic != null) return state.rules.darkMusic.map(MusicContainer::get).removeAll(m -> m == null);
+        return state.getPlanet() != null && state.getPlanet().darkMusic != null ? state.getPlanet().darkMusic : darkMusic;
     }
 
     /** Whether to play dark music.*/
@@ -344,5 +375,15 @@ public class SoundControl{
 
         int soundID;
         float curVolume, totalVolume;
+    }
+
+    public static @Nullable Music findMusic(String name){
+        if(name == null) return null;
+        Music cached = Core.assets.getOrNull(name, Music.class);
+        if(cached == null) cached = Core.assets.getOrNull(name + ".ogg", Music.class);
+        if(cached == null) cached = Core.assets.getOrNull(name + ".mp3", Music.class);
+        if(cached == null) cached = Core.assets.getOrNull("music/" + name + ".ogg", Music.class);
+        if(cached == null) cached = Core.assets.getOrNull("music/" + name + ".mp3", Music.class);
+        return cached;
     }
 }

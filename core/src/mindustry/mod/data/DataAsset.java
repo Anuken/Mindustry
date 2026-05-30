@@ -8,9 +8,9 @@ import java.io.*;
 /** Abstract class for a kind of asset used in an asset mod. */
 public abstract class DataAsset implements Comparable<DataAsset>{
     /** File path, including name and extension, but excluding base folder prefix. */
-    public String path;
+    public String path = "";
     /** File name, excluding extension. This is taken from the path. */
-    public String name;
+    public String name = "";
 
     public void setPath(String path){
         this.path = path.replace('\\', '/');

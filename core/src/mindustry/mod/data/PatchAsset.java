@@ -1,6 +1,7 @@
 package mindustry.mod.data;
 
 import arc.files.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
@@ -16,14 +17,14 @@ public class PatchAsset extends DataAsset{
     public String patch = "";
     /** Parsed JSON value. Can be an empty error value if parsing failed. */
     public JsonValue json = emptyValue;
-    /** Named obtained from patch. */
-    public String name = "";
     /** True if an error was encountered. */
     public boolean error;
     /** Warnings encountered during patching. */
     public Seq<String> warnings = new Seq<>();
 
     public PatchAsset(String patch){
+        //patches don't have a path by default, so make it something random when reading.
+        setPath("patch-" + Mathf.rand.nextLong() + ".json");
         this.patch = patch;
     }
 

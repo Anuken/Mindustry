@@ -11,6 +11,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -2237,6 +2238,27 @@ public class LExecutor{
             }else{
                 sound.play(Math.min(volume.numf() * Core.audio.sfxVolume, 2f), pitch.numf(), pan.numf(), false, limit.bool());
             }
+        }
+    }
+
+    public static class PlayMusicI implements LInstruction{
+        public LVar name, interrupt;
+
+        public PlayMusicI(){
+        }
+
+        public PlayMusicI(LVar name, LVar interrupt){
+            this.name = name;
+            this.interrupt = interrupt;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(headless) return;
+
+            //null music = stop
+            Music music = SoundControl.findMusic(PrintI.toString(name.obj()));
+            control.sound.playMusic(music, interrupt.bool());
         }
     }
 

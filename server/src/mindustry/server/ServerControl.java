@@ -371,8 +371,7 @@ public class ServerControl implements ApplicationListener{
             //content has sub-dirs based on type, which need to be passed as context to the reader
             if(type == DataAssetType.content){
                 for(ContentType ctype : ContentAsset.loadableContent){
-                    String lower = ctype.name().toLowerCase(Locale.ROOT);
-                    Fi subfolder = folder.child(lower + (lower.endsWith("s") ? "" : "s"));
+                    Fi subfolder = folder.child(ctype.folderName);
 
                     subfolder.mkdirs();
 

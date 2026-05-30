@@ -141,6 +141,12 @@ public class Planet extends UnlockableContent{
     public String icon = "planet";
     /** Plays in the planet dialog when this planet is selected. */
     public Music launchMusic = Musics.launch;
+    /** Overrides random ambient music to be played. */
+    public @Nullable Seq<Music> ambientMusic;
+    /** Overrides music that is played in certain situations, like during boss waves or low core health. */
+    public @Nullable Seq<Music> darkMusic;
+    /** If true, this overrides the game setting to always play ambient music. */
+    public boolean alwaysPlayMusic = false;
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system. */
