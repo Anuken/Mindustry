@@ -25,6 +25,7 @@ public class ClassMap{
         classes.put("SuicideAI", mindustry.ai.types.SuicideAI.class);
         classes.put("Ability", mindustry.entities.abilities.Ability.class);
         classes.put("ArmorPlateAbility", mindustry.entities.abilities.ArmorPlateAbility.class);
+        classes.put("EmptyDataAbility", mindustry.entities.abilities.EmptyDataAbility.class);
         classes.put("EnergyFieldAbility", mindustry.entities.abilities.EnergyFieldAbility.class);
         classes.put("ForceFieldAbility", mindustry.entities.abilities.ForceFieldAbility.class);
         classes.put("LiquidExplodeAbility", mindustry.entities.abilities.LiquidExplodeAbility.class);

@@ -13,6 +13,7 @@ import mindustry.ctype.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -26,6 +27,9 @@ import java.util.*;
 /** The current implementation is awful. Consider it a proof of concept. */
 @SuppressWarnings("unchecked")
 public class DataPatcher{
+    public static final int maxImageSize = 1024;
+    public static final int patchFormatVersion = 1;
+
     private static final Object root = new Object();
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
     private static ContentParser parser = createParser();
@@ -37,9 +41,12 @@ public class DataPatcher{
     private Seq<Runnable> afterCallbacks = new Seq<>();
     private Seq<Object> visitStack = new Seq<>();
     private @Nullable PatchSet currentlyApplying;
+    private DataPatchPacker packer = new DataPatchPacker();
 
     /** Currently active patches. Note that apply() should be called after modification. */
     public Seq<PatchSet> patches = new Seq<>();
+    /** Currently loaded patch images. */
+    public Seq<PatchImage> images = new Seq<>();
 
     static{
         for(var type : ContentType.all){
@@ -65,6 +72,12 @@ public class DataPatcher{
 
     public boolean isPatched(Object object){
         return usedpatches.contains(object);
+    }
+
+    public void applyImages(Seq<PatchImage> images){
+        this.images = images;
+
+        if(!Vars.headless) packer.pack(images);
     }
 
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
@@ -130,6 +143,8 @@ public class DataPatcher{
 
     public void unapply(){
         if(!applied) return;
+
+        if(!Vars.headless) packer.unapply();
 
         Vars.content = contentLoader;
         applied = false;
@@ -628,10 +643,15 @@ public class DataPatcher{
     }
 
     public static class PatchSet{
+        /** Raw string value, containing original formatting. */
         public String patch;
+        /** Parsed JSON value. Can be an empty error value if parsing failed. */
         public JsonValue json;
+        /** Named obtained from patch. */
         public String name = "";
+        /** True if an error was encountered. */
         public boolean error;
+        /** Warnings encountered during patching. */
         public Seq<String> warnings = new Seq<>();
 
         public PatchSet(String patch, JsonValue json){
