@@ -8,8 +8,8 @@ import mindustry.ctype.*;
 import java.io.*;
 
 public class ContentAsset extends DataAsset{
-    //Note: planets and sectors can't be loaded at the moment
-    public static final ContentType[] loadableContent = {ContentType.item, ContentType.block, ContentType.liquid, ContentType.status, ContentType.unit, ContentType.weather, ContentType.unitCommand, ContentType.unitStance};
+    //Note: sectors can't be loaded at the moment
+    public static final ContentType[] loadableContent = {ContentType.item, ContentType.block, ContentType.liquid, ContentType.status, ContentType.unit, ContentType.weather, ContentType.planet, ContentType.unitCommand, ContentType.unitStance};
 
     /** Content type to be parsed as. */
     public ContentType type = ContentType.unit;

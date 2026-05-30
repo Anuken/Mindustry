@@ -194,7 +194,7 @@ public class Planet extends UnlockableContent{
     /** Statistics of this planet campaign. If statParent is not null, this planet shares the same stats as the parent. */
     private CampaignStats campaignStats = new CampaignStats();
 
-    public Planet(String name, Planet parent, float radius){
+    public Planet(String name, @Nullable Planet parent, float radius){
         super(name);
 
         this.radius = radius;
@@ -233,6 +233,14 @@ public class Planet extends UnlockableContent{
             }
 
             sectorApproxRadius = sectors.first().tile.v.dst(sectors.first().tile.corners[0].v);
+        }
+    }
+
+    @Override
+    public void remove(){
+        if(parent != null){
+            parent.children.remove(this);
+            parent.updateTotalRadius();
         }
     }
 

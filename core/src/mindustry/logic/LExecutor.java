@@ -52,7 +52,7 @@ public class LExecutor{
     public LVar counter, unit, thisv, ipt, queryResult;
 
     public int[] binds;
-    public boolean yield;
+    public boolean yield, stop;
 
     public LongSeq graphicsBuffer = new LongSeq();
     public StringBuilder textBuffer = new StringBuilder();
@@ -122,6 +122,7 @@ public class LExecutor{
 
     /** Loads with a specified assembler. Resets all variables. */
     public void load(LAssembler builder){
+        stop = false;
         nameMap = null;
         vars = builder.vars.values().toSeq().retainAll(var -> !var.constant).toArray(LVar.class);
         for(int i = 0; i < vars.length; i++){
@@ -1239,6 +1240,7 @@ public class LExecutor{
             //skip back to self.
             exec.counter.numval --;
             exec.yield = true;
+            exec.stop = true;
         }
     }
 

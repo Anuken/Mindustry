@@ -10,6 +10,8 @@ import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
+import arc.util.serialization.JsonWriter.*;
+import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
@@ -46,6 +48,8 @@ public class ServerControl implements ApplicationListener{
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
         autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
 
+    static final String defaultRuleString = "reactorExplosions: false\nlogicUnitBuild: false\nlogicUnitDeconstruct: false";
+
     /** Global instance of ServerControl, initialized when the server is created. Should never be null on a dedicated server. */
     public static ServerControl instance;
 
@@ -69,7 +73,7 @@ public class ServerControl implements ApplicationListener{
     private PrintWriter socketOutput;
     private String suggested;
     private boolean autoPaused = false;
-    private Fi patchDirectory, dataAssetDirectory;
+    private Fi patchDirectory, dataAssetDirectory, rulesFile;
     private Seq<DataAsset> dataAssets = new Seq<>();
 
     private LineReader lineReader;
@@ -131,8 +135,7 @@ public class ServerControl implements ApplicationListener{
         Core.settings.defaults(
             "bans", "",
             "admins", "",
-            "shufflemode", "custom",
-            "globalrules", "{reactorExplosions: false, logicUnitBuild: false, logicUnitDeconstruct: false}"
+            "shufflemode", "custom"
         );
 
         //update log level
@@ -223,6 +226,28 @@ public class ServerControl implements ApplicationListener{
 
         customMapDirectory.mkdirs();
 
+        rulesFile = dataDirectory.child("rules.hjson");
+
+        if(!rulesFile.exists() && !Core.settings.has("globalrules")){
+            rulesFile.writeString(defaultRuleString);
+        }
+
+        //load the old 'globalrules' value
+        if(Core.settings.has("globalrules")){
+            try{
+                Jval base = Jval.newObject();
+                if(rulesFile.exists()){
+                    base.asObject().putAll(Jval.read(rulesFile.readString()).asObject());
+                }
+                base.asObject().putAll(Jval.read(Core.settings.getString("globalrules")).asObject());
+                rulesFile.writeString(base.toString(Jformat.hjson));
+
+                Core.settings.remove("globalrules");
+            }catch(Exception e){
+                Log.err("Failed to load previous global rules: ", e);
+            }
+        }
+
         patchDirectory = dataDirectory.child("patches");
         dataAssetDirectory = dataDirectory.child("assets");
         dataAssetDirectory.mkdirs();
@@ -306,8 +331,7 @@ public class ServerControl implements ApplicationListener{
 
         Events.on(PlayEvent.class, e -> {
             try{
-                JsonValue value = JsonIO.json.fromJson(null, Core.settings.getString("globalrules"));
-                JsonIO.json.readFields(state.rules, value);
+                JsonIO.json.readFields(state.rules, readRulesFile());
             }catch(Throwable t){
                 err("Error applying custom rules, proceeding without them.", t);
             }
@@ -356,6 +380,10 @@ public class ServerControl implements ApplicationListener{
                 }
             }
         });
+    }
+
+    JsonValue readRulesFile(){
+        return JsonIO.json.fromJson(null, Jval.read(rulesFile.readString()).toString(Jformat.plain));
     }
 
     void loadDataAssets(){
@@ -628,11 +656,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
-            String rules = Core.settings.getString("globalrules");
-            JsonValue base = JsonIO.json.fromJson(null, rules);
+            JsonValue base = readRulesFile();
 
             if(arg.length == 0){
-                info("Rules:\n@", JsonIO.print(rules));
+                info("Rules:\n@", Jval.read(base.toJson(OutputType.minimal)).toString(Jformat.hjson));
             }else if(arg.length == 1){
                 err("Invalid usage. Specify which rule to remove or add.");
             }else{
@@ -674,7 +701,7 @@ public class ServerControl implements ApplicationListener{
                     }
                 }
 
-                Core.settings.put("globalrules", base.toString());
+                rulesFile.writeString(Jval.read(base.toString()).toString(Jformat.hjson));
                 Call.setRules(state.rules);
             }
         });

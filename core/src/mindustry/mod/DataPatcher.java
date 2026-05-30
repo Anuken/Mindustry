@@ -35,6 +35,10 @@ public class DataPatcher{
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
     private static DataPatcher currentDataPatcher;
     private static ContentParser parser = createParser();
+    private static  ModMeta dpModMeta = new ModMeta(){{
+        name = internalName = "dp";
+    }};
+    private static LoadedMod dpMod = new LoadedMod(new Fi("dp"), new Fi(""), null, null, dpModMeta);
 
     private boolean applied;
     private boolean needsArrayFix;
@@ -136,13 +140,9 @@ public class DataPatcher{
 
         if(!content.isEmpty()){
             content.sort();
-            ModMeta meta = new ModMeta();
-            meta.name = "dp";
-            meta.internalName = "dp";
-            LoadedMod mod = new LoadedMod(new Fi("dp"), new Fi(""), null, null, meta);
 
             ContentLoader preLoad = Vars.content.copy();
-            boolean errored = false;
+            dpMod.erroredContent.clear();
 
             for(var asset : content){
                 currentlyApplyingContent = asset;
@@ -163,14 +163,14 @@ public class DataPatcher{
                 //TODO: what to do when errors happen in general?
                 try{
                     //this binds the content but does not load it entirely
-                    parser.parse(mod, asset.name, asset.data, file, asset.type);
+                    parser.parse(dpMod, asset.name, asset.data, file, asset.type);
                 }catch(Throwable e){
                     asset.warnings.add(Strings.getStackTrace(e));
 
                     //TODO: this warning is not very useful, nor is markError in general. What should be done here?
                     if(current != Vars.content.getLastAdded() && Vars.content.getLastAdded() != null){
                         //markError should log it already
-                        parser.markError(Vars.content.getLastAdded(), mod, file, e);
+                        parser.markError(Vars.content.getLastAdded(), dpMod, file, e);
                     }else{
                         Log.err("Error loading content: " + asset.path, e);
                     }
@@ -181,14 +181,14 @@ public class DataPatcher{
 
             Seq<Content> all = new Seq<>();
             for(var arr : Vars.content.getContentMap()){
-                all.addAll(arr.select(c -> c.minfo.mod == mod));
+                all.addAll(arr.select(c -> c.minfo.mod == dpMod));
             }
 
             for(var cont : all){
                 try{
                     cont.init();
                 }catch(Throwable t){
-                    parser.markError(cont, mod, cont.minfo.sourceFile, t);
+                    parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
                 }
             }
 
@@ -196,7 +196,7 @@ public class DataPatcher{
                 try{
                     cont.postInit();
                 }catch(Throwable t){
-                    parser.markError(cont, mod, cont.minfo.sourceFile, t);
+                    parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
                 }
             }
 
@@ -206,13 +206,14 @@ public class DataPatcher{
                         cont.loadIcon();
                         cont.load();
                     }catch(Throwable t){
-                        parser.markError(cont, mod, cont.minfo.sourceFile, t);
+                        parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
                     }
                 }
             }
 
             if(all.contains(Content::hasErrored)){
                 Log.err("Errors were encountered loading content. Content will be unloaded.");
+                callContentRemove();
                 Vars.content = preLoad;
                 needsArrayFix = false;
             }
@@ -226,6 +227,7 @@ public class DataPatcher{
     public void unapply(){
         if(!applied) return;
 
+        callContentRemove();
         Vars.content = contentLoader;
         applied = false;
 
@@ -247,6 +249,16 @@ public class DataPatcher{
         if(needsArrayFix) fixContentArrays();
 
         needsArrayFix = false;
+    }
+
+    void callContentRemove(){
+        for(var arr : Vars.content.getContentMap()){
+            for(var value : arr){
+                if(value.isModded() && value.minfo.mod == dpMod){
+                    value.remove();
+                }
+            }
+        }
     }
 
     void fixContentArrays(){

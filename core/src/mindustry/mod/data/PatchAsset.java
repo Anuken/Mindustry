@@ -23,7 +23,7 @@ public class PatchAsset extends DataAsset{
     public Seq<String> warnings = new Seq<>();
 
     public PatchAsset(String patch){
-        //patches don't have a path by default, so make it something random when reading.
+        //patches don't have a path by default, so make it something random when reading. TODO: this is a temporary measure.
         setPath("patch-" + Mathf.rand.nextLong() + ".json");
         this.patch = patch;
     }

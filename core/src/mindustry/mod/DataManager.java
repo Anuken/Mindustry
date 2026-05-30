@@ -9,6 +9,15 @@ import mindustry.mod.data.*;
  * Music: 10mb
  * Sounds: 500kb each
  * Images: 2mb
+ *
+ * TODO:
+ * - Prevent save from loading when content errors are present?
+ * - Patchset names are weird and broken with the new path system
+ * - Test planets/sectors/techtree stuff and make sure remove() works properly
+ * - Make sure existing content can't add to the tech tree and such
+ * - Test unit commands/stances
+ * - Try really hard to make the game crash or misbehave
+ * - Unit tests
  */
 public class DataManager{
     private DataPatcher patcher = new DataPatcher();
