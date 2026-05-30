@@ -78,11 +78,6 @@ public class FileMapGenerator implements WorldGenerator{
                 applyFilters();
                 //no super.end(), don't call world load event twice
             }
-
-            @Override
-            public boolean isMap(){
-                return true;
-            }
         });
         world.setGenerating(true);
 

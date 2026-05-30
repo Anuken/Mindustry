@@ -171,6 +171,11 @@ public class SaveIO{
 
             ver.read(stream, counter, context);
             Events.fire(new SaveLoadEvent(context.isMap()));
+
+            //this gets handled elsewhere when starting a new game or loading a sector
+            if(!context.isMap() && !state.isCampaign()){
+                Events.fire(new RulesLoadEvent(state.rules, true));
+            }
         }catch(Throwable e){
             throw new SaveException(e);
         }finally{
