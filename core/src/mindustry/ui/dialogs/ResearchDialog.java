@@ -26,7 +26,6 @@ import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.layout.*;
-import mindustry.ui.layout.BranchTreeLayout.TreeLocation;
 import mindustry.ui.layout.TreeLayout.*;
 
 import java.util.*;
