@@ -26,6 +26,7 @@ import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.layout.*;
+import mindustry.ui.layout.BranchTreeLayout.TreeLocation;
 import mindustry.ui.layout.TreeLayout.*;
 
 import java.util.*;
@@ -248,15 +249,15 @@ public class ResearchDialog extends BaseDialog{
             public void add(Item item, int amount){
                 //only have custom removal logic for when the sequence gets items taken out of it (e.g. research)
                 if(amount < 0){
+                    Sector curSector = state.isCampaign() ? state.rules.sector : null;
                     //remove items from each sector's storage, one by one
 
                     //negate amount since it's being *removed* - this makes it positive
                     amount = -amount;
 
-                    //% that gets removed from each sector
-                    double percentage = (double)amount / get(item);
+                    //% that gets removed from each sector except the current one
+                    double percentage = (double)amount / Math.max(get(item) - (curSector != null && cache.get(curSector) != null ? cache.get(curSector).get(item) : 0), 1);
                     int[] counter = {amount};
-                    Sector curSector = state.isCampaign() ? state.rules.sector : null;
                     
                     cache.each((sector, seq) -> {
                         if(counter[0] == 0 || sector == curSector) return;
