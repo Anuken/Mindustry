@@ -141,6 +141,14 @@ public class Planet extends UnlockableContent{
     public String icon = "planet";
     /** Plays in the planet dialog when this planet is selected. */
     public Music launchMusic = Musics.launch;
+    /** Music which plays at any time while on this planet. If empty, default music will be used. */
+    public Seq<Music> ambientMusic = new Seq<>();
+    /** Music which plays during times of conflict. If empty, default music will be used. */
+    public Seq<Music> darkMusic = new Seq<>();
+    /** Music used after a boss spawns. If empty, default music will be used. */
+    public Seq<Music> bossMusic = new Seq<>();
+    /** For mods. This should return a random music track to be played during gameplay. */
+    public @Nullable Prov<Music> randomMusicHandler;
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system. */
