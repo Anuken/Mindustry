@@ -129,6 +129,7 @@ public class NetClient implements ApplicationListener{
             platform.updateRPC();
             player.name = Core.settings.getString("name");
             player.color.set(Core.settings.getInt("color-0"));
+            Vars.ui.chatfrag.resetMaxTextLength();
 
             if(quiet) return;
 
@@ -273,7 +274,7 @@ public class NetClient implements ApplicationListener{
 
         if(message == null) return;
 
-        if(message.length() > maxTextLength){
+        if(message.length() > Config.maxMessageLength.num()){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
 
@@ -317,6 +318,11 @@ public class NetClient implements ApplicationListener{
                 }
             }
         }
+    }
+
+    @Remote(called = Loc.client, variants = Variant.both)
+    public static void setMaxTextLength(int length){
+        Vars.ui.chatfrag.setMaxTextLength(length);
     }
 
     @Remote(called = Loc.client, variants = Variant.one)
