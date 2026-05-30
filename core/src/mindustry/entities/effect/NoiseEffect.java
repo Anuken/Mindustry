@@ -3,7 +3,6 @@ package mindustry.entities.effect;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
 
@@ -22,10 +21,10 @@ public class NoiseEffect extends Effect{
     public float layerAlphaMul = 0.7f;
     public float layerSclMul = 0.8f;
     public float layerColorMul = 0.9f;
+    public Texture tex = Core.assets.get(noisePath, Texture.class);
 
     @Override
     public void render(EffectContainer e){
-        Texture tex = Core.assets.get(noisePath, Texture.class);
         if(tex == null) return;
 
         Color col = Tmp.c2.set(color != null ? color : e.color).mul(1f, 1f, 1f, e.fout());
