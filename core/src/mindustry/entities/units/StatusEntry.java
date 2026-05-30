@@ -1,5 +1,6 @@
 package mindustry.entities.units;
 
+import arc.util.io.*;
 import mindustry.type.*;
 
 public class StatusEntry{
@@ -16,4 +17,8 @@ public class StatusEntry{
         this.time = time;
         return this;
     }
+
+    public void read(Reads read){}
+
+    public void write(Writes write){}
 }
