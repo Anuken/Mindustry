@@ -690,7 +690,7 @@ public class StatValues{
                     }
 
                     if(type.statLiquidConsumed <= 0f && !compact && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier && (!(t instanceof Turret turret) || turret.displayAmmoMultiplier)){
-                        sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
+                        sep(bt, (type.ammoMultiplier < 1f ? "[negstat]" : "[stat]") + Core.bundle.format("bullet.multiplier", Strings.autoFixed(type.ammoMultiplier, 2)));
                     }
 
                     if(!compact && !Mathf.equal(type.reloadMultiplier, 1f)){
