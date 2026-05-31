@@ -62,7 +62,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(" read ");
+            table.add(token("read"));
 
             field(table, output, str -> output = str);
 
@@ -72,7 +72,7 @@ public class LStatements{
 
             row(table);
 
-            table.add(" at ");
+            table.add(token("at"));
 
             field(table, address, str -> address = str);
         }
@@ -94,17 +94,17 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(" write ");
+            table.add(token("write"));
 
             field(table, input, str -> input = str);
 
-            table.add(" to ");
+            table.add(token(" to "));
 
             fields(table, target, str -> target = str);
 
             row(table);
 
-            table.add(" at ");
+            table.add(token("at"));
 
             field(table, address, str -> address = str);
         }
@@ -137,7 +137,7 @@ public class LStatements{
             table.left();
 
             table.button(b -> {
-                b.label(() -> type.name());
+                b.label(() -> enumText(type));
                 b.clicked(() -> showSelect(b, GraphicsType.all, type, t -> {
                     type = t;
                     if(type == GraphicsType.color){
@@ -180,7 +180,7 @@ public class LStatements{
                         fields(s, "a", p2, v -> p2 = v);
                     }
                     case col -> {
-                        fields(s, "color", x, v -> x = v).width(144f);
+                        fields(s, token("color"), x, v -> x = v).width(144f);
                         col(s, x, res -> {
                             x = "%" + res.toString().substring(0, res.a >= 1f ? 6 : 8);
                             build(table);
@@ -201,17 +201,17 @@ public class LStatements{
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
-                        fields(s, "width", p1, v -> p1 = v);
-                        fields(s, "height", p2, v -> p2 = v);
+                        fields(s, token("width"), p1, v -> p1 = v);
+                        fields(s, token("height"), p2, v -> p2 = v);
                     }
                     case poly, linePoly -> {
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
-                        fields(s, "sides", p1, v -> p1 = v);
-                        fields(s, "radius", p2, v -> p2 = v);
+                        fields(s, token("sides"), p1, v -> p1 = v);
+                        fields(s, token("radius"), p2, v -> p2 = v);
                         row(s);
-                        fields(s, "rotation", p3, v -> p3 = v);
+                        fields(s, token("rotation"), p3, v -> p3 = v);
                     }
                     case triangle -> {
                         fields(s, "x", x, v -> x = v);
@@ -227,10 +227,10 @@ public class LStatements{
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
-                        fields(s, "image", p1, v -> p1 = v);
-                        fields(s, "size", p2, v -> p2 = v);
+                        fields(s, token("image"), p1, v -> p1 = v);
+                        fields(s, token("size"), p2, v -> p2 = v);
                         row(s);
-                        fields(s, "rotation", p3, v -> p3 = v);
+                        fields(s, token("rotation"), p3, v -> p3 = v);
                     }
                     case print -> {
                         fields(s, "x", x, v -> x = v);
@@ -238,7 +238,7 @@ public class LStatements{
 
                         row(s);
 
-                        fields(s, "align", p1, v -> p1 = v).width(170f);
+                        fields(s, token("align"), p1, v -> p1 = v).width(170f);
                         fieldAlignSelect(s, () -> p1, v -> {
                             p1 = v;
                             rebuild(table);
@@ -249,7 +249,7 @@ public class LStatements{
                         fields(s, "y", y, v -> y = v);
                     }
                     case rotate -> {
-                        fields(s, "degrees", p1, v -> p1 = v);
+                        fields(s, token("degrees"), p1, v -> p1 = v);
                     }
                 }
             }).expand().left();
@@ -305,7 +305,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(" char ");
+            table.add(token("char"));
             TextField field = field(table, value, str -> value = str).get();
             table.button(b -> {
                 b.image(Icon.pencilSmall);
@@ -366,7 +366,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(" to ");
+            table.add(token("to"));
             field(table, target, str -> target = str);
         }
 
@@ -387,7 +387,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(" to ");
+            table.add(token("to"));
             field(table, target, str -> target = str);
         }
 
@@ -410,7 +410,9 @@ public class LStatements{
         public void build(Table table){
             field(table, output, str -> output = str);
 
-            table.add(" = link# ");
+            table.add(" = ");
+
+            table.add(token("link#"));
 
             field(table, address, str -> address = str);
         }
@@ -441,17 +443,17 @@ public class LStatements{
 
             table.left();
 
-            table.add(" set ");
+            table.add(token(" set "));
 
             table.button(b -> {
-                b.label(() -> type.name());
+                b.label(() -> enumText(type));
                 b.clicked(() -> showSelect(b, LAccess.controls, type, t -> {
                     type = t;
                     rebuild(table);
                 }, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
-            table.add(" of ").self(this::param);
+            table.add(token(" of ")).self(this::param);
 
             field(table, target, v -> target = v);
 
@@ -462,7 +464,7 @@ public class LStatements{
             int c = 0;
             for(int i = 0; i < type.params.length; i++){
 
-                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
+                fields(table, token(type.params[i]), i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
 
                 if(++c % 2 == 0) row(table);
             }
@@ -490,7 +492,7 @@ public class LStatements{
             table.defaults().left();
 
             if(buildFrom()){
-                table.add(" from ").self(this::param);
+                table.add(token("from")).self(this::param);
 
                 fields(table, radar, v -> radar = v);
 
@@ -501,10 +503,10 @@ public class LStatements{
                 int fi = i;
                 Prov<RadarTarget> get = () -> (fi == 0 ? target1 : fi == 1 ? target2 : target3);
 
-                table.add(i == 0 ? " target " : " and ").self(this::param);
+                table.add(token(i == 0 ? " target " : " and ")).self(this::param);
 
                 table.button(b -> {
-                    b.label(() -> get.get().name());
+                    b.label(() -> enumText(get.get()));
                     b.clicked(() -> showSelect(b, RadarTarget.all, get.get(), t -> {
                         if(fi == 0) target1 = t; else if(fi == 1) target2 = t; else target3 = t;
                     }, 2, cell -> cell.size(100, 50)));
@@ -515,22 +517,22 @@ public class LStatements{
                 }
             }
 
-            table.add(" order ").self(this::param);
+            table.add(token(" order ")).self(this::param);
 
             fields(table, sortOrder, v -> sortOrder = v);
 
             table.row();
 
-            table.add(" sort ").self(this::param);
+            table.add(token(" sort ")).self(this::param);
 
             table.button(b -> {
-                b.label(() -> sort.name());
+                b.label(() -> enumText(sort));
                 b.clicked(() -> showSelect(b, RadarSort.all, sort, t -> {
                     sort = t;
                 }, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
-            table.add(" output ").self(this::param);
+            table.add(token(" output ")).self(this::param);
 
             fields(table, output, v -> output = v);
         }
@@ -627,7 +629,7 @@ public class LStatements{
                         //sensors
                         new Table(i -> {
                             for(LAccess sensor : LAccess.senseable){
-                                i.button(sensor.name(), Styles.flatt, () -> {
+                                i.button(enumText(sensor), Styles.flatt, () -> {
                                     stype("@" + sensor.name());
                                     hide.run();
                                 }).size(240f, 40f).self(c -> tooltip(c, sensor)).row();
@@ -657,7 +659,7 @@ public class LStatements{
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
-            table.add(" in ").self(this::param);
+            table.add(token(" in ")).self(this::param);
 
             field(table, from, str -> from = str);
         }
@@ -760,7 +762,7 @@ public class LStatements{
 
         void opButton(Table table, Table parent){
             table.button(b -> {
-                b.label(() -> op.symbol);
+                b.label(() -> selectTranslate(op.symbol));
                 b.clicked(() -> showSelect(b, LogicOp.all, op, o -> {
                     op = o;
                     rebuild(parent);
@@ -798,7 +800,8 @@ public class LStatements{
                 t.setColor(table.color);
 
                 field(t, result, str -> result = str);
-                t.add(" = if ");
+                t.add(" = ");
+                t.add(token("if"));
 
                 row(t);
 
@@ -812,9 +815,9 @@ public class LStatements{
             table.table(t -> {
                 t.setColor(table.color);
 
-                t.add("then ");
+                t.add(token("then "));
                 field(t, a, str -> a = str).width(130f);
-                t.add(" else ");
+                t.add(token(" else "));
                 field(t, b, str -> b = str).width(130f);
             }).left();
         }
@@ -837,7 +840,7 @@ public class LStatements{
         @Override
         public void build(Table table){
             field(table, value, str -> value = str);
-            table.add(" sec");
+            table.add(token(" sec"));
         }
 
         @Override
@@ -878,12 +881,12 @@ public class LStatements{
         public void build(Table table){
             fields(table, result, str -> result = str).width(120f);
 
-            table.add(" = lookup ");
+            table.add(token(" = lookup"));
 
             row(table);
 
             table.button(b -> {
-                b.label(() -> type.name());
+                b.label(() -> enumText(type));
                 b.clicked(() -> showSelect(b, GlobalVars.lookableContent, type, o -> {
                     type = o;
                 }));
@@ -913,7 +916,8 @@ public class LStatements{
         public void build(Table table){
             fields(table, result, str -> result = str);
 
-            table.add(" = pack ");
+            table.add(" = ");
+            table.add(token("pack"));
 
             row(table);
 
@@ -947,7 +951,8 @@ public class LStatements{
 
             row(table);
 
-            table.add(" = unpack ");
+            table.add(" = ");
+            table.add(token("unpack"));
 
             fields(table, value, str -> value = str);
         }
@@ -994,7 +999,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add("if ").padLeft(4);
+            table.add(token("if ")).padLeft(4);
 
             last = table.color;
             table.table(this::rebuild);
@@ -1010,7 +1015,7 @@ public class LStatements{
                 if(table.parent != null){
                     Label title = table.parent.find("statement-name");
                     if(title != null){
-                        title.update(() -> title.setText((dest != null ? name + " -> " + dest.index : name)));
+                        title.update(() -> title.setText((dest != null ? token(name) + " -> " + dest.index : token(name))));
                     }
                 }
             });
@@ -1031,7 +1036,7 @@ public class LStatements{
             if(op != ConditionOp.always) st.field(t, comp0, set0);
 
             t.button(b -> {
-                b.add(op.symbol);
+                b.add(st.selectTranslate(op.symbol));//Cannot make a static reference to the non-static method selectTranslate(String) from the type LStatement
                 b.clicked(() -> st.showSelect(b, ConditionOp.all, op, getter));
             }, Styles.logict, () -> {
             }).size(op == ConditionOp.always ? 80f : 48f, 40f).pad(4f).color(t.color);
@@ -1071,7 +1076,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(" type ");
+            table.add(token(" type "));
 
             TextField field = field(table, type, str -> type = str).get();
 
@@ -1126,7 +1131,7 @@ public class LStatements{
             table.add(" ");
 
             table.button(b -> {
-                b.label(() -> type.name());
+                b.label(() -> enumText(type));
                 b.clicked(() -> showSelect(b, Structs.filter(LUnitControl.class, LUnitControl.all, t ->
                     t == LUnitControl.build ? state.rules.logicUnitBuild :
                     t == LUnitControl.deconstruct ? state.rules.logicUnitDeconstruct :
@@ -1144,7 +1149,7 @@ public class LStatements{
             int c = 0;
             for(int i = 0; i < type.params.length; i++){
 
-                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : i == 3 ? p4 : p5, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : i == 3 ? v -> p4 = v : v -> p5 = v).width(100f);
+                fields(table, token(type.params[i]), i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : i == 3 ? p4 : p5, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : i == 3 ? v -> p4 = v : v -> p5 = v).width(100f);
 
                 if(++c % 2 == 0) row(table);
 
@@ -1204,10 +1209,10 @@ public class LStatements{
         void rebuild(Table table){
             table.clearChildren();
 
-            table.add(" find ").left().self(this::param);
+            table.add(token(" find ")).left().self(this::param);
 
             table.button(b -> {
-                b.label(() -> locate.name());
+                b.label(() -> enumText(locate));
                 b.clicked(() -> showSelect(b, LLocate.all, locate, t -> {
                     locate = t;
                     rebuild(table);
@@ -1217,14 +1222,14 @@ public class LStatements{
             switch(locate){
                 case building -> {
                     row(table);
-                    table.add(" group ").left().self(this::param);
+                    table.add(token(" group ")).left().self(this::param);
                     table.button(b -> {
-                        b.label(() -> flag.name());
+                        b.label(() -> enumText(flag));
                         b.clicked(() -> showSelect(b, BlockFlag.allLogic, flag, t -> flag = t, 2, cell -> cell.size(110, 50)));
                     }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
                     row(table);
 
-                    table.add(" enemy ").left().self(this::param);
+                    table.add(token(" enemy ")).left().self(this::param);
 
                     fields(table, enemy, str -> enemy = str);
 
@@ -1232,7 +1237,7 @@ public class LStatements{
                 }
 
                 case ore -> {
-                    table.add(" ore ").left().self(this::param);
+                    table.add(token(" ore ")).left().self(this::param);
                     table.table(ts -> {
                         ts.color.set(table.color);
 
@@ -1269,19 +1274,19 @@ public class LStatements{
                 }
             }
 
-            table.add(" outX ").left().self(this::param);
+            table.add(token(" outX ")).left().self(this::param);
             fields(table, outX, str -> outX = str);
 
-            table.add(" outY ").left().self(this::param);
+            table.add(token(" outY ")).left().self(this::param);
             fields(table, outY, str -> outY = str);
 
             row(table);
 
-            table.add(" found ").left().self(this::param);
+            table.add(token(" found ")).left().self(this::param);
             fields(table, outFound, str -> outFound = str);
 
             if(locate != LLocate.ore){
-                table.add(" building ").left().self(this::param);
+                table.add(token(" building ")).left().self(this::param);
                 fields(table, outBuild, str -> outBuild = str);
             }
 
@@ -1308,20 +1313,20 @@ public class LStatements{
         public void build(Table table){
             table.clearChildren();
 
-            table.button(shape == QueryShape.circle ? "circle" : "rect", Styles.logict, () -> {
+            table.button(shape == QueryShape.circle ? token("circle") : token("rect"), Styles.logict, () -> {
                 shape = shape == QueryShape.circle ? QueryShape.rect : QueryShape.circle;
                 build(table);
             }).size(80f, 40f).pad(4f).color(table.color);
 
             table.button(b -> {
-                b.label(() -> type.name());
+                b.label(() -> enumText(type));
                 b.clicked(() -> showSelect(b, QueryType.queryable, type, o -> {
                     type = o;
                     build(table);
                 }));
             }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
 
-            fields(table, "team", team, str -> team = str);
+            fields(table, token("team"), team, str -> team = str);
 
             row(table);
 
@@ -1331,10 +1336,10 @@ public class LStatements{
             table.row();
 
             if(shape == QueryShape.circle){
-                fields(table, "radius", w, str -> w = str);
+                fields(table, token("radius"), w, str -> w = str);
             }else{
-                fields(table, "width", w, str -> w = str);
-                fields(table, "height", h, str -> h = str);
+                fields(table, token("width"), w, str -> w = str);
+                fields(table, token("height"), h, str -> h = str);
             }
         }
 
@@ -1363,16 +1368,17 @@ public class LStatements{
         public void build(Table table){
             fields(table, result, str -> result = str);
 
-            table.add(" = get ");
+            table.add(" = ");
+            table.add(token("get "));
 
             row(table);
 
             table.button(b -> {
-                b.label(() -> layer.name());
+                b.label(() -> enumText(layer));
                 b.clicked(() -> showSelect(b, TileLayer.all, layer, o -> layer = o));
             }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
 
-            table.add(" at ");
+            table.add(token(" at "));
 
             fields(table, x, str -> x = str);
             table.add(", ");
@@ -1407,10 +1413,10 @@ public class LStatements{
 
         void rebuild(Table table){
             table.clearChildren();
-            table.add("set");
+            table.add(token("set"));
 
             table.button(b -> {
-                b.label(() -> layer.name());
+                b.label(() -> enumText(layer));
                 b.clicked(() -> showSelect(b, TileLayer.settable, layer, o -> {
                     layer = o;
                     rebuild(table);
@@ -1419,7 +1425,7 @@ public class LStatements{
 
             row(table);
 
-            table.add(" at ");
+            table.add(token(" at "));
 
             fields(table, x, str -> x = str);
             table.add(", ");
@@ -1427,17 +1433,17 @@ public class LStatements{
 
             row(table);
 
-            table.add(" to ");
+            table.add(token(" to "));
 
             fields(table, block, str -> block = str);
 
             if(layer == TileLayer.block){
                 row(table);
 
-                table.add("team ");
+                table.add(token("team "));
                 fields(table, team, str -> team = str);
 
-                table.add(" rotation ");
+                table.add(token(" rotation "));
                 fields(table, rotation, str -> rotation = str);
             }
         }
@@ -1466,12 +1472,12 @@ public class LStatements{
         public void build(Table table){
             fields(table, result, str -> result = str);
 
-            table.add(" = spawn ");
+            table.add(token(" = spawn"));
             field(table, type, str -> type = str).colspan(!LCanvas.useRows() ? 1 : 2);
 
             row(table);
 
-            table.add(" at ");
+            table.add(token(" at "));
             fields(table, x, str -> x = str);
 
             table.add(", ");
@@ -1483,10 +1489,10 @@ public class LStatements{
                 table.add();
             }
 
-            table.add("team ");
+            table.add(token("team "));
             field(table, team, str -> team = str);
 
-            table.add(" rot ");
+            table.add(token(" rot "));
             fields(table, rotation, str -> rotation = str).left();
         }
 
@@ -1514,27 +1520,27 @@ public class LStatements{
         public void build(Table table){
             fields(table, result, str -> result = str);
 
-            table.add(" = bullet ");
+            table.add(token(" = bullet "));
 
             row(table);
 
-            fields(table, "from", from, str -> from = str);
-            fields(table, "index", index, str -> index = str);
+            fields(table, token("from"), from, str -> from = str);
+            fields(table, token("index"), index, str -> index = str);
             row(table);
             fields(table, "x", x, str -> x = str);
             fields(table, "y", y, str -> y = str);
             table.row();
-            fields(table, "rotation", rotation, str -> rotation = str);
-            fields(table, "team", team, str -> team = str);
+            fields(table, token("rotation"), rotation, str -> rotation = str);
+            fields(table, token("team"), team, str -> team = str);
             row(table);
-            fields(table, "owner", owner, str -> owner = str);
-            fields(table, "damage", damage, str -> damage = str);
+            fields(table, token("owner"), owner, str -> owner = str);
+            fields(table, token("damage"), damage, str -> damage = str);
             table.row();
-            fields(table, "velocityScl", velocityScl, str -> velocityScl = str);
-            fields(table, "lifeScl", lifeScl, str -> lifeScl = str);
+            fields(table, token("velocityScl"), velocityScl, str -> velocityScl = str);
+            fields(table, token("lifeScl"), lifeScl, str -> lifeScl = str);
             row(table);
-            fields(table, "aimX", aimX, str -> aimX = str);
-            fields(table, "aimY", aimY, str -> aimY = str);
+            fields(table, token("aimX"), aimX, str -> aimX = str);
+            fields(table, token("aimY"), aimY, str -> aimY = str);
         }
 
         @Override
@@ -1568,7 +1574,7 @@ public class LStatements{
         public void build(Table table){
             table.clearChildren();
 
-            table.button(clear ? "clear" : "apply", Styles.logict, () -> {
+            table.button(token(clear ? "clear" : "apply"), Styles.logict, () -> {
                 clear = !clear;
                 build(table);
             }).size(80f, 40f).pad(4f).color(table.color);
@@ -1578,14 +1584,14 @@ public class LStatements{
             }
 
             table.button(b -> {
-                b.label(() -> effect).grow().wrap().labelAlign(Align.center).center();
+                b.label(() -> token(effect)).grow().wrap().labelAlign(Align.center).center();
                 b.clicked(() -> showSelect(b, statusNames, effect, o -> {
                     effect = o;
                     build(table);
                 }, 2, c -> c.size(120f, 38f)));
             }, Styles.logict, () -> {}).size(120f, 40f).pad(4f).color(table.color);
 
-            table.add(clear ? " from " : " to ");
+            table.add(token(clear ? " from " : " to "));
 
             row(table);
 
@@ -1593,11 +1599,11 @@ public class LStatements{
 
             if(!clear && !(content.statusEffect(effect) != null && content.statusEffect(effect).permanent)){
 
-                table.add(" for ");
+                table.add(token(" for "));
 
                 fields(table, duration, str -> duration = str);
 
-                table.add(" sec");
+                table.add(token(" sec"));
             }
         }
 
@@ -1628,7 +1634,8 @@ public class LStatements{
         public void build(Table table){
             field(table, to, str -> to = str);
 
-            table.add(" = weather ");
+            table.add(" = ");
+            table.add(token(" weather "));
 
             row(table);
 
@@ -1643,7 +1650,7 @@ public class LStatements{
                         i.left();
                         int c = 0;
                         for(Weather w : Vars.content.weathers()){
-                            i.button(w.name, Styles.flatt, () -> {
+                            i.button(token(w.name), Styles.flatt, () -> {
                                 weather = "@" + w.name;
                                 tfield.setText(weather);
                                 hide.run();
@@ -1680,7 +1687,8 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(" set weather ");
+            table.add(token("set "));
+            table.add(token("weather"));
 
             tfield = field(table, weather, str -> weather = str).padRight(0f).get();
 
@@ -1693,7 +1701,7 @@ public class LStatements{
                         i.left();
                         int c = 0;
                         for(Weather w : Vars.content.weathers()){
-                            i.button(w.name, Styles.flatt, () -> {
+                            i.button(token(w.name), Styles.flatt, () -> {
                                 weather = "@" + w.name;
                                 tfield.setText(weather);
                                 hide.run();
@@ -1705,7 +1713,7 @@ public class LStatements{
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
-            table.add(" state ");
+            table.add(token(" state "));
 
             fields(table, state, str -> state = str);
         }
@@ -1732,7 +1740,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add("natural ");
+            table.add(token("natural "));
             fields(table, natural, str -> natural = str);
 
             table.add("x ").visible(() -> !natural.equals("true"));
@@ -1772,7 +1780,7 @@ public class LStatements{
             table.clearChildren();
 
             table.button(b -> {
-                b.label(() -> rule.name()).growX().wrap().labelAlign(Align.center);
+                b.label(() -> enumText(rule)).growX().wrap().labelAlign(Align.center);
                 b.clicked(() -> showSelect(b, LogicRule.all, rule, o -> {
                     rule = o;
                     rebuild(table);
@@ -1796,13 +1804,13 @@ public class LStatements{
                         p1 = "@sharded";
                     }
 
-                    fields(table, "of", p1, s -> p1 = s);
+                    fields(table, token("of"), p1, s -> p1 = s);
                     table.add(" = ");
                     row(table);
                     field(table, value, s -> value = s);
                 }
                 case ban, unban -> {
-                    table.add(" block/unit ");
+                    table.add(token(" block/unit "));
 
                     fields(table, value, s -> value = s);
                 }
@@ -1844,7 +1852,7 @@ public class LStatements{
             table.clearChildren();
 
             table.button(b -> {
-                b.label(() -> type.name()).growX().wrap().labelAlign(Align.center);
+                b.label(() -> enumText(type)).growX().wrap().labelAlign(Align.center);
                 b.clicked(() -> showSelect(b, MessageType.all, type, o -> {
                     type = o;
                     rebuild(table);
@@ -1853,14 +1861,14 @@ public class LStatements{
 
             switch(type){
                 case announce, toast  -> {
-                    table.add(" for ");
+                    table.add(token(" for "));
                     fields(table, duration, str -> duration = str);
-                    table.add(" sec ");
+                    table.add(token(" sec "));
                 }
             }
             row(table);
 
-            table.add(" success ");
+            table.add(token(" success "));
             fields(table, outSuccess, str -> outSuccess = str);
         }
 
@@ -1894,7 +1902,7 @@ public class LStatements{
             table.clearChildren();
 
             table.button(b -> {
-                b.label(() -> action.name()).growX().wrap().labelAlign(Align.center);
+                b.label(() -> enumText(action)).growX().wrap().labelAlign(Align.center);
                 b.clicked(() -> showSelect(b, CutsceneAction.all, action, o -> {
                     action = o;
                     rebuild(table);
@@ -1910,11 +1918,11 @@ public class LStatements{
 
                     row(table);
 
-                    table.add(" speed ");
+                    table.add(token(" speed "));
                     fields(table, p3, str -> p3 = str);
                 }
                 case zoom -> {
-                    table.add(" level ");
+                    table.add(token(" level "));
                     fields(table, p1, str -> p1 = str);
                 }
             }
@@ -1945,7 +1953,7 @@ public class LStatements{
             table.clearChildren();
 
             table.button(b -> {
-                b.label(() -> type).growX().wrap().labelAlign(Align.center);
+                b.label(() -> token(type)).growX().wrap().labelAlign(Align.center);
                 b.clicked(() -> ui.effects.show(entry -> {
                     type = entry.name;
                     build(table);
@@ -1962,7 +1970,7 @@ public class LStatements{
 
             if(entry != null){
                 if(entry.color){
-                    fields(table, "color", color, str -> color = str).width(120f);
+                    fields(table, token("color"), color, str -> color = str).width(120f);
 
                     col(table, color, res -> {
                         color = "%" + res.toString().substring(0, res.a >= 1f ? 6 : 8);
@@ -1973,11 +1981,11 @@ public class LStatements{
                 row(table);
 
                 if(entry.size || entry.rotate){
-                    fields(table, entry.size ? "size" : "rotation", sizerot, str -> sizerot = str);
+                    fields(table, token(entry.size ? "size" : "rotation"), sizerot, str -> sizerot = str);
                 }
 
                 if(entry.data != null){
-                    fields(table, "data", data, str -> data = str);
+                    fields(table, token("data"), data, str -> data = str);
                 }
             }
         }
@@ -2004,19 +2012,19 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            fields(table, "team", team, str -> team = str);
+            fields(table, token("team"), team, str -> team = str);
             fields(table, "x", x, str -> x = str);
             row(table);
             fields(table, "y", y, str -> y = str);
-            fields(table, "radius", radius, str -> radius = str);
+            fields(table, token("radius"), radius, str -> radius = str);
             table.row();
-            fields(table, "damage", damage, str -> damage = str);
-            fields(table, "air", air, str -> air = str);
+            fields(table, token("damage"), damage, str -> damage = str);
+            fields(table, token("air"), air, str -> air = str);
             row(table);
-            fields(table, "ground", ground, str -> ground = str);
-            fields(table, "pierce", pierce, str -> pierce = str);
+            fields(table, token("ground"), ground, str -> ground = str);
+            fields(table, token("pierce"), pierce, str -> pierce = str);
             table.row();
-            fields(table, "effect", effect, str -> effect = str);
+            fields(table, token("effect"), effect, str -> effect = str);
         }
 
         @Override
@@ -2078,7 +2086,7 @@ public class LStatements{
             table.add(" = ");
 
             table.button(b -> {
-                b.label(() -> type.name()).growX().wrap().labelAlign(Align.center);
+                b.label(() -> enumText(type)).growX().wrap().labelAlign(Align.center);
                 b.clicked(() -> showSelect(b, FetchType.all, type, o -> {
                     type = o;
                     rebuild(table);
@@ -2087,7 +2095,7 @@ public class LStatements{
 
             row(table);
 
-            fields(table, "team", team, s -> team = s);
+            fields(table, token("team"), team, s -> team = s);
 
             if(type != FetchType.coreCount && type != FetchType.playerCount && type != FetchType.unitCount && type != FetchType.buildCount){
                 table.add(" # ");
@@ -2100,13 +2108,13 @@ public class LStatements{
             if(type == FetchType.buildCount || type == FetchType.build){
                 row(table);
 
-                fields(table, "block", extra, i -> extra = i);
+                fields(table, token("block"), extra, i -> extra = i);
             }
 
             if(type == FetchType.unitCount || type == FetchType.unit){
                 row(table);
 
-                fields(table, "unit", extra, i -> extra = i);
+                fields(table, token("unit"), extra, i -> extra = i);
             }
         }
 
@@ -2198,7 +2206,8 @@ public class LStatements{
 
             fields(table, result, str -> result = str).width(width);
 
-            table.add(" = flag ");
+            table.add(" = ");
+            table.add(token("flag"));
 
             fields(table, flag, str -> flag = str).width(width);
         }
@@ -2227,7 +2236,7 @@ public class LStatements{
         public void build(Table table){
             float width = LCanvas.useRows() ? 100f : 190f;
 
-            fields(table, flag, str -> flag = str).width(width);
+            fields(table, token(flag), str -> flag = str).width(width);
 
             table.add(" = ");
 
@@ -2259,7 +2268,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(" set ");
+            table.add(token("set"));
 
             tfield = field(table, type, str -> type = str).padRight(0f).get();
 
@@ -2299,7 +2308,7 @@ public class LStatements{
                     //sensors
                     new Table(i -> {
                         for(LAccess property : LAccess.settable){
-                            i.button(property.name(), Styles.flatt, () -> {
+                            i.button(enumText(property), Styles.flatt, () -> {
                                 stype("@" + property.name());
                                 hide.run();
                             }).size(240f, 40f).self(c -> tooltip(c, property)).row();
@@ -2331,13 +2340,13 @@ public class LStatements{
 
             row(table);
 
-            table.add(" of ").self(this::param);
+            table.add(token("of")).self(this::param);
 
             field(table, of, str -> of = str).colspan(2);
 
             row(table);
 
-            table.add(" to ");
+            table.add(token("to"));
 
             field(table, value, str -> value = str).colspan(2);
         }
@@ -2376,7 +2385,7 @@ public class LStatements{
         void rebuild(Table table){
             table.clearChildren();
 
-            table.button(positional ? "positional" : "global", Styles.logict, () -> {
+            table.button(token(positional ? "positional" : "global"), Styles.logict, () -> {
                 positional = !positional;
                 rebuild(table);
             }).size(160f, 40f).pad(4f).color(table.color);
@@ -2397,8 +2406,8 @@ public class LStatements{
 
             row(table);
 
-            fieldst(table, "volume", volume, str -> volume = str);
-            fieldst(table, "pitch", pitch, str -> pitch = str);
+            fieldst(table, token("volume"), volume, str -> volume = str);
+            fieldst(table, token("pitch"), pitch, str -> pitch = str);
 
             table.row();
 
@@ -2407,12 +2416,12 @@ public class LStatements{
 
                 fieldst(table, "y", y, str -> y = str);
             }else{
-                fieldst(table, "pan", pan, str -> pan = str);
+                fieldst(table, token("pan"), pan, str -> pan = str);
             }
 
             table.row();
 
-            fieldst(table, "limit", limit, str -> limit = str);
+            fieldst(table, token("limit"), limit, str -> limit = str);
         }
 
         @Override
@@ -2444,10 +2453,10 @@ public class LStatements{
         void rebuild(Table table){
             table.clearChildren();
 
-            table.add("set");
+            table.add(token("set"));
 
             table.button(b -> {
-                b.label(() -> type.name());
+                b.label(() -> enumText(type));
                 b.clicked(() -> showSelect(b, LMarkerControl.all, type, t -> {
                     type = t;
                     rebuild(table);
@@ -2456,7 +2465,7 @@ public class LStatements{
 
             row(table);
 
-            fieldst(table, "of id#", id, str -> id = str);
+            fieldst(table, token("of id#"), id, str -> id = str);
 
             //Q: why don't you just use arrays for this?
             //A: arrays aren't as easy to serialize so the code generator doesn't handle them
@@ -2469,7 +2478,7 @@ public class LStatements{
                     String value = i == 0 ? p1 : i == 1 ? p2 : p3;
                     Cons<String> setter = i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : v -> p3 = v;
 
-                    fields(t, type.params[i], value, setter).width(100f);
+                    fields(t, token(type.params[i]), value, setter).width(100f);
 
                     if(type == LMarkerControl.color || (type == LMarkerControl.colori && i == 1)){
                         col(t, value, res -> {
@@ -2532,10 +2541,10 @@ public class LStatements{
             table.clearChildren();
 
             table.button(b -> {
-                b.label(() -> type);
+                b.label(() -> token(type));
 
                 b.clicked(() -> showSelect(b, MapObjectives.allMarkerTypeNames.toArray(String.class), type, t -> {
-                    type = t;
+                    type = token(t);
                     build(table);
                 }, 2, cell -> cell.size(160, 50)));
             }, Styles.logict, () -> {}).size(190, 40).color(table.color).left().padLeft(2);
@@ -2550,7 +2559,7 @@ public class LStatements{
 
             row(table);
 
-            fieldst(table, "replace", replace, v -> replace = v);
+            fieldst(table, token("replace"), replace, v -> replace = v);
         }
 
         @Override

@@ -97,7 +97,7 @@ public class KeybindDialog extends Dialog{
 
                 table.labelWrap(() -> {
                     Axis axis = keybind.value;
-                    return axis.key != null ? axis.key.getName() : axis.min.getName() + " [red]/[] " + axis.max.getName();
+                    return axis.key != null ? getKeyName(axis.key) : getKeyName(axis.min) + " [red]/[] " + getKeyName(axis.max);
                 }).color(Pal.accent).left().minWidth(90).fillX().padRight(20);
 
                 table.button("@settings.rebind", tstyle, () -> {
@@ -107,8 +107,8 @@ public class KeybindDialog extends Dialog{
                 }).size(bw, bh);
             }else{
                 table.add(bundle.get("keybind." + keybind.name + ".name", Strings.capitalize(keybind.name)), Color.white).left().padRight(40).padLeft(8);
-                table.add(keybind.value.key.getName()).update(l -> {
-                    l.setText(keybind.value.key.getName());
+                table.add(getKeyName(keybind.value.key)).update(l -> {
+                    l.setText(getKeyName(keybind.value.key));
                     l.setColor(keybind.value.key == KeyCode.unset ? Color.darkGray : Pal.accent);
                 }).color(Pal.accent).left().minWidth(90).padRight(20);
 
@@ -149,6 +149,9 @@ public class KeybindDialog extends Dialog{
         }
     }
 
+    private String getKeyName(KeyCode code){
+        return bundle.get("key." + code.name(), code.getName());
+    }
     private void openDialog( KeyBind name){
         rebindDialog = new Dialog(rebindAxis ? bundle.get("keybind.press.axis") : bundle.get("keybind.press"));
 
