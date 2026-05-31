@@ -345,17 +345,26 @@ project(":core"){
         from sourceSets.main.allSource
     }
 
-    task assetsJar(type: Jar, dependsOn: ":tools:pack"){
+    task assetsJar(type: Jar){
         archiveClassifier = 'assets'
-        from files("assets"){
-            exclude "config", "cache", "music", "sounds", "sprites/fallback"
+
+        into('assets'){
+            from 'assets'
+            exclude 'config', 'cache', 'music', 'sounds', 'sprites/fallback'
+        }
+
+        into('assets-raw/sprites'){
+            from 'assets-raw/sprites_out'
+            include '**/*.png'
         }
     }
 
     task musicJar(type: Jar){
         archiveClassifier = 'music'
-        from files("assets"){
-            include "music/*", "sounds/*"
+
+        into('assets'){
+            from 'assets'
+            include '**/*.ogg', '**/*.mp3'
         }
     }
 
