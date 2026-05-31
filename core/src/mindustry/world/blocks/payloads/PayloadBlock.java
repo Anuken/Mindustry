@@ -15,7 +15,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class PayloadBlock extends Block{
-    public float payloadSpeed = 0.7f, payloadRotateSpeed = 5f;
+    public float payloadSpeed = 0.7f, payloadRotateSpeed = 3f;
 
     public String regionSuffix = "";
     public TextureRegion topRegion, outRegion, inRegion;
@@ -101,7 +101,8 @@ public class PayloadBlock extends Block{
 
         @Override
         public boolean canControlSelect(Unit unit){
-            return !unit.spawnedByCore && unit.type.allowedInPayloads && this.payload == null && acceptUnitPayload(unit) && unit.tileOn() != null && unit.tileOn().build == this;
+            return !unit.spawnedByCore && unit.type.allowedInPayloads && this.payload == null && acceptUnitPayload(unit) && 
+            (unit.isGrounded() && !unit.type.allowLegStep && solid) ? unit.within(this, size * tilesize * 0.7f + unit.hitSize / 2f) : unit.tileOn() != null && unit.tileOn().build == this;
         }
 
         @Override
@@ -118,9 +119,14 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public void handlePayload(Building source, Payload payload){
+        public void handlePayload(Building source, Payload payload, @Nullable Unit unit){
+            if(unit != null){
+                float clampPos = size * tilesize * 0.7f + unit.hitSize / 2f;
+                this.payVector.set(unit.x, unit.y).sub(this).clamp(-clampPos, -clampPos, clampPos, clampPos);
+            }else{
+                this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
+            }
             this.payload = (T)payload;
-            this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
             this.payRotation = payload.rotation();
 
             updatePayload();
