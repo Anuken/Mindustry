@@ -774,7 +774,11 @@ public class ContentParser{
                     if(prev != null && prev.preset == preset){
                         prev.preset = null;
                     }
-                    preset.initialize(planet, value.getInt("sector", 0), true);
+                    int sector = value.getInt("sector", 0) % planet.sectors.size;
+                    if(!allowPatching && sector > 0 && planet.sectors.get(sector).preset != null){
+                        throw new RuntimeException("Overwriting existing sectors is not allowed.");
+                    }
+                    preset.initialize(planet, sector, true);
                 }
 
                 value.remove("sector");

@@ -9,7 +9,7 @@ import mindustry.world.*;
 /** Do not rearrange, ever! */
 public enum ContentType{
     item("items", Item.class),
-    block("items", Block.class),
+    block("blocks", Block.class),
     mech_UNUSED,
     bullet("bullets", BulletType.class),
     liquid("liquids", Liquid.class),

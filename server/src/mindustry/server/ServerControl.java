@@ -73,7 +73,7 @@ public class ServerControl implements ApplicationListener{
     private PrintWriter socketOutput;
     private String suggested;
     private boolean autoPaused = false;
-    private Fi patchDirectory, dataAssetDirectory, rulesFile;
+    private Fi dataAssetDirectory, rulesFile;
     private Seq<DataAsset> dataAssets = new Seq<>();
 
     private LineReader lineReader;
@@ -248,7 +248,6 @@ public class ServerControl implements ApplicationListener{
             }
         }
 
-        patchDirectory = dataDirectory.child("patches");
         dataAssetDirectory = dataDirectory.child("assets");
         dataAssetDirectory.mkdirs();
         loadDataAssets();
@@ -387,6 +386,25 @@ public class ServerControl implements ApplicationListener{
     }
 
     void loadDataAssets(){
+        Fi oldPatchDirectory = dataDirectory.child("patches");
+        if(oldPatchDirectory.exists()){
+            Log.warn("Note: Patches are now placed in assets/patches. Any files contained in that directory have been automatically moved.");
+            Fi destDir = dataAssetDirectory.child("patches");
+            destDir.mkdirs();
+            for(Fi file : oldPatchDirectory.list()){
+                Fi dest = destDir.child(file.name());
+                if(!dest.isDirectory() && dest.exists()){
+                    dest = destDir.child("copied_patch_" + file.name());
+                }
+                if(!file.isDirectory()){
+                    file.copyTo(dest);
+                }else{
+                    file.copyFilesTo(dest);
+                }
+            }
+            oldPatchDirectory.deleteDirectory();
+        }
+
         dataAssets.clear();
 
         //special folder prefix for server-loaded content. this helps avoid conflicts.
@@ -417,8 +435,6 @@ public class ServerControl implements ApplicationListener{
                 }
             }else{
                 Seq<Fi> files = folder.findAll(f -> type.extensions.contains(f.extension().toLowerCase(Locale.ROOT)));
-                //add patches found in legacy 'patch' directory
-                if(type == DataAssetType.patch) files.addAll(patchDirectory.findAll(f -> type.extensions.contains(f.extension().toLowerCase(Locale.ROOT))));
 
                 for(Fi file : files){
                     try{
@@ -703,6 +719,34 @@ public class ServerControl implements ApplicationListener{
 
                 rulesFile.writeString(Jval.read(base.toString()).toString(Jformat.hjson));
                 Call.setRules(state.rules);
+            }
+        });
+
+        handler.register("dumpsettings", "Print every settings value. Useful for debugging.", arg -> {
+            var allKeys = Seq.with(Core.settings.keys());
+            allKeys.sort();
+            int maxLength = allKeys.max(String::length).length();
+            Log.info("Total values: @ | @ bytes", allKeys.size, String.format("%,d", Core.settings.getSettingsFile().length()));
+
+            for(String key : allKeys){
+                var value = Core.settings.get(key, null);
+
+                String valueToString;
+
+                if(value instanceof byte[] b) valueToString = "[" + b.length + " bytes]";
+                else valueToString = String.valueOf(value);
+
+                String typeName = switch(value == null ? "null" : value.getClass().getSimpleName()){
+                    case "Integer" -> "int   ";
+                    case "Boolean" -> "bool  ";
+                    case "Float"   -> "float ";
+                    case "Long"    -> "long  ";
+                    case "byte[]"  -> "byte[]";
+                    case "String"  -> "string";
+                    default -> value.getClass().getSimpleName();
+                };
+
+                Log.info("&lg@  &lg| @&lg |  &lg@", key + " ".repeat(maxLength - key.length()), typeName, valueToString);
             }
         });
 
