@@ -152,7 +152,13 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
                     net.setClientConnected();
                     net.handleClientReceived(con);
-                    Core.app.post(() -> ui.loadfrag.show("@connecting")); // TODO: This gets hidden and I can't figure out how to not do so.
+                    Core.app.post(() -> {  // TODO: This gets hidden and I can't figure out how to not do so.
+                        ui.loadfrag.show("@connecting");
+                        ui.loadfrag.setButton(() -> {
+                            ui.loadfrag.hide();
+                            netClient.disconnectQuietly();
+                        });
+                    });
 
                     Log.info("Initiated direct Steam P2P connection to server: @", currentServer.getAccountID());
                 });
