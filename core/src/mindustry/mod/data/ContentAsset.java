@@ -18,7 +18,7 @@ public class ContentAsset extends DataAsset{
     /** Warnings encountered during deserialization. */
     public Seq<String> warnings = new Seq<>();
 
-    public void readFromFile(String path, Fi file, ContentType type) throws IOException{
+    public void readOverride(String path, Fi file, ContentType type) throws IOException{
         this.type = type;
         setPath(path);
         data = file.readString();

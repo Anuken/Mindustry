@@ -12,6 +12,7 @@ import mindustry.mod.data.*;
  * - Clean up the class hierarchy for data assets
  * - Log error when more than 65k assets are present
  * - Make sure map import/export works
+ * - What happens when you save on a server? where do the assets go?
  * - Prevent save from loading when content errors are present?
  * - Patchset names are weird and broken with the new path system
  * - Test planets/sectors/techtree stuff and make sure remove() works properly

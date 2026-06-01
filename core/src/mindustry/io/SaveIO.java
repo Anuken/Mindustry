@@ -37,10 +37,14 @@ public class SaveIO{
     }
 
     public static void save(Fi file){
+        save(file, new SaveOptions());
+    }
+
+    public static void save(Fi file, SaveOptions options){
         boolean exists = file.exists();
         if(exists) file.moveTo(backupFileFor(file));
         try{
-            write(file);
+            write(file, options);
         }catch(Throwable e){
             if(exists) backupFileFor(file).moveTo(file);
             throw new RuntimeException(e);

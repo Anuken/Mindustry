@@ -18,6 +18,10 @@ public class DataAssetCache{
         }
     }
 
+    public void addOverride(String hash, Fi source){
+        hashToFile.put(hash, source);
+    }
+
     /** @return the hash */
     public byte[] add(byte[] bytes){
         byte[] hash = Streams.sha256(bytes);

@@ -426,7 +426,7 @@ public class ServerControl implements ApplicationListener{
                     for(Fi file : files){
                         try{
                             ContentAsset asset = (ContentAsset)type.create();
-                            asset.readFromFile(prefix + file.absolutePath().substring(subfolder.absolutePath().length() + 1), file, ctype);
+                            asset.readOverride(prefix + file.absolutePath().substring(subfolder.absolutePath().length() + 1), file, ctype);
                             dataAssets.add(asset);
                         }catch(Throwable e){
                             Log.err("Error loading content asset: " + file, e);
@@ -439,7 +439,7 @@ public class ServerControl implements ApplicationListener{
                 for(Fi file : files){
                     try{
                         var asset = type.create();
-                        asset.readFromFile(prefix + file.absolutePath().substring(folder.absolutePath().length() + 1), file);
+                        asset.readOverride(prefix + file.absolutePath().substring(folder.absolutePath().length() + 1), file);
                         dataAssets.add(asset);
                     }catch(Throwable e){
                         Log.err("Error loading data asset: " + file, e);
@@ -1187,7 +1187,7 @@ public class ServerControl implements ApplicationListener{
             });
         });
 
-        handler.register("save", "<slot>", "Save game state to a slot.", arg -> {
+        handler.register("save", "<slot> [embedAssets]", "Save game state to a slot.", arg -> {
             if(!state.isGame()){
                 err("Not hosting. Host a game first.");
                 return;
@@ -1196,7 +1196,9 @@ public class ServerControl implements ApplicationListener{
             Fi file = saveDirectory.child(arg[0] + "." + saveExtension);
 
             Core.app.post(() -> {
-                SaveIO.save(file);
+                SaveIO.save(file, new SaveOptions(){{
+                    embedAssets = arg.length > 1 && ("true".equalsIgnoreCase(arg[1]) || "yes".equalsIgnoreCase(arg[1]));
+                }});
                 info("Saved to @.", file);
             });
         });

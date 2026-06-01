@@ -7,6 +7,8 @@ import mindustry.mod.*;
 
 import java.io.*;
 
+import static mindustry.Vars.*;
+
 /** Abstract class for a kind of asset used in an asset mod. */
 public abstract class DataAsset implements Comparable<DataAsset>{
     /** File path, including name and extension, but excluding base folder prefix. */
@@ -56,10 +58,12 @@ public abstract class DataAsset implements Comparable<DataAsset>{
     }
 
     /** Reads this asset in from a file on disk. Only used on the server. */
-    public void readFromFile(String path, Fi file) throws IOException{
+    public void readOverride(String path, Fi file) throws IOException{
         setPath(path);
         setHash(file.sha256());
         this.overrideCacheFile = file;
+        //manually make this asset's hash refer to its file in the folder instead of using a folder
+        assetCache.addOverride(stringHash, file);
     }
 
     public void read(DataInput stream) throws IOException{
@@ -77,7 +81,7 @@ public abstract class DataAsset implements Comparable<DataAsset>{
     public void write(DataOutput stream) throws IOException{
         Fi file = getCacheFile();
         if(file == null || !file.exists()){
-            Log.err("Failed to write asset to save: missing cache file: " + path);
+            Log.err("Failed to embed asset in save: missing cache file: " + path);
             stream.writeInt(0);
             return;
         }
