@@ -133,6 +133,32 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             }catch(NumberFormatException e){
                 throw new IOException("Invalid Steam ID: " + lobbyname);
             }
+        }else if (ip.startsWith("steamserver:")){
+            String server = ip.substring("steamserver:".length());
+            try{
+                SteamID serverID = SteamID.createFromNativeHandle(Long.parseLong(server));
+                if(!serverID.isValid()) throw new IOException("Invalid Steam ID structure: " + server);
+
+                // Prepare for connection
+                logic.reset();
+                net.reset();
+                currentLobby = null;
+                currentServer = serverID;
+
+                // Run success
+                if(success != null) success.run();
+
+                // Connect
+                Connect con = new Connect();
+                con.addressTCP = "steam:" + currentServer.getAccountID();
+
+                net.setClientConnected();
+                net.handleClientReceived(con);
+
+                Log.info("Initiated direct Steam P2P connection to server: @", currentServer.getAccountID());
+            }catch(NumberFormatException e){
+                throw new IOException("Failed to parse server Steam ID: " + server);
+            }
         }else{
             provider.connectClient(ip, port, success);
         }
@@ -165,13 +191,11 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     @Override
     public void disconnectClient(){
         if(isSteamClient()){
-            if(currentLobby != null){
-                smat.leaveLobby(currentLobby);
-                snet.closeP2PSessionWithUser(currentServer);
-                currentServer = null;
-                currentLobby = null;
-                net.handleClientReceived(new Disconnect());
-            }
+            if(currentLobby != null) smat.leaveLobby(currentLobby);
+            snet.closeP2PSessionWithUser(currentServer);
+            currentServer = null;
+            currentLobby = null;
+            net.handleClientReceived(new Disconnect());
         }else{
             provider.disconnectClient();
         }
@@ -406,6 +430,13 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         }else if(steamIDRemote.equals(currentServer)){
             Log.info("Disconnected! @: @", steamIDRemote.getAccountID(), sessionError);
             net.handleClientReceived(new Disconnect());
+
+            Core.app.post(() -> {
+                ui.loadfrag.hide();
+                ui.showErrorMessage(Core.bundle.format("cantconnect", sessionError.name()));
+                net.handleClientReceived(new Disconnect());
+                currentServer = null;
+            });
         }
     }
 
