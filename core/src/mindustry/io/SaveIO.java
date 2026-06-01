@@ -111,26 +111,22 @@ public class SaveIO{
         return file.sibling(file.name() + "-backup." + file.extension());
     }
 
-    public static void write(Fi file, StringMap tags){
-        write(new FastDeflaterOutputStream(file.write(false, bufferSize)), tags);
+    public static void write(Fi file, SaveOptions options){
+        write(new FastDeflaterOutputStream(file.write(false, bufferSize)), options);
     }
 
     public static void write(Fi file){
-        write(file, null);
+        write(file, new SaveOptions());
     }
 
-    public static void write(OutputStream os, StringMap tags){
+    public static void write(OutputStream os, SaveOptions options){
         try(DataOutputStream stream = new DataOutputStream(os)){
             Events.fire(new SaveWriteEvent());
             SaveVersion ver = getVersion();
 
             stream.write(header);
             stream.writeInt(ver.version);
-            if(tags == null){
-                ver.write(stream);
-            }else{
-                ver.write(stream, tags);
-            }
+            ver.write(stream, options);
         }catch(Throwable e){
             throw new RuntimeException(e);
         }

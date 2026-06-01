@@ -6,17 +6,16 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.mod.data.*;
 
-import java.io.*;
-
 public class DataBundleLoader{
     private ObjectMap<I18NBundle, ObjectMap<String, String>> originalProperties = new ObjectMap<>();
 
     public void load(Seq<BundleAsset> assets){
         if(assets.isEmpty()) return;
 
-        ObjectMap<String, Seq<String>> localeToBundles = new ObjectMap<>();
+        ObjectMap<String, Seq<BundleAsset>> localeToBundles = new ObjectMap<>();
         for(var asset : assets){
-            localeToBundles.get(asset.name, Seq::new).add(asset.string);
+            if(asset.getCacheFile() == null) continue;
+            localeToBundles.get(asset.name, Seq::new).add(asset);
         }
 
         //add new keys to each bundle
@@ -29,9 +28,9 @@ public class DataBundleLoader{
             if(replacements != null){
                 originalProperties.put(bundle, bundle.getProperties().copy());
 
-                for(String str : replacements){
+                for(var asset : replacements){
                     try{
-                        PropertiesUtils.load(bundle.getProperties(), new StringReader(str));
+                        PropertiesUtils.load(bundle.getProperties(), asset.getCacheFileNoNull().reader());
                     }catch(Throwable e){
                         Log.err("Error loading bundles", e);
                     }

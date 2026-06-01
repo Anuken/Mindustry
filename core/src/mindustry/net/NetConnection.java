@@ -33,7 +33,8 @@ public abstract class NetConnection{
     /** Handles packet spam rate limits. */
     public Ratekeeper packetRate = new Ratekeeper();
 
-    public boolean hasConnected, hasBegunConnecting, hasDisconnected;
+    //TODO: refactor to state enum
+    public boolean hasConnected, hasBegunConnecting, determiningAssets, receivingAssets, hasDisconnected;
     public float viewWidth, viewHeight, viewX, viewY;
 
     public NetConnection(String address){
@@ -93,6 +94,11 @@ public abstract class NetConnection{
 
     public boolean isConnected(){
         return true;
+    }
+
+    public void sendStream(Streamable stream, ByteArrayOutputStream data){
+        stream.stream = new ByteArrayInputStream(data.toByteArray());
+        sendStream(stream);
     }
 
     public void sendStream(Streamable stream){

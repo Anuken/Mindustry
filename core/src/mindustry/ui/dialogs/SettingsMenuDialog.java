@@ -613,6 +613,7 @@ public class SettingsMenuDialog extends BaseDialog{
         files.addAll(saveDirectory.list());
         files.addAll(modDirectory.list());
         files.addAll(schematicDirectory.list());
+        files.addAll(assetCacheDirectory.list()); //important for saves
         String base = Core.settings.getDataDirectory().path();
 
         //add directories
@@ -652,6 +653,9 @@ public class SettingsMenuDialog extends BaseDialog{
 
         //delete old saves so they don't interfere
         saveDirectory.deleteDirectory();
+
+        //clear old assets cache
+        assetCacheDirectory.deleteDirectory();
 
         //purge existing tmp data, keep everything else
         tmpDirectory.deleteDirectory();

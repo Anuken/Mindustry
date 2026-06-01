@@ -69,6 +69,14 @@ public class Packets{
 
     }
 
+    public static class AssetRequirementStream extends Streamable{
+
+    }
+
+    public static class AssetStream extends Streamable{
+
+    }
+
     /** Marks the beginning of a stream. */
     public static class StreamBegin extends Packet{
         private static int lastid;

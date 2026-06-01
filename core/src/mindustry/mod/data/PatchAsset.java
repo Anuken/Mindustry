@@ -43,7 +43,7 @@ public class PatchAsset extends DataAsset{
     }
 
     @Override
-    void read(DataInput stream) throws IOException{
+    public void read(DataInput stream) throws IOException{
         int len = stream.readInt();
         byte[] bytes = new byte[len];
         stream.readFully(bytes);
@@ -51,7 +51,7 @@ public class PatchAsset extends DataAsset{
     }
 
     @Override
-    void write(DataOutput stream) throws IOException{
+    public void write(DataOutput stream) throws IOException{
         byte[] bytes = patch.getBytes(Strings.utf8);
         stream.writeInt(bytes.length);
         stream.write(bytes);

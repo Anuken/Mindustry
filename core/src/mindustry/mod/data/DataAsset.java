@@ -2,6 +2,8 @@ package mindustry.mod.data;
 
 import arc.files.*;
 import arc.util.*;
+import mindustry.*;
+import mindustry.mod.*;
 
 import java.io.*;
 
@@ -12,6 +14,22 @@ public abstract class DataAsset implements Comparable<DataAsset>{
     /** File name, excluding extension. This is taken from the path. */
     public String name = "";
 
+    /** sha256 of the internal data. this is null for non-external assets. */
+    public @Nullable String stringHash;
+    public @Nullable byte[] byteHash;
+    public @Nullable Fi overrideCacheFile;
+
+    /** Caches this asset in the asset folder, and updates its hash to correspond to the appropriate cache file. */
+    public void updateData(byte[] data){
+        setHash(Vars.assetCache.add(data));
+    }
+
+    public void setHash(byte[] value){
+        if(value.length != 32) throw new IllegalArgumentException("hash must be 32 bytes long: " + value.length);
+        byteHash = value;
+        stringHash = DataAssetCache.encodeHash(value);
+    }
+
     public void setPath(String path){
         this.path = path.replace('\\', '/');
         this.name = Strings.getFileNameWithoutExtension(path);
@@ -19,32 +37,60 @@ public abstract class DataAsset implements Comparable<DataAsset>{
 
     public abstract DataAssetType getType();
 
-    /** Reads this asset in from a file on disk. This should perform basic validation, e.g. checking size limits, or parsing JSON. */
-    public abstract void readFromFile(String path, Fi file) throws IOException;
-
-    abstract void read(DataInput stream) throws IOException;
-
-    abstract void write(DataOutput stream) throws IOException;
-
-    public static DataAsset readAsset(DataInput input) throws IOException{
-        short typeId = input.readShort();
-        if(typeId < 0 || typeId >= DataAssetType.all.length) throw new IOException("Invalid asset type ID: " + typeId);
-
-        String path = input.readUTF();
-        var type = DataAssetType.all[typeId];
-        var asset = type.create();
-
-        asset.setPath(path);
-        asset.read(input);
-
-        return asset;
+    public boolean isAlwaysEmbedded(){
+        return getType().embedded;
     }
 
-    public static void writeAsset(DataAsset asset, DataOutput output) throws IOException{
-        var type = asset.getType();
-        output.writeShort(type.ordinal());
-        output.writeUTF(asset.path);
-        asset.write(output);
+    public boolean isCached(){
+        return overrideCacheFile != null || (stringHash != null && Vars.assetCache.has(stringHash));
+    }
+
+    public Fi getCacheFileNoNull(){
+        Fi file = getCacheFile();
+        if(file == null) throw new RuntimeException("Cache file for asset " + path + " not found!");
+        return file;
+    }
+
+    public @Nullable Fi getCacheFile(){
+        return overrideCacheFile != null ? overrideCacheFile : Vars.assetCache.get(stringHash);
+    }
+
+    /** Reads this asset in from a file on disk. Only used on the server. */
+    public void readFromFile(String path, Fi file) throws IOException{
+        setPath(path);
+        setHash(file.sha256());
+        this.overrideCacheFile = file;
+    }
+
+    public void read(DataInput stream) throws IOException{
+        int length = stream.readInt();
+        if(length == 0){
+            Log.err("Empty asset in save: @", path);
+            return;
+        }
+
+        byte[] data = new byte[length];
+        stream.readFully(data);
+        updateData(data);
+    }
+
+    public void write(DataOutput stream) throws IOException{
+        Fi file = getCacheFile();
+        if(file == null || !file.exists()){
+            Log.err("Failed to write asset to save: missing cache file: " + path);
+            stream.writeInt(0);
+            return;
+        }
+
+        try{
+            //TODO: would be more memory efficient to use streams to copy it without reading the whole file at once
+            byte[] bytes = file.readBytes();
+            stream.writeInt(bytes.length);
+            stream.write(bytes);
+        }catch(ArcRuntimeException e){
+            Log.err("Failed to write asset to save: " + path, e);
+            stream.writeInt(0);
+        }
     }
 
     @Override

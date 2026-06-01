@@ -21,6 +21,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.TypeIO.*;
 import mindustry.logic.*;
+import mindustry.mod.data.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
@@ -30,7 +31,6 @@ import mindustry.world.meta.*;
 import java.io.*;
 import java.net.*;
 import java.nio.*;
-import java.util.zip.*;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
@@ -306,7 +306,12 @@ public class NetServer implements ApplicationListener{
             //playing in pvp mode automatically assigns players to teams
             player.team(assignTeam(player));
 
-            sendWorldData(player);
+            if(state.data.hasExternalAssets()){
+                con.determiningAssets = true;
+                sendAssetRequirements(player);
+            }else{
+                sendWorldData(player);
+            }
 
             platform.updateRPC();
 
@@ -513,13 +518,16 @@ public class NetServer implements ApplicationListener{
         return assigner.assign(current, players);
     }
 
+    public void sendAssetRequirements(Player player){
+        var stream = new ByteArrayOutputStream();
+        NetworkIO.writeRequiredAssets(new FastDeflaterOutputStream(stream), state.data.getAllExternalAssets());
+        player.con.sendStream(new AssetRequirementStream(), stream);
+    }
+
     public void sendWorldData(Player player){
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        DeflaterOutputStream def = new FastDeflaterOutputStream(stream);
-        NetworkIO.writeWorld(player, def);
-        WorldStream data = new WorldStream();
-        data.stream = new ByteArrayInputStream(stream.toByteArray());
-        player.con.sendStream(data);
+        var stream = new ByteArrayOutputStream();
+        NetworkIO.writeWorld(player, new FastDeflaterOutputStream(stream));
+        player.con.sendStream(new WorldStream(), stream);
 
         debug("Packed @ bytes of world data to @ (@ / @)", stream.size(), player.name, player.con.address, player.uuid());
     }
@@ -887,6 +895,35 @@ public class NetServer implements ApplicationListener{
                 }
             }
         }
+    }
+
+    @Remote(targets = Loc.client, priority = PacketPriority.high)
+    public static void requestWorld(Player player){
+        if(!player.con.hasBegunConnecting || player.con.determiningAssets || !player.con.receivingAssets || player.con.hasConnected) return;
+
+        player.con.receivingAssets = false;
+        netServer.sendWorldData(player);
+    }
+
+    @Remote(targets = Loc.client, priority = PacketPriority.high)
+    public static void requestAssets(Player player, short[] ids){
+        if(!player.con.hasBegunConnecting || !player.con.determiningAssets || player.con.receivingAssets || player.con.hasConnected) return;
+
+        player.con.determiningAssets = false;
+        player.con.receivingAssets = true;
+
+        Seq<DataAsset> res = new Seq<>();
+        Seq<DataAsset> allAssets = state.data.getAllExternalAssets();
+        for(short id : ids){
+            if(id >= allAssets.size || id < 0) continue;
+            res.add(allAssets.get(id));
+        }
+
+        var stream = new ByteArrayOutputStream();
+        NetworkIO.writeAssets(stream, res);
+        player.con.sendStream(new AssetStream(), stream);
+
+        debug("Packed @ bytes of asset data to @ (@ / @)", stream.size(), player.name, player.con.address, player.uuid());
     }
 
     @Remote(targets = Loc.client, priority = PacketPriority.high)

@@ -11,8 +11,8 @@ import mindustry.content.TechTree.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.maps.Map;
@@ -60,11 +60,6 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     @Override
-    public final void write(DataOutputStream stream) throws IOException{
-        write(stream, new StringMap());
-    }
-
-    @Override
     public void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
         readRegion("meta", stream, counter, in -> readMeta(in, context));
         if(version >= 12) readRegion("patches", stream, counter, this::readDataPatches);
@@ -80,9 +75,9 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void write(DataOutputStream stream, StringMap extraTags) throws IOException{
-        writeRegion("meta", stream, out -> writeMeta(out, extraTags));
-        writeRegion("patches", stream, this::writeDataPatches);
+    public void write(DataOutputStream stream, SaveOptions options) throws IOException{
+        writeRegion("meta", stream, out -> writeMeta(out, options.extraTags));
+        writeRegion("patches", stream, out -> writeDataPatches(out, options.embedAssets));
         writeRegion("content", stream, this::writeContentHeader);
         writeRegion("map", stream, this::writeMap);
         writeRegion("entities", stream, this::writeEntities);
@@ -127,7 +122,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
 
         StringMap result = new StringMap();
-        result.putAll(tags);
+        if(tags != null) result.putAll(tags);
 
         writeStringMap(stream, result.merge(StringMap.of(
             "saved", Time.millis(),
@@ -520,14 +515,6 @@ public abstract class SaveVersion extends SaveFileReader{
         readWorldEntities(stream, mapping);
     }
 
-    public void skipDataPatches(DataInput stream) throws IOException{
-        int total = stream.readInt();
-
-        for(int i = 0; i < total; i++){
-            DataAsset.readAsset(stream);
-        }
-    }
-
     public void readDataPatches(DataInput stream) throws IOException{
         stream.readInt(); //version - ignored for now
 
@@ -535,7 +522,30 @@ public abstract class SaveVersion extends SaveFileReader{
         Seq<DataAsset> assets = new Seq<>(total);
 
         for(int i = 0; i < total; i++){
-            assets.add(DataAsset.readAsset(stream));
+            byte typeId = stream.readByte();
+            if(typeId < 0 || typeId >= DataAssetType.all.length) throw new IOException("Invalid asset type ID: " + typeId);
+
+            String path = stream.readUTF();
+            boolean embedded = stream.readBoolean();
+            var type = DataAssetType.all[typeId];
+            var asset = type.create();
+
+            asset.setPath(path);
+
+            if(embedded){
+                asset.read(stream);
+            }else{
+                byte[] hash = new byte[32];
+                stream.readFully(hash);
+                asset.setHash(hash);
+
+                if(!asset.isCached()){
+                    //TODO: log this when loading a save
+                    Log.warn("Asset @: cache file not found.", asset.path);
+                }
+            }
+
+            assets.add(asset);
         }
 
         Events.fire(new DataPatchLoadEvent(assets));
@@ -543,14 +553,26 @@ public abstract class SaveVersion extends SaveFileReader{
         state.data.load(assets);
     }
 
-    public void writeDataPatches(DataOutput stream) throws IOException{
+    public void writeDataPatches(DataOutput stream, boolean forceEmbed) throws IOException{
         stream.writeInt(DataPatcher.patchFormatVersion);
 
         var assets = state.data.getAllAssets();
         stream.writeInt(assets.size);
 
         for(var asset : assets){
-            DataAsset.writeAsset(asset, stream);
+            boolean embed = forceEmbed || asset.isAlwaysEmbedded() || asset.byteHash == null;
+
+            stream.writeByte(asset.getType().ordinal());
+            stream.writeUTF(asset.path);
+            stream.writeBoolean(embed);
+
+            if(embed){
+                //most embedded assets (images, audio) write byte[] values directly from their cache file. game patches and content write raw string data.
+                asset.write(stream);
+            }else{
+                //if it's cached successfully, just write the 32-byte SHA256
+                stream.write(asset.byteHash);
+            }
         }
     }
 

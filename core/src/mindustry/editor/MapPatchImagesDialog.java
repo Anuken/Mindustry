@@ -72,7 +72,9 @@ public class MapPatchImagesDialog extends BaseDialog{
                         return;
                     }
 
-                    images.add(new ImageAsset(path, width, height, bytes));
+                    byte[] hash = assetCache.add(bytes);
+
+                    images.add(new ImageAsset(path, hash));
                     images.sort();
                     state.data.reloadImages(images);
                     rebuild();
@@ -93,7 +95,13 @@ public class MapPatchImagesDialog extends BaseDialog{
                         dialog.hide();
                         ui.loadAnd(() -> {
                             try{
-                                Seq<Future<ImageAsset>> images = new Seq<>();
+                                class Result{
+                                    int width, height;
+                                    Fi path;
+                                    byte[] hash; //null if width/height invalid
+                                }
+
+                                Seq<Future<?>> images = new Seq<>();
                                 var errors = new CopyOnWriteArrayList<String>();
 
                                 Fi zipped = new ZipFi(file);
@@ -101,15 +109,22 @@ public class MapPatchImagesDialog extends BaseDialog{
                                     if(ifile.extEquals("png")){
                                         images.add(mainExecutor.submit(() -> {
                                             try{
+                                                Result res = new Result();
+                                                res.path = ifile;
                                                 byte[] bytes = ifile.readBytes();
                                                 Pixmap pix = new Pixmap(bytes);
-                                                int width = pix.width;
-                                                int height = pix.height;
-                                                Pixmaps.bleed(pix);
-                                                bytes = PixmapIO.writePngBytes(pix);
+                                                res.width = pix.width;
+                                                res.height = pix.height;
+
+                                                if(res.width < DataPatcher.maxImageSize && res.height < DataPatcher.maxImageSize){
+                                                    Pixmaps.bleed(pix);
+                                                    bytes = PixmapIO.writePngBytes(pix);
+                                                    res.hash = assetCache.add(bytes);
+                                                }
+
                                                 pix.dispose();
 
-                                                return new ImageAsset(ifile.pathWithoutExtension(), width, height, bytes);
+                                                return res;
                                             }catch(Throwable error){
                                                 errors.add("[accent]" + ifile.path() + "[white]: " + Strings.getSimpleMessage(error));
                                                 return null;
@@ -123,19 +138,20 @@ public class MapPatchImagesDialog extends BaseDialog{
                                 int imported = 0;
 
                                 for(var future : images){
-                                    var image = future.get();
+                                    var image = (Result)future.get();
                                     if(image != null){
-                                        if(image.width > DataPatcher.maxImageSize || image.height > DataPatcher.maxImageSize){
-                                            errors.add("[accent]" + image.path + "[white]: " +Core.bundle.format("editor.patches.image.toolarge", width, height, DataPatcher.maxImageSize, DataPatcher.maxImageSize));
+                                        if(image.width > DataPatcher.maxImageSize || image.height > DataPatcher.maxImageSize || image.hash == null){
+                                            errors.add("[accent]" + image.path + "[white]: " + Core.bundle.format("editor.patches.image.toolarge", width, height, DataPatcher.maxImageSize, DataPatcher.maxImageSize));
                                             continue;
                                         }
 
-                                        var other = getImages().find(op -> (op.path.equalsIgnoreCase(image.path) || op.name.equalsIgnoreCase(image.name)));
+                                        String path = image.path.pathWithoutExtension(), name = image.path.nameWithoutExtension();
+                                        var other = getImages().find(op -> (op.path.equalsIgnoreCase(path) || op.name.equalsIgnoreCase(name)));
                                         if(other != null){
                                             errors.add("[accent]" + image.path + "[white]: " +Core.bundle.format("editor.patches.image.exists", other.name + " (" + other.path + ")").replace("\n", " "));
                                             continue;
                                         }
-                                        getImages().add(image);
+                                        getImages().add(new ImageAsset(path, image.hash));
                                         imported ++;
                                     }
                                 }
@@ -167,8 +183,11 @@ public class MapPatchImagesDialog extends BaseDialog{
                         try{
                             try(OutputStream fos = file.write(false, 4096); ZipOutputStream zos = new ZipOutputStream(fos)){
                                 for(var image : getImages()){
+                                    Fi cacheFile = image.getCacheFile();
+                                    if(cacheFile == null) continue;
+
                                     zos.putNextEntry(new ZipEntry(image.path + ".png"));
-                                    zos.write(image.data);
+                                    zos.write(cacheFile.readBytes());
                                     zos.closeEntry();
                                 }
                             }
@@ -211,13 +230,16 @@ public class MapPatchImagesDialog extends BaseDialog{
             if(searchString != null && !image.path.toLowerCase().contains(searchString)) continue;
             TextureRegion region = Core.atlas.find(regionPrefix + image.name, "nomap");
             boolean found = Core.atlas.has(regionPrefix + image.name);
+            @Nullable Fi cacheFile = image.getCacheFile();
+            int iwidth = found ? region.width : 1, iheight = found ? region.height : 1;
+            int ilength = cacheFile != null && cacheFile.exists() ? (int)cacheFile.length() : 0;
 
             inner.table(Styles.grayPanel, t -> {
                 t.margin(5f);
                 t.top();
                 t.add(new BorderImage(region, 4f)).scaling(Scaling.fit).with(b -> b.drawAlpha = true).size(size - 10f).row();
                 t.add((found ? "" : "[red]⚠[] ") + image.name).tooltip(regionPrefix + image.name + "\n[lightgray]" + image.path).ellipsis(true).left().width(size - 10f).growX().row();
-                t.add(image.width + "x" + image.height).tooltip(String.format("%,d", image.data.length) + "[lightgray]b").color(Color.lightGray).left().growX().row();
+                t.add(iwidth + "x" + iheight).tooltip(String.format("%,d", ilength) + "[lightgray]b").color(Color.lightGray).left().growX().row();
                 t.table(b -> {
                     b.left();
                     b.defaults().size((size - 10f) / 4f);
@@ -259,8 +281,8 @@ public class MapPatchImagesDialog extends BaseDialog{
                         d.cont.add(Core.bundle.format("editor.patches.image.region.name", regionPrefix + image.name)).row();
                         d.cont.add(Core.bundle.format("editor.patches.image.path", image.name)).row();
                         d.cont.add(Core.bundle.format("editor.patches.image.env", env)).row();
-                        d.cont.add(Core.bundle.format("editor.patches.image.size", image.width, image.height)).row();
-                        d.cont.add(Core.bundle.format("editor.patches.image.filesize", String.format("%,d", image.data.length) + "[darkgray]b"));
+                        d.cont.add(Core.bundle.format("editor.patches.image.size", iwidth, iheight)).row();
+                        d.cont.add(Core.bundle.format("editor.patches.image.filesize", String.format("%,d", ilength) + "[darkgray]b"));
 
                         d.addCloseButton();
                         d.show();
@@ -268,7 +290,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                     b.button(Icon.export, istyle, () -> {
                         platform.showFileChooser(false, "png", out -> {
                             try{
-                                out.writeBytes(image.data);
+                                image.getCacheFileNoNull().copyTo(out);
                             }catch(Throwable e){
                                 ui.showException(e);
                             }

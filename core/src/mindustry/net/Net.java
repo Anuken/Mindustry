@@ -46,6 +46,8 @@ public class Net{
         registerPacket(StreamChunk::new);
         registerPacket(WorldStream::new);
         registerPacket(ConnectPacket::new);
+        registerPacket(AssetRequirementStream::new);
+        registerPacket(AssetStream::new);
 
         //register generated packet classes
         Call.registerPackets();

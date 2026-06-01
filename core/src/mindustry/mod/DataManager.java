@@ -5,10 +5,13 @@ import mindustry.*;
 import mindustry.mod.data.*;
 
 /**
- * TODO: strict content limits and size limits.
- * Images: 2mb
- *
  * TODO:
+ * - Export embedded assets in shared saves
+ * - Make sure steam cloud syncs the folder
+ * - Display missing content when loading a save
+ * - Clean up the class hierarchy for data assets
+ * - Log error when more than 65k assets are present
+ * - Make sure map import/export works
  * - Prevent save from loading when content errors are present?
  * - Patchset names are weird and broken with the new path system
  * - Test planets/sectors/techtree stuff and make sure remove() works properly
@@ -25,12 +28,16 @@ public class DataManager{
     private DataBundleLoader bundleLoader = new DataBundleLoader();
 
     private ObjectMap<DataAssetType, Seq<DataAsset>> assets = new ObjectMap<>();
+    private Seq<DataAsset> orderedAssets = new Seq<>();
+    private Seq<DataAsset> orderedExternalAssets = new Seq<>();
 
     public void reloadPatches(Seq<PatchAsset> patches){
         if(patches != getPatches()) getPatches().set(patches);
 
         patcher.unapply();
         patcher.apply(patches, getContent());
+
+        rebuildOrderedAssets();
     }
 
     public void reloadImages(Seq<ImageAsset> images){
@@ -38,6 +45,8 @@ public class DataManager{
 
         packer.unload();
         packer.pack(images);
+
+        rebuildOrderedAssets();
     }
 
     public void load(Seq<DataAsset> newAssets){
@@ -57,6 +66,8 @@ public class DataManager{
         }
 
         patcher.apply(getPatches(), getContent());
+
+        rebuildOrderedAssets();
     }
 
     public void unload(){
@@ -68,12 +79,36 @@ public class DataManager{
         soundLoader.unload();
 
         assets.clear();
+        orderedAssets.clear();
+        orderedExternalAssets.clear();
+    }
+
+    private void rebuildOrderedAssets(){
+        orderedAssets.clear();
+        orderedExternalAssets.clear();
+        for(DataAssetType type : DataAssetType.all){
+            var seq = assets.get(type);
+            if(seq != null){
+                orderedAssets.addAll(seq);
+                if(!type.embedded){
+                    orderedExternalAssets.addAll(seq);
+                }
+            }
+        }
     }
 
     public Seq<DataAsset> getAllAssets(){
-        Seq<DataAsset> result = new Seq<>();
-        assets.each((key, seq) -> result.addAll(seq));
-        return result;
+        return orderedAssets;
+    }
+
+    /** @return whether any assets like audio/images (external to saves) are loaded, requiring separate network transmission. */
+    public boolean hasExternalAssets(){
+        return orderedExternalAssets.size > 0;
+    }
+
+    /** @return all assets that can be external to a save (for network sync) */
+    public Seq<DataAsset> getAllExternalAssets(){
+        return orderedExternalAssets;
     }
 
     public boolean isPatched(Object content){

@@ -152,6 +152,27 @@ public class NetClient implements ApplicationListener{
 
             finishConnecting();
         });
+
+        net.handleClient(AssetRequirementStream.class, data -> {
+            Seq<String> required = NetworkIO.readRequiredAssets(new InflaterInputStream(data.stream));
+            ShortSeq missing = new ShortSeq();
+            for(int i = 0; i < required.size; i++){
+                if(!assetCache.has(required.get(i))){
+                    missing.add((short)i);
+                }
+            }
+            Log.info("Requesting @ asset(s) from the server.", missing.size);
+            Call.requestAssets(missing.toArray());
+        });
+
+        net.handleClient(AssetStream.class, data -> {
+            Log.info("Received asset data: @ bytes.", data.stream.available());
+            //there's usually little reason to compress assets (PNGs, OGGs), so they are not deflated.
+            NetworkIO.loadAssets(data.stream);
+
+            //after receiving assets, tell the server that the client is ready to handle the world
+            Call.requestWorld();
+        });
     }
 
     public void addPacketHandler(String type, Cons<String> handler){

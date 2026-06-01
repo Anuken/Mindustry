@@ -25,17 +25,12 @@ public class ContentAsset extends DataAsset{
     }
 
     @Override
-    public void readFromFile(String path, Fi file) throws IOException{
-        throw new UnsupportedOperationException("Content needs an associated type. Use the other readFromFile method.");
-    }
-
-    @Override
     public DataAssetType getType(){
         return DataAssetType.content;
     }
 
     @Override
-    void read(DataInput stream) throws IOException{
+    public void read(DataInput stream) throws IOException{
         type = ContentType.all[stream.readShort()];
         int len = stream.readInt();
         byte[] bytes = new byte[len];
@@ -44,7 +39,7 @@ public class ContentAsset extends DataAsset{
     }
 
     @Override
-    void write(DataOutput stream) throws IOException{
+    public void write(DataOutput stream) throws IOException{
         stream.writeShort(type.ordinal());
         byte[] bytes = data.getBytes(Strings.utf8);
         stream.writeInt(bytes.length);

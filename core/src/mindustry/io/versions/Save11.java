@@ -38,15 +38,6 @@ public class Save11 extends SaveVersion{
         }
     }
 
-    @Override
-    public void skipDataPatches(DataInput stream) throws IOException{
-        int amount = stream.readUnsignedByte();
-        for(int i = 0; i < amount; i++){
-            int len = stream.readInt();
-            stream.skipBytes(len);
-        }
-    }
-
     //old, simplified string-only data patches
     @Override
     public void readDataPatches(DataInput stream) throws IOException{

@@ -19,24 +19,6 @@ public class Save12 extends SaveVersion{
     }
 
     @Override
-    public void skipDataPatches(DataInput stream) throws IOException{
-        stream.readInt(); //version - ignored for now
-        int amount = stream.readInt();
-        for(int i = 0; i < amount; i++){
-            int len = stream.readInt();
-            stream.skipBytes(len);
-        }
-
-        int imageAmount = stream.readInt();
-        for(int i = 0; i < imageAmount; i++){
-            stream.readUTF(); //name
-            stream.skipBytes(4); //w h
-            int len = stream.readInt(); //byte data
-            stream.skipBytes(len);
-        }
-    }
-
-    @Override
     public void readDataPatches(DataInput stream) throws IOException{
         stream.readInt(); //version - ignored for now
 
@@ -53,10 +35,12 @@ public class Save12 extends SaveVersion{
         int imageAmount = stream.readInt();
         for(int i = 0; i < imageAmount; i++){
             String name = stream.readUTF();
-            short w = stream.readShort(), h = stream.readShort();
+            //width/height ignored
+            stream.readShort();
+            stream.readShort();
             byte[] bytes = new byte[stream.readInt()];
             stream.readFully(bytes);
-            assets.add(new ImageAsset(name, w, h, bytes));
+            assets.add(new ImageAsset(name, assetCache.add(bytes)));
         }
 
         Events.fire(new DataPatchLoadEvent(assets));
