@@ -367,12 +367,13 @@ public class UnitTypes{
                 maxTargets = 6;
 
                 smartHeal = true;
+                smartDowntime = 60 * 4f;
             }});
 
             weapons.add(new Weapon("heal-weapon"){{
                 top = false;
                 shootY = 2f;
-                reload = 24f;
+                reload = 30f;
                 x = 4.5f;
                 alternate = false;
                 ejectEffect = Fx.none;
