@@ -149,8 +149,8 @@ public class TypeIO{
             write.s(command.id);
         }else if(object instanceof TypeObject typeObject){
             write.b(24);
-            write.b(typeObject.id());
-            typeObject.write(write);
+            write.b(typeObject.objectID());
+            typeObject.typeWrite(write);
         }else if(object instanceof Bullet b || object instanceof Seq<?> s){ //write bullets as null
             write.b((byte)0);
         }else{

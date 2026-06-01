@@ -6,17 +6,17 @@ import arc.util.io.*;
 
 /** Interface of the serializable data used in TypeIO.*/
 public interface TypeObject{
-    Seq<Func<Reads, Object>> handlers = new Seq<>();
+    IntMap<Func<Reads, Object>> handlers = new IntMap<>();
 
     static Func<Reads, Object> handler(int i){
         return handlers.get(i);
     }
 
     static void register(int id, Func<Reads, Object> handler){
-        handlers.set(id, handler);
+        handlers.put(id, handler);
     }
 
-    int id();
+    int objectID();
 
-    void write(Writes write);
+    void typeWrite(Writes write);
 }
