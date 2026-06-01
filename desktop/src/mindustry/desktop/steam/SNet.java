@@ -139,23 +139,23 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                 SteamID serverID = SteamID.createFromNativeHandle(Long.parseLong(server));
                 if(!serverID.isValid()) throw new IOException("Invalid Steam ID structure: " + server);
 
-                // Prepare for connection
-                logic.reset();
-                net.reset();
-                currentLobby = null;
-                currentServer = serverID;
+                Core.app.post(() -> {
+                    currentLobby = null;
+                    currentServer = serverID;
 
-                // Run success
-                if(success != null) success.run();
+                    // Run success
+                    if(success != null) success.run();
 
-                // Connect
-                Connect con = new Connect();
-                con.addressTCP = "steam:" + currentServer.getAccountID();
+                    // Connect
+                    Connect con = new Connect();
+                    con.addressTCP = "steam:" + currentServer.getAccountID();
 
-                net.setClientConnected();
-                net.handleClientReceived(con);
+                    net.setClientConnected();
+                    net.handleClientReceived(con);
+                    Core.app.post(() -> ui.loadfrag.show("@connecting")); // TODO: This gets hidden and I can't figure out how to not do so.
 
-                Log.info("Initiated direct Steam P2P connection to server: @", currentServer.getAccountID());
+                    Log.info("Initiated direct Steam P2P connection to server: @", currentServer.getAccountID());
+                });
             }catch(NumberFormatException e){
                 throw new IOException("Failed to parse server Steam ID: " + server);
             }
