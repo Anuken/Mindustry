@@ -358,12 +358,12 @@ public class UnitTypes{
             boostMultiplier = 2f;
             speed = 0.55f;
             hitSize = 8f;
-            health = 240f;
+            health = 200f;
             buildSpeed = 0.3f;
             armor = 1f;
 
-            abilities.add(new RepairFieldAbility(30f, 60f * 2, 100f){{
-                sameTypeHealMult = 0.10f;
+            abilities.add(new RepairFieldAbility(20f, 60f * 2, 100f){{
+                sameTypeHealMult = 0.15f;
                 maxTargets = 6;
 
                 smartHeal = true;
