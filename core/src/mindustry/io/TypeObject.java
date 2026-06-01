@@ -4,16 +4,19 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.io.*;
 
-/** Interface of the serializable data used in TypeIO.*/
 public interface TypeObject{
-    IntMap<Func<Reads, Object>> handlers = new IntMap<>();
+    IntMap<Func<Reads, Object>> readers = new IntMap<>();
 
     static Func<Reads, Object> handler(int i){
-        return handlers.get(i);
+        return readers.get(i);
     }
 
-    static void register(int id, Func<Reads, Object> handler){
-        handlers.put(id, handler);
+    /**
+     * Registers a custom type reader by id. This is mostly used for mods that need to transmit custom data.
+     * @param id a mod-specific, unique id for identifying this type object.
+     * */
+    static void register(int id, Func<Reads, Object> reader){
+        readers.put(id, reader);
     }
 
     int objectID();
