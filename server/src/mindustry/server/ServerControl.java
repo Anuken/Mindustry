@@ -452,6 +452,9 @@ public class ServerControl implements ApplicationListener{
 
         if(dataAssets.size > 0){
             Log.info("Loaded @ data asset files.", dataAssets.size);
+            if(dataAssets.count(d -> !d.isAlwaysEmbedded()) >= Short.MAX_VALUE){
+                Log.err("Warning: You have more than 32k asset files, which is above the maximum limit. Clients will not be able to connect.");
+            }
         }
     }
 

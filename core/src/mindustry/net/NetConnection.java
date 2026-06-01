@@ -96,6 +96,10 @@ public abstract class NetConnection{
         return true;
     }
 
+    public boolean allowAsyncSend(){
+        return false;
+    }
+
     public void sendStream(Streamable stream, ByteArrayOutputStream data){
         stream.stream = new ByteArrayInputStream(data.toByteArray());
         sendStream(stream);

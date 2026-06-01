@@ -362,6 +362,11 @@ public class ArcNetProvider implements NetProvider{
         }
 
         @Override
+        public boolean allowAsyncSend(){
+            return true;
+        }
+
+        @Override
         public boolean isConnected(){
             return connection.isConnected();
         }

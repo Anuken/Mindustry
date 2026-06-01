@@ -27,7 +27,10 @@ public class DataAssetCache{
         byte[] hash = Streams.sha256(bytes);
         String name = encodeHash(hash);
         Fi file = Vars.assetCacheDirectory.child(name);
-        file.writeBytes(bytes); //TODO: redundant disk writes if the data is already there
+        //avoid unnecessary disk writes when adding an asset that already exists. TODO: it's possible the file may be corrupted even if length matches?
+        if(file.length() != bytes.length){
+            file.writeBytes(bytes);
+        }
         hashToFile.put(name, file);
         return hash;
     }

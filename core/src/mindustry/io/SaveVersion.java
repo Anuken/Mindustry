@@ -143,7 +143,8 @@ public abstract class SaveVersion extends SaveFileReader{
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
             "nocores", state.rules.defaultTeam.cores().isEmpty(),
-            "playerteam", player == null ? state.rules.defaultTeam.id : player.team().id
+            "playerteam", player == null ? state.rules.defaultTeam.id : player.team().id,
+            "hasExternalAssets", state.data.getAllExternalAssets().size > 0
         )));
     }
 

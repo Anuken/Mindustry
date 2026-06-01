@@ -11,15 +11,17 @@ import static mindustry.Vars.*;
 
 /** Abstract class for a kind of asset used in an asset mod. */
 public abstract class DataAsset implements Comparable<DataAsset>{
+    /** set by the server to force content files to point to a specific folder */
+    private @Nullable Fi overrideCacheFile;
+
     /** File path, including name and extension, but excluding base folder prefix. */
     public String path = "";
     /** File name, excluding extension. This is taken from the path. */
     public String name = "";
 
     /** sha256 of the internal data. this is null for non-external assets. */
-    public @Nullable String stringHash;
     public @Nullable byte[] byteHash;
-    public @Nullable Fi overrideCacheFile;
+    public @Nullable String stringHash;
 
     /** Caches this asset in the asset folder, and updates its hash to correspond to the appropriate cache file. */
     public void updateData(byte[] data){

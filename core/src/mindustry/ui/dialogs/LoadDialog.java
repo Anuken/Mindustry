@@ -135,7 +135,13 @@ public class LoadDialog extends BaseDialog{
                         });
                     }).right();
 
-                    t.button(Icon.export, Styles.emptyi, () -> platform.export("save-" + slot.getName(), saveExtension, slot::exportFile)).right();
+                    t.button(Icon.export, Styles.emptyi, () -> {
+                        if(slot.hasExternalAssets() && !slot.isBeingPlayed()){
+                            ui.showInfo("@save.export.needsload");
+                        }else{
+                            platform.export("save-" + slot.getName(), saveExtension, slot::exportFile);
+                        }
+                    }).right();
 
                 }).padRight(-10).growX();
             }).growX().colspan(2);

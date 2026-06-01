@@ -33,7 +33,6 @@ public class PatchAsset extends DataAsset{
     @Override
     public void readOverride(String path, Fi file) throws IOException{
         setPath(path);
-        //This minimizes the JSON. If this is problematic to you, don't use the readFromFile method.
         patch = Jval.read(file.readString()).toString(Jformat.plain);
     }
 

@@ -919,11 +919,24 @@ public class NetServer implements ApplicationListener{
             res.add(allAssets.get(id));
         }
 
-        var stream = new ByteArrayOutputStream();
-        NetworkIO.writeAssets(stream, res);
-        player.con.sendStream(new AssetStream(), stream);
+        //packing the data and reading it from disk can be async; it shouldn't need to block the main thread.
+        mainExecutor.submit(() -> {
+            try{
+                var stream = new ByteArrayOutputStream();
+                NetworkIO.writeAssets(stream, res);
 
-        debug("Packed @ bytes of asset data to @ (@ / @)", stream.size(), player.name, player.con.address, player.uuid());
+                debug("Packed @ bytes of asset data to @ (@ / @)", stream.size(), player.name, player.con.address, player.uuid());
+
+                //ArcNetConnection (most connections) allows async sending. The Steam implementation does not.
+                if(player.con.allowAsyncSend()){
+                    player.con.sendStream(new AssetStream(), stream);
+                }else{
+                    Core.app.post(() -> player.con.sendStream(new AssetStream(), stream));
+                }
+            }catch(Exception e){
+                Log.err(e);
+            }
+        });
     }
 
     @Remote(targets = Loc.client, priority = PacketPriority.high)

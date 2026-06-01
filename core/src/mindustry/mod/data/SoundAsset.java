@@ -1,6 +1,6 @@
 package mindustry.mod.data;
 
-public class SoundAsset extends AudioAsset{
+public class SoundAsset extends DataAsset{
 
     @Override
     public DataAssetType getType(){
