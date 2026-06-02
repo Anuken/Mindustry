@@ -98,7 +98,7 @@ public class SettingsMenuDialog extends BaseDialog{
             t.button(bundle.format("settings.planetselect", "[#" + planet.iconColor + "]" + planet.localizedName), Icon.planet, style, () -> {
                 BaseDialog dialog = new BaseDialog("");
                 dialog.cont.pane(p -> {
-                    p.background(Tex.button).margin(1f);
+                    p.background(Tex.button);
                     int i = 0;
 
                     for(var plan : content.planets()){
@@ -125,7 +125,9 @@ public class SettingsMenuDialog extends BaseDialog{
                 ui.showConfirm("@confirm", bundle.format("settings.clearplanetresearch.confirm", planet.localizedName), () -> {
                     universe.clearLoadoutInfo();
                     for(TechNode node : TechTree.all){
-                        if(node.planet == planet) node.reset();
+                        if(node.rootNode == planet.techTree){
+                            node.reset();
+                        }
                     }
                     content.each(c -> {
                         if(c instanceof UnlockableContent u && u.databaseTabs.contains(planet)){

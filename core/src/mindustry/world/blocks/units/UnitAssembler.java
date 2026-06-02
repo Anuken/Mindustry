@@ -383,6 +383,7 @@ public class UnitAssembler extends PayloadBlock{
 
         @Override
         public void drawSelect(){
+            super.drawSelect();
             for(var module : modules){
                 Drawf.selected(module, Pal.accent);
             }
@@ -685,7 +686,7 @@ public class UnitAssembler extends PayloadBlock{
 
         @Override
         public BlockStatus status(){
-            if(!team.activateUnitFactories()) return BlockStatus.inactive;
+            if(!team.activateUnitFactories()) return BlockStatus.inactiveUnitFactory;
             return super.status();
         }
 

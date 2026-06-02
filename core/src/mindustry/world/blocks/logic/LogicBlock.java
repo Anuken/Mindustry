@@ -729,7 +729,7 @@ public class LogicBlock extends Block{
                 if(forceEditor) state.rules.editor = true;
                 byte[] bytes = compress(code, relativeConnections());
                 if(bytes.length > maxCompressedLen){
-                    ui.showErrorMessage(Core.bundle.format("logic.error.toolong", maxByteLen, bytes.length));
+                    ui.showErrorMessage(Core.bundle.format("logic.error.toolong", maxCompressedLen, bytes.length));
                 }else{
                     configure(bytes);
                     state.rules.editor = prev;

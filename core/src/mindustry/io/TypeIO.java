@@ -314,6 +314,12 @@ public class TypeIO{
 
     public static Ability[] readAbilities(Reads read, Ability[] abilities){
         byte len = read.b();
+
+        if(len != abilities.length){
+            abilities = new Ability[len];
+            for(int i = 0; i < len; i++) abilities[i] = new EmptyDataAbility();
+        }
+
         for(int i = 0; i < len; i++){
             float data = read.f();
             if(abilities.length > i){

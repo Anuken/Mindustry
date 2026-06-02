@@ -104,14 +104,16 @@ public class DrawTurret extends DrawBlock{
                 params.setRecoil(part.recoilIndex >= 0 && tb.curRecoils != null ? tb.curRecoils[part.recoilIndex] : tb.curRecoil);
                 part.draw(params);
             }
+        }
+        if(ammoParts.size > 0 && tb.getAmmoContent() != null){
+            float progress = tb.progress();
+            var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.curRecoil, tb.charge, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
 
-            if(ammoParts.size > 0 && tb.getAmmoContent() != null){
-                var parts = ammoParts.get(tb.getAmmoContent());
-                if(parts != null){
-                    for(var part : parts){
-                        params.setRecoil(part.recoilIndex >= 0 && tb.curRecoils != null ? tb.curRecoils[part.recoilIndex] : tb.curRecoil);
-                        part.draw(params);
-                    }
+            var parts = ammoParts.get(tb.getAmmoContent());
+            if(parts != null){
+                for(var part : parts){
+                    params.setRecoil(part.recoilIndex >= 0 && tb.curRecoils != null ? tb.curRecoils[part.recoilIndex] : tb.curRecoil);
+                    part.draw(params);
                 }
             }
         }

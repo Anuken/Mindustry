@@ -295,7 +295,7 @@ public class MinimapRenderer{
     }
 
     public void drawSpawns(){
-        if(!state.rules.showSpawns || !state.hasSpawns() || !state.rules.waves) return;
+        if(state.rules.hideSpawns || !state.hasSpawns() || !state.rules.waves) return;
 
         TextureRegion icon = Icon.units.getRegion();
 

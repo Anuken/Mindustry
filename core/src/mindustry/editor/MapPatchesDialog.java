@@ -16,6 +16,7 @@ import static mindustry.Vars.*;
 
 public class MapPatchesDialog extends BaseDialog{
     private Table list;
+    private MapPatchImagesDialog images = new MapPatchImagesDialog();
 
     public MapPatchesDialog(){
         super("@editor.patches");
@@ -23,9 +24,11 @@ public class MapPatchesDialog extends BaseDialog{
         shown(this::setup);
 
         addCloseButton();
-        buttons.button("@editor.patches.guide", Icon.link, () -> Core.app.openURI(patchesGuideURL)).size(200, 64f);
+        buttons.button("@editor.patches.guide", Icon.link, () -> Core.app.openURI(patchesGuideURL)).size(190f, 64f);
 
-        buttons.button("@add", Icon.add, () -> showImport(this::addPatch)).size(200f, 64f);
+        buttons.button("@editor.images", Icon.image, () -> images.show()).size(190f, 64f);
+
+        buttons.button("@add", Icon.add, () -> showImport(this::addPatch)).size(190f, 64f);
 
         cont.top();
         getCell(cont).grow();

@@ -454,6 +454,10 @@ public class BlockIndexer{
     }
 
     public Building findEnemyTile(Team team, float x, float y, float range, BuildingPriorityf priority, Boolf<Building> pred){
+        return findEnemyTile(team, x, y, range, priority, pred, null);
+    }
+
+    public Building findEnemyTile(Team team, float x, float y, float range, BuildingPriorityf priority, Boolf<Building> pred, @Nullable Team source){
         Building target = null;
         float targetDist = 0;
 
@@ -461,7 +465,7 @@ public class BlockIndexer{
             Team enemy = activeTeams.items[i];
             if(enemy == team || (enemy == Team.derelict && !state.rules.coreCapture)) continue;
 
-            Building candidate = indexer.findTile(enemy, x, y, range, b -> pred.get(b) && b.isDiscovered(team), true);
+            Building candidate = findTile(enemy, x, y, range, b -> pred.get(b) && b.isDiscovered(team), true, source);
             if(candidate == null) continue;
 
             //if a block has the same priority, the closer one should be targeted
@@ -488,6 +492,10 @@ public class BlockIndexer{
     }
 
     public Building findTile(Team team, float x, float y, float range, Boolf<Building> pred, boolean usePriority){
+        return findTile(team, x, y, range, pred, usePriority, null);
+    }
+
+    public Building findTile(Team team, float x, float y, float range, Boolf<Building> pred, boolean usePriority, @Nullable Team source){
         Building closest = null;
         float dst = 0;
         var buildings = team.data().buildingTree;
@@ -499,7 +507,7 @@ public class BlockIndexer{
         for(int i = 0; i < breturnArray.size; i++){
             var next = breturnArray.items[i];
 
-            if(!pred.get(next) || !next.block.targetable) continue;
+            if(!pred.get(next) || (next.team != source && !next.block.targetable)) continue;
 
             float bdst = next.dst(x, y) - next.hitSize() / 2f;
             if(bdst < range && (closest == null ||
