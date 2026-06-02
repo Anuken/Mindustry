@@ -147,10 +147,10 @@ public class TypeIO{
         }else if(object instanceof UnitCommand command){
             write.b(23);
             write.s(command.id);
-        }else if(object instanceof TypeObject typeObject){
+        }else if(object instanceof CustomData customData){
             write.b(24);
-            write.i(typeObject.objectID());
-            typeObject.typeWrite(write);
+            write.i(CustomData.id(customData.getClass()));
+            customData.dataWrite(write);
         }else if(object instanceof Bullet b || object instanceof Seq<?> s){ //write bullets as null
             write.b((byte)0);
         }else{
@@ -268,7 +268,7 @@ public class TypeIO{
                 yield objs;
             }
             case 23 -> content.unitCommand(read.us());
-            case 24 -> TypeObject.handler(read.i()).get(read);
+            case 24 -> CustomData.reader(read.i()).get(read);
             default -> throw new IllegalArgumentException("Unknown object type: " + type);
         };
     }
