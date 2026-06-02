@@ -72,6 +72,8 @@ public class Stat implements Comparable<Stat>{
     drillSpeed = new Stat("drillSpeed", StatCat.crafting),
     linkRange = new Stat("linkRange", StatCat.crafting),
     instructions = new Stat("instructions", StatCat.crafting),
+    meltdownOutput = new Stat("meltdownoutput", StatCat.crafting),
+
 
     weapons = new Stat("weapons", StatCat.function),
     bullet = new Stat("bullet", StatCat.function),

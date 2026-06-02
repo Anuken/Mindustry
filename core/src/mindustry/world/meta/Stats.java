@@ -5,6 +5,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.ObjectMap.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.mod.*;
 import mindustry.type.*;
 
@@ -21,6 +22,7 @@ public class Stats{
     public float timePeriod = -1;
 
     private @Nullable OrderedMap<StatCat, OrderedMap<Stat, Seq<StatValue>>> map;
+    private @Nullable ObjectMap<Stat, Seq<Planet>> statPlanets;
     private boolean dirty;
 
     /** Adds a single float value with this stat, formatted to 2 decimal places. */
@@ -108,6 +110,42 @@ public class Stats{
         dirty = true;
     }
 
+    /** Adds a single float value with this stat, formatted to 2 decimal places, and filtered to a planet. */
+    public void add(Stat stat, float value, StatUnit unit, Planet planet){
+        add(stat, StatValues.number(value, unit), planet);
+    }
+
+    /** Adds a stat value that only displays on specific planets. */
+    public void add(Stat stat, StatValue value, Planet planet){
+        add(stat, value, Seq.with(planet));
+    }
+
+    /** Adds a stat value that only displays on specific planets. */
+    public void add(Stat stat, StatValue value, Seq<Planet> planets){
+        add(stat, value);
+        
+        if(statPlanets == null) statPlanets = new ObjectMap<>();
+        if(!statPlanets.containsKey(stat)){
+            statPlanets.put(stat, new Seq<>());
+        }
+        
+        statPlanets.get(stat).addAll(planets);
+    }
+
+    /** Checks if a stat should be displayed on the given planet. */
+    public boolean shouldDisplay(Stat stat, @Nullable Planet planet){
+        if(statPlanets == null || !statPlanets.containsKey(stat)){
+            return true;
+        }
+
+        //in <any> environment display all, and in the main menu dont display
+        if(planet == Planets.sun) return true;
+        if(planet == null) return false;
+        
+        Seq<Planet> planets = statPlanets.get(stat);
+        return planets.contains(planet);
+    }
+
     /** Removes a stat, if it exists. */
     public void remove(Stat stat){
         if(map == null) map = new OrderedMap<>();
@@ -134,6 +172,33 @@ public class Stats{
             dirty = false;
         }
         return map;
+    }
+
+    /** Returns a map of stats for a specific planet. */
+    public OrderedMap<StatCat, OrderedMap<Stat, Seq<StatValue>>> toMap(@Nullable Planet planet){
+        OrderedMap<StatCat, OrderedMap<Stat, Seq<StatValue>>> full = toMap();
+        
+        if(statPlanets == null || statPlanets.isEmpty()){
+            return full;
+        }
+        
+        OrderedMap<StatCat, OrderedMap<Stat, Seq<StatValue>>> filter = new OrderedMap<>();
+        
+        for(Entry<StatCat, OrderedMap<Stat, Seq<StatValue>>> catEntry : full.entries()){
+            OrderedMap<Stat, Seq<StatValue>> catMap = new OrderedMap<>();
+            
+            for(Entry<Stat, Seq<StatValue>> entry : catEntry.value.entries()){
+                if(shouldDisplay(entry.key, planet)){
+                    catMap.put(entry.key, entry.value);
+                }
+            }
+            
+            if(!catMap.isEmpty()){
+                filter.put(catEntry.key, catMap);
+            }
+        }
+        
+        return filter;
     }
 
     public void statInfo(Cell<?> cell, Stat stat){
