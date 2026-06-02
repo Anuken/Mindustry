@@ -74,7 +74,6 @@ public class Stat implements Comparable<Stat>{
     instructions = new Stat("instructions", StatCat.crafting),
     meltdownOutput = new Stat("meltdownoutput", StatCat.crafting),
 
-
     weapons = new Stat("weapons", StatCat.function),
     bullet = new Stat("bullet", StatCat.function),
 
