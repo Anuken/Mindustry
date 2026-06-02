@@ -306,12 +306,7 @@ public class NetServer implements ApplicationListener{
             //playing in pvp mode automatically assigns players to teams
             player.team(assignTeam(player));
 
-            if(state.data.hasExternalAssets()){
-                con.determiningAssets = true;
-                sendAssetRequirements(player);
-            }else{
-                sendWorldData(player);
-            }
+            sendWorldAndAssets(player);
 
             platform.updateRPC();
 
@@ -319,6 +314,17 @@ public class NetServer implements ApplicationListener{
         });
 
         registerCommands();
+    }
+
+    public void sendWorldAndAssets(Player player){
+        if(state.data.hasExternalAssets()){
+            player.con.determiningAssets = true;
+            player.con.receivingAssets = false;
+            player.con.hasConnected = false;
+            sendAssetRequirements(player);
+        }else{
+            sendWorldData(player);
+        }
     }
 
     @Override
@@ -519,9 +525,12 @@ public class NetServer implements ApplicationListener{
     }
 
     public void sendAssetRequirements(Player player){
-        var stream = new ByteArrayOutputStream();
-        NetworkIO.writeRequiredAssets(new FastDeflaterOutputStream(stream), state.data.getAllExternalAssets());
-        player.con.sendStream(new AssetRequirementStream(), stream);
+        var assets = state.data.getAllExternalAssets();
+        mainExecutor.submit(() -> {
+            var stream = new ByteArrayOutputStream();
+            NetworkIO.writeRequiredAssets(new FastDeflaterOutputStream(stream), assets);
+            player.con.sendStreamAsync(new AssetRequirementStream(), stream);
+        });
     }
 
     public void sendWorldData(Player player){
@@ -529,7 +538,7 @@ public class NetServer implements ApplicationListener{
         NetworkIO.writeWorld(player, new FastDeflaterOutputStream(stream));
         player.con.sendStream(new WorldStream(), stream);
 
-        debug("Packed @ bytes of world data to @ (@ / @)", stream.size(), player.name, player.con.address, player.uuid());
+        debug("Packed @ of world data to @ (@ / @)", Strings.formatByteCount(stream.size()), player.name, player.con.address, player.uuid());
     }
 
     public void addPacketHandler(String type, Cons2<Player, String> handler){
@@ -925,14 +934,9 @@ public class NetServer implements ApplicationListener{
                 var stream = new ByteArrayOutputStream();
                 NetworkIO.writeAssets(stream, res);
 
-                debug("Packed @ bytes of asset data to @ (@ / @)", stream.size(), player.name, player.con.address, player.uuid());
+                debug("Packed @ of asset data to @ (@ / @)", Strings.formatByteCount(stream.size()), player.name, player.con.address, player.uuid());
 
-                //ArcNetConnection (most connections) allows async sending. The Steam implementation does not.
-                if(player.con.allowAsyncSend()){
-                    player.con.sendStream(new AssetStream(), stream);
-                }else{
-                    Core.app.post(() -> player.con.sendStream(new AssetStream(), stream));
-                }
+                player.con.sendStreamAsync(new AssetStream(), stream);
             }catch(Exception e){
                 Log.err(e);
             }

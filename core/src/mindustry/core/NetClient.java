@@ -147,7 +147,7 @@ public class NetClient implements ApplicationListener{
         });
 
         net.handleClient(WorldStream.class, data -> {
-            Log.info("Received world data: @ bytes.", data.stream.available());
+            Log.info("Received world data: @", Strings.formatByteCount(data.stream.available()));
             NetworkIO.loadWorld(new InflaterInputStream(data.stream));
 
             finishConnecting();
@@ -166,12 +166,15 @@ public class NetClient implements ApplicationListener{
         });
 
         net.handleClient(AssetStream.class, data -> {
-            Log.info("Received asset data: @ bytes.", data.stream.available());
-            //there's usually little reason to compress assets (PNGs, OGGs), so they are not deflated.
-            NetworkIO.loadAssets(data.stream);
+            Log.info("Received asset data: @", Strings.formatByteCount(data.stream.available()));
+            //don't block the main thread with asset file copying
+            mainExecutor.submit(() -> {
+                //there's usually little reason to compress assets (PNGs, OGGs), so they are not deflated.
+                NetworkIO.loadAssets(data.stream);
 
-            //after receiving assets, tell the server that the client is ready to handle the world
-            Call.requestWorld();
+                //after receiving assets, tell the server that the client is ready to handle the world
+                Core.app.post(Call::requestWorld);
+            });
         });
     }
 

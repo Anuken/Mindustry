@@ -145,6 +145,10 @@ public class DataPatcher{
             dpMod.erroredContent.clear();
 
             for(var asset : content){
+                asset.errored = false;
+                asset.content = null;
+                asset.warnings.clear();
+
                 currentlyApplyingContent = asset;
 
                 if(!Structs.contains(ContentAsset.loadableContent, asset.type)){
@@ -163,9 +167,11 @@ public class DataPatcher{
                 //TODO: what to do when errors happen in general?
                 try{
                     //this binds the content but does not load it entirely
-                    parser.parse(dpMod, asset.name, asset.data, file, asset.type);
+                    asset.content = parser.parse(dpMod, asset.name, asset.data, file, asset.type);
+                    asset.content.minfo.asset = asset;
                 }catch(Throwable e){
-                    asset.warnings.add(Strings.getStackTrace(e));
+                    asset.warnings.add(Strings.getFinalMessage(e));
+                    asset.errored = true;
 
                     //TODO: this warning is not very useful, nor is markError in general. What should be done here?
                     if(current != Vars.content.getLastAdded() && Vars.content.getLastAdded() != null){
@@ -188,6 +194,7 @@ public class DataPatcher{
                 try{
                     cont.init();
                 }catch(Throwable t){
+                    if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
                     parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
                 }
             }
@@ -196,6 +203,7 @@ public class DataPatcher{
                 try{
                     cont.postInit();
                 }catch(Throwable t){
+                    if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
                     parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
                 }
             }
@@ -206,6 +214,7 @@ public class DataPatcher{
                         cont.loadIcon();
                         cont.load();
                     }catch(Throwable t){
+                        if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
                         parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
                     }
                 }

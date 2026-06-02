@@ -9,7 +9,7 @@ import java.io.*;
 
 public class ContentAsset extends DataAsset{
     //Note: sectors can't be loaded at the moment
-    public static final ContentType[] loadableContent = {ContentType.item, ContentType.block, ContentType.liquid, ContentType.status, ContentType.unit, ContentType.weather, ContentType.planet, ContentType.unitCommand, ContentType.unitStance};
+    public static final ContentType[] loadableContent = {ContentType.item, ContentType.block, ContentType.liquid, ContentType.status, ContentType.unit, ContentType.weather, ContentType.planet};
 
     /** Content type to be parsed as. */
     public ContentType type = ContentType.unit;
@@ -17,6 +17,10 @@ public class ContentAsset extends DataAsset{
     public String data = "";
     /** Warnings encountered during deserialization. */
     public Seq<String> warnings = new Seq<>();
+    /** Content that was loaded, if successful. */
+    public @Nullable Content content;
+    /** If true, this asset failed to completely, and cannot be used. */
+    public boolean errored;
 
     public void readOverride(String path, Fi file, ContentType type) throws IOException{
         this.type = type;

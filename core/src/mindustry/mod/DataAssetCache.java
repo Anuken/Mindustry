@@ -18,12 +18,12 @@ public class DataAssetCache{
         }
     }
 
-    public void addOverride(String hash, Fi source){
+    public synchronized void addOverride(String hash, Fi source){
         hashToFile.put(hash, source);
     }
 
     /** @return the hash */
-    public byte[] add(byte[] bytes){
+    public synchronized byte[] add(byte[] bytes){
         byte[] hash = Streams.sha256(bytes);
         String name = encodeHash(hash);
         Fi file = Vars.assetCacheDirectory.child(name);
@@ -39,7 +39,7 @@ public class DataAssetCache{
         return get(hash) != null;
     }
 
-    public @Nullable Fi get(String shaHash){
+    public synchronized @Nullable Fi get(String shaHash){
         if(shaHash == null) return null;
         return hashToFile.get(shaHash);
     }

@@ -191,7 +191,7 @@ public class ContentParser{
             return result;
         });
         put(MassDriverBolt.class, (type, data) -> {
-            MassDriverBolt result = (MassDriverBolt)make(MassDriverBolt.class);
+            MassDriverBolt result = make(MassDriverBolt.class);
             readFields(result, data);
             return result;
         });
@@ -589,7 +589,7 @@ public class ContentParser{
                     block = locate(ContentType.block, name);
                 }
             }else{
-                block = make(resolve(value.getString("type", ""), Block.class), mod + "-" + name);
+                block = make(resolve(value.getString("type", ""), allowPatching ? Block.class : null), mod + "-" + name);
             }
 
             currentContent = block;
@@ -1336,6 +1336,10 @@ public class ContentParser{
         }
 
         if(object instanceof UnlockableContent unlock && research != null){
+            if(!allowPatching){
+                warn("Modifying the tech tree is not allowed (@)", currentFile);
+                return;
+            }
 
             //add research tech node
             String researchName;

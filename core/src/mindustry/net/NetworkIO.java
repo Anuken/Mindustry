@@ -105,7 +105,9 @@ public class NetworkIO{
 
         try(DataOutputStream stream = new DataOutputStream(os)){
             stream.writeInt(assets.size);
-            for(var asset : assets){
+            //can't use iterator as this seq might be accessed by multiple threads
+            for(int i = 0; i < assets.size; i ++){
+                var asset = assets.get(i);
                 if(asset.byteHash == null) throw new RuntimeException("Invalid asset (missing hash): " + asset.path);
                 stream.write(asset.byteHash);
             }

@@ -92,6 +92,16 @@ public class MapPatchImagesDialog extends BaseDialog{
                     TextButtonStyle style = Styles.flatt;
                     t.defaults().size(280f, 60f).left();
                     t.button("@editor.patches.image.importzip", Icon.download, style, () -> platform.showFileChooser(true, "zip", file -> {
+
+                        //Android doesn't allow accessing the file contents outside the callback; other platforms either copy it already, or don't have dumb permission issues
+                        Fi targetFile;
+                        if(OS.isAndroid){
+                            targetFile = tmpDirectory.child(file.name());
+                            file.copyTo(targetFile);
+                        }else{
+                            targetFile = file;
+                        }
+
                         dialog.hide();
                         ui.loadAnd(() -> {
                             try{
@@ -104,7 +114,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                                 Seq<Future<?>> images = new Seq<>();
                                 var errors = new CopyOnWriteArrayList<String>();
 
-                                Fi zipped = new ZipFi(file);
+                                Fi zipped = new ZipFi(targetFile);
                                 zipped.walk(ifile -> {
                                     if(ifile.extEquals("png")){
                                         images.add(mainExecutor.submit(() -> {
@@ -239,7 +249,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                 t.top();
                 t.add(new BorderImage(region, 4f)).scaling(Scaling.fit).with(b -> b.drawAlpha = true).size(size - 10f).row();
                 t.add((found ? "" : "[red]⚠[] ") + image.name).tooltip(regionPrefix + image.name + "\n[lightgray]" + image.path).ellipsis(true).left().width(size - 10f).growX().row();
-                t.add(iwidth + "x" + iheight).tooltip(String.format("%,d", ilength) + "[lightgray]b").color(Color.lightGray).left().growX().row();
+                t.add(iwidth + "x" + iheight).tooltip(Strings.formatByteCount(ilength) + "[lightgray]b").color(Color.lightGray).left().growX().row();
                 t.table(b -> {
                     b.left();
                     b.defaults().size((size - 10f) / 4f);
@@ -282,7 +292,7 @@ public class MapPatchImagesDialog extends BaseDialog{
                         d.cont.add(Core.bundle.format("editor.patches.image.path", image.name)).row();
                         d.cont.add(Core.bundle.format("editor.patches.image.env", env)).row();
                         d.cont.add(Core.bundle.format("editor.patches.image.size", iwidth, iheight)).row();
-                        d.cont.add(Core.bundle.format("editor.patches.image.filesize", String.format("%,d", ilength) + "[darkgray]b"));
+                        d.cont.add(Core.bundle.format("editor.patches.image.filesize", Strings.formatByteCount(ilength) + "[darkgray]b"));
 
                         d.addCloseButton();
                         d.show();

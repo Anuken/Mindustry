@@ -6,16 +6,9 @@ import mindustry.mod.data.*;
 
 /**
  * TODO:
- * - Make sure steam cloud syncs the folder
- * - Display missing content when loading a save
- * - Clean up the class hierarchy for data assets
- * - Make sure map import/export works
- * - Prevent save from loading when content errors are present?
+ * - Display world load progress properly with assets, and make sure it can't time out
  * - Patchset names are weird and broken with the new path system
  * - Test planets/sectors/techtree stuff and make sure remove() works properly
- * - What happens when you try to define a tech tree?
- * - Make sure existing content can't add to the tech tree and such
- * - Test unit commands/stances
  * - Try really hard to make the game crash or misbehave
  * - Unit tests
  */

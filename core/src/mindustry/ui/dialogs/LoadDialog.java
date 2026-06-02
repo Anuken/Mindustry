@@ -229,6 +229,27 @@ public class LoadDialog extends BaseDialog{
                     state.rules.editor = false;
                     state.rules.sector = null;
                     state.set(State.playing);
+
+                    var missing = state.data.getMissingAssets();
+                    if(missing.size > 0){
+                        BaseDialog d = new BaseDialog("@save.assets.missing");
+                        d.cont.add("@save.assets.missing.info").labelAlign(Align.center).expandX().wrap().colspan(2);
+                        d.cont.row();
+
+                        Collapser col = new Collapser(base -> base.pane(t -> {
+                            t.margin(14f);
+                            for(var asset : missing){
+                                t.add("[accent]" + asset.getType() + ": [lightgray]" + asset.path).left().row();
+                            }
+                        }), true);
+
+                        d.cont.button("@save.assets.missing.list", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
+                        d.cont.button("@ok", d::hide).size(110, 50).fillX().left();
+                        d.cont.row();
+                        d.cont.add(col).colspan(2).pad(2);
+
+                        d.show();
+                    }
                 }catch(SaveException e){
                     Log.err(e);
                     logic.reset();

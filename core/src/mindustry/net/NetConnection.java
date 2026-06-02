@@ -96,8 +96,9 @@ public abstract class NetConnection{
         return true;
     }
 
-    public boolean allowAsyncSend(){
-        return false;
+    public void sendStreamAsync(Streamable stream, ByteArrayOutputStream data){
+        //default implementation assumes async stream sending is allowed
+        sendStream(stream, data);
     }
 
     public void sendStream(Streamable stream, ByteArrayOutputStream data){

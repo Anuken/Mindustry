@@ -729,7 +729,7 @@ public class ServerControl implements ApplicationListener{
             var allKeys = Seq.with(Core.settings.keys());
             allKeys.sort();
             int maxLength = allKeys.max(String::length).length();
-            Log.info("Total values: @ | @ bytes", allKeys.size, String.format("%,d", Core.settings.getSettingsFile().length()));
+            Log.info("Total values: @ | @ bytes", allKeys.size, Strings.formatByteCount(Core.settings.getSettingsFile().length()));
 
             for(String key : allKeys){
                 var value = Core.settings.get(key, null);

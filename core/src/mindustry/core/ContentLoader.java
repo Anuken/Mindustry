@@ -194,7 +194,7 @@ public class ContentLoader{
             if(list.size > 0 && list.peek() == content){
                 list.pop();
             }
-            throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + content.name + "')");
+            throw new IllegalArgumentException("Two content objects defined with the same name: '" + content.name + "'");
         }
         if(currentMod != null){
             content.minfo.mod = currentMod;

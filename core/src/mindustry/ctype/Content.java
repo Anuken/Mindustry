@@ -5,6 +5,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
+import mindustry.mod.data.*;
 
 /** Base class for a content type that is loaded in {@link mindustry.core.ContentLoader}. */
 @NoPatch
@@ -79,5 +80,7 @@ public abstract class Content implements Comparable<Content>{
         public @Nullable String error;
         /** Base throwable that caused the error. */
         public @Nullable Throwable baseError;
+        /** If this was loaded as part of a save, this is the associated content asset. Null for mods. */
+        public @Nullable ContentAsset asset;
     }
 }
