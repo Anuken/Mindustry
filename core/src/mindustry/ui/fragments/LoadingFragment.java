@@ -34,12 +34,12 @@ public class LoadingFragment{
             t.add().height(133f).row();
             t.add(new WarningBar()).growX().height(24f);
             t.row();
-            nameLabel = t.add("@loading").pad(10f).style(Styles.techLabel).get();
+            nameLabel = t.add("@loading").pad(10f).style(Styles.outlineLabel).get();
             t.row();
             t.add(new WarningBar()).growX().height(24f);
             t.row();
 
-            text("@loading");
+            nameLabel.setText("@loading");
 
             bar = t.add(new Bar()).pad(3).padTop(6).size(500f, 40f).visible(false).get();
             t.row();
@@ -78,15 +78,33 @@ public class LoadingFragment{
         }
     }
 
+    public void showProgressBar(){
+        if(!bar.visible){
+            setProgress(() -> progValue);
+        }
+    }
+
+    public boolean showingProgress(){
+        return bar.visible;
+    }
+
     public void setButton(Runnable listener){
-        button.visible = true;
+        setButton(listener, true);
+    }
+
+    public void setButton(Runnable listener, boolean showProgress){
+        button.visible = showProgress;
         button.requestKeyboard();
         cancelListener = listener;
     }
 
     public void setText(String text){
-        text(text);
-        nameLabel.setColor(Pal.accent);
+        nameLabel.setText(text);
+    }
+
+    public void setText(String text, Color color){
+        nameLabel.setText(text);
+        nameLabel.setColor(color);
     }
 
     public void show(){
@@ -96,11 +114,11 @@ public class LoadingFragment{
     public void show(String text){
         button.visible = false;
         cancelListener = null;
-        nameLabel.setColor(Color.white);
         bar.visible = false;
         table.clearActions();
         table.touchable = Touchable.enabled;
-        text(text);
+        nameLabel.setColor(Color.white);
+        nameLabel.setText(text);
         table.visible = true;
         table.color.a = 1f;
         table.toFront();
@@ -118,19 +136,4 @@ public class LoadingFragment{
         }
     }
 
-    private void text(String text){
-        nameLabel.setText(text);
-
-        CharSequence realText = nameLabel.getText();
-
-        //fallback to the default font if characters are missing
-        //TODO this should happen everywhere
-        for(int i = 0; i < realText.length(); i++){
-            if(Fonts.tech.getData().getGlyph(realText.charAt(i)) == null){
-                nameLabel.setStyle(Styles.defaultLabel);
-                return;
-            }
-        }
-        nameLabel.setStyle(Styles.techLabel);
-    }
 }

@@ -6,7 +6,6 @@ import mindustry.mod.data.*;
 
 /**
  * TODO:
- * - Display world load progress properly with assets, and make sure it can't time out
  * - Patchset names are weird and broken with the new path system
  * - Test planets/sectors/techtree stuff and make sure remove() works properly
  * - Try really hard to make the game crash or misbehave

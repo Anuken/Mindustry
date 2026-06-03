@@ -90,12 +90,12 @@ public class NetClient implements ApplicationListener{
             }
 
             ui.loadfrag.hide();
-            ui.loadfrag.show("@connecting.data");
+            ui.loadfrag.show("@connecting.establish");
 
             ui.loadfrag.setButton(() -> {
                 ui.loadfrag.hide();
                 disconnectQuietly();
-            });
+            }, false);
 
             String locale = Core.settings.getString("locale");
             if(locale.equals("default")){
@@ -452,13 +452,13 @@ public class NetClient implements ApplicationListener{
 
         net.setClientLoaded(false);
 
-        ui.loadfrag.show("@connecting.data");
+        ui.loadfrag.show("@connecting.establish");
 
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
 
             netClient.disconnectQuietly();
-        });
+        }, false);
     }
 
     @Remote(variants = Variant.one)

@@ -11,6 +11,7 @@ import com.codedisaster.steamworks.SteamRemoteStorage.*;
 import com.codedisaster.steamworks.SteamUGC.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.maps.*;
 import mindustry.mod.Mods.*;
 import mindustry.service.*;
@@ -217,9 +218,9 @@ public class SWorkshop implements SteamUGCCallback{
 
             ui.loadfrag.setProgress(() -> {
                 ItemUpdateStatus status = ugc.getItemUpdateProgress(h, info);
-                ui.loadfrag.setText("@" + status.name().toLowerCase());
+                ui.loadfrag.setText("@" + status.name().toLowerCase(), Pal.accent);
                 if(status == ItemUpdateStatus.Invalid){
-                    ui.loadfrag.setText("@done");
+                    ui.loadfrag.setText("@done", Pal.accent);
                     return 1f;
                 }
                 return (float)status.ordinal() / (float)ItemUpdateStatus.values().length;

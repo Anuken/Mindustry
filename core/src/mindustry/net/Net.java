@@ -61,6 +61,10 @@ public class Net{
         packetToId.put(t.getClass(), packetProvs.size - 1);
     }
 
+    public static byte getPacketClassId(Class<?> c){
+        return (byte)packetToId.get(c, -1);
+    }
+
     public static byte getPacketId(Packet packet){
         int id = packetToId.get(packet.getClass(), -1);
         if(id == -1) throw new ArcRuntimeException("Unknown packet type: " + packet.getClass());
@@ -276,6 +280,15 @@ public class Net{
         if(object instanceof StreamBegin b){
             streams.put(b.id, currentStream = new StreamBuilder(b));
 
+            boolean isWorld = b.type == Net.getPacketClassId(WorldStream.class), isAssets = (b.type == Net.getPacketClassId(AssetStream.class) && b.total > 4);
+
+            if(isWorld || isAssets){
+                ui.loadfrag.showProgressBar();
+                ui.loadfrag.setProgress(0f);
+                ui.loadfrag.snapProgress();
+                ui.loadfrag.setText(Core.bundle.format(isWorld ? "receiving.world" : "receiving.assets", Strings.formatByteCount(b.total)));
+            }
+
         }else if(object instanceof StreamChunk c){
             StreamBuilder builder = streams.get(c.id);
             if(builder == null){
@@ -283,8 +296,11 @@ public class Net{
             }
             builder.add(c.data);
 
-            ui.loadfrag.setProgress(builder.progress());
-            ui.loadfrag.snapProgress();
+            if(ui.loadfrag.showingProgress()){
+                ui.loadfrag.setProgress(builder.progress());
+                ui.loadfrag.snapProgress();
+            }
+
             netClient.resetTimeout();
 
             if(builder.isDone()){

@@ -921,26 +921,31 @@ public class NetServer implements ApplicationListener{
         player.con.determiningAssets = false;
         player.con.receivingAssets = true;
 
-        Seq<DataAsset> res = new Seq<>();
-        Seq<DataAsset> allAssets = state.data.getAllExternalAssets();
-        for(short id : ids){
-            if(id >= allAssets.size || id < 0) continue;
-            res.add(allAssets.get(id));
-        }
-
-        //packing the data and reading it from disk can be async; it shouldn't need to block the main thread.
-        mainExecutor.submit(() -> {
-            try{
-                var stream = new ByteArrayOutputStream();
-                NetworkIO.writeAssets(stream, res);
-
-                debug("Packed @ of asset data to @ (@ / @)", Strings.formatByteCount(stream.size()), player.name, player.con.address, player.uuid());
-
-                player.con.sendStreamAsync(new AssetStream(), stream);
-            }catch(Exception e){
-                Log.err(e);
+        if(ids.length == 0){  //no assets required, all cached
+            player.con.receivingAssets = false;
+            netServer.sendWorldData(player);
+        }else{
+            Seq<DataAsset> res = new Seq<>();
+            Seq<DataAsset> allAssets = state.data.getAllExternalAssets();
+            for(short id : ids){
+                if(id >= allAssets.size || id < 0) continue;
+                res.add(allAssets.get(id));
             }
-        });
+
+            //packing the data and reading it from disk can be async; it shouldn't need to block the main thread.
+            mainExecutor.submit(() -> {
+                try{
+                    var stream = new ByteArrayOutputStream();
+                    NetworkIO.writeAssets(stream, res);
+
+                    debug("Packed @ of asset data to @ (@ / @)", Strings.formatByteCount(stream.size()), player.name, player.con.address, player.uuid());
+
+                    player.con.sendStreamAsync(new AssetStream(), stream);
+                }catch(Exception e){
+                    Log.err(e);
+                }
+            });
+        }
     }
 
     @Remote(targets = Loc.client, priority = PacketPriority.high)
