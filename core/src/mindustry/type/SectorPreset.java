@@ -95,8 +95,8 @@ public class SectorPreset extends UnlockableContent{
     }
 
     @Override
-    public void remove(){
-        super.remove();
+    public void removeContent(){
+        super.removeContent();
         if(sector != null && sector.preset == this){
             sector.preset = null;
         }

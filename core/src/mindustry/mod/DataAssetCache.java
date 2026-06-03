@@ -48,14 +48,15 @@ public class DataAssetCache{
         return get(encodeHash(shaHash));
     }
 
-    //base32 without padding
-    public static String encodeHash(byte[] data) {
+    //base32 without padding; data must be exactly 32 bytes
+    public static String encodeHash(byte[] data){
+        if(data.length != 32) throw new IllegalArgumentException("Data must be exactly 32 bytes (length: " + data.length + ")");
         char[] out = new char[52];
         int di = 0, oi = 0;
-        long bits;
 
         for(int i = 0; i < 6; i++){
-            bits = ((long)(data[di++] & 0xFF) << 32) |
+            long bits =
+                ((long)(data[di++] & 0xFF) << 32) |
                 ((long)(data[di++] & 0xFF) << 24) |
                 ((long)(data[di++] & 0xFF) << 16) |
                 ((long)(data[di++] & 0xFF) << 8)  |
@@ -77,7 +78,7 @@ public class DataAssetCache{
         out[oi++] = base32Alphabet[(b0 >>> 3) & 0x1F];
         out[oi++] = base32Alphabet[((b0 << 2) & 0x1C) | ((b1 >>> 6) & 0x03)];
         out[oi++] = base32Alphabet[(b1 >>> 1) & 0x1F];
-        out[oi++] = base32Alphabet[(b1 << 4) & 0x10];
+        out[oi++] = base32Alphabet[(b1 << 4) & 0x1F];
 
         return new String(out);
     }

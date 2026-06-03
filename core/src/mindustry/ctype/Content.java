@@ -3,8 +3,9 @@ package mindustry.ctype;
 import arc.files.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.mod.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.mod.Mods.*;
+import mindustry.mod.*;
 import mindustry.mod.data.*;
 
 /** Base class for a content type that is loaded in {@link mindustry.core.ContentLoader}. */
@@ -13,6 +14,8 @@ public abstract class Content implements Comparable<Content>{
     public short id;
     /** Info on which mod this content was loaded from. */
     public ModContentInfo minfo = new ModContentInfo();
+    /** If true, this content is invalid (added in a data patch and then removed). */
+    public boolean removed;
 
     public Content(){
         this.id = (short)Vars.content.getBy(getContentType()).size;
@@ -26,7 +29,8 @@ public abstract class Content implements Comparable<Content>{
     public abstract ContentType getContentType();
 
     /** Called when this content is removed in a data patch. */
-    public void remove(){}
+    @CallSuper
+    public void removeContent(){}
 
     /** Called after all content and modules are created. Do not use to load regions or texture data! */
     public void init(){}

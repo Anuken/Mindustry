@@ -578,10 +578,10 @@ public class ServerControl implements ApplicationListener{
             info("Map directory: &fi@", customMapDirectory.file().getAbsoluteFile().toString());
         });
 
-        handler.register("reloadpatches", "Reload all patch files from disk.", arg -> {
+        handler.register("reloadassets", "Reload all content/patch asset files from disk.", arg -> {
             loadDataAssets();
             if(dataAssets.isEmpty()){
-                err("No valid content patch files found.");
+                err("No valid asset files found.");
             }
         });
 

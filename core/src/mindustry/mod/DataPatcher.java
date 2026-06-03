@@ -264,7 +264,8 @@ public class DataPatcher{
         for(var arr : Vars.content.getContentMap()){
             for(var value : arr){
                 if(value.isModded() && value.minfo.mod == dpMod){
-                    value.remove();
+                    value.removed = true;
+                    value.removeContent();
                 }
             }
         }

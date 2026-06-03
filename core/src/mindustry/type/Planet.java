@@ -237,10 +237,14 @@ public class Planet extends UnlockableContent{
     }
 
     @Override
-    public void remove(){
+    public void removeContent(){
+        super.removeContent();
+
         if(parent != null){
             parent.children.remove(this);
             parent.updateTotalRadius();
+            if(mesh != null) mesh.dispose();
+            if(cloudMesh != null) cloudMesh.dispose();
         }
     }
 

@@ -1,7 +1,6 @@
 package mindustry.mod.data;
 
 import arc.files.*;
-import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
@@ -9,6 +8,7 @@ import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 
 import java.io.*;
+import java.util.*;
 
 public class PatchAsset extends DataAsset{
     private static final JsonValue emptyValue = new JsonValue("error");
@@ -23,8 +23,8 @@ public class PatchAsset extends DataAsset{
     public Seq<String> warnings = new Seq<>();
 
     public PatchAsset(String patch){
-        //patches don't have a path by default, so make it something random when reading. TODO: this is a temporary measure.
-        setPath("patch-" + Mathf.rand.nextLong() + ".json");
+        //patches don't have a path by default, so make it something random when reading. TODO: this is a temporary measure until a proper editor is added.
+        setPath("patch-" + UUID.randomUUID() + ".json");
         this.patch = patch;
     }
 

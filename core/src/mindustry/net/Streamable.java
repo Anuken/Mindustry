@@ -111,10 +111,6 @@ public class Streamable extends Packet{
             if(isClosed) throw new ClosedChannelException();
 
             if(currentBuffer == null || currentOffset >= currentBuffer.length){
-                //after a finish(), reads are allowed, but only if the queue isn't empty (otherwise it's a EOF)
-                //throwing EOF is against convention, but I don't care, this is invalid state, and you shouldn't be here
-                if(isFinished && queue.isEmpty()) throw new EOFException();
-
                 try{
                     currentBuffer = queue.take();
                     currentOffset = 0;
@@ -123,7 +119,7 @@ public class Streamable extends Packet{
                     if(currentBuffer == closedSignal){
                         queue.add(closedSignal);
                         //if the queue was finished, and you were trying to read something, you should get a EOF instead (invalid state)
-                        if(isFinished) throw new EOFException();
+                        if(isFinished) return -1;
                         throw new ClosedChannelException();
                     }
                 }catch(InterruptedException e){
@@ -146,7 +142,7 @@ public class Streamable extends Packet{
             return result == -1 ? -1 : (singleByte[0] & 0xFF);
         }
 
-        /** unlike close(), this allows the stream to finish reading whatever it's reading, but if it tries to read more, it will return -1 (EOF) */
+        /** unlike close(), this allows the stream to finish reading whatever it's reading, but if it tries to read more, it will throw EOF */
         public void finish(){
             isFinished = true;
             queue.add(closedSignal);
