@@ -20,6 +20,7 @@ import mindustry.type.*;
 
 import java.io.*;
 import java.nio.*;
+import java.nio.channels.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
@@ -145,7 +146,7 @@ public class NetworkIO{
         }
     }
 
-    public static void loadAssets(InputStream is){
+    public static void loadAssets(InputStream is) throws IOException{
         try(DataInputStream stream = new DataInputStream(is)){
             int amount = stream.readInt();
             for(int i = 0; i < amount; i++){
@@ -154,8 +155,8 @@ public class NetworkIO{
                 stream.readFully(bytes);
                 assetCache.add(bytes);
             }
-        }catch(IOException e){
-            throw new RuntimeException(e);
+        }catch(ClosedChannelException ignored){
+            //happens when the input stream is closed externally
         }
     }
 

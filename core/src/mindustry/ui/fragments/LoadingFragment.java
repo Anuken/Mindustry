@@ -88,12 +88,9 @@ public class LoadingFragment{
         return bar.visible;
     }
 
-    public void setButton(Runnable listener){
-        setButton(listener, true);
-    }
 
-    public void setButton(Runnable listener, boolean showProgress){
-        button.visible = showProgress;
+    public void setButton(Runnable listener){
+        button.visible = true;
         button.requestKeyboard();
         cancelListener = listener;
     }

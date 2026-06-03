@@ -6,8 +6,8 @@ import mindustry.mod.data.*;
 
 /**
  * TODO:
- * - Patchset names are weird and broken with the new path system
- * - Test planets/sectors/techtree stuff and make sure remove() works properly
+ * - Patchset names are weird and broken with the new path system (no unique file name)
+ * - Test planets and make sure remove() works properly
  * - Try really hard to make the game crash or misbehave
  * - Unit tests
  */

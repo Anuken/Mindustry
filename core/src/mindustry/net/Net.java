@@ -22,6 +22,8 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class Net{
+    public static final int packetIdAssetStream, packetIdWorldStream;
+
     private static Seq<Prov<? extends Packet>> packetProvs = new Seq<>();
     private static Seq<Class<? extends Packet>> packetClasses = new Seq<>();
     private static ObjectIntMap<Class<?>> packetToId = new ObjectIntMap<>();
@@ -44,21 +46,23 @@ public class Net{
     static{
         registerPacket(StreamBegin::new);
         registerPacket(StreamChunk::new);
-        registerPacket(WorldStream::new);
+        packetIdWorldStream = registerPacket(WorldStream::new);
         registerPacket(ConnectPacket::new);
         registerPacket(AssetRequirementStream::new);
-        registerPacket(AssetStream::new);
+        packetIdAssetStream = registerPacket(AssetStream::new);
 
         //register generated packet classes
         Call.registerPackets();
     }
 
     /** Registers a new packet type for serialization. */
-    public static <T extends Packet> void registerPacket(Prov<T> cons){
+    public static <T extends Packet> int registerPacket(Prov<T> cons){
+        int id = packetProvs.size;
         packetProvs.add(cons);
         var t = cons.get();
         packetClasses.add(t.getClass());
-        packetToId.put(t.getClass(), packetProvs.size - 1);
+        packetToId.put(t.getClass(), id);
+        return id;
     }
 
     public static byte getPacketClassId(Class<?> c){
@@ -162,6 +166,9 @@ public class Net{
      * Connect to an address.
      */
     public void connect(String ip, int port, Runnable success){
+        streams.clear();
+        currentStream = null;
+
         try{
             if(!active){
                 Events.fire(new ClientServerConnectEvent(ip, port));
@@ -212,6 +219,10 @@ public class Net{
         provider.disconnectClient();
         server = false;
         active = false;
+        for(var stream : streams){
+            stream.value.close();
+        }
+        currentStream = null;
     }
 
     /**
@@ -278,16 +289,11 @@ public class Net{
         object.handled();
 
         if(object instanceof StreamBegin b){
-            streams.put(b.id, currentStream = new StreamBuilder(b));
+            streams.put(b.id, currentStream = new StreamBuilder(b, ((Streamable)Net.newPacket(b.type)).incremental()));
+            b.incrementalStream = currentStream.incrementalStream;
 
-            boolean isWorld = b.type == Net.getPacketClassId(WorldStream.class), isAssets = (b.type == Net.getPacketClassId(AssetStream.class) && b.total > 4);
-
-            if(isWorld || isAssets){
-                ui.loadfrag.showProgressBar();
-                ui.loadfrag.setProgress(0f);
-                ui.loadfrag.snapProgress();
-                ui.loadfrag.setText(Core.bundle.format(isWorld ? "receiving.world" : "receiving.assets", Strings.formatByteCount(b.total)));
-            }
+            var listeners = clientListeners.get(StreamBegin.class);
+            if(listeners != null) listeners.get(object);
 
         }else if(object instanceof StreamChunk c){
             StreamBuilder builder = streams.get(c.id);
@@ -305,8 +311,13 @@ public class Net{
 
             if(builder.isDone()){
                 streams.remove(builder.id);
-                handleClientReceived(builder.build());
-                currentStream = null;
+                //incremental streams don't send an event as the data gets handled as it comes in
+                if(!builder.incremental){
+                    handleClientReceived(builder.build());
+                    currentStream = null;
+                }else{
+                    builder.incrementalStream.finish();
+                }
             }
         }else{
             int p = object.getPriority();

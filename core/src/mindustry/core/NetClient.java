@@ -95,7 +95,7 @@ public class NetClient implements ApplicationListener{
             ui.loadfrag.setButton(() -> {
                 ui.loadfrag.hide();
                 disconnectQuietly();
-            }, false);
+            });
 
             String locale = Core.settings.getString("locale");
             if(locale.equals("default")){
@@ -165,16 +165,34 @@ public class NetClient implements ApplicationListener{
             Call.requestAssets(missing.toArray());
         });
 
-        net.handleClient(AssetStream.class, data -> {
-            Log.info("Received asset data: @", Strings.formatByteCount(data.stream.available()));
-            //don't block the main thread with asset file copying
-            mainExecutor.submit(() -> {
-                //there's usually little reason to compress assets (PNGs, OGGs), so they are not deflated.
-                NetworkIO.loadAssets(data.stream);
+        net.handleClient(StreamBegin.class, data -> {
+            boolean isWorld = data.type == Net.packetIdWorldStream, isAssets = data.type == Net.packetIdAssetStream;
 
-                //after receiving assets, tell the server that the client is ready to handle the world
-                Core.app.post(Call::requestWorld);
-            });
+            if(isWorld || isAssets){
+                ui.loadfrag.showProgressBar();
+                ui.loadfrag.setProgress(0f);
+                ui.loadfrag.snapProgress();
+                ui.loadfrag.setText(Core.bundle.format(isWorld ? "receiving.world" : "receiving.assets", Strings.formatByteCount(data.total)));
+            }
+
+            if(isAssets){
+                //make this new thread block as it loads the assets
+                Threads.daemon(() -> {
+                    Log.info("Receiving asset data: @", Strings.formatByteCount(data.total));
+
+                    try{
+                        NetworkIO.loadAssets(data.incrementalStream);
+
+                        //after receiving assets, tell the server that the client is ready to handle the world
+                        Core.app.post(Call::requestWorld);
+                    }catch(Exception e){
+                        Core.app.post(() -> {
+                            ui.showException("@receiving.assets.fail", e);
+                            disconnectQuietly();
+                        });
+                    }
+                });
+            }
         });
     }
 
@@ -458,7 +476,7 @@ public class NetClient implements ApplicationListener{
             ui.loadfrag.hide();
 
             netClient.disconnectQuietly();
-        }, false);
+        });
     }
 
     @Remote(variants = Variant.one)
