@@ -636,6 +636,7 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         if(instantTransfer){
+            stats.add(Stat.itemsMoved, t -> t.add("∞ " + StatUnit.itemsSecond.localized()));
             stats.add(Stat.maxConsecutive, maxConsecutive, StatUnit.none);
         }
 
@@ -645,7 +646,10 @@ public class Block extends UnlockableContent implements Senseable{
 
         //Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(Stat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
-        if(hasItems && itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
+        if(hasItems){
+            if(itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
+            else if (instantTransfer || itemCapacity == 0) stats.add(Stat.itemCapacity, Core.bundle.format("bar.unabletoclog"));
+        }
     }
 
     public <T extends Building> void addBar(String name, Func<T, Bar> sup){

@@ -522,6 +522,28 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         };
     }
 
+    /** Searches sides in buildings with size > 1. */
+    public @Nullable Building nearbyEdge(int rotation){
+        int trns = block.size/2 + 1;
+        return nearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
+    }
+
+    /** Finds a building of the same team by side. Supports size > 1. */
+    public @Nullable Building proximityEdge(int rotation){
+        return proximityEdge(rotation, other -> true);
+    }
+
+    /** Finds a building of the same team by side and building predicate. Supports size > 1. */
+    public @Nullable Building proximityEdge(int rotation, Boolf<Building> pred){
+        int dir = Mathf.mod(rotation, 4);
+        for(var other : proximity){
+            if(relativeToEdge(other) == dir && pred.get(other)){
+                return other;
+            }
+        }
+        return null;
+    }
+
     public byte relativeTo(Tile tile){
         return relativeTo(tile.x, tile.y);
     }
@@ -541,32 +563,32 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return relativeTo(Edges.getFacingEdge(other, tile));
     }
 
+    public byte relativeToEdge(Building other){
+        return relativeTo(Edges.getFacingEdge(other, self()));
+    }
+
     public byte relativeTo(int cx, int cy){
         return tile.absoluteRelativeTo(cx, cy);
     }
 
     /** Multiblock front. */
     public @Nullable Building front(){
-        int trns = block.size/2 + 1;
-        return nearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
+        return nearbyEdge(rotation);
     }
 
     /** Multiblock back. */
     public @Nullable Building back(){
-        int trns = block.size/2 + 1;
-        return nearby(Geometry.d4(rotation + 2).x * trns, Geometry.d4(rotation + 2).y * trns);
+        return nearbyEdge(rotation + 2);
     }
 
     /** Multiblock left. */
     public @Nullable Building left(){
-        int trns = block.size/2 + 1;
-        return nearby(Geometry.d4(rotation + 1).x * trns, Geometry.d4(rotation + 1).y * trns);
+        return nearbyEdge(rotation + 1);
     }
 
     /** Multiblock right. */
     public @Nullable Building right(){
-        int trns = block.size/2 + 1;
-        return nearby(Geometry.d4(rotation + 3).x * trns, Geometry.d4(rotation + 3).y * trns);
+        return nearbyEdge(rotation + 3);
     }
 
     /** Any class that overrides this method and changes the value must call Vars.fogControl.forceUpdate(team). */

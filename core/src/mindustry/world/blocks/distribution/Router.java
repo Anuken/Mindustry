@@ -11,6 +11,8 @@ import mindustry.world.meta.*;
 
 public class Router extends Block{
     public float speed = 8f;
+    /** Whether this block can be chained, regardless of max consecutive limits. */
+    public boolean allowChaining = true;
 
     public Router(String name){
         super(name);
@@ -37,6 +39,7 @@ public class Router extends Block{
         public Tile lastInput;
         public float time;
         public @Nullable BlockUnitc unit;
+        public int consecutive;
 
         @Override
         public Unit unit(){
@@ -54,21 +57,21 @@ public class Router extends Block{
 
         @Override
         public void updateTile(){
-            if(!instantTransfer){
-                if(lastItem == null && items.any()){
-                    lastItem = items.first();
-                }
+            if(instantTransfer) return;
 
-                if(lastItem != null){
-                    time += 1f / speed * delta();
-                    Building target = getTileTarget(lastItem, lastInput, null, false);
+            if(lastItem == null && items.any()){
+                lastItem = items.first();
+            }
 
-                    if(target != null && (time >= 1f || !(target.block instanceof Router || target.block.instantTransfer))){
-                        getTileTarget(lastItem, lastInput, target, true);
-                        target.handleItem(this, lastItem);
-                        items.remove(lastItem, 1);
-                        lastItem = null;
-                    } 
+            if(lastItem != null){
+                time += 1f / speed * delta();
+                Building target = getTileTarget(lastItem, lastInput, null, false);
+
+                if(target != null && (time >= 1f || !(target.block instanceof Router || target.block.instantTransfer))){
+                    getTileTarget(lastItem, lastInput, target, true);
+                    target.handleItem(this, lastItem);
+                    items.remove(lastItem, 1);
+                    lastItem = null;
                 }
             }
         }
@@ -80,28 +83,32 @@ public class Router extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            if(instantTransfer){       
-                Building to = getTileTarget(item, lastInput, source, true);
-
-                return to != null && to.acceptItem(this, item) && to.team == team;
-                
-            }else{
+            if(!instantTransfer){
                 return team == source.team && lastItem == null && items.total() == 0;
             }
+
+            int chained = acceptTransfer(source);
+            Building to = getTileTarget(item, source.tile, source, false);
+            handleTransfer(chained);
+
+            return to != null && to.team == team;
         }
 
         @Override
         public void handleItem(Building source, Item item){
-            if(instantTransfer){
-                Building target = getTileTarget(item, lastInput, source, true);
-
-                if(target != null) target.handleItem(this, item);
-
-            }else{
+            if(!instantTransfer){
                 items.add(item, 1);
                 lastItem = item;
                 time = 0f;
+                lastInput = source.tile;
+                return;
             }
+
+            int chained = acceptTransfer(source);
+            Building target = getTileTarget(item, source.tile, source, true);
+            handleTransfer(chained);
+
+            if(target != null) target.handleItem(this, item);
 
             lastInput = source.tile;
         }
@@ -118,6 +125,24 @@ public class Router extends Block{
             return 0;
         }
 
+        public int acceptTransfer(Building source){
+            int prev = consecutive;
+            consecutive = prev == 0 && source != null && source.block.instantTransfer ? 2 : prev + 1;
+            return prev;
+        }
+
+        public void handleTransfer(int chained){
+            consecutive = chained;
+        }
+
+        public boolean canBackflow(Building other, Building src){
+            return other != src || src == null || !src.block.instantTransfer;
+        }
+
+        public boolean canChain(Building other){
+            return !other.block.instantTransfer || (consecutive < maxConsecutive && (allowChaining || !(other.block instanceof Router)));
+        }
+
         public @Nullable Building getTileTarget(Item item, Tile from, Building src, boolean set){
             if(unit != null && isControlled()){
                 unit.health(health);
@@ -128,28 +153,25 @@ public class Router extends Block{
                 int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
 
                 if(unit.isShooting()){
-                    Building other = nearby(rotation = angle);
-                    if(other != src){
-                        if(other != null && other.acceptItem(this, item)){
-                            return other;
-                        }
+                    Building other = proximityEdge(rotation = angle, build -> canBackflow(build, src) && canChain(build) && build.team == team && build.acceptItem(this, item));
+                    if(other != null){
+                        return other;
                     }
                 }
 
                 return null;
             }
 
-            int counter = rotation, consecutive = 0;
+            int counter = rotation;
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);
-                if(instantTransfer && other != src && other.block.instantTransfer){
-                    consecutive++;
-                    if(consecutive >= maxConsecutive) continue;
-                }
 
                 if(set) rotation = ((byte)((rotation + 1) % proximity.size)); 
-                if(other.tile == from && from.block() == Blocks.overflowGate || other == src) continue;
-                if(other.acceptItem(this, item)){
+                if((from != null && other.tile == from && from.block() == Blocks.overflowGate)
+                    || !canBackflow(other, src) 
+                    || (!allowChaining && other.block instanceof Router)) continue;
+                if(!canChain(other)) continue;
+                if(other.team == team && other.acceptItem(this, item)){
                     return other;
                 }
             }

@@ -2160,6 +2160,7 @@ public class Blocks{
             size = 2;
             instantTransfer = true;
             maxConsecutive = 2;
+            allowChaining = false;
         }};
 
         overflowGate = new OverflowGate("overflow-gate"){{
