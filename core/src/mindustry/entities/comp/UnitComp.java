@@ -38,7 +38,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     static final float warpDst = 8f;
 
     @Import boolean dead, disarmed;
-    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, ammo, dragMultiplier, armorOverride, speedMultiplier;
+    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, dragMultiplier, armorOverride, speedMultiplier;
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
@@ -202,6 +202,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return rotation;
     }
 
+    public float ammof(){
+        return 1f;
+    }
+
     @Override
     public boolean displayable(){
         return type.hoverable;
@@ -265,8 +269,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case health -> health;
             case shield -> shield;
             case maxHealth -> maxHealth;
-            case ammo -> !state.rules.unitAmmo ? type.ammoCapacity : ammo;
-            case ammoCapacity -> type.ammoCapacity;
             case x -> World.conv(x);
             case y -> World.conv(y);
             case velocityX -> vel.x * 60f / tilesize;
@@ -301,6 +303,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case size -> hitSize / tilesize;
             case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
             case selectedRotation -> controller instanceof Player p ? p.selectedRotation : 0;
+            case pingX -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingX) : Float.NaN;
+            case pingY -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingY) : Float.NaN;
             default -> Float.NaN;
         };
     }
@@ -319,6 +323,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case building -> isBuilding() && !buildPlan().breaking ? buildPlan().tile().build : null;
             case breaking -> isBuilding() && buildPlan().breaking ? buildPlan().tile().build : null;
             case selectedBlock -> controller instanceof Player p ? p.selectedBlock : null;
+            case pingText -> controller instanceof Player p && p.isPinging() ? p.pingText : null;
             default -> noSensed;
         };
     }
@@ -531,10 +536,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         this.hitSize = type.hitSize;
 
         if(mounts().length != type.weapons.size) setupWeapons(type);
-        if(abilities.length != type.abilities.size){
+        if(abilities.length != type.abilities.size || (abilities.length > 0 && abilities[0] instanceof EmptyDataAbility)){
+            var old = abilities;
             abilities = new Ability[type.abilities.size];
             for(int i = 0; i < type.abilities.size; i ++){
                 abilities[i] = type.abilities.get(i).copy();
+                if(i < old.length){
+                    abilities[i].data = old[i].data;
+                }
             }
         }
         if(controller == null) controller(type.createController(self()));
@@ -684,6 +693,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             }
         }
 
+        if(Float.isNaN(health)){
+            health = 0f;
+            kill();
+        }
+
         //update drown/flying state
 
         Floor floor = floorOn();
@@ -736,16 +750,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(!type.supportsEnv(state.rules.env) && !dead){
             Call.unitEnvDeath(self());
             team.data().updateCount(type, -1);
-        }
-
-        if(state.rules.unitAmmo && ammo < type.ammoCapacity - 0.0001f){
-            resupplyTime += Time.delta;
-
-            //resupply only at a fixed interval to prevent lag
-            if(resupplyTime > 10f){
-                type.ammoType.resupply(self());
-                resupplyTime = 0f;
-            }
         }
 
         for(Ability a : abilities){
@@ -825,7 +829,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             //boost if possible
             if(type.canBoost){
                 elevation = 1f;
-            }else if(!net.client()){
+            }else if(!net.client() && !(!headless && isRemote())){
                 kill();
             }
         }

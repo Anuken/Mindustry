@@ -25,6 +25,7 @@ public class ClassMap{
         classes.put("SuicideAI", mindustry.ai.types.SuicideAI.class);
         classes.put("Ability", mindustry.entities.abilities.Ability.class);
         classes.put("ArmorPlateAbility", mindustry.entities.abilities.ArmorPlateAbility.class);
+        classes.put("EmptyDataAbility", mindustry.entities.abilities.EmptyDataAbility.class);
         classes.put("EnergyFieldAbility", mindustry.entities.abilities.EnergyFieldAbility.class);
         classes.put("ForceFieldAbility", mindustry.entities.abilities.ForceFieldAbility.class);
         classes.put("LiquidExplodeAbility", mindustry.entities.abilities.LiquidExplodeAbility.class);
@@ -100,7 +101,6 @@ public class ClassMap{
         classes.put("Produce", mindustry.game.Objectives.Produce.class);
         classes.put("Research", mindustry.game.Objectives.Research.class);
         classes.put("SectorComplete", mindustry.game.Objectives.SectorComplete.class);
-        classes.put("AmmoType", mindustry.type.AmmoType.class);
         classes.put("Category", mindustry.type.Category.class);
         classes.put("CellLiquid", mindustry.type.CellLiquid.class);
         classes.put("ErrorContent", mindustry.type.ErrorContent.class);
@@ -126,8 +126,6 @@ public class ClassMap{
         classes.put("Weapon", mindustry.type.Weapon.class);
         classes.put("Weather", mindustry.type.Weather.class);
         classes.put("WeatherEntry", mindustry.type.Weather.WeatherEntry.class);
-        classes.put("ItemAmmoType", mindustry.type.ammo.ItemAmmoType.class);
-        classes.put("PowerAmmoType", mindustry.type.ammo.PowerAmmoType.class);
         classes.put("ErekirUnitType", mindustry.type.unit.ErekirUnitType.class);
         classes.put("MissileUnitType", mindustry.type.unit.MissileUnitType.class);
         classes.put("NeoplasmUnitType", mindustry.type.unit.NeoplasmUnitType.class);
@@ -480,6 +478,7 @@ public class ClassMap{
         classes.put("ConsumePowerDynamic", mindustry.world.consumers.ConsumePowerDynamic.class);
         classes.put("DrawArcSmelt", mindustry.world.draw.DrawArcSmelt.class);
         classes.put("DrawBlock", mindustry.world.draw.DrawBlock.class);
+        classes.put("DrawBlockParts", mindustry.world.draw.DrawBlockParts.class);
         classes.put("DrawBlurSpin", mindustry.world.draw.DrawBlurSpin.class);
         classes.put("DrawBubbles", mindustry.world.draw.DrawBubbles.class);
         classes.put("DrawCells", mindustry.world.draw.DrawCells.class);

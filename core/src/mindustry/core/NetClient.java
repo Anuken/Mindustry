@@ -13,14 +13,15 @@ import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.io.*;
+import mindustry.io.TypeIO.*;
 import mindustry.logic.*;
 import mindustry.net.Administration.*;
 import mindustry.net.*;
@@ -37,13 +38,15 @@ import static mindustry.Vars.*;
 public class NetClient implements ApplicationListener{
     private static final long entitySnapshotTimeout = 1000 * 20;
     private static final float dataTimeout = 60 * 30;
-    /** ticks between syncs, e.g. 5 means 60/5 = 12 syncs/sec*/
-    private static final float playerSyncTime = 4;
+    private static final Timekeeper
+        playerSyncTime = Timekeeper.ofMillis(66),
+        planSyncTime = Timekeeper.ofSeconds(0.5f),
+        pingTime = Timekeeper.ofSeconds(1f);
     private static final Reads dataReads = new Reads(null);
     private static final JsonValue tmpJsonMap = new JsonValue(ValueType.object);
 
     private long ping;
-    private Interval timer = new Interval(5);
+    //private Interval timer = new Interval(5);
     /** Whether the client is currently connecting. */
     private boolean connecting = false;
     /** If true, no message will be shown on disconnect. */
@@ -67,6 +70,7 @@ public class NetClient implements ApplicationListener{
     private ObjectMap<String, Seq<Cons<String>>> customPacketHandlers = new ObjectMap<>();
     /** Packet handlers for custom types of messages, in binary. */
     private ObjectMap<String, Seq<Cons<byte[]>>> customBinaryPacketHandlers = new ObjectMap<>();
+    private static final ClientBuildPlans plansOut = new ClientBuildPlans();
 
     public NetClient(){
 
@@ -684,7 +688,7 @@ public class NetClient implements ApplicationListener{
     }
 
     void sync(){
-        if(timer.get(0, playerSyncTime)){
+        if(playerSyncTime.poll()){
             boolean dead = player.dead();
             Unit unit = dead ? null : player.unit();
             int uid = dead || unit == null ? -1 : unit.id;
@@ -706,8 +710,40 @@ public class NetClient implements ApplicationListener{
             );
         }
 
-        if(timer.get(1, 60)){
+        if(pingTime.poll()){
             Call.ping(Time.millis());
+        }
+
+        if(planSyncTime.poll()){
+            int id = ++player.lastPreviewPlanGroup;
+
+            plansOut.clear();
+            control.input.getSyncedPlans(plansOut);
+            plansOut.truncate(maxPlayerPreviewPlans);
+
+            if(plansOut.isEmpty()){
+                Call.clientPlanSnapshot(id, null);
+            }else{
+                BuildPlan[] items = plansOut.items;
+                int size = plansOut.size;
+                //max snapshot size = 800
+                //max reasonable plan size = 12
+                //divide the two to get the size of plan batches
+                final int chunkSize = 900 / 12;
+
+                if(size < chunkSize){
+                    Call.clientPlanSnapshot(id, plansOut);
+                }else{
+                    for(int i = 0; i < size; i += chunkSize){
+                        int len = Math.min(i + chunkSize, size) - i;
+                        ClientBuildPlans cb = new ClientBuildPlans(len);
+                        System.arraycopy(items, i, cb.items, 0, len);
+                        cb.size = len;
+
+                        Call.clientPlanSnapshot(id, cb);
+                    }
+                }
+            }
         }
     }
 

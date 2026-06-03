@@ -5,6 +5,8 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.type.*;
 
+import static mindustry.content.Planets.*;
+
 /** Class for temporarily (?) storing links to map submissions on Discord. */
 public class SectorSubmissions{
     private static ObjectMap<Sector, MapSubmission> threadMap = new ObjectMap<>();
@@ -22,7 +24,7 @@ public class SectorSubmissions{
     }
 
     public static void registerSectors(){
-        registerSerpuloSector(76, "Tyrant-classZzz", "https://discord.com/channels/391020510269669376/1379926833411391580/1479890094486716499");
+        registerSerpuloSector(76, "Tyrant-classZzz", "https://discord.com/channels/391020510269669376/1379926833411391580/1479890094486716499", -1, 8f);
         registerSerpuloSector(47, "tinport", "https://discord.com/channels/391020510269669376/1379926802591645820/1481778410018570274");
         registerSerpuloSector(225, "Summi", "https://discord.com/channels/391020510269669376/1379926925719376152/1419026814826709103");
         //111 has an alternate submission https://discord.com/channels/391020510269669376/1379926842659569864/1404825715244793938
@@ -37,7 +39,7 @@ public class SectorSubmissions{
         registerSerpuloSector(16, "Namero", "https://discord.com/channels/391020510269669376/1379926788280680579/1409970152283312352");
         registerSerpuloSector(116, "Jamespire", "https://discord.com/channels/391020510269669376/1379926845058711734/1483297088426082336");
         registerSerpuloSector(69, "Oct", "https://discord.com/channels/391020510269669376/1379926831326822610/1406230980120940556");
-        registerSerpuloSector(92, "Skeledragon", "https://discord.com/channels/391020510269669376/1379926835621527615/1483974907720237159");
+        registerSerpuloSector(92, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926835621527615/1484550444369051772");
         registerSerpuloSector(197, "Hengryton Luck", "https://discord.com/channels/391020510269669376/1379926916911599676/1423257237341863966");
         registerSerpuloSector(67, "Ếch ngồi đáy giếng", "https://discord.com/channels/391020510269669376/1379926828696866898/1389981795386396768");
         //180 has an alternate submission that may be more appropriate in terms of difficulty: https://discord.com/channels/391020510269669376/1379926889648619580/1411534650412892185
@@ -68,11 +70,36 @@ public class SectorSubmissions{
         registerSerpuloSector(202, "D&X", "https://discord.com/channels/391020510269669376/1253760205091635201/1253760205091635201", 33, 6f);
 
         //megabases
-        registerSerpuloSector(103, "enwyz", "https://discord.com/channels/391020510269669376/1379926839559979030/1429203869514207255");
-        registerSerpuloSector(237, "Chocomint", "https://discord.com/channels/391020510269669376/1379926929636851812/1474447354982563840");
-        registerSerpuloSector(138, "Lilith", "https://discord.com/channels/391020510269669376/1379926873152164004/1470268689201889464");
-        registerSerpuloSector(150, "Jamespire", "https://discord.com/channels/391020510269669376/1379926876457537547/1484013941477609543");
+        registerSerpuloSector(246, "enwyz", "https://discord.com/channels/391020510269669376/1379926839559979030/1429203869514207255");
+        registerSerpuloSector(244, "Chocomint", "https://discord.com/channels/391020510269669376/1379926929636851812/1474447354982563840");
+        registerSerpuloSector(242, "cyan", "https://discord.com/channels/391020510269669376/1379926873152164004/1470268689201889464");
+        registerSerpuloSector(243, "Jamespire", "https://discord.com/channels/391020510269669376/1379926876457537547/1484013941477609543");
         registerSerpuloSector(247, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926976361533752/1431827990295220266");
+        registerSerpuloSector(245, "Grushashusha", "https://discord.com/channels/391020510269669376/1379926971286290584/1485245072034365462");
+        registerSerpuloSector(27, "Stormrider", "https://discord.com/channels/391020510269669376/1379926798833287289/1451252137224044722", -1, 10)
+        .showHidden = true;
+
+        Planets.serpulo.sectors.get(27).preset.shieldSectors.addAll(Planets.serpulo.sectors.get(246), Planets.serpulo.sectors.get(244), Planets.serpulo.sectors.get(242));
+
+        //TODO: until further notice, these sectors won't have a special name or icon. is that fine?
+        new SectorPreset("fallenVessel", serpulo, -1){{
+            requireUnlock = false;
+            //showHidden = true;
+            captureWave = 70;
+            difficulty = 9;
+        }};
+
+        new SectorPreset("geothermalStronghold", serpulo, 264){{
+            requireUnlock = false;
+            difficulty = 10;
+            //showHidden = true;
+        }};
+
+        new SectorPreset("cruxscape", serpulo, 54){{
+            requireUnlock = false;
+            difficulty = 10;
+            //showHidden = true;
+        }};
 
         /* UNUSED SECTORS:
         registerHiddenSectors(serpulo,
@@ -86,11 +113,11 @@ public class SectorSubmissions{
         );*/
     }
 
-    static void registerSerpuloSector(int id, String author, String mapFileLink){
-        registerSerpuloSector(id, author, mapFileLink, -1, 0f);
+    static SectorPreset registerSerpuloSector(int id, String author, String mapFileLink){
+        return registerSerpuloSector(id, author, mapFileLink, -1, 0f);
     }
 
-    static void registerSerpuloSector(int id, String author, String mapFileLink, int captureWave, float difficulty){
+    static SectorPreset registerSerpuloSector(int id, String author, String mapFileLink, int captureWave, float difficulty){
         Planet planet = Planets.serpulo;
         Sector sector = planet.sectors.get(id);
         MapSubmission sub = threadMap.get(sector, MapSubmission::new);
@@ -109,6 +136,8 @@ public class SectorSubmissions{
         }else{
             sector.generateEnemyBase = true;
         }
+
+        return preset;
     }
 
     static void registerThread(int id, String link){

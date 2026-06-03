@@ -96,8 +96,9 @@ public class MapIO{
                 }
             };
 
+            if(ver.version >= 12) ver.readRegion("patches", stream, counter, ver::skipDataPatches);
             ver.readRegion("content", stream, counter, ver::readContentHeader);
-            if(ver.version >= 11) ver.readRegion("content", stream, counter, ver::skipContentPatches);
+            if(ver.version == 11) ver.readRegion("patches", stream, counter, ver::skipDataPatches);
             ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext(){
                 @Override public void resize(int width, int height){}
                 @Override public boolean isGenerating(){return false;}

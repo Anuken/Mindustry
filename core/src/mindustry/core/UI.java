@@ -78,6 +78,7 @@ public class UI implements ApplicationListener, Loadable{
     public LogicDialog logic;
     public FullTextDialog fullText;
     public CampaignCompleteDialog campaignComplete;
+    public CampaignRulesDialog campaignRules;
 
     public IntMap<Dialog> followUpMenus;
 
@@ -129,7 +130,7 @@ public class UI implements ApplicationListener, Loadable{
         Dialog.setHideAction(() -> sequence(fadeOut(0.1f)));
 
         Tooltips.getInstance().animations = false;
-        Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black6).margin(4f).add(text));
+        Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black8).margin(4f).add(text));
         if(mobile){
             Tooltips.getInstance().offsetY += Scl.scl(60f);
         }
@@ -220,6 +221,7 @@ public class UI implements ApplicationListener, Loadable{
         logic = new LogicDialog();
         fullText = new FullTextDialog();
         campaignComplete = new CampaignCompleteDialog();
+        campaignRules = new CampaignRulesDialog();
         followUpMenus = new IntMap<>();
 
         Group group = Core.scene.root;
@@ -715,7 +717,12 @@ public class UI implements ApplicationListener, Loadable{
     /** Shows a menu that hides when another followUp-menu is shown or when nothing is selected.
      * @see UI#showMenu(String, String, String[][], Intc) */
     public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
-        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> callback.get(option));
+        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
+            callback.get(option);
+            if(!state.isGame()){
+                myself.hide();
+            }
+        });
         dialog.closeOnBack(() -> {
             followUpMenus.remove(menuId);
             callback.get(-1);

@@ -194,6 +194,8 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
         check("@rules.unitpayloadsexplode", b -> rules.unitPayloadsExplode = b, () -> rules.unitPayloadsExplode);
         numberi("@rules.unitcap", f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
+
+        number("@rules.unitfactoryactivation", f -> rules.unitFactoryActivationDelay = f * 60f, () -> rules.unitFactoryActivationDelay / 60f);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("@rules.unitcrashdamagemultiplier", f -> rules.unitCrashDamageMultiplier = f, () -> rules.unitCrashDamageMultiplier);
         number("@rules.unitminespeedmultiplier", f -> rules.unitMineSpeedMultiplier = f, () -> rules.unitMineSpeedMultiplier);
@@ -217,6 +219,7 @@ public class CustomRulesDialog extends BaseDialog{
 
 
         category("environment");
+        check("@rules.pauseDisabled", b -> rules.pauseDisabled = b, () -> rules.pauseDisabled);
         check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
         check("@rules.fire", b -> rules.fire = b, () -> rules.fire);
         check("@rules.fog", b -> rules.fog = b, () -> rules.fog);
@@ -246,7 +249,6 @@ public class CustomRulesDialog extends BaseDialog{
             current.button("@rules.weather", this::weatherDialog).width(250f).left().row();
         }
 
-
         category("planet");
         if(Core.bundle.get("rules.title.planet").toLowerCase().contains(ruleSearch)){
             current.table(Tex.button, t -> {
@@ -267,6 +269,7 @@ public class CustomRulesDialog extends BaseDialog{
                 }
 
                 t.button("@rules.anyenv", style, () -> {
+                    rules.attributes.clear();
                     rules.env = Vars.defaultEnv;
                     rules.planet = Planets.sun;
                 }).group(group).checked(b -> rules.planet == Planets.sun);
@@ -319,6 +322,7 @@ public class CustomRulesDialog extends BaseDialog{
                 check("@rules.fillitems", b -> teams.fillItems = b, () -> teams.fillItems);
                 number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
 
+                number("@rules.unitfactoryactivation", f -> teams.unitFactoryActivationDelay = f * 60f, () -> teams.unitFactoryActivationDelay / 60f);
                 number("@rules.unitdamagemultiplier", f -> teams.unitDamageMultiplier = f, () -> teams.unitDamageMultiplier);
                 number("@rules.unitcrashdamagemultiplier", f -> teams.unitCrashDamageMultiplier = f, () -> teams.unitCrashDamageMultiplier);
                 number("@rules.unitminespeedmultiplier", f -> teams.unitMineSpeedMultiplier = f, () -> teams.unitMineSpeedMultiplier);
