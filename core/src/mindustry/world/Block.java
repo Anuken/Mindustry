@@ -636,7 +636,7 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         if(instantTransfer){
-            stats.add(Stat.itemsMoved, t -> t.add("∞ " + StatUnit.itemsSecond.localized()));
+            stats.add(Stat.itemsMoved, StatUnit.instant.localized());
             stats.add(Stat.maxConsecutive, maxConsecutive, StatUnit.none);
         }
 
