@@ -6631,8 +6631,8 @@ public class Blocks{
             requirements(Category.units, with(Items.tungsten, 40, Items.silicon, 50, Items.graphite, 20));
             regionSuffix = "-dark";
             size = 3;
-            reload = 130f;
-            chargeTime = 90f;
+            reload = 45f;
+            chargeTime = 70f;
             range = 700f;
             maxPayloadSize = 2.5f;
             fogRadius = 5;
@@ -6640,7 +6640,7 @@ public class Blocks{
         }};
 
         largePayloadMassDriver = new PayloadMassDriver("large-payload-mass-driver"){{
-            requirements(Category.units, with(Items.phaseFabric, 20, Items.tungsten, 200, Items.silicon, 200, Items.graphite, 100, Items.oxide, 30));
+            requirements(Category.units, with(Items.phaseFabric, 10, Items.tungsten, 120, Items.silicon, 150, Items.graphite, 60, Items.oxide, 30));
             regionSuffix = "-dark";
             size = 5;
             reload = 130f;
@@ -6651,7 +6651,7 @@ public class Blocks{
         }};
 
         smallDeconstructor = new PayloadDeconstructor("small-deconstructor"){{
-            requirements(Category.units, with(Items.beryllium, 100, Items.silicon, 100, Items.oxide, 40, Items.graphite, 80));
+            requirements(Category.units, with(Items.beryllium, 70, Items.silicon, 70, Items.oxide, 25, Items.graphite, 50));
             regionSuffix = "-dark";
             itemCapacity = 100;
             consumePower(1f);
@@ -6684,12 +6684,12 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 100, Items.tungsten, 200, Items.thorium, 80));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.75f;
+            buildSpeed = 5f;
             maxBlockSize = 4;
             minBlockSize = 3;
             size = 5;
 
-            consumePower(3f);
+            consumePower(5f);
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
