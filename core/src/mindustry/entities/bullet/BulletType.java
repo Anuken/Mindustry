@@ -341,6 +341,10 @@ public class BulletType extends Content implements Cloneable{
     public float lightningCone = 360f;
     /** Offset of lightning relative to bullet rotation. */
     public float lightningAngle = 0f;
+    /** If false, lightning has to hit the first building it meets. */
+    public boolean canLightningJump = true;
+    /** If true, buildings can be hit multiple times with the same lightning. */
+    public boolean canLightningBMultiHit = true;
     /** The bullet created at lightning points. */
     public @Nullable BulletType lightningType = null;
 

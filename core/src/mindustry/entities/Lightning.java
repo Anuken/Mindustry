@@ -60,7 +60,7 @@ public class Lightning{
             }
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
-            //stop lightning generation if hit conditions are met
+            //stop lightning generation if hit conditions are met, pierceCap considers number of objects hit (not total hits)
             if(insulatedHit) break;
             if(hitter != null && hitter.type.pierceCap > 0 && hit.size - ignoredUnits + (hitter.type.pierceBuilding ? buildings.size : 0) >= hitter.type.pierceCap){
                 break;
@@ -94,46 +94,77 @@ public class Lightning{
                 nextPosition.y = y + Angles.trnsy(rotation, hitRange / 2f);
             }
 
-            //check for buildings from current (x,y) to next position (nextPosition)
-            buildingHit = false;
-            insulatedHit = false;
-            World.raycastEachWorld(x, y, nextPosition.getX(), nextPosition.getY(), (wx, wy) -> {
-                Tile tile = world.tile(wx, wy);
-                if(tile != null && tile.build != null && tile.team() != team){
-                    if(!buildings.contains(tile.build)){
-                        if(tile.build.isInsulated()){
-                            insulatedHit = true;
+            //if the lightning has to collide with the first building it meets
+            if(hitter != null && !hitter.type.canLightningJump){
+
+                //check for buildings from current (x,y) to next position (nextPosition)
+                buildingHit = false;
+                insulatedHit = false;
+                World.raycastEachWorld(x, y, nextPosition.getX(), nextPosition.getY(), (wx, wy) -> {
+                    Tile tile = world.tile(wx, wy);
+                    if(tile != null && tile.build != null && tile.team() != team){
+                        if(!buildings.contains(tile.build)){
+                            if(tile.build.isInsulated()){
+                                insulatedHit = true;
+                            }
+                            buildings.add(tile.build);
+                            //if the collision exists, override nextPosition to building
+                            nextPosition.x = wx * tilesize;
+                            nextPosition.y = wy * tilesize;
+                            makeBullet = true;
+                            buildingHit = true;
+                            return true;
+                        }else if(!hitter.type.canLightningBMultiHit){
+                            makeBullet = false;
                         }
-                        buildings.add(tile.build);
+                    }
+                    return false;
+                });
+
+                //handle case if a unit was initially meant to be hit, but detects a building along the way
+                if(unitHit){
+                    if(!makeBullet){
+                        Tile tile = world.tile(World.toTile(nextPosition.getX()), World.toTile(nextPosition.getY()));
+                        if(tile == null || tile.build == null || tile.team() == team){
+                            //make the bullet anyway on the unit if there's no buildings
+                            makeBullet = true;
+                        }else{
+                            //otherwise ignore and move on onto other targets
+                            ignoredUnits++;
+                        }
+                    }else if(buildingHit){
+                        //the unit is still a candidate for further chaining
+                        hit.remove(furthest.id());
+                    }
+                }
+
+            }else{
+
+                insulatedHit = false;
+                World.raycastEachWorld(x, y, nextPosition.getX(), nextPosition.getY(), (wx, wy) -> {
+                    Tile tile = world.tile(wx, wy);
+                    if(tile != null && tile.build != null && tile.team() != team && tile.build.isInsulated()){
+                        insulatedHit = true;
                         //if the collision exists, override nextPosition to building
                         nextPosition.x = wx * tilesize;
                         nextPosition.y = wy * tilesize;
-                        makeBullet = true;
-                        buildingHit = true;
                         return true;
-                    }else{
-                        //to fix potential untracked multi-hit for buildings, bullets shouldn't be made again if it hits the same building
-                        makeBullet = false;
                     }
-                }
-                return false;
-            });
+                    return false;
+                });
 
-            //handle case if a unit was initially meant to be hit, but detects a building along the way
-            if(unitHit){
-                if(!makeBullet){
-                    Tile tile = world.tile(World.toTile(nextPosition.x), World.toTile(nextPosition.y));
-                    if(tile == null || tile.build == null || tile.team() == team){
-                        //make the bullet anyway on the unit if there's no buildings
-                        makeBullet = true;
-                    }else{
-                        //otherwise ignore and move on onto other targets
-                        ignoredUnits++;
+                //check if a building exists at the targeted location hit
+                if(!unitHit && !insulatedHit){
+                    Tile tile = world.tile(World.toTile(nextPosition.getX()), World.toTile(nextPosition.getY()));
+                    if(tile != null && tile.build != null && tile.team() != team){
+                        if(!buildings.contains(tile.build)){
+                            buildings.add(tile.build);
+                        }else if(hitter != null && !hitter.type.canLightningBMultiHit){
+                            makeBullet = false;
+                        }
                     }
-                }else if(buildingHit){
-                    //the unit is still a candidate for further chaining
-                    hit.remove(furthest.id());
                 }
+
             }
 
             //make the next position to current
