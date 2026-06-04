@@ -4,10 +4,6 @@ import arc.struct.*;
 import mindustry.*;
 import mindustry.mod.data.*;
 
-/**
- * TODO:
- * - Unit tests
- */
 public class DataManager{
     private DataPatcher patcher = new DataPatcher();
     private DataImagePacker packer = new DataImagePacker();

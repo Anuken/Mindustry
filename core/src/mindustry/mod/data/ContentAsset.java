@@ -22,6 +22,15 @@ public class ContentAsset extends DataAsset{
     /** If true, this asset failed to completely, and cannot be used. */
     public boolean errored;
 
+    public ContentAsset(String path, ContentType type, String data){
+        setPath(path);
+        this.type = type;
+        this.data = data;
+    }
+
+    public ContentAsset(){
+    }
+
     public void readOverride(String path, Fi file, ContentType type) throws IOException{
         this.type = type;
         setPath(path);

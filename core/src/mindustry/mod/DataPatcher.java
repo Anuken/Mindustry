@@ -59,10 +59,10 @@ public class DataPatcher{
     static ContentParser createParser(){
         ContentParser cont = new ContentParser(){
             @Override
-            void warn(String string, Object... format){
+            void warnContext(@Nullable Content currentContent, @Nullable Fi currentFile, String string, Object... format){
                 //forward warnings to the current patcher - this is a bit hacky, but I do not want to re-initialize the parser every time
                 if(currentDataPatcher!= null){
-                    currentDataPatcher.warn(string, format);
+                    currentDataPatcher.warnContext(currentContent, currentFile, string, format);
                 }
             }
         };
@@ -183,7 +183,15 @@ public class DataPatcher{
                 }
             }
 
+            currentlyApplyingContent = null;
+
             parser.finishParsing();
+
+            for(var errored : dpMod.erroredContent){
+                if(errored.minfo.error != null && errored.minfo.asset != null){
+                    errored.minfo.asset.warnings.add(errored.minfo.error);
+                }
+            }
 
             Seq<Content> all = new Seq<>();
             for(var arr : Vars.content.getContentMap()){
@@ -750,9 +758,19 @@ public class DataPatcher{
     }
 
     void warn(String error, Object... fmt){
+        warnContext(null, null, error, fmt);
+    }
+
+    void warnContext(@Nullable Content currentContent, @Nullable Fi currentFile, String error, Object... fmt){
         String formatted = Strings.format(error, fmt);
-        if(currentlyApplyingPatch != null) currentlyApplyingPatch.warnings.add(formatted);
-        else if(currentlyApplyingContent != null) currentlyApplyingContent.warnings.add(formatted);
+
+        if(currentlyApplyingPatch != null){
+            currentlyApplyingPatch.warnings.add(formatted);
+        }else if(currentlyApplyingContent != null && (currentlyApplyingContent.content == null || currentlyApplyingContent.content.minfo.asset == null)){
+            currentlyApplyingContent.warnings.add(formatted);
+        }else if(currentContent != null && currentContent.minfo.asset != null){
+            currentContent.minfo.asset.warnings.add(formatted);
+        }
 
         Log.warn("[ContentPatcher] " + formatted);
     }

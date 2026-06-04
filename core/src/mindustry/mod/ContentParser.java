@@ -589,7 +589,7 @@ public class ContentParser{
                     block = locate(ContentType.block, name);
                 }
             }else{
-                block = make(resolve(value.getString("type", ""), allowPatching ? Block.class : null), mod + "-" + name);
+                block = make(resolve(value.getString("type", "Block"), allowPatching ? Block.class : null), mod + "-" + name);
             }
 
             currentContent = block;
@@ -1253,7 +1253,7 @@ public class ContentParser{
                 if(!field.field.isAnnotationPresent(Nullable.class) && field.field.get(object) == null && !implicitNullable.contains(field.field.getType())){
                     throw new RuntimeException("'" + field.field.getName() + "' in " +
                         ((object.getClass().isAnonymousClass() ? object.getClass().getSuperclass() : object.getClass()).getSimpleName()) +
-                        " is missing! Object: " + object);
+                        " is missing! " + object + "." + field.field.getName() + " cannot be null.");
                 }
             }catch(Exception e){
                 throw new RuntimeException(e);
@@ -1459,6 +1459,10 @@ public class ContentParser{
     }
 
     void warn(String string, Object... format){
+        warnContext(currentContent, currentFile, string, format);
+    }
+
+    void warnContext(@Nullable Content currentContent, @Nullable Fi currentFile, String string, Object... format){
         Log.warn(string, format);
     }
 
