@@ -6657,15 +6657,20 @@ public class Blocks{
             consumePower(1f);
             size = 3;
             deconstructSpeed = 3f;
+            separateItemCapacity = true;
+
+            //it just looks weird for anything larger
+            maxPayloadSize = 3;
         }};
 
         deconstructor = new PayloadDeconstructor("deconstructor"){{
             requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 100, Items.silicon, 250, Items.carbide, 50));
             regionSuffix = "-dark";
-            itemCapacity = 250;
+            itemCapacity = 320;
             consumePower(3f);
             size = 5;
             deconstructSpeed = 6f;
+            separateItemCapacity = true;
         }};
 
         constructor = new Constructor("constructor"){{
