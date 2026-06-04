@@ -648,7 +648,7 @@ public class Block extends UnlockableContent implements Senseable{
         if(hasLiquids) stats.add(Stat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems){
             if(itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
-            else if (instantTransfer || itemCapacity == 0) stats.add(Stat.itemCapacity, Core.bundle.format("bar.unabletoclog"));
+            else if (instantTransfer || itemCapacity == 0) stats.add(Stat.itemCapacity, Core.bundle.format("none") + ". " + Core.bundle.format("unabletoclog"));
         }
     }
 
