@@ -737,7 +737,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player == null || build == null || player.dead()) return;
 
         //make sure player is allowed to control the building
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.buildSelect, action -> action.tile = build.tile)){
+        if(net.server() && (!state.rules.possessionAllowed  || !netServer.admins.allowAction(player, ActionType.buildSelect, action -> action.tile = build.tile))){
             throw new ValidateException(player, "Player cannot control a building.");
         }
 
