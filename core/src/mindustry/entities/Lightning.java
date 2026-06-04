@@ -24,6 +24,7 @@ public class Lightning{
     private static final int maxChain = 8;
     private static final float hitRange = 30f;
     private static boolean makeBullet = true;
+    private static boolean buildingHit = false;
     private static boolean insulatedHit = false;
     private static int lastSeed = 0;
 
@@ -48,6 +49,7 @@ public class Lightning{
 
         Seq<Vec2> lines = new Seq<>();
         makeBullet = true;
+        int ignoredUnits = 0;
         insulatedHit = false;
 
         buildings.clear();
@@ -60,7 +62,7 @@ public class Lightning{
 
             //stop lightning generation if hit conditions are met
             if(insulatedHit) break;
-            if(hitter != null && hitter.type.pierceCap > 0 && hit.size + (hitter.type.pierceBuilding ? buildings.size : 0) >= hitter.type.pierceCap){
+            if(hitter != null && hitter.type.pierceCap > 0 && hit.size - ignoredUnits + (hitter.type.pierceBuilding ? buildings.size : 0) >= hitter.type.pierceCap){
                 break;
             }
             makeBullet = true;
@@ -78,8 +80,10 @@ public class Lightning{
             Unit furthest = Geometry.findFurthest(x, y, entities);
 
             //generate the next position
+            boolean unitHit = false;
             if(furthest != null){
                 //if the collision exists, set nextPosition to entity
+                unitHit = true;
                 hit.add(furthest.id());
                 nextPosition.x = furthest.x();
                 nextPosition.y = furthest.y();
@@ -91,6 +95,7 @@ public class Lightning{
             }
 
             //check for buildings from current (x,y) to next position (nextPosition)
+            buildingHit = false;
             insulatedHit = false;
             World.raycastEachWorld(x, y, nextPosition.getX(), nextPosition.getY(), (wx, wy) -> {
                 Tile tile = world.tile(wx, wy);
@@ -104,6 +109,7 @@ public class Lightning{
                         nextPosition.x = wx * tilesize;
                         nextPosition.y = wy * tilesize;
                         makeBullet = true;
+                        buildingHit = true;
                         return true;
                     }else{
                         //to fix potential untracked multi-hit for buildings, bullets shouldn't be made again if it hits the same building
@@ -112,6 +118,23 @@ public class Lightning{
                 }
                 return false;
             });
+
+            //handle case if a unit was initially meant to be hit, but detects a building along the way
+            if(unitHit){
+                if(!makeBullet){
+                    Tile tile = world.tile(World.toTile(nextPosition.x), World.toTile(nextPosition.y));
+                    if(tile == null || tile.build == null || tile.team() == team){
+                        //make the bullet anyway on the unit if there's no buildings
+                        makeBullet = true;
+                    }else{
+                        //otherwise ignore and move on onto other targets
+                        ignoredUnits++;
+                    }
+                }else if(buildingHit){
+                    //the unit is still a candidate for further chaining
+                    hit.remove(furthest.id());
+                }
+            }
 
             //make the next position to current
             x = nextPosition.getX();
