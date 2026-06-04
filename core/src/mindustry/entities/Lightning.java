@@ -19,9 +19,11 @@ public class Lightning{
     private static final Rect rect = new Rect();
     private static final Seq<Unit> entities = new Seq<>();
     private static final IntSet hit = new IntSet();
+    private static final Seq<Building> buildings = new Seq<>();
     private static final int maxChain = 8;
     private static final float hitRange = 30f;
     private static boolean bhit = false;
+    private static boolean insulatedHit = false;
     private static int lastSeed = 0;
 
     /** Create a lighting branch at a location. Use Team.derelict to damage everyone. */
@@ -45,28 +47,48 @@ public class Lightning{
 
         Seq<Vec2> lines = new Seq<>();
         bhit = false;
+        insulatedHit = false;
 
+        buildings.clear();
         for(int i = 0; i < length / 2; i++){
-            hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, hitter);
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
+            //check for buildings
+            bhit = false;
             if(lines.size > 1){
-                bhit = false;
+                insulatedHit = false;
                 Vec2 from = lines.get(lines.size - 2);
                 Vec2 to = lines.get(lines.size - 1);
-                World.raycastEach(World.toTile(from.getX()), World.toTile(from.getY()), World.toTile(to.getX()), World.toTile(to.getY()), (wx, wy) -> {
 
+                World.raycastEach(World.toTile(from.getX()), World.toTile(from.getY()), World.toTile(to.getX()), World.toTile(to.getY()), (wx, wy) -> {
                     Tile tile = world.tile(wx, wy);
-                    if(tile != null && (tile.build != null && tile.build.isInsulated()) && tile.team() != team){
-                        bhit = true;
-                        //snap it instead of removing
-                        lines.get(lines.size - 1).set(wx * tilesize, wy * tilesize);
-                        return true;
+                    if(tile != null && tile.build != null && tile.team() != team){
+                        if(tile.build.isInsulated()){
+                            insulatedHit = true;
+                            //snap it instead of removing
+                            lines.get(lines.size - 1).set(wx * tilesize, wy * tilesize);
+                            return true;
+                        }
+                        if(!buildings.contains(tile.build)){
+                            bhit = true;
+                            buildings.add(tile.build);
+                            //override the generated position
+                            lines.get(lines.size - 1).set(wx * tilesize, wy * tilesize);
+                            return true;
+                        }
                     }
                     return false;
                 });
-                if(bhit) break;
+
+                if(bhit){
+                    x = lines.get(lines.size - 1).x;
+                    y = lines.get(lines.size - 1).y;
+                }
+
             }
+
+            hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, hitter);
+            if(insulatedHit) break;
 
             rect.setSize(hitRange).setCenter(x, y);
             entities.clear();
@@ -78,7 +100,7 @@ public class Lightning{
                 });
             }
 
-            if(hitter != null && hitter.type.pierceCap > 0 && hit.size >= hitter.type.pierceCap){
+            if(hitter != null && hitter.type.pierceCap > 0 && hit.size + (hitter.type.pierceBuilding ? buildings.size : 0) >= hitter.type.pierceCap){
                 break;
             }
 
