@@ -1,6 +1,5 @@
 package mindustry.world.blocks.storage;
 
-import arc.Core;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -136,13 +135,6 @@ public class StorageBlock extends Block{
         @Override
         public boolean allowDeposit(){
             return linkedCore != null || super.allowDeposit();
-        }
-
-        @Override
-        public void onDestroyed(){
-            if(linkedCore != null){
-                Core.app.post(linkedCore::clampItems);
-            }
         }
     }
 }

@@ -531,8 +531,6 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void created(){
             super.created();
-
-            items = team.data().items;
             Events.fire(new CoreChangeEvent(this));
         }
 
@@ -710,6 +708,14 @@ public class CoreBlock extends StorageBlock{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
+
+            if(team.data().items == null){
+                // this is the first core of this team, assign its ItemModule as the default one
+                team.data().items = items;
+            }else{
+                items = team.data().items;
+            }
+
             state.teams.registerCore(this);
             int previousCapacity = storageCapacity;
 
@@ -808,6 +814,18 @@ public class CoreBlock extends StorageBlock{
                 ent.items = new ItemModule();
                 for(Item item : content.items()){
                     ent.items.set(item, (int)Math.min(ent.block.itemCapacity, items.get(item) * (float)ent.block.itemCapacity / totalCapacity));
+                }
+
+                // check if there are any other nearby cores
+                Point2[] edges = Edges.getEdges(ent.block.size);
+                for(Point2 edge : edges){
+                    Building b = world.build(ent.tileX() + edge.x, ent.tileY() + edge.y);
+                    if(b != this && b instanceof CoreBuild c){
+                        c.onProximityUpdate();
+                        if(ent.linkedCore == c){
+                            break;
+                        }
+                    }
                 }
             });
 

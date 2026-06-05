@@ -15,7 +15,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
-import mindustry.world.modules.ItemModule;
+import mindustry.world.modules.*;
 
 import java.util.*;
 
@@ -311,8 +311,8 @@ public class Teams{
         public Seq<Player> players = new Seq<>(false);
         /** All buildings. Updated on team change / building addition or removal. Includes even buildings that do not update(). */
         public Seq<Building> buildings = new Seq<>(false);
-        /** The item module for cores of this team. */
-        public ItemModule items = new ItemModule();
+        /** The item module for cores of this team. Null if no core was loaded. */
+        public @Nullable ItemModule items;
         /** Units of this team by type. Updated each frame. */
         public @Nullable Seq<Unit>[] unitsByType;
 
