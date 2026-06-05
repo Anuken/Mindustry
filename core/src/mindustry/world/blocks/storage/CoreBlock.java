@@ -252,7 +252,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     public class CoreBuild extends Building implements LaunchAnimator{
-        private int storageCapacity, previousCapacity;
+        private int storageCapacity;
 
         public boolean noEffect = false;
         public Team lastDamage = Team.derelict;
@@ -711,6 +711,7 @@ public class CoreBlock extends StorageBlock{
             super.onProximityUpdate();
 
             state.teams.registerCore(this);
+            int previousCapacity = storageCapacity;
 
             storageCapacity = itemCapacity;
             proximity.each(this::owns, t -> {
@@ -720,7 +721,6 @@ public class CoreBlock extends StorageBlock{
             });
 
             team.data().itemCap += storageCapacity - previousCapacity;
-            previousCapacity = storageCapacity;
 
             if(!world.isGenerating()){
                 clampItems();
