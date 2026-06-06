@@ -2,6 +2,7 @@ package mindustry.editor;
 
 import arc.*;
 import arc.func.*;
+import arc.scene.style.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
@@ -17,6 +18,16 @@ import static mindustry.Vars.*;
 public class MapPatchesDialog extends BaseDialog{
     private Table list;
     private MapPatchImagesDialog images = new MapPatchImagesDialog();
+    private DataAssetType currentType = DataAssetType.music;
+
+    private TextureRegionDrawable[] typeIcons = {
+    Icon.file,
+    Icon.box,
+    Icon.image,
+    Icon.info,
+    Icon.infoCircle,
+    Icon.fileText
+    };
 
     public MapPatchesDialog(){
         super("@editor.patches");
@@ -24,13 +35,24 @@ public class MapPatchesDialog extends BaseDialog{
         shown(this::setup);
 
         addCloseButton();
-        buttons.button("@editor.patches.guide", Icon.link, () -> Core.app.openURI(patchesGuideURL)).size(190f, 64f);
+        //buttons.button("@editor.patches.guide", Icon.link, () -> Core.app.openURI(patchesGuideURL)).size(190f, 64f);
 
-        buttons.button("@editor.images", Icon.image, () -> images.show()).size(190f, 64f);
+        //buttons.button("@editor.images", Icon.image, () -> images.show()).size(190f, 64f);
 
-        buttons.button("@add", Icon.add, () -> showImport(this::addPatch)).size(190f, 64f);
+        //buttons.button("@add", Icon.add, () -> showImport(this::addPatch)).size(190f, 64f);
 
-        cont.top();
+        Table types = new Table();
+        for(DataAssetType type : DataAssetType.all){
+            types.button(typeIcons[type.ordinal()], Styles.squareTogglei, () -> {
+                currentType = type;
+                setup();
+            }).checked(b -> currentType == type).tooltip(type.name()).size(50f).pad(4f).row();
+        }
+
+        cont.top().left();
+
+        cont.add(types).growY();
+
         getCell(cont).grow();
 
         cont.pane(t -> list = t);
@@ -38,20 +60,32 @@ public class MapPatchesDialog extends BaseDialog{
 
     private void setup(){
         list.clearChildren();
+
+        list.defaults().pad(4f);
+        float h = 50f;
+
+        for(var content : state.data.getAssets(currentType)){
+            list.button(content.path, Styles.grayt, () -> {
+
+            }).size(mobile ? 390f : 450f, h).margin(10f).with(b -> b.getLabel().setAlignment(Align.left, Align.left));
+
+            list.row();
+        }
+
+        if(true) return;
+
         var patches = state.data.getPatches();
 
         if(patches.isEmpty()){
             list.add("@editor.patches.none");
         }else{
-            Table t = list;
 
-            t.defaults().pad(4f);
-            float h = 50f;
+            list.defaults().pad(4f);
             for(var patch : patches){
                 int fields = countFields(patch.json);
 
                 if(patch.warnings.size > 0){
-                    t.button(Icon.warning, Styles.graySquarei, iconMed, () -> {
+                    list.button(Icon.warning, Styles.graySquarei, iconMed, () -> {
                         BaseDialog dialog = new BaseDialog("@editor.patches.errors");
                         dialog.cont.top().pane(p -> {
                             p.top();
@@ -66,10 +100,10 @@ public class MapPatchesDialog extends BaseDialog{
                         dialog.show();
                     }).size(h);
                 }else{
-                    t.add().size(h);
+                    list.add().size(h);
                 }
 
-                t.button((patch.name.isEmpty() ? "<unnamed>\n" : "[accent]" + patch.name + "\n") + "[lightgray][[" + Core.bundle.format("editor.patch.fields", fields) + "]", Styles.grayt, () -> {
+                list.button((patch.name.isEmpty() ? "<unnamed>\n" : "[accent]" + patch.name + "\n") + "[lightgray][[" + Core.bundle.format("editor.patch.fields", fields) + "]", Styles.grayt, () -> {
                     BaseDialog dialog = new BaseDialog(Core.bundle.format("editor.patch", patch.name.isEmpty() ? "<unnamed>" : patch.name));
                     dialog.cont.top().pane(p -> {
                         p.top();
@@ -83,23 +117,23 @@ public class MapPatchesDialog extends BaseDialog{
                     b.getLabel().setAlignment(Align.left, Align.left);
                 });
 
-                t.button(Icon.copy, Styles.graySquarei, Vars.iconMed, () -> {
+                list.button(Icon.copy, Styles.graySquarei, Vars.iconMed, () -> {
                     Core.app.setClipboardText(patch.patch);
                     ui.showInfoFade("@copied");
                 }).size(h);
 
-                t.button(Icon.refresh, Styles.graySquarei, Vars.iconMed, () -> {
+                list.button(Icon.refresh, Styles.graySquarei, Vars.iconMed, () -> {
                     showImport(str -> addPatch(str, patches.indexOf(patch)));
                 }).size(h);
 
-                t.button(Icon.trash, Styles.graySquarei, iconMed, () -> {
+                list.button(Icon.trash, Styles.graySquarei, iconMed, () -> {
                     ui.showConfirm("@editor.patches.delete.confirm",  () -> {
                         patches.remove(patch);
                         setup();
                     });
                 }).size(h);
 
-                t.row();
+                list.row();
             }
         }
     }
