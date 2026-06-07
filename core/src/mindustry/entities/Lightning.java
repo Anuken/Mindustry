@@ -114,7 +114,7 @@ public class Lightning{
                             makeBullet = true;
                             buildingHit = true;
                             return true;
-                        }else if(!hitter.type.canLightningBMultiHit){
+                        }else if(!hitter.type.canLightningMHitBuild){
                             makeBullet = false;
                         }
                     }
@@ -159,7 +159,7 @@ public class Lightning{
                     if(tile != null && tile.build != null && tile.team() != team){
                         if(!buildings.contains(tile.build)){
                             buildings.add(tile.build);
-                        }else if(hitter != null && !hitter.type.canLightningBMultiHit){
+                        }else if(hitter != null && !hitter.type.canLightningMHitBuild){
                             makeBullet = false;
                         }
                     }

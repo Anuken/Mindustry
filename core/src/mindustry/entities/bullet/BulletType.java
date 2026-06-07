@@ -344,7 +344,7 @@ public class BulletType extends Content implements Cloneable{
     /** If false, lightning has to hit the first building it meets. */
     public boolean canLightningJump = true;
     /** If true, buildings can be hit multiple times with the same lightning. */
-    public boolean canLightningBMultiHit = true;
+    public boolean canLightningMHitBuild = true;
     /** The bullet created at lightning points. */
     public @Nullable BulletType lightningType = null;
 
