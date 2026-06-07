@@ -70,7 +70,7 @@ public class Lightning{
             //find entities to hit
             rect.setSize(hitRange).setCenter(x, y);
             entities.clear();
-            if(hit.size < maxChain){
+            if(hit.size < maxChain || (hitter != null && hit.size <= hitter.type.pierceCap)){
                 Units.nearbyEnemies(team, rect, u -> {
                     if(!hit.contains(u.id()) && (hitter == null || u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround))){
                         entities.add(u);
@@ -111,7 +111,7 @@ public class Lightning{
                             //if the collision exists, override nextPosition to building
                             nextPosition.x = wx * tilesize;
                             nextPosition.y = wy * tilesize;
-                            makeBullet = true;
+                                                        makeBullet = true;
                             buildingHit = true;
                             return true;
                         }else if(!hitter.type.canLightningMHitBuild){
