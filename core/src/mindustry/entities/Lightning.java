@@ -23,6 +23,7 @@ public class Lightning{
     private static final Vec2 nextPosition = new Vec2();
     private static final int maxChain = 8;
     private static final float hitRange = 30f;
+    private static final float spawnHitRange = 5f;
     private static boolean makeBullet = true;
     private static boolean buildingHit = false;
     private static boolean insulatedHit = false;
@@ -51,6 +52,19 @@ public class Lightning{
         makeBullet = true;
         int hitCount = 0;
         insulatedHit = false;
+
+        //special case, can there be a unit or building when it first spawns?
+        if(hitter != null && hitter.type.pierceCap > 0){
+            Tile tile = world.tile(World.toTile(x), World.toTile(y));
+            if(tile != null && tile.build != null && tile.team() != team){
+                buildings.add(tile.build);
+                hitCount++;
+            }else{
+                entities.clear();
+                rect.setSize(spawnHitRange).setCenter(x, y);
+                Units.nearbyEnemies(team, rect, u -> makeBullet = !u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround));
+            }
+        }
 
         buildings.clear();
         for(int i = 0; i < length / 2; i++){
