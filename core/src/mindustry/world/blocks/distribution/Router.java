@@ -51,6 +51,11 @@ public class Router extends Block{
         }
 
         @Override
+        public boolean canControl(){
+            return size == 1;
+        }
+
+        @Override
         public boolean shouldAutoTarget(){
             return false;
         }
