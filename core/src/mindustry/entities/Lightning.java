@@ -49,7 +49,7 @@ public class Lightning{
 
         Seq<Vec2> lines = new Seq<>();
         makeBullet = true;
-        int ignoredUnits = 0;
+        int hitCount = 0;
         insulatedHit = false;
 
         buildings.clear();
@@ -62,7 +62,7 @@ public class Lightning{
 
             //stop lightning generation if hit conditions are met, pierceCap considers number of objects hit (not total hits)
             if(insulatedHit) break;
-            if(hitter != null && hitter.type.pierceCap > 0 && hit.size - ignoredUnits + (hitter.type.pierceBuilding ? buildings.size : 0) >= hitter.type.pierceCap){
+            if(hitter != null && hitter.type.pierceCap > 0 && hitCount >= hitter.type.pierceCap){
                 break;
             }
             makeBullet = true;
@@ -111,7 +111,7 @@ public class Lightning{
                             //if the collision exists, override nextPosition to building
                             nextPosition.x = wx * tilesize;
                             nextPosition.y = wy * tilesize;
-                                                        makeBullet = true;
+                            makeBullet = true;
                             buildingHit = true;
                             return true;
                         }else if(!hitter.type.canLightningMHitBuild){
@@ -126,20 +126,22 @@ public class Lightning{
                     if(!makeBullet){
                         Tile tile = world.tile(World.toTile(nextPosition.getX()), World.toTile(nextPosition.getY()));
                         if(tile == null || tile.build == null || tile.team() == team){
-                            //make the bullet anyway on the unit if there's no buildings
+                            //make the bullet since the detected building was an ignored multi-hit
                             makeBullet = true;
                         }else{
-                            //otherwise ignore and move on onto other targets
-                            ignoredUnits++;
+                            //otherwise, it will not hit the unit as it's on top of a building.
+                            unitHit = false;
                         }
                     }else if(buildingHit){
-                        //the unit is still a candidate for further chaining
+                        //for first time hit, the unit is still a candidate for further chaining
                         hit.remove(furthest.id());
+                        unitHit = false;
                     }
                 }
 
             }else{
 
+                //handling insulation for lightning jumps
                 insulatedHit = false;
                 World.raycastEachWorld(x, y, nextPosition.getX(), nextPosition.getY(), (wx, wy) -> {
                     Tile tile = world.tile(wx, wy);
@@ -165,6 +167,11 @@ public class Lightning{
                     }
                 }
 
+            }
+
+            //check if the lightning has hit anything
+            if(unitHit || (hitter != null && hitter.type.pierceBuilding && buildingHit)){
+                hitCount++;
             }
 
             //make the next position to current
