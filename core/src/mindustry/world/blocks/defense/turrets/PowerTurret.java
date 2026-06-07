@@ -35,6 +35,7 @@ public class PowerTurret extends Turret{
             return switch(sensor){
                 case ammo -> power == null ? 0f : power.status;
                 case ammoCapacity -> 1;
+                case heat -> heat;
                 default -> super.sense(sensor);
             };
         }
