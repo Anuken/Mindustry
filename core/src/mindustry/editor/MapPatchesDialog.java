@@ -21,11 +21,11 @@ public class MapPatchesDialog extends BaseDialog{
     private DataAssetType currentType = DataAssetType.music;
 
     private TextureRegionDrawable[] typeIcons = {
-    Icon.file,
+    Icon.fileCode,
     Icon.box,
     Icon.image,
-    Icon.info,
-    Icon.infoCircle,
+    Icon.volumeUp,
+    Icon.music,
     Icon.fileText
     };
 
@@ -35,6 +35,7 @@ public class MapPatchesDialog extends BaseDialog{
         shown(this::setup);
 
         addCloseButton();
+        getCell(cont).grow();
         //buttons.button("@editor.patches.guide", Icon.link, () -> Core.app.openURI(patchesGuideURL)).size(190f, 64f);
 
         //buttons.button("@editor.images", Icon.image, () -> images.show()).size(190f, 64f);
@@ -46,16 +47,14 @@ public class MapPatchesDialog extends BaseDialog{
             types.button(typeIcons[type.ordinal()], Styles.squareTogglei, () -> {
                 currentType = type;
                 setup();
-            }).checked(b -> currentType == type).tooltip(type.name()).size(50f).pad(4f).row();
+            }).checked(b -> currentType == type).tooltip(type.name()).size(50f).pad(4f);
         }
 
         cont.top().left();
 
-        cont.add(types).growY();
+        cont.add(types).left().row();
 
-        getCell(cont).grow();
-
-        cont.pane(t -> list = t);
+        cont.pane(t -> list = t).grow().top();
     }
 
     private void setup(){
