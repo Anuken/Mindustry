@@ -23,10 +23,10 @@ public class MapPatchesDialog extends BaseDialog{
     private TextureRegionDrawable[] typeIcons = {
     Icon.fileCode,
     Icon.box,
+    Icon.fileText,
     Icon.image,
     Icon.volumeUp,
-    Icon.music,
-    Icon.fileText
+    Icon.music
     };
 
     public MapPatchesDialog(){
