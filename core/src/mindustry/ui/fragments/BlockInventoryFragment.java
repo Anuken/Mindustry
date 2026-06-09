@@ -26,7 +26,7 @@ import static mindustry.Vars.*;
 public class BlockInventoryFragment{
     private static final float holdWithdraw = 20f;
     private static final float holdShrink = 120f;
-
+    public int cols = 3;
     Table table = new Table();
     Building build;
     float holdTime = 0f, emptyTime;
@@ -139,7 +139,6 @@ public class BlockInventoryFragment{
             }
         });
 
-        int cols = 3;
         int row = 0;
 
         table.margin(4f);
