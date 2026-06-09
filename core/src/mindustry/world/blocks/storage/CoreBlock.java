@@ -708,7 +708,6 @@ public class CoreBlock extends StorageBlock{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-
             if(team.data().items == null){
                 // this is the first core of this team, assign its ItemModule as the default one
                 team.data().items = items;
