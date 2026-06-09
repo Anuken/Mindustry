@@ -3,6 +3,7 @@ name: CD
 on:
   push:
     branches:
+      - feature/cd-pipeline
       - master
 
 permissions:
