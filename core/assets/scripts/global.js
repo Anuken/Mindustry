@@ -19,6 +19,7 @@ const floatp = method => new Floatp(){get: method}
 const cons = method => new Cons(){get: method}
 const prov = method => new Prov(){get: method}
 const func = method => new Func(){get: method}
+const getRealClass = value => Vars.mods.getScripts().getClass(value);
 
 const newEffect = (lifetime, renderer) => new Effect.Effect(lifetime, new Effect.EffectRenderer({render: renderer}))
 Call = Packages.mindustry.gen.Call
