@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - feature/cd-pipeline
 
 permissions:
   contents: write
