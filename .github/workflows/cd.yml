@@ -16,6 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout Arc dependency
+        uses: actions/checkout@v4
+        with:
+          repository: Anuken/Arc
+          path: Arc
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
