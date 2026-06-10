@@ -7,7 +7,7 @@ import mindustry.mod.data.*;
 public class DataManager{
     private DataPatcher patcher = new DataPatcher();
     private DataImagePacker packer = new DataImagePacker();
-    private DataSoundLoader soundLoader = new DataSoundLoader();
+    private DataAudioLoader soundLoader = new DataAudioLoader();
     private DataBundleLoader bundleLoader = new DataBundleLoader();
 
     private ObjectMap<DataAssetType, Seq<DataAsset>> assets = new ObjectMap<>();
@@ -28,6 +28,13 @@ public class DataManager{
 
         packer.unload();
         packer.pack(images);
+
+        rebuildOrderedAssets();
+    }
+
+    public void reloadAudio(){
+        soundLoader.unload();
+        soundLoader.load(getSounds(), getMusic());
 
         rebuildOrderedAssets();
     }

@@ -5,6 +5,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.mod.data.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -21,11 +22,11 @@ public class MapAssetsDialog extends BaseDialog{
 
     private AssetView[] views = {
         new MapPatchesView(),
-        new MapPatchesView(), //new MapContentView(),
+        new MapContentView(),
         new MapBundlesView(),
         new MapImagesView(),
-        new MapPatchesView(), //new MapSoundsView(),
-        new MapPatchesView(), //new MapMusicView()
+        new MapAudioView(DataAssetType.sound),
+        new MapAudioView(DataAssetType.music),
     };
 
     TextField searchField;
@@ -51,9 +52,10 @@ public class MapAssetsDialog extends BaseDialog{
             types.button(typeIcons[type.ordinal()], Styles.grayTogglei, () -> changeType(type))
             .checked(b -> currentType == type).tooltip(type.localized()).size(50f).pad(4f);
         }
+        types.image(Tex.whiteui, Pal.accent).size(4f, 50f).pad(4f);
         types.table(Styles.grayPanel, t -> {
             t.margin(8f);
-            t.label(() -> currentType.localized());
+            t.label(() -> currentType.localizedPlural());
         }).height(50f).pad(4f);
 
         cont.top().left();
@@ -86,6 +88,7 @@ public class MapAssetsDialog extends BaseDialog{
     void rebuild(){
         list.center().top();
         list.clearChildren();
+        list.marginBottom(70f);
 
         views[currentType.ordinal()].build(this, list);
 

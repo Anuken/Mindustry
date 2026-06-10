@@ -249,7 +249,7 @@ public class MapImagesView implements AssetView{
                     img.clicked(showInfo);
                 }).row();
                 t.add((found ? "" : "[red]⚠[] ") + image.name).tooltip(regionPrefix + image.name + "\n[lightgray]" + image.path).ellipsis(true).left().width(size - 10f).growX().row();
-                t.add(iwidth + "x" + iheight).tooltip(Strings.formatByteCount(ilength) + "[lightgray]b").color(Color.lightGray).left().growX().row();
+                t.add(iwidth + "x" + iheight).tooltip(Strings.formatByteCount(ilength)).color(Color.lightGray).left().growX().row();
                 t.table(b -> {
                     b.left();
                     b.defaults().size((size - 10f) / 4f);

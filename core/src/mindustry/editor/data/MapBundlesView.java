@@ -24,10 +24,10 @@ public class MapBundlesView implements AssetView{
     public void build(MapAssetsDialog diag, Table list){
         float h = 50f;
 
-        var patches = state.data.getBundles();
+        var bundles = state.data.getBundles();
 
         list.defaults().pad(4f);
-        for(var bundle : patches){
+        for(var bundle : bundles){
             if(diag.searchString != null && !bundle.name.toLowerCase().contains(diag.searchString)) continue;
 
             //TODO: handle invalid files
@@ -68,9 +68,29 @@ public class MapBundlesView implements AssetView{
                 }
             }).size(h).disabled(file == null);
 
+            list.button(Icon.export, Styles.graySquarei, Vars.iconMed, () -> {
+                if(ios){
+                    try{
+                        Fi out = tmpDirectory.child(Strings.getFileName(bundle.path));
+                        file.copyTo(out);
+                        platform.shareFile(out);
+                    }catch(Exception e){
+                        ui.showException(e);
+                    }
+                }else{
+                    platform.showFileChooser(false, "properties", out -> {
+                        try{
+                            file.copyTo(out);
+                        }catch(Exception e){
+                            ui.showException(e);
+                        }
+                    });
+                }
+            }).size(h).disabled(file == null);
+
             list.button(Icon.trash, Styles.graySquarei, iconMed, () -> {
-                ui.showConfirm("@patch.delete.confirm",  () -> {
-                    patches.remove(bundle);
+                ui.showConfirm("@asset.delete.confirm",  () -> {
+                    bundles.remove(bundle);
                     diag.rebuild();
                 });
             }).size(h);
@@ -91,21 +111,22 @@ public class MapBundlesView implements AssetView{
         }).size(190f, 64f);
     }
 
-    void addBundle(String text){
+    void addBundle(String path, String text){
+        //TODO: what if there are duplicates??
         try{
             var map = new StringMap();
             PropertiesUtils.load(map, new StringReader(text));
             byte[] bytes = text.getBytes(Strings.utf8);
             BundleAsset bundle = new BundleAsset();
+            bundle.setPath(path);
             bundle.updateData(bytes);
             state.data.getBundles().add(bundle);
-            //TODO: do I actually need to reload bundles?
         }catch(Exception e){
             ui.showException(e);
         }
     }
 
-    void showImport(Cons<String> handler){
+    void showImport(Cons2<String, String> handler){
         BaseDialog dialog = new BaseDialog("@editor.import");
         dialog.cont.pane(p -> {
             p.margin(10f);
@@ -115,12 +136,13 @@ public class MapBundlesView implements AssetView{
                 t.row();
                 t.button("@schematic.copy.import", Icon.copy, style, () -> {
                     dialog.hide();
-                    handler.get(Core.app.getClipboardText());
+                    //TODO bad name
+                    handler.get("bundle.properties", Core.app.getClipboardText());
                 }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
                 t.row();
                 t.button("@schematic.importfile", Icon.download, style, () -> platform.showMultiFileChooser(file -> {
                     dialog.hide();
-                    handler.get(file.readString());
+                    handler.get(file.name(), file.readString());
                 }, "txt", "bundle")).marginLeft(12f);
                 t.row();
             });

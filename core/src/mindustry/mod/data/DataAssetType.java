@@ -34,4 +34,8 @@ public enum DataAssetType{
     public String localized(){
         return Core.bundle.get("asset." + name());
     }
+
+    public String localizedPlural(){
+        return Core.bundle.get("asset." + name() + ".plural");
+    }
 }

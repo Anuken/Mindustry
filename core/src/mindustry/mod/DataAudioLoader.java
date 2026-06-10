@@ -8,9 +8,9 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.mod.data.*;
 
-public class DataSoundLoader{
+public class DataAudioLoader{
     private static final int soundIdOffset = 100_000;
-    private static final String prefix = "dp-";
+    public static final String prefix = "dp-";
 
     private Seq<Sound> loadedSounds = new Seq<>();
     private Seq<Music> loadedMusic = new Seq<>();
