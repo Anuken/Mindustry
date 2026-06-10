@@ -1,5 +1,6 @@
 package mindustry.mod.data;
 
+import arc.*;
 import arc.func.*;
 import arc.struct.*;
 
@@ -28,5 +29,9 @@ public enum DataAssetType{
 
     public DataAsset create(){
         return constructor.get();
+    }
+
+    public String localized(){
+        return Core.bundle.get("asset." + name());
     }
 }
