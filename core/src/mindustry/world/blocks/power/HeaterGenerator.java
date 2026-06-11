@@ -38,7 +38,7 @@ public class HeaterGenerator extends ConsumeGenerator{
     public void setBars(){
         super.setBars();
 
-        addBar("heat", (HeaterGeneratorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat / entity.heatOutScaled));
+        addBar("heat", (HeaterGeneratorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> Mathf.clamp(entity.heat / entity.heatOutScaled)));
     }
 
     public class HeaterGeneratorBuild extends ConsumeGeneratorBuild implements HeatBlock{
@@ -65,15 +65,22 @@ public class HeaterGenerator extends ConsumeGenerator{
         }
 
         @Override
+        public byte version(){
+            return 2;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.f(heat);
+            write.f(heatOutScaled);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             heat = read.f();
+            if(revision >= 2) heatOutScaled = read.f();
         }
     }
 }

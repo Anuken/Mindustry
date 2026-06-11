@@ -186,15 +186,22 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         @Override
+        public byte version(){
+            return 2;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.f(heat);
+            write.f(heatOutScaled);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             heat = read.f();
+            if(revision >= 2) heatOutScaled = read.f();
         }
     }
 }
