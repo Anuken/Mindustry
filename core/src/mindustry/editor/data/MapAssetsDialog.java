@@ -1,15 +1,28 @@
 package mindustry.editor.data;
 
+import arc.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.mod.*;
 import mindustry.mod.data.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
+import static mindustry.Vars.*;
+
+/*
+TODO:
+• warn about critical errors for content that prevent content loading
+• dividers for content types
+• weather icon in font?
+• remove planets from list of content that can be parsed to prevent confusion?
+• drop down for import/export zip, clear all
+• allow multi file selection when importing
+ */
 public class MapAssetsDialog extends BaseDialog{
     private static final TextureRegionDrawable[] typeIcons = {
         Icon.fileCode,
@@ -44,23 +57,42 @@ public class MapAssetsDialog extends BaseDialog{
             changeType(DataAssetType.patch);
         });
 
+        hidden(() -> {
+            list.clearChildren();
+            //in case items are added
+            DataPatcher.fixContentArrays();
+        });
+
         makeButtonOverlay();
         titleTable.remove();
 
         Table types = new Table();
+        types.defaults().size(50f).pad(4f);
+
+        types.button(Icon.menu, Styles.graySquarei, () -> {
+
+        });
+
+        types.image(Tex.whiteui, Pal.accent).size(4f, 50f);
+
         for(DataAssetType type : DataAssetType.all){
             types.button(typeIcons[type.ordinal()], Styles.grayTogglei, () -> changeType(type))
-            .checked(b -> currentType == type).tooltip(type.localized()).size(50f).pad(4f);
+            .checked(b -> currentType == type).tooltip(type.localized());
         }
-        types.image(Tex.whiteui, Pal.accent).size(4f, 50f).pad(4f);
+        types.image(Tex.whiteui, Pal.accent).size(4f, 50f);
+
         types.table(Styles.grayPanel, t -> {
             t.margin(8f);
-            t.label(() -> currentType.localizedPlural());
-        }).height(50f).pad(4f);
+            t.label(() -> currentType.localized());
+        }).height(50f).width(Float.NEGATIVE_INFINITY);
+
+        types.add().growX();
+
+        types.button("@asset.guide", Icon.link, Styles.grayt, () -> Core.app.openURI(patchesGuideURL)).marginLeft(10f).size(200f, 50f).pad(4f);
 
         cont.top().left();
 
-        cont.add(types).left().row();
+        cont.add(types).growX().left().row();
 
         cont.table(search -> {
             search.image(Icon.zoom);
@@ -82,6 +114,11 @@ public class MapAssetsDialog extends BaseDialog{
         addCloseButton();
         views[currentType.ordinal()].buildButtons(this, buttons);
 
+        //make sure new assets appear correctly when switching to the content view
+        if(type == DataAssetType.content){
+            state.data.reloadContent(false);
+        }
+
         rebuild();
     }
 
@@ -91,19 +128,6 @@ public class MapAssetsDialog extends BaseDialog{
         list.marginBottom(70f);
 
         views[currentType.ordinal()].build(this, list);
-
-        /*
-        list.defaults().pad(4f);
-        float h = 50f;
-
-        for(var content : state.data.getAssets(currentType)){
-            list.button(content.path, Styles.grayt, () -> {
-
-            }).size(mobile ? 390f : 450f, h).margin(10f).with(b -> b.getLabel().setAlignment(Align.left, Align.left));
-
-            list.row();
-        }
-         */
     }
 
 }

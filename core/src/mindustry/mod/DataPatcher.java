@@ -31,6 +31,7 @@ public class DataPatcher{
     public static final int maxImageSize = 1024;
     public static final int patchFormatVersion = 2;
 
+    private static boolean needsArrayFix = false;
     private static final Object root = new Object();
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
     private static DataPatcher currentDataPatcher;
@@ -41,7 +42,6 @@ public class DataPatcher{
     private static LoadedMod dpMod = new LoadedMod(new Fi("dp"), new Fi(""), null, null, dpModMeta);
 
     private boolean applied;
-    private boolean needsArrayFix;
     private ContentLoader contentLoader;
     private ObjectSet<Object> usedpatches = new ObjectSet<>();
     private Seq<Runnable> resetters = new Seq<>();
@@ -79,6 +79,11 @@ public class DataPatcher{
 
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
     public void apply(Seq<PatchAsset> patches, Seq<ContentAsset> content){
+        apply(patches, content, true);
+    }
+
+    /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
+    public void apply(Seq<PatchAsset> patches, Seq<ContentAsset> content, boolean reloadContentWorld){
         //if you're un-applying data patches, and it throws an error, just crash. this is not recoverable.
         if(applied){
             unapply();
@@ -160,7 +165,7 @@ public class DataPatcher{
                 Fi file = new Fi(asset.path);
 
                 //this is very important for resizing various arrays used in the game
-                if(asset.type == ContentType.item || asset.type == ContentType.liquid){
+                if((asset.type == ContentType.item || asset.type == ContentType.liquid)){
                     needsArrayFix = true;
                 }
 
@@ -221,6 +226,11 @@ public class DataPatcher{
                     try{
                         cont.loadIcon();
                         cont.load();
+                        if(cont.minfo.asset != null && cont instanceof UnlockableContent u){
+                            if(!u.uiIcon.found()){
+                                cont.minfo.asset.warnings.add("[" + u.name.substring(u.minfo.mod.name.length() + 1) + "] Could not find an icon. Ensure that you have an image named '" + u.name + "' loaded. Remember that imported images always have the 'dp-' prefix automatically applied.");
+                            }
+                        }
                     }catch(Throwable t){
                         if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
                         parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
@@ -235,13 +245,17 @@ public class DataPatcher{
                 needsArrayFix = false;
             }
 
-            if(needsArrayFix) fixContentArrays();
+            if(reloadContentWorld) fixContentArrays();
         }
 
         afterCallbacks.each(Runnable::run);
     }
 
     public void unapply(){
+        unapply(true);
+    }
+
+    public void unapply(boolean reloadContentWorld){
         if(!applied) return;
 
         callContentRemove();
@@ -263,9 +277,7 @@ public class DataPatcher{
         afterCallbacks.clear();
         usedpatches.clear();
 
-        if(needsArrayFix) fixContentArrays();
-
-        needsArrayFix = false;
+        if(reloadContentWorld) fixContentArrays();
     }
 
     void callContentRemove(){
@@ -279,7 +291,8 @@ public class DataPatcher{
         }
     }
 
-    void fixContentArrays(){
+    public static void fixContentArrays(){
+        if(!needsArrayFix) return;
         int items = Vars.content.items().size, liquids = Vars.content.liquids().size;
 
         //block item/liquid filter
@@ -302,6 +315,7 @@ public class DataPatcher{
 
         //TODO: this doesn't do anything about extensive ItemSeq usage across the codebase, which is limited to the campaign
         //TODO: this also doesn't change sectors
+        needsArrayFix = false;
     }
 
     void visit(Object object){

@@ -9,7 +9,7 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-/** Abstract class for a kind of asset used in an asset mod. */
+/** Abstract class for a kind of asset used in a data asset modification. */
 public abstract class DataAsset implements Comparable<DataAsset>{
     /** set by the server to force content files to point to a specific folder */
     private @Nullable Fi overrideCacheFile;
@@ -106,6 +106,8 @@ public abstract class DataAsset implements Comparable<DataAsset>{
 
     @Override
     public int compareTo(DataAsset asset){
+        int cmp = getType().compareTo(asset.getType());
+        if(cmp != 0) return cmp;
         return path.compareTo(asset.path);
     }
 }

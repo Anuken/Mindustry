@@ -18,7 +18,6 @@ public class MapPatchesView implements AssetView{
 
     @Override
     public void buildButtons(MapAssetsDialog diag, Table buttons){
-        buttons.button("@patch.guide", Icon.link, () -> Core.app.openURI(patchesGuideURL)).size(190f, 64f);
         buttons.button("@add", Icon.add, () -> showImport(this::addPatch)).size(190f, 64f);
     }
 
@@ -130,6 +129,7 @@ public class MapPatchesView implements AssetView{
         try{
             Jval.read(patch); //validation
 
+            //TODO: the name is incorrect (gibberish based on UUID)
             if(replaceIndex == -1){
                 patches.add(new PatchAsset(patch));
             }else{

@@ -19,7 +19,6 @@ import static mindustry.Vars.*;
 
 public class MapAudioView implements AssetView{
     public final DataAssetType type;
-    //TODO: stop when hidden, show when playing, stop when double tapped (but not sounds that stopped)
     public @Nullable AudioSource lastPlaying;
 
     public MapAudioView(DataAssetType type){
@@ -36,11 +35,10 @@ public class MapAudioView implements AssetView{
         for(var asset : assets){
             if(diag.searchString != null && !asset.name.toLowerCase().contains(diag.searchString)) continue;
 
-            //TODO: handle invalid files
             Fi file = asset.getCacheFile();
             var audioSource = (AudioSource)Core.assets.getOrNull(DataAudioLoader.prefix + asset.name, (Class<?>)(type == DataAssetType.music ? Music.class : Sound.class));
 
-            if(file == null || !audioSource.valid()){
+            if(file == null || audioSource == null || !audioSource.valid()){
                 list.button(Icon.warning, Styles.graySquarei, iconMed, () -> ui.showInfo("@asset.broken")).size(h);
             }else{
                 list.button(Icon.play, Styles.graySquarei, iconMed, () -> {
@@ -61,9 +59,7 @@ public class MapAudioView implements AssetView{
                         s.play();
                         s.bus = bus;
                     }
-                }).update(i -> {
-                    i.getStyle().imageUp = audioSource != null && audioSource.countPlaying() > 0 ? Icon.pause : Icon.play;
-                }).size(h);
+                }).update(i -> i.getStyle().imageUp = audioSource != null && audioSource.countPlaying() > 0 ? Icon.pause : Icon.play).size(h);
             }
 
             list.table(Styles.grayPanel, in -> {

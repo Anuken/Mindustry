@@ -1032,7 +1032,8 @@ public class ContentParser{
         currentFile = file;
         currentMod = mod;
 
-        JsonValue value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
+        var rawValue = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
+        if(!(rawValue instanceof JsonValue value)) throw new SerializationException("Content JSON must be an object, not a single value.");
 
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");

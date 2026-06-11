@@ -266,6 +266,17 @@ public class ContentLoader{
         return (ObjectMap<String, T>)contentNameMap[type.ordinal()];
     }
 
+    /** Only use this for modded/data patcher content. */
+    public void remove(@Nullable Content content){
+        if(content == null) return;
+        var type = content.getContentType();
+        getBy(type).remove(content);
+        if(content instanceof MappableContent m){
+            getNamesBy(type).remove(m.name);
+            if(nameMap.get(m.name) == m) nameMap.remove(m.name);
+        }
+    }
+
     //utility methods, just makes things a bit shorter
 
     public Seq<Block> blocks(){

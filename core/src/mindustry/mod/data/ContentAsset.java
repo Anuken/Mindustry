@@ -58,4 +58,14 @@ public class ContentAsset extends DataAsset{
         stream.writeInt(bytes.length);
         stream.write(bytes);
     }
+
+    @Override
+    public int compareTo(DataAsset asset){
+        if(asset instanceof ContentAsset cont){
+            int cmp = type.compareTo(cont.type);
+            if(cmp != 0) return cmp;
+        }
+
+        return super.compareTo(asset);
+    }
 }
