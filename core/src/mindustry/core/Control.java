@@ -3,13 +3,11 @@ package mindustry.core;
 import arc.*;
 import arc.assets.*;
 import arc.audio.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
-import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -24,7 +22,6 @@ import mindustry.game.Objectives.*;
 import mindustry.game.Saves.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
@@ -112,39 +109,6 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(SaveLoadEvent.class, event -> {
             input.checkUnit();
         });
-
-        Events.on(WorldLoadEvent.class, e -> app.post(() -> {
-            var errored = state.data.getContent().select(c -> c.errored);
-            if(!errored.isEmpty()){
-                new BaseDialog(bundle.get("mod.erroredcontent").replace("[red]", "")){{
-                    setFillParent(true);
-                    setTitleColor(Color.scarlet);
-                    cont.margin(15);
-                    cont.row();
-                    cont.add("@mod.errors.map").wrap().growX().center().labelAlign(Align.center);
-                    cont.row();
-                    cont.pane(d -> {
-                        d.left().marginLeft(15f);
-                        for(var asset : errored){
-                            d.add(asset.path).color(Pal.accent).left().padRight(10).growX().row();
-
-                            d.table(t -> {
-                                t.left();
-                                t.image(Tex.whiteui).width(3f).growY().color(Color.lightGray).padRight(8f).padTop(2f).padBottom(2f);
-
-                                t.add(asset.warnings.toString("\n\n")).color(Color.lightGray).labelAlign(Align.left, Align.left).left().growX().wrap().padTop(5f).row();
-                            }).padBottom(10f).grow().row();
-                        }
-                    }).width(Math.min(graphics.getWidth() / Scl.scl(1f) * 0.9f, 700f));
-
-                    buttons.button("@quit", Icon.exit, () -> {
-                        hide();
-                        ui.paused.runExitSave(false);
-                    }).size(210, 64);
-                    buttons.button("@continue", Icon.warning, this::hide).size(210, 64);
-                }}.show();
-            }
-        }));
 
         Events.on(ResetEvent.class, event -> {
             player.reset();

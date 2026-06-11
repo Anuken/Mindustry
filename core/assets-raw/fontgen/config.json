@@ -309,12 +309,6 @@
       ]
     },
     {
-      "uid": "dd6df3b754e8d0dbf09d9b24088f0442",
-      "css": "box",
-      "code": 59422,
-      "src": "iconic"
-    },
-    {
       "uid": "f08ba9f0e8f9b426a92efcaa59c1e932",
       "css": "reddit-alien",
       "code": 62081,
@@ -1203,6 +1197,66 @@
       "css": "sitemap",
       "code": 61672,
       "src": "fontawesome"
+    },
+    {
+      "uid": "2c413e78faf1d6631fd7b094d14c2253",
+      "css": "cloud",
+      "code": 59441,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "de2fc7a5c986ab8c622f63455d7cf814",
+      "css": "upload-cloud",
+      "code": 61678,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "f5999a012fc3752386635ec02a858447",
+      "css": "download-cloud",
+      "code": 61677,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "e7a4824e79002c2d8ce3047b2da8b5a2",
+      "css": "rain",
+      "code": 59442,
+      "src": "typicons"
+    },
+    {
+      "uid": "ac10a3a3077eab1b9d66509eb25fb9b4",
+      "css": "cloud-sun",
+      "code": 59448,
+      "src": "typicons"
+    },
+    {
+      "uid": "6f200a5a449259c51cd0ccf56b4c1e93",
+      "css": "drizzle",
+      "code": 59452,
+      "src": "typicons"
+    },
+    {
+      "uid": "3cac7625657b10cf706e7f332749c912",
+      "css": "cloud-flash",
+      "code": 59456,
+      "src": "typicons"
+    },
+    {
+      "uid": "364cc69fb3edb8fb21caa6a2c0489589",
+      "css": "cloud-wind",
+      "code": 59457,
+      "src": "typicons"
+    },
+    {
+      "uid": "cc05df515bebe11df3ada0a5910a8f6d",
+      "css": "box",
+      "code": 59422,
+      "src": "entypo"
+    },
+    {
+      "uid": "d5f287ad8e3a2db8f808bc09980ec3dc",
+      "css": "chart-alt",
+      "code": 59459,
+      "src": "typicons"
     }
   ]
 }

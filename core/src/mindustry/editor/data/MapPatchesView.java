@@ -18,7 +18,10 @@ public class MapPatchesView implements AssetView{
 
     @Override
     public void buildButtons(MapAssetsDialog diag, Table buttons){
-        buttons.button("@add", Icon.add, () -> showImport(this::addPatch)).size(190f, 64f);
+        buttons.button("@add", Icon.add, () -> showImport(s -> {
+            addPatch(s);
+            diag.rebuild();
+        })).size(190f, 64f);
     }
 
     @Override
@@ -106,10 +109,11 @@ public class MapPatchesView implements AssetView{
                     handler.get(Core.app.getClipboardText());
                 }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
                 t.row();
-                t.button("@schematic.importfile", Icon.download, style, () -> platform.showMultiFileChooser(file -> {
+                //currently doesn't allow multi import because it could be replacing exactly 1 patch
+                t.button("@schematic.importfile", Icon.download, style, () -> FileChooser.open("json", "hjson", "json5").submit(file -> {
                     dialog.hide();
                     handler.get(file.readString());
-                }, "json", "hjson", "json5")).marginLeft(12f);
+                })).marginLeft(12f);
                 t.row();
             });
         });

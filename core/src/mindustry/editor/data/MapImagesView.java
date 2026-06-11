@@ -30,40 +30,43 @@ public class MapImagesView implements AssetView{
     public void buildButtons(MapAssetsDialog diag, Table buttons){
 
         buttons.button("@add", Icon.add, () -> {
-            platform.showFileChooser(true, "png", result -> {
-                try{
-                    Pixmap pix = new Pixmap(result);
-                    int width = pix.width;
-                    int height = pix.height;
-                    Pixmaps.bleed(pix);
-                    byte[] bytes = PixmapIO.writePngBytes(pix);
-                    pix.dispose();
+            FileChooser.open("png", "jpeg", "jpg").submitMulti(results -> {
+                var images = getImages();
 
-                    if(width > DataPatcher.maxImageSize || height > DataPatcher.maxImageSize){
-                        ui.showErrorMessage(Core.bundle.format("asset.image.toolarge", width, height, DataPatcher.maxImageSize, DataPatcher.maxImageSize));
-                        return;
+                for(var result : results){
+                    try{
+                        Pixmap pix = new Pixmap(result);
+                        int width = pix.width;
+                        int height = pix.height;
+                        Pixmaps.bleed(pix);
+                        byte[] bytes = PixmapIO.writePngBytes(pix);
+                        pix.dispose();
+
+                        if(width > DataPatcher.maxImageSize || height > DataPatcher.maxImageSize){
+                            ui.showErrorMessage(Core.bundle.format("asset.image.toolarge", width, height, DataPatcher.maxImageSize, DataPatcher.maxImageSize));
+                            return;
+                        }
+
+                        //path and name are the same here; there's no path context.
+                        String name = result.nameWithoutExtension();
+                        String path = name;
+                        var other = images.find(p -> (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
+                        if(other != null){
+                            ui.showErrorMessage(Core.bundle.format("asset.image.exists", other.name + " (" + other.path + ")"));
+                            return;
+                        }
+
+                        byte[] hash = assetCache.add(bytes);
+
+                        images.add(new ImageAsset(path, hash));
+                    }catch(Exception e){
+                        ui.showException(e);
                     }
-
-                    var images = getImages();
-
-                    //path and name are the same here; there's no path context.
-                    String name = result.nameWithoutExtension();
-                    String path = name;
-                    var other = images.find(p -> (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
-                    if(other != null){
-                        ui.showErrorMessage(Core.bundle.format("asset.image.exists", other.name + " (" + other.path + ")"));
-                        return;
-                    }
-
-                    byte[] hash = assetCache.add(bytes);
-
-                    images.add(new ImageAsset(path, hash));
-                    images.sort();
-                    state.data.reloadImages(images);
-                    diag.rebuild();
-                }catch(Exception e){
-                    ui.showException(e);
                 }
+
+                images.sort();
+                state.data.reloadImages(images);
+                diag.rebuild();
             });
         }).size(190f, 64f);
 
@@ -74,7 +77,7 @@ public class MapImagesView implements AssetView{
                 p.table(Tex.button, t -> {
                     TextButtonStyle style = Styles.flatt;
                     t.defaults().size(280f, 60f).left();
-                    t.button("@asset.image.importzip", Icon.download, style, () -> platform.showFileChooser(true, "zip", file -> {
+                    t.button("@asset.image.importzip", Icon.download, style, () -> FileChooser.open("zip").submit(file -> {
 
                         //Android doesn't allow accessing the file contents outside the callback; other platforms either copy it already, or don't have dumb permission issues
                         Fi targetFile;
@@ -171,21 +174,17 @@ public class MapImagesView implements AssetView{
                             }
                         });
                     })).marginLeft(12f).row();
-                    t.button("@asset.image.exportzip", Icon.upload, style, () -> platform.showFileChooser(false, "zip", file -> {
+                    t.button("@asset.image.exportzip", Icon.upload, style, () -> FileChooser.export("images", "zip", file -> {
                         dialog.hide();
-                        try{
-                            try(OutputStream fos = file.write(false, 4096); ZipOutputStream zos = new ZipOutputStream(fos)){
-                                for(var image : getImages()){
-                                    Fi cacheFile = image.getCacheFile();
-                                    if(cacheFile == null) continue;
+                        try(OutputStream fos = file.write(false, 4096); ZipOutputStream zos = new ZipOutputStream(fos)){
+                            for(var image : getImages()){
+                                Fi cacheFile = image.getCacheFile();
+                                if(cacheFile == null) continue;
 
-                                    zos.putNextEntry(new ZipEntry(image.path + ".png"));
-                                    zos.write(cacheFile.readBytes());
-                                    zos.closeEntry();
-                                }
+                                zos.putNextEntry(new ZipEntry(image.path + ".png"));
+                                zos.write(cacheFile.readBytes());
+                                zos.closeEntry();
                             }
-                        }catch(Throwable e){
-                            ui.showException(e);
                         }
                     })).marginLeft(12f).row();
                     t.button("@asset.image.clearall", Icon.trash, style, () -> {
@@ -279,13 +278,7 @@ public class MapImagesView implements AssetView{
                     });
                     b.button(Icon.info, istyle, showInfo);
                     b.button(Icon.export, istyle, () -> {
-                        platform.showFileChooser(false, "png", out -> {
-                            try{
-                                image.getCacheFileNoNull().copyTo(out);
-                            }catch(Throwable e){
-                                ui.showException(e);
-                            }
-                        });
+                        FileChooser.export(image.name, "png", out -> image.getCacheFileNoNull().copyTo(out));
                     });
                     b.button(Icon.trash, istyle, () -> {
                         ui.showConfirm("@asset.image.delete.confirm", () -> {

@@ -71,6 +71,8 @@ public class MapAudioView implements AssetView{
                             m.setPosition(value);
                         }
                     });
+                    //only ogg can seek
+                    slider.touchable = asset.path.endsWith(".ogg") ? Touchable.enabled : Touchable.disabled;
                     slider.visible(() -> {
                         boolean valid = lastPlaying == m && m.isPlaying();
                         if(valid){
@@ -88,25 +90,7 @@ public class MapAudioView implements AssetView{
                 }
             }).size(mobile ? 390f : 450f, h).margin(10f);
 
-            list.button(Icon.export, Styles.graySquarei, Vars.iconMed, () -> {
-                if(ios){
-                    try{
-                        Fi out = tmpDirectory.child(Strings.getFileName(asset.path));
-                        file.copyTo(out);
-                        platform.shareFile(out);
-                    }catch(Exception e){
-                        ui.showException(e);
-                    }
-                }else{
-                    platform.showFileChooser(false, Strings.getFileExtension(asset.path), result -> {
-                        try{
-                            file.copyTo(result);
-                        }catch(Exception e){
-                            ui.showException(e);
-                        }
-                    });
-                }
-            }).size(h).disabled(file == null);
+            list.button(Icon.export, Styles.graySquarei, Vars.iconMed, () -> FileChooser.export(asset.name, Strings.getFileExtension(asset.path), file::copyTo)).size(h).disabled(file == null);
 
             list.button(Icon.trash, Styles.graySquarei, iconMed, () -> {
                 ui.showConfirm("@asset.delete.confirm",  () -> {
@@ -140,32 +124,35 @@ public class MapAudioView implements AssetView{
     public void buildButtons(MapAssetsDialog diag, Table buttons){
 
         buttons.button("@add", Icon.add, () -> {
-            platform.showMultiFileChooser(result -> {
-                try{
-                    //path and name are the same here; there's no path context.
-                    String name = result.nameWithoutExtension();
-                    String path = name;
-                    var other = state.data.getAssets(type).find(p -> (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
-                    if(other != null){
-                        ui.showErrorMessage(Core.bundle.format("asset.exists", other.name + " (" + other.path + ")"));
-                        return;
+            FileChooser.open("ogg", "mp3").submitMulti(result -> {
+                var assets = state.data.getAssets(type);
+
+                for(Fi file : result){
+                    try{
+                        //path and name are the same here; there's no path context.
+                        String name = file.nameWithoutExtension();
+                        String path = name;
+                        var other = state.data.getAssets(type).find(p -> (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
+                        if(other != null){
+                            ui.showErrorMessage(Core.bundle.format("asset.exists", other.name + " (" + other.path + ")"));
+                            return;
+                        }
+
+                        DataAsset asset = (type == DataAssetType.music ? new MusicAsset() : new SoundAsset());
+                        asset.setPath(path);
+                        asset.updateData(file.readBytes());
+
+                        assets.add(asset);
+                    }catch(Exception e){
+                        ui.showException(e);
                     }
-
-                    var assets = state.data.getAssets(type);
-
-                    DataAsset asset = (type == DataAssetType.music ? new MusicAsset() : new SoundAsset());
-                    asset.setPath(path);
-                    asset.updateData(result.readBytes());
-
-                    assets.add(asset);
-                    assets.sort();
-                    state.data.reloadAudio();
-                    diag.rebuild();
-                    lastPlaying = null;
-                }catch(Exception e){
-                    ui.showException(e);
                 }
-            }, "ogg", "mp3");
+
+                assets.sort();
+                state.data.reloadAudio();
+                diag.rebuild();
+                lastPlaying = null;
+            });
         }).size(190f, 64f);
 
     }

@@ -28,7 +28,7 @@ import java.util.*;
 /** The current implementation is awful. Consider it a proof of concept. */
 @SuppressWarnings("unchecked")
 public class DataPatcher{
-    public static final int maxImageSize = 1024;
+    public static final int maxImageSize = 2000;
     public static final int patchFormatVersion = 2;
 
     private static boolean needsArrayFix = false;
@@ -109,7 +109,9 @@ public class DataPatcher{
             set.error = false;
 
             try{
-                JsonValue value = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
+                Object someValue = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
+                if(!(someValue instanceof JsonValue value)) throw new SerializationException("Patch must be a JSON object.");
+
                 if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
                     JsonValue req = value.get("requiredPlanets");
                     value.remove("requiredPlanets");
@@ -136,6 +138,7 @@ public class DataPatcher{
 
             }catch(Exception e){
                 set.error = true;
+                set.name = "";
                 set.warnings.add(Strings.getSimpleMessage(e));
                 currentlyApplyingPatch = null;
 
@@ -146,7 +149,6 @@ public class DataPatcher{
         if(!content.isEmpty()){
             content.sort();
 
-            ContentLoader preLoad = Vars.content.copy();
             dpMod.erroredContent.clear();
 
             for(var asset : content){
@@ -169,7 +171,6 @@ public class DataPatcher{
                     needsArrayFix = true;
                 }
 
-                //TODO: what to do when errors happen in general?
                 try{
                     //this binds the content but does not load it entirely
                     asset.content = parser.parse(dpMod, asset.name, asset.data, file, asset.type);
@@ -178,10 +179,11 @@ public class DataPatcher{
                     asset.warnings.add(Strings.getFinalMessage(e));
                     asset.errored = true;
 
-                    //TODO: this warning is not very useful, nor is markError in general. What should be done here?
-                    if(current != Vars.content.getLastAdded() && Vars.content.getLastAdded() != null){
+                    var lastAdded = Vars.content.getLastAdded();
+                    if(current != lastAdded && lastAdded != null){
+                        Vars.content.remove(lastAdded);
                         //markError should log it already
-                        parser.markError(Vars.content.getLastAdded(), dpMod, file, e);
+                        parser.markError(lastAdded, dpMod, file, e);
                     }else{
                         Log.err("Error loading content: " + asset.path, e);
                     }
@@ -207,6 +209,7 @@ public class DataPatcher{
                 try{
                     cont.init();
                 }catch(Throwable t){
+                    Vars.content.remove(cont);
                     if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
                     parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
                 }
@@ -216,6 +219,7 @@ public class DataPatcher{
                 try{
                     cont.postInit();
                 }catch(Throwable t){
+                    Vars.content.remove(cont);
                     if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
                     parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
                 }
@@ -227,22 +231,16 @@ public class DataPatcher{
                         cont.loadIcon();
                         cont.load();
                         if(cont.minfo.asset != null && cont instanceof UnlockableContent u){
-                            if(!u.uiIcon.found()){
+                            if(!u.uiIcon.found() && u.getContentType() != ContentType.planet && u.getContentType() != ContentType.weather){
                                 cont.minfo.asset.warnings.add("[" + u.name.substring(u.minfo.mod.name.length() + 1) + "] Could not find an icon. Ensure that you have an image named '" + u.name + "' loaded. Remember that imported images always have the 'dp-' prefix automatically applied.");
                             }
                         }
                     }catch(Throwable t){
+                        Vars.content.remove(cont);
                         if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
                         parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
                     }
                 }
-            }
-
-            if(all.contains(Content::hasErrored)){
-                Log.err("Errors were encountered loading content. Content will be unloaded.");
-                callContentRemove();
-                Vars.content = preLoad;
-                needsArrayFix = false;
             }
 
             if(reloadContentWorld) fixContentArrays();

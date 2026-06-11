@@ -249,30 +249,12 @@ public class SettingsMenuDialog extends BaseDialog{
             t.row();
 
             t.button("@data.export", Icon.upload, style, () -> {
-                if(ios){
-                    Fi file = Core.files.local("mindustry-data-export.zip");
-                    try{
-                        exportData(file);
-                    }catch(Exception e){
-                        ui.showException(e);
-                    }
-                    platform.shareFile(file);
-                }else{
-                    platform.showFileChooser(false, "zip", file -> {
-                        try{
-                            exportData(file);
-                            ui.showInfo("@data.exported");
-                        }catch(Exception e){
-                            e.printStackTrace();
-                            ui.showException(e);
-                        }
-                    });
-                }
+                FileChooser.export("mindustry-data-export", "zip", this::exportData);
             }).marginLeft(4);
 
             t.row();
 
-            t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
+            t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> FileChooser.open("zip").submit(file -> {
                 try{
                     importData(file);
                     control.saves.resetSave();
@@ -281,7 +263,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 }catch(IllegalArgumentException e){
                     ui.showErrorMessage("@data.invalid");
                 }catch(Exception e){
-                    e.printStackTrace();
+                    Log.err(e);
                     if(e.getMessage() == null || !e.getMessage().contains("too short")){
                         ui.showException(e);
                     }else{
@@ -301,20 +283,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 if(settings.getDataDirectory().child("crashes").list().length == 0 && !settings.getDataDirectory().child("last_log.txt").exists()){
                     ui.showInfo("@crash.none");
                 }else{
-                    if(ios){
-                        Fi logs = tmpDirectory.child("logs.txt");
-                        logs.writeString(getLogs());
-                        platform.shareFile(logs);
-                    }else{
-                        platform.showFileChooser(false, "txt", file -> {
-                            try{
-                                file.writeBytes(getLogs().getBytes(Strings.utf8));
-                                app.post(() -> ui.showInfo("@crash.exported"));
-                            }catch(Throwable e){
-                                ui.showException(e);
-                            }
-                        });
-                    }
+                    FileChooser.export("logs", "txt", file -> file.writeString(getLogs()));
                 }
             }).marginLeft(4);
         });

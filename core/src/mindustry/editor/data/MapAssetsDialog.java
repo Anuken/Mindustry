@@ -16,12 +16,8 @@ import static mindustry.Vars.*;
 
 /*
 TODO:
-• warn about critical errors for content that prevent content loading
 • dividers for content types
-• weather icon in font?
-• remove planets from list of content that can be parsed to prevent confusion?
 • drop down for import/export zip, clear all
-• allow multi file selection when importing
  */
 public class MapAssetsDialog extends BaseDialog{
     private static final TextureRegionDrawable[] typeIcons = {

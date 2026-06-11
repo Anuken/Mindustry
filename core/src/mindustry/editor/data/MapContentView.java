@@ -1,7 +1,6 @@
 package mindustry.editor.data;
 
 import arc.*;
-import arc.files.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
@@ -24,7 +23,7 @@ public class MapContentView implements AssetView{
     ContentType.unit, Icon.units,
     ContentType.block, Icon.distribution,
     ContentType.planet, Icon.planet,
-    ContentType.weather, Icon.power, //TODO cloud icon
+    ContentType.weather, Icon.drizzle,
     ContentType.status, Icon.power
     );
 
@@ -44,7 +43,14 @@ public class MapContentView implements AssetView{
                     dialog.cont.top().pane(p -> {
                         p.top();
 
-                        for(var warning : content.warnings){
+                        var warns = content.warnings;
+                        if(content.errored){
+                            warns = new Seq<>();
+                            warns.add(Iconc.warning + " This content has critical errors, and cannot be used until the errors are fixed.");
+                            warns.addAll(content.warnings);
+                        }
+
+                        for(var warning : warns){
                             p.table(Styles.grayPanel, in -> {
                                 in.add(warning.replaceAll("\t", "  "), Styles.monoLabel).grow().wrap();
                             }).margin(6f).growX().pad(3f).row();
@@ -80,23 +86,7 @@ public class MapContentView implements AssetView{
             }).size(h);
 
             list.button(Icon.export, Styles.graySquarei, Vars.iconMed, () -> {
-                if(ios){
-                    try{
-                        Fi out = tmpDirectory.child(Strings.getFileName(content.path));
-                        out.writeString(content.data);
-                        platform.shareFile(out);
-                    }catch(Exception e){
-                        ui.showException(e);
-                    }
-                }else{
-                    platform.showFileChooser(false, "properties", out -> {
-                        try{
-                            out.writeString(content.data);
-                        }catch(Exception e){
-                            ui.showException(e);
-                        }
-                    });
-                }
+                FileChooser.export(content.name, "json", file -> file.writeString(content.data));
             }).size(h);
 
             list.button(Icon.trash, Styles.graySquarei, iconMed, () -> {
@@ -158,11 +148,11 @@ public class MapContentView implements AssetView{
 
         choose.buttons.button("@cancel", Icon.cancel, choose::hide).size(170f, 64f);
 
-        choose.buttons.button("@asset.content.import.file", Icon.fileText, () -> platform.showMultiFileChooser(file -> {
+        choose.buttons.button("@asset.content.import.file", Icon.fileText, () -> FileChooser.open("json", "json5", "hjson").submit(file -> {
             choose.hide();
             addContent(selected[0], nameField.getText(), file.readString());
             diag.rebuild();
-        }, "json", "hjson", "json5")).size(200f, 64f).disabled(b -> nameField.getText().isEmpty() || invalid[0]);
+        })).size(200f, 64f).disabled(b -> nameField.getText().isEmpty() || invalid[0]);
 
         choose.buttons.button("@asset.content.import.clipboard", Icon.copy, () -> {
             String text = Core.app.getClipboardText();

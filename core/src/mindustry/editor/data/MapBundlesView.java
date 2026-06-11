@@ -69,23 +69,7 @@ public class MapBundlesView implements AssetView{
             }).size(h).disabled(file == null);
 
             list.button(Icon.export, Styles.graySquarei, Vars.iconMed, () -> {
-                if(ios){
-                    try{
-                        Fi out = tmpDirectory.child(Strings.getFileName(bundle.path));
-                        file.copyTo(out);
-                        platform.shareFile(out);
-                    }catch(Exception e){
-                        ui.showException(e);
-                    }
-                }else{
-                    platform.showFileChooser(false, "properties", out -> {
-                        try{
-                            file.copyTo(out);
-                        }catch(Exception e){
-                            ui.showException(e);
-                        }
-                    });
-                }
+                FileChooser.export(bundle.name, "properties", file::copyTo);
             }).size(h).disabled(file == null);
 
             list.button(Icon.trash, Styles.graySquarei, iconMed, () -> {
@@ -140,10 +124,12 @@ public class MapBundlesView implements AssetView{
                     handler.get("bundle.properties", Core.app.getClipboardText());
                 }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
                 t.row();
-                t.button("@schematic.importfile", Icon.download, style, () -> platform.showMultiFileChooser(file -> {
+                t.button("@schematic.importfile", Icon.download, style, () -> FileChooser.open("properties", "txt").submitMulti(files -> {
                     dialog.hide();
-                    handler.get(file.name(), file.readString());
-                }, "txt", "bundle")).marginLeft(12f);
+                    for(var file : files){
+                        handler.get(file.name(), file.readString());
+                    }
+                })).marginLeft(12f);
                 t.row();
             });
         });
