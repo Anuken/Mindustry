@@ -11,6 +11,8 @@ import mindustry.world.meta.*;
 public class HeaterGenerator extends ConsumeGenerator{
     public float heatOutput = 10f;
     public float warmupRate = 0.15f;
+    /** Whether to scale heat output with timescale. */
+    public boolean scaleHeat = true;
 
     public HeaterGenerator(String name){
         super(name);
@@ -49,9 +51,11 @@ public class HeaterGenerator extends ConsumeGenerator{
         public void updateTile(){
             super.updateTile();
 
+            float approachHeat = heatOutput * (scaleHeat ? timeScale : 1f);
+
             //heat approaches target at the same speed regardless of efficiency. HeatOutput is scaled smoothly just like heat
-            heat = Mathf.approachDelta(heat, heatOutput * timeScale * efficiency, warmupRate * delta());
-            heatOutScaled = Mathf.approachDelta(heatOutScaled, heatOutput * timeScale, warmupRate * delta());
+            heat = Mathf.approachDelta(heat, approachHeat * efficiency, warmupRate * delta());
+            heatOutScaled = Mathf.approachDelta(heatOutScaled, approachHeat, warmupRate * delta());
         }
 
         @Override
