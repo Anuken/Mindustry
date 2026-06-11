@@ -19,7 +19,7 @@ public class HeatProducer extends GenericCrafter{
         drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
         rotateDraw = false;
         rotate = true;
-        canOverdrive = false;
+        canOverdrive = true;
         drawArrow = true;
         //it doesn't count as a standard crafter
         flags = EnumSet.of();
@@ -36,23 +36,25 @@ public class HeatProducer extends GenericCrafter{
     public void setBars(){
         super.setBars();
 
-        addBar("heat", (HeatProducerBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat / heatOutput));
+        addBar("heat", (HeatProducerBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat / entity.heatOutScaled));
     }
 
     public class HeatProducerBuild extends GenericCrafterBuild implements HeatBlock{
         public float heat;
+        public float heatOutScaled = heatOutput;
 
         @Override
         public void updateTile(){
             super.updateTile();
 
-            //heat approaches target at the same speed regardless of efficiency
-            heat = Mathf.approachDelta(heat, heatOutput * efficiency, warmupRate * delta());
+            //heat approaches target at the same speed regardless of efficiency. HeatOutput is scaled smoothly just like heat
+            heat = Mathf.approachDelta(heat, heatOutput * timeScale * efficiency, warmupRate * delta());
+            heatOutScaled = Mathf.approachDelta(heatOutScaled, heatOutput * timeScale, warmupRate * delta());
         }
 
         @Override
         public float heatFrac(){
-            return heat / heatOutput;
+            return heat / heatOutScaled;
         }
 
         @Override
