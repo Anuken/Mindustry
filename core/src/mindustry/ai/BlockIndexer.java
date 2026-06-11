@@ -176,29 +176,58 @@ public class BlockIndexer{
                 }
             }
 
-            //no longer part of the building list
-            data.buildings.remove(build);
-            data.buildingTypes.get(build.block, () -> new Seq<>(false)).remove(build);
+            {
+                int buildIndex = build.indexerBuildIndex & 0xffff;
 
-            //update the unit cap when building is removed
+                //remove from building list based on cached index
+                if(buildIndex < data.buildings.size && data.buildings.get(buildIndex) == build){
+                    data.buildings.remove(buildIndex);
+                    //update index of the building placed in the new position
+                    if(buildIndex < data.buildings.size) data.buildings.get(buildIndex).indexerBuildIndex = (short)buildIndex;
+                }else{
+                    int index = data.buildings.indexOf(build);
+                    if(index != -1){
+                        data.buildings.remove(index);
+                        //update index of the building placed in the new position
+                        if(index < data.buildings.size) data.buildings.get(index).indexerBuildIndex = (short)index;
+                    }
+                }
+            }
+
+            {
+                var targetTypes = data.buildingTypes.get(build.block, () -> new Seq<>(false));
+                int buildTypeIndex = build.indexerBuildTypeIndex & 0xffff;
+
+                //remove from building list based on cached index
+                if(buildTypeIndex < targetTypes.size && targetTypes.get(buildTypeIndex) == build){
+                    targetTypes.remove(buildTypeIndex);
+                    //update index of the building placed in the new position
+                    if(buildTypeIndex < targetTypes.size) targetTypes.get(buildTypeIndex).indexerBuildTypeIndex = (short)buildTypeIndex;
+                }else{
+                    int index = targetTypes.indexOf(build);
+                    if(index != -1){
+                        targetTypes.remove(index);
+                        //update index of the building placed in the new position
+                        if(index < targetTypes.size) targetTypes.get(index).indexerBuildTypeIndex = (short)index;
+                    }
+                }
+            }
+
             data.unitCap -= tile.block().unitCapModifier;
 
-            //unregister building from building quadtree
             if(data.buildingTree != null){
                 data.buildingTree.remove(build);
             }
 
-            //remove indexed turret
             if(data.turretTree != null && build.block.attacks){
                 data.turretTree.remove(build);
             }
 
-            //unregister damaged buildings
+            //unregister damaged buildings if applicable
             if(build.wasDamaged && damagedTiles[team.id] != null){
                 damagedTiles[team.id].remove(build);
             }
 
-            //is no longer registered
             build.wasDamaged = false;
         }
     }
@@ -425,6 +454,10 @@ public class BlockIndexer{
     }
 
     public Building findEnemyTile(Team team, float x, float y, float range, BuildingPriorityf priority, Boolf<Building> pred){
+        return findEnemyTile(team, x, y, range, priority, pred, null);
+    }
+
+    public Building findEnemyTile(Team team, float x, float y, float range, BuildingPriorityf priority, Boolf<Building> pred, @Nullable Team source){
         Building target = null;
         float targetDist = 0;
 
@@ -432,7 +465,7 @@ public class BlockIndexer{
             Team enemy = activeTeams.items[i];
             if(enemy == team || (enemy == Team.derelict && !state.rules.coreCapture)) continue;
 
-            Building candidate = indexer.findTile(enemy, x, y, range, b -> pred.get(b) && b.isDiscovered(team), true);
+            Building candidate = findTile(enemy, x, y, range, b -> pred.get(b) && b.isDiscovered(team), true, source);
             if(candidate == null) continue;
 
             //if a block has the same priority, the closer one should be targeted
@@ -459,6 +492,10 @@ public class BlockIndexer{
     }
 
     public Building findTile(Team team, float x, float y, float range, Boolf<Building> pred, boolean usePriority){
+        return findTile(team, x, y, range, pred, usePriority, null);
+    }
+
+    public Building findTile(Team team, float x, float y, float range, Boolf<Building> pred, boolean usePriority, @Nullable Team source){
         Building closest = null;
         float dst = 0;
         var buildings = team.data().buildingTree;
@@ -470,7 +507,7 @@ public class BlockIndexer{
         for(int i = 0; i < breturnArray.size; i++){
             var next = breturnArray.items[i];
 
-            if(!pred.get(next) || !next.block.targetable) continue;
+            if(!pred.get(next) || (next.team != source && !next.block.targetable)) continue;
 
             float bdst = next.dst(x, y) - next.hitSize() / 2f;
             if(bdst < range && (closest == null ||
@@ -563,9 +600,15 @@ public class BlockIndexer{
                 }
             }
 
+            var targetTypes = data.buildingTypes.get(tile.block(), () -> new Seq<>(false));
+
             //record in list of buildings
             data.buildings.add(tile.build);
-            data.buildingTypes.get(tile.block(), () -> new Seq<>(false)).add(tile.build);
+            targetTypes.add(tile.build);
+
+            //save indices for fast lookup
+            tile.build.indexerBuildIndex = (short)(data.buildings.size - 1);
+            tile.build.indexerBuildTypeIndex = (short)(targetTypes.size - 1);
 
             //update the unit cap when new tile is registered
             data.unitCap += tile.block().unitCapModifier;

@@ -13,6 +13,7 @@ import mindustry.ctype.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -26,6 +27,9 @@ import java.util.*;
 /** The current implementation is awful. Consider it a proof of concept. */
 @SuppressWarnings("unchecked")
 public class DataPatcher{
+    public static final int maxImageSize = 1024;
+    public static final int patchFormatVersion = 1;
+
     private static final Object root = new Object();
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
     private static ContentParser parser = createParser();
@@ -37,9 +41,12 @@ public class DataPatcher{
     private Seq<Runnable> afterCallbacks = new Seq<>();
     private Seq<Object> visitStack = new Seq<>();
     private @Nullable PatchSet currentlyApplying;
+    private DataPatchPacker packer = new DataPatchPacker();
 
     /** Currently active patches. Note that apply() should be called after modification. */
     public Seq<PatchSet> patches = new Seq<>();
+    /** Currently loaded patch images. */
+    public Seq<PatchImage> images = new Seq<>();
 
     static{
         for(var type : ContentType.all){
@@ -67,6 +74,12 @@ public class DataPatcher{
         return usedpatches.contains(object);
     }
 
+    public void applyImages(Seq<PatchImage> images){
+        this.images = images;
+
+        if(!Vars.headless) packer.pack(images);
+    }
+
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
     public void apply(Seq<String> patchArray) throws Exception{
         if(applied){
@@ -87,10 +100,22 @@ public class DataPatcher{
 
         for(String patch : patchArray){
             PatchSet set = new PatchSet(patch, new JsonValue("error"));
-            patches.add(set);
 
             try{
                 JsonValue value = parser.getJson().fromJson(null, Jval.read(patch).toString(Jformat.plain));
+                if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
+                    JsonValue req = value.get("requiredPlanets");
+                    value.remove("requiredPlanets");
+
+                    //this should be ignored unless this instance is a dedicated server
+                    if(Vars.headless){
+                        String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
+                        if(!Structs.contains(planets, Vars.state.rules.planet.name)){
+                            continue;
+                        }
+                    }
+                }
+
                 set.json = value;
                 currentlyApplying = set;
                 visitStack.clear();
@@ -109,6 +134,8 @@ public class DataPatcher{
 
                 Log.err("Failed to apply patch: " + patch, e);
             }
+
+            patches.add(set);
         }
 
         afterCallbacks.each(Runnable::run);
@@ -116,6 +143,8 @@ public class DataPatcher{
 
     public void unapply(){
         if(!applied) return;
+
+        if(!Vars.headless) packer.unapply();
 
         Vars.content = contentLoader;
         applied = false;
@@ -614,10 +643,15 @@ public class DataPatcher{
     }
 
     public static class PatchSet{
+        /** Raw string value, containing original formatting. */
         public String patch;
+        /** Parsed JSON value. Can be an empty error value if parsing failed. */
         public JsonValue json;
+        /** Named obtained from patch. */
         public String name = "";
+        /** True if an error was encountered. */
         public boolean error;
+        /** Warnings encountered during patching. */
         public Seq<String> warnings = new Seq<>();
 
         public PatchSet(String patch, JsonValue json){

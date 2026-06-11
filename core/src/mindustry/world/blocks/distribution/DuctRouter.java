@@ -123,6 +123,15 @@ public class DuctRouter extends Block{
             ItemSelection.buildTable(DuctRouter.this, table, content.items(), () -> sortItem, this::configure);
         }
 
+        @Override
+        public void configured(Unit player, Object value){
+            super.configured(player, value);
+
+            if(!headless){
+                renderer.minimap.update(tile);
+            }
+        }
+
         @Nullable
         public Building target(){
             if(current == null) return null;

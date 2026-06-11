@@ -407,6 +407,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
             event.unitIDs = unitIds;
+            event.unitCommand = command;
         })){
             throw new ValidateException(player, "Player cannot command units.");
         }
@@ -731,7 +732,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Events.fire(new TapEvent(player, tile));
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server)
     public static void buildingControlSelect(Player player, Building build){
         if(player == null || build == null || player.dead()) return;
 
@@ -743,7 +744,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player.team() == build.team && build.canControlSelect(player.unit())){
             var before = player.unit();
 
-            build.onControlSelect(player.unit());
+            Call.unitBuildingControlSelect(player.unit(), build);
 
             if(!before.dead && before.spawnedByCore && !before.isPlayer()){
                 Call.unitDespawn(before);
@@ -2071,9 +2072,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean tryRepairDerelict(Tile selected){
-        if(!player.dead() && selected != null && !state.rules.editor && player.team() != Team.derelict && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict &&
-            Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
-
+        if(canRepairDerelict(selected)){
             player.unit().addBuild(new BuildPlan(selected.build.tileX(), selected.build.tileY(), selected.build.rotation, selected.block(), selected.build.config()));
             return true;
         }

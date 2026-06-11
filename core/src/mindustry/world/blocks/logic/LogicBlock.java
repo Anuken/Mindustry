@@ -1,5 +1,6 @@
 package mindustry.world.blocks.logic;
 
+import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.func.*;
@@ -33,6 +34,7 @@ import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
     private static final int maxByteLen = 1024 * 100;
+    private static final int maxCompressedLen = 16_000;
     private static final int maxLinks = 6000;
     public static final int maxNameLength = 32;
 
@@ -180,7 +182,7 @@ public class LogicBlock extends Block{
 
     @Override
     public Object pointConfig(Object config, Cons<Point2> transformer){
-        if(config instanceof byte[] data){
+        if(config instanceof byte[] data && data.length <= maxCompressedLen){
 
             try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
                 //discard version for now
@@ -206,8 +208,8 @@ public class LogicBlock extends Block{
                 }
 
                 return compress(bytes, links);
-            }catch(IOException e){
-                Log.err(e);
+            }catch(IOException ignored){
+                //error should not be logged
             }
         }
         return config;
@@ -218,12 +220,30 @@ public class LogicBlock extends Block{
         public int x, y;
         public String name;
         public Building lastBuild;
+        public @Nullable LVar logicVar;
 
         public LogicLink(int x, int y, String name, boolean valid){
             this.x = x;
             this.y = y;
             this.name = name;
             this.valid = valid;
+        }
+
+        public void trySet(LExecutor exec, Object value){
+            if(logicVar != null){
+                logicVar.setconst(value);
+            }else{
+                var foundVar = exec.optionalVar(name);
+                if(foundVar != null){
+                    if(value != null){
+                        //should now become const as it is now a valid link
+                        //note: this will never become non-const even if invalidated
+                        //there isn't really a good reason to use these variables anyway, and it is an edge case
+                        foundVar.constant = true;
+                    }
+                    foundVar.setconst(value);
+                }
+            }
         }
 
         public LogicLink copy(){
@@ -243,6 +263,7 @@ public class LogicBlock extends Block{
         /** Display name, for convenience. This is currently only available for world processors. */
         public @Nullable String tag;
         public char iconTag;
+        public @Nullable LVar linksVar;
 
         /** Block of code to run after load. */
         public @Nullable Runnable loadBlock;
@@ -351,7 +372,7 @@ public class LogicBlock extends Block{
                     for(LogicLink link : links){
                         link.valid = validLink(world.build(link.x, link.y));
                         if(link.valid){
-                            asm.putConst(link.name, world.build(link.x, link.y));
+                            link.logicVar = asm.putConst(link.name, world.build(link.x, link.y));
                         }
                     }
 
@@ -368,7 +389,7 @@ public class LogicBlock extends Block{
                         }
                     }
 
-                    asm.putConst("@links", executor.links.length);
+                    linksVar = asm.putConst("@links", executor.links.length);
                     asm.putConst("@ipt", instructionsPerTick);
 
                     Object oldUnit = null;
@@ -412,7 +433,7 @@ public class LogicBlock extends Block{
         //editor-only processors cannot be damaged or destroyed
         @Override
         public boolean collide(Bullet other){
-            return !privileged;
+            return !privileged || destructible;
         }
 
         @Override
@@ -422,7 +443,7 @@ public class LogicBlock extends Block{
 
         @Override
         public void damage(float damage){
-            if(!privileged){
+            if(!privileged || destructible){
                 super.damage(damage);
             }
         }
@@ -496,15 +517,24 @@ public class LogicBlock extends Block{
                         l.lastBuild = cur;
                         changed = true;
                         l.valid = valid;
-                        if(valid){
 
+                        l.trySet(executor, null); //always clear old variable, it may get a new name
+
+                        if(valid){
                             //this prevents conflicts
                             l.name = "";
                             //finds a new matching name after toggling
                             l.name = findLinkName(cur.block);
 
                             //remove redundant links
-                            links.removeAll(o -> world.build(o.x, o.y) == cur && o != l);
+                            links.removeAll(o -> {
+                                boolean remove = world.build(o.x, o.y) == cur && o != l;
+                                if(remove) o.trySet(executor, null); //clear value when removing the link
+                                return remove;
+                            });
+
+                            //set the newly assigned building value
+                            l.trySet(executor, cur);
 
                             //break to prevent concurrent modification
                             updates = true;
@@ -515,7 +545,7 @@ public class LogicBlock extends Block{
             }
 
             if(changed){
-                updateCode(code, true, null);
+                updateLinks();
             }
 
             if(!privileged){
@@ -540,6 +570,23 @@ public class LogicBlock extends Block{
                 // may get out of sync with the accumulator increase.
                 accumulator += edelta() * ipt;
             }
+        }
+
+        public void updateLinks(){
+            int valids = links.count(l -> l.valid);
+            executor.links = new Building[valids];
+            executor.linkIds.clear();
+
+            int index = 0;
+            for(LogicLink link : links){
+                if(link.valid){
+                    Building build = world.build(link.x, link.y);
+                    executor.links[index ++] = build;
+                    if(build != null) executor.linkIds.add(build.id);
+                }
+            }
+
+            linksVar.numval = valids;
         }
 
         @Override
@@ -658,7 +705,7 @@ public class LogicBlock extends Block{
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && (privileged || (!other.block.privileged && other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(other instanceof ConstructBuild);
+            return other != null && other.isValid() && (privileged || (!other.block.privileged && other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(privileged && !state.rules.worldProcessorPlayerLink && other.team == state.rules.defaultTeam) && !(other instanceof ConstructBuild);
         }
 
         @Override
@@ -680,8 +727,13 @@ public class LogicBlock extends Block{
                 boolean prev = state.rules.editor;
                 //this is a hack to allow configuration to work correctly in the editor for privileged processors
                 if(forceEditor) state.rules.editor = true;
-                configure(compress(code, relativeConnections()));
-                state.rules.editor = prev;
+                byte[] bytes = compress(code, relativeConnections());
+                if(bytes.length > maxCompressedLen){
+                    ui.showErrorMessage(Core.bundle.format("logic.error.toolong", maxCompressedLen, bytes.length));
+                }else{
+                    configure(bytes);
+                    state.rules.editor = prev;
+                }
             });
         }
 

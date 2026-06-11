@@ -40,6 +40,7 @@ public class UnitAssembler extends PayloadBlock{
     public @Load("@-side2") TextureRegion sideRegion2;
 
     public int areaSize = 11;
+    /** Note: The spawned unit MUST have AssemblerAI as a controller and 'tether' (BuildingTetherComp) as a unit component. */
     public UnitType droneType = UnitTypes.assemblyDrone;
     public int dronesCreated = 4;
     public float droneConstructTime = 60f * 4f;
@@ -95,11 +96,11 @@ public class UnitAssembler extends PayloadBlock{
 
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
-        //overlapping construction areas not allowed; grow by a tiny amount so edges can't overlap either.
+        //overlapping construction areas not allowed unless it s being replaced; grow by a tiny amount so edges can't overlap either.
         Rect rect = getRect(Tmp.r1, tile.worldx() + offset, tile.worldy() + offset, rotation).grow(0.1f);
         return
-            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> b.block instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
-            !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> ((ConstructBuild)b).current instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
+            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> b != tile.build && b.block instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
+            !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> b != tile.build && ((ConstructBuild)b).current instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
     }
 
     @Override
@@ -382,6 +383,7 @@ public class UnitAssembler extends PayloadBlock{
 
         @Override
         public void drawSelect(){
+            super.drawSelect();
             for(var module : modules){
                 Drawf.selected(module, Pal.accent);
             }
@@ -462,14 +464,20 @@ public class UnitAssembler extends PayloadBlock{
             if(units.size < dronesCreated && enabled && (droneProgress += delta() * state.rules.unitBuildSpeed(team) * powerStatus / droneConstructTime) >= 1f){
                 if(!net.client()){
                     var unit = droneType.create(team);
-                    if(unit instanceof BuildingTetherc bt){
-                        bt.building(this);
+                    //If a unit isn't using AssemblerAI, it's bugged, likely because of an incorrect data patch or mod.
+                    //In that case, just ignore it and don't spawn anything
+                    if(unit.controller() instanceof AssemblerAI){
+                        if(unit instanceof BuildingTetherc bt){
+                            bt.building(this);
+                        }
+                        unit.set(x, y);
+                        unit.rotation = 90f;
+                        unit.add();
+                        units.add(unit);
+                        Call.assemblerDroneSpawned(tile, unit.id);
+                    }else{
+                        droneProgress = 0f;
                     }
-                    unit.set(x, y);
-                    unit.rotation = 90f;
-                    unit.add();
-                    units.add(unit);
-                    Call.assemblerDroneSpawned(tile, unit.id);
                 }
             }
 
@@ -678,7 +686,7 @@ public class UnitAssembler extends PayloadBlock{
 
         @Override
         public BlockStatus status(){
-            if(!team.activateUnitFactories()) return BlockStatus.inactive;
+            if(!team.activateUnitFactories()) return BlockStatus.inactiveUnitFactory;
             return super.status();
         }
 

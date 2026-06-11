@@ -516,8 +516,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             for(Sector sec : planet.sectors){
 
                 //draw shield arc
-                if(sec.shieldTarget != null && !sec.isCaptured() && !sec.shieldTarget.isCaptured()){
-                    planets.drawArcLine(planet, sec.tile.v, sec.shieldTarget.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Tmp.c3.set(Tmp.c2).mulA(0.5f), 0.15f, 110f, 25, 0.006f);
+                if(sec.shieldTarget != null && !sec.isCaptured() && !sec.shieldTarget.isCaptured() && (planet.generator.allowLanding(sec) || planet.generator.allowLanding(sec.shieldTarget))){
+                    planets.drawArcLine(planet, sec.tile.v, sec.shieldTarget.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Tmp.c3.set(Tmp.c2).mulA(0.5f), 0.3f, 110f, 25, 0.006f);
                 }
 
                 if(sec.hasBase()){
@@ -1197,7 +1197,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         stable.table(title -> {
             title.add("[accent]" + sector.name() + (debugSelect && (sector.info.name != null || sector.preset != null) ? " [lightgray](" + sector.id + ")" : "")).padLeft(3);
-            if(sector.preset == null){
+            if(sector.preset == null || (!sector.preset.requireUnlock)){
                 title.add().growX();
 
                 title.button(Icon.pencilSmall, Styles.clearNonei, () -> {

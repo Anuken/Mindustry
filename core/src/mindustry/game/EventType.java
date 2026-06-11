@@ -7,6 +7,7 @@ import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.MultiPacker;
+import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
@@ -79,10 +80,6 @@ public class EventType{
     public static class TurnEvent{}
     /** Called when the player places a line, mobile or desktop.*/
     public static class LineConfirmEvent{}
-    /** Called when a turret receives ammo, but only when the tutorial is active! */
-    public static class TurretAmmoDeliverEvent{}
-    /** Called when a core receives ammo, but only when the tutorial is active! */
-    public static class CoreItemDeliverEvent{}
     /** Called when the player opens info for a specific block.*/
     public static class BlockInfoEvent{}
     /** Called *after* all content has been initialized. */
@@ -111,12 +108,14 @@ public class EventType{
     /** Called when a game begins and the world tiles are initiated. About to updates tile proximity and sets up physics for the world(Before WorldLoadEvent) */
     public static class WorldLoadEndEvent{}
 
-    /** Called when a save loads custom patches. {@link #patches} can be modified in the event handler. */
+    /** Called when a save loads custom patches. {@link #patches} can be modified in the event handler. The array may be empty. */
     public static class ContentPatchLoadEvent{
         public final Seq<String> patches;
+        public final Seq<PatchImage> images;
 
-        public ContentPatchLoadEvent(Seq<String> patches){
+        public ContentPatchLoadEvent(Seq<String> patches, Seq<PatchImage> images){
             this.patches = patches;
+            this.images = images;
         }
     }
 

@@ -47,6 +47,20 @@ public class Saves{
         });
     }
 
+    private void clearOldMegabaseSectors(){
+        IntSet serpuloRemoval = IntSet.with(27, 245, 244, 243, 242, 247, 246, 237, 150, 157, 138, 251, 103);
+
+        //clear old megabase sectors from the beta period
+        saves.removeAll(s -> {
+            if(s.getSector() != null && s.getSector().planet == Planets.serpulo && serpuloRemoval.contains(s.getSector().id) && s.meta.build < 157 && s.meta.build > 146){
+                s.getSector().clearInfo();
+                s.file.delete();
+                return true;
+            }
+            return false;
+        });
+    }
+
     public void load(){
         saves.clear();
 
@@ -70,6 +84,8 @@ public class Saves{
                 Log.err(e);
             }
         }
+
+        clearOldMegabaseSectors();
 
         lastSectorSave = saves.find(s -> s.isSector() && s.getName().equals(Core.settings.getString("last-sector-save", "<none>")));
 

@@ -33,9 +33,6 @@ import static mindustry.Vars.*;
 /** Utilities for displaying certain stats in a table. */
 public class StatValues{
 
-    //only allocate once, dont break unit tests
-    static @Nullable TextureRegionDrawable noteIcon = Icon.arrowNoteSmall != null ? new TextureRegionDrawable(Icon.arrowNoteSmall) : null;
-
     public static StatValue string(String value, Object... args){
         String result = Strings.format(value, args);
         return table -> table.add(result);
@@ -603,14 +600,26 @@ public class StatValues{
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map){
-        return ammo(map, false, false);
+        return ammo(map, false, false, null);
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit){
-        return ammo(map, false, showUnit);
+        return ammo(map, false, showUnit, null);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, String blockName){
+        return ammo(map, false, false, blockName);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit, String blockName){
+        return ammo(map, false, showUnit, blockName);
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean nested, boolean showUnit){
+        return ammo(map, nested, showUnit, null);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean nested, boolean showUnit, @Nullable String blockName){
         return table -> {
 
             table.row();
@@ -624,7 +633,7 @@ public class StatValues{
                 BulletType type = map.get(t);
 
                 if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
-                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false).display(table);
+                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false, blockName).display(table);
                     continue;
                 }
 
@@ -642,6 +651,21 @@ public class StatValues{
                             }
                         });
                         bt.row();
+                    }
+
+                    if(blockName != null && t instanceof UnlockableContent){
+                        UnlockableContent content = (UnlockableContent) t;
+                        String key = "block." + blockName + "." + content.name + ".info";
+                        if(Core.bundle.has(key)){
+                            bt.table(desc -> {
+                                desc.image(Icon.info.getRegion()).size(20).color(Color.lightGray).scaling(Scaling.fit).padRight(8).padLeft(12);
+                                desc.add("[lightgray]" + Core.bundle.get(key));
+                            });
+                            
+                            bt.row();
+                            bt.add().height(10f);
+                            bt.row();
+                        }
                     }
 
                     if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
@@ -733,13 +757,25 @@ public class StatValues{
                         sep(bt, "@bullet.armorpierce");
                     }
 
-                    if(type.armorMultiplier != 1f && !type.pierceArmor){
-                        if(type.armorMultiplier > 1f){
-                            sep(bt, Core.bundle.format("bullet.armorweakness", (type.armorMultiplier)));
-                        }else if(Mathf.sign(type.armorMultiplier) == 1){
-                            sep(bt, Core.bundle.format("bullet.partialarmorpierce", (int)((1 - type.armorMultiplier) * 100)));
-                        }else{
-                            sep(bt, Core.bundle.format("bullet.antiarmor", (-type.armorMultiplier)));
+                    if(!type.pierceArmor){
+                        if(type.armorMultiplier != 1f){
+                            if(type.armorMultiplier > 1f){
+                                sep(bt, Core.bundle.format("bullet.armorweakness", (type.armorMultiplier)));
+                            }else if(Mathf.sign(type.armorMultiplier) == 1){
+                                sep(bt, Core.bundle.format("bullet.partialarmorpierce", (int)((1 - type.armorMultiplier) * 100)));
+                            }else{
+                                sep(bt, Core.bundle.format("bullet.antiarmor", (-type.armorMultiplier)));
+                            }
+                        }
+
+                        if(type.blockArmorMultiplier != 1f){
+                            if(type.blockArmorMultiplier > 1f){
+                                sep(bt, Core.bundle.format("bullet.blockarmorweakness", (type.blockArmorMultiplier)));
+                            }else if(Mathf.sign(type.blockArmorMultiplier) == 1){
+                                sep(bt, Core.bundle.format("bullet.blockpartialarmorpierce", (int)((1 - type.blockArmorMultiplier) * 100)));
+                            }else{
+                                sep(bt, Core.bundle.format("bullet.blockantiarmor", (-type.blockArmorMultiplier)));
+                            }
                         }
                     }
 
@@ -836,11 +872,7 @@ public class StatValues{
     private static Cell<?> note(Table table, String text){
         table.row();
         return table.table(t -> {
-            if(noteIcon != null){
-                noteIcon.setMinWidth(15f);
-                noteIcon.setMinHeight(15f);
-                t.image(noteIcon).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
-            }
+            t.image(Icon.arrowNoteSmall.getRegion()).size(15).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
             t.add(text);
         });
     }
