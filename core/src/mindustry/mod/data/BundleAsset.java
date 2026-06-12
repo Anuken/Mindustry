@@ -6,7 +6,7 @@ import arc.util.*;
 import arc.util.io.*;
 
 public class BundleAsset extends DataAsset{
-    public @Nullable OrderedMap<String, String > cachedBundle;
+    public @Nullable OrderedMap<String, String> cachedBundle;
 
     public void tryLoadCache(){
         if(cachedBundle != null) return;
@@ -19,6 +19,12 @@ public class BundleAsset extends DataAsset{
         }catch(Exception e){
             Log.err(e);
         }
+    }
+
+    @Override
+    public void updateData(byte[] data){
+        super.updateData(data);
+        this.cachedBundle = null;
     }
 
     @Override

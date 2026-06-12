@@ -200,6 +200,7 @@ public class DataPatcher{
                 if(errored.minfo.error != null && errored.minfo.asset != null){
                     errored.minfo.asset.warnings.add(errored.minfo.error);
                 }
+                Vars.content.remove(errored);
             }
 
             Seq<Content> all = new Seq<>();

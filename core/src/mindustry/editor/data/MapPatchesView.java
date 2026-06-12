@@ -133,7 +133,6 @@ public class MapPatchesView implements AssetView{
         try{
             Jval.read(patch); //validation
 
-            //TODO: the name is incorrect (gibberish based on UUID)
             if(replaceIndex == -1){
                 patches.add(new PatchAsset(patch));
             }else{
