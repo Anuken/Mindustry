@@ -128,13 +128,6 @@ public class GlobalVars{
             }
         }
 
-        for(var entry : Colors.getColors().entries()){
-            //ignore uppercase variants, they are duplicates
-            if(Character.isUpperCase(entry.key.charAt(0))) continue;
-
-            put("@color" + Strings.capitalize(entry.key), entry.value.toDoubleBits());
-        }
-
         for(UnitType type : Vars.content.units()){
             if(!type.internal){
                 put("@" + type.name, type);
@@ -143,6 +136,13 @@ public class GlobalVars{
 
         for(Weather weather : Vars.content.weathers()){
             put("@" + weather.name, weather);
+        }
+
+        for(var entry : Colors.getColors().entries()){
+            //ignore uppercase variants, they are duplicates
+            if(Character.isUpperCase(entry.key.charAt(0))) continue;
+
+            put("@color" + Strings.capitalize(entry.key), entry.value.toDoubleBits());
         }
 
         //store sensor constants
@@ -244,19 +244,16 @@ public class GlobalVars{
         return arr != null && content.id >= 0 && content.id < arr.length ? arr[content.id] : -1;
     }
 
-    /**
-     * @return a constant variable if there is a constant with this name, otherwise null.
-     * Attempt to get privileged variable from non-privileged logic executor returns null constant.
-     */
-    public LVar get(String name){
+    /** @return a constant variable if there is a constant with this name, or null. */
+    public @Nullable LVar get(String name){
         return vars.get(name);
     }
 
     /**
-     * @return a constant variable by name
-     * Attempt to get privileged variable from non-privileged logic executor returns null constant.
+     * @return a constant variable by name.
+     * Attempting to get privileged variable from a non-privileged logic executor returns a null constant.
      */
-    public LVar get(String name, boolean privileged){
+    public @Nullable LVar get(String name, boolean privileged){
         if(!privileged && privilegedNames.contains(name)) return vars.get("null");
         return vars.get(name);
     }
@@ -296,6 +293,14 @@ public class GlobalVars{
             varEntries.add(new VarEntry(name, "", "", privileged));
         }
         return var;
+    }
+
+    /** Removes a global variable - used for data patch reset. This variable is assumed not to be privileged or have a documentation entry. */
+    public void remove(LVar lvar){
+        LVar match = vars.get(lvar.name);
+        if(match == lvar){
+            vars.remove(lvar.name);
+        }
     }
 
     public LVar put(String name, Object value){

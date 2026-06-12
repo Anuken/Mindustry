@@ -13,6 +13,7 @@ import mindustry.ctype.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.mod.Mods.*;
 import mindustry.mod.data.*;
 import mindustry.type.*;
@@ -49,6 +50,7 @@ public class DataPatcher{
     private Seq<Object> visitStack = new Seq<>();
     private @Nullable PatchAsset currentlyApplyingPatch;
     private @Nullable ContentAsset currentlyApplyingContent;
+    private Seq<LVar> addedVars = new Seq<>();
 
     static{
         for(var type : ContentType.all){
@@ -225,6 +227,13 @@ public class DataPatcher{
                 }
             }
 
+            //register global variables
+            for(var cont : all){
+                if(!cont.hasErrored() && cont instanceof UnlockableContent u && Vars.logicVars.get("@" + u.name) == null){
+                    addedVars.add(Vars.logicVars.put("@" + u.name, u, false));
+                }
+            }
+
             if(!Vars.headless){
                 for(var cont : all){
                     try{
@@ -236,7 +245,7 @@ public class DataPatcher{
                             }
                         }
                     }catch(Throwable t){
-                        Vars.content.remove(cont);
+                        //not removed here, as this code is only called clientside, and removing it would cause a desync
                         if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
                         parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
                     }
@@ -269,6 +278,9 @@ public class DataPatcher{
             }
         }
         resetters.clear();
+        for(var lvar : addedVars){
+            Vars.logicVars.remove(lvar);
+        }
 
         //this should never throw an exception
         afterCallbacks.each(Runnable::run);

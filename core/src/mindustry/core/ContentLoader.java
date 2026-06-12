@@ -275,6 +275,8 @@ public class ContentLoader{
             getNamesBy(type).remove(m.name);
             if(nameMap.get(m.name) == m) nameMap.remove(m.name);
         }
+
+        content.removeContent();
     }
 
     //utility methods, just makes things a bit shorter

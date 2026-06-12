@@ -831,6 +831,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
         rebuildBlockSelection("");
     }
 
+    public void rebuildBlockSelection(){
+        rebuildBlockSelection("");
+    }
+
     private void rebuildBlockSelection(String searchText){
         blockSelection.clear();
 

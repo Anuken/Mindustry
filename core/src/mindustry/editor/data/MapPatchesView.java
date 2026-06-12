@@ -104,13 +104,13 @@ public class MapPatchesView implements AssetView{
                 TextButtonStyle style = Styles.flatt;
                 t.defaults().size(280f, 60f).left();
                 t.row();
-                t.button("@schematic.copy.import", Icon.copy, style, () -> {
+                t.button("@import.clipboard", Icon.copy, style, () -> {
                     dialog.hide();
                     handler.get(Core.app.getClipboardText());
                 }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
                 t.row();
                 //currently doesn't allow multi import because it could be replacing exactly 1 patch
-                t.button("@schematic.importfile", Icon.download, style, () -> FileChooser.open("json", "hjson", "json5").submit(file -> {
+                t.button("@import.file", Icon.download, style, () -> FileChooser.open("json", "hjson", "json5").submit(file -> {
                     dialog.hide();
                     handler.get(file.readString());
                 })).marginLeft(12f);

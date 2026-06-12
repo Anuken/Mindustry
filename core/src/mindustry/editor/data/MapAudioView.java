@@ -129,9 +129,8 @@ public class MapAudioView implements AssetView{
 
                 for(Fi file : result){
                     try{
-                        //path and name are the same here; there's no path context.
                         String name = file.nameWithoutExtension();
-                        String path = name;
+                        String path = file.name();
                         var other = state.data.getAssets(type).find(p -> (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
                         if(other != null){
                             ui.showErrorMessage(Core.bundle.format("asset.exists", other.name + " (" + other.path + ")"));

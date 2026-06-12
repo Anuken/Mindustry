@@ -31,6 +31,17 @@ public class PatchAsset extends DataAsset{
     PatchAsset(){}
 
     @Override
+    public byte[] getData(){
+        return patch.getBytes(Strings.utf8);
+    }
+
+    @Override
+    public void readFromZip(String path, Fi file){
+        setPath(path);
+        patch = file.readString();
+    }
+
+    @Override
     public void readOverride(String path, Fi file) throws IOException{
         setPath(path);
         patch = Jval.read(file.readString()).toString(Jformat.plain);

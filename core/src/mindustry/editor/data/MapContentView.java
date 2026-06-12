@@ -1,8 +1,11 @@
 package mindustry.editor.data;
 
 import arc.*;
+import arc.func.*;
+import arc.graphics.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
+import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -14,9 +17,13 @@ import mindustry.mod.data.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
+import java.util.regex.*;
+
 import static mindustry.Vars.*;
 
 public class MapContentView implements AssetView{
+    private static final Pattern unsafeNamePattern = Pattern.compile("[\\[\\]{}`!@#$%^&8*();:,]");
+
     static ObjectMap<ContentType, TextureRegionDrawable> contentIcons = ObjectMap.of(
     ContentType.item, Icon.box,
     ContentType.liquid, Icon.liquid,
@@ -33,9 +40,21 @@ public class MapContentView implements AssetView{
 
         var contents = state.data.getContent();
 
+        ContentType lastType = null;
+
         list.defaults().pad(4f);
         for(var content : contents){
             if(diag.searchString != null && !content.name.toLowerCase().contains(diag.searchString)) continue;
+
+            if(lastType != content.type){
+                lastType = content.type;
+                list.table(t -> {
+                    t.left();
+                    t.image(contentIcons.get(content.type)).color(Color.lightGray).size(iconSmall);
+                    t.add("@content." + content.type.name()).left().color(Color.lightGray).padLeft(12f).padRight(4f);
+                    t.image(Tex.whiteui).growX().color(Color.lightGray).height(4f);
+                }).colspan(6).fillX().padBottom(8f).row();
+            }
 
             if(content.warnings.size > 0){
                 list.button(Icon.warning, Styles.graySquarei, iconMed, () -> {
@@ -80,13 +99,60 @@ public class MapContentView implements AssetView{
                 b.getLabel().setAlignment(Align.left, Align.left);
             });
 
-            list.button(Icon.copy, Styles.graySquarei, Vars.iconMed, () -> {
-                Core.app.setClipboardText(content.data);
-                ui.showInfoFade("@copied");
+            list.button(Icon.refresh, Styles.graySquarei, Vars.iconMed, () -> {
+                Cons<String> handler = str -> {
+                    content.data = str;
+                    state.data.reloadContent(false);
+                    diag.rebuild();
+                };
+
+                BaseDialog dialog = new BaseDialog("@editor.import");
+                dialog.cont.pane(p -> {
+                    p.margin(10f);
+                    p.table(Tex.button, t -> {
+                        TextButtonStyle style = Styles.flatt;
+                        t.defaults().size(280f, 60f).left();
+                        t.row();
+                        t.button("@import.clipboard", Icon.copy, style, () -> {
+                            dialog.hide();
+                            handler.get(Core.app.getClipboardText());
+                        }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
+                        t.row();
+                        t.button("@import.file", Icon.download, style, () -> FileChooser.open("json", "hjson", "json5").submit(file -> {
+                            dialog.hide();
+                            handler.get(file.readString());
+                        })).marginLeft(12f);
+                        t.row();
+                    });
+                });
+
+                dialog.addCloseButton();
+                dialog.show();
             }).size(h);
 
             list.button(Icon.export, Styles.graySquarei, Vars.iconMed, () -> {
-                FileChooser.export(content.name, "json", file -> file.writeString(content.data));
+                BaseDialog dialog = new BaseDialog("@editor.export");
+                dialog.addCloseButton();
+                dialog.cont.pane(p -> {
+                    p.margin(10f);
+                    p.table(Tex.button, t -> {
+                        TextButtonStyle style = Styles.flatt;
+                        t.defaults().size(280f, 60f).left();
+                        t.row();
+                        t.button("@copy.clipboard", Icon.copy, style, () -> {
+                            dialog.hide();
+                            Core.app.setClipboardText(content.data);
+                            ui.showInfoFade("@copied");
+                        }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
+                        t.row();
+                        t.button("@export.file", Icon.export, style, () -> {
+                            dialog.hide();
+                            FileChooser.export(content.name, "json", file -> file.writeString(content.data));
+                        }).marginLeft(12f);
+                        t.row();
+                    });
+                });
+                dialog.show();
             }).size(h);
 
             list.button(Icon.trash, Styles.graySquarei, iconMed, () -> {
@@ -111,7 +177,7 @@ public class MapContentView implements AssetView{
     }
 
     void addContent(ContentType type, String path, String data){
-        ContentAsset asset = new ContentAsset(type.folderName + "/" + path, type, data);
+        ContentAsset asset = new ContentAsset(path, type, data);
         state.data.getContent().add(asset);
         state.data.reloadContent(false);
     }
@@ -124,8 +190,12 @@ public class MapContentView implements AssetView{
         choose.setFillParent(false);
         choose.closeOnBack();
         choose.cont.add("@name").padRight(10f);
-        var nameField = choose.cont.field("", text -> invalid[0] = content.byName(text) != null)
-        .with(t -> t.setFilter((field, c) -> !Character.isWhitespace(c))).width(400f).get();
+        var nameField = choose.cont.field("", text -> {})
+        .with(t -> {
+            t.setFilter((field, c) -> !Character.isWhitespace(c));
+            t.setValidator(MapContentView::isSafeContentName);
+            t.changed(() -> invalid[0] = content.byName(t.getText()) != null || !t.isValid());
+        }).width(400f).get();
         choose.cont.row();
 
         choose.cont.add("@asset.content.type").padRight(10f);
@@ -144,13 +214,13 @@ public class MapContentView implements AssetView{
 
         choose.cont.row();
 
-        choose.cont.add("@asset.content.exists").colspan(2).visible(() -> invalid[0]);
+        choose.cont.label(() -> !nameField.isValid() ? "@asset.content.badname" : "@asset.content.exists").colspan(2).visible(() -> invalid[0]);
 
         choose.buttons.button("@cancel", Icon.cancel, choose::hide).size(170f, 64f);
 
         choose.buttons.button("@asset.content.import.file", Icon.fileText, () -> FileChooser.open("json", "json5", "hjson").submit(file -> {
             choose.hide();
-            addContent(selected[0], nameField.getText(), file.readString());
+            addContent(selected[0], nameField.getText() + ".json", file.readString());
             diag.rebuild();
         })).size(200f, 64f).disabled(b -> nameField.getText().isEmpty() || invalid[0]);
 
@@ -159,9 +229,13 @@ public class MapContentView implements AssetView{
             if(text == null) return;
 
             choose.hide();
-            addContent(selected[0], nameField.getText(), text);
+            addContent(selected[0], nameField.getText() + ".json", text);
             diag.rebuild();
         }).size(200f, 64f).disabled(b -> nameField.getText().isEmpty() || invalid[0] || Core.app.getClipboardText() == null);
         choose.show();
+    }
+
+    static boolean isSafeContentName(String name){
+        return Strings.isSafeFilename(name) && !unsafeNamePattern.matcher(name).find();
     }
 }

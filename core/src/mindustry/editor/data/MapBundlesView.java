@@ -118,13 +118,13 @@ public class MapBundlesView implements AssetView{
                 TextButtonStyle style = Styles.flatt;
                 t.defaults().size(280f, 60f).left();
                 t.row();
-                t.button("@schematic.copy.import", Icon.copy, style, () -> {
+                t.button("@import.clipboard", Icon.copy, style, () -> {
                     dialog.hide();
                     //TODO bad name
                     handler.get("bundle.properties", Core.app.getClipboardText());
                 }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
                 t.row();
-                t.button("@schematic.importfile", Icon.download, style, () -> FileChooser.open("properties", "txt").submitMulti(files -> {
+                t.button("@import.file", Icon.download, style, () -> FileChooser.open("properties", "txt").submitMulti(files -> {
                     dialog.hide();
                     for(var file : files){
                         handler.get(file.name(), file.readString());

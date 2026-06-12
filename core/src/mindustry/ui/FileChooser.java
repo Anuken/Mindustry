@@ -100,15 +100,6 @@ public class FileChooser{
             Vars.platform.showFileChooser(this);
         }
 
-        /** Submits the request to handle multiple files as a loop that iterates through the resulting files and invokes the callback repeatedly. */
-        public void submitMultiLoop(Cons<Fi> multipleHandler){
-            submitMulti(files -> {
-                for(var f : files){
-                    multipleHandler.get(f);
-                }
-            });
-        }
-
         public FileChooserParams name(String fileName){
             this.fileName = fileName;
             return this;

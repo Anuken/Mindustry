@@ -104,6 +104,18 @@ public class DataManager{
         return orderedAssets;
     }
 
+    public boolean hasAssetPath(DataAssetType type, String path){
+        return getAssets(type).contains(a -> a.path.equals(path));
+    }
+
+    public boolean hasAssetName(DataAssetType type, String name){
+        return getAssets(type).contains(a -> a.name.equals(name));
+    }
+
+    public boolean hasAssetNameOrPath(DataAssetType type, String name, String path){
+        return getAssets(type).contains(a -> a.name.equals(name) || a.path.equals(path));
+    }
+
     /** @return whether any assets like audio/images (external to saves) are loaded, requiring separate network transmission. */
     public boolean hasExternalAssets(){
         return orderedExternalAssets.size > 0;

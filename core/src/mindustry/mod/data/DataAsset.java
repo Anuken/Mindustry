@@ -41,6 +41,15 @@ public abstract class DataAsset implements Comparable<DataAsset>{
 
     public abstract DataAssetType getType();
 
+    public String getFullPath(){
+        return getType().folder + "/" + path;
+    }
+
+    /** @return for embedded assets, the data. Not implemented for non-embedded assets (use the cache file). */
+    public byte[] getData(){
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
     public boolean isAlwaysEmbedded(){
         return getType().embedded;
     }
@@ -59,7 +68,13 @@ public abstract class DataAsset implements Comparable<DataAsset>{
         return overrideCacheFile != null ? overrideCacheFile : Vars.assetCache.get(stringHash);
     }
 
-    /** Reads this asset in from a file on disk. Only used on the server. */
+    public void readFromZip(String path, Fi file){
+        if(isAlwaysEmbedded()) throw new UnsupportedOperationException("Always-embedded assets need custom implementations for reading.");
+        setPath(path);
+        updateData(file.readBytes());
+    }
+
+    /** Reads this asset in from a file on disk, and makes its hash point to the specified file, instead of a new one in the cache folder. Only used on the server. */
     public void readOverride(String path, Fi file) throws IOException{
         setPath(path);
         setHash(file.sha256());

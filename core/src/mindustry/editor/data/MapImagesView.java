@@ -47,9 +47,8 @@ public class MapImagesView implements AssetView{
                             return;
                         }
 
-                        //path and name are the same here; there's no path context.
                         String name = result.nameWithoutExtension();
-                        String path = name;
+                        String path = result.name();
                         var other = images.find(p -> (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
                         if(other != null){
                             ui.showErrorMessage(Core.bundle.format("asset.image.exists", other.name + " (" + other.path + ")"));
@@ -71,7 +70,7 @@ public class MapImagesView implements AssetView{
         }).size(190f, 64f);
 
         buttons.button("@edit", Icon.menu, () -> {
-            BaseDialog dialog = new BaseDialog("@waves.edit");
+            BaseDialog dialog = new BaseDialog("@edit.menu");
             dialog.cont.pane(p -> {
                 p.margin(10f);
                 p.table(Tex.button, t -> {
@@ -144,7 +143,7 @@ public class MapImagesView implements AssetView{
                                         String path = image.path.pathWithoutExtension(), name = image.path.nameWithoutExtension();
                                         var other = getImages().find(op -> (op.path.equalsIgnoreCase(path) || op.name.equalsIgnoreCase(name)));
                                         if(other != null){
-                                            errors.add("[accent]" + image.path + "[white]: " +Core.bundle.format("asset.image.exists", other.name + " (" + other.path + ")").replace("\n", " "));
+                                            errors.add("[accent]" + image.path + "[white]: " + Core.bundle.format("asset.image.exists", other.name + " (" + other.path + ")").replace("\n", " "));
                                             continue;
                                         }
                                         getImages().add(new ImageAsset(path, image.hash));
@@ -187,7 +186,7 @@ public class MapImagesView implements AssetView{
                             }
                         }
                     })).marginLeft(12f).row();
-                    t.button("@asset.image.clearall", Icon.trash, style, () -> {
+                    t.button("@asset.clearall", Icon.trash, style, () -> {
                         dialog.hide();
                         ui.showConfirm("@asset.image.clearall.confirm", () -> {
                             getImages().clear();

@@ -38,6 +38,16 @@ public class ContentAsset extends DataAsset{
     }
 
     @Override
+    public String getFullPath(){
+        return getType().folder + "/" + type.folderName + "/" + path;
+    }
+
+    @Override
+    public byte[] getData(){
+        return data.getBytes(Strings.utf8);
+    }
+
+    @Override
     public DataAssetType getType(){
         return DataAssetType.content;
     }
