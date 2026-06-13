@@ -39,7 +39,7 @@ public class MapAudioView implements AssetView{
             var audioSource = (AudioSource)Core.assets.getOrNull(DataAudioLoader.prefix + asset.name, (Class<?>)(type == DataAssetType.music ? Music.class : Sound.class));
 
             if(file == null || audioSource == null || !audioSource.valid()){
-                list.button(Icon.warning, Styles.graySquarei, iconMed, () -> ui.showInfo("@asset.broken")).size(h);
+                list.button(Icon.warning, Styles.graySquarei, iconMed, () -> ui.showInfo(file == null ? "@asset.broken" : "@asset.audio.invalid")).size(h);
             }else{
                 list.button(Icon.play, Styles.graySquarei, iconMed, () -> {
                     if(lastPlaying != null && lastPlaying.countPlaying() > 0){
