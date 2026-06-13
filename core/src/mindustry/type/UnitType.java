@@ -528,6 +528,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         // Try to immediately resolve the Unit constructor based on EntityMapping entry, if it is set.
         // This is the default Vanilla behavior - it won't work properly for mods (see comment in `init()`)!
         constructor = EntityMapping.map(this.name);
+        if(constructor == null) constructor = UnitEntity::create;
         selectionSize = 30f;
     }
 

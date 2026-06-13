@@ -289,13 +289,6 @@ public class ClassMap{
         classes.put("HeatConsumer", mindustry.world.blocks.heat.HeatConsumer.class);
         classes.put("HeatProducer", mindustry.world.blocks.heat.HeatProducer.class);
         classes.put("HeatProducerBuild", mindustry.world.blocks.heat.HeatProducer.HeatProducerBuild.class);
-        classes.put("LegacyBlock", mindustry.world.blocks.legacy.LegacyBlock.class);
-        classes.put("LegacyCommandCenter", mindustry.world.blocks.legacy.LegacyCommandCenter.class);
-        classes.put("CommandBuild", mindustry.world.blocks.legacy.LegacyCommandCenter.CommandBuild.class);
-        classes.put("LegacyMechPad", mindustry.world.blocks.legacy.LegacyMechPad.class);
-        classes.put("LegacyMechPadBuild", mindustry.world.blocks.legacy.LegacyMechPad.LegacyMechPadBuild.class);
-        classes.put("LegacyUnitFactory", mindustry.world.blocks.legacy.LegacyUnitFactory.class);
-        classes.put("LegacyUnitFactoryBuild", mindustry.world.blocks.legacy.LegacyUnitFactory.LegacyUnitFactoryBuild.class);
         classes.put("ArmoredConduit", mindustry.world.blocks.liquid.ArmoredConduit.class);
         classes.put("ArmoredConduitBuild", mindustry.world.blocks.liquid.ArmoredConduit.ArmoredConduitBuild.class);
         classes.put("Conduit", mindustry.world.blocks.liquid.Conduit.class);
