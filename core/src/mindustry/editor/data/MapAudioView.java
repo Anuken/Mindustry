@@ -117,6 +117,13 @@ public class MapAudioView implements AssetView{
                 }
                 return super.remove();
             }
+
+            @Override
+            public void act(float delta){
+                if(lastPlaying != null && lastPlaying.countPlaying() > 0){
+                    control.sound.keepSilent();
+                }
+            }
         });
     }
 

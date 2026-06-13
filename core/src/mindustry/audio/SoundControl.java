@@ -33,7 +33,7 @@ public class SoundControl{
     protected long lastPlayed;
     protected @Nullable Music current;
     protected float fade;
-    protected boolean silenced;
+    protected boolean silenced, keepSilent;
 
     protected boolean wasPlaying;
     protected AudioFilter filter = new BiquadFilter(){{
@@ -159,7 +159,10 @@ public class SoundControl{
 
         Core.audio.setPaused(Core.audio.soundBus.id, state.isPaused());
 
-        if(state.isMenu()){
+        if(keepSilent){
+            keepSilent = false;
+            stop();
+        }else if(state.isMenu()){
             silenced = false;
             if(ui.planet.isShown()){
                 play(ui.planet.state.planet.launchMusic);
@@ -189,6 +192,10 @@ public class SoundControl{
         }
 
         updateLoops();
+    }
+
+    public void keepSilent(){
+        keepSilent = true;
     }
 
     protected void updateLoops(){

@@ -162,7 +162,6 @@ public class MapAssetsDialog extends BaseDialog{
                                         Fi subfolder = folder.child(ctype.folderName);
 
                                         Seq<Fi> files = subfolder.findAll(f -> type.extensions.contains(f.extension().toLowerCase(Locale.ROOT)));
-                                        Log.info(files);
 
                                         for(Fi cfile : files){
                                             String path = cfile.absolutePath().substring(subfolder.absolutePath().length() + 1);
