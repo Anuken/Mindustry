@@ -81,6 +81,8 @@ public class Styles{
     squarei,
     /** Square border, toggleable. */
     squareTogglei,
+    /** Square border, toggleable. */
+    grayTogglei,
     /** No background unless focused, no border. */
     clearNonei,
     /** Partially transparent black background. */
@@ -324,6 +326,13 @@ public class Styles{
             checked = flatDown;
             up = black;
             over = flatOver;
+        }};
+        grayTogglei = new ImageButtonStyle(){{
+            over = flatOver;
+            disabled = grayPanelDark;
+            down = flatOver;
+            up = grayPanel;
+            checked = flatDown;
         }};
         cleari = new ImageButtonStyle(){{
             down = flatDown;

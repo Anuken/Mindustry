@@ -2370,15 +2370,11 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            rebuild(table);
-        }
-
-        void rebuild(Table table){
             table.clearChildren();
 
             table.button(positional ? "positional" : "global", Styles.logict, () -> {
                 positional = !positional;
-                rebuild(table);
+                build(table);
             }).size(160f, 40f).pad(4f).color(table.color);
 
             row(table);
@@ -2391,7 +2387,7 @@ public class LStatements{
                 String soundName = id.startsWith("@sfx-") ? id.substring(5) : id;
                 b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), soundName, t -> {
                     id = "@sfx-" + t;
-                    rebuild(table);
+                    build(table);
                 }, 2, cell -> cell.size(160, 50)));
             }, Styles.logict, () -> {}).size(40).color(table.color).left().padLeft(-1);
 
@@ -2423,6 +2419,35 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new PlaySoundI(positional, builder.var(id), builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y), builder.var(limit));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("playmusic")
+    public static class PlayMusicStatement extends LStatement{
+        public String name = "\"game1\"", interrupt = "true";
+
+        @Override
+        public void build(Table table){
+            float width = LCanvas.useRows() ? 100f : 190f;
+
+            fields(table, "music", name, str -> name = str).width(width);
+
+            fields(table, "interrupt", interrupt, str -> interrupt = str).width(width);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PlayMusicI(builder.var(name), builder.var(interrupt));
         }
 
         @Override

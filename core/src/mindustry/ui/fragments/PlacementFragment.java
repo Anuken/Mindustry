@@ -488,9 +488,12 @@ public class PlacementFragment{
                         var stances = new Seq<UnitStance>();
                         var stancesOut = new Seq<UnitStance>();
 
-                        int[] counts = new int[content.units().size];
+                        int[][] countBox = new int[1][0];
 
                         rebuildCommand = () -> {
+                            if(countBox[0].length != content.units().size) countBox[0] = new int[content.units().size];
+                            int[] counts = countBox[0];
+
                             u.clearChildren();
                             var units = control.input.selectedUnits;
                             if(units.size > 0){
@@ -609,6 +612,8 @@ public class PlacementFragment{
 
                         u.update(() -> {
                             {
+                                if(countBox[0].length != content.units().size) countBox[0] = new int[content.units().size];
+                                int[] counts = countBox[0];
                                 activeCommands.clear();
                                 activeStances.clear();
                                 availableCommands.clear();

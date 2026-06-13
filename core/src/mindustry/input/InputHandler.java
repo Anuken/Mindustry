@@ -321,6 +321,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Seq<Unit> toAdd = queuedCommands.get(targetAsVec, Seq::new);
         boolean anyCommandedTarget = false;
 
+        if(unitTarget != null || buildTarget != null){
+            Events.fire(Trigger.unitCommandAttack);
+        }else{
+            Events.fire(Trigger.unitCommandPosition);
+        }
+
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
             if(unit != null && unit.team == player.team()){
@@ -1172,12 +1178,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 int[] ids = new int[selectedUnits.size];
                 for(int i = 0; i < ids.length; i++){
                     ids[i] = selectedUnits.get(i).id;
-                }
-
-                if(attack != null){
-                    Events.fire(Trigger.unitCommandAttack);
-                }else{
-                    Events.fire(Trigger.unitCommandPosition);
                 }
 
                 int maxChunkSize = 200;
