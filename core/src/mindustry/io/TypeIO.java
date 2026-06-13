@@ -1188,6 +1188,22 @@ public class TypeIO{
         return out;
     }
 
+    public static void writeShorts(Writes write, short[] ints){
+        write.s((short)ints.length);
+        for(short i : ints){
+            write.s(i);
+        }
+    }
+
+    public static short[] readShorts(Reads read){
+        short length = read.s();
+        short[] out = new short[length];
+        for(int i = 0; i < length; i++){
+            out[i] = read.s();
+        }
+        return out;
+    }
+
     public static void writeTraceInfo(Writes write, TraceInfo trace){
         writeString(write, trace.ip);
         writeString(write, trace.uuid);

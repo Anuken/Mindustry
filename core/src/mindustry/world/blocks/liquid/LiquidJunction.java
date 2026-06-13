@@ -11,6 +11,8 @@ public class LiquidJunction extends LiquidBlock{
     public LiquidJunction(String name){
         super(name);
         floating = true;
+        destructible = true;
+        update = false;
     }
 
     @Override
