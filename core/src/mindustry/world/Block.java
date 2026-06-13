@@ -1476,6 +1476,11 @@ public class Block extends UnlockableContent implements Senseable{
         }
     }
 
+    public void checkContentArrayCapacity(int items, int liquids){
+        if(liquidFilter.length != liquids) liquidFilter = Arrays.copyOf(liquidFilter, liquids);
+        if(itemFilter.length != items) itemFilter = Arrays.copyOf(itemFilter, items);
+    }
+
     @Override
     public void load(){
         super.load();

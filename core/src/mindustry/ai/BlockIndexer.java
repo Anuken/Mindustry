@@ -99,14 +99,14 @@ public class BlockIndexer{
                 Item drop;
                 int qx = tile.x / quadrantSize, qy = tile.y / quadrantSize;
                 if(tile.block() == Blocks.air){
-                    if((drop = tile.drop()) != null){
+                    if((drop = tile.drop()) != null && ores.length > drop.id){
                         //add position of quadrant to list
                         if(ores[drop.id] == null) ores[drop.id] = new IntSeq[quadWidth][quadHeight];
                         if(ores[drop.id][qx][qy] == null) ores[drop.id][qx][qy] = new IntSeq(false, 16);
                         ores[drop.id][qx][qy].add(tile.pos());
                         allOres.increment(drop);
                     }
-                }else if((drop = tile.wallDrop()) != null){
+                }else if((drop = tile.wallDrop()) != null && wallOres.length > drop.id){
                     //add position of quadrant to list
                     if(wallOres[drop.id] == null) wallOres[drop.id] = new IntSeq[quadWidth][quadHeight];
                     if(wallOres[drop.id][qx][qy] == null) wallOres[drop.id][qx][qy] = new IntSeq(false, 16);
@@ -242,7 +242,7 @@ public class BlockIndexer{
             int pos = tile.pos();
 
             if(tile.block() == Blocks.air){
-                if(drop != null){ //floor
+                if(drop != null && ores.length > drop.id){ //floor
                     if(ores[drop.id] == null) ores[drop.id] = new IntSeq[quadWidth][quadHeight];
                     if(ores[drop.id][qx][qy] == null) ores[drop.id][qx][qy] = new IntSeq(false, 16);
                     if(ores[drop.id][qx][qy].addUnique(pos)){
@@ -255,7 +255,7 @@ public class BlockIndexer{
                     if(old == 1) updatePresentOres();
                 }
             }else{
-                if(wallDrop != null){ //wall
+                if(wallDrop != null && wallOres.length > wallDrop.id){ //wall
                     if(wallOres[wallDrop.id] == null) wallOres[wallDrop.id] = new IntSeq[quadWidth][quadHeight];
                     if(wallOres[wallDrop.id][qx][qy] == null) wallOres[wallDrop.id][qx][qy] = new IntSeq(false, 16);
                     if(wallOres[wallDrop.id][qx][qy].addUnique(pos)){
@@ -264,7 +264,7 @@ public class BlockIndexer{
                     }
                 }
 
-                if(drop != null && ores != null && ores[drop.id] != null && ores[drop.id][qx][qy] != null && ores[drop.id][qx][qy].removeValue(pos)){ //floor
+                if(drop != null && ores != null && drop.id < ores.length && ores[drop.id] != null && ores[drop.id][qx][qy] != null && ores[drop.id][qx][qy].removeValue(pos)){ //floor
                     int old = allOres.increment(drop, -1);
                     if(old == 1) updatePresentOres();
                 }
@@ -274,7 +274,7 @@ public class BlockIndexer{
 
     /** @return whether a certain block is anywhere on this map. */
     public boolean isBlockPresent(Block block){
-        return blocksPresent != null && blocksPresent[block.id];
+        return blocksPresent != null && block.id < blocksPresent.length && blocksPresent[block.id];
     }
 
     private void clearFlags(){
@@ -525,7 +525,7 @@ public class BlockIndexer{
 
     /** Find the closest ore block relative to a position. */
     public Tile findClosestOre(float xp, float yp, Item item){
-        if(ores[item.id] != null){
+        if(item.id < ores.length && ores[item.id] != null){
             float minDst = 0f;
             Tile closest = null;
             for(int qx = 0; qx < quadWidth; qx++){
@@ -552,7 +552,7 @@ public class BlockIndexer{
     /** Find the closest ore wall relative to a position. */
     public Tile findClosestWallOre(float xp, float yp, Item item){
         //(stolen from foo's client :))))
-        if(wallOres[item.id] != null){
+        if(item.id < wallOres.length && wallOres[item.id] != null){
             float minDst = 0f;
             Tile closest = null;
             for(int qx = 0; qx < quadWidth; qx++){

@@ -1,6 +1,7 @@
-package mindustry.graphics;
+package mindustry.mod;
 
 import arc.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
@@ -10,34 +11,57 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
-import mindustry.mod.*;
+import mindustry.mod.data.*;
 
+import java.io.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 
 /** Manages data patch images. */
-public class DataPatchPacker{
+public class DataImagePacker{
     public static final String regionPrefix = "dp-";
 
     private @Nullable TextureAtlas patchAtlas;
 
     /** Packs a new set of images. If images are already packed, disposes of the old ones. */
-    public void pack(Seq<PatchImage> images){
+    public void pack(Seq<ImageAsset> images){
         if(patchAtlas != null){
-            unapply();
+            unload();
         }
         if(images.isEmpty()) return;
 
         Time.mark();
 
-        float totalSumArea = 0f;
-        int maxSize = 0;
+        AtomicInteger totalSumArea = new AtomicInteger(), maxSize = new AtomicInteger();
+        var sizeTasks = new Seq<Future<?>>();
+
         for(var image : images){
-            totalSumArea += image.width * image.height;
-            maxSize += Math.max(image.width, image.height);
+            sizeTasks.add(Vars.mainExecutor.submit(() -> {
+                try{
+                    try(DataInputStream in = new DataInputStream(image.getCacheFile().read())){
+                        long header = in.readLong();
+                        if(header != 0x89504e470d0a1a0aL) return; //not a PNG
+                        in.readInt(); //length
+                        int type = in.readInt(); //chunk type
+                        if(type != 0x49484452) return; //no HDR
+                        int width = in.readInt();
+                        int height = in.readInt();
+                        if(width <= 0 || height <= 0) return; //negative size
+
+                        totalSumArea.addAndGet(width * height);
+
+                        synchronized(maxSize){
+                            maxSize.set(Math.max(maxSize.get(), Math.max(width, height)));
+                        }
+                    }
+                }catch(Exception ignored){}
+            }));
         }
 
-        int targetPower = Mathf.nextPowerOfTwo((int)(Mathf.sqrt(totalSumArea) * 1.35f));
-        int targetSize = Mathf.clamp(Math.max(targetPower, maxSize), 128, Math.min(4096, Vars.maxTextureSize));
+        Threads.awaitAll(sizeTasks);
+
+        int targetPower = Mathf.nextPowerOfTwo((int)(Mathf.sqrt(totalSumArea.get()) * 1.35f));
+        int targetSize = Mathf.clamp(Math.max(targetPower, maxSize.get()), 128, Math.min(4096, Vars.maxTextureSize));
 
         PixmapPacker packer = new PixmapPacker(targetSize, targetSize, 2, true);
 
@@ -49,8 +73,12 @@ public class DataPatchPacker{
         var tasks = new Seq<Future<?>>();
         for(var image : images){
             tasks.add(Vars.mainExecutor.submit(() -> {
+                Fi cacheFile = image.getCacheFile();
+                //logged elsewhere
+                if(cacheFile == null) return;
+
                 try{
-                    Pixmap pixmap = new Pixmap(image.data);
+                    Pixmap pixmap = new Pixmap(cacheFile);
                     String name = regionPrefix + image.name;
 
                     if(anyEnv && image.path.contains("blocks/environment/")){
@@ -58,6 +86,8 @@ public class DataPatchPacker{
                     }else{
                         packer.pack(name, pixmap);
                     }
+
+                    pixmap.dispose();
                 }catch(Throwable e){
                     Log.err("Invalid patch image: " + image.path, e);
                 }
@@ -113,7 +143,7 @@ public class DataPatchPacker{
         Log.debug("[Patch Atlas] Time to pack: @ms", Time.elapsed());
     }
 
-    public void unapply(){
+    public void unload(){
         if(patchAtlas != null){
             for(var texture : patchAtlas.getTextures()){
                 patchAtlas.getTextures().remove(texture);

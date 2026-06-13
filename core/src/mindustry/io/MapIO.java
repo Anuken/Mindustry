@@ -48,7 +48,10 @@ public class MapIO{
 
     public static void writeMap(Fi file, Map map) throws IOException{
         try{
-            SaveIO.write(file, map.tags);
+            SaveIO.write(file, new SaveOptions(){{
+                extraTags = map.tags;
+                embedAssets = true;
+            }});
         }catch(Exception e){
             throw new IOException(e);
         }
@@ -96,9 +99,9 @@ public class MapIO{
                 }
             };
 
-            if(ver.version >= 12) ver.readRegion("patches", stream, counter, ver::skipDataPatches);
+            if(ver.version >= 12) ver.skipChunk(stream);
             ver.readRegion("content", stream, counter, ver::readContentHeader);
-            if(ver.version == 11) ver.readRegion("patches", stream, counter, ver::skipDataPatches);
+            if(ver.version == 11) ver.skipChunk(stream);
             ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext(){
                 @Override public void resize(int width, int height){}
                 @Override public boolean isGenerating(){return false;}
