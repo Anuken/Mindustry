@@ -719,58 +719,58 @@ public class Blocks{
             sclMax = 100f;
         }};
 
-        boulder = new Prop("boulder"){{
+        boulder = new StaticProp("boulder"){{
             variants = 2;
             stone.asFloor().decoration = craters.asFloor().decoration = charr.asFloor().decoration = this;
         }};
 
-        snowBoulder = new Prop("snow-boulder"){{
+        snowBoulder = new StaticProp("snow-boulder"){{
             variants = 2;
             snow.asFloor().decoration = ice.asFloor().decoration = iceSnow.asFloor().decoration = salt.asFloor().decoration = this;
         }};
 
-        shaleBoulder = new Prop("shale-boulder"){{
+        shaleBoulder = new StaticProp("shale-boulder"){{
             variants = 2;
             shale.asFloor().decoration = this;
         }};
 
-        sandBoulder = new Prop("sand-boulder"){{
+        sandBoulder = new StaticProp("sand-boulder"){{
             variants = 2;
             sand.asFloor().decoration = this;
         }};
 
-        daciteBoulder = new Prop("dacite-boulder"){{
+        daciteBoulder = new StaticProp("dacite-boulder"){{
             variants = 2;
             dacite.asFloor().decoration = this;
         }};
 
-        basaltBoulder = new Prop("basalt-boulder"){{
+        basaltBoulder = new StaticProp("basalt-boulder"){{
             variants = 2;
             basalt.asFloor().decoration = hotrock.asFloor().decoration = darksand.asFloor().decoration = magmarock.asFloor().decoration = this;
         }};
 
-        carbonBoulder = new Prop("carbon-boulder"){{
+        carbonBoulder = new StaticProp("carbon-boulder"){{
             variants = 2;
             carbonStone.asFloor().decoration = this;
         }};
 
-        ferricBoulder = new Prop("ferric-boulder"){{
+        ferricBoulder = new StaticProp("ferric-boulder"){{
             variants = 2;
             ferricStone.asFloor().decoration = ferricCraters.asFloor().decoration = this;
         }};
 
-        beryllicBoulder = new Prop("beryllic-boulder"){{
+        beryllicBoulder = new StaticProp("beryllic-boulder"){{
             variants = 2;
             beryllicStone.asFloor().decoration = this;
         }};
 
-        yellowStoneBoulder = new Prop("yellow-stone-boulder"){{
+        yellowStoneBoulder = new StaticProp("yellow-stone-boulder"){{
             variants = 2;
             yellowStone.asFloor().decoration = regolith.asFloor().decoration = yellowStonePlates.asFloor().decoration = this;
         }};
 
         //1px outline + 4.50 gaussian shadow in gimp
-        arkyicBoulder = new Prop("arkyic-boulder"){{
+        arkyicBoulder = new StaticProp("arkyic-boulder"){{
             variants = 3;
             customShadow = true;
             arkyicStone.asFloor().decoration = this;
