@@ -427,7 +427,7 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isShooting(){
-            return alwaysShooting || (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
+            return alwaysShooting || (unit.controller() instanceof Player ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
         }
 
         @Override

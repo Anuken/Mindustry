@@ -20,7 +20,7 @@ public class SaveIO{
     /** Save format header. */
     public static final byte[] header = {'M', 'S', 'A', 'V'};
     public static final IntMap<SaveVersion> versions = new IntMap<>();
-    public static final Seq<SaveVersion> versionArray = Seq.with(new Save1(), new Save2(), new Save3(), new Save4(), new Save5(), new Save6(), new Save7(), new Save8(), new Save9(), new Save10(), new Save11(), new Save12());
+    public static final Seq<SaveVersion> versionArray = Seq.with(new Save1(), new Save2(), new Save3(), new Save4(), new Save5(), new Save6(), new Save7(), new Save8(), new Save9(), new Save10(), new Save11(), new Save12(), new Save13());
 
     static{
         for(SaveVersion version : versionArray){
@@ -37,10 +37,14 @@ public class SaveIO{
     }
 
     public static void save(Fi file){
+        save(file, new SaveOptions());
+    }
+
+    public static void save(Fi file, SaveOptions options){
         boolean exists = file.exists();
         if(exists) file.moveTo(backupFileFor(file));
         try{
-            write(file);
+            write(file, options);
         }catch(Throwable e){
             if(exists) backupFileFor(file).moveTo(file);
             throw new RuntimeException(e);
@@ -111,26 +115,22 @@ public class SaveIO{
         return file.sibling(file.name() + "-backup." + file.extension());
     }
 
-    public static void write(Fi file, StringMap tags){
-        write(new FastDeflaterOutputStream(file.write(false, bufferSize)), tags);
+    public static void write(Fi file, SaveOptions options){
+        write(new FastDeflaterOutputStream(file.write(false, bufferSize)), options);
     }
 
     public static void write(Fi file){
-        write(file, null);
+        write(file, new SaveOptions());
     }
 
-    public static void write(OutputStream os, StringMap tags){
+    public static void write(OutputStream os, SaveOptions options){
         try(DataOutputStream stream = new DataOutputStream(os)){
             Events.fire(new SaveWriteEvent());
             SaveVersion ver = getVersion();
 
             stream.write(header);
             stream.writeInt(ver.version);
-            if(tags == null){
-                ver.write(stream);
-            }else{
-                ver.write(stream, tags);
-            }
+            ver.write(stream, options);
         }catch(Throwable e){
             throw new RuntimeException(e);
         }

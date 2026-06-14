@@ -434,6 +434,16 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         }
 
         @Override
+        public void sendStreamAsync(Streamable stream, ByteArrayOutputStream data){
+            if(Core.app.isOnMainThread()){
+                sendStream(stream, data);
+            }else{
+                //must be sent on main thread because of global buffer variables.
+                Core.app.post(() -> sendStream(stream, data));
+            }
+        }
+
+        @Override
         public void send(Object object, boolean reliable){
             try{
                 writeBuffer.limit(writeBuffer.capacity());

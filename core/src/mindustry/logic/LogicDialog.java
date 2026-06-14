@@ -130,12 +130,12 @@ public class LogicDialog extends BaseDialog{
                         dialog.hide();
                     }).marginLeft(12f).row();
 
-                    t.button("@schematic.copy", Icon.copy, style, () -> {
+                    t.button("@copy.clipboard", Icon.copy, style, () -> {
                         dialog.hide();
                         Core.app.setClipboardText(canvas.save());
                     }).marginLeft(12f).row();
 
-                    t.button("@schematic.copy.import", Icon.download, style, () -> {
+                    t.button("@import.clipboard", Icon.download, style, () -> {
                         dialog.hide();
                         try{
                             canvas.load(Core.app.getClipboardText().replace("\r\n", "\n"));

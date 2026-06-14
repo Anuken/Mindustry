@@ -242,7 +242,7 @@ public class EntityProcess extends BaseProcessor{
 
                 boolean collides = an.collide();
                 groupDefs.add(new GroupDefinition(name,
-                    ClassName.bestGuess(packageName + "." + groupType), types, an.spatial(), an.mapping(), collides));
+                    ClassName.bestGuess(packageName + "." + groupType), types, an.spatial(), an.mapping(), collides, an.update()));
 
                 TypeSpec.Builder accessor = TypeSpec.interfaceBuilder("IndexableEntity__" + name);
                 accessor.addMethod(MethodSpec.methodBuilder("setIndex__" + name).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).addParameter(int.class, "index").returns(void.class).build());
@@ -258,7 +258,7 @@ public class EntityProcess extends BaseProcessor{
 
                 //all component classes (not interfaces)
                 Seq<Stype> components = allComponents(type);
-                Seq<GroupDefinition> groups = groupDefs.select(g -> (!g.components.isEmpty() && !g.components.contains(s -> !components.contains(s))) || g.manualInclusions.contains(type));
+                Seq<GroupDefinition> groups = groupDefs.select(g -> (!g.components.isEmpty() && !Structs.contains(ann.excludeGroups(), g.name) && !g.components.contains(s -> !components.contains(s))) || g.manualInclusions.contains(type));
                 ObjectMap<String, Seq<Smethod>> methods = new ObjectMap<>();
                 ObjectMap<FieldSpec, Svar> specVariables = new ObjectMap<>();
                 ObjectSet<String> usedFields = new ObjectSet<>();
@@ -700,7 +700,11 @@ public class EntityProcess extends BaseProcessor{
                 }
             }
 
-            groupUpdate.addStatement("all.update()");
+            for(GroupDefinition group : groupDefs){
+                if(group.updates){
+                    groupUpdate.addStatement("$L.update()", group.name);
+                }
+            }
 
             for(GroupDefinition group : groupDefs){
                 if(group.collides){
@@ -985,16 +989,17 @@ public class EntityProcess extends BaseProcessor{
         final String name;
         final ClassName baseType;
         final Seq<Stype> components;
-        final boolean spatial, mapping, collides;
+        final boolean spatial, mapping, collides, updates;
         final ObjectSet<Selement> manualInclusions = new ObjectSet<>();
 
-        public GroupDefinition(String name, ClassName bestType, Seq<Stype> components, boolean spatial, boolean mapping, boolean collides){
+        public GroupDefinition(String name, ClassName bestType, Seq<Stype> components, boolean spatial, boolean mapping, boolean collides, boolean updates){
             this.baseType = bestType;
             this.components = components;
             this.name = name;
             this.spatial = spatial;
             this.mapping = mapping;
             this.collides = collides;
+            this.updates = updates;
         }
 
         @Override

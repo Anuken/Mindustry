@@ -249,30 +249,12 @@ public class SettingsMenuDialog extends BaseDialog{
             t.row();
 
             t.button("@data.export", Icon.upload, style, () -> {
-                if(ios){
-                    Fi file = Core.files.local("mindustry-data-export.zip");
-                    try{
-                        exportData(file);
-                    }catch(Exception e){
-                        ui.showException(e);
-                    }
-                    platform.shareFile(file);
-                }else{
-                    platform.showFileChooser(false, "zip", file -> {
-                        try{
-                            exportData(file);
-                            ui.showInfo("@data.exported");
-                        }catch(Exception e){
-                            e.printStackTrace();
-                            ui.showException(e);
-                        }
-                    });
-                }
+                FileChooser.export("mindustry-data-export", "zip", this::exportData);
             }).marginLeft(4);
 
             t.row();
 
-            t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
+            t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> FileChooser.open("zip").submit(file -> {
                 try{
                     importData(file);
                     control.saves.resetSave();
@@ -281,7 +263,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 }catch(IllegalArgumentException e){
                     ui.showErrorMessage("@data.invalid");
                 }catch(Exception e){
-                    e.printStackTrace();
+                    Log.err(e);
                     if(e.getMessage() == null || !e.getMessage().contains("too short")){
                         ui.showException(e);
                     }else{
@@ -301,20 +283,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 if(settings.getDataDirectory().child("crashes").list().length == 0 && !settings.getDataDirectory().child("last_log.txt").exists()){
                     ui.showInfo("@crash.none");
                 }else{
-                    if(ios){
-                        Fi logs = tmpDirectory.child("logs.txt");
-                        logs.writeString(getLogs());
-                        platform.shareFile(logs);
-                    }else{
-                        platform.showFileChooser(false, "txt", file -> {
-                            try{
-                                file.writeBytes(getLogs().getBytes(Strings.utf8));
-                                app.post(() -> ui.showInfo("@crash.exported"));
-                            }catch(Throwable e){
-                                ui.showException(e);
-                            }
-                        });
-                    }
+                    FileChooser.export("logs", "txt", file -> file.writeString(getLogs()));
                 }
             }).marginLeft(4);
         });
@@ -371,7 +340,7 @@ public class SettingsMenuDialog extends BaseDialog{
         menu.defaults().size(300f, 60f);
         menu.button("@settings.game", Icon.settings, style, isize, () -> visible(0)).marginLeft(marg).row();
         menu.button("@settings.graphics", Icon.image, style, isize, () -> visible(1)).marginLeft(marg).row();
-        menu.button("@settings.sound", Icon.filters, style, isize, () -> visible(2)).marginLeft(marg).row();
+        menu.button("@settings.sound", Icon.volumeUp, style, isize, () -> visible(2)).marginLeft(marg).row();
         menu.button("@settings.language", Icon.chat, style, isize, ui.language::show).marginLeft(marg).row();
         if(!mobile || Core.settings.getBool("keyboard")){
             menu.button("@settings.controls", Icon.move, style, isize, ui.controls::show).marginLeft(marg).row();
@@ -614,6 +583,7 @@ public class SettingsMenuDialog extends BaseDialog{
         files.addAll(saveDirectory.list());
         files.addAll(modDirectory.list());
         files.addAll(schematicDirectory.list());
+        files.addAll(assetCacheDirectory.list()); //important for saves
         String base = Core.settings.getDataDirectory().path();
 
         //add directories
@@ -653,6 +623,9 @@ public class SettingsMenuDialog extends BaseDialog{
 
         //delete old saves so they don't interfere
         saveDirectory.deleteDirectory();
+
+        //clear old assets cache
+        assetCacheDirectory.deleteDirectory();
 
         //purge existing tmp data, keep everything else
         tmpDirectory.deleteDirectory();
