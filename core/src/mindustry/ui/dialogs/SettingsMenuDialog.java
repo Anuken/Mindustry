@@ -565,6 +565,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         graphics.checkPref("skipcoreanimation", false);
         graphics.checkPref("hidedisplays", false);
+        graphics.checkPref("logiclocalization", true);
 
         if(OS.isMac){
             graphics.checkPref("macnotch", false);
