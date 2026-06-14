@@ -1275,13 +1275,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called only if {@link Block#drawCached} is true (off by default). */
     public void drawCached(){
-        if(block.variants == 0 || block.variantRegions == null){
-            Draw.rect(block.region, x, y, drawrot());
-        }else{
-            Draw.rect(block.variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, block.variantRegions.length - 1))], x, y, drawrot());
-        }
-
-        drawTeamTop();
+        draw();
     }
 
     public void recache(){

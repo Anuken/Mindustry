@@ -36,7 +36,7 @@ public class LiquidJunction extends LiquidBlock{
 
     public class LiquidJunctionBuild extends Building{
         @Override
-        public void drawCached(){
+        public void draw(){
             Draw.rect(region, x, y);
         }
 

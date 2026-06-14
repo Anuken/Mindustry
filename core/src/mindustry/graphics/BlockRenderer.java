@@ -640,6 +640,7 @@ public class BlockRenderer{
                 SpriteCache.getDefaultShader().bind();
                 SpriteCache.getDefaultShader().setUniformMatrix4("u_projectionViewMatrix", camera.mat);
 
+                if(false)
                 queuedCacheIndices.each(spriteCacheIndex -> {
                     SpriteCache sprites = caches.get(spriteCacheIndex);
                     IntSeq cachesToDraw = queuedCacheDraws.get(spriteCacheIndex);

@@ -232,7 +232,7 @@ public class Unloader extends Block{
         }
 
         @Override
-        public void drawCached(){
+        public void draw(){
             super.draw();
 
             Draw.color(sortItem == null ? Color.clear : sortItem.color);

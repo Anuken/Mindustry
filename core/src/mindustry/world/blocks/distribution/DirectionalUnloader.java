@@ -114,7 +114,7 @@ public class DirectionalUnloader extends Block{
         }
 
         @Override
-        public void drawCached(){
+        public void draw(){
             Draw.rect(region, x, y);
 
             Draw.rect(topRegion, x, y, rotdeg());

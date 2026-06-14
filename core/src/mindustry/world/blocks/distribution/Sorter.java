@@ -73,7 +73,7 @@ public class Sorter extends Block{
         }
 
         @Override
-        public void drawCached(){
+        public void draw(){
 
             if(sortItem == null){
                 Draw.rect(cross, x, y);
