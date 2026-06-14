@@ -2,6 +2,7 @@ package mindustry.entities.abilities;
 
 import arc.*;
 import arc.scene.ui.layout.*;
+import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -24,6 +25,10 @@ public abstract class Ability implements Cloneable{
     public void init(UnitType type){}
 
     public void displayBars(Unit unit, Table bars){}
+
+    public void read(Reads read){}
+
+    public void write(Writes write){}
 
     public void display(Table t){
         t.table(Styles.grayPanel, a -> {
