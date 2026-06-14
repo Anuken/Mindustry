@@ -203,7 +203,7 @@ public class GenericCrafter extends Block{
         public boolean shouldConsume(){
             if(outputItems != null){
                 for(var output : outputItems){
-                    if(items.get(output.item) + output.amount > itemCapacity){
+                    if(items.get(output.item) + scaleOutput(output.amount, true, false) > itemCapacity){
                         return false;
                     }
                 }
@@ -274,7 +274,7 @@ public class GenericCrafter extends Block{
             if(outputLiquids != null){
                 max = 0f;
                 for(var s : outputLiquids){
-                    float value = (liquidCapacity - liquids.get(s.liquid)) / (s.amount * edelta());
+                    float value = (liquidCapacity - liquids.get(s.liquid)) / (scaleOutput(s.amount) * edelta());
                     scaling = Math.min(scaling, value);
                     max = Math.max(max, value);
                 }
@@ -298,12 +298,21 @@ public class GenericCrafter extends Block{
             return totalProgress;
         }
 
+        public float scaleOutput(float amount){
+            return scaleOutput(amount, false, false);
+        }
+
+        public float scaleOutput(float amount, boolean item, boolean accumulate){
+            return amount;
+        }
+
         public void craft(){
             consume();
 
             if(outputItems != null){
                 for(var output : outputItems){
-                    for(int i = 0; i < output.amount; i++){
+                float maxOutput = scaleOutput(output.amount, true, true);
+                    for(int i = 0; i < maxOutput; i++){
                         offload(output.item);
                     }
                 }
