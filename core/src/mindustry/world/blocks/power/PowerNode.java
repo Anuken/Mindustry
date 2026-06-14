@@ -51,6 +51,7 @@ public class PowerNode extends PowerBlock{
         envEnabled |= Env.space;
         destructible = true;
         delayLandingConfig = true;
+        drawCached = true;
 
         //nodes do not even need to update
         update = false;
@@ -482,9 +483,12 @@ public class PowerNode extends PowerBlock{
         }
 
         @Override
-        public void draw(){
+        public void drawCached(){
             super.draw();
+        }
 
+        @Override
+        public void draw(){
             if(Mathf.zero(Renderer.laserOpacity) || isPayload() || team == Team.derelict) return;
 
             Draw.z(powerLayer);

@@ -225,7 +225,7 @@ public class Weather extends UnlockableContent{
                     Draw.alpha(Mathf.slope(life) * opacity);
 
                     float space = 45f;
-                    for(int j : new int[]{-1, 1}){
+                    for(int j : Mathf.signs){
                         Tmp.v1.trns(90f + j*space, 1f + 5f * life);
                         Lines.lineAngle(x + Tmp.v1.x, y + Tmp.v1.y, 90f + j*space, 3f * (1f - life));
                     }

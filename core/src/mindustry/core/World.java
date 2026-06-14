@@ -299,7 +299,6 @@ public class World{
     private void setSectorRules(Sector sector, boolean saveInfo){
         state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
-        state.rules.weather.clear();
 
         sector.planet.generator.addWeather(sector, state.rules);
 
