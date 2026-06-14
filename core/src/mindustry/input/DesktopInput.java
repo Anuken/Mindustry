@@ -267,12 +267,11 @@ public class DesktopInput extends InputHandler{
         panning |= detached;
 
 
-        if(!locked){
+        if(!logicCutscene && !locked){
             if(((player.dead() || state.isPaused() || detached) && !ui.chatfrag.shown()) && !scene.hasField() && !scene.hasDialog()){
                 if(input.keyDown(Binding.mouseMove)){
                     panCam = true;
                 }
-
                 Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.moveX), Core.input.axis(Binding.moveY)).nor().scl(camSpeed));
             }else if((!player.dead() || spectating != null) && !panning){
                 //TODO do not pan
