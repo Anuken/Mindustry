@@ -579,9 +579,8 @@ public class Renderer implements ApplicationListener{
             ui.showInfo("@screenshot.invalid");
             return;
         }
+
         try{
-
-
             FrameBuffer buffer = new FrameBuffer(w, h);
 
             drawWeather = false;
