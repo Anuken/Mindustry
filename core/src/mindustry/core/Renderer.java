@@ -603,7 +603,7 @@ public class Renderer implements ApplicationListener{
             drawWeather = true;
             buffer.dispose();
 
-            Threads.thread(() -> {
+            mainExecutor.submit(() -> {
                 for(int i = 0; i < lines.length; i += 4){
                     lines[i + 3] = (byte)255;
                 }

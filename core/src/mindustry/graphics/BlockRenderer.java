@@ -727,7 +727,7 @@ public class BlockRenderer{
 
         if(renderer.drawStatus){
             for(int i = 0; i < tileWithConsumerView.size; i++){
-                Building build = tileExtraCachedView.items[i];
+                Building build = tileWithConsumerView.items[i];
                 if(build.wasVisible){
                     //always guaranteed to be player team
                     build.drawStatus();
