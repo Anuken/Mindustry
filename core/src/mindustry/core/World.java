@@ -645,6 +645,11 @@ public class World{
             super.end();
         }
 
+        @Override
+        public boolean isMap(){
+            return true;
+        }
+
         public void applyFilters(){
             Seq<GenerateFilter> filters = map.filters();
 
