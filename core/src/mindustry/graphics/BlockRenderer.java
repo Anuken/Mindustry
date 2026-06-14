@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 
 public class BlockRenderer{
     //TODO cracks take up far to much space, so I had to limit it to 7. this means larger blocks won't have cracks - draw tiling mirrored stuff instead?
-    public static final int crackRegions = 8, maxCrackSize = 7, chunkSize = 32, maxSpritesPerCacheTile = 3;
+    public static final int crackRegions = 8, maxCrackSize = 7, chunkSize = 30, maxSpritesPerCacheTile = 3;
     public static boolean drawQuadtreeDebug = false;
     public static final Color shadowColor = new Color(0, 0, 0, 0.71f), blendShadowColor = Color.white.cpy().lerp(Color.black, shadowColor.a);
 
@@ -37,6 +37,8 @@ public class BlockRenderer{
     private IntSeq chunksToDraw = new IntSeq();
     private IntSet chunksToDrawSet = new IntSet();
     private Seq<Tile> tileview = new Seq<>(false, initialRequests, Tile.class);
+    private Seq<Building> tileExtraCachedView = new Seq<>(false, initialRequests, Building.class);
+    private Seq<Building> tileWithConsumerView = new Seq<>(false, initialRequests, Building.class);
     private Seq<Tile> lightview = new Seq<>(false, initialRequests, Tile.class);
     //TODO I don't like this system
     private Seq<UpdateRenderState> updateFloors = new Seq<>(UpdateRenderState.class);
@@ -143,7 +145,11 @@ public class BlockRenderer{
         if(chunk == null) return;
 
         chunk.dirty = true;
-        dirtyChunks.add(Point2.pack(tile.x / chunkSize, tile.y / chunkSize));
+        int packed = Point2.pack(tile.x / chunkSize, tile.y / chunkSize);
+        //don't re-cache the chunk unless it was in view
+        if(chunksToDrawSet.contains(packed)){
+            dirtyChunks.add(packed);
+        }
     }
 
     public void cacheChunk(int cx, int cy){
@@ -172,7 +178,7 @@ public class BlockRenderer{
             chunk.lastSeenTeam = pteam;
             int x1 = cx * chunkSize, y1 = cy * chunkSize, x2 = x1 + chunkSize, y2 = y1 + chunkSize;
 
-            blockTree.intersect(cx * chunkSize * tilesize, cy * chunkSize * tilesize, chunkSize * tilesize, chunkSize * tilesize, tile -> {
+            blockCachedTree.intersect(cx * chunkSize * tilesize, cy * chunkSize * tilesize, chunkSize * tilesize, chunkSize * tilesize, tile -> {
                 //only draw blocks strictly inside the chunk
                 if(!(tile.x >= x1 && tile.x < x2 && tile.y >= y1 && tile.y < y2) || !tile.block().drawCached) return;
 
@@ -513,6 +519,8 @@ public class BlockRenderer{
         chunksToDrawSet.clear();
         lastTeam = player.team();
         tileview.clear();
+        tileExtraCachedView.clear();
+        tileWithConsumerView.clear();
         lightview.clear();
         procLinks.clear();
         procLights.clear();
@@ -543,7 +551,14 @@ public class BlockRenderer{
                 }
             }
 
-            if(!block.drawDynamic) return;
+            if(build != null && block.hasConsumers && build.team == pteam){
+                tileWithConsumerView.add(build);
+            }
+
+            if(!block.drawDynamic){
+                if(build != null) tileExtraCachedView.add(build);
+                return;
+            }
 
             if(build == null || procLinks.add(build.id)){
                 tileview.add(tile);
@@ -683,6 +698,39 @@ public class BlockRenderer{
                     }
                 }
                 Draw.reset();
+            }
+        }
+
+        //draw overlay of extra cached tiles (they otherwise wouldn't draw cracks / status overlays)
+        for(int i = 0; i < tileExtraCachedView.size; i++){
+            Building build = tileExtraCachedView.items[i];
+
+            boolean visible = !build.inFogTo(pteam);
+
+            if(visible || build.wasVisible){
+                if(visible){
+                    build.visibleFlags |= (1L << pteam.id);
+                    if(!build.wasVisible){
+                        build.wasVisible = true;
+                        updateShadow(build);
+                        renderer.minimap.update(build.tile);
+                    }
+                }
+
+                if(build.damaged()){
+                    Draw.z(Layer.blockCracks);
+                    build.drawCracks();
+                }
+            }
+        }
+
+        if(renderer.drawStatus){
+            for(int i = 0; i < tileWithConsumerView.size; i++){
+                Building build = tileExtraCachedView.items[i];
+                if(build.wasVisible){
+                    //always guaranteed to be player team
+                    build.drawStatus();
+                }
             }
         }
 

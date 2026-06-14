@@ -43,6 +43,8 @@ public class Unloader extends Block{
         noUpdateDisabled = true;
         clearOnDoubleTap = true;
         unloadable = false;
+        drawCached = true;
+        drawDynamic = false;
 
         config(Item.class, (UnloaderBuild tile, Item item) -> tile.sortItem = item);
         configClear((UnloaderBuild tile) -> tile.sortItem = null);
@@ -230,7 +232,7 @@ public class Unloader extends Block{
         }
 
         @Override
-        public void draw(){
+        public void drawCached(){
             super.draw();
 
             Draw.color(sortItem == null ? Color.clear : sortItem.color);
@@ -242,6 +244,13 @@ public class Unloader extends Block{
         public void drawSelect(){
             super.drawSelect();
             drawItemSelection(sortItem);
+        }
+
+        @Override
+        public void configured(Unit builder, Object value){
+            super.configured(builder, value);
+
+            if(!headless) recache();
         }
 
         @Override
