@@ -13,6 +13,8 @@ public class LiquidJunction extends LiquidBlock{
         floating = true;
         destructible = true;
         update = false;
+        drawCached = true;
+        drawDynamic = false;
     }
 
     @Override

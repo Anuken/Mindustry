@@ -46,6 +46,7 @@ public class MendProjector extends Block{
         suppressable = true;
         envEnabled |= Env.space;
         flags = EnumSet.of(BlockFlag.blockRepair);
+        drawCached = true;
     }
 
     @Override
@@ -137,9 +138,12 @@ public class MendProjector extends Block{
         }
 
         @Override
-        public void draw(){
+        public void drawCached(){
             super.draw();
+        }
 
+        @Override
+        public void draw(){
             float f = 1f - (Time.time / 100f) % 1f;
 
             Draw.color(baseColor, phaseColor, phaseHeat);
