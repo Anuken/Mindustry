@@ -803,6 +803,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void handlePayload(Building source, Payload payload){
+        handlePayload(source, payload, null);
+    }
+
+    public void handlePayload(Building source, Payload payload, @Nullable Unit unit){
 
     }
 
