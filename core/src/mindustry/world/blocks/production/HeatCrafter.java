@@ -3,6 +3,7 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.math.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
@@ -69,6 +70,12 @@ public class HeatCrafter extends GenericCrafter{
         @Override
         public float warmupTarget(){
             return Mathf.clamp(heat / heatRequirement);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if (sensor == LAccess.heat) return heat;
+            return super.sense(sensor);
         }
 
         @Override
