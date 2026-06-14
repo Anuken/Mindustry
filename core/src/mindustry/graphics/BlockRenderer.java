@@ -159,7 +159,8 @@ public class BlockRenderer{
         if(chunk == null){
             chunk = cacheChunks[cx][cy] = new CacheChunk();
             if(caches.isEmpty() || caches.peek().getSpritesUsed() + required > caches.peek().getSpriteCapacity()){
-                caches.add(new SpriteCache(16382, true));
+                //there's no sense adding leftover space, since it will never be used
+                caches.add(new SpriteCache(16382 - (16382 % required), true));
                 queuedCacheDraws.add(new IntSeq());
             }
             chunk.cache = caches.peek();
@@ -640,7 +641,6 @@ public class BlockRenderer{
                 SpriteCache.getDefaultShader().bind();
                 SpriteCache.getDefaultShader().setUniformMatrix4("u_projectionViewMatrix", camera.mat);
 
-                if(false)
                 queuedCacheIndices.each(spriteCacheIndex -> {
                     SpriteCache sprites = caches.get(spriteCacheIndex);
                     IntSeq cachesToDraw = queuedCacheDraws.get(spriteCacheIndex);
