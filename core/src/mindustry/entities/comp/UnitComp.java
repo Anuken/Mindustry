@@ -862,13 +862,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     /** Actually destroys the unit, removing it and creating explosions. **/
     public void destroy(){
         if(!isAdded() || !killable()) return;
-
-        float explosiveness = 2f + item().explosiveness * stack().amount * 1.53f;
-        float flammability = item().flammability * stack().amount / 1.9f;
-        float power = item().charge * Mathf.pow(stack().amount, 1.11f) * 160f;
+        float explosiveness = 1f + item().explosiveness * stack().amount * state.rules.unitCrashDamage(team) * 1.5f;
+        float flammability = item().flammability * stack().amount / 2f * state.rules.unitCrashDamage(team);
+        float power = item().charge * stack().amount * 160f;
 
         if(!spawnedByCore){
-            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, (bounds() + type.legLength/1.7f) / 2f, state.rules.damageExplosions && state.rules.unitCrashDamage(team) > 0, item().flammability > 1, team, type.deathExplosionEffect, 0f);
+            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, (bounds() + type.legLength/1.7f) / 2f, state.rules.damageExplosions && 
+                state.rules.unitCrashDamage(team) > 0, item().flammability > 1, team, type.deathExplosionEffect, 0f, state.rules.unitCrashBuildDamageMultiplier);
         }else{
             type.deathExplosionEffect.at(x, y, bounds() / 2f / 8f);
         }
@@ -883,7 +883,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         Events.fire(new UnitDestroyEvent(self()));
 
-        if(explosiveness > 7f && (isLocal() || wasPlayer)){
+        if(explosiveness > 3f && (isLocal() || wasPlayer)){
             Events.fire(Trigger.suicideBomb);
         }
 
@@ -902,9 +902,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //if this unit crash landed (was flying), damage stuff in a radius
         if(type.flying && !spawnedByCore && type.createWreck && state.rules.unitCrashDamage(team) > 0){
             var shields = indexer.getEnemy(team, BlockFlag.shield);
-            float crashDamage = Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 2.5f * state.rules.unitCrashDamage(team);
+            float crashDamage = Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * state.rules.unitCrashDamage(team) * 2f;
             if(shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, crashDamage))){
-                Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, crashDamage, true, false, true);
+                Damage.damage(team, x, y, hitSize * 1.25f, crashDamage, true, false, true, false, null, 1f, state.rules.unitCrashBuildDamageMultiplier);
             }
         }
 
