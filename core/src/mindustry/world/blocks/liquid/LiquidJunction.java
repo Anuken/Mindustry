@@ -13,6 +13,8 @@ public class LiquidJunction extends LiquidBlock{
         floating = true;
         destructible = true;
         update = false;
+        drawCached = true;
+        drawDynamic = false;
     }
 
     @Override
@@ -34,7 +36,7 @@ public class LiquidJunction extends LiquidBlock{
 
     public class LiquidJunctionBuild extends Building{
         @Override
-        public void draw(){
+        public void drawCached(){
             Draw.rect(region, x, y);
         }
 

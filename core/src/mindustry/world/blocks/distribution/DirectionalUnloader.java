@@ -42,6 +42,8 @@ public class DirectionalUnloader extends Block{
         envDisabled = Env.none;
         clearOnDoubleTap = true;
         priority = TargetPriority.transport;
+        drawCached = true;
+        drawDynamic = false;
 
         config(Item.class, (DirectionalUnloaderBuild tile, Item item) -> tile.unloadItem = item);
         configClear((DirectionalUnloaderBuild tile) -> tile.unloadItem = null);
@@ -112,7 +114,7 @@ public class DirectionalUnloader extends Block{
         }
 
         @Override
-        public void draw(){
+        public void drawCached(){
             Draw.rect(region, x, y);
 
             Draw.rect(topRegion, x, y, rotdeg());

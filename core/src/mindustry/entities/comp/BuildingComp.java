@@ -1262,6 +1262,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         Draw.reset();
     }
 
+    /** Called only if {@link Block#drawDynamic} is true (on by default). */
     public void draw(){
         if(block.variants == 0 || block.variantRegions == null){
             Draw.rect(block.region, x, y, drawrot());
@@ -1270,6 +1271,21 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         drawTeamTop();
+    }
+
+    /** Called only if {@link Block#drawCached} is true (off by default). */
+    public void drawCached(){
+        if(block.variants == 0 || block.variantRegions == null){
+            Draw.rect(block.region, x, y, drawrot());
+        }else{
+            Draw.rect(block.variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, block.variantRegions.length - 1))], x, y, drawrot());
+        }
+
+        drawTeamTop();
+    }
+
+    public void recache(){
+        if(!headless) renderer.blocks.recacheBuilding(tile);
     }
 
     public void payloadDraw(){

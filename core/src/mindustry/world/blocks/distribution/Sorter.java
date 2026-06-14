@@ -31,6 +31,8 @@ public class Sorter extends Block{
         unloadable = false;
         saveConfig = true;
         clearOnDoubleTap = true;
+        drawCached = true;
+        drawDynamic = false;
 
         config(Item.class, (SorterBuild tile, Item item) -> tile.sortItem = item);
         configClear((SorterBuild tile) -> tile.sortItem = null);
@@ -65,12 +67,13 @@ public class Sorter extends Block{
             super.configured(player, value);
 
             if(!headless){
+                recache();
                 renderer.minimap.update(tile);
             }
         }
 
         @Override
-        public void draw(){
+        public void drawCached(){
 
             if(sortItem == null){
                 Draw.rect(cross, x, y);

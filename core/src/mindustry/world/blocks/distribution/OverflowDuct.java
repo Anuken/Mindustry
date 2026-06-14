@@ -33,6 +33,8 @@ public class OverflowDuct extends Block{
         priority = TargetPriority.transport;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
         regionRotated1 = 1;
+        drawCached = true;
+        drawDynamic = false;
     }
 
     @Override
@@ -63,7 +65,7 @@ public class OverflowDuct extends Block{
         public @Nullable Item current;
 
         @Override
-        public void draw(){
+        public void drawCached(){
             Draw.rect(region, x, y);
             Draw.rect(topRegion, x, y, rotdeg());
         }
