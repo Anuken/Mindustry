@@ -248,16 +248,18 @@ public class ResearchDialog extends BaseDialog{
             public void add(Item item, int amount){
                 //only have custom removal logic for when the sequence gets items taken out of it (e.g. research)
                 if(amount < 0){
+                    Sector curSector = state.isCampaign() ? state.rules.sector : null;
                     //remove items from each sector's storage, one by one
 
                     //negate amount since it's being *removed* - this makes it positive
                     amount = -amount;
 
-                    //% that gets removed from each sector
-                    double percentage = (double)amount / get(item);
+                    //% that gets removed from each sector except the current one
+                    double percentage = (double)amount / Math.max(get(item) - (curSector != null && cache.get(curSector) != null ? cache.get(curSector).get(item) : 0), 1);
                     int[] counter = {amount};
+                    
                     cache.each((sector, seq) -> {
-                        if(counter[0] == 0) return;
+                        if(counter[0] == 0 || sector == curSector) return;
 
                         //amount that will be removed
                         int toRemove = Math.min((int)Math.ceil(percentage * seq.get(item)), counter[0]);
@@ -268,6 +270,19 @@ public class ResearchDialog extends BaseDialog{
 
                         counter[0] -= toRemove;
                     });
+
+                    //only consume from the active sector last
+                    if(counter[0] > 0 && curSector != null){
+                        var seq = cache.get(curSector);
+                        if(seq != null){
+                            int toRemove = Math.min((int)Math.ceil(percentage * seq.get(item)), counter[0]);
+
+                            curSector.removeItem(item, toRemove);
+                            seq.remove(item, toRemove);
+
+                            counter[0] -= toRemove;
+                        }
+                    }
 
                     //negate again to display correct number
                     amount = -amount;
