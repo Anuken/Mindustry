@@ -298,7 +298,7 @@ public class HintsFragment{
         ),
 
         coreIncinerate(
-            () -> state.isCampaign() && state.rules.defaultTeam.core() != null && state.rules.defaultTeam.core().items.get(Items.copper) >= state.rules.defaultTeam.core().storageCapacity - 10,
+            () -> state.isCampaign() && state.rules.defaultTeam.core() != null && state.rules.defaultTeam.core().items.get(Items.copper) >= state.rules.defaultTeam.data().itemCap - 10,
             () -> false
         )
         ;

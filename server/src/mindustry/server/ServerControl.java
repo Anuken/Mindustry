@@ -772,7 +772,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             for(Item item : content.items()){
-                state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().storageCapacity);
+                state.teams.cores(team).first().items.set(item, state.teams.get(team).itemCap);
             }
 
             info("Core filled.");

@@ -143,9 +143,9 @@ public class CoreBlock extends StorageBlock{
         super.setBars();
 
         addBar("capacity", (CoreBuild e) -> new Bar(
-            () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
+            () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.team.data().itemCap)),
             () -> Pal.items,
-            () -> e.items.total() / ((float)e.storageCapacity * content.items().count(UnlockableContent::unlockedNow))
+            () -> e.items.total() / ((float)e.team.data().itemCap * content.items().count(UnlockableContent::unlockedNow))
         ));
     }
 
@@ -252,7 +252,8 @@ public class CoreBlock extends StorageBlock{
     }
 
     public class CoreBuild extends Building implements LaunchAnimator{
-        public int storageCapacity;
+        private int storageCapacity;
+
         public boolean noEffect = false;
         public Team lastDamage = Team.derelict;
         public float iframes = -1f;
@@ -530,7 +531,6 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void created(){
             super.created();
-
             Events.fire(new CoreChangeEvent(this));
         }
 
@@ -542,6 +542,7 @@ public class CoreBlock extends StorageBlock{
 
             super.changeTeam(next);
 
+            items = next.data().items;
             onProximityUpdate();
 
             Events.fire(new CoreChangeEvent(this));
@@ -549,7 +550,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public double sense(LAccess sensor){
-            if(sensor == LAccess.itemCapacity) return storageCapacity;
+            if(sensor == LAccess.itemCapacity) return team.data().itemCap;
             if(sensor == LAccess.maxUnits) return Units.getCap(team);
             return super.sense(sensor);
         }
@@ -684,6 +685,10 @@ public class CoreBlock extends StorageBlock{
             }
         }
 
+        public int capacity(){
+            return team.data().itemCap;
+        }
+
         @Override
         public void drawLight(){
             Drawf.light(x, y, lightRadius, Pal.accent, 0.65f + Mathf.absin(20f, 0.1f));
@@ -696,46 +701,41 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return state.rules.coreIncinerates ? Integer.MAX_VALUE/2 : storageCapacity;
+            return state.rules.coreIncinerates ? Integer.MAX_VALUE/2 : team.data().itemCap;
         }
 
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            for(Building other : state.teams.cores(team)){
-                if(other.tile != tile){
-                    this.items = other.items;
-                }
+            if(team.data().items == null){
+                // this is the first core of this team, assign its ItemModule as the default one
+                team.data().items = items;
+            }else{
+                items = team.data().items;
             }
-            state.teams.registerCore(this);
 
-            storageCapacity = itemCapacity + proximity.sum(e -> owns(e) ? e.block.itemCapacity : 0);
+            state.teams.registerCore(this);
+            int previousCapacity = storageCapacity;
+
+            storageCapacity = itemCapacity;
             proximity.each(this::owns, t -> {
                 t.items = items;
+                storageCapacity += t.block.itemCapacity;
                 ((StorageBuild)t).linkedCore = this;
             });
 
-            for(Building other : state.teams.cores(team)){
-                if(other.tile == tile) continue;
-                storageCapacity += other.block.itemCapacity + other.proximity.sum(e -> owns(other, e) ? e.block.itemCapacity : 0);
-            }
+            team.data().itemCap += storageCapacity - previousCapacity;
 
             if(!world.isGenerating()){
-                for(Item item : content.items()){
-                    items.set(item, Math.min(items.get(item), storageCapacity));
-                }
-            }
-
-            for(CoreBuild other : state.teams.cores(team)){
-                other.storageCapacity = storageCapacity;
+                clampItems();
             }
         }
 
         @Override
         public void handleStack(Item item, int amount, Teamc source){
             boolean incinerate = incinerateNonBuildable && !item.buildable;
-            int realAmount = incinerate ? 0 : Math.min(amount, storageCapacity - items.get(item));
+            int realAmount = incinerate ? 0 : Math.min(amount, team.data().itemCap - items.get(item));
             super.handleStack(item, realAmount, source);
 
             if(team == state.rules.defaultTeam && state.isCampaign()){
@@ -758,6 +758,12 @@ public class CoreBlock extends StorageBlock{
             }
 
             return result;
+        }
+
+        public void clampItems(){
+            for(Item item : content.items()){
+                items.set(item, Math.min(items.get(item), team.data().itemCap));
+            }
         }
 
         @Override
@@ -801,20 +807,31 @@ public class CoreBlock extends StorageBlock{
         public void onRemoved(){
             int totalCapacity = proximity.sum(e -> e.items != null && e.items == items ? e.block.itemCapacity : 0);
 
-            proximity.each(e -> owns(e) && e.items == items && owns(e), t -> {
+            proximity.each(e -> owns(e) && e.items == items, t -> {
                 StorageBuild ent = (StorageBuild)t;
                 ent.linkedCore = null;
                 ent.items = new ItemModule();
                 for(Item item : content.items()){
                     ent.items.set(item, (int)Math.min(ent.block.itemCapacity, items.get(item) * (float)ent.block.itemCapacity / totalCapacity));
                 }
+
+                // check if there are any other nearby cores
+                Point2[] edges = Edges.getEdges(ent.block.size);
+                for(Point2 edge : edges){
+                    Building b = world.build(ent.tileX() + edge.x, ent.tileY() + edge.y);
+                    if(b != this && b instanceof CoreBuild c){
+                        c.onProximityUpdate();
+                        if(ent.linkedCore == c){
+                            break;
+                        }
+                    }
+                }
             });
 
+            team.data().itemCap -= storageCapacity;
             state.teams.unregisterCore(this);
 
-            for(CoreBuild other : state.teams.cores(team)){
-                other.onProximityUpdate();
-            }
+            clampItems();
         }
 
         @Override
@@ -844,7 +861,7 @@ public class CoreBlock extends StorageBlock{
                     state.rules.sector.info.handleCoreItem(item, 1);
                 }
 
-                if(items.get(item) >= storageCapacity || incinerate){
+                if(items.get(item) >= team.data().itemCap || incinerate){
                     //create item incineration effect at random intervals
                     if(!noEffect){
                         incinerateEffect(this, source);
@@ -853,7 +870,7 @@ public class CoreBlock extends StorageBlock{
                 }else{
                     super.handleItem(source, item);
                 }
-            }else if(((state.rules.coreIncinerates && items.get(item) >= storageCapacity) || incinerate) && !noEffect){
+            }else if(((state.rules.coreIncinerates && items.get(item) >= team.data().itemCap) || incinerate) && !noEffect){
                 //create item incineration effect at random intervals
                 incinerateEffect(this, source);
                 noEffect = false;
