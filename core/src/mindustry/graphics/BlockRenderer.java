@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
+import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -669,7 +670,7 @@ public class BlockRenderer{
 
         drawDestroyed();
 
-        if(chunksToDraw.size > 0){
+        if(chunksToDraw.size > 0 && !input.keyDown(KeyCode.y)){
 
             for(int mlayer = 0; mlayer < BuildingCacheLayer.amount; mlayer++){
                 int layer = mlayer;
