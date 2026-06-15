@@ -1035,8 +1035,8 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(target.building() instanceof LogicDisplayBuild d && d.isValid() && (d.team == exec.team || exec.privileged)){
-                d.flushCommands(exec.graphicsBuffer);
+            if(target.building() instanceof LDrawable d && d.drawable(exec)){
+                d.draw(exec.graphicsBuffer);
             }
             exec.graphicsBuffer.clear();
         }
