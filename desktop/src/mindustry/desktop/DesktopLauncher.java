@@ -114,6 +114,7 @@ public class DesktopLauncher extends ClientLauncher{
         }catch(Throwable e){
             handleCrash(e);
         }
+        System.exit(0);
     }
 
     static void checkJavaVersion(){
