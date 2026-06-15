@@ -225,6 +225,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
+            recache();
 
             int[] bits = buildBlending(tile, rotation, null, true);
             blendbits = bits[0];
