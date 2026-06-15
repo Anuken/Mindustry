@@ -1,7 +1,7 @@
 package mindustry.graphics;
 
 public enum BuildingCacheLayer{
-    under(Layer.block - 0.2f),
+    under(Layer.block - 0.5f),
     normal(Layer.block);
 
     public final float layer;
