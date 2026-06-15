@@ -20,13 +20,16 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.environment.Floor.*;
 import mindustry.world.blocks.power.*;
 
+import java.util.*;
+
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class BlockRenderer{
     //TODO cracks take up far to much space, so I had to limit it to 7. this means larger blocks won't have cracks - draw tiling mirrored stuff instead?
     public static final int crackRegions = 8, maxCrackSize = 7, chunkSize = 30, maxSpritesPerCacheTile = 3;
-    public static boolean drawQuadtreeDebug = false;
+    public static final boolean drawQuadtreeDebug = false;
+    public static final boolean blockDrawCountDebug = false;
     public static final Color shadowColor = new Color(0, 0, 0, 0.71f), blendShadowColor = Color.white.cpy().lerp(Color.black, shadowColor.a);
 
     private static final int initialRequests = 32 * 32;
@@ -62,12 +65,22 @@ public class BlockRenderer{
 
     private CacheChunk[][] cacheChunks;
     private CacheBatch cbatch = new CacheBatch(null);
-    private Seq<SpriteCache> caches = new Seq<>();
-    private Seq<IntSeq> queuedCacheDraws = new Seq<>();
-    private IntSeq queuedCacheIndices = new IntSeq();
+
+    private Seq<SpriteCache>[] caches = new Seq[BuildingCacheLayer.amount];
+    private Seq<IntSeq>[] queuedCacheDraws = new Seq[BuildingCacheLayer.amount];
+    private IntSeq[] queuedCacheIndices = new IntSeq[BuildingCacheLayer.amount];
     private IntSet dirtyChunks = new IntSet();
 
+    //only used when blockDrawCountDebug = true
+    private ObjectIntMap<Block> blockDrawSprites = new ObjectIntMap<>();
+    private ObjectIntMap<Block> blockDrawTotal = new ObjectIntMap<>();
+
     public BlockRenderer(){
+        for(int i = 0; i < BuildingCacheLayer.amount; i++){
+            caches[i] = new Seq<>();
+            queuedCacheDraws[i] = new Seq<>();
+            queuedCacheIndices[i] = new IntSeq();
+        }
 
         Events.on(ClientLoadEvent.class, e -> {
             cracks = new TextureRegion[maxCrackSize][crackRegions];
@@ -94,7 +107,7 @@ public class BlockRenderer{
             if(blockTree == null || floorTree == null || overlayTree == null) return;
 
             if(event.tile.block().drawCached){
-                recacheBuilding(event.tile);
+                recacheBuilding(event.tile.block().buildingCacheLayer, event.tile);
             }
 
             if(indexBlock(event.tile)){
@@ -115,7 +128,7 @@ public class BlockRenderer{
             }
 
             if(event.tile.block().drawCached){
-                recacheBuilding(event.tile);
+                recacheBuilding(event.tile.block().buildingCacheLayer, event.tile);
             }
 
             if(visible){
@@ -136,7 +149,7 @@ public class BlockRenderer{
         });
     }
 
-    public void recacheBuilding(Tile tile){
+    public void recacheBuilding(BuildingCacheLayer layer, Tile tile){
         if(cacheChunks == null) return;
 
         int cx = tile.x / chunkSize, cy = tile.y / chunkSize;
@@ -147,7 +160,7 @@ public class BlockRenderer{
 
         if(chunk == null) return;
 
-        chunk.dirty = true;
+        chunk.dirty[layer.ordinal()] = true;
         int packed = Point2.pack(cx, cy);
         //don't re-cache the chunk unless it was in view
         if(chunksToDrawSet.contains(packed)){
@@ -155,25 +168,31 @@ public class BlockRenderer{
         }
     }
 
-    public void cacheChunk(int cx, int cy){
+    public void cacheChunk(int layer, int cx, int cy){
         int required = chunkSize * chunkSize * maxSpritesPerCacheTile;
 
         CacheChunk chunk = cacheChunks[cx][cy];
         if(chunk == null){
             chunk = cacheChunks[cx][cy] = new CacheChunk();
-            if(caches.isEmpty() || caches.peek().getSpritesUsed() + required > caches.peek().getSpriteCapacity()){
-                //there's no sense adding leftover space, since it will never be used
-                caches.add(new SpriteCache(16382 - (16382 % required), true));
-                queuedCacheDraws.add(new IntSeq());
-            }
-            chunk.cache = caches.peek();
-            chunk.spriteCacheIndex = caches.size - 1;
-            chunk.cache.beginCache();
-        }else{
-            chunk.cache.beginCache(chunk.id);
         }
 
-        cbatch.cache = chunk.cache;
+        SpriteCache cache = chunk.caches[layer];
+        if(cache == null){
+            var cacheArr = caches[layer];
+            if(cacheArr.isEmpty() || cacheArr.peek().getSpritesUsed() + required > cacheArr.peek().getSpriteCapacity()){
+                //there's no sense adding leftover space, since it will never be used
+                cacheArr.add(new SpriteCache(16382 - (16382 % required), true));
+                queuedCacheDraws[layer].add(new IntSeq());
+            }
+            cache = chunk.caches[layer] = cacheArr.peek();
+            chunk.spriteCacheIndices[layer] = cacheArr.size - 1;
+            cache.beginCache();
+        }else{
+            cache = chunk.caches[layer];
+            cache.beginCache(chunk.cacheIds[layer]);
+        }
+
+        cbatch.cache = cache;
         Batch lastBatch = Core.batch;
         try{
             Draw.flush();
@@ -184,7 +203,7 @@ public class BlockRenderer{
 
             blockCachedTree.intersect(cx * chunkSize * tilesize, cy * chunkSize * tilesize, chunkSize * tilesize, chunkSize * tilesize, tile -> {
                 //only draw blocks strictly inside the chunk
-                if(!(tile.x >= x1 && tile.x < x2 && tile.y >= y1 && tile.y < y2) || !tile.block().drawCached) return;
+                if(!(tile.x >= x1 && tile.x < x2 && tile.y >= y1 && tile.y < y2) || !tile.block().drawCached || tile.block().buildingCacheLayer.ordinal() != layer) return;
 
                 Block block = tile.block();
                 Building build = tile.build;
@@ -208,9 +227,9 @@ public class BlockRenderer{
             batch = lastBatch;
         }
 
-        chunk.dirty = false;
-        chunk.cache.reserve(required);
-        chunk.id = chunk.cache.endCache();
+        chunk.dirty[layer] = false;
+        cache.reserve(required);
+        chunk.cacheIds[layer] = cache.endCache();
     }
 
     public void reload(){
@@ -220,10 +239,12 @@ public class BlockRenderer{
         overlayTree = new OverlayQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
         floorTree = new FloorQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
 
-        for(SpriteCache cache : caches){
-            cache.dispose();
+        for(var arr : caches){
+            for(SpriteCache cache : arr){
+                cache.dispose();
+            }
+            arr.clear();
         }
-        caches.clear();
         int chunksx = Mathf.ceil((float)(world.width()) / chunkSize), chunksy = Mathf.ceil((float)(world.height()) / chunkSize);
         cacheChunks = new CacheChunk[chunksx][chunksy];
 
@@ -577,10 +598,14 @@ public class BlockRenderer{
             }
         });
 
-        queuedCacheIndices.clear();
-
-        for(var seq : queuedCacheDraws){
+        for(var seq : queuedCacheIndices){
             seq.clear();
+        }
+
+        for(var arr : queuedCacheDraws){
+            for(var seq : arr){
+                seq.clear();
+            }
         }
 
         //begin by checking any stale/uncached chunks, and caching them if necessary
@@ -588,18 +613,28 @@ public class BlockRenderer{
             int cx = Point2.x(xy);
             int cy = Point2.y(xy);
             CacheChunk chunk = cacheChunks[cx][cy];
-            if(chunk == null || chunk.dirty || chunk.lastSeenTeam != pteam){
-                cacheChunk(cx, cy);
+            if(chunk == null || chunk.lastSeenTeam != pteam){
+                for(int i = 0; i < BuildingCacheLayer.amount; i++){
+                    cacheChunk(i, cx, cy);
+                }
+            }else{
+                for(int i = 0; i < BuildingCacheLayer.amount; i++){
+                    if(chunk.dirty[i]){
+                        cacheChunk(i, cx, cy);
+                    }
+                }
             }
             //in case it was null (it can never be null after caching)
             chunk = cacheChunks[cx][cy];
 
-            //record the sprite cache IDs that will be drawn in queuedCacheIndices, and record the actual cache IDs of the respective sprite caches in queuedCacheDraws
-            IntSeq cacheIDsToDraw = queuedCacheDraws.get(chunk.spriteCacheIndex);
-            if(cacheIDsToDraw.isEmpty()){
-                queuedCacheIndices.add(chunk.spriteCacheIndex);
+            for(int layer = 0; layer < BuildingCacheLayer.amount; layer++){
+                //record the sprite cache IDs that will be drawn in queuedCacheIndices, and record the actual cache IDs of the respective sprite caches in queuedCacheDraws
+                IntSeq cacheIDsToDraw = queuedCacheDraws[layer].get(chunk.spriteCacheIndices[layer]);
+                if(cacheIDsToDraw.isEmpty()){
+                    queuedCacheIndices[layer].add(chunk.spriteCacheIndices[layer]);
+                }
+                cacheIDsToDraw.add(chunk.cacheIds[layer]);
             }
-            cacheIDsToDraw.add(chunk.id);
         });
 
         lastCamX = avgx;
@@ -636,22 +671,43 @@ public class BlockRenderer{
 
         if(chunksToDraw.size > 0){
 
-            Draw.draw(Layer.block, () -> {
-                dirtyChunks.each(c -> cacheChunk(Point2.x(c), Point2.y(c)));
-                dirtyChunks.clear();
+            for(int mlayer = 0; mlayer < BuildingCacheLayer.amount; mlayer++){
+                int layer = mlayer;
+                float z = BuildingCacheLayer.layers[layer];
 
-                //minor optimization: don't transfer the matrix every time
-                SpriteCache.getDefaultShader().bind();
-                SpriteCache.getDefaultShader().setUniformMatrix4("u_projectionViewMatrix", camera.mat);
+                Draw.draw(z, () -> {
+                    if(layer == 0){
+                        dirtyChunks.each(c -> {
+                            int cx = Point2.x(c), cy = Point2.y(c);
+                            var chunk = cacheChunks[cx][cy];
 
-                queuedCacheIndices.each(spriteCacheIndex -> {
-                    SpriteCache sprites = caches.get(spriteCacheIndex);
-                    IntSeq cachesToDraw = queuedCacheDraws.get(spriteCacheIndex);
-                    sprites.begin(false);
-                    cachesToDraw.each(sprites::draw);
-                    sprites.end();
+                            for(int l = 0; l < BuildingCacheLayer.amount; l++){
+                                if(chunk == null || chunk.dirty[l]){
+                                    cacheChunk(l, Point2.x(c), Point2.y(c));
+                                }
+                            }
+                        });
+                        dirtyChunks.clear();
+
+                        //minor optimization: don't transfer the matrix every time
+                        SpriteCache.getDefaultShader().bind();
+                        SpriteCache.getDefaultShader().setUniformMatrix4("u_projectionViewMatrix", camera.mat);
+                    }
+
+                    queuedCacheIndices[layer].each(spriteCacheIndex -> {
+                        SpriteCache sprites = caches[layer].get(spriteCacheIndex);
+                        IntSeq cachesToDraw = queuedCacheDraws[layer].get(spriteCacheIndex);
+                        sprites.begin(false);
+                        cachesToDraw.each(sprites::draw);
+                        sprites.end();
+                    });
                 });
-            });
+            }
+        }
+
+        if(blockDrawCountDebug){
+            blockDrawTotal.clear();
+            blockDrawSprites.clear();
         }
 
         //draw most tile stuff
@@ -666,6 +722,7 @@ public class BlockRenderer{
             boolean visible = (build == null || !build.inFogTo(pteam));
 
             if(block != Blocks.air && (visible || build.wasVisible)){
+                SpriteBatch.totalDrawCalls = 0;
                 block.drawBase(tile);
                 Draw.reset();
                 Draw.z(Layer.block);
@@ -700,7 +757,43 @@ public class BlockRenderer{
                     }
                 }
                 Draw.reset();
+
+                if(blockDrawCountDebug){
+                    blockDrawTotal.increment(block, 1);
+                    if(SpriteBatch.totalDrawCalls > 0) blockDrawSprites.increment(block, (int)SpriteBatch.totalDrawCalls);
+                }
             }
+        }
+
+        if(blockDrawCountDebug && graphics.getFrameId() % 30 == 0){
+            class Entry implements Comparable<Entry>{
+                Block block;
+                int amount;
+
+                public Entry(Block block, int amount){
+                    this.block = block;
+                    this.amount = amount;
+                }
+
+                @Override
+                public String toString(){
+                    return block + ": " + amount + " (average: " + Strings.autoFixed((float)amount/blockDrawTotal.get(block), 1) + ")";
+                }
+
+                @Override
+                public int compareTo(Entry entry){
+                    return Integer.compare(amount, entry.amount);
+                }
+            }
+            int total = 0;
+
+            Seq<Entry> entries = new Seq<>();
+            for(var v : blockDrawSprites){
+                entries.add(new Entry(v.key, v.value));
+                total += v.value;
+            }
+            entries.sort().reverse();
+            Log.info("Draw calls:\n" + entries.toString("\n") + "\nTOTAL: " + total + "\n");
         }
 
         //draw overlay of extra cached tiles (they otherwise wouldn't draw cracks / status overlays)
@@ -716,7 +809,7 @@ public class BlockRenderer{
                         build.wasVisible = true;
                         updateShadow(build);
                         renderer.minimap.update(build.tile);
-                        recacheBuilding(build.tile);
+                        recacheBuilding(build.block.buildingCacheLayer, build.tile);
                     }
                 }
 
@@ -791,11 +884,17 @@ public class BlockRenderer{
     }
 
     static class CacheChunk{
-        SpriteCache cache;
-        int spriteCacheIndex; //index of cache variable in list of global spritcaches
-        int id;
-        boolean dirty = true;
+        SpriteCache[] caches = new SpriteCache[BuildingCacheLayer.amount];
+        //index of cache variable in list of global sprite caches
+        int[] spriteCacheIndices = new int[BuildingCacheLayer.amount];
+        int[] cacheIds = new int[BuildingCacheLayer.amount];
+        boolean[] dirty = new boolean[BuildingCacheLayer.amount];
+
         Team lastSeenTeam;
+
+        {
+            Arrays.fill(dirty, true);
+        }
     }
 
     static class BlockQuadtree extends QuadTree<Tile>{

@@ -1279,7 +1279,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void recache(){
-        if(!headless) renderer.blocks.recacheBuilding(tile);
+        if(!headless) renderer.blocks.recacheBuilding(block.buildingCacheLayer, tile);
     }
 
     public void payloadDraw(){

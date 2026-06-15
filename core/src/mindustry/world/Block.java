@@ -235,6 +235,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean drawDynamic = true;
     /** If enabled, drawCached() will be called on the building. */
     public boolean drawCached = false;
+    /** */
+    public BuildingCacheLayer buildingCacheLayer = BuildingCacheLayer.normal;
     /** Special flag; if false, floor will be drawn under this block even if it is cached. */
     public boolean fillsTile = true;
     /** If true, this block can be covered by darkness / fog even if synthetic. */
