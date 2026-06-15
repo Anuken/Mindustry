@@ -715,6 +715,7 @@ public class BlockRenderer{
                         build.wasVisible = true;
                         updateShadow(build);
                         renderer.minimap.update(build.tile);
+                        recacheBuilding(build.tile);
                     }
                 }
 
