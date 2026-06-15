@@ -139,13 +139,16 @@ public class BlockRenderer{
     public void recacheBuilding(Tile tile){
         if(cacheChunks == null) return;
 
-        //TODO: recache that specific tile and not the whole cache
-        CacheChunk chunk = cacheChunks[tile.x / chunkSize][tile.y / chunkSize];
+        int cx = tile.x / chunkSize, cy = tile.y / chunkSize;
+
+        if(cx < 0 || cy < 0 || cx >= cacheChunks.length || cy >= cacheChunks[0].length) return;
+
+        CacheChunk chunk = cacheChunks[cx][cy];
 
         if(chunk == null) return;
 
         chunk.dirty = true;
-        int packed = Point2.pack(tile.x / chunkSize, tile.y / chunkSize);
+        int packed = Point2.pack(cx, cy);
         //don't re-cache the chunk unless it was in view
         if(chunksToDrawSet.contains(packed)){
             dirtyChunks.add(packed);
@@ -694,8 +697,6 @@ public class BlockRenderer{
                             build.drawTeam();
                             Draw.z(Layer.block);
                         }
-                    }else if(renderer.drawStatus && block.hasConsumers){
-                        build.drawStatus();
                     }
                 }
                 Draw.reset();
@@ -726,7 +727,7 @@ public class BlockRenderer{
             }
         }
 
-        if(renderer.drawStatus){
+        if(renderer.drawStatus && Lod.l2){
             for(int i = 0; i < tileWithConsumerView.size; i++){
                 Building build = tileWithConsumerView.items[i];
                 if(build.wasVisible){

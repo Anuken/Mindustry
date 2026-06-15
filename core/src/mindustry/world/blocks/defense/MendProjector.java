@@ -146,10 +146,12 @@ public class MendProjector extends Block{
         public void draw(){
             float f = 1f - (Time.time / 100f) % 1f;
 
+            if(!Lod.l2) return;
+
             Draw.color(baseColor, phaseColor, phaseHeat);
-            Draw.alpha(heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f);
+            Draw.alpha(heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f * Lod.alpha2);
             Draw.rect(topRegion, x, y);
-            Draw.alpha(1f);
+            Draw.alpha(Lod.alpha2);
             Lines.stroke((2f * f + 0.2f) * heat);
             Lines.square(x, y, Math.min(1f + (1f - f) * size * tilesize / 2f, size * tilesize/2f));
 
