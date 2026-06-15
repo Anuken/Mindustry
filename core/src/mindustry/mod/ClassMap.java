@@ -73,6 +73,7 @@ public class ClassMap{
         classes.put("SeqEffect", mindustry.entities.effect.SeqEffect.class);
         classes.put("SoundEffect", mindustry.entities.effect.SoundEffect.class);
         classes.put("WaveEffect", mindustry.entities.effect.WaveEffect.class);
+        classes.put("NoiseEffect", mindustry.entities.effect.NoiseEffect.class);
         classes.put("WrapEffect", mindustry.entities.effect.WrapEffect.class);
         classes.put("DrawPart", mindustry.entities.part.DrawPart.class);
         classes.put("PartFunc", mindustry.entities.part.DrawPart.PartFunc.class);
