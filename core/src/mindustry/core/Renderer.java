@@ -580,38 +580,44 @@ public class Renderer implements ApplicationListener{
             return;
         }
 
-        FrameBuffer buffer = new FrameBuffer(w, h);
+        try{
+            FrameBuffer buffer = new FrameBuffer(w, h);
 
-        drawWeather = false;
-        float vpW = camera.width, vpH = camera.height, px = camera.position.x, py = camera.position.y;
-        disableUI = true;
-        camera.width = w;
-        camera.height = h;
-        camera.position.x = w / 2f + tilesize / 2f;
-        camera.position.y = h / 2f + tilesize / 2f;
-        buffer.begin(Color.clear);
-        draw();
-        Draw.flush();
-        byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
-        buffer.end();
-        disableUI = false;
-        camera.width = vpW;
-        camera.height = vpH;
-        camera.position.set(px, py);
-        drawWeather = true;
-        buffer.dispose();
+            drawWeather = false;
+            float vpW = camera.width, vpH = camera.height, px = camera.position.x, py = camera.position.y;
+            disableUI = true;
+            camera.width = w;
+            camera.height = h;
+            camera.position.x = w / 2f + tilesize / 2f;
+            camera.position.y = h / 2f + tilesize / 2f;
+            buffer.begin(Color.clear);
+            draw();
+            Draw.flush();
+            byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
+            buffer.end();
+            disableUI = false;
+            camera.width = vpW;
+            camera.height = vpH;
+            camera.position.set(px, py);
+            drawWeather = true;
+            buffer.dispose();
 
-        Threads.thread(() -> {
-            for(int i = 0; i < lines.length; i += 4){
-                lines[i + 3] = (byte)255;
-            }
-            Pixmap fullPixmap = new Pixmap(w, h);
-            Buffers.copy(lines, 0, fullPixmap.pixels, lines.length);
-            Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
-            PixmapIO.writePng(file, fullPixmap);
-            fullPixmap.dispose();
-            app.post(() -> ui.showInfoFade(bundle.format("screenshot", file.toString())));
-        });
+            mainExecutor.submit(() -> {
+                for(int i = 0; i < lines.length; i += 4){
+                    lines[i + 3] = (byte)255;
+                }
+                Pixmap fullPixmap = new Pixmap(w, h);
+                Buffers.copy(lines, 0, fullPixmap.pixels, lines.length);
+                Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
+                PixmapIO.writePng(file, fullPixmap);
+                fullPixmap.dispose();
+                app.post(() -> ui.showInfoFade(bundle.format("screenshot", file.toString())));
+            });
+        }catch(Throwable e){
+            Log.err(e);
+            Vars.ui.showException("@screenshot.error", e);
+        }
+
     }
 
     public static class EnvRenderer{
