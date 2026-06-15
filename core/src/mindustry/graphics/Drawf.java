@@ -382,12 +382,14 @@ public class Drawf{
     }
 
     public static void liquid(TextureRegion region, float x, float y, float alpha, Color color, float rotation){
+        if(alpha < 1f/255f) return;
         Draw.color(color, alpha * color.a);
         Draw.rect(region, x, y, rotation);
         Draw.color();
     }
 
     public static void liquid(TextureRegion region, float x, float y, float alpha, Color color){
+        if(alpha < 1f/255f) return;
         Draw.color(color, alpha * color.a);
         Draw.rect(region, x, y);
         Draw.color();

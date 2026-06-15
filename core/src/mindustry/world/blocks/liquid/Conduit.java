@@ -53,6 +53,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
         noUpdateDisabled = true;
         canOverdrive = false;
         priority = TargetPriority.transport;
+        drawCached = true;
+        buildingCacheLayer = BuildingCacheLayer.under;
     }
 
     @Override
@@ -157,53 +159,67 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public boolean capped, backCapped = false;
 
         @Override
+        public void drawCached(){
+            draw(true);
+        }
+
+        @Override
         public void draw(){
+            draw(false);
+        }
+
+        public void draw(boolean under){
             int r = this.rotation;
+
+            if(under) Draw.color(botColor);
 
             //draw extra conduits facing this one for tiling purposes
             Draw.z(Layer.blockUnder);
             for(int i = 0; i < 4; i++){
                 if((blending & (1 << i)) != 0){
                     int dir = r - i;
-                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, i == 0 ? r : dir, i != 0 ? SliceMode.bottom : SliceMode.top);
+                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, i == 0 ? r : dir, i != 0 ? SliceMode.bottom : SliceMode.top, under);
                 }
             }
 
             Draw.z(Layer.block);
 
             Draw.scl(xscl, yscl);
-            drawAt(x, y, blendbits, r, SliceMode.none);
+            drawAt(x, y, blendbits, r, SliceMode.none, under);
             Draw.reset();
+
+            if(!under) return;
 
             if(capped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg());
             if(backCapped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg() + 180);
         }
 
-        protected void drawAt(float x, float y, int bits, int rotation, SliceMode slice){
+        protected void drawAt(float x, float y, int bits, int rotation, SliceMode slice, boolean under){
             float angle = rotation * 90f;
-            Draw.color(botColor);
-            Draw.rect(sliced(botRegions[bits], slice), x, y, angle);
+            if(under){
+                Draw.rect(sliced(botRegions[bits], slice), x, y, angle);
+            }else{
+                int offset = yscl == -1 ? 3 : 0;
 
-            int offset = yscl == -1 ? 3 : 0;
+                int frame = liquids.current().getAnimationFrame();
+                int gas = liquids.current().gas ? 1 : 0;
+                float ox = 0f, oy = 0f;
+                int wrapRot = (rotation + offset) % 4;
+                TextureRegion liquidr = bits == 1 && padCorners ? rotateRegions[wrapRot][gas][frame] : renderer.fluidFrames[gas][frame];
 
-            int frame = liquids.current().getAnimationFrame();
-            int gas = liquids.current().gas ? 1 : 0;
-            float ox = 0f, oy = 0f;
-            int wrapRot = (rotation + offset) % 4;
-            TextureRegion liquidr = bits == 1 && padCorners ? rotateRegions[wrapRot][gas][frame] : renderer.fluidFrames[gas][frame];
+                if(bits == 1 && padCorners){
+                    ox = rotateOffsets[wrapRot][0];
+                    oy = rotateOffsets[wrapRot][1];
+                }
 
-            if(bits == 1 && padCorners){
-                ox = rotateOffsets[wrapRot][0];
-                oy = rotateOffsets[wrapRot][1];
+                //the drawing state machine sure was a great design choice with no downsides or hidden behavior!!!
+                float xscl = Draw.xscl, yscl = Draw.yscl;
+                Draw.scl(1f, 1f);
+                Drawf.liquid(sliced(liquidr, slice), x + ox, y + oy, smoothLiquid, liquids.current().color.write(Tmp.c1).a(1f));
+                Draw.scl(xscl, yscl);
+
+                Draw.rect(sliced(topRegions[bits], slice), x, y, angle);
             }
-
-            //the drawing state machine sure was a great design choice with no downsides or hidden behavior!!!
-            float xscl = Draw.xscl, yscl = Draw.yscl;
-            Draw.scl(1f, 1f);
-            Drawf.liquid(sliced(liquidr, slice), x + ox, y + oy, smoothLiquid, liquids.current().color.write(Tmp.c1).a(1f));
-            Draw.scl(xscl, yscl);
-
-            Draw.rect(sliced(topRegions[bits], slice), x, y, angle);
         }
 
         @Override
