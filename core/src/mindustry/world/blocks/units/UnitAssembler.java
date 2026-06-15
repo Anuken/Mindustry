@@ -706,6 +706,13 @@ public class UnitAssembler extends PayloadBlock{
         }
 
         @Override
+        public boolean acceptUnitPayload(Unit unit){
+            var plan = plan();
+            return plan.requirements.contains(b -> b.item == unit.type() &&
+                blocks.get(unit.type()) < Mathf.round(b.amount * state.rules.unitCost(team)));
+        }
+
+        @Override
         public PayloadSeq getPayloads(){
             return blocks;
         }
