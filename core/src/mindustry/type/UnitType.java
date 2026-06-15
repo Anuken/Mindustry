@@ -1232,7 +1232,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         for(var region : toOutline){
             if(region instanceof AtlasRegion atlas && !Core.atlas.has(atlas.name + "-outline")){
                 String regionName = atlas.name;
-                Pixmap outlined = Pixmaps.outline(Core.atlas.getPixmap(region), outlineColor, outlineRadius);
+                Pixmap outlined = Pixmaps.outline(packer.get(region), outlineColor, outlineRadius);
 
                 Drawf.checkBleed(outlined);
 
@@ -1268,7 +1268,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
 
         if(sample instanceof Tankc){
-            PixmapRegion pix = Core.atlas.getPixmap(treadRegion);
+            PixmapRegion pix = packer.get(treadRegion);
 
             for(int r = 0; r < treadRects.length; r++){
                 Rect treadRect = treadRects[r];
