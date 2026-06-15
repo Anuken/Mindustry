@@ -4265,7 +4265,7 @@ public class Blocks{
                     width = 15f;
                     height = 21f;
                     shootEffect = Fx.shootBig;
-                    ammoMultiplier = 4;
+                    ammoMultiplier = 6;
                     reloadMultiplier = 1.7f;
                     knockback = 0.3f;
 
@@ -4278,6 +4278,7 @@ public class Blocks{
                     width = 16f;
                     height = 23f;
                     shootEffect = Fx.shootBig;
+                    ammoMultiplier = 3;
                     pierceCap = 2;
                     pierceBuilding = true;
                     knockback = 0.7f;
@@ -4298,7 +4299,7 @@ public class Blocks{
                     pierceCap = 2;
                     pierceBuilding = true;
                     knockback = 0.6f;
-                    ammoMultiplier = 3;
+                    ammoMultiplier = 5;
                     splashDamage = 20f;
                     splashDamageRadius = 25f;
                 }}
