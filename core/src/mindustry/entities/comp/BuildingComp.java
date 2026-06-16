@@ -176,6 +176,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public void remove(){
         removeFromList();
+        added = false;
     }
 
     public void removeFromList(){
