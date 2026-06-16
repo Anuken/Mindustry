@@ -289,7 +289,7 @@ public class Turret extends ReloadTurret{
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public BlockUnitc unit = (BlockUnitc)UnitTypes.block.create(team);
-        public boolean wasShooting;
+        public boolean wasShooting, isShooting;
         public int queuedBullets = 0;
 
         public float heatReq;
@@ -362,7 +362,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public boolean shouldConsume(){
-            return isShooting() || reloadCounter < reload;
+            return isShooting || reloadCounter < reload;
         }
 
         @Override
@@ -410,7 +410,7 @@ public class Turret extends ReloadTurret{
                 case rotation -> rotation;
                 case shootX -> World.conv(targetPos.x);
                 case shootY -> World.conv(targetPos.y);
-                case shooting -> isShooting() ? 1 : 0;
+                case shooting -> isShooting ? 1 : 0;
                 case progress -> progress();
                 default -> super.sense(sensor);
             };
@@ -427,7 +427,7 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isShooting(){
-            return alwaysShooting || (unit.controller() instanceof Player ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
+            return isShooting;
         }
 
         @Override
@@ -489,6 +489,7 @@ public class Turret extends ReloadTurret{
         @Override
         public void updateTile(){
             if(!validateTarget()) target = null;
+            isShooting = alwaysShooting || (unit.controller() instanceof Player ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
 
             if(unit.isPlayer()){ //there's no reason to update this when a player isn't controlling it
                 unit.ammo(getAmmoFraction());
@@ -498,7 +499,7 @@ public class Turret extends ReloadTurret{
                 soundLoop.update(x, y, shouldActiveSound(), activeSoundVolume());
             }
 
-            float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
+            float warmupTarget = (isShooting && canConsume()) || charging() ? 1f : 0f;
             if(warmupTarget > 0 && !controlled()){
                 warmupHold = 1f;
             }
