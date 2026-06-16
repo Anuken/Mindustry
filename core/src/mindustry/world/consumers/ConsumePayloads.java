@@ -5,13 +5,14 @@ import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
 public class ConsumePayloads extends Consume{
-    public Seq<PayloadStack> payloads;
+    public PayloadStack[] payloads;
 
     public ConsumePayloads(Seq<PayloadStack> payloads){
-        this.payloads = payloads;
+        this.payloads = payloads.toArray(Payload.class);
     }
 
     @Override

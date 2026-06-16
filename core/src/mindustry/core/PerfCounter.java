@@ -9,6 +9,10 @@ public enum PerfCounter{
     update,
     entityUpdate,
     buildingUpdate,
+    itemsUpdate,
+    liquidsUpdate,
+    consumeUpdate,
+    otherBuildingsUpdate,
     ui,
     render;
 

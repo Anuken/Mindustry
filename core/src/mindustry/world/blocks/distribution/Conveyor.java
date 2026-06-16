@@ -251,6 +251,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         public final void updateConveyor(){
+            efficiency = enabled ? 1f : 0f;
             minitem = 1f;
             mid = 0;
 

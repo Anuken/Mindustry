@@ -1,10 +1,12 @@
 package mindustry.core;
 
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.BufferedItemBridge.*;
 import mindustry.world.blocks.distribution.Conveyor.*;
 import mindustry.world.blocks.distribution.Duct.*;
@@ -20,7 +22,7 @@ import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
-@BuildingListDef(qualifiedType = "mindustry.gen.Building", method = "update")
+@BuildingListDef(qualifiedType = "mindustry.gen.Building", method = "updateTile")
 
 @BuildingListDef(type = ConveyorBuild.class, method = "updateConveyor")
 @BuildingListDef(type = DuctBuild.class, method = "updateDuct")
@@ -34,7 +36,18 @@ import static mindustry.Vars.*;
 @BuildingListDef(type = LiquidRouterBuild.class, method = "updateLiquidRouter")
 @BuildingListDef(type = LiquidBridgeBuild.class, method = "update")  //TODO: has consume power, meaning updateConsumption needs to be called too (bad)
 
-//TODO: make enable/disable just remove them from the list of things that need to update
+/*
+TODO: make enable/disable just remove them from the list of things that need to update
+- subpoint: remove all contents of update() as they would no longer needed
+
+TODO: remove the 'devirtualized' methods and see if it affects performance at all (check weaker devices too)
+
+TODO:
+ - refactor checkAllowUpdate in World to not access Groups.build
+ - refactor fog scanning Groups.build (2 different places) and move that into a new thread
+ - finally, remove it from the group list def (footgun avoidance)
+*
+ */
 public class Buildings{
     public final BuildingList buildings = new BuildingList();
 
@@ -54,6 +67,9 @@ public class Buildings{
     private final Seq<Building> timeScaleQueue = new Seq<>(false, 20, Building.class);
     private final Seq<Building> ambientSoundBuilds = new Seq<>(false, 20, Building.class);
     private final Seq<Building> ambientSoundQueue = new Seq<>(false, 20, Building.class);
+    private final Seq<LiquidUpdater> liquidUpdateBuilds = new Seq<>(false, 20, LiquidUpdater.class);
+
+    private final Seq<Future<?>> consFutures = new Seq<>();
 
     public void update(){
 
@@ -75,6 +91,7 @@ public class Buildings{
                     if(!build.isValid()){
                         ambientSoundBuilds.remove(i);
                         i --;
+                        len --;
                         continue;
                     }
 
@@ -102,6 +119,7 @@ public class Buildings{
         });
 
         var updateItems = Vars.mainExecutor.submit(() -> {
+            PerfCounter.itemsUpdate.begin();
             conveyors.update();
             ducts.update();
             junctions.update();
@@ -109,12 +127,31 @@ public class Buildings{
             itemBridges.update();
             stackConveyors.update();
             unloaders.update();
+            PerfCounter.itemsUpdate.end();
         });
 
         var updateLiquids = Vars.mainExecutor.submit(() -> {
+            PerfCounter.liquidsUpdate.begin();
             conduits.update();
             liquidRouters.update();
             liquidBridges.update();
+
+            {
+                LiquidUpdater[] items = liquidUpdateBuilds.items;
+                int len = liquidUpdateBuilds.size;
+                for(int i = 0; i < len; i++){
+                    var build = items[i];
+                    if(!build.isAdded()){
+                        liquidUpdateBuilds.remove(i);
+                        len --;
+                        i --;
+                    }else{
+                        build.processLiquids();
+                    }
+                }
+            }
+
+            PerfCounter.liquidsUpdate.end();
         });
 
         Threads.await(updateItems);
@@ -125,7 +162,36 @@ public class Buildings{
             Threads.await(updateSound);
         }
 
+        {
+            PerfCounter.consumeUpdate.begin();
+
+            consFutures.clear();
+            int chunks = Mathf.clamp(buildings.size / 400, 1, OS.cores);
+            int chunkSize = Math.max(buildings.size / chunks, 1);
+
+            Building[] items = buildings.values;
+            for(int i = 0; i < buildings.size; i += chunkSize){
+                int from = i;
+                int to = Math.min(buildings.size, i + chunkSize);
+
+                consFutures.add(mainExecutor.submit(() -> {
+                    for(int index = from; index < to; index++){
+                        items[index].updateConsumption();
+                    }
+                }));
+            }
+
+            Threads.awaitAll(consFutures);
+            PerfCounter.consumeUpdate.end();
+        }
+
+        PerfCounter.otherBuildingsUpdate.begin();
         buildings.update();
+        PerfCounter.otherBuildingsUpdate.end();
+    }
+
+    public void addLiquidUpdater(LiquidUpdater build){
+        liquidUpdateBuilds.add(build);
     }
 
     public void addAmbientSound(Building build){

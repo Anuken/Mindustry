@@ -95,7 +95,7 @@ public class Build{
         if(tile.team() == Team.derelict && team != Team.derelict && tile.block == result && tile.build != null && tile.block.allowDerelictRepair && state.rules.derelictRepair){
             tile.build.rotation = rotation;
             tile.build.changeTeam(team);
-            tile.build.enabled = true;
+            tile.build.setEnabled(true);
             if(tile.build.power != null){
                 tile.build.power.links.clear();
                 tile.build.powerGraphRemoved();

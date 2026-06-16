@@ -31,7 +31,6 @@ public class RepairTurret extends Block{
 
     public float repairRadius = 50f;
     public float repairSpeed = 0.3f;
-    public float powerUse;
     public float length = 5f;
     public float beamWidth = 1f;
     public float pulseRadius = 6f;
@@ -86,7 +85,6 @@ public class RepairTurret extends Block{
             consume(new ConsumeCoolant(coolantUse)).optional(true, true);
         }
 
-        consumePowerCond(powerUse, (RepairPointBuild entity) -> entity.target != null);
         updateClipRadius(repairRadius + tilesize);
         super.init();
     }

@@ -216,8 +216,8 @@ public class PowerGraph{
     public void update(){
         if(!consumers.isEmpty() && consumers.first().cheating()){
             //when cheating, just set status to 1
-            for(Building tile : consumers){
-                tile.power.status = 1f;
+            for(int i = 0; i < consumers.size; i++){
+                consumers.items[i].power.status = 1f;
             }
 
             lastPowerNeeded = lastPowerProduced = 1f;

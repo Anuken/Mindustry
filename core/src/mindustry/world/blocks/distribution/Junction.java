@@ -61,8 +61,6 @@ public class Junction extends Block{
         }
 
         public final void updateJunction(){
-            if(!enabled) return;
-
             for(int i = 0; i < 4; i++){
                 if(buffer.indexes[i] > 0){
                     if(buffer.indexes[i] > capacity) buffer.indexes[i] = capacity;

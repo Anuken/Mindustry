@@ -9,6 +9,7 @@ import mindustry.game.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
@@ -107,7 +108,7 @@ public class Pump extends LiquidBlock{
         return tile != null && tile.floor().liquidDrop != null;
     }
 
-    public class PumpBuild extends LiquidBuild{
+    public class PumpBuild extends LiquidBuild implements LiquidUpdater{
         public float warmup, totalProgress;
         public float consTimer;
         public float amount = 0f;
@@ -174,7 +175,10 @@ public class Pump extends LiquidBlock{
             }
 
             totalProgress += warmup * Time.delta;
+        }
 
+        @Override
+        public void processLiquids(){
             if(liquidDrop != null){
                 dumpLiquid(liquidDrop);
             }

@@ -25,7 +25,7 @@ public class SwitchBlock extends Block{
         group = BlockGroup.logic;
         envEnabled = Env.any;
 
-        config(Boolean.class, (SwitchBuild entity, Boolean b) -> entity.enabled = b);
+        config(Boolean.class, (SwitchBuild entity, Boolean b) -> entity.setEnabled(b));
     }
 
     public boolean accessible(){

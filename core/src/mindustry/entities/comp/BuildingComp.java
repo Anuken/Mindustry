@@ -174,6 +174,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             state.buildings.addAmbientSound(self());
         }
 
+        if(this instanceof LiquidUpdater l){
+            state.buildings.addLiquidUpdater(l);
+        }
+
         added = true;
     }
 
@@ -2279,8 +2283,21 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void checkAllowUpdate(){
         if(!allowUpdate()){
-            enabled = false;
+            setEnabled(false);
         }
+    }
+
+    public void setEnabled(boolean enable){
+        if(this.enabled == enable) return;
+
+        if(block.update && block.noUpdateDisabled){
+            if(enable){
+                add();
+            }else{
+                remove();
+            }
+        }
+        this.enabled = enable;
     }
 
     @Final
@@ -2289,9 +2306,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void update(){
         updateConsumption();
 
-        if(enabled || !block.noUpdateDisabled){
-            updateTile();
-        }
+        updateTile();
     }
 
     /** When a block is newly revealed outside of camera view range, it is updated on the minimap. */

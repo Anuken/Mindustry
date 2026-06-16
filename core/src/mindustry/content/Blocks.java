@@ -6401,9 +6401,10 @@ public class Blocks{
             repairSpeed = 0.45f;
             repairRadius = 60f;
             beamWidth = 0.73f;
-            powerUse = 1f;
             pulseRadius = 5f;
             ambientSoundVolume = 0.9f;
+
+            consumePower(1f);
         }};
 
         repairTurret = new RepairTurret("repair-turret"){{
@@ -6412,13 +6413,14 @@ public class Blocks{
             length = 6f;
             repairSpeed = 3f;
             repairRadius = 145f;
-            powerUse = 5f;
             beamWidth = 1.1f;
             pulseRadius = 6.1f;
             coolantUse = 0.16f;
             coolantMultiplier = 1.6f;
             acceptCoolant = true;
             ambientSoundVolume = 1.25f;
+
+            consumePower(5f);
         }};
 
         //endregion

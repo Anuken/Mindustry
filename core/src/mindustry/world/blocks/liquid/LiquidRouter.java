@@ -25,8 +25,6 @@ public class LiquidRouter extends LiquidBlock{
     public class LiquidRouterBuild extends LiquidBuild{
 
         public final void updateLiquidRouter(){
-            if(!enabled) return;
-
             dumpLiquid(liquids.current());
         }
 

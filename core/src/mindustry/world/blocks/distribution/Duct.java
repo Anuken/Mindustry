@@ -200,8 +200,6 @@ public class Duct extends Block implements Autotiler{
         }
 
         public final void updateDuct(){
-            if(!enabled) return;
-
             progress += edelta() / speed * 2f;
 
             if(current != null && next != null){

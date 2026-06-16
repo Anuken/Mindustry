@@ -19,7 +19,9 @@ public class ConsumePayloadDynamic extends Consume{
     @Override
     public float efficiency(Building build){
         float mult = multiplier.get(build);
-        for(PayloadStack stack : payloads.get(build)){
+        var stacks = payloads.get(build);
+        for(int i = 0; i < stacks.size; i ++){
+            var stack = stacks.get(i);
             if(!build.getPayloads().contains(stack.item, Math.round(stack.amount * mult))){
                 return 0f;
             }
@@ -30,7 +32,9 @@ public class ConsumePayloadDynamic extends Consume{
     @Override
     public void trigger(Building build){
         float mult = multiplier.get(build);
-        for(PayloadStack stack : payloads.get(build)){
+        var stacks = payloads.get(build);
+        for(int i = 0; i < stacks.size; i ++){
+            var stack = stacks.get(i);
             build.getPayloads().remove(stack.item, Math.round(stack.amount * mult));
         }
     }

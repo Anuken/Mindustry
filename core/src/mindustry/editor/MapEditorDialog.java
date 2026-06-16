@@ -350,7 +350,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
             }
 
-            Groups.build.clear();
             Groups.weather.clear();
             logic.play();
 

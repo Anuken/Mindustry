@@ -96,7 +96,7 @@ public class LogicBlock extends Block{
             if(oldSize > entity.links.size){ //check whether any were removed
                 //re-enable the target when unlinking
                 if(lbuild.block.autoResetEnabled && lbuild.lastDisabler == entity){
-                    lbuild.enabled = true;
+                    lbuild.setEnabled(true);
                 }
             }else{
                 entity.links.add(new LogicLink(x, y, entity.findLinkName(lbuild.block), true));
@@ -456,7 +456,7 @@ public class LogicBlock extends Block{
 
             for(var link : executor.links){
                 if(!link.enabled && link.lastDisabler == this){
-                    link.enabled = true;
+                    link.setEnabled(true);
                 }
             }
         }

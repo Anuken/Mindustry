@@ -94,7 +94,7 @@ public class DrawOperation{
                     Block block = content.block(to);
                     tile.setBlock(block, tile.team(), tile.build == null ? 0 : tile.build.rotation);
                     if(tile.build != null){
-                        tile.build.enabled = true;
+                        tile.build.setEnabled(true);
                     }
                 }
                 case opRotation -> {

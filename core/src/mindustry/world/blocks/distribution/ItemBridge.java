@@ -327,8 +327,6 @@ public class ItemBridge extends Block{
 
         @Override
         public void updateTile(){
-            if(!enabled) return;
-
             if(timer(timerCheckMoved, 30f)){
                 wasMoved = moved;
                 moved = false;
