@@ -70,8 +70,27 @@ public class DataImagePacker{
         TextureRegion envReserveRegion = Core.atlas.find("data-patch-reserved-env");
         PixmapPacker envPacker = anyEnv ? new PixmapPacker(envReserveRegion.width, envReserveRegion.height, 2, true) : null;
 
-        var tasks = new Seq<Future<?>>();
+        Seq<ImageAsset> toPack = new Seq<>(), pending = new Seq<>();
+        ObjectSet<String> generatedNames = new ObjectSet<>();
+
+        //this makes sure that generated images are prioritized
         for(var image : images){
+            if(image.isGenerated()){
+                generatedNames.add(image.name);
+                toPack.add(image);
+            }else{
+                pending.add(image);
+            }
+        }
+
+        for(var image : pending){
+            if(!generatedNames.contains(image.name)){
+                toPack.add(image);
+            }
+        }
+
+        var tasks = new Seq<Future<?>>();
+        for(var image : toPack){
             tasks.add(Vars.mainExecutor.submit(() -> {
                 Fi cacheFile = image.getCacheFile();
                 //logged elsewhere
@@ -131,7 +150,7 @@ public class DataImagePacker{
 
         printStats(packer, envPacker);
 
-        packer.dispose();
+        packer.forceDispose();
         //textures are never updated, so force disposal
         if(envPacker != null) envPacker.forceDispose();
 

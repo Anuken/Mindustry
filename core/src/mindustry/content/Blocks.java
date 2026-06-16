@@ -770,7 +770,7 @@ public class Blocks{
         }};
 
         //1px outline + 4.50 gaussian shadow in gimp
-        arkyicBoulder = new StaticProp("arkyic-boulder"){{
+        arkyicBoulder = new Prop("arkyic-boulder"){{
             variants = 3;
             customShadow = true;
             arkyicStone.asFloor().decoration = this;
@@ -801,22 +801,22 @@ public class Blocks{
             shadowOffset = -2.5f;
         }};
 
-        crystallineBoulder = new Prop("crystalline-boulder"){{
+        crystallineBoulder = new StaticProp("crystalline-boulder"){{
             variants = 2;
             crystallineStone.asFloor().decoration = this;
         }};
 
-        redIceBoulder = new Prop("red-ice-boulder"){{
+        redIceBoulder = new StaticProp("red-ice-boulder"){{
             variants = 3;
             redIce.asFloor().decoration = this;
         }};
 
-        rhyoliteBoulder = new Prop("rhyolite-boulder"){{
+        rhyoliteBoulder = new StaticProp("rhyolite-boulder"){{
             variants = 3;
             rhyolite.asFloor().decoration = roughRhyolite.asFloor().decoration = this;
         }};
 
-        redStoneBoulder = new Prop("red-stone-boulder"){{
+        redStoneBoulder = new StaticProp("red-stone-boulder"){{
             variants = 4;
             denseRedStone.asFloor().decoration = redStone.asFloor().decoration = this;
         }};
