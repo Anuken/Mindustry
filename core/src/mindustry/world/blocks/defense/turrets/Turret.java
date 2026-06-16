@@ -438,6 +438,10 @@ public class Turret extends ReloadTurret{
             return (Unit)unit;
         }
 
+        public boolean controlled(){
+            return unit.isPlayer();
+        }
+
         public boolean logicControlled(){
             return logicControlTime > 0;
         }
@@ -495,7 +499,7 @@ public class Turret extends ReloadTurret{
             }
 
             float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
-            if(warmupTarget > 0 && !isControlled()){
+            if(warmupTarget > 0 && !controlled()){
                 warmupHold = 1f;
             }
             if(warmupHold > 0f){
@@ -568,7 +572,7 @@ public class Turret extends ReloadTurret{
                 if(validateTarget()){
                     boolean canShoot;
 
-                    if(isControlled()){ //player behavior
+                    if(controlled()){ //player behavior
                         targetPos.set(unit.aimX(), unit.aimY());
                         canShoot = unit.isShooting();
                     }else if(logicControlled()){ //logic behavior
@@ -580,7 +584,7 @@ public class Turret extends ReloadTurret{
                         canShoot = within(target, range() + (target instanceof Sized hb ? hb.hitSize()/1.9f : 0f));
                     }
 
-                    if(!isControlled()){
+                    if(!controlled()){
                         unit.aimX(targetPos.x);
                         unit.aimY(targetPos.y);
                     }
@@ -624,7 +628,7 @@ public class Turret extends ReloadTurret{
         }
 
         protected boolean validateTarget(){
-            return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || isControlled() || logicControlled();
+            return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || controlled() || logicControlled();
         }
 
         protected boolean canHeal(){
