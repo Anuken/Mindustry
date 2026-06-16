@@ -1,13 +1,11 @@
 package mindustry.mod;
 
 import arc.struct.*;
-import mindustry.world.blocks.distribution.*;
-
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
 public class ClassMap{
     public static final ObjectMap<String, Class<?>> classes = new ObjectMap<>();
-
+    
     static{
         classes.put("AssemblerAI", mindustry.ai.types.AssemblerAI.class);
         classes.put("BoostAI", mindustry.ai.types.BoostAI.class);
@@ -152,6 +150,7 @@ public class ClassMap{
         classes.put("ExplosionShield", mindustry.world.blocks.ExplosionShield.class);
         classes.put("ItemSelection", mindustry.world.blocks.ItemSelection.class);
         classes.put("LaunchAnimator", mindustry.world.blocks.LaunchAnimator.class);
+        classes.put("LiquidUpdater", mindustry.world.blocks.LiquidUpdater.class);
         classes.put("RotBlock", mindustry.world.blocks.RotBlock.class);
         classes.put("TileBitmask", mindustry.world.blocks.TileBitmask.class);
         classes.put("UnitTetherBlock", mindustry.world.blocks.UnitTetherBlock.class);
@@ -228,7 +227,7 @@ public class ClassMap{
         classes.put("DirectionBridge", mindustry.world.blocks.distribution.DirectionBridge.class);
         classes.put("DirectionBridgeBuild", mindustry.world.blocks.distribution.DirectionBridge.DirectionBridgeBuild.class);
         classes.put("DirectionLiquidBridge", mindustry.world.blocks.distribution.DirectionLiquidBridge.class);
-        classes.put("DuctBridgeBuild", DirectionLiquidBridge.DirectionLiquidBridgeBuild.class);
+        classes.put("DirectionLiquidBridgeBuild", mindustry.world.blocks.distribution.DirectionLiquidBridge.DirectionLiquidBridgeBuild.class);
         classes.put("DirectionalUnloader", mindustry.world.blocks.distribution.DirectionalUnloader.class);
         classes.put("DirectionalUnloaderBuild", mindustry.world.blocks.distribution.DirectionalUnloader.DirectionalUnloaderBuild.class);
         classes.put("Duct", mindustry.world.blocks.distribution.Duct.class);
