@@ -47,7 +47,7 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-@EntityDef(value = {Buildingc.class}, excludeGroups = {"all"}, isFinal = false, genio = false, serialize = false)
+@EntityDef(value = {Buildingc.class}, excludeGroups = {"all", "build"}, isFinal = false, genio = false, serialize = false)
 @Component(base = true, genInterface = false)
 abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Sized, Senseable, Controllable, Settable{
     //region vars and initialization
@@ -58,6 +58,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     static final BuildDamageEvent bulletDamageEvent = new BuildDamageEvent();
     static int sleepingEntities = 0;
 
+    transient int buildingArrayIndex = -1;
+
+    @Import boolean added;
     @Import float x, y, health, maxHealth;
     @Import Team team;
     @Import boolean dead;
@@ -154,11 +157,36 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return self();
     }
 
+    @Replace
     @Override
     public void add(){
+        //there is no need for a 'is added' guard since it is injected regardless of whether the method is replaced
+
+        addToList();
         if(power != null){
             power.graph.checkAdd();
         }
+
+        added = true;
+    }
+
+    @Replace
+    @Override
+    public void remove(){
+        removeFromList();
+    }
+
+    public void removeFromList(){
+        state.buildings.buildings.remove(self());
+    }
+
+    public void addToList(){
+        state.buildings.buildings.add(self());
+    }
+
+    //used in clear()
+    public void markRemoved(){
+        added = false;
     }
 
     @Override

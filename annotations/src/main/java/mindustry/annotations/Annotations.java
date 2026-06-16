@@ -5,6 +5,21 @@ import java.lang.annotation.*;
 public class Annotations{
     //region entity interfaces
 
+    @Repeatable(BuildingListDefs.class)
+    @Retention(RetentionPolicy.SOURCE)
+    @Target({ElementType.TYPE})
+    public @interface BuildingListDef{
+        String qualifiedType() default "";
+        Class<?> type() default void.class;
+        String method();
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    @Target({ElementType.TYPE})
+    public @interface BuildingListDefs{
+        BuildingListDef[] value();
+    }
+
     /** Indicates that a method overrides other methods. */
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.SOURCE)

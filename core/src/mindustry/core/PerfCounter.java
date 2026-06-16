@@ -8,6 +8,7 @@ public enum PerfCounter{
     frame,
     update,
     entityUpdate,
+    buildingUpdate,
     ui,
     render;
 

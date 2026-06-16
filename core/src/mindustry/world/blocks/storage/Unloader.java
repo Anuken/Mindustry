@@ -8,6 +8,7 @@ import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.*;
 import arc.util.pooling.Pool.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -159,8 +160,17 @@ public class Unloader extends Block{
         }
 
         @Override
-        public void updateTile(){
-            if(((unloadTimer += delta()) < speed) || (possibleBlocks.size < 2)) return;
+        public void addToList(){
+            state.buildings.unloaders.add(this);
+        }
+
+        @Override
+        public void removeFromList(){
+            state.buildings.unloaders.remove(this);
+        }
+
+        public final void updateUnloader(){
+            if(!enabled || ((unloadTimer += delta()) < speed) || (possibleBlocks.size < 2)) return;
             Item item = null;
             boolean any = false;
 

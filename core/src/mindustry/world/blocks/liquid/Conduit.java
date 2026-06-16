@@ -245,8 +245,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
                 && (tile == null || source == this || (source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation);
         }
 
-        @Override
-        public void updateTile(){
+        public final void updateConduit(){
+            if(!noUpdateDisabled) return;
+
             smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
 
             if(liquids.currentAmount() > 0.0001f && timer(timerFlow, 1)){
@@ -255,6 +256,16 @@ public class Conduit extends LiquidBlock implements Autotiler{
             }else{
                 sleep();
             }
+        }
+
+        @Override
+        public void addToList(){
+            state.buildings.conduits.add(this);
+        }
+
+        @Override
+        public void removeFromList(){
+            state.buildings.conduits.remove(this);
         }
 
         @Nullable

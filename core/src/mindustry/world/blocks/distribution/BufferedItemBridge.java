@@ -6,6 +6,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class BufferedItemBridge extends ItemBridge{
     public final int timerAccept = timers++;
 
@@ -19,7 +21,7 @@ public class BufferedItemBridge extends ItemBridge{
         hasItems = true;
         canOverdrive = true;
     }
-    
+
     @Override
     public void setStats(){
         super.setStats();
@@ -27,7 +29,6 @@ public class BufferedItemBridge extends ItemBridge{
         //Hard to calculate, fps and overdive reliant. Movement speed taken from testing
         stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
     }
-
 
     public class BufferedItemBridgeBuild extends ItemBridgeBuild{
         ItemBuffer buffer = new ItemBuffer(bufferCapacity);
@@ -47,10 +48,19 @@ public class BufferedItemBridge extends ItemBridge{
         }
 
         @Override
+        public void addToList(){
+            state.buildings.bufferedItemBridges.add(this);
+        }
+
+        @Override
+        public void removeFromList(){
+            state.buildings.bufferedItemBridges.remove(this);
+        }
+
+        @Override
         public void doDump(){
             dump();
         }
-
 
         @Override
         public void write(Writes write){

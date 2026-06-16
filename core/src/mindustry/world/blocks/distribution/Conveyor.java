@@ -250,8 +250,7 @@ public class Conveyor extends Block implements Autotiler{
             }
         }
 
-        @Override
-        public void updateTile(){
+        public final void updateConveyor(){
             minitem = 1f;
             mid = 0;
 
@@ -295,6 +294,16 @@ public class Conveyor extends Block implements Autotiler{
             }
 
             noSleep();
+        }
+
+        @Override
+        public void addToList(){
+            state.buildings.conveyors.add(this);
+        }
+
+        @Override
+        public void removeFromList(){
+            state.buildings.conveyors.remove(this);
         }
 
         public boolean pass(Item item){
