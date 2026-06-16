@@ -98,6 +98,16 @@ public class DuctRouter extends Block{
         }
 
         @Override
+        public void addToList(){
+            state.buildings.ductRouters.add(this);
+        }
+
+        @Override
+        public void removeFromList(){
+            state.buildings.ductRouters.remove(this);
+        }
+
+        @Override
         public void updateTile(){
             progress += edelta() / speed * 2f;
 

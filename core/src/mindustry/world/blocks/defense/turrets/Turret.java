@@ -624,7 +624,7 @@ public class Turret extends ReloadTurret{
         }
 
         protected boolean validateTarget(){
-            return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || isControlled() || logicControlled();
+            return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || unit.isPlayer() || logicControlled();
         }
 
         protected boolean canHeal(){

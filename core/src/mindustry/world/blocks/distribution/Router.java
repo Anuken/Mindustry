@@ -9,6 +9,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class Router extends Block{
     public float speed = 8f;
 
@@ -49,6 +51,16 @@ public class Router extends Block{
         @Override
         public boolean shouldAutoTarget(){
             return false;
+        }
+
+        @Override
+        public void addToList(){
+            state.buildings.routers.add(this);
+        }
+
+        @Override
+        public void removeFromList(){
+            state.buildings.routers.remove(this);
         }
 
         @Override

@@ -2,8 +2,9 @@ package mindustry.world.blocks.distribution;
 
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.*;
 import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 public class DuctBridge extends DirectionBridge{
     public float speed = 5f;
@@ -25,6 +26,16 @@ public class DuctBridge extends DirectionBridge{
 
     public class DuctBridgeBuild extends DirectionBridgeBuild{
         public float progress = 0f;
+
+        @Override
+        public void addToList(){
+            state.buildings.ductBridges.add(this);
+        }
+
+        @Override
+        public void removeFromList(){
+            state.buildings.ductBridges.remove(this);
+        }
 
         @Override
         public void updateTile(){

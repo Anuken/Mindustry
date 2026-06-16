@@ -9,9 +9,13 @@ import mindustry.gen.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.BufferedItemBridge.*;
 import mindustry.world.blocks.distribution.Conveyor.*;
+import mindustry.world.blocks.distribution.DirectionLiquidBridge.*;
 import mindustry.world.blocks.distribution.Duct.*;
+import mindustry.world.blocks.distribution.DuctBridge.*;
+import mindustry.world.blocks.distribution.DuctRouter.*;
 import mindustry.world.blocks.distribution.ItemBridge.*;
 import mindustry.world.blocks.distribution.Junction.*;
+import mindustry.world.blocks.distribution.Router.*;
 import mindustry.world.blocks.distribution.StackConveyor.*;
 import mindustry.world.blocks.liquid.Conduit.*;
 import mindustry.world.blocks.liquid.LiquidBridge.*;
@@ -28,7 +32,10 @@ import static mindustry.Vars.*;
 @BuildingListDef(type = PowerGraph.class, method = "update")
 @BuildingListDef(type = ConveyorBuild.class, method = "updateConveyor")
 @BuildingListDef(type = DuctBuild.class, method = "updateDuct")
+@BuildingListDef(type = DuctBridgeBuild.class, method = "updateTile")
 @BuildingListDef(type = JunctionBuild.class, method = "updateJunction")
+@BuildingListDef(type = RouterBuild.class, method = "updateTile")
+@BuildingListDef(type = DuctRouterBuild.class, method = "updateTile")
 @BuildingListDef(type = ItemBridgeBuild.class, method = "update") //TODO: has consume power, meaning updateConsumption needs to be called too (bad)
 @BuildingListDef(type = BufferedItemBridgeBuild.class, method = "updateTile")
 @BuildingListDef(type = StackConveyorBuild.class, method = "updateStackConveyor")
@@ -37,6 +44,7 @@ import static mindustry.Vars.*;
 @BuildingListDef(type = ConduitBuild.class, method = "updateConduit")
 @BuildingListDef(type = LiquidRouterBuild.class, method = "updateLiquidRouter")
 @BuildingListDef(type = LiquidBridgeBuild.class, method = "update")  //TODO: has consume power, meaning updateConsumption needs to be called too (bad)
+@BuildingListDef(type = DirectionLiquidBridgeBuild.class, method = "updateTile")
 
 /*
 TODO: make enable/disable just remove them from the list of things that need to update
@@ -55,7 +63,10 @@ public class Buildings{
 
     public final ConveyorList conveyors = new ConveyorList();
     public final DuctList ducts = new DuctList();
+    public final DuctBridgeList ductBridges = new DuctBridgeList();
     public final JunctionList junctions = new JunctionList();
+    public final RouterList routers = new RouterList();
+    public final DuctRouterList ductRouters = new DuctRouterList();
     public final BufferedItemBridgeList bufferedItemBridges = new BufferedItemBridgeList();
     public final ItemBridgeList itemBridges = new ItemBridgeList();
     public final StackConveyorList stackConveyors = new StackConveyorList();
@@ -64,6 +75,7 @@ public class Buildings{
     public final ConduitList conduits = new ConduitList();
     public final LiquidRouterList liquidRouters = new LiquidRouterList();
     public final LiquidBridgeList liquidBridges = new LiquidBridgeList();
+    public final DirectionLiquidBridgeList directionLiquidBridges = new DirectionLiquidBridgeList();
 
     public final PowerGraphList powerGraphs = new PowerGraphList();
 
@@ -132,7 +144,10 @@ public class Buildings{
             PerfCounter.itemsUpdate.begin();
             conveyors.update();
             ducts.update();
+            ductBridges.update();
             junctions.update();
+            routers.update();
+            ductRouters.update();
             bufferedItemBridges.update();
             itemBridges.update();
             stackConveyors.update();
@@ -145,6 +160,7 @@ public class Buildings{
             conduits.update();
             liquidRouters.update();
             liquidBridges.update();
+            directionLiquidBridges.update();
 
             {
                 LiquidUpdater[] items = liquidUpdateBuilds.items;
