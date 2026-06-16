@@ -1,5 +1,6 @@
 package mindustry.core;
 
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -29,7 +30,6 @@ import mindustry.world.blocks.storage.Unloader.*;
 @BuildingListDef(type = LiquidRouterBuild.class, method = "updateLiquidRouter")
 @BuildingListDef(type = LiquidBridgeBuild.class, method = "update")  //TODO: has consume power, meaning updateConsumption needs to be called too (bad)
 
-//TODO: fix overdrive
 //TODO: make enable/disable just remove them from the list of things that need to update
 public class Buildings{
     public final BuildingList buildings = new BuildingList();
@@ -46,7 +46,25 @@ public class Buildings{
     public final LiquidRouterList liquidRouters = new LiquidRouterList();
     public final LiquidBridgeList liquidBridges = new LiquidBridgeList();
 
+    final Seq<Building> timeScaleBuilds = new Seq<>(false, 20, Building.class);
+
     public void update(){
+
+        {
+            float delta = Time.delta;
+            Building[] items = timeScaleBuilds.items;
+            int len = timeScaleBuilds.size;
+            for(int i = 0; i < len; i++){
+                var build = items[i];
+                if((build.timeScaleDuration -= delta) <= 0f){
+                    build.timeScale = 1f;
+                    build.hadTimeScale = false;
+                    timeScaleBuilds.remove(i);
+                    len --;
+                    i --;
+                }
+            }
+        }
 
         var updateItems = Vars.mainExecutor.submit(() -> {
             conveyors.update();
@@ -68,6 +86,11 @@ public class Buildings{
         Threads.await(updateLiquids);
 
         buildings.update();
+    }
+
+    public void addTimeScaled(Building build){
+        build.hadTimeScale = true;
+        timeScaleBuilds.add(build);
     }
 
     public void clear(){

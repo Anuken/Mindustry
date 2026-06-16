@@ -97,8 +97,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient float lastHealTime = -120f * 10f;
     transient Color suppressColor = Pal.sapBullet;
 
+    transient boolean hadTimeScale = false;
+    transient float timeScale = 1f, timeScaleDuration;
+
     private transient float lastDamageTime = -recentDamageTime;
-    private transient float timeScale = 1f, timeScaleDuration;
     private transient float dumpAccum;
 
     private transient boolean sleeping;
@@ -487,12 +489,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Sets the time scale of the building to the given intensity, unless it's above that value */
     public void applyBoost(float intensity, float duration){
-        if(!block.canOverdrive) return;
+        if(!block.canOverdrive || duration <= 0f) return;
+
         //do not refresh time scale when getting a lower intensity
         if(intensity >= this.timeScale - 0.001f){
             timeScaleDuration = Math.max(timeScaleDuration, duration);
         }
         timeScale = Math.max(timeScale, intensity);
+        if(!hadTimeScale){
+            state.buildings.addTimeScaled(self());
+        }
     }
 
     /** Sets the time scale of the building to the given intensity, unless it's below that value */
@@ -502,6 +508,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             timeScaleDuration = Math.max(timeScaleDuration, duration);
         }
         timeScale = Math.min(timeScale, intensity);
+        if(!hadTimeScale){
+            state.buildings.addTimeScaled(self());
+        }
     }
 
     public void applyHealSuppression(float amount){
@@ -2272,12 +2281,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Replace
     @Override
     public void update(){
-
-        //TODO refactor to separate loop?
-        if((timeScaleDuration -= Time.delta) <= 0f){
-            timeScale = 1f;
-        }
-
         //TODO separate multithreaded system for sound? AudioSource, etc
         if(!headless && block.ambientSound != Sounds.none && shouldAmbientSound()){
             control.sound.loop(block.ambientSound, self(), block.ambientSoundVolume * ambientVolume());

@@ -16,8 +16,8 @@ public class BuildingListProcess extends BaseProcessor{
     import ELEMENT_TYPE;
     
     public class CLASS_NAME{
-        private ELEMENT_TYPE[] values = new ELEMENT_TYPE[50];
-        private int size, index;
+        public ELEMENT_TYPE[] values = new ELEMENT_TYPE[50];
+        public int size, index;
         
         public void update(){
             for(index = 0; index < size; index++){
