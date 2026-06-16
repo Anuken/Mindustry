@@ -208,12 +208,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         float oldDelta = Time.delta;
                         Time.delta = deltaScl;
 
-                        Seq<Building> builds = new Seq<>();
                         Time.clear();
 
                         world.tiles.eachTile(t -> {
-                            if(t.build != null && t.isCenter() && t.block().update && t.build.allowUpdate()){
-                                builds.add(t.build);
+                            if(t.build != null && t.isCenter()){
                                 t.build.updateProximity();
                             }
                         });
@@ -230,10 +228,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                 }
                             }
                             Time.update();
-                            for(var build : builds){
-                                build.update();
-                            }
-                            Groups.powerGraph.update();
+                            state.buildings.update();
                             Groups.bullet.update(); //needed for mass drivers...
                         }
 

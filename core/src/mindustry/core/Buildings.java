@@ -16,6 +16,7 @@ import mindustry.world.blocks.distribution.StackConveyor.*;
 import mindustry.world.blocks.liquid.Conduit.*;
 import mindustry.world.blocks.liquid.LiquidBridge.*;
 import mindustry.world.blocks.liquid.LiquidRouter.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.Unloader.*;
 
 import java.util.concurrent.*;
@@ -24,6 +25,7 @@ import static mindustry.Vars.*;
 
 @BuildingListDef(qualifiedType = "mindustry.gen.Building", method = "updateTile")
 
+@BuildingListDef(type = PowerGraph.class, method = "update")
 @BuildingListDef(type = ConveyorBuild.class, method = "updateConveyor")
 @BuildingListDef(type = DuctBuild.class, method = "updateDuct")
 @BuildingListDef(type = JunctionBuild.class, method = "updateJunction")
@@ -38,7 +40,7 @@ import static mindustry.Vars.*;
 
 /*
 TODO: make enable/disable just remove them from the list of things that need to update
-- subpoint: remove all contents of update() as they would no longer needed
+- subpoint: remove all contents of update() as they would no longer be needed
 
 TODO: remove the 'devirtualized' methods and see if it affects performance at all (check weaker devices too)
 
@@ -62,6 +64,8 @@ public class Buildings{
     public final ConduitList conduits = new ConduitList();
     public final LiquidRouterList liquidRouters = new LiquidRouterList();
     public final LiquidBridgeList liquidBridges = new LiquidBridgeList();
+
+    public final PowerGraphList powerGraphs = new PowerGraphList();
 
     private final Seq<Building> timeScaleBuilds = new Seq<>(false, 20, Building.class);
     private final Seq<Building> timeScaleQueue = new Seq<>(false, 20, Building.class);
@@ -118,6 +122,12 @@ public class Buildings{
             }
         });
 
+        var updatePower = mainExecutor.submit(() -> {
+            PerfCounter.powerUpdate.begin();
+            powerGraphs.update();
+            PerfCounter.powerUpdate.end();
+        });
+
         var updateItems = Vars.mainExecutor.submit(() -> {
             PerfCounter.itemsUpdate.begin();
             conveyors.update();
@@ -157,10 +167,7 @@ public class Buildings{
         Threads.await(updateItems);
         Threads.await(updateLiquids);
         Threads.await(updateTimeScale);
-
-        if(updateSound != null){
-            Threads.await(updateSound);
-        }
+        Threads.await(updatePower);
 
         {
             PerfCounter.consumeUpdate.begin();
@@ -183,6 +190,10 @@ public class Buildings{
 
             Threads.awaitAll(consFutures);
             PerfCounter.consumeUpdate.end();
+        }
+
+        if(updateSound != null){
+            Threads.await(updateSound);
         }
 
         PerfCounter.otherBuildingsUpdate.begin();

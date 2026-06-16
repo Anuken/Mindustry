@@ -166,7 +166,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         addToList();
         if(power != null){
-            power.graph.checkAdd();
+            power.graph.addUpdate();
         }
 
         //note: removal is automatic and thus not necessary in remove()
