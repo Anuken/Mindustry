@@ -16,6 +16,10 @@ import mindustry.world.blocks.liquid.LiquidBridge.*;
 import mindustry.world.blocks.liquid.LiquidRouter.*;
 import mindustry.world.blocks.storage.Unloader.*;
 
+import java.util.concurrent.*;
+
+import static mindustry.Vars.*;
+
 @BuildingListDef(qualifiedType = "mindustry.gen.Building", method = "update")
 
 @BuildingListDef(type = ConveyorBuild.class, method = "updateConveyor")
@@ -46,12 +50,43 @@ public class Buildings{
     public final LiquidRouterList liquidRouters = new LiquidRouterList();
     public final LiquidBridgeList liquidBridges = new LiquidBridgeList();
 
-    final Seq<Building> timeScaleBuilds = new Seq<>(false, 20, Building.class);
+    private final Seq<Building> timeScaleBuilds = new Seq<>(false, 20, Building.class);
+    private final Seq<Building> timeScaleQueue = new Seq<>(false, 20, Building.class);
+    private final Seq<Building> ambientSoundBuilds = new Seq<>(false, 20, Building.class);
+    private final Seq<Building> ambientSoundQueue = new Seq<>(false, 20, Building.class);
 
     public void update(){
 
-        {
-            float delta = Time.delta;
+        timeScaleBuilds.addAll(timeScaleQueue);
+        timeScaleQueue.clear();
+
+        ambientSoundBuilds.addAll(ambientSoundQueue);
+        ambientSoundQueue.clear();
+
+        Future<?> updateSound = null;
+
+        if(!headless){
+            updateSound = mainExecutor.submit(() -> {
+                Building[] items = ambientSoundBuilds.items;
+                int len = ambientSoundBuilds.size;
+                for(int i = 0; i < len; i++){
+                    var build = items[i];
+
+                    if(!build.isValid()){
+                        ambientSoundBuilds.remove(i);
+                        i --;
+                        continue;
+                    }
+
+                    if(build.shouldAmbientSound()){
+                        control.sound.loop(build.block.ambientSound, build, build.block.ambientSoundVolume * build.ambientVolume());
+                    }
+                }
+            });
+        }
+
+        float delta = Time.delta;
+        var updateTimeScale = Vars.mainExecutor.submit(() -> {
             Building[] items = timeScaleBuilds.items;
             int len = timeScaleBuilds.size;
             for(int i = 0; i < len; i++){
@@ -64,7 +99,7 @@ public class Buildings{
                     i --;
                 }
             }
-        }
+        });
 
         var updateItems = Vars.mainExecutor.submit(() -> {
             conveyors.update();
@@ -84,13 +119,24 @@ public class Buildings{
 
         Threads.await(updateItems);
         Threads.await(updateLiquids);
+        Threads.await(updateTimeScale);
+
+        if(updateSound != null){
+            Threads.await(updateSound);
+        }
 
         buildings.update();
     }
 
+    public void addAmbientSound(Building build){
+        if(headless) return;
+
+        ambientSoundQueue.add(build);
+    }
+
     public void addTimeScaled(Building build){
         build.hadTimeScale = true;
-        timeScaleBuilds.add(build);
+        timeScaleQueue.add(build);
     }
 
     public void clear(){

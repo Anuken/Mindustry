@@ -97,7 +97,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient float lastHealTime = -120f * 10f;
     transient Color suppressColor = Pal.sapBullet;
 
-    transient boolean hadTimeScale = false;
+    transient volatile boolean hadTimeScale = false;
     transient float timeScale = 1f, timeScaleDuration;
 
     private transient float lastDamageTime = -recentDamageTime;
@@ -167,6 +167,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         addToList();
         if(power != null){
             power.graph.checkAdd();
+        }
+
+        //note: removal is automatic and thus not necessary in remove()
+        if(block.ambientSound != Sounds.none){
+            state.buildings.addAmbientSound(self());
         }
 
         added = true;
@@ -2282,11 +2287,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Replace
     @Override
     public void update(){
-        //TODO separate multithreaded system for sound? AudioSource, etc
-        if(!headless && block.ambientSound != Sounds.none && shouldAmbientSound()){
-            control.sound.loop(block.ambientSound, self(), block.ambientSoundVolume * ambientVolume());
-        }
-
         updateConsumption();
 
         if(enabled || !block.noUpdateDisabled){
