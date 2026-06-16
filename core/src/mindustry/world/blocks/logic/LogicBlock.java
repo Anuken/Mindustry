@@ -91,7 +91,11 @@ public class LogicBlock extends Block{
             int x = lbuild.tileX(), y = lbuild.tileY();
             int oldSize = entity.links.size;
 
-            entity.links.removeAll(l -> world.build(l.x, l.y) == lbuild);
+            entity.links.removeAll(l -> {
+                boolean remove = world.build(l.x, l.y) == lbuild;
+                if(remove) l.trySet(entity.executor, null);
+                return remove;
+            });
 
             if(oldSize > entity.links.size){ //check whether any were removed
                 //re-enable the target when unlinking
@@ -99,10 +103,12 @@ public class LogicBlock extends Block{
                     lbuild.enabled = true;
                 }
             }else{
-                entity.links.add(new LogicLink(x, y, entity.findLinkName(lbuild.block), true));
+                LogicLink link = new LogicLink(x, y, entity.findLinkName(lbuild.block), true);
+                link.trySet(entity.executor, lbuild);
+                entity.links.add(link);
             }
 
-            entity.updateCode(entity.code, true, null);
+            entity.updateLinks();
         });
     }
 
@@ -575,6 +581,8 @@ public class LogicBlock extends Block{
         }
 
         public void updateLinks(){
+            if(linksVar == null) return; //no valid code compiled yet
+
             int valids = links.count(l -> l.valid);
             executor.links = new Building[valids];
             executor.linkIds.clear();
