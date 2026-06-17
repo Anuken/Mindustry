@@ -10,6 +10,7 @@ import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 public class ThermalGenerator extends PowerGenerator{
@@ -71,7 +72,7 @@ public class ThermalGenerator extends PowerGenerator{
         return tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(attribute)) > minEfficiency;
     }
 
-    public class ThermalGeneratorBuild extends GeneratorBuild{
+    public class ThermalGeneratorBuild extends GeneratorBuild implements LiquidUpdater{
         public float sum;
 
         @Override
@@ -81,9 +82,17 @@ public class ThermalGenerator extends PowerGenerator{
             if(productionEfficiency > 0.1f && Mathf.chanceDelta(effectChance)){
                 generateEffect.at(x + Mathf.range(3f), y + Mathf.range(3f));
             }
+        }
 
+        @Override
+        public boolean shouldLiquidUpdate(){
+            return outputLiquid != null;
+        }
+
+        @Override
+        public void updateLiquids(float delta){
             if(outputLiquid != null){
-                float added = Math.min(productionEfficiency * delta() * outputLiquid.amount, liquidCapacity - liquids.get(outputLiquid.liquid));
+                float added = Math.min(productionEfficiency * delta * timeScale * outputLiquid.amount, liquidCapacity - liquids.get(outputLiquid.liquid));
                 liquids.add(outputLiquid.liquid, added);
                 dumpLiquid(outputLiquid.liquid);
             }

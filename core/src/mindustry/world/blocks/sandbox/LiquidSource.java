@@ -21,7 +21,8 @@ public class LiquidSource extends Block{
 
     public LiquidSource(String name){
         super(name);
-        update = true;
+        update = false;
+        destructible = true;
         solid = true;
         hasLiquids = true;
         liquidCapacity = 10000f;
@@ -55,11 +56,11 @@ public class LiquidSource extends Block{
         return new TextureRegion[]{bottomRegion, region};
     }
 
-    public class LiquidSourceBuild extends Building{
+    public class LiquidSourceBuild extends Building implements LiquidUpdater{
         public @Nullable Liquid source = null;
 
         @Override
-        public void updateTile(){
+        public void updateLiquids(float delta){
             if(source == null){
                 liquids.clear();
             }else{

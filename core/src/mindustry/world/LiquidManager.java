@@ -6,6 +6,7 @@ import mindustry.world.blocks.*;
 
 import java.util.concurrent.*;
 
+//TODO: consumers read AND write from the liquids array... on the main thread.
 public class LiquidManager{
     private static final int targetFps = 60;
     private static final long targetNanos = 1000 * Time.nanosPerMilli / targetFps;
@@ -21,6 +22,8 @@ public class LiquidManager{
     }
 
     public void add(LiquidUpdater building){
+        if(!building.shouldLiquidUpdate()) return;
+
         if(thread == null){
             thread = new UpdaterThread();
             thread.start();

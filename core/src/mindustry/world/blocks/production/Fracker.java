@@ -39,8 +39,12 @@ public class Fracker extends SolidPump{
             }else{
                 warmup = Mathf.lerpDelta(warmup, 0f, 0.02f);
                 lastPump = 0f;
-                dumpLiquid(result);
             }
+        }
+
+        @Override
+        public void updateLiquids(float delta){
+            dumpLiquid(result);
         }
     }
 }
