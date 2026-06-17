@@ -51,11 +51,12 @@ import static mindustry.Vars.*;
 @Component(base = true, genInterface = false)
 abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Sized, Senseable, Controllable, Settable{
     //region vars and initialization
-    static final float recentDamageTime = 60f * 5f;
+    static final float timeToSleep = 60f * 1f, recentDamageTime = 60f * 5f;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
     static final Seq<Building> tempBuilds = new Seq<>();
     static final BuildTeamChangeEvent teamChangeEvent = new BuildTeamChangeEvent();
     static final BuildDamageEvent bulletDamageEvent = new BuildDamageEvent();
+    static int sleepingEntities = 0;
 
     @Import float x, y, health, maxHealth;
     @Import Team team;
@@ -97,6 +98,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     private transient float timeScale = 1f, timeScaleDuration;
     private transient float dumpAccum;
 
+    private transient boolean sleeping;
+    private transient float sleepTime;
     private transient boolean initialized;
 
     //used only by the indexer
@@ -640,7 +643,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
     public void sleep(){
-       remove();
+       sleepTime += Time.delta;
+       if(!sleeping && sleepTime >= timeToSleep){
+           remove();
+           sleeping = true;
+           sleepingEntities++;
+       }
     }
 
     /** Call when this entity is updating. This wakes it up. */
