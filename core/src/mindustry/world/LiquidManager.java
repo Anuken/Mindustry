@@ -6,7 +6,8 @@ import mindustry.world.blocks.*;
 
 import java.util.concurrent.*;
 
-//TODO: consumers read AND write from the liquids array... on the main thread.
+//TODO: consumers read AND write from the liquids array... on the main thread. as do various other blocks. see remove() usage
+//TODO: payload loaders/unloaders don't use this system
 public class LiquidManager{
     private static final int targetFps = 60;
     private static final long targetNanos = 1000 * Time.nanosPerMilli / targetFps;
