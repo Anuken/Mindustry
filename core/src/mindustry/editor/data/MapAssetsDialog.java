@@ -116,6 +116,7 @@ public class MapAssetsDialog extends BaseDialog{
         //make sure new assets appear correctly when switching to the content view
         if(type == DataAssetType.content){
             state.data.reloadContent(false);
+            state.data.regenerateContentSprites(false);
         }
 
         rebuild();
@@ -153,6 +154,9 @@ public class MapAssetsDialog extends BaseDialog{
                             Seq<DataAsset> results = new Seq<>();
                             Fi zipped = new ZipFi(targetFile);
                             Seq<String> errors = new Seq<>();
+                            //force regen
+                            state.data.clearGeneratedImages();
+
                             for(var type : DataAssetType.all){
                                 Fi folder = zipped.child(type.folder);
 
@@ -208,6 +212,10 @@ public class MapAssetsDialog extends BaseDialog{
                                 prev.addAll(results);
                                 prev.sort();
                                 state.data.load(prev);
+                                if(state.data.getContent().size > 0){
+                                    //TODO: packs twice (bad)
+                                    state.data.regenerateContentSprites(false);
+                                }
                                 rebuild();
                             }
 
@@ -219,7 +227,7 @@ public class MapAssetsDialog extends BaseDialog{
                                     ep.add(Seq.with(errors).toString("\n", s -> "[gray]- []" + s)).labelAlign(Align.left, Align.left).grow();
                                 });
                             }else if(results.size == 0){
-                                idiag.cont.add("@asset.image.none");
+                                idiag.cont.add("@asset.import.none");
                             }
                             idiag.buttons.button("@ok", Icon.ok, idiag::hide).size(200f, 64f);
                             idiag.show();

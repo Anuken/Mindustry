@@ -9,6 +9,10 @@ public class ImageAsset extends DataAsset{
         setHash(hash);
     }
 
+    public boolean isGenerated(){
+        return path.startsWith("generated/");
+    }
+
     @Override
     public DataAssetType getType(){
         return DataAssetType.image;

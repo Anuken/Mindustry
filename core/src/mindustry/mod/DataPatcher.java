@@ -48,6 +48,7 @@ public class DataPatcher{
     private Seq<Runnable> resetters = new Seq<>();
     private Seq<Runnable> afterCallbacks = new Seq<>();
     private Seq<Object> visitStack = new Seq<>();
+    private Seq<Content> addedContent = new Seq<>();
     private @Nullable PatchAsset currentlyApplyingPatch;
     private @Nullable ContentAsset currentlyApplyingContent;
     private Seq<LVar> addedVars = new Seq<>();
@@ -203,7 +204,9 @@ public class DataPatcher{
                 Vars.content.remove(errored);
             }
 
-            Seq<Content> all = new Seq<>();
+            addedContent.clear();
+            Seq<Content> all = addedContent;
+
             for(var arr : Vars.content.getContentMap()){
                 all.addAll(arr.select(c -> c.minfo.mod == dpMod));
             }
@@ -287,8 +290,13 @@ public class DataPatcher{
         afterCallbacks.each(Runnable::run);
         afterCallbacks.clear();
         usedpatches.clear();
+        addedContent.clear();
 
         if(reloadContentWorld) fixContentArrays();
+    }
+
+    public Seq<Content> getAddedContent(){
+        return addedContent;
     }
 
     void callContentRemove(){
