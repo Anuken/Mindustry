@@ -8,6 +8,7 @@ import mindustry.gen.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
@@ -43,6 +44,8 @@ public class GameState{
     public Attributes envAttrs = new Attributes();
     /** Team data. Gets reset every new game. */
     public Teams teams = new Teams();
+    /** Runs liquids in a new thread. */
+    public LiquidManager liquids = new LiquidManager();
     /** Handles JSON edits of game content. */
     public DataManager data = new DataManager();
     /** Number of enemies in the game; only used clientside in servers. */

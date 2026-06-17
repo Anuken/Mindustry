@@ -2001,7 +2001,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Replace
     @Override
     public boolean isValid(){
-        return tile.build == self() && !dead();
+        return tile.build == self() && !dead;
     }
 
     @MethodPriority(100)
