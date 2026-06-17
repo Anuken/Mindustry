@@ -888,10 +888,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //TODO add this back
         //if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) liquid.unlock();
 
-        for(int i = 0; i < proximity.size; i++){
-            incrementDump(proximity.size);
+        int psize = proximity.size;
+        Building[] prox = proximity.items;
 
-            Building other = proximity.get((i + dump) % proximity.size);
+        if(psize == 0) return;
+
+        for(int i = 0; i < psize; i++){
+            incrementDump(psize);
+
+            Building other = prox[((i + dump) % psize)];
+            if(other == null) continue;
             if(outputDir != -1 && (outputDir + rotation) % 4 != relativeTo(other)) continue;
 
             other = other.getLiquidDestination(self(), liquid);

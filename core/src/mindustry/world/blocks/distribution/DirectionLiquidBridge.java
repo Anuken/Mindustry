@@ -6,6 +6,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
 
@@ -33,7 +34,7 @@ public class DirectionLiquidBridge extends DirectionBridge{
         return new TextureRegion[]{bottomRegion, region, dirRegion};
     }
 
-    public class DuctBridgeBuild extends DirectionBridgeBuild{
+    public class DuctBridgeBuild extends DirectionBridgeBuild implements LiquidUpdater{
         Building next;
 
         @Override
@@ -68,19 +69,24 @@ public class DirectionLiquidBridge extends DirectionBridge{
         public void updateTile(){
             var link = lastLink = findLink();
             if(link != null){
-                moveLiquid(link, liquids.current(), Time.delta);
                 link.occupied[rotation % 4] = this;
-            }
-
-            if(link == null){
-                if(liquids.currentAmount() > 0.0001f && timer(timerFlow, 1)){
-                    moveLiquidForward(next, false, liquids.current(), Time.delta);
-                }
             }
 
             for(int i = 0; i < 4; i++){
                 if(occupied[i] == null || occupied[i].rotation != i || !occupied[i].isValid() || occupied[i].lastLink != this){
                     occupied[i] = null;
+                }
+            }
+        }
+
+        @Override
+        public void updateLiquids(float delta){
+            var link = lastLink;
+            if(link != null){
+                moveLiquid(link, liquids.current(), delta);
+            }else{
+                if(liquids.currentAmount() > 0.0001f && timer(timerFlow, 1)){
+                    moveLiquidForward(next, false, liquids.current(), Time.delta);
                 }
             }
         }
