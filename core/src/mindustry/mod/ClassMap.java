@@ -150,6 +150,7 @@ public class ClassMap{
         classes.put("ExplosionShield", mindustry.world.blocks.ExplosionShield.class);
         classes.put("ItemSelection", mindustry.world.blocks.ItemSelection.class);
         classes.put("LaunchAnimator", mindustry.world.blocks.LaunchAnimator.class);
+        classes.put("LiquidUpdater", mindustry.world.blocks.LiquidUpdater.class);
         classes.put("RotBlock", mindustry.world.blocks.RotBlock.class);
         classes.put("TileBitmask", mindustry.world.blocks.TileBitmask.class);
         classes.put("UnitTetherBlock", mindustry.world.blocks.UnitTetherBlock.class);
