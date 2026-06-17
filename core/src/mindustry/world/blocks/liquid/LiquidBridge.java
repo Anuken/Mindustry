@@ -1,5 +1,6 @@
 package mindustry.world.blocks.liquid;
 
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
@@ -21,7 +22,7 @@ public class LiquidBridge extends ItemBridge{
         @Override
         public void updateTransport(Building other){
             if(warmup >= 0.25f){
-                moved |= moveLiquid(other, liquids.current()) > 0.05f;
+                moved |= moveLiquid(other, liquids.current(), Time.delta) > 0.05f;
             }
         }
 

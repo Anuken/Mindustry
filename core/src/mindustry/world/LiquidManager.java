@@ -10,18 +10,22 @@ import java.util.concurrent.*;
 public class LiquidManager{
     private static final int targetFps = 60;
     private static final long targetNanos = 1000 * Time.nanosPerMilli / targetFps;
-    private static volatile int globalTick;
 
-    //one thread per team
-    //note: buildings across teams don't interact in terms of liquids
-    private UpdaterThread[] threads = new UpdaterThread[256];
+    private UpdaterThread thread;
+    private int curTick;
 
-    public void add(Team team, LiquidUpdater building){
-        if(team == Team.derelict) return;
-        UpdaterThread thread = threads[team.id];
+    public void checkUpdate(){
+        //ensures volatile read
+        if(thread != null){
+            curTick = thread.tick;
+        }
+    }
+
+    public void add(LiquidUpdater building){
+        if(building.team() == Team.derelict) return;
 
         if(thread == null){
-            thread = threads[team.id] = new UpdaterThread(team);
+            thread = new UpdaterThread();
             thread.start();
         }
 
@@ -29,30 +33,29 @@ public class LiquidManager{
     }
 
     public void stop(){
-        for(var thread : threads){
-            if(thread != null){
-                thread.running = false;
-                thread.interrupt();
-            }
+        if(thread != null){
+            thread.running = false;
+            thread.interrupt();
+            thread = null;
         }
     }
 
     static class UpdaterThread extends Thread{
-        final Team team;
         Seq<LiquidUpdater> updaters = new Seq<>(false, 20, LiquidUpdater.class);
         ConcurrentLinkedQueue<LiquidUpdater> addQueue = new ConcurrentLinkedQueue<>();
-        volatile boolean running;
+        volatile boolean running = true;
+        volatile int tick;
 
-        public UpdaterThread(Team team){
-            this.team = team;
-        }
+        long lastNanos = Time.nanos();
 
         @Override
         public void run(){
             try{
-                int innerTick = 0;
                 while(running){
                     long nanos = Time.nanos();
+                    long deltaNanos = Time.timeSinceNanos(lastNanos);
+                    float deltaTicks = (float)deltaNanos / Time.nanosPerMilli / 1000f * 60f;
+                    lastNanos = nanos;
 
                     LiquidUpdater toAdd;
                     while((toAdd = addQueue.poll()) != null){
@@ -63,21 +66,23 @@ public class LiquidManager{
                     int size = updaters.size;
                     for(int i = 0; i < size; i++){
                         var item = items[i];
-                        if(!item.isValid() || item.team() != team){
+                        if(!item.isValid()){
+                            //note: this is an un-ordered seq, so this is just a O(1) swap
                             updaters.remove(i);
                             i --;
                             size --;
                         }else{
-                            item.updateLiquids();
+                            item.updateLiquids(deltaTicks);
                         }
                     }
 
-                    innerTick ++;
-                    globalTick = innerTick;
+                    //update 'global tick' as a volatile memory barrier
+                    tick ++;
 
                     long elapsed = Time.timeSinceNanos(nanos);
                     if(elapsed < targetNanos){
-                        Thread.sleep(elapsed / Time.nanosPerMilli, (int)(elapsed % Time.nanosPerMilli));
+                        long remaining = targetNanos - elapsed;
+                        Thread.sleep(remaining / Time.nanosPerMilli, (int)(remaining % Time.nanosPerMilli));
                     }
                 }
 

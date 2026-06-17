@@ -34,6 +34,7 @@ public class DirectionLiquidBridge extends DirectionBridge{
     }
 
     public class DuctBridgeBuild extends DirectionBridgeBuild{
+        Building next;
 
         @Override
         public void drawCached(){
@@ -57,16 +58,23 @@ public class DirectionLiquidBridge extends DirectionBridge{
         }
 
         @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+
+            next = front();
+        }
+
+        @Override
         public void updateTile(){
             var link = lastLink = findLink();
             if(link != null){
-                moveLiquid(link, liquids.current());
+                moveLiquid(link, liquids.current(), Time.delta);
                 link.occupied[rotation % 4] = this;
             }
 
             if(link == null){
                 if(liquids.currentAmount() > 0.0001f && timer(timerFlow, 1)){
-                    moveLiquidForward(false, liquids.current());
+                    moveLiquidForward(next, false, liquids.current(), Time.delta);
                 }
             }
 

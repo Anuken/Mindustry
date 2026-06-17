@@ -126,6 +126,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(shouldAdd){
             add();
         }
+        if(this instanceof LiquidUpdater lu) state.liquids.add(lu);
 
         checkAllowUpdate();
         created();
@@ -884,7 +885,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(liquids.get(liquid) <= 0.0001f) return;
 
-        if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) liquid.unlock();
+        //TODO add this back
+        //if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) liquid.unlock();
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -916,22 +918,23 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
-    public float moveLiquidForward(boolean leaks, Liquid liquid){
-        Tile next = tile.nearby(rotation);
+    public float moveLiquidForward(@Nullable Building next, boolean leaks, Liquid liquid, float delta){
+        if(next != null){
+            return moveLiquid(next, liquid, delta);
+        }else if(leaks){
+            Tile nextTile = tile.nearby(rotation);
 
-        if(next == null) return 0;
-
-        if(next.build != null){
-            return moveLiquid(next.build, liquid);
-        }else if(leaks && !next.block().solid && !next.block().hasLiquids){
-            float leakAmount = liquids.get(liquid) / 1.5f;
-            Puddles.deposit(next, tile, liquid, leakAmount, true, true);
-            liquids.remove(liquid, leakAmount);
+            if(!nextTile.block().solid && !nextTile.block().hasLiquids){
+                float leakAmount = liquids.get(liquid) / 1.5f;
+                liquids.remove(liquid, leakAmount);
+                //TODO: laggy
+                Core.app.post(() -> Puddles.deposit(nextTile, tile, liquid, leakAmount, true, true));
+            }
         }
         return 0;
     }
 
-    public float moveLiquid(Building next, Liquid liquid){
+    public float moveLiquid(Building next, Liquid liquid, float delta){
         if(next == null) return 0;
 
         next = next.getLiquidDestination(self(), liquid);
@@ -956,15 +959,20 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 if(other.blockReactive && liquid.blockReactive){
                     //TODO liquid reaction handler for extensibility
                     if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
-                        damageContinuous(1);
-                        next.damageContinuous(1);
-                        if(Mathf.chanceDelta(0.1)){
-                            Fx.fire.at(fx, fy);
-                        }
+                        var fnext = next;
+                        Core.app.post(() -> {
+                            damageContinuous(1);
+                            fnext.damageContinuous(1);
+                            if(Mathf.chanceDelta(0.1)){
+                                Fx.fire.at(fx, fy);
+                            }
+                        });
                     }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
-                        liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta));
+                        liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * delta));
                         if(Mathf.chanceDelta(0.2f)){
-                            Fx.steam.at(fx, fy);
+                            Core.app.post(() -> {
+                                Fx.steam.at(fx, fy);
+                            });
                         }
                     }
                 }

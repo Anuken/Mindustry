@@ -302,6 +302,7 @@ public class Logic implements ApplicationListener{
         Events.fire(new ResetEvent());
         world.tiles = new Tiles(0, 0);
 
+        state.liquids.stop();
         state.data.unload();
         State prev = state.getState();
         //recreate gamestate - sets state to menu
@@ -558,6 +559,8 @@ public class Logic implements ApplicationListener{
                 if(!net.client() && state.wavetime <= 0 && state.rules.waves){
                     runWave();
                 }
+
+                state.liquids.checkUpdate();
 
                 //apply weather attributes
                 state.envAttrs.clear();
