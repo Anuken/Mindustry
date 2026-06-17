@@ -2,7 +2,6 @@ package mindustry.world;
 
 import arc.struct.*;
 import arc.util.*;
-import mindustry.game.*;
 import mindustry.world.blocks.*;
 
 import java.util.concurrent.*;
@@ -22,8 +21,6 @@ public class LiquidManager{
     }
 
     public void add(LiquidUpdater building){
-        if(building.team() == Team.derelict) return;
-
         if(thread == null){
             thread = new UpdaterThread();
             thread.start();

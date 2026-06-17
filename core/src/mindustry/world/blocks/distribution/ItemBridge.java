@@ -201,6 +201,7 @@ public class ItemBridge extends Block{
         public float time = -8f, timeSpeed;
         public boolean wasMoved, moved, hadValidLink;
         public float transportCounter;
+        public Building lastValidLink;
 
         @Override
         public void pickedUp(){
@@ -333,9 +334,11 @@ public class ItemBridge extends Block{
             hadValidLink = linkValid(tile, other);
 
             if(!hadValidLink){
+                lastValidLink = null;
                 doDump();
                 warmup = 0f;
             }else{
+                lastValidLink = other.build;
                 var inc = ((ItemBridgeBuild)other.build).incoming;
                 int pos = tile.pos();
                 if(!inc.contains(pos)){

@@ -9,6 +9,7 @@ import mindustry.game.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
@@ -107,11 +108,13 @@ public class Pump extends LiquidBlock{
         return tile != null && tile.floor().liquidDrop != null;
     }
 
-    public class PumpBuild extends LiquidBuild{
+    public class PumpBuild extends LiquidBuild implements LiquidUpdater{
         public float warmup, totalProgress;
         public float consTimer;
         public float amount = 0f;
         public @Nullable Liquid liquidDrop = null;
+
+        float lastPumped;
 
         @Override
         public void draw(){
@@ -159,24 +162,29 @@ public class Pump extends LiquidBlock{
         @Override
         public void updateTile(){
             if(efficiency > 0 && liquidDrop != null){
-                float maxPump = Math.min(liquidCapacity - liquids.get(liquidDrop), amount * pumpAmount * edelta());
-                liquids.add(liquidDrop, maxPump);
-
                 //does nothing for most pumps, as those do not require items.
                 if((consTimer += delta()) >= consumeTime){
                     consume();
                     consTimer %= 1f;
                 }
 
-                warmup = Mathf.approachDelta(warmup, maxPump > 0.001f ? 1f : 0f, warmupSpeed);
+                warmup = Mathf.approachDelta(warmup, lastPumped > 0.001f ? 1f : 0f, warmupSpeed);
             }else{
                 warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
             }
 
             totalProgress += warmup * Time.delta;
+        }
 
-            if(liquidDrop != null){
-                dumpLiquid(liquidDrop);
+        @Override
+        public void updateLiquids(float delta){
+            var ld = liquidDrop;
+            if(ld != null){
+                float maxPump = Math.min(liquidCapacity - liquids.get(liquidDrop), amount * pumpAmount * efficiency * timeScale * delta);
+                liquids.add(liquidDrop, maxPump);
+                lastPumped = maxPump;
+
+                dumpLiquid(ld);
             }
         }
 

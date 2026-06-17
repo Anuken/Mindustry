@@ -121,12 +121,7 @@ public class SolidPump extends Pump{
         @Override
         public void updateTile(){
             liquidDrop = result;
-            float fraction = Math.max(validTiles + boost + (attribute == null ? 0 : attribute.env()), 0);
-
             if(efficiency > 0 && typeLiquid() < liquidCapacity - 0.001f){
-                float maxPump = Math.min(liquidCapacity - typeLiquid(), pumpAmount * delta() * fraction * efficiency);
-                liquids.add(result, maxPump);
-                lastPump = maxPump / Time.delta;
                 warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
                 if(Mathf.chance(delta() * updateEffectChance))
                     updateEffect.at(x + Mathf.range(size * 2f), y + Mathf.range(size * 2f));
@@ -136,6 +131,14 @@ public class SolidPump extends Pump{
             }
 
             pumpTime += warmup * edelta();
+        }
+
+        @Override
+        public void updateLiquids(float delta){
+            float fraction = Math.max(validTiles + boost + (attribute == null ? 0 : attribute.env()), 0);
+            float maxPump = Math.min(liquidCapacity - typeLiquid(), pumpAmount * delta * timeScale * fraction * efficiency);
+            liquids.add(result, maxPump);
+            lastPump = maxPump / Time.delta;
 
             dumpLiquid(result);
         }

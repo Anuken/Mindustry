@@ -14,6 +14,7 @@ import mindustry.logic.*;
 import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.liquid.Conduit.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
@@ -183,7 +184,7 @@ public class GenericCrafter extends Block{
         }
     }
 
-    public class GenericCrafterBuild extends Building{
+    public class GenericCrafterBuild extends Building implements LiquidUpdater{
         public float progress;
         public float totalProgress;
         public float warmup;
@@ -321,7 +322,10 @@ public class GenericCrafter extends Block{
                     dump(output.item);
                 }
             }
+        }
 
+        @Override
+        public void updateLiquids(float delta){
             if(outputLiquids != null){
                 for(int i = 0; i < outputLiquids.length; i++){
                     int dir = liquidOutputDirections.length > i ? liquidOutputDirections[i] : -1;
