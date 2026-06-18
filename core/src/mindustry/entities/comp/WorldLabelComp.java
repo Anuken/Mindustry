@@ -18,7 +18,13 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
     @Import int id;
     @Import float x, y;
 
-    public static final byte flagBackground = 1, flagOutline = 2, flagAlignLeft = 4, flagAlignRight = 8, flagAutoscale = 16;
+    public static final byte
+    flagBackground = 1,
+    flagOutline = 2,
+    flagAlignLeft = 4,
+    flagAlignRight = 8,
+    flagAutoscale = 16,
+    flagOnlyParentVisible = 32;
 
     public String text = "sample text";
     public float fontSize = 1f, z = Layer.playerName + 1;
@@ -38,6 +44,9 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
         if(parent != null){
             x += parent.x();
             y += parent.y();
+            if((flags & flagOnlyParentVisible) != 0 && !parent.isLocal()){
+                return;
+            }
         }
         drawAt(text, x, y, z, flags, fontSize, Align.center, (flags & flagAlignLeft) != 0 ? Align.left : (flags & flagAlignRight) != 0 ? Align.right : Align.center);
     }

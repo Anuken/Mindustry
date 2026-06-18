@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
+import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -95,6 +96,18 @@ public class JsonIO{
     static void apply(Json json){
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
+
+        json.setSerializer(MusicContainer.class, new Serializer<>(){
+            @Override
+            public void write(Json json, MusicContainer object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public MusicContainer read(Json json, JsonValue jsonData, Class type){
+                return new MusicContainer(jsonData.isString() ? jsonData.asString() : "");
+            }
+        });
 
         json.setSerializer(Color.class, new Serializer<>(){
             @Override
@@ -241,7 +254,9 @@ public class JsonIO{
 
             @Override
             public UnitType read(Json json, JsonValue jsonData, Class type){
-                return Vars.content.getByName(ContentType.unit, jsonData.asString());
+                if(jsonData.asString() == null) return UnitTypes.dagger;
+                UnitType u = Vars.content.getByName(ContentType.unit, jsonData.asString());
+                return u == null ? UnitTypes.dagger : u;
             }
         });
 

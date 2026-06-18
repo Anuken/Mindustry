@@ -3,6 +3,7 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.editor.*;
 import mindustry.game.*;
@@ -170,6 +171,10 @@ public class PausedDialog extends BaseDialog{
     }
 
     public void runExitSave(){
+        runExitSave(true);
+    }
+
+    public void runExitSave(boolean save){
         boolean wasClient = net.client();
         if(net.client()) netClient.disconnectQuietly();
 
@@ -185,14 +190,16 @@ public class PausedDialog extends BaseDialog{
             return;
         }
 
-        ui.loadAnd("@saving", () -> {
-            try{
-                control.saves.getCurrent().save();
-            }catch(Throwable e){
-                e.printStackTrace();
-                ui.showException("[accent]" + Core.bundle.get("savefail"), e);
-            }
-            logic.reset();
-        });
+        if(save){
+            ui.loadAnd("@saving", () -> {
+                try{
+                    control.saves.getCurrent().save();
+                }catch(Throwable e){
+                    Log.err(e);
+                    ui.showException("[accent]" + Core.bundle.get("savefail"), e);
+                }
+                logic.reset();
+            });
+        }
     }
 }

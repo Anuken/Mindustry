@@ -8,6 +8,7 @@ import arc.util.Log.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -701,6 +702,7 @@ public class Administration{
 
         /** valid only for command unit events */
         public @Nullable int[] unitIDs;
+        public @Nullable UnitCommand unitCommand;
 
         /** valid only for command building events */
         public @Nullable int[] buildingPositions;

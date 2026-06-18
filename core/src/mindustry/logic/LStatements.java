@@ -1300,6 +1300,62 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("query")
+    public static class QueryStatement extends LStatement{
+        public QueryShape shape = QueryShape.circle;
+        public QueryType type = QueryType.unit;
+        public String team = "null", x = "0", y = "0", w = "10", h = "10";
+
+        @Override
+        public void build(Table table){
+            table.clearChildren();
+
+            table.button(shape == QueryShape.circle ? "circle" : "rect", Styles.logict, () -> {
+                shape = shape == QueryShape.circle ? QueryShape.rect : QueryShape.circle;
+                build(table);
+            }).size(80f, 40f).pad(4f).color(table.color);
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, QueryType.queryable, type, o -> {
+                    type = o;
+                    build(table);
+                }));
+            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+
+            fields(table, "team", team, str -> team = str);
+
+            row(table);
+
+            fields(table, "x", x, str -> x = str);
+            fields(table, "y", y, str -> y = str);
+
+            table.row();
+
+            if(shape == QueryShape.circle){
+                fields(table, "radius", w, str -> w = str);
+            }else{
+                fields(table, "width", w, str -> w = str);
+                fields(table, "height", h, str -> h = str);
+            }
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new QueryI(shape, type, builder.var(team), builder.var(x), builder.var(y), builder.var(w), builder.var(h));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
     @RegisterStatement("getblock")
     public static class GetBlockStatement extends LStatement{
         public TileLayer layer = TileLayer.block;
@@ -2368,15 +2424,11 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            rebuild(table);
-        }
-
-        void rebuild(Table table){
             table.clearChildren();
 
             table.button(positional ? "positional" : "global", Styles.logict, () -> {
                 positional = !positional;
-                rebuild(table);
+                build(table);
             }).size(160f, 40f).pad(4f).color(table.color);
 
             row(table);
@@ -2389,7 +2441,7 @@ public class LStatements{
                 String soundName = id.startsWith("@sfx-") ? id.substring(5) : id;
                 b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), soundName, t -> {
                     id = "@sfx-" + t;
-                    rebuild(table);
+                    build(table);
                 }, 2, cell -> cell.size(160, 50)));
             }, Styles.logict, () -> {}).size(40).color(table.color).left().padLeft(-1);
 
@@ -2421,6 +2473,35 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new PlaySoundI(positional, builder.var(id), builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y), builder.var(limit));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("playmusic")
+    public static class PlayMusicStatement extends LStatement{
+        public String name = "\"game1\"", interrupt = "true";
+
+        @Override
+        public void build(Table table){
+            float width = LCanvas.useRows() ? 100f : 190f;
+
+            fields(table, "music", name, str -> name = str).width(width);
+
+            fields(table, "interrupt", interrupt, str -> interrupt = str).width(width);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PlayMusicI(builder.var(name), builder.var(interrupt));
         }
 
         @Override

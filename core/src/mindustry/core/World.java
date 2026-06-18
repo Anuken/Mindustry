@@ -299,7 +299,6 @@ public class World{
     private void setSectorRules(Sector sector, boolean saveInfo){
         state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
-        state.rules.weather.clear();
 
         sector.planet.generator.addWeather(sector, state.rules);
 
@@ -319,14 +318,14 @@ public class World{
             if(tile.floor().itemDrop != null && tile.block() == Blocks.air) content.add(tile.floor().itemDrop);
             if(tile.overlay().itemDrop != null && tile.block() == Blocks.air) content.add(tile.overlay().itemDrop);
             if(tile.wallDrop() != null) content.add(tile.wallDrop());
-            if(liquid != null) content.add(liquid);
+            if(liquid != null && tile.block() == Blocks.air) content.add(liquid);
         }
         state.rules.limitMapArea = border;
 
         state.rules.cloudColor = sector.planet.landCloudColor;
         state.rules.env = sector.planet.defaultEnv;
         state.rules.planet = sector.planet;
-        sector.planet.applyRules(state.rules);
+        sector.planet.applyRules(state.rules, !saveInfo);
         sector.info.resources = content.toSeq();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
 

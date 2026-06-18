@@ -29,7 +29,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
-import mindustry.type.ammo.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -377,10 +376,9 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** amount of items this unit can carry; <0 to determine based on hitSize. */
     public int itemCapacity = -1;
-    /** amount of ammo this unit can hold (if the rule is enabled); <0 to determine based on weapon fire rate. */
-    public int ammoCapacity = -1;
-    /** ammo this unit uses, if that system is enabled. */
-    public AmmoType ammoType = new ItemAmmoType(Items.copper);
+    /** @deprecated only kept for compatibility with some turrets that query this field! Remove this from your code immediately! */
+    @Deprecated
+    public int ammoCapacity = 1;
 
     /** max hardness of ore that this unit can mine (<0 to disable) */
     public int mineTier = -1;
@@ -530,6 +528,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         // Try to immediately resolve the Unit constructor based on EntityMapping entry, if it is set.
         // This is the default Vanilla behavior - it won't work properly for mods (see comment in `init()`)!
         constructor = EntityMapping.map(this.name);
+        if(constructor == null) constructor = UnitEntity::create;
         selectionSize = 30f;
     }
 
@@ -562,7 +561,6 @@ public class UnitType extends UnlockableContent implements Senseable{
         for(var ability : unit.abilities){
             ability.created(unit);
         }
-        unit.ammo = ammoCapacity; //fill up on ammo upon creation
         unit.elevation = flying ? 1f : 0;
         unit.heal();
         if(unit instanceof TimedKillc u){
@@ -712,11 +710,6 @@ public class UnitType extends UnlockableContent implements Senseable{
             //TODO overlay shields
             bars.add(new Bar("stat.health", Pal.health, unit::healthf).blink(Color.white));
             bars.row();
-
-            if(state.rules.unitAmmo){
-                bars.add(new Bar(ammoType.icon() + " " + Core.bundle.get("stat.ammo"), ammoType.barColor(), () -> unit.ammo / ammoCapacity));
-                bars.row();
-            }
 
             for(Ability ability : unit.abilities){
                 ability.displayBars(unit, bars);
@@ -1130,15 +1123,6 @@ public class UnitType extends UnlockableContent implements Senseable{
             }
         }
 
-        //dynamically create ammo capacity based on firing rate
-        if(ammoCapacity < 0){
-            float shotsPerSecond = weapons.sumf(w -> w.useAmmo ? 60f / w.reload : 0f);
-            //duration of continuous fire without reload
-            float targetSeconds = 35;
-
-            ammoCapacity = Math.max(1, (int)(shotsPerSecond * targetSeconds));
-        }
-
         estimateDps();
 
         //only do this after everything else was initialized
@@ -1248,7 +1232,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         for(var region : toOutline){
             if(region instanceof AtlasRegion atlas && !Core.atlas.has(atlas.name + "-outline")){
                 String regionName = atlas.name;
-                Pixmap outlined = Pixmaps.outline(Core.atlas.getPixmap(region), outlineColor, outlineRadius);
+                Pixmap outlined = Pixmaps.outline(packer.get(region), outlineColor, outlineRadius);
 
                 Drawf.checkBleed(outlined);
 
@@ -1284,7 +1268,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
 
         if(sample instanceof Tankc){
-            PixmapRegion pix = Core.atlas.getPixmap(treadRegion);
+            PixmapRegion pix = packer.get(treadRegion);
 
             for(int r = 0; r < treadRects.length; r++){
                 Rect treadRect = treadRects[r];
@@ -1449,6 +1433,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public double sense(LAccess sensor){
         return switch(sensor){
             case health, maxHealth -> health;
+            case armor -> armor;
+            case range -> World.conv(maxRange);
             case size -> hitSize / tilesize;
             case itemCapacity -> itemCapacity;
             case speed -> speed * 60f / tilesize;

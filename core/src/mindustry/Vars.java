@@ -232,6 +232,8 @@ public class Vars implements Loadable{
     public static Fi customMapDirectory;
     /** data subdirectory used for custom map previews */
     public static Fi mapPreviewDirectory;
+    /** directory for extracted assets */
+    public static Fi assetCacheDirectory;
     /** tmp subdirectory for map conversion */
     public static Fi tmpDirectory;
     /** data subdirectory used for saves */
@@ -263,7 +265,7 @@ public class Vars implements Loadable{
     public static Locale[] locales;
 
     //the main executor will only have at most [cores] number of threads active
-    public static ExecutorService mainExecutor = Threads.executor("Main Executor", OS.cores);
+    public static ExecutorService mainExecutor = Core.executor;
 
     public static FileTree tree = new FileTree();
     public static Net net;
@@ -280,6 +282,7 @@ public class Vars implements Loadable{
     public static GlobalVars logicVars;
     public static MapEditor editor;
     public static AvoidanceProcess avoidance;
+    public static DataAssetCache assetCache;
     public static GameService service = new GameService();
 
     public static Universe universe;
@@ -339,6 +342,7 @@ public class Vars implements Loadable{
         saveDirectory = dataDirectory.child("saves/");
         tmpDirectory = dataDirectory.child("tmp/");
         modDirectory = dataDirectory.child("mods/");
+        assetCacheDirectory = dataDirectory.child("assetCache");
         schematicDirectory = dataDirectory.child("schematics/");
         bebuildDirectory = dataDirectory.child("be_builds/");
         serverCacheFile = dataDirectory.child("server_list.json");
@@ -364,6 +368,7 @@ public class Vars implements Loadable{
         fogControl = new FogControl();
         bases = new BaseRegistry();
         logicVars = new GlobalVars();
+        assetCache = new DataAssetCache();
         javaPath =
             new Fi(OS.prop("java.home")).child("bin/java").exists() ? new Fi(OS.prop("java.home")).child("bin/java").absolutePath() :
             Core.files.local("jre/bin/java").exists() ? Core.files.local("jre/bin/java").absolutePath() : // Unix
@@ -384,6 +389,7 @@ public class Vars implements Loadable{
             emptyTile = new Tile(Short.MAX_VALUE - 20, Short.MAX_VALUE - 20);
         });
 
+        assetCache.load();
         mods.load();
         maps.load();
     }

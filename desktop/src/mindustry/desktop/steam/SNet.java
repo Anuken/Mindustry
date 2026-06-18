@@ -111,7 +111,11 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         Events.run(Trigger.newGame, this::updateWave);
 
         Events.on(PlayerIpBanEvent.class, e -> updateBans(e.ip));
-        Events.on(PlayerIpUnbanEvent.class, e -> updateBans(e.ip));
+        Events.on(PlayerUnbanEvent.class, e -> {
+            // updateBans works off of ip ban list. Unbanning a player does not unban their ip but since this is steam, their "ip" is just their steam id (which is their uuid as well) prefixed with steam:
+            netServer.admins.unbanPlayerIP("steam:" + e.uuid);
+            updateBans(null);
+        });
     }
 
     public boolean isSteamClient(){
@@ -281,31 +285,37 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             return;
         }
 
-        logic.reset();
-        net.reset();
+        ui.editor.hide();
 
-        currentLobby = steamIDLobby;
-        currentServer = smat.getLobbyOwner(steamIDLobby);
+        //delay joining by one frame because the editor bugs out if you don't
+        Core.app.post(() -> {
+            logic.reset();
+            net.reset();
 
-        Log.info("Connect to owner @: @", currentServer.getAccountID(), friends.getFriendPersonaName(currentServer));
+            currentLobby = steamIDLobby;
+            currentServer = smat.getLobbyOwner(steamIDLobby);
 
-        if(joinCallback != null){
-            joinCallback.run();
-            joinCallback = null;
-        }
+            Log.info("Connecting to owner @: @", currentServer.getAccountID(), friends.getFriendPersonaName(currentServer));
 
-        Connect con = new Connect();
-        con.addressTCP = "steam:" + currentServer.getAccountID();
+            if(joinCallback != null){
+                joinCallback.run();
+                joinCallback = null;
+            }
 
-        net.setClientConnected();
-        net.handleClientReceived(con);
+            Connect con = new Connect();
+            con.addressTCP = "steam:" + currentServer.getAccountID();
 
-        Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: @\nClient: @\nActive: @", net.server(), net.client(), net.active()))));
+            net.setClientConnected();
+            net.handleClientReceived(con);
+
+            Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: @\nClient: @\nActive: @", net.server(), net.client(), net.active()))));
+        });
     }
 
     @Override
     public void onLobbyChatUpdate(SteamID lobby, SteamID who, SteamID changer, ChatMemberStateChange change){
-        Log.info("lobby @: @ caused @'s change: @", lobby.getAccountID(), who.getAccountID(), changer.getAccountID(), change);
+        Log.info("lobby @: @ caused @'s change: @", lobby.getAccountID(), changer.getAccountID(), who.getAccountID(), change);
+        if(net.server() && change == ChatMemberStateChange.Entered && SteamAdmin.isAdmin("steam:" + who.getAccountID())) SteamAdmin.fetch(true); //fetch on admin join
         if(change == ChatMemberStateChange.Disconnected || change == ChatMemberStateChange.Left){
             if(net.client()){
                 //host left, leave as well
@@ -426,6 +436,16 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             super("steam:" + sid.getAccountID());
             this.sid = sid;
             Log.info("Created STEAM connection: @", sid.getAccountID());
+        }
+
+        @Override
+        public void sendStreamAsync(Streamable stream, ByteArrayOutputStream data){
+            if(Core.app.isOnMainThread()){
+                sendStream(stream, data);
+            }else{
+                //must be sent on main thread because of global buffer variables.
+                Core.app.post(() -> sendStream(stream, data));
+            }
         }
 
         @Override
