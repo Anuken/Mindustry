@@ -6,8 +6,6 @@ import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.struct.ObjectMap;
-import arc.struct.Seq;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
