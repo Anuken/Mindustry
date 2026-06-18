@@ -1559,58 +1559,6 @@ public class LStatements{
         }
     }
 
-    // Perhaps there is a better way to store these?
-    // IDK, because this is the storage method I use.
-    public static final ObjectMap<String, Seq<String>> patches = new ObjectMap<>();
-
-    @RegisterStatement("patchop")
-    public static class PatchOpStatement extends LStatement {
-        public PatchSerEnum op = PatchSerEnum.create;
-        public String name = "\"patch0\"", arg = "";
-
-        @Override
-        public void build(Table table) {
-            table.clearChildren();
-            table.button(b -> {
-                b.label(() -> op.displayName);
-                b.clicked(() -> showSelect(b, PatchSerEnum.values(), op, o -> {
-                    op = o;
-                    build(table);
-                }, 4, c -> c.width(150f)));
-            }, Styles.logict, () -> {}).size(150f, 40f).pad(4f).color(table.color);
-            table.table(Styles.none, t -> {
-                t.setColor(table.color);
-                t.add(" name");
-                field(t, name, str -> name = str).width(200f);
-            });
-            if(op == PatchSerEnum.addPatch){
-                table.row().add("statement");
-                arg = "\"unit.dagger.localizedName: 'DAGGER!'\"";
-                field(table, arg, str -> arg = str).width(600f);
-            }
-            if(op == PatchSerEnum.clone){
-                table.add("to");
-                arg = "\"patch1\"";
-                field(table, arg, str -> arg = str);
-            }
-        }
-
-        @Override
-        public LExecutor.LInstruction build(LAssembler builder) {
-            return new PatchOpI(op, builder.var(name), builder.var(arg));
-        }
-
-        @Override
-        public LCategory category() {
-            return LCategory.world;
-        }
-
-        @Override
-        public boolean privileged() {
-            return true;
-        }
-    }
-
     @RegisterStatement("status")
     public static class ApplyStatusStatement extends LStatement{
         public boolean clear;
