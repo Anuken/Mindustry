@@ -285,26 +285,31 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             return;
         }
 
-        logic.reset();
-        net.reset();
+        ui.editor.hide();
 
-        currentLobby = steamIDLobby;
-        currentServer = smat.getLobbyOwner(steamIDLobby);
+        //delay joining by one frame because the editor bugs out if you don't
+        Core.app.post(() -> {
+            logic.reset();
+            net.reset();
 
-        Log.info("Connect to owner @: @", currentServer.getAccountID(), friends.getFriendPersonaName(currentServer));
+            currentLobby = steamIDLobby;
+            currentServer = smat.getLobbyOwner(steamIDLobby);
 
-        if(joinCallback != null){
-            joinCallback.run();
-            joinCallback = null;
-        }
+            Log.info("Connecting to owner @: @", currentServer.getAccountID(), friends.getFriendPersonaName(currentServer));
 
-        Connect con = new Connect();
-        con.addressTCP = "steam:" + currentServer.getAccountID();
+            if(joinCallback != null){
+                joinCallback.run();
+                joinCallback = null;
+            }
 
-        net.setClientConnected();
-        net.handleClientReceived(con);
+            Connect con = new Connect();
+            con.addressTCP = "steam:" + currentServer.getAccountID();
 
-        Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: @\nClient: @\nActive: @", net.server(), net.client(), net.active()))));
+            net.setClientConnected();
+            net.handleClientReceived(con);
+
+            Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: @\nClient: @\nActive: @", net.server(), net.client(), net.active()))));
+        });
     }
 
     @Override
