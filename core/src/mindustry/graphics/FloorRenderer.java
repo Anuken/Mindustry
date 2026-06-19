@@ -525,20 +525,22 @@ public class FloorRenderer{
         @Override
         protected void draw(Texture texture, float[] spriteVertices, int offset, int count){
             //TODO broken
-            if(spriteVertices.length != 20){
-                throw new IllegalArgumentException("cached vertices must be in non-mixcolor format (20 per sprite, 5 per vertex)");
+            if(spriteVertices.length != 24){
+                throw new IllegalArgumentException("cached vertices must be in non-mixcolor format (24 per sprite, 6 per vertex: x y color u v depth)");
             }
 
             float[] verts = vertices;
             float[] src = spriteVertices;
             int idx = vidx;
             int sidx = offset;
+            float depth = texture.getDepth();
 
             //convert 5-float format to internal packed 3-float format
             for(int i = 0; i < 4; i++){
                 verts[idx++] = pack(src[sidx++], src[sidx++]);
                 verts[idx++] = src[sidx++];
                 verts[idx++] = Pack.packUv(src[sidx++], src[sidx++]);
+                verts[idx++] = depth;
             }
 
             vidx += spriteSize;

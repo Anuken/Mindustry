@@ -203,7 +203,7 @@ public class Shaders{
         public TextureRegion region;
 
         public UnitBuildShader(){
-            super("unitbuild", "default");
+            super("unitbuild", "default_batch");
         }
 
         @Override
@@ -243,7 +243,7 @@ public class Shaders{
         public float time;
 
         public BlockBuildShader(){
-            super("blockbuild", "default");
+            super("blockbuild", "default_batch");
         }
 
         @Override
@@ -477,6 +477,7 @@ public class Shaders{
     }
 
     public static class LoadShader extends Shader{
+
         public LoadShader(String frag, String vert){
             super(getShaderFi(vert + ".vert"), getShaderFi(frag + ".frag"));
         }

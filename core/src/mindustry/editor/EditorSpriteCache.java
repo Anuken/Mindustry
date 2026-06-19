@@ -4,22 +4,21 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
-import arc.struct.*;
 import arc.util.*;
 
 public class EditorSpriteCache implements Disposable{
-    //packed xy + color + packed uv
-    static final int vertexSize = 1 + 1 + 1;
+    //packed xy + color + packed uv + depth
+    static final int vertexSize = 1 + 1 + 1 + 1;
 
     private @Nullable Mesh mesh;
-    private final Seq<Texture> textures = new Seq<>(8);
-    private final IntSeq counts = new IntSeq(8);
+    private int count;
     private final float packX, packY, packW, packH;
 
     private float[] tmpVertices;
 
     /** Index in tmpVertices of current vertex data. */
     private int index;
+    private Texture texture;
 
     /** @param tmpVertices Temporary buffer to hold vertices while building up sprites. Should be large enough to hold all sprite data this cache will contain. */
     public EditorSpriteCache(float[] tmpVertices, float packX, float packY, float packW, float packH){
@@ -48,7 +47,8 @@ public class EditorSpriteCache implements Disposable{
         mesh = new Mesh(true, index / vertexSize, 0,
         VertexAttribute.packedPosition,
         VertexAttribute.color,
-        VertexAttribute.packedTexCoords
+        VertexAttribute.packedTexCoords,
+        VertexAttribute.depthCoords
         );
         mesh.indices = indices;
         mesh.setVertices(tmpVertices, 0, index);
@@ -115,32 +115,31 @@ public class EditorSpriteCache implements Disposable{
         int idx = index;
         float[] verts = tmpVertices;
         Texture texture = region.texture;
+        float depth = texture.getDepth();
 
         verts[idx + 0] = pack(x1, y1);
         verts[idx + 1] = colorPacked;
         verts[idx + 2] = Pack.packUv(u, v);
+        verts[idx + 3] = depth;
 
-        verts[idx + 3] = pack(x2, y2);
-        verts[idx + 4] = colorPacked;
-        verts[idx + 5] = Pack.packUv(u, v2);
+        verts[idx + 4] = pack(x2, y2);
+        verts[idx + 5] = colorPacked;
+        verts[idx + 6] = Pack.packUv(u, v2);
+        verts[idx + 7] = depth;
 
-        verts[idx + 6] = pack(x3, y3);
-        verts[idx + 7] = colorPacked;
-        verts[idx + 8] = Pack.packUv(u2, v2);
+        verts[idx + 8] = pack(x3, y3);
+        verts[idx + 9] = colorPacked;
+        verts[idx + 10] = Pack.packUv(u2, v2);
+        verts[idx + 11] = depth;
 
-        verts[idx + 9] = pack(x4, y4);
-        verts[idx + 10] = colorPacked;
-        verts[idx + 11] = Pack.packUv(u2, v);
+        verts[idx + 12] = pack(x4, y4);
+        verts[idx + 13] = colorPacked;
+        verts[idx + 14] = Pack.packUv(u2, v);
+        verts[idx + 15] = depth;
 
-        int lastIndex = textures.size - 1;
-        if(lastIndex < 0 || textures.get(lastIndex) != texture){
-            textures.add(texture);
-            counts.add(6);
-        }else{
-            counts.incr(lastIndex, 6);
-        }
-
+        count += 6;
         index += vertexSize * 4;
+        this.texture = texture;
     }
 
     private float pack(float x, float y){
@@ -151,15 +150,8 @@ public class EditorSpriteCache implements Disposable{
     public void render(Shader shader){
         if(mesh == null) throw new IllegalStateException("Cache is empty, call build() first.");
 
-        int offset = 0;
-
-        for(int i = 0; i < textures.size; i++){
-            int count = counts.items[i];
-            textures.get(i).bind();
-
-            mesh.render(shader, Gl.triangles, offset, count);
-            offset += count;
-        }
+        texture.bind();
+        mesh.render(shader, Gl.triangles, 0, count);
     }
 
     @Override
