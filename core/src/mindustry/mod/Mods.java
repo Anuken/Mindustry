@@ -8,6 +8,7 @@ import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
+import arc.graphics.gl.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
@@ -32,7 +33,11 @@ import static mindustry.Vars.*;
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
     //it would be nice to parse semver and have syntax like "<1.0.5" here, but mods clearly don't use semver and it's an inconsistent mess
-    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry", "schema", "scheme-size:1.0.5", "scheme-size:1.0.4", "scheme-size:1.0.3", "scheme-size:1.0.1", "scheme-size:1.0.0", "scheme-size:1.1.0", "scheme-size:1.0.4.1");
+    private static final ObjectSet<String> blacklistedMods = ObjectSet.with(
+        "ui-lib", "braindustry", "schema", "scheme-size:1.0.5", "scheme-size:1.0.4",
+        "scheme-size:1.0.3", "scheme-size:1.0.1", "scheme-size:1.0.0", "scheme-size:1.1.0",
+        "scheme-size:1.0.4.1"
+    );
 
     private Json json = new Json();
     private @Nullable Scripts scripts;
@@ -138,41 +143,6 @@ public class Mods implements Loadable{
         }
     }
 
-    /*
-
-    TODO: getPixmap:
-
-
-    public PixmapRegion getPixmap(String name){
-        return getPixmap(find(name));
-    }
-
-    public PixmapRegion getPixmap(AtlasRegion region){
-        if(region.pixmapRegion == null){
-            Pixmap pix = pixmaps.get(region.texture, () -> region.texture.getTextureData().getPixmap());
-            region.pixmapRegion = new PixmapRegion(pix, region.getX(), region.getY(), region.width, region.height);
-        }
-
-        return region.pixmapRegion;
-    }
-
-    public PixmapRegion getPixmap(TextureRegion region){
-        return getPixmap((AtlasRegion)region);
-    }
-
-    public ObjectMap<Texture, Pixmap> getPixmaps(){
-        return pixmaps;
-    }
-
-    public void disposePixmap(Texture texture){
-        if(pixmaps.containsKey(texture) && !pixmaps.get(texture).isDisposed()){
-            pixmaps.get(texture).dispose();
-        }
-        pixmaps.remove(texture);
-    }
-
-     */
-
     /** Repacks all in-game sprites. */
     @Override
     public void loadAsync(){
@@ -262,58 +232,7 @@ public class Mods implements Loadable{
 
         Pixmap[] whitePixmap = {null};
         Texture[] whiteTex = {null};
-
-        waitForMain(() -> {
-            whitePixmap[0] = Pixmaps.blankPixmap();
-            whiteTex[0] = new Texture(whitePixmap[0]);
-            var whiteRegion = new AtlasRegion(whiteTex[0], 0, 0, 1, 1);
-
-            Core.atlas.dispose();
-
-            //dead shadow-atlas for getting regions, but not pixmaps
-            var shadow = Core.atlas;
-            //dummy texture atlas that returns the 'shadow' regions; used for mod loading
-            Core.atlas = new TextureAtlas(){
-
-                {
-                    //needed for the correct operation of the found() method in the TextureRegion
-                    error = shadow.find("error");
-                }
-
-                @Override
-                public AtlasRegion white(){
-                    return whiteRegion;
-                }
-
-                @Override
-                public AtlasRegion find(String name){
-                    var base = packer.getOrNull(name);
-
-                    if(base != null){
-                        var reg = new AtlasRegion(shadow.find(name).texture, base.x, base.y, base.width, base.height);
-                        reg.name = name;
-                        return reg;
-                    }
-
-                    return shadow.find(name);
-                }
-
-                @Override
-                public boolean isFound(TextureRegion region){
-                    return region != shadow.find("error");
-                }
-
-                @Override
-                public TextureRegion find(String name, TextureRegion def){
-                    return !has(name) ? def : find(name);
-                }
-
-                @Override
-                public boolean has(String s){
-                    return shadow.has(s) || packer.getOrNull(s) != null;
-                }
-            };
-        });
+        TextureAtlas oldAtlas = Core.atlas;
 
         //generate new icons
         for(Seq<Content> arr : content.getContentMap()){
@@ -329,13 +248,24 @@ public class Mods implements Loadable{
         }
 
         waitForMain(() -> {
-            whitePixmap[0].dispose();
-            whiteTex[0].dispose();
+            //TODO: flashes for some reason.
 
             //replace old atlas data
-            Core.atlas = packer.flush(filter, new TextureAtlas());
+            Core.atlas = packer.create(filter);
+
+            //TODO very very hacky solution...
+            Events.on(ClientLoadEvent.class, e -> {
+                ArraySliceTexture last = new ArraySliceTexture(Core.atlas.getTexture(), Core.atlas.getTexture().depth - 1);
+                var target = (ArraySliceTexture)UI.packer.getTargetTexture();
+                target.array = last.array;
+                target.index = last.index;
+                target.overwriteHandle(last.getTextureObjectHandle());
+
+                oldAtlas.dispose();
+            });
 
             textureResize.each(e -> Core.atlas.find(e.key).scale = e.value);
+            renderer.loadFluidFrames();
 
             Core.atlas.setErrorRegion("error");
             Log.debug("Total pages: @", Core.atlas.getPages().size);

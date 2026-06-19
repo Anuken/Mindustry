@@ -106,7 +106,7 @@ public class DataImagePacker{
         Threads.awaitAll(tasks);
 
         TextureFilter filter = Core.settings.getBool("linear", !Vars.mobile) ? TextureFilter.linear : TextureFilter.nearest;
-        patchAtlas = packer.generateTextureAtlas(filter, filter, false);
+        patchAtlas = packer.generateTextureAtlas(filter, filter, false, true, 0);
 
         packer.forceDispose();
 

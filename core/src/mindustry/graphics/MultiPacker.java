@@ -79,9 +79,8 @@ public class MultiPacker implements Disposable{
         packer.pack(name, region, splits, pads);
     }
 
-    public TextureAtlas flush(TextureFilter filter, TextureAtlas atlas){
-        packer.updateTextureAtlas(atlas, filter, filter, false, false);
-        return atlas;
+    public TextureAtlas create(TextureFilter filter){
+        return packer.generateTextureAtlas(filter, filter, false, true, 1);
     }
 
     @Override
