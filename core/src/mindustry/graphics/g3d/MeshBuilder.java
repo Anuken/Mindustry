@@ -24,14 +24,14 @@ public class MeshBuilder{
             items[i] *= radius;
         }
 
-        mesh.getVerticesBuffer().put(items, 0, result.vertices.size);
+        mesh.getVertices().put(items, 0, result.vertices.size);
 
         short[] indices = new short[result.indices.size];
         for(int i = 0; i < result.indices.size; i++){
             indices[i] = (short)result.indices.items[i];
         }
 
-        mesh.getIndicesBuffer().put(indices);
+        mesh.getIndices().put(indices);
 
         return end(mesh);
     }
@@ -59,7 +59,7 @@ public class MeshBuilder{
                 floats[6] = v2.z * scale;
                 floats[7] = col;
 
-                mesh.getVerticesBuffer().put(floats);
+                mesh.getVertices().put(floats);
             }
         }
 
@@ -175,7 +175,7 @@ public class MeshBuilder{
                     shorts[11] = (short)(position + 5);
                 }
 
-                mesh.getIndicesBuffer().put(shorts, 0, c.length > 5 ? 12 : 9);
+                mesh.getIndices().put(shorts, 0, c.length > 5 ? 12 : 9);
 
                 position += c.length;
             }else{
@@ -216,21 +216,21 @@ public class MeshBuilder{
 
         Mesh mesh = new Mesh(true, vertices, indices, attributes.toArray(VertexAttribute.class));
 
-        mesh.getVerticesBuffer().limit(mesh.getVerticesBuffer().capacity());
-        mesh.getVerticesBuffer().position(0);
+        mesh.getVertices().limit(mesh.getVertices().capacity());
+        mesh.getVertices().position(0);
 
         if(indices > 0){
-            mesh.getIndicesBuffer().limit(mesh.getIndicesBuffer().capacity());
-            mesh.getIndicesBuffer().position(0);
+            mesh.getIndices().limit(mesh.getIndices().capacity());
+            mesh.getIndices().position(0);
         }
 
         return mesh;
     }
 
     private static Mesh end(Mesh mesh){
-        mesh.getVerticesBuffer().limit(mesh.getVerticesBuffer().position());
+        mesh.getVertices().limit(mesh.getVertices().position());
         if(mesh.getNumIndices() > 0){
-            mesh.getIndicesBuffer().limit(mesh.getIndicesBuffer().position());
+            mesh.getIndices().limit(mesh.getIndices().position());
         }
 
         return mesh;
@@ -282,7 +282,7 @@ public class MeshBuilder{
             if(floats.length > 7) floats[7] = emissive;
         }
 
-        mesh.getVerticesBuffer().put(floats);
+        mesh.getVertices().put(floats);
     }
 
     private static float packNormals(float x, float y, float z){

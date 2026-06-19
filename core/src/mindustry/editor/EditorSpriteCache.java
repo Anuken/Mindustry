@@ -42,7 +42,7 @@ public class EditorSpriteCache implements Disposable{
      * @param indices The shared index data in standard quad format, as seen in SpriteBatch.
      * Since this data is static, it should be the same across all caches, and be large enough to accommodate all sprites.
      * */
-    public void build(IndexData indices){
+    public void build(IndexBufferObject indices){
         if(mesh != null) mesh.dispose();
 
         mesh = new Mesh(true, index / vertexSize, 0,

@@ -6,5 +6,5 @@
   maxHeight: 4096,
   fast: true,
   stripWhitespaceCenter: true,
-  ignoredWhitespaceStrings: ["effects/"]
+  ignoredWhitespaceStrings: ["effects/", "environment/"]
 }

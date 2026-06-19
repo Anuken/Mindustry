@@ -12,7 +12,6 @@ import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.Font.*;
 import arc.graphics.g2d.PixmapPacker.*;
-import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
@@ -236,9 +235,9 @@ public class Fonts{
 
     /** Called from a static context for use in the loading screen.*/
     public static void loadDefaultFont(){
-        int max = Gl.getInt(Gl.maxTextureSize);
+        //TOOD: which size to use?
+        UI.packer = new PixmapPacker(4096, 2048, 2, true);
 
-        UI.packer = new PixmapPacker(max >= 4096 ? 4096 : 2048, 2048, 2, true);
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(Core.files::internal));
         Core.assets.setLoader(Font.class, null, new FreetypeFontLoader(Core.files::internal){
             ObjectSet<FreeTypeFontParameter> scaled = new ObjectSet<>();
@@ -279,37 +278,14 @@ public class Fonts{
     }
 
     /** Merges the UI and font atlas together for better performance. */
+    //TODO: does nothing at the moment.
     public static void mergeFontAtlas(TextureAtlas atlas){
-        //grab all textures from the ui page, remove all the regions assigned to it, then copy them over to UI.packer and replace the texture in this atlas.
-
-        //grab old UI texture and regions...
-        Texture texture = atlas.find("logo").texture;
+        if(true) return;
+        Texture texture = atlas.find("ui-page-placeholder").texture;
 
         Page page = UI.packer.getPages().first();
-
-        Seq<AtlasRegion> regions = atlas.getRegions().select(t -> t.texture == texture);
-        for(AtlasRegion region : regions){
-            //get new pack rect
-            page.setDirty(false);
-            Rect rect = UI.packer.pack(region.name, atlas.getPixmap(region), region.splits, region.pads);
-
-            //set new texture
-            region.texture = UI.packer.getPages().first().getTexture();
-            //set its new position
-            region.set((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
-            //add old texture
-            atlas.getTextures().add(region.texture);
-            //clear it
-            region.pixmapRegion = null;
-        }
-
-        //remove old texture, it will no longer be used
-        atlas.getTextures().remove(texture);
-        texture.dispose();
-        atlas.disposePixmap(texture);
-
         page.setDirty(true);
-        page.updateTexture(TextureFilter.linear, TextureFilter.linear, false);
+        page.texture = texture;
     }
 
     public static TextureRegionDrawable getGlyph(Font font, char glyph){
