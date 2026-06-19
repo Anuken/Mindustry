@@ -8,7 +8,6 @@ import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
@@ -138,7 +137,7 @@ public class Item extends UnlockableContent implements Senseable{
                     int index = i * (transitionFrames + 1) + j;
 
                     Pixmap res = Pixmaps.blend(pixmaps[i], pixmaps[(i + 1) % frames], f);
-                    packer.add(PageType.main, name + "-t" + index, res);
+                    packer.add(name + "-t" + index, res);
                     res.dispose();
                 }
             }

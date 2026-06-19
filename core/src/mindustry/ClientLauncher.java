@@ -139,7 +139,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         });
 
         assets.load("sprites/error.png", Texture.class);
-        atlas = TextureAtlas.blankAtlas();
+        atlas = new TextureAtlas(Core.files.internal("sprites/sprites.aatls"));
+        Fonts.loadDefaultFont();
+
         Vars.net = new Net(platform.getNet());
         MapPreviewLoader.setupLoaders();
         mods = new Mods();
@@ -149,13 +151,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         assets.load(new Vars());
 
-        Fonts.loadDefaultFont();
-
-        //load fallback atlas if max texture size is below 4096
-        assets.load(new AssetDescriptor<>("sprites/sprites.aatls", TextureAtlas.class)).loaded = t -> {
-            atlas = t;
-            Fonts.mergeFontAtlas(atlas);
-        };
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
 
         Musics.load();

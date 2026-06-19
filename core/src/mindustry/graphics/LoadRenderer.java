@@ -90,10 +90,8 @@ public class LoadRenderer implements Disposable{
             lastFrameTime = Time.millis();
         }
 
-        if(fx.getWidth() != graphics.getWidth() || fx.getHeight() != graphics.getHeight()){
-            fx.resize(graphics.getWidth(), graphics.getHeight());
-        }
-
+        fx.resize(graphics.getWidth(), graphics.getHeight());
+        fx.clear();
         fx.begin();
 
         if(assets.getLoadedAssets() != lastLength){

@@ -19,7 +19,6 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.mod.ContentParser.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -139,6 +138,41 @@ public class Mods implements Loadable{
         }
     }
 
+    /*
+
+    TODO: getPixmap:
+
+
+    public PixmapRegion getPixmap(String name){
+        return getPixmap(find(name));
+    }
+
+    public PixmapRegion getPixmap(AtlasRegion region){
+        if(region.pixmapRegion == null){
+            Pixmap pix = pixmaps.get(region.texture, () -> region.texture.getTextureData().getPixmap());
+            region.pixmapRegion = new PixmapRegion(pix, region.getX(), region.getY(), region.width, region.height);
+        }
+
+        return region.pixmapRegion;
+    }
+
+    public PixmapRegion getPixmap(TextureRegion region){
+        return getPixmap((AtlasRegion)region);
+    }
+
+    public ObjectMap<Texture, Pixmap> getPixmaps(){
+        return pixmaps;
+    }
+
+    public void disposePixmap(Texture texture){
+        if(pixmaps.containsKey(texture) && !pixmaps.get(texture).isDisposed()){
+            pixmaps.get(texture).dispose();
+        }
+        pixmaps.remove(texture);
+    }
+
+     */
+
     /** Repacks all in-game sprites. */
     @Override
     public void loadAsync(){
@@ -147,7 +181,7 @@ public class Mods implements Loadable{
         long startTime = Time.millis();
 
         //TODO this should estimate sprite sizes per page
-        MultiPacker packer = new MultiPacker();
+        MultiPacker packer = new MultiPacker(4096);
         var textureResize = new ObjectFloatMap<String>();
         int[] totalSprites = {0};
         //all packing tasks to await
@@ -204,36 +238,26 @@ public class Mods implements Loadable{
             }
         }
 
-        Seq<RegionEntry>[] entries = new Seq[PageType.all.length];
-        for(int i = 0; i < PageType.all.length; i++){
-            entries[i] = new Seq<>();
+        Seq<Pixmap> pageToPixmap = new Seq<>();
+        Seq<RegionEntry> entries = new Seq<>();
+        var pages = Core.atlas.getPages();
+
+        for(var page : pages){
+            pageToPixmap.add(new Pixmap(page.textureFile));
         }
 
-        ObjectMap<Texture, PageType> pageTypes = ObjectMap.of(
-        Core.atlas.find("white").texture, PageType.main,
-        Core.atlas.find("stone1").texture, PageType.environment,
-        Core.atlas.find("whiteui").texture, PageType.ui,
-        Core.atlas.find("rubble-1-0").texture, PageType.rubble
-        );
-
+        //TODO: handle aliases correctly
+        //TODO: for most mods, it is not necessary to load vanilla regions at all
         for(AtlasRegion region : Core.atlas.getRegions()){
-            PageType type = pageTypes.get(region.texture, PageType.main);
-
-            if(!packer.has(type, region.name)){
-                entries[type.ordinal()].add(new RegionEntry(region.name, Core.atlas.getPixmap(region), region.splits, region.pads));
+            if(!packer.has(region.name)){
+                entries.add(new RegionEntry(region.name, new PixmapRegion(pageToPixmap.get(region.texture.getDepth()), region.getX(), region.getY(), region.width, region.height), region.splits, region.pads));
             }
         }
 
-        //sort each page type by size first, for optimal packing
-        for(int i = 0; i < PageType.all.length; i++){
-            var rects = entries[i];
-            var type = PageType.all[i];
-            //TODO is this in reverse order?
-            rects.sort(Structs.comparingInt(o -> -Math.max(o.region.width, o.region.height)));
+        entries.sort(Structs.comparingInt(o -> -Math.max(o.region.width, o.region.height)));
 
-            for(var entry : rects){
-                packer.add(type, entry.name, entry.region, entry.splits, entry.pads);
-            }
+        for(var entry : entries){
+            packer.add(entry.name, entry.region, entry.splits, entry.pads);
         }
 
         Pixmap[] whitePixmap = {null};
@@ -263,12 +287,11 @@ public class Mods implements Loadable{
 
                 @Override
                 public AtlasRegion find(String name){
-                    var base = packer.getPacked(name);
+                    var base = packer.getOrNull(name);
 
                     if(base != null){
                         var reg = new AtlasRegion(shadow.find(name).texture, base.x, base.y, base.width, base.height);
                         reg.name = name;
-                        reg.pixmapRegion = base;
                         return reg;
                     }
 
@@ -287,16 +310,7 @@ public class Mods implements Loadable{
 
                 @Override
                 public boolean has(String s){
-                    return shadow.has(s) || packer.getPacked(s) != null;
-                }
-
-                //return the *actual* pixmap regions, not the disposed ones.
-                @Override
-                public PixmapRegion getPixmap(AtlasRegion region){
-                    PixmapRegion out = packer.getPacked(region.name);
-                    //this should not happen in normal situations
-                    if(out == null) return packer.getPacked("error");
-                    return out;
+                    return shadow.has(s) || packer.getOrNull(s) != null;
                 }
             };
         });
@@ -319,23 +333,12 @@ public class Mods implements Loadable{
             whiteTex[0].dispose();
 
             //replace old atlas data
-            Core.atlas = packer.flush(filter, new TextureAtlas(){
-
-                @Override
-                public PixmapRegion getPixmap(AtlasRegion region){
-                    var other = super.getPixmap(region);
-                    if(other.pixmap.isDisposed()){
-                        throw new RuntimeException("Calling getPixmap outside of createIcons is not supported!");
-                    }
-
-                    return other;
-                }
-            });
+            Core.atlas = packer.flush(filter, new TextureAtlas());
 
             textureResize.each(e -> Core.atlas.find(e.key).scale = e.value);
 
             Core.atlas.setErrorRegion("error");
-            Log.debug("Total pages: @", Core.atlas.getTextures().size);
+            Log.debug("Total pages: @", Core.atlas.getPages().size);
 
             packer.printStats();
 
@@ -399,7 +402,7 @@ public class Mods implements Loadable{
                         int hyphen = baseName.indexOf('-');
                         String fullName = ((prefix && !(hyphen != -1 && baseName.substring(hyphen + 1).startsWith(mod.name + "-"))) ? mod.name + "-" : "") + baseName;
 
-                        packer.add(getPage(file), fullName, new PixmapRegion(pix));
+                        packer.add(fullName, new PixmapRegion(pix));
                         if(textureScale != 1.0f){
                             textureResize.put(fullName, textureScale);
                         }
@@ -429,15 +432,6 @@ public class Mods implements Loadable{
     @Override
     public void loadSync(){
         loadIcons();
-    }
-
-    private PageType getPage(Fi file){
-        String path = file.path();
-        return
-            path.contains("sprites/blocks/environment") || path.contains("sprites-override/blocks/environment") ? PageType.environment :
-            path.contains("sprites/rubble") || path.contains("sprites-override/rubble") ? PageType.rubble :
-            path.contains("sprites/ui") || path.contains("sprites-override/ui") ? PageType.ui :
-            PageType.main;
     }
 
     /** Removes a mod file and marks it for requiring a restart. */

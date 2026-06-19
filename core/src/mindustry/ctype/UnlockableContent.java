@@ -13,7 +13,6 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -167,7 +166,7 @@ public abstract class UnlockableContent extends MappableContent{
 
     }
 
-    protected void makeOutline(PageType page, MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius){
+    protected void makeOutline(MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius){
         if(region instanceof AtlasRegion at && region.found()){
             String name = at.name;
             if(!makeNew || !packer.has(name + "-outline")){
@@ -176,7 +175,7 @@ public abstract class UnlockableContent extends MappableContent{
                     PixmapRegion base = packer.get(region);
                     var result = Pixmaps.outline(base, outlineColor, outlineRadius);
                     Drawf.checkBleed(result);
-                    packer.add(page, regName, result);
+                    packer.add(regName, result);
                     result.dispose();
                 }
             }
@@ -188,7 +187,7 @@ public abstract class UnlockableContent extends MappableContent{
             PixmapRegion base = packer.get(region);
             var result = Pixmaps.outline(base, outlineColor, outlineRadius);
             Drawf.checkBleed(result);
-            packer.add(PageType.main, name, result);
+            packer.add(name, result);
             result.dispose();
         }
     }

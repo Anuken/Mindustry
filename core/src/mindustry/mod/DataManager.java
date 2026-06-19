@@ -75,9 +75,9 @@ public class DataManager{
         UnlockableContent[] currentContent = {null};
         String[] currentHash = {null};
 
-        MultiPacker saver = new MultiPacker(false){
+        MultiPacker saver = new MultiPacker(0){
             @Override
-            public void add(PageType type, String name, PixmapRegion region, int[] splits, int[] pads){
+            public void add(String name, PixmapRegion region, int[] splits, int[] pads){
                 try{
                     if(region.pixmap.width > 2000) throw new IllegalArgumentException("Max image size exceeded");
 
@@ -100,11 +100,6 @@ public class DataManager{
             @Override
             public boolean has(String name){
                 return imageMap.containsKey(name);
-            }
-
-            @Override
-            public boolean has(PageType type, String name){
-                return has(name);
             }
 
             @Override

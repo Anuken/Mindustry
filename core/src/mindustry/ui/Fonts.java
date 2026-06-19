@@ -11,7 +11,6 @@ import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.Font.*;
-import arc.graphics.g2d.PixmapPacker.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
@@ -237,6 +236,7 @@ public class Fonts{
     public static void loadDefaultFont(){
         //TOOD: which size to use?
         UI.packer = new PixmapPacker(4096, 2048, 2, true);
+        UI.packer.setTargetTexture(Core.atlas.find("ui-page-placeholder").texture);
 
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(Core.files::internal));
         Core.assets.setLoader(Font.class, null, new FreetypeFontLoader(Core.files::internal){
@@ -275,17 +275,6 @@ public class Fonts{
             Fonts.tech = f;
             Fonts.tech.getData().down *= 1.5f;
         };
-    }
-
-    /** Merges the UI and font atlas together for better performance. */
-    //TODO: does nothing at the moment.
-    public static void mergeFontAtlas(TextureAtlas atlas){
-        if(true) return;
-        Texture texture = atlas.find("ui-page-placeholder").texture;
-
-        Page page = UI.packer.getPages().first();
-        page.setDirty(true);
-        page.texture = texture;
     }
 
     public static TextureRegionDrawable getGlyph(Font font, char glyph){

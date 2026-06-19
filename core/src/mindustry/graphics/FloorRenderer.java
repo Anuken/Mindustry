@@ -50,7 +50,6 @@ public class FloorRenderer{
     private Shader shader;
     private Mat combinedMat = new Mat();
     private Texture texture;
-    private TextureRegion error;
 
     private ChunkMesh[][][] cache;
     private boolean[][] dirty;
@@ -370,7 +369,6 @@ public class FloorRenderer{
         dirty = new boolean[chunksx][chunksy];
 
         texture = Core.atlas.find("grass1").texture;
-        error = Core.atlas.find("env-error");
 
         packWidth = world.unitWidth() + packPad *2f;
         packHeight = world.unitHeight() + packPad *2f;
@@ -414,13 +412,6 @@ public class FloorRenderer{
 
         @Override
         protected void draw(TextureRegion region, float x, float y, float originX, float originY, float width, float height, float rotation){
-
-            //substitute invalid regions with error
-            if(region.texture != texture && region != error){
-                draw(error, x, y, originX, originY, width, height, rotation);
-                return;
-            }
-
             float[] verts = vertices;
             int idx = vidx;
             vidx += spriteSize;

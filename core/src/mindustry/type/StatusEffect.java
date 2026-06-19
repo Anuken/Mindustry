@@ -11,7 +11,6 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.world.meta.*;
 
 public class StatusEffect extends UnlockableContent{
@@ -236,7 +235,7 @@ public class StatusEffect extends UnlockableContent{
         super.createIcons(packer);
 
         if(outline){
-            makeOutline(PageType.ui, packer, uiIcon, true, Pal.gray, 3);
+            makeOutline(packer, uiIcon, true, Pal.gray, 3);
         }
     }
 

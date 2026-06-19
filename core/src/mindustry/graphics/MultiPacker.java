@@ -1,67 +1,53 @@
 package mindustry.graphics;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
-import mindustry.*;
 
+//TODO: this needs to pack to a texture array
 public class MultiPacker implements Disposable{
-    private PixmapPacker[] packers;
+    private PixmapPacker packer;
     private ObjectSet<String> outlined = new ObjectSet<>();
 
-    public MultiPacker(){
-        this(true);
-    }
-
-    public MultiPacker(boolean initialize){
-        if(initialize){
-            packers = new PixmapPacker[PageType.all.length];
-            for(int i = 0; i < packers.length; i++){
-                packers[i] = new PixmapPacker(Math.min(Vars.maxTextureSize, PageType.all[i].width), Math.min(Vars.maxTextureSize, PageType.all[i].height), 2, true);
-            }
+    public MultiPacker(int size){
+        if(size > 0){
+            packer = new PixmapPacker(size, size, 2, true);
         }
     }
 
     public PixmapRegion get(TextureRegion region){
-        return Core.atlas.getPixmap(region);
+        return get(((AtlasRegion)region).name);
     }
 
     public PixmapRegion get(String region){
-        return Core.atlas.getPixmap(region);
+        PixmapRegion out = getOrNull(region);
+        //this should not happen in normal situations
+        if(out == null) return getOrNull("error");
+        return out;
     }
 
-    public @Nullable PixmapRegion getPacked(String name){
-        for(var packer : packers){
-            var region = packer.getRegion(name);
-            if(region != null){
-                return region;
-            }
-        }
-        return null;
+    public @Nullable PixmapRegion getOrNull(String name){
+        return packer.getRegion(name);
     }
 
     public void printStats(){
         if(Log.level != LogLevel.debug) return;
 
-        for(PageType type : PageType.all){
-            var packer = packers[type.ordinal()];
-            Log.debug("[Atlas] [&ly@&fr]", type);
-            Log.debug("[Atlas] - " + (packer.getPages().size > 1 ? "&fb&lr" : "&lg") + "@ page@&r", packer.getPages().size, packer.getPages().size > 1 ? "s" : "");
-            int i = 0;
-            for(var page : packer.getPages()){
-                float totalArea = 0;
-                for(var region : page.getRects().values()){
-                    totalArea += region.area();
-                }
-
-                Log.debug("[Atlas] - [@] @x@ (&lk@% used&fr)", i, page.getPixmap().width, page.getPixmap().height, (int)(totalArea / (page.getPixmap().width * page.getPixmap().height) * 100f));
-
-                i ++;
+        Log.debug("[Atlas] " + (packer.getPages().size > 1 ? "&fb&lr" : "&lg") + "@ page@&r", packer.getPages().size, packer.getPages().size > 1 ? "s" : "");
+        int i = 0;
+        for(var page : packer.getPages()){
+            float totalArea = 0;
+            for(var region : page.getRects().values()){
+                totalArea += region.area();
             }
+
+            Log.debug("[Atlas] - [@] @x@ (&lk@% used&fr)", i, page.getPixmap().width, page.getPixmap().height, (int)(totalArea / (page.getPixmap().width * page.getPixmap().height) * 100f));
+
+            i ++;
         }
     }
 
@@ -75,78 +61,33 @@ public class MultiPacker implements Disposable{
     }
 
     public boolean has(String name){
-        for(var page : PageType.all){
-            if(packers[page.ordinal()].getRect(name) != null){
-                return true;
-            }
+        if(packer.getRect(name) != null){
+            return true;
         }
         return false;
     }
 
-    public boolean has(PageType type, String name){
-        return packers[type.ordinal()].getRect(name) != null;
+    public void add(String name, Pixmap pix){
+        packer.pack(name, new PixmapRegion(pix));
     }
 
-    public void add(PageType type, String name, PixmapRegion region){
-        add(type, name, region, null, null);
+    public void add(String name, PixmapRegion region){
+        packer.pack(name, region, null, null);
     }
 
-    public void add(PageType type, String name, PixmapRegion region, int[] splits, int[] pads){
-        packers[type.ordinal()].pack(name, region, splits, pads);
-    }
-
-    public void add(PageType type, String name, Pixmap pix){
-        add(type, name, new PixmapRegion(pix));
+    public void add(String name, PixmapRegion region, int[] splits, int[] pads){
+        packer.pack(name, region, splits, pads);
     }
 
     public TextureAtlas flush(TextureFilter filter, TextureAtlas atlas){
-        for(PixmapPacker p : packers){
-            p.updateTextureAtlas(atlas, filter, filter, false, false);
-        }
+        packer.updateTextureAtlas(atlas, filter, filter, false, false);
         return atlas;
     }
 
     @Override
     public void dispose(){
-        if(packers == null) return;
-        for(int i = 0; i < PageType.all.length; i ++){
-            var packer = packers[i];
-            //the UI packer's image is later used when merging with the font, don't dispose it
-            if(i != PageType.ui.ordinal()){
-                packer.forceDispose();
-            }
-        }
-    }
-
-    //There are several pages for sprites.
-    //main page (sprites.png) - all sprites for units, weapons, placeable blocks, effects, bullets, etc
-    //environment page (sprites2.png) - all sprites for things in the environmental cache layer
-    //ui page (sprites3.png) - content icons, white icons, fonts and UI elements
-    //rubble page (sprites4.png) - scorch textures for unit deaths & wrecks
-    //editor page (sprites5.png) - all sprites needed for rendering in the editor, including block icons and a few minor sprites
-    public enum PageType{
-        //main page can be massive, but 8192 throws GL_OUT_OF_MEMORY on some GPUs and I can't deal with it yet.
-        main(4096),
-
-        environment(4096),
-        ui(4096),
-        rubble(4096, 2048);
-
-        public static final PageType[] all = values();
-
-        public int width = 2048, height = 2048;
-
-        PageType(int defaultSize){
-            this.width = this.height = defaultSize;
-        }
-
-        PageType(int width, int height){
-            this.width = width;
-            this.height = height;
-        }
-
-        PageType(){
-
+        if(packer != null){
+            packer.forceDispose();
         }
     }
 }
