@@ -573,6 +573,8 @@ public class LogicBlock extends Block{
         }
 
         public void updateLinks(){
+            if(linksVar == null) return;
+
             int valids = links.count(l -> l.valid);
             executor.links = new Building[valids];
             executor.linkIds.clear();
