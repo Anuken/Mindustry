@@ -110,7 +110,7 @@ public class Blocks{
     //defense - erekir
     radar,
     buildTower,
-    regenProjector, barrierProjector, shockwaveTower,
+    regenProjector, shockwaveTower,
     //campaign only
     shieldProjector,
     largeShieldProjector,
@@ -2034,19 +2034,6 @@ public class Blocks{
             }});
         }};
 
-        //TODO implement
-        if(false)
-        barrierProjector = new DirectionalForceProjector("barrier-projector"){{
-            requirements(Category.effect, with(Items.surgeAlloy, 100, Items.silicon, 125));
-            size = 3;
-            width = 50f;
-            length = 36;
-            shieldHealth = 2000f;
-            cooldownNormal = 3f;
-            cooldownBrokenBase = 0.35f;
-
-            consumePower(4f);
-        }};
 
         shockwaveTower = new ShockwaveTower("shockwave-tower"){{
             requirements(Category.effect, with(Items.surgeAlloy, 50, Items.silicon, 150, Items.oxide, 30, Items.tungsten, 100));
