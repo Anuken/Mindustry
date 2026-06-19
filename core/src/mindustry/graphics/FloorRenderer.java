@@ -92,7 +92,7 @@ public class FloorRenderer{
         varying vec4 v_color;
         varying vec2 v_texCoords;
         varying float v_depth;
-        uniform sampler2DArray u_texture;
+        uniform highp sampler2DArray u_texture;
 
         void main(){
           gl_FragColor = v_color * texture(u_texture, vec3(v_texCoords, v_depth));
