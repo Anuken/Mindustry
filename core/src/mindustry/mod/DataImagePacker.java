@@ -144,7 +144,6 @@ public class DataImagePacker{
 
         packer.forceDispose();
 
-
         //getRegions is intentionally not modified, it's a hassle to manage, O(n) to unapply, and not used anywhere important. there's no point.
         //the drawable map isn't used, and thus not modified either
 
