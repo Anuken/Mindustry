@@ -630,6 +630,12 @@ public class TypeIO{
             int x = read.us();
             int y = read.us();
             Block block = Vars.content.block(read.us());
+            if(block == null){
+                // Skip unrecognised block IDs (e.g. from a modded client)
+                read.b(); // consume rotation byte
+                readClientPlanConfig(read); // consume config
+                continue;
+            }
             int rotation = (block.rotate ? read.b() : 0);
             Object config = readClientPlanConfig(read);
             BuildPlan plan = new BuildPlan(x, y, rotation, block, config);
