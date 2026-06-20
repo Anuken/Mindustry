@@ -22,7 +22,6 @@ public enum PerfCounter{
     private long beginTime;
     private boolean began = false;
     private WindowedMean mean = new WindowedMean(meanWindow);
-    //
 
     public void begin(){
         began = true;
