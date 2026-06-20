@@ -59,8 +59,8 @@ public class PausedDialog extends BaseDialog{
 
         if(!mobile){
             if(steam){
-                cont.check("@steam.friendsonly", !Core.settings.getBool("steampublichost"), val -> {
-                    Core.settings.put("steampublichost", !val);
+                cont.check("@steam.friendsonly", !Core.settings.getBool("steampublichost2"), val -> {
+                    Core.settings.put("steampublichost2", !val);
                     platform.updateLobby();
                 }).colspan(2).left().with(c -> ui.addDescTooltip(c, "@steam.friendsonly.tooltip")).width(440f)
                     .visible(() -> net.server()).center().colspan(2).fillX().padBottom(10f).row();
