@@ -7,6 +7,7 @@ import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.graphics.gl.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -15,8 +16,8 @@ import mindustry.audio.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
-import mindustry.game.*;
 import mindustry.game.Saves.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -55,7 +56,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         loadFileLogger();
         platform = this;
-        maxTextureSize = Gl.getInt(Gl.maxTextureSize);
+        maxTextureSize = arc.graphics.gl.Gl.getInt(Gl.maxTextureSize);
         beginTime = Time.millis();
 
         //debug GL information

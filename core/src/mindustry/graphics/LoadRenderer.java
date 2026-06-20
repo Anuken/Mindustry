@@ -9,6 +9,7 @@ import arc.graphics.Pixmap.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.GLVersion.*;
+import arc.graphics.gl.*;
 import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -166,7 +167,7 @@ public class LoadRenderer implements Disposable{
         w = viewportWidth;
         h = viewportHeight;
 
-        Gl.viewport(viewportX, viewportY, viewportWidth, viewportHeight);
+        arc.graphics.gl.Gl.viewport(viewportX, viewportY, viewportWidth, viewportHeight);
         Draw.proj().setOrtho(0, 0, viewportWidth, viewportHeight);
 
         //background text and indicator
@@ -224,7 +225,7 @@ public class LoadRenderer implements Disposable{
                     }
 
                     Draw.flush();
-                    Gl.clear(Gl.stencilBufferBit);
+                    arc.graphics.gl.Gl.clear(arc.graphics.gl.Gl.stencilBufferBit);
                     Draw.beginStencil();
 
                     Fill.poly(floats);
@@ -329,7 +330,7 @@ public class LoadRenderer implements Disposable{
                                 Lines.circle(cx, cy, vsize/2f);
 
                                 if(rw > 0 && rh > 0){
-                                    Gl.viewport(viewportX + rx, viewportY + ry, rw, rh);
+                                    arc.graphics.gl.Gl.viewport(viewportX + rx, viewportY + ry, rw, rh);
 
                                     cam.position.set(2, 0, 2);
                                     cam.resize(rw, rh);
@@ -338,10 +339,10 @@ public class LoadRenderer implements Disposable{
                                     cam.update();
                                     Shaders.mesh.bind();
                                     Shaders.mesh.setUniformMatrix4("u_proj", cam.combined.val);
-                                    mesh.render(Shaders.mesh, Gl.lines);
+                                    mesh.render(Shaders.mesh, arc.graphics.gl.Gl.lines);
 
                                     //restore viewport
-                                    Gl.viewport(viewportX, viewportY, viewportWidth, viewportHeight);
+                                    arc.graphics.gl.Gl.viewport(viewportX, viewportY, viewportWidth, viewportHeight);
                                 }
 
                                 int points = 4;

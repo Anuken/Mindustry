@@ -2,6 +2,7 @@ package mindustry.graphics.g3d;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.graphics.g3d.PlanetGrid.*;

@@ -6,7 +6,6 @@ import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
-import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;

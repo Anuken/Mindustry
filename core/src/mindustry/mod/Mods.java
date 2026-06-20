@@ -7,7 +7,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
-import arc.graphics.gl.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;

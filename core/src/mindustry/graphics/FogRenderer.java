@@ -3,7 +3,6 @@ package mindustry.graphics;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
