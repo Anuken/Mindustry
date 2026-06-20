@@ -63,7 +63,8 @@ public class SteamAdmin{
     }
 
     public static boolean isBanned(String id){
-        if(!id.startsWith("steam:")) return false;
+        //bans are ignored with private lobbies
+        if(!id.startsWith("steam:") || !Core.settings.getBool("steampublichost")) return false;
         return data.bans.contains(id.substring("steam:".length()));
     }
 

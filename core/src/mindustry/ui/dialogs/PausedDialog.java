@@ -58,6 +58,14 @@ public class PausedDialog extends BaseDialog{
         });
 
         if(!mobile){
+            if(steam){
+                cont.check("@steam.friendsonly", !Core.settings.getBool("steampublichost"), val -> {
+                    Core.settings.put("steampublichost", !val);
+                    platform.updateLobby();
+                }).colspan(2).left().with(c -> ui.addDescTooltip(c, "@steam.friendsonly.tooltip")).width(440f)
+                    .visible(() -> net.server()).center().colspan(2).fillX().padBottom(10f).row();
+            }
+
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
