@@ -61,18 +61,15 @@ public class MultiPacker implements Disposable{
     }
 
     public boolean has(String name){
-        if(packer.getRect(name) != null){
-            return true;
-        }
-        return false;
+        return packer.getRect(name) != null;
     }
 
     public void add(String name, Pixmap pix){
-        packer.pack(name, new PixmapRegion(pix));
+        add(name, new PixmapRegion(pix));
     }
 
     public void add(String name, PixmapRegion region){
-        packer.pack(name, region, null, null);
+        add(name, region, null, null);
     }
 
     public void add(String name, PixmapRegion region, int[] splits, int[] pads){

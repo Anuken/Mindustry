@@ -3,8 +3,9 @@ package mindustry.mod;
 import arc.*;
 import arc.files.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g2d.TextureAtlas.*;
+import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -18,16 +19,23 @@ import java.util.concurrent.atomic.*;
 
 /** Manages data patch images. */
 public class DataImagePacker{
+    private static int defaultAtlasDepth = -1;
+
     public static final String regionPrefix = "dp-";
 
-    private @Nullable TextureAtlas patchAtlas;
+    private @Nullable Seq<AtlasRegion> addedRegions;
 
     /** Packs a new set of images. If images are already packed, disposes of the old ones. */
     public void pack(Seq<ImageAsset> images){
-        if(patchAtlas != null){
+        if(addedRegions != null){
             unload();
         }
+
         if(images.isEmpty()) return;
+
+        if(defaultAtlasDepth <= 0){
+            defaultAtlasDepth = Core.atlas.getTexture().getDepth();
+        }
 
         Time.mark();
 
@@ -59,8 +67,8 @@ public class DataImagePacker{
 
         Threads.awaitAll(sizeTasks);
 
-        int targetPower = Mathf.nextPowerOfTwo((int)(Mathf.sqrt(totalSumArea.get()) * 1.35f));
-        int targetSize = Mathf.clamp(Math.max(targetPower, maxSize.get()), 128, Math.min(4096, Vars.maxTextureSize));
+        int targetPower = Mathf.nextPowerOfTwo((int)(Mathf.sqrt(totalSumArea.get()) * 1.4f));
+        int targetSize = Mathf.clamp(Math.max(targetPower, maxSize.get()), 128, 4096);
 
         PixmapPacker packer = new PixmapPacker(targetSize, targetSize, 2, true);
 
@@ -105,12 +113,39 @@ public class DataImagePacker{
 
         Threads.awaitAll(tasks);
 
-        TextureFilter filter = Core.settings.getBool("linear", !Vars.mobile) ? TextureFilter.linear : TextureFilter.nearest;
-        patchAtlas = packer.generateTextureAtlas(filter, filter, false, true, 0);
+        Draw.flush();
+        var pagesToAdd = packer.getPages().select(p -> p.addedRects.size > 0);
+        addedRegions = new Seq<>();
+        Core.atlas.getTexture().resizeDepth(defaultAtlasDepth + pagesToAdd.size);
+
+        for(int i = 0; i < pagesToAdd.size; i ++){
+            var page = pagesToAdd.get(i);
+            ArraySliceTexture tex = new ArraySliceTexture(Core.atlas.getTexture(), i + defaultAtlasDepth);
+            tex.draw(page.image);
+
+            for(String name : page.addedRects){
+                var rect = page.rects.get(name);
+                var region = new AtlasRegion(tex, (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
+
+                if(rect.splits != null){
+                    region.splits = rect.splits;
+                    region.pads = rect.pads;
+                }
+
+                region.name = name;
+                region.offsetX = rect.offsetX;
+                region.offsetY = (int)(rect.originalHeight - rect.height - rect.offsetY);
+                region.originalWidth = rect.originalWidth;
+                region.originalHeight = rect.originalHeight;
+
+                Core.atlas.getRegionMap().put(name, region);
+                addedRegions.add(region);
+            }
+        }
 
         packer.forceDispose();
 
-        Core.atlas.getRegionMap().putAll(patchAtlas.getRegionMap());
+
         //getRegions is intentionally not modified, it's a hassle to manage, O(n) to unapply, and not used anywhere important. there's no point.
         //the drawable map isn't used, and thus not modified either
 
@@ -118,13 +153,11 @@ public class DataImagePacker{
     }
 
     public void unload(){
-        if(patchAtlas != null){
-            for(var region : patchAtlas.getRegions()){
-                patchAtlas.getRegionMap().remove(region.name);
+        if(addedRegions != null){
+            for(var region : addedRegions){
+                Core.atlas.getRegionMap().remove(region.name);
             }
-
-            patchAtlas.dispose();
-            patchAtlas = null;
+            addedRegions = null;
         }
     }
 
