@@ -82,7 +82,7 @@ public class MapContentView implements AssetView{
                 list.add().size(h);
             }
 
-            list.button(content.content instanceof UnlockableContent u && (u.uiIcon.found() || u.fullIcon.found()) ? new TextureRegionDrawable(u.uiIcon.found() ? u.uiIcon : u.fullIcon) :
+            list.button(content.content instanceof UnlockableContent u && u.uiIcon != null && (u.uiIcon.found() || u.fullIcon.found()) ? new TextureRegionDrawable(u.uiIcon.found() ? u.uiIcon : u.fullIcon) :
                 contentIcons.get(content.type, Icon.warning), Styles.graySquarei, iconMed, () -> {}).touchable(Touchable.disabled).size(h);
 
             list.button(("[accent]" + content.name + "\n") + "[lightgray]" + Core.bundle.get("content." + content.type), Styles.grayt, () -> {
