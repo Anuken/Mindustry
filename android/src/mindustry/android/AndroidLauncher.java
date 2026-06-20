@@ -211,7 +211,6 @@ public class AndroidLauncher extends AndroidApplication{
         }, new AndroidApplicationConfiguration(){{
             useImmersiveMode = true;
             hideStatusBar = true;
-            useGL30 = true;
         }});
         checkFiles(getIntent());
 

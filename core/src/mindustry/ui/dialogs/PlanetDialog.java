@@ -4,7 +4,6 @@ import arc.*;
 import arc.assets.loaders.TextureLoader.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.input.*;

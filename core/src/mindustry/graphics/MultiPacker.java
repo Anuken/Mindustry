@@ -1,7 +1,6 @@
 package mindustry.graphics;
 
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.struct.*;

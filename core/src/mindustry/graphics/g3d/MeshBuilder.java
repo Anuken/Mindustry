@@ -8,7 +8,7 @@ import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
 
 public class MeshBuilder{
-    private static final boolean packNormals = Core.gl30 != null && (Core.app.isMobile() || Core.graphics.getGLVersion().atLeast(3, 3));
+    private static final boolean packNormals = (Core.app.isMobile() || Core.graphics.getGLVersion().atLeast(3, 3));
     private static volatile float[] tmpHeights = new float[14580]; //highest amount of corners in vanilla
 
     /** Note that the resulting icosphere does not have normals or a color. */
@@ -211,7 +211,7 @@ public class MeshBuilder{
         }
 
         if(emissive){
-            attributes.add(new VertexAttribute(4, GL20.GL_UNSIGNED_BYTE, true, "a_emissive"));
+            attributes.add(new VertexAttribute(4, Gl.unsignedByte, true, "a_emissive"));
         }
 
         Mesh mesh = new Mesh(true, vertices, indices, attributes.toArray(VertexAttribute.class));

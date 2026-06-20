@@ -3,7 +3,7 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.files.*;
 import arc.func.*;
-import arc.graphics.Texture.*;
+import arc.graphics.*;
 import arc.input.*;
 import arc.scene.*;
 import arc.scene.event.*;

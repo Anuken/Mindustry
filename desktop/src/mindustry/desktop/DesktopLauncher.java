@@ -8,8 +8,8 @@ import arc.discord.*;
 import arc.discord.DiscordRPC.*;
 import arc.filedialogs.*;
 import arc.files.*;
+import arc.graphics.gl.*;
 import arc.math.*;
-import arc.profiling.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -75,8 +75,11 @@ public class DesktopLauncher extends ClientLauncher{
                                 if(str.contains(".")){
                                     String[] split = str.split("\\.");
                                     if(split.length == 2 && Strings.canParsePositiveInt(split[0]) && Strings.canParsePositiveInt(split[1])){
-                                        glVersions = new int[][]{{Strings.parseInt(split[0]), Strings.parseInt(split[1])}};
-                                        allowGl30 = true; //when a version is explicitly specified always allow GL 3
+                                        if(Strings.parseInt(split[0]) < 3){
+                                            Log.err("OpenGL 3.0 is required for Mindustry to run. Ignoring command-line GL version arguments.");
+                                        }else{
+                                            glVersions = new int[][]{{Strings.parseInt(split[0]), Strings.parseInt(split[1])}};
+                                        }
                                         break;
                                     }
                                 }
@@ -90,12 +93,11 @@ public class DesktopLauncher extends ClientLauncher{
                             case "testMobile" -> testMobile = true;
                             case "gltrace" -> {
                                 Events.on(ClientCreateEvent.class, e -> {
-                                    var profiler = new GLProfiler(Core.graphics);
-                                    profiler.enable();
+                                    GLProfiler.enable();
                                     Core.app.addListener(new ApplicationListener(){
                                         @Override
                                         public void update(){
-                                            profiler.reset();
+                                            GLProfiler.reset();
                                         }
                                     });
                                 });
@@ -297,7 +299,7 @@ public class DesktopLauncher extends ClientLauncher{
         String finalMessage = Strings.getFinalMessage(e);
         String total = Strings.getCauses(e).toString();
 
-        if(total.contains("Couldn't create window") || total.contains("OpenGL 2.0 or higher") || total.toLowerCase().contains("pixel format") || total.contains("GLEW")|| total.contains("unsupported combination of formats")){
+        if(total.contains("Couldn't create window") || total.contains("OpenGL 3.0 or higher") || total.toLowerCase().contains("pixel format") || total.contains("GLEW")|| total.contains("unsupported combination of formats")){
 
             message(
                 total.contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + finalMessage :

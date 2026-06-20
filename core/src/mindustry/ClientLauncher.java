@@ -139,6 +139,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         });
 
         assets.load("sprites/error.png", Texture.class);
+        //TODO: this takes 300+ms to load, which means 300ms of black screen
         atlas = new TextureAtlas(Core.files.internal("sprites/sprites.aatls"));
         Fonts.loadDefaultFont();
 
