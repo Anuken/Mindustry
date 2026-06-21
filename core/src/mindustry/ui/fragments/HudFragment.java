@@ -1073,7 +1073,6 @@ public class HudFragment{
                     lcell[0].padRight(-42f);
                 }
                 table.invalidateHierarchy();
-                table.pack();
                 couldSkip[0] = can;
             }
 

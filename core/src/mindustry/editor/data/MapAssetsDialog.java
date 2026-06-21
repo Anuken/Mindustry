@@ -48,7 +48,7 @@ public class MapAssetsDialog extends BaseDialog{
     private DataAssetType currentType = DataAssetType.music;
 
     public MapAssetsDialog(){
-        super("@patches");
+        super(""); //title is not displayed
 
         shown(() -> {
             searchString = null;
