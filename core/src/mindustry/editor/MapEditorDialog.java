@@ -429,7 +429,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     editor.tags.put("steamid", map.tags.get("steamid"));
                     workshop = true;
                 }
-                returned = maps.saveMap(editor.tags);
+                returned = maps.saveMap(editor.tags, false);
                 if(workshop){
                     returned.workshop = workshop;
                 }
