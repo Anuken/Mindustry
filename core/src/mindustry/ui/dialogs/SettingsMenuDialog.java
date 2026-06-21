@@ -419,12 +419,6 @@ public class SettingsMenuDialog extends BaseDialog{
                 platform.updateLobby();
                 return i + "";
             });
-
-            if(!Version.modifier.contains("beta")){
-                game.checkPref("steampublichost", false, i -> {
-                    platform.updateLobby();
-                });
-            }
         }
 
         game.checkPref("console", false);

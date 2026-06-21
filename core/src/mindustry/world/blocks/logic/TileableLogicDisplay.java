@@ -32,6 +32,7 @@ public class TileableLogicDisplay extends LogicDisplay{
         super(name);
 
         displaySize = 32;
+        allowRectanglePlacement = true;
     }
 
     public static void linkDisplays(TileableLogicDisplayBuild start){

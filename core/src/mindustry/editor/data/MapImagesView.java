@@ -45,7 +45,7 @@ public class MapImagesView implements AssetView{
 
                         if(width > DataPatcher.maxImageSize || height > DataPatcher.maxImageSize){
                             ui.showErrorMessage(Core.bundle.format("asset.image.toolarge", width, height, DataPatcher.maxImageSize, DataPatcher.maxImageSize));
-                            return;
+                            continue;
                         }
 
                         String name = result.nameWithoutExtension();
@@ -53,7 +53,7 @@ public class MapImagesView implements AssetView{
                         var other = images.find(p -> p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name));
                         if(other != null){
                             ui.showErrorMessage(Core.bundle.format("asset.image.exists", other.name + " (" + other.path + ")"));
-                            return;
+                            continue;
                         }
 
                         byte[] hash = assetCache.add(bytes);

@@ -1283,8 +1283,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void payloadDraw(){
-        if(block.isAir()) return;
-        draw();
+        float z = Draw.z();
+        if(block.drawCached){
+            Draw.z(block.buildingCacheLayer.layer);
+            drawCached();
+        }
+        if(block.drawDynamic){
+            Draw.z(z);
+            draw();
+        }
     }
 
     public void drawTeamTop(){
@@ -1793,6 +1800,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(power != null && updatePower){
             var oldGraph = power.graph;
+            for(var other : proximity){
+                if(other != null && other.team != team && other.power != null && other.power.graph == oldGraph){
+                    new PowerGraph().reflow(other);
+                }
+            }
             for(int i = 0; i < power.links.size; i++){
                 var other = world.build(power.links.items[i]);
 
