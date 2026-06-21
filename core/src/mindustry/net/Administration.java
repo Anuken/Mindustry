@@ -15,6 +15,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.regex.*;
 
 import static mindustry.Vars.*;
@@ -360,7 +361,7 @@ public class Administration{
             save();
             return true; // new key learned, assume its correct
         } else {
-            return info.publicKey.equals(publicKey);
+            return Arrays.equals(info.publicKey, publicKey);
         }
     }
 

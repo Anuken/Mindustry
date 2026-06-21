@@ -7,12 +7,17 @@ import java.security.*;
 import java.security.spec.*;
 
 /**
- * Handles Ed25519 signing and verification for player verification.
+ * Handles signing and verification for player verification.
  * <p>
- * The server generates a keypair on first run and saves it to settings. The public key is sent to clients
- * during the handshake, and clients use it to verify that the player is who it claims to be.
+ * The player stores private and public key, server verifies.
+ * Significantly more secure than old uuid/usid system.
+ * <p>
+ * Advantages:
+ * - Can verify that the player is who they say they are, even if the connection is intercepted or replaid.
+ * - Can be used accross a network of servers, similar to uuid, but cannot be stolen or spoofed assuming private key is kept safe.
  */
 public final class NetCrypto {
+    // Is not quantum resistant. But is fast, and I don't think Mindustry UUID spoofers will have quantum computers any time soon?
     private static final String ALGORITHM = "Ed25519";
 
     // null means not yet loaded
@@ -89,16 +94,12 @@ public final class NetCrypto {
     private static synchronized void ensureKeys() {
         if (cachedPrivateKey != null && cachedPublicKey != null) return;
 
-        String privB64 = Core.settings.getString("private-key");
-        String pubB64  = Core.settings.getString("public-key");
+        byte[] privBytes = Core.settings.getBytes("private-key");
+        byte[] pubBytes  = Core.settings.getBytes("public-key");
 
-        if (privB64 != null && !privB64.isBlank()
-                && pubB64  != null && !pubB64.isBlank()) {
+        if (privBytes != null && pubBytes  != null) {
             // Load from settings.
             try {
-                byte[] privBytes = java.util.Base64.getDecoder().decode(privB64.trim());
-                byte[] pubBytes  = java.util.Base64.getDecoder().decode(pubB64.trim());
-
                 KeyFactory kf = KeyFactory.getInstance(ALGORITHM);
                 cachedPrivateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(privBytes));
                 cachedPublicKey  = kf.generatePublic(new X509EncodedKeySpec(pubBytes));
@@ -118,11 +119,8 @@ public final class NetCrypto {
             cachedPrivateKey = kp.getPrivate();
             cachedPublicKey  = kp.getPublic();
 
-            String newPrivB64 = java.util.Base64.getEncoder().encodeToString(cachedPrivateKey.getEncoded());
-            String newPubB64  = java.util.Base64.getEncoder().encodeToString(cachedPublicKey.getEncoded());
-
-            Core.settings.put("private-key", newPrivB64);
-            Core.settings.put("public-key",  newPubB64);
+            Core.settings.put("private-key", cachedPrivateKey.getEncoded());
+            Core.settings.put("public-key",  cachedPublicKey.getEncoded());
 
             Log.info("Generated new Ed25519 keypair and saved to settings.");
         } catch (Exception e) {
