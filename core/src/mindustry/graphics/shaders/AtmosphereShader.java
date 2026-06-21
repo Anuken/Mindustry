@@ -36,7 +36,7 @@ public class AtmosphereShader extends LoadShader{
         setUniformf("u_innerRadius", planet.radius + planet.atmosphereRadIn);
         setUniformf("u_outerRadius", planet.radius + planet.atmosphereRadOut);
 
-        buffer.getDepthTexture().bind(4);
+        buffer.depthTexture.bind(4);
         setUniformi("u_topology", 4);
         setUniformf("u_viewport", Core.graphics.getWidth(), Core.graphics.getHeight());
     }

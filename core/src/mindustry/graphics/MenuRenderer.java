@@ -169,7 +169,7 @@ public class MenuRenderer implements Disposable{
     private void cache(){
 
         //draw shadows
-        Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
+        Draw.proj().setOrtho(0, 0, shadows.width, shadows.height);
         shadows.begin(Color.clear);
         Draw.color(Color.black);
 
@@ -222,7 +222,7 @@ public class MenuRenderer implements Disposable{
         batch.drawCache(cacheFloor);
         batch.endDraw();
         Draw.color();
-        Draw.rect(Draw.wrap(shadows.getTexture()),
+        Draw.rect(Draw.wrap(shadows.texture),
         width * tilesize / 2f - 4f, height * tilesize / 2f - 4f,
         width * tilesize, -height * tilesize);
         Draw.flush();

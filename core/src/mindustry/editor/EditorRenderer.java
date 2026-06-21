@@ -118,7 +118,8 @@ public class EditorRenderer implements Disposable{
         Draw.proj(Core.camera.mat);
 
         Draw.shader(Shaders.darkness);
-        Draw.rect(Draw.wrap(renderer.blocks.getShadowBuffer().getTexture()), world.width() * tilesize/2f - tilesize/2f, world.height() * tilesize/2f - tilesize/2f, world.width() * tilesize, -world.height() * tilesize);
+        FrameBuffer frameBuffer = renderer.blocks.getShadowBuffer();
+        Draw.rect(Draw.wrap(frameBuffer.texture), world.width() * tilesize/2f - tilesize/2f, world.height() * tilesize/2f - tilesize/2f, world.width() * tilesize, -world.height() * tilesize);
         Draw.shader();
 
         Draw.proj(Tmp.m2);

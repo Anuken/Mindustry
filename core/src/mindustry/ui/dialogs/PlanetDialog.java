@@ -48,7 +48,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public static boolean debugSelect = false, debugSectorAttackEdit, debugShowNumbers = false;
     public static float sectorShowDuration = 60f * 2.4f;
 
-    public final FrameBuffer buffer = new FrameBuffer(2, 2, true);
+    public final FrameBuffer buffer = new FrameBuffer(2, 2, Format.defaultColorDepth);
     public final LaunchLoadoutDialog loadouts = new LaunchLoadoutDialog();
     public final PlanetRenderer planets = renderer.planets;
 
@@ -917,7 +917,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             buffer.end();
 
             Draw.color(color);
-            Draw.rect(Draw.wrap(buffer.getTexture()), width/2f, height/2f, width, -height);
+            Draw.rect(Draw.wrap(buffer.texture), width/2f, height/2f, width, -height);
             Draw.color();
         }
     }

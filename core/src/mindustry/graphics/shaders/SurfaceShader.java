@@ -43,7 +43,7 @@ public class SurfaceShader extends Shader{
             }
 
             noiseTex.bind(1);
-            renderer.effectBuffer.getTexture().bind(0);
+            renderer.effectBuffer.texture.bind(0);
 
             setUniformi("u_noise", 1);
         }

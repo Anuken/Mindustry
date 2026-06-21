@@ -38,7 +38,7 @@ public class PlanetRenderer implements Disposable{
     //seed: 8kmfuix03fw
     public final CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
 
-    private final FrameBuffer framebuffer = new FrameBuffer(2, 2, true);
+    private final FrameBuffer framebuffer = new FrameBuffer(Format.defaultColorDepth);
 
     public PlanetRenderer(){
         projector.setScaling(1f / 150f);

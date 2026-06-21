@@ -30,7 +30,7 @@ public class SpaceShader extends SurfaceShader{
         setUniformf("u_time", Time.time);
 
         texture.bind(1);
-        renderer.effectBuffer.getTexture().bind(0);
+        renderer.effectBuffer.texture.bind(0);
 
         setUniformi("u_stars", 1);
     }

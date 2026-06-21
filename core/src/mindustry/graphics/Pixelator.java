@@ -14,7 +14,7 @@ public class Pixelator implements Disposable{
     private float px, py, pre;
 
     {
-        buffer.getTexture().setFilter(TextureFilter.nearest, TextureFilter.nearest);
+        buffer.texture.setFilter(TextureFilter.nearest, TextureFilter.nearest);
     }
 
     public void drawPixelate(){

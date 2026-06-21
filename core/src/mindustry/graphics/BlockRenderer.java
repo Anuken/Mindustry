@@ -3,7 +3,6 @@ package mindustry.graphics;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -252,10 +251,10 @@ public class BlockRenderer{
         lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
         hadMapLimit = state.rules.limitMapArea;
 
-        shadows.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
+        shadows.texture.setFilter(TextureFilter.linear, TextureFilter.linear);
         shadows.resize(world.width(), world.height());
         shadows.begin(Color.white);
-        Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
+        Draw.proj().setOrtho(0, 0, shadows.width, shadows.height);
 
         Draw.color(blendShadowColor);
 
@@ -287,10 +286,10 @@ public class BlockRenderer{
     }
 
     public void updateShadows(boolean ignoreBuildings, boolean ignoreTerrain){
-        shadows.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
+        shadows.texture.setFilter(TextureFilter.linear, TextureFilter.linear);
         shadows.resize(world.width(), world.height());
         shadows.begin(Color.white);
-        Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
+        Draw.proj().setOrtho(0, 0, shadows.width, shadows.height);
 
         Draw.color(blendShadowColor);
 
@@ -307,12 +306,12 @@ public class BlockRenderer{
 
     public void updateDarkness(){
         darkEvents.clear();
-        dark.getTexture().setFilter(TextureFilter.linear);
+        dark.texture.setFilter(TextureFilter.linear);
         dark.resize(world.width(), world.height());
         //fill darkness with black when map area is limited
         dark.begin(state.rules.limitMapArea ? Color.black : Color.white);
 
-        Draw.proj().setOrtho(0, 0, dark.getWidth(), dark.getHeight());
+        Draw.proj().setOrtho(0, 0, dark.width, dark.height);
 
         //clear out initial starting area
         if(state.rules.limitMapArea){
@@ -426,7 +425,7 @@ public class BlockRenderer{
             Draw.flush();
 
             dark.begin();
-            Draw.proj().setOrtho(0, 0, dark.getWidth(), dark.getHeight());
+            Draw.proj().setOrtho(0, 0, dark.width, dark.height);
 
             darkEvents.each(pos -> {
                 var tile = world.tile(pos);
@@ -446,7 +445,7 @@ public class BlockRenderer{
         }
 
         Draw.shader(Shaders.darkness);
-        Draw.fbo(dark.getTexture(), world.width(), world.height(), tilesize, tilesize/2f);
+        Draw.fbo(dark.texture, world.width(), world.height(), tilesize, tilesize/2f);
         Draw.shader();
     }
 
@@ -481,7 +480,7 @@ public class BlockRenderer{
             Draw.flush();
 
             shadows.begin();
-            Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
+            Draw.proj().setOrtho(0, 0, shadows.width, shadows.height);
 
             for(Tile tile : shadowEvents){
                 if(tile == null) continue;
@@ -509,7 +508,7 @@ public class BlockRenderer{
         u2 = (x + camera.width / 2f) / ww,
         v2 = (y + camera.height / 2f) / wh;
 
-        Tmp.tr1.set(shadows.getTexture());
+        Tmp.tr1.set(shadows.texture);
         Tmp.tr1.set(u, v2, u2, v);
 
         Draw.shader(Shaders.darkness);
