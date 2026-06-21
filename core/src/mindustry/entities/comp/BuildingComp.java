@@ -1216,9 +1216,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             float brcy = y - (block.size * tilesize / 2f) + (tilesize * multiplier / 2f);
 
             Draw.z(Layer.power + 1);
-            Draw.color(Pal.gray);
+            Draw.color(Pal.gray, Lod.alpha2);
             Fill.square(brcx, brcy, 2.5f * multiplier, 45);
-            Draw.color(status().color);
+            Draw.color(status().color, Lod.alpha2);
             Fill.square(brcx, brcy, 1.5f * multiplier, 45);
             Draw.color();
         }
@@ -1279,7 +1279,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void recache(){
-        if(!headless) renderer.blocks.recacheBuilding(tile);
+        if(!headless) renderer.blocks.recacheBuilding(block.buildingCacheLayer, tile);
     }
 
     public void payloadDraw(){
@@ -1886,6 +1886,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(Building other : tmpTiles){
             other.onProximityUpdate();
         }
+
+        if(!headless && block.drawCached) recache();
     }
 
     public void onNearbyBuildAdded(Building other){}
