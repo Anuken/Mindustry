@@ -351,13 +351,13 @@ public class NetServer implements ApplicationListener{
             con.verified        = true;
 
             //playing in pvp mode automatically assigns players to teams
-            player.team(assignTeam(player));
+            con.player.team(assignTeam(con.player));
 
-            sendWorldAndAssets(player);
+            sendWorldAndAssets(con.player);
 
             platform.updateRPC();
 
-            Events.fire(new PlayerConnect(player));
+            Events.fire(new PlayerConnect(con.player));
         });
 
         registerCommands();
