@@ -47,8 +47,8 @@ public class Planets{
             generator = new ErekirPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 5);
             cloudMeshLoader = () -> new MultiMesh(
-                new HexSkyMesh(this, 2, 0.15f, 0.14f, 5, Color.valueOf("eba768").a(0.75f), 2, 0.42f, 1f, 0.43f),
-                new HexSkyMesh(this, 3, 0.6f, 0.15f, 5, Color.valueOf("eea293").a(0.75f), 2, 0.42f, 1.2f, 0.45f)
+                new HexSkyMesh(this, 2, 0.15f, 0.17f, 5, Color.valueOf("eba768").a(0.75f), 2, 0.42f, 1f, 0.43f),
+                new HexSkyMesh(this, 3, 0.6f, 0.19f, 5, Color.valueOf("eea293").a(0.75f), 2, 0.42f, 1.2f, 0.45f)
             );
             alwaysUnlocked = true;
             landCloudColor = Color.valueOf("ed6542");
@@ -59,6 +59,7 @@ public class Planets{
             atmosphereRadOut = 0.3f;
             tidalLock = true;
             orbitSpacing = 2f;
+            outlineScale = 1.22f;
             totalRadius += 2.6f;
             lightSrcTo = 0.5f;
             lightDstFrom = 0.2f;

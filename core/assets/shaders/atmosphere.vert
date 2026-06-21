@@ -1,13 +1,16 @@
-attribute vec4 a_position;
+#define HIGHP
 
-varying vec4 v_position;
-varying mat4 v_model;
+in vec3 a_position;
 
-uniform mat4 u_model;
-uniform mat4 u_projection;
+out vec3 v_position;
+
+uniform mat4 u_projView;
+uniform mat4 u_trans;
+uniform float u_outerRadius;
 
 void main(){
-    v_position = a_position;
-    v_model = u_model;
-    gl_Position = u_projection*u_model*a_position;
+    vec4 pos = u_trans * vec4(a_position * u_outerRadius, 1.0);
+
+    v_position = pos.xyz;
+    gl_Position = u_projView * pos;
 }

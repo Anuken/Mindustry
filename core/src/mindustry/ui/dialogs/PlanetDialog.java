@@ -872,7 +872,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             Ray r = planets.cam.getPickRay(mouseX, mouseY);
 
             // get planet we're hovering over
-            Vec3 intersect = planet.intersect(r, outlineRad * planet.radius);
+            Vec3 intersect = planet.intersect(r, planet.outlineScale * planet.radius);
 
             if(intersect != null && selectable(planet) && intersect.dst(r.origin) < nearest){
                 nearest = intersect.dst(r.origin);
@@ -1003,7 +1003,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if(state.planet.hasGrid()){
-            hovered = Core.scene.getDialog() == this ? state.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad * state.planet.radius) : null;
+            hovered = Core.scene.getDialog() == this ? state.planet.getSector(planets.cam.getMouseRay(), state.planet.outlineScale * state.planet.radius) : null;
         }else if(state.planet.isLandable()){
             boolean wasNull = selected == null;
             //always have the first sector selected.

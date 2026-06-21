@@ -1,12 +1,5 @@
+//all depth fixes taken from: https://github.com/GglLfr/Confictura
 #define HIGHP
-
-const float PI = 3.14159265359;
-const float MAX = 10000.0;
-
-const float PEAK = 0.1;
-const float FLARE = 0.0025;
-const float INTENSITY = 14.3;
-const float G_M = -0.85;
 
 #define SCATTER_OUT 3
 #define SCATTER_IN 3
@@ -16,29 +9,35 @@ const float fNumOutScatter = float(SCATTER_OUT);
 const int numInScatter = SCATTER_IN;
 const float fNumInScatter = float(SCATTER_IN);
 
-varying vec4 v_position;
-varying mat4 v_model;
+const float pi = 3.14159265359;
+const float peak = 0.1;
+const float flare = 0.0025;
+const float intensity = 14.3;
+const float gm = -0.85;
+
+in vec3 v_position;
+
+uniform mat4 u_invProj;
+uniform vec3 u_camPos;
+uniform vec3 u_relCamPos;
+uniform vec2 u_depthRange;
+uniform vec3 u_center;
+uniform vec3 u_light;
+uniform vec3 u_color;
 
 uniform float u_innerRadius;
 uniform float u_outerRadius;
-uniform vec3 u_color;
-uniform vec2 u_resolution;
-uniform float u_time;
-uniform vec3 u_campos;
-uniform vec3 u_rcampos;
-uniform mat4 u_invproj;
-uniform vec3 u_light;
+uniform sampler2D u_topology;
+uniform vec2 u_viewport;
 
-vec2 rayIntersection(vec3 p, vec3 dir, float radius){
-    float b = dot(p, dir);
-    float c = dot(p, p) - radius * radius;
+vec2 intersect(vec3 ray_origin, vec3 ray_dir, float radius){
+    float b = dot(ray_origin, ray_dir);
+    float c = dot(ray_origin, ray_origin) - radius * radius;
 
     float d = b * b - c;
-    if(d < 0.0){
-        return vec2(MAX, -MAX);
-    }
-    d = sqrt(d);
+    if(d < 0.0) discard;
 
+    d = sqrt(d);
     float near = -b - d;
     float far = -b + d;
 
@@ -74,47 +73,52 @@ float optic(vec3 p, vec3 q){
         sum += density(v);
         v += step;
     }
-    sum *= length(step)*(1.0 / (u_outerRadius - u_innerRadius));
+    sum *= length(step) * (1.0 / (u_outerRadius - u_innerRadius));
     return sum;
 }
 
-vec3 inScatter(vec3 o, vec3 dir, vec2 e, vec3 l){
-    float len = (e.y - e.x) / fNumInScatter;
-    vec3 step = dir * len;
-    vec3 p = o + dir * e.x;
-    vec3 v = p + dir * (len * 0.5);
+vec3 inScatter(vec3 eye, vec3 ray, vec2 bound, vec3 light){
+    float len = (bound.y - bound.x) / fNumInScatter;
+    len = min(len, u_innerRadius * 0.5);
+
+    vec3 step = ray * len;
+    vec3 start = eye + ray * bound.x;
+    vec3 march = start + ray * (len * 0.5);
 
     vec3 sum = vec3(0.0);
     for(int i = 0; i < numInScatter; i++){
-        vec2 f = rayIntersection(v, l, u_outerRadius);
-        vec3 u = v + l * f.y;
-        float n = (optic(p, v) + optic(v, u))*(PI * 4.0);
+        vec2 f = intersect(march, light, u_outerRadius);
+        vec3 u = march + light * f.y;
+        float n = (optic(start, march) + optic(march, u)) * (pi * 4.0);
 
-        sum += density(v) * exp(-n * (PEAK * u_color + FLARE));
-        v += step;
+        sum += density(march) * exp(-n * (peak * u_color + flare));
+        march += step;
     }
     sum *= len * (1.0 / (u_outerRadius - u_innerRadius));
-    float c = dot(dir, -l);
+    float c = dot(ray, -light);
     float cc = c * c;
-    return sum * (PEAK * u_color * rayleighPhase(cc) + FLARE * miePhase(G_M, c, cc)) * INTENSITY;
+    return sum * (peak * u_color * rayleighPhase(cc) + flare * miePhase(gm, c, cc)) * intensity;
 }
 
-vec3 rayDirection(){
-    vec4 ray = v_model*v_position - vec4(u_campos, 1.0);
-    return normalize(vec3(ray));
+float depth(vec2 uv){
+    float depth = texture(u_topology, uv).r;
+
+    float x_ndc = uv.x * 2.0 - 1.0;
+    float y_ndc = uv.y * 2.0 - 1.0;
+    float z_ndc = depth * 2.0 - 1.0;
+    vec4 clip = vec4(x_ndc, y_ndc, z_ndc, 1.0);
+
+    vec4 view = u_invProj * clip;
+    return length(view.xyz / view.w);
 }
 
 void main(){
-    vec3 dir = rayDirection();
-    vec3 eye = u_rcampos;
+    vec3 eye = u_relCamPos;
+    vec3 ray = normalize(v_position - u_camPos);
+    vec3 normal = normalize(v_position - u_center);
 
-    vec3 l = u_light;
+    vec2 bound = intersect(eye, ray, u_outerRadius);
+    bound.y = min(bound.y, depth(gl_FragCoord.xy / u_viewport));
 
-    vec2 e = rayIntersection(eye, dir, u_outerRadius);
-    vec2 f = rayIntersection(eye, dir, u_innerRadius);
-    e.y = min(e.y, f.x);
-
-    vec3 result = inScatter(eye, dir, e, l);
-
-    gl_FragColor = vec4(result, 1.0);
+    fragColor = vec4(inScatter(eye, ray, bound, u_light), 1.0);
 }
