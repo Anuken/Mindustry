@@ -62,6 +62,7 @@ public class Planets{
             outlineScale = 1.22f;
             totalRadius += 2.6f;
             lightSrcTo = 0.5f;
+            minZoom = 0.7f;
             lightDstFrom = 0.2f;
             clearSectorOnLose = true;
             defaultCore = Blocks.coreBastion;
