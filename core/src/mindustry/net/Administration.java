@@ -352,6 +352,18 @@ public class Administration{
         return true;
     }
 
+    /** Returns true if the public key was saved, or if the public key matches the one already saved. */
+    public boolean saveOrVerifyPublicKey(String id, byte[] publicKey){
+        PlayerInfo info = getCreateInfo(id);
+        if(info.publicKey == null){
+            info.publicKey = publicKey;
+            save();
+            return true; // new key learned, assume its correct
+        } else {
+            return info.publicKey.equals(publicKey);
+        }
+    }
+
     public boolean isWhitelistEnabled(){
         return Config.whitelist.bool();
     }
@@ -623,6 +635,7 @@ public class Administration{
         public int timesJoined;
         public boolean banned, admin;
         public long lastKicked; //last kicked time to expiration
+        public byte[] publicKey;
 
         public transient long lastMessageTime, lastSyncTime;
         public transient String lastSentMessage;

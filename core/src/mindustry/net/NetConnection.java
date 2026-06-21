@@ -32,12 +32,10 @@ public abstract class NetConnection{
     public Ratekeeper chatRate = new Ratekeeper();
     /** Handles packet spam rate limits. */
     public Ratekeeper packetRate = new Ratekeeper();
-    /** If player has passed public key verification. **/
+    /** If player has passed public key verification. Always false for non-headless servers **/
     public boolean verified = false;
     /** Nonce sent to client for public key verification, set to null once verified. **/
     public byte[] pendingNonce = null;
-    /** Claimed public key, set to null once verified. **/
-    public byte[] clientPublicKey = null;
 
     //TODO: refactor to state enum
     public boolean hasConnected, hasBegunConnecting, determiningAssets, receivingAssets, hasDisconnected;

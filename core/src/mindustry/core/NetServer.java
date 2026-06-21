@@ -305,22 +305,26 @@ public class NetServer implements ApplicationListener{
 
             con.player = player;
 
-            byte[] nonce       = NetCrypto.generateNonce();
-            con.pendingNonce   = nonce;
+            if (headless) {
+                byte[] nonce = NetCrypto.generateNonce();
+                con.pendingNonce = nonce;
 
-            AuthChallengePacket challenge = new AuthChallengePacket();
-            challenge.nonce = nonce;
-            con.send(challenge, true);
+                AuthChallengePacket challenge = new AuthChallengePacket();
+                challenge.nonce = nonce;
+                con.send(challenge, true);
 
-            debug("Auth: issued challenge to @", con.address);
+                debug("Issued challenge to @", con.address);
 
-            // Kick the client if it doesn't respond in time.
-            Timer.schedule(() -> {
-                if(con.pendingNonce != null && con.isConnected() && !con.kicked){
-                    debug("Auth: @ timed out waiting for auth response.", con.address);
-                    con.kick("Authentication timeout.");
-                }
-            }, authTimeoutMs / 1000f);
+                // Kick the client if it doesn't respond in time.
+                Timer.schedule(() -> {
+                    if (con.pendingNonce != null && con.isConnected() && !con.kicked) {
+                        debug("@ timed out waiting for auth response.", con.address);
+                        con.kick("Authentication timeout.");
+                    }
+                }, authTimeoutMs / 1000f);
+            } else {
+                connectPlayer(con);
+            }
         });
 
         net.handleServer(AuthResponsePacket.class, (con, packet) -> {
@@ -330,37 +334,42 @@ public class NetServer implements ApplicationListener{
             byte[] nonce       = con.pendingNonce;
             con.pendingNonce   = null; // consume immediately — one-time use
 
+            // todo public key NEEDS to be stored for this to work. Is this correct way?
+            if (!admins.saveOrVerifyPublicKey(con.uuid, packet.publicKey)) {
+                info("Rejected @ — public key mismatch (potential relay/MITM attempt or bad key).", con.address);
+                con.kick("Connection failed."); // Generic fail as to not give more info to potential attackers
+            }
+
             boolean sigOk = NetCrypto.verify(packet.publicKey, nonce, packet.claimedHost, packet.signature);
             if(!sigOk){
-                info("Auth: rejected @ — invalid signature (relay/MITM attempt or bad key).", con.address);
-                con.kick("Connection failed: invalid signature.");
+                info("Rejected @ — invalid signature (relay/MITM attempt or bad key).", con.address);
+                con.kick("Connection failed."); // Generic fail as to not give more info to potential attackers
                 return;
             }
 
             boolean hostOk = true;
             //todo add commands for server and such, probably also limit this whole auth flow to work for servers only?
-            // todo also add storage of previously acquired public keys to Adminstration, and run this all only if Vars.headless = true
             if(!hostOk){
-                info("Auth: rejected @ — claimed host '@' not in allowed list.", con.address, packet.claimedHost);
+                info("Rejected @ — claimed host '@' not in allowed list.", con.address, packet.claimedHost);
                 con.kick("Authentication failed: host not in allowed list.");
                 return;
             }
 
-            // Everything passed
-            con.clientPublicKey = packet.publicKey;
-            con.verified        = true;
-
-            //playing in pvp mode automatically assigns players to teams
-            con.player.team(assignTeam(con.player));
-
-            sendWorldAndAssets(con.player);
-
-            platform.updateRPC();
-
-            Events.fire(new PlayerConnect(con.player));
+            con.verified = true;
+            connectPlayer(con);
         });
 
         registerCommands();
+    }
+
+    private void connectPlayer(NetConnection con){
+        if(con == null) return;
+
+        //playing in pvp mode automatically assigns players to teams
+        con.player.team(assignTeam(con.player));
+        sendWorldAndAssets(con.player);
+        platform.updateRPC();
+        Events.fire(new PlayerConnect(con.player));
     }
 
     public void sendWorldAndAssets(Player player){

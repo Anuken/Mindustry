@@ -65,7 +65,7 @@ public final class NetCrypto {
             return verifier.verify(signature);
         } catch (Exception e) {
             // Malformed key / signature bytes — treat as verification failure.
-            Log.warn("NetCrypto: verification threw exception: @", e.getMessage());
+            Log.warn("Verification threw exception: @", e.getMessage());
             return false;
         }
     }
@@ -103,10 +103,10 @@ public final class NetCrypto {
                 cachedPrivateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(privBytes));
                 cachedPublicKey  = kf.generatePublic(new X509EncodedKeySpec(pubBytes));
 
-                Log.debug("NetCrypto: loaded Ed25519 keypair from settings.");
+                Log.debug("Loaded Ed25519 keypair from settings.");
                 return;
             } catch (Exception e) {
-                Log.warn("NetCrypto: failed to load keypair from settings (@), regenerating.", e.getMessage());
+                Log.warn("Failed to load keypair from settings (@), regenerating.", e.getMessage());
                 // Fall through to generation.
             }
         }
@@ -124,7 +124,7 @@ public final class NetCrypto {
             Core.settings.put("private-key", newPrivB64);
             Core.settings.put("public-key",  newPubB64);
 
-            Log.info("NetCrypto: generated new Ed25519 keypair and saved to settings.");
+            Log.info("Generated new Ed25519 keypair and saved to settings.");
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate Ed25519 keypair", e);
         }
