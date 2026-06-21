@@ -60,6 +60,7 @@ public class NetClient implements ApplicationListener{
     private long lastSnapshotTimestamp;
     /** Last sent client snapshot ID. */
     private int lastSent;
+    private String lastTargetAddress;
 
     /** List of entities that were removed, and need not be added while syncing. */
     private IntSet removed = new IntSet();
@@ -119,7 +120,34 @@ public class NetClient implements ApplicationListener{
                 return;
             }
 
+            lastTargetAddress = packet.addressTCP;
             net.send(c, true);
+        });
+
+        net.handleClient(AuthChallengePacket.class, packet -> {
+            if(packet.nonce == null || packet.nonce.length == 0){
+                Log.warn("Auth: received empty nonce from server, ignoring.");
+                return;
+            }
+
+            Log.info("Auth: received challenge from server, signing nonce @.", (Object) packet.nonce);
+
+            // Channel binding sign - aka the advantage over uuid+usid
+            // The server that sent the challenge is the one who will accept it.
+            // Can't be replayed due to nonce, cant be intercepted and then replayed as the client sends what it thinks is target
+            // The target server would need to be comprimised to allow MITM attack to work - which is unlikely
+            String target = lastTargetAddress.isBlank() ? "unknown" : lastTargetAddress;
+
+            byte[] signature = NetCrypto.sign(packet.nonce, target);
+
+            AuthResponsePacket response = new AuthResponsePacket();
+            response.publicKey  = NetCrypto.getPublicKeyBytes();
+            response.signature  = signature;
+            response.claimedHost = target;
+
+            net.send(response, true);
+
+            Log.info("Auth: responded to challenge from server, claimed host '@'.", target);
         });
 
         net.handleClient(Disconnect.class, packet -> {

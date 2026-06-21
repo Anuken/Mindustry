@@ -50,6 +50,8 @@ public class Net{
         registerPacket(ConnectPacket::new);
         registerPacket(AssetRequirementStream::new);
         packetIdAssetStream = registerPacket(AssetStream::new);
+        registerPacket(AuthChallengePacket::new);
+        registerPacket(AuthResponsePacket::new);
 
         //register generated packet classes
         Call.registerPackets();

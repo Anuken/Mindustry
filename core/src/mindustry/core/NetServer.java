@@ -38,6 +38,8 @@ import static mindustry.Vars.*;
 public class NetServer implements ApplicationListener{
     /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
     private static final int maxSnapshotSize = 800;
+    /** Maximum time to wait for a client to confirm its public key. */
+    private static final long authTimeoutMs = 10_000L;
     private static final Timekeeper
         blockSyncTime = Timekeeper.ofSeconds(6f),
         healthSyncTime = Timekeeper.ofSeconds(0.5f),
@@ -302,6 +304,51 @@ public class NetServer implements ApplicationListener{
             }
 
             con.player = player;
+
+            byte[] nonce       = NetCrypto.generateNonce();
+            con.pendingNonce   = nonce;
+
+            AuthChallengePacket challenge = new AuthChallengePacket();
+            challenge.nonce = nonce;
+            con.send(challenge, true);
+
+            debug("Auth: issued challenge to @", con.address);
+
+            // Kick the client if it doesn't respond in time.
+            Timer.schedule(() -> {
+                if(con.pendingNonce != null && con.isConnected() && !con.kicked){
+                    debug("Auth: @ timed out waiting for auth response.", con.address);
+                    con.kick("Authentication timeout.");
+                }
+            }, authTimeoutMs / 1000f);
+        });
+
+        net.handleServer(AuthResponsePacket.class, (con, packet) -> {
+            if(con.pendingNonce == null || con.kicked || !con.isConnected()) return;
+            debug("Received auth response from @", con.address);
+
+            byte[] nonce       = con.pendingNonce;
+            con.pendingNonce   = null; // consume immediately — one-time use
+
+            boolean sigOk = NetCrypto.verify(packet.publicKey, nonce, packet.claimedHost, packet.signature);
+            if(!sigOk){
+                info("Auth: rejected @ — invalid signature (relay/MITM attempt or bad key).", con.address);
+                con.kick("Connection failed: invalid signature.");
+                return;
+            }
+
+            boolean hostOk = true;
+            //todo add commands for server and such, probably also limit this whole auth flow to work for servers only?
+            // todo also add storage of previously acquired public keys to Adminstration, and run this all only if Vars.headless = true
+            if(!hostOk){
+                info("Auth: rejected @ — claimed host '@' not in allowed list.", con.address, packet.claimedHost);
+                con.kick("Authentication failed: host not in allowed list.");
+                return;
+            }
+
+            // Everything passed
+            con.clientPublicKey = packet.publicKey;
+            con.verified        = true;
 
             //playing in pvp mode automatically assigns players to teams
             player.team(assignTeam(player));
