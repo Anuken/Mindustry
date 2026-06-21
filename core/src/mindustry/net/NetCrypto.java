@@ -17,7 +17,7 @@ import java.security.spec.*;
  * - Can be used accross a network of servers, similar to uuid, but cannot be stolen or spoofed assuming private key is kept safe.
  */
 public final class NetCrypto {
-    // Is not quantum resistant. But is fast, and I don't think Mindustry UUID spoofers will have quantum computers any time soon?
+    // Is not quantum resistant. But is fast. Ed25519 is more common and likely to be supported by RoboVM + Android
     private static final String ALGORITHM = "Ed25519";
 
     // null means not yet loaded
