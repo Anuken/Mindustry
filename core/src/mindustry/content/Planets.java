@@ -26,12 +26,12 @@ public class Planets{
     verilus;
 
     public static void load(){
-        sun = new Planet("sun", null, 4f){{
+        sun = new Planet("sun", null, 5f){{
             bloom = true;
             accessible = false;
 
             meshLoader = () -> new SunMesh(
-                this, 4,
+                this, 5,
                 5, 0.3, 1.7, 1.2, 1,
                 1.1f,
                 Color.valueOf("ff7a38"),
@@ -56,7 +56,7 @@ public class Planets{
             defaultEnv = Env.scorching | Env.terrestrial;
             startSector = 10;
             atmosphereRadIn = 0.02f;
-            atmosphereRadOut = 0.3f;
+            atmosphereRadOut = 0.5f;
             tidalLock = true;
             orbitSpacing = 2f;
             outlineScale = 1.22f;
