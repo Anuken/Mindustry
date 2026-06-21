@@ -166,8 +166,9 @@ public class UnitAssembler extends PayloadBlock{
 
     @Override
     public void afterPatch(){
-        initCapacities();
         super.afterPatch();
+
+        initCapacities();
     }
 
     public void initCapacities(){
