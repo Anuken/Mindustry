@@ -212,7 +212,7 @@ public class MapImagesView implements AssetView{
         inner.top().left();
 
         float size = 200f;
-        int cols = (int)Math.max(1, Core.graphics.getWidth() / Scl.scl(size + 12f));
+        int cols = (int)Math.max(1, (Core.graphics.getWidth() - Scl.scl(20f)) * 0.9f / Scl.scl(size + 14f));
         int i = 0;
         for(var image : getImages()){
             //showing generated images is confusing, so don't.
