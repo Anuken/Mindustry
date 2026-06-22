@@ -68,7 +68,7 @@ public class LStatements{
 
             table.add(" = ");
 
-            fields(table, target, str -> target = str);
+            field(table, target, str -> target = str);
 
             row(table);
 
@@ -100,7 +100,7 @@ public class LStatements{
 
             table.add(" to ");
 
-            fields(table, target, str -> target = str);
+            field(table, target, str -> target = str);
 
             row(table);
 
