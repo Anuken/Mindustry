@@ -257,7 +257,7 @@ public class Mods implements Loadable{
                 var target = (ArraySliceTexture)UI.packer.getTargetTexture();
                 target.array = last.array;
                 target.index = last.index;
-                target.overwriteHandle(last.getTextureObjectHandle());
+                target.overwriteHandle(last.getHandle());
 
                 oldAtlas.dispose();
             });
