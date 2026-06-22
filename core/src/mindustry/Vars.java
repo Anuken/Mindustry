@@ -216,8 +216,6 @@ public class Vars implements Loadable{
     /** Whether to draw shadows of blocks at map edges and static blocks.
      * Do not change unless you know exactly what you are doing.*/
     public static boolean enableDarkness = true;
-    /** Whether to draw debug lines for collisions. */
-    public static boolean drawDebugHitboxes = false;
     /** Whether to draw avoidance fields. */
     public static boolean debugDrawAvoidance = false;
     /** Whether the on-disk server file cache has been loaded. */

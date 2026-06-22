@@ -91,9 +91,9 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         }
     }
 
-    /** Calls {@link #fixedUpdate(int, int)} with a maximum of 10 updates per frame. */
+    /** Calls {@link #fixedUpdate(int, int)} with a minimum FPS of 10. */
     public void fixedUpdate(int targetFps){
-        fixedUpdate(targetFps, 10);
+        fixedUpdate(targetFps, Math.max(2, targetFps / 10));
     }
 
     /**
