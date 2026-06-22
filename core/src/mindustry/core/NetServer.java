@@ -305,7 +305,7 @@ public class NetServer implements ApplicationListener{
 
             con.player = player;
 
-            if (headless) {
+            if(headless){
                 byte[] nonce = NetCrypto.generateNonce();
                 con.pendingNonce = nonce;
 
@@ -317,12 +317,12 @@ public class NetServer implements ApplicationListener{
 
                 // Kick the client if it doesn't respond in time.
                 Timer.schedule(() -> {
-                    if (con.pendingNonce != null && con.isConnected() && !con.kicked) {
+                    if(con.pendingNonce != null && con.isConnected() && !con.kicked){
                         debug("@ timed out waiting for auth response.", con.address);
                         con.kick("Authentication timeout.");
                     }
                 }, authTimeoutMs / 1000f);
-            } else {
+            }else{
                 connectPlayer(con);
             }
         });
@@ -335,7 +335,7 @@ public class NetServer implements ApplicationListener{
             con.pendingNonce   = null; // consume immediately — one-time use
 
             // todo public key NEEDS to be stored for this to work. Is this correct way?
-            if (!admins.saveOrVerifyPublicKey(con.uuid, packet.publicKey)) {
+            if(!admins.saveOrVerifyPublicKey(con.uuid, packet.publicKey)){
                 info("Rejected @ — public key mismatch (potential relay/MITM attempt or bad key).", con.address);
                 con.kick("Connection failed."); // Generic fail as to not give more info to potential attackers
             }

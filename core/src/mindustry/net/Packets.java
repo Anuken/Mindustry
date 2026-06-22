@@ -195,14 +195,14 @@ public class Packets{
         public byte[] nonce;
 
         @Override
-        public void read(Reads read) {
+        public void read(Reads read){
             int len = read.i();
             nonce = new byte[len];
             read.b(nonce);
         }
 
         @Override
-        public void write(Writes write) {
+        public void write(Writes write){
             write.i(nonce.length);
             write.b(nonce);
         }
@@ -213,13 +213,13 @@ public class Packets{
         }
     }
 
-    public static class AuthResponsePacket extends Packet {
+    public static class AuthResponsePacket extends Packet{
         public byte[] publicKey;
         public byte[] signature;
         public String claimedHost;
 
         @Override
-        public void read(Reads read) {
+        public void read(Reads read){
             int pkLen = read.i();
             publicKey = new byte[pkLen];
             read.b(publicKey);
@@ -230,7 +230,7 @@ public class Packets{
         }
 
         @Override
-        public void write(Writes write) {
+        public void write(Writes write){
             write.i(publicKey.length);
             write.b(publicKey);
             write.i(signature.length);

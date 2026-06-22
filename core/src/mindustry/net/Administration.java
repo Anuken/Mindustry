@@ -360,7 +360,7 @@ public class Administration{
             info.publicKey = publicKey;
             save();
             return true; // new key learned, assume its correct
-        } else {
+        }else{
             return Arrays.equals(info.publicKey, publicKey);
         }
     }
