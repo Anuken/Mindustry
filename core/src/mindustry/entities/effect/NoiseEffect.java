@@ -21,7 +21,7 @@ public class NoiseEffect extends Effect{
     public float layerAlphaMul = 0.7f;
     public float layerSclMul = 0.8f;
     public float layerColorMul = 0.9f;
-    public Texture tex = Core.assets.get(noisePath, Texture.class);
+    public Texture tex = Core.assets.getOrNull(noisePath, Texture.class);
 
     @Override
     public void render(EffectContainer e){
