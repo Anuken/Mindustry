@@ -460,6 +460,23 @@ public class Logic implements ApplicationListener{
         Core.settings.manualSave();
     }
 
+    protected void updateEntities(){
+        PerfCounter.entityUpdate.begin();
+
+        Groups.updatePooling();
+
+        Groups.bullet.updatePhysics();
+        Groups.unit.updatePhysics();
+        Groups.all.update();
+
+        PerfCounter.buildingUpdate.begin();
+        Groups.build.update();
+        PerfCounter.buildingUpdate.begin();
+
+        Groups.bullet.collide();
+        PerfCounter.entityUpdate.end();
+    }
+
     @Override
     public void update(){
         PerfCounter.frame.end();
@@ -564,9 +581,7 @@ public class Logic implements ApplicationListener{
                 state.envAttrs.add(state.rules.attributes);
                 Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
-                PerfCounter.entityUpdate.begin();
-                Groups.update();
-                PerfCounter.entityUpdate.end();
+                updateEntities();
 
                 Events.fire(Trigger.afterGameUpdate);
             }
