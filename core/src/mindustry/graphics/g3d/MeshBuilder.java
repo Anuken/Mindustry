@@ -14,7 +14,7 @@ public class MeshBuilder{
 
     /** Note that the resulting icosphere does not have normals or a color. */
     public static Mesh buildIcosphere(int divisions, float radius){
-        MeshResult result = Icosphere.create(divisions);
+        Icosphere.MeshResult result = Icosphere.create(divisions);
 
         Mesh mesh = begin(result.vertices.size / 3, result.indices.size, false, false, false);
 

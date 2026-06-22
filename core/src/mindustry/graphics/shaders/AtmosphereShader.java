@@ -2,7 +2,7 @@ package mindustry.graphics.shaders;
 
 import arc.*;
 import arc.graphics.g3d.*;
-import arc.math.geom.*;
+import arc.math.*;
 import arc.util.*;
 import mindustry.type.*;
 

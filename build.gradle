@@ -374,11 +374,9 @@ project(":core"){
         api arcModule("arc-core")
         api arcModule("extensions:flabel")
         api arcModule("extensions:freetype")
-        api arcModule("extensions:g3d")
         api arcModule("extensions:fx")
         api arcModule("extensions:arcnet")
         api "com.github.Anuken:rhino:$rhinoVersion"
-        if(localArc && debugged()) api arcModule("extensions:recorder")
         if(localArc) api arcModule(":extensions:packer")
 
         compileOnly project(":annotations")

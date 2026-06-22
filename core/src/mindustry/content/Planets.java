@@ -3,7 +3,6 @@ package mindustry.content;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.*;

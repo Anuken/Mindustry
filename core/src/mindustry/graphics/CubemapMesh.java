@@ -3,7 +3,7 @@ package mindustry.graphics;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.gl.*;
-import arc.math.geom.*;
+import arc.math.*;
 import arc.util.*;
 
 public class CubemapMesh implements Disposable{
