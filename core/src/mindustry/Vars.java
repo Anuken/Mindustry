@@ -85,17 +85,17 @@ public class Vars implements Loadable{
     public static final String patchesGuideURL = "https://mindustrygame.github.io/wiki/datapatches/";
     /** URLs to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String[] serverJsonBeURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_be.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_be.json"};
-    /** URLs to the JSON file containing all the stable servers.  */
+    /** URLs to the JSON file containing all the stable servers. */
     public static final String[] serverJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_v8.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_v8.json"};
-    /** URLs to the JSON files containing the list of mods.  */
+    /** URLs to the JSON files containing the list of mods. */
     public static final String[] modJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrymods/mods.json"};
-    /** URLs to the JSON file containing players banned from Steam.  */
+    /** URLs to the JSON file containing players banned from Steam. */
     public static final String[] steamBansURLs = {"https://raw.githubusercontent.com/Anuken/MindustrySteamBans/master/data.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrysteambans/data.json"};
-    /** URL of the github issue report template.*/
+    /** URL of the github issue report template. */
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<ServerGroup> defaultServers = Seq.with();
-    /** cached server list - only used if defaultServers have not been fetched*/
+    /** cached server list - only used if defaultServers have not been fetched */
     public static final Seq<ServerGroup> cachedServers = Seq.with();
     /** maximum openGL errors logged */
     public static final int maxGlErrors = 100;
