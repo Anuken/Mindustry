@@ -5,7 +5,7 @@ import arc.math.*;
 import static arc.Core.*;
 
 public class Lod{
-    private static final float threshold1 = 1.4f, threshold2 = 0.7f;
+    private static final float threshold1 = 1.4f, threshold2 = 0.8f;
     private static final float fade = 0.2f;
 
     public static boolean disable = false;
