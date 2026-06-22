@@ -47,10 +47,11 @@ public class BorderImage extends Image{
 
     @Override
     public void draw(){
-        TextureFilter prev = TextureFilter.linear;
+        TextureFilter prevMin = TextureFilter.linear, prevMag = TextureFilter.linear;
 
         if(forceNearest && getDrawable() instanceof TextureRegionDrawable draw){
-            prev = draw.getRegion().texture.getMinFilter();
+            prevMin = draw.getRegion().texture.getMinFilter();
+            prevMag = draw.getRegion().texture.getMagFilter();
             draw.getRegion().texture.setFilter(TextureFilter.nearest);
         }
         if(drawAlpha){
@@ -71,7 +72,7 @@ public class BorderImage extends Image{
         Draw.reset();
 
         if(forceNearest && getDrawable() instanceof TextureRegionDrawable draw){
-            draw.getRegion().texture.setFilter(prev);
+            draw.getRegion().texture.setFilter(prevMin, prevMag);
         }
     }
 }

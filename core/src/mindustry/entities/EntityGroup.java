@@ -5,6 +5,8 @@ import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Time.*;
+import arc.util.pooling.*;
 import mindustry.gen.*;
 
 import java.util.*;
@@ -26,6 +28,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     private boolean clearing;
 
     private int index;
+
+    private double fixedCounter, timeCounter;
+    private long lastTimeAccess = -1;
+    private Seq<DelayRun> timeRuns = new Seq<>();
 
     public static int nextId(){
         if(lastId >= Integer.MAX_VALUE - 2) lastId = 0;
@@ -83,6 +89,52 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         for(index = 0; index < array.size; index++){
             array.items[index].update();
         }
+    }
+
+    /** Calls {@link #fixedUpdate(int, int)} with a minimum FPS of 10. */
+    public void fixedUpdate(int targetFps){
+        fixedUpdate(targetFps, Math.max(2, targetFps / 10));
+    }
+
+    /**
+     * Updates this entity group at a fixed rate and delta time, regardless of framerate.
+     * If updates per frame exceed {@param maxUpdatesPerFrame}, they will be skipped - visually, the game will look like it is slowing down.
+     * For example, a value of 60 targetUps and 10 maxUpdatesPerFrame will mean that the game only starts slowing down below (60 / 10) = 6 FPS.
+     * */
+    public void fixedUpdate(int targetUps, int maxUpdatesPerFrame){
+        //if fixedUpdate isn't called, e.g. when the game is paused or map is reloaded, the time counter needs to 'sync' with the actual proper time
+        if(lastTimeAccess != Core.graphics.getFrameId()){
+            timeCounter = Time.getInternalTime();
+        }
+
+        double targetDelta = 1.0 / targetUps;
+        float timeDelta = (float)targetDelta * 60f;
+        float prevDelta = Time.delta;
+        double prevTime = Time.getInternalTime();
+        var oldRuns = Time.getRuns();
+
+        //since some logic (incorrectly!) relies on Time.time, it has to be passed like this across several variables.
+        Time.delta = timeDelta;
+        Time.setInternalTime(timeCounter);
+        Time.setRuns(timeRuns);
+        int updates = 0;
+
+        fixedCounter += Core.graphics.getDeltaTime();
+
+        while(fixedCounter >= targetDelta && updates++ < maxUpdatesPerFrame){
+            //this executes any pending tasks (manually reassigned), and increments internal time, which is local to this group
+            Time.update();
+            update();
+            fixedCounter -= targetDelta;
+        }
+
+        timeCounter = Time.getInternalTime();
+
+        Time.delta = prevDelta;
+        Time.setInternalTime(prevTime);
+        Time.setRuns(oldRuns);
+
+        lastTimeAccess = Core.graphics.getFrameId();
     }
 
     public Seq<T> copy(){
@@ -269,6 +321,8 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         array.each(Entityc::remove);
         array.clear();
         if(map != null) map.clear();
+        Pools.freeAll(timeRuns, true);
+        timeRuns.clear();
 
         clearing = false;
     }

@@ -88,6 +88,7 @@ public class Annotations{
         boolean collide() default false;
         boolean spatial() default false;
         boolean mapping() default false;
+        boolean update() default false;
     }
 
     /** Indicates an entity definition. */
@@ -107,6 +108,8 @@ public class Annotations{
         boolean genio() default true;
         /** Whether I made a massive mistake by merging two different class branches */
         boolean legacy() default false;
+        /** Groups to exclude. */
+        String[] excludeGroups() default {};
     }
 
     /** Indicates an internal interface for entity components. */

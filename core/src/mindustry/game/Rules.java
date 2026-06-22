@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
+import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.graphics.g3d.*;
@@ -164,6 +165,12 @@ public class Rules{
     public Attributes attributes = new Attributes();
     /** Sector for saves that have them. */
     public @Nullable Sector sector;
+    /** Overrides random ambient music to be played. */
+    public @Nullable Seq<MusicContainer> ambientMusic;
+    /** Overrides music that is played in certain situations, like during boss waves or low core health. */
+    public @Nullable Seq<MusicContainer> darkMusic;
+    /** If true, this overrides the game setting to always play ambient music. */
+    public boolean alwaysPlayMusic = false;
     /** Spawn layout. */
     public Seq<SpawnGroup> spawns = new Seq<>();
     /** Starting items put in cores. */

@@ -8,7 +8,6 @@ import arc.discord.*;
 import arc.discord.DiscordRPC.*;
 import arc.filedialogs.*;
 import arc.files.*;
-import arc.func.*;
 import arc.math.*;
 import arc.profiling.*;
 import arc.struct.*;
@@ -27,6 +26,8 @@ import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.service.*;
 import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.ui.FileChooser.*;
 import mindustry.ui.dialogs.*;
 
 import java.io.*;
@@ -327,30 +328,11 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
-    public void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
-        showNativeFileChooser(title, open, cons, extension);
-    }
-
-    @Override
-    public void showMultiFileChooser(Cons<Fi> cons, String... extensions){
-        showNativeFileChooser("@open", true, cons, extensions);
-    }
-
-    void showNativeFileChooser(String title, boolean open, Cons<Fi> cons, String... shownExtensions){
-        String formatted = (title.startsWith("@") ? Core.bundle.get(title.substring(1)) : title).replaceAll("\"", "'");
-
-        //this should never happen unless someone is being dumb with the parameters
-        String[] ext = shownExtensions == null || shownExtensions.length == 0 ? new String[]{""} : shownExtensions;
-
-        if(OS.isLinux){
-            showZenity(open, formatted, shownExtensions, cons, () -> Platform.defaultFileDialog(open, title, ext[0], cons));
-            return;
-        }
-
-        //native file dialog
+    public void showFileChooser(FileChooserParams params){
         Threads.daemon(() -> {
             try{
                 FileDialogs.loadNatives();
+                var ext = params.extensions;
 
                 String result;
                 String[] patterns = new String[ext.length];
@@ -359,14 +341,14 @@ public class DesktopLauncher extends ClientLauncher{
                 }
 
                 //on MacOS, .msav is not properly recognized until I put garbage into the array?
-                if(patterns.length == 1 && OS.isMac && open){
+                if(patterns.length == 1 && OS.isMac && params.open){
                     patterns = new String[]{"", "*." + ext[0]};
                 }
 
-                if(open){
-                    result = FileDialogs.openFileDialog(formatted, FileChooser.getLastDirectory().absolutePath(), patterns, "." + ext[0] + " files", false);
+                if(params.open){
+                    result = FileDialogs.openFileDialog(params.title, FileChooserDialog.getLastDirectory().absolutePath() + "/", patterns, "." + ext[0] + " files", params.allowMultiple);
                 }else{
-                    result = FileDialogs.saveFileDialog(formatted, FileChooser.getLastDirectory().child("file." + ext[0]).absolutePath(), patterns, "." + ext[0] + " files");
+                    result = FileDialogs.saveFileDialog(params.title, FileChooserDialog.getLastDirectory().child(params.fileName).absolutePath(), patterns, "." + ext[0] + " files");
                 }
 
                 if(result == null) return;
@@ -378,85 +360,31 @@ public class DesktopLauncher extends ClientLauncher{
                 //cancelled selection, ignore result
                 if(result.isEmpty() || result.equals("\n")) return;
                 if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
-                if(result.contains("\n")) throw new IOException("invalid input: \"" + result + "\"");
 
-                Fi file = Core.files.absolute(result);
+                Fi[] resultFiles = Seq.with(result.split("\\|")).map(Core.files::absolute).toArray(Fi.class);
+
+                if(result.isEmpty()) return;
+
                 Core.app.post(() -> {
-                    FileChooser.setLastDirectory(file.isDirectory() ? file : file.parent());
+                    FileChooserDialog.setLastDirectory(resultFiles[0].isDirectory() ? resultFiles[0] : resultFiles[0].parent());
 
-                    if(!open){
-                        cons.get(file.parent().child(file.nameWithoutExtension() + "." + ext[0]));
+                    if(!params.open){
+                        Fi single = resultFiles[0];
+                        //fix extension to match filters
+                        if(!Structs.contains(params.extensions, single::extEquals)){
+                            single = single.parent().child(single.nameWithoutExtension() + "." + ext[0]);
+                        }
+                        params.handleChooseResult(single);
                     }else{
-                        cons.get(file);
+                        params.handleChooseResult(resultFiles);
                     }
                 });
             }catch(Throwable error){
-                Log.err("Failure to execute native file chooser", error);
-                Core.app.post(() -> {
-                    if(ext.length > 1){
-                        showMultiFileChooser(cons, ext);
-                    }else{
-                        Platform.defaultFileDialog(open, formatted, ext[0], cons);
-                    }
-                });
+                Log.err("Failed to execute native file chooser", error);
+                Core.app.post(() -> FileChooser.showFallbackFileChooser(params));
             }
         });
     }
-
-
-    /** attempt to use the native file picker with zenity, or runs the fallback Runnable if the operation fails */
-    static void showZenity(boolean open, String title, String[] extensions, Cons<Fi> cons, Runnable fallback){
-        Threads.daemon(() -> {
-            try{
-                String formatted = (title.startsWith("@") ? Core.bundle.get(title.substring(1)) : title).replaceAll("\"", "'");
-
-                String last = FileChooser.getLastDirectory().absolutePath();
-                if(!last.endsWith("/")) last += "/";
-
-                //zenity doesn't support filtering by extension
-                Seq<String> args = Seq.with("zenity",
-                "--file-selection",
-                "--title=" + formatted,
-                "--filename=" + last,
-                "--confirm-overwrite",
-                "--file-filter=" + Seq.with(extensions).toString(" ", s -> "*." + s),
-                "--file-filter=All files | *" //allow anything if the user wants
-                );
-
-                if(!open){
-                    args.add("--save");
-                }
-
-                String result = OS.exec(args.toArray(String.class));
-                //first line.
-                if(result.length() > 1 && result.contains("\n")){
-                    result = result.split("\n")[0];
-                }
-
-                //cancelled selection, ignore result
-                if(result.isEmpty() || result.equals("\n")) return;
-
-                if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
-                if(result.contains("\n")) throw new IOException("invalid input: \"" + result + "\"");
-
-                Fi file = Core.files.absolute(result);
-                Core.app.post(() -> {
-                    FileChooser.setLastDirectory(file.isDirectory() ? file : file.parent());
-
-                    if(!open){
-                        cons.get(file.parent().child(file.nameWithoutExtension() + "." + extensions[0]));
-                    }else{
-                        cons.get(file);
-                    }
-                });
-            }catch(Exception e){
-                Log.err(e);
-                Log.warn("zenity not found, using non-native file dialog. Consider installing `zenity` for native file dialogs.");
-                Core.app.post(fallback);
-            }
-        });
-    }
-
 
     @Override
     public Seq<Fi> getWorkshopContent(Class<? extends Publishable> type){

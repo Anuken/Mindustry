@@ -152,7 +152,7 @@ public class ItemModule extends BlockModule{
 
     public boolean has(ItemStack[] stacks, float multiplier){
         for(ItemStack stack : stacks){
-            if(!has(stack.item, Math.round(stack.amount * multiplier))) return false;
+            if(stack.item.id >= items.length || !has(stack.item, Math.round(stack.amount * multiplier))) return false;
         }
         return true;
     }
@@ -281,6 +281,10 @@ public class ItemModule extends BlockModule{
     public void clear(){
         Arrays.fill(items, 0);
         total = 0;
+    }
+
+    public void checkArrayCapacity(int size){
+        if(items.length != size) items = Arrays.copyOf(items, size);
     }
 
     @Override
