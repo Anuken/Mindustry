@@ -18,7 +18,7 @@ import java.security.spec.*;
  */
 public final class NetCrypto{
     // Is not quantum resistant. But is fast. Ed25519 is more common and likely to be supported by RoboVM + Android
-    private static final String ALGORITHM = "Ed25519";
+    private static final String keyAlgorithm = "Ed25519";
 
     // null means not yet loaded
     private static PrivateKey cachedPrivateKey;
@@ -37,7 +37,7 @@ public final class NetCrypto{
 
     public static PublicKey decodePublicKey(byte[] encoded){
         try{
-            KeyFactory kf = KeyFactory.getInstance(ALGORITHM);
+            KeyFactory kf = KeyFactory.getInstance(keyAlgorithm);
             return kf.generatePublic(new X509EncodedKeySpec(encoded));
         } catch (Exception e){
             throw new IllegalArgumentException("Invalid Ed25519 public key", e);
@@ -48,7 +48,7 @@ public final class NetCrypto{
         ensureKeys();
         try{
             byte[] payload = buildPayload(nonce, claimedHost);
-            Signature signer = Signature.getInstance(ALGORITHM);
+            Signature signer = Signature.getInstance(keyAlgorithm);
             signer.initSign(cachedPrivateKey);
             signer.update(payload);
             return signer.sign();
@@ -64,7 +64,7 @@ public final class NetCrypto{
         try{
             PublicKey pk = decodePublicKey(publicKeyBytes);
             byte[] payload = buildPayload(nonce, claimedHost);
-            Signature verifier = Signature.getInstance(ALGORITHM);
+            Signature verifier = Signature.getInstance(keyAlgorithm);
             verifier.initVerify(pk);
             verifier.update(payload);
             return verifier.verify(signature);
@@ -100,7 +100,7 @@ public final class NetCrypto{
         if (privBytes != null && pubBytes  != null){
             // Load from settings.
             try{
-                KeyFactory kf = KeyFactory.getInstance(ALGORITHM);
+                KeyFactory kf = KeyFactory.getInstance(keyAlgorithm);
                 cachedPrivateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(privBytes));
                 cachedPublicKey  = kf.generatePublic(new X509EncodedKeySpec(pubBytes));
 
@@ -114,7 +114,7 @@ public final class NetCrypto{
 
         // Generate a brand-new keypair and persist it.
         try{
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance(ALGORITHM);
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance(keyAlgorithm);
             KeyPair kp = kpg.generateKeyPair();
             cachedPrivateKey = kp.getPrivate();
             cachedPublicKey  = kp.getPublic();
