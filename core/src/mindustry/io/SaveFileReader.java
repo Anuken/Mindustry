@@ -192,7 +192,7 @@ public abstract class SaveFileReader{
 
     public abstract void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException;
 
-    public abstract void write(DataOutputStream stream) throws IOException;
+    public abstract void write(DataOutputStream stream, SaveOptions options) throws IOException;
 
     public interface IORunner<T>{
         void accept(T stream) throws IOException;

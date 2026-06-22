@@ -21,6 +21,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.TypeIO.*;
 import mindustry.logic.*;
+import mindustry.mod.data.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
@@ -30,7 +31,6 @@ import mindustry.world.meta.*;
 import java.io.*;
 import java.net.*;
 import java.nio.*;
-import java.util.zip.*;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
@@ -306,7 +306,7 @@ public class NetServer implements ApplicationListener{
             //playing in pvp mode automatically assigns players to teams
             player.team(assignTeam(player));
 
-            sendWorldData(player);
+            sendWorldAndAssets(player);
 
             platform.updateRPC();
 
@@ -314,6 +314,17 @@ public class NetServer implements ApplicationListener{
         });
 
         registerCommands();
+    }
+
+    public void sendWorldAndAssets(Player player){
+        if(state.data.hasExternalAssets()){
+            player.con.determiningAssets = true;
+            player.con.receivingAssets = false;
+            player.con.hasConnected = false;
+            sendAssetRequirements(player);
+        }else{
+            sendWorldData(player);
+        }
     }
 
     @Override
@@ -513,15 +524,21 @@ public class NetServer implements ApplicationListener{
         return assigner.assign(current, players);
     }
 
-    public void sendWorldData(Player player){
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        DeflaterOutputStream def = new FastDeflaterOutputStream(stream);
-        NetworkIO.writeWorld(player, def);
-        WorldStream data = new WorldStream();
-        data.stream = new ByteArrayInputStream(stream.toByteArray());
-        player.con.sendStream(data);
+    public void sendAssetRequirements(Player player){
+        var assets = state.data.getAllExternalAssets();
+        mainExecutor.submit(() -> {
+            var stream = new ByteArrayOutputStream();
+            NetworkIO.writeRequiredAssets(new FastDeflaterOutputStream(stream), assets);
+            player.con.sendStreamAsync(new AssetRequirementStream(), stream);
+        });
+    }
 
-        debug("Packed @ bytes of world data to @ (@ / @)", stream.size(), player.name, player.con.address, player.uuid());
+    public void sendWorldData(Player player){
+        var stream = new ByteArrayOutputStream();
+        NetworkIO.writeWorld(player, new FastDeflaterOutputStream(stream));
+        player.con.sendStream(new WorldStream(), stream);
+
+        debug("Packed @ of world data to @ (@ / @)", Strings.formatByteCount(stream.size()), player.name, player.con.address, player.uuid());
     }
 
     public void addPacketHandler(String type, Cons2<Player, String> handler){
@@ -886,6 +903,48 @@ public class NetServer implements ApplicationListener{
                     other.team(team);
                 }
             }
+        }
+    }
+
+    @Remote(targets = Loc.client, priority = PacketPriority.high)
+    public static void requestWorld(Player player){
+        if(!player.con.hasBegunConnecting || player.con.determiningAssets || !player.con.receivingAssets || player.con.hasConnected) return;
+
+        player.con.receivingAssets = false;
+        netServer.sendWorldData(player);
+    }
+
+    @Remote(targets = Loc.client, priority = PacketPriority.high)
+    public static void requestAssets(Player player, short[] ids){
+        if(!player.con.hasBegunConnecting || !player.con.determiningAssets || player.con.receivingAssets || player.con.hasConnected) return;
+
+        player.con.determiningAssets = false;
+        player.con.receivingAssets = true;
+
+        if(ids.length == 0){  //no assets required, all cached
+            player.con.receivingAssets = false;
+            netServer.sendWorldData(player);
+        }else{
+            Seq<DataAsset> res = new Seq<>();
+            Seq<DataAsset> allAssets = state.data.getAllExternalAssets();
+            for(short id : ids){
+                if(id >= allAssets.size || id < 0) continue;
+                res.add(allAssets.get(id));
+            }
+
+            //packing the data and reading it from disk can be async; it shouldn't need to block the main thread.
+            mainExecutor.submit(() -> {
+                try{
+                    var stream = new ByteArrayOutputStream();
+                    NetworkIO.writeAssets(stream, res);
+
+                    debug("Packed @ of asset data to @ (@ / @)", Strings.formatByteCount(stream.size()), player.name, player.con.address, player.uuid());
+
+                    player.con.sendStreamAsync(new AssetStream(), stream);
+                }catch(Exception e){
+                    Log.err(e);
+                }
+            });
         }
     }
 

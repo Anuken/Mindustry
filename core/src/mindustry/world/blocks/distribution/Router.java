@@ -24,6 +24,8 @@ public class Router extends Block{
         group = BlockGroup.transportation;
         unloadable = false;
         noUpdateDisabled = true;
+        drawCached = true;
+        drawDynamic = false;
     }
 
     @Override

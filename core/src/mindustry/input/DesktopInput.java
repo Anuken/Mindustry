@@ -241,7 +241,7 @@ public class DesktopInput extends InputHandler{
 
         if(!scene.hasField() && !scene.hasDialog()){
             if(input.keyTap(Binding.debugHitboxes)){
-                drawDebugHitboxes = !drawDebugHitboxes;
+                Core.settings.put("drawhitboxes", !settings.getBool("drawhitboxes"));
             }
 
             if(input.keyTap(Binding.detachCamera)){

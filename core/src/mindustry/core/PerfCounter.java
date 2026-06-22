@@ -8,13 +8,15 @@ public enum PerfCounter{
     frame,
     update,
     entityUpdate,
+    buildingUpdate,
+    unitUpdate,
     ui,
     render;
 
     public static final PerfCounter[] all = values();
 
-    static final int meanWindow = 30;
-    static final int refreshTimeMillis = 500;
+    static final int meanWindow = 120;
+    static final int refreshTimeMillis = 100;
 
     private long valueRefreshTime;
     private float refreshValue;

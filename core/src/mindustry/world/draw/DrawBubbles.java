@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 
 public class DrawBubbles extends DrawBlock{
     public Color color = Color.valueOf("7457ce");
@@ -22,10 +23,10 @@ public class DrawBubbles extends DrawBlock{
 
     @Override
     public void draw(Building build){
-        if(build.warmup() <= 0.001f) return;
+        if(build.warmup() <= 0.001f || !Lod.l1) return;
 
         Draw.color(color);
-        Draw.alpha(build.warmup());
+        Draw.alpha(build.warmup() * Lod.alpha1);
 
         rand.setSeed(build.id);
         for(int i = 0; i < amount; i++){

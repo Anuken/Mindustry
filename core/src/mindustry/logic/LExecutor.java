@@ -11,6 +11,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -51,7 +52,7 @@ public class LExecutor{
     public LVar counter, unit, thisv, ipt, queryResult;
 
     public int[] binds;
-    public boolean yield;
+    public boolean yield, stop;
 
     public LongSeq graphicsBuffer = new LongSeq();
     public StringBuilder textBuffer = new StringBuilder();
@@ -121,6 +122,7 @@ public class LExecutor{
 
     /** Loads with a specified assembler. Resets all variables. */
     public void load(LAssembler builder){
+        stop = false;
         nameMap = null;
         vars = builder.vars.values().toSeq().retainAll(var -> !var.constant).toArray(LVar.class);
         for(int i = 0; i < vars.length; i++){
@@ -1238,6 +1240,7 @@ public class LExecutor{
             //skip back to self.
             exec.counter.numval --;
             exec.yield = true;
+            exec.stop = true;
         }
     }
 
@@ -1555,7 +1558,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(net.client()) return;
 
-            Tile tile = world.tile(x.numi(), y.numi());
+            Tile tile = world.tile(Mathf.round(x.numf()), Mathf.round(y.numf()));
             if(tile != null && block.obj() instanceof Block b){
                 switch(layer){
                     case ore -> {
@@ -2237,6 +2240,27 @@ public class LExecutor{
             }else{
                 sound.play(Math.min(volume.numf() * Core.audio.sfxVolume, 2f), pitch.numf(), pan.numf(), false, limit.bool());
             }
+        }
+    }
+
+    public static class PlayMusicI implements LInstruction{
+        public LVar name, interrupt;
+
+        public PlayMusicI(){
+        }
+
+        public PlayMusicI(LVar name, LVar interrupt){
+            this.name = name;
+            this.interrupt = interrupt;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(headless) return;
+
+            //null music = stop
+            Music music = SoundControl.findMusic(PrintI.toString(name.obj()));
+            control.sound.playMusic(music, interrupt.bool());
         }
     }
 
